@@ -36,7 +36,7 @@ void DMA::AddEncoder(const Encoder* encoder) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::AddEncoderRate(const Encoder* encoder) {
+void DMA::AddEncoderPeriod(const Encoder* encoder) {
   int32_t status = 0;
   HAL_AddDMAEncoderPeriod(dmaHandle, encoder->m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -47,7 +47,7 @@ void DMA::AddCounter(const Counter* counter) {
   HAL_AddDMACounter(dmaHandle, counter->m_counter, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
-void DMA::AddCounterRate(const Counter* counter) {
+void DMA::AddCounterPeriod(const Counter* counter) {
   {
     int32_t status = 0;
     HAL_AddDMACounterPeriod(dmaHandle, counter->m_counter, &status);

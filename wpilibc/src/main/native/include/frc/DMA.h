@@ -25,10 +25,10 @@ class DMA : ErrorBase {
   void SetRate(int cycles);
 
   void AddEncoder(const Encoder* encoder);
-  void AddEncoderRate(const Encoder* encoder);
+  void AddEncoderPeriod(const Encoder* encoder);
 
   void AddCounter(const Counter* counter);
-  void AddCounterRate(const Counter* counter);
+  void AddCounterPeriod(const Counter* counter);
 
   void AddDigitalSource(const DigitalSource* digitalSource);
 

@@ -14,6 +14,7 @@
 #include "frc/AnalogInput.h"
 #include "frc/AnalogOutput.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "frc/Encoder.h"
 #include "frc2/Timer.h"
 
 class MyRobot : public frc::TimedRobot {
@@ -27,10 +28,20 @@ class MyRobot : public frc::TimedRobot {
 
   frc::DigitalOutput triggerOutput{1};
 
+  frc::DigitalOutput sourceA{2};
+  frc::DigitalOutput sourceB{3};
+  frc::Encoder encoder{sourceA, sourceB};
+  frc::Counter counter{frc::CounterBase::EncodingType::k2X, &sourceA, &sourceB, false};
+  frc::Encoder encoder2x{sourceA, sourceB, false, frc::Encoder::EncodingType::k1X};
+
 
   void RobotInit() override {
     dma.AddDutyCycle(&dutyCycle);
     dma.AddAnalogInput(&analogInput);
+    dma.AddEncoder(&encoder);
+    dma.AddEncoder(&encoder2x);
+    dma.AddCounter(&counter);
+    dma.AddDigitalSource(&sourceA);
 
 
     dutyCycleOutput.EnablePWM(0.5);
@@ -43,6 +54,17 @@ class MyRobot : public frc::TimedRobot {
     dma.StartDMA(1024);
 
     frc::SmartDashboard::PutNumber("SetDC", 0.5);
+
+    sourceA.Set(true);
+    sourceB.Set(true);
+    sourceA.Set(false);
+    sourceB.Set(false);
+    sourceA.Set(true);
+    sourceB.Set(true);
+    sourceA.Set(false);
+    sourceB.Set(false);
+    sourceA.Set(true);
+    sourceB.Set(true);
 
   }
 
@@ -59,7 +81,18 @@ class MyRobot : public frc::TimedRobot {
     if (dmaStatus == HAL_DMAReadStatus::HAL_DMA_OK) {
       frc::SmartDashboard::PutNumber("DMA Analog Input", sample.GetAnalogInputVoltage(&analogInput, &status));
       frc::SmartDashboard::PutNumber("DMA Duty Cycle", sample.GetDutyCycleOutput(&dutyCycle, &status));
+      frc::SmartDashboard::PutNumber("DMA Counter", sample.GetCounter(&counter, &status));
+      frc::SmartDashboard::PutNumber("DMA Encoder", sample.GetEncoderDistance(&encoder, &status));
+      frc::SmartDashboard::PutNumber("DMA Encoder 2x", sample.GetEncoderDistance(&encoder2x, &status));
+      frc::SmartDashboard::PutBoolean("DMA Input", sample.GetDigitalSource(&sourceA, &status));
     }
+
+      frc::SmartDashboard::PutNumber("Analog Input", analogInput.GetVoltage());
+      frc::SmartDashboard::PutNumber("Duty Cycle", dutyCycle.GetOutput());
+      frc::SmartDashboard::PutNumber("Counter", counter.Get());
+      frc::SmartDashboard::PutNumber("Encoder", encoder.GetDistance());
+      frc::SmartDashboard::PutNumber("Encoder 2x", encoder2x.GetDistance());
+      frc::SmartDashboard::PutBoolean("Input", sourceA.Get());
 
     frc::SmartDashboard::PutNumber("Status", status);
     frc::SmartDashboard::PutNumber("DMA Status", (int)dmaStatus);

@@ -220,7 +220,7 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_DMAJNI_readDMA
 
     static_assert(sizeof(uint32_t) == sizeof(jint), "Java ints must be 32 bits");
 
-    env->SetIntArrayRegion(buf, 0, dmaSample.captureSize, dmaSample.readBuffer);
+    env->SetIntArrayRegion(buf, 0, dmaSample.captureSize, reinterpret_cast<jint*>(dmaSample.readBuffer));
 
     int32_t* nativeArr = static_cast<int32_t*>(env->GetPrimitiveArrayCritical(store, nullptr));
 

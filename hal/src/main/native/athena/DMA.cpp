@@ -683,6 +683,35 @@ uint64_t HAL_GetDMASampleTime(const HAL_DMASample* dmaSample, int32_t* status) {
   return dmaSample->timeStamp;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
+
+// Like tEncoder::tOutput with the bitfields reversed.
+typedef union {
+  struct {
+    unsigned Direction: 1;
+    signed Value: 31;
+  };
+  struct {
+    unsigned value: 32;
+  };
+} t1Output;
+
+// Like tEncoder::tOutput with the bitfields reversed.
+typedef union {
+  struct {
+    unsigned Period : 23;
+    signed Count : 8;
+    unsigned Stalled : 1;
+  };
+  struct {
+    unsigned value: 32;
+  };
+} t1Period;
+
+#pragma GCC diagnostic pop
+
 int32_t HAL_GetDMASampleEncoderRaw(const HAL_DMASample* dmaSample,
                                 HAL_EncoderHandle encoderHandle,
                                 int32_t* status) {
@@ -724,8 +753,18 @@ int32_t HAL_GetDMASampleEncoderRaw(const HAL_DMASample* dmaSample,
   if (*status != 0) {
     return -1;
   }
-  int32_t result = dmaWord;
-  result = result << 1;
+
+  int32_t result = 0;
+
+  // Extract the 31-bit signed tEncoder::tOutput Value using a struct with the
+  // reverse packed field order of tOutput. This gets Value from the high
+  // order 31 bits of output on little-endian ARM using gcc. This works
+  // even though C/C++ doesn't guarantee bitfield order.
+  t1Output output;
+
+  output.value = dmaWord;
+  result = output.Value;
+
   return result;
 }
 
@@ -771,8 +810,18 @@ int32_t HAL_GetDMASampleEncoderPeriodRaw(const HAL_DMASample* dmaSample,
   if (*status != 0) {
     return -1;
   }
-  int32_t result = dmaWord;
-  result = result << 1;
+
+  int32_t result = 0;
+
+  // Extract the 31-bit signed tEncoder::tOutput Value using a struct with the
+  // reverse packed field order of tOutput. This gets Value from the high
+  // order 31 bits of output on little-endian ARM using gcc. This works
+  // even though C/C++ doesn't guarantee bitfield order.
+  t1Period output;
+
+  output.value = dmaWord;
+  result = output.Period;
+
   return result;
 }
 
@@ -803,8 +852,18 @@ int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
   if (*status != 0) {
     return -1;
   }
-  int32_t result = dmaWord;
-  result = result << 1;
+
+  int32_t result = 0;
+
+  // Extract the 31-bit signed tEncoder::tOutput Value using a struct with the
+  // reverse packed field order of tOutput. This gets Value from the high
+  // order 31 bits of output on little-endian ARM using gcc. This works
+  // even though C/C++ doesn't guarantee bitfield order.
+  t1Output output;
+
+  output.value = dmaWord;
+  result = output.Value;
+
   return result;
 }
 
@@ -836,8 +895,17 @@ int32_t HAL_GetDMASampleCounterPeriod(const HAL_DMASample* dmaSample,
   if (*status != 0) {
     return -1;
   }
-  int32_t result = dmaWord;
-  result = result << 1;
+  int32_t result = 0;
+
+  // Extract the 31-bit signed tEncoder::tOutput Value using a struct with the
+  // reverse packed field order of tOutput. This gets Value from the high
+  // order 31 bits of output on little-endian ARM using gcc. This works
+  // even though C/C++ doesn't guarantee bitfield order.
+  t1Period output;
+
+  output.value = dmaWord;
+  result = output.Period;
+
   return result;
 }
 
