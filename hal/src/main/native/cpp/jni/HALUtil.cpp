@@ -50,7 +50,6 @@ static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
 static JClass canDataCls;
 static JClass halValueCls;
-static JClass baseStoreCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
@@ -58,8 +57,7 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
-    {"edu/wpi/first/hal/HALValue", &halValueCls},
-    {"edu/wpi/first/hal/DMASample/BaseStore", &baseStoreCls}};
+    {"edu/wpi/first/hal/HALValue", &halValueCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -302,11 +300,6 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
   }
   return env->CallStaticObjectMethod(halValueCls, fromNative, (jint)value.type,
                                      value1, value2);
-}
-
-jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index) {
-  static jmethodID ctor = env->GetMethodID(baseStoreCls, "<init>", "(II)V");
-  return env->NewObject(baseStoreCls, ctor, valueType, index);
 }
 
 JavaVM* GetJVM() { return jvm; }
