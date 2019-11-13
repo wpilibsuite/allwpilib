@@ -9,7 +9,8 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
 
@@ -50,8 +51,8 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   m_forwardHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_forwardChannel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
-                                 forwardChannel, HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(),
+                             forwardChannel);
     m_forwardHandle = HAL_kInvalidHandle;
     m_reverseHandle = HAL_kInvalidHandle;
     return;
@@ -60,8 +61,8 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   m_reverseHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_reverseChannel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
-                                 reverseChannel, HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(),
+                             reverseChannel);
     // free forward solenoid
     HAL_FreeSolenoidPort(m_forwardHandle);
     m_forwardHandle = HAL_kInvalidHandle;
@@ -110,8 +111,8 @@ void DoubleSolenoid::Set(Value value) {
   int rstatus = 0;
   HAL_SetSolenoid(m_reverseHandle, reverse, &rstatus);
 
-  wpi_setErrorWithContext(fstatus, HAL_GetErrorMessage(fstatus));
-  wpi_setErrorWithContext(rstatus, HAL_GetErrorMessage(rstatus));
+  wpi_setHALError(fstatus);
+  wpi_setHALError(rstatus);
 }
 
 DoubleSolenoid::Value DoubleSolenoid::Get() const {
@@ -121,8 +122,8 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
   bool valueForward = HAL_GetSolenoid(m_forwardHandle, &fstatus);
   bool valueReverse = HAL_GetSolenoid(m_reverseHandle, &rstatus);
 
-  wpi_setErrorWithContext(fstatus, HAL_GetErrorMessage(fstatus));
-  wpi_setErrorWithContext(rstatus, HAL_GetErrorMessage(rstatus));
+  wpi_setHALError(fstatus);
+  wpi_setHALError(rstatus);
 
   if (valueForward) return kForward;
   if (valueReverse) return kReverse;

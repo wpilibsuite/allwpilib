@@ -22,9 +22,9 @@ if (project.hasProperty('useCpp') && project.useCpp) {
 
 if (project.hasProperty('useJava') && project.useJava) {
     dependencies {
-        compile "edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:${opencvVersion}"
+        implementation "edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:${opencvVersion}"
         if (!project.hasProperty('skipDev') || !project.skipDev) {
-            devCompile "edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:${opencvVersion}"
+            devImplementation "edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:${opencvVersion}"
         }
         if (project.hasProperty('useDocumentation') && project.useDocumentation) {
             javaSource "edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:${opencvVersion}:sources"

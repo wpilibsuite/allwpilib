@@ -124,6 +124,10 @@
 #define HAL_SIM_NOT_SUPPORTED -1155
 #define HAL_SIM_NOT_SUPPORTED_MESSAGE "HAL: Method not supported in sim"
 
+#define HAL_CAN_BUFFER_OVERRUN -35007
+#define HAL_CAN_BUFFER_OVERRUN_MESSAGE \
+  "HAL: CAN Output Buffer Full. Ensure a device is attached"
+
 #define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"
 #define VI_ERROR_RSRC_LOCKED_MESSAGE "HAL - VISA: Resource Locked"

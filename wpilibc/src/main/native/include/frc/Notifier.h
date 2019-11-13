@@ -16,6 +16,7 @@
 
 #include <hal/Types.h>
 #include <units/units.h>
+#include <wpi/Twine.h>
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
@@ -45,6 +46,13 @@ class Notifier : public ErrorBase {
 
   Notifier(Notifier&& rhs);
   Notifier& operator=(Notifier&& rhs);
+
+  /**
+   * Sets the name of the notifier.  Used for debugging purposes only.
+   *
+   * @param name Name
+   */
+  void SetName(const wpi::Twine& name);
 
   /**
    * Change the handler function.

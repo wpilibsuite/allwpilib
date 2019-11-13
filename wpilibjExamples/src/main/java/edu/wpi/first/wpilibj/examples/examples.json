@@ -7,7 +7,8 @@
     ],
     "foldername": "gettingstarted",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Tank Drive",
@@ -20,7 +21,8 @@
     ],
     "foldername": "tankdrive",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Arcade Drive",
@@ -30,7 +32,8 @@
     ],
     "foldername": "arcadedrive",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Mecanum Drive",
@@ -43,7 +46,8 @@
     ],
     "foldername": "mecanumdrive",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "PDP CAN Monitoring",
@@ -55,7 +59,8 @@
     ],
     "foldername": "canpdp",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Solenoids",
@@ -68,7 +73,8 @@
     ],
     "foldername": "solenoid",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Encoder",
@@ -80,7 +86,8 @@
     ],
     "foldername": "encoder",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Relay",
@@ -92,7 +99,8 @@
     ],
     "foldername": "relay",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Ultrasonic",
@@ -104,7 +112,8 @@
     ],
     "foldername": "ultrasonic",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Ultrasonic PID",
@@ -116,7 +125,8 @@
     ],
     "foldername": "ultrasonicpid",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Potentiometer PID",
@@ -129,7 +139,8 @@
     ],
     "foldername": "potentiometerpid",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Elevator with trapezoid profiled PID",
@@ -142,7 +153,8 @@
     ],
     "foldername": "elevatortrapezoidprofile",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Elevator with profiled PID controller",
@@ -155,7 +167,8 @@
     ],
     "foldername": "elevatorprofiledpid",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Gyro",
@@ -168,7 +181,8 @@
     ],
     "foldername": "gyro",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Gyro Mecanum",
@@ -181,7 +195,8 @@
     ],
     "foldername": "gyromecanum",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "HID Rumble",
@@ -191,7 +206,8 @@
     ],
     "foldername": "hidrumble",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Motor Controller",
@@ -203,7 +219,8 @@
     ],
     "foldername": "motorcontrol",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Motor Control With Encoder",
@@ -217,8 +234,9 @@
       "Complete List"
     ],
     "foldername": "motorcontrolencoder",
-    "gradlebase": "java"
-    ,"mainclass": "Main"
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "GearsBot",
@@ -228,7 +246,8 @@
     ],
     "foldername": "gearsbot",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "PacGoat",
@@ -238,7 +257,8 @@
     ],
     "foldername": "pacgoat",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Simple Vision",
@@ -249,7 +269,8 @@
     ],
     "foldername": "quickvision",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Intermediate Vision",
@@ -260,7 +281,8 @@
     ],
     "foldername": "intermediatevision",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Axis Camera Sample",
@@ -270,7 +292,8 @@
     ],
     "foldername": "axiscamera",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Shuffleboard Sample",
@@ -281,7 +304,8 @@
     ],
     "foldername": "shuffleboard",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "'Traditional' Hatchbot",
@@ -292,7 +316,8 @@
     ],
     "foldername": "hatchbottraditional",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "'Inlined' Hatchbot",
@@ -304,7 +329,8 @@
     ],
     "foldername": "hatchbotinlined",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "Select Command Example",
@@ -314,7 +340,8 @@
     ],
     "foldername": "selectcommand",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "Scheduler Event Logging",
@@ -325,7 +352,8 @@
     ],
     "foldername": "schedulereventlogging",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "Frisbeebot",
@@ -336,7 +364,8 @@
     ],
     "foldername": "frisbeebot",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "Gyro Drive Commands",
@@ -348,7 +377,8 @@
     ],
     "foldername": "gyrodrivecommands",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "SwerveBot",
@@ -358,7 +388,8 @@
     ],
     "foldername": "swervebot",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "MecanumBot",
@@ -368,7 +399,8 @@
     ],
     "foldername": "mecanumbot",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "DifferentialDriveBot",
@@ -378,7 +410,8 @@
     ],
     "foldername": "differentialdrivebot",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "RamseteCommand",
@@ -392,6 +425,29 @@
     ],
     "foldername": "ramsetecommand",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Arcade Drive Xbox Controller",
+    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Arcade Drive and an Xbox Controller",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "arcadedrivexboxcontroller",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 1
+  },
+  {
+    "name": "Tank Drive Xbox Controller",
+    "description": "Demonstrates the use of the DifferentialDrive class to drive a robot with Tank Drive and an Xbox Controller",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "tankdrivexboxcontroller",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 1
   }
 ]

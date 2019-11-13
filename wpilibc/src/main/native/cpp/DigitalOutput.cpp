@@ -11,7 +11,8 @@
 #include <utility>
 
 #include <hal/DIO.h>
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Ports.h>
 
 #include "frc/SensorUtil.h"
@@ -34,8 +35,7 @@ DigitalOutput::DigitalOutput(int channel) {
   int32_t status = 0;
   m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), false, &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumDigitalChannels(),
-                                 channel, HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumDigitalChannels(), channel);
     m_channel = std::numeric_limits<int>::max();
     m_handle = HAL_kInvalidHandle;
     return;
@@ -58,7 +58,7 @@ void DigitalOutput::Set(bool value) {
 
   int32_t status = 0;
   HAL_SetDIO(m_handle, value, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 bool DigitalOutput::Get() const {
@@ -66,7 +66,7 @@ bool DigitalOutput::Get() const {
 
   int32_t status = 0;
   bool val = HAL_GetDIO(m_handle, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return val;
 }
 
@@ -85,7 +85,7 @@ void DigitalOutput::Pulse(double length) {
 
   int32_t status = 0;
   HAL_Pulse(m_handle, length, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 bool DigitalOutput::IsPulsing() const {
@@ -93,7 +93,7 @@ bool DigitalOutput::IsPulsing() const {
 
   int32_t status = 0;
   bool value = HAL_IsPulsing(m_handle, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
@@ -102,7 +102,7 @@ void DigitalOutput::SetPWMRate(double rate) {
 
   int32_t status = 0;
   HAL_SetDigitalPWMRate(rate, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void DigitalOutput::EnablePWM(double initialDutyCycle) {
@@ -112,15 +112,15 @@ void DigitalOutput::EnablePWM(double initialDutyCycle) {
 
   if (StatusIsFatal()) return;
   m_pwmGenerator = HAL_AllocateDigitalPWM(&status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   if (StatusIsFatal()) return;
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, initialDutyCycle, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   if (StatusIsFatal()) return;
   HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, m_channel, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void DigitalOutput::DisablePWM() {
@@ -132,10 +132,10 @@ void DigitalOutput::DisablePWM() {
   // Disable the output by routing to a dead bit.
   HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil::kDigitalChannels,
                                  &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   HAL_FreeDigitalPWM(m_pwmGenerator, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   m_pwmGenerator = HAL_kInvalidHandle;
 }
@@ -145,7 +145,7 @@ void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
 
   int32_t status = 0;
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {

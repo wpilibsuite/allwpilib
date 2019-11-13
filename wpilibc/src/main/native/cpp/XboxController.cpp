@@ -7,7 +7,7 @@
 
 #include "frc/XboxController.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 using namespace frc;
 

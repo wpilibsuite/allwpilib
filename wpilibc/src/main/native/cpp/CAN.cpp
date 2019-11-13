@@ -13,7 +13,6 @@
 #include <hal/CANAPI.h>
 #include <hal/Errors.h>
 #include <hal/FRCUsageReporting.h>
-#include <hal/HALBase.h>
 
 using namespace frc;
 
@@ -22,7 +21,7 @@ CAN::CAN(int deviceId) {
   m_handle =
       HAL_InitializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType, &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setHALError(status);
     m_handle = HAL_kInvalidHandle;
     return;
   }
@@ -36,7 +35,7 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
       static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
       static_cast<HAL_CANDeviceType>(deviceType), &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setHALError(status);
     m_handle = HAL_kInvalidHandle;
     return;
   }
@@ -55,26 +54,26 @@ CAN::~CAN() {
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANPacket(m_handle, data, length, apiId, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void CAN::WritePacketRepeating(const uint8_t* data, int length, int apiId,
                                int repeatMs) {
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void CAN::WriteRTRFrame(int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void CAN::StopPacketRepeating(int apiId) {
   int32_t status = 0;
   HAL_StopCANPacketRepeating(m_handle, apiId, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 bool CAN::ReadPacketNew(int apiId, CANData* data) {
@@ -85,7 +84,7 @@ bool CAN::ReadPacketNew(int apiId, CANData* data) {
     return false;
   }
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setHALError(status);
     return false;
   } else {
     return true;
@@ -100,7 +99,7 @@ bool CAN::ReadPacketLatest(int apiId, CANData* data) {
     return false;
   }
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setHALError(status);
     return false;
   } else {
     return true;
@@ -116,7 +115,7 @@ bool CAN::ReadPacketTimeout(int apiId, int timeoutMs, CANData* data) {
     return false;
   }
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setHALError(status);
     return false;
   } else {
     return true;
