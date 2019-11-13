@@ -10,7 +10,7 @@
 #include <cassert>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 using namespace frc;
 

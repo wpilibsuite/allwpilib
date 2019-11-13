@@ -135,34 +135,6 @@ uint64_t HAL_GetFPGATime(int32_t* status);
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
 
-// ifdef's definition is to allow for default parameters in C++.
-#ifdef __cplusplus
-/**
- * Reports a hardware usage to the HAL.
- *
- * @param resource       the used resource
- * @param instanceNumber the instance of the resource
- * @param context        a user specified context index
- * @param feature        a user specified feature string
- * @return               the index of the added value in NetComm
- */
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
-                   int32_t context = 0, const char* feature = nullptr);
-#else
-
-/**
- * Reports a hardware usage to the HAL.
- *
- * @param resource       the used resource
- * @param instanceNumber the instance of the resource
- * @param context        a user specified context index
- * @param feature        a user specified feature string
- * @return               the index of the added value in NetComm
- */
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature);
-#endif
-
 #ifdef __cplusplus
 }  // extern "C"
 #endif

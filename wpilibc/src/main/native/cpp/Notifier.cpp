@@ -9,7 +9,9 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/Notifier.h>
+#include <wpi/SmallString.h>
 
 #include "frc/Timer.h"
 #include "frc/Utility.h"
@@ -23,7 +25,7 @@ Notifier::Notifier(std::function<void()> handler) {
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   m_thread = std::thread([=] {
     for (;;) {
@@ -57,7 +59,7 @@ Notifier::~Notifier() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) m_thread.join();
@@ -88,6 +90,13 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
   m_periodic = std::move(rhs.m_periodic);
 
   return *this;
+}
+
+void Notifier::SetName(const wpi::Twine& name) {
+  wpi::SmallString<64> nameBuf;
+  int32_t status = 0;
+  HAL_SetNotifierName(m_notifier,
+                      name.toNullTerminatedStringRef(nameBuf).data(), &status);
 }
 
 void Notifier::SetHandler(std::function<void()> handler) {
@@ -122,7 +131,7 @@ void Notifier::StartPeriodic(units::second_t period) {
 void Notifier::Stop() {
   int32_t status = 0;
   HAL_CancelNotifierAlarm(m_notifier, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void Notifier::UpdateAlarm(uint64_t triggerTime) {
@@ -131,7 +140,7 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
   auto notifier = m_notifier.load();
   if (notifier == 0) return;
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void Notifier::UpdateAlarm() {

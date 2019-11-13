@@ -203,6 +203,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_CAN_TIMEOUT_MESSAGE;
     case HAL_SIM_NOT_SUPPORTED:
       return HAL_SIM_NOT_SUPPORTED_MESSAGE;
+    case HAL_CAN_BUFFER_OVERRUN:
+      return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
     default:
       return "Unknown error status";
   }

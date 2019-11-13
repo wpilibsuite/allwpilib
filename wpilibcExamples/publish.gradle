@@ -12,8 +12,8 @@ def commandsZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_commands_CLS'
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppExamplesZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = examplesZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = examplesZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -25,8 +25,8 @@ task cppExamplesZip(type: Zip) {
 }
 
 task cppTemplatesZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = templatesZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = templatesZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -38,8 +38,8 @@ task cppTemplatesZip(type: Zip) {
 }
 
 task cppCommandsZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = commandsZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = commandsZipBaseName
 
     from(licenseFile) {
         into '/'

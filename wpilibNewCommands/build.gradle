@@ -13,18 +13,18 @@ evaluationDependsOn(':wpilibj')
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 dependencies {
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    compile project(':hal')
-    compile project(':wpilibj')
-    devCompile project(':wpiutil')
-    devCompile project(':ntcore')
-    devCompile project(':cscore')
-    devCompile project(':hal')
-    devCompile project(':wpilibj')
-    testCompile 'com.google.guava:guava:19.0'
-    testCompile 'org.mockito:mockito-core:2.27.0'
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':hal')
+    implementation project(':wpilibj')
+    devImplementation project(':wpiutil')
+    devImplementation project(':ntcore')
+    devImplementation project(':cscore')
+    devImplementation project(':hal')
+    devImplementation project(':wpilibj')
+    testImplementation 'com.google.guava:guava:19.0'
+    testImplementation 'org.mockito:mockito-core:2.27.0'
 }
 
 nativeUtils.exportsConfigs {

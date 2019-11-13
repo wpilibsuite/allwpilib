@@ -30,7 +30,7 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
    * @param requirements the subsystems to require
    */
   RunCommand(std::function<void()> toRun,
-             std::initializer_list<Subsystem*> requirements);
+             std::initializer_list<Subsystem*> requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 

@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/PIDOutput.h"
 #include "frc/smartdashboard/SendableBuilder.h"

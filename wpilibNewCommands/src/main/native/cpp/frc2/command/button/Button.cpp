@@ -16,8 +16,9 @@ Button Button::WhenPressed(Command* command, bool interruptible) {
   return *this;
 }
 
-Button Button::WhenPressed(std::function<void()> toRun) {
-  WhenActive(std::move(toRun));
+Button Button::WhenPressed(std::function<void()> toRun,
+                           std::initializer_list<Subsystem*> requirements) {
+  WhenActive(std::move(toRun), requirements);
   return *this;
 }
 
@@ -26,8 +27,9 @@ Button Button::WhileHeld(Command* command, bool interruptible) {
   return *this;
 }
 
-Button Button::WhileHeld(std::function<void()> toRun) {
-  WhileActiveContinous(std::move(toRun));
+Button Button::WhileHeld(std::function<void()> toRun,
+                         std::initializer_list<Subsystem*> requirements) {
+  WhileActiveContinous(std::move(toRun), requirements);
   return *this;
 }
 
@@ -41,8 +43,9 @@ Button Button::WhenReleased(Command* command, bool interruptible) {
   return *this;
 }
 
-Button Button::WhenReleased(std::function<void()> toRun) {
-  WhenInactive(std::move(toRun));
+Button Button::WhenReleased(std::function<void()> toRun,
+                            std::initializer_list<Subsystem*> requirements) {
+  WhenInactive(std::move(toRun), requirements);
   return *this;
 }
 

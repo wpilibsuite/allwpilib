@@ -9,7 +9,7 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/AnalogInput.h"
 #include "frc/DutyCycle.h"
@@ -29,7 +29,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   int32_t status = 0;
   m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setHALError(status);
     m_trigger = HAL_kInvalidHandle;
     return;
   }
@@ -44,7 +44,7 @@ AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   int32_t status = 0;
   m_trigger = HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setHALError(status);
     m_trigger = HAL_kInvalidHandle;
     return;
   }
@@ -88,42 +88,42 @@ void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void AnalogTrigger::SetLimitsDutyCycle(double lower, double upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsDutyCycle(m_trigger, lower, upper, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsRaw(m_trigger, lower, upper, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void AnalogTrigger::SetAveraged(bool useAveragedValue) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerAveraged(m_trigger, useAveragedValue, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void AnalogTrigger::SetFiltered(bool useFilteredValue) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerFiltered(m_trigger, useFilteredValue, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 int AnalogTrigger::GetIndex() const {
   if (StatusIsFatal()) return -1;
   int32_t status = 0;
   auto ret = HAL_GetAnalogTriggerFPGAIndex(m_trigger, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return ret;
 }
 
@@ -131,7 +131,7 @@ bool AnalogTrigger::GetInWindow() {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerInWindow(m_trigger, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return result;
 }
 
@@ -139,7 +139,7 @@ bool AnalogTrigger::GetTriggerState() {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerTriggerState(m_trigger, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return result;
 }
 

@@ -139,6 +139,9 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
   return handle;
 }
 
+void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
+                         int32_t* status) {}
+
 void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
   if (!notifier) return;

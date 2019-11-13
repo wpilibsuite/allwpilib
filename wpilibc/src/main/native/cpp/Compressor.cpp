@@ -8,7 +8,7 @@
 #include "frc/Compressor.h"
 
 #include <hal/Compressor.h>
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
 
@@ -22,8 +22,7 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
   int32_t status = 0;
   m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumPCMModules(), pcmID,
-                                 HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumPCMModules(), pcmID);
     return;
   }
   SetClosedLoopControl(true);

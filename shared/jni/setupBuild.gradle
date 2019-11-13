@@ -17,8 +17,8 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 dependencies {
     if (!project.hasProperty('noWpiutil')) {
-        compile project(':wpiutil')
-        devCompile project(':wpiutil')
+        implementation project(':wpiutil')
+        devImplementation project(':wpiutil')
     }
 }
 

@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/math>
 
 #include "frc/SpeedController.h"
