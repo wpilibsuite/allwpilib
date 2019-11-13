@@ -9,6 +9,7 @@
 
 #include "frc/Counter.h"
 #include "frc/DigitalSource.h"
+#include "frc/DriverStation.h"
 #include "frc/DutyCycle.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
@@ -53,6 +54,12 @@ DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource)
 }
 
 void DutyCycleEncoder::Init() {
+  m_simDevice = hal::SimDevice{"DutyCycleEncoder", m_dutyCycle->GetFPGAIndex()};
+
+  if (m_simDevice) {
+    m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
+  }
+
   m_analogTrigger.SetLimitsDutyCycle(0.25, 0.75);
   m_counter.SetUpSource(
       m_analogTrigger.CreateOutput(AnalogTriggerType::kRisingPulse));
@@ -63,21 +70,27 @@ void DutyCycleEncoder::Init() {
                                         m_dutyCycle->GetSourceChannel());
 }
 
-units::turn_t DutyCycleEncoder::Get() const {
-  // As the values are not atomic, keep trying until we get 2 reads of the same value
-  // If we don't within 10 attempts, error
+units::turn_t DutyCycleEncoder::Get() {
+  if (m_simPosition) return units::turn_t{m_simPosition.Get()};
+
+  // As the values are not atomic, keep trying until we get 2 reads of the same
+  // value If we don't within 10 attempts, error
   for (int i = 0; i < 10; i++) {
     auto counter = m_counter.Get();
     auto pos = m_dutyCycle->GetOutput();
     auto counter2 = m_counter.Get();
-    if (counter == counter2) {
+    auto pos2 = m_dutyCycle->GetOutput();
+    if (counter == counter2 && pos == pos2) {
       units::turn_t turns{counter + pos - m_positionOffset};
+      m_lastPosition = turns;
       return turns;
     }
   }
 
-  wpi_setErrnoErrorWithContext("Failed to read DutyCycle Encoder. Potential Speed Overrun");
-  return units::turn_t{0.0};
+  frc::DriverStation::GetInstance().ReportWarning(
+      "Failed to read DutyCycle Encoder. Potential Speed Overrun. Returning "
+      "last value");
+  return m_lastPosition;
 }
 
 void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
@@ -86,7 +99,7 @@ void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
 double DutyCycleEncoder::GetDistancePerRotation() const {
   return m_distancePerRotation;
 }
-double DutyCycleEncoder::GetDistance() const {
+double DutyCycleEncoder::GetDistance() {
   return Get().to<double>() * GetDistancePerRotation();
 }
 
@@ -96,7 +109,7 @@ int DutyCycleEncoder::GetFrequency() const {
 
 void DutyCycleEncoder::Reset() {
   m_counter.Reset();
-  m_positionOffset = m_dutyCycle->GetOutput();;
+  m_positionOffset = m_dutyCycle->GetOutput();
 }
 
 bool DutyCycleEncoder::IsConnected() const {

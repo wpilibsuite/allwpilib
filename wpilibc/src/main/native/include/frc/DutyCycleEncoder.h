@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include <hal/SimDevice.h>
 #include <hal/Types.h>
 #include <units/units.h>
 
@@ -112,7 +113,7 @@ class DutyCycleEncoder : public ErrorBase,
    *
    * @return the encoder value in rotations
    */
-  units::turn_t Get() const;
+  units::turn_t Get();
 
   /**
    * Set the distance per rotation of the encoder. This sets the multiplier used
@@ -140,7 +141,7 @@ class DutyCycleEncoder : public ErrorBase,
    *
    * @return The distance driven since the last reset
    */
-  double GetDistance() const;
+  double GetDistance();
 
   void InitSendable(SendableBuilder& builder) override;
 
@@ -153,5 +154,9 @@ class DutyCycleEncoder : public ErrorBase,
   int m_frequencyThreshold = 100;
   double m_positionOffset = 0;
   double m_distancePerRotation = 1.0;
+  units::turn_t m_lastPosition{0.0};
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simPosition;
 };
 }  // namespace frc

@@ -9,7 +9,9 @@
 
 #include <memory>
 
+#include <hal/SimDevice.h>
 #include <hal/Types.h>
+#include <units/units.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
@@ -63,24 +65,7 @@ class AnalogEncoder : public ErrorBase,
    *
    * @return the encoder value in rotations
    */
-  double Get() const;
-
-  /**
-   * Get the number of whole rotations since the last reset.
-   *
-   * @return number of whole rotations
-   */
-  int GetRotations() const;
-
-  /**
-   * Get the absolute position in the rotation.
-   *
-   * This is not affected by reset(), and is always just the absolute value
-   * straight from the encoder.
-   *
-   * @return the encoder absolute position
-   */
-  double GetPositionInRotation() const;
+  units::turn_t Get();
 
   /**
    * Get the offset of position relative to the last reset.
@@ -119,7 +104,7 @@ class AnalogEncoder : public ErrorBase,
    *
    * @return The distance driven since the last reset
    */
-  double GetDistance() const;
+  double GetDistance();
 
   void InitSendable(SendableBuilder& builder) override;
 
@@ -131,5 +116,9 @@ class AnalogEncoder : public ErrorBase,
   Counter m_counter;
   double m_positionOffset = 0;
   double m_distancePerRotation = 1.0;
+  units::turn_t m_lastPosition{0.0};
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simPosition;
 };
 }  // namespace frc
