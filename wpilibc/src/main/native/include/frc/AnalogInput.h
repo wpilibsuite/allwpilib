@@ -19,6 +19,8 @@
 namespace frc {
 
 class SendableBuilder;
+class DMA;
+class DMASample;
 
 /**
  * Analog input class.
@@ -38,6 +40,8 @@ class AnalogInput : public ErrorBase,
                     public SendableHelper<AnalogInput> {
   friend class AnalogTrigger;
   friend class AnalogGyro;
+  friend class DMA;
+  friend class DMASample;
 
  public:
   static constexpr int kAccumulatorModuleNumber = 1;
