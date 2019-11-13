@@ -60,19 +60,19 @@ repositories {
 }
 
 dependencies {
-    compile project(':hal')
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    compile project(':cameraserver')
-    testCompile 'com.google.guava:guava:19.0'
-    testCompile 'org.mockito:mockito-core:2.27.0'
-    devCompile project(':hal')
-    devCompile project(':wpiutil')
-    devCompile project(':ntcore')
-    devCompile project(':cscore')
-    devCompile project(':cameraserver')
-    devCompile sourceSets.main.output
+    implementation project(':hal')
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':cameraserver')
+    testImplementation 'com.google.guava:guava:19.0'
+    testImplementation 'org.mockito:mockito-core:2.27.0'
+    devImplementation project(':hal')
+    devImplementation project(':wpiutil')
+    devImplementation project(':ntcore')
+    devImplementation project(':cscore')
+    devImplementation project(':cameraserver')
+    devImplementation sourceSets.main.output
 }
 
 apply plugin: 'cpp'

@@ -75,8 +75,8 @@ doxygen {
 }
 
 tasks.register("zipCppDocs", Zip) {
-    baseName = zipBaseNameCpp
-    destinationDir = outputsFolder
+    archiveBaseName = zipBaseNameCpp
+    destinationDirectory = outputsFolder
     dependsOn doxygen
     from ("$buildDir/docs/doxygen/html")
     into '/'
@@ -136,8 +136,8 @@ task generateJavaDocs(type: Javadoc) {
 }
 
 tasks.register("zipJavaDocs", Zip) {
-    baseName = zipBaseNameJava
-    destinationDir = outputsFolder
+    archiveBaseName = zipBaseNameJava
+    destinationDirectory = outputsFolder
     dependsOn generateJavaDocs
     from ("$buildDir/docs/javadoc")
     into '/'
