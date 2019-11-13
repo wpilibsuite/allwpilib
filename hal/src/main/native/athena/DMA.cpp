@@ -1066,4 +1066,29 @@ int32_t HAL_GetDMASampleDutyCycleOutputRaw(const HAL_DMASample* dmaSample,
   }
   return dmaWord;
 }
+
+void HAL_GetDMAOffsetsForDirectBufferRead(HAL_Handle handle, int32_t* valueType, int32_t* index) {
+  auto handleType = getHandleType(handle);
+  auto idx = getHandleIndex(handle);
+  switch (handleType) {
+    case HAL_HandleEnum::DutyCycle:
+      *valueType = idx < 4 ? kEnable_DutyCycle_Low : kEnable_DutyCycle_High;
+      *index = idx < 4 ? idx : idx - 4;
+      return;
+    case HAL_HandleEnum::AnalogInput:
+      *valueType = idx < 4 ? kEnable_AI0_Low : kEnable_AI0_High;
+      *index = idx < 4 ? idx : idx - 4;
+      return;
+    case HAL_HandleEnum::Encoder:
+      return;
+    case HAL_HandleEnum::Counter:
+      return;
+    case HAL_HandleEnum::DIO:
+      return;
+    default:
+      *valueType = 0;
+      *index = 0;
+      return;
+  }
+}
 }  // extern "C"

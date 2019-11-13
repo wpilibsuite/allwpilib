@@ -5,6 +5,5 @@ repositories {
     }
 }
 dependencies {
-    implementation "edu.wpi.first:native-utils:2020.5.1"
-    implementation "jaci.gradle:EmbeddedTools:2019.11.13"
+    implementation "edu.wpi.first:native-utils:2020.5.2"
 }

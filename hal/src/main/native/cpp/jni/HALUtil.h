@@ -70,6 +70,8 @@ jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
 
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
 
+jobject CreateDMABaseStore(JNIEnv* env, int valueType, int index);
+
 JavaVM* GetJVM();
 
 }  // namespace frc

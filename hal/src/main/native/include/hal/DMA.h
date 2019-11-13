@@ -120,6 +120,8 @@ int32_t HAL_GetDMASampleDutyCycleOutputRaw(const HAL_DMASample* dmaSample,
                                         HAL_DutyCycleHandle dutyCycleHandle,
                                         int32_t* status);
 
+void HAL_GetDMAOffsetsForDirectBufferRead(HAL_Handle handle, int32_t* valueType, int32_t* index);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

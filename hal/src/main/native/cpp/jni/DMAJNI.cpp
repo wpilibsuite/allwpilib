@@ -240,8 +240,8 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_DMAJNI_readDMA
  * Signature: (I)Ledu/wpi/first/hal/DMASample/BaseStore;
  */
 JNIEXPORT jobject JNICALL Java_edu_wpi_first_hal_DMAJNI_getSensorReadData
-  (JNIEnv *, jclass, jint) {
-    return nullptr;
+  (JNIEnv * env, jclass, jint) {
+    return CreateDMABaseStore(env, 0, 0);
   }
 
 }
