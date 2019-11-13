@@ -54,6 +54,14 @@ deploy {
             }
         }
 
+        javaArtifact('myRobotJava') {
+            jar = 'shadowJar'
+            postdeploy << { ctx ->
+                ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
+                ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
+            }
+        }
+
         nativeArtifact('myRobotCpp') {
             component = 'myRobotCpp'
             targetPlatform = nativeUtils.wpi.platforms.roborio
@@ -96,21 +104,26 @@ deploy {
     }
 }
 
-tasks.register('deployAthenaShared') {
+tasks.register('deployJava') {
+    dependsOn tasks.named('deployMyRobotJavaRoborio')
+    dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
+}
+
+tasks.register('deployShared') {
     dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
     dependsOn tasks.named('deployMyRobotCppRoborio')
 }
 
-tasks.register('deployAthenaStatic') {
+tasks.register('deployStatic') {
     dependsOn tasks.named('deployMyRobotCppStaticRoborio')
 }
 
-tasks.register('deployAthenaReleaseShared') {
+tasks.register('deployReleaseShared') {
     dependsOn tasks.named('deployMyRobotCppReleaseLibrariesRoborio')
     dependsOn tasks.named('deployMyRobotCppReleaseRoborio')
 }
 
-tasks.register('deployAthenaReleaseStatic') {
+tasks.register('deployReleaseStatic') {
     dependsOn tasks.named('deployMyRobotCppReleaseStaticRoborio')
 }
 
@@ -135,10 +148,6 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':wpilibOldCommands')
     implementation project(':wpilibNewCommands')
-}
-
-jar {
-    manifest { attributes 'Robot-Class': 'MyRobot' }
 }
 
 model {
