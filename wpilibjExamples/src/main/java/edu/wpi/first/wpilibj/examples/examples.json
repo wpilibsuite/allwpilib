@@ -484,6 +484,19 @@
     "commandversion": 2
   },
   {
+    "name": "ArmBot",
+    "description": "An example command-based robot demonstrating the use of a ProfiledPIDCommand to control an arm.",
+    "tags": [
+      "ArmBot",
+      "PID",
+      "Motion Profile"
+    ],
+    "foldername": "armbot",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "MecanumControllerCommand",
     "description": "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.",
     "tags": [

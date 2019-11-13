@@ -10,19 +10,14 @@ package edu.wpi.first.wpilibj.examples.armbot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import edu.wpi.first.wpilibj.examples.armbot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj.examples.armbot.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.AutoConstants.kAutoShootTimeSeconds;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.AutoConstants.kAutoTimeoutSeconds;
 import static edu.wpi.first.wpilibj.examples.armbot.Constants.OIConstants.kDriverControllerPort;
 
 /**

@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.examples.armbot.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -23,7 +30,6 @@ import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kVVol
  * A robot arm subsystem that moves with a motion profile.
  */
 public class ArmSubsystem extends ProfiledPIDSubsystem {
-
   private final PWMVictorSPX m_motor = new PWMVictorSPX(kMotorPort);
   private final Encoder m_encoder = new Encoder(kEncoderPorts[0], kEncoderPorts[1]);
   private final ArmFeedforward m_feedforward =
@@ -31,6 +37,9 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
 
   private TrapezoidProfile.State m_goal;
 
+  /**
+   * Create a new ArmSubsystem.
+   */
   public ArmSubsystem() {
     super(new ProfiledPIDController(
         kP,
@@ -51,6 +60,11 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
     m_motor.setVoltage(output + feedforward);
   }
 
+  /**
+   * Sets the goal position for the arm.
+   *
+   * @param position The goal position, in radians.
+   */
   public void setGoal(double position) {
     m_goal = new TrapezoidProfile.State(position, 0);
   }

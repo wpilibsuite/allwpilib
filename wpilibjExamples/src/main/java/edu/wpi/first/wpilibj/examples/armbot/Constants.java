@@ -48,7 +48,7 @@ public final class Constants {
     public static final double kMaxVelocityRadPerSecond = 3;
     public static final double kMaxAccelerationRadPerSecSquared = 10;
 
-    public static final int[] kEncoderPorts = new int[]{4,5};
+    public static final int[] kEncoderPorts = new int[]{4, 5};
     public static final int kEncoderPPR = 256;
     public static final double kEncoderDistancePerPulse = 2.0 * Math.PI / kEncoderPPR;
 

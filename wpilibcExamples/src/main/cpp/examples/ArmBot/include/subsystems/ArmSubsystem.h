@@ -1,0 +1,38 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
+
+#include <frc/Encoder.h>
+#include <frc/PWMVictorSPX.h>
+#include <frc/controller/ArmFeedforward.h>
+#include <frc2/command/ProfiledPIDSubsystem.h>
+
+/**
+ * A robot arm subsystem that moves with a motion profile.
+ */
+class ArmSubsystem : public frc2::ProfiledPIDSubsystem {
+  using State = frc::TrapezoidProfile::State;
+
+ public:
+  ArmSubsystem();
+
+  void UseOutput(double output, State setpoint) override;
+
+  void SetGoal(units::radian_t goal);
+
+  State GetGoal() override;
+
+  units::meter_t GetMeasurement() override;
+
+ private:
+  frc::PWMVictorSPX m_motor;
+  frc::Encoder m_encoder;
+  frc::ArmFeedforward m_feedforward;
+
+  State m_goal;
+};
