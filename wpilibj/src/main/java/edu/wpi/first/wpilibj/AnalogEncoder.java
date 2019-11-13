@@ -22,7 +22,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   private Counter m_counter;
   private double m_positionOffset;
   private double m_distancePerRotation = 1.0;
-  private double m_lastPosition = 0;
+  private double m_lastPosition;
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;

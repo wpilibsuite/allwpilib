@@ -26,7 +26,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private int m_frequencyThreshold = 100;
   private double m_positionOffset;
   private double m_distancePerRotation = 1.0;
-  private double m_lastPosition = 0;
+  private double m_lastPosition;
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
