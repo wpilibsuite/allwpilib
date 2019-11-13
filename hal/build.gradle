@@ -191,7 +191,9 @@ model {
         all {
             if (!(it instanceof NativeBinarySpec)) return
             if (it.component.name != 'hal' && it.component.name != 'halBase') return
-            nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared')
+            if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
+                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared')
+            }
         }
     }
 }
