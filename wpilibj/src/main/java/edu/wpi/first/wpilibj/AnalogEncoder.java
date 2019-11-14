@@ -144,6 +144,9 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   public void close() {
     m_counter.close();
     m_analogTrigger.close();
+    if (m_simDevice != null) {
+      m_simDevice.close();
+    }
   }
 
   @Override

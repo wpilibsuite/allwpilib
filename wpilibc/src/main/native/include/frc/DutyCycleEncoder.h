@@ -162,5 +162,6 @@ class DutyCycleEncoder : public ErrorBase,
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;
+  hal::SimBoolean m_simIsConnected;
 };
 }  // namespace frc

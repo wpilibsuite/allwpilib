@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
@@ -30,6 +31,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
+  protected SimBoolean m_simIsConnected;
 
   /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
@@ -60,6 +62,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
     if (m_simDevice != null) {
       m_simPosition = m_simDevice.createDouble("Position", false, 0.0);
+      m_simIsConnected = m_simDevice.createBoolean("Connected", false, true);
     }
 
     m_analogTrigger.setLimitsDutyCycle(0.25, 0.75);
@@ -174,6 +177,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * @return true if the sensor is connected
    */
   public boolean isConnected() {
+    if (m_simIsConnected != null) {
+      return m_simIsConnected.get();
+    }
     return getFrequency() > m_frequencyThreshold;
   }
 
@@ -198,6 +204,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     if (m_ownsDutyCycle) {
       m_dutyCycle.close();
     }
+    if (m_simDevice != null) {
+      m_simDevice.close();
+    }
   }
 
   @Override
@@ -205,5 +214,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("AbsoluteEncoder");
     builder.addDoubleProperty("Distance", this::getDistance, null);
     builder.addDoubleProperty("Distance Per Rotation", this::getDistancePerRotation, null);
+    builder.addBooleanProperty("Is Connected", this::isConnected, null);
   }
 }

@@ -62,6 +62,7 @@ void DutyCycleEncoder::Init() {
 
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
+    m_simIsConnected = m_simDevice.CreateBoolean("Connected", false, true);
   }
 
   m_analogTrigger.SetLimitsDutyCycle(0.25, 0.75);
@@ -119,6 +120,7 @@ void DutyCycleEncoder::Reset() {
 }
 
 bool DutyCycleEncoder::IsConnected() const {
+  if (m_simIsConnected) return m_simIsConnected.Get();
   return GetFrequency() > m_frequencyThreshold;
 }
 
@@ -135,5 +137,8 @@ void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
                             nullptr);
   builder.AddDoubleProperty("Distance Per Rotation",
                             [this] { return this->GetDistancePerRotation(); },
+                            nullptr);
+  builder.AddDoubleProperty("Is Connected",
+                            [this] { return this->IsConnected(); },
                             nullptr);
 }
