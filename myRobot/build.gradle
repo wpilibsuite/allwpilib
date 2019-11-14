@@ -21,6 +21,8 @@ ext {
     skipDev = true
 }
 
+apply from: "${rootDir}/shared/opencv.gradle"
+
 deploy {
     targets {
         target('roborio') {
@@ -120,10 +122,6 @@ tasks.register('deployReleaseShared') {
 tasks.register('deployReleaseStatic') {
     dependsOn tasks.named('deployMyRobotCppReleaseStaticRoborio')
 }
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
-apply from: "${rootDir}/shared/opencv.gradle"
 
 mainClassName = 'Main'
 
