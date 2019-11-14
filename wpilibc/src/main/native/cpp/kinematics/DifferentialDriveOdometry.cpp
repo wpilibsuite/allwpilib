@@ -10,17 +10,21 @@
 using namespace frc;
 
 DifferentialDriveOdometry::DifferentialDriveOdometry(
-    DifferentialDriveKinematics kinematics, const Pose2d& initialPose)
+    DifferentialDriveKinematics kinematics, const Rotation2d& gyroAngle,
+    const Pose2d& initialPose)
     : m_kinematics(kinematics), m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
+  m_gyroOffset = gyroAngle - m_pose.Rotation();
 }
 
 const Pose2d& DifferentialDriveOdometry::UpdateWithTime(
-    units::second_t currentTime, const Rotation2d& angle,
+    units::second_t currentTime, const Rotation2d& gyroAngle,
     const DifferentialDriveWheelSpeeds& wheelSpeeds) {
   units::second_t deltaTime =
       (m_previousTime >= 0_s) ? currentTime - m_previousTime : 0_s;
   m_previousTime = currentTime;
+
+  auto angle = gyroAngle + m_gyroOffset;
 
   auto [dx, dy, dtheta] = m_kinematics.ToChassisSpeeds(wheelSpeeds);
   static_cast<void>(dtheta);

@@ -30,18 +30,21 @@ public class DifferentialDriveOdometry {
   private Pose2d m_poseMeters;
   private double m_prevTimeSeconds = -1;
 
+  private Rotation2d m_gyroOffset;
   private Rotation2d m_previousAngle;
 
   /**
    * Constructs a DifferentialDriveOdometry object.
    *
    * @param kinematics        The differential drive kinematics for your drivetrain.
+   * @param gyroAngle         The angle reported by the gyroscope.
    * @param initialPoseMeters The starting position of the robot on the field.
    */
-  public DifferentialDriveOdometry(DifferentialDriveKinematics kinematics,
+  public DifferentialDriveOdometry(DifferentialDriveKinematics kinematics, Rotation2d gyroAngle,
                                    Pose2d initialPoseMeters) {
     m_kinematics = kinematics;
     m_poseMeters = initialPoseMeters;
+    m_gyroOffset = gyroAngle.minus(m_poseMeters.getRotation());
     m_previousAngle = initialPoseMeters.getRotation();
   }
 
@@ -49,24 +52,31 @@ public class DifferentialDriveOdometry {
    * Constructs a DifferentialDriveOdometry object with the default pose at the origin.
    *
    * @param kinematics The differential drive kinematics for your drivetrain.
+   * @param gyroAngle  The angle reported by the gyroscope.
    */
-  public DifferentialDriveOdometry(DifferentialDriveKinematics kinematics) {
-    this(kinematics, new Pose2d());
+  public DifferentialDriveOdometry(DifferentialDriveKinematics kinematics, Rotation2d gyroAngle) {
+    this(kinematics, gyroAngle, new Pose2d());
   }
 
   /**
    * Resets the robot's position on the field. Do NOT zero your encoders if you
    * call this function at any other time except initialization.
    *
+   * <p>The gyroscope angle does not need to be reset here on the user's robot code.
+   * The library automatically takes care of offsetting the gyro angle.
+   *
    * @param poseMeters The position on the field that your robot is at.
+   * @param gyroAngle  The angle reported by the gyroscope.
    */
-  public void resetPosition(Pose2d poseMeters) {
+  public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     m_poseMeters = poseMeters;
     m_previousAngle = poseMeters.getRotation();
+    m_gyroOffset = gyroAngle.minus(m_poseMeters.getRotation());
   }
 
   /**
    * Returns the position of the robot on the field.
+   *
    * @return The pose of the robot (x and y are in meters).
    */
   public Pose2d getPoseMeters() {
@@ -82,14 +92,16 @@ public class DifferentialDriveOdometry {
    * angular rate that is calculated from forward kinematics.
    *
    * @param currentTimeSeconds The current time in seconds.
-   * @param angle              The current robot angle.
+   * @param gyroAngle          The angle reported by the gyroscope.
    * @param wheelSpeeds        The current wheel speeds.
    * @return The new pose of the robot.
    */
-  public Pose2d updateWithTime(double currentTimeSeconds, Rotation2d angle,
+  public Pose2d updateWithTime(double currentTimeSeconds, Rotation2d gyroAngle,
                                DifferentialDriveWheelSpeeds wheelSpeeds) {
     double period = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : 0.0;
     m_prevTimeSeconds = currentTimeSeconds;
+
+    var angle = gyroAngle.plus(m_gyroOffset);
 
     var chassisState = m_kinematics.toChassisSpeeds(wheelSpeeds);
     var newPose = m_poseMeters.exp(
@@ -111,13 +123,13 @@ public class DifferentialDriveOdometry {
    * also takes in an angle parameter which is used instead of the
    * angular rate that is calculated from forward kinematics.
    *
-   * @param angle       The angle of the robot.
+   * @param gyroAngle   The angle reported by the gyroscope.
    * @param wheelSpeeds The current wheel speeds.
    * @return The new pose of the robot.
    */
-  public Pose2d update(Rotation2d angle,
+  public Pose2d update(Rotation2d gyroAngle,
                        DifferentialDriveWheelSpeeds wheelSpeeds) {
     return updateWithTime(Timer.getFPGATimestamp(),
-        angle, wheelSpeeds);
+        gyroAngle, wheelSpeeds);
   }
 }
