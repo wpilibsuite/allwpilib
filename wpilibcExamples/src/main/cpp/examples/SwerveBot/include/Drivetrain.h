@@ -57,5 +57,5 @@ class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
-  frc::SwerveDriveOdometry<4> m_odometry{m_kinematics};
+  frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, GetAngle()};
 };

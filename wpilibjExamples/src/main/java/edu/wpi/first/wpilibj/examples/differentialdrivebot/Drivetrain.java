@@ -51,7 +51,7 @@ public class Drivetrain {
       = new DifferentialDriveKinematics(kTrackWidth);
 
   private final DifferentialDriveOdometry m_odometry
-      = new DifferentialDriveOdometry(m_kinematics);
+      = new DifferentialDriveOdometry(m_kinematics, getAngle());
 
   /**
    * Constructs a differential drive object.

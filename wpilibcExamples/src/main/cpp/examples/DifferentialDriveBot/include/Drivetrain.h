@@ -75,5 +75,5 @@ class Drivetrain {
   frc::AnalogGyro m_gyro{0};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
-  frc::DifferentialDriveOdometry m_odometry{m_kinematics};
+  frc::DifferentialDriveOdometry m_odometry{m_kinematics, GetAngle()};
 };
