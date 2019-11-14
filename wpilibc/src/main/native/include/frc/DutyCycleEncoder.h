@@ -38,12 +38,14 @@ class DutyCycleEncoder : public ErrorBase,
    * @param dutyCycle the duty cycle to attach to
    */
   explicit DutyCycleEncoder(DutyCycle& dutyCycle);
+
   /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * @param dutyCycle the duty cycle to attach to
    */
   explicit DutyCycleEncoder(DutyCycle* dutyCycle);
+
   /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
@@ -57,12 +59,14 @@ class DutyCycleEncoder : public ErrorBase,
    * @param source the digital source to attach to
    */
   explicit DutyCycleEncoder(DigitalSource& digitalSource);
+
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
    * @param source the digital source to attach to
    */
   explicit DutyCycleEncoder(DigitalSource* digitalSource);
+
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *

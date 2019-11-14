@@ -35,12 +35,14 @@ class AnalogEncoder : public ErrorBase,
    * @param analogInput the analog input to attach to
    */
   explicit AnalogEncoder(AnalogInput& analogInput);
+
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
    */
   explicit AnalogEncoder(AnalogInput* analogInput);
+
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
