@@ -806,7 +806,7 @@ int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
     return -1;
   }
 
-return static_cast<int32_t>(dmaWord) >> 1;
+  return static_cast<int32_t>(dmaWord) >> 1;
 }
 
 int32_t HAL_GetDMASampleCounterPeriod(const HAL_DMASample* dmaSample,
