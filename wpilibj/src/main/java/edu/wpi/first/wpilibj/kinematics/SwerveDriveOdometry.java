@@ -40,7 +40,7 @@ public class SwerveDriveOdometry {
                              Pose2d initialPose) {
     m_kinematics = kinematics;
     m_poseMeters = initialPose;
-    m_gyroOffset = gyroAngle.minus(m_poseMeters.getRotation());
+    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPose.getRotation();
   }
 
@@ -66,7 +66,7 @@ public class SwerveDriveOdometry {
   public void resetPosition(Pose2d pose, Rotation2d gyroAngle) {
     m_poseMeters = pose;
     m_previousAngle = pose.getRotation();
-    m_gyroOffset = gyroAngle.minus(m_poseMeters.getRotation());
+    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
   }
 
   /**

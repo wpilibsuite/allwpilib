@@ -52,7 +52,7 @@ class DifferentialDriveOdometry {
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
-    m_gyroOffset = gyroAngle - m_pose.Rotation();
+    m_gyroOffset = m_pose.Rotation() - gyroAngle;
   }
 
   /**

@@ -14,7 +14,7 @@ DifferentialDriveOdometry::DifferentialDriveOdometry(
     const Pose2d& initialPose)
     : m_kinematics(kinematics), m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
-  m_gyroOffset = gyroAngle - m_pose.Rotation();
+  m_gyroOffset = m_pose.Rotation() - gyroAngle;
 }
 
 const Pose2d& DifferentialDriveOdometry::UpdateWithTime(

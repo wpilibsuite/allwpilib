@@ -40,7 +40,7 @@ public class MecanumDriveOdometry {
                               Pose2d initialPoseMeters) {
     m_kinematics = kinematics;
     m_poseMeters = initialPoseMeters;
-    m_gyroOffset = gyroAngle.minus(m_poseMeters.getRotation());
+    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
   }
 
@@ -66,7 +66,7 @@ public class MecanumDriveOdometry {
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     m_poseMeters = poseMeters;
     m_previousAngle = poseMeters.getRotation();
-    m_gyroOffset = gyroAngle.minus(m_poseMeters.getRotation());
+    m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
   }
 
   /**
