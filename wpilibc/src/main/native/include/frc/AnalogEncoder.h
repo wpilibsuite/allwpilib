@@ -65,7 +65,7 @@ class AnalogEncoder : public ErrorBase,
    *
    * @return the encoder value in rotations
    */
-  units::turn_t Get();
+  units::turn_t Get() const;
 
   /**
    * Get the offset of position relative to the last reset.
@@ -104,7 +104,7 @@ class AnalogEncoder : public ErrorBase,
    *
    * @return The distance driven since the last reset
    */
-  double GetDistance();
+  double GetDistance() const;
 
   void InitSendable(SendableBuilder& builder) override;
 
@@ -116,7 +116,7 @@ class AnalogEncoder : public ErrorBase,
   Counter m_counter;
   double m_positionOffset = 0;
   double m_distancePerRotation = 1.0;
-  units::turn_t m_lastPosition{0.0};
+  mutable units::turn_t m_lastPosition{0.0};
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;

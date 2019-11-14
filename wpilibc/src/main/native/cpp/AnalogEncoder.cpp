@@ -7,8 +7,7 @@
 
 #include "frc/AnalogEncoder.h"
 
-#include <frc/AnalogInput.h>
-
+#include "frc/AnalogInput.h"
 #include "frc/Counter.h"
 #include "frc/DriverStation.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -21,12 +20,14 @@ AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
       m_counter{} {
   Init();
 }
+
 AnalogEncoder::AnalogEncoder(AnalogInput* analogInput)
     : m_analogInput{analogInput, NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},
       m_counter{} {
   Init();
 }
+
 AnalogEncoder::AnalogEncoder(std::shared_ptr<AnalogInput> analogInput)
     : m_analogInput{std::move(analogInput)},
       m_analogTrigger{m_analogInput.get()},
@@ -51,7 +52,7 @@ void AnalogEncoder::Init() {
                                         m_analogInput->GetChannel());
 }
 
-units::turn_t AnalogEncoder::Get() {
+units::turn_t AnalogEncoder::Get() const {
   if (m_simPosition) return units::turn_t{m_simPosition.Get()};
 
   // As the values are not atomic, keep trying until we get 2 reads of the same
@@ -79,10 +80,12 @@ double AnalogEncoder::GetPositionOffset() const { return m_positionOffset; }
 void AnalogEncoder::SetDistancePerRotation(double distancePerRotation) {
   m_distancePerRotation = distancePerRotation;
 }
+
 double AnalogEncoder::GetDistancePerRotation() const {
   return m_distancePerRotation;
 }
-double AnalogEncoder::GetDistance() {
+
+double AnalogEncoder::GetDistance() const {
   return Get().to<double>() * GetDistancePerRotation();
 }
 

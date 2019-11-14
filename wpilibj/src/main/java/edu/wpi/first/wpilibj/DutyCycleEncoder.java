@@ -205,7 +205,5 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("AbsoluteEncoder");
     builder.addDoubleProperty("Distance", this::getDistance, null);
     builder.addDoubleProperty("Distance Per Rotation", this::getDistancePerRotation, null);
-
   }
-
 }

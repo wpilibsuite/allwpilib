@@ -21,12 +21,14 @@ DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle)
       m_counter{} {
   Init();
 }
+
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle* dutyCycle)
     : m_dutyCycle{dutyCycle, NullDeleter<DutyCycle>{}},
       m_analogTrigger{m_dutyCycle.get()},
       m_counter{} {
   Init();
 }
+
 DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DutyCycle> dutyCycle)
     : m_dutyCycle{std::move(dutyCycle)},
       m_analogTrigger{m_dutyCycle.get()},
@@ -40,12 +42,14 @@ DutyCycleEncoder::DutyCycleEncoder(DigitalSource& digitalSource)
       m_counter{} {
   Init();
 }
+
 DutyCycleEncoder::DutyCycleEncoder(DigitalSource* digitalSource)
     : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)},
       m_analogTrigger{m_dutyCycle.get()},
       m_counter{} {
   Init();
 }
+
 DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource)
     : m_dutyCycle{std::make_shared<DutyCycle>(digitalSource)},
       m_analogTrigger{m_dutyCycle.get()},
@@ -70,7 +74,7 @@ void DutyCycleEncoder::Init() {
                                         m_dutyCycle->GetSourceChannel());
 }
 
-units::turn_t DutyCycleEncoder::Get() {
+units::turn_t DutyCycleEncoder::Get() const {
   if (m_simPosition) return units::turn_t{m_simPosition.Get()};
 
   // As the values are not atomic, keep trying until we get 2 reads of the same
@@ -96,10 +100,12 @@ units::turn_t DutyCycleEncoder::Get() {
 void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
   m_distancePerRotation = distancePerRotation;
 }
+
 double DutyCycleEncoder::GetDistancePerRotation() const {
   return m_distancePerRotation;
 }
-double DutyCycleEncoder::GetDistance() {
+
+double DutyCycleEncoder::GetDistance() const {
   return Get().to<double>() * GetDistancePerRotation();
 }
 
@@ -115,6 +121,7 @@ void DutyCycleEncoder::Reset() {
 bool DutyCycleEncoder::IsConnected() const {
   return GetFrequency() > m_frequencyThreshold;
 }
+
 void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
   if (frequency < 0) {
     frequency = 0;
