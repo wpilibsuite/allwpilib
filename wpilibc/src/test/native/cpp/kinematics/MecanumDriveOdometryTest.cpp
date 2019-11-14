@@ -18,11 +18,11 @@ class MecanumDriveOdometryTest : public ::testing::Test {
   Translation2d m_br{-12_m, -12_m};
 
   MecanumDriveKinematics kinematics{m_fl, m_fr, m_bl, m_br};
-  MecanumDriveOdometry odometry{kinematics};
+  MecanumDriveOdometry odometry{kinematics, 0_rad};
 };
 
 TEST_F(MecanumDriveOdometryTest, MultipleConsecutiveUpdates) {
-  odometry.ResetPosition(Pose2d());
+  odometry.ResetPosition(Pose2d(), 0_rad);
   MecanumDriveWheelSpeeds wheelSpeeds{3.536_mps, 3.536_mps, 3.536_mps,
                                       3.536_mps};
 
@@ -35,7 +35,7 @@ TEST_F(MecanumDriveOdometryTest, MultipleConsecutiveUpdates) {
 }
 
 TEST_F(MecanumDriveOdometryTest, TwoIterations) {
-  odometry.ResetPosition(Pose2d());
+  odometry.ResetPosition(Pose2d(), 0_rad);
   MecanumDriveWheelSpeeds speeds{3.536_mps, 3.536_mps, 3.536_mps, 3.536_mps};
 
   odometry.UpdateWithTime(0_s, Rotation2d(), MecanumDriveWheelSpeeds{});
@@ -47,7 +47,7 @@ TEST_F(MecanumDriveOdometryTest, TwoIterations) {
 }
 
 TEST_F(MecanumDriveOdometryTest, Test90DegreeTurn) {
-  odometry.ResetPosition(Pose2d());
+  odometry.ResetPosition(Pose2d(), 0_rad);
   MecanumDriveWheelSpeeds speeds{-13.328_mps, 39.986_mps, -13.329_mps,
                                  39.986_mps};
   odometry.UpdateWithTime(0_s, Rotation2d(), MecanumDriveWheelSpeeds{});

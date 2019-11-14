@@ -24,7 +24,8 @@ class MecanumDriveOdometryTest {
   private final MecanumDriveKinematics m_kinematics =
       new MecanumDriveKinematics(m_fl, m_fr, m_bl, m_br);
 
-  private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics);
+  private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
+      new Rotation2d());
 
   @Test
   void testMultipleConsecutiveUpdates() {

@@ -24,7 +24,8 @@ class SwerveDriveOdometryTest {
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(m_fl, m_fr, m_bl, m_br);
 
-  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics);
+  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
+      new Rotation2d());
 
   @Test
   void testTwoIterations() {

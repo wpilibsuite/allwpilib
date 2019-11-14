@@ -21,13 +21,13 @@ class SwerveDriveOdometryTest : public ::testing::Test {
   Translation2d m_br{-12_m, -12_m};
 
   SwerveDriveKinematics<4> m_kinematics{m_fl, m_fr, m_bl, m_br};
-  SwerveDriveOdometry<4> m_odometry{m_kinematics};
+  SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad};
 };
 
 TEST_F(SwerveDriveOdometryTest, TwoIterations) {
   SwerveModuleState state{5_mps, Rotation2d()};
 
-  m_odometry.ResetPosition(Pose2d());
+  m_odometry.ResetPosition(Pose2d(), 0_rad);
   m_odometry.UpdateWithTime(0_s, Rotation2d(), SwerveModuleState(),
                             SwerveModuleState(), SwerveModuleState(),
                             SwerveModuleState());
@@ -47,7 +47,7 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
 
   SwerveModuleState zero{0_mps, Rotation2d()};
 
-  m_odometry.ResetPosition(Pose2d());
+  m_odometry.ResetPosition(Pose2d(), 0_rad);
   m_odometry.UpdateWithTime(0_s, Rotation2d(), zero, zero, zero, zero);
   auto pose =
       m_odometry.UpdateWithTime(1_s, Rotation2d(90_deg), fl, fr, bl, br);

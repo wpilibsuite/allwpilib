@@ -17,9 +17,9 @@ using namespace frc;
 
 TEST(DifferentialDriveOdometry, OneIteration) {
   DifferentialDriveKinematics kinematics{0.381_m * 2};
-  DifferentialDriveOdometry odometry{kinematics};
+  DifferentialDriveOdometry odometry{kinematics, 0_rad};
 
-  odometry.ResetPosition(Pose2d());
+  odometry.ResetPosition(Pose2d(), 0_rad);
   DifferentialDriveWheelSpeeds wheelSpeeds{0.02_mps, 0.02_mps};
   odometry.UpdateWithTime(0_s, Rotation2d(), DifferentialDriveWheelSpeeds());
   const auto& pose = odometry.UpdateWithTime(1_s, Rotation2d(), wheelSpeeds);
@@ -31,9 +31,9 @@ TEST(DifferentialDriveOdometry, OneIteration) {
 
 TEST(DifferentialDriveOdometry, QuarterCircle) {
   DifferentialDriveKinematics kinematics{0.381_m * 2};
-  DifferentialDriveOdometry odometry{kinematics};
+  DifferentialDriveOdometry odometry{kinematics, 0_rad};
 
-  odometry.ResetPosition(Pose2d());
+  odometry.ResetPosition(Pose2d(), 0_rad);
   DifferentialDriveWheelSpeeds wheelSpeeds{
       0.0_mps, units::meters_per_second_t(5 * wpi::math::pi)};
   odometry.UpdateWithTime(0_s, Rotation2d(), DifferentialDriveWheelSpeeds());
