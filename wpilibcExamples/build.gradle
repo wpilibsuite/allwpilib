@@ -44,21 +44,6 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-ext {
-    chipObjectComponents = ['commands']
-    netCommComponents = ['commands']
-    examplesMap.each { key, value ->
-        chipObjectComponents << key.toString()
-        netCommComponents << key.toString()
-    }
-    templatesMap.each { key, value ->
-        chipObjectComponents << key.toString()
-        netCommComponents << key.toString()
-    }
-}
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
 model {
     components {
         commands(NativeLibrarySpec) {
@@ -106,6 +91,9 @@ model {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
                         lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
                         lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
+                    }
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
                     }
                 }
                 sources {
@@ -157,6 +145,9 @@ model {
                         lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
                         lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
                         lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
+                    }
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
                     }
                 }
                 sources {
