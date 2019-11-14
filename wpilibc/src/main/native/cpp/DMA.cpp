@@ -31,6 +31,7 @@ void DMA::SetPause(bool pause) {
   HAL_SetDMAPause(dmaHandle, pause, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
+
 void DMA::SetRate(int cycles) {
   int32_t status = 0;
   HAL_SetDMARate(dmaHandle, cycles, &status);
@@ -54,12 +55,11 @@ void DMA::AddCounter(const Counter* counter) {
   HAL_AddDMACounter(dmaHandle, counter->m_counter, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
+
 void DMA::AddCounterPeriod(const Counter* counter) {
-  {
-    int32_t status = 0;
-    HAL_AddDMACounterPeriod(dmaHandle, counter->m_counter, &status);
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  }
+  int32_t status = 0;
+  HAL_AddDMACounterPeriod(dmaHandle, counter->m_counter, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 void DMA::AddDigitalSource(const DigitalSource* digitalSource) {
@@ -80,11 +80,13 @@ void DMA::AddAnalogInput(const AnalogInput* analogInput) {
   HAL_AddDMAAnalogInput(dmaHandle, analogInput->m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
+
 void DMA::AddAveragedAnalogInput(const AnalogInput* analogInput) {
   int32_t status = 0;
   HAL_AddDMAAveragedAnalogInput(dmaHandle, analogInput->m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
+
 void DMA::AddAnalogAccumulator(const AnalogInput* analogInput) {
   int32_t status = 0;
   HAL_AddDMAAnalogAccumulator(dmaHandle, analogInput->m_port, &status);
@@ -105,6 +107,7 @@ void DMA::StartDMA(int queueDepth) {
   HAL_StartDMA(dmaHandle, queueDepth, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
+
 void DMA::StopDMA() {
   int32_t status = 0;
   HAL_StopDMA(dmaHandle, &status);

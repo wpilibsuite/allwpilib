@@ -19,7 +19,7 @@ class DutyCycle;
 class AnalogInput;
 class DMASample;
 
-class DMA : ErrorBase {
+class DMA : public ErrorBase {
   friend class DMASample;
 
  public:
