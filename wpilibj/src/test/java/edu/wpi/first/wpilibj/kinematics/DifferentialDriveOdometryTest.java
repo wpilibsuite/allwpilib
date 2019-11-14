@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -49,4 +50,22 @@ class DifferentialDriveOdometryTest {
         () -> assertEquals(pose.getRotation().getDegrees(), 90.0, kEpsilon)
     );
   }
+
+  @Test
+  void testGyroAngleReset() {
+    var gyro = Rotation2d.fromDegrees(90.0);
+    var fieldAngle = Rotation2d.fromDegrees(0.0);
+    m_odometry.resetPosition(new Pose2d(new Translation2d(), fieldAngle), gyro);
+    var pose___ = m_odometry.getPoseMeters();
+    var speeds = new DifferentialDriveWheelSpeeds(1.0, 1.0);
+    m_odometry.updateWithTime(0.0, gyro, new DifferentialDriveWheelSpeeds());
+    var pose = m_odometry.updateWithTime(1.0, gyro, speeds);
+
+    assertAll(
+            () -> assertEquals(1.0, pose.getTranslation().getX(), kEpsilon),
+            () -> assertEquals(0.00, pose.getTranslation().getY(), kEpsilon),
+            () -> assertEquals(0.00, pose.getRotation().getRadians(), kEpsilon)
+    );
+  }
+
 }
