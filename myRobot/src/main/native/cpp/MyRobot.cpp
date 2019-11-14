@@ -7,12 +7,29 @@
 
 #include <frc/TimedRobot.h>
 
+#include "hal/AddressableLED.h"
+#include "hal/DIO.h"
+#include "hal/HALBase.h"
+
 class MyRobot : public frc::TimedRobot {
+
+  HAL_DigitalHandle output;
+  HAL_AddressableLEDHandle ledHandle;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
-  void RobotInit() override {}
+  void RobotInit() override {
+    int32_t status = 0;
+    output = HAL_InitializeDIOPort(HAL_GetPort(0), false, &status);
+    std::cout << status << std::endl;
+    ledHandle = HAL_InitializeAddressableLED(output, &status);
+    std::cout << status << std::endl;
+
+    HAL_SetAddressableLEDTiming(ledHandle, 350, 800, 700, 600, 50000, &status);
+    std::cout << status << std::endl;
+  }
 
   /**
    * This function is run once each time the robot enters autonomous mode

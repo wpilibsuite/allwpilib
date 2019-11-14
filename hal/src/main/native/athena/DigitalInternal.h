@@ -97,6 +97,18 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         uint8_t& channel, uint8_t& module, bool& analogTrigger);
 
 /**
+ * Remap the Digital Channel to map to the bitfield channel of the FPGA
+ */
+constexpr int32_t remapDigitalChannelToBitfieldChannel(int32_t channel) {
+  // First 10 are headers
+  if (channel < kNumDigitalHeaders) return channel;
+  // 2nd group of 16 are mxp. So if mxp port, add 6, since they start at 10
+  else if (channel < kNumDigitalMXPChannels) return channel + 6;
+  // Assume SPI, so remove MXP channels
+  else return channel - kNumDigitalMXPChannels;
+}
+
+/**
  * Map DIO channel numbers from their physical number (10 to 26) to their
  * position in the bit field.
  */
