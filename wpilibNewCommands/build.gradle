@@ -40,8 +40,6 @@ nativeUtils.exportsConfigs {
     }
 }
 
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
 apply plugin: DisableBuildingGTest
 
 model {
@@ -64,6 +62,9 @@ model {
             if (it instanceof GoogleTestTestSuiteBinarySpec) {
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
+            }
+            if ((it instanceof NativeExecutableBinarySpec || it instanceof GoogleTestTestSuiteBinarySpec) && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
             }
         }
     }
