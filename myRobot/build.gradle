@@ -21,12 +21,6 @@ ext {
     skipDev = true
 }
 
-ext {
-    chipObjectComponents = ['myRobotCpp', 'myRobotCppStatic']
-    netCommComponents = ['myRobotCpp', 'myRobotCppStatic']
-    useNiJava = true
-}
-
 deploy {
     targets {
         target('roborio') {
@@ -178,6 +172,9 @@ model {
                     project(':hal').addHalJniDependency(binary)
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
+                    }
             }
         }
         myRobotCppStatic(NativeExecutableSpec) {
@@ -203,6 +200,9 @@ model {
                     project(':hal').addHalDependency(binary, 'static')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
+                    }
             }
         }
     }
