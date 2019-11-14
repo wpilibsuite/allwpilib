@@ -93,5 +93,5 @@ class MecanumDriveOdometryTest {
             () -> assertEquals(0.00, pose.getRotation().getRadians(), 0.1)
     );
   }
-  
+
 }

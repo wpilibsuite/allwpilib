@@ -59,14 +59,13 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
 
 TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
   m_odometry.ResetPosition(Pose2d(), Rotation2d(90_deg));
-  
+
   SwerveModuleState state{5_mps, Rotation2d()};
 
-  m_odometry.ResetPosition(Pose2d(), 0_rad);
   m_odometry.UpdateWithTime(0_s, Rotation2d(90_deg), SwerveModuleState(),
                             SwerveModuleState(), SwerveModuleState(),
                             SwerveModuleState());
-  auto pose = m_odometry.UpdateWithTime(0.1_s, Rotation2d(), state, state,
+  auto pose = m_odometry.UpdateWithTime(0.1_s, Rotation2d(90_deg), state, state,
                                         state, state);
 
   EXPECT_NEAR(0.5, pose.Translation().X().to<double>(), kEpsilon);

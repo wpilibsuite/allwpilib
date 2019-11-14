@@ -60,10 +60,12 @@ TEST_F(MecanumDriveOdometryTest, Test90DegreeTurn) {
 
 TEST_F(MecanumDriveOdometryTest, GyroAngleReset) {
   odometry.ResetPosition(Pose2d(), Rotation2d(90_deg));
-  
+
+  MecanumDriveWheelSpeeds speeds{3.536_mps, 3.536_mps, 3.536_mps, 3.536_mps};
+
   odometry.UpdateWithTime(0_s, Rotation2d(90_deg), MecanumDriveWheelSpeeds{});
   auto pose = odometry.UpdateWithTime(0.10_s, Rotation2d(90_deg), speeds);
-  
+
   EXPECT_NEAR(pose.Translation().X().to<double>(), 0.5, 0.01);
   EXPECT_NEAR(pose.Translation().Y().to<double>(), 0.0, 0.01);
   EXPECT_NEAR(pose.Rotation().Radians().to<double>(), 0.0, 0.01);
