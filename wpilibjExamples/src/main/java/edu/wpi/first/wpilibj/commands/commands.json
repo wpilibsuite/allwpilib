@@ -7,7 +7,7 @@
     ],
     "foldername": "emptyclass",
     "replacename": "ReplaceMeEmptyClass",
-    "version": 0
+    "commandversion": 0
   },
   {
     "name": "Command",
@@ -17,7 +17,7 @@
     ],
     "foldername": "command",
     "replacename": "ReplaceMeCommand",
-    "version": 1
+    "commandversion": 1
   },
   {
     "name": "Command Group",
@@ -27,7 +27,7 @@
     ],
     "foldername": "commandgroup",
     "replacename": "ReplaceMeCommandGroup",
-    "version": 1
+    "commandversion": 1
   },
   {
     "name": "Instant Command",
@@ -37,7 +37,7 @@
     ],
     "foldername": "instant",
     "replacename": "ReplaceMeInstantCommand",
-    "version": 1
+    "commandversion": 1
   },
   {
     "name": "Subsystem",
@@ -45,9 +45,9 @@
     "tags": [
       "subsystem"
     ],
-    "foldername": "subsystem",
+    "foldername": "subsystem2",
     "replacename": "ReplaceMeSubsystem",
-    "version": 1
+    "commandversion": 1
   },
   {
     "name": "PID Subsystem",
@@ -58,7 +58,7 @@
     ],
     "foldername": "pidsubsystem",
     "replacename": "ReplaceMePIDSubsystem",
-    "version": 1
+    "commandversion": 1
   },
   {
     "name": "Timed Command",
@@ -68,7 +68,7 @@
     ],
     "foldername": "timed",
     "replacename": "ReplaceMeTimedCommand",
-    "version": 1
+    "commandversion": 1
   },
   {
     "name": "Trigger",
@@ -78,7 +78,7 @@
     ],
     "foldername": "trigger",
     "replacename": "ReplaceMeTrigger",
-    "version": 1
+    "commandversion": 1
   },
   {
     "name": "Command",
@@ -86,9 +86,9 @@
     "tags": [
       "command"
     ],
-    "foldername": "wpilibj2/command",
+    "foldername": "command2",
     "replacename": "ReplaceMeCommand",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "InstantCommand",
@@ -96,9 +96,9 @@
     "tags": [
       "instantcommand"
     ],
-    "foldername": "wpilibj2/instantcommand",
+    "foldername": "instantcommand",
     "replacename": "ReplaceMeInstantCommand",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "ParallelCommandGroup",
@@ -106,9 +106,9 @@
     "tags": [
       "parallelcommandgroup"
     ],
-    "foldername": "wpilibj2/parallelcommandgroup",
+    "foldername": "parallelcommandgroup",
     "replacename": "ReplaceMeParallelCommandGroup",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "ParallelDeadlineGroup",
@@ -116,9 +116,9 @@
     "tags": [
       "paralleldeadlinegroup"
     ],
-    "foldername": "wpilibj2/paralleldeadlinegroup",
+    "foldername": "paralleldeadlinegroup",
     "replacename": "ReplaceMeParallelDeadlineGroup",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "ParallelRaceGroup",
@@ -126,9 +126,9 @@
     "tags": [
       "parallelracegroup"
     ],
-    "foldername": "wpilibj2/parallelracegroup",
+    "foldername": "parallelracegroup",
     "replacename": "ReplaceMeParallelRaceGroup",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "PIDCommand",
@@ -136,9 +136,9 @@
     "tags": [
       "pidcommand"
     ],
-    "foldername": "wpilibj2/pidcommand",
+    "foldername": "pidcommand",
     "replacename": "ReplaceMePIDCommand",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "PIDSubsystem",
@@ -146,9 +146,9 @@
     "tags": [
       "pidsubsystem"
     ],
-    "foldername": "wpilibj2/pidsubsystem",
+    "foldername": "pidsubsystem2",
     "replacename": "ReplaceMePIDSubsystem",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "ProfiledPIDCommand",
@@ -156,9 +156,9 @@
     "tags": [
       "profiledpidcommand"
     ],
-    "foldername": "wpilibj2/profiledpidcommand",
+    "foldername": "profiledpidcommand",
     "replacename": "ReplaceMeProfiledPIDCommand",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "ProfiledPIDSubsystem",
@@ -166,9 +166,9 @@
     "tags": [
       "profiledpidsubsystem"
     ],
-    "foldername": "wpilibj2/profiledpidsubsystem",
+    "foldername": "profiledpidsubsystem",
     "replacename": "ReplaceMeProfiledPIDSubsystem",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "SequentialCommandGroup",
@@ -176,9 +176,9 @@
     "tags": [
       "sequentialcommandgroup"
     ],
-    "foldername": "wpilibj2/sequentialcommandgroup",
+    "foldername": "sequentialcommandgroup",
     "replacename": "ReplaceMeSequentialCommandGroup",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "Subsystem",
@@ -186,9 +186,9 @@
     "tags": [
       "subsystem"
     ],
-    "foldername": "wpilibj2/subsystem",
+    "foldername": "subsystem2",
     "replacename": "ReplaceMeSubsystem",
-    "version": 2
+    "commandversion": 2
   },
   {
     "name": "TrapezoidProfileCommand",
@@ -196,8 +196,8 @@
     "tags": [
       "trapezoidprofilecommand"
     ],
-    "foldername": "wpilibj2/trapezoidprofilecommand",
+    "foldername": "trapezoidprofilecommand",
     "replacename": "ReplaceMeTrapezoidProfileCommand",
-    "version": 2
+    "commandversion": 2
   }
 ]
