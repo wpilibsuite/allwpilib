@@ -7,18 +7,17 @@
 
 #pragma once
 
-#include <frc/ErrorBase.h>
-#include <frc/WPIErrors.h>
-#include <frc2/command/Subsystem.h>
-
+#include <functional>
 #include <memory>
 #include <string>
 
+#include <frc/ErrorBase.h>
 #include <units/units.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
-#include <wpi/Twine.h>
+
+#include "frc2/command/Subsystem.h"
 
 namespace frc2 {
 
@@ -128,17 +127,21 @@ class Command : public frc::ErrorBase {
    * Decorates this command with a runnable to run before this command starts.
    *
    * @param toRun the Runnable to run
+   * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup BeforeStarting(std::function<void()> toRun) &&;
+  SequentialCommandGroup BeforeStarting(std::function<void()> toRun,
+                                        std::initializer_list<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
    *
    * @param toRun the Runnable to run
+   * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup AndThen(std::function<void()> toRun) &&;
+  SequentialCommandGroup AndThen(std::function<void()> toRun,
+                                 std::initializer_list<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end

@@ -44,8 +44,8 @@ tasks.whenTaskAdded { task ->
 }
 
 dependencies {
-      compile "com.google.protobuf:protobuf-java:${protobuf_version}"
-      compile "com.google.protobuf:protoc:${protobuf_version}"
+      implementation "com.google.protobuf:protobuf-java:${protobuf_version}"
+      implementation "com.google.protobuf:protoc:${protobuf_version}"
 }
 
 /* There is a nice gradle plugin for protobuf, and the protoc tool

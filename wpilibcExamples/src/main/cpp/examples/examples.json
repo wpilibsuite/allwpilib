@@ -9,7 +9,8 @@
       "Complete List"
     ],
     "foldername": "MotorControl",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Motor Control With Encoder",
@@ -23,7 +24,8 @@
       "Complete List"
     ],
     "foldername": "MotorControlEncoder",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Relay",
@@ -34,7 +36,8 @@
       "Complete List"
     ],
     "foldername": "Relay",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "PDP CAN Monitoring",
@@ -45,7 +48,8 @@
       "Sensors"
     ],
     "foldername": "CANPDP",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Solenoids",
@@ -57,7 +61,8 @@
       "Complete List"
     ],
     "foldername": "Solenoid",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Encoder",
@@ -68,7 +73,8 @@
       "Sensors"
     ],
     "foldername": "Encoder",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Arcade Drive",
@@ -80,7 +86,8 @@
       "Complete List"
     ],
     "foldername": "ArcadeDrive",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Mecanum Drive",
@@ -92,7 +99,8 @@
       "Complete List"
     ],
     "foldername": "MecanumDrive",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Ultrasonic",
@@ -104,7 +112,8 @@
       "Analog"
     ],
     "foldername": "Ultrasonic",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "UltrasonicPID",
@@ -116,7 +125,8 @@
       "Analog"
     ],
     "foldername": "UltrasonicPID",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Gyro",
@@ -129,7 +139,8 @@
       "Joystick"
     ],
     "foldername": "Gyro",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Gyro Mecanum",
@@ -142,7 +153,8 @@
       "Joysitck"
     ],
     "foldername": "GyroMecanum",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "HID Rumble",
@@ -151,7 +163,8 @@
       "Joystick"
     ],
     "foldername": "HidRumble",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "PotentiometerPID",
@@ -164,7 +177,8 @@
       "Analog"
     ],
     "foldername": "PotentiometerPID",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Elevator with trapezoid profiled PID",
@@ -176,7 +190,8 @@
       "Joystick"
     ],
     "foldername": "ElevatorTrapezoidProfile",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Elevator with profiled PID controller",
@@ -188,7 +203,8 @@
       "Joystick"
     ],
     "foldername": "ElevatorProfiledPID",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Getting Started",
@@ -198,7 +214,8 @@
       "Complete List"
     ],
     "foldername": "GettingStarted",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Simple Vision",
@@ -208,7 +225,8 @@
       "Complete List"
     ],
     "foldername": "QuickVision",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Intermediate Vision",
@@ -218,7 +236,8 @@
       "Complete List"
     ],
     "foldername": "IntermediateVision",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Axis Camera Sample",
@@ -228,7 +247,8 @@
       "Complete List"
     ],
     "foldername": "AxisCameraSample",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "GearsBot",
@@ -238,7 +258,8 @@
       "Complete List"
     ],
     "foldername": "GearsBot",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "PacGoat",
@@ -248,7 +269,8 @@
       "Complete List"
     ],
     "foldername": "PacGoat",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "HAL",
@@ -257,7 +279,8 @@
       "HAL"
     ],
     "foldername": "HAL",
-    "gradlebase": "c"
+    "gradlebase": "c",
+    "commandversion": 1
   },
   {
     "name": "ShuffleBoard",
@@ -266,7 +289,8 @@
       "ShuffleBoard"
     ],
     "foldername": "ShuffleBoard",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "'Traditional' Hatchbot",
@@ -276,7 +300,8 @@
       "Command-based"
     ],
     "foldername": "HatchbotTraditional",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "'Inlined' Hatchbot",
@@ -287,7 +312,8 @@
       "Lambdas"
     ],
     "foldername": "HatchbotInlined",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "Select Command Example",
@@ -296,7 +322,8 @@
       "Command-based"
     ],
     "foldername": "SelectCommand",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "Scheduler Event Logging",
@@ -306,7 +333,8 @@
       "Shuffleboard"
     ],
     "foldername": "SchedulerEventLogging",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "Frisbeebot",
@@ -316,7 +344,8 @@
       "PID"
     ],
     "foldername": "Frisbeebot",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "Gyro Drive Commands",
@@ -327,7 +356,8 @@
       "Gyro"
     ],
     "foldername": "GyroDriveCommands",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "SwerveBot",
@@ -336,7 +366,8 @@
       "SwerveBot"
     ],
     "foldername": "SwerveBot",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "MecanumBot",
@@ -345,7 +376,8 @@
       "MecanumBot"
     ],
     "foldername": "MecanumBot",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "DifferentialDriveBot",
@@ -354,7 +386,8 @@
       "DifferentialDriveBot"
     ],
     "foldername": "DifferentialDriveBot",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
   },
   {
     "name": "RamseteCommand",
@@ -367,6 +400,33 @@
       "Path following"
     ],
     "foldername": "RamseteCommand",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Arcade Drive Xbox Controller",
+    "description": "An example program which demonstrates the use of Arcade Drive with the DifferentialDrive class and an Xbox Controller.",
+    "tags": [
+      "Getting Started with C++",
+      "Robot and Motor",
+      "XboxController",
+      "Complete List"
+    ],
+    "foldername": "ArcadeDriveXboxController",
+    "gradlebase": "cpp",
+    "commandversion": 1
+  },
+  {
+    "name": "Tank Drive Xbox Controller",
+    "description": "An example program which demonstrates the use of Tank Drive with the DifferentialDrive class and an Xbox Controller.",
+    "tags": [
+      "Getting Started with C++",
+      "Robot and Motor",
+      "XboxController",
+      "Complete List"
+    ],
+    "foldername": "TankDriveXboxController",
+    "gradlebase": "cpp",
+    "commandversion": 1
   }
 ]

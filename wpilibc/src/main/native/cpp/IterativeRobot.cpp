@@ -7,7 +7,8 @@
 
 #include "frc/IterativeRobot.h"
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/DriverStation.h"
 
@@ -30,7 +31,13 @@ void IterativeRobot::StartCompetition() {
   while (true) {
     // Wait for driver station data so the loop doesn't hog the CPU
     DriverStation::GetInstance().WaitForData();
+    if (m_exit) break;
 
     LoopFunc();
   }
+}
+
+void IterativeRobot::EndCompetition() {
+  m_exit = true;
+  DriverStation::GetInstance().WakeupWaitForData();
 }

@@ -7,9 +7,12 @@
 
 #pragma once
 
+#include <functional>
+#include <initializer_list>
+
+#include <frc/controller/ProfiledPIDController.h>
 #include <units/units.h>
 
-#include "frc/controller/ProfiledPIDController.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -41,7 +44,7 @@ class ProfiledPIDCommand
                      std::function<units::meter_t()> measurementSource,
                      std::function<State()> goalSource,
                      std::function<void(double, State)> useOutput,
-                     std::initializer_list<Subsystem*> requirements);
+                     std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Creates a new PIDCommand, which controls the given output with a

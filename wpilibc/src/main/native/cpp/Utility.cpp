@@ -17,7 +17,7 @@
 #include <cstring>
 
 #include <hal/DriverStation.h>
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StackTrace.h>

@@ -1009,6 +1009,16 @@ public class DriverStation {
   }
 
   /**
+   * Forces waitForData() to return immediately.
+   */
+  public void wakeupWaitForData() {
+    m_waitForDataMutex.lock();
+    m_waitForDataCount++;
+    m_waitForDataCond.signalAll();
+    m_waitForDataMutex.unlock();
+  }
+
+  /**
    * Copy data from the DS task for the user. If no new data exists, it will just be returned,
    * otherwise the data will be copied from the DS polling loop.
    */
@@ -1061,11 +1071,7 @@ public class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
-    m_waitForDataMutex.lock();
-    m_waitForDataCount++;
-    m_waitForDataCond.signalAll();
-    m_waitForDataMutex.unlock();
-
+    wakeupWaitForData();
     sendMatchData();
   }
 

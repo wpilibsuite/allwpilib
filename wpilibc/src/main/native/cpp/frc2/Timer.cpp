@@ -10,7 +10,7 @@
 #include <chrono>
 #include <thread>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/DriverStation.h"
 #include "frc/RobotController.h"
@@ -129,7 +129,7 @@ bool Timer::HasPeriodPassed(units::second_t period) {
 
 units::second_t Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
-  return units::second_t(frc::RobotController::GetFPGATime()) * 1.0e-6;
+  return units::second_t(frc::RobotController::GetFPGATime() * 1.0e-6);
 }
 
 units::second_t Timer::GetMatchTime() {

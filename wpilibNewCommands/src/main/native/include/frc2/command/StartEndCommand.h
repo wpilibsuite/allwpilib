@@ -7,8 +7,11 @@
 
 #pragma once
 
-#include "CommandBase.h"
-#include "CommandHelper.h"
+#include <functional>
+#include <initializer_list>
+
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
@@ -29,7 +32,7 @@ class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
    * @param requirements the subsystems required by this command
    */
   StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd,
-                  std::initializer_list<Subsystem*> requirements);
+                  std::initializer_list<Subsystem*> requirements = {});
 
   StartEndCommand(StartEndCommand&& other) = default;
 

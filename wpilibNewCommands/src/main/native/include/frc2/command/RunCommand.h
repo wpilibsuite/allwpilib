@@ -7,8 +7,11 @@
 
 #pragma once
 
-#include "CommandBase.h"
-#include "CommandHelper.h"
+#include <functional>
+#include <initializer_list>
+
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
@@ -27,7 +30,7 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
    * @param requirements the subsystems to require
    */
   RunCommand(std::function<void()> toRun,
-             std::initializer_list<Subsystem*> requirements);
+             std::initializer_list<Subsystem*> requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 

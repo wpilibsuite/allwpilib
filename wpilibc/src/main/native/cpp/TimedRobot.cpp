@@ -11,7 +11,9 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/Notifier.h>
 
 #include "frc/Timer.h"
 #include "frc/Utility.h"
@@ -43,6 +45,11 @@ void TimedRobot::StartCompetition() {
   }
 }
 
+void TimedRobot::EndCompetition() {
+  int32_t status = 0;
+  HAL_StopNotifier(m_notifier, &status);
+}
+
 units::second_t TimedRobot::GetPeriod() const {
   return units::second_t(m_period);
 }
@@ -52,7 +59,8 @@ TimedRobot::TimedRobot(double period) : TimedRobot(units::second_t(period)) {}
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
+  HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Timed);
@@ -62,7 +70,7 @@ TimedRobot::~TimedRobot() {
   int32_t status = 0;
 
   HAL_StopNotifier(m_notifier, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   HAL_CleanNotifier(m_notifier, &status);
 }
@@ -71,5 +79,5 @@ void TimedRobot::UpdateAlarm() {
   int32_t status = 0;
   HAL_UpdateNotifierAlarm(
       m_notifier, static_cast<uint64_t>(m_expirationTime * 1e6), &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }

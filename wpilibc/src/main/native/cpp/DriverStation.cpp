@@ -9,7 +9,9 @@
 
 #include <chrono>
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Power.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
@@ -473,6 +475,13 @@ double DriverStation::GetBatteryVoltage() const {
   return voltage;
 }
 
+void DriverStation::WakeupWaitForData() {
+  std::scoped_lock waitLock(m_waitForDataMutex);
+  // Nofify all threads
+  m_waitForDataCounter++;
+  m_waitForDataCond.notify_all();
+}
+
 void DriverStation::GetData() {
   {
     // Compute the pressed and released buttons
@@ -494,13 +503,7 @@ void DriverStation::GetData() {
     }
   }
 
-  {
-    std::scoped_lock waitLock(m_waitForDataMutex);
-    // Nofify all threads
-    m_waitForDataCounter++;
-    m_waitForDataCond.notify_all();
-  }
-
+  WakeupWaitForData();
   SendMatchData();
 }
 

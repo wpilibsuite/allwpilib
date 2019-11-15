@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include <frc/controller/ProfiledPIDController.h>
 #include <units/units.h>
 
-#include "frc/controller/ProfiledPIDController.h"
 #include "frc2/command/SubsystemBase.h"
 
 namespace frc2 {
@@ -36,8 +36,10 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    * Uses the output from the ProfiledPIDController.
    *
    * @param output the output of the ProfiledPIDController
+   * @param setpoint the setpoint state of the ProfiledPIDController, for
+   * feedforward
    */
-  virtual void UseOutput(double output, State state) = 0;
+  virtual void UseOutput(double output, State setpoint) = 0;
 
   /**
    * Returns the goal used by the ProfiledPIDController.

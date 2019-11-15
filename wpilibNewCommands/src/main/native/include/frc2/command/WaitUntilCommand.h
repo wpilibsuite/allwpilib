@@ -7,8 +7,11 @@
 
 #pragma once
 
-#include "CommandBase.h"
-#include "frc/Timer.h"
+#include <functional>
+
+#include <units/units.h>
+
+#include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
@@ -36,7 +39,7 @@ class WaitUntilCommand : public CommandHelper<CommandBase, WaitUntilCommand> {
    *
    * @param time the match time after which to end, in seconds
    */
-  explicit WaitUntilCommand(double time);
+  explicit WaitUntilCommand(units::second_t time);
 
   WaitUntilCommand(WaitUntilCommand&& other) = default;
 

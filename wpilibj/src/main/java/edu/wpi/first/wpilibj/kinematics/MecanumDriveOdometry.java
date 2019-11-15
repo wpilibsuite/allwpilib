@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
 
 /**
- * Class for mecnaum drive odometry. Odometry allows you to track the robot's
+ * Class for mecanum drive odometry. Odometry allows you to track the robot's
  * position on the field over a course of a match using readings from your
  * mecanum wheel encoders.
  *
@@ -104,7 +104,7 @@ public class MecanumDriveOdometry {
    * also takes in an angle parameter which is used instead of the
    * angular rate that is calculated from forward kinematics.
    *
-   * @param angle       THe angle of the robot.
+   * @param angle       The angle of the robot.
    * @param wheelSpeeds The current wheel speeds.
    * @return The new pose of the robot.
    */

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -115,9 +116,7 @@ public class RobotContainer {
         exampleTrajectory,
         m_robotDrive::getPose,
         new RamseteController(kRamseteB, kRamseteZeta),
-        ksVolts,
-        kvVoltSecondsPerMeter,
-        kaVoltSecondsSquaredPerMeter,
+        new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter),
         kDriveKinematics,
         m_robotDrive.getLeftEncoder()::getRate,
         m_robotDrive.getRightEncoder()::getRate,

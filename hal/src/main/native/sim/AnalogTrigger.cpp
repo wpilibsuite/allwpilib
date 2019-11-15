@@ -179,25 +179,7 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
                                  : HALSIM_AnalogTriggerUnassigned;
   triggerData->triggerMode = setVal;
 }
-void HAL_SetAnalogTriggerDutyCycle(HAL_AnalogTriggerHandle analogTriggerHandle,
-                                   HAL_Bool useDutyCycle, int32_t* status) {
-  auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
-  if (trigger == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
 
-  AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
-
-  if (triggerData->triggerMode.Get() != HALSIM_AnalogTriggerUnassigned) {
-    *status = INCOMPATIBLE_STATE;
-    return;
-  }
-
-  auto setVal = useDutyCycle ? HALSIM_AnalogTriggerDutyCycle
-                             : HALSIM_AnalogTriggerUnassigned;
-  triggerData->triggerMode = setVal;
-}
 void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
                                   HAL_Bool useFilteredValue, int32_t* status) {
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);

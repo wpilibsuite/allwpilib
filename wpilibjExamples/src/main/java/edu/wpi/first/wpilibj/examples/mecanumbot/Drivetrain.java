@@ -32,9 +32,9 @@ public class Drivetrain {
   private final Spark m_backRightMotor = new Spark(4);
 
   private final Encoder m_frontLeftEncoder = new Encoder(0, 1);
-  private final Encoder m_frontRightEncoder = new Encoder(0, 1);
-  private final Encoder m_backLeftEncoder = new Encoder(0, 1);
-  private final Encoder m_backRightEncoder = new Encoder(0, 1);
+  private final Encoder m_frontRightEncoder = new Encoder(2, 3);
+  private final Encoder m_backLeftEncoder = new Encoder(4, 5);
+  private final Encoder m_backRightEncoder = new Encoder(6, 7);
 
   private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
   private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);

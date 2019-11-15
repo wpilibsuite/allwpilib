@@ -6,7 +6,8 @@
       "Timed"
     ],
     "foldername": "timed",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Timed Skeleton (Advanced)",
@@ -15,7 +16,8 @@
       "Timed", "Skeleton"
     ],
     "foldername": "timedskeleton",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "RobotBase Skeleton (Advanced)",
@@ -24,7 +26,8 @@
       "RobotBase", "Skeleton"
     ],
     "foldername": "robotbaseskeleton",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Command Robot",
@@ -33,6 +36,17 @@
       "Command"
     ],
     "foldername": "commandbased",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Old Command Robot",
+    "description": "Old-Command style (deprecated)",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "oldcommandbased",
+    "gradlebase": "cpp",
+    "commandversion": 1
   }
 ]

@@ -13,12 +13,11 @@
 #endif
 
 #include <memory>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
-#include "CommandGroupBase.h"
-#include "CommandHelper.h"
+#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
@@ -99,7 +98,7 @@ class ParallelDeadlineGroup
 
   void SetDeadline(std::unique_ptr<Command>&& deadline);
 
-  std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
+  std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   Command* m_deadline;
   bool m_runWhenDisabled{true};
   bool isRunning = false;

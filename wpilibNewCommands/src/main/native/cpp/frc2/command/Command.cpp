@@ -7,8 +7,6 @@
 
 #include "frc2/command/Command.h"
 
-#include <iostream>
-
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
@@ -50,19 +48,21 @@ ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
   return ParallelRaceGroup(std::move(temp));
 }
 
-SequentialCommandGroup Command::BeforeStarting(std::function<void()> toRun) && {
+SequentialCommandGroup Command::BeforeStarting(std::function<void()> toRun,
+                                               std::initializer_list<Subsystem*> requirements) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::make_unique<InstantCommand>(
-      std::move(toRun), std::initializer_list<Subsystem*>{}));
+      std::move(toRun), requirements));
   temp.emplace_back(std::move(*this).TransferOwnership());
   return SequentialCommandGroup(std::move(temp));
 }
 
-SequentialCommandGroup Command::AndThen(std::function<void()> toRun) && {
+SequentialCommandGroup Command::AndThen(std::function<void()> toRun,
+                                        std::initializer_list<Subsystem*> requirements) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::move(*this).TransferOwnership());
   temp.emplace_back(std::make_unique<InstantCommand>(
-      std::move(toRun), std::initializer_list<Subsystem*>{}));
+      std::move(toRun), requirements));
   return SequentialCommandGroup(std::move(temp));
 }
 

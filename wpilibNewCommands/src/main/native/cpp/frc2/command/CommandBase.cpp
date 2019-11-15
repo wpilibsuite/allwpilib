@@ -9,8 +9,6 @@
 
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
-#include <frc2/command/CommandScheduler.h>
-#include <frc2/command/SetUtilities.h>
 
 using namespace frc2;
 

@@ -7,11 +7,12 @@
 
 #pragma once
 
+#include <wpi/ArrayRef.h>
 #include <wpi/SmallVector.h>
 
-#include "CommandBase.h"
-#include "CommandHelper.h"
-#include "SetUtilities.h"
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandHelper.h"
+#include "frc2/command/SetUtilities.h"
 
 namespace frc2 {
 /**

@@ -154,7 +154,7 @@ void HAL_SetAnalogTriggerLimitsDutyCycle(
 
   trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * lower),
                                     status);
-  trigger->trigger->writeLowerLimit(static_cast<int32_t>(scaleFactor * upper),
+  trigger->trigger->writeUpperLimit(static_cast<int32_t>(scaleFactor * upper),
                                     status);
 }
 
@@ -254,10 +254,9 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
       result = trigger->trigger->readOutput_OverLimit(trigger->index, status);
       break;
     case HAL_Trigger_kRisingPulse:
-      result = trigger->trigger->readOutput_Rising(trigger->index, status);
-      break;
     case HAL_Trigger_kFallingPulse:
-      result = trigger->trigger->readOutput_Falling(trigger->index, status);
+      *status = ANALOG_TRIGGER_PULSE_OUTPUT_ERROR;
+      return false;
       break;
   }
   return result;

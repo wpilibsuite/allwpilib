@@ -57,6 +57,8 @@ typedef HAL_Handle HAL_SimDeviceHandle;
 
 typedef HAL_Handle HAL_SimValueHandle;
 
+typedef HAL_Handle HAL_DMAHandle;
+
 typedef HAL_Handle HAL_DutyCycleHandle;
 
 typedef HAL_CANHandle HAL_PDPHandle;

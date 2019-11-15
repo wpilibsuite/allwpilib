@@ -28,8 +28,9 @@ Trigger Trigger::WhenActive(Command* command, bool interruptible) {
   return *this;
 }
 
-Trigger Trigger::WhenActive(std::function<void()> toRun) {
-  return WhenActive(InstantCommand(std::move(toRun), {}));
+Trigger Trigger::WhenActive(std::function<void()> toRun,
+                            std::initializer_list<Subsystem*> requirements) {
+  return WhenActive(InstantCommand(std::move(toRun), requirements));
 }
 
 Trigger Trigger::WhileActiveContinous(Command* command, bool interruptible) {
@@ -48,8 +49,9 @@ Trigger Trigger::WhileActiveContinous(Command* command, bool interruptible) {
   return *this;
 }
 
-Trigger Trigger::WhileActiveContinous(std::function<void()> toRun) {
-  return WhileActiveContinous(InstantCommand(std::move(toRun), {}));
+Trigger Trigger::WhileActiveContinous(std::function<void()> toRun,
+                                      std::initializer_list<Subsystem*> requirements) {
+  return WhileActiveContinous(InstantCommand(std::move(toRun), requirements));
 }
 
 Trigger Trigger::WhileActiveOnce(Command* command, bool interruptible) {
@@ -82,8 +84,9 @@ Trigger Trigger::WhenInactive(Command* command, bool interruptible) {
   return *this;
 }
 
-Trigger Trigger::WhenInactive(std::function<void()> toRun) {
-  return WhenInactive(InstantCommand(std::move(toRun), {}));
+Trigger Trigger::WhenInactive(std::function<void()> toRun,
+                              std::initializer_list<Subsystem*> requirements) {
+  return WhenInactive(InstantCommand(std::move(toRun), requirements));
 }
 
 Trigger Trigger::ToggleWhenActive(Command* command, bool interruptible) {

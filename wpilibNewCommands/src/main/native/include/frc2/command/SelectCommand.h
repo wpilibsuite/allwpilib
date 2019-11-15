@@ -15,14 +15,14 @@
 #include <memory>
 #include <unordered_map>
 #include <utility>
+#include <type_traits>
 #include <vector>
 
-#include "CommandBase.h"
-#include "CommandGroupBase.h"
-#include "PrintCommand.h"
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandGroupBase.h"
+#include "frc2/command/PrintCommand.h"
 
 namespace frc2 {
-template <typename Key>
 /**
  * Runs one of a selection of commands, either using a selector and a key to
  * command mapping, or a supplier that returns the command directly at runtime.
@@ -39,6 +39,7 @@ template <typename Key>
  * <p>As a rule, CommandGroups require the union of the requirements of their
  * component commands.
  */
+template <typename Key>
 class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
  public:
   /**

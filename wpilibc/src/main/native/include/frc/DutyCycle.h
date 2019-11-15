@@ -18,6 +18,8 @@
 namespace frc {
 class DigitalSource;
 class AnalogTrigger;
+class DMA;
+class DMASample;
 
 /**
  * Class to read a duty cycle PWM input.
@@ -34,6 +36,8 @@ class DutyCycle : public ErrorBase,
                   public Sendable,
                   public SendableHelper<DutyCycle> {
   friend class AnalogTrigger;
+  friend class DMA;
+  friend class DMASample;
 
  public:
   /**
@@ -112,6 +116,13 @@ class DutyCycle : public ErrorBase,
    * @return the FPGA index
    */
   int GetFPGAIndex() const;
+
+  /**
+   * Get the channel of the source.
+   *
+   * @return the source channel
+   */
+  int GetSourceChannel() const;
 
  protected:
   void InitSendable(SendableBuilder& builder) override;

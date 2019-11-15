@@ -10,7 +10,9 @@
 #include <limits>
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/AnalogOutput.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Ports.h>
 
 #include "frc/SensorUtil.h"
@@ -35,8 +37,7 @@ AnalogOutput::AnalogOutput(int channel) {
   int32_t status = 0;
   m_port = HAL_InitializeAnalogOutputPort(port, &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumAnalogOutputs(), channel,
-                                 HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumAnalogOutputs(), channel);
     m_channel = std::numeric_limits<int>::max();
     m_port = HAL_kInvalidHandle;
     return;
@@ -52,14 +53,14 @@ void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
   HAL_SetAnalogOutput(m_port, voltage, &status);
 
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 double AnalogOutput::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetAnalogOutput(m_port, &status);
 
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   return voltage;
 }

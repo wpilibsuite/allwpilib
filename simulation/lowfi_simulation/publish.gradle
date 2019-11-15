@@ -7,8 +7,8 @@ def zipBaseName = "_GROUP_edu_wpi_first_halsim_ID_${nativeName}_CLS"
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppSourcesZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "sources"
 
     from(licenseFile) {
@@ -21,8 +21,8 @@ task cppSourcesZip(type: Zip) {
 }
 
 task cppHeadersZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "headers"
 
     from(licenseFile) {

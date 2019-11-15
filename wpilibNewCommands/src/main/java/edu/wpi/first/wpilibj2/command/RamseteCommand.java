@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
@@ -45,9 +46,7 @@ public class RamseteCommand extends CommandBase {
   private final Trajectory m_trajectory;
   private final Supplier<Pose2d> m_pose;
   private final RamseteController m_follower;
-  private final double m_ks;
-  private final double m_kv;
-  private final double m_ka;
+  private final SimpleMotorFeedforward m_feedforward;
   private final DifferentialDriveKinematics m_kinematics;
   private final DoubleSupplier m_leftSpeed;
   private final DoubleSupplier m_rightSpeed;
@@ -67,12 +66,8 @@ public class RamseteCommand extends CommandBase {
    * @param trajectory                     The trajectory to follow.
    * @param pose                           A function that supplies the robot pose - use one of
    *                                       the odometry classes to provide this.
-   * @param controller                       The RAMSETE controller used to follow the trajectory.
-   * @param ksVolts                        Constant feedforward term for the robot drive.
-   * @param kvVoltSecondsPerMeter          Velocity-proportional feedforward term for the robot
-   *                                       drive.
-   * @param kaVoltSecondsSquaredPerMeter   Acceleration-proportional feedforward term for the robot
-   *                                       drive.
+   * @param controller                     The RAMSETE controller used to follow the trajectory.
+   * @param feedforward                    The feedforward to use for the drive.
    * @param kinematics                     The kinematics for the robot drivetrain.
    * @param leftWheelSpeedMetersPerSecond  A function that supplies the speed of the left side of
    *                                       the robot drive.
@@ -88,9 +83,7 @@ public class RamseteCommand extends CommandBase {
   public RamseteCommand(Trajectory trajectory,
                         Supplier<Pose2d> pose,
                         RamseteController controller,
-                        double ksVolts,
-                        double kvVoltSecondsPerMeter,
-                        double kaVoltSecondsSquaredPerMeter,
+                        SimpleMotorFeedforward feedforward,
                         DifferentialDriveKinematics kinematics,
                         DoubleSupplier leftWheelSpeedMetersPerSecond,
                         DoubleSupplier rightWheelSpeedMetersPerSecond,
@@ -101,9 +94,7 @@ public class RamseteCommand extends CommandBase {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "RamseteCommand");
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
     m_follower = requireNonNullParam(controller, "controller", "RamseteCommand");
-    m_ks = ksVolts;
-    m_kv = kvVoltSecondsPerMeter;
-    m_ka = kaVoltSecondsSquaredPerMeter;
+    m_feedforward = feedforward;
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "RamseteCommand");
     m_leftSpeed = requireNonNullParam(leftWheelSpeedMetersPerSecond,
                                       "leftWheelSpeedMetersPerSecond",
@@ -146,9 +137,7 @@ public class RamseteCommand extends CommandBase {
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "RamseteCommand");
     m_output = requireNonNullParam(outputMetersPerSecond, "output", "RamseteCommand");
 
-    m_ks = 0;
-    m_kv = 0;
-    m_ka = 0;
+    m_feedforward = null;
     m_leftSpeed = null;
     m_rightSpeed = null;
     m_leftController = null;
@@ -192,14 +181,12 @@ public class RamseteCommand extends CommandBase {
 
     if (m_usePID) {
       double leftFeedforward =
-          m_ks * Math.signum(leftSpeedSetpoint)
-              + m_kv * leftSpeedSetpoint
-              + m_ka * (leftSpeedSetpoint - m_prevSpeeds.leftMetersPerSecond) / dt;
+          m_feedforward.calculate(leftSpeedSetpoint,
+                                  (leftSpeedSetpoint - m_prevSpeeds.leftMetersPerSecond) / dt);
 
       double rightFeedforward =
-          m_ks * Math.signum(rightSpeedSetpoint)
-              + m_kv * rightSpeedSetpoint
-              + m_ka * (rightSpeedSetpoint - m_prevSpeeds.rightMetersPerSecond) / dt;
+          m_feedforward.calculate(rightSpeedSetpoint,
+                                  (rightSpeedSetpoint - m_prevSpeeds.rightMetersPerSecond) / dt);
 
       leftOutput = leftFeedforward
           + m_leftController.calculate(m_leftSpeed.getAsDouble(),

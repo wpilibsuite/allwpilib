@@ -7,8 +7,10 @@
 
 #pragma once
 
-#include "CommandBase.h"
-#include "CommandHelper.h"
+#include <functional>
+
+#include "frc2/command/CommandBase.h"
+#include "frc2/command/CommandHelper.h"
 
 namespace frc2 {
 /**
@@ -33,7 +35,8 @@ class FunctionalCommand : public CommandHelper<CommandBase, FunctionalCommand> {
   FunctionalCommand(std::function<void()> onInit,
                     std::function<void()> onExecute,
                     std::function<void(bool)> onEnd,
-                    std::function<bool()> isFinished);
+                    std::function<bool()> isFinished,
+                    std::initializer_list<Subsystem*> requirements = {});
 
   FunctionalCommand(FunctionalCommand&& other) = default;
 

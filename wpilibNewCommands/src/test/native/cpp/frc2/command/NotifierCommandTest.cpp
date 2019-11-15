@@ -26,5 +26,6 @@ TEST_F(NotifierCommandTest, NotifierCommandScheduleTest) {
   std::this_thread::sleep_for(std::chrono::milliseconds(250));
   scheduler.Cancel(&command);
 
-  EXPECT_NEAR(.01 * counter, .25, .025);
+  EXPECT_GT(counter, 10);
+  EXPECT_LT(counter, 100);
 }

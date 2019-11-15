@@ -10,6 +10,8 @@ evaluationDependsOn(':hal')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
+evaluationDependsOn(':wpilibOldCommands')
+evaluationDependsOn(':wpilibNewCommands')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
@@ -29,6 +31,8 @@ cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
+cppProjectZips.add(project(':wpilibOldCommands').cppHeadersZip)
+cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 
 doxygen {
   executables {
@@ -71,8 +75,8 @@ doxygen {
 }
 
 tasks.register("zipCppDocs", Zip) {
-    baseName = zipBaseNameCpp
-    destinationDir = outputsFolder
+    archiveBaseName = zipBaseNameCpp
+    destinationDirectory = outputsFolder
     dependsOn doxygen
     from ("$buildDir/docs/doxygen/html")
     into '/'
@@ -100,7 +104,7 @@ task generateJavaDocs(type: Javadoc) {
     classpath += project(":wpiutil").sourceSets.main.compileClasspath
     options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
-    options.addStringOption('Xdoclint:accessibility,html,missing,reference,syntax')
+    options.addBooleanOption "Xdoclint:html,missing,reference,syntax", true
     options.addBooleanOption('html5', true)
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
@@ -110,6 +114,8 @@ task generateJavaDocs(type: Javadoc) {
     source project(':ntcore').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
+    source project(':wpilibOldCommands').sourceSets.main.java
+    source project(':wpilibNewCommands').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
@@ -130,8 +136,8 @@ task generateJavaDocs(type: Javadoc) {
 }
 
 tasks.register("zipJavaDocs", Zip) {
-    baseName = zipBaseNameJava
-    destinationDir = outputsFolder
+    archiveBaseName = zipBaseNameJava
+    destinationDirectory = outputsFolder
     dependsOn generateJavaDocs
     from ("$buildDir/docs/javadoc")
     into '/'
