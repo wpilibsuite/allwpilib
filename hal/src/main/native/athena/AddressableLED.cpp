@@ -94,17 +94,17 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     return HAL_kInvalidHandle;
   }
 
-  led->ledBuffer = new uint32_t[0xFFFF];
-  led->ledBufferSize = 0xFFFF;
+  led->ledBuffer = nullptr;
+  led->ledBufferSize = 0;
 
-  // uint32_t session = led->led->getSystemInterface()->getHandle();
-  // std::cout << "Session Handle: " << session << " lv status " << *status << std::endl;
+  uint32_t session = led->led->getSystemInterface()->getHandle();
+  //std::cout << "Session Handle: " << session << " lv status " << *status << std::endl;
 
-  // uint32_t* data = nullptr;
-  // size_t size = 0;
-  // *status = NiFpga_OpenHostMemoryBuffer(session, "HMB_0_LED", reinterpret_cast<void**>(&data), &size);
+  *status = NiFpga_OpenHostMemoryBuffer(session, "HMB_0_LED", reinterpret_cast<void**>(&led->ledBuffer), &led->ledBufferSize);
 
-  // std::cout << "HMB Open Error: "  << *status << std::endl;
+  std::cout << "HMB Open: "  << *status << std::endl;
+
+  *status = 0;
 
   // if (*status != 0) {
   //   addressableLEDHandles->Free(handle);
@@ -153,6 +153,8 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
   }
 
   std::memcpy(led->ledBuffer, data, length);
+
+  asm("dmb");
 
   led->led->writeStringLength(length, status);
   led->led->strobeLoad(status);

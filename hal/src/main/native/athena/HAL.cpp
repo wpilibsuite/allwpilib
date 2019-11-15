@@ -344,6 +344,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   // Return false if program failed to kill an existing program
   if (!killExistingProgram(timeout, mode)) {
+    wpi::outs() << "Failed To Kill\n";
+    wpi::outs().flush();
     return false;
   }
 
@@ -360,9 +362,15 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   int32_t status = 0;
   global.reset(tGlobal::create(&status));
+  wpi::outs() << "global Status " << status << "\n";
   watchdog.reset(tSysWatchdog::create(&status));
+  wpi::outs() << "WD Status " << status << "\n";
 
-  if (status != 0) return false;
+  if (status != 0) {
+        wpi::outs() << "Failed Status Global Or Watchdog\n";
+    wpi::outs().flush();
+     return false;
+  }
 
   HAL_InitializeDriverStation();
 

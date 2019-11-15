@@ -34,19 +34,26 @@ class MyRobot : public frc::TimedRobot {
     std::cout << status << std::endl;
 
     uint32_t buf[10];
+    for (int i = 0; i < 10; i++) {
+      buf[i] = (i % 2 == 0) ? 0xFFFFFFFF : 0;
+    }
 
     HAL_WriteAddressableLEDData(ledHandle, buf, 10, &status);
 
     //HAL_SetAddressableLEDTiming(ledHandle, 1000, 3000, 3000, 1000, 100, &status);
     HAL_SetAddressableLEDTiming(ledHandle, 350, 800, 700, 600, 100, &status);
 
-    HAL_WriteAddressableLEDOnce(ledHandle, &status);
+    HAL_WriteAddressableLEDContinuously(ledHandle, &status);
+
+
 
     //std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     //HAL_StopAddressableLEDWrite(ledHandle, &status);
 
     std::cout << status << std::endl;
+
+    //HAL_ExitMain();
 
 
   }
