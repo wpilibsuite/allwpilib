@@ -113,6 +113,13 @@ class DutyCycle : public ErrorBase,
    */
   int GetFPGAIndex() const;
 
+  /**
+   * Get the channel of the source.
+   *
+   * @return the source channel
+   */
+  int GetSourceChannel() const;
+
  protected:
   void InitSendable(SendableBuilder& builder) override;
 
