@@ -15,12 +15,34 @@
 extern "C" {
 #endif
 
-HAL_AddressableLEDHandle HAL_InitializeAddressableLED(HAL_DigitalHandle outputPort, int32_t* status);
+HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
+    HAL_DigitalHandle outputPort, int32_t* status);
+
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle);
 
-void HAL_WriteAddressableLEDStringLength(HAL_AddressableLEDHandle handle, int32_t value, int32_t* status);
+void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
+                                     HAL_DigitalHandle outputPort,
+                                     int32_t* status);
 
-void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle, int32_t highTime0, int32_t lowTime0, int32_t highTime1, int32_t lowTime1, int32_t reset, int32_t* status);
+void HAL_WriteAddressableLEDStringLength(HAL_AddressableLEDHandle handle,
+                                         int32_t value, int32_t* status);
+
+void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,
+                                 int32_t highTime0NanoSeconds,
+                                 int32_t lowTime0NanoSeconds,
+                                 int32_t highTime1NanoSeconds,
+                                 int32_t lowTime1NanoSeconds,
+                                 int32_t resetTimeMicroSeconds,
+                                 int32_t* status);
+
+void HAL_WriteAddressableLEDOnce(HAL_AddressableLEDHandle handle,
+                                 int32_t* status);
+
+void HAL_WriteAddressableLEDContinuously(HAL_AddressableLEDHandle handle,
+                                         int32_t* status);
+
+void HAL_StopAddressableLEDWrite(HAL_AddressableLEDHandle handle,
+                                 int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
