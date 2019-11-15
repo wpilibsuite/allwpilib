@@ -139,6 +139,5 @@ void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
                             [this] { return this->GetDistancePerRotation(); },
                             nullptr);
   builder.AddDoubleProperty("Is Connected",
-                            [this] { return this->IsConnected(); },
-                            nullptr);
+                            [this] { return this->IsConnected(); }, nullptr);
 }
