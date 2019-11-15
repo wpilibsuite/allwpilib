@@ -593,7 +593,7 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
   }
 
   dma->manager = std::make_unique<tDMAManager>(
-      1, queueDepth * dma->captureStore.captureSize, status);
+      g_DMA_index, queueDepth * dma->captureStore.captureSize, status);
   if (*status != 0) {
     return;
   }
