@@ -121,9 +121,4 @@ int32_t HAL_GetDMASampleDutyCycleOutputRaw(const HAL_DMASample* dmaSample,
                                            int32_t* status) {
   return 0;
 }
-
-void HAL_GetDMAOffsetsForDirectBufferRead(HAL_Handle handle, int32_t* valueType,
-                                          int32_t* index) {
-  {}
-}
 }  // extern "C"
