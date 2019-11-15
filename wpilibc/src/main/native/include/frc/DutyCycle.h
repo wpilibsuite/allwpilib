@@ -18,6 +18,8 @@
 namespace frc {
 class DigitalSource;
 class AnalogTrigger;
+class DMA;
+class DMASample;
 
 /**
  * Class to read a duty cycle PWM input.
@@ -34,6 +36,8 @@ class DutyCycle : public ErrorBase,
                   public Sendable,
                   public SendableHelper<DutyCycle> {
   friend class AnalogTrigger;
+  friend class DMA;
+  friend class DMASample;
 
  public:
   /**
