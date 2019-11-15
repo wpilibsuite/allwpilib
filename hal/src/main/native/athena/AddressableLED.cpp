@@ -32,6 +32,8 @@ NiFpga_Status NiFpga_OpenHostMemoryBuffer(NiFpga_Session session,
 namespace {
 struct AddressableLED {
   std::unique_ptr<tLED> led;
+  uint32_t* ledBuffer;
+  size_t ledBufferSize;
 };
 }  // namespace
 
@@ -84,13 +86,6 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     return HAL_kInvalidHandle;
   }
 
-  led->led->writeStringLength(1, status);
-
-  if (*status != 0) {
-    addressableLEDHandles->Free(handle);
-    return HAL_kInvalidHandle;
-  }
-
   led->led->writeOutputSelect(
       remapDigitalChannelToBitfieldChannel(digitalPort->channel), status);
 
@@ -99,19 +94,22 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     return HAL_kInvalidHandle;
   }
 
-  uint32_t session = led->led->getSystemInterface()->getHandle();
-  std::cout << "Session Handle: " << session << " lv status " << *status << std::endl;
+  led->ledBuffer = new uint32_t[0xFFFF];
+  led->ledBufferSize = 0xFFFF;
 
-  uint32_t* data = nullptr;
-  size_t size = 0;
-  *status = NiFpga_OpenHostMemoryBuffer(session, "HMB_0_LED", reinterpret_cast<void**>(&data), &size);
+  // uint32_t session = led->led->getSystemInterface()->getHandle();
+  // std::cout << "Session Handle: " << session << " lv status " << *status << std::endl;
 
-  std::cout << "HMB Open Error: "  << *status << std::endl;
+  // uint32_t* data = nullptr;
+  // size_t size = 0;
+  // *status = NiFpga_OpenHostMemoryBuffer(session, "HMB_0_LED", reinterpret_cast<void**>(&data), &size);
 
-  if (*status != 0) {
-    addressableLEDHandles->Free(handle);
-    return HAL_kInvalidHandle;
-  }
+  // std::cout << "HMB Open Error: "  << *status << std::endl;
+
+  // if (*status != 0) {
+  //   addressableLEDHandles->Free(handle);
+  //   return HAL_kInvalidHandle;
+  // }
 
   return handle;
 }
@@ -141,15 +139,23 @@ void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
       remapDigitalChannelToBitfieldChannel(digitalPort->channel), status);
 }
 
-void HAL_WriteAddressableLEDStringLength(HAL_AddressableLEDHandle handle,
-                                         int32_t value, int32_t* status) {
+void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
+                                 const uint32_t* data, int32_t length, int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
-  led->led->writeStringLength(value, status);
+  if (static_cast<uint32_t>(length) > led->ledBufferSize) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  std::memcpy(led->ledBuffer, data, length);
+
+  led->led->writeStringLength(length, status);
+  led->led->strobeLoad(status);
 }
 
 void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,

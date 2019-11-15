@@ -24,8 +24,9 @@ void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
                                      HAL_DigitalHandle outputPort,
                                      int32_t* status);
 
-void HAL_WriteAddressableLEDStringLength(HAL_AddressableLEDHandle handle,
-                                         int32_t value, int32_t* status);
+void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
+                                 const uint32_t* data, int32_t length,
+                                 int32_t* status);
 
 void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,
                                  int32_t highTime0NanoSeconds,
