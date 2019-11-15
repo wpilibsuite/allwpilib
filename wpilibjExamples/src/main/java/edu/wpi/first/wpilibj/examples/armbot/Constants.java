@@ -54,7 +54,7 @@ public final class Constants {
 
     // The offset of the arm from the horizontal in its neutral position,
     // measured from the horizontal
-    public static final double kArmOffsetRads = .5;
+    public static final double kArmOffsetRads = 0.5;
   }
 
   public static final class AutoConstants {
