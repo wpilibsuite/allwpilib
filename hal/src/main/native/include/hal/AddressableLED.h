@@ -11,6 +11,8 @@
 
 #include "hal/Types.h"
 
+#include "AddressableLEDTypes.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,8 +27,8 @@ void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
                                      int32_t* status);
 
 void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
-                                 const uint32_t* data, int32_t length,
-                                 int32_t* status);
+                                 const struct HAL_AddressableLEDData* data,
+                                 int32_t length, int32_t* status);
 
 void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,
                                  int32_t highTime0NanoSeconds,
@@ -36,11 +38,8 @@ void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,
                                  int32_t resetTimeMicroSeconds,
                                  int32_t* status);
 
-void HAL_WriteAddressableLEDOnce(HAL_AddressableLEDHandle handle,
-                                 int32_t* status);
-
-void HAL_WriteAddressableLEDContinuously(HAL_AddressableLEDHandle handle,
-                                         int32_t* status);
+void HAL_StartAddressableLEDWrite(HAL_AddressableLEDHandle handle,
+                                  int32_t* status);
 
 void HAL_StopAddressableLEDWrite(HAL_AddressableLEDHandle handle,
                                  int32_t* status);

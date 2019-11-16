@@ -11,6 +11,7 @@
 
 #include "hal/AddressableLED.h"
 #include "hal/DIO.h"
+#include "hal/PWM.h"
 #include "hal/HALBase.h"
 
 #include "hal/ChipObject.h"
@@ -28,22 +29,29 @@ class MyRobot : public frc::TimedRobot {
   void RobotInit() override {
 
     int32_t status = 0;
-    output = HAL_InitializeDIOPort(HAL_GetPort(0), false, &status);
+    output = HAL_InitializePWMPort(HAL_GetPort(0), &status);
     std::cout << status << std::endl;
     ledHandle = HAL_InitializeAddressableLED(output, &status);
     std::cout << status << std::endl;
 
-    uint32_t buf[10];
-    for (int i = 0; i < 10; i++) {
-      buf[i] = (i % 2 == 0) ? 0xFFFFFFFF : 0;
+    HAL_AddressableLEDData buf[12];
+    std::memset(buf, 0, sizeof(buf));
+    for (int i = 0; i < 12; i += 3) {
+      buf[i].g = 0x96;
+      buf[i + 1].b = 0x96;
+      buf[i + 2].r = 0x96;
     }
 
-    HAL_WriteAddressableLEDData(ledHandle, buf, 10, &status);
+    HAL_WriteAddressableLEDData(ledHandle, buf, 12, &status);
+
+    std::cout << status << std::endl;
 
     //HAL_SetAddressableLEDTiming(ledHandle, 1000, 3000, 3000, 1000, 100, &status);
-    HAL_SetAddressableLEDTiming(ledHandle, 350, 800, 700, 600, 100, &status);
+    //HAL_SetAddressableLEDTiming(ledHandle, 350, 800, 700, 600, 500, &status);
 
-    HAL_WriteAddressableLEDContinuously(ledHandle, &status);
+    std::cout << status << std::endl;
+
+    HAL_StartAddressableLEDWrite(ledHandle, &status);
 
 
 
