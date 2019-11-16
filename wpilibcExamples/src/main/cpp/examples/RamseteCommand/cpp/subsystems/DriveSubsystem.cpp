@@ -72,7 +72,7 @@ frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
   return {
     units::meters_per_second_t(m_leftEncoder.GetRate()),
         units::meters_per_second_t(m_rightEncoder.GetRate())
-  }
+  };
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
