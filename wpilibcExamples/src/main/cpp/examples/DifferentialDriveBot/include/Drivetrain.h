@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <units/units.h>
-
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
 #include <frc/Spark.h>
@@ -16,6 +14,7 @@
 #include <frc/controller/PIDController.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
+#include <units/units.h>
 #include <wpi/math>
 
 /**
@@ -75,5 +74,5 @@ class Drivetrain {
   frc::AnalogGyro m_gyro{0};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
-  frc::DifferentialDriveOdometry m_odometry{m_kinematics};
+  frc::DifferentialDriveOdometry m_odometry{m_kinematics, GetAngle()};
 };

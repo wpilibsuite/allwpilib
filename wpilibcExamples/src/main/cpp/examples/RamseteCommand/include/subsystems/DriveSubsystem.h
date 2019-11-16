@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <units/units.h>
-
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
@@ -17,6 +15,7 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/units.h>
 
 #include "Constants.h"
 
