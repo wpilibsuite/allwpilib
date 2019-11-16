@@ -26,23 +26,29 @@ void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
                                      HAL_DigitalHandle outputPort,
                                      int32_t* status);
 
+void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
+                                 int32_t length, int32_t* status);
+
 void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
                                  const struct HAL_AddressableLEDData* data,
                                  int32_t length, int32_t* status);
 
-void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,
-                                 int32_t highTime0NanoSeconds,
-                                 int32_t lowTime0NanoSeconds,
-                                 int32_t highTime1NanoSeconds,
-                                 int32_t lowTime1NanoSeconds,
-                                 int32_t resetTimeMicroSeconds,
-                                 int32_t* status);
+void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
+                                    int32_t highTime0NanoSeconds,
+                                    int32_t lowTime0NanoSeconds,
+                                    int32_t highTime1NanoSeconds,
+                                    int32_t lowTime1NanoSeconds,
+                                    int32_t* status);
 
-void HAL_StartAddressableLEDWrite(HAL_AddressableLEDHandle handle,
+void HAL_SetAddressableLEDStringSyncTime(HAL_AddressableLEDHandle handle,
+                                         int32_t syncTimeMicroSeconds,
+                                         int32_t* status);
+
+void HAL_StartAddressableLEDOutput(HAL_AddressableLEDHandle handle,
+                                   int32_t* status);
+
+void HAL_StopAddressableLEDOutput(HAL_AddressableLEDHandle handle,
                                   int32_t* status);
-
-void HAL_StopAddressableLEDWrite(HAL_AddressableLEDHandle handle,
-                                 int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

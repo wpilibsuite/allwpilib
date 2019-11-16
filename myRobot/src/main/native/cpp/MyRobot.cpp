@@ -34,6 +34,8 @@ class MyRobot : public frc::TimedRobot {
     ledHandle = HAL_InitializeAddressableLED(output, &status);
     std::cout << status << std::endl;
 
+    HAL_SetAddressableLEDLength(ledHandle, 12, &status);
+
     HAL_AddressableLEDData buf[12];
     std::memset(buf, 0, sizeof(buf));
     for (int i = 0; i < 12; i += 3) {
@@ -51,7 +53,7 @@ class MyRobot : public frc::TimedRobot {
 
     std::cout << status << std::endl;
 
-    HAL_StartAddressableLEDWrite(ledHandle, &status);
+    HAL_StartAddressableLEDOutput(ledHandle, &status);
 
 
 

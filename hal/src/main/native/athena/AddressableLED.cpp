@@ -13,11 +13,14 @@
 
 using namespace hal;
 
+constexpr int32_t kMaxStringSize = 5460;
+
 namespace {
 struct AddressableLED {
   std::unique_ptr<tLED> led;
   void* ledBuffer;
   size_t ledBufferSize;
+  int32_t stringLength = 1;
 };
 }  // namespace
 
@@ -117,11 +120,7 @@ void HAL_SetAddressableLEDOutputPort(HAL_AddressableLEDHandle handle,
   led->led->writeOutputSelect(digitalPort->channel, status);
 }
 
-static_assert(sizeof(HAL_AddressableLEDData) == sizeof(uint32_t),
-              "LED Data must be 32 bit");
-
-void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
-                                 const struct HAL_AddressableLEDData* data,
+void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
                                  int32_t length, int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
@@ -129,7 +128,7 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
     return;
   }
 
-  if (static_cast<uint32_t>(length) > led->ledBufferSize) {
+  if (length > kMaxStringSize) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
@@ -145,7 +144,23 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 
   led->led->writeStringLength(length, status);
 
-  if (*status != 0) {
+  led->stringLength = length;
+}
+
+static_assert(sizeof(HAL_AddressableLEDData) == sizeof(uint32_t),
+              "LED Data must be 32 bit");
+
+void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
+                                 const struct HAL_AddressableLEDData* data,
+                                 int32_t length, int32_t* status) {
+  auto led = addressableLEDHandles->Get(handle);
+  if (!led) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (length > led->stringLength) {
+    *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
@@ -154,15 +169,12 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
   asm("dmb");
 
   led->led->strobeLoad(status);
-
-  while (led->led->readPixelWriteIndex(status) < length)
-    ;
 }
 
 void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,
                                  int32_t highTime0, int32_t lowTime0,
                                  int32_t highTime1, int32_t lowTime1,
-                                 int32_t resetTime, int32_t* status) {
+                                 int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
     *status = HAL_HANDLE_ERROR;
@@ -173,12 +185,22 @@ void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,
   led->led->writeLowBitTickTiming(0, highTime0 / 25, status);
   led->led->writeHighBitTickTiming(1, lowTime1 / 25, status);
   led->led->writeHighBitTickTiming(0, highTime1 / 25, status);
-
-  led->led->writeSyncTiming(resetTime, status);
 }
 
-void HAL_StartAddressableLEDWrite(HAL_AddressableLEDHandle handle,
-                                  int32_t* status) {
+void HAL_SetAddressableLEDStringSyncTime(HAL_AddressableLEDHandle handle,
+                                         int32_t syncTimeMicroSeconds,
+                                         int32_t* status) {
+  auto led = addressableLEDHandles->Get(handle);
+  if (!led) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  led->led->writeSyncTiming(syncTimeMicroSeconds, status);
+}
+
+void HAL_StartAddressableLEDOutput(HAL_AddressableLEDHandle handle,
+                                   int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
     *status = HAL_HANDLE_ERROR;
@@ -188,8 +210,8 @@ void HAL_StartAddressableLEDWrite(HAL_AddressableLEDHandle handle,
   led->led->strobeStart(status);
 }
 
-void HAL_StopAddressableLEDWrite(HAL_AddressableLEDHandle handle,
-                                 int32_t* status) {
+void HAL_StopAddressableLEDOutput(HAL_AddressableLEDHandle handle,
+                                  int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
     *status = HAL_HANDLE_ERROR;
