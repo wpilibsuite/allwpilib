@@ -164,6 +164,7 @@ class UsbCameraImpl : public SourceImpl {
   bool m_lifecam_exposure{false};    // Microsoft LifeCam exposure
   bool m_ps3eyecam_exposure{false};  // PS3 Eyecam exposure
   bool m_picamera{false};            // Raspberry Pi camera
+  bool m_c922_h264{false};           // Logitech C922 Pro H264 embed in JPEG
 
   //
   // Variables protected by m_mutex

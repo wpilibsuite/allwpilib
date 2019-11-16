@@ -3,8 +3,11 @@ project(cscore)
 include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
+include(FindPkgConfig)
 
 find_package( OpenCV REQUIRED )
+pkg_check_modules(X264 IMPORTED_TARGET x264)
+pkg_check_modules(LIBAVCODEC IMPORTED_TARGET libavcodec)
 
 file(GLOB
     cscore_native_src src/main/native/cpp/*.cpp)
@@ -32,7 +35,7 @@ target_include_directories(cscore PUBLIC
                             $<INSTALL_INTERFACE:${include_dest}/cscore>)
 target_include_directories(cscore PRIVATE src/main/native/cpp)
 wpilib_target_warnings(cscore)
-target_link_libraries(cscore PUBLIC wpiutil ${OpenCV_LIBS})
+target_link_libraries(cscore PUBLIC wpiutil ${OpenCV_LIBS} PRIVATE PkgConfig::X264 PkgConfig::LIBAVCODEC)
 
 set_property(TARGET cscore PROPERTY FOLDER "libraries")
 

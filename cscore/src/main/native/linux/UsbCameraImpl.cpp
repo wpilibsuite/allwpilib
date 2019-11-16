@@ -74,6 +74,8 @@ static VideoMode::PixelFormat ToPixelFormat(__u32 pixelFormat) {
       return VideoMode::kBGR;
     case V4L2_PIX_FMT_GREY:
       return VideoMode::kGray;
+    case V4L2_PIX_FMT_H264:
+      return VideoMode::kH264;
     default:
       return VideoMode::kUnknown;
   }
@@ -92,6 +94,8 @@ static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
       return V4L2_PIX_FMT_BGR24;
     case VideoMode::kGray:
       return V4L2_PIX_FMT_GREY;
+    case VideoMode::kH264:
+      return V4L2_PIX_FMT_H264;
     default:
       return 0;
   }
@@ -460,6 +464,8 @@ void UsbCameraImpl::CameraThreadMain() {
         int width = m_mode.width;
         int height = m_mode.height;
         bool good = true;
+        if (m_c922_h264 && m_mode.pixelFormat == VideoMode::kH264) {
+        }
         if (m_mode.pixelFormat == VideoMode::kMJPEG &&
             !GetJpegSize(image, &width, &height)) {
           SWARNING("invalid JPEG image received from camera");
@@ -810,8 +816,13 @@ void UsbCameraImpl::DeviceSetMode() {
                           : 0;
 #endif
   vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  vfmt.fmt.pix.pixelformat =
-      FromPixelFormat(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat));
+  // fake C922 Pro H264 mode
+  if (m_c922_h264 && m_mode.pixelFormat == VideoMode::kH264) {
+    vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
+  } else {
+    vfmt.fmt.pix.pixelformat = FromPixelFormat(
+        static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat));
+  }
   if (vfmt.fmt.pix.pixelformat == 0) {
     SWARNING("could not set format " << m_mode.pixelFormat
                                      << ", defaulting to MJPEG");
@@ -1135,6 +1146,15 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     }
   }
 
+  // fake H264 modes for C922
+  if (m_c922_h264) {
+    for (size_t i = 0, end = modes.size(); i < end; ++i) {
+      const VideoMode& mode = modes[i];
+      if (mode.pixelFormat == VideoMode::kMJPEG)
+        modes.emplace_back(VideoMode::kH264, mode.width, mode.height, mode.fps);
+    }
+  }
+
   {
     std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
@@ -1216,6 +1236,7 @@ void UsbCameraImpl::SetQuirks() {
   m_lifecam_exposure =
       desc.endswith("LifeCam HD-3000") || desc.endswith("LifeCam Cinema (TM)");
   m_picamera = desc.startswith("mmal service");
+  m_c922_h264 = desc.startswith("C922 Pro");
 
   int deviceNum = GetDeviceNum(m_path.c_str());
   if (deviceNum >= 0) {

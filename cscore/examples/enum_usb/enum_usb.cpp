@@ -72,6 +72,12 @@ int main() {
         case cs::VideoMode::kRGB565:
           wpi::outs() << "RGB565";
           break;
+        case cs::VideoMode::kGray:
+          wpi::outs() << "Gray";
+          break;
+        case cs::VideoMode::kH264:
+          wpi::outs() << "H264";
+          break;
         default:
           wpi::outs() << "Unknown";
           break;
