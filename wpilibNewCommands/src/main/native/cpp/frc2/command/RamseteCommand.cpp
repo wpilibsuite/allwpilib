@@ -25,8 +25,7 @@ RamseteCommand::RamseteCommand(
       m_controller(controller),
       m_feedforward(feedforward),
       m_kinematics(kinematics),
-      m_leftSpeed(leftSpeed),
-      m_rightSpeed(rightSpeed),
+      m_speeds(wheelSpeeds),
       m_leftController(std::make_unique<frc2::PIDController>(leftController)),
       m_rightController(std::make_unique<frc2::PIDController>(rightController)),
       m_outputVolts(output),
@@ -82,11 +81,11 @@ void RamseteCommand::Execute() {
 
     auto leftOutput =
         volt_t(m_leftController->Calculate(
-            m_leftSpeed().to<double>(), targetWheelSpeeds.left.to<double>())) +
+            m_speeds().left.to<double>(), targetWheelSpeeds.left.to<double>())) +
         leftFeedforward;
 
     auto rightOutput = volt_t(m_rightController->Calculate(
-                           m_rightSpeed().to<double>(),
+                           m_speeds().right.to<double>(),
                            targetWheelSpeeds.right.to<double>())) +
                        rightFeedforward;
 

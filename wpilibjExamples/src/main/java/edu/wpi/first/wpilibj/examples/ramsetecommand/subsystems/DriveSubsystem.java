@@ -19,17 +19,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kDriveKinematics;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kGyroReversed;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftMotor1Port;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftMotor2Port;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kRightEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kRightEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kRightMotor1Port;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kRightMotor2Port;
+import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.*;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
@@ -72,11 +62,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(Rotation2d.fromDegrees(getHeading()),
-                                  new DifferentialDriveWheelSpeeds(
-                                      m_leftEncoder.getRate(),
-                                      m_rightEncoder.getRate()
-                                  ));
+    m_odometry.update(Rotation2d.fromDegrees(getHeading()), getWheelSpeeds());
   }
 
   /**
@@ -86,6 +72,15 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
   }
 
   /**

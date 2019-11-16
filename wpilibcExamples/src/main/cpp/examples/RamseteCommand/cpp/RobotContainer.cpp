@@ -68,12 +68,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc::SimpleMotorFeedforward<units::meters>(
           DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
       DriveConstants::kDriveKinematics,
-      [this] {
-        return units::meters_per_second_t(m_drive.GetLeftEncoder().GetRate());
-      },
-      [this] {
-        return units::meters_per_second_t(m_drive.GetRightEncoder().GetRate());
-      },
+      [this] { return m_drive.GetWheelSpeeds(); },
       frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
       frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
