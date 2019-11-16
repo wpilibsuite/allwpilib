@@ -52,7 +52,8 @@ public class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
   );
 
-  private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics);
+  private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
+      getAngle());
 
   /**
    * Constructs a MecanumDrive and resets the gyro.
