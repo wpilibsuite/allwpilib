@@ -28,7 +28,7 @@ namespace halsimgui {
  * @param spacing spacing between each LED (both horizontal and vertical);
  *                if 0, defaults to 1/3 of font size
  */
-void DrawLEDs(int* values, int numValues, int cols, const ImU32* colors,
+void DrawLEDs(const int* values, int numValues, int cols, const ImU32* colors,
               float size = 0.0f, float spacing = 0.0f);
 
 }  // namespace halsimgui

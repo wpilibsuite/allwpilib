@@ -8,6 +8,7 @@
 #pragma once
 
 #include <units/units.h>
+#include <wpi/math>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -33,7 +34,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * 3.142) / static_cast<double>(kEncoderCPR);
+    (kWheelDiameterInches * wpi::math::pi) / static_cast<double>(kEncoderCPR);
 }  // namespace DriveConstants
 
 namespace ShooterConstants {

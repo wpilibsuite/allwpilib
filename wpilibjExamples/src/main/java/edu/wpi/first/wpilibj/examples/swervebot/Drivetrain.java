@@ -37,7 +37,7 @@ public class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
   );
 
-  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics);
+  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, getAngle());
 
   public Drivetrain() {
     m_gyro.reset();

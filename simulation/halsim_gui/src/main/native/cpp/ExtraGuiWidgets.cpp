@@ -9,7 +9,7 @@
 
 namespace halsimgui {
 
-void DrawLEDs(int* values, int numValues, int cols, const ImU32* colors,
+void DrawLEDs(const int* values, int numValues, int cols, const ImU32* colors,
               float size, float spacing) {
   if (numValues == 0) return;
   if (size == 0) size = ImGui::GetFontSize() / 2.0;

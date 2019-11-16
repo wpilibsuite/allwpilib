@@ -31,19 +31,26 @@ class MecanumDriveOdometry {
    * Constructs a MecanumDriveOdometry object.
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
+   * @param gyroAngle The angle reported by the gyroscope.
    * @param initialPose The starting position of the robot on the field.
    */
   explicit MecanumDriveOdometry(MecanumDriveKinematics kinematics,
+                                const Rotation2d& gyroAngle,
                                 const Pose2d& initialPose = Pose2d());
 
   /**
    * Resets the robot's position on the field.
    *
+   * The gyroscope angle does not need to be reset here on the user's robot
+   * code. The library automatically takes care of offsetting the gyro angle.
+   *
    * @param pose The position on the field that your robot is at.
+   * @param gyroAngle The angle reported by the gyroscope.
    */
-  void ResetPosition(const Pose2d& pose) {
+  void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
     m_pose = pose;
     m_previousAngle = pose.Rotation();
+    m_gyroOffset = m_pose.Rotation() - gyroAngle;
   }
 
   /**
@@ -61,13 +68,13 @@ class MecanumDriveOdometry {
    * angular rate that is calculated from forward kinematics.
    *
    * @param currentTime The current time.
-   * @param angle The angle of the robot.
+   * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelSpeeds The current wheel speeds.
    *
    * @return The new pose of the robot.
    */
   const Pose2d& UpdateWithTime(units::second_t currentTime,
-                               const Rotation2d& angle,
+                               const Rotation2d& gyroAngle,
                                MecanumDriveWheelSpeeds wheelSpeeds);
 
   /**
@@ -78,14 +85,15 @@ class MecanumDriveOdometry {
    * This also takes in an angle parameter which is used instead of the
    * angular rate that is calculated from forward kinematics.
    *
-   * @param angle The angle of the robot.
+   * @param gyroAngle The angle reported by the gyroscope.
    * @param wheelSpeeds The current wheel speeds.
    *
    * @return The new pose of the robot.
    */
-  const Pose2d& Update(const Rotation2d& angle,
+  const Pose2d& Update(const Rotation2d& gyroAngle,
                        MecanumDriveWheelSpeeds wheelSpeeds) {
-    return UpdateWithTime(frc2::Timer::GetFPGATimestamp(), angle, wheelSpeeds);
+    return UpdateWithTime(frc2::Timer::GetFPGATimestamp(), gyroAngle,
+                          wheelSpeeds);
   }
 
  private:
@@ -94,6 +102,7 @@ class MecanumDriveOdometry {
 
   units::second_t m_previousTime = -1_s;
   Rotation2d m_previousAngle;
+  Rotation2d m_gyroOffset;
 };
 
 }  // namespace frc

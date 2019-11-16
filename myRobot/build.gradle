@@ -69,30 +69,11 @@ deploy {
 
         }
 
-        nativeArtifact('myRobotCppRelease') {
-            component = 'myRobotCpp'
-            targetPlatform = nativeUtils.wpi.platforms.roborio
-            libraryDirectory = '/usr/local/frc/third-party/lib'
-            buildType = 'release'
-              postdeploy << { ctx ->
-               ctx.execute('chmod +x myRobotCpp')
-             }
-        }
-
         nativeArtifact('myRobotCppStatic') {
             component = 'myRobotCppStatic'
             targetPlatform = nativeUtils.wpi.platforms.roborio
             buildType = 'debug'
 
-            postdeploy << { ctx ->
-                ctx.execute('chmod +x myRobotCppStatic')
-            }
-        }
-
-        nativeArtifact('myRobotCppStaticRelease') {
-            component = 'myRobotCppStatic'
-            targetPlatform = nativeUtils.wpi.platforms.roborio
-            buildType = 'release'
             postdeploy << { ctx ->
                 ctx.execute('chmod +x myRobotCppStatic')
             }
@@ -112,15 +93,6 @@ tasks.register('deployShared') {
 
 tasks.register('deployStatic') {
     dependsOn tasks.named('deployMyRobotCppStaticRoborio')
-}
-
-tasks.register('deployReleaseShared') {
-    dependsOn tasks.named('deployMyRobotCppReleaseLibrariesRoborio')
-    dependsOn tasks.named('deployMyRobotCppReleaseRoborio')
-}
-
-tasks.register('deployReleaseStatic') {
-    dependsOn tasks.named('deployMyRobotCppReleaseStaticRoborio')
 }
 
 mainClassName = 'Main'
