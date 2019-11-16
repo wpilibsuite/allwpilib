@@ -78,13 +78,18 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
             / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter)
             * Math.signum(velocityMetersPerSecond) / 2);
     double minChassisAcceleration =
-          minWheelAcceleration
-              / (1 - m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter)
-              * Math.signum(velocityMetersPerSecond) / 2);
+        minWheelAcceleration
+            / (1 - m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter)
+            * Math.signum(velocityMetersPerSecond) / 2);
 
-    // Negate min chassis acceleration if center of turn is inside of wheelbase
-    if((m_kinematics.trackWidthMeters / 2) > (1 / Math.abs(curvatureRadPerMeter))) {
-      minChassisAcceleration = -minChassisAcceleration;
+    // Negate acceleration of wheel on inside of turn if center of turn is inside of wheelbase
+    if ((m_kinematics.trackWidthMeters / 2) > (1 / Math.abs(curvatureRadPerMeter))) {
+      if (velocityMetersPerSecond > 0) {
+        minChassisAcceleration = -minChassisAcceleration;
+      }
+      else {
+        maxChassisAcceleration = -maxChassisAcceleration;
+      }
     }
 
     return new MinMax(minChassisAcceleration, maxChassisAcceleration);

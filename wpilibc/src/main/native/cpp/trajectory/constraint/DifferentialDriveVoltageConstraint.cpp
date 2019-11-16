@@ -58,9 +58,15 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
       (1 - m_kinematics.trackWidth * units::math::abs(curvature) *
                wpi::sgn(speed) / (2_rad));
 
-  // Negate min chassis acceleration if center of turn is inside of wheelbase
+  // Negate acceleration of wheel on inside of turn
+  // if center of turn is inside of wheelbase
   if ((m_kinematics.trackWidth / 2) > 1_rad / units::math::abs(curvature)) {
-    minChassisAcceleration = -minChassisAcceleration;
+    if (velocity > 0) {
+      minChassisAcceleration = -minChassisAcceleration;
+    }
+    else {
+      maxChassisAcceleration = -maxChassisAcceleration;
+    }
   }
 
   return {minChassisAcceleration, maxChassisAcceleration};
