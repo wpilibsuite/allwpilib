@@ -18,6 +18,7 @@ includeOtherLibs {
   ^ntcore
   ^opencv2/
   ^support/
+  ^units/
   ^vision/
   ^wpi/
 }

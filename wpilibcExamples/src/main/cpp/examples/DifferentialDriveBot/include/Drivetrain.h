@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <units/units.h>
-
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
 #include <frc/Spark.h>
@@ -16,6 +14,7 @@
 #include <frc/controller/PIDController.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
+#include <units/units.h>
 #include <wpi/math>
 
 /**
