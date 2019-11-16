@@ -15,8 +15,7 @@ RamseteCommand::RamseteCommand(
     frc::RamseteController controller,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
     frc::DifferentialDriveKinematics kinematics,
-    std::function<units::meters_per_second_t()> leftSpeed,
-    std::function<units::meters_per_second_t()> rightSpeed,
+    std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
     frc2::PIDController leftController, frc2::PIDController rightController,
     std::function<void(volt_t, volt_t)> output,
     std::initializer_list<Subsystem*> requirements)
