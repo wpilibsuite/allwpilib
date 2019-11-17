@@ -261,9 +261,9 @@ public class MecanumFollowerCommand extends CommandBase {
     m_finalPose = m_trajectory.sample(m_trajectory.getTotalTimeSeconds()).poseMeters;
 
     var initialXVelocity = initialState.velocityMetersPerSecond
-        * Math.sin(initialState.poseMeters.getRotation().getRadians());
+        * initialState.poseMeters.getRotation().getCos();
     var initialYVelocity = initialState.velocityMetersPerSecond
-        * Math.cos(initialState.poseMeters.getRotation().getRadians());
+        * initialState.poseMeters.getRotation().getSin();
 
     m_prevSpeeds = m_kinematics.toWheelSpeeds(
       new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
@@ -285,10 +285,16 @@ public class MecanumFollowerCommand extends CommandBase {
     double targetXVel = m_xdController.calculate(
         m_pose.get().getTranslation().getX(),
         desiredPose.getTranslation().getX());
+    
+    //System.out.println(targetXVel);
 
     double targetYVel = m_ydController.calculate(
         m_pose.get().getTranslation().getY(),
         desiredPose.getTranslation().getY());
+
+    //System.out.println(targetYVel);
+
+    //System.out.println(poseError);
 
     // The robot will go to the desired rotation of the final pose in the trajectory,
     // not following the poses at individual states.

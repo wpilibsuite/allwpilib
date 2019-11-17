@@ -101,10 +101,6 @@ class SwerveFollowerCommand
   bool IsFinished() override;
 
  private:
-  frc2::Timer m_timer;
-  units::second_t m_prevTime;
-  frc::Pose2d m_finalPose;
-
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
   frc::SwerveDriveKinematics<NumModules> m_kinematics;
@@ -113,6 +109,10 @@ class SwerveFollowerCommand
   std::unique_ptr<frc::ProfiledPIDController> m_thetaController;
   std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
       m_outputStates;
+
+  frc2::Timer m_timer;
+  units::second_t m_prevTime;
+  frc::Pose2d m_finalPose;
 };
 }  // namespace frc2
 

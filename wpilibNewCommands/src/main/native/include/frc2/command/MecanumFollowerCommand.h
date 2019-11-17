@@ -155,12 +155,6 @@ class MecanumFollowerCommand
   bool IsFinished() override;
 
  private:
-  frc2::Timer m_timer;
-  frc::MecanumDriveWheelSpeeds m_prevSpeeds;
-  units::second_t m_prevTime;
-  frc::Pose2d m_finalPose;
-  bool m_usePID;
-
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
   const units::voltage::volt_t m_ks;
@@ -182,5 +176,11 @@ class MecanumFollowerCommand
   std::function<void(units::voltage::volt_t, units::voltage::volt_t,
                      units::voltage::volt_t, units::voltage::volt_t)>
       m_outputVolts;
+
+  bool m_usePID;
+  frc2::Timer m_timer;
+  frc::MecanumDriveWheelSpeeds m_prevSpeeds;
+  units::second_t m_prevTime;
+  frc::Pose2d m_finalPose;
 };
 }  // namespace frc2

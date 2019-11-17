@@ -33,7 +33,7 @@ class MecanumFollowerCommandTest {
   private double frontRightSpeed;
   private double rearRightSpeed;
 
-  private double kTrackLength = 0.7;
+  private double kTrackLength = 0.5;
   private double kTrackWidth = 0.5;
   
   private MecanumDriveKinematics kinematics = new MecanumDriveKinematics(
@@ -42,17 +42,7 @@ class MecanumFollowerCommandTest {
     new Translation2d(-kTrackLength / 2, kTrackWidth / 2),
     new Translation2d(-kTrackLength / 2, -kTrackWidth / 2));
 
-  private MecanumDriveOdometry odometry = new MecanumDriveOdometry(kinematics, new Pose2d(0, 0, new Rotation2d(0)));
-
-  private static double boundRadians(double value) {
-    while (value > Math.PI) {
-      value -= Math.PI * 2;
-    }
-    while (value <= -Math.PI) {
-      value += Math.PI * 2;
-    }
-    return value;
-  }
+  private MecanumDriveOdometry odometry = new MecanumDriveOdometry(kinematics, new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));
 
   public void setFrontLeftSpeed(double frontLeftSpeed) {
     this.frontLeftSpeed = frontLeftSpeed;
@@ -84,22 +74,27 @@ class MecanumFollowerCommandTest {
     final var subsystem = new Subsystem() {};
 
     final var waypoints = new ArrayList<Pose2d>();
-    waypoints.add(new Pose2d(2.75, 22.521, new Rotation2d(0)));
-    waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
-    var config = new TrajectoryConfig(3.0, 0.1);
+    waypoints.add(new Pose2d(0, 0, new Rotation2d(0)));
+    waypoints.add(new Pose2d(1, 0, new Rotation2d(0)));
+    var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
-    final double kDt = 0.02;
-    final var totalTime = trajectory.getTotalTimeSeconds();
+    final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
+    
+    final var endXVelocity = endState.velocityMetersPerSecond
+        * Math.sin(endState.poseMeters.getRotation().getRadians());
+    final var endYVelocity = endState.velocityMetersPerSecond
+        * Math.cos(endState.poseMeters.getRotation().getRadians());
+
 
     final var command = new MecanumFollowerCommand(trajectory, 
       this::getRobotPose,
       kinematics,
-      new PIDController(1, 0, 0),
-      new PIDController(1, 0, 0),
+      new PIDController(0.6, 0, 0),
+      new PIDController(0.6, 0, 0),
       new ProfiledPIDController(1, 0, 0,
-        new TrapezoidProfile.Constraints(Math.PI, 3.0)),
-      3.0,
+        new TrapezoidProfile.Constraints(2*Math.PI, 4*Math.PI)),
+      50,
       this::setFrontLeftSpeed,
       this::setRearLeftSpeed,
       this::setFrontRightSpeed,
@@ -109,11 +104,16 @@ class MecanumFollowerCommandTest {
     scheduler.registerSubsystem(subsystem);
     
     scheduler.schedule(command);
-    scheduler.run();
+
+    command.initialize();
+    while ( !command.isFinished() ){
+      command.execute();
+    }
+    command.end(true);
 
     assertAll(
-        () -> assertEquals(0.0, frontLeftSpeed)
-    
+      () -> assertEquals(getRobotPose(), endState.poseMeters),
+      () -> assertEquals(0, frontLeftSpeed)
     );
   }
 }
