@@ -84,7 +84,7 @@ m_timer.Stop();
 
 template <int NumModules>
 bool SwerveFollowerCommand<NumModules>::IsFinished() {
-return m_timer.HasPeriodPassed(m_trajectory.TotalTime().to<double>());
+return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
 }
 
 }

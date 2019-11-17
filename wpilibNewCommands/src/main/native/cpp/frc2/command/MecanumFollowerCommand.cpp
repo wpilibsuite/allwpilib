@@ -197,5 +197,5 @@ void MecanumFollowerCommand::Execute() {
 void MecanumFollowerCommand::End(bool interrupted) { m_timer.Stop(); }
 
 bool MecanumFollowerCommand::IsFinished() {
-  return m_timer.HasPeriodPassed(m_trajectory.TotalTime().to<double>());
+  return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
 }

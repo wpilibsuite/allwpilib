@@ -101,7 +101,7 @@ class SwerveFollowerCommand
   bool IsFinished() override;
 
  private:
-  frc::Timer m_timer;
+  frc2::Timer m_timer;
   units::second_t m_prevTime;
   frc::Pose2d m_finalPose;
 
