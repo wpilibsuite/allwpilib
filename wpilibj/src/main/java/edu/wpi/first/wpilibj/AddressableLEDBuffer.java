@@ -32,9 +32,9 @@ public class AddressableLEDBuffer {
    */
   @SuppressWarnings("ParameterName")
   public void setLED(int index, int r, int g, int b) {
-    m_buffer[index * 4] = (byte)b;
-    m_buffer[(index * 4) + 1] = (byte)g;
-    m_buffer[(index * 4) + 2] = (byte)r;
+    m_buffer[index * 4] = (byte) b;
+    m_buffer[(index * 4) + 1] = (byte) g;
+    m_buffer[(index * 4) + 2] = (byte) r;
     m_buffer[(index * 4) + 3] = 0;
   }
 }

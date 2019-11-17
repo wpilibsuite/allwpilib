@@ -224,11 +224,11 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 }
 
 void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
-                                 int32_t lowTime0NanoSeconds,
-                                 int32_t highTime0NanoSeconds,
-                                 int32_t lowTime1NanoSeconds,
-                                 int32_t highTime1NanoSeconds,
-                                 int32_t* status) {
+                                    int32_t lowTime0NanoSeconds,
+                                    int32_t highTime0NanoSeconds,
+                                    int32_t lowTime1NanoSeconds,
+                                    int32_t highTime1NanoSeconds,
+                                    int32_t* status) {
   auto led = addressableLEDHandles->Get(handle);
   if (!led) {
     *status = HAL_HANDLE_ERROR;

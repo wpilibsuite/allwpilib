@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "AddressableLEDTypes.h"
+#include "hal/AddressableLEDTypes.h"
 #include "hal/Types.h"
 
 #ifdef __cplusplus

@@ -16,11 +16,12 @@
 
 #include "frc/ErrorBase.h"
 
+namespace frc {
+class PWM;
+
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
  */
-namespace frc {
-class PWM;
 class AddressableLED : public ErrorBase {
  public:
   class LEDData : public HAL_AddressableLEDData {
