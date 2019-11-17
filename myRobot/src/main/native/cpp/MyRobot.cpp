@@ -7,59 +7,12 @@
 
 #include <frc/TimedRobot.h>
 
-#include <hal/AddressableLED.h>
-#include <hal/ChipObject.h>
-#include <hal/DIO.h>
-#include <hal/HALBase.h>
-#include <hal/PWM.h>
-
-#include "FRC_NetworkCommunication/LoadOut.h"
-
 class MyRobot : public frc::TimedRobot {
-  HAL_DigitalHandle output;
-  HAL_AddressableLEDHandle ledHandle;
-
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
-  void RobotInit() override {
-    int32_t status = 0;
-    output = HAL_InitializePWMPort(HAL_GetPort(0), &status);
-    std::cout << status << std::endl;
-    ledHandle = HAL_InitializeAddressableLED(output, &status);
-    std::cout << status << std::endl;
-
-    HAL_SetAddressableLEDLength(ledHandle, 12, &status);
-
-    HAL_AddressableLEDData buf[12];
-    std::memset(buf, 0, sizeof(buf));
-    for (int i = 0; i < 12; i += 3) {
-      buf[i].g = 0x96;
-      buf[i + 1].b = 0x96;
-      buf[i + 2].r = 0x96;
-    }
-
-    HAL_WriteAddressableLEDData(ledHandle, buf, 12, &status);
-
-    std::cout << status << std::endl;
-
-    // HAL_SetAddressableLEDTiming(ledHandle, 1000, 3000, 3000, 1000, 100,
-    // &status); HAL_SetAddressableLEDTiming(ledHandle, 350, 800, 700, 600, 500,
-    // &status);
-
-    std::cout << status << std::endl;
-
-    HAL_StartAddressableLEDOutput(ledHandle, &status);
-
-    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    // HAL_StopAddressableLEDWrite(ledHandle, &status);
-
-    std::cout << status << std::endl;
-
-    // HAL_ExitMain();
-  }
+  void RobotInit() override {}
 
   /**
    * This function is run once each time the robot enters autonomous mode
@@ -92,4 +45,4 @@ class MyRobot : public frc::TimedRobot {
   void RobotPeriodic() override {}
 };
 
-int main() { frc::StartRobot<MyRobot>(); }
+int main() { return frc::StartRobot<MyRobot>(); }
