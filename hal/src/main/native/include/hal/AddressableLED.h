@@ -9,9 +9,8 @@
 
 #include <stdint.h>
 
-#include "hal/Types.h"
-
 #include "AddressableLEDTypes.h"
+#include "hal/Types.h"
 
 #ifdef __cplusplus
 extern "C" {

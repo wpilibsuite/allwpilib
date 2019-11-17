@@ -5,20 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-
-
 #include <frc/TimedRobot.h>
 
-#include "hal/AddressableLED.h"
-#include "hal/DIO.h"
-#include "hal/PWM.h"
-#include "hal/HALBase.h"
+#include <hal/AddressableLED.h>
+#include <hal/ChipObject.h>
+#include <hal/DIO.h>
+#include <hal/HALBase.h>
+#include <hal/PWM.h>
 
-#include "hal/ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 
 class MyRobot : public frc::TimedRobot {
-
   HAL_DigitalHandle output;
   HAL_AddressableLEDHandle ledHandle;
 
@@ -27,7 +24,6 @@ class MyRobot : public frc::TimedRobot {
    * used for any initialization code.
    */
   void RobotInit() override {
-
     int32_t status = 0;
     output = HAL_InitializePWMPort(HAL_GetPort(0), &status);
     std::cout << status << std::endl;
@@ -48,24 +44,21 @@ class MyRobot : public frc::TimedRobot {
 
     std::cout << status << std::endl;
 
-    //HAL_SetAddressableLEDTiming(ledHandle, 1000, 3000, 3000, 1000, 100, &status);
-    //HAL_SetAddressableLEDTiming(ledHandle, 350, 800, 700, 600, 500, &status);
+    // HAL_SetAddressableLEDTiming(ledHandle, 1000, 3000, 3000, 1000, 100,
+    // &status); HAL_SetAddressableLEDTiming(ledHandle, 350, 800, 700, 600, 500,
+    // &status);
 
     std::cout << status << std::endl;
 
     HAL_StartAddressableLEDOutput(ledHandle, &status);
 
+    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-
-    //std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    //HAL_StopAddressableLEDWrite(ledHandle, &status);
+    // HAL_StopAddressableLEDWrite(ledHandle, &status);
 
     std::cout << status << std::endl;
 
-    //HAL_ExitMain();
-
-
+    // HAL_ExitMain();
   }
 
   /**
@@ -99,7 +92,4 @@ class MyRobot : public frc::TimedRobot {
   void RobotPeriodic() override {}
 };
 
-
-int main() {
-  frc::StartRobot<MyRobot>();
-}
+int main() { frc::StartRobot<MyRobot>(); }

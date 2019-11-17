@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -103,9 +103,11 @@ constexpr int32_t remapDigitalChannelToBitfieldChannel(int32_t channel) {
   // First 10 are headers
   if (channel < kNumDigitalHeaders) return channel;
   // 2nd group of 16 are mxp. So if mxp port, add 6, since they start at 10
-  else if (channel < kNumDigitalMXPChannels) return channel + 6;
+  else if (channel < kNumDigitalMXPChannels)
+    return channel + 6;
   // Assume SPI, so remove MXP channels
-  else return channel - kNumDigitalMXPChannels;
+  else
+    return channel - kNumDigitalMXPChannels;
 }
 
 /**

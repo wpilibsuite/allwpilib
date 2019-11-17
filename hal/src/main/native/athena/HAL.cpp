@@ -390,9 +390,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   wpi::outs() << "WD Status " << status << "\n";
 
   if (status != 0) {
-        wpi::outs() << "Failed Status Global Or Watchdog\n";
+    wpi::outs() << "Failed Status Global Or Watchdog\n";
     wpi::outs().flush();
-     return false;
+    return false;
   }
 
   HAL_InitializeDriverStation();
