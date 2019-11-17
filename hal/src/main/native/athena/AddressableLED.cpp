@@ -8,12 +8,20 @@
 #include "FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h"
 #include "ConstantsInternal.h"
 #include "cstring"
-#include <iostream>
-#include <thread>
 
 using namespace hal;
 
 constexpr int32_t kMaxStringSize = 5460;
+
+extern "C" {
+  NiFpga_Status NiFpga_ClientFunctionCall(NiFpga_Session session,
+                                        uint32_t group,
+                                        uint32_t functionId,
+                                        const void* inBuffer,
+                                        size_t inBufferSize,
+                                        void* outBuffer,
+                                        size_t outBufferSize);
+}
 
 namespace {
 struct AddressableLED {
@@ -39,6 +47,52 @@ void InitializeAddressableLED() {
 }
 }  // namespace init
 }  // namespace hal
+
+// Shim for broken ChipObject function
+static const uint32_t clientFeature_hostMemoryBuffer = 0;
+static const uint32_t hostMemoryBufferFunction_open = 2;
+
+// Input arguments for HMB open
+struct AtomicHMBOpenInputs
+{
+   const char* memoryName;
+};
+
+// Output arguments for HMB open
+struct AtomicHMBOpenOutputs
+{
+   size_t size;
+   void* virtualAddress;
+};
+
+static NiFpga_Status OpenHostMemoryBuffer(NiFpga_Session session,
+                                          const char* memoryName,
+                                          void** virtualAddress,
+                                          size_t* size)
+{
+   struct AtomicHMBOpenOutputs outputs;
+
+   struct AtomicHMBOpenInputs inputs;
+   inputs.memoryName = memoryName;
+
+   NiFpga_Status retval = NiFpga_ClientFunctionCall(session,
+                                    clientFeature_hostMemoryBuffer,
+                                    hostMemoryBufferFunction_open,
+                                    &inputs,
+                                    sizeof(struct AtomicHMBOpenInputs),
+                                    (uint8_t*)(&outputs),
+                                    sizeof(struct AtomicHMBOpenOutputs));
+   if (NiFpga_IsError(retval))
+   {
+      return retval;
+   }
+   *virtualAddress = outputs.virtualAddress;
+   if (size != NULL)
+   {
+      *size = outputs.size;
+   }
+   return retval;
+}
 
 extern "C" {
 
@@ -85,7 +139,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 
   uint32_t session = led->led->getSystemInterface()->getHandle();
 
-  *status = NiFpga_OpenHostMemoryBuffer(session, "HMB_0_LED", &led->ledBuffer,
+  *status = OpenHostMemoryBuffer(session, "HMB_0_LED", &led->ledBuffer,
                                         &led->ledBufferSize);
 
   if (*status != 0) {
