@@ -16,6 +16,8 @@
 using namespace frc;
 using namespace wpi::java;
 
+static_assert(sizeof(jbyte) * 4 == sizeof(HAL_AddressableLEDData));
+
 extern "C" {
 /*
  * Class:     edu_wpi_first_hal_AddressableLEDJNI

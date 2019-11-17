@@ -20,8 +20,6 @@
 
 using namespace hal;
 
-constexpr int32_t kMaxStringSize = 5460;
-
 extern "C" {
 NiFpga_Status NiFpga_ClientFunctionCall(NiFpga_Session session, uint32_t group,
                                         uint32_t functionId,
@@ -180,7 +178,7 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
     return;
   }
 
-  if (length > kMaxStringSize) {
+  if (length > HAL_kAddressableLEDMaxLength) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }

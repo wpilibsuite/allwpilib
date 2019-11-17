@@ -25,6 +25,7 @@ namespace hal {
 namespace init {
 void InitializeHAL() {
   InitializeAccelerometerData();
+  InitializeAddressableLEDData();
   InitializeAnalogGyroData();
   InitializeAnalogInData();
   InitializeAnalogOutData();
@@ -46,6 +47,7 @@ void InitializeHAL() {
   InitializeSPIAccelerometerData();
   InitializeSPIData();
   InitializeAccelerometer();
+  InitializeAddressableLED();
   InitializeAnalogAccumulator();
   InitializeAnalogGyro();
   InitializeAnalogInput();

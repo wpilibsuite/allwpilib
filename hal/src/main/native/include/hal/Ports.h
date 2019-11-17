@@ -151,6 +151,13 @@ int32_t HAL_GetNumPDPChannels(void);
  * @return the number of Duty Cycle inputs
  */
 int32_t HAL_GetNumDutyCycles(void);
+
+/**
+ * Gets the number of addressable LED generators in the current system.
+ *
+ * @return the number of Addressable LED generators
+ */
+int32_t HAL_GetNumAddressableLEDs(void);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
