@@ -223,7 +223,7 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
   led->led->strobeLoad(status);
 }
 
-void HAL_SetAddressableLEDTiming(HAL_AddressableLEDHandle handle,
+void HAL_SetAddressableLEDBitTiming(HAL_AddressableLEDHandle handle,
                                  int32_t lowTime0NanoSeconds,
                                  int32_t highTime0NanoSeconds,
                                  int32_t lowTime1NanoSeconds,

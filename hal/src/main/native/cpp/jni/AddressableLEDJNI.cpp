@@ -70,7 +70,8 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setData
   (JNIEnv* env, jclass, jint handle, jbyteArray arr)
 {
   int32_t status = 0;
-  JByteArrayRef arrRef{env, arr};
+  JByteArrayRef jArrRef{env, arr};
+  auto arrRef = jArrRef.array();
   HAL_WriteAddressableLEDData(
       static_cast<HAL_AddressableLEDHandle>(handle),
       reinterpret_cast<const HAL_AddressableLEDData*>(arrRef.data()),
@@ -102,7 +103,7 @@ Java_edu_wpi_first_hal_AddressableLEDJNI_setBitTiming
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_AddressableLEDJNI_setSyncTime
-  (JNIEnv* env, jclass, jint handle, jint synctime)
+  (JNIEnv* env, jclass, jint handle, jint syncTime)
 {
   int32_t status = 0;
   HAL_SetAddressableLEDSyncTime(static_cast<HAL_AddressableLEDHandle>(handle),

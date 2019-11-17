@@ -24,6 +24,7 @@ class PWM;
 class AddressableLED : public ErrorBase {
  public:
   class LEDData : public HAL_AddressableLEDData {
+   public:
     LEDData() : LEDData(0, 0, 0) {}
     LEDData(int _r, int _g, int _b) {
       r = _r;

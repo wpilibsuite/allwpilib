@@ -13,8 +13,9 @@ import edu.wpi.first.hal.AddressableLEDJNI;
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
  */
 public class AddressableLED implements AutoCloseable {
-  private PWM m_pwmOutput;
+  private final PWM m_pwmOutput;
   private int m_handle;
+  private final boolean m_ownsPwm;
 
   /**
    * Constructs a new driver from a PWM output.
@@ -23,6 +24,7 @@ public class AddressableLED implements AutoCloseable {
    */
   public AddressableLED(PWM output) {
     m_pwmOutput = output;
+    m_ownsPwm = false;
     init();
   }
 
@@ -33,6 +35,7 @@ public class AddressableLED implements AutoCloseable {
    */
   public AddressableLED(int port) {
     m_pwmOutput = new PWM(port);
+    m_ownsPwm = true;
     init();
   }
 
@@ -45,7 +48,9 @@ public class AddressableLED implements AutoCloseable {
     if (m_handle != 0) {
       AddressableLEDJNI.free(m_handle);
     }
-    m_pwmOutput = null;
+    if (m_ownsPwm) {
+      m_pwmOutput.close();
+    }
   }
 
   /**

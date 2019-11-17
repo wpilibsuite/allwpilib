@@ -31,10 +31,10 @@ public class AddressableLEDBuffer {
    * @param b the b value
    */
   @SuppressWarnings("ParameterName")
-  public void setLED(int index, byte r, byte g, byte b) {
-    m_buffer[index * 4] = b;
-    m_buffer[(index * 4) + 1] = g;
-    m_buffer[(index * 4) + 2] = r;
+  public void setLED(int index, int r, int g, int b) {
+    m_buffer[index * 4] = (byte)b;
+    m_buffer[(index * 4) + 1] = (byte)g;
+    m_buffer[(index * 4) + 2] = (byte)r;
     m_buffer[(index * 4) + 3] = 0;
   }
 }
