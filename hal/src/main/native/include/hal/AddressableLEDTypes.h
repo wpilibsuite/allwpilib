@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#define HAL_kAddressableLEDMaxLength 5460
+
 struct HAL_AddressableLEDData {
   uint8_t b;
   uint8_t g;
