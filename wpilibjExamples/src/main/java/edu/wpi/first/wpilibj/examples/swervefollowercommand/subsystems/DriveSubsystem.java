@@ -82,12 +82,23 @@ public class DriveSubsystem extends SubsystemBase {
   private final Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(this.getHeading()));
+  SwerveDriveOdometry m_odometry =
+      new SwerveDriveOdometry(kDriveKinematics, getAngle());
 
   /**
    * Creates a new DriveSubsystem.
    */
   public DriveSubsystem() {}
+
+  /**
+   * Returns the angle of the robot as a Rotation2d.
+   *
+   * @return The angle of the robot.
+   */
+  public Rotation2d getAngle() {
+    // Negating the angle because WPILib gyros are CW positive.
+    return Rotation2d.fromDegrees(m_gyro.getAngle() * (kGyroReversed ? 1. : -1.));
+  }
 
   @Override
   public void periodic() {
@@ -115,7 +126,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, new Rotation2d(this.getHeading()));
+    m_odometry.resetPosition(pose, getAngle());
   }
 
   /**
@@ -130,7 +141,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var swerveModuleStates = kDriveKinematics.toSwerveModuleStates(
         fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rot, new Rotation2d(-m_gyro.getAngle()))
+            xSpeed, ySpeed, rot, getAngle())
             : new ChassisSpeeds(xSpeed, ySpeed, rot)
     );
     SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeedMetersPerSecond);

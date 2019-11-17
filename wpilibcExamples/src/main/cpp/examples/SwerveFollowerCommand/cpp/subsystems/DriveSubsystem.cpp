@@ -42,7 +42,7 @@ DriveSubsystem::DriveSubsystem()
         frc::Translation2d(-kTrackLength / 2, kTrackWidth / 2),
         frc::Translation2d(-kTrackLength / 2, -kTrackWidth / 2)},
 
-      m_odometry{kDriveKinematics, frc::Pose2d()} {}
+      m_odometry{kDriveKinematics, frc::Rotation2d(units::degree_t(GetHeading())), frc::Pose2d()} {}
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
@@ -58,7 +58,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   auto states = kDriveKinematics.ToSwerveModuleStates(
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
                           xSpeed, ySpeed, rot,
-                          frc::Rotation2d(units::degree_t(-m_gyro.GetAngle())))
+                          frc::Rotation2d(units::degree_t(GetHeading())))
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
   kDriveKinematics.NormalizeWheelSpeeds(&states, AutoConstants::kMaxSpeed);
@@ -89,7 +89,7 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360);
+  return std::remainder(m_gyro.GetAngle(), 360)  * (kGyroReversed ? -1. : 1.);
 }
 
 void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
@@ -101,5 +101,5 @@ double DriveSubsystem::GetTurnRate() {
 frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  m_odometry.ResetPosition(pose);
+  m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
 }

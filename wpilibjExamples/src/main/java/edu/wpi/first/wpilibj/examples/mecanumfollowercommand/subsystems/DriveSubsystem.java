@@ -40,7 +40,6 @@ public class DriveSubsystem extends SubsystemBase {
   private final PWMVictorSPX m_frontRight = new PWMVictorSPX(kFrontRightMotorPort);
   private final PWMVictorSPX m_rearRight = new PWMVictorSPX(kRearRightMotorPort);
 
-
   private final MecanumDrive m_drive = new MecanumDrive(
         m_frontLeft,
         m_rearLeft,
@@ -71,7 +70,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(kDriveKinematics, new Rotation2d(this.getHeading()));
+  MecanumDriveOdometry m_odometry =
+      new MecanumDriveOdometry(kDriveKinematics, getAngle());
 
   /**
    * Creates a new DriveSubsystem.
@@ -84,10 +84,20 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRightEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
   }
 
+  /**
+   * Returns the angle of the robot as a Rotation2d.
+   *
+   * @return The angle of the robot.
+   */
+  public Rotation2d getAngle() {
+    // Negating the angle because WPILib gyros are CW positive.
+    return Rotation2d.fromDegrees(m_gyro.getAngle() * (kGyroReversed ? 1. : -1.));
+  }
+
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(new Rotation2d(getHeading()),
+    m_odometry.update(getAngle(),
         new MecanumDriveWheelSpeeds(
           m_frontLeftEncoder.getRate(),
           m_rearLeftEncoder.getRate(),
@@ -110,7 +120,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, new Rotation2d(this.getHeading()));
+    m_odometry.resetPosition(pose, getAngle());
   }
 
   /**

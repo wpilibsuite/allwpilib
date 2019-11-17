@@ -31,7 +31,7 @@ DriveSubsystem::DriveSubsystem()
       m_rearRightEncoder{kRearRightEncoderPorts[0], kRearRightEncoderPorts[1],
                          kRearRightEncoderReversed},
 
-      m_odometry{kDriveKinematics, frc::Pose2d()} {
+      m_odometry{kDriveKinematics, frc::Rotation2d(units::degree_t(GetHeading())), frc::Pose2d()} {
   // Set the distance per pulse for the encoders
   m_frontLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
@@ -54,7 +54,7 @@ void DriveSubsystem::Periodic() {
 void DriveSubsystem::Drive(double xSpeed, double ySpeed, double rot,
                            bool feildRelative) {
   if (feildRelative) {
-    m_drive.DriveCartesian(ySpeed, xSpeed, rot, m_gyro.GetAngle());
+    m_drive.DriveCartesian(ySpeed, xSpeed, rot, -m_gyro.GetAngle());
   } else {
     m_drive.DriveCartesian(ySpeed, xSpeed, rot);
   }
@@ -106,7 +106,7 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 }
 
 double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360);
+  return std::remainder(m_gyro.GetAngle(), 360)  * (kGyroReversed ? -1. : 1.);
 }
 
 void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
@@ -118,5 +118,5 @@ double DriveSubsystem::GetTurnRate() {
 frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  m_odometry.ResetPosition(pose);
+  m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
 }
