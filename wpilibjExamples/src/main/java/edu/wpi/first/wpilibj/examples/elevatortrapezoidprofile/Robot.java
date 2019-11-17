@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5);
+    m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
   }
 
   @Override

@@ -60,6 +60,7 @@ TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
   wpi_setHALError(status);
+  HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Timed);

@@ -14,6 +14,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <mockdata/DriverStationData.h>
+#include <mockdata/MockHooks.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
@@ -328,7 +329,7 @@ static void DriverStationExecute() {
 
   // Send new data every 20 ms (may be slower depending on GUI refresh rate)
   static double lastNewDataTime = 0.0;
-  if ((curTime - lastNewDataTime) > 0.02) {
+  if ((curTime - lastNewDataTime) > 0.02 && !HALSIM_IsTimingPaused()) {
     lastNewDataTime = curTime;
     HALSIM_NotifyDriverStationNewData();
   }
@@ -367,7 +368,7 @@ static void DisplayFMS() {
                          ImGuiInputTextFlags_EnterReturnsTrue)) {
     HALSIM_SetDriverStationMatchTime(matchTime);
     startMatchTime = curTime - matchTime;
-  } else if (!HALSIM_GetDriverStationEnabled()) {
+  } else if (!HALSIM_GetDriverStationEnabled() || HALSIM_IsTimingPaused()) {
     startMatchTime = curTime - matchTime;
   } else if (matchTimeEnabled) {
     HALSIM_SetDriverStationMatchTime(curTime - startMatchTime);

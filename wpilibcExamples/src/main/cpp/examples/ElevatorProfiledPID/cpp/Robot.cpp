@@ -5,20 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <units/units.h>
-
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <units/units.h>
+#include <wpi/math>
 
 class Robot : public frc::TimedRobot {
  public:
   static constexpr units::second_t kDt = 20_ms;
 
-  Robot() { m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5); }
+  Robot() {
+    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * wpi::math::pi * 1.5);
+  }
 
   void TeleopPeriodic() override {
     if (m_joystick.GetRawButtonPressed(2)) {

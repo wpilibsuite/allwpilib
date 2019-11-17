@@ -71,5 +71,5 @@ class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
-  frc::MecanumDriveOdometry m_odometry{m_kinematics};
+  frc::MecanumDriveOdometry m_odometry{m_kinematics, GetAngle()};
 };

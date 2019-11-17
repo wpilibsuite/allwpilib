@@ -17,8 +17,8 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 dependencies {
     if (!project.hasProperty('noWpiutil')) {
-        compile project(':wpiutil')
-        devCompile project(':wpiutil')
+        implementation project(':wpiutil')
+        devImplementation project(':wpiutil')
     }
 }
 
@@ -31,18 +31,6 @@ ext {
 staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
-
-if (project.hasProperty('niLibraries')) {
-    ext {
-        chipObjectComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
-                                "${nativeName}JNI".toString(), "${nativeName}JNIShared".toString(), "${nativeName}Test".toString()]
-        netCommComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
-                             "${nativeName}JNI".toString(), "${nativeName}JNIShared".toString(), "${nativeName}Test".toString()]
-        useNiJava = true
-    }
-
-    apply from: "${rootDir}/shared/nilibraries.gradle"
-}
 
 model {
     components {
@@ -211,6 +199,9 @@ model {
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
+                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
+                }
             }
         }
     }
@@ -243,6 +234,9 @@ model {
             lib library: nativeName, linkage: 'shared'
             if (!project.hasProperty('noWpiutil')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
+                }
             }
         }
     }

@@ -5,6 +5,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id "com.gradle.enterprise" version "3.0"
+}
+
 // Set the flag to tell gradle to ignore unresolved headers
 // Libraries like eigen and opencv use macro includes, which
 // Gradle doesn't properly ignore, and completely disables

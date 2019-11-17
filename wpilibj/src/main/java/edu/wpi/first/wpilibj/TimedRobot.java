@@ -43,6 +43,7 @@ public class TimedRobot extends IterativeRobotBase {
    */
   protected TimedRobot(double period) {
     super(period);
+    NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
   }

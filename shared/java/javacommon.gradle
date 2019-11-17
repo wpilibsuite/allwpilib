@@ -1,5 +1,5 @@
 apply plugin: 'maven-publish'
-apply plugin: 'java'
+apply plugin: 'java-library'
 //apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'jacoco'
 
@@ -20,21 +20,21 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 task outputJar(type: Jar, dependsOn: classes) {
-    baseName javaBaseName
-    destinationDir outputsFolder
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
     from sourceSets.main.output
 }
 
 task outputSourcesJar(type: Jar, dependsOn: classes) {
-    baseName javaBaseName
-    destinationDir outputsFolder
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task outputJavadocJar(type: Jar, dependsOn: javadoc) {
-    baseName javaBaseName
-    destinationDir outputsFolder
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
@@ -104,7 +104,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
 
-    devCompile sourceSets.main.output
+    devImplementation sourceSets.main.output
 
     //errorprone 'com.google.errorprone:error_prone_core:2.3.2-SNAPSHOT'
     //errorproneJavac 'com.google.errorprone:error_prone_core:2.3.1'

@@ -11,15 +11,15 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 
 dependencies {
-    compile project(':wpilibj')
+    implementation project(':wpilibj')
 
-    compile project(':hal')
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    compile project(':cameraserver')
-    compile project(':wpilibOldCommands')
-    compile project(':wpilibNewCommands')
+    implementation project(':hal')
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':cameraserver')
+    implementation project(':wpilibOldCommands')
+    implementation project(':wpilibNewCommands')
 }
 
 if (!project.hasProperty('skipPMD')) {

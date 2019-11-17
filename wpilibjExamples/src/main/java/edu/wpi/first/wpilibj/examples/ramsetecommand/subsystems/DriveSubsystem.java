@@ -57,7 +57,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(kDriveKinematics);
+  DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(kDriveKinematics,
+      Rotation2d.fromDegrees(getHeading()));
 
   /**
    * Creates a new DriveSubsystem.
@@ -93,7 +94,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose);
+    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
   }
 
   /**

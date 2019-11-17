@@ -28,6 +28,8 @@ public class DutyCycle implements Sendable, AutoCloseable {
   // Explicitly package private
   final int m_handle;
 
+  private final DigitalSource m_source;
+
   /**
    * Constructs a DutyCycle input from a DigitalSource input.
    *
@@ -39,6 +41,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
     m_handle = DutyCycleJNI.initialize(digitalSource.getPortHandleForRouting(),
         digitalSource.getAnalogTriggerTypeForRouting());
 
+    m_source = digitalSource;
     int index = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_DutyCycle, index + 1);
     SendableRegistry.addLW(this, "Duty Cycle", index);
@@ -105,6 +108,10 @@ public class DutyCycle implements Sendable, AutoCloseable {
   @SuppressWarnings("AbbreviationAsWordInName")
   public final int getFPGAIndex() {
     return DutyCycleJNI.getFPGAIndex(m_handle);
+  }
+
+  public int getSourceChannel() {
+    return m_source.getChannel();
   }
 
   @Override
