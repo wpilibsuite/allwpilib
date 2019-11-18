@@ -197,7 +197,7 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the rear left drive encoder
    */
-  
+
   public Encoder getRearLeftEncoder() {
     return m_rearLeftEncoder;
   }

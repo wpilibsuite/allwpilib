@@ -119,7 +119,7 @@ public class RobotContainer {
     MecanumFollowerCommand mecanumFollowerCommand = new MecanumFollowerCommand(
         exampleTrajectory,
         m_robotDrive::getPose,
-        
+
         ksVolts,
         kvVoltSecondsPerMeter,
         kaVoltSecondsSquaredPerMeter,
@@ -138,7 +138,7 @@ public class RobotContainer {
         new PIDController(kPRearLeftVel, 0, 0),
         new PIDController(kPFrontRightVel, 0, 0),
         new PIDController(kPRearRightVel, 0, 0),
-        
+
         m_robotDrive::getCurrentWheelSpeeds,
 
         m_robotDrive::setFrontLeftSpeedControllerVolts, //Consumers for the output voltages

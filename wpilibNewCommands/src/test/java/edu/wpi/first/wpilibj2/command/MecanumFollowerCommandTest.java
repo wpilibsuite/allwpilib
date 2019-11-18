@@ -44,7 +44,7 @@ class MecanumFollowerCommandTest {
 
   private static final double m_trackLength = 0.5;
   private static final double m_trackWidth = 0.5;
-  
+
   private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
       new Translation2d(m_trackLength / 2, m_trackWidth / 2),
       new Translation2d(m_trackLength / 2, -m_trackWidth / 2),
@@ -94,8 +94,8 @@ class MecanumFollowerCommandTest {
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
     final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
-    
-    final var command = new MecanumFollowerCommand(trajectory, 
+
+    final var command = new MecanumFollowerCommand(trajectory,
         this::getRobotPose,
         m_kinematics,
         new PIDController(0.6, 0, 0),
@@ -110,7 +110,7 @@ class MecanumFollowerCommandTest {
 
 
     scheduler.registerSubsystem(subsystem);
-    
+
     scheduler.schedule(command);
 
     m_rotTimer.reset();
@@ -134,4 +134,3 @@ class MecanumFollowerCommandTest {
     );
   }
 }
-

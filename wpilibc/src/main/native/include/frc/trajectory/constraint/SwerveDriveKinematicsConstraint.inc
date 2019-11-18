@@ -32,7 +32,7 @@ SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
   auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
       {xVelocity, yVelocity, velocity * curvature});
   m_kinematics.NormalizeWheelSpeeds(&wheelSpeeds, m_maxSpeed);
-  
+
   auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
 
   return units::math::hypot(normSpeeds.vx, normSpeeds.vy);
@@ -46,4 +46,4 @@ SwerveDriveKinematicsConstraint<NumModules>::MinMaxAcceleration(
   return {};
 }
 
-} // namespace frc
+}  // namespace frc

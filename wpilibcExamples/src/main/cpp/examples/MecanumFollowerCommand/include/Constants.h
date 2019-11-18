@@ -5,12 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <units/units.h>
-
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-
+#include <units/units.h>
 #include <wpi/math>
 
 #pragma once

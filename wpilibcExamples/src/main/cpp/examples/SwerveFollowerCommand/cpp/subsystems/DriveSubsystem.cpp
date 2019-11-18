@@ -7,19 +7,20 @@
 
 #include "subsystems/DriveSubsystem.h"
 
-#include <units/units.h>
-
 #include <frc/geometry/Rotation2d.h>
+#include <units/units.h>
 
 #include "Constants.h"
 
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : m_frontLeft{
-          kFrontLeftDriveMotorPort,       kFrontLeftTurningMotorPort,
-          kFrontLeftDriveEncoderPorts,    kFrontLeftTurningEncoderPorts,
-          kFrontLeftDriveEncoderReversed, kFrontLeftTurningEncoderReversed},
+    : m_frontLeft{kFrontLeftDriveMotorPort,
+                  kFrontLeftTurningMotorPort,
+                  kFrontLeftDriveEncoderPorts,
+                  kFrontLeftTurningEncoderPorts,
+                  kFrontLeftDriveEncoderReversed,
+                  kFrontLeftTurningEncoderReversed},
 
       m_rearLeft{
           kRearLeftDriveMotorPort,       kRearLeftTurningMotorPort,
@@ -36,7 +37,9 @@ DriveSubsystem::DriveSubsystem()
           kRearRightDriveEncoderPorts,    kRearRightTurningEncoderPorts,
           kRearRightDriveEncoderReversed, kRearRightTurningEncoderReversed},
 
-      m_odometry{kDriveKinematics, frc::Rotation2d(units::degree_t(GetHeading())), frc::Pose2d()} {}
+      m_odometry{kDriveKinematics,
+                 frc::Rotation2d(units::degree_t(GetHeading())),
+                 frc::Pose2d()} {}
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
@@ -83,7 +86,7 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360)  * (kGyroReversed ? -1. : 1.);
+  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1. : 1.);
 }
 
 void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
@@ -95,5 +98,6 @@ double DriveSubsystem::GetTurnRate() {
 frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
+  m_odometry.ResetPosition(pose,
+                           frc::Rotation2d(units::degree_t(GetHeading())));
 }

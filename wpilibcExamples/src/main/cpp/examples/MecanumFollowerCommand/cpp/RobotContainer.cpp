@@ -100,10 +100,11 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc2::PIDController(DriveConstants::kPFrontRightVel, 0, 0),
       frc2::PIDController(DriveConstants::kPRearRightVel, 0, 0),
 
-      [this](units::voltage::volt_t frontLeft, units::voltage::volt_t rearLeft, units::voltage::volt_t frontRight, units::voltage::volt_t rearRight) {
-        m_drive.SetSpeedControllersVolts(
-            frontLeft, rearLeft,
-            frontRight, rearRight);
+      [this](units::voltage::volt_t frontLeft, units::voltage::volt_t rearLeft,
+             units::voltage::volt_t frontRight,
+             units::voltage::volt_t rearRight) {
+        m_drive.SetSpeedControllersVolts(frontLeft, rearLeft, frontRight,
+                                         rearRight);
       },
 
       {&m_drive});

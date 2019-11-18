@@ -285,7 +285,7 @@ public class MecanumFollowerCommand extends CommandBase {
     double targetXVel = m_xdController.calculate(
         m_pose.get().getTranslation().getX(),
         desiredPose.getTranslation().getX());
-    
+
     //System.out.println(targetXVel);
 
     double targetYVel = m_ydController.calculate(

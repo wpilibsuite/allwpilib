@@ -87,8 +87,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Sets the drive SpeedControllers to a desired voltage.
    */
-  void SetSpeedControllersVolts(units::volt_t frontLeftPower, units::volt_t rearLeftPower,
-                           units::volt_t frontRightPower, units::volt_t rearRightPower);
+  void SetSpeedControllersVolts(units::volt_t frontLeftPower,
+                                units::volt_t rearLeftPower,
+                                units::volt_t frontRightPower,
+                                units::volt_t rearRightPower);
 
   /**
    * Sets the max output of the drive. Useful for scaling the drive to drive

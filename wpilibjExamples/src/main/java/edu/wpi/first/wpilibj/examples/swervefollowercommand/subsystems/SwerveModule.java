@@ -29,7 +29,7 @@ public class SwerveModule {
   private final Encoder m_driveEncoder;
   private final Encoder m_turningEncoder;
 
-  private final PIDController m_drivePIDController = 
+  private final PIDController m_drivePIDController =
       new PIDController(kPModuleDriveController, 0, 0);
 
   //Using a TrapezoidProfile PIDController to allow for smooth turning

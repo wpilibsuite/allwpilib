@@ -47,7 +47,6 @@ import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.Dri
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
-
   //Robot swerve modules
   private final SwerveModule m_frontLeft = new SwerveModule(kFrontLeftDriveMotorPort,
       kFrontLeftTurningMotorPort,

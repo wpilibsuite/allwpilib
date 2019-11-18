@@ -7,11 +7,10 @@
 
 #include "subsystems/DriveSubsystem.h"
 
-#include "Constants.h"
-
+#include <frc/geometry/Rotation2d.h>
 #include <units/units.h>
 
-#include <frc/geometry/Rotation2d.h>
+#include "Constants.h"
 
 using namespace DriveConstants;
 
@@ -31,13 +30,14 @@ DriveSubsystem::DriveSubsystem()
       m_rearRightEncoder{kRearRightEncoderPorts[0], kRearRightEncoderPorts[1],
                          kRearRightEncoderReversed},
 
-      m_odometry{kDriveKinematics, frc::Rotation2d(units::degree_t(GetHeading())), frc::Pose2d()} {
+      m_odometry{kDriveKinematics,
+                 frc::Rotation2d(units::degree_t(GetHeading())),
+                 frc::Pose2d()} {
   // Set the distance per pulse for the encoders
   m_frontLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_frontRightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearRightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-
 }
 
 void DriveSubsystem::Periodic() {
@@ -61,9 +61,9 @@ void DriveSubsystem::Drive(double xSpeed, double ySpeed, double rot,
 }
 
 void DriveSubsystem::SetSpeedControllersVolts(units::volt_t frontLeftPower,
-                                         units::volt_t rearLeftPower,
-                                         units::volt_t frontRightPower,
-                                         units::volt_t rearRightPower) {
+                                              units::volt_t rearLeftPower,
+                                              units::volt_t frontRightPower,
+                                              units::volt_t rearRightPower) {
   m_frontLeft.SetVoltage(frontLeftPower);
   m_rearLeft.SetVoltage(rearLeftPower);
   m_frontRight.SetVoltage(frontRightPower);
@@ -81,9 +81,7 @@ frc::Encoder& DriveSubsystem::GetFrontLeftEncoder() {
   return m_frontLeftEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetRearLeftEncoder() { 
-  return m_rearLeftEncoder; 
-}
+frc::Encoder& DriveSubsystem::GetRearLeftEncoder() { return m_rearLeftEncoder; }
 
 frc::Encoder& DriveSubsystem::GetFrontRightEncoder() {
   return m_frontRightEncoder;
@@ -95,10 +93,10 @@ frc::Encoder& DriveSubsystem::GetRearRightEncoder() {
 
 frc::MecanumDriveWheelSpeeds DriveSubsystem::getCurrentWheelSpeeds() {
   return (frc::MecanumDriveWheelSpeeds{
-          units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_rearLeftEncoder.GetRate()),
-          units::meters_per_second_t(m_frontRightEncoder.GetRate()),
-          units::meters_per_second_t(m_rearRightEncoder.GetRate())});
+      units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
+      units::meters_per_second_t(m_rearLeftEncoder.GetRate()),
+      units::meters_per_second_t(m_frontRightEncoder.GetRate()),
+      units::meters_per_second_t(m_rearRightEncoder.GetRate())});
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
@@ -106,7 +104,7 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 }
 
 double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360)  * (kGyroReversed ? -1. : 1.);
+  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1. : 1.);
 }
 
 void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
@@ -118,5 +116,6 @@ double DriveSubsystem::GetTurnRate() {
 frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  m_odometry.ResetPosition(pose, frc::Rotation2d(units::degree_t(GetHeading())));
+  m_odometry.ResetPosition(pose,
+                           frc::Rotation2d(units::degree_t(GetHeading())));
 }

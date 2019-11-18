@@ -76,20 +76,21 @@ template <class T>
 void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
   builder.GetEntry(kInstance).SetDouble(m_instance);
-  builder.AddStringArrayProperty(kOptions,
-                                 [=]() {
-                                   std::vector<std::string> keys;
-                                   for (const auto& choice : m_choices) {
-                                     keys.push_back(choice.first());
-                                   }
+  builder.AddStringArrayProperty(
+      kOptions,
+      [=]() {
+        std::vector<std::string> keys;
+        for (const auto& choice : m_choices) {
+          keys.push_back(choice.first());
+        }
 
-                                   // Unlike std::map, wpi::StringMap elements
-                                   // are not sorted
-                                   std::sort(keys.begin(), keys.end());
+        // Unlike std::map, wpi::StringMap elements
+        // are not sorted
+        std::sort(keys.begin(), keys.end());
 
-                                   return keys;
-                                 },
-                                 nullptr);
+        return keys;
+      },
+      nullptr);
   builder.AddSmallStringProperty(
       kDefault,
       [=](wpi::SmallVectorImpl<char>&) -> wpi::StringRef {

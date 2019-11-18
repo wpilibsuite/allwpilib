@@ -6,9 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "RobotContainer.h"
-#include "subsystems/DriveSubsystem.h"
-
-#include <units/units.h>
 
 #include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
@@ -19,8 +16,10 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveFollowerCommand.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <units/units.h>
 
 #include "Constants.h"
+#include "subsystems/DriveSubsystem.h"
 
 using namespace DriveConstants;
 
@@ -33,9 +32,12 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.Drive(units::meters_per_second_t(m_driverController.GetY(frc::GenericHID::kLeftHand)),
-                      units::meters_per_second_t(m_driverController.GetY(frc::GenericHID::kRightHand)),
-                      units::radians_per_second_t(m_driverController.GetX(frc::GenericHID::kLeftHand)),
+        m_drive.Drive(units::meters_per_second_t(
+                          m_driverController.GetY(frc::GenericHID::kLeftHand)),
+                      units::meters_per_second_t(
+                          m_driverController.GetY(frc::GenericHID::kRightHand)),
+                      units::radians_per_second_t(
+                          m_driverController.GetX(frc::GenericHID::kLeftHand)),
                       false);
       },
       {&m_drive}));

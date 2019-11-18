@@ -128,14 +128,15 @@ class SwerveDriveKinematics {
    * angle of each module on the robot.
    *
    * @param moduleStates The state of the modules as an std::array of type
-   * SwerveModuleState, NumModules long as measured from respective encoders 
+   * SwerveModuleState, NumModules long as measured from respective encoders
    * and gyros. The order of the swerve module states should be same as passed
    * into the constructor of this class.
    *
    * @return The resulting chassis speed.
    */
   template <typename... ModuleStates>
-  ChassisSpeeds ToChassisSpeeds(std::array<SwerveModuleState, NumModules> moduleStates);
+  ChassisSpeeds ToChassisSpeeds(
+      std::array<SwerveModuleState, NumModules> moduleStates);
 
   /**
    * Normalizes the wheel speeds using some max attainable speed. Sometimes,

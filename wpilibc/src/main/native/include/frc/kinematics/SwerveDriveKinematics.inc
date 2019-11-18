@@ -83,8 +83,8 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 
 template <size_t NumModules>
 template <typename... ModuleStates>
-ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(std::array<SwerveModuleState,
-    NumModules> moduleStates) {
+ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
+    std::array<SwerveModuleState, NumModules> moduleStates) {
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix;
 
   for (size_t i = 0; i < NumModules; i++) {
@@ -101,7 +101,7 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(std::array<Swer
   return {units::meters_per_second_t{chassisSpeedsVector(0)},
           units::meters_per_second_t{chassisSpeedsVector(1)},
           units::radians_per_second_t{chassisSpeedsVector(2)}};
-  }
+}
 
 template <size_t NumModules>
 void SwerveDriveKinematics<NumModules>::NormalizeWheelSpeeds(

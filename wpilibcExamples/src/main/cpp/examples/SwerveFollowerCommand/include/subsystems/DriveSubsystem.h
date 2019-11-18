@@ -91,18 +91,17 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetOdometry(frc::Pose2d pose);
 
-
   units::meter_t kTrackWidth =
-    .5_m;  // Distance between centers of right and left wheels on robot
+      .5_m;  // Distance between centers of right and left wheels on robot
   units::meter_t kTrackLength =
-    .7_m;  // Distance between centers of front and back wheels on robot
+      .7_m;  // Distance between centers of front and back wheels on robot
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
-        frc::Translation2d(kTrackLength / 2, kTrackWidth / 2),
-        frc::Translation2d(kTrackLength / 2, -kTrackWidth / 2),
-        frc::Translation2d(-kTrackLength / 2, kTrackWidth / 2),
-        frc::Translation2d(-kTrackLength / 2, -kTrackWidth / 2)};
-  
+      frc::Translation2d(kTrackLength / 2, kTrackWidth / 2),
+      frc::Translation2d(kTrackLength / 2, -kTrackWidth / 2),
+      frc::Translation2d(-kTrackLength / 2, kTrackWidth / 2),
+      frc::Translation2d(-kTrackLength / 2, -kTrackWidth / 2)};
+
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

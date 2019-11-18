@@ -14,10 +14,10 @@
 #include <units/units.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
-#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
-#include "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
+#include "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
@@ -99,8 +99,7 @@ class TrajectoryConfig {
    * @param kinematics The mecanum drive kinematics.
    */
   void SetKinematics(MecanumDriveKinematics kinematics) {
-    AddConstraint(
-        MecanumDriveKinematicsConstraint(kinematics, m_maxVelocity));
+    AddConstraint(MecanumDriveKinematicsConstraint(kinematics, m_maxVelocity));
   }
 
   /**
@@ -109,11 +108,10 @@ class TrajectoryConfig {
    *
    * @param kinematics The swerve drive kinematics.
    */
-  
+
   template <size_t NumModules>
   void SetKinematics(SwerveDriveKinematics<NumModules>& kinematics) {
-    AddConstraint(
-        SwerveDriveKinematicsConstraint(kinematics, m_maxVelocity));
+    AddConstraint(SwerveDriveKinematicsConstraint(kinematics, m_maxVelocity));
   }
 
   /**

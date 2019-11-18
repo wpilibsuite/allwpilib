@@ -45,7 +45,7 @@ class SwerveFollowerCommandTest {
 
   private static final double m_trackLength = 0.5;
   private static final double m_trackWidth = 0.5;
-  
+
   private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
       new Translation2d(m_trackLength / 2, m_trackWidth / 2),
       new Translation2d(m_trackLength / 2, -m_trackWidth / 2),
@@ -79,8 +79,8 @@ class SwerveFollowerCommandTest {
     final var trajectory = TrajectoryGenerator.generateTrajectory(waypoints, config);
 
     final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
-    
-    final var command = new SwerveFollowerCommand(trajectory, 
+
+    final var command = new SwerveFollowerCommand(trajectory,
         this::getRobotPose,
         m_kinematics,
         new PIDController(0.6, 0, 0),
@@ -91,7 +91,7 @@ class SwerveFollowerCommandTest {
 
 
     scheduler.registerSubsystem(subsystem);
-    
+
     scheduler.schedule(command);
 
     m_rotTimer.reset();
@@ -115,4 +115,3 @@ class SwerveFollowerCommandTest {
     );
   }
 }
-
