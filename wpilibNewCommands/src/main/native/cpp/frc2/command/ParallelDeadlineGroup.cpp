@@ -31,7 +31,7 @@ void ParallelDeadlineGroup::Execute() {
     if (commandRunning.first->IsFinished()) {
       commandRunning.first->End(false);
       commandRunning.second = false;
-      if (commandRunning.first == m_deadline) {
+      if (commandRunning.first.get() == m_deadline) {
         m_finished = true;
       }
     }
