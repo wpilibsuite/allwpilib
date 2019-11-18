@@ -13,6 +13,7 @@
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
+#include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/handles/HandlesInternal.h"
@@ -94,11 +95,23 @@ extern "C" {
 
 HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     HAL_DigitalHandle outputPort, int32_t* status) {
+  hal::init::CheckInit();
+
   auto digitalPort =
       hal::digitalChannelHandles->Get(outputPort, hal::HAL_HandleEnum::PWM);
 
   if (!digitalPort) {
-    *status = HAL_HANDLE_ERROR;
+    // If DIO was passed, channel error, else generic error
+    if (getHandleType(outputPort) == hal::HAL_HandleEnum::DIO) {
+      *status == HAL_LED_CHANNEL_ERROR;
+    } else {
+      *status == HAL_HANDLE_ERROR;
+    }
+    return HAL_kInvalidHandle;
+  }
+
+  if (digitalPort->channel >= kNumPWMHeaders) {
+    *status = HAL_LED_CHANNEL_ERROR;
     return HAL_kInvalidHandle;
   }
 
