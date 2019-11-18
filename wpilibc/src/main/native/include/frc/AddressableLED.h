@@ -33,6 +33,15 @@ class AddressableLED : public ErrorBase {
       b = _b;
       padding = 0;
     }
+
+    /**
+     * A helper method to set all values of the LED.
+     */
+    void SetLED(int r, int g, int b) {
+      this->r = r;
+      this->g = g;
+      this->b = b;
+    }
   };
 
   /**

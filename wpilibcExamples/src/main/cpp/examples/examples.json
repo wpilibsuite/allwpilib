@@ -428,5 +428,45 @@
     "foldername": "TankDriveXboxController",
     "gradlebase": "cpp",
     "commandversion": 1
+  },
+  {
+    "name": "Duty Cycle Encoder",
+    "description": "Demonstrates the use of the Duty Cycle Encoder class",
+    "tags": [
+      "Getting Started with C++"
+    ],
+    "foldername": "DutyCycleEncoder",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Duty Cycle Input",
+    "description": "Demonstrates the use of the Duty Cycle class",
+    "tags": [
+      "Getting Started with C++"
+    ],
+    "foldername": "DutyCycleInput",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Addressable LED",
+    "description": "Demonstrates the use of the Addressable LED class",
+    "tags": [
+      "Getting Started with C++"
+    ],
+    "foldername": "AddressableLED",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "DMA",
+    "description": "Demonstrates the use of the DMA class",
+    "tags": [
+      "Advanced C++"
+    ],
+    "foldername": "DMA",
+    "gradlebase": "cpp",
+    "commandversion": 2
   }
 ]
