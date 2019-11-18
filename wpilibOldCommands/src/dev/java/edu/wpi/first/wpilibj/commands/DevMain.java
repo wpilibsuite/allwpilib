@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.wpilibj.commands;
 
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.networktables.NetworkTablesJNI;
