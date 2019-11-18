@@ -21,7 +21,7 @@ void ParallelDeadlineGroup::Initialize() {
     commandRunning.first->Initialize();
     commandRunning.second = true;
   }
-  isRunning = true;
+  m_finished = false;
 }
 
 void ParallelDeadlineGroup::Execute() {
@@ -31,6 +31,9 @@ void ParallelDeadlineGroup::Execute() {
     if (commandRunning.first->IsFinished()) {
       commandRunning.first->End(false);
       commandRunning.second = false;
+      if (commandRunning.first == m_deadline) {
+        m_finished = true;
+      }
     }
   }
 }
@@ -41,10 +44,9 @@ void ParallelDeadlineGroup::End(bool interrupted) {
       commandRunning.first->End(true);
     }
   }
-  isRunning = false;
 }
 
-bool ParallelDeadlineGroup::IsFinished() { return m_deadline->IsFinished(); }
+bool ParallelDeadlineGroup::IsFinished() { return m_finished; }
 
 bool ParallelDeadlineGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;
@@ -56,7 +58,7 @@ void ParallelDeadlineGroup::AddCommands(
     return;
   }
 
-  if (isRunning) {
+  if (!m_finished) {
     wpi_setWPIErrorWithContext(CommandIllegalUse,
                                "Commands cannot be added to a CommandGroup "
                                "while the group is running");

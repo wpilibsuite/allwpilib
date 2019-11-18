@@ -101,7 +101,7 @@ class ParallelDeadlineGroup
   std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   Command* m_deadline;
   bool m_runWhenDisabled{true};
-  bool isRunning = false;
+  bool m_finished{true};
 };
 }  // namespace frc2
 
