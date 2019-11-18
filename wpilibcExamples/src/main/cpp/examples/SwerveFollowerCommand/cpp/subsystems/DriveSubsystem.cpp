@@ -36,12 +36,6 @@ DriveSubsystem::DriveSubsystem()
           kRearRightDriveEncoderPorts,    kRearRightTurningEncoderPorts,
           kRearRightDriveEncoderReversed, kRearRightTurningEncoderReversed},
 
-      kDriveKinematics{
-        frc::Translation2d(kTrackLength / 2, kTrackWidth / 2),
-        frc::Translation2d(kTrackLength / 2, -kTrackWidth / 2),
-        frc::Translation2d(-kTrackLength / 2, kTrackWidth / 2),
-        frc::Translation2d(-kTrackLength / 2, -kTrackWidth / 2)},
-
       m_odometry{kDriveKinematics, frc::Rotation2d(units::degree_t(GetHeading())), frc::Pose2d()} {}
 
 void DriveSubsystem::Periodic() {

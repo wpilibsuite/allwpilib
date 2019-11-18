@@ -13,7 +13,7 @@ int sgn(T val) {
 
 namespace frc2 {
 
-template <int NumModules>
+template <size_t NumModules>
 SwerveFollowerCommand<NumModules>::SwerveFollowerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
@@ -32,15 +32,15 @@ SwerveFollowerCommand<NumModules>::SwerveFollowerCommand(
 this->AddRequirements(requirements);
 }
 
-template <int NumModules>
+template <size_t NumModules>
 void SwerveFollowerCommand<NumModules>::Initialize() {
-auto m_finalPose = m_trajectory.Sample(m_trajectory.TotalTime()).pose;
+m_finalPose = m_trajectory.Sample(m_trajectory.TotalTime()).pose;
 
 m_timer.Reset();
 m_timer.Start();
 }
 
-template <int NumModules>
+template <size_t NumModules>
 void SwerveFollowerCommand<NumModules>::Execute() {
 auto curTime = units::second_t(m_timer.Get());
 
@@ -61,7 +61,8 @@ auto targetYVel = units::velocity::meters_per_second_t(
 // trajectory, not following the poses at individual states.
 auto targetAngularVel =
     units::angular_velocity::radians_per_second_t(m_thetaController->Calculate(
-        units::meter_t(m_pose().Rotation().Radians().to<double>()), units::meter_t(m_finalPose.Rotation().Radians().to<double>())));
+        units::meter_t(m_pose().Rotation().Radians().to<double>()),
+        units::meter_t(m_finalPose.Rotation().Radians().to<double>())));
 
 auto vRef = m_desiredState.velocity;
 
@@ -77,12 +78,12 @@ auto targetModuleStates =
 m_outputStates(targetModuleStates);
 }
 
-template <int NumModules>
+template <size_t NumModules>
 void SwerveFollowerCommand<NumModules>::End(bool interrupted) {
 m_timer.Stop();
 }
 
-template <int NumModules>
+template <size_t NumModules>
 bool SwerveFollowerCommand<NumModules>::IsFinished() {
 return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
 }

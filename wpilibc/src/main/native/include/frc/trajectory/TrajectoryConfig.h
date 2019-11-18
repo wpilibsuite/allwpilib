@@ -98,7 +98,7 @@ class TrajectoryConfig {
    *
    * @param kinematics The mecanum drive kinematics.
    */
-  void SetKinematics(const MecanumDriveKinematics& kinematics) {
+  void SetKinematics(MecanumDriveKinematics kinematics) {
     AddConstraint(
         MecanumDriveKinematicsConstraint(kinematics, m_maxVelocity));
   }
@@ -110,8 +110,8 @@ class TrajectoryConfig {
    * @param kinematics The swerve drive kinematics.
    */
   
-  template <int NumModules>
-  void SetKinematics(const SwerveDriveKinematics<NumModules>& kinematics) {
+  template <size_t NumModules>
+  void SetKinematics(SwerveDriveKinematics<NumModules>& kinematics) {
     AddConstraint(
         SwerveDriveKinematicsConstraint(kinematics, m_maxVelocity));
   }

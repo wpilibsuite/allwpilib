@@ -22,7 +22,7 @@
  */
 namespace frc {
 
-template <int NumModules>
+template <size_t NumModules>
 class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
   SwerveDriveKinematicsConstraint(

@@ -35,30 +35,25 @@ constexpr int kRearLeftTurningMotorPort = 3;
 constexpr int kFrontRightTurningMotorPort = 5;
 constexpr int kRearRightTurningMotorPort = 7;
 
-constexpr std::array kFrontLeftTurningEncoderPorts = {0, 1};
-constexpr std::array kRearLeftTurningEncoderPorts = {2, 3};
-constexpr std::array kFrontRightTurningEncoderPorts = {4, 5};
-constexpr std::array kRearRightTurningEncoderPorts = {5, 6};
+constexpr int kFrontLeftTurningEncoderPorts[2]{0, 1};
+constexpr int kRearLeftTurningEncoderPorts[2]{2, 3};
+constexpr int kFrontRightTurningEncoderPorts[2]{4, 5};
+constexpr int kRearRightTurningEncoderPorts[2]{5, 6};
 
 constexpr bool kFrontLeftTurningEncoderReversed = false;
 constexpr bool kRearLeftTurningEncoderReversed = true;
 constexpr bool kFrontRightTurningEncoderReversed = false;
 constexpr bool kRearRightTurningEncoderReversed = true;
 
-constexpr std::array kFrontLeftDriveEncoderPorts = {0, 1};
-constexpr std::array kRearLeftDriveEncoderPorts = {2, 3};
-constexpr std::array kFrontRightDriveEncoderPorts = {4, 5};
-constexpr std::array kRearRightDriveEncoderPorts = {5, 6};
+constexpr int kFrontLeftDriveEncoderPorts[2]{0, 1};
+constexpr int kRearLeftDriveEncoderPorts[2]{2, 3};
+constexpr int kFrontRightDriveEncoderPorts[2]{4, 5};
+constexpr int kRearRightDriveEncoderPorts[2]{5, 6};
 
 constexpr bool kFrontLeftDriveEncoderReversed = false;
 constexpr bool kRearLeftDriveEncoderReversed = true;
 constexpr bool kFrontRightDriveEncoderReversed = false;
 constexpr bool kRearRightDriveEncoderReversed = true;
-
-constexpr auto kTrackWidth =
-    .5_m;  // Distance between centers of right and left wheels on robot
-constexpr auto kTrackLength =
-    .7_m;  // Distance between centers of front and back wheels on robot
 
 constexpr bool kGyroReversed = false;
 

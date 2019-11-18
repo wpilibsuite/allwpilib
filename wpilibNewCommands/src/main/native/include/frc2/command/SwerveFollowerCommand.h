@@ -46,7 +46,7 @@ namespace frc2 {
  * trajectory.
  */
 
-template <int NumModules>
+template <size_t NumModules>
 class SwerveFollowerCommand
     : public CommandHelper<CommandBase, SwerveFollowerCommand<NumModules>> {
   using voltsecondspermeter =

@@ -21,8 +21,8 @@
 class SwerveModule {
  public:
   SwerveModule(int driveMotorChannel, int turningMotorChannel,
-               std::array<int, 2> driveEncoderPorts,
-               std::array<int, 2> turningEncoderPorts,
+               const int driveEncoderPorts[2],
+               const int turningEncoderPorts[2],
                bool driveEncoderReversed, bool turningEncoderReversed);
 
   frc::SwerveModuleState GetState();

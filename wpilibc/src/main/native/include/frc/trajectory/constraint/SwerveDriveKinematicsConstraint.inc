@@ -16,13 +16,13 @@
 
 namespace frc {
 
-template <int NumModules>
+template <size_t NumModules>
 SwerveDriveKinematicsConstraint<NumModules>::SwerveDriveKinematicsConstraint(
     frc::SwerveDriveKinematics<NumModules> kinematics,
     units::meters_per_second_t maxSpeed)
     : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 
-template <int NumModules>
+template <size_t NumModules>
 units::meters_per_second_t
 SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
     const Pose2d& pose, curvature_t curvature,
@@ -38,7 +38,7 @@ SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
   return units::math::hypot(normSpeeds.vx, normSpeeds.vy);
 }
 
-template <int NumModules>
+template <size_t NumModules>
 TrajectoryConstraint::MinMax
 SwerveDriveKinematicsConstraint<NumModules>::MinMaxAcceleration(
     const Pose2d& pose, curvature_t curvature,
