@@ -26,9 +26,9 @@ import edu.wpi.first.wpilibj.geometry.Twist2d;
  * positions. It is very important that only one type of odometry is used with
  * each instantiation of this class.
  *
- * <p>Note: It is important to reset both your encoders to zero before you start
- * using this class. Only reset your encoders ONCE. You should not reset your
- * encoders even if you want to reset your robot's pose.
+ * <p>Note: If you are using the encoder positions / distances method, it is important
+ * that you reset your encoders to zero before using this class. Any subsequent pose
+ * resets also require the encoders to be reset to zero.
  */
 public class DifferentialDriveOdometry {
   private final DifferentialDriveKinematics m_kinematics;
@@ -67,8 +67,10 @@ public class DifferentialDriveOdometry {
   }
 
   /**
-   * Resets the robot's position on the field. Do NOT zero your encoders if you
-   * call this function at any other time except initialization.
+   * Resets the robot's position on the field.
+   *
+   * <p>If you are using the encoder distances method instead of the velocity method,
+   * you NEED to reset your encoders (to zero) when calling this method.
    *
    * <p>The gyroscope angle does not need to be reset here on the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
@@ -80,6 +82,9 @@ public class DifferentialDriveOdometry {
     m_poseMeters = poseMeters;
     m_previousAngle = poseMeters.getRotation();
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
+
+    m_prevLeftDistance = 0.0;
+    m_prevRightDistance = 0.0;
   }
 
   /**
