@@ -67,7 +67,8 @@ class Robot : public frc::TimedRobot {
       auto encoderDistance = sample.GetEncoderDistance(&m_encoder, &status);
       // Period is not scaled, and is a raw value
       auto encoderPeriod = sample.GetEncoderPeriodRaw(&m_encoder, &status);
-      auto analogVoltage = sample.GetAnalogInputVoltage(&m_analogInput, &status);
+      auto analogVoltage =
+          sample.GetAnalogInputVoltage(&m_analogInput, &status);
 
       frc::SmartDashboard::PutNumber("Distance", encoderDistance);
       frc::SmartDashboard::PutNumber("Period", encoderPeriod);
