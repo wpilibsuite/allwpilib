@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 public class Robot extends TimedRobot {
   private AddressableLED m_led;
   private AddressableLEDBuffer m_ledBuffer;
-  private int m_count = 0;
+  private int m_count;
 
   @Override
   public void robotInit() {

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.TimedRobot;
 
+@SuppressWarnings({"PMD.SingularField", "PMD.UnusedLocalVariable"})
 public class Robot extends TimedRobot {
   private DigitalInput m_input;
   private DutyCycle m_dutyCycle;
