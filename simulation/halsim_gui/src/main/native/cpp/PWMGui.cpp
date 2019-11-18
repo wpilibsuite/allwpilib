@@ -9,9 +9,11 @@
 
 #include <cstdio>
 #include <cstring>
+#include <memory>
 
 #include <hal/Ports.h>
 #include <imgui.h>
+#include <mockdata/AddressableLEDData.h>
 #include <mockdata/PWMData.h>
 
 #include "HALSimGui.h"
@@ -20,6 +22,19 @@ using namespace halsimgui;
 
 static void DisplayPWMs() {
   bool hasOutputs = false;
+  static const int numPWM = HAL_GetNumPWMChannels();
+  static const int numLED = HAL_GetNumAddressableLEDs();
+  static auto ledMap = std::make_unique<int[]>(numPWM);
+
+  std::memset(ledMap.get(), 0, numPWM * sizeof(ledMap[0]));
+
+  for (int i = 0; i < numLED; ++i) {
+    if (HALSIM_GetAddressableLEDInitialized(i)) {
+      int channel = HALSIM_GetAddressableLEDOutputPort(i);
+      if (channel >= 0 && channel < numPWM) ledMap[channel] = i + 1;
+    }
+  }
+
   // struct History {
   //  History() { std::memset(data, 0, 90 * sizeof(float)); }
   //  History(const History&) = delete;
@@ -30,7 +45,6 @@ static void DisplayPWMs() {
   //};
   // static std::vector<std::unique_ptr<History>> history;
   bool first = true;
-  static const int numPWM = HAL_GetNumPWMChannels();
   for (int i = 0; i < numPWM; ++i) {
     if (HALSIM_GetPWMInitialized(i)) {
       hasOutputs = true;
@@ -42,8 +56,12 @@ static void DisplayPWMs() {
 
       char name[32];
       std::snprintf(name, sizeof(name), "PWM[%d]", i);
-      float val = HALSimGui::AreOutputsDisabled() ? 0 : HALSIM_GetPWMSpeed(i);
-      ImGui::Value(name, val, "%0.3f");
+      if (ledMap[i] > 0) {
+        ImGui::Text("%s: LED[%d]", name, ledMap[i] - 1);
+      } else {
+        float val = HALSimGui::AreOutputsDisabled() ? 0 : HALSIM_GetPWMSpeed(i);
+        ImGui::Value(name, val, "%0.3f");
+      }
 
       // lazily build history storage
       // if (static_cast<unsigned int>(i) > history.size())

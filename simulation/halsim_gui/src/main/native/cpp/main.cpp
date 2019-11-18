@@ -9,6 +9,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "AccelerometerGui.h"
+#include "AddressableLEDGui.h"
 #include "AnalogGyroGui.h"
 #include "AnalogInputGui.h"
 #include "AnalogOutGui.h"
@@ -33,6 +34,7 @@ __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
   HALSimGui::Add(AccelerometerGui::Initialize);
+  HALSimGui::Add(AddressableLEDGui::Initialize);
   HALSimGui::Add(AnalogGyroGui::Initialize);
   HALSimGui::Add(AnalogInputGui::Initialize);
   HALSimGui::Add(AnalogOutGui::Initialize);

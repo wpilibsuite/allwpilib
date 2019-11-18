@@ -17,7 +17,7 @@
 #include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
+class AddressableLED;
 class SendableBuilder;
 
 /**
@@ -39,6 +39,7 @@ class SendableBuilder;
  */
 class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
  public:
+  friend class AddressableLED;
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */

@@ -149,6 +149,7 @@ model {
         }
         myRobotCppStatic(NativeExecutableSpec) {
             targetBuildTypes 'debug'
+            nativeUtils.excludeBinariesFromStrip(it)
             sources {
                 cpp {
                     source {
