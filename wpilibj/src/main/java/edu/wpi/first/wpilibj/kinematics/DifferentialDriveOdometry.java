@@ -21,6 +21,11 @@ import edu.wpi.first.wpilibj.geometry.Twist2d;
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
+ * <p>There are two ways of tracking the robot's position on the field with this
+ * class: one involving using encoder velocities and the other involving encoder
+ * positions. It is very important that only one type of odometry is used with
+ * each instantiation of this class.
+ *
  * <p>Note: It is important to reset both your encoders to zero before you start
  * using this class. Only reset your encoders ONCE. You should not reset your
  * encoders even if you want to reset your robot's pose.
@@ -32,6 +37,9 @@ public class DifferentialDriveOdometry {
 
   private Rotation2d m_gyroOffset;
   private Rotation2d m_previousAngle;
+
+  private double m_prevLeftDistance;
+  private double m_prevRightDistance;
 
   /**
    * Constructs a DifferentialDriveOdometry object.
@@ -108,6 +116,36 @@ public class DifferentialDriveOdometry {
         new Twist2d(chassisState.vxMetersPerSecond * period,
             chassisState.vyMetersPerSecond * period,
             angle.minus(m_previousAngle).getRadians()));
+
+    m_previousAngle = angle;
+
+    m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
+    return m_poseMeters;
+  }
+
+  /**
+   * Updates the robot position on the field using distance measurements from encoders. This
+   * method is more numerically accurate than using velocities to integrate the pose and
+   * is also advantageous for teams that are using lower CPR encoders.
+   *
+   * @param gyroAngle           The angle reported by the gyroscope.
+   * @param leftDistanceMeters  The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @return The new pose of the robot.
+   */
+  public Pose2d update(Rotation2d gyroAngle, double leftDistanceMeters,
+                       double rightDistanceMeters) {
+    double deltaLeftDistance = leftDistanceMeters - m_prevLeftDistance;
+    double deltaRightDistance = rightDistanceMeters - m_prevRightDistance;
+
+    m_prevLeftDistance = leftDistanceMeters;
+    m_prevRightDistance = rightDistanceMeters;
+
+    double averageDeltaDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
+    var angle = gyroAngle.plus(m_gyroOffset);
+
+    var newPose = m_poseMeters.exp(
+        new Twist2d(averageDeltaDistance, 0.0, angle.minus(m_previousAngle).getRadians()));
 
     m_previousAngle = angle;
 

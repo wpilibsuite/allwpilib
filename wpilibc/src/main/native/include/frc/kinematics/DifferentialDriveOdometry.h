@@ -23,6 +23,11 @@ namespace frc {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
+ * There are two ways of tracking the robot's position on the field with this
+ * class: one involving using encoder velocities and the other involving encoder
+ * positions. It is very important that only one type of odometry is used with
+ * each instantiation of this class.
+ *
  * Note: It is important to reset both your encoders to zero before you start
  * using this class. Only reset your encoders ONCE. You should not reset your
  * encoders even if you want to reset your robot's pose.
@@ -80,6 +85,20 @@ class DifferentialDriveOdometry {
                                const DifferentialDriveWheelSpeeds& wheelSpeeds);
 
   /**
+   * Updates the robot position on the field using distance measurements from
+   * encoders. This method is more numerically accurate than using velocities to
+   * integrate the pose and is also advantageous for teams that are using lower
+   * CPR encoders.
+   *
+   * @param gyroAngle The angle reported by the gyroscope.
+   * @param leftDistanceMeters The distance traveled by the left encoder.
+   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @return The new pose of the robot.
+   */
+  const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
+                       units::meter_t rightDistance);
+
+  /**
    * Updates the robot's position on the field using forward kinematics and
    * integration of the pose over time. This method automatically calculates
    * the current time to calculate period (difference between two timestamps).
@@ -105,5 +124,8 @@ class DifferentialDriveOdometry {
   units::second_t m_previousTime = -1_s;
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
+
+  units::meter_t m_prevLeftDistance = 0_m;
+  units::meter_t m_prevRightDistance = 0_m;
 };
 }  // namespace frc

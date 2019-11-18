@@ -37,3 +37,24 @@ const Pose2d& DifferentialDriveOdometry::UpdateWithTime(
 
   return m_pose;
 }
+
+const Pose2d& DifferentialDriveOdometry::Update(const Rotation2d& gyroAngle,
+                                                units::meter_t leftDistance,
+                                                units::meter_t rightDistance) {
+  auto deltaLeftDistance = leftDistance - m_prevLeftDistance;
+  auto deltaRightDistance = rightDistance - m_prevRightDistance;
+
+  m_prevLeftDistance = leftDistance;
+  m_prevRightDistance = rightDistance;
+
+  auto averageDeltaDistance = (deltaLeftDistance + deltaRightDistance) / 2.0;
+  auto angle = gyroAngle + m_gyroOffset;
+
+  auto newPose = m_pose.Exp(
+      {averageDeltaDistance, 0_m, (angle - m_previousAngle).Radians()});
+
+  m_previousAngle = angle;
+  m_pose = {newPose.Translation(), angle};
+
+  return m_pose;
+}
