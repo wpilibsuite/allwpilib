@@ -44,6 +44,24 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     HAL_DigitalHandle outputPort, int32_t* status) {
   hal::init::CheckInit();
 
+  auto digitalPort =
+      hal::digitalChannelHandles->Get(outputPort, hal::HAL_HandleEnum::PWM);
+
+  if (!digitalPort) {
+    // If DIO was passed, channel error, else generic error
+    if (getHandleType(outputPort) == hal::HAL_HandleEnum::DIO) {
+      *status = HAL_LED_CHANNEL_ERROR;
+    } else {
+      *status = HAL_HANDLE_ERROR;
+    }
+    return HAL_kInvalidHandle;
+  }
+
+  if (digitalPort->channel >= kNumPWMHeaders) {
+    *status = HAL_LED_CHANNEL_ERROR;
+    return HAL_kInvalidHandle;
+  }
+
   HAL_AddressableLEDHandle handle = ledHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
@@ -57,11 +75,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   }
 
   int16_t index = getHandleIndex(handle);
-  if (auto port = digitalChannelHandles->Get(outputPort, HAL_HandleEnum::PWM)) {
-    SimAddressableLEDData[index].outputPort = port->channel;
-  } else {
-    SimAddressableLEDData[index].outputPort = -1;
-  }
+  SimAddressableLEDData[index].outputPort = digitalPort->channel;
   SimAddressableLEDData[index].length = 1;
   SimAddressableLEDData[index].running = false;
   SimAddressableLEDData[index].initialized = true;

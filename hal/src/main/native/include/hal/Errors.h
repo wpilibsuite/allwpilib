@@ -94,6 +94,10 @@
 #define HAL_HANDLE_ERROR_MESSAGE \
   "HAL: A handle parameter was passed incorrectly"
 
+#define HAL_LED_CHANNEL_ERROR -1099
+#define HAL_LED_CHANNEL_ERROR_MESSAGE \
+  "HAL: Addressable LEDs only supported on PWM Headers, not MXP or DIO"
+
 #define HAL_INVALID_DMA_ADDITION -1102
 #define HAL_INVALID_DMA_ADDITION_MESSAGE \
   "HAL_AddDMA() only works before HAL_StartDMA()"
