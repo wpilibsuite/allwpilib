@@ -50,9 +50,9 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   if (!digitalPort) {
     // If DIO was passed, channel error, else generic error
     if (getHandleType(outputPort) == hal::HAL_HandleEnum::DIO) {
-      *status == HAL_LED_CHANNEL_ERROR;
+      *status = HAL_LED_CHANNEL_ERROR;
     } else {
-      *status == HAL_HANDLE_ERROR;
+      *status = HAL_HANDLE_ERROR;
     }
     return HAL_kInvalidHandle;
   }
