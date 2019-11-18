@@ -9,6 +9,7 @@
 
 #include <frc/AddressableLED.h>
 #include <frc/TimedRobot.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class Robot : public frc::TimedRobot {
   // PWM port 0

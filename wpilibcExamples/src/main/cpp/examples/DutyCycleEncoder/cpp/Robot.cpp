@@ -9,6 +9,7 @@
 #include <frc/DutyCycle.h>
 #include <frc/DutyCycleEncoder.h>
 #include <frc/TimedRobot.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class Robot : public frc::TimedRobot {
   frc::DigitalInput m_input{0};  // Input channel
@@ -34,6 +35,11 @@ class Robot : public frc::TimedRobot {
 
     // Output scaled by DistancePerPulse
     auto distance = m_dutyCycleEncoder.GetDistance();
+
+    frc::SmartDashboard::PutBoolean("Connected", connected);
+    frc::SmartDashboard::PutNumber("Frequency", frequency);
+    frc::SmartDashboard::PutNumber("Output", output.to<double>());
+    frc::SmartDashboard::PutNumber("Distance", distance);
   }
 };
 

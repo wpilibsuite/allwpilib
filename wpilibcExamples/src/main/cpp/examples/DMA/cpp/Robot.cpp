@@ -11,6 +11,7 @@
 #include <frc/DigitalOutput.h>
 #include <frc/Encoder.h>
 #include <frc/TimedRobot.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class Robot : public frc::TimedRobot {
   frc::DMA m_dma;  // DMA object
@@ -66,7 +67,11 @@ class Robot : public frc::TimedRobot {
       auto encoderDistance = sample.GetEncoderDistance(&m_encoder, &status);
       // Period is not scaled, and is a raw value
       auto encoderPeriod = sample.GetEncoderPeriodRaw(&m_encoder, &status);
-      auto analogInput = sample.GetAnalogInputVoltage(&m_analogInput, &status);
+      auto analogVoltage = sample.GetAnalogInputVoltage(&m_analogInput, &status);
+
+      frc::SmartDashboard::PutNumber("Distance", encoderDistance);
+      frc::SmartDashboard::PutNumber("Period", encoderPeriod);
+      frc::SmartDashboard::PutNumber("Input", analogVoltage);
     }
   }
 };

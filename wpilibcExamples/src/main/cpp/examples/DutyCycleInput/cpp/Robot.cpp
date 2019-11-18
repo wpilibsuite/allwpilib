@@ -8,6 +8,7 @@
 #include <frc/DigitalInput.h>
 #include <frc/DutyCycle.h>
 #include <frc/TimedRobot.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class Robot : public frc::TimedRobot {
   frc::DigitalInput m_input{0};         // Input channel
@@ -23,6 +24,9 @@ class Robot : public frc::TimedRobot {
     // Output of duty cycle, ranging from 0 to 1
     // 1 is fully on, 0 is fully off
     auto output = m_dutyCycle.GetOutput();
+
+    frc::SmartDashboard::PutNumber("Frequency", frequency);
+    frc::SmartDashboard::PutNumber("Duty Cycle", output);
   }
 };
 
