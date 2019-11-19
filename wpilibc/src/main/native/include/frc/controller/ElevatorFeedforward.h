@@ -36,9 +36,9 @@ class ElevatorFeedforward {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    */
-  constexpr ElevatorFeedforward(units::volt_t kS, units::volt_t kG,
-                      units::unit_t<kv_unit> kV,
-                      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+  constexpr ElevatorFeedforward(
+      units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
+      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
       : kS(kS), kG(kG), kV(kV), kA(kA) {}
 
   /**
@@ -49,8 +49,8 @@ class ElevatorFeedforward {
    * @return The computed feedforward, in volts.
    */
   constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
-                          units::unit_t<Acceleration> acceleration =
-                              units::unit_t<Acceleration>(0)) {
+                                    units::unit_t<Acceleration> acceleration =
+                                        units::unit_t<Acceleration>(0)) {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
   }
 

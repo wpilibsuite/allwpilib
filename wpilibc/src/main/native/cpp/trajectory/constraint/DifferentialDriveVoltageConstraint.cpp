@@ -73,8 +73,7 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   if ((m_kinematics.trackWidth / 2) > 1_rad / units::math::abs(curvature)) {
     if (velocity > 0) {
       minChassisAcceleration = -minChassisAcceleration;
-    }
-    else {
+    } else {
       maxChassisAcceleration = -maxChassisAcceleration;
     }
   }

@@ -35,8 +35,9 @@ class SimpleMotorFeedforward {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    */
-  constexpr SimpleMotorFeedforward(units::volt_t kS, units::unit_t<kv_unit> kV,
-                         units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+  constexpr SimpleMotorFeedforward(
+      units::volt_t kS, units::unit_t<kv_unit> kV,
+      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
       : kS(kS), kV(kV), kA(kA) {}
 
   /**
@@ -51,8 +52,8 @@ class SimpleMotorFeedforward {
                                         units::unit_t<Acceleration>(0)) const {
     return kS * wpi::sgn(velocity) + kV * velocity + kA * acceleration;
 
-  units::volt_t kS{0};
-  units::unit_t<kv_unit> kV{0};
-  units::unit_t<ka_unit> kA{0};
-};
+    units::volt_t kS{0};
+    units::unit_t<kv_unit> kV{0};
+    units::unit_t<ka_unit> kA{0};
+  };
 }  // namespace frc
