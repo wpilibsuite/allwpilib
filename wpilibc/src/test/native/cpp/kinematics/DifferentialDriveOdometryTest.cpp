@@ -60,9 +60,9 @@ TEST(DifferentialDriveWheelSpeeds, GyroAngleReset) {
 
 TEST(DifferentialDriveOdometry, EncoderDistances) {
   DifferentialDriveKinematics kinematics{0.381_m * 2};
-  DifferentialDriveOdometry odometry{kinematics, Rotation2d(0_deg)};
+  DifferentialDriveOdometry odometry{kinematics, Rotation2d(45_deg)};
 
-  const auto& pose = odometry.Update(Rotation2d(90_deg), 0_m,
+  const auto& pose = odometry.Update(Rotation2d(135_deg), 0_m,
                                      units::meter_t(5 * wpi::math::pi));
 
   EXPECT_NEAR(pose.Translation().X().to<double>(), 5.0, kEpsilon);
