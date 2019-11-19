@@ -40,7 +40,7 @@ class ArmFeedforward {
   constexpr ArmFeedforward(
       units::volt_t kS, units::volt_t kCos, units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : m_kS(kS), m_kCos(kCos), m_kV(kV), m_kA(kA) {}
+      : kS(kS), kCos(kCos), kV(kV), kA(kA) {}
 
   /**
    * Calculates the feedforward from the gains and setpoints.
@@ -54,8 +54,8 @@ class ArmFeedforward {
                           units::unit_t<Velocity> velocity,
                           units::unit_t<Acceleration> acceleration =
                               units::unit_t<Acceleration>(0)) const {
-    return m_kS * wpi::sgn(velocity) + m_kCos * units::math::cos(angle) +
-           m_kV * velocity + m_kA * acceleration;
+    return kS * wpi::sgn(velocity) + kCos * units::math::cos(angle) +
+           kV * velocity + kA * acceleration;
   }
 
   units::volt_t kS{0};
