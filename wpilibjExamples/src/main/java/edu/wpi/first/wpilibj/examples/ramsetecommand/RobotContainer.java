@@ -118,8 +118,7 @@ public class RobotContainer {
         new RamseteController(kRamseteB, kRamseteZeta),
         new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter),
         kDriveKinematics,
-        m_robotDrive.getLeftEncoder()::getRate,
-        m_robotDrive.getRightEncoder()::getRate,
+        m_robotDrive::getWheelSpeeds,
         new PIDController(kPDriveVel, 0, 0),
         new PIDController(kPDriveVel, 0, 0),
         // RamseteCommand passes volts to the callback

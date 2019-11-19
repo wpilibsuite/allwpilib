@@ -838,9 +838,10 @@ SaturatingMultiplyAdd(T X, T Y, T A, bool *ResultOverflowed = nullptr) {
   return SaturatingAdd(A, Product, &Overflowed);
 }
 
-// Typesafe implementation of the signum function.  Returns -1 if negative, 1 if positive, 0 if 0.
+// Typesafe implementation of the signum function.
+// Returns -1 if negative, 1 if positive, 0 if 0.
 template <typename T>
-int sgn(T val) {
+constexpr int sgn(T val) {
   return (T(0) < val) - (val < T(0));
 }
 

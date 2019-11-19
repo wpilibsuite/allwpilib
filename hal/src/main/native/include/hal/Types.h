@@ -61,6 +61,8 @@ typedef HAL_Handle HAL_DMAHandle;
 
 typedef HAL_Handle HAL_DutyCycleHandle;
 
+typedef HAL_Handle HAL_AddressableLEDHandle;
+
 typedef HAL_CANHandle HAL_PDPHandle;
 
 typedef int32_t HAL_Bool;

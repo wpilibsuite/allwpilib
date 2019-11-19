@@ -68,6 +68,7 @@ enum class HAL_HandleEnum {
   SerialPort = 20,
   DutyCycle = 21,
   DMA = 22,
+  AddressableLED = 23,
 };
 
 /**

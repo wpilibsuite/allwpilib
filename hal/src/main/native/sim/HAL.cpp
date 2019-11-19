@@ -25,6 +25,7 @@ namespace hal {
 namespace init {
 void InitializeHAL() {
   InitializeAccelerometerData();
+  InitializeAddressableLEDData();
   InitializeAnalogGyroData();
   InitializeAnalogInData();
   InitializeAnalogOutData();
@@ -46,6 +47,7 @@ void InitializeHAL() {
   InitializeSPIAccelerometerData();
   InitializeSPIData();
   InitializeAccelerometer();
+  InitializeAddressableLED();
   InitializeAnalogAccumulator();
   InitializeAnalogGyro();
   InitializeAnalogInput();
@@ -205,6 +207,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_SIM_NOT_SUPPORTED_MESSAGE;
     case HAL_CAN_BUFFER_OVERRUN:
       return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
+    case HAL_LED_CHANNEL_ERROR:
+      return HAL_LED_CHANNEL_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }

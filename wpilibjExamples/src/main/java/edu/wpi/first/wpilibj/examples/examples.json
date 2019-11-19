@@ -451,6 +451,39 @@
     "commandversion": 1
   },
   {
+    "name": "Duty Cycle Encoder",
+    "description": "Demonstrates the use of the Duty Cycle Encoder class",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "dutycycleencoder",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Duty Cycle Input",
+    "description": "Demonstrates the use of the Duty Cycle class",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "dutycycleinput",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Addressable LED",
+    "description": "Demonstrates the use of the Addressable LED class",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "addressableled",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "MecanumFollowerCommand",
     "description": "An example command-based robot demonstrating the use of a MecanumFollowerCommand to follow a pregenerated trajectory.",
     "tags": [
