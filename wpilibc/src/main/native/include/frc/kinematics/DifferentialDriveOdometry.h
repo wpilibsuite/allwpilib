@@ -97,8 +97,8 @@ class DifferentialDriveOdometry {
    * CPR encoders.
    *
    * @param gyroAngle The angle reported by the gyroscope.
-   * @param leftDistanceMeters The distance traveled by the left encoder.
-   * @param rightDistanceMeters The distance traveled by the right encoder.
+   * @param leftDistance The distance traveled by the left encoder.
+   * @param rightDistance The distance traveled by the right encoder.
    * @return The new pose of the robot.
    */
   const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
