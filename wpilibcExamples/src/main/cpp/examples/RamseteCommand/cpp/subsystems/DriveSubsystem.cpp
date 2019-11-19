@@ -29,9 +29,7 @@ DriveSubsystem::DriveSubsystem()
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
   m_odometry.Update(frc::Rotation2d(units::degree_t(GetHeading())),
-                    frc::DifferentialDriveWheelSpeeds{
-                        units::meters_per_second_t(m_leftEncoder.GetRate()),
-                        units::meters_per_second_t(m_rightEncoder.GetRate())});
+                    GetWheelSpeeds());
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
@@ -69,6 +67,11 @@ double DriveSubsystem::GetTurnRate() {
 }
 
 frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+
+frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
+  return {units::meters_per_second_t(m_leftEncoder.GetRate()),
+          units::meters_per_second_t(m_rightEncoder.GetRate())};
+}
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(pose,

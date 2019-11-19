@@ -72,11 +72,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(Rotation2d.fromDegrees(getHeading()),
-                                  new DifferentialDriveWheelSpeeds(
-                                      m_leftEncoder.getRate(),
-                                      m_rightEncoder.getRate()
-                                  ));
+    m_odometry.update(Rotation2d.fromDegrees(getHeading()), getWheelSpeeds());
   }
 
   /**
@@ -86,6 +82,15 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
   }
 
   /**

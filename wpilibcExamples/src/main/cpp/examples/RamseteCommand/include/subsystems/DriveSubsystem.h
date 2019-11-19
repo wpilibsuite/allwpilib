@@ -102,6 +102,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::Pose2d GetPose();
 
   /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  frc::DifferentialDriveWheelSpeeds GetWheelSpeeds();
+
+  /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
