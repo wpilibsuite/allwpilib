@@ -26,7 +26,7 @@ class SimpleMotorFeedforward {
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
  public:
-  SimpleMotorFeedforward() = default;
+  constexpr SimpleMotorFeedforward() = default;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.
@@ -35,8 +35,9 @@ class SimpleMotorFeedforward {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    */
-  SimpleMotorFeedforward(units::volt_t kS, units::unit_t<kv_unit> kV,
-                         units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+  constexpr SimpleMotorFeedforward(
+      units::volt_t kS, units::unit_t<kv_unit> kV,
+      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
       : m_kS(kS), m_kV(kV), m_kA(kA) {}
 
   /**
@@ -46,9 +47,9 @@ class SimpleMotorFeedforward {
    * @param acceleration The acceleration setpoint, in distance per second^2.
    * @return The computed feedforward, in volts.
    */
-  units::volt_t Calculate(units::unit_t<Velocity> velocity,
-                          units::unit_t<Acceleration> acceleration =
-                              units::unit_t<Acceleration>(0)) {
+  constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
+                                    units::unit_t<Acceleration> acceleration =
+                                        units::unit_t<Acceleration>(0)) const {
     return m_kS * wpi::sgn(velocity) + m_kV * velocity + m_kA * acceleration;
   }
 
