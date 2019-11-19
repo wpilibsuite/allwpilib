@@ -8,6 +8,7 @@
 #pragma once
 
 #include <units/units.h>
+#include <wpi/MathExtras.h>
 
 namespace frc {
 /**
@@ -26,7 +27,7 @@ class ArmFeedforward {
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
  public:
-  ArmFeedforward() = default;
+  constexpr ArmFeedforward() = default;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.
@@ -36,9 +37,10 @@ class ArmFeedforward {
    * @param kV   The velocity gain, in volt seconds per radian.
    * @param kA   The acceleration gain, in volt seconds^2 per radian.
    */
-  ArmFeedforward(units::volt_t kS, units::volt_t kCos,
-                 units::unit_t<kv_unit> kV,
-                 units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0));
+  constexpr ArmFeedforward(
+      units::volt_t kS, units::volt_t kCos, units::unit_t<kv_unit> kV,
+      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+      : m_kS(kS), m_kCos(kCos), m_kV(kV), m_kA(kA) {}
 
   /**
    * Calculates the feedforward from the gains and setpoints.
@@ -51,7 +53,10 @@ class ArmFeedforward {
   units::volt_t Calculate(units::unit_t<Angle> angle,
                           units::unit_t<Velocity> velocity,
                           units::unit_t<Acceleration> acceleration =
-                              units::unit_t<Acceleration>(0));
+                              units::unit_t<Acceleration>(0)) const {
+    return m_kS * wpi::sgn(velocity) + m_kCos * units::math::cos(angle) +
+           m_kV * velocity + m_kA * acceleration;
+  }
 
  private:
   units::volt_t m_kS{0};
