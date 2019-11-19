@@ -16,6 +16,7 @@
 #include "frc2/Timer.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/ProfiledPIDController.h"
+#include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
@@ -46,12 +47,6 @@ namespace frc2 {
 
 class MecanumFollowerCommand
     : public CommandHelper<CommandBase, MecanumFollowerCommand> {
-  using voltsecondspermeter =
-      units::compound_unit<units::voltage::volt, units::second,
-                           units::inverse<units::meter>>;
-  using voltsecondssquaredpermeter =
-      units::compound_unit<units::voltage::volt, units::squared<units::second>,
-                           units::inverse<units::meter>>;
 
  public:
   /**
@@ -68,15 +63,11 @@ class MecanumFollowerCommand
    * @param trajectory                        The trajectory to follow.
    * @param pose                              A function that supplies the robot pose - use one of
    *                                          the odometry classes to provide this.
-   * @param ksVolts                           Constant feedforward term for the robot drive.
-   * @param kvVoltSecondsPerMeter             Velocity-proportional feedforward term for the robot
-   *                                          drive.
-   * @param kaVoltSecondsSquaredPerMeter      Acceleration-proportional feedforward term
-   *                                          for the robot drive.
+   * @param feedforward                       The feedforward to use for the drivetrain.
    * @param kinematics                        The kinematics for the robot drivetrain.
-   * @param xController                      The Trajectory Tracker PID controller
+   * @param xController                       The Trajectory Tracker PID controller
    *                                          for the robot's x position.
-   * @param yController                      The Trajectory Tracker PID controller
+   * @param yController                       The Trajectory Tracker PID controller
    *                                          for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
@@ -93,8 +84,7 @@ class MecanumFollowerCommand
 
   MecanumFollowerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-      units::voltage::volt_t ks, units::unit_t<voltsecondspermeter> kv,
-      units::unit_t<voltsecondssquaredpermeter> ka,
+      frc::SimpleMotorFeedforward<units::meters> feedforward,
       frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
       frc2::PIDController yController,
       frc::ProfiledPIDController thetaController,
@@ -114,10 +104,9 @@ class MecanumFollowerCommand
    * The user should implement a velocity PID on the desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
-   * this
-   * is left to the user, since it is not appropriate for paths with non-stationary end-states.
+   * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
    *
-   * <p>Note2: The rotation controller will calculate the rotation based on the final pose
+   * <p>Note 2: The rotation controller will calculate the rotation based on the final pose
    * in the trajectory, not the poses at each time step.
    *
    * @param trajectory                        The trajectory to follow.
@@ -157,9 +146,7 @@ class MecanumFollowerCommand
  private:
   frc::Trajectory m_trajectory;
   std::function<frc::Pose2d()> m_pose;
-  const units::voltage::volt_t m_ks;
-  const units::unit_t<voltsecondspermeter> m_kv;
-  const units::unit_t<voltsecondssquaredpermeter> m_ka;
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward;
   frc::MecanumDriveKinematics m_kinematics;
   std::unique_ptr<frc2::PIDController> m_xController;
   std::unique_ptr<frc2::PIDController> m_yController;

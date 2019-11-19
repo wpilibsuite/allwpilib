@@ -83,8 +83,6 @@ class MecanumFollowerCommandTest {
   @Test
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   void testReachesReference() {
-    CommandScheduler scheduler = new CommandScheduler();
-
     final var subsystem = new Subsystem() {};
 
     final var waypoints = new ArrayList<Pose2d>();
@@ -107,11 +105,6 @@ class MecanumFollowerCommandTest {
         this::setFrontRightSpeed,
         this::setRearRightSpeed,
         subsystem);
-
-
-    scheduler.registerSubsystem(subsystem);
-
-    scheduler.schedule(command);
 
     m_rotTimer.reset();
     m_rotTimer.start();

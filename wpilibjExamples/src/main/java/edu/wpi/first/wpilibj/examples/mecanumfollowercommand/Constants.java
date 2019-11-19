@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumfollowercommand;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -61,9 +62,8 @@ public final class Constants {
     // for *your* robot's drive.
     // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
-    public static final double ksVolts = 1;
-    public static final double kvVoltSecondsPerMeter = .8;
-    public static final double kaVoltSecondsSquaredPerMeter = .15;
+    public static final SimpleMotorFeedforward kFeedforward =
+        new SimpleMotorFeedforward(1, 0.8, 0.15);
 
     // Example value only - as above, this must be tuned for your drive!
     public static final double kPFrontLeftVel = .5;

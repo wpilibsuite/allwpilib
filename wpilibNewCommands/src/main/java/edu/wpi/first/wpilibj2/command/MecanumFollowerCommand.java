@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
@@ -46,12 +47,11 @@ public class MecanumFollowerCommand extends CommandBase {
   private MecanumDriveWheelSpeeds m_prevSpeeds;
   private double m_prevTime;
   private Pose2d m_finalPose;
+  private final boolean m_usePID;
 
   private final Trajectory m_trajectory;
   private final Supplier<Pose2d> m_pose;
-  private final double m_ks;
-  private final double m_kv;
-  private final double m_ka;
+  private final SimpleMotorFeedforward m_feedforward;
   private final MecanumDriveKinematics m_kinematics;
   private final PIDController m_xdController;
   private final PIDController m_ydController;
@@ -75,17 +75,13 @@ public class MecanumFollowerCommand extends CommandBase {
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path
    * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
    *
-   * <p>Note2: The rotation controller will calculate the rotation based on the final pose in the
+   * <p>Note 2: The rotation controller will calculate the rotation based on the final pose in the
    * trajectory, not the poses at each time step.
    *
    * @param trajectory                        The trajectory to follow.
    * @param pose                              A function that supplies the robot pose - use one of
    *                                          the odometry classes to provide this.
-   * @param ksVolts                           Constant feedforward term for the robot drive.
-   * @param kvVoltSecondsPerMeter             Velocity-proportional feedforward term for the robot
-   *                                          drive.
-   * @param kaVoltSecondsSquaredPerMeter      Acceleration-proportional feedforward term
-   *                                          for the robot drive.
+   * @param feedforward                       The feedforward to use for the drivetrain.
    * @param kinematics                        The kinematics for the robot drivetrain.
    * @param xdController                      The Trajectory Tracker PID controller
    *                                          for the robot's x position.
@@ -110,9 +106,7 @@ public class MecanumFollowerCommand extends CommandBase {
   @SuppressWarnings("PMD.ExcessiveParameterList")
   public MecanumFollowerCommand(Trajectory trajectory,
                                 Supplier<Pose2d> pose,
-                                double ksVolts,
-                                double kvVoltSecondsPerMeter,
-                                double kaVoltSecondsSquaredPerMeter,
+                                SimpleMotorFeedforward feedforward,
                                 MecanumDriveKinematics kinematics,
 
                                 PIDController xdController,
@@ -135,9 +129,7 @@ public class MecanumFollowerCommand extends CommandBase {
                                 Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumFollowerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumFollowerCommand");
-    m_ks = ksVolts;
-    m_kv = kvVoltSecondsPerMeter;
-    m_ka = kaVoltSecondsSquaredPerMeter;
+    m_feedforward = requireNonNullParam(feedforward, "feedforward", "MecanumFollowerCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "MecanumFollowerCommand");
 
     m_xdController = requireNonNullParam(xdController, "xdController",
@@ -170,6 +162,9 @@ public class MecanumFollowerCommand extends CommandBase {
       "frontRightOutput", "MecanumFollowerCommand");
     m_rearRightOutput = requireNonNullParam(rearRightOutputVolts,
       "rearRightOutput", "MecanumFollowerCommand");
+    
+    m_usePID = true;
+    
     addRequirements(requirements);
   }
 
@@ -178,8 +173,7 @@ public class MecanumFollowerCommand extends CommandBase {
    * The user should implement a velocity PID on the desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
-   * this
-   * is left to the user, since it is not appropriate for paths with non-stationary end-states.
+   * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
    *
    * <p>Note2: The rotation controller will calculate the rotation based on the final pose
    * in the trajectory, not the poses at each time step.
@@ -219,9 +213,7 @@ public class MecanumFollowerCommand extends CommandBase {
                                 Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumFollowerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumFollowerCommand");
-    m_ks = 0;
-    m_kv = 0;
-    m_ka = 0;
+    m_feedforward = new SimpleMotorFeedforward(0, 0, 0);
     m_kinematics = requireNonNullParam(kinematics,
       "kinematics", "MecanumFollowerCommand");
 
@@ -250,6 +242,9 @@ public class MecanumFollowerCommand extends CommandBase {
       "frontRightOutput", "MecanumFollowerCommand");
     m_rearRightOutput = requireNonNullParam(rearRightOutputMetersPerSecond,
       "rearRightOutput", "MecanumFollowerCommand");
+
+    m_usePID = false;
+
     addRequirements(requirements);
   }
 
@@ -286,15 +281,9 @@ public class MecanumFollowerCommand extends CommandBase {
         m_pose.get().getTranslation().getX(),
         desiredPose.getTranslation().getX());
 
-    //System.out.println(targetXVel);
-
     double targetYVel = m_ydController.calculate(
         m_pose.get().getTranslation().getY(),
         desiredPose.getTranslation().getY());
-
-    //System.out.println(targetYVel);
-
-    //System.out.println(poseError);
 
     // The robot will go to the desired rotation of the final pose in the trajectory,
     // not following the poses at individual states.
@@ -323,23 +312,18 @@ public class MecanumFollowerCommand extends CommandBase {
     double frontRightOutput;
     double rearRightOutput;
 
-    if (m_frontLeftController != null) {
-      final double frontLeftFeedforward = m_ks * Math.signum(frontLeftSpeedSetpoint)
-              + m_kv * frontLeftSpeedSetpoint
-              + m_ka * (frontLeftSpeedSetpoint - m_prevSpeeds.frontLeftMetersPerSecond) / dt;
+    if (m_usePID) {
+      final double frontLeftFeedforward = m_feedforward.calculate(frontLeftSpeedSetpoint,
+              (frontLeftSpeedSetpoint - m_prevSpeeds.frontLeftMetersPerSecond) / dt);
 
-      final double rearLeftFeedforward = m_ks * Math.signum(rearLeftSpeedSetpoint)
-              + m_kv * rearLeftSpeedSetpoint
-              + m_ka * (rearLeftSpeedSetpoint - m_prevSpeeds.rearLeftMetersPerSecond) / dt;
+      final double rearLeftFeedforward = m_feedforward.calculate(rearLeftSpeedSetpoint,
+              (rearLeftSpeedSetpoint - m_prevSpeeds.rearLeftMetersPerSecond) / dt);
 
-      final double frontRightFeedforward = m_ks * Math.signum(frontRightSpeedSetpoint)
-              + m_kv * frontRightSpeedSetpoint
-              + m_ka * (frontRightSpeedSetpoint - m_prevSpeeds.frontRightMetersPerSecond) / dt;
+      final double frontRightFeedforward = m_feedforward.calculate(frontRightSpeedSetpoint,
+              (frontRightSpeedSetpoint - m_prevSpeeds.frontRightMetersPerSecond) / dt);
 
-      final double rearRightFeedforward = m_ks * Math.signum(rearRightSpeedSetpoint)
-              + m_kv * rearRightSpeedSetpoint
-              + m_ka * (rearRightSpeedSetpoint - m_prevSpeeds.rearRightMetersPerSecond) / dt;
-
+      final double rearRightFeedforward = m_feedforward.calculate(rearRightSpeedSetpoint,
+            (rearRightSpeedSetpoint - m_prevSpeeds.rearRightMetersPerSecond) / dt);
 
       frontLeftOutput = frontLeftFeedforward + m_frontLeftController.calculate(
             m_currentWheelSpeeds.get().frontLeftMetersPerSecond,

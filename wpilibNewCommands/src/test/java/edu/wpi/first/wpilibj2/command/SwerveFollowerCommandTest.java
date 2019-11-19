@@ -68,8 +68,6 @@ class SwerveFollowerCommandTest {
   @Test
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   void testReachesReference() {
-    CommandScheduler scheduler = new CommandScheduler();
-
     final var subsystem = new Subsystem() {};
 
     final var waypoints = new ArrayList<Pose2d>();
@@ -88,11 +86,6 @@ class SwerveFollowerCommandTest {
         m_rotController,
         this::setModuleStates,
         subsystem);
-
-
-    scheduler.registerSubsystem(subsystem);
-
-    scheduler.schedule(command);
 
     m_rotTimer.reset();
     m_rotTimer.start();

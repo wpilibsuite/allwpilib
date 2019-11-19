@@ -27,7 +27,7 @@ const frc::MecanumDriveKinematics DriveConstants::kDriveKinematics{
     frc::Translation2d(kTrackLength / 2, -kTrackWidth / 2),
     frc::Translation2d(-kTrackLength / 2, kTrackWidth / 2),
     frc::Translation2d(-kTrackLength / 2, -kTrackWidth / 2)};
-
+    
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
@@ -75,7 +75,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   frc2::MecanumFollowerCommand mecanumFollowerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
-      DriveConstants::ks, DriveConstants::kv, DriveConstants::ka,
+      frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
       DriveConstants::kDriveKinematics,
 
       frc2::PIDController(AutoConstants::kPXController, 0, 0),

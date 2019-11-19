@@ -18,8 +18,7 @@ int sgn(T val) {
 
 MecanumFollowerCommand::MecanumFollowerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
-    units::voltage::volt_t ks, units::unit_t<voltsecondspermeter> kv,
-    units::unit_t<voltsecondssquaredpermeter> ka,
+    frc::SimpleMotorFeedforward<units::meters> feedforward,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
     frc2::PIDController yController, frc::ProfiledPIDController thetaController,
     units::meters_per_second_t MaxWheelVelocityMetersPerSecond,
@@ -34,9 +33,7 @@ MecanumFollowerCommand::MecanumFollowerCommand(
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
-      m_ks(ks),
-      m_kv(kv),
-      m_ka(ka),
+      m_feedforward(feedforward),
       m_kinematics(kinematics),
       m_xController(std::make_unique<frc2::PIDController>(xController)),
       m_yController(std::make_unique<frc2::PIDController>(yController)),
@@ -69,9 +66,6 @@ MecanumFollowerCommand::MecanumFollowerCommand(
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
-      m_ks(0),
-      m_kv(0),
-      m_ka(0),
       m_kinematics(kinematics),
       m_xController(std::make_unique<frc2::PIDController>(xController)),
       m_yController(std::make_unique<frc2::PIDController>(yController)),
@@ -96,7 +90,7 @@ void MecanumFollowerCommand::Initialize() {
 
   m_prevSpeeds = m_kinematics.ToWheelSpeeds(
       frc::ChassisSpeeds{initialXVelocity, initialYVelocity,
-                         initialState.curvature * initialState.velocity});
+      units::radians_per_second_t(0)});
 
   m_timer.Reset();
   m_timer.Start();
@@ -134,8 +128,8 @@ void MecanumFollowerCommand::Execute() {
 
   auto vRef = m_desiredState.velocity;
 
-  targetXVel += vRef * std::sin(m_poseError.Rotation().Radians().to<double>());
-  targetYVel += vRef * std::cos(m_poseError.Rotation().Radians().to<double>());
+  targetXVel += vRef * m_poseError.Rotation().Cos();
+  targetYVel += vRef * m_poseError.Rotation().Sin();
 
   auto targetChassisSpeeds =
       frc::ChassisSpeeds{targetXVel, targetYVel, targetAngularVel};
@@ -149,36 +143,37 @@ void MecanumFollowerCommand::Execute() {
   auto frontRightSpeedSetpoint = targetWheelSpeeds.frontRight;
   auto rearRightSpeedSetpoint = targetWheelSpeeds.rearRight;
 
-  if (m_frontLeftController.get() != nullptr) {
+  if (m_usePID) {
     auto frontLeftFeedforward =
-        m_ks * sgn(frontLeftSpeedSetpoint) + m_kv * frontLeftSpeedSetpoint +
-        m_ka * (frontLeftSpeedSetpoint - m_prevSpeeds.frontLeft) / dt;
+        m_feedforward.Calculate(frontLeftSpeedSetpoint,
+        (frontLeftSpeedSetpoint - m_prevSpeeds.frontLeft) / dt);
 
     auto rearLeftFeedforward =
-        m_ks * sgn(rearLeftSpeedSetpoint) + m_kv * rearLeftSpeedSetpoint +
-        m_ka * (rearLeftSpeedSetpoint - m_prevSpeeds.rearLeft) / dt;
+        m_feedforward.Calculate(rearLeftSpeedSetpoint,
+        (rearLeftSpeedSetpoint - m_prevSpeeds.rearLeft) / dt);
 
     auto frontRightFeedforward =
-        m_ks * sgn(frontRightSpeedSetpoint) + m_kv * frontRightSpeedSetpoint +
-        m_ka * (frontRightSpeedSetpoint - m_prevSpeeds.frontRight) / dt;
+        m_feedforward.Calculate(frontRightSpeedSetpoint,
+        (frontRightSpeedSetpoint - m_prevSpeeds.frontRight) / dt);
+
 
     auto rearRightFeedforward =
-        m_ks * sgn(rearRightSpeedSetpoint) + m_kv * rearRightSpeedSetpoint +
-        m_ka * (rearRightSpeedSetpoint - m_prevSpeeds.rearRight) / dt;
+        m_feedforward.Calculate(rearRightSpeedSetpoint,
+        (rearRightSpeedSetpoint - m_prevSpeeds.rearRight) / dt);
 
-    auto frontLeftOutput = voltage::volt_t(m_frontLeftController->Calculate(
+    auto frontLeftOutput = volt_t(m_frontLeftController->Calculate(
                                m_currentWheelSpeeds().frontLeft.to<double>(),
                                frontLeftSpeedSetpoint.to<double>())) +
                            frontLeftFeedforward;
-    auto rearLeftOutput = voltage::volt_t(m_rearLeftController->Calculate(
+    auto rearLeftOutput = volt_t(m_rearLeftController->Calculate(
                               m_currentWheelSpeeds().rearLeft.to<double>(),
                               rearLeftSpeedSetpoint.to<double>())) +
                           rearLeftFeedforward;
-    auto frontRightOutput = voltage::volt_t(m_frontRightController->Calculate(
+    auto frontRightOutput = volt_t(m_frontRightController->Calculate(
                                 m_currentWheelSpeeds().frontRight.to<double>(),
                                 frontRightSpeedSetpoint.to<double>())) +
                             frontRightFeedforward;
-    auto rearRightOutput = voltage::volt_t(m_rearRightController->Calculate(
+    auto rearRightOutput = volt_t(m_rearRightController->Calculate(
                                m_currentWheelSpeeds().rearRight.to<double>(),
                                rearRightSpeedSetpoint.to<double>())) +
                            rearRightFeedforward;

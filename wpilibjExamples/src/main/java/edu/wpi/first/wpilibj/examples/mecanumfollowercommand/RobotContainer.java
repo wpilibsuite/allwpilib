@@ -34,13 +34,11 @@ import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.Au
 import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.AutoConstants.kPYController;
 import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.AutoConstants.kThetaControllerConstraints;
 import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kDriveKinematics;
+import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kFeedforward;
 import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kPFrontLeftVel;
 import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kPFrontRightVel;
 import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kPRearLeftVel;
 import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kPRearRightVel;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kaVoltSecondsSquaredPerMeter;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.ksVolts;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kvVoltSecondsPerMeter;
 import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.OIConstants.kDriverControllerPort;
 
 /*
@@ -120,9 +118,7 @@ public class RobotContainer {
         exampleTrajectory,
         m_robotDrive::getPose,
 
-        ksVolts,
-        kvVoltSecondsPerMeter,
-        kaVoltSecondsSquaredPerMeter,
+        kFeedforward,
         kDriveKinematics,
 
         //Position contollers
