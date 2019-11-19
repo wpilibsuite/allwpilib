@@ -37,6 +37,8 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   auto maxWheelSpeed = std::max(wheelSpeeds.left, wheelSpeeds.right);
   auto minWheelSpeed = std::min(wheelSpeeds.left, wheelSpeeds.right);
 
+  // Calculate maximum/minimum possible accelerations from motor dynamics
+  // and max/min wheel speeds
   auto maxWheelAcceleration =
       (m_maxVoltage - m_feedforward.kS * wpi::sgn(maxWheelSpeed) -
        m_feedforward.kV * maxWheelSpeed) /
@@ -46,9 +48,17 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
        m_feedforward.kV * minWheelSpeed) /
       m_feedforward.kA;
 
+  // Robot chassis turning on radius 1/|curvature|.  Outer wheel has radius
+  // increased by half of the wheelbase.  Inner wheel has radius decreased
+  // by half of the wheelbase.  Solve resulting equations, and you get
+  // the implementation below.
+
+  // sgn(speed) term added to correctly account for which wheel is on
+  // outside of turn:
   // If moving forward, max acceleration constraint corresponds to wheel on
-  // outside of turn If moving backward, max acceleration constraint corresponds
-  // to wheel on inside of turn
+  // outside of turn
+  // If moving backward, max acceleration constraint corresponds to wheel on
+  // inside of turn
   auto maxChassisAcceleration =
       maxWheelAcceleration /
       (1 + m_kinematics.trackWidth * units::math::abs(curvature) *
@@ -58,7 +68,7 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
       (1 - m_kinematics.trackWidth * units::math::abs(curvature) *
                wpi::sgn(speed) / (2_rad));
 
-  // Negate acceleration of wheel on inside of turn
+  // Negate acceleration corresponding to wheel on inside of turn
   // if center of turn is inside of wheelbase
   if ((m_kinematics.trackWidth / 2) > 1_rad / units::math::abs(curvature)) {
     if (velocity > 0) {

@@ -64,6 +64,8 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
     double minWheelSpeed = Math.min(wheelSpeeds.leftMetersPerSecond,
                                     wheelSpeeds.rightMetersPerSecond);
 
+    // Calculate maximum/minimum possible accelerations from motor dynamics
+    // and max/min wheel speeds
     double maxWheelAcceleration =
         (m_maxVoltage - m_feedforward.ks * Math.signum(maxWheelSpeed)
             - m_feedforward.kv * maxWheelSpeed) / m_feedforward.ka;
@@ -71,8 +73,16 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
         (-m_maxVoltage - m_feedforward.ks * Math.signum(minWheelSpeed)
             - m_feedforward.kv * minWheelSpeed) / m_feedforward.ka;
 
+    // Robot chassis turning on radius 1/|curvature|.  Outer wheel has radius
+    // increased by half of the wheelbase.  Inner wheel has radius decreased
+    // by half of the wheelbase.  Solve resulting equations, and you get
+    // the implementation below.
+
+    // sgn(speed) term added to correctly account for which wheel is on
+    // outside of turn:
     // If moving forward, max acceleration constraint corresponds to wheel on outside of turn
     // If moving backward, max acceleration constraint corresponds to wheel on inside of turn
+
     double maxChassisAcceleration =
         maxWheelAcceleration
             / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter)
