@@ -51,10 +51,62 @@ class SimpleMotorFeedforward {
                                     units::unit_t<Acceleration> acceleration =
                                         units::unit_t<Acceleration>(0)) const {
     return kS * wpi::sgn(velocity) + kV * velocity + kA * acceleration;
-
-    units::volt_t kS{0};
-    units::unit_t<kv_unit> kV{0};
-    units::unit_t<ka_unit> kA{0};
   }
+
+  /**
+   * Calculates the maximum achievable velocity given a maximum voltage supply
+   * and an acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param acceleration The acceleration of the motor.
+   * @return The maximum possible velocity at the given acceleration.
+   */
+  constexpr units::unit_t<Velocity> MaxAchievableVelocity(
+      units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+    return (maxVoltage - kS - kA * acceleration) / kV;
+  }
+
+  /**
+   * Calculates the minimum achievable velocity given a maximum voltage supply
+   * and an acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param acceleration The acceleration of the motor.
+   * @return The minimum possible velocity at the given acceleration.
+   */
+  constexpr units::unit_t<Velocity> MinAchievableVelocity(
+      units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+    return (-maxVoltage + kS - kA * acceleration) / kV;
+  }
+
+  /**
+   * Calculates the maximum achievable acceleration given a maximum voltage
+   * supply and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param velocity The velocity of the motor.
+   * @return The maximum possible acceleration at the given velocity.
+   */
+  constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
+      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
+    return (maxVoltage - kS * wpi::sgn(velocity) - kV * velocity) / kA;
+  }
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage
+   * supply and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the motor.
+   * @param velocity The velocity of the motor.
+   * @return The minimum possible acceleration at the given velocity.
+   */
+  constexpr units::unit_t<Acceleration> MinAchievableAcceleration(
+      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
+    return MaxAchievableAcceleration(-maxVoltage, velocity);
+  }
+
+  units::volt_t kS{0};
+  units::unit_t<kv_unit> kV{0};
+  units::unit_t<ka_unit> kA{0};
 };
 }  // namespace frc

@@ -40,13 +40,9 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   // Calculate maximum/minimum possible accelerations from motor dynamics
   // and max/min wheel speeds
   auto maxWheelAcceleration =
-      (m_maxVoltage - m_feedforward.kS * wpi::sgn(maxWheelSpeed) -
-       m_feedforward.kV * maxWheelSpeed) /
-      m_feedforward.kA;
+      m_feedforward.MaxAchievableAcceleration(m_maxVoltage, maxWheelSpeed);
   auto minWheelAcceleration =
-      (-m_maxVoltage - m_feedforward.kS * wpi::sgn(minWheelSpeed) -
-       m_feedforward.kV * minWheelSpeed) /
-      m_feedforward.kA;
+      m_feedforward.MinAchievableAcceleration(m_maxVoltage, minWheelSpeed);
 
   // Robot chassis turning on radius 1/|curvature|.  Outer wheel has radius
   // increased by half of the wheelbase.  Inner wheel has radius decreased
@@ -71,7 +67,7 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   // Negate acceleration corresponding to wheel on inside of turn
   // if center of turn is inside of wheelbase
   if ((m_kinematics.trackWidth / 2) > 1_rad / units::math::abs(curvature)) {
-    if (velocity > 0) {
+    if (speed > 0_mps) {
       minChassisAcceleration = -minChassisAcceleration;
     } else {
       maxChassisAcceleration = -maxChassisAcceleration;
