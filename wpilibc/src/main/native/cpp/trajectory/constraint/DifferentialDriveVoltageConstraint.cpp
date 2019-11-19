@@ -44,10 +44,11 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   auto minWheelAcceleration =
       m_feedforward.MinAchievableAcceleration(m_maxVoltage, minWheelSpeed);
 
-  // Robot chassis turning on radius 1/|curvature|.  Outer wheel has radius
-  // increased by half of the wheelbase.  Inner wheel has radius decreased
-  // by half of the wheelbase.  Solve resulting equations, and you get
-  // the implementation below.
+  // Robot chassis turning on radius = 1/|curvature|.  Outer wheel has radius
+  // increased by half of the trackwidth T.  Inner wheel has radius decreased
+  // by half of the wheelbase.  Achassis / radius = Aouter / (radius + T/2), so
+  // Achassis = Aouter * radius / (radius + T/2) = Aouter / (1 + |curvature|T/2)
+  // Inner wheel is similar.
 
   // sgn(speed) term added to correctly account for which wheel is on
   // outside of turn:
