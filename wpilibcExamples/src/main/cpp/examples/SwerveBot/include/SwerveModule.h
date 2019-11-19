@@ -8,7 +8,7 @@
 #pragma once
 
 #include <frc/Encoder.h>
-#include <frc/Spark.h>
+#include <frc/PWMVictorSPX.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/kinematics/SwerveModuleState.h>
@@ -34,8 +34,8 @@ class SwerveModule {
       kModuleMaxAngularAcceleration = units::meters_per_second_squared_t(
           wpi::math::pi * 2.0);  // radians per second squared
 
-  frc::Spark m_driveMotor;
-  frc::Spark m_turningMotor;
+  frc::PWMVictorSPX m_driveMotor;
+  frc::PWMVictorSPX m_turningMotor;
 
   frc::Encoder m_driveEncoder{0, 1};
   frc::Encoder m_turningEncoder{2, 3};

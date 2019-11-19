@@ -9,7 +9,8 @@ package edu.wpi.first.wpilibj.examples.differentialdrivebot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -29,10 +30,10 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final Spark m_leftMaster = new Spark(1);
-  private final Spark m_leftFollower = new Spark(2);
-  private final Spark m_rightMaster = new Spark(3);
-  private final Spark m_rightFollower = new Spark(4);
+  private final SpeedController m_leftMaster = new PWMVictorSPX(1);
+  private final SpeedController m_leftFollower = new PWMVictorSPX(2);
+  private final SpeedController m_rightMaster = new PWMVictorSPX(3);
+  private final SpeedController m_rightFollower = new PWMVictorSPX(4);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
