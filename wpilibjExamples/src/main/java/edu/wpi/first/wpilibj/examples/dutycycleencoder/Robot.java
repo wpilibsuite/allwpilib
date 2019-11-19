@@ -10,8 +10,9 @@ package edu.wpi.first.wpilibj.examples.dutycycleencoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-@SuppressWarnings({"PMD.SingularField", "PMD.UnusedLocalVariable"})
+@SuppressWarnings({"PMD.SingularField"})
 public class Robot extends TimedRobot {
   private DigitalInput m_input;
   private DutyCycleEncoder m_dutyCycleEncoder;
@@ -38,6 +39,11 @@ public class Robot extends TimedRobot {
 
     // Output scaled by DistancePerPulse
     double distance = m_dutyCycleEncoder.getDistance();
+
+    SmartDashboard.putBoolean("Connected", connected);
+    SmartDashboard.putNumber("Frequency", frequency);
+    SmartDashboard.putNumber("Output", output.to<double>());
+    SmartDashboard.putNumber("Distance", distance);
   }
 
 }

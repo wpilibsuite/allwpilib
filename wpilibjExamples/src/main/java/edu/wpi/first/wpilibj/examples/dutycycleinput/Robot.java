@@ -10,8 +10,9 @@ package edu.wpi.first.wpilibj.examples.dutycycleinput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-@SuppressWarnings({"PMD.SingularField", "PMD.UnusedLocalVariable"})
+@SuppressWarnings({"PMD.SingularField"})
 public class Robot extends TimedRobot {
   private DigitalInput m_input;
   private DutyCycle m_dutyCycle;
@@ -30,6 +31,9 @@ public class Robot extends TimedRobot {
     // Output of duty cycle, ranging from 0 to 1
     // 1 is fully on, 0 is fully off
     double output = m_dutyCycle.getOutput();
+
+    SmartDashboard.putNumber("Frequency", frequency);
+    SmartDashboard.putNumber("Duty Cycle", output);
   }
 
 }
