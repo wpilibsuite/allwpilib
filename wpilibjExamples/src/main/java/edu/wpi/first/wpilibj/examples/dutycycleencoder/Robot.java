@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Connected", connected);
     SmartDashboard.putNumber("Frequency", frequency);
-    SmartDashboard.putNumber("Output", output.to<double>());
+    SmartDashboard.putNumber("Output", output);
     SmartDashboard.putNumber("Distance", distance);
   }
 
