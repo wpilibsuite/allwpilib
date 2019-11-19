@@ -32,7 +32,7 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
    */
   TrapezoidProfileSubsystem(Constraints constraints,
                             units::unit_t<Unit> position,
-                            units::second_t period = .02_s)
+                            units::second_t period = 20_ms)
                             : m_constraints(constraints),
                               m_state{units::meter_t(position.template to<double>()), 0_mps},
                               m_period(period) {}
