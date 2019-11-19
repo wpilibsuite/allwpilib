@@ -69,8 +69,8 @@ class DifferentialDriveOdometryTest {
 
   @Test
   void testOdometryWithEncoderDistances() {
-    m_odometry.resetPosition(new Pose2d(), new Rotation2d());
-    var pose = m_odometry.update(Rotation2d.fromDegrees(90.0), 0.0, 5 * Math.PI);
+    m_odometry.resetPosition(new Pose2d(), Rotation2d.fromDegrees(45));
+    var pose = m_odometry.update(Rotation2d.fromDegrees(135.0), 0.0, 5 * Math.PI);
 
     assertAll(
         () -> assertEquals(pose.getTranslation().getX(), 5.0, kEpsilon),
