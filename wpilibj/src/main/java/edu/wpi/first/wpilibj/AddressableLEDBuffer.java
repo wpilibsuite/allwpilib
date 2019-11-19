@@ -37,4 +37,13 @@ public class AddressableLEDBuffer {
     m_buffer[(index * 4) + 2] = (byte) r;
     m_buffer[(index * 4) + 3] = 0;
   }
+
+  /**
+   * Gets the buffer length.
+   *
+   * @return the buffer length
+   */
+  public int getLength() {
+    return m_buffer.length / 4;
+  }
 }
