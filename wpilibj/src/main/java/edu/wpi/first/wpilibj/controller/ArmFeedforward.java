@@ -70,4 +70,56 @@ public class ArmFeedforward {
   public double calculate(double positionRadians, double velocity) {
     return calculate(positionRadians, velocity, 0);
   }
+
+  /**
+   * Calculates the maximum achievable velocity given a maximum voltage supply, a position, and an
+   * acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the arm.
+   * @param angle The angle of the arm.
+   * @param acceleration The acceleration of the arm.
+   * @return The maximum possible velocity at the given acceleration and angle.
+   */
+  public double maxAchievableVelocity(double maxVoltage, double angle, double acceleration) {
+    return (maxVoltage - ks - Math.cos(angle) * kcos - acceleration * ka) / kv;
+  }
+
+  /**
+   * Calculates the minimum achievable velocity given a maximum voltage supply, a position, and an
+   * acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the arm.
+   * @param angle The angle of the arm.
+   * @param acceleration The acceleration of the arm.
+   * @return The minimum possible velocity at the given acceleration and angle.
+   */
+  public double minAchievableVelocity(double maxVoltage, double angle, double acceleration) {
+    return (-maxVoltage + ks - Math.cos(angle) * kcos - acceleration * ka) / kv;
+  }
+
+  /**
+   * Calculates the maximum achievable acceleration given a maximum voltage supply, a position,
+   * and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the arm.
+   * @param angle The angle of the arm.
+   * @param velocity The velocity of the arm.
+   * @return The maximum possible acceleration at the given velocity.
+   */
+  public double maxAchievableAcceleration(double maxVoltage, double angle, double velocity) {
+    return (maxVoltage - ks * Math.signum(velocity) - Math.cos(angle) * kcos - velocity * kv) / ka;
+  }
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage supply, a position,
+   * and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the arm.
+   * @param angle The angle of the arm.
+   * @param velocity The velocity of the arm.
+   * @return The minimum possible acceleration at the given velocity.
+   */
+  public double minAchievableAcceleration(double maxVoltage, double angle, double velocity) {
+    return maxAchievableAcceleration(-maxVoltage, angle, velocity);
+  }
 }

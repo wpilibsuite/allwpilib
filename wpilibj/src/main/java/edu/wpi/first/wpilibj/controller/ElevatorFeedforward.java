@@ -67,4 +67,48 @@ public class ElevatorFeedforward {
   public double calculate(double velocity) {
     return calculate(velocity, 0);
   }
+
+  /**
+   * Calculates the maximum achievable velocity given a maximum voltage supply and an acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param acceleration The acceleration of the elevator.
+   * @return The maximum possible velocity at the given acceleration.
+   */
+  public double maxAchievableVelocity(double maxVoltage, double acceleration) {
+    return (maxVoltage - ks - kg - acceleration * ka) / kv;
+  }
+
+  /**
+   * Calculates the minimum achievable velocity given a maximum voltage supply and an acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param acceleration The acceleration of the elevator.
+   * @return The minimum possible velocity at the given acceleration.
+   */
+  public double minAchievableVelocity(double maxVoltage, double acceleration) {
+    return (-maxVoltage + ks - kg - acceleration * ka) / kv;
+  }
+
+  /**
+   * Calculates the maximum achievable acceleration given a maximum voltage supply and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param velocity The velocity of the elevator.
+   * @return The maximum possible acceleration at the given velocity.
+   */
+  public double maxAchievableAcceleration(double maxVoltage, double velocity) {
+    return (maxVoltage - ks * Math.signum(velocity) - kg - velocity * kv) / ka;
+  }
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage supply and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param velocity The velocity of the elevator.
+   * @return The minimum possible acceleration at the given velocity.
+   */
+  public double minAchievableAcceleration(double maxVoltage, double velocity) {
+    return maxAchievableAcceleration(-maxVoltage, velocity);
+  }
 }

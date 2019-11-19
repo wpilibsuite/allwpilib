@@ -54,6 +54,58 @@ class ElevatorFeedforward {
     return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
   }
 
+  /**
+   * Calculates the maximum achievable velocity given a maximum voltage supply
+   * and an acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param acceleration The acceleration of the elevator.
+   * @return The maximum possible velocity at the given acceleration.
+   */
+  constexpr units::unit_t<Velocity> MaxAchievableVelocity(
+      units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+    return (maxVoltage - kS - kG - kA * acceleration) / kV;
+  }
+
+  /**
+   * Calculates the minimum achievable velocity given a maximum voltage supply
+   * and an acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param acceleration The acceleration of the elevator.
+   * @return The minimum possible velocity at the given acceleration.
+   */
+  constexpr units::unit_t<Velocity> MinAchievableVelocity(
+      units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+    return (-maxVoltage + kS - kG - kA * acceleration) / kV;
+  }
+
+  /**
+   * Calculates the maximum achievable acceleration given a maximum voltage
+   * supply and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param velocity The velocity of the elevator.
+   * @return The maximum possible acceleration at the given velocity.
+   */
+  constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
+      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
+    return (maxVoltage - kS * wpi::sgn(velocity) - kG - kV * velocity) / kA;
+  }
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage
+   * supply and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the elevator.
+   * @param velocity The velocity of the elevator.
+   * @return The minimum possible acceleration at the given velocity.
+   */
+  constexpr units::unit_t<Acceleration> MinAchievableAcceleration(
+      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
+    return MaxAchievableAcceleration(-maxVoltage, velocity);
+  }
+
   units::volt_t kS{0};
   units::volt_t kG{0};
   units::unit_t<kv_unit> kV{0};

@@ -58,6 +58,70 @@ class ArmFeedforward {
            kV * velocity + kA * acceleration;
   }
 
+  /**
+   * Calculates the maximum achievable velocity given a maximum voltage supply,
+   * a position, and an acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the arm.
+   * @param angle The angle of the arm
+   * @param acceleration The acceleration of the arm.
+   * @return The maximum possible velocity at the given acceleration and angle.
+   */
+  units::unit_t<Velocity> MaxAchievableVelocity(
+      units::volt_t maxVoltage, Angle angle,
+      units::unit_t<Acceleration> acceleration) {
+    return (maxVoltage - kS - kCos * units::math::cos(angle) -
+            kA * acceleration) /
+           kV;
+  }
+
+  /**
+   * Calculates the minimum achievable velocity given a maximum voltage supply,
+   * a position, and an acceleration.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the arm.
+   * @param angle The angle of the arm
+   * @param acceleration The acceleration of the arm.
+   * @return The minimum possible velocity at the given acceleration and angle.
+   */
+  units::unit_t<Velocity> MinAchievableVelocity(
+      units::volt_t maxVoltage, Angle angle,
+      units::unit_t<Acceleration> acceleration) {
+    return (-maxVoltage + kS - kCos * units::math::cos(angle) -
+            kA * acceleration) /
+           kV;
+  }
+
+  /**
+   * Calculates the maximum achievable acceleration given a maximum voltage
+   * supply, a position, and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the arm.
+   * @param angle The angle of the arm
+   * @param velocity The velocity of the arm.
+   * @return The maximum possible acceleration at the given velocity and angle.
+   */
+  units::unit_t<Acceleration> MaxAchievableAcceleration(
+      units::volt_t maxVoltage, Angle angle, units::unit_t<Velocity> velocity) {
+    return (maxVoltage - kS * wpi::sgn(velocity) -
+            kCos * units::math::cos(angle) - kV * velocity) /
+           kA;
+  }
+
+  /**
+   * Calculates the minimum achievable acceleration given a maximum voltage
+   * supply, a position and a velocity.
+   *
+   * @param maxVoltage The maximum voltage that can be supplied to the arm.
+   * @param angle The angle of the arm
+   * @param velocity The velocity of the arm.
+   * @return The minimum possible acceleration at the given velocity and angle.
+   */
+  units::unit_t<Acceleration> MinAchievableAcceleration(
+      units::volt_t maxVoltage, Angle angle, units::unit_t<Velocity> velocity) {
+    return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
+  }
+
   units::volt_t kS{0};
   units::volt_t kCos{0};
   units::unit_t<kv_unit> kV{0};
