@@ -33,7 +33,7 @@ public class SD540 extends PWMSpeedController {
    * Common initialization code called by all constructors.
    */
   protected void initSD540() {
-    setBounds(2.05, 1.55, 1.50, 1.44, .94);
+    setBounds(2.05, 1.55, 1.50, 1.44, 0.94);
     setPeriodMultiplier(PeriodMultiplier.k1X);
     setSpeed(0.0);
     setZeroLatch();

@@ -23,10 +23,10 @@ class NotifierCommandTest extends CommandTestBase {
 
     Counter counter = new Counter();
 
-    NotifierCommand command = new NotifierCommand(counter::increment, .01);
+    NotifierCommand command = new NotifierCommand(counter::increment, 0.01);
 
     scheduler.schedule(command);
-    Timer.delay(.25);
+    Timer.delay(0.25);
     scheduler.cancel(command);
 
     assertTrue(counter.m_counter > 10, "Should have hit at least 10 triggers");

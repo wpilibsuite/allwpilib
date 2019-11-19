@@ -38,7 +38,7 @@ public class PWMVictorSPX extends PWMSpeedController {
   public PWMVictorSPX(final int channel) {
     super(channel);
 
-    setBounds(2.004, 1.52, 1.50, 1.48, .997);
+    setBounds(2.004, 1.52, 1.50, 1.48, 0.997);
     setPeriodMultiplier(PeriodMultiplier.k1X);
     setSpeed(0.0);
     setZeroLatch();

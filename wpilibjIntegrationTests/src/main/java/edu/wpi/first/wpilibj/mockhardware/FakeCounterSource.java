@@ -107,7 +107,7 @@ public class FakeCounterSource implements AutoCloseable {
       Thread.currentThread().interrupt();
     }
     m_task = new EncoderThread(this);
-    Timer.delay(.01);
+    Timer.delay(0.01);
   }
 
   /**

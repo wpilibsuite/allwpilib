@@ -131,7 +131,7 @@ public class FakeEncoderSource implements AutoCloseable {
       Thread.currentThread().interrupt();
     }
     m_task = new QuadEncoderThread(this);
-    Timer.delay(.01);
+    Timer.delay(0.01);
   }
 
   /**
