@@ -29,10 +29,10 @@ protected:
   frc::Rotation2d m_angle{0_rad};  
 
   std::array<frc::SwerveModuleState, 4> m_moduleStates{
-      frc::SwerveModuleState{units::meters_per_second_t(0), frc::Rotation2d(units::radian_t(0))},
-      frc::SwerveModuleState{units::meters_per_second_t(0), frc::Rotation2d(units::radian_t(0))},
-      frc::SwerveModuleState{units::meters_per_second_t(0), frc::Rotation2d(units::radian_t(0))},
-      frc::SwerveModuleState{units::meters_per_second_t(0), frc::Rotation2d(units::radian_t(0))}
+      frc::SwerveModuleState{},
+      frc::SwerveModuleState{},
+      frc::SwerveModuleState{},
+      frc::SwerveModuleState{}
   };  
 
   frc::ProfiledPIDController m_rotController{1, 0, 0,
@@ -40,6 +40,7 @@ protected:
 
   static constexpr units::meter_t kxTolerance{1 / 12.0};
   static constexpr units::meter_t kyTolerance{1 / 12.0}; 
+  static constexpr units::radian_t kangularTolerance{1 / 12.0};
 
   static constexpr units::meter_t m_trackLength{0.5};
   static constexpr units::meter_t m_trackWidth{0.5};  
@@ -104,5 +105,9 @@ TEST_F(SwerveFollowerCommandTest, ReachesReference) {
 
   EXPECT_NEAR_UNITS(endState.pose.Translation().X(), getRobotPose().Translation().X(),
                     kxTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.Translation().Y(), getRobotPose().Translation().Y(),
+                    kyTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(), getRobotPose().Rotation().Radians(),
+                    kangularTolerance);
 
 }

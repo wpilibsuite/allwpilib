@@ -24,8 +24,6 @@
 
 class MecanumFollowerCommandTest : public ::testing::Test {
 protected:
-  static constexpr units::meter_t kTolerance{1 / 12.0};
-  
   frc2::Timer m_rotTimer;
   frc::Rotation2d m_angle{0_rad};
   
@@ -39,6 +37,7 @@ protected:
   
   static constexpr units::meter_t kxTolerance{1 / 12.0};
   static constexpr units::meter_t kyTolerance{1 / 12.0};
+  static constexpr units::radian_t kangularTolerance{1 / 12.0};
   
   
   static constexpr units::meter_t m_trackLength{0.5};
@@ -112,5 +111,9 @@ TEST_F(MecanumFollowerCommandTest, ReachesReference) {
 
   EXPECT_NEAR_UNITS(endState.pose.Translation().X(), getRobotPose().Translation().X(),
                     kxTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.Translation().Y(), getRobotPose().Translation().Y(),
+                    kyTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(), getRobotPose().Rotation().Radians(),
+                    kangularTolerance);
 
 }
