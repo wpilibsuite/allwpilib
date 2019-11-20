@@ -31,12 +31,12 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * <p>Four motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Spark m_frontLeft = new Spark(1);
- *   Spark m_rearLeft = new Spark(2);
+ *   SpeedController m_frontLeft = new PWMVictorSPX(1);
+ *   SpeedController m_rearLeft = new PWMVictorSPX(2);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
  *
- *   Spark m_frontRight = new Spark(3);
- *   Spark m_rearRight = new Spark(4);
+ *   SpeedController m_frontRight = new PWMVictorSPX(3);
+ *   SpeedController m_rearRight = new PWMVictorSPX(4);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
@@ -46,14 +46,14 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * <p>Six motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Spark m_frontLeft = new Spark(1);
- *   Spark m_midLeft = new Spark(2);
- *   Spark m_rearLeft = new Spark(3);
+ *   SpeedController m_frontLeft = new PWMVictorSPX(1);
+ *   SpeedController m_midLeft = new PWMVictorSPX(2);
+ *   SpeedController m_rearLeft = new PWMVictorSPX(3);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_midLeft, m_rearLeft);
  *
- *   Spark m_frontRight = new Spark(4);
- *   Spark m_midRight = new Spark(5);
- *   Spark m_rearRight = new Spark(6);
+ *   SpeedController m_frontRight = new PWMVictorSPX(4);
+ *   SpeedController m_midRight = new PWMVictorSPX(5);
+ *   SpeedController m_rearRight = new PWMVictorSPX(6);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_midRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
