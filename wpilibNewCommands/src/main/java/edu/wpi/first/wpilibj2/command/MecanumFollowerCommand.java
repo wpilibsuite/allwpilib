@@ -95,7 +95,7 @@ public class MecanumFollowerCommand extends CommandBase {
    * @param rearRightController               The rear right wheel velocity PID.
    * @param currentWheelSpeeds                A MecanumDriveWheelSpeeds object containing
    *                                          the current wheel speeds.
-   * @param driveOutputVolts                  A MecanumDriveMotorVoltages object containing
+   * @param outputDriveVoltages                  A MecanumDriveMotorVoltages object containing
    *                                          the output motor voltages.
    * @param requirements                      The subsystems to require.
    */
