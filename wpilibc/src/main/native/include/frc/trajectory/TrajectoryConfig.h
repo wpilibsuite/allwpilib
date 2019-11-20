@@ -108,7 +108,6 @@ class TrajectoryConfig {
    *
    * @param kinematics The swerve drive kinematics.
    */
-
   template <size_t NumModules>
   void SetKinematics(SwerveDriveKinematics<NumModules>& kinematics) {
     AddConstraint(SwerveDriveKinematicsConstraint(kinematics, m_maxVelocity));
