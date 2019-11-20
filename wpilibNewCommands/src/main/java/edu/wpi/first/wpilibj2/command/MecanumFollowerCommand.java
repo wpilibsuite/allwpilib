@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.function.DoubleConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 
@@ -62,10 +63,8 @@ public class MecanumFollowerCommand extends CommandBase {
   private final PIDController m_frontRightController;
   private final PIDController m_rearRightController;
   private final Supplier<MecanumDriveWheelSpeeds> m_currentWheelSpeeds;
-  private final DoubleConsumer m_frontLeftOutput;
-  private final DoubleConsumer m_rearLeftOutput;
-  private final DoubleConsumer m_frontRightOutput;
-  private final DoubleConsumer m_rearRightOutput;
+  private final Consumer<MecanumDriveMotorVoltages> m_outputDriveVoltages;
+  private final Consumer<MecanumDriveWheelSpeeds> m_outputWheelSpeeds;
 
   /**
    * Constructs a new MecanumFollowerCommand that when executed will follow the provided trajectory.
@@ -96,10 +95,8 @@ public class MecanumFollowerCommand extends CommandBase {
    * @param rearRightController               The rear right wheel velocity PID.
    * @param currentWheelSpeeds                A MecanumDriveWheelSpeeds object containing
    *                                          the current wheel speeds.
-   * @param frontLeftOutputVolts              The front left wheel output in volts.
-   * @param rearLeftOutputVolts               The rear left wheel output in volts.`
-   * @param frontRightOutputVolts             The front right wheel output in volts.
-   * @param rearRightOutputVolts              The rear right wheel output in volts.
+   * @param driveOutputVolts                  A MecanumDriveMotorVoltages object containing
+   *                                          the output motor voltages.
    * @param requirements                      The subsystems to require.
    */
 
@@ -122,10 +119,7 @@ public class MecanumFollowerCommand extends CommandBase {
 
                                 Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
 
-                                DoubleConsumer frontLeftOutputVolts,
-                                DoubleConsumer rearLeftOutputVolts,
-                                DoubleConsumer frontRightOutputVolts,
-                                DoubleConsumer rearRightOutputVolts,
+                                Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
                                 Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumFollowerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumFollowerCommand");
@@ -154,15 +148,11 @@ public class MecanumFollowerCommand extends CommandBase {
     m_currentWheelSpeeds = requireNonNullParam(currentWheelSpeeds,
       "currentWheelSpeeds", "MecanumFollowerCommand");
 
-    m_frontLeftOutput = requireNonNullParam(frontLeftOutputVolts,
-      "frontLeftOutput", "MecanumFollowerCommand");
-    m_rearLeftOutput = requireNonNullParam(rearLeftOutputVolts,
-      "rearLeftOutput", "MecanumFollowerCommand");
-    m_frontRightOutput =  requireNonNullParam(frontRightOutputVolts,
-      "frontRightOutput", "MecanumFollowerCommand");
-    m_rearRightOutput = requireNonNullParam(rearRightOutputVolts,
-      "rearRightOutput", "MecanumFollowerCommand");
+    m_outputDriveVoltages = requireNonNullParam(outputDriveVoltages,
+    "outputDriveVoltages", "MecanumFollowerCommand");
     
+    m_outputWheelSpeeds = null;
+
     m_usePID = true;
     
     addRequirements(requirements);
@@ -189,10 +179,8 @@ public class MecanumFollowerCommand extends CommandBase {
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
    * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a drivetrain wheel.
-   * @param frontLeftOutputMetersPerSecond    The front left wheel output in volts.
-   * @param rearLeftOutputMetersPerSecond     The rear left wheel output in volts.`
-   * @param frontRightOutputMetersPerSecond   The front right wheel output in volts.
-   * @param rearRightOutputMetersPerSecond    The rear right wheel output in volts.
+   * @param outputWheelSpeeds                 A MecanumDriveWheelSpeeds object containing
+   *                                          the output wheel speeds.
    * @param requirements                      The subsystems to require.
    */
 
@@ -206,10 +194,7 @@ public class MecanumFollowerCommand extends CommandBase {
 
                                 double maxWheelVelocityMetersPerSecond,
 
-                                DoubleConsumer frontLeftOutputMetersPerSecond,
-                                DoubleConsumer rearLeftOutputMetersPerSecond,
-                                DoubleConsumer frontRightOutputMetersPerSecond,
-                                DoubleConsumer rearRightOutputMetersPerSecond,
+                                Consumer<MecanumDriveWheelSpeeds> outputWheelSpeeds,
                                 Subsystem... requirements) {
     m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumFollowerCommand");
     m_pose = requireNonNullParam(pose, "pose", "MecanumFollowerCommand");
@@ -234,14 +219,10 @@ public class MecanumFollowerCommand extends CommandBase {
 
     m_currentWheelSpeeds = null;
 
-    m_frontLeftOutput = requireNonNullParam(frontLeftOutputMetersPerSecond,
-      "frontLeftOutput", "MecanumFollowerCommand");
-    m_rearLeftOutput = requireNonNullParam(rearLeftOutputMetersPerSecond,
-      "rearLeftOutput", "MecanumFollowerCommand");
-    m_frontRightOutput =  requireNonNullParam(frontRightOutputMetersPerSecond,
-      "frontRightOutput", "MecanumFollowerCommand");
-    m_rearRightOutput = requireNonNullParam(rearRightOutputMetersPerSecond,
-      "rearRightOutput", "MecanumFollowerCommand");
+    m_outputWheelSpeeds = requireNonNullParam(outputWheelSpeeds,
+      "outputWheelSpeeds", "MecanumFollowerCommand");
+                                  
+    m_outputDriveVoltages = null;
 
     m_usePID = false;
 
@@ -341,17 +322,20 @@ public class MecanumFollowerCommand extends CommandBase {
             m_currentWheelSpeeds.get().rearRightMetersPerSecond,
              rearRightSpeedSetpoint);
 
+      m_outputDriveVoltages.accept(new MecanumDriveMotorVoltages(
+          frontLeftOutput,
+          frontRightOutput,
+          rearLeftOutput,
+          rearRightOutput));
+
     } else {
-      frontLeftOutput = frontLeftSpeedSetpoint;
-      rearLeftOutput = rearLeftSpeedSetpoint;
-      frontRightOutput = frontRightSpeedSetpoint;
-      rearRightOutput = rearRightSpeedSetpoint;
+      m_outputWheelSpeeds.accept(new MecanumDriveWheelSpeeds(
+          frontLeftSpeedSetpoint,
+          frontRightSpeedSetpoint,
+          rearLeftSpeedSetpoint,
+          rearRightSpeedSetpoint));
     }
 
-    m_frontLeftOutput.accept(frontLeftOutput);
-    m_rearLeftOutput.accept(rearLeftOutput);
-    m_frontRightOutput.accept(frontRightOutput);
-    m_rearRightOutput.accept(rearRightOutput);
 
     m_prevTime = curTime;
     m_prevSpeeds = targetWheelSpeeds;

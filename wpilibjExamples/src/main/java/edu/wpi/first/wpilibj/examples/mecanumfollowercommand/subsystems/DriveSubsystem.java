@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -142,33 +143,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   }
 
-
   /**
   * Sets the front left drive SpeedController to a voltage.
   */
-  public void setFrontLeftSpeedControllerVolts(double volts) {
-    m_frontLeft.setVoltage(volts);
-  }
-
-  /**
-  * Sets the rear left drive SpeedController to a voltage.
-  */
-  public void setRearLeftSpeedControllerVolts(double volts) {
-    m_rearLeft.setVoltage(volts);
-  }
-
-  /**
-  * Sets the front right drive SpeedController to a voltage.
-  */
-  public void setFrontRightSpeedControllerVolts(double volts) {
-    m_frontRight.setVoltage(volts);
-  }
-
-  /**
-  * Sets the rear right drive SpeedController to a voltage.
-  */
-  public void setRearRightSpeedControllerVolts(double volts) {
-    m_rearRight.setVoltage(volts);
+  public void setDriveSpeedControllersVolts(MecanumDriveMotorVoltages volts) {
+    m_frontLeft.setVoltage(volts.frontLeftVoltage);
+    m_rearLeft.setVoltage(volts.rearLeftVoltage);
+    m_frontRight.setVoltage(volts.frontRightVoltage);
+    m_rearRight.setVoltage(volts.rearRightVoltage);
   }
 
 

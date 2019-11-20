@@ -137,10 +137,7 @@ public class RobotContainer {
 
         m_robotDrive::getCurrentWheelSpeeds,
 
-        m_robotDrive::setFrontLeftSpeedControllerVolts, //Consumers for the output voltages
-        m_robotDrive::setRearLeftSpeedControllerVolts,
-        m_robotDrive::setFrontRightSpeedControllerVolts,
-        m_robotDrive::setRearRightSpeedControllerVolts,
+        m_robotDrive::setDriveSpeedControllersVolts, //Consumer for the output motor voltages
 
         m_robotDrive
     );

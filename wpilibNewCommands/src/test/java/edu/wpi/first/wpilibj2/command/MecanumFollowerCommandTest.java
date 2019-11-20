@@ -54,20 +54,11 @@ class MecanumFollowerCommandTest {
   private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
       new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));
 
-  public void setFrontLeftSpeed(double frontLeftSpeed) {
-    this.m_frontLeftSpeed = frontLeftSpeed;
-  }
-
-  public void setRearLeftSpeed(double rearLeftSpeed) {
-    this.m_rearLeftSpeed = rearLeftSpeed;
-  }
-
-  public void setFrontRightSpeed(double frontRightSpeed) {
-    this.m_frontRightSpeed = frontRightSpeed;
-  }
-
-  public void setRearRightSpeed(double rearRightSpeed) {
-    this.m_rearRightSpeed = rearRightSpeed;
+  public void setWheelSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
+    this.m_frontLeftSpeed = wheelSpeeds.frontLeftMetersPerSecond;
+    this.m_rearLeftSpeed = wheelSpeeds.rearLeftMetersPerSecond;
+    this.m_frontRightSpeed = wheelSpeeds.frontRightMetersPerSecond;
+    this.m_rearRightSpeed = wheelSpeeds.rearRightMetersPerSecond;
   }
 
   public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
@@ -100,10 +91,7 @@ class MecanumFollowerCommandTest {
         new PIDController(0.6, 0, 0),
         m_rotController,
         8.8,
-        this::setFrontLeftSpeed,
-        this::setRearLeftSpeed,
-        this::setFrontRightSpeed,
-        this::setRearRightSpeed,
+        this::setWheelSpeeds,
         subsystem);
 
     m_rotTimer.reset();
