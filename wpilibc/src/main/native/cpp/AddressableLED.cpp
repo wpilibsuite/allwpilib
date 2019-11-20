@@ -8,6 +8,7 @@
 #include "frc/AddressableLED.h"
 
 #include <hal/AddressableLED.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
@@ -30,6 +31,8 @@ AddressableLED::AddressableLED(int port) {
   if (m_handle == HAL_kInvalidHandle) {
     HAL_FreePWMPort(m_pwmHandle, &status);
   }
+
+  HAL_Report(HALUsageReporting::kResourceType_AddressableLEDs, port + 1);
 }
 
 AddressableLED::~AddressableLED() {
