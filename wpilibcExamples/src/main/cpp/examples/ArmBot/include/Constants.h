@@ -8,7 +8,6 @@
 #pragma once
 
 #include <units/units.h>
-
 #include <wpi/math>
 
 /**
