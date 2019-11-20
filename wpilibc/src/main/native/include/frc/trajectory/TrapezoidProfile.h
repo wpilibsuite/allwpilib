@@ -55,14 +55,14 @@ class TrapezoidProfile {
  public:
   class Constraints {
    public:
-    Velocity_t maxVelocity = Velocity_t(0);
-    Acceleration_t maxAcceleration = Acceleration_t(0);
+    Velocity_t maxVelocity{0};
+    Acceleration_t maxAcceleration{0};
   };
 
   class State {
    public:
-    Distance_t position = Distance_t(0);
-    Velocity_t velocity = Velocity_t(0);
+    Distance_t position{0};
+    Velocity_t velocity{0};
     bool operator==(const State& rhs) const {
       return position == rhs.position && velocity == rhs.velocity;
     }
