@@ -8,25 +8,15 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AddressableLEDJNI;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.PWMJNI;
 
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
  */
 public class AddressableLED implements AutoCloseable {
-  private final PWM m_pwmOutput;
-  private int m_handle;
-  private final boolean m_ownsPwm;
-
-  /**
-   * Constructs a new driver from a PWM output.
-   *
-   * @param output the pwm output to use
-   */
-  public AddressableLED(PWM output) {
-    m_pwmOutput = output;
-    m_ownsPwm = false;
-    init();
-  }
+  private final int m_pwmHandle;
+  private final int m_handle;
 
   /**
    * Constructs a new driver for a specific port.
@@ -34,13 +24,8 @@ public class AddressableLED implements AutoCloseable {
    * @param port the output port to use (Must be a PWM port)
    */
   public AddressableLED(int port) {
-    m_pwmOutput = new PWM(port);
-    m_ownsPwm = true;
-    init();
-  }
-
-  private void init() {
-    m_handle = AddressableLEDJNI.initialize(m_pwmOutput.m_handle);
+    m_pwmHandle = PWMJNI.initializePWMPort(HAL.getPort((byte) port));
+    m_handle = AddressableLEDJNI.initialize(m_pwmHandle);
   }
 
   @Override
@@ -48,8 +33,8 @@ public class AddressableLED implements AutoCloseable {
     if (m_handle != 0) {
       AddressableLEDJNI.free(m_handle);
     }
-    if (m_ownsPwm) {
-      m_pwmOutput.close();
+    if (m_pwmHandle != 0) {
+      PWMJNI.freePWMPort(m_pwmHandle);
     }
   }
 
