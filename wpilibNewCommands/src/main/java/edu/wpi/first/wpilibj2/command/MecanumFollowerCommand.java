@@ -150,11 +150,11 @@ public class MecanumFollowerCommand extends CommandBase {
 
     m_outputDriveVoltages = requireNonNullParam(outputDriveVoltages,
     "outputDriveVoltages", "MecanumFollowerCommand");
-    
+
     m_outputWheelSpeeds = null;
 
     m_usePID = true;
-    
+
     addRequirements(requirements);
   }
 
@@ -221,7 +221,7 @@ public class MecanumFollowerCommand extends CommandBase {
 
     m_outputWheelSpeeds = requireNonNullParam(outputWheelSpeeds,
       "outputWheelSpeeds", "MecanumFollowerCommand");
-                                  
+
     m_outputDriveVoltages = null;
 
     m_usePID = false;

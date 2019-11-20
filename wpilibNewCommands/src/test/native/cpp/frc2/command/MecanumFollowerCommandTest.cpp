@@ -26,41 +26,41 @@ class MecanumFollowerCommandTest : public ::testing::Test {
 protected:
   frc2::Timer m_rotTimer;
   frc::Rotation2d m_angle{0_rad};
-  
+
   units::meters_per_second_t  m_frontLeftSpeed = 0.0_mps;
   units::meters_per_second_t  m_rearLeftSpeed = 0.0_mps;
   units::meters_per_second_t  m_frontRightSpeed = 0.0_mps;
   units::meters_per_second_t  m_rearRightSpeed = 0.0_mps;
-  
+
   frc::ProfiledPIDController m_rotController{1, 0, 0,
       frc::TrapezoidProfile::Constraints{9_mps, 3_mps_sq}};
-  
+
   static constexpr units::meter_t kxTolerance{1 / 12.0};
   static constexpr units::meter_t kyTolerance{1 / 12.0};
   static constexpr units::radian_t kangularTolerance{1 / 12.0};
-  
-  
+
+
   static constexpr units::meter_t m_trackLength{0.5};
   static constexpr units::meter_t m_trackWidth{0.5};
-  
+
   frc::MecanumDriveKinematics m_kinematics{
       frc::Translation2d{m_trackLength / 2, m_trackWidth / 2},
       frc::Translation2d{m_trackLength / 2, -m_trackWidth / 2},
       frc::Translation2d{-m_trackLength / 2, m_trackWidth / 2},
       frc::Translation2d{-m_trackLength / 2, -m_trackWidth / 2}
   };
-  
+
   frc::MecanumDriveOdometry m_odometry{
       m_kinematics,
       frc::Rotation2d{0_rad},
       frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_rad}}
   };
-  
+
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
     return frc::MecanumDriveWheelSpeeds{m_frontLeftSpeed,
         m_frontRightSpeed, m_rearLeftSpeed, m_rearRightSpeed};
   }
-  
+
   frc::Pose2d getRobotPose() {
     m_odometry.Update(m_angle, getCurrentWheelSpeeds());
     return m_odometry.GetPose();
