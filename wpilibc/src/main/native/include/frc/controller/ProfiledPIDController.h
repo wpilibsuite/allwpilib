@@ -37,6 +37,8 @@ class ProfiledPIDController
   using Acceleration =
       units::compound_unit<Velocity, units::inverse<units::seconds>>;
   using Acceleration_t = units::unit_t<Acceleration>;
+  using State = typename TrapezoidProfile<Distance>::State;
+  using Constraints = typename TrapezoidProfile<Distance>::Constraints;
 
  public:
   /**
@@ -50,10 +52,8 @@ class ProfiledPIDController
    * @param period      The period between controller updates in seconds. The
    *                    default is 20 milliseconds.
    */
-  ProfiledPIDController(
-      double Kp, double Ki, double Kd,
-      typename TrapezoidProfile<Distance>::Constraints constraints,
-      units::second_t period = 20_ms)
+  ProfiledPIDController(double Kp, double Ki, double Kd,
+                        Constraints constraints, units::second_t period = 20_ms)
       : m_controller(Kp, Ki, Kd, period), m_constraints(constraints) {}
 
   ~ProfiledPIDController() override = default;
@@ -130,9 +130,7 @@ class ProfiledPIDController
    *
    * @param goal The desired unprofiled setpoint.
    */
-  void SetGoal(typename TrapezoidProfile<Distance>::State goal) {
-    m_goal = goal;
-  }
+  void SetGoal(State goal) { m_goal = goal; }
 
   /**
    * Sets the goal for the ProfiledPIDController.
@@ -144,7 +142,7 @@ class ProfiledPIDController
   /**
    * Gets the goal for the ProfiledPIDController.
    */
-  typename TrapezoidProfile<Distance>::State GetGoal() const { return m_goal; }
+  State GetGoal() const { return m_goal; }
 
   /**
    * Returns true if the error is within the tolerance of the error.
@@ -158,19 +156,14 @@ class ProfiledPIDController
    *
    * @param constraints Velocity and acceleration constraints for goal.
    */
-  void SetConstraints(
-      typename TrapezoidProfile<Distance>::Constraints constraints) {
-    m_constraints = constraints;
-  }
+  void SetConstraints(Constraints constraints) { m_constraints = constraints; }
 
   /**
    * Returns the current setpoint of the ProfiledPIDController.
    *
    * @return The current setpoint.
    */
-  typename TrapezoidProfile<Distance>::State GetSetpoint() const {
-    return m_setpoint;
-  }
+  State GetSetpoint() const { return m_setpoint; }
 
   /**
    * Returns true if the error is within the tolerance of the error.
@@ -263,8 +256,7 @@ class ProfiledPIDController
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
    */
-  double Calculate(Distance_t measurement,
-                   typename TrapezoidProfile<Distance>::State goal) {
+  double Calculate(Distance_t measurement, State goal) {
     SetGoal(goal);
     return Calculate(measurement);
   }
