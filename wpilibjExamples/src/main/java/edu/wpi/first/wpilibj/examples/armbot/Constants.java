@@ -42,8 +42,8 @@ public final class Constants {
     // These are fake gains; in actuality these must be determined individually for each robot
     public static final double kSVolts = 1;
     public static final double kCosVolts = 1;
-    public static final double kVVoltSecondPerRad = .5;
-    public static final double kAVoltSecondSquaredPerRad = .1;
+    public static final double kVVoltSecondPerRad = 0.5;
+    public static final double kAVoltSecondSquaredPerRad = 0.1;
 
     public static final double kMaxVelocityRadPerSecond = 3;
     public static final double kMaxAccelerationRadPerSecSquared = 10;

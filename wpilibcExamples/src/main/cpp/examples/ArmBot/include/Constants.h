@@ -47,8 +47,8 @@ constexpr double kP = 1;
 // each robot
 constexpr auto kS = 1_V;
 constexpr auto kCos = 1_V;
-constexpr auto kV = .5_V * 1_s / 1_rad;
-constexpr auto kA = .1_V * 1_s * 1_s / 1_rad;
+constexpr auto kV = 0.5_V * 1_s / 1_rad;
+constexpr auto kA = 0.1_V * 1_s * 1_s / 1_rad;
 
 constexpr auto kMaxVelocity = 3_rad_per_s;
 constexpr auto kMaxAcceleration = 10_rad / (1_s * 1_s);
@@ -59,7 +59,7 @@ constexpr auto kEncoderDistancePerPulse = 2.0_rad * wpi::math::pi / kEncoderPPR;
 
 // The offset of the arm from the horizontal in its neutral position,
 // measured from the horizontal
-constexpr auto kArmOffset = .5_rad;
+constexpr auto kArmOffset = 0.5_rad;
 }  // namespace ArmConstants
 
 namespace AutoConstants {
