@@ -78,7 +78,8 @@ class MecanumFollowerCommand
    * @param frontRightController              The front right wheel velocity PID.
    * @param rearRightController               The rear right wheel velocity PID.
    *                                          the current wheel speeds.
-   * @param output                            The output of the velocity PIDs in volts.
+   * @param output                            The output of the velocity PIDs and feedfrowards
+   *                                          in volts.
    * @param requirements                      The subsystems to require.
    */
 
@@ -103,7 +104,7 @@ class MecanumFollowerCommand
    * Constructs a new MecanumFollowerCommand that when executed will follow the provided trajectory.
    * The user should implement a velocity PID on the desired output wheel velocities.
    *
-   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
+   * <p>Note: The controllers will *not* set the output velocities to zero upon completion of the path -
    * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
    *
    * <p>Note 2: The rotation controller will calculate the rotation based on the final pose
@@ -120,7 +121,7 @@ class MecanumFollowerCommand
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
    * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a drivetrain wheel.
-   * @param output                            The output of the velocity PID's in volts.
+   * @param output                            The output of the velocity PID's in meters per second.
    * @param requirements                      The subsystems to require.
    */
   MecanumFollowerCommand(
