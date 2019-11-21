@@ -61,7 +61,7 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
     for (double i = 0.0; i < 360.0; i = i + 1.0) {
       m_potSource.setAngle(i);
       m_potSource.setMaxVoltage(RobotController.getVoltage5V());
-      Timer.delay(.02);
+      Timer.delay(0.02);
       assertEquals(i, m_pot.get(), DOUBLE_COMPARISON_DELTA);
     }
   }
