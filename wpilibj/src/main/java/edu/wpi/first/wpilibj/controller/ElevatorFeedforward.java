@@ -57,6 +57,9 @@ public class ElevatorFeedforward {
     return ks * Math.signum(velocity) + kg + kv * velocity + ka * acceleration;
   }
 
+  // Rearranging the main equation from the calculate() method yields the
+  // formulas for the methods below:
+
   /**
    * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to
    * be zero).

@@ -58,6 +58,9 @@ class ArmFeedforward {
            kV * velocity + kA * acceleration;
   }
 
+  // Rearranging the main equation from the calculate() method yields the
+  // formulas for the methods below:
+
   /**
    * Calculates the maximum achievable velocity given a maximum voltage supply,
    * a position, and an acceleration.
