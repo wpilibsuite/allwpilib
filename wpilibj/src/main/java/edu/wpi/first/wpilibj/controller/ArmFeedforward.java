@@ -113,7 +113,7 @@ public class ArmFeedforward {
    * supply, a position, and a velocity. Useful for ensuring that velocity and
    * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
-   * a simultaneously-achievable velocity constraint.
+   * a simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
    * @param angle The angle of the arm.
@@ -129,7 +129,7 @@ public class ArmFeedforward {
    * supply, a position, and a velocity. Useful for ensuring that velocity and
    * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
-   * a simultaneously-achievable velocity constraint.
+   * a simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
    * @param angle The angle of the arm.

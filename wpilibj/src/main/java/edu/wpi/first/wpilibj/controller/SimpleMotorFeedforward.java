@@ -103,7 +103,7 @@ public class SimpleMotorFeedforward {
    * supply and a velocity. Useful for ensuring that velocity and
    * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
-   * a simultaneously-achievable velocity constraint.
+   * a simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param velocity The velocity of the motor.
@@ -118,7 +118,7 @@ public class SimpleMotorFeedforward {
    * supply and a velocity. Useful for ensuring that velocity and
    * acceleration constraints for a trapezoidal profile are simultaneously
    * achievable - enter the velocity constraint, and this will give you
-   * a simultaneously-achievable velocity constraint.
+   * a simultaneously-achievable acceleration constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the motor.
    * @param velocity The velocity of the motor.
