@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <algorithm>
-
 #include <units/units.h>
 
 namespace frc {
@@ -146,5 +144,6 @@ class TrapezoidProfile {
   units::second_t m_endFullSpeed;
   units::second_t m_endDeccel;
 };
-#include "TrapezoidProfile.inc"
 }  // namespace frc
+
+#include "TrapezoidProfile.inc"

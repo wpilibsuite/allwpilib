@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <algorithm>
+
+namespace frc {
 template <class Distance>
 TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints,
                                              State goal, State initial)
@@ -157,3 +160,4 @@ units::second_t TrapezoidProfile<Distance>::TimeLeftUntil(
 
   return accelTime + fullSpeedTime + deccelTime;
 }
+}  // namespace frc
