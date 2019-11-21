@@ -8,6 +8,7 @@
 #include <array>
 
 #include <frc/AddressableLED.h>
+#include <frc/AddressableLEDBuffer.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -15,7 +16,7 @@ class Robot : public frc::TimedRobot {
   // PWM port 0
   // Must be a PWM header, not MXP or DIO
   frc::AddressableLED m_led{0};
-  std::array<frc::AddressableLED::LEDData, 12> m_ledBuffer;  // Reuse the buffer
+  frc::AddressableLEDBuffer<12> m_ledBuffer; // Reuse the buffer
   int m_count = 0;
 
  public:
