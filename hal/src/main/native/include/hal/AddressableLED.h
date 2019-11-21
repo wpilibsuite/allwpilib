@@ -12,6 +12,12 @@
 #include "hal/AddressableLEDTypes.h"
 #include "hal/Types.h"
 
+/**
+ * @defgroup hal_addressable Addressable LED Functions
+ * @ingroup hal_capi
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -52,3 +58,4 @@ void HAL_StopAddressableLEDOutput(HAL_AddressableLEDHandle handle,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+/** @} */
