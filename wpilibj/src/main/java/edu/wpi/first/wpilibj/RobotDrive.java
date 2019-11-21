@@ -178,7 +178,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
       double value = Math.log(-curve);
       double ratio = (value - m_sensitivity) / (value + m_sensitivity);
       if (ratio == 0) {
-        ratio = .0000000001;
+        ratio = 0.0000000001;
       }
       leftOutput = outputMagnitude / ratio;
       rightOutput = outputMagnitude;
@@ -186,7 +186,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
       double value = Math.log(curve);
       double ratio = (value - m_sensitivity) / (value + m_sensitivity);
       if (ratio == 0) {
-        ratio = .0000000001;
+        ratio = 0.0000000001;
       }
       leftOutput = outputMagnitude;
       rightOutput = outputMagnitude / ratio;

@@ -41,8 +41,10 @@ class Robot : public frc::TimedRobot {
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  frc::TrapezoidProfile::Constraints m_constraints{1.75_mps, 0.75_mps_sq};
-  frc::ProfiledPIDController m_controller{1.3, 0.0, 0.7, m_constraints, kDt};
+  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{1.75_mps,
+                                                                  0.75_mps_sq};
+  frc::ProfiledPIDController<units::meters> m_controller{1.3, 0.0, 0.7,
+                                                         m_constraints, kDt};
 };
 
 #ifndef RUNNING_FRC_TESTS

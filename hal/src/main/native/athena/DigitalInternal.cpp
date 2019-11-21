@@ -103,9 +103,9 @@ void initializeDigital(int32_t* status) {
                     (kSystemClockTicksPerMicrosecond * 1e3);
 
   pwmSystem->writeConfig_Period(
-      static_cast<uint16_t>(kDefaultPwmPeriod / loopTime + .5), status);
+      static_cast<uint16_t>(kDefaultPwmPeriod / loopTime + 0.5), status);
   uint16_t minHigh = static_cast<uint16_t>(
-      (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + .5);
+      (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + 0.5);
   pwmSystem->writeConfig_MinHigh(minHigh, status);
   // Ensure that PWM output values are set to OFF
   for (uint8_t pwmIndex = 0; pwmIndex < kNumPWMChannels; pwmIndex++) {

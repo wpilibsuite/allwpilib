@@ -35,7 +35,7 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 double DriveSubsystem::GetAverageEncoderDistance() {
-  return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.;
+  return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
 }
 
 frc::Encoder& DriveSubsystem::GetLeftEncoder() { return m_leftEncoder; }

@@ -30,12 +30,12 @@ public final class Constants {
     public static final boolean kLeftEncoderReversed = false;
     public static final boolean kRightEncoderReversed = true;
 
-    public static final double kTrackwidthMeters = .6;
+    public static final double kTrackwidthMeters = 0.6;
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackwidthMeters);
 
     public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = .15;
+    public static final double kWheelDiameterMeters = 0.15;
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
@@ -48,11 +48,11 @@ public final class Constants {
     // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
     public static final double ksVolts = 1;
-    public static final double kvVoltSecondsPerMeter = .8;
-    public static final double kaVoltSecondsSquaredPerMeter = .15;
+    public static final double kvVoltSecondsPerMeter = 0.8;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.15;
 
     // Example value only - as above, this must be tuned for your drive!
-    public static final double kPDriveVel = .5;
+    public static final double kPDriveVel = 0.5;
   }
 
   public static final class OIConstants {
@@ -69,6 +69,6 @@ public final class Constants {
 
     // Reasonable baseline values for a RAMSETE Controller in units of meters and seconds
     public static final double kRamseteB = 2;
-    public static final double kRamseteZeta = .7;
+    public static final double kRamseteZeta = 0.7;
   }
 }

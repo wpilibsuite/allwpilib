@@ -17,9 +17,9 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/trajectory/Trajectory.h>
-#include <frc2/Timer.h>
 #include <units/units.h>
 
+#include "frc2/Timer.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -42,7 +42,6 @@ namespace frc2 {
  * @see Trajectory
  */
 class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
-
  public:
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -58,7 +57,8 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * the odometry classes to provide this.
    * @param controller      The RAMSETE controller used to follow the
    * trajectory.
-   * @param feedforward     A component for calculating the feedforward for the drive.
+   * @param feedforward     A component for calculating the feedforward for the
+   * drive.
    * @param kinematics      The kinematics for the robot drivetrain.
    * @param wheelSpeeds     A function that supplies the speeds of the left
    * and right sides of the robot drive.

@@ -8,44 +8,37 @@
 #include "frc/AddressableLED.h"
 
 #include <hal/AddressableLED.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
+#include <hal/PWM.h>
+#include <hal/Ports.h>
 
-#include "frc/PWM.h"
 #include "frc/WPIErrors.h"
 
 using namespace frc;
 
-AddressableLED::AddressableLED(PWM& output)
-    : m_pwmOutput{&output, NullDeleter<PWM>()} {
-  Init();
-}
-
-AddressableLED::AddressableLED(PWM* output)
-    : m_pwmOutput{output, NullDeleter<PWM>()} {
-  if (m_pwmOutput == nullptr) {
-    wpi_setWPIError(NullParameter);
-  } else {
-    Init();
-  }
-}
-
-AddressableLED::AddressableLED(std::shared_ptr<PWM> output)
-    : m_pwmOutput{std::move(output)} {
-  Init();
-}
-
-AddressableLED::AddressableLED(int port)
-    : m_pwmOutput{std::make_shared<PWM>(port)} {
-  if (!m_pwmOutput->StatusIsFatal()) {
-    Init();
-  }
-}
-
-AddressableLED::~AddressableLED() { HAL_FreeAddressableLED(m_handle); }
-
-void AddressableLED::Init() {
+AddressableLED::AddressableLED(int port) {
   int32_t status = 0;
-  m_handle = HAL_InitializeAddressableLED(m_pwmOutput->m_handle, &status);
+
+  m_pwmHandle = HAL_InitializePWMPort(HAL_GetPort(port), &status);
+  wpi_setHALErrorWithRange(status, 0, HAL_GetNumPWMChannels(), port);
+  if (m_pwmHandle == HAL_kInvalidHandle) {
+    return;
+  }
+
+  m_handle = HAL_InitializeAddressableLED(m_pwmHandle, &status);
   wpi_setHALError(status);
+  if (m_handle == HAL_kInvalidHandle) {
+    HAL_FreePWMPort(m_pwmHandle, &status);
+  }
+
+  HAL_Report(HALUsageReporting::kResourceType_AddressableLEDs, port + 1);
+}
+
+AddressableLED::~AddressableLED() {
+  HAL_FreeAddressableLED(m_handle);
+  int32_t status = 0;
+  HAL_FreePWMPort(m_pwmHandle, &status);
 }
 
 void AddressableLED::SetLength(int length) {

@@ -43,7 +43,7 @@ class PIDInputOutputTest {
     double out = 0;
 
     for (int i = 0; i < 5; i++) {
-      out = m_controller.calculate(.025, 0);
+      out = m_controller.calculate(0.025, 0);
     }
 
     assertEquals(-0.5 * m_controller.getPeriod(), out, 1e-5);

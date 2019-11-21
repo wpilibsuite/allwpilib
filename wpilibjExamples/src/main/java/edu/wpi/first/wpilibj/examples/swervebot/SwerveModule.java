@@ -8,7 +8,8 @@
 package edu.wpi.first.wpilibj.examples.swervebot;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -23,8 +24,8 @@ public class SwerveModule {
   private static final double kModuleMaxAngularAcceleration
       = 2 * Math.PI; // radians per second squared
 
-  private final Spark m_driveMotor;
-  private final Spark m_turningMotor;
+  private final SpeedController m_driveMotor;
+  private final SpeedController m_turningMotor;
 
   private final Encoder m_driveEncoder = new Encoder(0, 1);
   private final Encoder m_turningEncoder = new Encoder(2, 3);
@@ -42,8 +43,8 @@ public class SwerveModule {
    * @param turningMotorChannel ID for the turning motor.
    */
   public SwerveModule(int driveMotorChannel, int turningMotorChannel) {
-    m_driveMotor = new Spark(driveMotorChannel);
-    m_turningMotor = new Spark(turningMotorChannel);
+    m_driveMotor = new PWMVictorSPX(driveMotorChannel);
+    m_turningMotor = new PWMVictorSPX(turningMotorChannel);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder

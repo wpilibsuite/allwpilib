@@ -154,7 +154,7 @@ public class Pose2d {
    *
    * @param twist The change in pose in the robot's coordinate frame since the
    *              previous pose update. For example, if a non-holonomic robot moves forward
-   *              0.01 meters and changes angle by .5 degrees since the previous pose update,
+   *              0.01 meters and changes angle by 0.5 degrees since the previous pose update,
    *              the twist would be Twist2d{0.01, 0.0, toRadians(0.5)}
    * @return The new pose of the robot.
    */

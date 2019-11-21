@@ -124,7 +124,7 @@ public class ProfiledPIDCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    m_useOutput.accept(0., new State());
+    m_useOutput.accept(0.0, new State());
   }
 
   /**

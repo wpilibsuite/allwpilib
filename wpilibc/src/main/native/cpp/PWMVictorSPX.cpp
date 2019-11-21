@@ -14,7 +14,7 @@
 using namespace frc;
 
 PWMVictorSPX::PWMVictorSPX(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.004, 1.52, 1.50, 1.48, .997);
+  SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);
   SetZeroLatch();

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,7 +49,7 @@ TEST(MotorEncoderConnectorTest, TestWithoutDistancePerPulseRealisitcUpdate) {
   frc::sim::lowfi::MotorEncoderConnector connector(motorSim, encoderSim);
 
   talon.Set(0.5);
-  motorSim.Update(.02);
+  motorSim.Update(0.02);
   connector.Update();
 
   // Position
@@ -64,7 +64,7 @@ TEST(MotorEncoderConnectorTest, TestWithoutDistancePerPulseRealisitcUpdate) {
 TEST(MotorEncoderConnectorTest, TestWithDistancePerPulseFullSpeed) {
   frc::Talon talon{3};
   frc::Encoder encoder{3, 1};
-  encoder.SetDistancePerPulse(.001);
+  encoder.SetDistancePerPulse(0.001);
 
   frc::sim::lowfi::SimpleMotorModel motorModelSim(6000);
   frc::sim::lowfi::WpiMotorSim motorSim(3, motorModelSim);
@@ -88,7 +88,7 @@ TEST(MotorEncoderConnectorTest, TestWithDistancePerPulseFullSpeed) {
 TEST(MotorEncoderConnectorTest, TestWithDistancePerPulseRealistic) {
   frc::Talon talon{3};
   frc::Encoder encoder{3, 1};
-  encoder.SetDistancePerPulse(.001);
+  encoder.SetDistancePerPulse(0.001);
 
   frc::sim::lowfi::SimpleMotorModel motorModelSim(6000);
   frc::sim::lowfi::WpiMotorSim motorSim(3, motorModelSim);
@@ -97,7 +97,7 @@ TEST(MotorEncoderConnectorTest, TestWithDistancePerPulseRealistic) {
 
   talon.Set(0.5);
 
-  motorSim.Update(.02);
+  motorSim.Update(0.02);
   connector.Update();
 
   // Position

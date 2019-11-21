@@ -18,7 +18,7 @@ class CommandDecoratorTest : public CommandTestBase {};
 TEST_F(CommandDecoratorTest, WithTimeoutTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  auto command = RunCommand([] {}, {}).WithTimeout(.1_s);
+  auto command = RunCommand([] {}, {}).WithTimeout(100_ms);
 
   scheduler.Schedule(&command);
 

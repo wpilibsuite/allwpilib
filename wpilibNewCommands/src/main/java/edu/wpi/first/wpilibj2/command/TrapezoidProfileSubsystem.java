@@ -30,7 +30,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
                                    double initialPosition) {
     m_constraints = constraints;
     m_state = new TrapezoidProfile.State(initialPosition, 0);
-    m_period = .02;
+    m_period = 0.02;
   }
 
   /**

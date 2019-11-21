@@ -27,7 +27,7 @@ TEST_F(PIDInputOutputTest, ContinuousInputTest) {
 TEST_F(PIDInputOutputTest, ProportionalGainOutputTest) {
   controller->SetP(4);
 
-  EXPECT_DOUBLE_EQ(-.1, controller->Calculate(.025, 0));
+  EXPECT_DOUBLE_EQ(-0.1, controller->Calculate(0.025, 0));
 }
 
 TEST_F(PIDInputOutputTest, IntegralGainOutputTest) {
@@ -36,10 +36,10 @@ TEST_F(PIDInputOutputTest, IntegralGainOutputTest) {
   double out = 0;
 
   for (int i = 0; i < 5; i++) {
-    out = controller->Calculate(.025, 0);
+    out = controller->Calculate(0.025, 0);
   }
 
-  EXPECT_DOUBLE_EQ(-.5 * controller->GetPeriod().to<double>(), out);
+  EXPECT_DOUBLE_EQ(-0.5 * controller->GetPeriod().to<double>(), out);
 }
 
 TEST_F(PIDInputOutputTest, DerivativeGainOutputTest) {
@@ -47,6 +47,6 @@ TEST_F(PIDInputOutputTest, DerivativeGainOutputTest) {
 
   controller->Calculate(0, 0);
 
-  EXPECT_DOUBLE_EQ(-.01_s / controller->GetPeriod(),
-                   controller->Calculate(.0025, 0));
+  EXPECT_DOUBLE_EQ(-10_ms / controller->GetPeriod(),
+                   controller->Calculate(0.0025, 0));
 }

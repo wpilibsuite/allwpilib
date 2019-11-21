@@ -84,7 +84,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_upSource = null;
     m_downSource = null;
 
-    setMaxPeriod(.5);
+    setMaxPeriod(0.5);
 
     HAL.report(tResourceType.kResourceType_Counter, m_index + 1, mode.value + 1);
     SendableRegistry.addLW(this, "Counter", m_index);
