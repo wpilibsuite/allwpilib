@@ -13,13 +13,14 @@ using namespace ArmConstants;
 using State = frc::TrapezoidProfile<units::radians>::State;
 
 ArmSubsystem::ArmSubsystem()
-    : frc2::ProfiledPIDSubsystem(frc::ProfiledPIDController<units::radians>(
-          kP, 0, 0, {kMaxVelocity, kMaxAcceleration})),
+    : frc2::ProfiledPIDSubsystem<units::radians>(
+          frc::ProfiledPIDController<units::radians>(
+              kP, 0, 0, {kMaxVelocity, kMaxAcceleration})),
       m_motor(kMotorPort),
       m_encoder(kEncoderPorts[0], kEncoderPorts[1]),
       m_feedforward(kS, kCos, kV, kA),
       // Start arm at rest in neutral position
-      m_goal{kArmOffset., 0_mps} {
+      m_goal{kArmOffset, 0_rad_per_s} {
   m_encoder.SetDistancePerPulse(kEncoderDistancePerPulse.to<double>());
 }
 
@@ -37,7 +38,6 @@ void ArmSubsystem::SetGoal(units::radian_t goal) {
 
 State ArmSubsystem::GetGoal() { return m_goal; }
 
-units::meter_t ArmSubsystem::GetMeasurement() {
-  return units::meter_t(m_encoder.GetDistance()) +
-         units::meter_t(kArmOffset.to<double>());
+units::radian_t ArmSubsystem::GetMeasurement() {
+  return units::radian_t(m_encoder.GetDistance()) + kArmOffset;
 }
