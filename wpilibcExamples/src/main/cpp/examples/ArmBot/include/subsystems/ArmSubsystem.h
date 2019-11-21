@@ -17,7 +17,7 @@
  * A robot arm subsystem that moves with a motion profile.
  */
 class ArmSubsystem : public frc2::ProfiledPIDSubsystem<units::radians> {
-  using State = frc::TrapezoidProfile<units:radian>::State;
+  using State = frc::TrapezoidProfile<units::radians>::State;
 
  public:
   ArmSubsystem();
