@@ -42,7 +42,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * the trajectory but rather goes to the angle given in the final state of the trajectory.
  */
 
-@SuppressWarnings("PMD.TooManyFields")
+@SuppressWarnings({"PMD.TooManyFields", "MemberName"})
 public class MecanumFollowerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private MecanumDriveWheelSpeeds m_prevSpeeds;
@@ -54,8 +54,8 @@ public class MecanumFollowerCommand extends CommandBase {
   private final Supplier<Pose2d> m_pose;
   private final SimpleMotorFeedforward m_feedforward;
   private final MecanumDriveKinematics m_kinematics;
-  private final PIDController m_xdController;
-  private final PIDController m_ydController;
+  private final PIDController m_xController;
+  private final PIDController m_yController;
   private final ProfiledPIDController m_thetaController;
   private final double m_maxWheelVelocityMetersPerSecond;
   private final PIDController m_frontLeftController;
@@ -82,9 +82,9 @@ public class MecanumFollowerCommand extends CommandBase {
    *                                          the odometry classes to provide this.
    * @param feedforward                       The feedforward to use for the drivetrain.
    * @param kinematics                        The kinematics for the robot drivetrain.
-   * @param xdController                      The Trajectory Tracker PID controller
+   * @param xController                      The Trajectory Tracker PID controller
    *                                          for the robot's x position.
-   * @param ydController                      The Trajectory Tracker PID controller
+   * @param yController                      The Trajectory Tracker PID controller
    *                                          for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
@@ -100,14 +100,14 @@ public class MecanumFollowerCommand extends CommandBase {
    * @param requirements                      The subsystems to require.
    */
 
-  @SuppressWarnings("PMD.ExcessiveParameterList")
+  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
   public MecanumFollowerCommand(Trajectory trajectory,
                                 Supplier<Pose2d> pose,
                                 SimpleMotorFeedforward feedforward,
                                 MecanumDriveKinematics kinematics,
 
-                                PIDController xdController,
-                                PIDController ydController,
+                                PIDController xController,
+                                PIDController yController,
                                 ProfiledPIDController thetaController,
 
                                 double maxWheelVelocityMetersPerSecond,
@@ -126,9 +126,9 @@ public class MecanumFollowerCommand extends CommandBase {
     m_feedforward = requireNonNullParam(feedforward, "feedforward", "MecanumFollowerCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "MecanumFollowerCommand");
 
-    m_xdController = requireNonNullParam(xdController, "xdController",
+    m_xController = requireNonNullParam(xController, "xController",
       "MecanumFollowerCommand");
-    m_ydController = requireNonNullParam(ydController, "ydController",
+    m_yController = requireNonNullParam(yController, "yController",
       "MecanumFollowerCommand");
     m_thetaController = requireNonNullParam(thetaController, "thetaController",
       "MecanumFollowerCommand");
@@ -172,9 +172,9 @@ public class MecanumFollowerCommand extends CommandBase {
    * @param pose                              A function that supplies the robot pose - use one of
    *                                          the odometry classes to provide this.
    * @param kinematics                        The kinematics for the robot drivetrain.
-   * @param xdController                      The Trajectory Tracker PID controller
+   * @param xController                      The Trajectory Tracker PID controller
    *                                          for the robot's x position.
-   * @param ydController                      The Trajectory Tracker PID controller
+   * @param yController                      The Trajectory Tracker PID controller
    *                                          for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
@@ -184,12 +184,12 @@ public class MecanumFollowerCommand extends CommandBase {
    * @param requirements                      The subsystems to require.
    */
 
-  @SuppressWarnings("PMD.ExcessiveParameterList")
+  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
   public MecanumFollowerCommand(Trajectory trajectory,
                                 Supplier<Pose2d> pose,
                                 MecanumDriveKinematics kinematics,
-                                PIDController xdController,
-                                PIDController ydController,
+                                PIDController xController,
+                                PIDController yController,
                                 ProfiledPIDController thetaController,
 
                                 double maxWheelVelocityMetersPerSecond,
@@ -202,10 +202,10 @@ public class MecanumFollowerCommand extends CommandBase {
     m_kinematics = requireNonNullParam(kinematics,
       "kinematics", "MecanumFollowerCommand");
 
-    m_xdController = requireNonNullParam(xdController,
-      "xdController", "MecanumFollowerCommand");
-    m_ydController = requireNonNullParam(ydController,
-      "xdController", "MecanumFollowerCommand");
+    m_xController = requireNonNullParam(xController,
+      "xController", "MecanumFollowerCommand");
+    m_yController = requireNonNullParam(yController,
+      "xController", "MecanumFollowerCommand");
     m_thetaController = requireNonNullParam(thetaController,
       "thetaController", "MecanumFollowerCommand");
 
@@ -258,11 +258,11 @@ public class MecanumFollowerCommand extends CommandBase {
 
     var poseError = desiredPose.relativeTo(m_pose.get());
 
-    double targetXVel = m_xdController.calculate(
+    double targetXVel = m_xController.calculate(
         m_pose.get().getTranslation().getX(),
         desiredPose.getTranslation().getX());
 
-    double targetYVel = m_ydController.calculate(
+    double targetYVel = m_yController.calculate(
         m_pose.get().getTranslation().getY(),
         desiredPose.getTranslation().getY());
 

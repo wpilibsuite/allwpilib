@@ -34,6 +34,8 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * <p>The robot angle controller does not follow the angle given by
  * the trajectory but rather goes to the angle given in the final state of the trajectory.
  */
+
+@SuppressWarnings("MemberName")
 public class SwerveFollowerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private Pose2d m_finalPose;
@@ -41,8 +43,8 @@ public class SwerveFollowerCommand extends CommandBase {
   private final Trajectory m_trajectory;
   private final Supplier<Pose2d> m_pose;
   private final SwerveDriveKinematics m_kinematics;
-  private final PIDController m_xdController;
-  private final PIDController m_ydController;
+  private final PIDController m_xController;
+  private final PIDController m_yController;
   private final ProfiledPIDController m_thetaController;
   private final Consumer<SwerveModuleState[]> m_outputModuleStates;
 
@@ -61,9 +63,9 @@ public class SwerveFollowerCommand extends CommandBase {
    * @param pose                              A function that supplies the robot pose - use one of
    *                                          the odometry classes to provide this.
    * @param kinematics                        The kinematics for the robot drivetrain.
-   * @param xdController                      The Trajectory Tracker PID controller
+   * @param xController                      The Trajectory Tracker PID controller
    *                                          for the robot's x position.
-   * @param ydController                      The Trajectory Tracker PID controller
+   * @param yController                      The Trajectory Tracker PID controller
    *                                          for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID controller
    *                                          for angle for the robot.
@@ -72,11 +74,12 @@ public class SwerveFollowerCommand extends CommandBase {
    * @param requirements                      The subsystems to require.
    */
 
+  @SuppressWarnings("ParameterName")
   public SwerveFollowerCommand(Trajectory trajectory,
                                Supplier<Pose2d> pose,
                                SwerveDriveKinematics kinematics,
-                               PIDController xdController,
-                               PIDController ydController,
+                               PIDController xController,
+                               PIDController yController,
                                ProfiledPIDController thetaController,
 
                                Consumer<SwerveModuleState[]> outputModuleStates,
@@ -85,10 +88,10 @@ public class SwerveFollowerCommand extends CommandBase {
     m_pose = requireNonNullParam(pose, "pose", "SwerveFollowerCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "SwerveFollowerCommand");
 
-    m_xdController = requireNonNullParam(xdController,
-      "xdController", "SwerveFollowerCommand");
-    m_ydController = requireNonNullParam(ydController,
-      "xdController", "SwerveFollowerCommand");
+    m_xController = requireNonNullParam(xController,
+      "xController", "SwerveFollowerCommand");
+    m_yController = requireNonNullParam(yController,
+      "xController", "SwerveFollowerCommand");
     m_thetaController = requireNonNullParam(thetaController,
       "thetaController", "SwerveFollowerCommand");
 
@@ -115,11 +118,11 @@ public class SwerveFollowerCommand extends CommandBase {
 
     var poseError = desiredPose.relativeTo(m_pose.get());
 
-    double targetXVel = m_xdController.calculate(
+    double targetXVel = m_xController.calculate(
         m_pose.get().getTranslation().getX(),
         desiredPose.getTranslation().getX());
 
-    double targetYVel = m_ydController.calculate(
+    double targetYVel = m_yController.calculate(
         m_pose.get().getTranslation().getY(),
         desiredPose.getTranslation().getY());
 

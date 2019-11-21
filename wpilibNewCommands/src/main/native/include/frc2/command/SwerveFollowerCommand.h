@@ -74,9 +74,9 @@ class SwerveFollowerCommand
    * pose - use one of the odometry classes to provide this.
    * @param kinematics                        The kinematics for the robot
    * drivetrain.
-   * @param xdController                      The Trajectory Tracker PID
+   * @param xController                      The Trajectory Tracker PID
    * controller for the robot's x position.
-   * @param ydController                      The Trajectory Tracker PID
+   * @param yController                      The Trajectory Tracker PID
    * controller for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID
    * controller for angle for the robot.
