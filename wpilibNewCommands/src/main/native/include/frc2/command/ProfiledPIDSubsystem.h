@@ -65,7 +65,7 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    *
    * @return the measurement of the process variable
    */
-  virtual units::meter_t GetMeasurement() = 0;
+  virtual Distance_t GetMeasurement() = 0;
 
   /**
    * Enables the PID control.  Resets the controller.

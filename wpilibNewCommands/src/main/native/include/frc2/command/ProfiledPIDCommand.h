@@ -139,7 +139,7 @@ class ProfiledPIDCommand
 
  protected:
   frc::ProfiledPIDController<Distance> m_controller;
-  std::function<units::unit_t<Distance>> m_measurement;
+  std::function<Distance_t> m_measurement;
   std::function<State()> m_goal;
   std::function<void(double, State)> m_useOutput;
 };
