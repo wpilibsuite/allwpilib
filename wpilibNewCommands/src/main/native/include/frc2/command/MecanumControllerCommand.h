@@ -9,18 +9,18 @@
 #include <functional>
 #include <memory>
 
+#include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <frc/kinematics/MecanumDriveKinematics.h>
+#include <frc/kinematics/MecanumDriveWheelSpeeds.h>
+#include <frc/trajectory/Trajectory.h>
 #include <units/units.h>
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc/controller/PIDController.h"
-#include "frc/controller/ProfiledPIDController.h"
-#include "frc/controller/SimpleMotorFeedforward.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "frc/kinematics/MecanumDriveKinematics.h"
-#include "frc/kinematics/MecanumDriveWheelSpeeds.h"
-#include "frc/trajectory/Trajectory.h"
 #include "frc2/Timer.h"
 
 #pragma once
@@ -93,15 +93,15 @@ class MecanumControllerCommand
       frc::SimpleMotorFeedforward<units::meters> feedforward,
       frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
       frc2::PIDController yController,
-      frc::ProfiledPIDController thetaController,
+      frc::ProfiledPIDController<units::radians> thetaController,
       units::meters_per_second_t maxWheelVelocity,
       std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
       frc2::PIDController frontLeftController,
       frc2::PIDController rearLeftController,
       frc2::PIDController frontRightController,
       frc2::PIDController rearRightController,
-      std::function<void(units::volt_t, units::volt_t,
-                         units::volt_t, units::volt_t)>
+      std::function<void(units::volt_t, units::volt_t, units::volt_t,
+                         units::volt_t)>
           output,
       std::initializer_list<Subsystem*> requirements);
 
@@ -138,7 +138,7 @@ class MecanumControllerCommand
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
       frc2::PIDController yController,
-      frc::ProfiledPIDController thetaController,
+      frc::ProfiledPIDController<units::radians> thetaController,
       units::meters_per_second_t maxWheelVelocity,
       std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                          units::meters_per_second_t,
@@ -161,7 +161,7 @@ class MecanumControllerCommand
   frc::MecanumDriveKinematics m_kinematics;
   std::unique_ptr<frc2::PIDController> m_xController;
   std::unique_ptr<frc2::PIDController> m_yController;
-  std::unique_ptr<frc::ProfiledPIDController> m_thetaController;
+  std::unique_ptr<frc::ProfiledPIDController<units::radians>> m_thetaController;
   const units::meters_per_second_t m_maxWheelVelocity;
   std::unique_ptr<frc2::PIDController> m_frontLeftController;
   std::unique_ptr<frc2::PIDController> m_rearLeftController;
@@ -171,8 +171,8 @@ class MecanumControllerCommand
   std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                      units::meters_per_second_t, units::meters_per_second_t)>
       m_outputVel;
-  std::function<void(units::volt_t, units::volt_t,
-                     units::volt_t, units::volt_t)>
+  std::function<void(units::volt_t, units::volt_t, units::volt_t,
+                     units::volt_t)>
       m_outputVolts;
 
   bool m_usePID;

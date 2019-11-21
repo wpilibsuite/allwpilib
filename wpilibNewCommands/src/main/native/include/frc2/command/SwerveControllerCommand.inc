@@ -4,7 +4,10 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
+
 #pragma once
+
+#include <memory>
 
 namespace frc2 {
 
@@ -13,7 +16,7 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
     frc2::PIDController xController, frc2::PIDController yController,
-    frc::ProfiledPIDController thetaController,
+    frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
@@ -22,7 +25,8 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
       m_xController(std::make_unique<frc2::PIDController>(xController)),
       m_yController(std::make_unique<frc2::PIDController>(yController)),
       m_thetaController(
-          std::make_unique<frc::ProfiledPIDController>(thetaController)),
+          std::make_unique<frc::ProfiledPIDController<units::radians>>(
+              thetaController)),
       m_outputStates(output) {
   this->AddRequirements(requirements);
 }
@@ -44,23 +48,19 @@ void SwerveControllerCommand<NumModules>::Execute() {
 
   auto m_poseError = m_desiredPose.RelativeTo(m_pose());
 
-  auto targetXVel =
-      units::meters_per_second_t(m_xController->Calculate(
-          (m_pose().Translation().X().template to<double>()),
-          (m_desiredPose.Translation().X().template to<double>())));
-  auto targetYVel =
-      units::meters_per_second_t(m_yController->Calculate(
-          (m_pose().Translation().Y().template to<double>()),
-          (m_desiredPose.Translation().Y().template to<double>())));
+  auto targetXVel = units::meters_per_second_t(m_xController->Calculate(
+      (m_pose().Translation().X().template to<double>()),
+      (m_desiredPose.Translation().X().template to<double>())));
+  auto targetYVel = units::meters_per_second_t(m_yController->Calculate(
+      (m_pose().Translation().Y().template to<double>()),
+      (m_desiredPose.Translation().Y().template to<double>())));
 
   // Profiled PID Controller only takes meters as setpoint and measurement
   // The robot will go to the desired rotation of the final pose in the
   // trajectory, not following the poses at individual states.
-  auto targetAngularVel = units::radians_per_second_t(
-      m_thetaController->Calculate(
-          units::meter_t(m_pose().Rotation().Radians().template to<double>()),
-          units::meter_t(
-              m_finalPose.Rotation().Radians().template to<double>())));
+  auto targetAngularVel =
+      units::radians_per_second_t(m_thetaController->Calculate(
+          m_pose().Rotation().Radians(), m_finalPose.Rotation().Radians()));
 
   auto vRef = m_desiredState.velocity;
 

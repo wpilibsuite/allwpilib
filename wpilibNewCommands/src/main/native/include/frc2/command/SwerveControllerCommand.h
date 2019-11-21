@@ -9,17 +9,17 @@
 #include <functional>
 #include <memory>
 
+#include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/geometry/Pose2d.h>
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <frc/kinematics/SwerveDriveKinematics.h>
+#include <frc/kinematics/SwerveModuleState.h>
+#include <frc/trajectory/Trajectory.h>
 #include <units/units.h>
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc/controller/PIDController.h"
-#include "frc/controller/ProfiledPIDController.h"
-#include "frc/geometry/Pose2d.h"
-#include "frc/kinematics/ChassisSpeeds.h"
-#include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc/kinematics/SwerveModuleState.h"
-#include "frc/trajectory/Trajectory.h"
 #include "frc2/Timer.h"
 
 #pragma once
@@ -88,7 +88,7 @@ class SwerveControllerCommand
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
       frc2::PIDController xController, frc2::PIDController yController,
-      frc::ProfiledPIDController thetaController,
+      frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
       std::initializer_list<Subsystem*> requirements);
@@ -107,7 +107,7 @@ class SwerveControllerCommand
   frc::SwerveDriveKinematics<NumModules> m_kinematics;
   std::unique_ptr<frc2::PIDController> m_xController;
   std::unique_ptr<frc2::PIDController> m_yController;
-  std::unique_ptr<frc::ProfiledPIDController> m_thetaController;
+  std::unique_ptr<frc::ProfiledPIDController<units::radians>> m_thetaController;
   std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
       m_outputStates;
 

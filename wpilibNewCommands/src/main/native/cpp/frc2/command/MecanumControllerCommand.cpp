@@ -14,15 +14,16 @@ MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController, frc::ProfiledPIDController thetaController,
+    frc2::PIDController yController,
+    frc::ProfiledPIDController<units::radians> thetaController,
     units::meters_per_second_t maxWheelVelocity,
     std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
     frc2::PIDController frontLeftController,
     frc2::PIDController rearLeftController,
     frc2::PIDController frontRightController,
     frc2::PIDController rearRightController,
-    std::function<void(units::volt_t, units::volt_t,
-                       units::volt_t, units::volt_t)>
+    std::function<void(units::volt_t, units::volt_t, units::volt_t,
+                       units::volt_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
@@ -32,7 +33,8 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_xController(std::make_unique<frc2::PIDController>(xController)),
       m_yController(std::make_unique<frc2::PIDController>(yController)),
       m_thetaController(
-          std::make_unique<frc::ProfiledPIDController>(thetaController)),
+          std::make_unique<frc::ProfiledPIDController<units::radians>>(
+              thetaController)),
       m_maxWheelVelocity(maxWheelVelocity),
       m_frontLeftController(
           std::make_unique<frc2::PIDController>(frontLeftController)),
@@ -51,7 +53,8 @@ MecanumControllerCommand::MecanumControllerCommand(
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
-    frc2::PIDController yController, frc::ProfiledPIDController thetaController,
+    frc2::PIDController yController,
+    frc::ProfiledPIDController<units::radians> thetaController,
     units::meters_per_second_t maxWheelVelocity,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                        units::meters_per_second_t, units::meters_per_second_t)>
@@ -63,7 +66,8 @@ MecanumControllerCommand::MecanumControllerCommand(
       m_xController(std::make_unique<frc2::PIDController>(xController)),
       m_yController(std::make_unique<frc2::PIDController>(yController)),
       m_thetaController(
-          std::make_unique<frc::ProfiledPIDController>(thetaController)),
+          std::make_unique<frc::ProfiledPIDController<units::radians>>(
+              thetaController)),
       m_maxWheelVelocity(maxWheelVelocity),
       m_outputVel(output),
       m_usePID(false) {
@@ -79,8 +83,8 @@ void MecanumControllerCommand::Initialize() {
   auto initialYVelocity =
       initialState.velocity * initialState.pose.Rotation().Sin();
 
-  m_prevSpeeds = m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds{
-      initialXVelocity, initialYVelocity, 0_rad_per_s});
+  m_prevSpeeds = m_kinematics.ToWheelSpeeds(
+      frc::ChassisSpeeds{initialXVelocity, initialYVelocity, 0_rad_per_s});
 
   m_timer.Reset();
   m_timer.Start();
@@ -111,10 +115,8 @@ void MecanumControllerCommand::Execute() {
   // Profiled PID Controller only takes meters as setpoint and measurement
   // The robot will go to the desired rotation of the final pose in the
   // trajectory, not following the poses at individual states.
-  auto targetAngularVel =
-      radians_per_second_t(m_thetaController->Calculate(
-          units::meter_t(m_pose().Rotation().Radians().to<double>()),
-          units::meter_t(m_finalPose.Rotation().Radians().to<double>())));
+  auto targetAngularVel = radians_per_second_t(m_thetaController->Calculate(
+      m_pose().Rotation().Radians(), m_finalPose.Rotation().Radians()));
 
   auto vRef = m_desiredState.velocity;
 

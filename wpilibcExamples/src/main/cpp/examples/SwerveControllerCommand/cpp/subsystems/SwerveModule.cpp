@@ -37,7 +37,8 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel,
 
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
-  m_turningPIDController.EnableContinuousInput(-wpi::math::pi, wpi::math::pi);
+  m_turningPIDController.EnableContinuousInput(units::radian_t(-wpi::math::pi),
+                                               units::radian_t(wpi::math::pi));
 }
 
 frc::SwerveModuleState SwerveModule::GetState() {
@@ -52,10 +53,7 @@ void SwerveModule::SetDesiredState(frc::SwerveModuleState& state) {
 
   // Calculate the turning motor output from the turning PID controller.
   auto turnOutput = m_turningPIDController.Calculate(
-      units::meter_t(m_turningEncoder.Get()),
-      // We have to convert to the meters type here because that's what
-      // ProfiledPIDController wants.
-      units::meter_t(state.angle.Radians().to<double>()));
+      units::radian_t(m_turningEncoder.Get()), state.angle.Radians());
 
   // Set the motor outputs.
   m_driveMotor.Set(driveOutput);

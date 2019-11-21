@@ -80,8 +80,9 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
       frc2::PIDController(AutoConstants::kPXController, 0, 0),
       frc2::PIDController(AutoConstants::kPYController, 0, 0),
-      frc::ProfiledPIDController(AutoConstants::kPThetaController, 0, 0,
-                                 AutoConstants::kThetaControllerConstraints),
+      frc::ProfiledPIDController<units::radians>(
+          AutoConstants::kPThetaController, 0, 0,
+          AutoConstants::kThetaControllerConstraints),
 
       AutoConstants::kMaxSpeed,
 

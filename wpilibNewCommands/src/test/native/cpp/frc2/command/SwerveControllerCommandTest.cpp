@@ -5,6 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <frc2/Timer.h>
+#include <frc2/command/Subsystem.h>
+#include <frc2/command/SwerveControllerCommand.h>
+
+#include <iostream>
+
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
@@ -12,21 +18,19 @@
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/kinematics/SwerveModuleState.h>
-#include <frc2/Timer.h>
-#include <frc2/command/Subsystem.h>
-#include <frc2/command/SwerveControllerCommand.h>
-
-#include <iostream>
-
+#include <frc/trajectory/TrajectoryGenerator.h>
 #include <wpi/math>
 
-#include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
 class SwerveControllerCommandTest : public ::testing::Test {
+  using radians_per_second_squared_t =
+      units::compound_unit<units::radians,
+                           units::inverse<units::squared<units::second>>>;
+
  protected:
   frc2::Timer m_rotTimer;
   frc::Rotation2d m_angle{0_rad};
@@ -35,8 +39,10 @@ class SwerveControllerCommandTest : public ::testing::Test {
       frc::SwerveModuleState{}, frc::SwerveModuleState{},
       frc::SwerveModuleState{}, frc::SwerveModuleState{}};
 
-  frc::ProfiledPIDController m_rotController{
-      1, 0, 0, frc::TrapezoidProfile::Constraints{9_mps, 3_mps_sq}};
+  frc::ProfiledPIDController<units::radians> m_rotController{
+      1, 0, 0,
+      frc::TrapezoidProfile<units::radians>::Constraints{
+          9_rad_per_s, units::unit_t<radians_per_second_squared_t>(3)}};
 
   static constexpr units::meter_t kxTolerance{1 / 12.0};
   static constexpr units::meter_t kyTolerance{1 / 12.0};

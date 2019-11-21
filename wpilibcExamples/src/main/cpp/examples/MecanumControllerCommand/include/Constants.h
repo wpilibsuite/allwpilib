@@ -83,9 +83,8 @@ constexpr double kPXController = 0.5;
 constexpr double kPYController = 0.5;
 constexpr double kPThetaController = 0.5;
 
-constexpr frc::TrapezoidProfile::Constraints kThetaControllerConstraints{
-    units::meters_per_second_t(kMaxAngularSpeed.to<double>()),
-    units::meters_per_second_squared_t(kMaxAngularAcceleration.to<double>())};
+constexpr frc::TrapezoidProfile<units::radians>::Constraints
+    kThetaControllerConstraints{kMaxAngularSpeed, kMaxAngularAcceleration};
 
 }  // namespace AutoConstants
 
