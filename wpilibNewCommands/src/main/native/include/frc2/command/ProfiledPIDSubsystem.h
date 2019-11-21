@@ -25,7 +25,7 @@ class ProfiledPIDSubsystem : public SubsystemBase {
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Velocity_t = units::unit_t<Velocity>;
-  using State = frc::TrapezoidProfile<Distance>::State;
+  using State = typename frc::TrapezoidProfile<Distance>::State;
 
  public:
   /**
@@ -65,7 +65,7 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    *
    * @return the measurement of the process variable
    */
-  virtual units::meter_t GetMeasurement() = 0;
+  virtual Distance_t GetMeasurement() = 0;
 
   /**
    * Enables the PID control.  Resets the controller.

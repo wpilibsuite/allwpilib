@@ -32,7 +32,7 @@ class ProfiledPIDCommand
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Velocity_t = units::unit_t<Velocity>;
-  using State = frc::TrapezoidProfile<Distance>::State;
+  using State = typename frc::TrapezoidProfile<Distance>::State;
 
  public:
   /**
@@ -139,7 +139,7 @@ class ProfiledPIDCommand
 
  protected:
   frc::ProfiledPIDController<Distance> m_controller;
-  std::function<units::unit_t<Distance>> m_measurement;
+  std::function<Distance_t> m_measurement;
   std::function<State()> m_goal;
   std::function<void(double, State)> m_useOutput;
 };

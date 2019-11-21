@@ -30,7 +30,7 @@ class TrapezoidProfileCommand
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Velocity_t = units::unit_t<Velocity>;
-  using State = frc::TrapezoidProfile<Distance>::State;
+  using State = typename frc::TrapezoidProfile<Distance>::State;
  public:
   /**
    * Creates a new TrapezoidProfileCommand that will execute the given
