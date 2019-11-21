@@ -57,15 +57,17 @@ class SwerveControllerCommand
 
  public:
   /**
-   * Constructs a new SwerveControllerCommand that when executed will follow the provided
-   * trajectory. This command will not return output voltages but rather raw module states from the
-   * position controllers which need to be put into a velocity PID.
+   * Constructs a new SwerveControllerCommand that when executed will follow the
+   * provided trajectory. This command will not return output voltages but
+   * rather raw module states from the position controllers which need to be put
+   * into a velocity PID.
    *
-   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
-   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon
+   * completion of the path- this is left to the user, since it is not
+   * appropriate for paths with nonstationary endstates.
    *
-   * <p>Note 2: The rotation controller will calculate the rotation based on the final pose
-   * in the trajectory, not the poses at each time step.
+   * <p>Note 2: The rotation controller will calculate the rotation based on the
+   * final pose in the trajectory, not the poses at each time step.
    *
    * @param trajectory      The trajectory to follow.
    * @param pose            A function that supplies the robot pose,
