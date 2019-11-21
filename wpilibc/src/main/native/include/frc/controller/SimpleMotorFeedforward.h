@@ -66,6 +66,7 @@ class SimpleMotorFeedforward {
    */
   constexpr units::unit_t<Velocity> MaxAchievableVelocity(
       units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+    // Assume max velocity is positive
     return (maxVoltage - kS - kA * acceleration) / kV;
   }
 
@@ -79,6 +80,7 @@ class SimpleMotorFeedforward {
    */
   constexpr units::unit_t<Velocity> MinAchievableVelocity(
       units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+    // Assume min velocity is positive, ks flips sign
     return (-maxVoltage + kS - kA * acceleration) / kV;
   }
 

@@ -73,6 +73,7 @@ class ArmFeedforward {
   units::unit_t<Velocity> MaxAchievableVelocity(
       units::volt_t maxVoltage, Angle angle,
       units::unit_t<Acceleration> acceleration) {
+    // Assume max velocity is positive
     return (maxVoltage - kS - kCos * units::math::cos(angle) -
             kA * acceleration) /
            kV;
@@ -90,6 +91,7 @@ class ArmFeedforward {
   units::unit_t<Velocity> MinAchievableVelocity(
       units::volt_t maxVoltage, Angle angle,
       units::unit_t<Acceleration> acceleration) {
+    // Assume min velocity is negative, ks flips sign
     return (-maxVoltage + kS - kCos * units::math::cos(angle) -
             kA * acceleration) /
            kV;

@@ -74,6 +74,7 @@ public class SimpleMotorFeedforward {
    * @return The maximum possible velocity at the given acceleration.
    */
   public double maxAchievableVelocity(double maxVoltage, double acceleration) {
+    // Assume max velocity is positive
     return (maxVoltage - ks - acceleration * ka) / kv;
   }
 
@@ -85,6 +86,7 @@ public class SimpleMotorFeedforward {
    * @return The minimum possible velocity at the given acceleration.
    */
   public double minAchievableVelocity(double maxVoltage, double acceleration) {
+    // Assume min velocity is negative, ks flips sign
     return (-maxVoltage + ks - acceleration * ka) / kv;
   }
 

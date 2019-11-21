@@ -57,9 +57,6 @@ public class ElevatorFeedforward {
     return ks * Math.signum(velocity) + kg + kv * velocity + ka * acceleration;
   }
 
-  // Rearranging the main equation from the calculate() method yields the
-  // formulas for the methods below:
-
   /**
    * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to
    * be zero).
@@ -71,6 +68,9 @@ public class ElevatorFeedforward {
     return calculate(velocity, 0);
   }
 
+  // Rearranging the main equation from the calculate() method yields the
+  // formulas for the methods below:
+
   /**
    * Calculates the maximum achievable velocity given a maximum voltage supply and an acceleration.
    *
@@ -79,6 +79,7 @@ public class ElevatorFeedforward {
    * @return The maximum possible velocity at the given acceleration.
    */
   public double maxAchievableVelocity(double maxVoltage, double acceleration) {
+    // Assume max velocity is positive
     return (maxVoltage - ks - kg - acceleration * ka) / kv;
   }
 
@@ -90,6 +91,7 @@ public class ElevatorFeedforward {
    * @return The minimum possible velocity at the given acceleration.
    */
   public double minAchievableVelocity(double maxVoltage, double acceleration) {
+    // Assume min velocity is negative, ks flips sign
     return (-maxVoltage + ks - kg - acceleration * ka) / kv;
   }
 

@@ -60,9 +60,6 @@ public class ArmFeedforward {
         + ka * accelRadPerSecSquared;
   }
 
-  // Rearranging the main equation from the calculate() method yields the
-  // formulas for the methods below:
-
   /**
    * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to
    * be zero).
@@ -74,6 +71,9 @@ public class ArmFeedforward {
     return calculate(positionRadians, velocity, 0);
   }
 
+  // Rearranging the main equation from the calculate() method yields the
+  // formulas for the methods below:
+
   /**
    * Calculates the maximum achievable velocity given a maximum voltage supply, a position, and an
    * acceleration.
@@ -84,6 +84,7 @@ public class ArmFeedforward {
    * @return The maximum possible velocity at the given acceleration and angle.
    */
   public double maxAchievableVelocity(double maxVoltage, double angle, double acceleration) {
+    // Assume max velocity is positive
     return (maxVoltage - ks - Math.cos(angle) * kcos - acceleration * ka) / kv;
   }
 
@@ -97,6 +98,7 @@ public class ArmFeedforward {
    * @return The minimum possible velocity at the given acceleration and angle.
    */
   public double minAchievableVelocity(double maxVoltage, double angle, double acceleration) {
+    // Assume min velocity is negative, ks flips sign
     return (-maxVoltage + ks - Math.cos(angle) * kcos - acceleration * ka) / kv;
   }
 
