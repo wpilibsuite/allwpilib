@@ -71,8 +71,8 @@ public final class Constants {
     // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
     public static final double ksVolts = 1;
-    public static final double kvVoltSecondsPerMeter = .8;
-    public static final double kaVoltSecondsSquaredPerMeter = .15;
+    public static final double kvVoltSecondsPerMeter = 0.8;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.15;
 
   }
 
@@ -81,7 +81,7 @@ public final class Constants {
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
 
     public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = .15;
+    public static final double kWheelDiameterMeters = 0.15;
     public static final double kDriveEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;

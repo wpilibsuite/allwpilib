@@ -50,7 +50,7 @@ public final class Constants {
           new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = .15;
+    public static final double kWheelDiameterMeters = 0.15;
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
@@ -66,10 +66,10 @@ public final class Constants {
         new SimpleMotorFeedforward(1, 0.8, 0.15);
 
     // Example value only - as above, this must be tuned for your drive!
-    public static final double kPFrontLeftVel = .5;
-    public static final double kPRearLeftVel = .5;
-    public static final double kPFrontRightVel = .5;
-    public static final double kPRearRightVel = .5;
+    public static final double kPFrontLeftVel = 0.5;
+    public static final double kPRearLeftVel = 0.5;
+    public static final double kPFrontRightVel = 0.5;
+    public static final double kPRearRightVel = 0.5;
 
   }
 
@@ -84,9 +84,9 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = .5;
-    public static final double kPYController = .5;
-    public static final double kPThetaController = .5;
+    public static final double kPXController = 0.5;
+    public static final double kPYController = 0.5;
+    public static final double kPThetaController = 0.5;
 
     //Constraint for the motion profilied robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =

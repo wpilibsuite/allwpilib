@@ -61,14 +61,14 @@ constexpr bool kGyroReversed = false;
 // Toolsuite provides a convenient tool for obtaining these values for your
 // robot.
 constexpr auto ks = 1_V;
-constexpr auto kv = .8 * 1_V * 1_s / 1_m;
-constexpr auto ka = .15 * 1_V * 1_s * 1_s / 1_m;
+constexpr auto kv = 0.8 * 1_V * 1_s / 1_m;
+constexpr auto ka = 0.15 * 1_V * 1_s * 1_s / 1_m;
 
 // Example value only - as above, this must be tuned for your drive!
-constexpr double kPFrontLeftVel = .5;
-constexpr double kPRearLeftVel = .5;
-constexpr double kPFrontRightVel = .5;
-constexpr double kPRearRightVel = .5;
+constexpr double kPFrontLeftVel = 0.5;
+constexpr double kPRearLeftVel = 0.5;
+constexpr double kPFrontRightVel = 0.5;
+constexpr double kPRearRightVel = 0.5;
 }  // namespace DriveConstants
 
 namespace ModuleConstants {
@@ -97,9 +97,9 @@ constexpr auto kMaxAngularSpeed = units::radians_per_second_t(3.142);
 constexpr auto kMaxAngularAcceleration =
     units::unit_t<radians_per_second_squared_t>(3.142);
 
-constexpr double kPXController = .5;
-constexpr double kPYController = .5;
-constexpr double kPThetaController = .5;
+constexpr double kPXController = 0.5;
+constexpr double kPYController = 0.5;
+constexpr double kPThetaController = 0.5;
 
 //
 
