@@ -59,7 +59,10 @@ class ElevatorFeedforward {
 
   /**
    * Calculates the maximum achievable velocity given a maximum voltage supply
-   * and an acceleration.
+   * and an acceleration.  Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
+   * achievable - enter the acceleration constraint, and this will give you
+   * a simultaneously-achievable velocity constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the elevator.
    * @param acceleration The acceleration of the elevator.
@@ -73,7 +76,10 @@ class ElevatorFeedforward {
 
   /**
    * Calculates the minimum achievable velocity given a maximum voltage supply
-   * and an acceleration.
+   * and an acceleration.  Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
+   * achievable - enter the acceleration constraint, and this will give you
+   * a simultaneously-achievable velocity constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the elevator.
    * @param acceleration The acceleration of the elevator.
@@ -87,7 +93,10 @@ class ElevatorFeedforward {
 
   /**
    * Calculates the maximum achievable acceleration given a maximum voltage
-   * supply and a velocity.
+   * supply and a velocity. Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
+   * achievable - enter the velocity constraint, and this will give you
+   * a simultaneously-achievable velocity constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the elevator.
    * @param velocity The velocity of the elevator.
@@ -100,7 +109,10 @@ class ElevatorFeedforward {
 
   /**
    * Calculates the minimum achievable acceleration given a maximum voltage
-   * supply and a velocity.
+   * supply and a velocity. Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
+   * achievable - enter the velocity constraint, and this will give you
+   * a simultaneously-achievable velocity constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the elevator.
    * @param velocity The velocity of the elevator.

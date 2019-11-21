@@ -63,7 +63,10 @@ class ArmFeedforward {
 
   /**
    * Calculates the maximum achievable velocity given a maximum voltage supply,
-   * a position, and an acceleration.
+   * a position, and an acceleration.  Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
+   * achievable - enter the acceleration constraint, and this will give you
+   * a simultaneously-achievable velocity constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
    * @param angle The angle of the arm
@@ -81,7 +84,10 @@ class ArmFeedforward {
 
   /**
    * Calculates the minimum achievable velocity given a maximum voltage supply,
-   * a position, and an acceleration.
+   * a position, and an acceleration.  Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
+   * achievable - enter the acceleration constraint, and this will give you
+   * a simultaneously-achievable velocity constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
    * @param angle The angle of the arm
@@ -99,7 +105,10 @@ class ArmFeedforward {
 
   /**
    * Calculates the maximum achievable acceleration given a maximum voltage
-   * supply, a position, and a velocity.
+   * supply, a position, and a velocity. Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
+   * achievable - enter the velocity constraint, and this will give you
+   * a simultaneously-achievable velocity constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
    * @param angle The angle of the arm
@@ -115,7 +124,10 @@ class ArmFeedforward {
 
   /**
    * Calculates the minimum achievable acceleration given a maximum voltage
-   * supply, a position and a velocity.
+   * supply, a position, and a velocity. Useful for ensuring that velocity and
+   * acceleration constraints for a trapezoidal profile are simultaneously
+   * achievable - enter the velocity constraint, and this will give you
+   * a simultaneously-achievable velocity constraint.
    *
    * @param maxVoltage The maximum voltage that can be supplied to the arm.
    * @param angle The angle of the arm
