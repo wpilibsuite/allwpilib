@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <initializer_list>
+#include <utility>
 
 #include <frc/controller/ProfiledPIDController.h>
 #include <units/units.h>
@@ -50,10 +51,10 @@ class ProfiledPIDCommand
                      std::function<State()> goalSource,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements = {})
-                     : m_controller{controller},
-                           m_measurement{std::move(measurementSource)},
-                           m_goal{std::move(goalSource)},
-                           m_useOutput{std::move(useOutput)} {
+      : m_controller{controller},
+        m_measurement{std::move(measurementSource)},
+        m_goal{std::move(goalSource)},
+        m_useOutput{std::move(useOutput)} {
     AddRequirements(requirements);
   }
 
@@ -72,11 +73,11 @@ class ProfiledPIDCommand
                      std::function<units::unit_t<Distance>> goalSource,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
-                     : ProfiledPIDCommand(controller, measurementSource,
-                                          [&goalSource]() {
-                                            return State{goalSource(), 0_mps};
-                                          },
-                                          useOutput, requirements) {}
+      : ProfiledPIDCommand(controller, measurementSource,
+                           [&goalSource]() {
+                             return State{goalSource(), 0_mps};
+                           },
+                           useOutput, requirements) {}
 
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -92,8 +93,8 @@ class ProfiledPIDCommand
                      std::function<units::unit_t<Distance>> measurementSource,
                      State goal, std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
-                     : ProfiledPIDCommand(controller, measurementSource, [goal] { return goal; },
-                                          useOutput, requirements) {}
+      : ProfiledPIDCommand(controller, measurementSource,
+                           [goal] { return goal; }, useOutput, requirements) {}
 
   /**
    * Creates a new PIDCommand, which controls the given output with a
@@ -110,8 +111,8 @@ class ProfiledPIDCommand
                      units::meter_t goal,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
-                     : ProfiledPIDCommand(controller, measurementSource, [goal] { return goal; },
-                                          useOutput, requirements) {}
+      : ProfiledPIDCommand(controller, measurementSource,
+                           [goal] { return goal; }, useOutput, requirements) {}
 
   ProfiledPIDCommand(ProfiledPIDCommand&& other) = default;
 
@@ -133,9 +134,7 @@ class ProfiledPIDCommand
    *
    * @return The ProfiledPIDController
    */
-  frc::ProfiledPIDController<Distance>& GetController() {
-    return m_controller;
-  }
+  frc::ProfiledPIDController<Distance>& GetController() { return m_controller; }
 
  protected:
   frc::ProfiledPIDController<Distance> m_controller;

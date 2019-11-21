@@ -13,9 +13,9 @@
 #endif
 
 #include <memory>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
-#include <type_traits>
 #include <vector>
 
 #include "frc2/command/CommandBase.h"

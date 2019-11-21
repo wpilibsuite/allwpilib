@@ -11,8 +11,8 @@
 #include <initializer_list>
 
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <frc2/Timer.h>
 
+#include "frc2/Timer.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -31,6 +31,7 @@ class TrapezoidProfileCommand
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Velocity_t = units::unit_t<Velocity>;
   using State = typename frc::TrapezoidProfile<Distance>::State;
+
  public:
   /**
    * Creates a new TrapezoidProfileCommand that will execute the given
@@ -39,10 +40,9 @@ class TrapezoidProfileCommand
    * @param profile The motion profile to execute.
    * @param output  The consumer for the profile output.
    */
-  TrapezoidProfileCommand(
-      frc::TrapezoidProfile<Distance> profile,
-      std::function<void(State)> output,
-      std::initializer_list<Subsystem*> requirements)
+  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
+                          std::function<void(State)> output,
+                          std::initializer_list<Subsystem*> requirements)
       : m_profile(profile), m_output(output) {
     AddRequirements(requirements);
   }
@@ -52,9 +52,7 @@ class TrapezoidProfileCommand
     m_timer.Start();
   }
 
-  void Execute() override {
-    m_output(m_profile.Calculate(m_timer.Get()));
-  }
+  void Execute() override { m_output(m_profile.Calculate(m_timer.Get())); }
 
   void End(bool interrupted) override { m_timer.Stop(); }
 

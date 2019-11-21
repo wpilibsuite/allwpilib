@@ -1,8 +1,42 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  gtest/
+  ni-libraries/include/
+  ni-libraries/lib/
+  FRCNetComm\.java$
+  simulation/frc_gazebo_plugins/frcgazebo/
+  simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
+}
+
+modifiableFileExclude {
+  \.so$
+}
+
+repoRootNameOverride {
+  wpilib
+}
+
 includeOtherLibs {
-  ^HAL/
-  ^networktables/
+  ^cameraserver/
+  ^cscore
   ^frc/
+  ^hal/
+  ^imgui
+  ^mockdata/
+  ^networktables/
+  ^ntcore
+  ^opencv2/
+  ^support/
   ^units/
+  ^vision/
   ^wpi/
-  ^frc2/Timer
 }

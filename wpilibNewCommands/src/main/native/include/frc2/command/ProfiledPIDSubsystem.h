@@ -34,7 +34,7 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    * @param controller the ProfiledPIDController to use
    */
   explicit ProfiledPIDSubsystem(frc::ProfiledPIDController<Distance> controller)
-                                : m_controller{controller} {}
+      : m_controller{controller} {}
 
   void Periodic() override {
     if (m_enabled) {
@@ -79,18 +79,16 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    * Disables the PID control.  Sets output to zero.
    */
   virtual void Disable() {
-     UseOutput(0, State{Distance_t(0), Velocity_t(0)});
-     m_enabled = false;
-   }
+    UseOutput(0, State{Distance_t(0), Velocity_t(0)});
+    m_enabled = false;
+  }
 
   /**
    * Returns the ProfiledPIDController.
    *
    * @return The controller.
    */
-  frc::ProfiledPIDController<Distance>& GetController() {
-    return m_controller;
-  }
+  frc::ProfiledPIDController<Distance>& GetController() { return m_controller; }
 
  protected:
   frc::ProfiledPIDController<Distance> m_controller;
