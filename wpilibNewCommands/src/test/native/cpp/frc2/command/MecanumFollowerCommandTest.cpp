@@ -42,14 +42,14 @@ class MecanumFollowerCommandTest : public ::testing::Test {
   static constexpr units::meter_t kyTolerance{1 / 12.0};
   static constexpr units::radian_t kAngularTolerance{1 / 12.0};
 
-  static constexpr units::meter_t kTrackLength{0.5};
+  static constexpr units::meter_t kWheelBase{0.5};
   static constexpr units::meter_t kTrackWidth{0.5};
 
   frc::MecanumDriveKinematics m_kinematics{
-      frc::Translation2d{kTrackLength / 2, kTrackWidth / 2},
-      frc::Translation2d{kTrackLength / 2, -kTrackWidth / 2},
-      frc::Translation2d{-kTrackLength / 2, kTrackWidth / 2},
-      frc::Translation2d{-kTrackLength / 2, -kTrackWidth / 2}};
+      frc::Translation2d{kWheelBase / 2, kTrackWidth / 2},
+      frc::Translation2d{kWheelBase / 2, -kTrackWidth / 2},
+      frc::Translation2d{-kWheelBase / 2, kTrackWidth / 2},
+      frc::Translation2d{-kWheelBase / 2, -kTrackWidth / 2}};
 
   frc::MecanumDriveOdometry m_odometry{m_kinematics, 0_rad,
                                        frc::Pose2d{0_m, 0_m, 0_rad}};

@@ -132,10 +132,10 @@ public class SwerveFollowerCommand extends CommandBase {
         m_pose.get().getRotation().getRadians(),
         m_finalPose.getRotation().getRadians());
 
-    double dvRef = desiredState.velocityMetersPerSecond;
+    double vRef = desiredState.velocityMetersPerSecond;
 
-    targetXVel += dvRef * poseError.getRotation().getCos();
-    targetYVel += dvRef * poseError.getRotation().getSin();
+    targetXVel += vRef * poseError.getRotation().getCos();
+    targetYVel += vRef * poseError.getRotation().getSin();
 
     var targetChassisSpeeds = new ChassisSpeeds(targetXVel, targetYVel, targetAngularVel);
 

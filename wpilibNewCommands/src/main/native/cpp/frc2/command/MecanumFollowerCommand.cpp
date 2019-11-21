@@ -11,23 +11,20 @@ using namespace frc2;
 using namespace units;
 
 template <typename T>
-int sgn(T val) {
-  return (T(0) < val) - (val < T(0));
-}
 
 MecanumFollowerCommand::MecanumFollowerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
     frc2::PIDController yController, frc::ProfiledPIDController thetaController,
-    units::meters_per_second_t MaxWheelVelocityMetersPerSecond,
+    units::meters_per_second_t maxWheelVelocity,
     std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
     frc2::PIDController frontLeftController,
     frc2::PIDController rearLeftController,
     frc2::PIDController frontRightController,
     frc2::PIDController rearRightController,
-    std::function<void(units::voltage::volt_t, units::voltage::volt_t,
-                       units::voltage::volt_t, units::voltage::volt_t)>
+    std::function<void(units::volt_t, units::volt_t,
+                       units::volt_t, units::volt_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
     : m_trajectory(trajectory),
@@ -38,7 +35,7 @@ MecanumFollowerCommand::MecanumFollowerCommand(
       m_yController(std::make_unique<frc2::PIDController>(yController)),
       m_thetaController(
           std::make_unique<frc::ProfiledPIDController>(thetaController)),
-      m_maxWheelVelocityMetersPerSecond(MaxWheelVelocityMetersPerSecond),
+      m_maxWheelVelocity(maxWheelVelocity),
       m_frontLeftController(
           std::make_unique<frc2::PIDController>(frontLeftController)),
       m_rearLeftController(
@@ -57,7 +54,7 @@ MecanumFollowerCommand::MecanumFollowerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
     frc2::PIDController yController, frc::ProfiledPIDController thetaController,
-    units::meters_per_second_t MaxWheelVelocityMetersPerSecond,
+    units::meters_per_second_t maxWheelVelocity,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
@@ -69,7 +66,7 @@ MecanumFollowerCommand::MecanumFollowerCommand(
       m_yController(std::make_unique<frc2::PIDController>(yController)),
       m_thetaController(
           std::make_unique<frc::ProfiledPIDController>(thetaController)),
-      m_maxWheelVelocityMetersPerSecond(MaxWheelVelocityMetersPerSecond),
+      m_maxWheelVelocity(maxWheelVelocity),
       m_outputVel(output),
       m_usePID(false) {
   AddRequirements(requirements);
@@ -85,7 +82,7 @@ void MecanumFollowerCommand::Initialize() {
       initialState.velocity * initialState.pose.Rotation().Sin();
 
   m_prevSpeeds = m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds{
-      initialXVelocity, initialYVelocity, units::radians_per_second_t(0)});
+      initialXVelocity, initialYVelocity, 0_rad_per_s});
 
   m_timer.Reset();
   m_timer.Start();
@@ -106,10 +103,10 @@ void MecanumFollowerCommand::Execute() {
 
   auto m_poseError = m_desiredPose.RelativeTo(m_pose());
 
-  auto targetXVel = velocity::meters_per_second_t(
+  auto targetXVel = meters_per_second_t(
       m_xController->Calculate((m_pose().Translation().X().to<double>()),
                                (m_desiredPose.Translation().X().to<double>())));
-  auto targetYVel = velocity::meters_per_second_t(
+  auto targetYVel = meters_per_second_t(
       m_yController->Calculate((m_pose().Translation().Y().to<double>()),
                                (m_desiredPose.Translation().Y().to<double>())));
 
@@ -117,7 +114,7 @@ void MecanumFollowerCommand::Execute() {
   // The robot will go to the desired rotation of the final pose in the
   // trajectory, not following the poses at individual states.
   auto targetAngularVel =
-      angular_velocity::radians_per_second_t(m_thetaController->Calculate(
+      radians_per_second_t(m_thetaController->Calculate(
           units::meter_t(m_pose().Rotation().Radians().to<double>()),
           units::meter_t(m_finalPose.Rotation().Radians().to<double>())));
 
@@ -131,7 +128,7 @@ void MecanumFollowerCommand::Execute() {
 
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(targetChassisSpeeds);
 
-  targetWheelSpeeds.Normalize(m_maxWheelVelocityMetersPerSecond);
+  targetWheelSpeeds.Normalize(m_maxWheelVelocity);
 
   auto frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeft;
   auto rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeft;

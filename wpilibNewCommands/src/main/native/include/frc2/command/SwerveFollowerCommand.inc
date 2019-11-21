@@ -7,9 +7,6 @@
 #pragma once
 
 template <typename T>
-int sgn(T val) {
-  return (T(0) < val) - (val < T(0));
-}
 
 namespace frc2 {
 
@@ -50,18 +47,18 @@ void SwerveFollowerCommand<NumModules>::Execute() {
   auto m_poseError = m_desiredPose.RelativeTo(m_pose());
 
   auto targetXVel =
-      units::velocity::meters_per_second_t(m_xController->Calculate(
+      units::meters_per_second_t(m_xController->Calculate(
           (m_pose().Translation().X().template to<double>()),
           (m_desiredPose.Translation().X().template to<double>())));
   auto targetYVel =
-      units::velocity::meters_per_second_t(m_yController->Calculate(
+      units::meters_per_second_t(m_yController->Calculate(
           (m_pose().Translation().Y().template to<double>()),
           (m_desiredPose.Translation().Y().template to<double>())));
 
   // Profiled PID Controller only takes meters as setpoint and measurement
   // The robot will go to the desired rotation of the final pose in the
   // trajectory, not following the poses at individual states.
-  auto targetAngularVel = units::angular_velocity::radians_per_second_t(
+  auto targetAngularVel = units::radians_per_second_t(
       m_thetaController->Calculate(
           units::meter_t(m_pose().Rotation().Radians().template to<double>()),
           units::meter_t(

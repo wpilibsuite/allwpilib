@@ -54,14 +54,14 @@ public final class Constants {
 
     public static final double kTrackWidth = 0.5;
     //Distance between centers of right and left wheels on robot
-    public static final double kTrackLength = 0.7;
+    public static final double kWheelBase = 0.7;
     //Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
-          new Translation2d(kTrackLength / 2, kTrackWidth / 2),
-          new Translation2d(kTrackLength / 2, -kTrackWidth / 2),
-          new Translation2d(-kTrackLength / 2, kTrackWidth / 2),
-          new Translation2d(-kTrackLength / 2, -kTrackWidth / 2));
+          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final boolean kGyroReversed = false;
 

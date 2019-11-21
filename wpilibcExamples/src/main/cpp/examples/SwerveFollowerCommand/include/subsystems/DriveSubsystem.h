@@ -93,14 +93,14 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   units::meter_t kTrackWidth =
       .5_m;  // Distance between centers of right and left wheels on robot
-  units::meter_t kTrackLength =
+  units::meter_t kWheelBase =
       .7_m;  // Distance between centers of front and back wheels on robot
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
-      frc::Translation2d(kTrackLength / 2, kTrackWidth / 2),
-      frc::Translation2d(kTrackLength / 2, -kTrackWidth / 2),
-      frc::Translation2d(-kTrackLength / 2, kTrackWidth / 2),
-      frc::Translation2d(-kTrackLength / 2, -kTrackWidth / 2)};
+      frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),
+      frc::Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+      frc::Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+      frc::Translation2d(-kWheelBase / 2, -kTrackWidth / 2)};
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

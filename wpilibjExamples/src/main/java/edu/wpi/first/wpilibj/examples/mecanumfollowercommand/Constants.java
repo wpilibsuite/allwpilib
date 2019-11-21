@@ -39,15 +39,15 @@ public final class Constants {
 
     public static final double kTrackWidth = 0.5;
     // Distance between centers of right and left wheels on robot
-    public static final double kTrackLength = 0.7;
+    public static final double kWheelBase = 0.7;
     // Distance between centers of front and back wheels on robot
 
     public static final MecanumDriveKinematics kDriveKinematics =
         new MecanumDriveKinematics(
-          new Translation2d(kTrackLength / 2, kTrackWidth / 2),
-          new Translation2d(kTrackLength / 2, -kTrackWidth / 2),
-          new Translation2d(-kTrackLength / 2, kTrackWidth / 2),
-          new Translation2d(-kTrackLength / 2, -kTrackWidth / 2));
+          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final int kEncoderCPR = 1024;
     public static final double kWheelDiameterMeters = .15;

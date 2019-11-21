@@ -73,7 +73,7 @@ class MecanumFollowerCommand
    * controller for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID
    * controller for angle for the robot.
-   * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a
+   * @param maxWheelVelocity   The maximum velocity of a
    * drivetrain wheel.
    * @param currentWheelSpeeds                A MecanumDriveWheelSpeeds object
    * containing
@@ -93,14 +93,14 @@ class MecanumFollowerCommand
       frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
       frc2::PIDController yController,
       frc::ProfiledPIDController thetaController,
-      units::meters_per_second_t MaxWheelVelocityMetersPerSecond,
+      units::meters_per_second_t maxWheelVelocity,
       std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
       frc2::PIDController frontLeftController,
       frc2::PIDController rearLeftController,
       frc2::PIDController frontRightController,
       frc2::PIDController rearRightController,
-      std::function<void(units::voltage::volt_t, units::voltage::volt_t,
-                         units::voltage::volt_t, units::voltage::volt_t)>
+      std::function<void(units::volt_t, units::volt_t,
+                         units::volt_t, units::volt_t)>
           output,
       std::initializer_list<Subsystem*> requirements);
 
@@ -127,7 +127,7 @@ class MecanumFollowerCommand
    * controller for the robot's y position.
    * @param thetaController                   The Trajectory Tracker PID
    * controller for angle for the robot.
-   * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a
+   * @param maxWheelVelocity   The maximum velocity of a
    * drivetrain wheel.
    * @param output                            The output of the velocity PID's
    * in meters per second.
@@ -138,7 +138,7 @@ class MecanumFollowerCommand
       frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
       frc2::PIDController yController,
       frc::ProfiledPIDController thetaController,
-      units::meters_per_second_t MaxWheelVelocityMetersPerSecond,
+      units::meters_per_second_t maxWheelVelocity,
       std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
@@ -161,7 +161,7 @@ class MecanumFollowerCommand
   std::unique_ptr<frc2::PIDController> m_xController;
   std::unique_ptr<frc2::PIDController> m_yController;
   std::unique_ptr<frc::ProfiledPIDController> m_thetaController;
-  const units::meters_per_second_t m_maxWheelVelocityMetersPerSecond;
+  const units::meters_per_second_t m_maxWheelVelocity;
   std::unique_ptr<frc2::PIDController> m_frontLeftController;
   std::unique_ptr<frc2::PIDController> m_rearLeftController;
   std::unique_ptr<frc2::PIDController> m_frontRightController;
@@ -170,8 +170,8 @@ class MecanumFollowerCommand
   std::function<void(units::meters_per_second_t, units::meters_per_second_t,
                      units::meters_per_second_t, units::meters_per_second_t)>
       m_outputVel;
-  std::function<void(units::voltage::volt_t, units::voltage::volt_t,
-                     units::voltage::volt_t, units::voltage::volt_t)>
+  std::function<void(units::volt_t, units::volt_t,
+                     units::volt_t, units::volt_t)>
       m_outputVolts;
 
   bool m_usePID;

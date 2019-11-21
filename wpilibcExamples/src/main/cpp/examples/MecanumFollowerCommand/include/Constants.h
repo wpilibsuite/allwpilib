@@ -40,7 +40,7 @@ constexpr bool kRearRightEncoderReversed = true;
 
 constexpr auto kTrackWidth =
     .5_m;  // Distance between centers of right and left wheels on robot
-constexpr auto kTrackLength =
+constexpr auto kWheelBase =
     .7_m;  // Distance between centers of front and back wheels on robot
 extern const frc::MecanumDriveKinematics kDriveKinematics;
 
@@ -82,8 +82,6 @@ constexpr auto kMaxAngularAcceleration =
 constexpr double kPXController = .5;
 constexpr double kPYController = .5;
 constexpr double kPThetaController = .5;
-
-//
 
 constexpr frc::TrapezoidProfile::Constraints kThetaControllerConstraints{
     units::meters_per_second_t(kMaxAngularSpeed.to<double>()),

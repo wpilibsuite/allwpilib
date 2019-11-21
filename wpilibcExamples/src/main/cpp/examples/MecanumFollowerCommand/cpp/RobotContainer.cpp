@@ -23,10 +23,10 @@
 using namespace DriveConstants;
 
 const frc::MecanumDriveKinematics DriveConstants::kDriveKinematics{
-    frc::Translation2d(kTrackLength / 2, kTrackWidth / 2),
-    frc::Translation2d(kTrackLength / 2, -kTrackWidth / 2),
-    frc::Translation2d(-kTrackLength / 2, kTrackWidth / 2),
-    frc::Translation2d(-kTrackLength / 2, -kTrackWidth / 2)};
+    frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),
+    frc::Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+    frc::Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+    frc::Translation2d(-kWheelBase / 2, -kTrackWidth / 2)};
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -100,9 +100,9 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc2::PIDController(DriveConstants::kPFrontRightVel, 0, 0),
       frc2::PIDController(DriveConstants::kPRearRightVel, 0, 0),
 
-      [this](units::voltage::volt_t frontLeft, units::voltage::volt_t rearLeft,
-             units::voltage::volt_t frontRight,
-             units::voltage::volt_t rearRight) {
+      [this](units::volt_t frontLeft, units::volt_t rearLeft,
+             units::volt_t frontRight,
+             units::volt_t rearRight) {
         m_drive.SetSpeedControllersVolts(frontLeft, rearLeft, frontRight,
                                          rearRight);
       },
