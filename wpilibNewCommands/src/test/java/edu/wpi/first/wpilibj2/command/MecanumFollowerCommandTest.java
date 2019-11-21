@@ -42,14 +42,14 @@ class MecanumFollowerCommandTest {
   private static final double kxTolerance = 1 / 12.0;
   private static final double kyTolerance = 1 / 12.0;
 
-  private static final double m_trackLength = 0.5;
-  private static final double m_trackWidth = 0.5;
+  private static final double kTrackLength = 0.5;
+  private static final double kTrackWidth = 0.5;
 
   private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
-      new Translation2d(m_trackLength / 2, m_trackWidth / 2),
-      new Translation2d(m_trackLength / 2, -m_trackWidth / 2),
-      new Translation2d(-m_trackLength / 2, m_trackWidth / 2),
-      new Translation2d(-m_trackLength / 2, -m_trackWidth / 2));
+      new Translation2d(kTrackLength / 2, kTrackWidth / 2),
+      new Translation2d(kTrackLength / 2, -kTrackWidth / 2),
+      new Translation2d(-kTrackLength / 2, kTrackWidth / 2),
+      new Translation2d(-kTrackLength / 2, -kTrackWidth / 2));
 
   private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
       new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));

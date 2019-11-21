@@ -15,7 +15,6 @@ int sgn(T val) {
   return (T(0) < val) - (val < T(0));
 }
 
-
 MecanumFollowerCommand::MecanumFollowerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
@@ -54,7 +53,6 @@ MecanumFollowerCommand::MecanumFollowerCommand(
   AddRequirements(requirements);
 }
 
-
 MecanumFollowerCommand::MecanumFollowerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
@@ -82,15 +80,12 @@ void MecanumFollowerCommand::Initialize() {
   auto initialState = m_trajectory.Sample(0_s);
 
   auto initialXVelocity =
-      initialState.velocity *
-      initialState.pose.Rotation().Cos();
+      initialState.velocity * initialState.pose.Rotation().Cos();
   auto initialYVelocity =
-      initialState.velocity *
-      initialState.pose.Rotation().Sin();
+      initialState.velocity * initialState.pose.Rotation().Sin();
 
-  m_prevSpeeds = m_kinematics.ToWheelSpeeds(
-      frc::ChassisSpeeds{initialXVelocity, initialYVelocity,
-      units::radians_per_second_t(0)});
+  m_prevSpeeds = m_kinematics.ToWheelSpeeds(frc::ChassisSpeeds{
+      initialXVelocity, initialYVelocity, units::radians_per_second_t(0)});
 
   m_timer.Reset();
   m_timer.Start();
@@ -144,21 +139,20 @@ void MecanumFollowerCommand::Execute() {
   auto rearRightSpeedSetpoint = targetWheelSpeeds.rearRight;
 
   if (m_usePID) {
-    auto frontLeftFeedforward =
-        m_feedforward.Calculate(frontLeftSpeedSetpoint,
+    auto frontLeftFeedforward = m_feedforward.Calculate(
+        frontLeftSpeedSetpoint,
         (frontLeftSpeedSetpoint - m_prevSpeeds.frontLeft) / dt);
 
-    auto rearLeftFeedforward =
-        m_feedforward.Calculate(rearLeftSpeedSetpoint,
+    auto rearLeftFeedforward = m_feedforward.Calculate(
+        rearLeftSpeedSetpoint,
         (rearLeftSpeedSetpoint - m_prevSpeeds.rearLeft) / dt);
 
-    auto frontRightFeedforward =
-        m_feedforward.Calculate(frontRightSpeedSetpoint,
+    auto frontRightFeedforward = m_feedforward.Calculate(
+        frontRightSpeedSetpoint,
         (frontRightSpeedSetpoint - m_prevSpeeds.frontRight) / dt);
 
-
-    auto rearRightFeedforward =
-        m_feedforward.Calculate(rearRightSpeedSetpoint,
+    auto rearRightFeedforward = m_feedforward.Calculate(
+        rearRightSpeedSetpoint,
         (rearRightSpeedSetpoint - m_prevSpeeds.rearRight) / dt);
 
     auto frontLeftOutput = volt_t(m_frontLeftController->Calculate(

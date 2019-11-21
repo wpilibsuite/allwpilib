@@ -13,7 +13,6 @@
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc2/Timer.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/ProfiledPIDController.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
@@ -22,6 +21,7 @@
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
 #include "frc/trajectory/Trajectory.h"
+#include "frc2/Timer.h"
 
 #pragma once
 
@@ -33,52 +33,58 @@ namespace frc2 {
  *
  * <p>The command handles trajectory-following,
  * Velocity PID calculations, and feedforwards internally. This
- * is intended to be a more-or-less "complete solution" that can be used by teams without a great
- * deal of controls expertise.
+ * is intended to be a more-or-less "complete solution" that can be used by
+ * teams without a great deal of controls expertise.
  *
- * <p>Advanced teams seeking more flexibility (for example, those who wish to use the onboard
- * PID functionality of a "smart" motor controller) may use the secondary constructor that omits
- * the PID and feedforward functionality, returning only the raw wheel speeds from the PID
- * controllers.
+ * <p>Advanced teams seeking more flexibility (for example, those who wish to
+ * use the onboard PID functionality of a "smart" motor controller) may use the
+ * secondary constructor that omits the PID and feedforward functionality,
+ * returning only the raw wheel speeds from the PID controllers.
  *
  * <p>The robot angle controller does not follow the angle given by
- * the trajectory but rather goes to the angle given in the final state of the trajectory.
+ * the trajectory but rather goes to the angle given in the final state of the
+ * trajectory.
  */
 class MecanumFollowerCommand
     : public CommandHelper<CommandBase, MecanumFollowerCommand> {
-
  public:
   /**
-   * Constructs a new MecanumFollowerCommand that when executed will follow the provided trajectory.
-   * PID control and feedforward are handled internally,
+   * Constructs a new MecanumFollowerCommand that when executed will follow the
+   * provided trajectory. PID control and feedforward are handled internally,
    * outputs are scaled from -12 to 12 as a voltage output to the motor.
    *
-   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path
-   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon
+   * completion of the path this is left to the user, since it is not
+   * appropriate for paths with nonstationary endstates.
    *
-   * <p>Note2: The rotation controller will calculate the rotation based on the final pose in the
-   * trajectory, not the poses at each time step.
+   * <p>Note2: The rotation controller will calculate the rotation based on the
+   * final pose in the trajectory, not the poses at each time step.
    *
    * @param trajectory                        The trajectory to follow.
-   * @param pose                              A function that supplies the robot pose - use one of
-   *                                          the odometry classes to provide this.
-   * @param feedforward                       The feedforward to use for the drivetrain.
-   * @param kinematics                        The kinematics for the robot drivetrain.
-   * @param xController                       The Trajectory Tracker PID controller
-   *                                          for the robot's x position.
-   * @param yController                       The Trajectory Tracker PID controller
-   *                                          for the robot's y position.
-   * @param thetaController                   The Trajectory Tracker PID controller
-   *                                          for angle for the robot.
-   * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a drivetrain wheel.
-   * @param currentWheelSpeeds                A MecanumDriveWheelSpeeds object containing
+   * @param pose                              A function that supplies the robot
+   * pose - use one of the odometry classes to provide this.
+   * @param feedforward                       The feedforward to use for the
+   * drivetrain.
+   * @param kinematics                        The kinematics for the robot
+   * drivetrain.
+   * @param xController                       The Trajectory Tracker PID
+   * controller for the robot's x position.
+   * @param yController                       The Trajectory Tracker PID
+   * controller for the robot's y position.
+   * @param thetaController                   The Trajectory Tracker PID
+   * controller for angle for the robot.
+   * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a
+   * drivetrain wheel.
+   * @param currentWheelSpeeds                A MecanumDriveWheelSpeeds object
+   * containing
    * @param frontLeftController               The front left wheel velocity PID.
    * @param rearLeftController                The rear left wheel velocity PID.
-   * @param frontRightController              The front right wheel velocity PID.
+   * @param frontRightController              The front right wheel velocity
+   * PID.
    * @param rearRightController               The rear right wheel velocity PID.
    *                                          the current wheel speeds.
-   * @param output                            The output of the velocity PIDs and feedfrowards
-   *                                          in volts.
+   * @param output                            The output of the velocity PIDs
+   * and feedfrowards in volts.
    * @param requirements                      The subsystems to require.
    */
   MecanumFollowerCommand(
@@ -99,27 +105,32 @@ class MecanumFollowerCommand
       std::initializer_list<Subsystem*> requirements);
 
   /**
-   * Constructs a new MecanumFollowerCommand that when executed will follow the provided trajectory.
-   * The user should implement a velocity PID on the desired output wheel velocities.
+   * Constructs a new MecanumFollowerCommand that when executed will follow the
+   * provided trajectory. The user should implement a velocity PID on the
+   * desired output wheel velocities.
    *
-   * <p>Note: The controllers will *not* set the output velocities to zero upon completion of the path -
-   * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
+   * <p>Note: The controllers will *not* set the output velocities to zero upon
+   * completion of the path - this is left to the user, since it is not
+   * appropriate for paths with non-stationary end-states.
    *
-   * <p>Note 2: The rotation controller will calculate the rotation based on the final pose
-   * in the trajectory, not the poses at each time step.
+   * <p>Note 2: The rotation controller will calculate the rotation based on the
+   * final pose in the trajectory, not the poses at each time step.
    *
    * @param trajectory                        The trajectory to follow.
-   * @param pose                              A function that supplies the robot pose - use one of
-   *                                          the odometry classes to provide this.
-   * @param kinematics                        The kinematics for the robot drivetrain.
-   * @param xController                      The Trajectory Tracker PID controller
-   *                                          for the robot's x position.
-   * @param yController                      The Trajectory Tracker PID controller
-   *                                          for the robot's y position.
-   * @param thetaController                   The Trajectory Tracker PID controller
-   *                                          for angle for the robot.
-   * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a drivetrain wheel.
-   * @param output                            The output of the velocity PID's in meters per second.
+   * @param pose                              A function that supplies the robot
+   * pose - use one of the odometry classes to provide this.
+   * @param kinematics                        The kinematics for the robot
+   * drivetrain.
+   * @param xController                      The Trajectory Tracker PID
+   * controller for the robot's x position.
+   * @param yController                      The Trajectory Tracker PID
+   * controller for the robot's y position.
+   * @param thetaController                   The Trajectory Tracker PID
+   * controller for angle for the robot.
+   * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a
+   * drivetrain wheel.
+   * @param output                            The output of the velocity PID's
+   * in meters per second.
    * @param requirements                      The subsystems to require.
    */
   MecanumFollowerCommand(
