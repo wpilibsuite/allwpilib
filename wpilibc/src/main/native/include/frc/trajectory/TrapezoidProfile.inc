@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 template <class Distance>
 TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints,
                                              State goal, State initial)
@@ -52,7 +54,7 @@ TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints,
   m_endAccel = accelerationTime - cutoffBegin;
   m_endFullSpeed = m_endAccel + fullSpeedDist / m_constraints.maxVelocity;
   m_endDeccel = m_endFullSpeed + accelerationTime - cutoffEnd;
-};
+}
 
 template <class Distance>
 typename TrapezoidProfile<Distance>::State
@@ -82,7 +84,7 @@ TrapezoidProfile<Distance>::Calculate(units::second_t t) const {
   }
 
   return Direct(result);
-};
+}
 
 template <class Distance>
 units::second_t TrapezoidProfile<Distance>::TimeLeftUntil(
@@ -156,4 +158,4 @@ units::second_t TrapezoidProfile<Distance>::TimeLeftUntil(
   units::second_t fullSpeedTime = fullSpeedDist / m_constraints.maxVelocity;
 
   return accelTime + fullSpeedTime + deccelTime;
-};
+}
