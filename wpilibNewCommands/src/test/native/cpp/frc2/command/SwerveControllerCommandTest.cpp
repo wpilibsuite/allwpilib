@@ -32,7 +32,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
                            units::inverse<units::squared<units::second>>>;
 
  protected:
-  frc2::Timer m_rotTimer;
+  frc2::Timer m_timer;
   frc::Rotation2d m_angle{0_rad};
 
   std::array<frc::SwerveModuleState, 4> m_moduleStates{
@@ -65,7 +65,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
   }
 
   frc::Pose2d getRobotPose() {
-    m_odometry.Update(m_angle, getCurrentWheelSpeeds());
+    m_odometry.UpdateWithTime(m_timer.Get(), m_angle, getCurrentWheelSpeeds());
     return m_odometry.GetPose();
   }
 };
@@ -87,14 +87,14 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
       m_rotController,
       [&](auto moduleStates) { m_moduleStates = moduleStates; }, {&subsystem});
 
-  m_rotTimer.Reset();
-  m_rotTimer.Start();
+  m_timer.Reset();
+  m_timer.Start();
   command.Initialize();
   while (!command.IsFinished()) {
     command.Execute();
-    m_angle = trajectory.Sample(m_rotTimer.Get()).pose.Rotation();
+    m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
   }
-  m_rotTimer.Stop();
+  m_timer.Stop();
   command.End(false);
 
   EXPECT_NEAR_UNITS(endState.pose.Translation().X(),

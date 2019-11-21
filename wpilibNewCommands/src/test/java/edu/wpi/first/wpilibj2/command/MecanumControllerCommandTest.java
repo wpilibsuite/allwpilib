@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MecanumControllerCommandTest {
-  private final Timer m_rotTimer = new Timer();
+  private final Timer m_timer = new Timer();
   private Rotation2d m_angle = new Rotation2d(0);
 
   private double m_frontLeftSpeed;
@@ -41,6 +41,7 @@ class MecanumControllerCommandTest {
 
   private static final double kxTolerance = 1 / 12.0;
   private static final double kyTolerance = 1 / 12.0;
+  private static final double kAngularTolerance = 1 / 12.0;
 
   private static final double kWheelBase = 0.5;
   private static final double kTrackWidth = 0.5;
@@ -67,7 +68,7 @@ class MecanumControllerCommandTest {
   }
 
   public Pose2d getRobotPose() {
-    m_odometry.update(m_angle, getCurrentWheelSpeeds());
+    m_odometry.updateWithTime(m_timer.get(), m_angle, getCurrentWheelSpeeds());
     return m_odometry.getPoseMeters();
   }
 
@@ -94,15 +95,15 @@ class MecanumControllerCommandTest {
         this::setWheelSpeeds,
         subsystem);
 
-    m_rotTimer.reset();
-    m_rotTimer.start();
+    m_timer.reset();
+    m_timer.start();
 
     command.initialize();
     while (!command.isFinished()) {
       command.execute();
-      m_angle = trajectory.sample(m_rotTimer.get()).poseMeters.getRotation();
+      m_angle = trajectory.sample(m_timer.get()).poseMeters.getRotation();
     }
-    m_rotTimer.stop();
+    m_timer.stop();
     command.end(true);
 
     assertAll(
@@ -111,7 +112,7 @@ class MecanumControllerCommandTest {
         () -> assertEquals(endState.poseMeters.getTranslation().getY(),
           getRobotPose().getTranslation().getY(), kyTolerance),
         () -> assertEquals(endState.poseMeters.getRotation().getRadians(),
-          getRobotPose().getRotation().getRadians())
+          getRobotPose().getRotation().getRadians(), kAngularTolerance)
     );
   }
 }

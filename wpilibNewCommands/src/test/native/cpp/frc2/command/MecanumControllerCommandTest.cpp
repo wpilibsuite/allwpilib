@@ -31,7 +31,7 @@ class MecanumControllerCommandTest : public ::testing::Test {
                            units::inverse<units::squared<units::second>>>;
 
  protected:
-  frc2::Timer m_rotTimer;
+  frc2::Timer m_timer;
   frc::Rotation2d m_angle{0_rad};
 
   units::meters_per_second_t m_frontLeftSpeed = 0.0_mps;
@@ -66,7 +66,7 @@ class MecanumControllerCommandTest : public ::testing::Test {
   }
 
   frc::Pose2d getRobotPose() {
-    m_odometry.Update(m_angle, getCurrentWheelSpeeds());
+    m_odometry.UpdateWithTime(m_timer.Get(), m_angle, getCurrentWheelSpeeds());
     return m_odometry.GetPose();
   }
 };
@@ -97,14 +97,14 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
       },
       {&subsystem});
 
-  m_rotTimer.Reset();
-  m_rotTimer.Start();
+  m_timer.Reset();
+  m_timer.Start();
   command.Initialize();
   while (!command.IsFinished()) {
     command.Execute();
-    m_angle = trajectory.Sample(m_rotTimer.Get()).pose.Rotation();
+    m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
   }
-  m_rotTimer.Stop();
+  m_timer.Stop();
   command.End(false);
 
   EXPECT_NEAR_UNITS(endState.pose.Translation().X(),
