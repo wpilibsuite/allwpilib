@@ -7,11 +7,10 @@
 
 #include "Robot.h"
 
-#include <hal/DriverStation.h>
-
 #include <frc/DriverStation.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <hal/DriverStation.h>
 #include <networktables/NetworkTable.h>
 
 void Robot::RobotInit() {}

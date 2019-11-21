@@ -16,7 +16,7 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
-  ^HAL/
+  ^hal/
   ^networktables/
   ^opencv2/
   ^support/
