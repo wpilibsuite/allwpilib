@@ -57,32 +57,29 @@ class SwerveControllerCommand
 
  public:
   /**
-   * Constructs a new SwerveControllerCommand that when executed will follow the
-   * provided trajectory. This command will not return output voltages but
-   * rather raw module states from the position controllers which need to be put
-   * into a velocity PID.
+   * Constructs a new SwerveControllerCommand that when executed will follow the provided
+   * trajectory. This command will not return output voltages but rather raw module states from the
+   * position controllers which need to be put into a velocity PID.
    *
-   * <p>Note: The controllers will *not* set the outputVolts to zero upon
-   * completion of the path- this is left to the user, since it is not
-   * appropriate for paths with nonstationary endstates.
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
+   * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
    *
-   * <p>Note 2: The rotation controller will calculate the rotation based on the
-   * final pose in the trajectory, not the poses at each time step.
+   * <p>Note 2: The rotation controller will calculate the rotation based on the final pose
+   * in the trajectory, not the poses at each time step.
    *
-   * @param trajectory                        The trajectory to follow.
-   * @param pose                              A function that supplies the robot
-   * pose - use one of the odometry classes to provide this.
-   * @param kinematics                        The kinematics for the robot
-   * drivetrain.
-   * @param xController                      The Trajectory Tracker PID
-   * controller for the robot's x position.
-   * @param yController                      The Trajectory Tracker PID
-   * controller for the robot's y position.
-   * @param thetaController                   The Trajectory Tracker PID
-   * controller for angle for the robot.
-   * @param outputModuleStates                The raw output module states from
-   * the position controllers.
-   * @param requirements                      The subsystems to require.
+   * @param trajectory      The trajectory to follow.
+   * @param pose            A function that supplies the robot pose - use one of
+   *                        the odometry classes to provide this.
+   * @param kinematics      The kinematics for the robot drivetrain.
+   * @param xController     The Trajectory Tracker PID controller
+   *                        for the robot's x position.
+   * @param yController     The Trajectory Tracker PID controller
+   *                        for the robot's y position.
+   * @param thetaController The Trajectory Tracker PID controller
+   *                        for angle for the robot.
+   * @param output          The raw output module states from the
+   *                        position controllers.
+   * @param requirements    The subsystems to require.
    */
   SwerveControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,

@@ -36,11 +36,11 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * and the linear speeds have no effect on the angular speed.
    *
    * @param xSpeed        Speed of the robot in the x direction
-   * (forward/backwards).
+   *                      (forward/backwards).
    * @param ySpeed        Speed of the robot in the y direction (sideways).
    * @param rot           Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to
-   * the field.
+   *                      the field.
    */
   void Drive(double xSpeed, double ySpeed, double rot, bool feildRelative);
 

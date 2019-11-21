@@ -41,10 +41,10 @@ public class MecanumDriveMotorVoltages {
   /**
    * Constructs a MecanumDriveMotorVoltages.
    *
-   * @param frontLeftVoltage    Voltage of the front left motor.
-   * @param frontRightVoltage   Voltage of the front right motor.
-   * @param rearLeftVoltage     Voltage of the rear left motor.
-   * @param rearRightVoltage    Voltage of the rear right motor.
+   * @param frontLeftVoltage  Voltage of the front left motor.
+   * @param frontRightVoltage Voltage of the front right motor.
+   * @param rearLeftVoltage   Voltage of the rear left motor.
+   * @param rearRightVoltage  Voltage of the rear right motor.
    */
   public MecanumDriveMotorVoltages(double frontLeftVoltage,
                                  double frontRightVoltage,

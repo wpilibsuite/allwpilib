@@ -77,27 +77,27 @@ public class MecanumControllerCommand extends CommandBase {
    * <p>Note 2: The rotation controller will calculate the rotation based on the final pose in the
    * trajectory, not the poses at each time step.
    *
-   * @param trajectory                        The trajectory to follow.
-   * @param pose                              A function that supplies the robot pose - use one of
-   *                                          the odometry classes to provide this.
-   * @param feedforward                       The feedforward to use for the drivetrain.
-   * @param kinematics                        The kinematics for the robot drivetrain.
-   * @param xController                      The Trajectory Tracker PID controller
-   *                                          for the robot's x position.
-   * @param yController                      The Trajectory Tracker PID controller
-   *                                          for the robot's y position.
-   * @param thetaController                   The Trajectory Tracker PID controller
-   *                                          for angle for the robot.
-   * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a drivetrain wheel.
-   * @param frontLeftController               The front left wheel velocity PID.
-   * @param rearLeftController                The rear left wheel velocity PID.
-   * @param frontRightController              The front right wheel velocity PID.
-   * @param rearRightController               The rear right wheel velocity PID.
-   * @param currentWheelSpeeds                A MecanumDriveWheelSpeeds object containing
-   *                                          the current wheel speeds.
-   * @param outputDriveVoltages                  A MecanumDriveMotorVoltages object containing
-   *                                          the output motor voltages.
-   * @param requirements                      The subsystems to require.
+   * @param trajectory                      The trajectory to follow.
+   * @param pose                            A function that supplies the robot pose - use one of
+   *                                        the odometry classes to provide this.
+   * @param feedforward                     The feedforward to use for the drivetrain.
+   * @param kinematics                      The kinematics for the robot drivetrain.
+   * @param xController                     The Trajectory Tracker PID controller
+   *                                        for the robot's x position.
+   * @param yController                     The Trajectory Tracker PID controller
+   *                                        for the robot's y position.
+   * @param thetaController                 The Trajectory Tracker PID controller
+   *                                        for angle for the robot.
+   * @param maxWheelVelocityMetersPerSecond The maximum velocity of a drivetrain wheel.
+   * @param frontLeftController             The front left wheel velocity PID.
+   * @param rearLeftController              The rear left wheel velocity PID.
+   * @param frontRightController            The front right wheel velocity PID.
+   * @param rearRightController             The rear right wheel velocity PID.
+   * @param currentWheelSpeeds              A MecanumDriveWheelSpeeds object containing
+   *                                        the current wheel speeds.
+   * @param outputDriveVoltages             A MecanumDriveMotorVoltages object containing
+   *                                        the output motor voltages.
+   * @param requirements                    The subsystems to require.
    */
 
   @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
@@ -168,20 +168,20 @@ public class MecanumControllerCommand extends CommandBase {
    * <p>Note2: The rotation controller will calculate the rotation based on the final pose
    * in the trajectory, not the poses at each time step.
    *
-   * @param trajectory                        The trajectory to follow.
-   * @param pose                              A function that supplies the robot pose - use one of
-   *                                          the odometry classes to provide this.
-   * @param kinematics                        The kinematics for the robot drivetrain.
-   * @param xController                      The Trajectory Tracker PID controller
-   *                                          for the robot's x position.
-   * @param yController                      The Trajectory Tracker PID controller
-   *                                          for the robot's y position.
-   * @param thetaController                   The Trajectory Tracker PID controller
-   *                                          for angle for the robot.
-   * @param maxWheelVelocityMetersPerSecond   The maximum velocity of a drivetrain wheel.
-   * @param outputWheelSpeeds                 A MecanumDriveWheelSpeeds object containing
-   *                                          the output wheel speeds.
-   * @param requirements                      The subsystems to require.
+   * @param trajectory                      The trajectory to follow.
+   * @param pose                            A function that supplies the robot pose - use one of
+   *                                        the odometry classes to provide this.
+   * @param kinematics                      The kinematics for the robot drivetrain.
+   * @param xController                     The Trajectory Tracker PID controller
+   *                                        for the robot's x position.
+   * @param yController                     The Trajectory Tracker PID controller
+   *                                        for the robot's y position.
+   * @param thetaController                 The Trajectory Tracker PID controller
+   *                                        for angle for the robot.
+   * @param maxWheelVelocityMetersPerSecond The maximum velocity of a drivetrain wheel.
+   * @param outputWheelSpeeds               A MecanumDriveWheelSpeeds object containing
+   *                                        the output wheel speeds.
+   * @param requirements                    The subsystems to require.
    */
 
   @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
