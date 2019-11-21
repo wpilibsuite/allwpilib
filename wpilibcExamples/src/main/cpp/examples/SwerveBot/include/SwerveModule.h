@@ -24,15 +24,10 @@ class SwerveModule {
   static constexpr double kWheelRadius = 0.0508;
   static constexpr int kEncoderResolution = 4096;
 
-  // We have to use meters here instead of radians because of the fact that
-  // ProfiledPIDController's constraints only take in meters per second and
-  // meters per second squared.
-
-  static constexpr units::meters_per_second_t kModuleMaxAngularVelocity =
-      units::meters_per_second_t(wpi::math::pi);  // radians per second
-  static constexpr units::meters_per_second_squared_t
-      kModuleMaxAngularAcceleration = units::meters_per_second_squared_t(
-          wpi::math::pi * 2.0);  // radians per second squared
+  static constexpr auto kModuleMaxAngularVelocity =
+      wpi::math::pi * 1_rad_per_s;  // radians per second
+  static constexpr auto kModuleMaxAngularAcceleration =
+      wpi::math::pi * 2_rad_per_s / 1_s;  // radians per second^2
 
   frc::PWMVictorSPX m_driveMotor;
   frc::PWMVictorSPX m_turningMotor;
@@ -41,7 +36,7 @@ class SwerveModule {
   frc::Encoder m_turningEncoder{2, 3};
 
   frc2::PIDController m_drivePIDController{1.0, 0, 0};
-  frc::ProfiledPIDController m_turningPIDController{
+  frc::ProfiledPIDController<units::radians> m_turningPIDController{
       1.0,
       0.0,
       0.0,

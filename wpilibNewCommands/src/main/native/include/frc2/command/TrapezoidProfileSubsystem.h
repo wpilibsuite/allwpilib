@@ -17,10 +17,14 @@ namespace frc2 {
  * A subsystem that generates and runs trapezoidal motion profiles automatically.  The user
  * specifies how to use the current state of the motion profile by overriding the `UseState` method.
  */
-template <class Unit>
+template <class Distance>
 class TrapezoidProfileSubsystem : public SubsystemBase {
-  using State = frc::TrapezoidProfile::State;
-  using Constraints = frc::TrapezoidProfile::Constraints;
+  using Distance_t = units::unit_t<Distance>;
+  using Velocity =
+      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  using Velocity_t = units::unit_t<Velocity>;
+  using State = frc::TrapezoidProfile<Distance>::State;
+  using Constraints = frc::TrapezoidProfile<Distance>::Constraints;
  public:
   /**
    * Creates a new TrapezoidProfileSubsystem.
@@ -31,14 +35,14 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
    * @param period          The period of the main robot loop, in seconds.
    */
   TrapezoidProfileSubsystem(Constraints constraints,
-                            units::unit_t<Unit> position,
+                            Distance_t position,
                             units::second_t period = 20_ms)
                             : m_constraints(constraints),
-                              m_state{units::meter_t(position.template to<double>()), 0_mps},
+                              m_state{position, Velocity_t(0)},
                               m_period(period) {}
 
   void Periodic() override {
-    auto profile = frc::TrapezoidProfile(m_constraints, GetGoal(), m_state);
+    auto profile = frc::TrapezoidProfile<Distance>(m_constraints, GetGoal(), m_state);
     m_state = profile.Calculate(m_period);
     UseState(m_state);
   }

@@ -19,8 +19,13 @@ namespace frc2 {
  *
  * @see ProfiledPIDController
  */
+template <class Distance>
 class ProfiledPIDSubsystem : public SubsystemBase {
-  using State = frc::TrapezoidProfile::State;
+  using Distance_t = units::unit_t<Distance>;
+  using Velocity =
+      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  using Velocity_t = units::unit_t<Velocity>;
+  using State = frc::TrapezoidProfile<Distance>::State;
 
  public:
   /**
@@ -28,9 +33,15 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    *
    * @param controller the ProfiledPIDController to use
    */
-  explicit ProfiledPIDSubsystem(frc::ProfiledPIDController controller);
+  explicit ProfiledPIDSubsystem(frc::ProfiledPIDController<Distance> controller)
+                                : m_controller{controller} {}
 
-  void Periodic() override;
+  void Periodic() override {
+    if (m_enabled) {
+      UseOutput(m_controller.Calculate(GetMeasurement(), GetGoal()),
+                m_controller.GetSetpoint());
+    }
+  }
 
   /**
    * Uses the output from the ProfiledPIDController.
@@ -59,22 +70,30 @@ class ProfiledPIDSubsystem : public SubsystemBase {
   /**
    * Enables the PID control.  Resets the controller.
    */
-  virtual void Enable();
+  virtual void Enable() {
+    m_controller.Reset();
+    m_enabled = true;
+  }
 
   /**
    * Disables the PID control.  Sets output to zero.
    */
-  virtual void Disable();
+  virtual void Disable() {
+     UseOutput(0, State{Distance_t(0), Velocity_t(0)});
+     m_enabled = false;
+   }
 
   /**
    * Returns the ProfiledPIDController.
    *
    * @return The controller.
    */
-  frc::ProfiledPIDController& GetController();
+  frc::ProfiledPIDController<Distance>& GetController() {
+    return m_controller;
+  }
 
  protected:
-  frc::ProfiledPIDController m_controller;
+  frc::ProfiledPIDController<Distance> m_controller;
   bool m_enabled;
 };
 }  // namespace frc2
