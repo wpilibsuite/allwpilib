@@ -336,7 +336,6 @@ public class MecanumFollowerCommand extends CommandBase {
           rearRightSpeedSetpoint));
     }
 
-
     m_prevTime = curTime;
     m_prevSpeeds = targetWheelSpeeds;
   }

@@ -43,14 +43,14 @@ class SwerveFollowerCommandTest {
   private static final double kxTolerance = 1 / 12.0;
   private static final double kyTolerance = 1 / 12.0;
 
-  private static final double m_trackLength = 0.5;
-  private static final double m_trackWidth = 0.5;
+  private static final double ktrackLength = 0.5;
+  private static final double ktrackWidth = 0.5;
 
   private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-      new Translation2d(m_trackLength / 2, m_trackWidth / 2),
-      new Translation2d(m_trackLength / 2, -m_trackWidth / 2),
-      new Translation2d(-m_trackLength / 2, m_trackWidth / 2),
-      new Translation2d(-m_trackLength / 2, -m_trackWidth / 2));
+      new Translation2d(ktrackLength / 2, ktrackWidth / 2),
+      new Translation2d(ktrackLength / 2, -ktrackWidth / 2),
+      new Translation2d(-ktrackLength / 2, ktrackWidth / 2),
+      new Translation2d(-ktrackLength / 2, -ktrackWidth / 2));
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
       new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));

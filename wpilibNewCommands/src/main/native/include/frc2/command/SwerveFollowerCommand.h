@@ -45,7 +45,6 @@ namespace frc2 {
  * the trajectory but rather goes to the angle given in the final state of the
  * trajectory.
  */
-
 template <size_t NumModules>
 class SwerveFollowerCommand
     : public CommandHelper<CommandBase, SwerveFollowerCommand<NumModules>> {

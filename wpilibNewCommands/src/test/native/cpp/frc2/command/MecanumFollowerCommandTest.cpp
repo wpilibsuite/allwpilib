@@ -37,23 +37,22 @@ protected:
 
   static constexpr units::meter_t kxTolerance{1 / 12.0};
   static constexpr units::meter_t kyTolerance{1 / 12.0};
-  static constexpr units::radian_t kangularTolerance{1 / 12.0};
+  static constexpr units::radian_t kAngularTolerance{1 / 12.0};
 
-
-  static constexpr units::meter_t m_trackLength{0.5};
-  static constexpr units::meter_t m_trackWidth{0.5};
+  static constexpr units::meter_t ktrackLength{0.5};
+  static constexpr units::meter_t ktrackWidth{0.5};
 
   frc::MecanumDriveKinematics m_kinematics{
-      frc::Translation2d{m_trackLength / 2, m_trackWidth / 2},
-      frc::Translation2d{m_trackLength / 2, -m_trackWidth / 2},
-      frc::Translation2d{-m_trackLength / 2, m_trackWidth / 2},
-      frc::Translation2d{-m_trackLength / 2, -m_trackWidth / 2}
+      frc::Translation2d{ktrackLength / 2, ktrackWidth / 2},
+      frc::Translation2d{ktrackLength / 2, -ktrackWidth / 2},
+      frc::Translation2d{-ktrackLength / 2, ktrackWidth / 2},
+      frc::Translation2d{-ktrackLength / 2, -ktrackWidth / 2}
   };
 
   frc::MecanumDriveOdometry m_odometry{
       m_kinematics,
-      frc::Rotation2d{0_rad},
-      frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_rad}}
+      0_rad,
+      frc::Pose2d{0_m, 0_m, 0_rad}
   };
 
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
@@ -114,6 +113,6 @@ TEST_F(MecanumFollowerCommandTest, ReachesReference) {
   EXPECT_NEAR_UNITS(endState.pose.Translation().Y(), getRobotPose().Translation().Y(),
                     kyTolerance);
   EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(), getRobotPose().Rotation().Radians(),
-                    kangularTolerance);
+                    kAngularTolerance);
 
 }

@@ -40,31 +40,31 @@ protected:
 
   static constexpr units::meter_t kxTolerance{1 / 12.0};
   static constexpr units::meter_t kyTolerance{1 / 12.0};
-  static constexpr units::radian_t kangularTolerance{1 / 12.0};
+  static constexpr units::radian_t kAngularTolerance{1 / 12.0};
 
-  static constexpr units::meter_t m_trackLength{0.5};
-  static constexpr units::meter_t m_trackWidth{0.5};
+  static constexpr units::meter_t ktrackLength{0.5};
+  static constexpr units::meter_t ktrackWidth{0.5};
 
   frc::SwerveDriveKinematics<4> m_kinematics{
-      frc::Translation2d{m_trackLength / 2, m_trackWidth / 2},
-      frc::Translation2d{m_trackLength / 2, -m_trackWidth / 2},
-      frc::Translation2d{-m_trackLength / 2, m_trackWidth / 2},
-      frc::Translation2d{-m_trackLength / 2, -m_trackWidth / 2}
+      frc::Translation2d{ktrackLength / 2, ktrackWidth / 2},
+      frc::Translation2d{ktrackLength / 2, -ktrackWidth / 2},
+      frc::Translation2d{-ktrackLength / 2, ktrackWidth / 2},
+      frc::Translation2d{-ktrackLength / 2, -ktrackWidth / 2}
   };
 
   frc::SwerveDriveOdometry<4> m_odometry{
       m_kinematics,
-      frc::Rotation2d{0_rad},
-      frc::Pose2d{0_m, 0_m, frc::Rotation2d{0_rad}}
+      0_rad,
+      frc::Pose2d{0_m, 0_m, 0_rad}
   };
 
   std::array<frc::SwerveModuleState, 4> getCurrentWheelSpeeds() {
-  return m_moduleStates;
+    return m_moduleStates;
   }
 
   frc::Pose2d getRobotPose() {
-  m_odometry.Update(m_angle, getCurrentWheelSpeeds());
-  return m_odometry.GetPose();
+    m_odometry.Update(m_angle, getCurrentWheelSpeeds());
+    return m_odometry.GetPose();
   }
 
 };
@@ -108,6 +108,6 @@ TEST_F(SwerveFollowerCommandTest, ReachesReference) {
   EXPECT_NEAR_UNITS(endState.pose.Translation().Y(), getRobotPose().Translation().Y(),
                     kyTolerance);
   EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(), getRobotPose().Rotation().Radians(),
-                    kangularTolerance);
+                    kAngularTolerance);
 
 }

@@ -34,7 +34,6 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * <p>The robot angle controller does not follow the angle given by
  * the trajectory but rather goes to the angle given in the final state of the trajectory.
  */
-
 public class SwerveFollowerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private Pose2d m_finalPose;

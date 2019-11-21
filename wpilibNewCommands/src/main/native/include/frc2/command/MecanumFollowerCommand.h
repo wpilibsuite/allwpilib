@@ -44,7 +44,6 @@ namespace frc2 {
  * <p>The robot angle controller does not follow the angle given by
  * the trajectory but rather goes to the angle given in the final state of the trajectory.
  */
-
 class MecanumFollowerCommand
     : public CommandHelper<CommandBase, MecanumFollowerCommand> {
 
@@ -82,7 +81,6 @@ class MecanumFollowerCommand
    *                                          in volts.
    * @param requirements                      The subsystems to require.
    */
-
   MecanumFollowerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SimpleMotorFeedforward<units::meters> feedforward,
