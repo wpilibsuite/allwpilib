@@ -8,9 +8,9 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AddressableLEDJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PWMJNI;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
