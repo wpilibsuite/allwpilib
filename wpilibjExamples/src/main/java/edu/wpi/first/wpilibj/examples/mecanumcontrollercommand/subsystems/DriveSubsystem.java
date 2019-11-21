@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.mecanumfollowercommand.subsystems;
+package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
@@ -19,21 +19,21 @@ import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kDriveKinematics;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kFrontLeftEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kFrontLeftEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kFrontLeftMotorPort;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kFrontRightEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kFrontRightEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kFrontRightMotorPort;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kGyroReversed;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kRearLeftEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kRearLeftEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kRearLeftMotorPort;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kRearRightEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kRearRightEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kRearRightMotorPort;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kDriveKinematics;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kFrontLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kFrontLeftEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kFrontLeftMotorPort;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kFrontRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kFrontRightEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kFrontRightMotorPort;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kGyroReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kRearLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kRearLeftEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kRearLeftMotorPort;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kRearRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kRearRightEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kRearRightMotorPort;
 
 public class DriveSubsystem extends SubsystemBase {
   private final PWMVictorSPX m_frontLeft = new PWMVictorSPX(kFrontLeftMotorPort);

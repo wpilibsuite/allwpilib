@@ -11,7 +11,7 @@ template <typename T>
 namespace frc2 {
 
 template <size_t NumModules>
-SwerveFollowerCommand<NumModules>::SwerveFollowerCommand(
+SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SwerveDriveKinematics<NumModules> kinematics,
     frc2::PIDController xController, frc2::PIDController yController,
@@ -30,7 +30,7 @@ SwerveFollowerCommand<NumModules>::SwerveFollowerCommand(
 }
 
 template <size_t NumModules>
-void SwerveFollowerCommand<NumModules>::Initialize() {
+void SwerveControllerCommand<NumModules>::Initialize() {
   m_finalPose = m_trajectory.Sample(m_trajectory.TotalTime()).pose;
 
   m_timer.Reset();
@@ -38,7 +38,7 @@ void SwerveFollowerCommand<NumModules>::Initialize() {
 }
 
 template <size_t NumModules>
-void SwerveFollowerCommand<NumModules>::Execute() {
+void SwerveControllerCommand<NumModules>::Execute() {
   auto curTime = units::second_t(m_timer.Get());
 
   auto m_desiredState = m_trajectory.Sample(curTime);
@@ -79,12 +79,12 @@ void SwerveFollowerCommand<NumModules>::Execute() {
 }
 
 template <size_t NumModules>
-void SwerveFollowerCommand<NumModules>::End(bool interrupted) {
+void SwerveControllerCommand<NumModules>::End(bool interrupted) {
   m_timer.Stop();
 }
 
 template <size_t NumModules>
-bool SwerveFollowerCommand<NumModules>::IsFinished() {
+bool SwerveControllerCommand<NumModules>::IsFinished() {
   return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
 }
 

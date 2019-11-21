@@ -36,7 +36,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  */
 
 @SuppressWarnings("MemberName")
-public class SwerveFollowerCommand extends CommandBase {
+public class SwerveControllerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private Pose2d m_finalPose;
 
@@ -49,7 +49,7 @@ public class SwerveFollowerCommand extends CommandBase {
   private final Consumer<SwerveModuleState[]> m_outputModuleStates;
 
   /**
-   * Constructs a new SwerveFollowerCommand that when executed will follow the provided trajectory.
+   * Constructs a new SwerveControllerCommand that when executed will follow the provided trajectory.
    * This command will not return output voltages but rather raw module states from
    * the position controllers which need to be put into a velocity PID.
    *
@@ -75,7 +75,7 @@ public class SwerveFollowerCommand extends CommandBase {
    */
 
   @SuppressWarnings("ParameterName")
-  public SwerveFollowerCommand(Trajectory trajectory,
+  public SwerveControllerCommand(Trajectory trajectory,
                                Supplier<Pose2d> pose,
                                SwerveDriveKinematics kinematics,
                                PIDController xController,
@@ -84,19 +84,19 @@ public class SwerveFollowerCommand extends CommandBase {
 
                                Consumer<SwerveModuleState[]> outputModuleStates,
                                Subsystem... requirements) {
-    m_trajectory = requireNonNullParam(trajectory, "trajectory", "SwerveFollowerCommand");
-    m_pose = requireNonNullParam(pose, "pose", "SwerveFollowerCommand");
-    m_kinematics = requireNonNullParam(kinematics, "kinematics", "SwerveFollowerCommand");
+    m_trajectory = requireNonNullParam(trajectory, "trajectory", "SwerveControllerCommand");
+    m_pose = requireNonNullParam(pose, "pose", "SwerveControllerCommand");
+    m_kinematics = requireNonNullParam(kinematics, "kinematics", "SwerveControllerCommand");
 
     m_xController = requireNonNullParam(xController,
-      "xController", "SwerveFollowerCommand");
+      "xController", "SwerveControllerCommand");
     m_yController = requireNonNullParam(yController,
-      "xController", "SwerveFollowerCommand");
+      "xController", "SwerveControllerCommand");
     m_thetaController = requireNonNullParam(thetaController,
-      "thetaController", "SwerveFollowerCommand");
+      "thetaController", "SwerveControllerCommand");
 
     m_outputModuleStates = requireNonNullParam(outputModuleStates,
-      "frontLeftOutput", "SwerveFollowerCommand");
+      "frontLeftOutput", "SwerveControllerCommand");
     addRequirements(requirements);
   }
 

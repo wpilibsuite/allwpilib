@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "frc2/command/MecanumFollowerCommand.h"
+#include "frc2/command/MecanumControllerCommand.h"
 
 using namespace frc2;
 using namespace units;
 
 template <typename T>
 
-MecanumFollowerCommand::MecanumFollowerCommand(
+MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
@@ -50,7 +50,7 @@ MecanumFollowerCommand::MecanumFollowerCommand(
   AddRequirements(requirements);
 }
 
-MecanumFollowerCommand::MecanumFollowerCommand(
+MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
     frc2::PIDController yController, frc::ProfiledPIDController thetaController,
@@ -72,7 +72,7 @@ MecanumFollowerCommand::MecanumFollowerCommand(
   AddRequirements(requirements);
 }
 
-void MecanumFollowerCommand::Initialize() {
+void MecanumControllerCommand::Initialize() {
   m_prevTime = 0_s;
   auto initialState = m_trajectory.Sample(0_s);
 
@@ -94,7 +94,7 @@ void MecanumFollowerCommand::Initialize() {
   }
 }
 
-void MecanumFollowerCommand::Execute() {
+void MecanumControllerCommand::Execute() {
   auto curTime = second_t(m_timer.Get());
   auto dt = curTime - m_prevTime;
 
@@ -180,8 +180,8 @@ void MecanumFollowerCommand::Execute() {
   }
 }
 
-void MecanumFollowerCommand::End(bool interrupted) { m_timer.Stop(); }
+void MecanumControllerCommand::End(bool interrupted) { m_timer.Stop(); }
 
-bool MecanumFollowerCommand::IsFinished() {
+bool MecanumControllerCommand::IsFinished() {
   return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
 }

@@ -14,7 +14,7 @@
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h>
 #include <frc2/command/InstantCommand.h>
-#include <frc2/command/MecanumFollowerCommand.h>
+#include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/button/JoystickButton.h>
 
@@ -72,7 +72,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  frc2::MecanumFollowerCommand mecanumFollowerCommand(
+  frc2::MecanumControllerCommand mecanumControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       frc::SimpleMotorFeedforward<units::meters>(ks, kv, ka),
@@ -111,6 +111,6 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   // no auto
   return new frc2::SequentialCommandGroup(
-      std::move(mecanumFollowerCommand),
+      std::move(mecanumControllerCommand),
       frc2::InstantCommand([this]() { m_drive.Drive(0, 0, 0, false); }, {}));
 }

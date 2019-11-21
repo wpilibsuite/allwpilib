@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.swervefollowercommand;
+package edu.wpi.first.wpilibj.examples.swervecontrollercommand;
 
 import edu.wpi.first.wpilibj.RobotBase;
 

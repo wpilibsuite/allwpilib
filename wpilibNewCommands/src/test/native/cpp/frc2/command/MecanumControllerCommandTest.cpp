@@ -12,7 +12,7 @@
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc2/Timer.h>
-#include <frc2/command/MecanumFollowerCommand.h>
+#include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/Subsystem.h>
 
 #include <iostream>
@@ -25,7 +25,7 @@
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
-class MecanumFollowerCommandTest : public ::testing::Test {
+class MecanumControllerCommandTest : public ::testing::Test {
  protected:
   frc2::Timer m_rotTimer;
   frc::Rotation2d m_angle{0_rad};
@@ -65,7 +65,7 @@ class MecanumFollowerCommandTest : public ::testing::Test {
   }
 };
 
-TEST_F(MecanumFollowerCommandTest, ReachesReference) {
+TEST_F(MecanumControllerCommandTest, ReachesReference) {
   frc2::Subsystem subsystem{};
 
   auto waypoints =
@@ -75,7 +75,7 @@ TEST_F(MecanumFollowerCommandTest, ReachesReference) {
 
   auto endState = trajectory.Sample(trajectory.TotalTime());
 
-  auto command = frc2::MecanumFollowerCommand(
+  auto command = frc2::MecanumControllerCommand(
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
 
       frc2::PIDController(0.6, 0, 0), frc2::PIDController(0.6, 0, 0),

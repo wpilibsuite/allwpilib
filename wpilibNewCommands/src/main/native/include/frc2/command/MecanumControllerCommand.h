@@ -45,11 +45,11 @@ namespace frc2 {
  * the trajectory but rather goes to the angle given in the final state of the
  * trajectory.
  */
-class MecanumFollowerCommand
-    : public CommandHelper<CommandBase, MecanumFollowerCommand> {
+class MecanumControllerCommand
+    : public CommandHelper<CommandBase, MecanumControllerCommand> {
  public:
   /**
-   * Constructs a new MecanumFollowerCommand that when executed will follow the
+   * Constructs a new MecanumControllerCommand that when executed will follow the
    * provided trajectory. PID control and feedforward are handled internally,
    * outputs are scaled from -12 to 12 as a voltage output to the motor.
    *
@@ -87,7 +87,7 @@ class MecanumFollowerCommand
    * and feedfrowards in volts.
    * @param requirements                      The subsystems to require.
    */
-  MecanumFollowerCommand(
+  MecanumControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SimpleMotorFeedforward<units::meters> feedforward,
       frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
@@ -105,7 +105,7 @@ class MecanumFollowerCommand
       std::initializer_list<Subsystem*> requirements);
 
   /**
-   * Constructs a new MecanumFollowerCommand that when executed will follow the
+   * Constructs a new MecanumControllerCommand that when executed will follow the
    * provided trajectory. The user should implement a velocity PID on the
    * desired output wheel velocities.
    *
@@ -133,7 +133,7 @@ class MecanumFollowerCommand
    * in meters per second.
    * @param requirements                      The subsystems to require.
    */
-  MecanumFollowerCommand(
+  MecanumControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
       frc2::PIDController yController,

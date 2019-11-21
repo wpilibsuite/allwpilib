@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.swervefollowercommand.subsystems;
+package edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
@@ -15,12 +15,12 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
-import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kDriveEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared;
-import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond;
-import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kPModuleDriveController;
-import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kPModuleTurningController;
-import static edu.wpi.first.wpilibj.examples.swervefollowercommand.Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kDriveEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kPModuleDriveController;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kPModuleTurningController;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
 
 public class SwerveModule {
   private final Spark m_driveMotor;

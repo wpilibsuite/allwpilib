@@ -5,13 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.mecanumfollowercommand;
+package edu.wpi.first.wpilibj.examples.swervecontrollercommand;
 
 import java.util.List;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -21,25 +20,20 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.MecanumFollowerCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import edu.wpi.first.wpilibj.examples.mecanumfollowercommand.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems.DriveSubsystem;
 
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.AutoConstants.kPThetaController;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.AutoConstants.kPXController;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.AutoConstants.kPYController;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.AutoConstants.kThetaControllerConstraints;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kDriveKinematics;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kFeedforward;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kPFrontLeftVel;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kPFrontRightVel;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kPRearLeftVel;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.DriveConstants.kPRearRightVel;
-import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.OIConstants.kDriverControllerPort;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kMaxSpeedMetersPerSecond;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kPThetaController;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kPXController;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kPYController;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kThetaControllerConstraints;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants.kDriveKinematics;
+import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.OIConstants.kDriverControllerPort;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -47,7 +41,6 @@ import static edu.wpi.first.wpilibj.examples.mecanumfollowercommand.Constants.OI
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
-@SuppressWarnings("PMD.ExcessiveImports")
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -81,12 +74,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Drive at half speed when the right bumper is held
-    new JoystickButton(m_driverController, Button.kBumperRight.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(.5))
-        .whenReleased(() -> m_robotDrive.setMaxOutput(1));
-
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -114,35 +103,23 @@ public class RobotContainer {
         config
     );
 
-    MecanumFollowerCommand mecanumFollowerCommand = new MecanumFollowerCommand(
+    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
         exampleTrajectory,
-        m_robotDrive::getPose,
-
-        kFeedforward,
+        m_robotDrive::getPose, //Functional interface to feed supplier
         kDriveKinematics,
 
-        //Position contollers
+        //Position controllers
         new PIDController(kPXController, 0, 0),
         new PIDController(kPYController, 0, 0),
         new ProfiledPIDController(kPThetaController, 0, 0, kThetaControllerConstraints),
 
-        //Needed for normalizing wheel speeds
-        kMaxSpeedMetersPerSecond,
-
-        //Velocity PID's
-        new PIDController(kPFrontLeftVel, 0, 0),
-        new PIDController(kPRearLeftVel, 0, 0),
-        new PIDController(kPFrontRightVel, 0, 0),
-        new PIDController(kPRearRightVel, 0, 0),
-
-        m_robotDrive::getCurrentWheelSpeeds,
-
-        m_robotDrive::setDriveSpeedControllersVolts, //Consumer for the output motor voltages
+        m_robotDrive::setModuleStates,
 
         m_robotDrive
+
     );
 
     // Run path following command, then stop at the end.
-    return mecanumFollowerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
   }
 }

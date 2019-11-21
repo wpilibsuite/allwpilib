@@ -14,7 +14,7 @@
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/SwerveFollowerCommand.h>
+#include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <units/units.h>
 
@@ -63,7 +63,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  frc2::SwerveFollowerCommand<4> swerveFollowerCommand(
+  frc2::SwerveControllerCommand<4> swerveControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
@@ -79,7 +79,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   // no auto
   return new frc2::SequentialCommandGroup(
-      std::move(swerveFollowerCommand), std::move(swerveFollowerCommand),
+      std::move(swerveControllerCommand), std::move(swerveControllerCommand),
       frc2::InstantCommand(
           [this]() {
             m_drive.Drive(units::meters_per_second_t(0),

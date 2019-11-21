@@ -43,7 +43,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  */
 
 @SuppressWarnings({"PMD.TooManyFields", "MemberName"})
-public class MecanumFollowerCommand extends CommandBase {
+public class MecanumControllerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private MecanumDriveWheelSpeeds m_prevSpeeds;
   private double m_prevTime;
@@ -67,7 +67,7 @@ public class MecanumFollowerCommand extends CommandBase {
   private final Consumer<MecanumDriveWheelSpeeds> m_outputWheelSpeeds;
 
   /**
-   * Constructs a new MecanumFollowerCommand that when executed will follow the provided trajectory.
+   * Constructs a new MecanumControllerCommand that when executed will follow the provided trajectory.
    * PID control and feedforward are handled internally,
    * outputs are scaled from -12 to 12 as a voltage output to the motor.
    *
@@ -101,7 +101,7 @@ public class MecanumFollowerCommand extends CommandBase {
    */
 
   @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
-  public MecanumFollowerCommand(Trajectory trajectory,
+  public MecanumControllerCommand(Trajectory trajectory,
                                 Supplier<Pose2d> pose,
                                 SimpleMotorFeedforward feedforward,
                                 MecanumDriveKinematics kinematics,
@@ -121,35 +121,35 @@ public class MecanumFollowerCommand extends CommandBase {
 
                                 Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
                                 Subsystem... requirements) {
-    m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumFollowerCommand");
-    m_pose = requireNonNullParam(pose, "pose", "MecanumFollowerCommand");
-    m_feedforward = requireNonNullParam(feedforward, "feedforward", "MecanumFollowerCommand");
-    m_kinematics = requireNonNullParam(kinematics, "kinematics", "MecanumFollowerCommand");
+    m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumControllerCommand");
+    m_pose = requireNonNullParam(pose, "pose", "MecanumControllerCommand");
+    m_feedforward = requireNonNullParam(feedforward, "feedforward", "MecanumControllerCommand");
+    m_kinematics = requireNonNullParam(kinematics, "kinematics", "MecanumControllerCommand");
 
     m_xController = requireNonNullParam(xController, "xController",
-      "MecanumFollowerCommand");
+      "MecanumControllerCommand");
     m_yController = requireNonNullParam(yController, "yController",
-      "MecanumFollowerCommand");
+      "MecanumControllerCommand");
     m_thetaController = requireNonNullParam(thetaController, "thetaController",
-      "MecanumFollowerCommand");
+      "MecanumControllerCommand");
 
     m_maxWheelVelocityMetersPerSecond = requireNonNullParam(maxWheelVelocityMetersPerSecond,
-      "maxWheelVelocityMetersPerSecond", "MecanumFollowerCommand");
+      "maxWheelVelocityMetersPerSecond", "MecanumControllerCommand");
 
     m_frontLeftController = requireNonNullParam(frontLeftController,
-      "frontLeftController", "MecanumFollowerCommand");
+      "frontLeftController", "MecanumControllerCommand");
     m_rearLeftController = requireNonNullParam(rearLeftController,
-      "rearLeftController", "MecanumFollowerCommand");
+      "rearLeftController", "MecanumControllerCommand");
     m_frontRightController = requireNonNullParam(frontRightController,
-      "frontRightController", "MecanumFollowerCommand");
+      "frontRightController", "MecanumControllerCommand");
     m_rearRightController = requireNonNullParam(rearRightController,
-      "rearRightController", "MecanumFollowerCommand");
+      "rearRightController", "MecanumControllerCommand");
 
     m_currentWheelSpeeds = requireNonNullParam(currentWheelSpeeds,
-      "currentWheelSpeeds", "MecanumFollowerCommand");
+      "currentWheelSpeeds", "MecanumControllerCommand");
 
     m_outputDriveVoltages = requireNonNullParam(outputDriveVoltages,
-    "outputDriveVoltages", "MecanumFollowerCommand");
+    "outputDriveVoltages", "MecanumControllerCommand");
 
     m_outputWheelSpeeds = null;
 
@@ -159,7 +159,7 @@ public class MecanumFollowerCommand extends CommandBase {
   }
 
   /**
-   * Constructs a new MecanumFollowerCommand that when executed will follow the provided trajectory.
+   * Constructs a new MecanumControllerCommand that when executed will follow the provided trajectory.
    * The user should implement a velocity PID on the desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
@@ -185,7 +185,7 @@ public class MecanumFollowerCommand extends CommandBase {
    */
 
   @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
-  public MecanumFollowerCommand(Trajectory trajectory,
+  public MecanumControllerCommand(Trajectory trajectory,
                                 Supplier<Pose2d> pose,
                                 MecanumDriveKinematics kinematics,
                                 PIDController xController,
@@ -196,21 +196,21 @@ public class MecanumFollowerCommand extends CommandBase {
 
                                 Consumer<MecanumDriveWheelSpeeds> outputWheelSpeeds,
                                 Subsystem... requirements) {
-    m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumFollowerCommand");
-    m_pose = requireNonNullParam(pose, "pose", "MecanumFollowerCommand");
+    m_trajectory = requireNonNullParam(trajectory, "trajectory", "MecanumControllerCommand");
+    m_pose = requireNonNullParam(pose, "pose", "MecanumControllerCommand");
     m_feedforward = new SimpleMotorFeedforward(0, 0, 0);
     m_kinematics = requireNonNullParam(kinematics,
-      "kinematics", "MecanumFollowerCommand");
+      "kinematics", "MecanumControllerCommand");
 
     m_xController = requireNonNullParam(xController,
-      "xController", "MecanumFollowerCommand");
+      "xController", "MecanumControllerCommand");
     m_yController = requireNonNullParam(yController,
-      "xController", "MecanumFollowerCommand");
+      "xController", "MecanumControllerCommand");
     m_thetaController = requireNonNullParam(thetaController,
-      "thetaController", "MecanumFollowerCommand");
+      "thetaController", "MecanumControllerCommand");
 
     m_maxWheelVelocityMetersPerSecond = requireNonNullParam(maxWheelVelocityMetersPerSecond,
-      "maxWheelVelocityMetersPerSecond", "MecanumFollowerCommand");
+      "maxWheelVelocityMetersPerSecond", "MecanumControllerCommand");
 
     m_frontLeftController = null;
     m_rearLeftController = null;
@@ -220,7 +220,7 @@ public class MecanumFollowerCommand extends CommandBase {
     m_currentWheelSpeeds = null;
 
     m_outputWheelSpeeds = requireNonNullParam(outputWheelSpeeds,
-      "outputWheelSpeeds", "MecanumFollowerCommand");
+      "outputWheelSpeeds", "MecanumControllerCommand");
 
     m_outputDriveVoltages = null;
 

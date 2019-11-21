@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -27,14 +27,15 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MecanumFollowerCommandTest {
+class SwerveControllerCommandTest {
   private final Timer m_rotTimer = new Timer();
   private Rotation2d m_angle = new Rotation2d(0);
 
-  private double m_frontLeftSpeed;
-  private double m_rearLeftSpeed;
-  private double m_frontRightSpeed;
-  private double m_rearRightSpeed;
+  private SwerveModuleState[] m_moduleStates = new SwerveModuleState[]{
+    new SwerveModuleState(0, new Rotation2d(0)),
+    new SwerveModuleState(0, new Rotation2d(0)),
+    new SwerveModuleState(0, new Rotation2d(0)),
+    new SwerveModuleState(0, new Rotation2d(0))};
 
   private final ProfiledPIDController m_rotController = new ProfiledPIDController(1, 0, 0,
       new TrapezoidProfile.Constraints(3 * Math.PI, Math.PI));
@@ -45,29 +46,22 @@ class MecanumFollowerCommandTest {
   private static final double kWheelBase = 0.5;
   private static final double kTrackWidth = 0.5;
 
-  private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
+  private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
       new Translation2d(kWheelBase / 2, kTrackWidth / 2),
       new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
       new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
       new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-  private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
+  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
       new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));
 
-  public void setWheelSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
-    this.m_frontLeftSpeed = wheelSpeeds.frontLeftMetersPerSecond;
-    this.m_rearLeftSpeed = wheelSpeeds.rearLeftMetersPerSecond;
-    this.m_frontRightSpeed = wheelSpeeds.frontRightMetersPerSecond;
-    this.m_rearRightSpeed = wheelSpeeds.rearRightMetersPerSecond;
-  }
-
-  public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
-    return new MecanumDriveWheelSpeeds(m_frontLeftSpeed,
-      m_frontRightSpeed, m_rearLeftSpeed, m_rearRightSpeed);
+  @SuppressWarnings("PMD.ArrayIsStoredDirectly")
+  public void setModuleStates(SwerveModuleState[] moduleStates) {
+    this.m_moduleStates = moduleStates;
   }
 
   public Pose2d getRobotPose() {
-    m_odometry.update(m_angle, getCurrentWheelSpeeds());
+    m_odometry.update(m_angle, m_moduleStates);
     return m_odometry.getPoseMeters();
   }
 
@@ -84,14 +78,13 @@ class MecanumFollowerCommandTest {
 
     final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
 
-    final var command = new MecanumFollowerCommand(trajectory,
+    final var command = new SwerveControllerCommand(trajectory,
         this::getRobotPose,
         m_kinematics,
         new PIDController(0.6, 0, 0),
         new PIDController(0.6, 0, 0),
         m_rotController,
-        8.8,
-        this::setWheelSpeeds,
+        this::setModuleStates,
         subsystem);
 
     m_rotTimer.reset();

@@ -14,7 +14,7 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc2/Timer.h>
 #include <frc2/command/Subsystem.h>
-#include <frc2/command/SwerveFollowerCommand.h>
+#include <frc2/command/SwerveControllerCommand.h>
 
 #include <iostream>
 
@@ -26,7 +26,7 @@
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
-class SwerveFollowerCommandTest : public ::testing::Test {
+class SwerveControllerCommandTest : public ::testing::Test {
  protected:
   frc2::Timer m_rotTimer;
   frc::Rotation2d m_angle{0_rad};
@@ -64,7 +64,7 @@ class SwerveFollowerCommandTest : public ::testing::Test {
   }
 };
 
-TEST_F(SwerveFollowerCommandTest, ReachesReference) {
+TEST_F(SwerveControllerCommandTest, ReachesReference) {
   frc2::Subsystem subsystem{};
 
   auto waypoints =
@@ -74,7 +74,7 @@ TEST_F(SwerveFollowerCommandTest, ReachesReference) {
 
   auto endState = trajectory.Sample(trajectory.TotalTime());
 
-  auto command = frc2::SwerveFollowerCommand<4>(
+  auto command = frc2::SwerveControllerCommand<4>(
       trajectory, [&]() { return getRobotPose(); }, m_kinematics,
 
       frc2::PIDController(0.6, 0, 0), frc2::PIDController(0.6, 0, 0),

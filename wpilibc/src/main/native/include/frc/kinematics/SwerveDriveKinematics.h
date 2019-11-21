@@ -118,6 +118,7 @@ class SwerveDriveKinematics {
    *
    * @return The resulting chassis speed.
    */
+  template <typename... ModuleStates>
   ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates);
 
   /**

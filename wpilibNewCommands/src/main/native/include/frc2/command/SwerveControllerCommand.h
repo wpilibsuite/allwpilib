@@ -46,8 +46,8 @@ namespace frc2 {
  * trajectory.
  */
 template <size_t NumModules>
-class SwerveFollowerCommand
-    : public CommandHelper<CommandBase, SwerveFollowerCommand<NumModules>> {
+class SwerveControllerCommand
+    : public CommandHelper<CommandBase, SwerveControllerCommand<NumModules>> {
   using voltsecondspermeter =
       units::compound_unit<units::voltage::volt, units::second,
                            units::inverse<units::meter>>;
@@ -57,7 +57,7 @@ class SwerveFollowerCommand
 
  public:
   /**
-   * Constructs a new SwerveFollowerCommand that when executed will follow the
+   * Constructs a new SwerveControllerCommand that when executed will follow the
    * provided trajectory. This command will not return output voltages but
    * rather raw module states from the position controllers which need to be put
    * into a velocity PID.
@@ -84,7 +84,7 @@ class SwerveFollowerCommand
    * the position controllers.
    * @param requirements                      The subsystems to require.
    */
-  SwerveFollowerCommand(
+  SwerveControllerCommand(
       frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
       frc::SwerveDriveKinematics<NumModules> kinematics,
       frc2::PIDController xController, frc2::PIDController yController,
@@ -117,4 +117,4 @@ class SwerveFollowerCommand
 };
 }  // namespace frc2
 
-#include "SwerveFollowerCommand.inc"
+#include "SwerveControllerCommand.inc"

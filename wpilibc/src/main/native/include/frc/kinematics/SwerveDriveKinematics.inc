@@ -55,6 +55,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
 }
 
 template <size_t NumModules>
+template <typename... ModuleStates>
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
     ModuleStates&&... wheelStates) {
   static_assert(sizeof...(wheelStates) == NumModules,
