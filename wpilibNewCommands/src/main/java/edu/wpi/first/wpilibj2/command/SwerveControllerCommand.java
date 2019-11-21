@@ -49,9 +49,9 @@ public class SwerveControllerCommand extends CommandBase {
   private final Consumer<SwerveModuleState[]> m_outputModuleStates;
 
   /**
-   * Constructs a new SwerveControllerCommand that when executed will follow the provided trajectory.
-   * This command will not return output voltages but rather raw module states from
-   * the position controllers which need to be put into a velocity PID.
+   * Constructs a new SwerveControllerCommand that when executed will follow the provided
+   * trajectory. This command will not return output voltages but rather raw module states from the
+   * position controllers which need to be put into a velocity PID.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path-
    * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
@@ -110,6 +110,7 @@ public class SwerveControllerCommand extends CommandBase {
   }
 
   @Override
+  @SuppressWarnings("LocalVariableName")
   public void execute() {
     double curTime = m_timer.get();
 

@@ -493,7 +493,7 @@
       "Trajectory",
       "Path following"
     ],
-    "foldername": "mecanumControllercommand",
+    "foldername": "mecanumcontrollercommand",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -508,7 +508,7 @@
       "Trajectory",
       "Path following"
     ],
-    "foldername": "swerveControllercommand",
+    "foldername": "swervecontrollercommand",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

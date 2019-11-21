@@ -6,8 +6,6 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-template <typename T>
-
 namespace frc2 {
 
 template <size_t NumModules>

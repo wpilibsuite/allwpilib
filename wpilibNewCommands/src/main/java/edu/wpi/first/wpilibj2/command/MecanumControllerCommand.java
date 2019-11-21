@@ -67,9 +67,9 @@ public class MecanumControllerCommand extends CommandBase {
   private final Consumer<MecanumDriveWheelSpeeds> m_outputWheelSpeeds;
 
   /**
-   * Constructs a new MecanumControllerCommand that when executed will follow the provided trajectory.
-   * PID control and feedforward are handled internally,
-   * outputs are scaled from -12 to 12 as a voltage output to the motor.
+   * Constructs a new MecanumControllerCommand that when executed will follow the provided
+   * trajectory. PID control and feedforward are handled internally. Outputs are scaled from -12 to
+   * 12 as a voltage output to the motor.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path
    * this is left to the user, since it is not appropriate for paths with nonstationary endstates.
@@ -159,8 +159,8 @@ public class MecanumControllerCommand extends CommandBase {
   }
 
   /**
-   * Constructs a new MecanumControllerCommand that when executed will follow the provided trajectory.
-   * The user should implement a velocity PID on the desired output wheel velocities.
+   * Constructs a new MecanumControllerCommand that when executed will follow the provided
+   * trajectory. The user should implement a velocity PID on the desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the outputVolts to zero upon completion of the path -
    * this is left to the user, since it is not appropriate for paths with non-stationary end-states.
@@ -249,6 +249,7 @@ public class MecanumControllerCommand extends CommandBase {
   }
 
   @Override
+  @SuppressWarnings("LocalVariableName")
   public void execute() {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;
