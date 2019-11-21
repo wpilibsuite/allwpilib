@@ -10,32 +10,29 @@
 #include "Constants.h"
 
 using namespace ArmConstants;
-using State = frc::TrapezoidProfile::State;
+using State = frc::TrapezoidProfile<units::radians>::State;
 
 ArmSubsystem::ArmSubsystem()
-    : frc2::ProfiledPIDSubsystem(frc::ProfiledPIDController(
-          kP, 0, 0,
-          {units::meters_per_second_t(kMaxVelocity.to<double>()),
-           units::meters_per_second_squared_t(kMaxAcceleration.to<double>())})),
+    : frc2::ProfiledPIDSubsystem(frc::ProfiledPIDController<units::radians>(
+          kP, 0, 0, {kMaxVelocity, kMaxAcceleration})),
       m_motor(kMotorPort),
       m_encoder(kEncoderPorts[0], kEncoderPorts[1]),
       m_feedforward(kS, kCos, kV, kA),
       // Start arm at rest in neutral position
-      m_goal{units::meter_t(kArmOffset.to<double>()), 0_mps} {
+      m_goal{kArmOffset., 0_mps} {
   m_encoder.SetDistancePerPulse(kEncoderDistancePerPulse.to<double>());
 }
 
 void ArmSubsystem::UseOutput(double output, State setpoint) {
   // Calculate the feedforward from the sepoint
-  units::volt_t feedforward = m_feedforward.Calculate(
-      units::radian_t(setpoint.position.to<double>()),
-      units::radians_per_second_t(setpoint.velocity.to<double>()));
+  units::volt_t feedforward =
+      m_feedforward.Calculate(setpoint.position, setpoint.velocity);
   // Add the feedforward to the PID output to get the motor output
   m_motor.SetVoltage(units::volt_t(output) + feedforward);
 }
 
 void ArmSubsystem::SetGoal(units::radian_t goal) {
-  m_goal = State{units::meter_t(goal.to<double>()), 0_mps};
+  m_goal = State{goal, 0_rad_per_s};
 }
 
 State ArmSubsystem::GetGoal() { return m_goal; }

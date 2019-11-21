@@ -11,12 +11,13 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/controller/ArmFeedforward.h>
 #include <frc2/command/ProfiledPIDSubsystem.h>
+#include <units/units.h>
 
 /**
  * A robot arm subsystem that moves with a motion profile.
  */
-class ArmSubsystem : public frc2::ProfiledPIDSubsystem {
-  using State = frc::TrapezoidProfile::State;
+class ArmSubsystem : public frc2::ProfiledPIDSubsystem<units::radians> {
+  using State = frc::TrapezoidProfile<units:radian>::State;
 
  public:
   ArmSubsystem();
@@ -27,7 +28,7 @@ class ArmSubsystem : public frc2::ProfiledPIDSubsystem {
 
   State GetGoal() override;
 
-  units::meter_t GetMeasurement() override;
+  units::radian_t GetMeasurement() override;
 
  private:
   frc::PWMVictorSPX m_motor;
