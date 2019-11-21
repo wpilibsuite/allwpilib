@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include <units/units.h>
 
 namespace frc {

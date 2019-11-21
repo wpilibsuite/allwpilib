@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <algorithm>
-
 template <class Distance>
 TrapezoidProfile<Distance>::TrapezoidProfile(Constraints constraints,
                                              State goal, State initial)
