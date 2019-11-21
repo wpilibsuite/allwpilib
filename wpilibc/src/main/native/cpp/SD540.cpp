@@ -14,7 +14,7 @@
 using namespace frc;
 
 SD540::SD540(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.05, 1.55, 1.50, 1.44, .94);
+  SetBounds(2.05, 1.55, 1.50, 1.44, 0.94);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);
   SetZeroLatch();

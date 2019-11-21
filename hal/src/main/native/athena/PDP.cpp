@@ -308,54 +308,54 @@ void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
 
   currents[0] = ((static_cast<uint32_t>(pdpStatus.bits.chan1_h8) << 2) |
                  pdpStatus.bits.chan1_l2) *
-                .125;
+                0.125;
   currents[1] = ((static_cast<uint32_t>(pdpStatus.bits.chan2_h6) << 4) |
                  pdpStatus.bits.chan2_l4) *
-                .125;
+                0.125;
   currents[2] = ((static_cast<uint32_t>(pdpStatus.bits.chan3_h4) << 6) |
                  pdpStatus.bits.chan3_l6) *
-                .125;
+                0.125;
   currents[3] = ((static_cast<uint32_t>(pdpStatus.bits.chan4_h2) << 8) |
                  pdpStatus.bits.chan4_l8) *
-                .125;
+                0.125;
   currents[4] = ((static_cast<uint32_t>(pdpStatus.bits.chan5_h8) << 2) |
                  pdpStatus.bits.chan5_l2) *
-                .125;
+                0.125;
   currents[5] = ((static_cast<uint32_t>(pdpStatus.bits.chan6_h6) << 4) |
                  pdpStatus.bits.chan6_l4) *
-                .125;
+                0.125;
 
   currents[6] = ((static_cast<uint32_t>(pdpStatus2.bits.chan7_h8) << 2) |
                  pdpStatus2.bits.chan7_l2) *
-                .125;
+                0.125;
   currents[7] = ((static_cast<uint32_t>(pdpStatus2.bits.chan8_h6) << 4) |
                  pdpStatus2.bits.chan8_l4) *
-                .125;
+                0.125;
   currents[8] = ((static_cast<uint32_t>(pdpStatus2.bits.chan9_h4) << 6) |
                  pdpStatus2.bits.chan9_l6) *
-                .125;
+                0.125;
   currents[9] = ((static_cast<uint32_t>(pdpStatus2.bits.chan10_h2) << 8) |
                  pdpStatus2.bits.chan10_l8) *
-                .125;
+                0.125;
   currents[10] = ((static_cast<uint32_t>(pdpStatus2.bits.chan11_h8) << 2) |
                   pdpStatus2.bits.chan11_l2) *
-                 .125;
+                 0.125;
   currents[11] = ((static_cast<uint32_t>(pdpStatus2.bits.chan12_h6) << 4) |
                   pdpStatus2.bits.chan12_l4) *
-                 .125;
+                 0.125;
 
   currents[12] = ((static_cast<uint32_t>(pdpStatus3.bits.chan13_h8) << 2) |
                   pdpStatus3.bits.chan13_l2) *
-                 .125;
+                 0.125;
   currents[13] = ((static_cast<uint32_t>(pdpStatus3.bits.chan14_h6) << 4) |
                   pdpStatus3.bits.chan14_l4) *
-                 .125;
+                 0.125;
   currents[14] = ((static_cast<uint32_t>(pdpStatus3.bits.chan15_h4) << 6) |
                   pdpStatus3.bits.chan15_l6) *
-                 .125;
+                 0.125;
   currents[15] = ((static_cast<uint32_t>(pdpStatus3.bits.chan16_h2) << 8) |
                   pdpStatus3.bits.chan16_l8) *
-                 .125;
+                 0.125;
 }
 
 double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status) {

@@ -35,7 +35,7 @@ Encoder::Encoder(HAL_Handle digitalSourceHandleA,
         return;
       }
       m_counter = HAL_kInvalidHandle;
-      SetMaxPeriod(.5, status);
+      SetMaxPeriod(0.5, status);
       break;
     }
     case HAL_Encoder_k1X:

@@ -90,7 +90,7 @@ class RobotContainer {
   frc2::InstantCommand m_stopFeeder{[this] { m_shooter.StopFeeder(); },
                                     {&m_shooter}};
 
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(.5); },
+  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
                                         {}};
   frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
                                         {}};
