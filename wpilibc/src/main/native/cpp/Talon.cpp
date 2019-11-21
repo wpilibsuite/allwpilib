@@ -14,7 +14,7 @@
 using namespace frc;
 
 Talon::Talon(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.037, 1.539, 1.513, 1.487, .989);
+  SetBounds(2.037, 1.539, 1.513, 1.487, 0.989);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);
   SetZeroLatch();

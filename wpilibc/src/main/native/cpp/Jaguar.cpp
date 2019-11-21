@@ -14,7 +14,7 @@
 using namespace frc;
 
 Jaguar::Jaguar(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.31, 1.55, 1.507, 1.454, .697);
+  SetBounds(2.31, 1.55, 1.507, 1.454, 0.697);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);
   SetZeroLatch();

@@ -25,7 +25,7 @@ Counter::Counter(Mode mode) {
   m_counter = HAL_InitializeCounter((HAL_Counter_Mode)mode, &m_index, &status);
   wpi_setHALError(status);
 
-  SetMaxPeriod(.5);
+  SetMaxPeriod(0.5);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1, mode + 1);
   SendableRegistry::GetInstance().AddLW(this, "Counter", m_index);

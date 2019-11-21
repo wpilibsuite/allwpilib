@@ -38,7 +38,7 @@ constexpr double kEncoderDistancePerPulse =
 constexpr bool kGyroReversed = true;
 
 constexpr double kStabilizationP = 1;
-constexpr double kStabilizationI = .5;
+constexpr double kStabilizationI = 0.5;
 constexpr double kStabilizationD = 0;
 
 constexpr double kTurnP = 1;
@@ -52,7 +52,7 @@ constexpr double kTurnRateToleranceDegPerS = 10;  // degrees per second
 namespace AutoConstants {
 constexpr double kAutoDriveDistanceInches = 60;
 constexpr double kAutoBackupDistanceInches = 20;
-constexpr double kAutoDriveSpeed = .5;
+constexpr double kAutoDriveSpeed = 0.5;
 }  // namespace AutoConstants
 
 namespace OIConstants {
