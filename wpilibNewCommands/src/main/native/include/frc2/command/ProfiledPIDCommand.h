@@ -32,7 +32,7 @@ class ProfiledPIDCommand
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Velocity_t = units::unit_t<Velocity>;
-  using State = frc::TrapezoidProfile<Distance>::State;
+  using State = typename frc::TrapezoidProfile<Distance>::State;
 
  public:
   /**

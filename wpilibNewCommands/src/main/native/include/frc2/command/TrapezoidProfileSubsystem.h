@@ -23,8 +23,8 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Velocity_t = units::unit_t<Velocity>;
-  using State = frc::TrapezoidProfile<Distance>::State;
-  using Constraints = frc::TrapezoidProfile<Distance>::Constraints;
+  using State = typename frc::TrapezoidProfile<Distance>::State;
+  using Constraints = typename frc::TrapezoidProfile<Distance>::Constraints;
  public:
   /**
    * Creates a new TrapezoidProfileSubsystem.
