@@ -25,7 +25,7 @@ class DifferentialDriveVoltageConstraintTest {
   void testDifferentialDriveVoltageConstraint() {
     // Pick an unreasonably large kA to ensure the constraint has to do some work
     var feedforward = new SimpleMotorFeedforward(1, 1, 3);
-    var kinematics = new DifferentialDriveKinematics(.5);
+    var kinematics = new DifferentialDriveKinematics(0.5);
     double maxVoltage = 10;
     var constraint = new DifferentialDriveVoltageConstraint(feedforward,
                                                             kinematics,
