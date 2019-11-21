@@ -10,8 +10,6 @@
 using namespace frc2;
 using namespace units;
 
-template <typename T>
-
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::SimpleMotorFeedforward<units::meters> feedforward,

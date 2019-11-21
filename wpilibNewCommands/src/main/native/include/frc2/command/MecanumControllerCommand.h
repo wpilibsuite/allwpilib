@@ -49,15 +49,16 @@ class MecanumControllerCommand
     : public CommandHelper<CommandBase, MecanumControllerCommand> {
  public:
   /**
-   * Constructs a new MecanumControllerCommand that when executed will follow the
-   * provided trajectory. PID control and feedforward are handled internally,
-   * outputs are scaled from -12 to 12 as a voltage output to the motor.
+   * Constructs a new MecanumControllerCommand that when executed will follow
+   * the provided trajectory. PID control and feedforward are handled
+   * internally. Outputs are scaled from -12 to 12 as a voltage output to the
+   * motor.
    *
-   * <p>Note: The controllers will *not* set the outputVolts to zero upon
+   * Note: The controllers will *not* set the outputVolts to zero upon
    * completion of the path this is left to the user, since it is not
    * appropriate for paths with nonstationary endstates.
    *
-   * <p>Note2: The rotation controller will calculate the rotation based on the
+   * Note2: The rotation controller will calculate the rotation based on the
    * final pose in the trajectory, not the poses at each time step.
    *
    * @param trajectory                        The trajectory to follow.
@@ -105,8 +106,8 @@ class MecanumControllerCommand
       std::initializer_list<Subsystem*> requirements);
 
   /**
-   * Constructs a new MecanumControllerCommand that when executed will follow the
-   * provided trajectory. The user should implement a velocity PID on the
+   * Constructs a new MecanumControllerCommand that when executed will follow
+   * the provided trajectory. The user should implement a velocity PID on the
    * desired output wheel velocities.
    *
    * <p>Note: The controllers will *not* set the output velocities to zero upon
