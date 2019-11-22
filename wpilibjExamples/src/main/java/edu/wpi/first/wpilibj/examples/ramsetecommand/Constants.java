@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.examples.ramsetecommand;
 
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -62,10 +61,6 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-
-    public static final DifferentialDriveKinematicsConstraint kAutoPathConstraints =
-        new DifferentialDriveKinematicsConstraint(DriveConstants.kDriveKinematics,
-                                                  kMaxSpeedMetersPerSecond);
 
     // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
     public static final double kRamseteB = 2;
