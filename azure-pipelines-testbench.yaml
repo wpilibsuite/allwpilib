@@ -31,5 +31,13 @@ jobs:
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'JUnit'
-        testResultsFiles: '*.xml'
+        testResultsFiles: 'cpp*.xml'
+        testRunTitle: 'C++ Test Report'
+        searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'java*.xml'
+        testRunTitle: 'Java Test Report'
         searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
