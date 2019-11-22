@@ -468,5 +468,33 @@
     "foldername": "DMA",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "MecanumControllerCommand",
+    "description": "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "MecanumControllerCommand",
+      "Mecanum",
+      "PID",
+      "Trajectory",
+      "Path following"
+    ],
+    "foldername": "MecanumControllerCommand",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveControllerCommand",
+    "description": "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "SwerveControllerCommand",
+      "Swerve",
+      "PID",
+      "Trajectory",
+      "Path following"
+    ],
+    "foldername": "SwerveControllerCommand",
+    "gradlebase": "cpp",
+    "commandversion": 2
   }
 ]
