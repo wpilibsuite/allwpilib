@@ -32,4 +32,4 @@ jobs:
       inputs:
         testResultsFormat: 'JUnit'
         testResultsFiles: '*.xml'
-        searchFolder: 'test-reports'
+        searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
