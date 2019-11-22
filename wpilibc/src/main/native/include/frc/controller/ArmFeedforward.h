@@ -74,7 +74,7 @@ class ArmFeedforward {
    * @return The maximum possible velocity at the given acceleration and angle.
    */
   units::unit_t<Velocity> MaxAchievableVelocity(
-      units::volt_t maxVoltage, Angle angle,
+      units::volt_t maxVoltage, units::unit_t<Angle> angle,
       units::unit_t<Acceleration> acceleration) {
     // Assume max velocity is positive
     return (maxVoltage - kS - kCos * units::math::cos(angle) -
@@ -95,7 +95,7 @@ class ArmFeedforward {
    * @return The minimum possible velocity at the given acceleration and angle.
    */
   units::unit_t<Velocity> MinAchievableVelocity(
-      units::volt_t maxVoltage, Angle angle,
+      units::volt_t maxVoltage, units::unit_t<Angle> angle,
       units::unit_t<Acceleration> acceleration) {
     // Assume min velocity is negative, ks flips sign
     return (-maxVoltage + kS - kCos * units::math::cos(angle) -
@@ -116,7 +116,8 @@ class ArmFeedforward {
    * @return The maximum possible acceleration at the given velocity and angle.
    */
   units::unit_t<Acceleration> MaxAchievableAcceleration(
-      units::volt_t maxVoltage, Angle angle, units::unit_t<Velocity> velocity) {
+      units::volt_t maxVoltage, units::unit_t<Angle> angle,
+      units::unit_t<Velocity> velocity) {
     return (maxVoltage - kS * wpi::sgn(velocity) -
             kCos * units::math::cos(angle) - kV * velocity) /
            kA;
@@ -135,7 +136,8 @@ class ArmFeedforward {
    * @return The minimum possible acceleration at the given velocity and angle.
    */
   units::unit_t<Acceleration> MinAchievableAcceleration(
-      units::volt_t maxVoltage, Angle angle, units::unit_t<Velocity> velocity) {
+      units::volt_t maxVoltage, units::unit_t<Angle> angle,
+      units::unit_t<Velocity> velocity) {
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
 
