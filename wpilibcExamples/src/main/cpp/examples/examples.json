@@ -496,5 +496,17 @@
     "foldername": "SwerveControllerCommand",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "ArmBot",
+    "description": "An example command-based robot demonstrating the use of a ProfiledPIDSubsystem to control an arm.",
+    "tags": [
+      "ArmBot",
+      "PID",
+      "Motion Profile"
+    ],
+    "foldername": "ArmBot",
+    "gradlebase": "cpp",
+    "commandversion": 2
   }
 ]
