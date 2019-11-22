@@ -9,7 +9,7 @@ trigger:
 jobs:
 - job: TestBench
   pool: RoboRioConnections
-  timeoutInMinutes: 20
+  timeoutInMinutes: 60
   workspace:
     clean: all
   steps:
