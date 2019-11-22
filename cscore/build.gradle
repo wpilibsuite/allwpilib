@@ -19,7 +19,8 @@ ext {
     sharedCvConfigs = [cscore    : [],
                        cscoreBase: [],
                        cscoreDev : [],
-                       cscoreTest: []]
+                       cscoreTest: [],
+                       cscoreJNIShared: []]
     staticCvConfigs = [cscoreJNI: []]
     useJava = true
     useCpp = true
