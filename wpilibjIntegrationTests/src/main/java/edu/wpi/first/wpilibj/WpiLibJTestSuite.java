@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
  * easy to determine if a test is missing from the list.
  */
 @RunWith(Suite.class)
-@SuiteClasses({AnalogCrossConnectTest.class, AnalogPotentiometerTest.class,
+@SuiteClasses({AnalogPotentiometerTest.class,
     BuiltInAccelerometerTest.class, ConstantsPortsTest.class, CounterTest.class,
     DigitalGlitchFilterTest.class, DIOCrossConnectTest.class,
     DriverStationTest.class, EncoderTest.class, GyroTest.class, MotorEncoderTest.class,
