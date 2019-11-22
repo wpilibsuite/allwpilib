@@ -63,7 +63,7 @@ class MecanumControllerCommand
    *
    * @param trajectory           The trajectory to follow.
    * @param pose                 A function that supplies the robot pose,
-   *                             provided with the odometry class.
+   *                             provided by the odometry class.
    * @param feedforward          The feedforward to use for the drivetrain.
    * @param kinematics           The kinematics for the robot drivetrain.
    * @param xController          The Trajectory Tracker PID controller

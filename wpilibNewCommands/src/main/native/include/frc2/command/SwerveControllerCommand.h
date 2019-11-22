@@ -71,7 +71,7 @@ class SwerveControllerCommand
    *
    * @param trajectory      The trajectory to follow.
    * @param pose            A function that supplies the robot pose,
-   *                        provided with the odometry class.
+   *                        provided by the odometry class.
    * @param kinematics      The kinematics for the robot drivetrain.
    * @param xController     The Trajectory Tracker PID controller
    *                        for the robot's x position.
