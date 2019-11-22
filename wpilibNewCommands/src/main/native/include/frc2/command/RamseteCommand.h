@@ -17,9 +17,9 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/trajectory/Trajectory.h>
-#include <frc2/Timer.h>
 #include <units/units.h>
 
+#include "frc2/Timer.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -42,7 +42,6 @@ namespace frc2 {
  * @see Trajectory
  */
 class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
-
  public:
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
@@ -58,12 +57,11 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * the odometry classes to provide this.
    * @param controller      The RAMSETE controller used to follow the
    * trajectory.
-   * @param feedforward     A component for calculating the feedforward for the drive.
+   * @param feedforward     A component for calculating the feedforward for the
+   * drive.
    * @param kinematics      The kinematics for the robot drivetrain.
-   * @param leftSpeed       A function that supplies the speed of the left side
-   * of the robot drive.
-   * @param rightSpeed      A function that supplies the speed of the right side
-   * of the robot drive.
+   * @param wheelSpeeds     A function that supplies the speeds of the left
+   * and right sides of the robot drive.
    * @param leftController  The PIDController for the left side of the robot
    * drive.
    * @param rightController The PIDController for the right side of the robot
@@ -76,8 +74,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
                  frc::RamseteController controller,
                  frc::SimpleMotorFeedforward<units::meters> feedforward,
                  frc::DifferentialDriveKinematics kinematics,
-                 std::function<units::meters_per_second_t()> leftSpeed,
-                 std::function<units::meters_per_second_t()> rightSpeed,
+                 std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
                  frc2::PIDController leftController,
                  frc2::PIDController rightController,
                  std::function<void(units::volt_t, units::volt_t)> output,
@@ -121,8 +118,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   frc::RamseteController m_controller;
   frc::SimpleMotorFeedforward<units::meters> m_feedforward;
   frc::DifferentialDriveKinematics m_kinematics;
-  std::function<units::meters_per_second_t()> m_leftSpeed;
-  std::function<units::meters_per_second_t()> m_rightSpeed;
+  std::function<frc::DifferentialDriveWheelSpeeds()> m_speeds;
   std::unique_ptr<frc2::PIDController> m_leftController;
   std::unique_ptr<frc2::PIDController> m_rightController;
   std::function<void(units::volt_t, units::volt_t)> m_outputVolts;

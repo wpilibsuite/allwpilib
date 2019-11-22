@@ -17,7 +17,6 @@
 #include "frc/ErrorBase.h"
 
 namespace frc {
-class PWM;
 
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
@@ -33,28 +32,16 @@ class AddressableLED : public ErrorBase {
       b = _b;
       padding = 0;
     }
+
+    /**
+     * A helper method to set all values of the LED.
+     */
+    void SetLED(int r, int g, int b) {
+      this->r = r;
+      this->g = g;
+      this->b = b;
+    }
   };
-
-  /**
-   * Constructs a new driver from a PWM output.
-   *
-   * @param output the pwm output to use
-   */
-  explicit AddressableLED(PWM& output);
-
-  /**
-   * Constructs a new driver from a PWM output.
-   *
-   * @param output the pwm output to use
-   */
-  explicit AddressableLED(PWM* output);
-
-  /**
-   * Constructs a new driver from a PWM output.
-   *
-   * @param output the pwm output to use
-   */
-  explicit AddressableLED(std::shared_ptr<PWM> output);
 
   /**
    * Constructs a new driver for a specific port.
@@ -133,9 +120,7 @@ class AddressableLED : public ErrorBase {
   void Stop();
 
  private:
-  void Init();
-
-  std::shared_ptr<PWM> m_pwmOutput;
+  hal::Handle<HAL_DigitalHandle> m_pwmHandle;
   hal::Handle<HAL_AddressableLEDHandle> m_handle;
 };
 }  // namespace frc

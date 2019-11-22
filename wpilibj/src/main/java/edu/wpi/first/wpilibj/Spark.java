@@ -33,7 +33,7 @@ public class Spark extends PWMSpeedController {
    * Common initialization code called by all constructors.
    */
   protected void initSpark() {
-    setBounds(2.003, 1.55, 1.50, 1.46, .999);
+    setBounds(2.003, 1.55, 1.50, 1.46, 0.999);
     setPeriodMultiplier(PeriodMultiplier.k1X);
     setSpeed(0.0);
     setZeroLatch();

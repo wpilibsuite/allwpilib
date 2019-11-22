@@ -12,7 +12,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
+#include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/RamseteCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
@@ -44,11 +44,19 @@ void RobotContainer::ConfigureButtonBindings() {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
+  // Create a voltage constraint to ensure we don't accelerate too fast
+  frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
+      frc::SimpleMotorFeedforward<units::meters>(
+          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
+      DriveConstants::kDriveKinematics, 10_V);
+
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
   // Add kinematics to ensure max speed is actually obeyed
   config.SetKinematics(DriveConstants::kDriveKinematics);
+  // Apply the voltage constraint
+  config.AddConstraint(autoVoltageConstraint);
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
@@ -68,12 +76,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc::SimpleMotorFeedforward<units::meters>(
           DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
       DriveConstants::kDriveKinematics,
-      [this] {
-        return units::meters_per_second_t(m_drive.GetLeftEncoder().GetRate());
-      },
-      [this] {
-        return units::meters_per_second_t(m_drive.GetRightEncoder().GetRate());
-      },
+      [this] { return m_drive.GetWheelSpeeds(); },
       frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
       frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
       [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },

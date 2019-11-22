@@ -38,7 +38,7 @@ public class Jaguar extends PWMSpeedController {
   public Jaguar(final int channel) {
     super(channel);
 
-    setBounds(2.31, 1.55, 1.507, 1.454, .697);
+    setBounds(2.31, 1.55, 1.507, 1.454, 0.697);
     setPeriodMultiplier(PeriodMultiplier.k1X);
     setSpeed(0.0);
     setZeroLatch();

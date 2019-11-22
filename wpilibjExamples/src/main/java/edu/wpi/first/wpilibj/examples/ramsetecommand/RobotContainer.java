@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -79,7 +80,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Drive at half speed when the right bumper is held
     new JoystickButton(m_driverController, Button.kBumperRight.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(.5))
+        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
 
   }
@@ -91,11 +92,23 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+
+    // Create a voltage constraint to ensure we don't accelerate too fast
+    var autoVoltageConstraint =
+        new DifferentialDriveVoltageConstraint(
+            new SimpleMotorFeedforward(ksVolts,
+                                       kvVoltSecondsPerMeter,
+                                       kaVoltSecondsSquaredPerMeter),
+            kDriveKinematics,
+            10);
+
     // Create config for trajectory
     TrajectoryConfig config =
         new TrajectoryConfig(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared)
             // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(kDriveKinematics);
+            .setKinematics(kDriveKinematics)
+            // Apply the voltage constraint
+            .addConstraint(autoVoltageConstraint);
 
     // An example trajectory to follow.  All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -118,8 +131,7 @@ public class RobotContainer {
         new RamseteController(kRamseteB, kRamseteZeta),
         new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter),
         kDriveKinematics,
-        m_robotDrive.getLeftEncoder()::getRate,
-        m_robotDrive.getRightEncoder()::getRate,
+        m_robotDrive::getWheelSpeeds,
         new PIDController(kPDriveVel, 0, 0),
         new PIDController(kPDriveVel, 0, 0),
         // RamseteCommand passes volts to the callback

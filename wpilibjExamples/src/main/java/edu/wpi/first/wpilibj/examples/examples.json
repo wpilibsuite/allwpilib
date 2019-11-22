@@ -449,5 +449,81 @@
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 1
+  },
+  {
+    "name": "Duty Cycle Encoder",
+    "description": "Demonstrates the use of the Duty Cycle Encoder class",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "dutycycleencoder",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Duty Cycle Input",
+    "description": "Demonstrates the use of the Duty Cycle class",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "dutycycleinput",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Addressable LED",
+    "description": "Demonstrates the use of the Addressable LED class",
+    "tags": [
+      "Getting Started with Java"
+    ],
+    "foldername": "addressableled",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "ArmBot",
+    "description": "An example command-based robot demonstrating the use of a ProfiledPIDCommand to control an arm.",
+    "tags": [
+      "ArmBot",
+      "PID",
+      "Motion Profile"
+    ],
+    "foldername": "armbot",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumControllerCommand",
+    "description": "An example command-based robot demonstrating the use of a MecanumControllerCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "MecanumControllerCommand",
+      "Mecanum",
+      "PID",
+      "Trajectory",
+      "Path following"
+    ],
+    "foldername": "mecanumcontrollercommand",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveControllerCommand",
+    "description": "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "SwerveControllerCommand",
+      "Swerve",
+      "PID",
+      "Trajectory",
+      "Path following"
+    ],
+    "foldername": "swervecontrollercommand",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]

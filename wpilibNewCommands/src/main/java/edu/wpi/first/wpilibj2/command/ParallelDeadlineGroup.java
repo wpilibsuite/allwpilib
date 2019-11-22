@@ -21,6 +21,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   //maps commands in this group to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
+  private boolean m_finished = true;
   private Command m_deadline;
 
   /**
@@ -57,7 +58,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   public final void addCommands(Command... commands) {
     requireUngrouped(commands);
 
-    if (m_commands.containsValue(true)) {
+    if (!m_finished) {
       throw new IllegalStateException(
           "Commands cannot be added to a CommandGroup while the group is running");
     }
@@ -81,6 +82,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
       commandRunning.getKey().initialize();
       commandRunning.setValue(true);
     }
+    m_finished = false;
   }
 
   @Override
@@ -93,6 +95,9 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
       if (commandRunning.getKey().isFinished()) {
         commandRunning.getKey().end(false);
         commandRunning.setValue(false);
+        if (commandRunning.getKey() == m_deadline) {
+          m_finished = true;
+        }
       }
     }
   }
@@ -108,7 +113,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
 
   @Override
   public boolean isFinished() {
-    return m_deadline.isFinished();
+    return m_finished;
   }
 
   @Override

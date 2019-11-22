@@ -14,7 +14,7 @@
 using namespace frc;
 
 PWMSparkMax::PWMSparkMax(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.003, 1.55, 1.50, 1.46, .999);
+  SetBounds(2.003, 1.55, 1.50, 1.46, 0.999);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);
   SetZeroLatch();

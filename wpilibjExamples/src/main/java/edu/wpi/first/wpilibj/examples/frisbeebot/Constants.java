@@ -40,7 +40,7 @@ public final class Constants {
     public static final int kEncoderCPR = 1024;
     public static final double kEncoderDistancePerPulse =
         // Distance units will be rotations
-        1. / (double) kEncoderCPR;
+        1.0 / (double) kEncoderCPR;
 
     public static final int kShooterMotorPort = 4;
     public static final int kFeederMotorPort = 5;
@@ -56,12 +56,12 @@ public final class Constants {
 
     // On a real robot the feedforward constants should be empirically determined; these are
     // reasonable guesses.
-    public static final double kSVolts = .05;
+    public static final double kSVolts = 0.05;
     public static final double kVVoltSecondsPerRotation =
         // Should have value 12V at free speed...
-        12. / kShooterFreeRPS;
+        12.0 / kShooterFreeRPS;
 
-    public static final double kFeederSpeed = .5;
+    public static final double kFeederSpeed = 0.5;
   }
 
   public static final class AutoConstants {

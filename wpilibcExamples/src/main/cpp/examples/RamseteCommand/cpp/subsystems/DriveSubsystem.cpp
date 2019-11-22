@@ -29,9 +29,7 @@ DriveSubsystem::DriveSubsystem()
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
   m_odometry.Update(frc::Rotation2d(units::degree_t(GetHeading())),
-                    frc::DifferentialDriveWheelSpeeds{
-                        units::meters_per_second_t(m_leftEncoder.GetRate()),
-                        units::meters_per_second_t(m_rightEncoder.GetRate())});
+                    GetWheelSpeeds());
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
@@ -49,7 +47,7 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 double DriveSubsystem::GetAverageEncoderDistance() {
-  return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.;
+  return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
 }
 
 frc::Encoder& DriveSubsystem::GetLeftEncoder() { return m_leftEncoder; }
@@ -61,14 +59,19 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 }
 
 double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1. : 1.);
+  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1.0 : 1.0);
 }
 
 double DriveSubsystem::GetTurnRate() {
-  return m_gyro.GetRate() * (kGyroReversed ? -1. : 1.);
+  return m_gyro.GetRate() * (kGyroReversed ? -1.0 : 1.0);
 }
 
 frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+
+frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
+  return {units::meters_per_second_t(m_leftEncoder.GetRate()),
+          units::meters_per_second_t(m_rightEncoder.GetRate())};
+}
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(pose,

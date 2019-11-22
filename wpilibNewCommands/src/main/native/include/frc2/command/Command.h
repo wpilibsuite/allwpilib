@@ -130,8 +130,9 @@ class Command : public frc::ErrorBase {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup BeforeStarting(std::function<void()> toRun,
-                                        std::initializer_list<Subsystem*> requirements = {}) &&;
+  SequentialCommandGroup BeforeStarting(
+      std::function<void()> toRun,
+      std::initializer_list<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -140,8 +141,9 @@ class Command : public frc::ErrorBase {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup AndThen(std::function<void()> toRun,
-                                 std::initializer_list<Subsystem*> requirements = {}) &&;
+  SequentialCommandGroup AndThen(
+      std::function<void()> toRun,
+      std::initializer_list<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end

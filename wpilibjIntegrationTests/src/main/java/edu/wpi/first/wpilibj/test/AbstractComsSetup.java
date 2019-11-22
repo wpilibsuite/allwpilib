@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -232,14 +232,14 @@ public abstract class AbstractComsSetup {
     // reached then continue to run this loop
     for (timeoutIndex = 0; timeoutIndex < (timeout * 100) && !correctState.getAsBoolean();
          timeoutIndex++) {
-      Timer.delay(.01);
+      Timer.delay(0.01);
     }
     if (correctState.getAsBoolean()) {
-      simpleLog(level, message + " took " + (timeoutIndex * .01) + " seconds");
+      simpleLog(level, message + " took " + (timeoutIndex * 0.01) + " seconds");
     } else {
-      simpleLog(level, message + " timed out after " + (timeoutIndex * .01) + " seconds");
+      simpleLog(level, message + " timed out after " + (timeoutIndex * 0.01) + " seconds");
     }
-    return timeoutIndex * .01;
+    return timeoutIndex * 0.01;
   }
 
 }

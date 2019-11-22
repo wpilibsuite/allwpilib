@@ -56,7 +56,7 @@ public class GyroTest extends AbstractComsSetup {
 
   public void testInitial(AnalogGyro gyro) {
     double angle = gyro.getAngle();
-    assertEquals(errorMessage(angle, 0), 0, angle, .5);
+    assertEquals(errorMessage(angle, 0), 0, angle, 0.5);
   }
 
   /**
@@ -68,7 +68,7 @@ public class GyroTest extends AbstractComsSetup {
     // Set angle
     for (int i = 0; i < 5; i++) {
       m_tpcam.getPan().set(0);
-      Timer.delay(.1);
+      Timer.delay(0.1);
     }
 
     Timer.delay(0.5);
@@ -99,7 +99,7 @@ public class GyroTest extends AbstractComsSetup {
     gyro.reset();
     Timer.delay(0.25);
     double angle = gyro.getAngle();
-    assertEquals(errorMessage(angle, 0), 0, angle, .5);
+    assertEquals(errorMessage(angle, 0), 0, angle, 0.5);
     Timer.delay(5);
     angle = gyro.getAngle();
     assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 2.0);

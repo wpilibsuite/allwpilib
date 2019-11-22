@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class MotorEncoderTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(MotorEncoderTest.class.getName());
 
-  private static final double MOTOR_RUNTIME = .25;
+  private static final double MOTOR_RUNTIME = 0.25;
 
   // private static final List<MotorEncoderFixture> pairs = new
   // ArrayList<MotorEncoderFixture>();
@@ -109,7 +109,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testIncrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(.2);
+    me.getMotor().set(0.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not incremented: start: " + startValue + "; current: "
@@ -125,7 +125,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testDecrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(-.2);
+    me.getMotor().set(-0.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not decremented: start: " + startValue + "; current: "
@@ -140,7 +140,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     final int counter1Start = me.getCounters()[0].get();
     final int counter2Start = me.getCounters()[1].get();
 
-    me.getMotor().set(.75);
+    me.getMotor().set(0.75);
     Timer.delay(MOTOR_RUNTIME);
     int counter1End = me.getCounters()[0].get();
     int counter2End = me.getCounters()[1].get();

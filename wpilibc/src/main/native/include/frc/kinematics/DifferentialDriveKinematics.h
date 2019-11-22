@@ -32,7 +32,7 @@ class DifferentialDriveKinematics {
    * scrubbing effects.
    */
   constexpr explicit DifferentialDriveKinematics(units::meter_t trackWidth)
-      : m_trackWidth(trackWidth) {}
+      : trackWidth(trackWidth) {}
 
   /**
    * Returns a chassis speed from left and right component velocities using
@@ -44,7 +44,7 @@ class DifferentialDriveKinematics {
   constexpr ChassisSpeeds ToChassisSpeeds(
       const DifferentialDriveWheelSpeeds& wheelSpeeds) const {
     return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0_mps,
-            (wheelSpeeds.right - wheelSpeeds.left) / m_trackWidth * 1_rad};
+            (wheelSpeeds.right - wheelSpeeds.left) / trackWidth * 1_rad};
   }
 
   /**
@@ -57,11 +57,10 @@ class DifferentialDriveKinematics {
    */
   constexpr DifferentialDriveWheelSpeeds ToWheelSpeeds(
       const ChassisSpeeds& chassisSpeeds) const {
-    return {chassisSpeeds.vx - m_trackWidth / 2 * chassisSpeeds.omega / 1_rad,
-            chassisSpeeds.vx + m_trackWidth / 2 * chassisSpeeds.omega / 1_rad};
+    return {chassisSpeeds.vx - trackWidth / 2 * chassisSpeeds.omega / 1_rad,
+            chassisSpeeds.vx + trackWidth / 2 * chassisSpeeds.omega / 1_rad};
   }
 
- private:
-  units::meter_t m_trackWidth;
+  units::meter_t trackWidth;
 };
 }  // namespace frc

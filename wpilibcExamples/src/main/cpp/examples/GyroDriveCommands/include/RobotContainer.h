@@ -68,7 +68,7 @@ class RobotContainer {
       // Require the robot drive
       {&m_drive}};
 
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(.5); },
+  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
                                         {}};
   frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
                                         {}};

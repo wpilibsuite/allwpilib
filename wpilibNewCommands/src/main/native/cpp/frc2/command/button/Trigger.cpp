@@ -7,7 +7,7 @@
 
 #include "frc2/command/button/Trigger.h"
 
-#include <frc2/command/InstantCommand.h>
+#include "frc2/command/InstantCommand.h"
 
 using namespace frc2;
 
@@ -49,8 +49,9 @@ Trigger Trigger::WhileActiveContinous(Command* command, bool interruptible) {
   return *this;
 }
 
-Trigger Trigger::WhileActiveContinous(std::function<void()> toRun,
-                                      std::initializer_list<Subsystem*> requirements) {
+Trigger Trigger::WhileActiveContinous(
+    std::function<void()> toRun,
+    std::initializer_list<Subsystem*> requirements) {
   return WhileActiveContinous(InstantCommand(std::move(toRun), requirements));
 }
 

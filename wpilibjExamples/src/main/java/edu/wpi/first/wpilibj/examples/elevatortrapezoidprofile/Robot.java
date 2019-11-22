@@ -9,7 +9,8 @@ package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -19,7 +20,7 @@ public class Robot extends TimedRobot {
 
   private final Joystick m_joystick = new Joystick(1);
   private final Encoder m_encoder = new Encoder(1, 2);
-  private final Spark m_motor = new Spark(1);
+  private final SpeedController m_motor = new PWMVictorSPX(1);
   private final PIDController m_controller = new PIDController(1.3, 0.0, 0.7, kDt);
 
   private final TrapezoidProfile.Constraints m_constraints =

@@ -78,7 +78,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the average of the TWO encoder readings
    */
   public double getAverageEncoderDistance() {
-    return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.;
+    return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
   }
 
   /**
