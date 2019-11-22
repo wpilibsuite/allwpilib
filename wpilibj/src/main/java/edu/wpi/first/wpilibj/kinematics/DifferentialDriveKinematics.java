@@ -15,8 +15,9 @@ package edu.wpi.first.wpilibj.kinematics;
  * velocity components whereas forward kinematics converts left and right
  * component velocities into a linear and angular chassis speed.
  */
+@SuppressWarnings("MemberName")
 public class DifferentialDriveKinematics {
-  private final double m_trackWidthMeters;
+  public final double trackWidthMeters;
 
   /**
    * Constructs a differential drive kinematics object.
@@ -27,7 +28,7 @@ public class DifferentialDriveKinematics {
    *                         measured value due to scrubbing effects.
    */
   public DifferentialDriveKinematics(double trackWidthMeters) {
-    m_trackWidthMeters = trackWidthMeters;
+    this.trackWidthMeters = trackWidthMeters;
   }
 
   /**
@@ -41,7 +42,7 @@ public class DifferentialDriveKinematics {
     return new ChassisSpeeds(
         (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2, 0,
         (wheelSpeeds.rightMetersPerSecond - wheelSpeeds.leftMetersPerSecond)
-            / m_trackWidthMeters
+            / trackWidthMeters
     );
   }
 
@@ -55,9 +56,9 @@ public class DifferentialDriveKinematics {
    */
   public DifferentialDriveWheelSpeeds toWheelSpeeds(ChassisSpeeds chassisSpeeds) {
     return new DifferentialDriveWheelSpeeds(
-        chassisSpeeds.vxMetersPerSecond - m_trackWidthMeters / 2
+        chassisSpeeds.vxMetersPerSecond - trackWidthMeters / 2
           * chassisSpeeds.omegaRadiansPerSecond,
-        chassisSpeeds.vxMetersPerSecond + m_trackWidthMeters / 2
+        chassisSpeeds.vxMetersPerSecond + trackWidthMeters / 2
           * chassisSpeeds.omegaRadiansPerSecond
     );
   }
