@@ -34,7 +34,7 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(Parameterized.class)
 public class PDPTest extends AbstractComsSetup {
-  private static final Logger logger = Logger.getLogger(PCMTest.class.getName());
+  private static final Logger logger = Logger.getLogger(PDPTest.class.getName());
 
   private static PowerDistributionPanel pdp;
   private static MotorEncoderFixture<?> me;
