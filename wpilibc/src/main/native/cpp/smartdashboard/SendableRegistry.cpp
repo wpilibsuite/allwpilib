@@ -42,7 +42,7 @@ struct SendableRegistry::Impl {
     }
   };
 
-  wpi::mutex mutex;
+  wpi::recursive_mutex mutex;
 
   wpi::UidVector<std::unique_ptr<Component>, 32> components;
   wpi::DenseMap<void*, UID> componentMap;
@@ -310,7 +310,9 @@ void SendableRegistry::ForeachLiveWindow(
     wpi::function_ref<void(CallbackData& data)> callback) const {
   assert(dataHandle >= 0);
   std::scoped_lock lock(m_impl->mutex);
-  for (auto&& comp : m_impl->components) {
+  wpi::SmallVector<Impl::Component*, 128> components;
+  for (auto&& comp : m_impl->components) components.emplace_back(comp.get());
+  for (auto comp : components) {
     if (comp->sendable && comp->liveWindow) {
       if (static_cast<size_t>(dataHandle) >= comp->data.size())
         comp->data.resize(dataHandle + 1);
