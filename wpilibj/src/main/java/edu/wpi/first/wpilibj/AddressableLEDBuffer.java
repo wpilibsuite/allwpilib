@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.util.Color;
+
 /**
  * Buffer storage for Addressable LEDs.
  */
@@ -26,9 +28,9 @@ public class AddressableLEDBuffer {
    * Sets a specific led in the buffer.
    *
    * @param index the index to write
-   * @param r the r value [0-255]
-   * @param g the g value [0-255]
-   * @param b the b value [0-255]
+   * @param r     the r value [0-255]
+   * @param g     the g value [0-255]
+   * @param b     the b value [0-255]
    */
   @SuppressWarnings("ParameterName")
   public void setRGB(int index, int r, int g, int b) {
@@ -42,9 +44,9 @@ public class AddressableLEDBuffer {
    * Sets a specific led in the buffer.
    *
    * @param index the index to write
-   * @param h the h value [0-180]
-   * @param s the s value [0-255]
-   * @param v the v value [0-255]
+   * @param h     the h value [0-180]
+   * @param s     the s value [0-255]
+   * @param v     the v value [0-255]
    */
   @SuppressWarnings("ParameterName")
   public void setHSV(final int index, final int h, final int s, final int v) {
@@ -80,6 +82,16 @@ public class AddressableLEDBuffer {
         setRGB(index, v, p, q);
         break;
     }
+  }
+
+  /*
+   * Sets a specific LED in the buffer.
+   *
+   * @param index The index to write
+   * @param color The color of the LED
+   */
+  public void setLED(int index, Color color) {
+    setRGB(index, color.red, color.green, color.blue);
   }
 
   /**
