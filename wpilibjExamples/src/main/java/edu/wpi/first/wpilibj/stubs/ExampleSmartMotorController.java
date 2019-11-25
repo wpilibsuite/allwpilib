@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 /**
  * A simplified stub class that simulates the API of a common "smart" motor controller.
  *
- * Has no actual functionality.
+ * <p>Has no actual functionality.
  */
 public class ExampleSmartMotorController implements SpeedController {
 
@@ -20,6 +20,7 @@ public class ExampleSmartMotorController implements SpeedController {
    *
    * @param port The port for the controller.
    */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public ExampleSmartMotorController(int port) {
   }
 

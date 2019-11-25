@@ -69,18 +69,19 @@ public class RobotContainer {
     // Do the same thing as above when the 'B' button is pressed, but defined inline
     new JoystickButton(m_driverController, Button.kB.value)
         .whenPressed(
-            new TrapezoidProfileCommand(new TrapezoidProfile(
-                // Limit the max acceleration and velocity
-                new TrapezoidProfile.Constraints(kMaxSpeedMetersPerSecond,
-                                                 kMaxAccelerationMetersPerSecondSquared),
-                // End at desired position in meters; implicitly starts at 0
-                new TrapezoidProfile.State(3, 0)),
-                                        // Pipe the profile state to the drive
-                                        setpointState -> m_robotDrive.setDriveStates(
-                                            setpointState,
-                                            setpointState),
-                                        // Require the drive
-                                        m_robotDrive)
+            new TrapezoidProfileCommand(
+                new TrapezoidProfile(
+                    // Limit the max acceleration and velocity
+                    new TrapezoidProfile.Constraints(kMaxSpeedMetersPerSecond,
+                                                     kMaxAccelerationMetersPerSecondSquared),
+                    // End at desired position in meters; implicitly starts at 0
+                    new TrapezoidProfile.State(3, 0)),
+                // Pipe the profile state to the drive
+                setpointState -> m_robotDrive.setDriveStates(
+                    setpointState,
+                    setpointState),
+                // Require the drive
+                m_robotDrive)
                 .beforeStarting(m_robotDrive::resetEncoders)
                 .withTimeout(10));
 

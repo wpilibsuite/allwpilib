@@ -25,19 +25,20 @@ public class TurnToAngleProfiled extends ProfiledPIDCommand {
    * @param drive              The drive subsystem to use
    */
   public TurnToAngleProfiled(double targetAngleDegrees, DriveSubsystem drive) {
-    super(new ProfiledPIDController(kTurnP, kTurnI, kTurnD,
-                                    new TrapezoidProfile.Constraints(
-                                        kMaxTurnRateDegPerS,
-                                        kMaxTurnAccelerationDegPerSSquared
-                                    )),
-          // Close loop on heading
-          drive::getHeading,
-          // Set reference to target
-          targetAngleDegrees,
-          // Pipe output to turn robot
-          (output, setpoint) -> drive.arcadeDrive(0, output),
-          // Require the drive
-          drive);
+    super(
+        new ProfiledPIDController(kTurnP, kTurnI, kTurnD,
+                                  new TrapezoidProfile.Constraints(
+                                      kMaxTurnRateDegPerS,
+                                      kMaxTurnAccelerationDegPerSSquared
+                                  )),
+        // Close loop on heading
+        drive::getHeading,
+        // Set reference to target
+        targetAngleDegrees,
+        // Pipe output to turn robot
+        (output, setpoint) -> drive.arcadeDrive(0, output),
+        // Require the drive
+        drive);
 
     // Set the controller to be continuous (because it is an angle controller)
     getController().enableContinuousInput(-180, 180);

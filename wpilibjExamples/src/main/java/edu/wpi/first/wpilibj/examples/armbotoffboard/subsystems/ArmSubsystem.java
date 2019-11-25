@@ -37,7 +37,7 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem {
     super(new TrapezoidProfile.Constraints(kMaxVelocityRadPerSecond,
                                            kMaxAccelerationRadPerSecSquared),
           kArmOffsetRads);
-    m_motor.setPID(kP, 0,0);
+    m_motor.setPID(kP, 0, 0);
   }
 
   @Override
@@ -47,6 +47,6 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem {
     // Add the feedforward to the PID output to get the motor output
     m_motor.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition,
                         setpoint.position,
-                        feedforward/12.0);
+                        feedforward / 12.0);
   }
 }

@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -18,7 +17,6 @@ public class Robot extends TimedRobot {
   private static double kDt = 0.02;
 
   private final Joystick m_joystick = new Joystick(1);
-  private final Encoder m_encoder = new Encoder(1, 2);
   private final ExampleSmartMotorController m_motor = new ExampleSmartMotorController(1);
   // Note: These gains are fake, and will have to be tuned for your robot.
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 1.5);
@@ -53,6 +51,6 @@ public class Robot extends TimedRobot {
 
     // Send setpoint to offboard controller PID
     m_motor.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition, m_setpoint.position,
-                        m_feedforward.calculate(m_setpoint.velocity)/12.0);
+                        m_feedforward.calculate(m_setpoint.velocity) / 12.0);
   }
 }
