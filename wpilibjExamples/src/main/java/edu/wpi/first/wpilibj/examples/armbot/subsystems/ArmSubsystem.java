@@ -35,8 +35,6 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
   private final ArmFeedforward m_feedforward =
       new ArmFeedforward(kSVolts, kCosVolts, kVVoltSecondPerRad, kAVoltSecondSquaredPerRad);
 
-  private TrapezoidProfile.State m_goal;
-
   /**
    * Create a new ArmSubsystem.
    */
@@ -49,7 +47,7 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
                                          kMaxAccelerationRadPerSecSquared)));
     m_encoder.setDistancePerPulse(kEncoderDistancePerPulse);
     // Start arm at rest in neutral position
-    m_goal = new TrapezoidProfile.State(kArmOffsetRads, 0);
+    setGoal(kArmOffsetRads);
   }
 
   @Override
@@ -58,20 +56,6 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
     double feedforward = m_feedforward.calculate(setpoint.position, setpoint.velocity);
     // Add the feedforward to the PID output to get the motor output
     m_motor.setVoltage(output + feedforward);
-  }
-
-  /**
-   * Sets the goal position for the arm.
-   *
-   * @param position The goal position, in radians.
-   */
-  public void setGoal(double position) {
-    m_goal = new TrapezoidProfile.State(position, 0);
-  }
-
-  @Override
-  public TrapezoidProfile.State getGoal() {
-    return m_goal;
   }
 
   @Override

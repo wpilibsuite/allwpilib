@@ -35,14 +35,7 @@ class Wrist : public frc2::PIDSubsystem {
    * by
    * the subsystem.
    */
-  void UseOutput(double d) override;
-
-  double GetSetpoint() override;
-
-  /**
-   * Sets the setpoint for the subsystem.
-   */
-  void SetSetpoint(double setpoint);
+  void UseOutput(double output, double setpoint) override;
 
  private:
   frc::PWMVictorSPX m_motor{6};

@@ -9,19 +9,17 @@
 
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc2/command/PIDSubsystem.h>
+#include <units/units.h>
 
 class ShooterSubsystem : public frc2::PIDSubsystem {
  public:
   ShooterSubsystem();
 
-  void UseOutput(double output) override;
-
-  double GetSetpoint() override;
+  void UseOutput(double output, double setpoint) override;
 
   double GetMeasurement() override;
-
-  void Disable() override;
 
   bool AtSetpoint();
 
@@ -33,4 +31,5 @@ class ShooterSubsystem : public frc2::PIDSubsystem {
   frc::PWMVictorSPX m_shooterMotor;
   frc::PWMVictorSPX m_feederMotor;
   frc::Encoder m_shooterEncoder;
+  frc::SimpleMotorFeedforward<units::turns> m_shooterFeedforward;
 };

@@ -18,10 +18,10 @@ ArmSubsystem::ArmSubsystem()
               kP, 0, 0, {kMaxVelocity, kMaxAcceleration})),
       m_motor(kMotorPort),
       m_encoder(kEncoderPorts[0], kEncoderPorts[1]),
-      m_feedforward(kS, kCos, kV, kA),
-      // Start arm at rest in neutral position
-      m_goal{kArmOffset, 0_rad_per_s} {
+      m_feedforward(kS, kCos, kV, kA) {
   m_encoder.SetDistancePerPulse(kEncoderDistancePerPulse.to<double>());
+  // Start arm in neutral position
+  SetGoal(State{kArmOffset, 0_rad_per_s});
 }
 
 void ArmSubsystem::UseOutput(double output, State setpoint) {
@@ -31,12 +31,6 @@ void ArmSubsystem::UseOutput(double output, State setpoint) {
   // Add the feedforward to the PID output to get the motor output
   m_motor.SetVoltage(units::volt_t(output) + feedforward);
 }
-
-void ArmSubsystem::SetGoal(units::radian_t goal) {
-  m_goal = State{goal, 0_rad_per_s};
-}
-
-State ArmSubsystem::GetGoal() { return m_goal; }
 
 units::radian_t ArmSubsystem::GetMeasurement() {
   return units::radian_t(m_encoder.GetDistance()) + kArmOffset;

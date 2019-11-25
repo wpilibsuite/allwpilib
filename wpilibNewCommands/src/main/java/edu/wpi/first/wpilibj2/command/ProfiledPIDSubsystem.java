@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 import static edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
@@ -19,6 +20,8 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   protected final ProfiledPIDController m_controller;
   protected boolean m_enabled;
+
+  private TrapezoidProfile.State m_goal;
 
   /**
    * Creates a new ProfiledPIDSubsystem.
@@ -33,7 +36,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (m_enabled) {
-      useOutput(m_controller.calculate(getMeasurement(), getGoal()), m_controller.getSetpoint());
+      useOutput(m_controller.calculate(getMeasurement(), m_goal), m_controller.getSetpoint());
     }
   }
 
@@ -42,26 +45,37 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   }
 
   /**
+   * Sets the goal state for the subsystem.
+   *
+   * @param goal The goal state for the subsystem's motion profile.
+   */
+  public void setGoal(TrapezoidProfile.State goal) {
+    m_goal = goal;
+  }
+
+  /**
+   * Sets the goal state for the subsystem.  Goal velocity assumed to be zero.
+   *
+   * @param goal The goal position for the subsystem's motion profile.
+   */
+  public void setGoal(double goal) {
+    setGoal(new TrapezoidProfile.State(goal, 0));
+  }
+
+  /**
    * Uses the output from the ProfiledPIDController.
    *
    * @param output   the output of the ProfiledPIDController
    * @param setpoint the setpoint state of the ProfiledPIDController, for feedforward
    */
-  public abstract void useOutput(double output, State setpoint);
-
-  /**
-   * Returns the goal used by the ProfiledPIDController.
-   *
-   * @return the goal to be used by the controller
-   */
-  public abstract State getGoal();
+  protected abstract void useOutput(double output, State setpoint);
 
   /**
    * Returns the measurement of the process variable used by the ProfiledPIDController.
    *
    * @return the measurement of the process variable
    */
-  public abstract double getMeasurement();
+  protected abstract double getMeasurement();
 
   /**
    * Enables the PID control.  Resets the controller.
@@ -77,5 +91,14 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   public void disable() {
     m_enabled = false;
     useOutput(0, new State());
+  }
+
+  /**
+   * Returns whether the controller is enabled.
+   *
+   * @return Whether the controller is enabled.
+   */
+  public boolean isEnabled() {
+    return m_enabled;
   }
 }

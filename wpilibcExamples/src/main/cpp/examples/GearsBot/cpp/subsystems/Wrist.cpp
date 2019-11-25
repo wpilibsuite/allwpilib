@@ -26,10 +26,6 @@ void Wrist::Log() {
   // frc::SmartDashboard::PutData("Wrist Angle", &m_pot);
 }
 
-double Wrist::GetSetpoint() { return m_setpoint; }
-
-void Wrist::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
-
 double Wrist::GetMeasurement() { return m_pot.Get(); }
 
-void Wrist::UseOutput(double d) { m_motor.Set(d); }
+void Wrist::UseOutput(double output, double setpoint) { m_motor.Set(output); }

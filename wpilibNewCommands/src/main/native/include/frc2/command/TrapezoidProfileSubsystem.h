@@ -41,22 +41,29 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
                             units::second_t period = 20_ms)
       : m_constraints(constraints),
         m_state{position, Velocity_t(0)},
+        m_goal{position, Velocity_t{0}},
         m_period(period) {}
 
   void Periodic() override {
     auto profile =
-        frc::TrapezoidProfile<Distance>(m_constraints, GetGoal(), m_state);
+        frc::TrapezoidProfile<Distance>(m_constraints, m_goal, m_state);
     m_state = profile.Calculate(m_period);
     UseState(m_state);
   }
 
   /**
-   * Users should override this to return the goal state for the subsystem's
-   * motion profile.
+   * Sets the goal state for the subsystem.
    *
-   * @return The goal state for the subsystem's motion profile.
+   * @param goal The goal state for the subsystem's motion profile.
    */
-  virtual State GetGoal() = 0;
+  void SetGoal(State goal) { m_goal = goal; }
+
+  /**
+   * Sets the goal state for the subsystem.  Goal velocity assumed to be zero.
+   *
+   * @param goal The goal position for the subsystem's motion profile.
+   */
+  void SetGoal(Distance_t goal) { m_goal = State{goal, Velocity_t(0)}; }
 
  protected:
   /**
@@ -70,6 +77,7 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
  private:
   Constraints m_constraints;
   State m_state;
+  State m_goal;
   units::second_t m_period;
 };
 }  // namespace frc2
