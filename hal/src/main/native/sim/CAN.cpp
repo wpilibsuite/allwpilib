@@ -26,8 +26,15 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
 void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
                             uint8_t* data, uint8_t* dataSize,
                             uint32_t* timeStamp, int32_t* status) {
+  // Use a data size of 42 as call check. Difficult to add check to invoke handler
+  *dataSize = 42;
+  auto tmpStatus = *status;
   SimCanData->receiveMessage(messageID, messageIDMask, data, dataSize,
                              timeStamp, status);
+  // If no handler invoked, return message not found
+  if (*dataSize == 42 && *status == tmpStatus) {
+    *status = HAL_ERR_CANSessionMux_MessageNotFound;
+  }
 }
 void HAL_CAN_OpenStreamSession(uint32_t* sessionHandle, uint32_t messageID,
                                uint32_t messageIDMask, uint32_t maxMessages,
