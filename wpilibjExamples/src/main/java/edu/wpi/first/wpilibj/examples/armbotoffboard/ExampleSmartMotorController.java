@@ -1,4 +1,11 @@
-package edu.wpi.first.wpilibj.stubs;
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+package edu.wpi.first.wpilibj.examples.armbotoffboard;
 
 import edu.wpi.first.wpilibj.SpeedController;
 
@@ -8,7 +15,6 @@ import edu.wpi.first.wpilibj.SpeedController;
  * <p>Has no actual functionality.
  */
 public class ExampleSmartMotorController implements SpeedController {
-
   public enum PIDMode {
     kPosition,
     kVelocity,

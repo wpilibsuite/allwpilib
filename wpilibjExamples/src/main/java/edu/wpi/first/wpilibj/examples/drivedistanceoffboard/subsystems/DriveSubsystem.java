@@ -9,9 +9,10 @@ package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems;
 
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.stubs.ExampleSmartMotorController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.ExampleSmartMotorController;
 
 import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kLeftMotor1Port;
 import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kLeftMotor2Port;

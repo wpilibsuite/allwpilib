@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard.commands;
 
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -12,7 +19,6 @@ import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.Dri
  * Drives a set distance using a motion profile.
  */
 public class DriveDistanceProfiled extends TrapezoidProfileCommand {
-
   /**
    * Creates a new DriveDistanceProfiled command.
    *
