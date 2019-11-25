@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -277,7 +276,6 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
 
   @Test(timeout = 4000)
-  @Ignore
   public void testDisableStopsInterruptFiring() {
     final InterruptCounter counter = new InterruptCounter();
     TestInterruptHandlerFunction function = new TestInterruptHandlerFunction(counter);
