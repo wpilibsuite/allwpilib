@@ -5,26 +5,24 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gyrodrivecommands;
+package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngle;
-import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngleProfiled;
-import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.commands.DriveDistanceProfiled;
+import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kStabilizationD;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kStabilizationI;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kStabilizationP;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.OIConstants.kDriverControllerPort;
+import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared;
+import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kMaxSpeedMetersPerSecond;
+import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -53,7 +51,7 @@ public class RobotContainer {
         // hand, and turning controlled by the right.
         new RunCommand(() -> m_robotDrive
             .arcadeDrive(m_driverController.getY(GenericHID.Hand.kLeft),
-                m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
+                         m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
 
   }
 
@@ -61,35 +59,35 @@ public class RobotContainer {
    * Use this method to define your button->command mappings.  Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Drive at half speed when the right bumper is held
+    // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of 10 seconds
+    new JoystickButton(m_driverController, Button.kA.value)
+        .whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
+
+    // Do the same thing as above when the 'B' button is pressed, but defined inline
+    new JoystickButton(m_driverController, Button.kB.value)
+        .whenPressed(
+            new TrapezoidProfileCommand(new TrapezoidProfile(
+                // Limit the max acceleration and velocity
+                new TrapezoidProfile.Constraints(kMaxSpeedMetersPerSecond,
+                                                 kMaxAccelerationMetersPerSecondSquared),
+                // End at desired position in meters; implicitly starts at 0
+                new TrapezoidProfile.State(3, 0)),
+                                        // Pipe the profile state to the drive
+                                        setpointState -> m_robotDrive.setDriveStates(
+                                            setpointState,
+                                            setpointState),
+                                        // Require the drive
+                                        m_robotDrive)
+                .beforeStarting(m_robotDrive::resetEncoders)
+                .withTimeout(10));
+
+    // Drive at half speed when the bumper is held
     new JoystickButton(m_driverController, Button.kBumperRight.value)
         .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
-
-    // Stabilize robot to drive straight with gyro when left bumper is held
-    new JoystickButton(m_driverController, Button.kBumperLeft.value).whenHeld(
-        new PIDCommand(
-            new PIDController(kStabilizationP, kStabilizationI, kStabilizationD),
-            // Close the loop on the turn rate
-            m_robotDrive::getTurnRate,
-            // Setpoint is 0
-            0,
-            // Pipe the output to the turning controls
-            output -> m_robotDrive
-                .arcadeDrive(m_driverController.getY(GenericHID.Hand.kLeft), output),
-            // Require the robot drive
-            m_robotDrive));
-
-    // Turn to 90 degrees when the 'X' button is pressed, with a 5 second timeout
-    new JoystickButton(m_driverController, Button.kX.value)
-        .whenPressed(new TurnToAngle(90, m_robotDrive).withTimeout(5));
-
-    // Turn to -90 degrees with a profile when the 'A' button is pressed, with a 5 second timeout
-    new JoystickButton(m_driverController, Button.kA.value)
-        .whenPressed(new TurnToAngleProfiled(-90, m_robotDrive).withTimeout(5));
   }
 
 
@@ -99,7 +97,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // no auto
     return new InstantCommand();
   }
 }

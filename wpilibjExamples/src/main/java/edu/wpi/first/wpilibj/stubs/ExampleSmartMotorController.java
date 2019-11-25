@@ -43,6 +43,38 @@ public class ExampleSmartMotorController implements SpeedController {
   public void setSetpoint(PIDMode mode, double setpoint, double arbFeedforward) {
   }
 
+  /**
+   * Places this motor controller in follower mode.
+   *
+   * @param master The master to follow.
+   */
+  public void follow(ExampleSmartMotorController master) {
+  }
+
+  /**
+   * Returns the encoder distance.
+   *
+   * @return The current encoder distance.
+   */
+  public double getEncoderDistance() {
+    return 0;
+  }
+
+  /**
+   * Returns the encoder rate.
+   *
+   * @return The current encoder rate.
+   */
+  public double getEncoderRate() {
+    return 0;
+  }
+
+  /**
+   * Resets the encoder to zero distance.
+   */
+  public void resetEncoder() {
+  }
+
   @Override
   public void set(double speed) {
   }
