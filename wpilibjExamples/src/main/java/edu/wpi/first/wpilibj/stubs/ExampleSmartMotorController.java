@@ -1,13 +1,19 @@
-package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
+package edu.wpi.first.wpilibj.stubs;
 
 import edu.wpi.first.wpilibj.SpeedController;
 
 /**
  * A simplified stub class that simulates the API of a common "smart" motor controller.
  *
- * Has no actual functioanality.
+ * Has no actual functionality.
  */
 public class ExampleSmartMotorController implements SpeedController {
+
+  public enum PIDMode {
+    kPosition,
+    kVelocity,
+    kMovementWitchcraft
+  }
 
   /**
    * Creates a new ExampleSmartMotorController.
@@ -30,10 +36,11 @@ public class ExampleSmartMotorController implements SpeedController {
   /**
    * Example method for setting the setpoint of the smart controller in PID mode.
    *
+   * @param mode The mode of the PID controller.
    * @param setpoint The controller setpoint.
    * @param arbFeedforward An arbitrary feedforward output (from -1 to 1).
    */
-  public void setSetpoint(double setpoint, double arbFeedforward) {
+  public void setSetpoint(PIDMode mode, double setpoint, double arbFeedforward) {
   }
 
   @Override
