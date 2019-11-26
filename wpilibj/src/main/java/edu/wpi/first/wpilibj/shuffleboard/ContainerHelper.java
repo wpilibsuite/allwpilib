@@ -44,7 +44,7 @@ final class ContainerHelper {
 
   ShuffleboardLayout getLayout(String title, String type) {
     if (!m_layouts.containsKey(title)) {
-      ShuffleboardLayout layout = new ShuffleboardLayout(m_container, type, title);
+      ShuffleboardLayout layout = new ShuffleboardLayout(m_container, title, type);
       m_components.add(layout);
       m_layouts.put(title, layout);
     }
