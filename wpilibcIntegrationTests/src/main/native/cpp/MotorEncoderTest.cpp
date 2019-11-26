@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <algorithm>
+
 #include "TestBench.h"
 #include "frc/Encoder.h"
 #include "frc/Jaguar.h"
@@ -146,7 +148,8 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 
   /* 10 seconds should be plenty time to get to the reference */
   frc::Notifier pidRunner{[this, &pidController] {
-    m_speedController->Set(pidController.Calculate(m_encoder->GetDistance()));
+    auto speed = pidController.Calculate(m_encoder->GetDistance());
+    m_speedController->Set(std::clamp(speed, -0.2, 0.2));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
@@ -171,9 +174,9 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
 
   /* 10 seconds should be plenty time to get to the reference */
   frc::Notifier pidRunner{[this, &pidController] {
-    m_speedController->Set(
-        pidController.Calculate(m_filter->Calculate(m_encoder->GetRate())) +
-        8e-5);
+    auto speed =
+        pidController.Calculate(m_filter->Calculate(m_encoder->GetRate()));
+    m_speedController->Set(std::clamp(speed, -0.3, 0.3));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
