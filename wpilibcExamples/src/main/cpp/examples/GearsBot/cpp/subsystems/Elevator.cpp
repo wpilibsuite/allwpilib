@@ -28,8 +28,6 @@ void Elevator::Log() { frc::SmartDashboard::PutData("Wrist Pot", &m_pot); }
 
 double Elevator::GetMeasurement() { return m_pot.Get(); }
 
-void Elevator::UseOutput(double d) { m_motor.Set(d); }
-
-double Elevator::GetSetpoint() { return m_setpoint; }
-
-void Elevator::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
+void Elevator::UseOutput(double output, double setpoint) {
+  m_motor.Set(output);
+}

@@ -17,31 +17,21 @@ ShooterSubsystem::ShooterSubsystem()
     : PIDSubsystem(frc2::PIDController(kP, kI, kD)),
       m_shooterMotor(kShooterMotorPort),
       m_feederMotor(kFeederMotorPort),
-      m_shooterEncoder(kEncoderPorts[0], kEncoderPorts[1]) {
+      m_shooterEncoder(kEncoderPorts[0], kEncoderPorts[1]),
+      m_shooterFeedforward(kS, kV) {
   m_controller.SetTolerance(kShooterToleranceRPS.to<double>());
   m_shooterEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  SetSetpoint(kShooterTargetRPS.to<double>());
 }
 
-void ShooterSubsystem::UseOutput(double output) {
-  // Use a feedforward of the form kS + kV * velocity
-  m_shooterMotor.SetVoltage(units::volt_t(output) + kS +
-                            kV * kShooterTargetRPS);
-}
-
-void ShooterSubsystem::Disable() {
-  // Turn off motor when we disable, since useOutput(0) doesn't stop the motor
-  // due to our feedforward
-  frc2::PIDSubsystem::Disable();
-  m_shooterMotor.Set(0);
+void ShooterSubsystem::UseOutput(double output, double setpoint) {
+  m_shooterMotor.SetVoltage(units::volt_t(output) +
+                            m_shooterFeedforward.Calculate(kShooterTargetRPS));
 }
 
 bool ShooterSubsystem::AtSetpoint() { return m_controller.AtSetpoint(); }
 
 double ShooterSubsystem::GetMeasurement() { return m_shooterEncoder.GetRate(); }
-
-double ShooterSubsystem::GetSetpoint() {
-  return kShooterTargetRPS.to<double>();
-}
 
 void ShooterSubsystem::RunFeeder() { m_feederMotor.Set(kFeederSpeed); }
 

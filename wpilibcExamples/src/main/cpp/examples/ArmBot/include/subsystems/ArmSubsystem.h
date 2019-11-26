@@ -24,16 +24,10 @@ class ArmSubsystem : public frc2::ProfiledPIDSubsystem<units::radians> {
 
   void UseOutput(double output, State setpoint) override;
 
-  void SetGoal(units::radian_t goal);
-
-  State GetGoal() override;
-
   units::radian_t GetMeasurement() override;
 
  private:
   frc::PWMVictorSPX m_motor;
   frc::Encoder m_encoder;
   frc::ArmFeedforward m_feedforward;
-
-  State m_goal;
 };

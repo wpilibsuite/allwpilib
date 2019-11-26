@@ -19,6 +19,8 @@ public abstract class PIDSubsystem extends SubsystemBase {
   protected final PIDController m_controller;
   protected boolean m_enabled;
 
+  private double m_setpoint;
+
   /**
    * Creates a new PIDSubsystem.
    *
@@ -32,7 +34,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (m_enabled) {
-      useOutput(m_controller.calculate(getMeasurement(), getSetpoint()));
+      useOutput(m_controller.calculate(getMeasurement(), m_setpoint), m_setpoint);
     }
   }
 
@@ -41,25 +43,28 @@ public abstract class PIDSubsystem extends SubsystemBase {
   }
 
   /**
+   * Sets the setpoint for the subsystem.
+   *
+   * @param setpoint the setpoint for the subsystem
+   */
+  public void setSetpoint(double setpoint) {
+    m_setpoint = setpoint;
+  }
+
+  /**
    * Uses the output from the PIDController.
    *
    * @param output the output of the PIDController
+   * @param setpoint the setpoint of the PIDController (for feedforward)
    */
-  public abstract void useOutput(double output);
-
-  /**
-   * Returns the reference (setpoint) used by the PIDController.
-   *
-   * @return the reference (setpoint) to be used by the controller
-   */
-  public abstract double getSetpoint();
+  protected abstract void useOutput(double output, double setpoint);
 
   /**
    * Returns the measurement of the process variable used by the PIDController.
    *
    * @return the measurement of the process variable
    */
-  public abstract double getMeasurement();
+  protected abstract double getMeasurement();
 
   /**
    * Enables the PID control.  Resets the controller.
@@ -74,6 +79,15 @@ public abstract class PIDSubsystem extends SubsystemBase {
    */
   public void disable() {
     m_enabled = false;
-    useOutput(0);
+    useOutput(0, 0);
+  }
+
+  /**
+   * Returns whether the controller is enabled.
+   *
+   * @return Whether the controller is enabled.
+   */
+  public boolean isEnabled() {
+    return m_enabled;
   }
 }

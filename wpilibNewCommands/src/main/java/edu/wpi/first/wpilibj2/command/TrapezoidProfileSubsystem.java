@@ -18,6 +18,7 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
   private final TrapezoidProfile.Constraints m_constraints;
 
   private TrapezoidProfile.State m_state;
+  private TrapezoidProfile.State m_goal;
 
   /**
    * Creates a new TrapezoidProfileSubsystem.
@@ -51,17 +52,28 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    var profile = new TrapezoidProfile(m_constraints, getGoal(), m_state);
+    var profile = new TrapezoidProfile(m_constraints, m_goal, m_state);
     m_state = profile.calculate(m_period);
     useState(m_state);
   }
 
   /**
-   * Users should override this to return the goal state for the subsystem's motion profile.
+   * Sets the goal state for the subsystem.
    *
-   * @return The goal state for the subsystem's motion profile.
+   * @param goal The goal state for the subsystem's motion profile.
    */
-  public abstract TrapezoidProfile.State getGoal();
+  public void setGoal(TrapezoidProfile.State goal) {
+    m_goal = goal;
+  }
+
+  /**
+   * Sets the goal state for the subsystem.  Goal velocity assumed to be zero.
+   *
+   * @param goal The goal position for the subsystem's motion profile.
+   */
+  public void setGoal(double goal) {
+    setGoal(new TrapezoidProfile.State(goal, 0));
+  }
 
   /**
    * Users should override this to consume the current state of the motion profile.
