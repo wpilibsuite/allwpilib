@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "hal/Types.h"
+
 /**
  * @defgroup hal_extensions Simulator Extensions
  * @ingroup hal_capi
