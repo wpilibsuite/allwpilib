@@ -45,5 +45,5 @@ double MedianFilter::Calculate(double next) {
 
 void MedianFilter::Reset() {
   m_orderedValues.clear();
-  m_valueBuffer.clear();
+  m_valueBuffer.reset();
 }
