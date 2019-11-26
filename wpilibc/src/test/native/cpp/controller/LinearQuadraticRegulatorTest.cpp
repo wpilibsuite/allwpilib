@@ -11,10 +11,13 @@
 
 #include <Eigen/Core>
 
+#include <iostream>
+
 #include "frc/controller/LinearQuadraticRegulator.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/system/plant/ElevatorSystem.h"
+#include "frc/system/plant/SingleJointedArmSystem.h"
 
 namespace frc {
 
@@ -38,6 +41,50 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
 
   EXPECT_NEAR(522.15314269, controller.K(0, 0), 1e-6);
   EXPECT_NEAR(38.20138596, controller.K(0, 1), 1e-6);
+}
+
+TEST(LinearQuadraticRegulatorTest, ArmGains) {
+  LinearSystem<2, 1, 1> plant = [] {
+    auto motors = DCMotor::Vex775Pro(2);
+
+    // Carriage mass
+    constexpr auto m = 4_kg;
+
+    // Radius of pulley
+    constexpr auto r = 0.4_m;
+
+    // Gear ratio
+    constexpr double G = 100.0;
+
+    return SingleJointedArmSystem(motors, 1.0 / 3.0 * m * r * r, G);
+  }();
+  LinearQuadraticRegulator<2, 1, 1> controller{
+      plant, {0.01745, 0.08726}, {12.0}, 0.00505_s};
+
+  EXPECT_NEAR(19.16, controller.K(0, 0), 1e-1);
+  EXPECT_NEAR(3.32, controller.K(0, 1), 1e-1);
+}
+
+TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
+  LinearSystem<2, 1, 1> plant = [] {
+    auto motors = DCMotor::Vex775Pro(4);
+
+    // Carriage mass
+    constexpr auto m = 8_kg;
+
+    // Radius of pulley
+    constexpr auto r = 0.75_in;
+
+    // Gear ratio
+    constexpr double G = 14.67;
+
+    return ElevatorSystem(motors, m, r, G);
+  }();
+  LinearQuadraticRegulator<2, 1, 1> controller{
+      plant, {0.1, 0.2}, {12.0}, 0.020_s};
+
+  EXPECT_NEAR(10.38, controller.K(0, 0), 1e-1);
+  EXPECT_NEAR(0.69, controller.K(0, 1), 1e-1);
 }
 
 }  // namespace frc

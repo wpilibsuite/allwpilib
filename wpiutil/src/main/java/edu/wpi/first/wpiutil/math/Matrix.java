@@ -324,4 +324,10 @@ public class Matrix<R extends Num, C extends Num> {
   public Matrix(SimpleMatrix storage) {
     this.m_storage = Objects.requireNonNull(storage);
   }
+
+  @Override
+  public String toString() {
+    return m_storage.toString();
+  }
+
 }

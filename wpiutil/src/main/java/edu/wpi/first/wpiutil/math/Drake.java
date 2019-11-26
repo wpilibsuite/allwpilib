@@ -32,6 +32,40 @@ public final class Drake {
     return S;
   }
 
-  private Drake() {
+
+  private Drake() { }
+
+  /**
+   * Solves the discrete alegebraic Riccati equation.
+   *
+   * @param A System matrix.
+   * @param B Input matrix.
+   * @param Q State cost matrix.
+   * @param R Input cost matrix.
+   * @return Solution of DARE.
+   */
+  public static SimpleMatrix discreteAlgebraicRiccatiEquation(
+          Matrix A,
+          Matrix B,
+          Matrix Q,
+          Matrix R) {
+    return discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(), Q.getStorage(), R.getStorage());
   }
+
+  public static <N extends Num> Matrix<N, N> exp(
+          Matrix<N, N> A
+  ) {
+    Matrix<N, N> toReturn  = new Matrix<>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
+    DrakeJNI.exp(A.getStorage().getDDRM().getData(), A.getNumRows(), toReturn.getStorage().getDDRM().getData());
+    return toReturn;
+  }
+
+  public static SimpleMatrix exp(
+          SimpleMatrix A
+  ) {
+    SimpleMatrix toReturn  = new SimpleMatrix(A.numRows(), A.numRows());
+    DrakeJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
+    return toReturn;
+  }
+
 }

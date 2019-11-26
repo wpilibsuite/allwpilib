@@ -9,6 +9,7 @@ package edu.wpi.first.wpiutil.math;
 
 import java.util.Objects;
 
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -56,6 +57,17 @@ public final class MatrixUtils {
   }
 
   /**
+   * Creates the identity matrix of the given dimension.
+   *
+   * @param dim The dimension of the desired matrix.
+   * @param <D> The dimension of the desired matrix.
+   * @return The DxD identity matrix.
+   */
+  public static <D extends Num> Matrix<D, D> eye(D dim) {
+    return new Matrix<>(SimpleMatrix.identity(Objects.requireNonNull(dim).getNum()));
+  }
+
+  /**
    * Entrypoint to the MatBuilder class for creation
    * of custom matrices with the given dimensions and contents.
    *
@@ -80,4 +92,5 @@ public final class MatrixUtils {
   public static <D extends Num> VecBuilder<D> vec(Nat<D> dim) {
     return new VecBuilder<>(dim);
   }
+
 }

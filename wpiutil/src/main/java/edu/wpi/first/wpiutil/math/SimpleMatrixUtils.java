@@ -9,7 +9,12 @@ package edu.wpi.first.wpiutil.math;
 
 import java.util.function.BiFunction;
 
+import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.NormOps_DDRM;
+import org.ejml.dense.row.SpecializedOps_CDRM;
+import org.ejml.dense.row.decomposition.qr.QRDecompositionHouseholder_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleBase;
 import org.ejml.simple.SimpleMatrix;
 
@@ -141,7 +146,37 @@ public class SimpleMatrixUtils {
     return SimpleMatrix.identity(Math.min(rows, cols));
   }
 
-  private static class Pair<A, B> {
+    /**
+     * The identy of a square matrix
+     * @param rows the number of rows (and columns)
+     * @return the identiy matrix, rows x rows.
+     */
+    private static SimpleMatrix eye(int rows) {
+        return SimpleMatrix.identity(rows);
+    }
+
+  public static SimpleMatrix lltDecompose(SimpleMatrix src) {
+    SimpleMatrix temp = src.copy();
+    CholeskyDecomposition_F64<DMatrixRMaj> chol =
+            DecompositionFactory_DDRM.chol(temp.numRows(),true);
+    if( !chol.decompose(temp.getMatrix()))
+      throw new RuntimeException("Cholesky failed!");
+
+    return SimpleMatrix.wrap(chol.getT(null));
+  }
+
+  public static SimpleMatrix householderQrDecompose(SimpleMatrix src) {
+    var temp = src.copy();
+
+    var decomposer = new QRDecompositionHouseholder_DDRM();
+    if(!(decomposer.decompose(temp.getDDRM()))) {
+      throw new RuntimeException("householder decomposition failed!");
+    }
+
+    return temp;
+  }
+
+  public static class Pair<A, B> {
     private final A m_first;
     private final B m_second;
 
@@ -157,5 +192,109 @@ public class SimpleMatrixUtils {
     public B getSecond() {
       return m_second;
     }
+
+    public static <A, B> Pair<A, B> of(A a, B b) {
+        return new Pair<>(a, b);
+    }
   }
+
+    /**
+     * Calculate matrix exponential of a square matrix.
+     *
+     * Implementation from jblas https://github.com/jblas-project/jblas
+     *
+     * A scaled Pade approximation algorithm is used.
+     * The algorithm has been directly translated from Golub and Van Loan "Matrix Computations",
+     * algorithm 11.3.1. Special Horner techniques from 11.2 are also used to minimize the number
+     * of matrix multiplications.
+     *
+     * @param A a square matrix.
+     * @return the matrix exponential of A.
+     */
+    public static SimpleMatrix scipyExpm(SimpleMatrix A) {
+
+        /*
+         * Copyright (c) 2009, Mikio L. Braun
+         * All rights reserved.
+         *
+         * Redistribution and use in source and binary forms, with or without
+         * modification, are permitted provided that the following conditions are
+         * met:
+         *
+         *     * Redistributions of source code must retain the above copyright
+         *       notice, this list of conditions and the following disclaimer.
+         *
+         *     * Redistributions in binary form must reproduce the above
+         *       copyright notice, this list of conditions and the following
+         *       disclaimer in the documentation and/or other materials provided
+         *       with the distribution.
+         *
+         *     * Neither the name of the Technische Universität Berlin nor the
+         *       names of its contributors may be used to endorse or promote
+         *       products derived from this software without specific prior
+         *       written permission.
+         *
+         * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+         * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+         * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+         * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+         * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+         * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+         * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+         * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+         * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+         * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+         * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+         */
+
+        if(A.numRows() != A.numCols()) {
+            throw new RuntimeException("A must be square to preform expm!");
+        }
+
+        // constants for pade approximation
+        final double c0 = 1.0;
+        final double c1 = 0.5;
+        final double c2 = 0.12;
+        final double c3 = 0.01833333333333333;
+        final double c4 = 0.0019927536231884053;
+        final double c5 = 1.630434782608695E-4;
+        final double c6 = 1.0351966873706E-5;
+        final double c7 = 5.175983436853E-7;
+        final double c8 = 2.0431513566525E-8;
+        final double c9 = 6.306022705717593E-10;
+        final double c10 = 1.4837700484041396E-11;
+        final double c11 = 2.5291534915979653E-13;
+        final double c12 = 2.8101705462199615E-15;
+        final double c13 = 1.5440497506703084E-17;
+
+        int j = Math.max(0, 1 + (int) Math.floor(Math.log(A.elementMaxAbs()) / Math.log(2)));
+        SimpleMatrix As = A.divide(Math.pow(2, j)); // scaled version of A
+        int n = A.numRows();
+
+        // calculate D and N using special Horner techniques
+        SimpleMatrix As_2 = As.mult(As);
+        SimpleMatrix As_4 = As_2.mult(As_2);
+        SimpleMatrix As_6 = As_4.mult(As_2);
+        // U = c0*I + c2*A^2 + c4*A^4 + (c6*I + c8*A^2 + c10*A^4 + c12*A^6)*A^6
+        SimpleMatrix U = eye(n).scale(c0).plus(As_2.scale(c2)).plus(As_4.scale(c4)).plus(
+                eye(n).scale(c6).plus(As_2.scale(c8)).plus(As_4.scale(c10)).plus(As_6.scale(c12)).mult(As_6));
+        // V = c1*I + c3*A^2 + c5*A^4 + (c7*I + c9*A^2 + c11*A^4 + c13*A^6)*A^6
+        SimpleMatrix V = eye(n).scale(c1).plus(As_2.scale(c3)).plus(As_4.scale(c5)).plus(
+                eye(n).scale(c7).plus(As_2.scale(c9)).plus(As_4.scale(c11)).plus(As_6.scale(c13)).mult(As_6));
+
+        SimpleMatrix AV = As.mult(V);
+        SimpleMatrix N = U.plus(AV);
+        SimpleMatrix D = U.minus(AV);
+
+        // solve DF = N for F
+        SimpleMatrix F = D.solve(N);
+
+        // now square j times
+        for (int k = 0; k < j; k++) {
+            F.mult(F);
+        }
+
+        return F;
+
+    }
 }
