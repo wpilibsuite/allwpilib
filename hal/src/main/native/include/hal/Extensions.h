@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,5 +41,19 @@ int HAL_LoadOneExtension(const char* library);
  * @return        the succes state of the initialization
  */
 int HAL_LoadExtensions(void);
+
+/**
+ * Enables or Disables the message saying no HAL extensions were found.
+ *
+ * Some apps don't care, and its just clutter. But for general team code,
+ * we want it.
+ *
+ * This must be called before HAL_Initialize is called.
+ *
+ * This defaults to true.
+ *
+ * @param showMessage true to show message, false to not.
+ */
+void HAL_SetShowExtensionsNotFoundMessages(HAL_Bool showMessage);
 }  // extern "C"
 /** @} */

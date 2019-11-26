@@ -41,6 +41,11 @@ void InitializeExtensions() {}
 }  // namespace init
 }  // namespace hal
 
+static bool& GetShowNotFoundMessage() {
+  static bool showMsg = true;
+  return showMsg;
+}
+
 extern "C" {
 
 int HAL_LoadOneExtension(const char* library) {
@@ -91,8 +96,10 @@ int HAL_LoadExtensions(void) {
   wpi::SmallVector<wpi::StringRef, 2> libraries;
   const char* e = std::getenv("HALSIM_EXTENSIONS");
   if (!e) {
-    wpi::outs() << "HAL Extensions: No extensions found\n";
-    wpi::outs().flush();
+    if (GetShowNotFoundMessage()) {
+      wpi::outs() << "HAL Extensions: No extensions found\n";
+      wpi::outs().flush();
+    }
     return rc;
   }
   wpi::StringRef env{e};
@@ -103,6 +110,10 @@ int HAL_LoadExtensions(void) {
     if (rc < 0) break;
   }
   return rc;
+}
+
+void HAL_SetShowExtensionsNotFoundMessages(HAL_Bool showMessage) {
+  GetShowNotFoundMessage() = showMessage;
 }
 
 }  // extern "C"
