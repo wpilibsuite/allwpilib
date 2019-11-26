@@ -41,7 +41,7 @@ class MedianFilter {
   void Reset();
 
  private:
-  wpi::circular_buffer<double> m_valueBuffer{0};
+  wpi::circular_buffer<double> m_valueBuffer;
   std::vector<double> m_orderedValues;
   size_t m_size;
 };
