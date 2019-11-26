@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj;
 
 import java.util.ArrayList;
@@ -8,7 +15,8 @@ import edu.wpi.first.wpiutil.CircularBuffer;
 
 /**
  * A class that implements a moving-window median filter.  Useful for reducing measurement noise,
- * especially with processes that generate occasional, extreme outliers (such as SolvePNP).
+ * especially with processes that generate occasional, extreme outliers (such as values from
+ * vision processing, LIDAR, or ultrasonic sensors).
  */
 public class MedianFilter {
   private final CircularBuffer m_valueBuffer;
@@ -53,17 +61,18 @@ public class MedianFilter {
     // and remove from ordered list
     if (curSize > m_size) {
       m_orderedValues.remove(m_valueBuffer.removeLast());
+      curSize = curSize - 1;
     }
 
     // Add next value to circular buffer
     m_valueBuffer.addFirst(next);
 
-    if (m_size % 2 == 1) {
+    if (curSize % 2 == 1) {
       // If size is odd, return middle element of sorted list
-      return m_orderedValues.get(curSize/2);
+      return m_orderedValues.get(curSize / 2);
     } else {
       // If size is even, return average of middle elements
-      return m_orderedValues.get(curSize/2) + m_orderedValues.get(curSize/2 + 1) / 2.0;
+      return (m_orderedValues.get(curSize / 2 - 1) + m_orderedValues.get(curSize / 2)) / 2.0;
     }
   }
 }
