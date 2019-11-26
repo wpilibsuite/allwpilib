@@ -41,4 +41,9 @@ double MedianFilter::Calculate(double next) {
     return (m_orderedValues[curSize / 2 - 1] + m_orderedValues[curSize / 2]) /
            2.0;
   }
+
+  void MedianFilter::Reset() {
+    m_orderedValues.clear();
+    m_valueBuffer.clear();
+  }
 }

@@ -75,4 +75,12 @@ public class MedianFilter {
       return (m_orderedValues.get(curSize / 2 - 1) + m_orderedValues.get(curSize / 2)) / 2.0;
     }
   }
+
+  /**
+   * Resets the filter, clearing the window of all elements.
+   */
+  public void reset() {
+    m_orderedValues.clear();
+    m_valueBuffer.clear();
+  }
 }
