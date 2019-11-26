@@ -38,7 +38,7 @@ double MedianFilter::Calculate(double next) {
     return m_orderedValues[curSize / 2];
   } else {
     // If size is even, return average of middle elements
-    return (m_orderedValues[curSize / 2 - 1] +
-           m_orderedValues[curSize / 2]) / 2.0;
+    return (m_orderedValues[curSize / 2 - 1] + m_orderedValues[curSize / 2]) /
+           2.0;
   }
 }
