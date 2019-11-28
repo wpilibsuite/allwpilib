@@ -54,7 +54,7 @@ class Robot : public frc::TimedRobot {
   static constexpr int kUltrasonicPort = 0;
 
   // median filter to discard outliers; filters over 5 samples
-  frc::MedianFilter m_filter{5};
+  frc::MedianFilter<double> m_filter{5};
 
   frc::AnalogInput m_ultrasonic{kUltrasonicPort};
 
