@@ -47,13 +47,16 @@ public class QuinticHermiteSpline extends Spline {
     for (int i = 0; i < 6; i++) {
       m_coefficients.set(0, i, xCoeffs.get(0, i));
       m_coefficients.set(1, i, yCoeffs.get(0, i));
-
+    }
+    for (int i = 0; i < 6; i++) {
       // Populate Row 2 and Row 3 with the derivatives of the equations above.
-      // Then populate row 4 and 5 with the second derivatives.
       m_coefficients.set(2, i, m_coefficients.get(0, i) * (5 - i));
       m_coefficients.set(3, i, m_coefficients.get(1, i) * (5 - i));
-      m_coefficients.set(4, i, m_coefficients.get(2, i) * (5 - i));
-      m_coefficients.set(5, i, m_coefficients.get(3, i) * (5 - i));
+    }
+    for (int i = 0; i < 5; i++) {
+      // Then populate row 4 and 5 with the second derivatives.
+      m_coefficients.set(4, i, m_coefficients.get(2, i) * (4 - i));
+      m_coefficients.set(5, i, m_coefficients.get(3, i) * (4 - i));
     }
   }
 

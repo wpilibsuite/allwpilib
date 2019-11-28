@@ -30,7 +30,7 @@ QuinticHermiteSpline::QuinticHermiteSpline(
     m_coefficients.template block<2, 1>(2, i) =
         m_coefficients.template block<2, 1>(0, i) * (5 - i);
   }
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 5; i++) {
     m_coefficients.template block<2, 1>(4, i) =
         m_coefficients.template block<2, 1>(2, i) * (4 - i);
   }
