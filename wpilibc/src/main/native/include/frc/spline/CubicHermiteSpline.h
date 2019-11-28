@@ -48,7 +48,7 @@ class CubicHermiteSpline : public Spline<3> {
   }
 
  private:
-  Eigen::Matrix<double, 6, 4> m_coefficients;
+  Eigen::Matrix<double, 6, 4> m_coefficients = Eigen::Matrix<double, 6, 4>::Zero();
 
   /**
    * Returns the hermite basis matrix for cubic hermite spline interpolation.
