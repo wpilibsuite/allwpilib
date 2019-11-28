@@ -50,11 +50,19 @@ public class QuinticHermiteSpline extends Spline {
     }
     for (int i = 0; i < 6; i++) {
       // Populate Row 2 and Row 3 with the derivatives of the equations above.
+      // Here, we are multiplying by (5 - i) to manually take the derivative. The
+      // power of the term in index 0 is 5, index 1 is 4 and so on. To find the
+      // co-efficient of the derivative, we can use the power rule and multiply
+      // the existing co-efficient by its power.
       m_coefficients.set(2, i, m_coefficients.get(0, i) * (5 - i));
       m_coefficients.set(3, i, m_coefficients.get(1, i) * (5 - i));
     }
     for (int i = 0; i < 5; i++) {
       // Then populate row 4 and 5 with the second derivatives.
+      // Here, we are multiplying by (4 - i) to manually take the derivative. The
+      // power of the term in index 0 is 4, index 1 is 3 and so on. To find the
+      // co-efficient of the derivative, we can use the power rule and multiply
+      // the existing co-efficient by its power.
       m_coefficients.set(4, i, m_coefficients.get(2, i) * (4 - i));
       m_coefficients.set(5, i, m_coefficients.get(3, i) * (4 - i));
     }
