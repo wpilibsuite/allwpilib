@@ -141,8 +141,8 @@ class LinearFilter {
   double Calculate(double input);
 
  private:
-  wpi::circular_buffer<double> m_inputs{0};
-  wpi::circular_buffer<double> m_outputs{0};
+  wpi::circular_buffer<double> m_inputs;
+  wpi::circular_buffer<double> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };
