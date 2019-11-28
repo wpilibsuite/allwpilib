@@ -48,7 +48,7 @@ class QuinticHermiteSpline : public Spline<5> {
   }
 
  private:
-  Eigen::Matrix<double, 6, 6> m_coefficients = Eigen::Matrix<double, 6, 6>::Zero();;
+  Eigen::Matrix<double, 6, 6> m_coefficients = Eigen::Matrix<double, 6, 6>::Zero();
 
   /**
    * Returns the hermite basis matrix for quintic hermite spline interpolation.
