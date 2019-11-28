@@ -34,7 +34,7 @@ CubicHermiteSpline::CubicHermiteSpline(
     m_coefficients.template block<2, 1>(2, i) =
         m_coefficients.template block<2, 1>(0, i) * (3 - i);
   }
-  
+
   for (int i = 0; i < 3; i++) {
     // Here, we are multiplying by (2 - i) to manually take the derivative. The
     // power of the term in index 0 is 2, index 1 is 1 and so on. To find the
