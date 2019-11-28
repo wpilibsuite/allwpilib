@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 
 TEST(MedianFilterTest, MedianFilterNotFullTestEven) {
-  frc::MedianFilter filter{10};
+  frc::MedianFilter<double> filter{10};
 
   filter.Calculate(3);
   filter.Calculate(0);
@@ -19,7 +19,7 @@ TEST(MedianFilterTest, MedianFilterNotFullTestEven) {
 }
 
 TEST(MedianFilterTest, MedianFilterNotFullTestOdd) {
-  frc::MedianFilter filter{10};
+  frc::MedianFilter<double> filter{10};
 
   filter.Calculate(3);
   filter.Calculate(0);
@@ -30,7 +30,7 @@ TEST(MedianFilterTest, MedianFilterNotFullTestOdd) {
 }
 
 TEST(MedianFilterTest, MedianFilterFullTestEven) {
-  frc::MedianFilter filter{6};
+  frc::MedianFilter<double> filter{6};
 
   filter.Calculate(3);
   filter.Calculate(0);
@@ -43,7 +43,7 @@ TEST(MedianFilterTest, MedianFilterFullTestEven) {
 }
 
 TEST(MedianFilterTest, MedianFilterFullTestOdd) {
-  frc::MedianFilter filter{5};
+  frc::MedianFilter<double> filter{5};
 
   filter.Calculate(3);
   filter.Calculate(0);
