@@ -30,7 +30,7 @@ static int32_t analogNumChannelsToActivate = 0;
 
 static std::atomic<bool> analogSystemInitialized{false};
 
-bool analogSampleRateSet = false;
+static bool analogSampleRateSet = false;
 
 namespace init {
 void InitializeAnalogInternal() {
