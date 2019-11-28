@@ -23,8 +23,14 @@
 
 using namespace halsimgui;
 
-static constexpr int kDefaultColumns = 10;
-static std::vector<int> numColumns;
+namespace {
+struct LEDDisplaySettings {
+  int numColumns = 10;
+  LEDConfig config;
+};
+}  // namespace
+
+static std::vector<LEDDisplaySettings> displaySettings;
 
 // read/write columns setting to ini file
 static void* AddressableLEDReadOpen(ImGuiContext* ctx,
@@ -33,15 +39,15 @@ static void* AddressableLEDReadOpen(ImGuiContext* ctx,
   int num;
   if (wpi::StringRef{name}.getAsInteger(10, num)) return nullptr;
   if (num < 0) return nullptr;
-  if (num >= static_cast<int>(numColumns.size()))
-    numColumns.resize(num + 1, kDefaultColumns);
-  return &numColumns[num];
+  if (num >= static_cast<int>(displaySettings.size()))
+    displaySettings.resize(num + 1);
+  return &displaySettings[num];
 }
 
 static void AddressableLEDReadLine(ImGuiContext* ctx,
                                    ImGuiSettingsHandler* handler, void* entry,
                                    const char* lineStr) {
-  int* cols = static_cast<int*>(entry);
+  auto* settings = static_cast<LEDDisplaySettings*>(entry);
   // format: columns=#
   wpi::StringRef line{lineStr};
   auto [name, value] = line.split('=');
@@ -50,24 +56,41 @@ static void AddressableLEDReadLine(ImGuiContext* ctx,
   if (name == "columns") {
     int num;
     if (value.getAsInteger(10, num)) return;
-    *cols = num;
+    settings->numColumns = num;
+  } else if (name == "serpentine") {
+    int num;
+    if (value.getAsInteger(10, num)) return;
+    settings->config.serpentine = num != 0;
+  } else if (name == "order") {
+    int num;
+    if (value.getAsInteger(10, num)) return;
+    settings->config.order = static_cast<LEDConfig::Order>(num);
+  } else if (name == "start") {
+    int num;
+    if (value.getAsInteger(10, num)) return;
+    settings->config.start = static_cast<LEDConfig::Start>(num);
   }
 }
 
 static void AddressableLEDWriteAll(ImGuiContext* ctx,
                                    ImGuiSettingsHandler* handler,
                                    ImGuiTextBuffer* out_buf) {
-  for (size_t i = 0; i < numColumns.size(); ++i) {
-    out_buf->appendf("[AddressableLED][%d]\ncolumns=%d\n\n",
-                     static_cast<int>(i), numColumns[i]);
+  for (size_t i = 0; i < displaySettings.size(); ++i) {
+    out_buf->appendf(
+        "[AddressableLED][%d]\ncolumns=%d\nserpentine=%d\norder=%d\n"
+        "start=%d\n\n",
+        static_cast<int>(i), displaySettings[i].numColumns,
+        displaySettings[i].config.serpentine ? 1 : 0,
+        static_cast<int>(displaySettings[i].config.order),
+        static_cast<int>(displaySettings[i].config.start));
   }
 }
 
 static void DisplayAddressableLEDs() {
   bool hasAny = false;
   static const int numLED = HAL_GetNumAddressableLEDs();
-  if (numLED > static_cast<int>(numColumns.size()))
-    numColumns.resize(numLED, kDefaultColumns);
+  if (numLED > static_cast<int>(displaySettings.size()))
+    displaySettings.resize(numLED);
 
   for (int i = 0; i < numLED; ++i) {
     if (!HALSIM_GetAddressableLEDInitialized(i)) continue;
@@ -82,8 +105,22 @@ static void DisplayAddressableLEDs() {
     ImGui::PushItemWidth(ImGui::GetFontSize() * 6);
     ImGui::LabelText("Length", "%d", length);
     ImGui::LabelText("Running", "%s", running ? "Yes" : "No");
-    ImGui::InputInt("Columns", &numColumns[i]);
-    if (numColumns[i] < 1) numColumns[i] = 1;
+    ImGui::InputInt("Columns", &displaySettings[i].numColumns);
+    {
+      static const char* options[] = {"Row Major", "Column Major"};
+      int val = displaySettings[i].config.order;
+      if (ImGui::Combo("Order", &val, options, 2))
+        displaySettings[i].config.order = static_cast<LEDConfig::Order>(val);
+    }
+    {
+      static const char* options[] = {"Upper Left", "Lower Left", "Upper Right",
+                                      "Lower Right"};
+      int val = displaySettings[i].config.start;
+      if (ImGui::Combo("Start", &val, options, 4))
+        displaySettings[i].config.start = static_cast<LEDConfig::Start>(val);
+    }
+    ImGui::Checkbox("Serpentine", &displaySettings[i].config.serpentine);
+    if (displaySettings[i].numColumns < 1) displaySettings[i].numColumns = 1;
     ImGui::PopItemWidth();
 
     // show as LED indicators
@@ -100,7 +137,8 @@ static void DisplayAddressableLEDs() {
       }
     }
 
-    DrawLEDs(values, length, numColumns[i], colors);
+    DrawLEDs(values, length, displaySettings[i].numColumns, colors, 0, 0,
+             displaySettings[i].config);
   }
   if (!hasAny) ImGui::Text("No addressable LEDs");
 }
