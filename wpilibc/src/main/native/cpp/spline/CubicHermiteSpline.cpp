@@ -27,10 +27,20 @@ CubicHermiteSpline::CubicHermiteSpline(
   // Populate Row 2 and Row 3 with the derivatives of the equations above.
   // Then populate row 4 and 5 with the second derivatives.
   for (int i = 0; i < 4; i++) {
+    // Here, we are multiplying by (3 - i) to manually take the derivative. The
+    // power of the term in index 0 is 3, index 1 is 2 and so on. To find the
+    // co-efficient of the derivative, we can use the power rule and multiply
+    // the existing co-efficient by its power.
     m_coefficients.template block<2, 1>(2, i) =
         m_coefficients.template block<2, 1>(0, i) * (3 - i);
-
+  }
+  
+  for (int i = 0; i < 3; i++) {
+    // Here, we are multiplying by (2 - i) to manually take the derivative. The
+    // power of the term in index 0 is 2, index 1 is 1 and so on. To find the
+    // co-efficient of the derivative, we can use the power rule and multiply
+    // the existing co-efficient by its power.
     m_coefficients.template block<2, 1>(4, i) =
-        m_coefficients.template block<2, 1>(2, i) * (3 - i);
+        m_coefficients.template block<2, 1>(2, i) * (2 - i);
   }
 }
