@@ -37,14 +37,11 @@ stages:
 
 - stage: Test
   jobs:
-  - job: TestBench
+  - job: C++
     pool: RoboRioConnections
-
-    timeoutInMinutes: 60
-
+    timeoutInMinutes: 30
     workspace:
       clean: all
-
     steps:
     - task: DownloadPipelineArtifact@0
       inputs:
@@ -52,22 +49,57 @@ stages:
         targetPath: 'build/integrationTestFiles'
 
     - task: ShellScript@2
-      displayName: Run Tests & Get Results
+      displayName: Run C++ Tests
       inputs:
-        scriptPath: test-scripts/jenkins-run-tests-get-results.sh
+        scriptPath: test-scripts/deploy-and-run-test-on-robot.sh
+        args: 'cpp -A "--gtest_output=xml:/home/admin/testResults/cppreport.xml"'
 
     - task: PublishTestResults@2
       displayName: Publish C++ Test Results
       inputs:
         testResultsFormat: 'JUnit'
-        testResultsFiles: 'cpp*.xml'
+        testResultsFiles: '*.xml'
         testRunTitle: 'C++ Test Report'
         searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
+
+  - job: Java
+    pool: RoboRioConnections
+    timeoutInMinutes: 30
+    workspace:
+      clean: all
+    steps:
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'Integration Tests'
+        targetPath: 'build/integrationTestFiles'
+
+    - task: ShellScript@2
+      displayName: Run Java Tests
+      inputs:
+        scriptPath: test-scripts/deploy-and-run-test-on-robot.sh
+        args: 'java'
 
     - task: PublishTestResults@2
       displayName: Publish Java Test Results
       inputs:
         testResultsFormat: 'JUnit'
-        testResultsFiles: 'java*.xml'
+        testResultsFiles: '*.xml'
         testRunTitle: 'Java Test Report'
         searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
+
+
+
+
+
+    # - task: ShellScript@2
+    #   displayName: Run Tests & Get Results
+    #   inputs:
+    #     scriptPath: test-scripts/jenkins-run-tests-get-results.sh
+
+    # - task: PublishTestResults@2
+    #   displayName: Publish C++ Test Results
+    #   inputs:
+    #     testResultsFormat: 'JUnit'
+    #     testResultsFiles: 'cpp*.xml'
+    #     testRunTitle: 'C++ Test Report'
+    #     searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
