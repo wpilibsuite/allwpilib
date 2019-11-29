@@ -37,7 +37,7 @@ stages:
 
 - stage: Test
   jobs:
-  - job: C++
+  - job: CppTestbench
     pool: RoboRioConnections
     timeoutInMinutes: 30
     workspace:
@@ -62,7 +62,7 @@ stages:
         testRunTitle: 'C++ Test Report'
         searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
 
-  - job: Java
+  - job: JavaTestbench
     pool: RoboRioConnections
     timeoutInMinutes: 30
     workspace:
