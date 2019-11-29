@@ -6,13 +6,18 @@ trigger:
     include:
     - master
 
-jobs:
-- job: TestBench
-  pool: RoboRioConnections
-  timeoutInMinutes: 60
-  workspace:
-    clean: all
-  steps:
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'Ubuntu 16.04'
+
+    container: ubuntu
+
+    timeoutInMinutes: 0
+
+    steps:
     - task: Gradle@2
       condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
       inputs:
@@ -23,6 +28,27 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
         options: '-Ponlylinuxathena -PbuildServer'
+
+    - task: PublishPipelineArtifact@0
+      inputs:
+        artifactName: 'Integration Tests'
+        targetPath: 'build/integrationTestFiles'
+
+- stage: Test
+  jobs:
+  - job: TestBench
+    pool: RoboRioConnections
+
+    timeoutInMinutes: 60
+
+    workspace:
+      clean: all
+
+    steps:
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'Integration Tests'
+        targetPath: 'build/integrationTestFiles'
 
     - task: ShellScript@2
       displayName: Run Tests & Get Results
