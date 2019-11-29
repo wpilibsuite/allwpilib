@@ -13,7 +13,8 @@ stages:
     pool:
       vmImage: 'Ubuntu 16.04'
 
-    container: ubuntu
+    container:
+      image:  wpilib/ubuntu-base:18.04
 
     timeoutInMinutes: 0
 
