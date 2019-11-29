@@ -92,3 +92,38 @@ void AddressableLED::Stop() {
   HAL_StopAddressableLEDOutput(m_handle, &status);
   wpi_setHALError(status);
 }
+
+void AddressableLED::LEDData::SetHSV(int h, int s, int v) {
+  if (s == 0) {
+    SetRGB(v, v, v);
+    return;
+  }
+
+  int region = h / 30;
+  int remainder = (h - (region * 30)) * 6;
+
+  int p = (v * (255 - s)) >> 8;
+  int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
+  int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+
+  switch (region) {
+    case 0:
+      SetRGB(v, t, p);
+      break;
+    case 1:
+      SetRGB(q, v, p);
+      break;
+    case 2:
+      SetRGB(p, v, t);
+      break;
+    case 3:
+      SetRGB(p, q, v);
+      break;
+    case 4:
+      SetRGB(t, p, v);
+      break;
+    default:
+      SetRGB(v, p, q);
+      break;
+  }
+}

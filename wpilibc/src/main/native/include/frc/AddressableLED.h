@@ -35,12 +35,25 @@ class AddressableLED : public ErrorBase {
 
     /**
      * A helper method to set all values of the LED.
+     *
+     * @param r the r value [0-255]
+     * @param g the g value [0-255]
+     * @param b the b value [0-255]
      */
-    void SetLED(int r, int g, int b) {
+    void SetRGB(int r, int g, int b) {
       this->r = r;
       this->g = g;
       this->b = b;
     }
+
+    /**
+     * A helper method to set all values of the LED.
+     *
+     * @param h the h value [0-180]
+     * @param s the s value [0-255]
+     * @param v the v value [0-255]
+     */
+    void SetHSV(int h, int s, int v);
   };
 
   /**
