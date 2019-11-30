@@ -9,8 +9,8 @@ trigger:
 stages:
 - stage: Build
   jobs:
-  - job: BuildIntegrationTests
-    displayName: Build Integration Tests
+  - job: IntegrationTests
+    displayName: Integration Tests
     pool:
       vmImage: 'Ubuntu 16.04'
 
@@ -38,7 +38,8 @@ stages:
 
 - stage: Test
   jobs:
-  - job: CppTestbench
+  - job: Cpp
+    displayName: C++
     pool: RoboRioConnections
     timeoutInMinutes: 30
     workspace:
@@ -63,7 +64,7 @@ stages:
         testRunTitle: 'C++ Test Report'
         searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
 
-  - job: JavaTestbench
+  - job: Java
     pool: RoboRioConnections
     timeoutInMinutes: 30
     workspace:
