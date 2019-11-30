@@ -26,16 +26,60 @@ public class AddressableLEDBuffer {
    * Sets a specific led in the buffer.
    *
    * @param index the index to write
-   * @param r the r value
-   * @param g the g value
-   * @param b the b value
+   * @param r the r value [0-255]
+   * @param g the g value [0-255]
+   * @param b the b value [0-255]
    */
   @SuppressWarnings("ParameterName")
-  public void setLED(int index, int r, int g, int b) {
+  public void setRGB(int index, int r, int g, int b) {
     m_buffer[index * 4] = (byte) b;
     m_buffer[(index * 4) + 1] = (byte) g;
     m_buffer[(index * 4) + 2] = (byte) r;
     m_buffer[(index * 4) + 3] = 0;
+  }
+
+  /**
+   * Sets a specific led in the buffer.
+   *
+   * @param index the index to write
+   * @param h the h value [0-180]
+   * @param s the s value [0-255]
+   * @param v the v value [0-255]
+   */
+  @SuppressWarnings("ParameterName")
+  public void setHSV(final int index, final int h, final int s, final int v) {
+    if (s == 0) {
+      setRGB(index, v, v, v);
+      return;
+    }
+
+    final int region = h / 30;
+    final int remainder = (h - (region * 30)) * 6;
+
+    final int p = (v * (255 - s)) >> 8;
+    final int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
+    final int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region) {
+      case 0:
+        setRGB(index, v, t, p);
+        break;
+      case 1:
+        setRGB(index, q, v, p);
+        break;
+      case 2:
+        setRGB(index, p, v, t);
+        break;
+      case 3:
+        setRGB(index, p, q, v);
+        break;
+      case 4:
+        setRGB(index, t, p, v);
+        break;
+      default:
+        setRGB(index, v, p, q);
+        break;
+    }
   }
 
   /**
