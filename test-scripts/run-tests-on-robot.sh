@@ -17,12 +17,11 @@ source config.sh
 DEFAULT_TEST_DIR=${DEFAULT_DESTINATION_DIR}
 DEFAULT_PATH_TO_JRE=/usr/local/frc/JRE/bin/java
 
-usage="$(basename "$0") [-h] (java|cpp) name [-d test_dir] [-A] [arg] [arg]...
+usage="$(basename "$0") [-h] (java|cpp) [-d test_dir] [-A] [arg] [arg]...
 A script designed to run the integration tests.
 This script should only be run on the roborio.
 Where:
     -h    Show this help text
-    name  The name of the user trying to run the tests (used for driver station)
     -d    The directory where the tests have been placed.
           This is done to prevent overwriting an already running program.
           This scrip will automatically move the test into the ${DEFAULT_TEST_DIR}
@@ -42,12 +41,11 @@ fi
 
 LANGUAGE=none
 TEST_FILE=none
-NAME=$2
 TEST_DIR="$DEFAULT_TEST_DIR"
-# Begin searching for options from the third paramater on
-PARAM_ARGS=${@:3}
+# Begin searching for options from the second paramater on
+PARAM_ARGS=${@:2}
 # Where the test arguments start
-TEST_RUN_ARGS=${@:3}
+TEST_RUN_ARGS=${@:2}
 RUN_WITH_DEFAULT_ARGS=true
 DEFAULT_ARGS=""
 
