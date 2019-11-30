@@ -9,7 +9,8 @@ trigger:
 stages:
 - stage: Build
   jobs:
-  - job: Build
+  - job: BuildIntegrationTests
+    displayName: Build Integration Tests
     pool:
       vmImage: 'Ubuntu 16.04'
 
