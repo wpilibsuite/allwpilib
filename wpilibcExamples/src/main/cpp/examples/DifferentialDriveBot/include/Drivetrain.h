@@ -35,7 +35,7 @@ class Drivetrain {
     m_leftEncoder.Reset();
     m_rightEncoder.Reset();
 
-    m_odometry = DifferentialDriveOdometry(GetAngle());
+    m_odometry = frc::DifferentialDriveOdometry(GetAngle());
   }
 
   /**

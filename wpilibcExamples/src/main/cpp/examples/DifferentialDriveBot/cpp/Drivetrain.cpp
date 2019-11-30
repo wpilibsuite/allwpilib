@@ -23,6 +23,6 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(GetAngle(), m_leftEncoder.GetDistance(),
-                    m_rightEncoder.GetDistance());
+  m_odometry.Update(GetAngle(), units::meter_t(m_leftEncoder.GetDistance()),
+                    units::meter_t(m_rightEncoder.GetDistance()));
 }

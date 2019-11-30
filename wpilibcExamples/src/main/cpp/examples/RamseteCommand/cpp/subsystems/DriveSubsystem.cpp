@@ -24,14 +24,15 @@ DriveSubsystem::DriveSubsystem()
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
 
   ResetEncoders();
-  m_odometry =
-      DifferentialDriveOdometry(frc::Rotation2d(units::degree_t(GetHeading())));
+  m_odometry = frc::DifferentialDriveOdometry(
+      frc::Rotation2d(units::degree_t(GetHeading())));
 }
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
   m_odometry.Update(frc::Rotation2d(units::degree_t(GetHeading())),
-                    GetWheelSpeeds());
+                    units::meter_t(m_leftEncoder.GetDistance()),
+                    units::meter_t(m_rightEncoder.GetDistance()));
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
