@@ -19,6 +19,7 @@ import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.Dri
 import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kRightMotor1Port;
 import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kRightMotor2Port;
 import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kaVoltSecondsSquaredPerMeter;
+import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kp;
 import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.ksVolts;
 import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kvVoltSecondsPerMeter;
 
@@ -50,6 +51,9 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     m_leftSlave.follow(m_leftMaster);
     m_rightSlave.follow(m_rightMaster);
+
+    m_leftMaster.setPID(kp, 0, 0);
+    m_rightMaster.setPID(kp, 0, 0);
   }
 
   /**
