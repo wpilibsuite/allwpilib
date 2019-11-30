@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #*----------------------------------------------------------------------------*#
-#* Copyright (c) FIRST 2014. All Rights Reserved.							  *#
+#* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        *#
 #* Open Source Software - may be modified and shared by FRC teams. The code   *#
 #* must be accompanied by the FIRST BSD license file in the root directory of *#
-#* the project.															      *#
+#* the project.                                                               *#
 #*----------------------------------------------------------------------------*#
 
 # Configurable variables
@@ -19,7 +19,7 @@ DEFAULT_DESTINATION_RUN_TEST_SCRIPT=${DEFAULT_DESTINATION_DIR}/${DEFAULT_LOCAL_R
 
 usage="$(basename "$0") [-h] (java|cpp) [-A] [arg] [arg]...
 A script designed to run the integration tests.
-This script should only be run on the roborio.
+This script should only be run on the computer connected to the roboRIO.
 Where:
     -h    Show this help text.
     -A    Disable language recomended arguments.
@@ -30,7 +30,6 @@ Where:
 LANGUAGE=none
 LOCAL_TEST_FILE=none
 DESTINATION_TEST_FILE=none
-LIBRARY_FILES=none
 TEST_RUN_ARGS=""
 
 # Begin searching for options from the third paramater on
@@ -72,18 +71,9 @@ SSH_RUN_TESTS="ssh -t ${ROBOT_ADDRESS} ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT} ${
 SCP_NATIVE_LIBRARIES="scp ${DEFAULT_LIBRARY_NATIVE_FILES}/* ${ROBOT_ADDRESS}:${DEFAULT_LIBRARY_NATIVE_DESTINATION}"
 CONFIG_NATIVE_LIBRARIES="ssh -t ${ADMIN_ROBOT_ADDRESS} ldconfig"
 
-if [ $(which sshpass) ]; then
-    sshpass -p "" ${SCP_NATIVE_LIBRARIES}
-    sshpass -p "" ${CONFIG_NATIVE_LIBRARIES}
-    sshpass -p "" ${SCP_TEST_SCRIPT}
-    sshpass -p "" ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
-    sshpass -p "" ${SCP_TEST_PROGRAM}
-    sshpass -p "" ${SSH_RUN_TESTS}
-else
-    eval ${SCP_NATIVE_LIBRARIES}
-    eval ${CONFIG_NATIVE_LIBRARIES}
-    eval ${SCP_TEST_SCRIPT}
-    eval ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
-    eval ${SCP_TEST_PROGRAM}
-    eval ${SSH_RUN_TESTS}
-fi
+eval ${SCP_NATIVE_LIBRARIES}
+eval ${CONFIG_NATIVE_LIBRARIES}
+eval ${SCP_TEST_SCRIPT}
+eval ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
+eval ${SCP_TEST_PROGRAM}
+eval ${SSH_RUN_TESTS}
