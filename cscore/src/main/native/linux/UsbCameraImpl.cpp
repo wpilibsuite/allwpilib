@@ -1197,7 +1197,7 @@ void UsbCameraImpl::SetQuirks() {
   if (deviceNum >= 0) {
     int vendorId, productId;
     if (GetVendorProduct(deviceNum, &vendorId, &productId)) {
-      m_ps3eyecam_exposure = vendorId == 0x2000 && productId == 0x0145;
+      m_ps3eyecam_exposure = vendorId == 0x1415 && productId == 0x2000;
     }
   }
 }
