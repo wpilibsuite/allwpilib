@@ -36,7 +36,8 @@ stages:
         artifactName: 'Integration Tests'
         targetPath: 'build/integrationTestFiles'
 
-- stage: Test
+- stage: TestBench
+  displayName: Test Bench
   jobs:
   - job: Cpp
     displayName: C++
