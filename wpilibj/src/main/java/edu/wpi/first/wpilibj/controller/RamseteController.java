@@ -69,7 +69,7 @@ public class RamseteController {
    * results.
    */
   public RamseteController() {
-    super(2.0, 0.7);
+    this(2.0, 0.7);
   }
 
   /**
