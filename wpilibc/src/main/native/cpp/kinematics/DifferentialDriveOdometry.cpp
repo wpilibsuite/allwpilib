@@ -10,8 +10,7 @@
 using namespace frc;
 
 DifferentialDriveOdometry::DifferentialDriveOdometry(
-    DifferentialDriveKinematics kinematics, const Rotation2d& gyroAngle,
-    const Pose2d& initialPose)
+    const Rotation2d& gyroAngle, const Pose2d& initialPose)
     : m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
