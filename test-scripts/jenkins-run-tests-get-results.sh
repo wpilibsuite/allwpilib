@@ -14,14 +14,6 @@ source config.sh
 printf "Getting exclusive lock for RIO execution...\n"
 flock -x 200 || exit 1
 
-# Ensure the teststand is dead
-SSH_STOP_TESTSTAND="ssh -t ${ROBOT_ADDRESS} sh -c '/etc/init.d/teststand stop; sleep 1'"
-if [ $(which sshpass) ]; then
-    sshpass -p "" ${SSH_STOP_TESTSTAND}
-else
-    eval ${SSH_STOP_TESTSTAND}
-fi
-
 # If there are already test results in the repository then remove them
 if [[ -e ${DEFAULT_LOCAL_TEST_RESULTS_DIR} ]]; then
     rm -R ${DEFAULT_LOCAL_TEST_RESULTS_DIR}
