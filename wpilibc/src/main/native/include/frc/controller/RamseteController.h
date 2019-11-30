@@ -45,16 +45,21 @@ namespace frc {
 class RamseteController {
  public:
   /**
-   * Construct a Ramsete unicycle controller. The default arguments for
-   * b and zeta of 2.0 and 0.7 have been well-tested to produce desireable
-   * results.
+   * Construct a Ramsete unicycle controller.
    *
    * @param b    Tuning parameter (b > 0) for which larger values make
    *             convergence more aggressive like a proportional term.
    * @param zeta Tuning parameter (0 < zeta < 1) for which larger values provide
    *             more damping in response.
    */
-  explicit RamseteController(double b = 2.0, double zeta = 0.7);
+  RamseteController(double b, double zeta);
+  
+  /**
+   * Construct a Ramsete unicycle controller. The default arguments for
+   * b and zeta of 2.0 and 0.7 have been well-tested to produce desireable
+   * results.
+   */
+  RamseteController() : RamseteController(2.0, 0.7) {}
 
   /**
    * Returns true if the pose error is within tolerance of the reference.
