@@ -23,33 +23,24 @@ namespace frc {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
- * There are two ways of tracking the robot's position on the field with this
- * class: one involving using encoder velocities and the other involving encoder
- * positions. It is very important that only one type of odometry is used with
- * each instantiation of this class.
- *
- * Note: If you are using the encoder positions / distances method, it is
- * important that you reset your encoders to zero before using this class. Any
- * subsequent pose resets also require the encoders to be reset to zero.
+ * It is important that you reset your encoders to zero before using this class.
+ * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 class DifferentialDriveOdometry {
  public:
   /**
    * Constructs a DifferentialDriveOdometry object.
    *
-   * @param kinematics The differential drive kinematics for your drivetrain.
    * @param gyroAngle The angle reported by the gyroscope.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit DifferentialDriveOdometry(DifferentialDriveKinematics kinematics,
-                                     const Rotation2d& gyroAngle,
+  explicit DifferentialDriveOdometry(const Rotation2d& gyroAngle,
                                      const Pose2d& initialPose = Pose2d());
 
   /**
    * Resets the robot's position on the field.
    *
-   * If you are using the encoder distances method instead of the velocity
-   * method, you NEED to reset your encoders (to zero) when calling this method.
+   * You NEED to reset your encoders (to zero) when calling this method.
    *
    * The gyroscope angle does not need to be reset here on the user's robot
    * code. The library automatically takes care of offsetting the gyro angle.
@@ -73,24 +64,6 @@ class DifferentialDriveOdometry {
   const Pose2d& GetPose() const { return m_pose; }
 
   /**
-   * Updates the robot's position on the field using forward kinematics and
-   * integration of the pose over time. This method takes in the current time as
-   * a parameter to calculate period (difference between two timestamps). The
-   * period is used to calculate the change in distance from a velocity. This
-   * also takes in an angle parameter which is used instead of the
-   * angular rate that is calculated from forward kinematics.
-   *
-   * @param currentTime The current time.
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelSpeeds The current wheel speeds.
-   *
-   * @return The new pose of the robot.
-   */
-  const Pose2d& UpdateWithTime(units::second_t currentTime,
-                               const Rotation2d& gyroAngle,
-                               const DifferentialDriveWheelSpeeds& wheelSpeeds);
-
-  /**
    * Updates the robot position on the field using distance measurements from
    * encoders. This method is more numerically accurate than using velocities to
    * integrate the pose and is also advantageous for teams that are using lower
@@ -104,30 +77,9 @@ class DifferentialDriveOdometry {
   const Pose2d& Update(const Rotation2d& gyroAngle, units::meter_t leftDistance,
                        units::meter_t rightDistance);
 
-  /**
-   * Updates the robot's position on the field using forward kinematics and
-   * integration of the pose over time. This method automatically calculates
-   * the current time to calculate period (difference between two timestamps).
-   * The period is used to calculate the change in distance from a velocity.
-   * This also takes in an angle parameter which is used instead of the
-   * angular rate that is calculated from forward kinematics.
-   *
-   * @param gyroAngle The angle reported by the gyroscope.
-   * @param wheelSpeeds     The current wheel speeds.
-   *
-   * @return The new pose of the robot.
-   */
-  const Pose2d& Update(const Rotation2d& gyroAngle,
-                       const DifferentialDriveWheelSpeeds& wheelSpeeds) {
-    return UpdateWithTime(frc2::Timer::GetFPGATimestamp(), gyroAngle,
-                          wheelSpeeds);
-  }
-
  private:
-  DifferentialDriveKinematics m_kinematics;
   Pose2d m_pose;
 
-  units::second_t m_previousTime = -1_s;
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
 

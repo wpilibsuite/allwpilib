@@ -31,6 +31,11 @@ class Drivetrain {
                                       kEncoderResolution);
     m_rightEncoder.SetDistancePerPulse(2 * wpi::math::pi * kWheelRadius /
                                        kEncoderResolution);
+
+    m_leftEncoder.Reset();
+    m_rightEncoder.Reset();
+
+    m_odometry = DifferentialDriveOdometry(GetAngle());
   }
 
   /**
@@ -46,7 +51,6 @@ class Drivetrain {
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
       wpi::math::pi};  // 1/2 rotation per second
 
-  frc::DifferentialDriveWheelSpeeds GetSpeeds() const;
   void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
   void Drive(units::meters_per_second_t xSpeed,
              units::radians_per_second_t rot);
@@ -74,5 +78,5 @@ class Drivetrain {
   frc::AnalogGyro m_gyro{0};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
-  frc::DifferentialDriveOdometry m_odometry{m_kinematics, GetAngle()};
+  frc::DifferentialDriveOdometry m_odometry;
 };
