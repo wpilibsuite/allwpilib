@@ -68,7 +68,7 @@ else
     exit 1
 fi
 
-PARAM_COUNTER=2
+PARAM_COUNTER=1
 printf "Param Args ${PARAM_ARGS}\n"
 
 # Check for optional paramaters
