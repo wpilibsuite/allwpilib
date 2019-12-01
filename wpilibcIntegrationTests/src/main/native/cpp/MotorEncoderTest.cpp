@@ -48,7 +48,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
   SpeedController* m_speedController;
   Encoder* m_encoder;
-  LinearFilter* m_filter;
+  LinearFilter<double>* m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
@@ -70,7 +70,8 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
                                 TestBench::kTalonEncoderChannelB);
         break;
     }
-    m_filter = new LinearFilter(LinearFilter::MovingAverage(50));
+    m_filter =
+        new LinearFilter<double>(LinearFilter<double>::MovingAverage(50));
   }
 
   void TearDown() override {
