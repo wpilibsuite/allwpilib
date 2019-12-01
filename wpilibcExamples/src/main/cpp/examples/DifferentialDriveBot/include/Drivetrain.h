@@ -34,8 +34,6 @@ class Drivetrain {
 
     m_leftEncoder.Reset();
     m_rightEncoder.Reset();
-
-    m_odometry = frc::DifferentialDriveOdometry(GetAngle());
   }
 
   /**
@@ -78,5 +76,5 @@ class Drivetrain {
   frc::AnalogGyro m_gyro{0};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
-  frc::DifferentialDriveOdometry m_odometry;
+  frc::DifferentialDriveOdometry m_odometry{GetAngle()};
 };

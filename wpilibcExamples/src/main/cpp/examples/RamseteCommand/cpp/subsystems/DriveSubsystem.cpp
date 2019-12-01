@@ -18,14 +18,13 @@ DriveSubsystem::DriveSubsystem()
       m_right1{kRightMotor1Port},
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
-      m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
+      m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]},
+      m_odometry{frc::Rotation2d(units::degree_t(GetHeading()))} {
   // Set the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
 
   ResetEncoders();
-  m_odometry = frc::DifferentialDriveOdometry(
-      frc::Rotation2d(units::degree_t(GetHeading())));
 }
 
 void DriveSubsystem::Periodic() {
