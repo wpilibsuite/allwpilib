@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kDriveKinematics;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kEncoderDistancePerPulse;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kGyroReversed;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftEncoderPorts;
@@ -57,8 +56,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(kDriveKinematics,
-      Rotation2d.fromDegrees(getHeading()));
+  private final DifferentialDriveOdometry m_odometry;
 
   /**
    * Creates a new DriveSubsystem.
@@ -67,12 +65,16 @@ public class DriveSubsystem extends SubsystemBase {
     // Sets the distance per pulse for the encoders
     m_leftEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
     m_rightEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+
+    resetEncoders();
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
   }
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(Rotation2d.fromDegrees(getHeading()), getWheelSpeeds());
+    m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getDistance(),
+        m_rightEncoder.getDistance());
   }
 
   /**
@@ -99,6 +101,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
+    resetEncoders();
     m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
   }
 
