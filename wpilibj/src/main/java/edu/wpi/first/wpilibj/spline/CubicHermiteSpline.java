@@ -52,8 +52,8 @@ public class CubicHermiteSpline extends Spline {
       // Then populate row 4 and 5 with the second derivatives.
       // Here, we are multiplying by (3 - i) to manually take the derivative. The
       // power of the term in index 0 is 3, index 1 is 2 and so on. To find the
-      // co-efficient of the derivative, we can use the power rule and multiply
-      // the existing co-efficient by its power.
+      // coefficient of the derivative, we can use the power rule and multiply
+      // the existing coefficient by its power.
       m_coefficients.set(2, i, m_coefficients.get(0, i) * (3 - i));
       m_coefficients.set(3, i, m_coefficients.get(1, i) * (3 - i));
     }
@@ -61,8 +61,8 @@ public class CubicHermiteSpline extends Spline {
     for (int i = 0; i < 3; i++) {
       // Here, we are multiplying by (2 - i) to manually take the derivative. The
       // power of the term in index 0 is 2, index 1 is 1 and so on. To find the
-      // co-efficient of the derivative, we can use the power rule and multiply
-      // the existing co-efficient by its power.
+      // coefficient of the derivative, we can use the power rule and multiply
+      // the existing coefficient by its power.
       m_coefficients.set(4, i, m_coefficients.get(2, i) * (2 - i));
       m_coefficients.set(5, i, m_coefficients.get(3, i) * (2 - i));
     }
