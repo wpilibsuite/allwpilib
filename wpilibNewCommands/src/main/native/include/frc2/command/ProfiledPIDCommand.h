@@ -55,7 +55,7 @@ class ProfiledPIDCommand
         m_measurement{std::move(measurementSource)},
         m_goal{std::move(goalSource)},
         m_useOutput{std::move(useOutput)} {
-    AddRequirements(requirements);
+    this->AddRequirements(requirements);
   }
 
   /**
