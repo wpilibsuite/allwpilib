@@ -46,7 +46,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   /**
    * Constructs a new RamseteCommand that, when executed, will follow the
    * provided trajectory. PID control and feedforward are handled internally,
-   * and outputs are scaled -1 to 1 for easy consumption by speed controllers.
+   * and outputs are scaled -12 to 12 representing units of volts.
    *
    * <p>Note: The controller will *not* set the outputVolts to zero upon
    * completion of the path - this is left to the user, since it is not
