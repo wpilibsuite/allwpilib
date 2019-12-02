@@ -19,17 +19,19 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]},
-      m_odometry{kDriveKinematics,
-                 frc::Rotation2d(units::degree_t(GetHeading()))} {
+      m_odometry{frc::Rotation2d(units::degree_t(GetHeading()))} {
   // Set the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+
+  ResetEncoders();
 }
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
   m_odometry.Update(frc::Rotation2d(units::degree_t(GetHeading())),
-                    GetWheelSpeeds());
+                    units::meter_t(m_leftEncoder.GetDistance()),
+                    units::meter_t(m_rightEncoder.GetDistance()));
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
@@ -74,6 +76,7 @@ frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
+  ResetEncoders();
   m_odometry.ResetPosition(pose,
                            frc::Rotation2d(units::degree_t(GetHeading())));
 }

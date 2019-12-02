@@ -51,8 +51,7 @@ public class Drivetrain {
   private final DifferentialDriveKinematics m_kinematics
       = new DifferentialDriveKinematics(kTrackWidth);
 
-  private final DifferentialDriveOdometry m_odometry
-      = new DifferentialDriveOdometry(m_kinematics, getAngle());
+  private final DifferentialDriveOdometry m_odometry;
 
   /**
    * Constructs a differential drive object.
@@ -66,6 +65,11 @@ public class Drivetrain {
     // resolution.
     m_leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
     m_rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+
+    m_leftEncoder.reset();
+    m_rightEncoder.reset();
+
+    m_odometry = new DifferentialDriveOdometry(getAngle());
   }
 
   /**
@@ -76,15 +80,6 @@ public class Drivetrain {
   public Rotation2d getAngle() {
     // Negating the angle because WPILib gyros are CW positive.
     return Rotation2d.fromDegrees(-m_gyro.getAngle());
-  }
-
-  /**
-   * Returns the current wheel speeds.
-   *
-   * @return The current wheel speeds.
-   */
-  public DifferentialDriveWheelSpeeds getCurrentSpeeds() {
-    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
   }
 
   /**
@@ -117,6 +112,6 @@ public class Drivetrain {
    * Updates the field-relative position.
    */
   public void updateOdometry() {
-    m_odometry.update(getAngle(), getCurrentSpeeds());
+    m_odometry.update(getAngle(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
   }
 }

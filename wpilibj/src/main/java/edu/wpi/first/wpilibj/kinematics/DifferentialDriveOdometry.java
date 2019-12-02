@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
@@ -21,19 +20,11 @@ import edu.wpi.first.wpilibj.geometry.Twist2d;
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  *
- * <p>There are two ways of tracking the robot's position on the field with this
- * class: one involving using encoder velocities and the other involving encoder
- * positions. It is very important that only one type of odometry is used with
- * each instantiation of this class.
- *
- * <p>Note: If you are using the encoder positions / distances method, it is important
- * that you reset your encoders to zero before using this class. Any subsequent pose
- * resets also require the encoders to be reset to zero.
+ * <p>It is important that you reset your encoders to zero before using this class.
+ * Any subsequent pose resets also require the encoders to be reset to zero.
  */
 public class DifferentialDriveOdometry {
-  private final DifferentialDriveKinematics m_kinematics;
   private Pose2d m_poseMeters;
-  private double m_prevTimeSeconds = -1;
 
   private Rotation2d m_gyroOffset;
   private Rotation2d m_previousAngle;
@@ -44,13 +35,11 @@ public class DifferentialDriveOdometry {
   /**
    * Constructs a DifferentialDriveOdometry object.
    *
-   * @param kinematics        The differential drive kinematics for your drivetrain.
    * @param gyroAngle         The angle reported by the gyroscope.
    * @param initialPoseMeters The starting position of the robot on the field.
    */
-  public DifferentialDriveOdometry(DifferentialDriveKinematics kinematics, Rotation2d gyroAngle,
+  public DifferentialDriveOdometry(Rotation2d gyroAngle,
                                    Pose2d initialPoseMeters) {
-    m_kinematics = kinematics;
     m_poseMeters = initialPoseMeters;
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
@@ -59,18 +48,16 @@ public class DifferentialDriveOdometry {
   /**
    * Constructs a DifferentialDriveOdometry object with the default pose at the origin.
    *
-   * @param kinematics The differential drive kinematics for your drivetrain.
-   * @param gyroAngle  The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope.
    */
-  public DifferentialDriveOdometry(DifferentialDriveKinematics kinematics, Rotation2d gyroAngle) {
-    this(kinematics, gyroAngle, new Pose2d());
+  public DifferentialDriveOdometry(Rotation2d gyroAngle) {
+    this(gyroAngle, new Pose2d());
   }
 
   /**
    * Resets the robot's position on the field.
    *
-   * <p>If you are using the encoder distances method instead of the velocity method,
-   * you NEED to reset your encoders (to zero) when calling this method.
+   * <p>You NEED to reset your encoders (to zero) when calling this method.
    *
    * <p>The gyroscope angle does not need to be reset here on the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
@@ -96,37 +83,6 @@ public class DifferentialDriveOdometry {
     return m_poseMeters;
   }
 
-  /**
-   * Updates the robot's position on the field using forward kinematics and
-   * integration of the pose over time. This method takes in the current time as
-   * a parameter to calculate period (difference between two timestamps). The
-   * period is used to calculate the change in distance from a velocity. This
-   * also takes in an angle parameter which is used instead of the
-   * angular rate that is calculated from forward kinematics.
-   *
-   * @param currentTimeSeconds The current time in seconds.
-   * @param gyroAngle          The angle reported by the gyroscope.
-   * @param wheelSpeeds        The current wheel speeds.
-   * @return The new pose of the robot.
-   */
-  public Pose2d updateWithTime(double currentTimeSeconds, Rotation2d gyroAngle,
-                               DifferentialDriveWheelSpeeds wheelSpeeds) {
-    double period = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : 0.0;
-    m_prevTimeSeconds = currentTimeSeconds;
-
-    var angle = gyroAngle.plus(m_gyroOffset);
-
-    var chassisState = m_kinematics.toChassisSpeeds(wheelSpeeds);
-    var newPose = m_poseMeters.exp(
-        new Twist2d(chassisState.vxMetersPerSecond * period,
-            chassisState.vyMetersPerSecond * period,
-            angle.minus(m_previousAngle).getRadians()));
-
-    m_previousAngle = angle;
-
-    m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
-    return m_poseMeters;
-  }
 
   /**
    * Updates the robot position on the field using distance measurements from encoders. This
@@ -156,23 +112,5 @@ public class DifferentialDriveOdometry {
 
     m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
     return m_poseMeters;
-  }
-
-  /**
-   * Updates the robot's position on the field using forward kinematics and
-   * integration of the pose over time. This method automatically calculates the
-   * current time to calculate period (difference between two timestamps). The
-   * period is used to calculate the change in distance from a velocity. This
-   * also takes in an angle parameter which is used instead of the
-   * angular rate that is calculated from forward kinematics.
-   *
-   * @param gyroAngle   The angle reported by the gyroscope.
-   * @param wheelSpeeds The current wheel speeds.
-   * @return The new pose of the robot.
-   */
-  public Pose2d update(Rotation2d gyroAngle,
-                       DifferentialDriveWheelSpeeds wheelSpeeds) {
-    return updateWithTime(Timer.getFPGATimestamp(),
-        gyroAngle, wheelSpeeds);
   }
 }

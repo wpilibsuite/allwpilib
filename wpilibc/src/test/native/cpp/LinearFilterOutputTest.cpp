@@ -73,40 +73,41 @@ static double GetPulseData(double t) {
 class LinearFilterOutputTest
     : public testing::TestWithParam<LinearFilterOutputTestType> {
  protected:
-  std::unique_ptr<frc::LinearFilter> m_filter;
+  std::unique_ptr<frc::LinearFilter<double>> m_filter;
   std::function<double(double)> m_data;
   double m_expectedOutput = 0.0;
 
   void SetUp() override {
     switch (GetParam()) {
       case TEST_SINGLE_POLE_IIR: {
-        m_filter = std::make_unique<frc::LinearFilter>(
-            frc::LinearFilter::SinglePoleIIR(kSinglePoleIIRTimeConstant,
-                                             kFilterStep));
+        m_filter = std::make_unique<frc::LinearFilter<double>>(
+            frc::LinearFilter<double>::SinglePoleIIR(kSinglePoleIIRTimeConstant,
+                                                     kFilterStep));
         m_data = GetData;
         m_expectedOutput = kSinglePoleIIRExpectedOutput;
         break;
       }
 
       case TEST_HIGH_PASS: {
-        m_filter = std::make_unique<frc::LinearFilter>(
-            frc::LinearFilter::HighPass(kHighPassTimeConstant, kFilterStep));
+        m_filter = std::make_unique<frc::LinearFilter<double>>(
+            frc::LinearFilter<double>::HighPass(kHighPassTimeConstant,
+                                                kFilterStep));
         m_data = GetData;
         m_expectedOutput = kHighPassExpectedOutput;
         break;
       }
 
       case TEST_MOVAVG: {
-        m_filter = std::make_unique<frc::LinearFilter>(
-            frc::LinearFilter::MovingAverage(kMovAvgTaps));
+        m_filter = std::make_unique<frc::LinearFilter<double>>(
+            frc::LinearFilter<double>::MovingAverage(kMovAvgTaps));
         m_data = GetData;
         m_expectedOutput = kMovAvgExpectedOutput;
         break;
       }
 
       case TEST_PULSE: {
-        m_filter = std::make_unique<frc::LinearFilter>(
-            frc::LinearFilter::MovingAverage(kMovAvgTaps));
+        m_filter = std::make_unique<frc::LinearFilter<double>>(
+            frc::LinearFilter<double>::MovingAverage(kMovAvgTaps));
         m_data = GetPulseData;
         m_expectedOutput = 0.0;
         break;
