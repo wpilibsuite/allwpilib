@@ -13,9 +13,6 @@
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
-  // Put the chooser on the dashboard
-  frc::Shuffleboard::GetTab("Autonomous").Add(m_chooser);
-
   // Configure the button bindings
   ConfigureButtonBindings();
 

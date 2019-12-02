@@ -8,7 +8,8 @@
 #pragma once
 
 #include <frc/Encoder.h>
-#include <frc/SimpleMotorFeedforward.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
 

@@ -13,7 +13,7 @@ class ExampleSmartMotorController : public frc::SpeedController {
     kPosition,
     kVelocity,
     kMovementWitchcraft
-  }
+  };
 
   /**
    * Creates a new ExampleSmartMotorController.
@@ -77,15 +77,14 @@ class ExampleSmartMotorController : public frc::SpeedController {
   void Set(double speed) override {
   }
 
-  double Get() override {
+  double Get() const override {
     return 0;
   }
 
-  void setInverted(boolean isInverted) override {
-
+  void SetInverted(bool isInverted) override {
   }
 
-  boolean GetInverted() override {
+  bool GetInverted() const override {
     return false;
   }
 
@@ -95,6 +94,6 @@ class ExampleSmartMotorController : public frc::SpeedController {
   void StopMotor() override {
   }
 
-  void PidWrite(double output) override {
+  void PIDWrite(double output) override {
   }
 };

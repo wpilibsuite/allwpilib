@@ -17,11 +17,7 @@
 #include <frc2/command/StartEndCommand.h>
 
 #include "Constants.h"
-#include "commands/ComplexAuto.h"
 #include "subsystems/DriveSubsystem.h"
-#include "subsystems/HatchSubsystem.h"
-
-namespace ac = AutoConstants;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since

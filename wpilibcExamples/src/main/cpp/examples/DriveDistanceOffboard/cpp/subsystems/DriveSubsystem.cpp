@@ -28,12 +28,12 @@ void DriveSubsystem::Periodic() {
 
 void DriveSubsystem::SetDriveStates(frc::TrapezoidProfile<units::meters>::State left,
                                     frc::TrapezoidProfile<units::meters>::State right) {
-  m_leftMaster.SetSetpoint(ExampleSmartMotorController.PIDMode::kPosition,
+  m_leftMaster.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
                            left.position.to<double>(),
-                           m_feedforward.calculate(left.velocity).to<double>());
+                           m_feedforward.Calculate(left.velocity).to<double>());
   m_rightMaster.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
                             right.position.to<double>(),
-                            m_feedforward.calculate(right.velocity).to<double>());
+                            m_feedforward.Calculate(right.velocity).to<double>());
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
@@ -41,8 +41,8 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
 }
 
 void DriveSubsystem::ResetEncoders() {
-  m_leftEncoder.Reset();
-  m_rightEncoder.Reset();
+  m_leftMaster.ResetEncoder();
+  m_rightMaster.ResetEncoder();
 }
 
 units::meter_t DriveSubsystem::GetLeftEncoderDistance() {
