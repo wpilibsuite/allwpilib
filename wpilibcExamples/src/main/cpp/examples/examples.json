@@ -508,5 +508,29 @@
     "foldername": "ArmBot",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "ArmBotOffboard",
+    "description": "An example command-based robot demonstrating the use of a TrapezoidProfileSubsystem to control an arm with an offboard PID.",
+    "tags": [
+      "ArmBotOffboard",
+      "PID",
+      "Motion Profile"
+    ],
+    "foldername": "ArmBotOffboard",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "DriveDistanceOffboard",
+    "description": "An example command-based robot demonstrating the use of a TrapezoidProfileCommand to drive a robot a set distance with offboard PID on the drive.",
+    "tags": [
+      "DriveDistance",
+      "PID",
+      "Motion Profile"
+    ],
+    "foldername": "DriveDistanceOffboard",
+    "gradlebase": "cpp",
+    "commandversion": 2
   }
 ]
