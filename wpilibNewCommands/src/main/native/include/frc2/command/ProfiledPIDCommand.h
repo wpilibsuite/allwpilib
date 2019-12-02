@@ -47,7 +47,7 @@ class ProfiledPIDCommand
    * @param requirements      the subsystems required by this command
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
-                     std::function<units::unit_t<Distance>> measurementSource,
+                     std::function<Distance_t()> measurementSource,
                      std::function<State()> goalSource,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements = {})
@@ -69,13 +69,13 @@ class ProfiledPIDCommand
    * @param requirements      the subsystems required by this command
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
-                     std::function<units::unit_t<Distance>> measurementSource,
-                     std::function<units::unit_t<Distance>> goalSource,
+                     std::function<Distance_t()> measurementSource,
+                     std::function<Distance_t()> goalSource,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
       : ProfiledPIDCommand(controller, measurementSource,
                            [&goalSource]() {
-                             return State{goalSource(), 0_mps};
+                             return State{goalSource(), Velocity_t{0}};
                            },
                            useOutput, requirements) {}
 
@@ -90,8 +90,8 @@ class ProfiledPIDCommand
    * @param requirements      the subsystems required by this command
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
-                     std::function<units::unit_t<Distance>> measurementSource,
-                     State goal, std::function<void(double, State)> useOutput,
+                     std::function<Distance_t()> measurementSource, State goal,
+                     std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
       : ProfiledPIDCommand(controller, measurementSource,
                            [goal] { return goal; }, useOutput, requirements) {}
@@ -107,7 +107,7 @@ class ProfiledPIDCommand
    * @param requirements      the subsystems required by this command
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
-                     std::function<units::unit_t<Distance>> measurementSource,
+                     std::function<Distance_t()> measurementSource,
                      Distance_t goal,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
@@ -138,7 +138,7 @@ class ProfiledPIDCommand
 
  protected:
   frc::ProfiledPIDController<Distance> m_controller;
-  std::function<Distance_t> m_measurement;
+  std::function<Distance_t()> m_measurement;
   std::function<State()> m_goal;
   std::function<void(double, State)> m_useOutput;
 };

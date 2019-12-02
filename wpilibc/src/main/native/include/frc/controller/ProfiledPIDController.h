@@ -217,9 +217,10 @@ class ProfiledPIDController
    * @param velocityTolerance Velocity error which is tolerable.
    */
   void SetTolerance(
-      double positionTolerance,
-      double velocityTolerance = std::numeric_limits<double>::infinity()) {
-    m_controller.SetTolerance(positionTolerance, velocityTolerance);
+      Distance_t positionTolerance,
+      Velocity_t velocityTolerance = std::numeric_limits<double>::infinity()) {
+    m_controller.SetTolerance(positionTolerance.template to<double>(),
+                              velocityTolerance.template to<double>());
   }
 
   /**
