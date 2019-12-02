@@ -5,14 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "commands/TurnToAngle.h"
+#include "commands/TurnToAngleProfiled.h"
 
-#include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
 
 using namespace DriveConstants;
 
 TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
-    : CommandHelper(frc2::PIDController(kTurnP, kTurnI, kTurnD),
+    : CommandHelper(frc2::ProfiledPIDController(kTurnP, kTurnI, kTurnD,
+                                                {kMaxTurnRate,
+                                                kMaxTurnAcceleration}),
                     // Close loop on heading
                     [drive] { return drive->GetHeading(); },
                     // Set reference to target
@@ -26,8 +28,7 @@ TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
   // Set the controller tolerance - the delta tolerance ensures the robot is
   // stationary at the setpoint before it is considered as having reached the
   // reference
-  m_controller.SetTolerance(kTurnTolerance.to<double>(),
-                            kTurnRateTolerance.to<double>());
+  m_controller.SetTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
 
   AddRequirements({drive});
 }
