@@ -9,10 +9,9 @@
 
 #include <frc/Encoder.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/trajectory/TrapezoidProfile.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <frc2/command/SubsystemBase.h>
-
 #include <units/units.h>
 
 #include "Constants.h"

@@ -26,14 +26,16 @@ void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
 }
 
-void DriveSubsystem::SetDriveStates(frc::TrapezoidProfile<units::meters>::State left,
-                                    frc::TrapezoidProfile<units::meters>::State right) {
+void DriveSubsystem::SetDriveStates(
+    frc::TrapezoidProfile<units::meters>::State left,
+    frc::TrapezoidProfile<units::meters>::State right) {
   m_leftMaster.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
                            left.position.to<double>(),
                            m_feedforward.Calculate(left.velocity).to<double>());
-  m_rightMaster.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                            right.position.to<double>(),
-                            m_feedforward.Calculate(right.velocity).to<double>());
+  m_rightMaster.SetSetpoint(
+      ExampleSmartMotorController::PIDMode::kPosition,
+      right.position.to<double>(),
+      m_feedforward.Calculate(right.velocity).to<double>());
 }
 
 void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
