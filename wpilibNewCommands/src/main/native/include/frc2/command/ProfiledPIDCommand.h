@@ -108,7 +108,7 @@ class ProfiledPIDCommand
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<units::unit_t<Distance>> measurementSource,
-                     units::meter_t goal,
+                     Distance_t goal,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
       : ProfiledPIDCommand(controller, measurementSource,
