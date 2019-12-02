@@ -11,26 +11,29 @@
 
 using namespace DriveConstants;
 
-TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
-    : CommandHelper(frc2::ProfiledPIDController(kTurnP, kTurnI, kTurnD,
-                                                {kMaxTurnRate,
-                                                kMaxTurnAcceleration}),
-                    // Close loop on heading
-                    [drive] { return drive->GetHeading(); },
-                    // Set reference to target
-                    targetAngleDegrees,
-                    // Pipe output to turn robot
-                    [drive](double output) { drive->ArcadeDrive(0, output); },
-                    // Require the drive
-                    {drive}) {
+TurnToAngleProfiled::TurnToAngleProfiled(units::degree_t target,
+                                         DriveSubsystem* drive)
+    : CommandHelper(
+          frc::ProfiledPIDController<units::radians>(
+              kTurnP, kTurnI, kTurnD, {kMaxTurnRate, kMaxTurnAcceleration}),
+          // Close loop on heading
+          [drive] { return drive->GetHeading(); },
+          // Set reference to target
+          target,
+          // Pipe output to turn robot
+          [drive](double output, auto setpointState) {
+            drive->ArcadeDrive(0, output);
+          },
+          // Require the drive
+          {drive}) {
   // Set the controller to be continuous (because it is an angle controller)
-  m_controller.EnableContinuousInput(-180, 180);
+  GetController().EnableContinuousInput(-180_deg, 180_deg);
   // Set the controller tolerance - the delta tolerance ensures the robot is
   // stationary at the setpoint before it is considered as having reached the
   // reference
-  m_controller.SetTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
+  GetController().SetTolerance(kTurnTolerance, kTurnRateTolerance);
 
   AddRequirements({drive});
 }
 
-bool TurnToAngle::IsFinished() { return m_controller.AtSetpoint(); }
+bool TurnToAngleProfiled::IsFinished() { return GetController().AtGoal(); }

@@ -49,7 +49,7 @@ class RobotContainer {
 
   // Turn to 90 degrees, with a 5 second timeout
   frc2::ParallelRaceGroup m_turnTo90 =
-      TurnToAngle{90, &m_drive}.WithTimeout(5_s);
+      TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s);
 
   // Stabilize the robot while driving
   frc2::PIDCommand m_stabilizeDriving{

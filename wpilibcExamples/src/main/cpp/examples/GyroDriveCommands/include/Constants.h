@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <wpi/math>
 #include <units/units.h>
+#include <wpi/math>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide

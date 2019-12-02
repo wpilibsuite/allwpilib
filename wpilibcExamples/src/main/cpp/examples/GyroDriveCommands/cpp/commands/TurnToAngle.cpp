@@ -11,12 +11,12 @@
 
 using namespace DriveConstants;
 
-TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
+TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
     : CommandHelper(frc2::PIDController(kTurnP, kTurnI, kTurnD),
                     // Close loop on heading
-                    [drive] { return drive->GetHeading(); },
+                    [drive] { return drive->GetHeading().to<double>(); },
                     // Set reference to target
-                    targetAngleDegrees,
+                    target.to<double>(),
                     // Pipe output to turn robot
                     [drive](double output) { drive->ArcadeDrive(0, output); },
                     // Require the drive
@@ -32,4 +32,4 @@ TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
   AddRequirements({drive});
 }
 
-bool TurnToAngle::IsFinished() { return m_controller.AtSetpoint(); }
+bool TurnToAngle::IsFinished() { return GetController().AtSetpoint(); }
