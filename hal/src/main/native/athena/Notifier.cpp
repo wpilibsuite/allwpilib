@@ -13,6 +13,7 @@
 
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <thread>
 
 #include "HALInitializer.h"
 #include "hal/ChipObject.h"
@@ -26,7 +27,7 @@ static constexpr int32_t kTimerInterruptNumber = 28;
 
 static wpi::mutex notifierMutex;
 static std::unique_ptr<tAlarm> notifierAlarm;
-static std::unique_ptr<tInterruptManager> notifierManager;
+static std::thread notifierThread;
 static uint64_t closestTrigger{UINT64_MAX};
 
 namespace {
@@ -43,6 +44,7 @@ struct Notifier {
 
 static std::atomic_flag notifierAtexitRegistered{ATOMIC_FLAG_INIT};
 static std::atomic_int notifierRefCount{0};
+static std::atomic_bool notifierRunning{false};
 
 using namespace hal;
 
@@ -65,7 +67,7 @@ class NotifierHandleContainer
 
 static NotifierHandleContainer* notifierHandles;
 
-static void alarmCallback(uint32_t, void*) {
+static void alarmCallback() {
   std::scoped_lock lock(notifierMutex);
   int32_t status = 0;
   uint64_t currentTime = 0;
@@ -97,9 +99,20 @@ static void alarmCallback(uint32_t, void*) {
   }
 }
 
+static void notifierThreadMain() {
+  tRioStatusCode status = 0;
+  tInterruptManager manager{1 << kTimerInterruptNumber, true, &status};
+  while (notifierRunning) {
+    auto triggeredMask = manager.watch(0, false, &status);
+    if (!notifierRunning) break;
+    alarmCallback();
+  }
+}
+
 static void cleanupNotifierAtExit() {
   notifierAlarm = nullptr;
-  notifierManager = nullptr;
+  notifierRunning = false;
+  notifierThread.join();
 }
 
 namespace hal {
@@ -120,14 +133,8 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
 
   if (notifierRefCount.fetch_add(1) == 0) {
     std::scoped_lock lock(notifierMutex);
-    // create manager and alarm if not already created
-    if (!notifierManager) {
-      notifierManager = std::make_unique<tInterruptManager>(
-          1 << kTimerInterruptNumber, false, status);
-      notifierManager->registerHandler(alarmCallback, nullptr, status);
-      notifierManager->enable(status);
-    }
-    if (!notifierAlarm) notifierAlarm.reset(tAlarm::create(status));
+    notifierThread = std::thread(notifierThreadMain);
+    notifierAlarm.reset(tAlarm::create(status));
   }
 
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
@@ -169,21 +176,19 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   notifier->cond.notify_all();
 
   if (notifierRefCount.fetch_sub(1) == 1) {
-    // if this was the last notifier, clean up alarm and manager
+    // if this was the last notifier, clean up alarm and thread
     // the notifier can call back into our callback, so don't hold the lock
     // here (the atomic fetch_sub will prevent multiple parallel entries
     // into this function)
 
-    // Cleaning up the manager takes up to a second to complete, so don't do
-    // that here. Fix it more permanently in 2019...
+    if (notifierAlarm) notifierAlarm->writeEnable(false, status);
+    notifierRunning = false;
+    // TODO with new image, manually trigger notifier in FPGA
+    if (notifierThread.joinable()) notifierThread.join();
 
-    // if (notifierAlarm) notifierAlarm->writeEnable(false, status);
-    // if (notifierManager) notifierManager->disable(status);
-
-    // std::scoped_lock lock(notifierMutex);
-    // notifierAlarm = nullptr;
-    // notifierManager = nullptr;
-    // closestTrigger = UINT64_MAX;
+    std::scoped_lock lock(notifierMutex);
+    notifierAlarm = nullptr;
+    closestTrigger = UINT64_MAX;
   }
 }
 
