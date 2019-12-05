@@ -44,7 +44,7 @@ class TrapezoidProfileCommand
                           std::function<void(State)> output,
                           std::initializer_list<Subsystem*> requirements)
       : m_profile(profile), m_output(output) {
-    AddRequirements(requirements);
+    this->AddRequirements(requirements);
   }
 
   void Initialize() override {
