@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpiutil.math;
 
-public final class MathUtils {
-  private MathUtils() {
+public final class MathUtil {
+  private MathUtil() {
     throw new AssertionError("utility class");
   }
 

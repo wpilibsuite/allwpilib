@@ -9,8 +9,6 @@
 
 #include <cstring>
 
-#include <FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h>
-
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HALInitializer.h"

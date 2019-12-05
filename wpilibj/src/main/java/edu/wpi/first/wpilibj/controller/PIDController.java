@@ -12,7 +12,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpiutil.math.MathUtils;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * Implements a PID control loop.
@@ -197,7 +197,7 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public void setSetpoint(double setpoint) {
     if (m_maximumInput > m_minimumInput) {
-      m_setpoint = MathUtils.clamp(setpoint, m_minimumInput, m_maximumInput);
+      m_setpoint = MathUtil.clamp(setpoint, m_minimumInput, m_maximumInput);
     } else {
       m_setpoint = setpoint;
     }
@@ -320,7 +320,7 @@ public class PIDController implements Sendable, AutoCloseable {
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
     if (m_Ki != 0) {
-      m_totalError = MathUtils.clamp(m_totalError + m_positionError * m_period,
+      m_totalError = MathUtil.clamp(m_totalError + m_positionError * m_period,
           m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
     }
 
@@ -378,7 +378,7 @@ public class PIDController implements Sendable, AutoCloseable {
 
     // Clamp setpoint to new input
     if (m_maximumInput > m_minimumInput) {
-      m_setpoint = MathUtils.clamp(m_setpoint, m_minimumInput, m_maximumInput);
+      m_setpoint = MathUtil.clamp(m_setpoint, m_minimumInput, m_maximumInput);
     }
   }
 }
