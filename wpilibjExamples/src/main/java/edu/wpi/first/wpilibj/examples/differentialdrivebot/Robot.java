@@ -11,11 +11,12 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Drivetrain.kMaxAngularSpeed;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Drivetrain.kMaxSpeed;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.OIConstants.kDriverControllerPort;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kMaxAngularSpeed;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kMaxSpeed;
 
 public class Robot extends TimedRobot {
-  private final XboxController m_controller = new XboxController(0);
+  private final XboxController m_controller = new XboxController(kDriverControllerPort);
   private final Drivetrain m_drive = new Drivetrain();
 
   @Override

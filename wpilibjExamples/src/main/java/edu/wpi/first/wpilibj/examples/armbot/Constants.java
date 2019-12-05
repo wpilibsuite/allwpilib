@@ -40,6 +40,9 @@ public final class Constants {
     public static final double kP = 1;
 
     // These are fake gains; in actuality these must be determined individually for each robot
+    // either experimentally or theoretically for *your* robot's arm.
+    // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
+    // values for your robot.
     public static final double kSVolts = 1;
     public static final double kCosVolts = 1;
     public static final double kVVoltSecondPerRad = 0.5;

@@ -17,6 +17,19 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftFrontPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftRearPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightFrontPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightRearPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRangeFinderPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kSimEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRealEncoderDistancePerPulse;
+
+
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 public class DriveTrain extends SubsystemBase {
@@ -25,15 +38,15 @@ public class DriveTrain extends SubsystemBase {
    * These include four drive motors, a left and right encoder and a gyro.
    */
   private final SpeedController m_leftMotor =
-      new SpeedControllerGroup(new PWMVictorSPX(0), new PWMVictorSPX(1));
+      new SpeedControllerGroup(new PWMVictorSPX(kLeftFrontPort), new PWMVictorSPX(kLeftRearPort));
   private final SpeedController m_rightMotor =
-      new SpeedControllerGroup(new PWMVictorSPX(2), new PWMVictorSPX(3));
+      new SpeedControllerGroup(new PWMVictorSPX(kRightFrontPort), new PWMVictorSPX(kRightRearPort));
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-  private final Encoder m_leftEncoder = new Encoder(1, 2);
-  private final Encoder m_rightEncoder = new Encoder(3, 4);
-  private final AnalogInput m_rangefinder = new AnalogInput(6);
+  private final Encoder m_leftEncoder = new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
+  private final Encoder m_rightEncoder = new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1], kRightEncoderReversed);
+  private final AnalogInput m_rangefinder = new AnalogInput(kRangeFinderPort);
   private final AnalogGyro m_gyro = new AnalogGyro(1);
 
   /**
@@ -48,12 +61,11 @@ public class DriveTrain extends SubsystemBase {
     // simulate 360 tick encoders. This if statement allows for the
     // real robot to handle this difference in devices.
     if (Robot.isReal()) {
-      m_leftEncoder.setDistancePerPulse(0.042);
-      m_rightEncoder.setDistancePerPulse(0.042);
+      m_leftEncoder.setDistancePerPulse(kRealEncoderDistancePerPulse);
+      m_rightEncoder.setDistancePerPulse(kRealEncoderDistancePerPulse);
     } else {
-      // Circumference in ft = 4in/12(in/ft)*PI
-      m_leftEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
-      m_rightEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
+      m_leftEncoder.setDistancePerPulse(kSimEncoderDistancePerPulse);
+      m_rightEncoder.setDistancePerPulse(kSimEncoderDistancePerPulse);
     }
 
     // Let's name the sensors on the LiveWindow
@@ -88,10 +100,11 @@ public class DriveTrain extends SubsystemBase {
   /**
    * Get the robot's heading.
    *
-   * @return The robots heading in degrees.
+   * @return The robots heading in degrees from 0 to 360.
    */
   public double getHeading() {
-    return m_gyro.getAngle();
+    // Negating the angle because WPILib gyros are CW positive.
+    return -m_gyro.getAngle();
   }
 
   /**

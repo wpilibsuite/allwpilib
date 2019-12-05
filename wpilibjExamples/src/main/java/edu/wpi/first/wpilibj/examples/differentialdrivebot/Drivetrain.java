@@ -15,28 +15,33 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftMaster;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftFollower;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightMaster;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightFollower;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kDriveKinematics;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kPLeftVel;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kPRightVel;
 
 /**
  * Represents a differential drive style drivetrain.
  */
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // meters per second
-  public static final double kMaxAngularSpeed = 2 * Math.PI; // one rotation per second
+  private final SpeedController m_leftMaster = new PWMVictorSPX(kLeftMaster);
+  private final SpeedController m_leftFollower = new PWMVictorSPX(kLeftFollower);
+  private final SpeedController m_rightMaster = new PWMVictorSPX(kRightMaster);
+  private final SpeedController m_rightFollower = new PWMVictorSPX(kRightFollower);
 
-  private static final double kTrackWidth = 0.381 * 2; // meters
-  private static final double kWheelRadius = 0.0508; // meters
-  private static final int kEncoderResolution = 4096;
-
-  private final SpeedController m_leftMaster = new PWMVictorSPX(1);
-  private final SpeedController m_leftFollower = new PWMVictorSPX(2);
-  private final SpeedController m_rightMaster = new PWMVictorSPX(3);
-  private final SpeedController m_rightFollower = new PWMVictorSPX(4);
-
-  private final Encoder m_leftEncoder = new Encoder(0, 1);
-  private final Encoder m_rightEncoder = new Encoder(2, 3);
+  private final Encoder m_leftEncoder = new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
+  private final Encoder m_rightEncoder = new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1], kRightEncoderReversed);
 
   private final SpeedControllerGroup m_leftGroup
       = new SpeedControllerGroup(m_leftMaster, m_leftFollower);
@@ -45,11 +50,8 @@ public class Drivetrain {
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
-  private final PIDController m_leftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_rightPIDController = new PIDController(1, 0, 0);
-
-  private final DifferentialDriveKinematics m_kinematics
-      = new DifferentialDriveKinematics(kTrackWidth);
+  private final PIDController m_leftPIDController = new PIDController(kPLeftVel, 0, 0);
+  private final PIDController m_rightPIDController = new PIDController(kPRightVel, 0, 0);
 
   private final DifferentialDriveOdometry m_odometry;
 
@@ -63,8 +65,8 @@ public class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    m_rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    m_leftEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+    m_rightEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
 
     m_leftEncoder.reset();
     m_rightEncoder.reset();
@@ -104,7 +106,7 @@ public class Drivetrain {
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double rot) {
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0.0, rot));
+    var wheelSpeeds = kDriveKinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0.0, rot));
     setSpeeds(wheelSpeeds);
   }
 

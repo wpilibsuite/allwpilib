@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to
- * maintian rotation vectorsin relation to the starting orientation of the robot
+ * maintain rotation vectorsin relation to the starting orientation of the robot
  * (field-oriented controls).
  */
 public class Robot extends TimedRobot {

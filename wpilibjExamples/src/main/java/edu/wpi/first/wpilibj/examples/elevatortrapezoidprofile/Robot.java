@@ -16,11 +16,13 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 public class Robot extends TimedRobot {
+    // Calculate period for the Trapezoidal Profile and PIDController
   private static double kDt = 0.02;
 
   private final Joystick m_joystick = new Joystick(1);
   private final Encoder m_encoder = new Encoder(1, 2);
   private final SpeedController m_motor = new PWMVictorSPX(1);
+  /*                                                           kP   kI   kD   period */
   private final PIDController m_controller = new PIDController(1.3, 0.0, 0.7, kDt);
 
   private final TrapezoidProfile.Constraints m_constraints =
@@ -30,12 +32,18 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    /*
+     * A 360 count encoder is directly attached to a 3 inch diameter
+     * (1.5inch radius) drum, and that we want to measure distance the
+     *  elevator travels in inches.
+     */
     m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
   }
 
   @Override
   public void teleopPeriodic() {
     if (m_joystick.getRawButtonPressed(2)) {
+      // Making the desired state(goal) of stationary 5 inches up.
       m_goal = new TrapezoidProfile.State(5, 0);
     } else if (m_joystick.getRawButtonPressed(3)) {
       m_goal = new TrapezoidProfile.State(0, 0);

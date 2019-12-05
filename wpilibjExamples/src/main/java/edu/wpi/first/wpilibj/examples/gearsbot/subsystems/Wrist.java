@@ -13,6 +13,11 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kWristPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kPotPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kP_real;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kP_simulation;
+
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
@@ -21,9 +26,6 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 public class Wrist extends PIDSubsystem {
   private final Victor m_motor;
   private final AnalogPotentiometer m_pot;
-
-  private static final double kP_real = 1;
-  private static final double kP_simulation = 0.05;
 
   /**
    * Create a new wrist subsystem.
@@ -35,14 +37,14 @@ public class Wrist extends PIDSubsystem {
     }
     getController().setTolerance(2.5);
 
-    m_motor = new Victor(6);
+    m_motor = new Victor(kWristPort);
 
     // Conversion value of potentiometer varies between the real world and
     // simulation
     if (Robot.isReal()) {
-      m_pot = new AnalogPotentiometer(3, -270.0 / 5);
+      m_pot = new AnalogPotentiometer(kPotPort, -270.0 / 5);
     } else {
-      m_pot = new AnalogPotentiometer(3); // Defaults to degrees
+      m_pot = new AnalogPotentiometer(kPotPort); // Defaults to degrees
     }
 
     // Let's name everything on the LiveWindow

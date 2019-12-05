@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
 
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.OIConstants.kDriverControllerPort;
+
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -43,7 +45,7 @@ public class RobotContainer {
   private final Wrist m_wrist = new Wrist();
   private final Claw m_claw = new Claw();
 
-  private final Joystick m_joystick = new Joystick(0);
+  private final Joystick m_joystick = new Joystick(kDriverControllerPort);
 
   private final CommandBase m_autonomousCommand =
       new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator);
