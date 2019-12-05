@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpiutil.math.MathUtils;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * A class for driving Killough drive platforms.
@@ -179,10 +179,10 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
       m_reported = true;
     }
 
-    ySpeed = MathUtils.clamp(ySpeed, -1.0, 1.0);
+    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
     ySpeed = applyDeadband(ySpeed, m_deadband);
 
-    xSpeed = MathUtils.clamp(xSpeed, -1.0, 1.0);
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
     // Compensate for gyro angle.
