@@ -86,18 +86,27 @@ deploy {
 }
 
 tasks.register('deployJava') {
-    dependsOn tasks.named('deployJreRoborio')
-    dependsOn tasks.named('deployMyRobotJavaRoborio')
-    dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
+    try {
+        dependsOn tasks.named('deployJreRoborio')
+        dependsOn tasks.named('deployMyRobotJavaRoborio')
+        dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
+    } catch (ignored) {
+    }
 }
 
 tasks.register('deployShared') {
-    dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
-    dependsOn tasks.named('deployMyRobotCppRoborio')
+    try {
+        dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
+        dependsOn tasks.named('deployMyRobotCppRoborio')
+    } catch (ignored) {
+    }
 }
 
 tasks.register('deployStatic') {
-    dependsOn tasks.named('deployMyRobotCppStaticRoborio')
+    try {
+        dependsOn tasks.named('deployMyRobotCppStaticRoborio')
+    } catch (ignored) {
+    }
 }
 
 mainClassName = 'Main'
