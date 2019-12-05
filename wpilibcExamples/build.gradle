@@ -93,7 +93,7 @@ model {
                         lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
                     }
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
                     }
                 }
                 sources {
@@ -147,7 +147,7 @@ model {
                         lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
                     }
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
                     }
                 }
                 sources {

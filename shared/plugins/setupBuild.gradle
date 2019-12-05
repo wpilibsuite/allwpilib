@@ -57,7 +57,7 @@ if (!project.hasProperty('onlylinuxathena')) {
                         }
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                         if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                            nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'ni_runtime_shared')
+                            nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
                         }
                     } else {
                         it.buildable = false
