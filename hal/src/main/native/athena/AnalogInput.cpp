@@ -224,7 +224,8 @@ double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
 
 int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
                                int32_t* status) {
-  // On the roboRIO, LSB is the same for all channels. So the channel lookup can be avoided
+  // On the roboRIO, LSB is the same for all channels. So the channel lookup can
+  // be avoided
   return FRC_NetworkCommunication_nAICalibration_getLSBWeight(0, 0, status);
 
   // Keep the old code for future hardware
@@ -241,7 +242,8 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
 
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
-  // On the roboRIO, offset is the same for all channels. So the channel lookup can be avoided
+  // On the roboRIO, offset is the same for all channels. So the channel lookup
+  // can be avoided
   return FRC_NetworkCommunication_nAICalibration_getOffset(0, 0, status);
 
   // Keep the old code for future hardware
