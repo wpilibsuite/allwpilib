@@ -83,7 +83,9 @@ int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
     return 0;
   }
 
-  return dutyCycle->dutyCycle->readFrequency(status);
+  // TODO Handle Overflow
+  unsigned char overflow = 0;
+  return dutyCycle->dutyCycle->readFrequency(&overflow, status);
 }
 
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
@@ -100,7 +102,9 @@ int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
     return 0;
   }
 
-  return dutyCycle->dutyCycle->readOutput(status);
+  // TODO Handle Overflow
+  unsigned char overflow = 0;
+  return dutyCycle->dutyCycle->readOutput(&overflow, status);
 }
 
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,

@@ -40,7 +40,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
              std::function<double()> measurementSource,
              std::function<double()> setpointSource,
              std::function<void(double)> useOutput,
-             std::initializer_list<Subsystem*> requirements);
+             std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Creates a new PIDCommand, which controls the given output with a

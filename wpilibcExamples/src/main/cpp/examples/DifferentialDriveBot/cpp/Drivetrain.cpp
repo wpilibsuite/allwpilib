@@ -7,11 +7,6 @@
 
 #include "Drivetrain.h"
 
-frc::DifferentialDriveWheelSpeeds Drivetrain::GetSpeeds() const {
-  return {units::meters_per_second_t(m_leftEncoder.GetRate()),
-          units::meters_per_second_t(m_rightEncoder.GetRate())};
-}
-
 void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   const auto leftOutput = m_leftPIDController.Calculate(
       m_leftEncoder.GetRate(), speeds.left.to<double>());
@@ -28,5 +23,6 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(GetAngle(), GetSpeeds());
+  m_odometry.Update(GetAngle(), units::meter_t(m_leftEncoder.GetDistance()),
+                    units::meter_t(m_rightEncoder.GetDistance()));
 }

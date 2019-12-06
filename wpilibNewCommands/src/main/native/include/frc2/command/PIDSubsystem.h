@@ -30,25 +30,11 @@ class PIDSubsystem : public SubsystemBase {
   void Periodic() override;
 
   /**
-   * Uses the output from the PIDController.
+   * Sets the setpoint for the subsystem.
    *
-   * @param output the output of the PIDController
+   * @param setpoint the setpoint for the subsystem
    */
-  virtual void UseOutput(double output) = 0;
-
-  /**
-   * Returns the reference (setpoint) used by the PIDController.
-   *
-   * @return the reference (setpoint) to be used by the controller
-   */
-  virtual double GetSetpoint() = 0;
-
-  /**
-   * Returns the measurement of the process variable used by the PIDController.
-   *
-   * @return the measurement of the process variable
-   */
-  virtual double GetMeasurement() = 0;
+  void SetSetpoint(double setpoint);
 
   /**
    * Enables the PID control.  Resets the controller.
@@ -61,6 +47,13 @@ class PIDSubsystem : public SubsystemBase {
   virtual void Disable();
 
   /**
+   * Returns whether the controller is enabled.
+   *
+   * @return Whether the controller is enabled.
+   */
+  bool IsEnabled();
+
+  /**
    * Returns the PIDController.
    *
    * @return The controller.
@@ -70,5 +63,23 @@ class PIDSubsystem : public SubsystemBase {
  protected:
   PIDController m_controller;
   bool m_enabled;
+
+  /**
+   * Returns the measurement of the process variable used by the PIDController.
+   *
+   * @return the measurement of the process variable
+   */
+  virtual double GetMeasurement() = 0;
+
+  /**
+   * Uses the output from the PIDController.
+   *
+   * @param output the output of the PIDController
+   * @param setpoint the setpoint of the PIDController (for feedforward)
+   */
+  virtual void UseOutput(double output, double setpoint) = 0;
+
+ private:
+  double m_setpoint{0};
 };
 }  // namespace frc2

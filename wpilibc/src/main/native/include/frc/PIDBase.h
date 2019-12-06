@@ -402,7 +402,7 @@ class PIDBase : public PIDInterface,
   double m_error = 0;
   double m_result = 0;
 
-  LinearFilter m_filter{{}, {}};
+  LinearFilter<double> m_filter{{}, {}};
 };
 
 }  // namespace frc

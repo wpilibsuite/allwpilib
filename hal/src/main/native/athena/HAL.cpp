@@ -42,6 +42,7 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeHAL() {
+  InitializeAddressableLED();
   InitializeAccelerometer();
   InitializeAnalogAccumulator();
   InitializeAnalogGyro();
@@ -56,6 +57,7 @@ void InitializeHAL() {
   InitializeCounter();
   InitializeDigitalInternal();
   InitializeDIO();
+  InitializeDMA();
   InitializeDutyCycle();
   InitializeEncoder();
   InitializeFPGAEncoder();
@@ -213,6 +215,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return ERR_FRCSystem_NetCommNotResponding_MESSAGE;
     case ERR_FRCSystem_NoDSConnection:
       return ERR_FRCSystem_NoDSConnection_MESSAGE;
+    case HAL_CAN_BUFFER_OVERRUN:
+      return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
+    case HAL_LED_CHANNEL_ERROR:
+      return HAL_LED_CHANNEL_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
@@ -252,6 +258,28 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
     if (*status != 0) return 0;
   }
   return (upper2 << 32) + lower;
+}
+
+uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
+  // Capture the current FPGA time.  This will give us the upper half of the
+  // clock.
+  uint64_t fpga_time = HAL_GetFPGATime(status);
+  if (*status != 0) return 0;
+
+  // Now, we need to detect the case where the lower bits rolled over after we
+  // sampled.  In that case, the upper bits will be 1 bigger than they should
+  // be.
+
+  // Break it into lower and upper portions.
+  uint32_t lower = fpga_time & 0xffffffffull;
+  uint64_t upper = (fpga_time >> 32) & 0xffffffff;
+
+  // The time was sampled *before* the current time, so roll it back.
+  if (lower < unexpanded_lower) {
+    --upper;
+  }
+
+  return (upper << 32) + static_cast<uint64_t>(unexpanded_lower);
 }
 
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {

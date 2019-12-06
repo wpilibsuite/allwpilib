@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <frc2/command/Command.h>
-#include <frc2/command/CommandScheduler.h>
-
 #include <atomic>
 #include <memory>
 #include <utility>
+
+#include "frc2/command/Command.h"
+#include "frc2/command/CommandScheduler.h"
 
 namespace frc2 {
 class Command;
@@ -96,8 +96,10 @@ class Trigger {
    * Binds a runnable to execute when the trigger becomes active.
    *
    * @param toRun the runnable to execute.
+   * @paaram requirements the required subsystems.
    */
-  Trigger WhenActive(std::function<void()> toRun);
+  Trigger WhenActive(std::function<void()> toRun,
+                     std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
@@ -145,8 +147,11 @@ class Trigger {
    * Binds a runnable to execute repeatedly while the trigger is active.
    *
    * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
    */
-  Trigger WhileActiveContinous(std::function<void()> toRun);
+  Trigger WhileActiveContinous(
+      std::function<void()> toRun,
+      std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started when the trigger becomes active, and
@@ -234,8 +239,10 @@ class Trigger {
    * Binds a runnable to execute when the trigger becomes inactive.
    *
    * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
    */
-  Trigger WhenInactive(std::function<void()> toRun);
+  Trigger WhenInactive(std::function<void()> toRun,
+                       std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Binds a command to start when the trigger becomes active, and be cancelled

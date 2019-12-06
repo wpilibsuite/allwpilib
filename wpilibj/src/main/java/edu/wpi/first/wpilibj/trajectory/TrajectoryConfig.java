@@ -11,7 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.MecanumDriveKinematicsConstraint;
+import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
 /**
@@ -77,10 +81,34 @@ public class TrajectoryConfig {
   }
 
   /**
-   * Returns the starting velocity of the trajectory.
-   *
-   * @return The starting velocity of the trajectory.
-   */
+  * Adds a mecanum drive kinematics constraint to ensure that
+  * no wheel velocity of a mecanum drive goes above the max velocity.
+  *
+  * @param kinematics The mecanum drive kinematics.
+  * @return Instance of the current config object.
+  */
+  public TrajectoryConfig setKinematics(MecanumDriveKinematics kinematics) {
+    addConstraint(new MecanumDriveKinematicsConstraint(kinematics, m_maxVelocity));
+    return this;
+  }
+
+  /**
+  * Adds a swerve drive kinematics constraint to ensure that
+  * no wheel velocity of a swerve drive goes above the max velocity.
+  *
+  * @param kinematics The swerve drive kinematics.
+  * @return Instance of the current config object.
+  */
+  public TrajectoryConfig setKinematics(SwerveDriveKinematics kinematics) {
+    addConstraint(new SwerveDriveKinematicsConstraint(kinematics, m_maxVelocity));
+    return this;
+  }
+
+  /**
+  * Returns the starting velocity of the trajectory.
+  *
+  * @return The starting velocity of the trajectory.
+  */
   public double getStartVelocity() {
     return m_startVelocity;
   }

@@ -25,12 +25,13 @@ static constexpr auto kDt = 10_ms;
   }
 
 TEST(TrapezoidProfileTest, ReachesGoal) {
-  frc::TrapezoidProfile::Constraints constraints{1.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{3_m, 0_mps};
-  frc::TrapezoidProfile::State state;
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{1.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{3_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::State state;
 
   for (int i = 0; i < 450; ++i) {
-    frc::TrapezoidProfile profile{constraints, goal, state};
+    frc::TrapezoidProfile<units::meter> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
   }
   EXPECT_EQ(state, goal);
@@ -39,10 +40,11 @@ TEST(TrapezoidProfileTest, ReachesGoal) {
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
 TEST(TrapezoidProfileTest, PosContinousUnderVelChange) {
-  frc::TrapezoidProfile::Constraints constraints{1.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{12_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{1.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{12_m, 0_mps};
 
-  frc::TrapezoidProfile profile{constraints, goal};
+  frc::TrapezoidProfile<units::meter> profile{constraints, goal};
   auto state = profile.Calculate(kDt);
 
   auto lastPos = state.position;
@@ -51,7 +53,7 @@ TEST(TrapezoidProfileTest, PosContinousUnderVelChange) {
       constraints.maxVelocity = 0.75_mps;
     }
 
-    profile = frc::TrapezoidProfile{constraints, goal, state};
+    profile = frc::TrapezoidProfile<units::meter>{constraints, goal, state};
     state = profile.Calculate(kDt);
     auto estimatedVel = (state.position - lastPos) / kDt;
 
@@ -71,31 +73,33 @@ TEST(TrapezoidProfileTest, PosContinousUnderVelChange) {
 
 // There is some somewhat tricky code for dealing with going backwards
 TEST(TrapezoidProfileTest, Backwards) {
-  frc::TrapezoidProfile::Constraints constraints{0.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{-2_m, 0_mps};
-  frc::TrapezoidProfile::State state;
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::State state;
 
   for (int i = 0; i < 400; ++i) {
-    frc::TrapezoidProfile profile{constraints, goal, state};
+    frc::TrapezoidProfile<units::meter> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
   }
   EXPECT_EQ(state, goal);
 }
 
 TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
-  frc::TrapezoidProfile::Constraints constraints{0.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{-2_m, 0_mps};
-  frc::TrapezoidProfile::State state;
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::State state;
 
   for (int i = 0; i < 200; ++i) {
-    frc::TrapezoidProfile profile{constraints, goal, state};
+    frc::TrapezoidProfile<units::meter> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
   }
   EXPECT_NE(state, goal);
 
   goal = {0.0_m, 0.0_mps};
   for (int i = 0; i < 550; ++i) {
-    frc::TrapezoidProfile profile{constraints, goal, state};
+    frc::TrapezoidProfile<units::meter> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
   }
   EXPECT_EQ(state, goal);
@@ -103,30 +107,32 @@ TEST(TrapezoidProfileTest, SwitchGoalInMiddle) {
 
 // Checks to make sure that it hits top speed
 TEST(TrapezoidProfileTest, TopSpeed) {
-  frc::TrapezoidProfile::Constraints constraints{0.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{4_m, 0_mps};
-  frc::TrapezoidProfile::State state;
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{4_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::State state;
 
   for (int i = 0; i < 200; ++i) {
-    frc::TrapezoidProfile profile{constraints, goal, state};
+    frc::TrapezoidProfile<units::meter> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
   }
   EXPECT_NEAR_UNITS(constraints.maxVelocity, state.velocity, 10e-5_mps);
 
   for (int i = 0; i < 2000; ++i) {
-    frc::TrapezoidProfile profile{constraints, goal, state};
+    frc::TrapezoidProfile<units::meter> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
   }
   EXPECT_EQ(state, goal);
 }
 
 TEST(TrapezoidProfileTest, TimingToCurrent) {
-  frc::TrapezoidProfile::Constraints constraints{0.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{2_m, 0_mps};
-  frc::TrapezoidProfile::State state;
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::State state;
 
   for (int i = 0; i < 400; i++) {
-    frc::TrapezoidProfile profile{constraints, goal, state};
+    frc::TrapezoidProfile<units::meter> profile{constraints, goal, state};
     state = profile.Calculate(kDt);
     EXPECT_NEAR_UNITS(profile.TimeLeftUntil(state.position), 0_s, 2e-2_s);
   }
@@ -135,16 +141,17 @@ TEST(TrapezoidProfileTest, TimingToCurrent) {
 TEST(TrapezoidProfileTest, TimingToGoal) {
   using units::unit_cast;
 
-  frc::TrapezoidProfile::Constraints constraints{0.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{2_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
 
-  frc::TrapezoidProfile profile{constraints, goal};
+  frc::TrapezoidProfile<units::meter> profile{constraints, goal};
   auto state = profile.Calculate(kDt);
 
   auto predictedTimeLeft = profile.TimeLeftUntil(goal.position);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    profile = frc::TrapezoidProfile(constraints, goal, state);
+    profile = frc::TrapezoidProfile<units::meter>(constraints, goal, state);
     state = profile.Calculate(kDt);
     if (!reachedGoal && state == goal) {
       // Expected value using for loop index is just an approximation since the
@@ -158,16 +165,17 @@ TEST(TrapezoidProfileTest, TimingToGoal) {
 TEST(TrapezoidProfileTest, TimingBeforeGoal) {
   using units::unit_cast;
 
-  frc::TrapezoidProfile::Constraints constraints{0.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{2_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{2_m, 0_mps};
 
-  frc::TrapezoidProfile profile{constraints, goal};
+  frc::TrapezoidProfile<units::meter> profile{constraints, goal};
   auto state = profile.Calculate(kDt);
 
   auto predictedTimeLeft = profile.TimeLeftUntil(1_m);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    profile = frc::TrapezoidProfile(constraints, goal, state);
+    profile = frc::TrapezoidProfile<units::meter>(constraints, goal, state);
     state = profile.Calculate(kDt);
     if (!reachedGoal &&
         (units::math::abs(state.velocity - 1_mps) < 10e-5_mps)) {
@@ -180,16 +188,17 @@ TEST(TrapezoidProfileTest, TimingBeforeGoal) {
 TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
   using units::unit_cast;
 
-  frc::TrapezoidProfile::Constraints constraints{0.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{-2_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
 
-  frc::TrapezoidProfile profile{constraints, goal};
+  frc::TrapezoidProfile<units::meter> profile{constraints, goal};
   auto state = profile.Calculate(kDt);
 
   auto predictedTimeLeft = profile.TimeLeftUntil(goal.position);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    profile = frc::TrapezoidProfile(constraints, goal, state);
+    profile = frc::TrapezoidProfile<units::meter>(constraints, goal, state);
     state = profile.Calculate(kDt);
     if (!reachedGoal && state == goal) {
       // Expected value using for loop index is just an approximation since the
@@ -203,16 +212,17 @@ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
 TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
   using units::unit_cast;
 
-  frc::TrapezoidProfile::Constraints constraints{0.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State goal{-2_m, 0_mps};
+  frc::TrapezoidProfile<units::meter>::Constraints constraints{0.75_mps,
+                                                               0.75_mps_sq};
+  frc::TrapezoidProfile<units::meter>::State goal{-2_m, 0_mps};
 
-  frc::TrapezoidProfile profile{constraints, goal};
+  frc::TrapezoidProfile<units::meter> profile{constraints, goal};
   auto state = profile.Calculate(kDt);
 
   auto predictedTimeLeft = profile.TimeLeftUntil(-1_m);
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
-    profile = frc::TrapezoidProfile(constraints, goal, state);
+    profile = frc::TrapezoidProfile<units::meter>(constraints, goal, state);
     state = profile.Calculate(kDt);
     if (!reachedGoal &&
         (units::math::abs(state.velocity + 1_mps) < 10e-5_mps)) {

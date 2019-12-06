@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <units/units.h>
-
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
@@ -17,6 +15,7 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/units.h>
 
 #include "Constants.h"
 
@@ -101,6 +100,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @return The pose.
    */
   frc::Pose2d GetPose();
+
+  /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  frc::DifferentialDriveWheelSpeeds GetWheelSpeeds();
 
   /**
    * Resets the odometry to the specified pose.

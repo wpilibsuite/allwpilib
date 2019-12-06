@@ -7,7 +7,7 @@
 
 #include "frc/smartdashboard/SmartDashboard.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringMap.h>
@@ -79,6 +79,10 @@ unsigned int SmartDashboard::GetFlags(wpi::StringRef key) {
 
 void SmartDashboard::Delete(wpi::StringRef key) {
   Singleton::GetInstance().table->Delete(key);
+}
+
+nt::NetworkTableEntry SmartDashboard::GetEntry(wpi::StringRef key) {
+  return Singleton::GetInstance().table->GetEntry(key);
 }
 
 void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {

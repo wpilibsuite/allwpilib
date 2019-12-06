@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/PIDOutput.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -35,7 +35,7 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   m_F = Kf;
 
   m_pidInput = &source;
-  m_filter = LinearFilter::MovingAverage(1);
+  m_filter = LinearFilter<double>::MovingAverage(1);
 
   m_pidOutput = &output;
 
@@ -196,7 +196,7 @@ void PIDBase::SetPercentTolerance(double percent) {
 
 void PIDBase::SetToleranceBuffer(int bufLength) {
   std::scoped_lock lock(m_thisMutex);
-  m_filter = LinearFilter::MovingAverage(bufLength);
+  m_filter = LinearFilter<double>::MovingAverage(bufLength);
 }
 
 bool PIDBase::OnTarget() const {

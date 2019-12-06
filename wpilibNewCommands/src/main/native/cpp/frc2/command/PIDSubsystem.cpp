@@ -14,9 +14,11 @@ PIDSubsystem::PIDSubsystem(PIDController controller)
 
 void PIDSubsystem::Periodic() {
   if (m_enabled) {
-    UseOutput(m_controller.Calculate(GetMeasurement(), GetSetpoint()));
+    UseOutput(m_controller.Calculate(GetMeasurement(), m_setpoint), m_setpoint);
   }
 }
+
+void PIDSubsystem::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
 
 void PIDSubsystem::Enable() {
   m_controller.Reset();
@@ -24,8 +26,10 @@ void PIDSubsystem::Enable() {
 }
 
 void PIDSubsystem::Disable() {
-  UseOutput(0);
+  UseOutput(0, 0);
   m_enabled = false;
 }
+
+bool PIDSubsystem::IsEnabled() { return m_enabled; }
 
 PIDController& PIDSubsystem::GetController() { return m_controller; }

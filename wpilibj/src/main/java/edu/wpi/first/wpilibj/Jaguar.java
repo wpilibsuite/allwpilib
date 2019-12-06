@@ -13,6 +13,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Texas Instruments / Vex Robotics Jaguar Speed Controller as a PWM device.
+ *
+ * <p>Note that the Jaguar uses the following bounds for PWM values. These values should work
+ * reasonably well for most controllers, but if users experience issues such as asymmetric
+ * behavior around the deadband or inability to saturate the controller in either direction,
+ * calibration is recommended. The calibration procedure can be found in the Jaguar User Manual
+ * available from Vex.
+ *
+ * <p><ul>
+ * <li>2.310ms = full "forward"
+ * <li>1.550ms = the "high end" of the deadband range
+ * <li>1.507ms = center of the deadband range (off)
+ * <li>1.454ms = the "low end" of the deadband range
+ * <li>0.697ms = full "reverse"
+ * </ul>
  */
 public class Jaguar extends PWMSpeedController {
   /**
@@ -24,15 +38,7 @@ public class Jaguar extends PWMSpeedController {
   public Jaguar(final int channel) {
     super(channel);
 
-    /*
-     * Input profile defined by Luminary Micro.
-     *
-     * Full reverse ranges from 0.671325ms to 0.6972211ms Proportional reverse
-     * ranges from 0.6972211ms to 1.4482078ms Neutral ranges from 1.4482078ms to
-     * 1.5517922ms Proportional forward ranges from 1.5517922ms to 2.3027789ms
-     * Full forward ranges from 2.3027789ms to 2.328675ms
-     */
-    setBounds(2.31, 1.55, 1.507, 1.454, .697);
+    setBounds(2.31, 1.55, 1.507, 1.454, 0.697);
     setPeriodMultiplier(PeriodMultiplier.k1X);
     setSpeed(0.0);
     setZeroLatch();

@@ -11,7 +11,7 @@
 #include <cmath>
 #include <cstddef>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/Base.h"
 #include "frc/SpeedController.h"

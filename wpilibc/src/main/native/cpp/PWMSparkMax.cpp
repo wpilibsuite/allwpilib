@@ -7,22 +7,14 @@
 
 #include "frc/PWMSparkMax.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 PWMSparkMax::PWMSparkMax(int channel) : PWMSpeedController(channel) {
-  /* Note that the SparkMax uses the following bounds for PWM values.
-   *
-   *   2.003ms = full "forward"
-   *   1.55ms = the "high end" of the deadband range
-   *   1.50ms = center of the deadband range (off)
-   *   1.46ms = the "low end" of the deadband range
-   *   0.999ms = full "reverse"
-   */
-  SetBounds(2.003, 1.55, 1.50, 1.46, .999);
+  SetBounds(2.003, 1.55, 1.50, 1.46, 0.999);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);
   SetZeroLatch();

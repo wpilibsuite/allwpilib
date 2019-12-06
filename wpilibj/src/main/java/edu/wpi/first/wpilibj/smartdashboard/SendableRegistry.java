@@ -8,7 +8,9 @@
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
@@ -454,6 +456,10 @@ public class SendableRegistry {
     public SendableBuilderImpl builder;
   }
 
+  // As foreachLiveWindow is single threaded, cache the components it
+  // iterates over to avoid risk of ConcurrentModificationException
+  private static List<Component> foreachComponents = new ArrayList<>();
+
   /**
    * Iterates over LiveWindow-enabled objects in the registry.
    * It is *not* safe to call other SendableRegistry functions from the
@@ -467,7 +473,9 @@ public class SendableRegistry {
   public static synchronized void foreachLiveWindow(int dataHandle,
       Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();
-    for (Component comp : components.values()) {
+    foreachComponents.clear();
+    foreachComponents.addAll(components.values());
+    for (Component comp : foreachComponents) {
       if (comp.m_sendable == null) {
         continue;
       }
@@ -508,5 +516,6 @@ public class SendableRegistry {
         }
       }
     }
+    foreachComponents.clear();
   }
 }

@@ -12,6 +12,7 @@ import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -100,11 +101,12 @@ public class Trigger {
   /**
    * Runs the given runnable whenever the trigger just becomes active.
    *
-   * @param toRun the runnable to run
+   * @param toRun        the runnable to run
+   * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
    */
-  public Trigger whenActive(final Runnable toRun) {
-    return whenActive(new InstantCommand(toRun));
+  public Trigger whenActive(final Runnable toRun, Subsystem... requirements) {
+    return whenActive(new InstantCommand(toRun, requirements));
   }
 
   /**
@@ -155,11 +157,12 @@ public class Trigger {
   /**
    * Constantly runs the given runnable while the button is held.
    *
-   * @param toRun the runnable to run
+   * @param toRun        the runnable to run
+   * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
    */
-  public Trigger whileActiveContinuous(final Runnable toRun) {
-    return whileActiveContinuous(new InstantCommand(toRun));
+  public Trigger whileActiveContinuous(final Runnable toRun, Subsystem... requirements) {
+    return whileActiveContinuous(new InstantCommand(toRun, requirements));
   }
 
   /**
@@ -243,11 +246,12 @@ public class Trigger {
   /**
    * Runs the given runnable when the trigger becomes inactive.
    *
-   * @param toRun the runnable to run
+   * @param toRun        the runnable to run
+   * @param requirements the required subsystems
    * @return this trigger, so calls can be chained
    */
-  public Trigger whenInactive(final Runnable toRun) {
-    return whenInactive(new InstantCommand(toRun));
+  public Trigger whenInactive(final Runnable toRun, Subsystem... requirements) {
+    return whenInactive(new InstantCommand(toRun, requirements));
   }
 
   /**

@@ -35,7 +35,7 @@ Encoder::Encoder(HAL_Handle digitalSourceHandleA,
         return;
       }
       m_counter = HAL_kInvalidHandle;
-      SetMaxPeriod(.5, status);
+      SetMaxPeriod(0.5, status);
       break;
     }
     case HAL_Encoder_k1X:
@@ -236,6 +236,19 @@ void InitializeEncoder() {
   encoderHandles = &eH;
 }
 }  // namespace init
+}  // namespace hal
+
+namespace hal {
+bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
+                          HAL_FPGAEncoderHandle* fpgaHandle,
+                          HAL_CounterHandle* counterHandle) {
+  auto encoder = encoderHandles->Get(handle);
+  if (!handle) return false;
+
+  *fpgaHandle = encoder->m_encoder;
+  *counterHandle = encoder->m_counter;
+  return true;
+}
 }  // namespace hal
 
 extern "C" {

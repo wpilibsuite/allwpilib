@@ -84,7 +84,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the average of the two encoder readings
    */
   public double getAverageEncoderDistance() {
-    return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.;
+    return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
   }
 
   /**
@@ -127,7 +127,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from 180 to 180
    */
   public double getHeading() {
-    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (kGyroReversed ? -1. : 1.);
+    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (kGyroReversed ? -1.0 : 1.0);
   }
 
   /**
@@ -136,6 +136,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate() * (kGyroReversed ? -1. : 1.);
+    return m_gyro.getRate() * (kGyroReversed ? -1.0 : 1.0);
   }
 }

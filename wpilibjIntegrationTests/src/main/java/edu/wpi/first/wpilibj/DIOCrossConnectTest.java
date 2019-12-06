@@ -87,7 +87,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   public void testSetHigh() {
     dio.getOutput().set(true);
     assertTrue("DIO Not High after no delay", dio.getInput().get());
-    Timer.delay(.02);
+    Timer.delay(0.02);
     assertTrue("DIO Not High after .05s delay", dio.getInput().get());
   }
 
@@ -98,7 +98,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   public void testSetLow() {
     dio.getOutput().set(false);
     assertFalse("DIO Not Low after no delay", dio.getInput().get());
-    Timer.delay(.02);
+    Timer.delay(0.02);
     assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
   }
 

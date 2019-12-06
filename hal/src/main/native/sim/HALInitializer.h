@@ -19,6 +19,7 @@ static inline void CheckInit() {
 }
 
 extern void InitializeAccelerometerData();
+extern void InitializeAddressableLEDData();
 extern void InitializeAnalogGyroData();
 extern void InitializeAnalogInData();
 extern void InitializeAnalogOutData();
@@ -41,6 +42,7 @@ extern void InitializeSimDeviceData();
 extern void InitializeSPIAccelerometerData();
 extern void InitializeSPIData();
 extern void InitializeAccelerometer();
+extern void InitializeAddressableLED();
 extern void InitializeAnalogAccumulator();
 extern void InitializeAnalogGyro();
 extern void InitializeAnalogInput();

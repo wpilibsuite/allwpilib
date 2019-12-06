@@ -9,7 +9,7 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
+#include "frc/DigitalSource.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -24,7 +24,7 @@ class SendableBuilder;
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public ErrorBase,
+class DigitalOutput : public DigitalSource,
                       public Sendable,
                       public SendableHelper<DigitalOutput> {
  public:
@@ -59,10 +59,26 @@ class DigitalOutput : public ErrorBase,
    */
   bool Get() const;
 
+  // Digital Source Interface
+  /**
+   * @return The HAL Handle to the specified source.
+   */
+  HAL_Handle GetPortHandleForRouting() const override;
+
+  /**
+   * @return The type of analog trigger output to be used. 0 for Digitals
+   */
+  AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
+
+  /**
+   * Is source an AnalogTrigger
+   */
+  bool IsAnalogTrigger() const override;
+
   /**
    * @return The GPIO channel number that this object represents.
    */
-  int GetChannel() const;
+  int GetChannel() const override;
 
   /**
    * Output a single pulse on the digital output line.

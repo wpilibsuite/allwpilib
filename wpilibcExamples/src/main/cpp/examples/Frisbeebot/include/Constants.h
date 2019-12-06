@@ -8,6 +8,7 @@
 #pragma once
 
 #include <units/units.h>
+#include <wpi/math>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -33,7 +34,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * 3.142) / static_cast<double>(kEncoderCPR);
+    (kWheelDiameterInches * wpi::math::pi) / static_cast<double>(kEncoderCPR);
 }  // namespace DriveConstants
 
 namespace ShooterConstants {
@@ -42,7 +43,7 @@ constexpr bool kEncoderReversed = false;
 constexpr int kEncoderCPR = 1024;
 constexpr double kEncoderDistancePerPulse =
     // Distance units will be rotations
-    1. / static_cast<double>(kEncoderCPR);
+    1.0 / static_cast<double>(kEncoderCPR);
 
 constexpr int kShooterMotorPort = 4;
 constexpr int kFeederMotorPort = 5;
@@ -57,12 +58,12 @@ constexpr double kD = 0;
 
 // On a real robot the feedforward constants should be empirically determined;
 // these are reasonable guesses.
-constexpr auto kS = .05_V;
+constexpr auto kS = 0.05_V;
 constexpr auto kV =
     // Should have value 12V at free speed...
     12_V / kShooterFreeRPS;
 
-constexpr double kFeederSpeed = .5;
+constexpr double kFeederSpeed = 0.5;
 }  // namespace ShooterConstants
 
 namespace AutoConstants {

@@ -65,8 +65,10 @@ class Button : public Trigger {
    * Binds a runnable to execute when the button is pressed.
    *
    * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
    */
-  Button WhenPressed(std::function<void()> toRun);
+  Button WhenPressed(std::function<void()> toRun,
+                     std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started repeatedly while the button is pressed, and
@@ -100,8 +102,10 @@ class Button : public Trigger {
    * Binds a runnable to execute repeatedly while the button is pressed.
    *
    * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
    */
-  Button WhileHeld(std::function<void()> toRun);
+  Button WhileHeld(std::function<void()> toRun,
+                   std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started when the button is pressed, and cancelled
@@ -163,8 +167,10 @@ class Button : public Trigger {
    * Binds a runnable to execute when the button is released.
    *
    * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
    */
-  Button WhenReleased(std::function<void()> toRun);
+  Button WhenReleased(std::function<void()> toRun,
+                      std::initializer_list<Subsystem*> requirements = {});
 
   /**
    * Binds a command to start when the button is pressed, and be cancelled when

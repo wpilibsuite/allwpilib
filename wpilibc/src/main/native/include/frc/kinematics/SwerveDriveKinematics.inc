@@ -63,6 +63,13 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
                 "locations provided in constructor.");
 
   std::array<SwerveModuleState, NumModules> moduleStates{wheelStates...};
+
+  return this->ToChassisSpeeds(moduleStates);
+}
+
+template <size_t NumModules>
+ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
+    std::array<SwerveModuleState, NumModules> moduleStates) {
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix;
 
   for (size_t i = 0; i < NumModules; i++) {

@@ -233,6 +233,16 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
  */
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status);
+
+/**
+ *  Get the analog voltage from a raw value.
+ *
+ * @param analogPortHandle  Handle to the analog port the values were read from.
+ * @param rawValue          The raw analog value
+ * @return                  The voltage relating to the value
+ */
+double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
+                                 int32_t rawValue, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

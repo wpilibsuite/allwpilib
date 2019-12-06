@@ -9,7 +9,8 @@ package edu.wpi.first.wpilibj.examples.elevatorprofiledpid;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -19,7 +20,7 @@ public class Robot extends TimedRobot {
 
   private final Joystick m_joystick = new Joystick(1);
   private final Encoder m_encoder = new Encoder(1, 2);
-  private final Spark m_motor = new Spark(1);
+  private final SpeedController m_motor = new PWMVictorSPX(1);
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
@@ -30,7 +31,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5);
+    m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
   }
 
   @Override

@@ -36,7 +36,7 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static final double kStabilizationP = 1;
-    public static final double kStabilizationI = .5;
+    public static final double kStabilizationI = 0.5;
     public static final double kStabilizationD = 0;
 
     public static final double kTurnP = 1;

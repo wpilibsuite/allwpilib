@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.examples.frisbeebot.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kD;
@@ -31,6 +32,8 @@ public class ShooterSubsystem extends PIDSubsystem {
   private final PWMVictorSPX m_feederMotor = new PWMVictorSPX(kFeederMotorPort);
   private final Encoder m_shooterEncoder =
       new Encoder(kEncoderPorts[0], kEncoderPorts[1], kEncoderReversed);
+  private final SimpleMotorFeedforward m_shooterFeedforward
+      = new SimpleMotorFeedforward(kSVolts, kVVoltSecondsPerRotation);
 
   /**
    * The shooter subsystem for the robot.
@@ -39,17 +42,12 @@ public class ShooterSubsystem extends PIDSubsystem {
     super(new PIDController(kP, kI, kD));
     getController().setTolerance(kShooterToleranceRPS);
     m_shooterEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+    setSetpoint(kShooterTargetRPS);
   }
 
   @Override
-  public void useOutput(double output) {
-    // Use a feedforward of the form kS + kV * velocity
-    m_shooterMotor.setVoltage(output + kSVolts + kVVoltSecondsPerRotation * kShooterTargetRPS);
-  }
-
-  @Override
-  public double getSetpoint() {
-    return kShooterTargetRPS;
+  public void useOutput(double output, double setpoint) {
+    m_shooterMotor.setVoltage(output + m_shooterFeedforward.calculate(setpoint));
   }
 
   @Override
@@ -67,13 +65,5 @@ public class ShooterSubsystem extends PIDSubsystem {
 
   public void stopFeeder() {
     m_feederMotor.set(0);
-  }
-
-  @Override
-  public void disable() {
-    super.disable();
-    // Turn off motor when we disable, since useOutput(0) doesn't stop the motor due to our
-    // feedforward
-    m_shooterMotor.set(0);
   }
 }

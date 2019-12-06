@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/mutex.h>
 

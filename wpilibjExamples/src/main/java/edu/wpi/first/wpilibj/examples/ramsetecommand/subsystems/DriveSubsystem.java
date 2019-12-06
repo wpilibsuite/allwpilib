@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kDriveKinematics;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kEncoderDistancePerPulse;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kGyroReversed;
 import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftEncoderPorts;
@@ -57,7 +56,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final Gyro m_gyro = new ADXRS450_Gyro();
 
   // Odometry class for tracking robot pose
-  DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(kDriveKinematics);
+  private final DifferentialDriveOdometry m_odometry;
 
   /**
    * Creates a new DriveSubsystem.
@@ -66,16 +65,16 @@ public class DriveSubsystem extends SubsystemBase {
     // Sets the distance per pulse for the encoders
     m_leftEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
     m_rightEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+
+    resetEncoders();
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
   }
 
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(Rotation2d.fromDegrees(getHeading()),
-                                  new DifferentialDriveWheelSpeeds(
-                                      m_leftEncoder.getRate(),
-                                      m_rightEncoder.getRate()
-                                  ));
+    m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getDistance(),
+        m_rightEncoder.getDistance());
   }
 
   /**
@@ -88,12 +87,22 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
+  }
+
+  /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose);
+    resetEncoders();
+    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
   }
 
   /**
@@ -131,7 +140,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the average of the two encoder readings
    */
   public double getAverageEncoderDistance() {
-    return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.;
+    return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
   }
 
   /**
@@ -174,7 +183,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from 180 to 180
    */
   public double getHeading() {
-    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (kGyroReversed ? -1. : 1.);
+    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (kGyroReversed ? -1.0 : 1.0);
   }
 
   /**
@@ -183,6 +192,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate() * (kGyroReversed ? -1. : 1.);
+    return m_gyro.getRate() * (kGyroReversed ? -1.0 : 1.0);
   }
 }

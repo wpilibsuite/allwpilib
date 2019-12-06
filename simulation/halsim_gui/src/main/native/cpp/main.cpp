@@ -9,6 +9,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "AccelerometerGui.h"
+#include "AddressableLEDGui.h"
 #include "AnalogGyroGui.h"
 #include "AnalogInputGui.h"
 #include "AnalogOutGui.h"
@@ -23,6 +24,7 @@
 #include "RoboRioGui.h"
 #include "SimDeviceGui.h"
 #include "SolenoidGui.h"
+#include "TimingGui.h"
 
 using namespace halsimgui;
 
@@ -32,6 +34,7 @@ __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
   HALSimGui::Add(AccelerometerGui::Initialize);
+  HALSimGui::Add(AddressableLEDGui::Initialize);
   HALSimGui::Add(AnalogGyroGui::Initialize);
   HALSimGui::Add(AnalogInputGui::Initialize);
   HALSimGui::Add(AnalogOutGui::Initialize);
@@ -45,6 +48,7 @@ __declspec(dllexport)
   HALSimGui::Add(RoboRioGui::Initialize);
   HALSimGui::Add(SimDeviceGui::Initialize);
   HALSimGui::Add(SolenoidGui::Initialize);
+  HALSimGui::Add(TimingGui::Initialize);
 
   wpi::outs() << "Simulator GUI Initializing.\n";
   if (!HALSimGui::Initialize()) return 0;

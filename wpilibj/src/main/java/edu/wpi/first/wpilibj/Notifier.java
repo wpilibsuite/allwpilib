@@ -139,6 +139,16 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
+   * Sets the name of the notifier.  Used for debugging purposes only.
+   *
+   * @param name Name
+   */
+  public void setName(String name) {
+    m_thread.setName(name);
+    NotifierJNI.setNotifierName(m_notifier.get(), name);
+  }
+
+  /**
    * Change the handler function.
    *
    * @param handler Handler

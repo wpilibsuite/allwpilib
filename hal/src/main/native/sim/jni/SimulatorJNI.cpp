@@ -144,6 +144,54 @@ Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_restartTiming
 
 /*
  * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
+ * Method:    pauseTiming
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_pauseTiming
+  (JNIEnv*, jclass)
+{
+  HALSIM_PauseTiming();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
+ * Method:    resumeTiming
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_resumeTiming
+  (JNIEnv*, jclass)
+{
+  HALSIM_ResumeTiming();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
+ * Method:    isTimingPaused
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_isTimingPaused
+  (JNIEnv*, jclass)
+{
+  return HALSIM_IsTimingPaused();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
+ * Method:    stepTiming
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_stepTiming
+  (JNIEnv*, jclass, jlong delta)
+{
+  HALSIM_StepTiming(delta);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
  * Method:    resetHandles
  * Signature: ()V
  */

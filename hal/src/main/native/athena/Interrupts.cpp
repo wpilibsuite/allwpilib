@@ -118,7 +118,11 @@ void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle,
   if (anInterrupt == nullptr) {
     return nullptr;
   }
-  anInterrupt->manager->disable(status);
+
+  if (anInterrupt->manager->isEnabled(status)) {
+    anInterrupt->manager->disable(status);
+  }
+
   void* param = anInterrupt->param;
   return param;
 }
@@ -152,7 +156,10 @@ void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  anInterrupt->manager->enable(status);
+
+  if (!anInterrupt->manager->isEnabled(status)) {
+    anInterrupt->manager->enable(status);
+  }
 }
 
 void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
@@ -162,7 +169,9 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  anInterrupt->manager->disable(status);
+  if (anInterrupt->manager->isEnabled(status)) {
+    anInterrupt->manager->disable(status);
+  }
 }
 
 int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,

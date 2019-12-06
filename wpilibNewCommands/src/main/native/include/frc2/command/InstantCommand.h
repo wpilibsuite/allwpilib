@@ -29,7 +29,7 @@ class InstantCommand : public CommandHelper<CommandBase, InstantCommand> {
    * @param requirements the subsystems required by this command
    */
   InstantCommand(std::function<void()> toRun,
-                 std::initializer_list<Subsystem*> requirements);
+                 std::initializer_list<Subsystem*> requirements = {});
 
   InstantCommand(InstantCommand&& other) = default;
 

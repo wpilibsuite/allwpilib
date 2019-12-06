@@ -1,19 +1,46 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Testing steps for real hardware
 
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+    - master
 
-pool:
-  vmImage: 'ubuntu-latest'
+jobs:
+- job: TestBench
+  pool: RoboRioConnections
+  timeoutInMinutes: 60
+  workspace:
+    clean: all
+  steps:
+    - task: Gradle@2
+      condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+      inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        publishJUnitResults: false
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
+        options: '-Ponlylinuxathena -PbuildServer'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+    - task: ShellScript@2
+      displayName: Run Tests & Get Results
+      inputs:
+        scriptPath: test-scripts/jenkins-run-tests-get-results.sh
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    - task: PublishTestResults@2
+      displayName: Publish C++ Test Results
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'cpp*.xml'
+        testRunTitle: 'C++ Test Report'
+        searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
+
+    - task: PublishTestResults@2
+      displayName: Publish Java Test Results
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'java*.xml'
+        testRunTitle: 'Java Test Report'
+        searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'

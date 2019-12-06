@@ -17,7 +17,7 @@
 #include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
+class AddressableLED;
 class SendableBuilder;
 
 /**
@@ -34,11 +34,12 @@ class SendableBuilder;
  *   - 1999 to 1001 = linear scaling from "full forward" to "center"
  *   - 1000 = center value
  *   - 999 to 2 = linear scaling from "center" to "full reverse"
- *   - 1 = minimum pulse width (currently .5ms)
+ *   - 1 = minimum pulse width (currently 0.5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
 class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
  public:
+  friend class AddressableLED;
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */
