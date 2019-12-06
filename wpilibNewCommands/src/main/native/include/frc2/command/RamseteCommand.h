@@ -93,7 +93,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * trajectory.
    * @param kinematics      The kinematics for the robot drivetrain.
    * @param output          A function that consumes the computed left and right
-   * outputs (in volts) for the robot drive.
+   * wheel speeds.
    * @param requirements    The subsystems to require.
    */
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
