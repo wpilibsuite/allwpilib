@@ -8,12 +8,19 @@
 #include "frc/DutyCycleEncoder.h"
 
 #include "frc/Counter.h"
+#include "frc/DigitalInput.h"
 #include "frc/DigitalSource.h"
 #include "frc/DriverStation.h"
 #include "frc/DutyCycle.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
+
+DutyCycleEncoder::DutyCycleEncoder(int channel)
+    : m_dutyCycle{std::make_shared<DutyCycle>(std::make_shared<DigitalInput>(channel))},
+      m_analogTrigger{m_dutyCycle.get()},
+      m_counter{} {
+}
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle)
     : m_dutyCycle{&dutyCycle, NullDeleter<DutyCycle>{}},

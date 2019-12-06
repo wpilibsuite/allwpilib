@@ -7,20 +7,17 @@
 
 package edu.wpi.first.wpilibj.examples.dutycycleencoder;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 @SuppressWarnings({"PMD.SingularField"})
 public class Robot extends TimedRobot {
-  private DigitalInput m_input;
   private DutyCycleEncoder m_dutyCycleEncoder;
 
   @Override
   public void robotInit() {
-    m_input = new DigitalInput(0);
-    m_dutyCycleEncoder = new DutyCycleEncoder(m_input);
+    m_dutyCycleEncoder = new DutyCycleEncoder(0);
 
     // Set to 0.5 units per rotation
     m_dutyCycleEncoder.setDistancePerRotation(0.5);
