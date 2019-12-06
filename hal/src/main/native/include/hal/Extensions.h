@@ -45,9 +45,9 @@ int HAL_LoadOneExtension(const char* library);
 int HAL_LoadExtensions(void);
 
 /**
- * Enables or Disables the message saying no HAL extensions were found.
+ * Enables or disables the message saying no HAL extensions were found.
  *
- * Some apps don't care, and its just clutter. But for general team code,
+ * Some apps don't care, and the message create clutter. For general team code,
  * we want it.
  *
  * This must be called before HAL_Initialize is called.
