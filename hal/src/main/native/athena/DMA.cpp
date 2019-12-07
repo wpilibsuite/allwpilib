@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
+#include <type_traits>
 
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"
@@ -28,7 +29,8 @@
 
 using namespace hal;
 
-static_assert(std::is_pod_v<HAL_DMASample>, "DMA Sample must be POD");
+static_assert(std::is_standard_layout_v<HAL_DMASample>,
+              "HAL_DMASample must have standard layout");
 
 namespace {
 
