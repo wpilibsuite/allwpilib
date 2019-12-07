@@ -82,4 +82,10 @@ public class ChassisSpeeds {
         omegaRadiansPerSecond
     );
   }
+
+  @Override
+  public String toString() {
+    return String.format("vx: %.2f m/s, vy: %.2f m/s, angular: %.2f rad/s", vxMetersPerSecond,
+        vyMetersPerSecond, omegaRadiansPerSecond);
+  }
 }
