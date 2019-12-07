@@ -224,26 +224,38 @@ double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
 
 int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
                                int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  int32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
-      0, port->channel, status);  // XXX: aiSystemIndex == 0?
-  return lsbWeight;
+  // On the roboRIO, LSB is the same for all channels. So the channel lookup can
+  // be avoided
+  return FRC_NetworkCommunication_nAICalibration_getLSBWeight(0, 0, status);
+
+  // Keep the old code for future hardware
+
+  // auto port = analogInputHandles->Get(analogPortHandle);
+  // if (port == nullptr) {
+  //   *status = HAL_HANDLE_ERROR;
+  //   return 0;
+  // }
+  // int32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
+  //     0, port->channel, status);  // XXX: aiSystemIndex == 0?
+  // return lsbWeight;
 }
 
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
-      0, port->channel, status);  // XXX: aiSystemIndex == 0?
-  return offset;
+  // On the roboRIO, offset is the same for all channels. So the channel lookup
+  // can be avoided
+  return FRC_NetworkCommunication_nAICalibration_getOffset(0, 0, status);
+
+  // Keep the old code for future hardware
+
+  // auto port = analogInputHandles->Get(analogPortHandle);
+  // if (port == nullptr) {
+  //   *status = HAL_HANDLE_ERROR;
+  //   return 0;
+  // }
+  // int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
+  //     0, port->channel, status);  // XXX: aiSystemIndex == 0?
+  // return offset;
 }
 
 }  // extern "C"
