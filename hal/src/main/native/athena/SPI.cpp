@@ -565,7 +565,7 @@ void HAL_StopSPIAuto(HAL_SPIPort port, int32_t* status) {
 void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
                                 int32_t dataSize, int32_t zeroSize,
                                 int32_t* status) {
-  if (dataSize < 0 || dataSize > 16) {
+  if (dataSize < 0 || dataSize > 32) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
@@ -589,7 +589,7 @@ void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
   // set byte counts
   tSPI::tAutoByteCount config;
   config.ZeroByteCount = static_cast<unsigned>(zeroSize) & 0x7f;
-  config.TxByteCount = static_cast<unsigned>(dataSize) & 0xf;
+  config.TxByteCount = static_cast<unsigned>(dataSize) & 0x1f;
   spiSystem->writeAutoByteCount(config, status);
 }
 
