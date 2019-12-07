@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <hal/AnalogInput.h>
 #include <hal/DMA.h>
 #include <units/units.h>
@@ -104,5 +106,6 @@ class DMASample : public HAL_DMASample {
   }
 };
 
-static_assert(std::is_pod_v<frc::DMASample>, "DMA Sample MUST Be POD");
+static_assert(std::is_standard_layout_v<frc::DMASample>,
+              "frc::DMASample must have standard layout");
 }  // namespace frc
