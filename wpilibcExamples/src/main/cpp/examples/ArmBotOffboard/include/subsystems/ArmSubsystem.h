@@ -7,23 +7,24 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+#include <frc/controller/ArmFeedforward.h>
+#include <frc2/command/TrapezoidProfileSubsystem.h>
+#include <units/units.h>
 
-#include "subsystems/DriveSubsystem.h"
+#include "ExampleSmartMotorController.h"
 
 /**
- * A command that will turn the robot to the specified angle.
+ * A robot arm subsystem that moves with a motion profile.
  */
-class TurnToAngle : public frc2::CommandHelper<frc2::PIDCommand, TurnToAngle> {
- public:
-  /**
-   * Turns to robot to the specified angle.
-   *
-   * @param targetAngleDegrees The angle to turn to
-   * @param drive              The drive subsystem to use
-   */
-  TurnToAngle(units::degree_t target, DriveSubsystem* drive);
+class ArmSubsystem : public frc2::TrapezoidProfileSubsystem<units::radians> {
+  using State = frc::TrapezoidProfile<units::radians>::State;
 
-  bool IsFinished() override;
+ public:
+  ArmSubsystem();
+
+  void UseState(State setpoint) override;
+
+ private:
+  ExampleSmartMotorController m_motor;
+  frc::ArmFeedforward m_feedforward;
 };

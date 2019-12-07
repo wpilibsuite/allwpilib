@@ -25,39 +25,21 @@ constexpr int kLeftMotor2Port = 1;
 constexpr int kRightMotor1Port = 2;
 constexpr int kRightMotor2Port = 3;
 
-constexpr int kLeftEncoderPorts[]{0, 1};
-constexpr int kRightEncoderPorts[]{2, 3};
-constexpr bool kLeftEncoderReversed = false;
-constexpr bool kRightEncoderReversed = true;
+// These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+// These characterization values MUST be determined either experimentally or
+// theoretically for *your* robot's drive. The RobotPy Characterization
+// Toolsuite provides a convenient tool for obtaining these values for your
+// robot.
+constexpr auto ks = 1_V;
+constexpr auto kv = 0.8_V * 1_s / 1_m;
+constexpr auto ka = 0.15_V * 1_s * 1_s / 1_m;
 
-constexpr int kEncoderCPR = 1024;
-constexpr double kWheelDiameterInches = 6;
-constexpr double kEncoderDistancePerPulse =
-    // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * wpi::math::pi) / static_cast<double>(kEncoderCPR);
+constexpr double kp = 1;
 
-constexpr bool kGyroReversed = true;
+constexpr auto kMaxSpeed = 3_mps;
+constexpr auto kMaxAcceleration = 3_mps_sq;
 
-constexpr double kStabilizationP = 1;
-constexpr double kStabilizationI = 0.5;
-constexpr double kStabilizationD = 0;
-
-constexpr double kTurnP = 1;
-constexpr double kTurnI = 0;
-constexpr double kTurnD = 0;
-
-constexpr auto kTurnTolerance = 5_deg;
-constexpr auto kTurnRateTolerance = 10_deg_per_s;
-
-constexpr auto kMaxTurnRate = 100_deg_per_s;
-constexpr auto kMaxTurnAcceleration = 300_deg_per_s / 1_s;
 }  // namespace DriveConstants
-
-namespace AutoConstants {
-constexpr double kAutoDriveDistanceInches = 60;
-constexpr double kAutoBackupDistanceInches = 20;
-constexpr double kAutoDriveSpeed = 0.5;
-}  // namespace AutoConstants
 
 namespace OIConstants {
 constexpr int kDriverControllerPort = 1;

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.gyrodrivecommands;
+package edu.wpi.first.wpilibj.examples.armbotoffboard;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -32,22 +32,25 @@ public final class Constants {
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterInches * Math.PI) / (double) kEncoderCPR;
+  }
 
-    public static final boolean kGyroReversed = false;
+  public static final class ArmConstants {
+    public static final int kMotorPort = 4;
 
-    public static final double kStabilizationP = 1;
-    public static final double kStabilizationI = 0.5;
-    public static final double kStabilizationD = 0;
+    public static final double kP = 1;
 
-    public static final double kTurnP = 1;
-    public static final double kTurnI = 0;
-    public static final double kTurnD = 0;
+    // These are fake gains; in actuality these must be determined individually for each robot
+    public static final double kSVolts = 1;
+    public static final double kCosVolts = 1;
+    public static final double kVVoltSecondPerRad = 0.5;
+    public static final double kAVoltSecondSquaredPerRad = 0.1;
 
-    public static final double kMaxTurnRateDegPerS = 100;
-    public static final double kMaxTurnAccelerationDegPerSSquared = 300;
+    public static final double kMaxVelocityRadPerSecond = 3;
+    public static final double kMaxAccelerationRadPerSecSquared = 10;
 
-    public static final double kTurnToleranceDeg = 5;
-    public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
+    // The offset of the arm from the horizontal in its neutral position,
+    // measured from the horizontal
+    public static final double kArmOffsetRads = 0.5;
   }
 
   public static final class OIConstants {

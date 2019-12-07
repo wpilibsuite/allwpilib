@@ -45,12 +45,3 @@ frc::Encoder& DriveSubsystem::GetRightEncoder() { return m_rightEncoder; }
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
-
-units::degree_t DriveSubsystem::GetHeading() {
-  return units::degree_t(std::remainder(m_gyro.GetAngle(), 360) *
-                         (kGyroReversed ? -1.0 : 1.0));
-}
-
-double DriveSubsystem::GetTurnRate() {
-  return m_gyro.GetRate() * (kGyroReversed ? -1.0 : 1.0);
-}

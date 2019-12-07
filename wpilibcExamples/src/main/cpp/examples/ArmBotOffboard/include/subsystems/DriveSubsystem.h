@@ -7,13 +7,11 @@
 
 #pragma once
 
-#include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
-#include <units/units.h>
 
 #include "Constants.h"
 
@@ -70,20 +68,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void SetMaxOutput(double maxOutput);
 
-  /**
-   * Returns the heading of the robot.
-   *
-   * @return the robot's heading in degrees, from 180 to 180
-   */
-  units::degree_t GetHeading();
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  double GetTurnRate();
-
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
@@ -108,7 +92,4 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   // The right-side drive encoder
   frc::Encoder m_rightEncoder;
-
-  // The gyro sensor
-  frc::ADXRS450_Gyro m_gyro;
 };

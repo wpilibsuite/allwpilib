@@ -7,15 +7,15 @@
 
 #pragma once
 
-#include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
-#include <frc/SpeedControllerGroup.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/units.h>
 
 #include "Constants.h"
+#include "ExampleSmartMotorController.h"
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
@@ -27,6 +27,15 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void Periodic() override;
 
   // Subsystem methods go here.
+
+  /**
+   * Attempts to follow the given drive states using offboard PID.
+   *
+   * @param left The left wheel state.
+   * @param right The right wheel state.
+   */
+  void SetDriveStates(frc::TrapezoidProfile<units::meters>::State left,
+                      frc::TrapezoidProfile<units::meters>::State right);
 
   /**
    * Drives the robot using arcade controls.
@@ -42,25 +51,18 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void ResetEncoders();
 
   /**
-   * Gets the average distance of the TWO encoders.
+   * Gets the distance of the left encoder.
    *
    * @return the average of the TWO encoder readings
    */
-  double GetAverageEncoderDistance();
+  units::meter_t GetLeftEncoderDistance();
 
   /**
-   * Gets the left drive encoder.
+   * Gets the distance of the right encoder.
    *
-   * @return the left drive encoder
+   * @return the average of the TWO encoder readings
    */
-  frc::Encoder& GetLeftEncoder();
-
-  /**
-   * Gets the right drive encoder.
-   *
-   * @return the right drive encoder
-   */
-  frc::Encoder& GetRightEncoder();
+  units::meter_t GetRightEncoderDistance();
 
   /**
    * Sets the max output of the drive.  Useful for scaling the drive to drive
@@ -70,45 +72,19 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void SetMaxOutput(double maxOutput);
 
-  /**
-   * Returns the heading of the robot.
-   *
-   * @return the robot's heading in degrees, from 180 to 180
-   */
-  units::degree_t GetHeading();
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  double GetTurnRate();
-
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  frc::PWMVictorSPX m_left1;
-  frc::PWMVictorSPX m_left2;
-  frc::PWMVictorSPX m_right1;
-  frc::PWMVictorSPX m_right2;
+  ExampleSmartMotorController m_leftMaster;
+  ExampleSmartMotorController m_leftSlave;
+  ExampleSmartMotorController m_rightMaster;
+  ExampleSmartMotorController m_rightSlave;
 
-  // The motors on the left side of the drive
-  frc::SpeedControllerGroup m_leftMotors{m_left1, m_left2};
-
-  // The motors on the right side of the drive
-  frc::SpeedControllerGroup m_rightMotors{m_right1, m_right2};
+  // A feedforward component for the drive
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward;
 
   // The robot's drive
-  frc::DifferentialDrive m_drive{m_leftMotors, m_rightMotors};
-
-  // The left-side drive encoder
-  frc::Encoder m_leftEncoder;
-
-  // The right-side drive encoder
-  frc::Encoder m_rightEncoder;
-
-  // The gyro sensor
-  frc::ADXRS450_Gyro m_gyro;
+  frc::DifferentialDrive m_drive{m_leftMaster, m_rightMaster};
 };

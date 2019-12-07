@@ -35,28 +35,35 @@ constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterInches * wpi::math::pi) / static_cast<double>(kEncoderCPR);
-
-constexpr bool kGyroReversed = true;
-
-constexpr double kStabilizationP = 1;
-constexpr double kStabilizationI = 0.5;
-constexpr double kStabilizationD = 0;
-
-constexpr double kTurnP = 1;
-constexpr double kTurnI = 0;
-constexpr double kTurnD = 0;
-
-constexpr auto kTurnTolerance = 5_deg;
-constexpr auto kTurnRateTolerance = 10_deg_per_s;
-
-constexpr auto kMaxTurnRate = 100_deg_per_s;
-constexpr auto kMaxTurnAcceleration = 300_deg_per_s / 1_s;
 }  // namespace DriveConstants
 
+namespace ArmConstants {
+constexpr int kMotorPort = 4;
+
+constexpr double kP = 1;
+
+// These are fake gains; in actuality these must be determined individually for
+// each robot
+constexpr auto kS = 1_V;
+constexpr auto kCos = 1_V;
+constexpr auto kV = 0.5_V * 1_s / 1_rad;
+constexpr auto kA = 0.1_V * 1_s * 1_s / 1_rad;
+
+constexpr auto kMaxVelocity = 3_rad_per_s;
+constexpr auto kMaxAcceleration = 10_rad / (1_s * 1_s);
+
+constexpr int kEncoderPorts[]{4, 5};
+constexpr int kEncoderPPR = 256;
+constexpr auto kEncoderDistancePerPulse = 2.0_rad * wpi::math::pi / kEncoderPPR;
+
+// The offset of the arm from the horizontal in its neutral position,
+// measured from the horizontal
+constexpr auto kArmOffset = 0.5_rad;
+}  // namespace ArmConstants
+
 namespace AutoConstants {
-constexpr double kAutoDriveDistanceInches = 60;
-constexpr double kAutoBackupDistanceInches = 20;
-constexpr double kAutoDriveSpeed = 0.5;
+constexpr auto kAutoTimeoutSeconds = 12_s;
+constexpr auto kAutoShootTimeSeconds = 7_s;
 }  // namespace AutoConstants
 
 namespace OIConstants {

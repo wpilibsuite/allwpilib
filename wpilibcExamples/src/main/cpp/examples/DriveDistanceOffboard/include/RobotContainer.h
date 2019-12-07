@@ -8,17 +8,16 @@
 #pragma once
 
 #include <frc/XboxController.h>
-#include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
+#include <frc2/command/ParallelRaceGroup.h>
+#include <frc2/command/RunCommand.h>
+#include <frc2/command/SequentialCommandGroup.h>
+#include <frc2/command/StartEndCommand.h>
 
 #include "Constants.h"
-#include "commands/TurnToAngle.h"
 #include "subsystems/DriveSubsystem.h"
-
-namespace ac = AutoConstants;
-namespace dc = DriveConstants;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -42,8 +41,10 @@ class RobotContainer {
   // The robot's subsystems
   DriveSubsystem m_drive;
 
-  // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
+                                        {}};
+  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
+                                        {}};
 
   void ConfigureButtonBindings();
 };

@@ -8,22 +8,13 @@
 #pragma once
 
 #include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+#include <frc2/command/TrapezoidProfileCommand.h>
 
 #include "subsystems/DriveSubsystem.h"
 
-/**
- * A command that will turn the robot to the specified angle.
- */
-class TurnToAngle : public frc2::CommandHelper<frc2::PIDCommand, TurnToAngle> {
+class DriveDistanceProfiled
+    : public frc2::CommandHelper<frc2::TrapezoidProfileCommand<units::meters>,
+                                 DriveDistanceProfiled> {
  public:
-  /**
-   * Turns to robot to the specified angle.
-   *
-   * @param targetAngleDegrees The angle to turn to
-   * @param drive              The drive subsystem to use
-   */
-  TurnToAngle(units::degree_t target, DriveSubsystem* drive);
-
-  bool IsFinished() override;
+  DriveDistanceProfiled(units::meter_t distance, DriveSubsystem* drive);
 };
