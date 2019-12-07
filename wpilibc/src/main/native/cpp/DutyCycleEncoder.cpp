@@ -17,10 +17,10 @@
 using namespace frc;
 
 DutyCycleEncoder::DutyCycleEncoder(int channel)
-    : m_dutyCycle{std::make_shared<DutyCycle>(std::make_shared<DigitalInput>(channel))},
+    : m_dutyCycle{std::make_shared<DutyCycle>(
+          std::make_shared<DigitalInput>(channel))},
       m_analogTrigger{m_dutyCycle.get()},
-      m_counter{} {
-}
+      m_counter{} {}
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle)
     : m_dutyCycle{&dutyCycle, NullDeleter<DutyCycle>{}},
