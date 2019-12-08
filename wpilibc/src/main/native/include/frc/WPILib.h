@@ -16,8 +16,10 @@
 
 // clang-format on
 
+#if __has_include(<cameraserver/CameraServer.h>)
 #include <cameraserver/CameraServer.h>
 #include <vision/VisionRunner.h>
+#endif
 
 #include "frc/ADXL345_I2C.h"
 #include "frc/ADXL345_SPI.h"
@@ -82,6 +84,7 @@
 #include "frc/VictorSP.h"
 #include "frc/WPIErrors.h"
 #include "frc/XboxController.h"
+#if __has_include("frc/buttons/InternalButton.h")
 #include "frc/buttons/InternalButton.h"
 #include "frc/buttons/JoystickButton.h"
 #include "frc/buttons/NetworkButton.h"
@@ -95,6 +98,7 @@
 #include "frc/commands/WaitCommand.h"
 #include "frc/commands/WaitForChildren.h"
 #include "frc/commands/WaitUntilCommand.h"
+#endif
 #include "frc/drive/DifferentialDrive.h"
 #include "frc/drive/KilloughDrive.h"
 #include "frc/drive/MecanumDrive.h"
