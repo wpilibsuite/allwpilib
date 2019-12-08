@@ -85,7 +85,7 @@ public class ChassisSpeeds {
 
   @Override
   public String toString() {
-    return String.format("ChassisSpeeds(vx: %.2f m/s, vy: %.2f m/s, angular: %.2f rad/s)",
+    return String.format("ChassisSpeeds(Vx: %.2f m/s, Vy: %.2f m/s, Omega: %.2f rad/s)",
         vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
   }
 }
