@@ -62,7 +62,7 @@ public class DifferentialDriveWheelSpeeds {
 
   @Override
   public String toString() {
-    return String.format("Left: %.2f m/s, Right: %.2f m/s", leftMetersPerSecond,
-        rightMetersPerSecond);
+    return String.format("DifferentialDriveWheelSpeeds(Left: %.2f m/s, Right: %.2f m/s)",
+        leftMetersPerSecond, rightMetersPerSecond);
   }
 }

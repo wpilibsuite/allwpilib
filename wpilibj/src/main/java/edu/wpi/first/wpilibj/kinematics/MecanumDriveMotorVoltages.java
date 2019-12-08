@@ -58,8 +58,8 @@ public class MecanumDriveMotorVoltages {
 
   @Override
   public String toString() {
-    return String.format("Front Left: %.2f V, Front Right: %.2f V, Rear Left: %.2f V, "
-            + "Rear Right: %.2f V", frontLeftVoltage, frontRightVoltage, rearLeftVoltage,
-        rearRightVoltage);
+    return String.format("MecanumDriveMotorVoltages(Front Left: %.2f V, Front Right: %.2f V, "
+            + "Rear Left: %.2f V, Rear Right: %.2f V)", frontLeftVoltage, frontRightVoltage,
+        rearLeftVoltage, rearRightVoltage);
   }
 }

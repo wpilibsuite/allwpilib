@@ -57,6 +57,7 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
 
   @Override
   public String toString() {
-    return String.format("Speed: %.2f m/s, Angle: %s", speedMetersPerSecond, angle);
+    return String.format("SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speedMetersPerSecond,
+        angle);
   }
 }
