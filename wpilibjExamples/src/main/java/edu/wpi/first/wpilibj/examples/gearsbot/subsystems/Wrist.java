@@ -13,12 +13,12 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kWristPort;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kPotPort;
+import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+
 import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kP_real;
 import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kP_simulation;
-
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kPotPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.WristConstants.kWristPort;
 
 /**
  * The wrist subsystem is like the elevator, but with a rotational joint instead of a linear joint.

@@ -13,14 +13,14 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kElevatorPort;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kPotPort;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kP_real;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kI_real;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kP_simulation;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kI_simulation;
-
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kElevatorPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kI_real;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kI_simulation;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kP_real;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kP_simulation;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.ElevatorConstants.kPotPort;
 
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in it's current state PID

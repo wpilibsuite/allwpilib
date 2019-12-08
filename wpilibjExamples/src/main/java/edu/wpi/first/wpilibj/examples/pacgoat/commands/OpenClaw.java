@@ -7,27 +7,27 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
  * Opens the claw.
  */
-public class OpenClaw extends Command {
+public class OpenClaw extends CommandBase {
   public OpenClaw() {
-    requires(Robot.collector);
+    addRequirements(Robot.collector);
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
+  public void initialize() {
     Robot.collector.open();
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
-  protected boolean isFinished() {
+  public boolean isFinished() {
     return Robot.collector.isOpen();
   }
 }

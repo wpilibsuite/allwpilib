@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.triggers;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.Trigger;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * A custom button that is triggered when TWO buttons on a Joystick are

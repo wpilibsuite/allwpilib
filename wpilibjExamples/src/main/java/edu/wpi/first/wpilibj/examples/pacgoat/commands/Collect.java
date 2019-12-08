@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
@@ -15,14 +15,15 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
 /**
  * Get the robot set to collect balls.
  */
-public class Collect extends CommandGroup {
+public class Collect extends SequentialCommandGroup {
   /**
    * Create a new collect command.
    */
   public Collect() {
-    addSequential(new SetCollectionSpeed(Collector.kForward));
-    addParallel(new CloseClaw());
-    addSequential(new SetPivotSetpoint(Pivot.kCollect));
-    addSequential(new WaitForBall());
+    addCommands(
+        parallel(new SetCollectionSpeed(Collector.kForward),
+        new CloseClaw()),
+        new SetPivotSetpoint(Pivot.kCollect),
+        new WaitForBall());
   }
 }

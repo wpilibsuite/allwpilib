@@ -7,28 +7,27 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.TimedCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
  * Extend the shooter and then retract it after a second.
  */
-public class ExtendShooter extends TimedCommand {
+public class ExtendShooter extends CommandBase {
   public ExtendShooter() {
-    super(1);
-    requires(Robot.shooter);
+    addRequirements(Robot.shooter);
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
+  public void initialize() {
     Robot.shooter.extendBoth();
   }
 
   // Called once after isFinished returns true
   @Override
-  protected void end() {
+  public void end(boolean interrupted) {
     Robot.shooter.retractBoth();
   }
 }

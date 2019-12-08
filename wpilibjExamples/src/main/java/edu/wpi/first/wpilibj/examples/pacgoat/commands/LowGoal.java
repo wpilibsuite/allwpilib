@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
@@ -16,13 +16,15 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
  * Spit the ball out into the low goal assuming that the robot is in front of
  * it.
  */
-public class LowGoal extends CommandGroup {
+public class LowGoal extends SequentialCommandGroup {
   /**
    * Create a new low goal command.
    */
   public LowGoal() {
-    addSequential(new SetPivotSetpoint(Pivot.kLowGoal));
-    addSequential(new SetCollectionSpeed(Collector.kReverse));
-    addSequential(new ExtendShooter());
+    addCommands(
+        new SetPivotSetpoint(Pivot.kLowGoal),
+        new SetCollectionSpeed(Collector.kReverse),
+        new ExtendShooter()
+    );
   }
 }

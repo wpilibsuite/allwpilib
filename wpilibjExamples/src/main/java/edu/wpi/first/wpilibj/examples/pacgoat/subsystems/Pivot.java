@@ -11,10 +11,24 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
+
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kDRealPivotController;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kDSimPivotController;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kIRealPivotController;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kISimPivotController;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kLowerLimitSwitchPort;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kPRealPivotController;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kPSimPivotController;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kPivotMotorPort;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kPivotPotPort;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kToleranceRealPivotController;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kToleranceSimPivotController;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.PivotConstants.kUpperLimitSwitchPort;
 
 /**
  * The Pivot subsystem contains the Van-door motor and the pot for PID control
@@ -28,26 +42,27 @@ public class Pivot extends PIDSubsystem {
   public static final double kShootNear = 30;
 
   // Sensors for measuring the position of the pivot.
-  private final DigitalInput m_upperLimitSwitch = new DigitalInput(13);
-  private final DigitalInput m_lowerLimitSwitch = new DigitalInput(12);
+  private final DigitalInput m_upperLimitSwitch = new DigitalInput(kUpperLimitSwitchPort);
+  private final DigitalInput m_lowerLimitSwitch = new DigitalInput(kLowerLimitSwitchPort);
 
   // 0 degrees is vertical facing up.
   // Angle increases the more forward the pivot goes.
-  private final Potentiometer m_pot = new AnalogPotentiometer(1);
+  private final Potentiometer m_pot = new AnalogPotentiometer(kPivotPotPort);
 
   // Motor to move the pivot.
-  private final SpeedController m_motor = new Victor(5);
+  private final SpeedController m_motor = new Victor(kPivotMotorPort);
 
   /**
    * Create a new pivot subsystem.
    */
   public Pivot() {
-    super("Pivot", 7.0, 0.0, 8.0);
-    setAbsoluteTolerance(0.005);
-    getPIDController().setContinuous(false);
+    super(
+        new PIDController(kPRealPivotController, kIRealPivotController, kDRealPivotController));
+    getController().setTolerance(kToleranceRealPivotController);
+    getController().disableContinuousInput();
     if (Robot.isSimulation()) { // PID is different in simulation.
-      getPIDController().setPID(0.5, 0.001, 2);
-      setAbsoluteTolerance(5);
+      getController().setPID(kPSimPivotController, kISimPivotController, kDSimPivotController);
+      getController().setTolerance(kToleranceSimPivotController);
     }
 
     // Put everything to the LiveWindow for testing.
@@ -55,22 +70,14 @@ public class Pivot extends PIDSubsystem {
     addChild("Lower Limit Switch", m_lowerLimitSwitch);
     addChild("Pot", (AnalogPotentiometer) m_pot);
     addChild("Motor", (Victor) m_motor);
-    addChild("PIDSubsystem Controller", getPIDController());
-  }
-
-  /**
-   * No default command, if PID is enabled, the current setpoint will be
-   * maintained.
-   */
-  @Override
-  public void initDefaultCommand() {
+    addChild("PIDSubsystem Controller", getController());
   }
 
   /**
    * The angle read in by the potentiometer.
    */
   @Override
-  protected double returnPIDInput() {
+  protected double getMeasurement() {
     return m_pot.get();
   }
 
@@ -78,24 +85,30 @@ public class Pivot extends PIDSubsystem {
    * Set the motor speed based off of the PID output.
    */
   @Override
-  protected void usePIDOutput(double output) {
-    m_motor.pidWrite(output);
+  protected void useOutput(double output, double setpoint) {
+    m_motor.set(output);
   }
 
   /**
    * If the pivot is at its upper limit.
    */
   public boolean isAtUpperLimit() {
-    // TODO: inverted from real robot (prefix with !)
-    return m_upperLimitSwitch.get();
+    if (Robot.isSimulation()) { // Inverted from real robot
+      return m_upperLimitSwitch.get();
+    } else {
+      return !m_upperLimitSwitch.get();
+    }
   }
 
   /**
    * If the pivot is at its lower limit.
    */
   public boolean isAtLowerLimit() {
-    // TODO: inverted from real robot (prefix with !)
-    return m_lowerLimitSwitch.get();
+    if (Robot.isSimulation()) { // Inverted from real robot
+      return m_lowerLimitSwitch.get();
+    } else {
+      return !m_lowerLimitSwitch.get();
+    }
   }
 
   /**

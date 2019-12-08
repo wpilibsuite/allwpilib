@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
@@ -19,20 +19,13 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * <p>NOTE: The simulator currently doesn't support the compressor or pressure
  * sensors.
  */
-public class Pneumatics extends Subsystem {
+public class Pneumatics extends SubsystemBase {
   AnalogInput m_pressureSensor = new AnalogInput(3);
 
   private static final double kMaxPressure = 2.55;
 
   public Pneumatics() {
     addChild("Pressure Sensor", m_pressureSensor);
-  }
-
-  /**
-   * No default command.
-   */
-  @Override
-  public void initDefaultCommand() {
   }
 
   /**

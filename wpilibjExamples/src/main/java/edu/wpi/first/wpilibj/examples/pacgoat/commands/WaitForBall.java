@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
@@ -16,14 +16,14 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * nothing and is intended to be used in command groups to wait for this
  * condition.
  */
-public class WaitForBall extends Command {
+public class WaitForBall extends CommandBase {
   public WaitForBall() {
-    requires(Robot.collector);
+    addRequirements(Robot.collector);
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
-  protected boolean isFinished() {
+  public boolean isFinished() {
     return Robot.collector.hasBall();
   }
 }

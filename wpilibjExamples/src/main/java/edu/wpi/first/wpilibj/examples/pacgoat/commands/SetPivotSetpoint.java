@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
@@ -16,24 +16,24 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * tolerance, but leaves the PID loop running to maintain the position. Other
  * commands using the pivot should make sure they disable PID!
  */
-public class SetPivotSetpoint extends Command {
+public class SetPivotSetpoint extends CommandBase {
   private final double m_setpoint;
 
   public SetPivotSetpoint(double setpoint) {
     this.m_setpoint = setpoint;
-    requires(Robot.pivot);
+    addRequirements(Robot.pivot);
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
+  public void initialize() {
     Robot.pivot.enable();
     Robot.pivot.setSetpoint(m_setpoint);
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
-  protected boolean isFinished() {
-    return Robot.pivot.onTarget();
+  public boolean isFinished() {
+    return Robot.pivot.getController().atSetpoint();
   }
 }

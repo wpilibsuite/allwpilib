@@ -13,44 +13,65 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kBackLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kBackLeftEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kBackLeftLocation;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kBackLeftMotorPort;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kBackRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kBackRightEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kBackRightLocation;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kBackRightMotorPort;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kFrontLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kFrontLeftEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kFrontLeftLocation;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kFrontLeftMotorPort;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kFrontRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kFrontRightEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kFrontRightLocation;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kFrontRightMotorPort;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kMaxSpeed;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kPbackLeftController;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kPbackRightController;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kPfrontLeftController;
+import static edu.wpi.first.wpilibj.examples.mecanumbot.Constants.DriveConstants.kPfrontRightController;
+
 /**
  * Represents a mecanum drive style drivetrain.
  */
-@SuppressWarnings("PMD.TooManyFields")
+@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
+  private final SpeedController m_frontLeftMotor = new PWMVictorSPX(kFrontLeftMotorPort);
+  private final SpeedController m_frontRightMotor = new PWMVictorSPX(kFrontRightMotorPort);
+  private final SpeedController m_backLeftMotor = new PWMVictorSPX(kBackLeftMotorPort);
+  private final SpeedController m_backRightMotor = new PWMVictorSPX(kBackRightMotorPort);
 
-  private final SpeedController m_frontLeftMotor = new PWMVictorSPX(1);
-  private final SpeedController m_frontRightMotor = new PWMVictorSPX(2);
-  private final SpeedController m_backLeftMotor = new PWMVictorSPX(3);
-  private final SpeedController m_backRightMotor = new PWMVictorSPX(4);
+  private final Encoder m_frontLeftEncoder = new Encoder(
+      kFrontLeftEncoderPorts[0], kFrontLeftEncoderPorts[1], kFrontLeftEncoderReversed);
+  private final Encoder m_frontRightEncoder = new Encoder(
+      kFrontRightEncoderPorts[0], kFrontRightEncoderPorts[1], kFrontRightEncoderReversed);
+  private final Encoder m_backLeftEncoder = new Encoder(
+      kBackLeftEncoderPorts[0], kBackLeftEncoderPorts[1], kBackLeftEncoderReversed);
+  private final Encoder m_backRightEncoder = new Encoder(
+      kBackRightEncoderPorts[0], kBackRightEncoderPorts[1], kBackRightEncoderReversed);
 
-  private final Encoder m_frontLeftEncoder = new Encoder(0, 1);
-  private final Encoder m_frontRightEncoder = new Encoder(2, 3);
-  private final Encoder m_backLeftEncoder = new Encoder(4, 5);
-  private final Encoder m_backRightEncoder = new Encoder(6, 7);
-
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
-
-  private final PIDController m_frontLeftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_frontRightPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_backLeftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_backRightPIDController = new PIDController(1, 0, 0);
+  private final PIDController m_frontLeftPIDController = new PIDController(
+        kPfrontLeftController, 0, 0);
+  private final PIDController m_frontRightPIDController = new PIDController(
+        kPfrontRightController, 0, 0);
+  private final PIDController m_backLeftPIDController = new PIDController(
+        kPbackLeftController, 0, 0);
+  private final PIDController m_backRightPIDController = new PIDController(
+        kPbackRightController, 0, 0);
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
+      kFrontLeftLocation, kFrontRightLocation, kBackLeftLocation, kBackRightLocation
   );
 
   private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,

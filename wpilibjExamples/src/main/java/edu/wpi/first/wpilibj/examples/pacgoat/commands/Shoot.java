@@ -7,21 +7,23 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
 
 /**
  * Shoot the ball at the current angle.
  */
-public class Shoot extends CommandGroup {
+public class Shoot extends SequentialCommandGroup {
   /**
    * Create a new shoot command.
    */
   public Shoot() {
-    addSequential(new WaitForPressure());
-    addSequential(new SetCollectionSpeed(Collector.kStop));
-    addSequential(new OpenClaw());
-    addSequential(new ExtendShooter());
+    addCommands(
+        new WaitForPressure(),
+        new SetCollectionSpeed(Collector.kStop),
+        new OpenClaw(),
+        new ExtendShooter()
+    );
   }
 }

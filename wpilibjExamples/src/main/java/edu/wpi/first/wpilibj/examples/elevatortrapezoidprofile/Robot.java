@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 public class Robot extends TimedRobot {
-    // Calculate period for the Trapezoidal Profile and PIDController
+  // Calculate period for the Trapezoidal Profile and PIDController
   private static double kDt = 0.02;
 
   private final Joystick m_joystick = new Joystick(1);

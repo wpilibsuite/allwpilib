@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
@@ -17,14 +17,9 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * points than get none. When called sequentially, this command will block until
  * the hot goal is detected or until it is timed out.
  */
-public class CheckForHotGoal extends Command {
+public class CheckForHotGoal extends CommandBase {
   public CheckForHotGoal(double time) {
-    setTimeout(time);
-  }
-
-  // Make this return true when this Command no longer needs to run execute()
-  @Override
-  protected boolean isFinished() {
-    return isTimedOut() || Robot.shooter.goalIsHot();
+    withTimeout(time);
+    withInterrupt(Robot.shooter::goalIsHot);
   }
 }

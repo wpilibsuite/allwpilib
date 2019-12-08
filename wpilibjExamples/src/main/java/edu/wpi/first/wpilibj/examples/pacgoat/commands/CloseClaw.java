@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
@@ -19,12 +19,12 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  */
 public class CloseClaw extends InstantCommand {
   public CloseClaw() {
-    requires(Robot.collector);
+    addRequirements(Robot.collector);
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
+  public void initialize() {
     Robot.collector.close();
   }
 }

@@ -10,9 +10,9 @@ package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kPDrive;
-
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
+
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kPDrive;
 
 
 /**

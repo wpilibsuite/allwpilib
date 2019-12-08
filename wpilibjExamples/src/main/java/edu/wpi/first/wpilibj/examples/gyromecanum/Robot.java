@@ -13,25 +13,21 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
+import static edu.wpi.first.wpilibj.examples.gyromecanum.Constants.DriveConstants.kFrontLeftChannel;
+import static edu.wpi.first.wpilibj.examples.gyromecanum.Constants.DriveConstants.kFrontRightChannel;
+import static edu.wpi.first.wpilibj.examples.gyromecanum.Constants.DriveConstants.kRearLeftChannel;
+import static edu.wpi.first.wpilibj.examples.gyromecanum.Constants.DriveConstants.kRearRightChannel;
+import static edu.wpi.first.wpilibj.examples.gyromecanum.Constants.DriveConstants.kVoltsPerDegreePerSecond;
+import static edu.wpi.first.wpilibj.examples.gyromecanum.Constants.OIConstants.kJoystickPort;
+
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to
  * maintain rotation vectorsin relation to the starting orientation of the robot
  * (field-oriented controls).
  */
 public class Robot extends TimedRobot {
-  // gyro calibration constant, may need to be adjusted;
-  // gyro value of 360 is set to correspond to one full revolution
-  private static final double kVoltsPerDegreePerSecond = 0.0128;
-
-  private static final int kFrontLeftChannel = 0;
-  private static final int kRearLeftChannel = 1;
-  private static final int kFrontRightChannel = 2;
-  private static final int kRearRightChannel = 3;
-  private static final int kGyroPort = 0;
-  private static final int kJoystickPort = 0;
-
   private MecanumDrive m_robotDrive;
-  private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+  private final AnalogGyro m_gyro = new AnalogGyro(0);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   @Override

@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
@@ -20,13 +20,13 @@ public class SetCollectionSpeed extends InstantCommand {
   private final double m_speed;
 
   public SetCollectionSpeed(double speed) {
-    requires(Robot.collector);
+    addRequirements(Robot.collector);
     this.m_speed = speed;
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
+  public void initialize() {
     Robot.collector.setSpeed(m_speed);
   }
 }

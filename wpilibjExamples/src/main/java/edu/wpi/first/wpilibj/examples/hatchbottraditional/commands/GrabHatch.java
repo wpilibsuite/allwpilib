@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsys
 
 /**
  * A simple command that grabs a hatch with the {@link HatchSubsystem}.  Written explicitly for
- * pedagogical purposes.  Actual code should inline a command this simple with {@link
+ * pedagogical purposes. Actual code should inline a command this simple with {@link
  * edu.wpi.first.wpilibj2.command.InstantCommand}.
  */
 public class GrabHatch extends CommandBase {

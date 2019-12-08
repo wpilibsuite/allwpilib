@@ -17,20 +17,19 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftEncoderReversed;
 import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftFrontPort;
 import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftRearPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRangeFinderPort;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRealEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightEncoderReversed;
 import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightFrontPort;
 import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightRearPort;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRangeFinderPort;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kLeftEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRightEncoderReversed;
 import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kSimEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.gearsbot.Constants.DriveConstants.kRealEncoderDistancePerPulse;
-
-
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 public class DriveTrain extends SubsystemBase {
   /**
@@ -44,8 +43,10 @@ public class DriveTrain extends SubsystemBase {
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-  private final Encoder m_leftEncoder = new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
-  private final Encoder m_rightEncoder = new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1], kRightEncoderReversed);
+  private final Encoder m_leftEncoder = new Encoder(
+      kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
+  private final Encoder m_rightEncoder = new Encoder(
+      kRightEncoderPorts[0], kRightEncoderPorts[1], kRightEncoderReversed);
   private final AnalogInput m_rangefinder = new AnalogInput(kRangeFinderPort);
   private final AnalogGyro m_gyro = new AnalogGyro(1);
 

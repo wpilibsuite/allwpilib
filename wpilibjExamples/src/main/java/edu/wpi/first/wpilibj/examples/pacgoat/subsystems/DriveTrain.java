@@ -8,35 +8,48 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
-import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
+
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kFrontLeftCIMPort;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kFrontRightCIMPort;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kLeftEncoderEncodingType;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kLeftEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kRealEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kRearLeftCIMPort;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kRearRightCIMPort;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kRightEncoderEncodingType;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kRightEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.pacgoat.Constants.DriveConstants.kSimEncoderDistancePerPulse;
 
 /**
  * The DriveTrain subsystem controls the robot's chassis and reads in
  * information about it's speed and position.
  */
-public class DriveTrain extends Subsystem {
+public class DriveTrain extends SubsystemBase {
   // Subsystem devices
-  private final SpeedController m_frontLeftCIM = new Victor(1);
-  private final SpeedController m_frontRightCIM = new Victor(2);
-  private final SpeedController m_rearLeftCIM = new Victor(3);
-  private final SpeedController m_rearRightCIM = new Victor(4);
+  private final SpeedController m_frontLeftCIM = new Victor(kFrontLeftCIMPort);
+  private final SpeedController m_frontRightCIM = new Victor(kFrontRightCIMPort);
+  private final SpeedController m_rearLeftCIM = new Victor(kRearLeftCIMPort);
+  private final SpeedController m_rearRightCIM = new Victor(kRearRightCIMPort);
   private final SpeedControllerGroup m_leftCIMs = new SpeedControllerGroup(
       m_frontLeftCIM, m_rearLeftCIM);
   private final SpeedControllerGroup m_rightCIMs = new SpeedControllerGroup(
       m_frontRightCIM, m_rearRightCIM);
   private final DifferentialDrive m_drive;
-  private final Encoder m_rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
-  private final Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
+  private final Encoder m_rightEncoder = new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1],
+      kRightEncoderReversed, kRightEncoderEncodingType);
+  private final Encoder m_leftEncoder = new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1],
+      kLeftEncoderReversed, kLeftEncoderEncodingType);
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   /**
@@ -58,14 +71,12 @@ public class DriveTrain extends Subsystem {
     m_drive.setMaxOutput(1.0);
 
     if (Robot.isReal()) { // Converts to feet
-      m_rightEncoder.setDistancePerPulse(0.0785398);
-      m_leftEncoder.setDistancePerPulse(0.0785398);
+      m_rightEncoder.setDistancePerPulse(kRealEncoderDistancePerPulse);
+      m_leftEncoder.setDistancePerPulse(kRealEncoderDistancePerPulse);
     } else {
       // Convert to feet 4in diameter wheels with 360 tick sim encoders
-      m_rightEncoder.setDistancePerPulse(
-          (4.0/* in */ * Math.PI) / (360.0 * 12.0/* in/ft */));
-      m_leftEncoder.setDistancePerPulse(
-          (4.0/* in */ * Math.PI) / (360.0 * 12.0/* in/ft */));
+      m_rightEncoder.setDistancePerPulse(kSimEncoderDistancePerPulse);
+      m_leftEncoder.setDistancePerPulse(kSimEncoderDistancePerPulse);
     }
 
     addChild("Right Encoder", m_rightEncoder);
@@ -76,15 +87,6 @@ public class DriveTrain extends Subsystem {
       m_gyro.setSensitivity(0.007); // TODO: Handle more gracefully?
     }
     addChild("Gyro", m_gyro);
-  }
-
-  /**
-   * When other commands aren't using the drivetrain, allow tank drive with
-   * the joystick.
-   */
-  @Override
-  public void initDefaultCommand() {
-    setDefaultCommand(new DriveWithJoystick());
   }
 
   /**

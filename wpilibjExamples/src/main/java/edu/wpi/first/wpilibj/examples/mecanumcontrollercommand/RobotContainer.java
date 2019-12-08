@@ -121,15 +121,15 @@ public class RobotContainer {
         kFeedforward,
         kDriveKinematics,
 
-        //Position contollers
+        // Position controllers
         new PIDController(kPXController, 0, 0),
         new PIDController(kPYController, 0, 0),
         new ProfiledPIDController(kPThetaController, 0, 0, kThetaControllerConstraints),
 
-        //Needed for normalizing wheel speeds
+        // Needed for normalizing wheel speeds
         kMaxSpeedMetersPerSecond,
 
-        //Velocity PID's
+        // Velocity PID's
         new PIDController(kPFrontLeftVel, 0, 0),
         new PIDController(kPRearLeftVel, 0, 0),
         new PIDController(kPFrontRightVel, 0, 0),
@@ -137,7 +137,7 @@ public class RobotContainer {
 
         m_robotDrive::getCurrentWheelSpeeds,
 
-        m_robotDrive::setDriveSpeedControllersVolts, //Consumer for the output motor voltages
+        m_robotDrive::setDriveSpeedControllersVolts, // Consumer for the output motor voltages
 
         m_robotDrive
     );

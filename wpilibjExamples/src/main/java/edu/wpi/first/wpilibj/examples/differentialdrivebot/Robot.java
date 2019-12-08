@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.OIConstants.kDriverControllerPort;
 import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kMaxAngularSpeed;
 import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kMaxSpeed;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.OIConstants.kDriverControllerPort;
 
 public class Robot extends TimedRobot {
   private final XboxController m_controller = new XboxController(kDriverControllerPort);

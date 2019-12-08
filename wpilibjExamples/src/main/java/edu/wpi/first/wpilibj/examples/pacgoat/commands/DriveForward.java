@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * This command drives the robot over a given distance with simple proportional
  * control This command will drive a given distance limiting to a maximum speed.
  */
-public class DriveForward extends Command {
+public class DriveForward extends CommandBase {
   private final double m_driveForwardSpeed;
   private final double m_distance;
   private double m_error;
@@ -36,19 +36,20 @@ public class DriveForward extends Command {
    * @param maxSpeed The maximum speed to drive at
    */
   public DriveForward(double dist, double maxSpeed) {
-    requires(Robot.drivetrain);
+    addRequirements(Robot.drivetrain);
     m_distance = dist;
     m_driveForwardSpeed = maxSpeed;
   }
 
   @Override
-  protected void initialize() {
+  public void initialize() {
     Robot.drivetrain.getRightEncoder().reset();
-    setTimeout(2);
+    withTimeout(2);
+    withInterrupt(() -> Math.abs(m_error) <= kTolerance);
   }
 
   @Override
-  protected void execute() {
+  public void execute() {
     m_error = m_distance - Robot.drivetrain.getRightEncoder().getDistance();
     if (m_driveForwardSpeed * kP * m_error >= m_driveForwardSpeed) {
       Robot.drivetrain.tankDrive(m_driveForwardSpeed, m_driveForwardSpeed);
@@ -59,12 +60,7 @@ public class DriveForward extends Command {
   }
 
   @Override
-  protected boolean isFinished() {
-    return Math.abs(m_error) <= kTolerance || isTimedOut();
-  }
-
-  @Override
-  protected void end() {
+  public void end(boolean interrupted) {
     Robot.drivetrain.stop();
   }
 }

@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * The Shooter subsystem handles shooting. The mechanism for shooting is
@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * cylinder and ignores the latch.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class Shooter extends Subsystem {
+public class Shooter extends SubsystemBase {
   // Devices
   DoubleSolenoid m_piston1 = new DoubleSolenoid(1, 3, 4);
   DoubleSolenoid m_piston2 = new DoubleSolenoid(1, 5, 6);
@@ -43,14 +43,7 @@ public class Shooter extends Subsystem {
     addChild("Piston1 Reed Switch Back ", m_piston1ReedSwitchBack);
     addChild("Latch Piston", m_latchPiston);
   }
-
-  /**
-   * No default command.
-   */
-  @Override
-  public void initDefaultCommand() {
-  }
-
+  
   /**
    * Extend both solenoids to shoot.
    */

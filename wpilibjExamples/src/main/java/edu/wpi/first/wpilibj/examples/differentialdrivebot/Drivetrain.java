@@ -18,18 +18,18 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftMaster;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftFollower;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightMaster;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightFollower;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kEncoderDistancePerPulse;
 import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kDriveKinematics;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftFollower;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kLeftMaster;
 import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kPLeftVel;
 import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kPRightVel;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightFollower;
+import static edu.wpi.first.wpilibj.examples.differentialdrivebot.Constants.DriveConstants.kRightMaster;
 
 /**
  * Represents a differential drive style drivetrain.
@@ -40,8 +40,10 @@ public class Drivetrain {
   private final SpeedController m_rightMaster = new PWMVictorSPX(kRightMaster);
   private final SpeedController m_rightFollower = new PWMVictorSPX(kRightFollower);
 
-  private final Encoder m_leftEncoder = new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
-  private final Encoder m_rightEncoder = new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1], kRightEncoderReversed);
+  private final Encoder m_leftEncoder = new Encoder(
+      kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
+  private final Encoder m_rightEncoder = new Encoder(
+      kRightEncoderPorts[0], kRightEncoderPorts[1], kRightEncoderReversed);
 
   private final SpeedControllerGroup m_leftGroup
       = new SpeedControllerGroup(m_leftMaster, m_leftFollower);
