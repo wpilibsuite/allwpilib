@@ -631,4 +631,12 @@ int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {
   return spiSystem->readTransferSkippedFullCount(status);
 }
 
+// These 2 functions are so the new stall functionality
+// can be tested. How they're used is not very clear
+// but I want them to be testable so we can add an impl.
+// We will not be including these in the headers
+void* HAL_GetSPIDMAManager() { return spiAutoDMA.get(); }
+
+void* HAL_GetSPISystem() { return spiSystem.get(); }
+
 }  // extern "C"
