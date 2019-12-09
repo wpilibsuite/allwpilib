@@ -485,13 +485,39 @@
   },
   {
     "name": "ArmBot",
-    "description": "An example command-based robot demonstrating the use of a ProfiledPIDCommand to control an arm.",
+    "description": "An example command-based robot demonstrating the use of a ProfiledPIDSubsystem to control an arm.",
     "tags": [
       "ArmBot",
       "PID",
       "Motion Profile"
     ],
     "foldername": "armbot",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "ArmBotOffboard",
+    "description": "An example command-based robot demonstrating the use of a TrapezoidProfileSubsystem to control an arm with an offboard PID.",
+    "tags": [
+      "ArmBotOffboard",
+      "PID",
+      "Motion Profile"
+    ],
+    "foldername": "armbotoffboard",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "DriveDistanceOffboard",
+    "description": "An example command-based robot demonstrating the use of a TrapezoidProfileCommand to drive a robot a set distance with offboard PID on the drive.",
+    "tags": [
+      "DriveDistance",
+      "PID",
+      "Motion Profile"
+    ],
+    "foldername": "drivedistanceoffboard",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

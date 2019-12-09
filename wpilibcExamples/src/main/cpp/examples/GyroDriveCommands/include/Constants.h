@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <units/units.h>
 #include <wpi/math>
 
 /**
@@ -45,8 +46,11 @@ constexpr double kTurnP = 1;
 constexpr double kTurnI = 0;
 constexpr double kTurnD = 0;
 
-constexpr double kTurnToleranceDeg = 5;
-constexpr double kTurnRateToleranceDegPerS = 10;  // degrees per second
+constexpr auto kTurnTolerance = 5_deg;
+constexpr auto kTurnRateTolerance = 10_deg_per_s;
+
+constexpr auto kMaxTurnRate = 100_deg_per_s;
+constexpr auto kMaxTurnAcceleration = 300_deg_per_s / 1_s;
 }  // namespace DriveConstants
 
 namespace AutoConstants {

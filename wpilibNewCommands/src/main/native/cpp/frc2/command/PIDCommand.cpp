@@ -36,4 +36,4 @@ void PIDCommand::Execute() {
 
 void PIDCommand::End(bool interrupted) { m_useOutput(0); }
 
-PIDController& PIDCommand::getController() { return m_controller; }
+PIDController& PIDCommand::GetController() { return m_controller; }

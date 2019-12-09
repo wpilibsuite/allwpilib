@@ -72,7 +72,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
    *
    * @return The PIDController
    */
-  PIDController& getController();
+  PIDController& GetController();
 
  protected:
   PIDController m_controller;
