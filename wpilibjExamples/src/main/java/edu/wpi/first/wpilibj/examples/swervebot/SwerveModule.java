@@ -16,24 +16,26 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.ModuleConstants.kDriveEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.ModuleConstants.kDriveEncoderReversed;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.ModuleConstants.kModuleMaxAngularAcceleration;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.ModuleConstants.kModuleMaxAngularVelocity;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.ModuleConstants.kPdriveController;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.ModuleConstants.kPturningController;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.ModuleConstants.kTurningEncoderReversed;
+
 public class SwerveModule {
-  private static final double kWheelRadius = 0.0508;
-  private static final int kEncoderResolution = 4096;
-
-  private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularSpeed;
-  private static final double kModuleMaxAngularAcceleration
-      = 2 * Math.PI; // radians per second squared
-
   private final SpeedController m_driveMotor;
   private final SpeedController m_turningMotor;
 
-  private final Encoder m_driveEncoder = new Encoder(0, 1);
-  private final Encoder m_turningEncoder = new Encoder(2, 3);
+  private final Encoder m_driveEncoder;
+  private final Encoder m_turningEncoder;
 
-  private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
+  private final PIDController m_drivePIDController = new PIDController(kPdriveController, 0, 0);
 
   private final ProfiledPIDController m_turningPIDController
-      = new ProfiledPIDController(1, 0, 0,
+      = new ProfiledPIDController(kPturningController, 0, 0,
       new TrapezoidProfile.Constraints(kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
 
   /**
@@ -41,20 +43,31 @@ public class SwerveModule {
    *
    * @param driveMotorChannel   ID for the drive motor.
    * @param turningMotorChannel ID for the turning motor.
+   * @param driveEncoderPorts Array containing port A and B of the drive encoder.
+   * @param turningEncoderPorts Array containing port A and B of turning encoder.
+   * 
    */
-  public SwerveModule(int driveMotorChannel, int turningMotorChannel) {
+  public SwerveModule(int driveMotorChannel,
+      int turningMotorChannel,
+      int[] driveEncoderPorts,
+      int[] turningEncoderPorts) {
     m_driveMotor = new PWMVictorSPX(driveMotorChannel);
     m_turningMotor = new PWMVictorSPX(turningMotorChannel);
+
+    m_driveEncoder = new Encoder(driveEncoderPorts[0],
+        driveEncoderPorts[1], kDriveEncoderReversed);
+    m_turningEncoder = new Encoder(turningEncoderPorts[0],
+        turningEncoderPorts[1], kTurningEncoderReversed);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    m_driveEncoder.setDistancePerPulse(kDriveEncoderDistancePerPulse);
 
     // Set the distance (in this case, angle) per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * wpi::math::pi)
     // divided by the encoder resolution.
-    m_turningEncoder.setDistancePerPulse(2 * Math.PI / kEncoderResolution);
+    m_turningEncoder.setDistancePerPulse(kTurningEncoderDistancePerPulse);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.

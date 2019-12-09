@@ -9,32 +9,58 @@ package edu.wpi.first.wpilibj.examples.swervebot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackLeftDriveEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackLeftDriveMotorPort;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackLeftLocation;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackLeftTurningEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackLeftTurningMotorPort;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackRightDriveEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackRightDriveMotorPort;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackRightLocation;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackRightTurningEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kBackRightTurningMotorPort;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontLeftDriveEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontLeftDriveMotorPort;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontLeftLocation;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontLeftTurningEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontLeftTurningMotorPort;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontRightDriveEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontRightDriveMotorPort;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontRightLocation;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontRightTurningEncoderPorts;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kFrontRightTurningMotorPort;
+import static edu.wpi.first.wpilibj.examples.swervebot.Constants.DriveConstants.kMaxSpeed;
+
 /**
  * Represents a swerve drive style drivetrain.
  */
+@SuppressWarnings("PMD.ExcessiveImports")
 public class Drivetrain {
-  public static final double kMaxSpeed = 3.0; // 3 meters per second
-  public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
-
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
-
-  private final SwerveModule m_frontLeft = new SwerveModule(1, 2);
-  private final SwerveModule m_frontRight = new SwerveModule(3, 4);
-  private final SwerveModule m_backLeft = new SwerveModule(5, 6);
-  private final SwerveModule m_backRight = new SwerveModule(7, 8);
+  private final SwerveModule m_frontLeft = new SwerveModule(kFrontLeftDriveMotorPort,
+      kFrontLeftTurningMotorPort,
+      kFrontLeftDriveEncoderPorts,
+      kFrontLeftTurningEncoderPorts);
+  private final SwerveModule m_frontRight = new SwerveModule(kFrontRightDriveMotorPort,
+      kFrontRightTurningMotorPort,
+      kFrontRightDriveEncoderPorts,
+      kFrontRightTurningEncoderPorts);
+  private final SwerveModule m_backLeft = new SwerveModule(kBackLeftDriveMotorPort,
+      kBackLeftTurningMotorPort,
+      kBackLeftDriveEncoderPorts,
+      kBackLeftTurningEncoderPorts);
+  private final SwerveModule m_backRight = new SwerveModule(kBackRightDriveMotorPort,
+      kBackRightTurningMotorPort,
+      kBackRightDriveEncoderPorts,
+      kBackRightTurningEncoderPorts);
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
+      kFrontLeftLocation, kFrontRightLocation, kBackLeftLocation, kBackRightLocation
   );
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, getAngle());
