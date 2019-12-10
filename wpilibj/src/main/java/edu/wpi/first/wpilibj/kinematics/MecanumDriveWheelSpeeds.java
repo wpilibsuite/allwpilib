@@ -81,4 +81,11 @@ public class MecanumDriveWheelSpeeds {
           * attainableMaxSpeedMetersPerSecond;
     }
   }
+
+  @Override
+  public String toString() {
+    return String.format("MecanumDriveWheelSpeeds(Front Left: %.2f m/s, Front Right: %.2f m/s, "
+            + "Rear Left: %.2f m/s, Rear Right: %.2f m/s)", frontLeftMetersPerSecond,
+        frontRightMetersPerSecond, rearLeftMetersPerSecond, rearRightMetersPerSecond);
+  }
 }
