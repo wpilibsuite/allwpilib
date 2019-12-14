@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj.livewindow;
 
-import java.util.function.Function;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
