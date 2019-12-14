@@ -30,6 +30,7 @@
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tInterrupt.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tLED.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tPWM.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tHMB.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tPower.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tRelay.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tSPI.h>
