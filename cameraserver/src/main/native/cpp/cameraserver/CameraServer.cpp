@@ -52,7 +52,7 @@ CameraServer* CameraServer::GetInstance() {
     static void* call() { return new CameraServer{}; }
   };
   struct Deleter {
-    static void call(void* ptr) { delete reinterpret_cast<CameraServer*>(ptr); }
+    static void call(void* ptr) { delete static_cast<CameraServer*>(ptr); }
   };
   static wpi::ManagedStatic<CameraServer, Creator, Deleter> instance;
   return &(*instance);
