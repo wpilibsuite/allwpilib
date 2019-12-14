@@ -8,18 +8,17 @@
 #include "hal/AddressableLED.h"
 
 #include <cstring>
+#include <FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h"
 #include "hal/ChipObject.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 
 using namespace hal;
-
 
 namespace {
 struct AddressableLED {
