@@ -33,6 +33,13 @@ class DutyCycleEncoder : public ErrorBase,
                          public SendableHelper<DutyCycleEncoder> {
  public:
   /**
+   * Construct a new DutyCycleEncoder on a specific channel.
+   *
+   * @param channel the channel to attach to
+   */
+  explicit DutyCycleEncoder(int channel);
+
+  /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * @param dutyCycle the duty cycle to attach to

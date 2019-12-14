@@ -54,4 +54,10 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
   public int compareTo(SwerveModuleState o) {
     return Double.compare(this.speedMetersPerSecond, o.speedMetersPerSecond);
   }
+
+  @Override
+  public String toString() {
+    return String.format("SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speedMetersPerSecond,
+        angle);
+  }
 }

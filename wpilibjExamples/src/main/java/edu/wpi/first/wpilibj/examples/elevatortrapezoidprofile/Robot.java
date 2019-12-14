@@ -7,21 +7,18 @@
 
 package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 public class Robot extends TimedRobot {
   private static double kDt = 0.02;
 
   private final Joystick m_joystick = new Joystick(1);
-  private final Encoder m_encoder = new Encoder(1, 2);
-  private final SpeedController m_motor = new PWMVictorSPX(1);
-  private final PIDController m_controller = new PIDController(1.3, 0.0, 0.7, kDt);
+  private final ExampleSmartMotorController m_motor = new ExampleSmartMotorController(1);
+  // Note: These gains are fake, and will have to be tuned for your robot.
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 1.5);
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(1.75, 0.75);
@@ -30,7 +27,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
+    // Note: These gains are fake, and will have to be tuned for your robot.
+    m_motor.setPID(1.3, 0.0, 0.7);
   }
 
   @Override
@@ -50,10 +48,8 @@ public class Robot extends TimedRobot {
     // toward the goal while obeying the constraints.
     m_setpoint = profile.calculate(kDt);
 
-    double output = m_controller.calculate(m_encoder.getDistance(),
-                                           m_setpoint.position);
-
-    // Run controller with profiled setpoint and update motor output
-    m_motor.set(output);
+    // Send setpoint to offboard controller PID
+    m_motor.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition, m_setpoint.position,
+                        m_feedforward.calculate(m_setpoint.velocity) / 12.0);
   }
 }

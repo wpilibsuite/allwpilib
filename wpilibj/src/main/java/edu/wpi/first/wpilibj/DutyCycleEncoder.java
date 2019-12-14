@@ -34,6 +34,16 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   protected SimBoolean m_simIsConnected;
 
   /**
+   * Construct a new DutyCycleEncoder on a specific channel.
+   *
+   * @param channel the channel to attach to
+   */
+  public DutyCycleEncoder(int channel) {
+    m_dutyCycle = new DutyCycle(new DigitalInput(channel));
+    init();
+  }
+
+  /**
    * Construct a new DutyCycleEncoder attached to an existing DutyCycle object.
    *
    * @param dutyCycle the duty cycle to attach to

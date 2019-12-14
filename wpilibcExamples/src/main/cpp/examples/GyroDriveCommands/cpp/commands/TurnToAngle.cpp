@@ -11,12 +11,12 @@
 
 using namespace DriveConstants;
 
-TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
+TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
     : CommandHelper(frc2::PIDController(kTurnP, kTurnI, kTurnD),
                     // Close loop on heading
-                    [drive] { return drive->GetHeading(); },
+                    [drive] { return drive->GetHeading().to<double>(); },
                     // Set reference to target
-                    targetAngleDegrees,
+                    target.to<double>(),
                     // Pipe output to turn robot
                     [drive](double output) { drive->ArcadeDrive(0, output); },
                     // Require the drive
@@ -26,9 +26,10 @@ TurnToAngle::TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive)
   // Set the controller tolerance - the delta tolerance ensures the robot is
   // stationary at the setpoint before it is considered as having reached the
   // reference
-  m_controller.SetTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
+  m_controller.SetTolerance(kTurnTolerance.to<double>(),
+                            kTurnRateTolerance.to<double>());
 
   AddRequirements({drive});
 }
 
-bool TurnToAngle::IsFinished() { return m_controller.AtSetpoint(); }
+bool TurnToAngle::IsFinished() { return GetController().AtSetpoint(); }

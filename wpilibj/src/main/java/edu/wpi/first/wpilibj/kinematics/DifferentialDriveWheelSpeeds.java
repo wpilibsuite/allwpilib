@@ -59,4 +59,10 @@ public class DifferentialDriveWheelSpeeds {
           * attainableMaxSpeedMetersPerSecond;
     }
   }
+
+  @Override
+  public String toString() {
+    return String.format("DifferentialDriveWheelSpeeds(Left: %.2f m/s, Right: %.2f m/s)",
+        leftMetersPerSecond, rightMetersPerSecond);
+  }
 }

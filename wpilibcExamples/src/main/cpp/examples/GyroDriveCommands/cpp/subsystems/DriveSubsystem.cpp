@@ -46,8 +46,9 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
 
-double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1.0 : 1.0);
+units::degree_t DriveSubsystem::GetHeading() {
+  return units::degree_t(std::remainder(m_gyro.GetAngle(), 360) *
+                         (kGyroReversed ? -1.0 : 1.0));
 }
 
 double DriveSubsystem::GetTurnRate() {

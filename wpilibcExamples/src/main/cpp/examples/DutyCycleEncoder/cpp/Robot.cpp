@@ -5,17 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/DigitalInput.h>
-#include <frc/DutyCycle.h>
 #include <frc/DutyCycleEncoder.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 class Robot : public frc::TimedRobot {
-  frc::DigitalInput m_input{0};  // Input channel
-
-  // Duty cycle encoder
-  frc::DutyCycleEncoder m_dutyCycleEncoder{m_input};
+  // Duty cycle encoder on channel 0
+  frc::DutyCycleEncoder m_dutyCycleEncoder{0};
 
  public:
   void RobotInit() override {
