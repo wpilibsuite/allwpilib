@@ -9,9 +9,9 @@
 
 #include <frc/RobotState.h>
 #include <frc/WPIErrors.h>
+#include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
-#include <frc/livewindow/LiveWindow.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
