@@ -70,13 +70,11 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 CommandScheduler::CommandScheduler() : m_impl(new Impl) {
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
   auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = [this]{
+  scheduler->enabled = [this] {
     this->Disable();
     this->CancelAll();
   };
-  scheduler->disabled = [this]{
-    this->Enable();
-  };
+  scheduler->disabled = [this] { this->Enable(); };
 }
 
 CommandScheduler::~CommandScheduler() {
