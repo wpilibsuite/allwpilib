@@ -8,6 +8,7 @@
 #include "hal/AddressableLED.h"
 
 #include <cstring>
+
 #include <FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h>
 
 #include "ConstantsInternal.h"
@@ -44,7 +45,6 @@ void InitializeAddressableLED() {
 }
 }  // namespace init
 }  // namespace hal
-
 
 extern "C" {
 
