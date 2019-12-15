@@ -30,7 +30,7 @@ static wpi::mutex* getManagedStaticMutex() {
   return ManagedStaticMutex;
 }
 
-void ManagedStaticBase::RegisterManagedStatic(void * created,
+void ManagedStaticBase::RegisterManagedStatic(void* created,
                                               void (*Deleter)(void*)) const {
   std::scoped_lock Lock(*getManagedStaticMutex());
 
