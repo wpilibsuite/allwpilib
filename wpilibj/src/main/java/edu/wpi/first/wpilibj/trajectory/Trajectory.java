@@ -66,7 +66,7 @@ public class Trajectory {
    * @return The initial pose of the trajectory.
    */
   public Pose2d getInitialPose() {
-      return sample(0).poseMeters;
+    return sample(0).poseMeters;
   }
 
   /**
