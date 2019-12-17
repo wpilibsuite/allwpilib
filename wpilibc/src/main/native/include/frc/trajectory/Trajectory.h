@@ -110,7 +110,7 @@ class Trajectory {
    *
    * @return The initial pose of the trajectory.
    */
-  const Pose2d& InitialPose() const { return Sample(0_s).pose; }
+  Pose2d InitialPose() const { return Sample(0_s).pose; }
 
  private:
   std::vector<State> m_states;
