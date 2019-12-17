@@ -59,6 +59,15 @@ public class Trajectory {
   private static Pose2d lerp(Pose2d startValue, Pose2d endValue, double t) {
     return startValue.plus((endValue.minus(startValue)).times(t));
   }
+  
+  /**
+   * Returns the initial pose of the trajectory.
+   *
+   * @return The initial pose of the trajectory.
+   */
+  public Pose2d getInitialPose() {
+      return sample(0).poseMeters;
+  }
 
   /**
    * Returns the overall duration of the trajectory.
