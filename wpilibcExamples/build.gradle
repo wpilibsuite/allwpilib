@@ -222,6 +222,25 @@ model {
 }
 apply from: 'publish.gradle'
 
+model {
+    tasks {
+        def c = $.components
+        project.tasks.register('buildDesktopCpp') { compileTask->
+            def systemArch = getCurrentArch()
+            c.each {
+                if (it in NativeExecutableSpec && it.name) {
+                    it.binaries.each {
+                        def arch = it.targetPlatform.name
+                        if (arch == systemArch && it.buildType.name == 'debug') {
+                            compileTask.dependsOn it.tasks.link
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 ext {
     templateDirectory = new File("$projectDir/src/main/cpp/templates/")
     templateFile = new File("$projectDir/src/main/cpp/templates/templates.json")

@@ -170,3 +170,5 @@ test {
         showStandardStreams = true
     }
 }
+
+apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"

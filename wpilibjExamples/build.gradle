@@ -39,6 +39,10 @@ gradle.projectsEvaluated {
     }
 }
 
+tasks.register('buildDesktopJava') {
+    it.dependsOn tasks.withType(JavaCompile)
+}
+
 apply from: 'publish.gradle'
 
 ext {
