@@ -14,7 +14,7 @@
 class Robot : public frc::TimedRobot {
   static constexpr int kLength = 60;
 
-  // PWM port 0
+  // PWM port 9
   // Must be a PWM header, not MXP or DIO
   frc::AddressableLED m_led{9};
   std::array<frc::AddressableLED::LEDData, kLength>

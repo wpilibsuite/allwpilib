@@ -24,9 +24,18 @@ static void DisplayAnalogInputs() {
   bool hasInputs = false;
   static int numAnalog = HAL_GetNumAnalogInputs();
   static int numAccum = HAL_GetNumAccumulators();
+  bool first = true;
   for (int i = 0; i < numAnalog; ++i) {
     if (HALSIM_GetAnalogInInitialized(i)) {
       hasInputs = true;
+
+      if (!first) {
+        ImGui::Spacing();
+        ImGui::Spacing();
+      } else {
+        first = false;
+      }
+
       char name[32];
       std::snprintf(name, sizeof(name), "In[%d]", i);
       if (i < numAccum && HALSIM_GetAnalogGyroInitialized(i)) {

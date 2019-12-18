@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngle;
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngleProfiled;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
@@ -85,6 +86,10 @@ public class RobotContainer {
     // Turn to 90 degrees when the 'X' button is pressed, with a 5 second timeout
     new JoystickButton(m_driverController, Button.kX.value)
         .whenPressed(new TurnToAngle(90, m_robotDrive).withTimeout(5));
+
+    // Turn to -90 degrees with a profile when the 'A' button is pressed, with a 5 second timeout
+    new JoystickButton(m_driverController, Button.kA.value)
+        .whenPressed(new TurnToAngleProfiled(-90, m_robotDrive).withTimeout(5));
   }
 
 

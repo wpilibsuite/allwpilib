@@ -22,7 +22,7 @@ public class SwerveDriveKinematicsConstraint implements TrajectoryConstraint {
   private final SwerveDriveKinematics m_kinematics;
 
   /**
-   * Constructs a mecanum drive dynamics constraint.
+   * Constructs a swerve drive dynamics constraint.
    *
    * @param maxSpeedMetersPerSecond The max speed that a side of the robot can travel at.
    */
