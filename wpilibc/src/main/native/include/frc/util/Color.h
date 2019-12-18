@@ -58,7 +58,7 @@ class Color {
 
   /**
    * #7FFFD4.
-    */
+   */
   static const Color kAquamarine;
 
   /**
@@ -838,7 +838,8 @@ constexpr Color Color::kLemonChiffon{1.0f, 0.98039216f, 0.8039216f};
 constexpr Color Color::kLightBlue{0.6784314f, 0.84705883f, 0.9019608f};
 constexpr Color Color::kLightCoral{0.9411765f, 0.5019608f, 0.5019608f};
 constexpr Color Color::kLightCyan{0.8784314f, 1.0f, 1.0f};
-constexpr Color Color::kLightGoldenrodYellow{0.98039216f, 0.98039216f, 0.8235294f};
+constexpr Color Color::kLightGoldenrodYellow{0.98039216f, 0.98039216f,
+                                             0.8235294f};
 constexpr Color Color::kLightGray{0.827451f, 0.827451f, 0.827451f};
 constexpr Color Color::kLightGreen{0.5647059f, 0.93333334f, 0.5647059f};
 constexpr Color Color::kLightPink{1.0f, 0.7137255f, 0.75686276f};

@@ -9,4 +9,5 @@
 
 using namespace frc;
 
-constexpr Color::Color(Color8Bit color) : red(color.red / 255), green(color.green / 255), blue(color.blue / 255) {}
+constexpr Color::Color(Color8Bit color)
+    : red(color.red / 255), green(color.green / 255), blue(color.blue / 255) {}
