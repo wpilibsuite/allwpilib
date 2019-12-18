@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
  * Buffer storage for Addressable LEDs.
@@ -84,13 +85,26 @@ public class AddressableLEDBuffer {
     }
   }
 
-  /*
+  /**
    * Sets a specific LED in the buffer.
    *
    * @param index The index to write
    * @param color The color of the LED
    */
   public void setLED(int index, Color color) {
+    setRGB(index,
+        (int) (color.red * 255),
+        (int) (color.green * 255),
+        (int) (color.blue * 255));
+  }
+
+  /**
+   * Sets a specific LED in the buffer.
+   *
+   * @param index The index to write
+   * @param color The color of the LED
+   */
+  public void setLED(int index, Color8Bit color) {
     setRGB(index, color.red, color.green, color.blue);
   }
 

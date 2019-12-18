@@ -7,322 +7,909 @@
 
 #pragma once
 
+#include "Color8Bit.h"
+
 namespace frc {
+
+class Color8Bit;
 
 /**
  * Represents colors that can be used with Addressable LEDs.
  */
 class Color {
  public:
+  /*
+   * FIRST Colors
+   */
+
+  /**
+   * #1560BD.
+   */
+  static const Color kDenim;
+
+  /**
+   * #0066B3.
+   */
+  static const Color kFirstBlue;
+
+  /**
+   * #ED1C24.
+   */
+  static const Color kFirstRed;
+
+  /*
+   * Standard Colors
+   */
+
+  /**
+   * #F0F8FF.
+   */
+  static const Color kAliceBlue;
+
+  /**
+   * #FAEBD7.
+   */
+  static const Color kAntiqueWhite;
+
+  /**
+   * #00FFFF.
+   */
+  static const Color kAqua;
+
+  /**
+   * #7FFFD4.
+    */
+  static const Color kAquamarine;
+
+  /**
+   * #F0FFFF.
+   */
+  static const Color kAzure;
+
+  /**
+   * #F5F5DC.
+   */
+  static const Color kBeige;
+
+  /**
+   * #FFE4C4.
+   */
+  static const Color kBisque;
+
+  /**
+   * #000000.
+   */
+  static const Color kBlack;
+
+  /**
+   * #FFEBCD.
+   */
+  static const Color kBlanchedAlmond;
+
+  /**
+   * #0000FF.
+   */
+  static const Color kBlue;
+
+  /**
+   * #8A2BE2.
+   */
+  static const Color kBlueViolet;
+
+  /**
+   * #A52A2A.
+   */
+  static const Color kBrown;
+
+  /**
+   * #DEB887.
+   */
+  static const Color kBurlywood;
+
+  /**
+   * #5F9EA0.
+   */
+  static const Color kCadetBlue;
+
+  /**
+   * #7FFF00.
+   */
+  static const Color kChartreuse;
+
+  /**
+   * #D2691E.
+   */
+  static const Color kChocolate;
+
+  /**
+   * #FF7F50.
+   */
+  static const Color kCoral;
+
+  /**
+   * #6495ED.
+   */
+  static const Color kCornflowerBlue;
+
+  /**
+   * #FFF8DC.
+   */
+  static const Color kCornsilk;
+
+  /**
+   * #DC143C.
+   */
+  static const Color kCrimson;
+
+  /**
+   * #00FFFF.
+   */
+  static const Color kCyan;
+
+  /**
+   * #00008B.
+   */
+  static const Color kDarkBlue;
+
+  /**
+   * #008B8B.
+   */
+  static const Color kDarkCyan;
+
+  /**
+   * #B8860B.
+   */
+  static const Color kDarkGoldenrod;
+
+  /**
+   * #A9A9A9.
+   */
+  static const Color kDarkGray;
+
+  /**
+   * #006400.
+   */
+  static const Color kDarkGreen;
+
+  /**
+   * #BDB76B.
+   */
+  static const Color kDarkKhaki;
+
+  /**
+   * #8B008B.
+   */
+  static const Color kDarkMagenta;
+
+  /**
+   * #556B2F.
+   */
+  static const Color kDarkOliveGreen;
+
+  /**
+   * #FF8C00.
+   */
+  static const Color kDarkOrange;
+
+  /**
+   * #9932CC.
+   */
+  static const Color kDarkOrchid;
+
+  /**
+   * #8B0000.
+   */
+  static const Color kDarkRed;
+
+  /**
+   * #E9967A.
+   */
+  static const Color kDarkSalmon;
+
+  /**
+   * #8FBC8F.
+   */
+  static const Color kDarkSeaGreen;
+
+  /**
+   * #483D8B.
+   */
+  static const Color kDarkSlateBlue;
+
+  /**
+   * #2F4F4F.
+   */
+  static const Color kDarkSlateGray;
+
+  /**
+   * #00CED1.
+   */
+  static const Color kDarkTurquoise;
+
+  /**
+   * #9400D3.
+   */
+  static const Color kDarkViolet;
+
+  /**
+   * #FF1493.
+   */
+  static const Color kDeepPink;
+
+  /**
+   * #00BFFF.
+   */
+  static const Color kDeepSkyBlue;
+
+  /**
+   * #696969.
+   */
+  static const Color kDimGray;
+
+  /**
+   * #1E90FF.
+   */
+  static const Color kDodgerBlue;
+
+  /**
+   * #B22222.
+   */
+  static const Color kFirebrick;
+
+  /**
+   * #FFFAF0.
+   */
+  static const Color kFloralWhite;
+
+  /**
+   * #228B22.
+   */
+  static const Color kForestGreen;
+
+  /**
+   * #FF00FF.
+   */
+  static const Color kFuchsia;
+
+  /**
+   * #DCDCDC.
+   */
+  static const Color kGainsboro;
+
+  /**
+   * #F8F8FF.
+   */
+  static const Color kGhostWhite;
+
+  /**
+   * #FFD700.
+   */
+  static const Color kGold;
+
+  /**
+   * #DAA520.
+   */
+  static const Color kGoldenrod;
+
+  /**
+   * #808080.
+   */
+  static const Color kGray;
+
+  /**
+   * #008000.
+   */
+  static const Color kGreen;
+
+  /**
+   * #ADFF2F.
+   */
+  static const Color kGreenYellow;
+
+  /**
+   * #F0FFF0.
+   */
+  static const Color kHoneydew;
+
+  /**
+   * #FF69B4.
+   */
+  static const Color kHotPink;
+
+  /**
+   * #CD5C5C.
+   */
+  static const Color kIndianRed;
+
+  /**
+   * #4B0082.
+   */
+  static const Color kIndigo;
+
+  /**
+   * #FFFFF0.
+   */
+  static const Color kIvory;
+
+  /**
+   * #F0E68C.
+   */
+  static const Color kKhaki;
+
+  /**
+   * #E6E6FA.
+   */
+  static const Color kLavender;
+
+  /**
+   * #FFF0F5.
+   */
+  static const Color kLavenderBlush;
+
+  /**
+   * #7CFC00.
+   */
+  static const Color kLawnGreen;
+
+  /**
+   * #FFFACD.
+   */
+  static const Color kLemonChiffon;
+
+  /**
+   * #ADD8E6.
+   */
+  static const Color kLightBlue;
+
+  /**
+   * #F08080.
+   */
+  static const Color kLightCoral;
+
+  /**
+   * #E0FFFF.
+   */
+  static const Color kLightCyan;
+
+  /**
+   * #FAFAD2.
+   */
+  static const Color kLightGoldenrodYellow;
+
+  /**
+   * #D3D3D3.
+   */
+  static const Color kLightGray;
+
+  /**
+   * #90EE90.
+   */
+  static const Color kLightGreen;
+
+  /**
+   * #FFB6C1.
+   */
+  static const Color kLightPink;
+
+  /**
+   * #FFA07A.
+   */
+  static const Color kLightSalmon;
+
+  /**
+   * #20B2AA.
+   */
+  static const Color kLightSeagGeen;
+
+  /**
+   * #87CEFA.
+   */
+  static const Color kLightSkyBlue;
+
+  /**
+   * #778899.
+   */
+  static const Color kLightSlateGray;
+
+  /**
+   * #B0C4DE.
+   */
+  static const Color kLightSteellue;
+
+  /**
+   * #FFFFE0.
+   */
+  static const Color kLightYellow;
+
+  /**
+   * #00FF00.
+   */
+  static const Color kLime;
+
+  /**
+   * #32CD32.
+   */
+  static const Color kLimeGreen;
+
+  /**
+   * #FAF0E6.
+   */
+  static const Color kLinen;
+
+  /**
+   * #FF00FF.
+   */
+  static const Color kMagenta;
+
+  /**
+   * #800000.
+   */
+  static const Color kMaroon;
+
+  /**
+   * #66CDAA.
+   */
+  static const Color kMediumAquamarine;
+
+  /**
+   * #0000CD.
+   */
+  static const Color kMediumBlue;
+
+  /**
+   * #BA55D3.
+   */
+  static const Color kMediumOrchid;
+
+  /**
+   * #9370DB.
+   */
+  static const Color kMediumPurple;
+
+  /**
+   * #3CB371.
+   */
+  static const Color kMediumSeaGreen;
+
+  /**
+   * #7B68EE.
+   */
+  static const Color kMediumSlateBlue;
+
+  /**
+   * #00FA9A.
+   */
+  static const Color kMediumSpringGreen;
+
+  /**
+   * #48D1CC.
+   */
+  static const Color kMediumTurquoise;
+
+  /**
+   * #C71585.
+   */
+  static const Color kMediumVioletRed;
+
+  /**
+   * #191970.
+   */
+  static const Color kMidnightBlue;
+
+  /**
+   * #F5FFFA.
+   */
+  static const Color kMintcream;
+
+  /**
+   * #FFE4E1.
+   */
+  static const Color kMistyRose;
+
+  /**
+   * #FFE4B5.
+   */
+  static const Color kMoccasin;
+
+  /**
+   * #FFDEAD.
+   */
+  static const Color kNavajoWhite;
+
+  /**
+   * #000080.
+   */
+  static const Color kNavy;
+
+  /**
+   * #FDF5E6.
+   */
+  static const Color kOldLace;
+
+  /**
+   * #808000.
+   */
+  static const Color kOlive;
+
+  /**
+   * #6B8E23.
+   */
+  static const Color kOliveDrab;
+
+  /**
+   * #FFA500.
+   */
+  static const Color kOrange;
+
+  /**
+   * #FF4500.
+   */
+  static const Color kOrangeRed;
+
+  /**
+   * #DA70D6.
+   */
+  static const Color kOrchid;
+
+  /**
+   * #EEE8AA.
+   */
+  static const Color kPaleGoldenrod;
+
+  /**
+   * #98FB98.
+   */
+  static const Color kPaleGreen;
+
+  /**
+   * #AFEEEE.
+   */
+  static const Color kPaleTurquoise;
+
+  /**
+   * #DB7093.
+   */
+  static const Color kPaleVioletRed;
+
+  /**
+   * #FFEFD5.
+   */
+  static const Color kPapayaWhip;
+
+  /**
+   * #FFDAB9.
+   */
+  static const Color kPeachPuff;
+
+  /**
+   * #CD853F.
+   */
+  static const Color kPeru;
+
+  /**
+   * #FFC0CB.
+   */
+  static const Color kPink;
+
+  /**
+   * #DDA0DD.
+   */
+  static const Color kPlum;
+
+  /**
+   * #B0E0E6.
+   */
+  static const Color kPowderBlue;
+
+  /**
+   * #800080.
+   */
+  static const Color kPurple;
+
+  /**
+   * #FF0000.
+   */
+  static const Color kRed;
+
+  /**
+   * #BC8F8F.
+   */
+  static const Color kRosyBrown;
+
+  /**
+   * #4169E1.
+   */
+  static const Color kRoyalBlue;
+
+  /**
+   * #8B4513.
+   */
+  static const Color kSaddleBrown;
+
+  /**
+   * #FA8072.
+   */
+  static const Color kSalmon;
+
+  /**
+   * #F4A460.
+   */
+  static const Color kSandyBrown;
+
+  /**
+   * #2E8B57.
+   */
+  static const Color kSeaGreen;
+
+  /**
+   * #FFF5EE.
+   */
+  static const Color kSeashell;
+
+  /**
+   * #A0522D.
+   */
+  static const Color kSienna;
+
+  /**
+   * #C0C0C0.
+   */
+  static const Color kSilver;
+
+  /**
+   * #87CEEB.
+   */
+  static const Color kSkyBlue;
+
+  /**
+   * #6A5ACD.
+   */
+  static const Color kSlateBlue;
+
+  /**
+   * #708090.
+   */
+  static const Color kSlateGray;
+
+  /**
+   * #FFFAFA.
+   */
+  static const Color kSnow;
+
+  /**
+   * #00FF7F.
+   */
+  static const Color kSpringGreen;
+
+  /**
+   * #4682B4.
+   */
+  static const Color kSteelBlue;
+
+  /**
+   * #D2B48C.
+   */
+  static const Color kTan;
+
+  /**
+   * #008080.
+   */
+  static const Color kTeal;
+
+  /**
+   * #D8BFD8.
+   */
+  static const Color kThistle;
+
+  /**
+   * #FF6347.
+   */
+  static const Color kTomato;
+
+  /**
+   * #40E0D0.
+   */
+  static const Color kTurquoise;
+
+  /**
+   * #EE82EE.
+   */
+  static const Color kViolet;
+
+  /**
+   * #F5DEB3.
+   */
+  static const Color kWheat;
+
+  /**
+   * #FFFFFF.
+   */
+  static const Color kWhite;
+
+  /**
+   * #F5F5F5.
+   */
+  static const Color kWhiteSmoke;
+
+  /**
+   * #FFFF00.
+   */
+  static const Color kYellow;
+
+  /**
+   * #9ACD32.
+   */
+  static const Color kYellowGreen;
+
   /**
    * Constructs a Color.
    *
-   * @param red Red value (0-255)
-   * @param green Green value (0-255)
-   * @param blue Blue value (0-255)
+   * @param red Red value (0-1)
+   * @param green Green value (0-1)
+   * @param blue Blue value (0-1)
    */
-  constexpr Color(int r, int g, int b) : red(r), green(g), blue(b) {}
+  constexpr Color(double r, double g, double b) : red(r), green(g), blue(b) {}
 
-  static const Color kAliceBlue;
-  static const Color kAntiqueWhite;
-  static const Color kAqua;
-  static const Color kAquamarine;
-  static const Color kAzure;
-  static const Color kBeige;
-  static const Color kBisque;
-  static const Color kBlack;
-  static const Color kBlanchedAlmond;
-  static const Color kBlue;
-  static const Color kBlueViolet;
-  static const Color kBrown;
-  static const Color kBurlywood;
-  static const Color kCadetBlue;
-  static const Color kChartreuse;
-  static const Color kChocolate;
-  static const Color kCoral;
-  static const Color kCornflowerBlue;
-  static const Color kCornsilk;
-  static const Color kCrimson;
-  static const Color kCyan;
-  static const Color kDarkBlue;
-  static const Color kDarkCyan;
-  static const Color kDarkGoldenrod;
-  static const Color kDarkGray;
-  static const Color kDarkGreen;
-  static const Color kDarkGrey;
-  static const Color kDarkKhaki;
-  static const Color kDarkMagenta;
-  static const Color kDarkOliveGreen;
-  static const Color kDarkOrange;
-  static const Color kDarkOrchid;
-  static const Color kDarkRed;
-  static const Color kDarkSalmon;
-  static const Color kDarkSeaGreen;
-  static const Color kDarkSlateBlue;
-  static const Color kDarkSlateGray;
-  static const Color kDarkSlateGrey;
-  static const Color kDarkTurquoise;
-  static const Color kDarkViolet;
-  static const Color kDeepPink;
-  static const Color kDeepSkyBlue;
-  static const Color kDenim;
-  static const Color kDimGray;
-  static const Color kDimGrey;
-  static const Color kDodgerBlue;
-  static const Color kFirebrick;
-  static const Color kFloralWhite;
-  static const Color kForestGreen;
-  static const Color kFuchsia;
-  static const Color kGainsboro;
-  static const Color kGhostWhite;
-  static const Color kGold;
-  static const Color kGoldenrod;
-  static const Color kGray;
-  static const Color kGreen;
-  static const Color kGreenYellow;
-  static const Color kGrey;
-  static const Color kHoneydew;
-  static const Color kHotPink;
-  static const Color kIndianRed;
-  static const Color kIndigo;
-  static const Color kIvory;
-  static const Color kKhaki;
-  static const Color kLavender;
-  static const Color kLavenderBlush;
-  static const Color kLawnGreen;
-  static const Color kLemonChiffon;
-  static const Color kLightBlue;
-  static const Color kLightCoral;
-  static const Color kLightCyan;
-  static const Color kLightGoldenrodYellow;
-  static const Color kLightGray;
-  static const Color kLightGreen;
-  static const Color kLightGrey;
-  static const Color kLightPink;
-  static const Color kLightSalmon;
-  static const Color kLightSeagGeen;
-  static const Color kLightSkyBlue;
-  static const Color kLightSlateGray;
-  static const Color kLightSlateGrey;
-  static const Color kLightSteellue;
-  static const Color kLightYellow;
-  static const Color kLime;
-  static const Color kLimeGreen;
-  static const Color kLinen;
-  static const Color kMagenta;
-  static const Color kMaroon;
-  static const Color kMediumAquamarine;
-  static const Color kMediumBlue;
-  static const Color kMediumOrchid;
-  static const Color kMediumPurple;
-  static const Color kMediumSeaGreen;
-  static const Color kMediumSlateBlue;
-  static const Color kMediumSpringGreen;
-  static const Color kMediumTurquoise;
-  static const Color kMediumVioletRed;
-  static const Color kMidnightBlue;
-  static const Color kMintcream;
-  static const Color kMistyRose;
-  static const Color kMoccasin;
-  static const Color kNavajoWhite;
-  static const Color kNavy;
-  static const Color kOldlace;
-  static const Color kOlive;
-  static const Color kOliveDrab;
-  static const Color kOrange;
-  static const Color kOrangeRed;
-  static const Color kOrchid;
-  static const Color kPaleGoldenrod;
-  static const Color kPaleGreen;
-  static const Color kPaleTurquoise;
-  static const Color kPaleVioletRed;
-  static const Color kPapayaWhip;
-  static const Color kPeachpuff;
-  static const Color kPeru;
-  static const Color kPink;
-  static const Color kPlum;
-  static const Color kPowderBlue;
-  static const Color kPurple;
-  static const Color kRed;
-  static const Color kRosyBrown;
-  static const Color kRoyalBlue;
-  static const Color kSaddleBrown;
-  static const Color kSalmon;
-  static const Color kSandyBrown;
-  static const Color kSeaGreen;
-  static const Color kSeashell;
-  static const Color kSienna;
-  static const Color kSilver;
-  static const Color kSkyBlue;
-  static const Color kSlateBlue;
-  static const Color kSlateGray;
-  static const Color kSlateGrey;
-  static const Color kSnow;
-  static const Color kSpringGreen;
-  static const Color kSteelBlue;
-  static const Color kTan;
-  static const Color kTeal;
-  static const Color kThistle;
-  static const Color kTomato;
-  static const Color kTurquoise;
-  static const Color kViolet;
-  static const Color kWheat;
-  static const Color kWhite;
-  static const Color kWhiteSmoke;
-  static const Color kYellow;
-  static const Color kYellowGreen;
+  /**
+   * Constructs a Color from a Color8Bit.
+   *
+   * @param color The color
+   */
+  constexpr Color(Color8Bit color);
 
-  int red;
-  int green;
-  int blue;
+  double red;
+  double green;
+  double blue;
 };
 
-constexpr Color Color::kAliceBlue{240, 248, 255};
-constexpr Color Color::kAntiqueWhite{250, 235, 215};
-constexpr Color Color::kAqua{0, 255, 255};
-constexpr Color Color::kAquamarine{127, 255, 212};
-constexpr Color Color::kAzure{240, 255, 255};
-constexpr Color Color::kBeige{245, 245, 220};
-constexpr Color Color::kBisque{255, 228, 196};
-constexpr Color Color::kBlack{0, 0, 0};
-constexpr Color Color::kBlanchedAlmond{255, 235, 205};
-constexpr Color Color::kBlue{0, 0, 255};
-constexpr Color Color::kBlueViolet{138, 43, 226};
-constexpr Color Color::kBrown{165, 42, 42};
-constexpr Color Color::kBurlywood{222, 184, 135};
-constexpr Color Color::kCadetBlue{95, 158, 160};
-constexpr Color Color::kChartreuse{127, 255, 0};
-constexpr Color Color::kChocolate{210, 105, 30};
-constexpr Color Color::kCoral{255, 127, 80};
-constexpr Color Color::kCornflowerBlue{100, 149, 237};
-constexpr Color Color::kCornsilk{255, 248, 220};
-constexpr Color Color::kCrimson{220, 20, 60};
-constexpr Color Color::kCyan{0, 255, 255};
-constexpr Color Color::kDarkBlue{0, 0, 139};
-constexpr Color Color::kDarkCyan{0, 139, 139};
-constexpr Color Color::kDarkGoldenrod{184, 134, 11};
-constexpr Color Color::kDarkGray{169, 169, 169};
-constexpr Color Color::kDarkGreen{0, 100, 0};
-constexpr Color Color::kDarkGrey{169, 169, 169};
-constexpr Color Color::kDarkKhaki{189, 183, 107};
-constexpr Color Color::kDarkMagenta{139, 0, 139};
-constexpr Color Color::kDarkOliveGreen{85, 107, 47};
-constexpr Color Color::kDarkOrange{255, 140, 0};
-constexpr Color Color::kDarkOrchid{153, 50, 204};
-constexpr Color Color::kDarkRed{139, 0, 0};
-constexpr Color Color::kDarkSalmon{233, 150, 122};
-constexpr Color Color::kDarkSeaGreen{143, 188, 143};
-constexpr Color Color::kDarkSlateBlue{72, 61, 139};
-constexpr Color Color::kDarkSlateGray{47, 79, 79};
-constexpr Color Color::kDarkSlateGrey{47, 79, 79};
-constexpr Color Color::kDarkTurquoise{0, 206, 209};
-constexpr Color Color::kDarkViolet{148, 0, 211};
-constexpr Color Color::kDeepPink{255, 20, 147};
-constexpr Color Color::kDeepSkyBlue{0, 191, 255};
-constexpr Color Color::kDenim{21, 96, 189};
-constexpr Color Color::kDimGray{105, 105, 105};
-constexpr Color Color::kDimGrey{105, 105, 105};
-constexpr Color Color::kDodgerBlue{30, 144, 255};
-constexpr Color Color::kFirebrick{178, 34, 34};
-constexpr Color Color::kFloralWhite{255, 250, 240};
-constexpr Color Color::kForestGreen{34, 139, 34};
-constexpr Color Color::kFuchsia{255, 0, 255};
-constexpr Color Color::kGainsboro{220, 220, 220};
-constexpr Color Color::kGhostWhite{248, 248, 255};
-constexpr Color Color::kGold{255, 215, 0};
-constexpr Color Color::kGoldenrod{218, 165, 32};
-constexpr Color Color::kGray{128, 128, 128};
-constexpr Color Color::kGreen{0, 128, 0};
-constexpr Color Color::kGreenYellow{173, 255, 47};
-constexpr Color Color::kGrey{128, 128, 128};
-constexpr Color Color::kHoneydew{240, 255, 240};
-constexpr Color Color::kHotPink{255, 105, 180};
-constexpr Color Color::kIndianRed{205, 92, 92};
-constexpr Color Color::kIndigo{75, 0, 130};
-constexpr Color Color::kIvory{255, 255, 240};
-constexpr Color Color::kKhaki{240, 230, 140};
-constexpr Color Color::kLavender{230, 230, 250};
-constexpr Color Color::kLavenderBlush{255, 240, 245};
-constexpr Color Color::kLawnGreen{124, 252, 0};
-constexpr Color Color::kLemonChiffon{255, 250, 205};
-constexpr Color Color::kLightBlue{173, 216, 230};
-constexpr Color Color::kLightCoral{240, 128, 128};
-constexpr Color Color::kLightCyan{224, 255, 255};
-constexpr Color Color::kLightGoldenrodYellow{250, 250, 210};
-constexpr Color Color::kLightGray{211, 211, 211};
-constexpr Color Color::kLightGreen{144, 238, 144};
-constexpr Color Color::kLightGrey{211, 211, 211};
-constexpr Color Color::kLightPink{255, 182, 193};
-constexpr Color Color::kLightSalmon{255, 160, 122};
-constexpr Color Color::kLightSeagGeen{32, 178, 170};
-constexpr Color Color::kLightSkyBlue{135, 206, 250};
-constexpr Color Color::kLightSlateGray{119, 136, 153};
-constexpr Color Color::kLightSlateGrey{119, 136, 153};
-constexpr Color Color::kLightSteellue{176, 196, 222};
-constexpr Color Color::kLightYellow{255, 255, 224};
-constexpr Color Color::kLime{0, 255, 0};
-constexpr Color Color::kLimeGreen{50, 205, 50};
-constexpr Color Color::kLinen{250, 240, 230};
-constexpr Color Color::kMagenta{255, 0, 255};
-constexpr Color Color::kMaroon{128, 0, 0};
-constexpr Color Color::kMediumAquamarine{102, 205, 170};
-constexpr Color Color::kMediumBlue{0, 0, 205};
-constexpr Color Color::kMediumOrchid{186, 85, 211};
-constexpr Color Color::kMediumPurple{147, 112, 219};
-constexpr Color Color::kMediumSeaGreen{60, 179, 113};
-constexpr Color Color::kMediumSlateBlue{123, 104, 238};
-constexpr Color Color::kMediumSpringGreen{0, 250, 154};
-constexpr Color Color::kMediumTurquoise{72, 209, 204};
-constexpr Color Color::kMediumVioletRed{199, 21, 133};
-constexpr Color Color::kMidnightBlue{25, 25, 112};
-constexpr Color Color::kMintcream{245, 255, 250};
-constexpr Color Color::kMistyRose{255, 228, 225};
-constexpr Color Color::kMoccasin{255, 228, 181};
-constexpr Color Color::kNavajoWhite{255, 222, 173};
-constexpr Color Color::kNavy{0, 0, 128};
-constexpr Color Color::kOldlace{253, 245, 230};
-constexpr Color Color::kOlive{128, 128, 0};
-constexpr Color Color::kOliveDrab{107, 142, 35};
-constexpr Color Color::kOrange{255, 165, 0};
-constexpr Color Color::kOrangeRed{255, 69, 0};
-constexpr Color Color::kOrchid{218, 112, 214};
-constexpr Color Color::kPaleGoldenrod{238, 232, 170};
-constexpr Color Color::kPaleGreen{152, 251, 152};
-constexpr Color Color::kPaleTurquoise{175, 238, 238};
-constexpr Color Color::kPaleVioletRed{219, 112, 147};
-constexpr Color Color::kPapayaWhip{255, 239, 213};
-constexpr Color Color::kPeachpuff{255, 218, 185};
-constexpr Color Color::kPeru{205, 133, 63};
-constexpr Color Color::kPink{255, 192, 203};
-constexpr Color Color::kPlum{221, 160, 221};
-constexpr Color Color::kPowderBlue{176, 224, 230};
-constexpr Color Color::kPurple{128, 0, 128};
-constexpr Color Color::kRed{255, 0, 0};
-constexpr Color Color::kRosyBrown{188, 143, 143};
-constexpr Color Color::kRoyalBlue{65, 105, 225};
-constexpr Color Color::kSaddleBrown{139, 69, 19};
-constexpr Color Color::kSalmon{250, 128, 114};
-constexpr Color Color::kSandyBrown{244, 164, 96};
-constexpr Color Color::kSeaGreen{46, 139, 87};
-constexpr Color Color::kSeashell{255, 245, 238};
-constexpr Color Color::kSienna{160, 82, 45};
-constexpr Color Color::kSilver{192, 192, 192};
-constexpr Color Color::kSkyBlue{135, 206, 235};
-constexpr Color Color::kSlateBlue{106, 90, 205};
-constexpr Color Color::kSlateGray{112, 128, 144};
-constexpr Color Color::kSlateGrey{112, 128, 144};
-constexpr Color Color::kSnow{255, 250, 250};
-constexpr Color Color::kSpringGreen{0, 255, 127};
-constexpr Color Color::kSteelBlue{70, 130, 180};
-constexpr Color Color::kTan{210, 180, 140};
-constexpr Color Color::kTeal{0, 128, 128};
-constexpr Color Color::kThistle{216, 191, 216};
-constexpr Color Color::kTomato{255, 99, 71};
-constexpr Color Color::kTurquoise{64, 224, 208};
-constexpr Color Color::kViolet{238, 130, 238};
-constexpr Color Color::kWheat{245, 222, 179};
-constexpr Color Color::kWhite{255, 255, 255};
-constexpr Color Color::kWhiteSmoke{245, 245, 245};
-constexpr Color Color::kYellow{255, 255, 0};
-constexpr Color Color::kYellowGreen{154, 205, 50};
+/*
+ * FIRST Colors
+ */
+constexpr Color Color::kDenim{0.0823529412, 0.376470589, 0.7411764706};
+constexpr Color Color::kFirstBlue{0.0, 0.4, 0.7019607844};
+constexpr Color Color::kFirstRed{0.9294117648, 0.1098039216, 0.1411764706};
+
+/*
+ * Standard Colors
+ */
+constexpr Color Color::kAliceBlue{0.9411765f, 0.972549f, 1.0f};
+constexpr Color Color::kAntiqueWhite{0.98039216f, 0.92156863f, 0.84313726f};
+constexpr Color Color::kAqua{0.0f, 1.0f, 1.0f};
+constexpr Color Color::kAquamarine{0.49803922f, 1.0f, 0.83137256f};
+constexpr Color Color::kAzure{0.9411765f, 1.0f, 1.0f};
+constexpr Color Color::kBeige{0.9607843f, 0.9607843f, 0.8627451f};
+constexpr Color Color::kBisque{1.0f, 0.89411765f, 0.76862746f};
+constexpr Color Color::kBlack{0.0f, 0.0f, 0.0f};
+constexpr Color Color::kBlanchedAlmond{1.0f, 0.92156863f, 0.8039216f};
+constexpr Color Color::kBlue{0.0f, 0.0f, 1.0f};
+constexpr Color Color::kBlueViolet{0.5411765f, 0.16862746f, 0.8862745f};
+constexpr Color Color::kBrown{0.64705884f, 0.16470589f, 0.16470589f};
+constexpr Color Color::kBurlywood{0.87058824f, 0.72156864f, 0.5294118f};
+constexpr Color Color::kCadetBlue{0.37254903f, 0.61960787f, 0.627451f};
+constexpr Color Color::kChartreuse{0.49803922f, 1.0f, 0.0f};
+constexpr Color Color::kChocolate{0.8235294f, 0.4117647f, 0.11764706f};
+constexpr Color Color::kCoral{1.0f, 0.49803922f, 0.3137255f};
+constexpr Color Color::kCornflowerBlue{0.39215687f, 0.58431375f, 0.92941177f};
+constexpr Color Color::kCornsilk{1.0f, 0.972549f, 0.8627451f};
+constexpr Color Color::kCrimson{0.8627451f, 0.078431375f, 0.23529412f};
+constexpr Color Color::kCyan{0.0f, 1.0f, 1.0f};
+constexpr Color Color::kDarkBlue{0.0f, 0.0f, 0.54509807f};
+constexpr Color Color::kDarkCyan{0.0f, 0.54509807f, 0.54509807f};
+constexpr Color Color::kDarkGoldenrod{0.72156864f, 0.5254902f, 0.043137256f};
+constexpr Color Color::kDarkGray{0.6627451f, 0.6627451f, 0.6627451f};
+constexpr Color Color::kDarkGreen{0.0f, 0.39215687f, 0.0f};
+constexpr Color Color::kDarkKhaki{0.7411765f, 0.7176471f, 0.41960785f};
+constexpr Color Color::kDarkMagenta{0.54509807f, 0.0f, 0.54509807f};
+constexpr Color Color::kDarkOliveGreen{0.33333334f, 0.41960785f, 0.18431373f};
+constexpr Color Color::kDarkOrange{1.0f, 0.54901963f, 0.0f};
+constexpr Color Color::kDarkOrchid{0.6f, 0.19607843f, 0.8f};
+constexpr Color Color::kDarkRed{0.54509807f, 0.0f, 0.0f};
+constexpr Color Color::kDarkSalmon{0.9137255f, 0.5882353f, 0.47843137f};
+constexpr Color Color::kDarkSeaGreen{0.56078434f, 0.7372549f, 0.56078434f};
+constexpr Color Color::kDarkSlateBlue{0.28235295f, 0.23921569f, 0.54509807f};
+constexpr Color Color::kDarkSlateGray{0.18431373f, 0.30980393f, 0.30980393f};
+constexpr Color Color::kDarkTurquoise{0.0f, 0.80784315f, 0.81960785f};
+constexpr Color Color::kDarkViolet{0.5803922f, 0.0f, 0.827451f};
+constexpr Color Color::kDeepPink{1.0f, 0.078431375f, 0.5764706f};
+constexpr Color Color::kDeepSkyBlue{0.0f, 0.7490196f, 1.0f};
+constexpr Color Color::kDimGray{0.4117647f, 0.4117647f, 0.4117647f};
+constexpr Color Color::kDodgerBlue{0.11764706f, 0.5647059f, 1.0f};
+constexpr Color Color::kFirebrick{0.69803923f, 0.13333334f, 0.13333334f};
+constexpr Color Color::kFloralWhite{1.0f, 0.98039216f, 0.9411765f};
+constexpr Color Color::kForestGreen{0.13333334f, 0.54509807f, 0.13333334f};
+constexpr Color Color::kFuchsia{1.0f, 0.0f, 1.0f};
+constexpr Color Color::kGainsboro{0.8627451f, 0.8627451f, 0.8627451f};
+constexpr Color Color::kGhostWhite{0.972549f, 0.972549f, 1.0f};
+constexpr Color Color::kGold{1.0f, 0.84313726f, 0.0f};
+constexpr Color Color::kGoldenrod{0.85490197f, 0.64705884f, 0.1254902f};
+constexpr Color Color::kGray{0.5019608f, 0.5019608f, 0.5019608f};
+constexpr Color Color::kGreen{0.0f, 0.5019608f, 0.0f};
+constexpr Color Color::kGreenYellow{0.6784314f, 1.0f, 0.18431373f};
+constexpr Color Color::kHoneydew{0.9411765f, 1.0f, 0.9411765f};
+constexpr Color Color::kHotPink{1.0f, 0.4117647f, 0.7058824f};
+constexpr Color Color::kIndianRed{0.8039216f, 0.36078432f, 0.36078432f};
+constexpr Color Color::kIndigo{0.29411766f, 0.0f, 0.50980395f};
+constexpr Color Color::kIvory{1.0f, 1.0f, 0.9411765f};
+constexpr Color Color::kKhaki{0.9411765f, 0.9019608f, 0.54901963f};
+constexpr Color Color::kLavender{0.9019608f, 0.9019608f, 0.98039216f};
+constexpr Color Color::kLavenderBlush{1.0f, 0.9411765f, 0.9607843f};
+constexpr Color Color::kLawnGreen{0.4862745f, 0.9882353f, 0.0f};
+constexpr Color Color::kLemonChiffon{1.0f, 0.98039216f, 0.8039216f};
+constexpr Color Color::kLightBlue{0.6784314f, 0.84705883f, 0.9019608f};
+constexpr Color Color::kLightCoral{0.9411765f, 0.5019608f, 0.5019608f};
+constexpr Color Color::kLightCyan{0.8784314f, 1.0f, 1.0f};
+constexpr Color Color::kLightGoldenrodYellow{0.98039216f, 0.98039216f, 0.8235294f};
+constexpr Color Color::kLightGray{0.827451f, 0.827451f, 0.827451f};
+constexpr Color Color::kLightGreen{0.5647059f, 0.93333334f, 0.5647059f};
+constexpr Color Color::kLightPink{1.0f, 0.7137255f, 0.75686276f};
+constexpr Color Color::kLightSalmon{1.0f, 0.627451f, 0.47843137f};
+constexpr Color Color::kLightSeagGeen{0.1254902f, 0.69803923f, 0.6666667f};
+constexpr Color Color::kLightSkyBlue{0.5294118f, 0.80784315f, 0.98039216f};
+constexpr Color Color::kLightSlateGray{0.46666667f, 0.53333336f, 0.6f};
+constexpr Color Color::kLightSteellue{0.6901961f, 0.76862746f, 0.87058824f};
+constexpr Color Color::kLightYellow{1.0f, 1.0f, 0.8784314f};
+constexpr Color Color::kLime{0.0f, 1.0f, 0.0f};
+constexpr Color Color::kLimeGreen{0.19607843f, 0.8039216f, 0.19607843f};
+constexpr Color Color::kLinen{0.98039216f, 0.9411765f, 0.9019608f};
+constexpr Color Color::kMagenta{1.0f, 0.0f, 1.0f};
+constexpr Color Color::kMaroon{0.5019608f, 0.0f, 0.0f};
+constexpr Color Color::kMediumAquamarine{0.4f, 0.8039216f, 0.6666667f};
+constexpr Color Color::kMediumBlue{0.0f, 0.0f, 0.8039216f};
+constexpr Color Color::kMediumOrchid{0.7294118f, 0.33333334f, 0.827451f};
+constexpr Color Color::kMediumPurple{0.5764706f, 0.4392157f, 0.85882354f};
+constexpr Color Color::kMediumSeaGreen{0.23529412f, 0.7019608f, 0.44313726f};
+constexpr Color Color::kMediumSlateBlue{0.48235294f, 0.40784314f, 0.93333334f};
+constexpr Color Color::kMediumSpringGreen{0.0f, 0.98039216f, 0.6039216f};
+constexpr Color Color::kMediumTurquoise{0.28235295f, 0.81960785f, 0.8f};
+constexpr Color Color::kMediumVioletRed{0.78039217f, 0.08235294f, 0.52156866f};
+constexpr Color Color::kMidnightBlue{0.09803922f, 0.09803922f, 0.4392157f};
+constexpr Color Color::kMintcream{0.9607843f, 1.0f, 0.98039216f};
+constexpr Color Color::kMistyRose{1.0f, 0.89411765f, 0.88235295f};
+constexpr Color Color::kMoccasin{1.0f, 0.89411765f, 0.70980394f};
+constexpr Color Color::kNavajoWhite{1.0f, 0.87058824f, 0.6784314f};
+constexpr Color Color::kNavy{0.0f, 0.0f, 0.5019608f};
+constexpr Color Color::kOldLace{0.99215686f, 0.9607843f, 0.9019608f};
+constexpr Color Color::kOlive{0.5019608f, 0.5019608f, 0.0f};
+constexpr Color Color::kOliveDrab{0.41960785f, 0.5568628f, 0.13725491f};
+constexpr Color Color::kOrange{1.0f, 0.64705884f, 0.0f};
+constexpr Color Color::kOrangeRed{1.0f, 0.27058825f, 0.0f};
+constexpr Color Color::kOrchid{0.85490197f, 0.4392157f, 0.8392157f};
+constexpr Color Color::kPaleGoldenrod{0.93333334f, 0.9098039f, 0.6666667f};
+constexpr Color Color::kPaleGreen{0.59607846f, 0.9843137f, 0.59607846f};
+constexpr Color Color::kPaleTurquoise{0.6862745f, 0.93333334f, 0.93333334f};
+constexpr Color Color::kPaleVioletRed{0.85882354f, 0.4392157f, 0.5764706f};
+constexpr Color Color::kPapayaWhip{1.0f, 0.9372549f, 0.8352941f};
+constexpr Color Color::kPeachPuff{1.0f, 0.85490197f, 0.7254902f};
+constexpr Color Color::kPeru{0.8039216f, 0.52156866f, 0.24705882f};
+constexpr Color Color::kPink{1.0f, 0.7529412f, 0.79607844f};
+constexpr Color Color::kPlum{0.8666667f, 0.627451f, 0.8666667f};
+constexpr Color Color::kPowderBlue{0.6901961f, 0.8784314f, 0.9019608f};
+constexpr Color Color::kPurple{0.5019608f, 0.0f, 0.5019608f};
+constexpr Color Color::kRed{1.0f, 0.0f, 0.0f};
+constexpr Color Color::kRosyBrown{0.7372549f, 0.56078434f, 0.56078434f};
+constexpr Color Color::kRoyalBlue{0.25490198f, 0.4117647f, 0.88235295f};
+constexpr Color Color::kSaddleBrown{0.54509807f, 0.27058825f, 0.07450981f};
+constexpr Color Color::kSalmon{0.98039216f, 0.5019608f, 0.44705883f};
+constexpr Color Color::kSandyBrown{0.95686275f, 0.6431373f, 0.3764706f};
+constexpr Color Color::kSeaGreen{0.18039216f, 0.54509807f, 0.34117648f};
+constexpr Color Color::kSeashell{1.0f, 0.9607843f, 0.93333334f};
+constexpr Color Color::kSienna{0.627451f, 0.32156864f, 0.1764706f};
+constexpr Color Color::kSilver{0.7529412f, 0.7529412f, 0.7529412f};
+constexpr Color Color::kSkyBlue{0.5294118f, 0.80784315f, 0.92156863f};
+constexpr Color Color::kSlateBlue{0.41568628f, 0.3529412f, 0.8039216f};
+constexpr Color Color::kSlateGray{0.4392157f, 0.5019608f, 0.5647059f};
+constexpr Color Color::kSnow{1.0f, 0.98039216f, 0.98039216f};
+constexpr Color Color::kSpringGreen{0.0f, 1.0f, 0.49803922f};
+constexpr Color Color::kSteelBlue{0.27450982f, 0.50980395f, 0.7058824f};
+constexpr Color Color::kTan{0.8235294f, 0.7058824f, 0.54901963f};
+constexpr Color Color::kTeal{0.0f, 0.5019608f, 0.5019608f};
+constexpr Color Color::kThistle{0.84705883f, 0.7490196f, 0.84705883f};
+constexpr Color Color::kTomato{1.0f, 0.3882353f, 0.2784314f};
+constexpr Color Color::kTurquoise{0.2509804f, 0.8784314f, 0.8156863f};
+constexpr Color Color::kViolet{0.93333334f, 0.50980395f, 0.93333334f};
+constexpr Color Color::kWheat{0.9607843f, 0.87058824f, 0.7019608f};
+constexpr Color Color::kWhite{1.0f, 1.0f, 1.0f};
+constexpr Color Color::kWhiteSmoke{0.9607843f, 0.9607843f, 0.9607843f};
+constexpr Color Color::kYellow{1.0f, 1.0f, 0.0f};
+constexpr Color Color::kYellowGreen{0.6039216f, 0.8039216f, 0.19607843f};
 }  // namespace frc
