@@ -44,7 +44,7 @@ public final class Constants {
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
-    // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
+    // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
     public static final double ksVolts = 0.22;
     public static final double kvVoltSecondsPerMeter = 1.98;
