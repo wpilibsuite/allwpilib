@@ -45,7 +45,7 @@ constexpr bool kGyroReversed = true;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
-// theoretically for *your* robot's drive. The RobotPy Characterization
+// theoretically for *your* robot's drive. The Robot Characterization
 // Toolsuite provides a convenient tool for obtaining these values for your
 // robot.
 constexpr auto ks = 0.22_V;
