@@ -5,19 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "wpi/ManagedStatic.h" // NOLINT(build/include_order)
+#include "wpi/ManagedStatic.h"  // NOLINT(build/include_order)
 
 #include "gtest/gtest.h"
 
 static int refCount = 0;
 
 struct StaticTestClass {
-  StaticTestClass() {
-    refCount++;
-  }
-  ~StaticTestClass() {
-    refCount--;
-  }
+  StaticTestClass() { refCount++; }
+  ~StaticTestClass() { refCount--; }
 
   void Func() {}
 };
@@ -51,9 +47,8 @@ TEST(ManagedStaticTest, EagerInit) {
     refCount = 0;
     StaticTestClass* test = new StaticTestClass{};
     ASSERT_EQ(refCount, 1);
-    wpi::ManagedStatic<StaticTestClass> managedStatic(test, [](void* val){
-      delete static_cast<StaticTestClass*>(val);
-    });
+    wpi::ManagedStatic<StaticTestClass> managedStatic(
+        test, [](void* val) { delete static_cast<StaticTestClass*>(val); });
     ASSERT_EQ(refCount, 1);
     managedStatic->Func();
     ASSERT_EQ(refCount, 1);
@@ -62,4 +57,4 @@ TEST(ManagedStaticTest, EagerInit) {
   wpi_shutdown();
   ASSERT_EQ(refCount, 0);
 }
-}
+}  // namespace wpi
