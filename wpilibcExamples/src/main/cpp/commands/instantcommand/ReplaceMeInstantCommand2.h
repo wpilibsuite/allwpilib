@@ -8,12 +8,13 @@
 #pragma once
 
 #include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+#include <frc2/command/InstantCommand.h>
 
-class ReplaceMePIDCommand
-    : public frc2::CommandHelper<frc2::PIDCommand, ReplaceMePIDCommand> {
+class ReplaceMeInstantCommand2
+    : public frc2::CommandHelper<frc2::InstantCommand,
+                                 ReplaceMeInstantCommand2> {
  public:
-  ReplaceMePIDCommand();
+  ReplaceMeInstantCommand2();
 
-  bool IsFinished() override;
+  void Initialize() override;
 };

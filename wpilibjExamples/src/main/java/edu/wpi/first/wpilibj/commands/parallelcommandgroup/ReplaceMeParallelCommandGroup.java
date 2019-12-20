@@ -13,9 +13,11 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class ReplaceMeParallelCommandGroup extends ParallelCommandGroup {
+  /**
+   * Creates a new ReplaceMeParallelCommandGroup.
+   */
   public ReplaceMeParallelCommandGroup() {
-    super(
-        //Add your commands here
-    );
+    //Add your commands in the super() call
+    super();
   }
 }

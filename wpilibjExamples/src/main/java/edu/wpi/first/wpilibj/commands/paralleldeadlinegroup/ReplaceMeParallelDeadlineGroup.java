@@ -14,11 +14,13 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class ReplaceMeParallelDeadlineGroup extends ParallelDeadlineGroup {
+  /**
+   * Creates a new ReplaceMeParallelDeadlineGroup.
+   */
   public ReplaceMeParallelDeadlineGroup() {
+    // Add your commands in the super() call.  Add the deadline first.
     super(
-        // Add your deadline command here
         new InstantCommand()
-        //Add your other commands here
     );
   }
 }

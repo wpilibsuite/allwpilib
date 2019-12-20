@@ -11,19 +11,18 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 public class ReplaceMePIDSubsystem extends PIDSubsystem {
+  /**
+   * Creates a new ReplaceMePIDSubsystem.
+   */
   public ReplaceMePIDSubsystem() {
-    super(new PIDController(0, 0, 0));
+    super(
+        // The PIDController used by the subsystem
+        new PIDController(0, 0, 0));
   }
 
   @Override
-  public void useOutput(double output) {
+  public void useOutput(double output, double setpoint) {
     // Use the output here
-  }
-
-  @Override
-  public double getSetpoint() {
-    // Return the setpoint here
-    return 0;
   }
 
   @Override

@@ -14,16 +14,21 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class ReplaceMePIDCommand extends PIDCommand {
+  /**
+   * Creates a new ReplaceMePIDCommand.
+   */
   public ReplaceMePIDCommand() {
-    super(new PIDController(0, 0, 0),
-          // This should return the measurement
-          () -> 0,
-          // This should return the setpoint (can also be a constant)
-          () -> 0,
-          // This uses the output
-          (output) -> {
-            // Use the output here
-          });
+    super(
+        // The controller that the command will use
+        new PIDController(0, 0, 0),
+        // This should return the measurement
+        () -> 0,
+        // This should return the setpoint (can also be a constant)
+        () -> 0,
+        // This uses the output
+        output -> {
+          // Use the output here
+        });
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.
   }

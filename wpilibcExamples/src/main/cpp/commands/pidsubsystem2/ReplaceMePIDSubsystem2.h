@@ -7,13 +7,14 @@
 
 #pragma once
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+#include <frc2/command/PIDSubsystem.h>
 
-class ReplaceMePIDCommand
-    : public frc2::CommandHelper<frc2::PIDCommand, ReplaceMePIDCommand> {
+class ReplaceMePIDSubsystem2 : public frc2::PIDSubsystem {
  public:
-  ReplaceMePIDCommand();
+  ReplaceMePIDSubsystem2();
 
-  bool IsFinished() override;
+ protected:
+  void UseOutput(double output, double setpoint) override;
+
+  double GetMeasurement() override;
 };

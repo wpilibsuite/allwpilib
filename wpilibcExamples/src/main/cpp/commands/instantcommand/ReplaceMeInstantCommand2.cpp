@@ -5,15 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "ReplaceMeInstantCommand2.h"
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+// NOTE:  Consider using this command inline, rather than writing a subclass.
+// For more information, see:
+// https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
+ReplaceMeInstantCommand2::ReplaceMeInstantCommand2() {
+  // Use addRequirements() here to declare subsystem dependencies.
+}
 
-class ReplaceMePIDCommand
-    : public frc2::CommandHelper<frc2::PIDCommand, ReplaceMePIDCommand> {
- public:
-  ReplaceMePIDCommand();
-
-  bool IsFinished() override;
-};
+// Called when the command is initially scheduled.
+void ReplaceMeInstantCommand2::Initialize() {}

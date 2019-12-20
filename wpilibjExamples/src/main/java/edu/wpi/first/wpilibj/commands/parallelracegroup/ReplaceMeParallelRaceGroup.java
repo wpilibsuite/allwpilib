@@ -13,9 +13,11 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class ReplaceMeParallelRaceGroup extends ParallelRaceGroup {
+  /**
+   * Creates a new ReplaceMeParallelRaceGroup.
+   */
   public ReplaceMeParallelRaceGroup() {
-    super(
-        //Add your commands here
-    );
+    // Add your commands in the super() call.
+    super();
   }
 }

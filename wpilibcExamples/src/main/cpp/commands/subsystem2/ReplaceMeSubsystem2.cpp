@@ -5,15 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "ReplaceMeSubsystem2.h"
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+ReplaceMeSubsystem2::ReplaceMeSubsystem2() {}
 
-class ReplaceMePIDCommand
-    : public frc2::CommandHelper<frc2::PIDCommand, ReplaceMePIDCommand> {
- public:
-  ReplaceMePIDCommand();
-
-  bool IsFinished() override;
-};
+// This method will be called once per scheduler run
+void ReplaceMeSubsystem2::Periodic() {}

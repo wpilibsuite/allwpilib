@@ -45,7 +45,7 @@
     "tags": [
       "subsystem"
     ],
-    "foldername": "subsystem2",
+    "foldername": "subsystem",
     "replacename": "ReplaceMeSubsystem",
     "commandversion": 1
   },
@@ -198,6 +198,16 @@
     ],
     "foldername": "trapezoidprofilecommand",
     "replacename": "ReplaceMeTrapezoidProfileCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "TrapezoidProfileSubsystem",
+    "description": "A command that executes a trapezoidal motion profile.",
+    "tags": [
+      "trapezoidprofilesubsystem"
+    ],
+    "foldername": "trapezoidprofilesubsystem",
+    "replacename": "ReplaceMeTrapezoidProfileSubsystem",
     "commandversion": 2
   }
 ]

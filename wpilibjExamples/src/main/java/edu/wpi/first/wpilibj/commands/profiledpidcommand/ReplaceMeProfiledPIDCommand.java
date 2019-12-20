@@ -15,17 +15,25 @@ import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class ReplaceMeProfiledPIDCommand extends ProfiledPIDCommand {
+  /**
+   * Creates a new ReplaceMeProfiledPIDCommand.
+   */
   public ReplaceMeProfiledPIDCommand() {
-    super(new ProfiledPIDController(0, 0, 0,
-                                    new TrapezoidProfile.Constraints(0, 0)),
-          // This should return the measurement
-          () -> 0,
-          // This should return the goal (can also be a constant)
-          () -> new TrapezoidProfile.State(),
-          // This uses the output
-          (output, setpoint) -> {
-            // Use the output (and setpoint, if desired) here
-          });
+    super(
+        // The ProfiledPIDController used by the command
+        new ProfiledPIDController(
+            // The PID gains
+            0, 0, 0,
+            // The motion profile constraints
+            new TrapezoidProfile.Constraints(0, 0)),
+        // This should return the measurement
+        () -> 0,
+        // This should return the goal (can also be a constant)
+        () -> new TrapezoidProfile.State(),
+        // This uses the output
+        (output, setpoint) -> {
+          // Use the output (and setpoint, if desired) here
+        });
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.
   }

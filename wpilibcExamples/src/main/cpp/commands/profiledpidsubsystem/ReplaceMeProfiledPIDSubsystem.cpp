@@ -1,18 +1,24 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "ReplaceMeProfiledPIDSubsystem.h"
 
 ReplaceMeProfiledPIDSubsystem::ReplaceMeProfiledPIDSubsystem()
-    : ProfiledPIDSubsystem(frc::ProfiledPIDController(0, 0, 0,
-                                 {0_mps, 0_mps_sq})) {
-}
+    : ProfiledPIDSubsystem(
+          // The ProfiledPIDController used by the subsystem
+          frc::ProfiledPIDController<units::meter>(
+              // The PID gains
+              0, 0, 0,
+              // The constraints for the motion profiles
+              {0_mps, 0_mps_sq})) {}
 
-void ReplaceMeProfiledPIDSubsystem::UseOutput(double output,
-                                              frc::TrapezoidProfile::State setpoint) {
+void ReplaceMeProfiledPIDSubsystem::UseOutput(
+    double output, frc::TrapezoidProfile<units::meter>::State setpoint) {
   // Use the output and current trajectory setpoint here
-}
-
-frc::TrapezoidProfile::State ReplaceMeProfiledPIDSubsystem::GetGoal() {
-  // Return the goal here
-  return frc::TrapezoidProfile::State{0_m, 0_mps};
 }
 
 units::meter_t ReplaceMeProfiledPIDSubsystem::GetMeasurement() {

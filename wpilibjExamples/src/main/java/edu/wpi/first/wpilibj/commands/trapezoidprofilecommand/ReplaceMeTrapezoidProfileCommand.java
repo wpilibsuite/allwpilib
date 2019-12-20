@@ -14,14 +14,21 @@ import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class ReplaceMeTrapezoidProfileCommand extends TrapezoidProfileCommand {
+  /**
+   * Creates a new ReplaceMeTrapezoidProfileCommand.
+   */
   public ReplaceMeTrapezoidProfileCommand() {
-    super(new TrapezoidProfile(new TrapezoidProfile.Constraints(0, 0),
-                               // Goal state
-                               new TrapezoidProfile.State(),
-                               // Initial state
-                               new TrapezoidProfile.State()),
-          (state) -> {
-            // Use current trajectory state here
-          });
+    super(
+        // The motion profile to be executed
+        new TrapezoidProfile(
+            // The motion profile constraints
+            new TrapezoidProfile.Constraints(0, 0),
+            // Goal state
+            new TrapezoidProfile.State(),
+            // Initial state
+            new TrapezoidProfile.State()),
+        state -> {
+          // Use current trajectory state here
+        });
   }
 }

@@ -5,15 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "ReplaceMeTrapezoidProfileSubsystem.h"
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+ReplaceMeTrapezoidProfileSubsystem::ReplaceMeTrapezoidProfileSubsystem()
+    : TrapezoidProfileSubsystem(
+          // The motion profile constraints
+          {5_mps, 5_mps_sq},
+          // The initial position of the mechanism
+          0_m) {}
 
-class ReplaceMePIDCommand
-    : public frc2::CommandHelper<frc2::PIDCommand, ReplaceMePIDCommand> {
- public:
-  ReplaceMePIDCommand();
-
-  bool IsFinished() override;
-};
+void ReplaceMeTrapezoidProfileSubsystem::UseState(
+    frc::TrapezoidProfile<units::meters>::State state) {
+  // Use the current profile state here
+}

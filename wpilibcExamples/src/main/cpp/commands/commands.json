@@ -136,12 +136,12 @@
     ],
     "foldername": "command2",
     "headers": [
-      "ReplaceMeCommand.h"
+      "ReplaceMeCommand2.h"
     ],
     "source": [
-      "ReplaceMeCommand.cpp"
+      "ReplaceMeCommand2.cpp"
     ],
-    "replacename": "ReplaceMeCommand",
+    "replacename": "ReplaceMeCommand2",
     "commandversion": 2
   },
   {
@@ -152,12 +152,12 @@
     ],
     "foldername": "instantcommand",
     "headers": [
-      "ReplaceMeInstantCommand.h"
+      "ReplaceMeInstantCommand2.h"
     ],
     "source": [
-      "ReplaceMeInstantCommand.cpp"
+      "ReplaceMeInstantCommand2.cpp"
     ],
-    "replacename": "ReplaceMeInstantCommand",
+    "replacename": "ReplaceMeInstantCommand2",
     "commandversion": 2
   },
   {
@@ -232,12 +232,12 @@
     ],
     "foldername": "pidsubsystem2",
     "headers": [
-      "ReplaceMePIDSubsystem.h"
+      "ReplaceMePIDSubsystem2.h"
     ],
     "source": [
-      "ReplaceMePIDSubsystem.cpp"
+      "ReplaceMePIDSubsystem2.cpp"
     ],
-    "replacename": "ReplaceMePIDSubsystem",
+    "replacename": "ReplaceMePIDSubsystem2",
     "commandversion": 2
   },
   {
@@ -296,12 +296,12 @@
     ],
     "foldername": "subsystem2",
     "headers": [
-      "ReplaceMeSubsystem.h"
+      "ReplaceMeSubsystem2.h"
     ],
     "source": [
-      "ReplaceMeSubsystem.cpp"
+      "ReplaceMeSubsystem2.cpp"
     ],
-    "replacename": "ReplaceMeSubsystem",
+    "replacename": "ReplaceMeSubsystem2",
     "commandversion": 2
   },
   {
@@ -318,6 +318,22 @@
       "ReplaceMeTrapezoidProfileCommand.cpp"
     ],
     "replacename": "ReplaceMeTrapezoidProfileCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "TrapezoidProfileSubsystem",
+    "description": "A command that executes a trapezoidal motion profile.",
+    "tags": [
+      "trapezoidprofilesubsystem"
+    ],
+    "foldername": "trapezoidprofilesubsystem",
+    "headers": [
+      "ReplaceMeTrapezoidProfileSubsystem.h"
+    ],
+    "source": [
+      "ReplaceMeTrapezoidProfileSubsystem.cpp"
+    ],
+    "replacename": "ReplaceMeTrapezoidProfileSubsystem",
     "commandversion": 2
   }
 ]

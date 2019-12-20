@@ -5,15 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "ReplaceMePIDSubsystem2.h"
 
-#include <frc2/command/CommandHelper.h>
-#include <frc2/command/PIDCommand.h>
+ReplaceMePIDSubsystem2::ReplaceMePIDSubsystem2()
+    : PIDSubsystem(
+          // The PIDController used by the subsystem
+          frc2::PIDController(0, 0, 0)) {}
 
-class ReplaceMePIDCommand
-    : public frc2::CommandHelper<frc2::PIDCommand, ReplaceMePIDCommand> {
- public:
-  ReplaceMePIDCommand();
+void ReplaceMePIDSubsystem2::UseOutput(double output, double setpoint) {
+  // Use the output here
+}
 
-  bool IsFinished() override;
-};
+double ReplaceMePIDSubsystem2::GetMeasurement() {
+  // Return the process variable measurement here
+  return 0;
+}
