@@ -20,6 +20,8 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
   private TrapezoidProfile.State m_state;
   private TrapezoidProfile.State m_goal;
 
+  private boolean m_enabled = true;
+
   /**
    * Creates a new TrapezoidProfileSubsystem.
    *
@@ -54,7 +56,9 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
   public void periodic() {
     var profile = new TrapezoidProfile(m_constraints, m_goal, m_state);
     m_state = profile.calculate(m_period);
-    useState(m_state);
+    if (m_enabled) {
+      useState(m_state);
+    }
   }
 
   /**
@@ -73,6 +77,20 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    */
   public void setGoal(double goal) {
     setGoal(new TrapezoidProfile.State(goal, 0));
+  }
+
+  /**
+   * Enable the TrapezoidProfileSubsystem's output.
+   */
+  public void enable() {
+    m_enabled = true;
+  }
+
+  /**
+   * Disable the TrapezoidProfileSubsystem's output.
+   */
+  public void disable() {
+    m_enabled = false;
   }
 
   /**

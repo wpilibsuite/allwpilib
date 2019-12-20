@@ -42,7 +42,7 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          std::initializer_list<Subsystem*> requirements)
+                          std::initializer_list<Subsystem*> requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
   }

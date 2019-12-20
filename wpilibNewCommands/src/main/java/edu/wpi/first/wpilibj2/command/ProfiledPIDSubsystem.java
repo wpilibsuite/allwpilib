@@ -28,9 +28,11 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    *
    * @param controller the ProfiledPIDController to use
    */
-  public ProfiledPIDSubsystem(ProfiledPIDController controller) {
+  public ProfiledPIDSubsystem(ProfiledPIDController controller,
+                              double initialPosition) {
     requireNonNullParam(controller, "controller", "ProfiledPIDSubsystem");
     m_controller = controller;
+    setGoal(initialPosition);
   }
 
   @Override
