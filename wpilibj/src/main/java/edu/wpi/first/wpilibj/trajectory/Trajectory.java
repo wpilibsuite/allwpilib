@@ -151,6 +151,7 @@ public class Trajectory {
    * @param transform The transform to transform the trajectory by.
    * @return The transformed trajectory.
    */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public Trajectory transformBy(Transform2d transform) {
     var firstState = m_states.get(0);
     var firstPose = firstState.poseMeters;
