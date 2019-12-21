@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Transform2d;
 
 /**
  * Represents a time-parameterized trajectory. The trajectory contains of
@@ -139,6 +140,37 @@ public class Trajectory {
     // Interpolate between the two states for the state that we want.
     return prevSample.interpolate(sample,
         (timeSeconds - prevSample.timeSeconds) / (sample.timeSeconds - prevSample.timeSeconds));
+  }
+
+  /**
+   * Transforms all poses in the trajectory by the given transform. This is
+   * useful for converting a robot-relative trajectory into a field-relative
+   * trajectory.
+   *
+   * @param transform The transform to transform the trajectory by.
+   * @return The transformed trajectory.
+   */
+  public Trajectory transformBy(Transform2d transform) {
+    return new Trajectory(m_states.stream().map(state -> new State(state.timeSeconds,
+        state.velocityMetersPerSecond, state.accelerationMetersPerSecondSq,
+        state.poseMeters.plus(transform), state.curvatureRadPerMeter))
+        .collect(Collectors.toList()));
+  }
+
+  /**
+   * Transforms all poses in the trajectory so that they are relative to the
+   * given pose. This is useful for converting a field-relative trajectory
+   * into a robot-relative trajectory.
+   *
+   * @param pose The pose that is the origin of the coordinate frame that
+   *             the current trajectory will be transformed into.
+   * @return The transformed trajectory.
+   */
+  public Trajectory relativeTo(Pose2d pose) {
+    return new Trajectory(m_states.stream().map(state -> new State(state.timeSeconds,
+        state.velocityMetersPerSecond, state.accelerationMetersPerSecondSq,
+        state.poseMeters.relativeTo(pose), state.curvatureRadPerMeter))
+        .collect(Collectors.toList()));
   }
 
   /**
