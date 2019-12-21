@@ -108,10 +108,21 @@ Trajectory::State Trajectory::Sample(units::second_t t) const {
 }
 
 Trajectory Trajectory::TransformBy(const Transform2d& transform) {
+  auto& firstState = m_states[0];
+  auto& firstPose = firstState.pose;
+
+  // Calculate the transformed first pose.
+  auto newFirstPose = firstPose + transform;
   auto newStates = m_states;
-  for (auto& state : newStates) {
-    state.pose += transform;
+  newStates[0].pose = newFirstPose;
+
+  for (int i = 1; i < newStates.size(); i++) {
+    auto& state = newStates[i];
+    // We are transforming relative to the coordinate frame of the new initial
+    // pose.
+    state.pose = newFirstPose + (state.pose - firstPose);
   }
+
   return Trajectory(newStates);
 }
 

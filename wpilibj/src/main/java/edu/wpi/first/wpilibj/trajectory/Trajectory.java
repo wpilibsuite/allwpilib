@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -151,10 +152,29 @@ public class Trajectory {
    * @return The transformed trajectory.
    */
   public Trajectory transformBy(Transform2d transform) {
-    return new Trajectory(m_states.stream().map(state -> new State(state.timeSeconds,
-        state.velocityMetersPerSecond, state.accelerationMetersPerSecondSq,
-        state.poseMeters.plus(transform), state.curvatureRadPerMeter))
-        .collect(Collectors.toList()));
+    var firstState = m_states.get(0);
+    var firstPose = firstState.poseMeters;
+
+    // Calculate the transformed first pose.
+    var newFirstPose = firstPose.plus(transform);
+    List<State> newStates = new ArrayList<>();
+
+    newStates.add(new State(
+        firstState.timeSeconds, firstState.velocityMetersPerSecond,
+        firstState.accelerationMetersPerSecondSq, newFirstPose, firstState.curvatureRadPerMeter
+    ));
+
+    for (int i = 1; i < m_states.size(); i++) {
+      var state = m_states.get(i);
+      // We are transforming relative to the coordinate frame of the new initial pose.
+      newStates.add(new State(
+          state.timeSeconds, state.velocityMetersPerSecond,
+          state.accelerationMetersPerSecondSq, newFirstPose.plus(state.poseMeters.minus(firstPose)),
+          state.curvatureRadPerMeter
+      ));
+    }
+
+    return new Trajectory(newStates);
   }
 
   /**
