@@ -61,6 +61,15 @@ public class Trajectory {
   }
 
   /**
+   * Returns the initial pose of the trajectory.
+   *
+   * @return The initial pose of the trajectory.
+   */
+  public Pose2d getInitialPose() {
+    return sample(0).poseMeters;
+  }
+
+  /**
    * Returns the overall duration of the trajectory.
    *
    * @return The duration of the trajectory.

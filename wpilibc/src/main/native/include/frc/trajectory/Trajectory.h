@@ -105,6 +105,13 @@ class Trajectory {
    */
   State Sample(units::second_t t) const;
 
+  /**
+   * Returns the initial pose of the trajectory.
+   *
+   * @return The initial pose of the trajectory.
+   */
+  Pose2d InitialPose() const { return Sample(0_s).pose; }
+
  private:
   std::vector<State> m_states;
   units::second_t m_totalTime;
