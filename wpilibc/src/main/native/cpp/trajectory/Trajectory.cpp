@@ -107,14 +107,14 @@ Trajectory::State Trajectory::Sample(units::second_t t) const {
                                 (t - prevSample.t) / (sample.t - prevSample.t));
 }
 
-Trajectory frc::Trajectory::TransformBy(const Transform2d& transform) {
+Trajectory Trajectory::TransformBy(const Transform2d& transform) {
   auto newStates = m_states;
   for (auto& state : newStates) {
     state.pose = state.pose + transform;
   }
   return Trajectory(newStates);
 }
-Trajectory frc::Trajectory::RelativeTo(const Pose2d& pose) {
+Trajectory Trajectory::RelativeTo(const Pose2d& pose) {
   auto newStates = m_states;
   for (auto& state : newStates) {
     state.pose = state.pose.RelativeTo(pose);
