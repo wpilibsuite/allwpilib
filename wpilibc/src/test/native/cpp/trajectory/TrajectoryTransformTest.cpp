@@ -14,7 +14,7 @@
 
 void TestSameShapedTrajectory(std::vector<frc::Trajectory::State> statesA,
                               std::vector<frc::Trajectory::State> statesB) {
-  for (int i = 0; i < statesA.size() - 1; i++) {
+  for (unsigned int i = 0; i < statesA.size() - 1; i++) {
     auto a1 = statesA[i].pose;
     auto a2 = statesA[i + 1].pose;
 

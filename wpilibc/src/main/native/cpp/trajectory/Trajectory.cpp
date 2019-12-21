@@ -116,7 +116,7 @@ Trajectory Trajectory::TransformBy(const Transform2d& transform) {
   auto newStates = m_states;
   newStates[0].pose = newFirstPose;
 
-  for (int i = 1; i < newStates.size(); i++) {
+  for (unsigned int i = 1; i < newStates.size(); i++) {
     auto& state = newStates[i];
     // We are transforming relative to the coordinate frame of the new initial
     // pose.
