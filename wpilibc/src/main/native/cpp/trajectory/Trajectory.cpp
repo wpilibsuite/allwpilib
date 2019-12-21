@@ -110,10 +110,11 @@ Trajectory::State Trajectory::Sample(units::second_t t) const {
 Trajectory Trajectory::TransformBy(const Transform2d& transform) {
   auto newStates = m_states;
   for (auto& state : newStates) {
-    state.pose = state.pose + transform;
+    state.pose += transform;
   }
   return Trajectory(newStates);
 }
+
 Trajectory Trajectory::RelativeTo(const Pose2d& pose) {
   auto newStates = m_states;
   for (auto& state : newStates) {
