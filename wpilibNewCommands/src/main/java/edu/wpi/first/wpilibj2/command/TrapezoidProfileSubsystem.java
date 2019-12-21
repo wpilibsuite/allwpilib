@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
 /**
  * A subsystem that generates and runs trapezoidal motion profiles automatically.  The user
  * specifies how to use the current state of the motion profile by overriding the `useState` method.
@@ -26,30 +28,38 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
    * Creates a new TrapezoidProfileSubsystem.
    *
    * @param constraints     The constraints (maximum velocity and acceleration) for the profiles.
-   * @param initialPosition The initial position of the controller mechanism when the subsystem
-   *                        is constructed.
-   */
-  public TrapezoidProfileSubsystem(TrapezoidProfile.Constraints constraints,
-                                   double initialPosition) {
-    m_constraints = constraints;
-    m_state = new TrapezoidProfile.State(initialPosition, 0);
-    m_period = 0.02;
-  }
-
-  /**
-   * Creates a new TrapezoidProfileSubsystem.
-   *
-   * @param constraints     The constraints (maximum velocity and acceleration) for the profiles.
-   * @param initialPosition The initial position of the controller mechanism when the subsystem
+   * @param initialPosition The initial position of the controlled mechanism when the subsystem
    *                        is constructed.
    * @param period          The period of the main robot loop, in seconds.
    */
   public TrapezoidProfileSubsystem(TrapezoidProfile.Constraints constraints,
                                    double initialPosition,
                                    double period) {
-    m_constraints = constraints;
+    m_constraints = requireNonNullParam(constraints, "constraints", "TrapezoidProfileSubsystem");
     m_state = new TrapezoidProfile.State(initialPosition, 0);
+    setGoal(initialPosition);
     m_period = period;
+  }
+
+  /**
+   * Creates a new TrapezoidProfileSubsystem.
+   *
+   * @param constraints     The constraints (maximum velocity and acceleration) for the profiles.
+   * @param initialPosition The initial position of the controlled mechanism when the subsystem
+   *                        is constructed.
+   */
+  public TrapezoidProfileSubsystem(TrapezoidProfile.Constraints constraints,
+                                   double initialPosition) {
+    this(constraints, initialPosition, 0.02);
+  }
+
+  /**
+   * Creates a new TrapezoidProfileSubsystem.
+   *
+   * @param constraints     The constraints (maximum velocity and acceleration) for the profiles.
+   */
+  public TrapezoidProfileSubsystem(TrapezoidProfile.Constraints constraints) {
+    this(constraints, 0, 0.02);
   }
 
   @Override
