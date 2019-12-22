@@ -28,9 +28,8 @@ public abstract class PIDSubsystem extends SubsystemBase {
    * @param initialPosition the initial setpoint of the subsystem
    */
   public PIDSubsystem(PIDController controller, double initialPosition) {
-    requireNonNullParam(controller, "controller", "PIDSubsystem");
     setSetpoint(initialPosition);
-    m_controller = controller;
+    m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
   }
 
   /**
