@@ -146,7 +146,7 @@ public class Trajectory {
   /**
    * Transforms all poses in the trajectory by the given transform. This is
    * useful for converting a robot-relative trajectory into a field-relative
-   * trajectory.
+   * trajectory. This works with respect to the first pose in the trajectory.
    *
    * @param transform The transform to transform the trajectory by.
    * @return The transformed trajectory.
