@@ -32,9 +32,13 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    * Creates a new ProfiledPIDSubsystem.
    *
    * @param controller the ProfiledPIDController to use
+   * @param initialPosition the initial goal position of the subsystem
    */
-  explicit ProfiledPIDSubsystem(frc::ProfiledPIDController<Distance> controller)
-      : m_controller{controller} {}
+  explicit ProfiledPIDSubsystem(frc::ProfiledPIDController<Distance> controller,
+                                Distance_t initialPosition = Distance_t{0})
+      : m_controller{controller} {
+    SetGoal(initialPosition);
+  }
 
   void Periodic() override {
     if (m_enabled) {
