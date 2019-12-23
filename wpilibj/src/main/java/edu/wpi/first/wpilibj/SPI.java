@@ -426,7 +426,7 @@ public class SPI implements AutoCloseable {
 
   /**
    * Configure the Auto SPI Stall time between reads.
-   * 
+   *
    * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
    * MXP.
    * @param csToSclkTicks the number of ticks to wait before asserting the cs pin

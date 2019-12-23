@@ -631,7 +631,9 @@ int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {
   return spiSystem->readTransferSkippedFullCount(status);
 }
 
-void HAL_ConfigureSPIAutoStall(HAL_SPIPort port, int32_t csToSclkTicks, int32_t stallTicks, int32_t pow2BytesPerRead, int32_t* status) {
+void HAL_ConfigureSPIAutoStall(HAL_SPIPort port, int32_t csToSclkTicks,
+                               int32_t stallTicks, int32_t pow2BytesPerRead,
+                               int32_t* status) {
   std::scoped_lock lock(spiAutoMutex);
   // FPGA only has one auto SPI engine
   if (port != spiAutoPort) {

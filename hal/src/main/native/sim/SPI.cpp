@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -66,7 +66,8 @@ int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {
   return 0;
 }
 
-void HAL_ConfigureSPIAutoStall(HAL_SPIPort port, int32_t csToSclkTicks, int32_t stallTicks, int32_t pow2BytesPerRead, int32_t* status) {
-}
+void HAL_ConfigureSPIAutoStall(HAL_SPIPort port, int32_t csToSclkTicks,
+                               int32_t stallTicks, int32_t pow2BytesPerRead,
+                               int32_t* status) {}
 
-}
+}  // extern "C"

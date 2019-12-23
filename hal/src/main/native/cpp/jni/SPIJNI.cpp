@@ -399,11 +399,14 @@ Java_edu_wpi_first_hal_SPIJNI_spiGetAutoDroppedCount
  * Method:    spiConfigureAutoStall
  * Signature: (IIII)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_SPIJNI_spiConfigureAutoStall
-  (JNIEnv * env, jclass, jint port, jint csToSclkTicks, jint stallTicks, jint pow2BytesPerRead) 
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_SPIJNI_spiConfigureAutoStall
+  (JNIEnv* env, jclass, jint port, jint csToSclkTicks, jint stallTicks,
+   jint pow2BytesPerRead)
 {
   int32_t status = 0;
-  HAL_ConfigureSPIAutoStall(static_cast<HAL_SPIPort>(port), csToSclkTicks, stallTicks, pow2BytesPerRead, &status);
+  HAL_ConfigureSPIAutoStall(static_cast<HAL_SPIPort>(port), csToSclkTicks,
+                            stallTicks, pow2BytesPerRead, &status);
   CheckStatus(env, status);
 }
 
