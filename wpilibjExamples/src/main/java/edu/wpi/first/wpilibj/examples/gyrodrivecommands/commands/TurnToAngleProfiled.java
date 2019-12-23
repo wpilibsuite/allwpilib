@@ -11,15 +11,8 @@ import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
-
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kMaxTurnAccelerationDegPerSSquared;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kMaxTurnRateDegPerS;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kTurnD;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kTurnI;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kTurnP;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kTurnRateToleranceDegPerS;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kTurnToleranceDeg;
 
 /**
  * A command that will turn the robot to the specified angle using a motion profile.
@@ -33,11 +26,10 @@ public class TurnToAngleProfiled extends ProfiledPIDCommand {
    */
   public TurnToAngleProfiled(double targetAngleDegrees, DriveSubsystem drive) {
     super(
-        new ProfiledPIDController(kTurnP, kTurnI, kTurnD,
-                                  new TrapezoidProfile.Constraints(
-                                      kMaxTurnRateDegPerS,
-                                      kMaxTurnAccelerationDegPerSSquared
-                                  )),
+        new ProfiledPIDController(DriveConstants.kTurnP, DriveConstants.kTurnI,
+                                  DriveConstants.kTurnD, new TrapezoidProfile.Constraints(
+            DriveConstants.kMaxTurnRateDegPerS,
+            DriveConstants.kMaxTurnAccelerationDegPerSSquared)),
         // Close loop on heading
         drive::getHeading,
         // Set reference to target
@@ -51,7 +43,8 @@ public class TurnToAngleProfiled extends ProfiledPIDCommand {
     getController().enableContinuousInput(-180, 180);
     // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
     // setpoint before it is considered as having reached the reference
-    getController().setTolerance(kTurnToleranceDeg, kTurnRateToleranceDegPerS);
+    getController()
+        .setTolerance(DriveConstants.kTurnToleranceDeg, DriveConstants.kTurnRateToleranceDegPerS);
   }
 
   @Override

@@ -13,36 +13,26 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kD;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kFeederMotorPort;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kFeederSpeed;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kI;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kP;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kSVolts;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kShooterMotorPort;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kShooterTargetRPS;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kShooterToleranceRPS;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants.kVVoltSecondsPerRotation;
+import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends PIDSubsystem {
-  private final PWMVictorSPX m_shooterMotor = new PWMVictorSPX(kShooterMotorPort);
-  private final PWMVictorSPX m_feederMotor = new PWMVictorSPX(kFeederMotorPort);
+  private final PWMVictorSPX m_shooterMotor = new PWMVictorSPX(ShooterConstants.kShooterMotorPort);
+  private final PWMVictorSPX m_feederMotor = new PWMVictorSPX(ShooterConstants.kFeederMotorPort);
   private final Encoder m_shooterEncoder =
-      new Encoder(kEncoderPorts[0], kEncoderPorts[1], kEncoderReversed);
-  private final SimpleMotorFeedforward m_shooterFeedforward
-      = new SimpleMotorFeedforward(kSVolts, kVVoltSecondsPerRotation);
+      new Encoder(ShooterConstants.kEncoderPorts[0], ShooterConstants.kEncoderPorts[1],
+                  ShooterConstants.kEncoderReversed);
+  private final SimpleMotorFeedforward m_shooterFeedforward =
+      new SimpleMotorFeedforward(ShooterConstants.kSVolts,
+                                 ShooterConstants.kVVoltSecondsPerRotation);
 
   /**
    * The shooter subsystem for the robot.
    */
   public ShooterSubsystem() {
-    super(new PIDController(kP, kI, kD));
-    getController().setTolerance(kShooterToleranceRPS);
-    m_shooterEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
-    setSetpoint(kShooterTargetRPS);
+    super(new PIDController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD));
+    getController().setTolerance(ShooterConstants.kShooterToleranceRPS);
+    m_shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
+    setSetpoint(ShooterConstants.kShooterTargetRPS);
   }
 
   @Override
@@ -60,7 +50,7 @@ public class ShooterSubsystem extends PIDSubsystem {
   }
 
   public void runFeeder() {
-    m_feederMotor.set(kFeederSpeed);
+    m_feederMotor.set(ShooterConstants.kFeederSpeed);
   }
 
   public void stopFeeder() {

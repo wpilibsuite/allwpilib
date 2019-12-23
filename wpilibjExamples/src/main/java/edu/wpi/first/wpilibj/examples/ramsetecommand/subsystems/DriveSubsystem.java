@@ -19,38 +19,31 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kGyroReversed;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftMotor1Port;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kLeftMotor2Port;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kRightEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kRightEncoderReversed;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kRightMotor1Port;
-import static edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants.kRightMotor2Port;
+import edu.wpi.first.wpilibj.examples.ramsetecommand.Constants.DriveConstants;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
   private final SpeedControllerGroup m_leftMotors =
-      new SpeedControllerGroup(new PWMVictorSPX(kLeftMotor1Port),
-          new PWMVictorSPX(kLeftMotor2Port));
+      new SpeedControllerGroup(new PWMVictorSPX(DriveConstants.kLeftMotor1Port),
+                               new PWMVictorSPX(DriveConstants.kLeftMotor2Port));
 
   // The motors on the right side of the drive.
   private final SpeedControllerGroup m_rightMotors =
-      new SpeedControllerGroup(new PWMVictorSPX(kRightMotor1Port),
-          new PWMVictorSPX(kRightMotor2Port));
+      new SpeedControllerGroup(new PWMVictorSPX(DriveConstants.kRightMotor1Port),
+                               new PWMVictorSPX(DriveConstants.kRightMotor2Port));
 
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
 
   // The left-side drive encoder
   private final Encoder m_leftEncoder =
-      new Encoder(kLeftEncoderPorts[0], kLeftEncoderPorts[1], kLeftEncoderReversed);
+      new Encoder(DriveConstants.kLeftEncoderPorts[0], DriveConstants.kLeftEncoderPorts[1],
+                  DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
   private final Encoder m_rightEncoder =
-      new Encoder(kRightEncoderPorts[0], kRightEncoderPorts[1], kRightEncoderReversed);
+      new Encoder(DriveConstants.kRightEncoderPorts[0], DriveConstants.kRightEncoderPorts[1],
+                  DriveConstants.kRightEncoderReversed);
 
   // The gyro sensor
   private final Gyro m_gyro = new ADXRS450_Gyro();
@@ -63,8 +56,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public DriveSubsystem() {
     // Sets the distance per pulse for the encoders
-    m_leftEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
-    m_rightEncoder.setDistancePerPulse(kEncoderDistancePerPulse);
+    m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
 
     resetEncoders();
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
@@ -74,7 +67,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getDistance(),
-        m_rightEncoder.getDistance());
+                      m_rightEncoder.getDistance());
   }
 
   /**
@@ -183,7 +176,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from 180 to 180
    */
   public double getHeading() {
-    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (kGyroReversed ? -1.0 : 1.0);
+    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
   /**
@@ -192,6 +185,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate() * (kGyroReversed ? -1.0 : 1.0);
+    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }

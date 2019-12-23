@@ -12,35 +12,27 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.ExampleSmartMotorController;
-
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kLeftMotor1Port;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kLeftMotor2Port;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kRightMotor1Port;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kRightMotor2Port;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kaVoltSecondsSquaredPerMeter;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kp;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.ksVolts;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kvVoltSecondsPerMeter;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
   private final ExampleSmartMotorController m_leftMaster =
-      new ExampleSmartMotorController(kLeftMotor1Port);
+      new ExampleSmartMotorController(DriveConstants.kLeftMotor1Port);
 
   private final ExampleSmartMotorController m_leftSlave =
-      new ExampleSmartMotorController(kLeftMotor2Port);
+      new ExampleSmartMotorController(DriveConstants.kLeftMotor2Port);
 
   private final ExampleSmartMotorController m_rightMaster =
-      new ExampleSmartMotorController(kRightMotor1Port);
+      new ExampleSmartMotorController(DriveConstants.kRightMotor1Port);
 
   private final ExampleSmartMotorController m_rightSlave =
-      new ExampleSmartMotorController(kRightMotor2Port);
+      new ExampleSmartMotorController(DriveConstants.kRightMotor2Port);
 
   private final SimpleMotorFeedforward m_feedforward =
-      new SimpleMotorFeedforward(ksVolts,
-                                 kvVoltSecondsPerMeter,
-                                 kaVoltSecondsSquaredPerMeter);
+      new SimpleMotorFeedforward(DriveConstants.ksVolts,
+                                 DriveConstants.kvVoltSecondsPerMeter,
+                                 DriveConstants.kaVoltSecondsSquaredPerMeter);
 
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMaster, m_rightMaster);
@@ -52,8 +44,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_leftSlave.follow(m_leftMaster);
     m_rightSlave.follow(m_rightMaster);
 
-    m_leftMaster.setPID(kp, 0, 0);
-    m_rightMaster.setPID(kp, 0, 0);
+    m_leftMaster.setPID(DriveConstants.kp, 0, 0);
+    m_rightMaster.setPID(DriveConstants.kp, 0, 0);
   }
 
   /**
