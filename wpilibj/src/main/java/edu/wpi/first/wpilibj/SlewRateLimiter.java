@@ -11,7 +11,9 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * A class that limits the rate of change of an input value.  Useful for implementing voltage,
- * setpoint, and/or output ramps.
+ * setpoint, and/or output ramps.  A slew-rate limit is most appropriate when the quantity being
+ * controlled is a velocity or a voltage; when controlling a position, consider using a
+ * {@link edu.wpi.first.wpilibj.trajectory.TrapezoidProfile} instead.
  */
 public class SlewRateLimiter {
   private final Timer m_timer = new Timer();

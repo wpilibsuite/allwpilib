@@ -16,7 +16,12 @@
 namespace frc {
 /**
  * A class that limits the rate of change of an input value.  Useful for
- * implementing voltage, setpoint, and/or output ramps.
+ * implementing voltage, setpoint, and/or output ramps.  A slew-rate limit
+ * is most appropriate when the quantity being controlled is a velocity or
+ * a voltage; when controlling a position, consider using a TrapezoidProfile
+ * instead.
+ *
+ * @see TrapezoidProfile
  */
 template <class Unit>
 class SlewRateLimiter {
