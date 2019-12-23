@@ -18,6 +18,8 @@ void InitializeSPI() {}
 }  // namespace init
 }  // namespace hal
 
+extern "C" {
+
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
   hal::init::CheckInit();
   SimSPIData[port].initialized = true;
@@ -62,4 +64,9 @@ int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint32_t* buffer,
 }
 int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {
   return 0;
+}
+
+void HAL_ConfigureSPIAutoStall(HAL_SPIPort port, int32_t csToSclkTicks, int32_t stallTicks, int32_t pow2BytesPerRead, int32_t* status) {
+}
+
 }

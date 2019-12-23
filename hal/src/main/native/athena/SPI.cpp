@@ -631,12 +631,19 @@ int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {
   return spiSystem->readTransferSkippedFullCount(status);
 }
 
-// These 2 functions are so the new stall functionality
-// can be tested. How they're used is not very clear
-// but I want them to be testable so we can add an impl.
-// We will not be including these in the headers
-void* HAL_GetSPIDMAManager() { return spiAutoDMA.get(); }
+void HAL_ConfigureSPIAutoStall(HAL_SPIPort port, int32_t csToSclkTicks, int32_t stallTicks, int32_t pow2BytesPerRead, int32_t* status) {
+  std::scoped_lock lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (port != spiAutoPort) {
+    *status = INCOMPATIBLE_STATE;
+    return;
+  }
 
-void* HAL_GetSPISystem() { return spiSystem.get(); }
+  tSPI::tStallConfig stallConfig;
+  stallConfig.CsToSclkTicks = static_cast<uint8_t>(csToSclkTicks);
+  stallConfig.StallTicks = static_cast<uint16_t>(stallTicks);
+  stallConfig.Pow2BytesPerRead = static_cast<uint8_t>(pow2BytesPerRead);
+  spiSystem->writeStallConfig(stallConfig, status);
+}
 
 }  // extern "C"

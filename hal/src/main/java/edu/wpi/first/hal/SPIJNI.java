@@ -61,4 +61,6 @@ public class SPIJNI extends JNIWrapper {
                                                    double timeout);
 
   public static native int spiGetAutoDroppedCount(int port);
+
+  public static native void spiConfigureAutoStall(int port, int csToSclkTicks, int stallTicks, int pow2BytesPerRead);
 }

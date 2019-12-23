@@ -424,6 +424,19 @@ public class SPI implements AutoCloseable {
     return SPIJNI.spiGetAutoDroppedCount(m_port);
   }
 
+  /**
+   * Configure the Auto SPI Stall time between reads.
+   * 
+   * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for
+   * MXP.
+   * @param csToSclkTicks the number of ticks to wait before asserting the cs pin
+   * @param stallTicks the number of ticks to stall for
+   * @param pow2BytesPerRead the number of bytes to read before stalling
+   */
+  public void configureAutoStall(int csToSclkTicks, int stallTicks, int pow2BytesPerRead) {
+    SPIJNI.spiConfigureAutoStall(m_port, csToSclkTicks, stallTicks, pow2BytesPerRead);
+  }
+
   private static final int kAccumulateDepth = 2048;
 
   @SuppressWarnings("PMD.TooManyFields")
