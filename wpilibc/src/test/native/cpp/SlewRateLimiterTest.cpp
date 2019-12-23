@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <thread>
+
 #include "frc/SlewRateLimiter.h"
 #include "gtest/gtest.h"
 
