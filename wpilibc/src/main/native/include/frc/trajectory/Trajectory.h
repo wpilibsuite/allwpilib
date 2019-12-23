@@ -12,6 +12,7 @@
 #include <units/units.h>
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Transform2d.h"
 
 namespace wpi {
 class json;
@@ -104,6 +105,27 @@ class Trajectory {
    * @return The state at that point in time.
    */
   State Sample(units::second_t t) const;
+
+  /**
+   * Transforms all poses in the trajectory by the given transform. This is
+   * useful for converting a robot-relative trajectory into a field-relative
+   * trajectory. This works with respect to the first pose in the trajectory.
+   *
+   * @param transform The transform to transform the trajectory by.
+   * @return The transformed trajectory.
+   */
+  Trajectory TransformBy(const Transform2d& transform);
+
+  /**
+   * Transforms all poses in the trajectory so that they are relative to the
+   * given pose. This is useful for converting a field-relative trajectory
+   * into a robot-relative trajectory.
+   *
+   * @param pose The pose that is the origin of the coordinate frame that
+   *             the current trajectory will be transformed into.
+   * @return The transformed trajectory.
+   */
+  Trajectory RelativeTo(const Pose2d& pose);
 
   /**
    * Returns the initial pose of the trajectory.

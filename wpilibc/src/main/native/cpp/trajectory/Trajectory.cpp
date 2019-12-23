@@ -107,6 +107,33 @@ Trajectory::State Trajectory::Sample(units::second_t t) const {
                                 (t - prevSample.t) / (sample.t - prevSample.t));
 }
 
+Trajectory Trajectory::TransformBy(const Transform2d& transform) {
+  auto& firstState = m_states[0];
+  auto& firstPose = firstState.pose;
+
+  // Calculate the transformed first pose.
+  auto newFirstPose = firstPose + transform;
+  auto newStates = m_states;
+  newStates[0].pose = newFirstPose;
+
+  for (unsigned int i = 1; i < newStates.size(); i++) {
+    auto& state = newStates[i];
+    // We are transforming relative to the coordinate frame of the new initial
+    // pose.
+    state.pose = newFirstPose + (state.pose - firstPose);
+  }
+
+  return Trajectory(newStates);
+}
+
+Trajectory Trajectory::RelativeTo(const Pose2d& pose) {
+  auto newStates = m_states;
+  for (auto& state : newStates) {
+    state.pose = state.pose.RelativeTo(pose);
+  }
+  return Trajectory(newStates);
+}
+
 void frc::to_json(wpi::json& json, const Trajectory::State& state) {
   json = wpi::json{{"time", state.t.to<double>()},
                    {"velocity", state.velocity.to<double>()},
