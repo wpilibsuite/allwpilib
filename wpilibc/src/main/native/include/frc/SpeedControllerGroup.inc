@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <functional>
+#include <vector>
+
 namespace frc {
 
 template <class... SpeedControllers>
