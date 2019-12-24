@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -35,7 +37,7 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
   }
 
   public SpeedControllerGroup(SpeedController[] speedControllers) {
-    m_speedControllers = speedControllers;
+    m_speedControllers = Arrays.copyOf(speedControllers, speedControllers.length);
     init();
   }
 
