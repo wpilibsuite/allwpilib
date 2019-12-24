@@ -8,12 +8,19 @@
 #include "frc/SpeedControllerGroup.h"
 
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 SpeedControllerGroup::SpeedControllerGroup(
     std::vector<std::reference_wrapper<SpeedController>>&& speedControllers)
-    : m_speedControllers(std::move(speedControllers)) {}
+    : m_speedControllers(std::move(speedControllers)) {
+  for (auto& speedController : m_speedControllers)
+    SendableRegistry::GetInstance().AddChild(this, &speedController.get());
+  static int instances = 0;
+  ++instances;
+  SendableRegistry::GetInstance().Add(this, "SpeedControllerGroup", instances);
+}
 
 void SpeedControllerGroup::Set(double speed) {
   for (auto speedController : m_speedControllers) {

@@ -7,19 +7,12 @@
 
 #pragma once
 
-#include "frc/smartdashboard/SendableRegistry.h"
-
 namespace frc {
 
 template <class... SpeedControllers>
 SpeedControllerGroup::SpeedControllerGroup(
     SpeedController& speedController, SpeedControllers&... speedControllers)
-    : m_speedControllers{speedController, speedControllers...} {
-  for (auto& speedController : m_speedControllers)
-    SendableRegistry::GetInstance().AddChild(this, &speedController.get());
-  static int instances = 0;
-  ++instances;
-  SendableRegistry::GetInstance().Add(this, "SpeedControllerGroup", instances);
-}
+    : SpeedControllerGroup(std::vector<std::reference_wrapper<SpeedController>>{
+          speedController, speedControllers...}) {}
 
 }  // namespace frc
