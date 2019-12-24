@@ -11,6 +11,7 @@
 #include <frc/WPIErrors.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
@@ -67,6 +68,8 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 }
 
 CommandScheduler::CommandScheduler() : m_impl(new Impl) {
+  HAL_Report(HALUsageReporting::kResourceType_Command,
+             HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
 }
 

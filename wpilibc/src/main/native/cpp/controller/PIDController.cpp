@@ -22,7 +22,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
     : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   static int instances = 0;
   instances++;
-  HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
+  HAL_Report(HALUsageReporting::kResourceType_PIDController2, instances);
   frc::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
 }
 

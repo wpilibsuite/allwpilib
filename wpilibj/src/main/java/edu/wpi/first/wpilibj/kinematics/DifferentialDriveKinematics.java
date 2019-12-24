@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+
 /**
  * Helper class that converts a chassis velocity (dx and dtheta components) to
  * left and right wheel velocities for a differential drive.
@@ -29,6 +33,7 @@ public class DifferentialDriveKinematics {
    */
   public DifferentialDriveKinematics(double trackWidthMeters) {
     this.trackWidthMeters = trackWidthMeters;
+    HAL.report(tResourceType.kResourceType_Kinematics, tInstances.kKinematics_DifferentialDrive);
   }
 
   /**

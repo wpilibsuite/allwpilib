@@ -9,6 +9,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/QR>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -63,6 +64,8 @@ class MecanumDriveKinematics {
     SetInverseKinematics(frontLeftWheel, frontRightWheel, rearLeftWheel,
                          rearRightWheel);
     m_forwardKinematics = m_inverseKinematics.householderQr();
+    HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+               HALUsageReporting::kKinematics_MecanumDrive);
   }
 
   MecanumDriveKinematics(const MecanumDriveKinematics&) = default;

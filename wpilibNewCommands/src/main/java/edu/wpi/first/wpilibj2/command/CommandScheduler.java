@@ -89,7 +89,7 @@ public final class CommandScheduler implements Sendable {
 
 
   CommandScheduler() {
-    HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
+    HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
   }
 

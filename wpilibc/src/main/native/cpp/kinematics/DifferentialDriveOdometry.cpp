@@ -7,6 +7,8 @@
 
 #include "frc/kinematics/DifferentialDriveOdometry.h"
 
+#include <hal/FRCUsageReporting.h>
+
 using namespace frc;
 
 DifferentialDriveOdometry::DifferentialDriveOdometry(
@@ -14,6 +16,8 @@ DifferentialDriveOdometry::DifferentialDriveOdometry(
     : m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
+  HAL_Report(HALUsageReporting::kResourceType_Odometry,
+             HALUsageReporting::kOdometry_DifferentialDrive);
 }
 
 const Pose2d& DifferentialDriveOdometry::Update(const Rotation2d& gyroAngle,
