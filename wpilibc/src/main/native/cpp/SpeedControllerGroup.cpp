@@ -11,6 +11,10 @@
 
 using namespace frc;
 
+SpeedControllerGroup::SpeedControllerGroup(
+    std::vector<std::reference_wrapper<SpeedController>>&& speedControllers)
+    : m_speedControllers(std::move(speedControllers)) {}
+
 void SpeedControllerGroup::Set(double speed) {
   for (auto speedController : m_speedControllers) {
     speedController.get().Set(m_isInverted ? -speed : speed);

@@ -23,6 +23,8 @@ class SpeedControllerGroup : public Sendable,
   template <class... SpeedControllers>
   explicit SpeedControllerGroup(SpeedController& speedController,
                                 SpeedControllers&... speedControllers);
+  explicit SpeedControllerGroup(
+      std::vector<std::reference_wrapper<SpeedController>>&& speedControllers);
   ~SpeedControllerGroup() override = default;
 
   SpeedControllerGroup(SpeedControllerGroup&&) = default;
