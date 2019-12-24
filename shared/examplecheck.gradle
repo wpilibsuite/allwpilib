@@ -70,6 +70,7 @@ task checkCommands(type: Task) {
             assert it.tags != null
             assert it.foldername != null
             assert it.replacename != null
+            assert it.commandversion != null
             if (project.isCppCommands) {
                 assert it.headers != null
                 assert !it.headers.isEmpty()
