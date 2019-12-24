@@ -28,13 +28,23 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
                               SpeedController... speedControllers) {
     m_speedControllers = new SpeedController[speedControllers.length + 1];
     m_speedControllers[0] = speedController;
-    SendableRegistry.addChild(this, speedController);
     for (int i = 0; i < speedControllers.length; i++) {
       m_speedControllers[i + 1] = speedControllers[i];
-      SendableRegistry.addChild(this, speedControllers[i]);
+    }
+    init();
+  }
+
+  public SpeedControllerGroup(SpeedController[] speedControllers) {
+    m_speedControllers = speedControllers;
+    init();
+  }
+
+  private void init() {
+    for (SpeedController controller : m_speedControllers) {
+      SendableRegistry.addChild(this, controller);
     }
     instances++;
-    SendableRegistry.addLW(this, "tSpeedControllerGroup", instances);
+    SendableRegistry.addLW(this, "SpeedControllerGroup", instances);
   }
 
   @Override
