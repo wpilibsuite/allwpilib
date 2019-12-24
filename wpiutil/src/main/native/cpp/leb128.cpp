@@ -38,7 +38,7 @@ uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val) {
 }
 
 uint64_t ReadUleb128(const char* addr, uint64_t* ret) {
-  uint32_t result = 0;
+  uint64_t result = 0;
   int shift = 0;
   size_t count = 0;
 
@@ -59,7 +59,7 @@ uint64_t ReadUleb128(const char* addr, uint64_t* ret) {
 }
 
 bool ReadUleb128(raw_istream& is, uint64_t* ret) {
-  uint32_t result = 0;
+  uint64_t result = 0;
   int shift = 0;
 
   while (1) {
