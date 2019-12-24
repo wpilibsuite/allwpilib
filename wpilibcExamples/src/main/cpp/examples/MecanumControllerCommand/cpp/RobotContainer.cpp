@@ -22,12 +22,6 @@
 
 using namespace DriveConstants;
 
-const frc::MecanumDriveKinematics DriveConstants::kDriveKinematics{
-    frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),
-    frc::Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-    frc::Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-    frc::Translation2d(-kWheelBase / 2, -kTrackWidth / 2)};
-
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
