@@ -11,6 +11,8 @@
 
 #include "frc/spline/SplineHelper.h"
 #include "frc/trajectory/TrajectoryParameterizer.h"
+#include "frc/spline/SplineParameterizer.h"
+#include "frc/DriverStation.h"
 
 using namespace frc;
 
@@ -29,9 +31,14 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     end.y[1] *= -1;
   }
 
-  auto points =
+  std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+  try {
       SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
           initial, interiorWaypoints, end));
+  } catch (SplineParameterizer::MalformedSplineException& e) {
+    DriverStation::ReportError(e.what());
+    return kDoNothingTrajectory;
+  }
 
   // After trajectory generation, flip theta back so it's relative to the
   // field. Also fix curvature.
@@ -68,8 +75,14 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     }
   }
 
-  auto points = SplinePointsFromSplines(
-      SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
+  std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+  try {
+    SplinePointsFromSplines(
+        SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
+  } catch (SplineParameterizer::MalformedSplineException& e) {
+    DriverStation::ReportError(e.what());
+    return kDoNothingTrajectory;
+  }
 
   // After trajectory generation, flip theta back so it's relative to the
   // field. Also fix curvature.

@@ -8,9 +8,11 @@
 package edu.wpi.first.wpilibj.trajectory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
@@ -19,8 +21,12 @@ import edu.wpi.first.wpilibj.spline.PoseWithCurvature;
 import edu.wpi.first.wpilibj.spline.Spline;
 import edu.wpi.first.wpilibj.spline.SplineHelper;
 import edu.wpi.first.wpilibj.spline.SplineParameterizer;
+import edu.wpi.first.wpilibj.spline.SplineParameterizer.MalformedSplineException;
 
 public final class TrajectoryGenerator {
+  private static final Trajectory kDoNothingTrajectory =
+      new Trajectory(Arrays.asList(new Trajectory.State()));
+  
   /**
    * Private constructor because this is a utility class.
    */
@@ -60,9 +66,15 @@ public final class TrajectoryGenerator {
     }
 
     // Get the spline points
-    var points = splinePointsFromSplines(SplineHelper.getCubicSplinesFromControlVectors(
-        newInitial, interiorWaypoints.toArray(new Translation2d[0]), newEnd
-    ));
+    List<PoseWithCurvature> points;
+    try {
+      points = splinePointsFromSplines(SplineHelper.getCubicSplinesFromControlVectors(newInitial,
+          interiorWaypoints.toArray(new Translation2d[0]), newEnd));
+    } catch (MalformedSplineException e) {
+      DriverStation.reportError(e.getMessage(), e.getStackTrace());
+      return kDoNothingTrajectory;
+      // return kEmptyTrajectory.transformBy(new Transform2d(new Translation2d(initial.x[0], initial.y[0]), Rotation2d.fromDegrees(Math.atan2(initial.y[1], initial.x[1]))));
+    }
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
@@ -130,9 +142,15 @@ public final class TrajectoryGenerator {
     }
 
     // Get the spline points
-    var points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromControlVectors(
-        newControlVectors.toArray(new Spline.ControlVector[]{})
-    ));
+    List<PoseWithCurvature> points;
+    try {
+      points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromControlVectors(
+          newControlVectors.toArray(new Spline.ControlVector[]{})
+      ));
+    } catch (MalformedSplineException e) {
+      DriverStation.reportError(e.getMessage(), e.getStackTrace());
+      return kDoNothingTrajectory;
+    }
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
@@ -171,6 +189,7 @@ public final class TrajectoryGenerator {
    *
    * @param splines The splines to parameterize.
    * @return The spline points for use in time parameterization of a trajectory.
+   * @throws MalformedSplineException
    */
   public static List<PoseWithCurvature> splinePointsFromSplines(
       Spline[] splines) {
