@@ -17,11 +17,8 @@ public class ExampleSubsystem extends SubsystemBase {
 
   }
 
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
   @Override
   public void periodic() {
-
+    // This method will be called once per scheduler run
   }
 }
