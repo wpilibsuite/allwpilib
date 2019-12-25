@@ -15,12 +15,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kDriveEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kPModuleDriveController;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kPModuleTurningController;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants.kTurningEncoderDistancePerPulse;
+import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.ModuleConstants;
 
 public class SwerveModule {
   private final Spark m_driveMotor;
@@ -30,13 +25,15 @@ public class SwerveModule {
   private final Encoder m_turningEncoder;
 
   private final PIDController m_drivePIDController =
-      new PIDController(kPModuleDriveController, 0, 0);
+      new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
 
   //Using a TrapezoidProfile PIDController to allow for smooth turning
   private final ProfiledPIDController m_turningPIDController
-      = new ProfiledPIDController(kPModuleTurningController, 0, 0,
-        new TrapezoidProfile.Constraints(kMaxModuleAngularSpeedRadiansPerSecond,
-          kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+      = new ProfiledPIDController(
+          ModuleConstants.kPModuleTurningController, 0, 0,
+          new TrapezoidProfile.Constraints(
+              ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
+              ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
 
   /**
    * Constructs a SwerveModule.
@@ -45,11 +42,11 @@ public class SwerveModule {
    * @param turningMotorChannel ID for the turning motor.
    */
   public SwerveModule(int driveMotorChannel,
-      int turningMotorChannel,
-      int[] driveEncoderPorts,
-      int[] turningEncoderPorts,
-      boolean driveEncoderReversed,
-      boolean turningEncoderReversed) {
+                      int turningMotorChannel,
+                      int[] driveEncoderPorts,
+                      int[] turningEncoderPorts,
+                      boolean driveEncoderReversed,
+                      boolean turningEncoderReversed) {
 
     m_driveMotor = new Spark(driveMotorChannel);
     m_turningMotor = new Spark(turningMotorChannel);
@@ -61,7 +58,7 @@ public class SwerveModule {
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_driveEncoder.setDistancePerPulse(kDriveEncoderDistancePerPulse);
+    m_driveEncoder.setDistancePerPulse(ModuleConstants.kDriveEncoderDistancePerPulse);
 
     //Set whether drive encoder should be reversed or not
     m_driveEncoder.setReverseDirection(driveEncoderReversed);
@@ -69,7 +66,7 @@ public class SwerveModule {
     // Set the distance (in this case, angle) per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * wpi::math::pi)
     // divided by the encoder resolution.
-    m_turningEncoder.setDistancePerPulse(kTurningEncoderDistancePerPulse);
+    m_turningEncoder.setDistancePerPulse(ModuleConstants.kTurningEncoderDistancePerPulse);
 
     //Set whether turning encoder should be reversed or not
     m_turningEncoder.setReverseDirection(turningEncoderReversed);
