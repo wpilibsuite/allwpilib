@@ -100,7 +100,7 @@ public class PIDController implements Sendable, AutoCloseable {
     instances++;
     SendableRegistry.addLW(this, "PIDController", instances);
 
-    HAL.report(tResourceType.kResourceType_PIDController, instances);
+    HAL.report(tResourceType.kResourceType_PIDController2, instances);
   }
 
   @Override

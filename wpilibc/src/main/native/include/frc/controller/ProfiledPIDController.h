@@ -21,6 +21,9 @@
 #include "frc/trajectory/TrapezoidProfile.h"
 
 namespace frc {
+namespace detail {
+void ReportProfiledPIDController();
+}  // namespace detail
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid
@@ -54,7 +57,9 @@ class ProfiledPIDController
    */
   ProfiledPIDController(double Kp, double Ki, double Kd,
                         Constraints constraints, units::second_t period = 20_ms)
-      : m_controller(Kp, Ki, Kd, period), m_constraints(constraints) {}
+      : m_controller(Kp, Ki, Kd, period), m_constraints(constraints) {
+    detail::ReportProfiledPIDController();
+  }
 
   ~ProfiledPIDController() override = default;
 

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hal/FRCUsageReporting.h>
 #include <units/units.h>
 
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -31,8 +32,11 @@ class DifferentialDriveKinematics {
    * empirical value may be larger than the physical measured value due to
    * scrubbing effects.
    */
-  constexpr explicit DifferentialDriveKinematics(units::meter_t trackWidth)
-      : trackWidth(trackWidth) {}
+  explicit DifferentialDriveKinematics(units::meter_t trackWidth)
+      : trackWidth(trackWidth) {
+    HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+               HALUsageReporting::kKinematics_DifferentialDrive);
+  }
 
   /**
    * Returns a chassis speed from left and right component velocities using

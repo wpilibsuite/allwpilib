@@ -12,6 +12,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/QR>
+#include <hal/FRCUsageReporting.h>
 #include <units/units.h>
 
 #include "frc/geometry/Rotation2d.h"
@@ -71,6 +72,9 @@ class SwerveDriveKinematics {
     }
 
     m_forwardKinematics = m_inverseKinematics.householderQr();
+
+    HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+               HALUsageReporting::kKinematics_SwerveDrive);
   }
 
   SwerveDriveKinematics(const SwerveDriveKinematics&) = default;

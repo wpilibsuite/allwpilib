@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -17,6 +19,8 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public class ProfiledPIDController implements Sendable {
+  private static int instances;
+
   private PIDController m_controller;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -54,6 +58,8 @@ public class ProfiledPIDController implements Sendable {
                         double period) {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
+    instances++;
+    HAL.report(tResourceType.kResourceType_ProfiledPIDController, instances);
   }
 
   /**
