@@ -11,5 +11,6 @@
 // For more information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 ReplaceMeParallelCommandGroup::ReplaceMeParallelCommandGroup() {
-  // Add your commands here
+  // Add your commands here, e.g.
+  // AddCommands(FooCommand(), BarCommand());
 }

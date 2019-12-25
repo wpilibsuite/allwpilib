@@ -17,7 +17,7 @@ public class ReplaceMeParallelRaceGroup extends ParallelRaceGroup {
    * Creates a new ReplaceMeParallelRaceGroup.
    */
   public ReplaceMeParallelRaceGroup() {
-    // Add your commands in the super() call.
-    super();
+    // Add your commands in the super() call, e.g.
+    // super(new FooCommand(), new BarCommand());super();
   }
 }
