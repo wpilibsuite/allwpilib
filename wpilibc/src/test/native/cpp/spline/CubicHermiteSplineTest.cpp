@@ -120,3 +120,16 @@ TEST_F(CubicHermiteSplineTest, OneInterior) {
   Pose2d end{4_m, 0_m, 0_rad};
   Run(start, waypoints, end);
 }
+
+TEST_F(CubicHermiteSplineTest, Malformed) {
+  EXPECT_THROW(Run(
+    Pose2d{0_m, 0_m, Rotation2d(0_deg)},
+    std::vector<Translation2d>{},
+    Pose2d{1_m, 0_m, Rotation2d(180_deg)}
+  ), SplineParameterizer::MalformedSplineException);
+  EXPECT_THROW(Run(
+    Pose2d{10_m, 10_m, Rotation2d(90_deg)},
+    std::vector<Translation2d>{},
+    Pose2d{10_m, 11_m, Rotation2d(-90_deg)}
+  ), SplineParameterizer::MalformedSplineException);
+}

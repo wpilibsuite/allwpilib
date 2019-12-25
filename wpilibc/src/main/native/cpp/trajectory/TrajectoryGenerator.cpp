@@ -33,7 +33,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
 
   std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
   try {
-      SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
+      points = SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
           initial, interiorWaypoints, end));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     DriverStation::ReportError(e.what());
@@ -77,7 +77,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
 
   std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
   try {
-    SplinePointsFromSplines(
+    points = SplinePointsFromSplines(
         SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     DriverStation::ReportError(e.what());
