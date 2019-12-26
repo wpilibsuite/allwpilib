@@ -103,6 +103,7 @@ public final class SplineParameterizer {
    * @throws MalformedSplineException When the spline is malformed (e.g. has close adjacent points
    *                                  with approximately opposing headings)
    */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static List<PoseWithCurvature> parameterize(Spline spline, double t0, double t1) {
     var splinePoints = new ArrayList<PoseWithCurvature>();
 
@@ -136,7 +137,8 @@ public final class SplineParameterizer {
         splinePoints.add(spline.getPoint(current.t1));
       }
 
-      if (iterations++ >= kMaxIterations) {
+      iterations++;
+      if (iterations >= kMaxIterations) {
         throw new MalformedSplineException(
           "Could not parameterize a malformed spline. "
           + "This means that you probably had two or more adjacent waypoints that were very close "
