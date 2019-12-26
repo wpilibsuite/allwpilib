@@ -33,9 +33,10 @@
 
 #include <frc/spline/Spline.h>
 
+#include <stack>
+#include <string>
 #include <utility>
 #include <vector>
-#include <stack>
 
 #include <units/units.h>
 #include <wpi/Twine.h>
@@ -50,7 +51,8 @@ class SplineParameterizer {
   using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
 
   struct MalformedSplineException : public std::runtime_error {
-    MalformedSplineException(const std::string& what_arg) : runtime_error(what_arg) {}
+    explicit MalformedSplineException(const char* what_arg)
+        : runtime_error(what_arg) {}
   };
 
   /**
@@ -75,8 +77,8 @@ class SplineParameterizer {
     // The parameterization does not add the initial point. Let's add that.
     splinePoints.push_back(spline.GetPoint(t0));
 
-    // We use an "explicit stack" to simulate recursion, instead of a recursive function call
-    // This give us greater control, instead of a stack overflow
+    // We use an "explicit stack" to simulate recursion, instead of a recursive
+    // function call This give us greater control, instead of a stack overflow
     std::stack<StackContents> stack;
     stack.emplace(StackContents{t0, t1});
 
@@ -87,6 +89,7 @@ class SplineParameterizer {
 
     while (!stack.empty()) {
       current = stack.top();
+      stack.pop();
       start = spline.GetPoint(current.t0);
       end = spline.GetPoint(current.t1);
 
@@ -103,13 +106,11 @@ class SplineParameterizer {
 
       if (iterations++ >= kMaxIterations) {
         throw MalformedSplineException(
-            (wpi::Twine{"Could not parameterize a malformed spline. "}
-            + "This means that you probably had two or more adjacent waypoints "
-            + "that were very close together with headings in opposing directions.").str()
-          );
+            "Could not parameterize a malformed spline. "
+            "This means that you probably had two or more adjacent "
+            "waypoints that were very close together with headings "
+            "in opposing directions.");
       }
-
-      stack.pop();
     }
 
     return splinePoints;
@@ -122,8 +123,8 @@ class SplineParameterizer {
   static constexpr units::radian_t kMaxDtheta = 0.0872_rad;
 
   struct StackContents {
-    double t1;
     double t0;
+    double t1;
   };
 
   /**

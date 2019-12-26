@@ -9,12 +9,15 @@
 
 #include <utility>
 
-#include "frc/spline/SplineHelper.h"
-#include "frc/trajectory/TrajectoryParameterizer.h"
-#include "frc/spline/SplineParameterizer.h"
 #include "frc/DriverStation.h"
+#include "frc/spline/SplineHelper.h"
+#include "frc/spline/SplineParameterizer.h"
+#include "frc/trajectory/TrajectoryParameterizer.h"
 
 using namespace frc;
+
+const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
+    std::vector<Trajectory::State>{Trajectory::State()});
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
     Spline<3>::ControlVector initial,
@@ -33,8 +36,9 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
 
   std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
   try {
-      points = SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
-          initial, interiorWaypoints, end));
+    points =
+        SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
+            initial, interiorWaypoints, end));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     DriverStation::ReportError(e.what());
     return kDoNothingTrajectory;

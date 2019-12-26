@@ -149,19 +149,14 @@ class CubicHermiteSplineTest {
     run(start, waypoints, end);
   }
 
-    @Test
+  @Test
   void testMalformed() {
-    assertAll(
-      () -> assertThrows(MalformedSplineException.class,
-            () -> run(
-              new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-              new ArrayList<>(),
-              new Pose2d(1, 0, Rotation2d.fromDegrees(180)))),
-      () -> assertThrows(MalformedSplineException.class, 
-            () -> run(
-              new Pose2d(10, 10, Rotation2d.fromDegrees(90)),
-              Arrays.asList(new Translation2d(10, 10.5)),
-              new Pose2d(10, 11, Rotation2d.fromDegrees(-90))))
-    );
+    assertThrows(MalformedSplineException.class, () -> run(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+        new ArrayList<>(), new Pose2d(1, 0, Rotation2d.fromDegrees(180))));
+    assertThrows(MalformedSplineException.class, () -> run(
+        new Pose2d(10, 10, Rotation2d.fromDegrees(90)),
+        Arrays.asList(new Translation2d(10, 10.5)),
+        new Pose2d(10, 11, Rotation2d.fromDegrees(-90))));
   }
 }

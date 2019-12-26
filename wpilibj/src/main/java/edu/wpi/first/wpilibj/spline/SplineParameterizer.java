@@ -35,8 +35,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.wpi.first.wpilibj.DriverStation;
-
 /**
  * Class used to parameterize a spline by its arc length.
  */
@@ -49,7 +47,7 @@ public final class SplineParameterizer {
    * A malformed spline does not actually explode the LIFO stack size. Instead, the stack size
    * stays at a relatively small number (e.g. 30) and never decreases. Because of this, we must
    * count iterations. Even long, complex paths don't usually go over 300 iterations, so hitting
-   * this maximum should definitely indicate something has gone wrong. 
+   * this maximum should definitely indicate something has gone wrong.
    */
   private static final int kMaxIterations = 5000;
 
@@ -87,7 +85,8 @@ public final class SplineParameterizer {
    *
    * @param spline The spline to parameterize.
    * @return A list of poses and curvatures that represents various points on the spline.
-   * @throws MalformedSplineException
+   * @throws MalformedSplineException When the spline is malformed (e.g. has close adjacent points
+   *                                  with approximately opposing headings)
    */
   public static List<PoseWithCurvature> parameterize(Spline spline) {
     return parameterize(spline, 0.0, 1.0);
@@ -101,7 +100,8 @@ public final class SplineParameterizer {
    * @param t0     Starting internal spline parameter. It is recommended to use 0.0.
    * @param t1     Ending internal spline parameter. It is recommended to use 1.0.
    * @return       A list of poses and curvatures that represents various points on the spline.
-   * @throws MalformedSplineException
+   * @throws MalformedSplineException When the spline is malformed (e.g. has close adjacent points
+   *                                  with approximately opposing headings)
    */
   public static List<PoseWithCurvature> parameterize(Spline spline, double t0, double t1) {
     var splinePoints = new ArrayList<PoseWithCurvature>();

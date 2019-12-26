@@ -7,16 +7,12 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
@@ -80,14 +76,16 @@ class TrajectoryGeneratorTest {
   void testMalformedTrajectory() {
     // TODO (for review): this spews an ugly stack trace into test stdout
     // Should I add bindings to HALSIM_SetSendError?
-    var initial = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
-    var t =
+    var traj =
         TrajectoryGenerator.generateTrajectory(
-          Arrays.asList(initial, new Pose2d(1, 0, Rotation2d.fromDegrees(180))),
+          Arrays.asList(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+            new Pose2d(1, 0, Rotation2d.fromDegrees(180))
+          ),
           new TrajectoryConfig(feetToMeters(12), feetToMeters(12))
         );
 
-    assertEquals(t.getStates().size(), 1);
-    assertEquals(t.getTotalTimeSeconds(), 0);
+    assertEquals(traj.getStates().size(), 1);
+    assertEquals(traj.getTotalTimeSeconds(), 0);
   }
 }

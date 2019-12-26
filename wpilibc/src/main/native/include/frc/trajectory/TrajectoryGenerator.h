@@ -114,8 +114,7 @@ class TrajectoryGenerator {
     return splinePoints;
   }
 
-  private:
-    static const Trajectory kDoNothingTrajectory;
+ private:
+  static const Trajectory kDoNothingTrajectory;
 };
-const Trajectory TrajectoryGenerator::kDoNothingTrajectory(std::vector<Trajectory::State>{Trajectory::State()});
 }  // namespace frc

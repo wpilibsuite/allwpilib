@@ -85,3 +85,12 @@ TEST_F(QuinticHermiteSplineTest, SquigglyCurve) {
   Run(Pose2d(0_m, 0_m, Rotation2d(90_deg)),
       Pose2d(-1_m, 0_m, Rotation2d(90_deg)));
 }
+
+TEST_F(QuinticHermiteSplineTest, ThrowsOnMalformed) {
+  EXPECT_THROW(Run(Pose2d(0_m, 0_m, Rotation2d(0_deg)),
+                   Pose2d(1_m, 0_m, Rotation2d(180_deg))),
+               SplineParameterizer::MalformedSplineException);
+  EXPECT_THROW(Run(Pose2d(10_m, 10_m, Rotation2d(90_deg)),
+                   Pose2d(10_m, 11_m, Rotation2d(-90_deg))),
+               SplineParameterizer::MalformedSplineException);
+}
