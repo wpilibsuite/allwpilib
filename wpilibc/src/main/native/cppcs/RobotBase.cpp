@@ -36,7 +36,7 @@ int frc::RunHALInitialization() {
     return -1;
   }
   HAL_Report(HALUsageReporting::kResourceType_Language,
-             HALUsageReporting::kLanguage_CPlusPlus);
+             HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
   wpi::outs() << "\n********** Robot program starting **********\n";
   return 0;
 }

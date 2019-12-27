@@ -317,7 +317,8 @@ public abstract class RobotBase implements AutoCloseable {
     // Needed because all the OpenCV JNI functions don't have built in loading
     CameraServerJNI.enumerateSinks();
 
-    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0,
+        WPILibVersion.Version);
 
     if (HAL.hasMain()) {
       Thread thread = new Thread(() -> {
