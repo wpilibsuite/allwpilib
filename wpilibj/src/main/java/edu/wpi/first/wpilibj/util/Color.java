@@ -7,8 +7,12 @@
 
 package edu.wpi.first.wpilibj.util;
 
+import java.util.Objects;
+
 /**
  * Represents colors.
+ *
+ * Limited to 12 bits of precision.
  */
 @SuppressWarnings("MemberName")
 public class Color {
@@ -739,6 +743,8 @@ public class Color {
   public final double green;
   public final double blue;
 
+  private static final double kPrecision = Math.pow(2, -12);
+
   /**
    * Constructs a Color.
    *
@@ -747,9 +753,9 @@ public class Color {
    * @param blue  Blue value (0-1)
    */
   Color(double red, double green, double blue) {
-    this.red = red;
-    this.green = green;
-    this.blue = blue;
+    this.red = round(red);
+    this.green = round(green);
+    this.blue = round(blue);
   }
 
   /**
@@ -761,5 +767,29 @@ public class Color {
     this(color.red / 255.0,
         color.green / 255.0,
         color.blue / 255.0);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (other == null || getClass() != other.getClass()) {
+      return false;
+    }
+
+    Color color = (Color) other;
+    return Double.compare(color.red, red) == 0 &&
+            Double.compare(color.green, green) == 0 &&
+            Double.compare(color.blue, blue) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(red, green, blue);
+  }
+
+  private static double round(double value) {
+    return Math.round(value / kPrecision) * kPrecision;
   }
 }

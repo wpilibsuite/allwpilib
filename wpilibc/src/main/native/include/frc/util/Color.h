@@ -15,6 +15,8 @@ class Color8Bit;
 
 /**
  * Represents colors that can be used with Addressable LEDs.
+ *
+ * Limited to 12 bits of precision.
  */
 class Color {
  public:
@@ -748,7 +750,7 @@ class Color {
    * @param green Green value (0-1)
    * @param blue Blue value (0-1)
    */
-  constexpr Color(double r, double g, double b) : red(r), green(g), blue(b) {}
+  constexpr Color(double r, double g, double b) : red(round(r)), green(round(g)), blue(round(b)) {}
 
   /**
    * Constructs a Color from a Color8Bit.
@@ -760,6 +762,20 @@ class Color {
   double red;
   double green;
   double blue;
+
+private:
+  static constexpr double kPrecision = 1.0 / (1 << 12);
+
+  static constexpr double round(double value) {
+    const double rounded = int(value / kPrecision) + 0.5;
+    return rounded * kPrecision;
+  }
 };
+
+bool operator==(const Color& c1, const Color& c2) {
+  return c1.red == c2.red &&
+      c1.green == c2.green &&
+      c1.blue == c2.blue;
+}
 
 }  // namespace frc

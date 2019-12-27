@@ -162,4 +162,4 @@ constexpr Color Color::kYellow{1.0f, 1.0f, 0.0f};
 constexpr Color Color::kYellowGreen{0.6039216f, 0.8039216f, 0.19607843f};
 
 constexpr Color::Color(Color8Bit color)
-    : red(color.red / 255), green(color.green / 255), blue(color.blue / 255) {}
+    : red(round(color.red / 255)), green(round(color.green / 255)), blue(round(color.blue / 255)) {}

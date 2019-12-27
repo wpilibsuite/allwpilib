@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.util;
 
+import java.util.Objects;
+
 /**
  * Represents colors with 8 bits of precision.
  */
@@ -38,5 +40,25 @@ public class Color8Bit {
     this((int) (color.red * 255),
         (int) (color.green * 255),
         (int) (color.blue * 255));
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (other == null || getClass() != other.getClass()) {
+      return false;
+    }
+
+    Color8Bit color8Bit = (Color8Bit) other;
+    return red == color8Bit.red &&
+            green == color8Bit.green &&
+            blue == color8Bit.blue;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(red, green, blue);
   }
 }
