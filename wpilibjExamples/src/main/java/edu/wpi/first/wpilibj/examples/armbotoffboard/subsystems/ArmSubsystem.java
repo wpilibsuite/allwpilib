@@ -11,9 +11,8 @@ import edu.wpi.first.wpilibj.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 
+import edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.ArmConstants;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.ExampleSmartMotorController;
-
-import static edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.ArmConstants;
 
 /**
  * A robot arm subsystem that moves with a motion profile.

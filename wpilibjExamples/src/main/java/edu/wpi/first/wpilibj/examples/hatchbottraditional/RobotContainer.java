@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.ComplexAuto;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.DefaultDrive;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.DriveDistance;
@@ -24,8 +26,6 @@ import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsys
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants;
-import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.OIConstants;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a

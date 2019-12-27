@@ -18,8 +18,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.schedulereventlogging.Constants.OIConstants;
+
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.schedulereventlogging.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -29,7 +30,8 @@ import static edu.wpi.first.wpilibj.examples.schedulereventlogging.Constants.OIC
  */
 public class RobotContainer {
   // The driver's controller
-  private final XboxController m_driverController = new XboxController(kDriverControllerPort);
+  private final XboxController m_driverController =
+      new XboxController(OIConstants.kDriverControllerPort);
 
   // A few commands that do nothing, but will demonstrate the scheduler functionality
   private final CommandBase m_instantCommand1 = new InstantCommand();

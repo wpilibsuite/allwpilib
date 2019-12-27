@@ -16,13 +16,13 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngle;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngleProfiled;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.OIConstants;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
