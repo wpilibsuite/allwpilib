@@ -14,6 +14,7 @@
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI.h"
 #include "mockdata/DriverStationData.h"
+#include "mockdata/MockHooks.h"
 
 using namespace wpi::java;
 
@@ -444,6 +445,25 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_notifyNewData
   (JNIEnv*, jclass)
 {
   HALSIM_NotifyDriverStationNewData();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Method:    setSendError
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendError
+  (JNIEnv*, jclass, jboolean shouldSend)
+{
+  if (shouldSend) {
+    HALSIM_SetSendError(nullptr);
+  } else {
+    HALSIM_SetSendError([](HAL_Bool isError, int32_t errorCode,
+                           HAL_Bool isLVCode, const char* details,
+                           const char* location, const char* callStack,
+                           HAL_Bool printMsg) {return 1;});
+  }
 }
 
 /*

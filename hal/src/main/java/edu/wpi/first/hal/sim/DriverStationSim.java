@@ -79,6 +79,15 @@ public class DriverStationSim {
     DriverStationDataJNI.notifyNewData();
   }
 
+  /**
+   * Toggles suppression of DriverStation.reportError and reportWarning messages.
+   * 
+   * @param shouldSend If false then messages will will be suppressed.
+   */
+  public void setSendError(boolean shouldSend) {
+    DriverStationDataJNI.setSendError(shouldSend);
+  }
+
   public void resetData() {
     DriverStationDataJNI.resetData();
   }

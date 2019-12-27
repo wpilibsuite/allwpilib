@@ -49,5 +49,7 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native void registerAllCallbacks(NotifyCallback callback, boolean initialNotify);
   public static native void notifyNewData();
 
+  public static native void setSendError(boolean shouldSend);
+
   public static native void resetData();
 }
