@@ -81,7 +81,7 @@ public class DriverStationSim {
 
   /**
    * Toggles suppression of DriverStation.reportError and reportWarning messages.
-   * 
+   *
    * @param shouldSend If false then messages will will be suppressed.
    */
   public void setSendError(boolean shouldSend) {
