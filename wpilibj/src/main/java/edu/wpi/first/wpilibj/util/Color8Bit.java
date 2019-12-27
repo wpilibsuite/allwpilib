@@ -52,9 +52,9 @@ public class Color8Bit {
     }
 
     Color8Bit color8Bit = (Color8Bit) other;
-    return red == color8Bit.red &&
-            green == color8Bit.green &&
-            blue == color8Bit.blue;
+    return red == color8Bit.red
+        && green == color8Bit.green
+        && blue == color8Bit.blue;
   }
 
   @Override

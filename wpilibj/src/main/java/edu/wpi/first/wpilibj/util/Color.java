@@ -12,7 +12,7 @@ import java.util.Objects;
 /**
  * Represents colors.
  *
- * Limited to 12 bits of precision.
+ * <p>Limited to 12 bits of precision.
  */
 @SuppressWarnings("MemberName")
 public class Color {
@@ -779,9 +779,9 @@ public class Color {
     }
 
     Color color = (Color) other;
-    return Double.compare(color.red, red) == 0 &&
-            Double.compare(color.green, green) == 0 &&
-            Double.compare(color.blue, blue) == 0;
+    return Double.compare(color.red, red) == 0
+        && Double.compare(color.green, green) == 0
+        && Double.compare(color.blue, blue) == 0;
   }
 
   @Override
