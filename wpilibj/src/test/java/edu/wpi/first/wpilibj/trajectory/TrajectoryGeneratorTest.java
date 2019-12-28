@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import edu.wpi.first.hal.sim.DriverStationSim;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
@@ -74,8 +75,9 @@ class TrajectoryGeneratorTest {
 
   @Test
   void testMalformedTrajectory() {
-    // TODO (for review): this spews an ugly stack trace into test stdout
-    // Should I add bindings to HALSIM_SetSendError?
+    var dsSim = new DriverStationSim();
+    dsSim.setSendError(false);
+
     var traj =
         TrajectoryGenerator.generateTrajectory(
           Arrays.asList(
@@ -87,5 +89,7 @@ class TrajectoryGeneratorTest {
 
     assertEquals(traj.getStates().size(), 1);
     assertEquals(traj.getTotalTimeSeconds(), 0);
+
+    dsSim.setSendError(true);
   }
 }
