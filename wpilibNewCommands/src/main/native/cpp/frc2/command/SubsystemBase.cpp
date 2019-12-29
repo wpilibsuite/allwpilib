@@ -63,5 +63,4 @@ void SubsystemBase::SetSubsystem(const wpi::Twine& name) {
 void SubsystemBase::AddChild(std::string name, frc::Sendable* child) {
   auto& registry = frc::SendableRegistry::GetInstance();
   registry.AddLW(child, GetSubsystem(), name);
-  registry.AddChild(this, child);
 }

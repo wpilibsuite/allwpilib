@@ -184,7 +184,6 @@ public abstract class Subsystem implements Sendable, AutoCloseable {
    */
   public void addChild(String name, Sendable child) {
     SendableRegistry.addLW(child, getSubsystem(), name);
-    SendableRegistry.addChild(this, child);
   }
 
   /**
@@ -195,7 +194,6 @@ public abstract class Subsystem implements Sendable, AutoCloseable {
   public void addChild(Sendable child) {
     SendableRegistry.setSubsystem(child, getSubsystem());
     SendableRegistry.enableLiveWindow(child);
-    SendableRegistry.addChild(this, child);
   }
 
   /**
