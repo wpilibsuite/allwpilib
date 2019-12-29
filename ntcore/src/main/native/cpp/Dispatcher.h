@@ -48,6 +48,7 @@ class DispatcherBase : public IDispatcher {
   virtual ~DispatcherBase();
 
   unsigned int GetNetworkMode() const;
+  void StartNoNetwork();
   void StartServer(const Twine& persist_filename,
                    std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   void StartClient();

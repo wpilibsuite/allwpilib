@@ -44,6 +44,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public static final int kNetModeClient = 0x02;
   public static final int kNetModeStarting = 0x04;
   public static final int kNetModeFailure = 0x08;
+  public static final int kNetModeDisabled = 0x10;
 
   /**
    * The default port that network tables operates on.
@@ -673,6 +674,23 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public int getNetworkMode() {
     return NetworkTablesJNI.getNetworkMode(m_handle);
+  }
+
+  /**
+   * Disables networking.  Prevents calls to startServer or startClient
+   * from taking effect.  Has no effect if startServer or startClient
+   * has already been called.
+   */
+  public void disableNetwork() {
+    NetworkTablesJNI.disableNetwork(m_handle);
+  }
+
+  /**
+   * Enables networking.  startServer or startClient can be called after
+   * this call to start a server or client.  By default, networking is enabled.
+   */
+  public void enableNetwork() {
+    NetworkTablesJNI.enableNetwork(m_handle);
   }
 
   /**

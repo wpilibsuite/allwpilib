@@ -1370,6 +1370,30 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getNetworkMode
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    disableNetwork
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_disableNetwork
+  (JNIEnv*, jclass, jint inst)
+{
+  nt::DisableNetwork(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    enableNetwork
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_enableNetwork
+  (JNIEnv*, jclass, jint inst)
+{
+  nt::EnableNetwork(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    startServer
  * Signature: (ILjava/lang/String;Ljava/lang/String;I)V
  */

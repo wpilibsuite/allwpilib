@@ -115,6 +115,16 @@ DispatcherBase::~DispatcherBase() { Stop(); }
 
 unsigned int DispatcherBase::GetNetworkMode() const { return m_networkMode; }
 
+void DispatcherBase::StartNoNetwork() {
+  {
+    std::scoped_lock lock(m_user_mutex);
+    if (m_active) return;
+    m_active = true;
+  }
+  m_networkMode = NT_NET_MODE_DISABLED;
+  m_storage.SetDispatcher(this, false);
+}
+
 void DispatcherBase::StartServer(
     const Twine& persist_filename,
     std::unique_ptr<wpi::NetworkAcceptor> acceptor) {

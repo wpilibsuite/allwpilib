@@ -139,6 +139,8 @@ public final class NetworkTablesJNI {
 
   public static native void setNetworkIdentity(int inst, String name);
   public static native int getNetworkMode(int inst);
+  public static native void disableNetwork(int inst);
+  public static native void enableNetwork(int inst);
   public static native void startServer(int inst, String persistFilename, String listenAddress, int port);
   public static native void stopServer(int inst);
   public static native void startClient(int inst);
