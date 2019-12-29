@@ -10,17 +10,18 @@ package edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.HatchConstants;
+
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
-import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.HatchConstants.kHatchSolenoidModule;
-import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.HatchConstants.kHatchSolenoidPorts;
 
 /**
  * A hatch mechanism actuated by a single {@link DoubleSolenoid}.
  */
 public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid m_hatchSolenoid =
-      new DoubleSolenoid(kHatchSolenoidModule, kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]);
+      new DoubleSolenoid(HatchConstants.kHatchSolenoidModule, HatchConstants.kHatchSolenoidPorts[0],
+                         HatchConstants.kHatchSolenoidPorts[1]);
 
   /**
    * Grabs the hatch.

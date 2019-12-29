@@ -16,13 +16,12 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.commands.DriveDistanceProfiled;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kMaxAccelerationMetersPerSecondSquared;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants.kMaxSpeedMetersPerSecond;
-import static edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -35,7 +34,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -72,8 +71,9 @@ public class RobotContainer {
             new TrapezoidProfileCommand(
                 new TrapezoidProfile(
                     // Limit the max acceleration and velocity
-                    new TrapezoidProfile.Constraints(kMaxSpeedMetersPerSecond,
-                                                     kMaxAccelerationMetersPerSecondSquared),
+                    new TrapezoidProfile.Constraints(
+                        DriveConstants.kMaxSpeedMetersPerSecond,
+                        DriveConstants.kMaxAccelerationMetersPerSecondSquared),
                     // End at desired position in meters; implicitly starts at 0
                     new TrapezoidProfile.State(3, 0)),
                 // Pipe the profile state to the drive

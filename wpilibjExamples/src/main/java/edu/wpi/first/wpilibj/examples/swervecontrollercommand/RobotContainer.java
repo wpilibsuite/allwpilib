@@ -24,16 +24,10 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems.DriveSubsystem;
-
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kPThetaController;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kPXController;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kPYController;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoConstants.kThetaControllerConstraints;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants.kDriveKinematics;
-import static edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.OIConstants.kDriverControllerPort;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -46,7 +40,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -85,9 +79,10 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Create config for trajectory
     TrajectoryConfig config =
-        new TrajectoryConfig(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared)
+        new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond,
+                             AutoConstants.kMaxAccelerationMetersPerSecondSquared)
             // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(kDriveKinematics);
+            .setKinematics(DriveConstants.kDriveKinematics);
 
     // An example trajectory to follow.  All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -96,7 +91,7 @@ public class RobotContainer {
         // Pass through these two interior waypoints, making an 's' curve path
         List.of(
             new Translation2d(1, 1),
-            new Translation2d(2, - 1)
+            new Translation2d(2, -1)
         ),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
@@ -106,12 +101,13 @@ public class RobotContainer {
     SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
         exampleTrajectory,
         m_robotDrive::getPose, //Functional interface to feed supplier
-        kDriveKinematics,
+        DriveConstants.kDriveKinematics,
 
         //Position controllers
-        new PIDController(kPXController, 0, 0),
-        new PIDController(kPYController, 0, 0),
-        new ProfiledPIDController(kPThetaController, 0, 0, kThetaControllerConstraints),
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0,
+                                  AutoConstants.kThetaControllerConstraints),
 
         m_robotDrive::setModuleStates,
 
