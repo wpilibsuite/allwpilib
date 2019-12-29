@@ -124,7 +124,11 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");
+#ifdef __FRC_ROBORIO__
   inst.StartServer("/home/lvuser/networktables.ini");
+#else
+  inst.StartServer();
+#endif
 
   SmartDashboard::init();
 
