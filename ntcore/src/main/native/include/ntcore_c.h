@@ -95,7 +95,7 @@ enum NT_NetworkMode {
   NT_NET_MODE_CLIENT = 0x02,   /* running in client mode */
   NT_NET_MODE_STARTING = 0x04, /* flag for starting (either client or server) */
   NT_NET_MODE_FAILURE = 0x08,  /* flag for failure (either client or server) */
-  NT_NET_MODE_DISABLED = 0x10, /* network disabled */
+  NT_NET_MODE_LOCAL = 0x10,    /* running in local-only mode */
 };
 
 /*
@@ -1039,17 +1039,17 @@ void NT_SetNetworkIdentity(NT_Inst inst, const char* name, size_t name_len);
 unsigned int NT_GetNetworkMode(NT_Inst inst);
 
 /**
- * Disables networking.  Prevents calls to NT_StartServer or NT_StartClient
- * from taking effect.  Has no effect if NT_StartServer or NT_StartClient
- * has already been called.
+ * Starts local-only operation.  Prevents calls to NT_StartServer or
+ * NT_StartClient from taking effect.  Has no effect if NT_StartServer or
+ * NT_StartClient has already been called.
  */
-void NT_DisableNetwork(NT_Inst inst);
+void NT_StartLocal(NT_Inst inst);
 
 /**
- * Enables networking.  NT_StartServer or NT_StartClient can be called after
- * this call to start a server or client.  By default, networking is enabled.
+ * Stops local-only operation.  NT_StartServer or NT_StartClient can be called
+ * after this call to start a server or client.
  */
-void NT_EnableNetwork(NT_Inst inst);
+void NT_StopLocal(NT_Inst inst);
 
 /**
  * Starts a server using the specified filename, listening address, and port.

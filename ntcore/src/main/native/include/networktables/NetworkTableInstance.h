@@ -61,7 +61,8 @@ class NetworkTableInstance final {
     kNetModeServer = NT_NET_MODE_SERVER,
     kNetModeClient = NT_NET_MODE_CLIENT,
     kNetModeStarting = NT_NET_MODE_STARTING,
-    kNetModeFailure = NT_NET_MODE_FAILURE
+    kNetModeFailure = NT_NET_MODE_FAILURE,
+    kNetModeLocal = NT_NET_MODE_LOCAL
   };
 
   /**
@@ -299,17 +300,17 @@ class NetworkTableInstance final {
   unsigned int GetNetworkMode() const;
 
   /**
-   * Disables networking.  Prevents calls to StartServer or StartClient
+   * Starts local-only operation.  Prevents calls to StartServer or StartClient
    * from taking effect.  Has no effect if StartServer or StartClient
    * has already been called.
    */
-  void DisableNetwork();
+  void StartLocal();
 
   /**
-   * Enables networking.  StartServer or StartClient can be called after
-   * this call to start a server or client.  By default, networking is enabled.
+   * Stops local-only operation.  StartServer or StartClient can be called after
+   * this call to start a server or client.
    */
-  void EnableNetwork();
+  void StopLocal();
 
   /**
    * Starts a server using the specified filename, listening address, and port.

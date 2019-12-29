@@ -539,9 +539,9 @@ unsigned int NT_GetNetworkMode(NT_Inst inst) {
   return nt::GetNetworkMode(inst);
 }
 
-void NT_DisableNetwork(NT_Inst inst) { nt::DisableNetwork(inst); }
+void NT_StartLocal(NT_Inst inst) { nt::StartLocal(inst); }
 
-void NT_EnableNetwork(NT_Inst inst) { nt::EnableNetwork(inst); }
+void NT_StopLocal(NT_Inst inst) { nt::StopLocal(inst); }
 
 void NT_StartServer(NT_Inst inst, const char* persist_filename,
                     const char* listen_address, unsigned int port) {

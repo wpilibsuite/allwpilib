@@ -1131,17 +1131,17 @@ unsigned int GetNetworkMode();
 unsigned int GetNetworkMode(NT_Inst inst);
 
 /**
- * Disables networking.  Prevents calls to StartServer or StartClient
+ * Starts local-only operation.  Prevents calls to StartServer or StartClient
  * from taking effect.  Has no effect if StartServer or StartClient
  * has already been called.
  */
-void DisableNetwork(NT_Inst inst);
+void StartLocal(NT_Inst inst);
 
 /**
- * Enables networking.  StartServer or StartClient can be called after
- * this call to start a server or client.  By default, networking is enabled.
+ * Stops local-only operation.  StartServer or StartClient can be called after
+ * this call to start a server or client.
  */
-void EnableNetwork(NT_Inst inst);
+void StopLocal(NT_Inst inst);
 
 /**
  * Starts a server using the specified filename, listening address, and port.

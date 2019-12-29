@@ -1370,26 +1370,26 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getNetworkMode
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    disableNetwork
+ * Method:    startLocal
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_disableNetwork
+Java_edu_wpi_first_networktables_NetworkTablesJNI_startLocal
   (JNIEnv*, jclass, jint inst)
 {
-  nt::DisableNetwork(inst);
+  nt::StartLocal(inst);
 }
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
- * Method:    enableNetwork
+ * Method:    stopLocal
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_enableNetwork
+Java_edu_wpi_first_networktables_NetworkTablesJNI_stopLocal
   (JNIEnv*, jclass, jint inst)
 {
-  nt::EnableNetwork(inst);
+  nt::StopLocal(inst);
 }
 
 /*

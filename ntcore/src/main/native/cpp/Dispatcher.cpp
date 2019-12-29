@@ -115,13 +115,13 @@ DispatcherBase::~DispatcherBase() { Stop(); }
 
 unsigned int DispatcherBase::GetNetworkMode() const { return m_networkMode; }
 
-void DispatcherBase::StartNoNetwork() {
+void DispatcherBase::StartLocal() {
   {
     std::scoped_lock lock(m_user_mutex);
     if (m_active) return;
     m_active = true;
   }
-  m_networkMode = NT_NET_MODE_DISABLED;
+  m_networkMode = NT_NET_MODE_LOCAL;
   m_storage.SetDispatcher(this, false);
 }
 

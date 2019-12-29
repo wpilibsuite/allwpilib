@@ -742,14 +742,14 @@ unsigned int GetNetworkMode(NT_Inst inst) {
   return ii->dispatcher.GetNetworkMode();
 }
 
-void DisableNetwork(NT_Inst inst) {
+void StartLocal(NT_Inst inst) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) return;
 
-  ii->dispatcher.StartNoNetwork();
+  ii->dispatcher.StartLocal();
 }
 
-void EnableNetwork(NT_Inst inst) {
+void StopLocal(NT_Inst inst) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) return;
 
