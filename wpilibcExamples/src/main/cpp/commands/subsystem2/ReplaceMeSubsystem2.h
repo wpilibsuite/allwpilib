@@ -9,14 +9,14 @@
 
 #include <frc2/command/SubsystemBase.h>
 
-class ExampleSubsystem : public frc2::SubsystemBase {
+class ReplaceMeSubsystem2 : public frc2::SubsystemBase {
  public:
-  ExampleSubsystem();
+  ReplaceMeSubsystem2();
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
    */
-  void Periodic() override;
+  void Periodic();
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

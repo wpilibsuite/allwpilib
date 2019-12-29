@@ -5,20 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "ReplaceMeInstantCommand2.h"
 
-#include <frc2/command/SubsystemBase.h>
+// NOTE:  Consider using this command inline, rather than writing a subclass.
+// For more information, see:
+// https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
+ReplaceMeInstantCommand2::ReplaceMeInstantCommand2() {
+  // Use addRequirements() here to declare subsystem dependencies.
+}
 
-class ExampleSubsystem : public frc2::SubsystemBase {
- public:
-  ExampleSubsystem();
-
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
-  void Periodic() override;
-
- private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
-};
+// Called when the command is initially scheduled.
+void ReplaceMeInstantCommand2::Initialize() {}

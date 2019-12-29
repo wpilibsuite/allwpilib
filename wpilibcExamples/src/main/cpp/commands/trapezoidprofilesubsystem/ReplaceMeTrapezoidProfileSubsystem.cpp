@@ -5,20 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "ReplaceMeTrapezoidProfileSubsystem.h"
 
-#include <frc2/command/SubsystemBase.h>
+ReplaceMeTrapezoidProfileSubsystem::ReplaceMeTrapezoidProfileSubsystem()
+    : TrapezoidProfileSubsystem(
+          // The motion profile constraints
+          {5_mps, 5_mps_sq},
+          // The initial position of the mechanism
+          0_m) {}
 
-class ExampleSubsystem : public frc2::SubsystemBase {
- public:
-  ExampleSubsystem();
-
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
-  void Periodic() override;
-
- private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
-};
+void ReplaceMeTrapezoidProfileSubsystem::UseState(
+    frc::TrapezoidProfile<units::meters>::State state) {
+  // Use the current profile state here
+}

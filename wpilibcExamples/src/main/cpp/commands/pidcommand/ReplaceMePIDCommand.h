@@ -7,18 +7,13 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/CommandHelper.h>
+#include <frc2/command/PIDCommand.h>
 
-class ExampleSubsystem : public frc2::SubsystemBase {
+class ReplaceMePIDCommand
+    : public frc2::CommandHelper<frc2::PIDCommand, ReplaceMePIDCommand> {
  public:
-  ExampleSubsystem();
+  ReplaceMePIDCommand();
 
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
-  void Periodic() override;
-
- private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
+  bool IsFinished() override;
 };

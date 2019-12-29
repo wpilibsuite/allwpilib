@@ -5,20 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "ReplaceMeSequentialCommandGroup.h"
 
-#include <frc2/command/SubsystemBase.h>
-
-class ExampleSubsystem : public frc2::SubsystemBase {
- public:
-  ExampleSubsystem();
-
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
-  void Periodic() override;
-
- private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
-};
+// NOTE:  Consider using this command inline, rather than writing a subclass.
+// For more information, see:
+// https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
+ReplaceMeSequentialCommandGroup::ReplaceMeSequentialCommandGroup() {
+  // Add your commands here, e.g.
+  // AddCommands(FooCommand(), BarCommand());
+}

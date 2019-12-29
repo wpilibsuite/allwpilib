@@ -5,20 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "ReplaceMePIDSubsystem2.h"
 
-#include <frc2/command/SubsystemBase.h>
+ReplaceMePIDSubsystem2::ReplaceMePIDSubsystem2()
+    : PIDSubsystem(
+          // The PIDController used by the subsystem
+          frc2::PIDController(0, 0, 0)) {}
 
-class ExampleSubsystem : public frc2::SubsystemBase {
- public:
-  ExampleSubsystem();
+void ReplaceMePIDSubsystem2::UseOutput(double output, double setpoint) {
+  // Use the output here
+}
 
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
-  void Periodic() override;
-
- private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
-};
+double ReplaceMePIDSubsystem2::GetMeasurement() {
+  // Return the process variable measurement here
+  return 0;
+}

@@ -7,18 +7,13 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/TrapezoidProfileSubsystem.h>
 
-class ExampleSubsystem : public frc2::SubsystemBase {
+class ReplaceMeTrapezoidProfileSubsystem
+    : frc2::TrapezoidProfileSubsystem<units::meters> {
  public:
-  ExampleSubsystem();
+  ReplaceMeTrapezoidProfileSubsystem();
 
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
-  void Periodic() override;
-
- private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
+ protected:
+  void UseState(frc::TrapezoidProfile<units::meters>::State state) override;
 };

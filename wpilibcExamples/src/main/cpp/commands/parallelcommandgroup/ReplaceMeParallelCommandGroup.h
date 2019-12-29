@@ -7,18 +7,12 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
+#include <frc2/command/CommandHelper.h>
+#include <frc2/command/ParallelCommandGroup.h>
 
-class ExampleSubsystem : public frc2::SubsystemBase {
+class ReplaceMeParallelCommandGroup
+    : public frc2::CommandHelper<frc2::ParallelCommandGroup,
+                                 ReplaceMeParallelCommandGroup> {
  public:
-  ExampleSubsystem();
-
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
-  void Periodic() override;
-
- private:
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
+  ReplaceMeParallelCommandGroup();
 };
