@@ -11,8 +11,8 @@ resources:
   - container: ubuntu
     image:  wpilib/ubuntu-base:18.04
 
-variables:
-- group: Artifactory-Package-Publish
+# variables:
+# - group: Artifactory-Package-Publish
 
 trigger:
   batch: true
