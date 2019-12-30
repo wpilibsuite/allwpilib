@@ -6,7 +6,7 @@ parameters:
   preBuild: []
 
 jobs:
-- template: azure-templates/build-job.yml
+- template: build-job.yml
   parameters:
     jobName: 'Windows_32_Bit'
     pool: ${{ parameters.pool }}
