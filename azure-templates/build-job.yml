@@ -1,13 +1,11 @@
 # Job for building
 
 parameters:
-- jobName: ''
-  default: false
-- vmImage: 'Ubuntu 16.04'
-- container: wpilib2020
-- buildOptions: ''
-- artifactName: ''
-  default: false
+  jobName: ''
+  vmImage: 'Ubuntu 16.04'
+  container: wpilib2020
+  buildOptions: ''
+  artifactName: ''
 
 jobs:
 - job: ${{ parameters.jobName }}
