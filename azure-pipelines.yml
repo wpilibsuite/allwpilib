@@ -49,7 +49,8 @@ stages:
   - template: azure-templates/build-job.yml
     parameters:
       jobName: Windows_64_Bit
-      vmImage: 'windows-2019'
+      pool:
+        vmImage: 'windows-2019'
       container: ''
       jdkVersionOption: '1.11'
       buildOptions: '-PskipPMD'
