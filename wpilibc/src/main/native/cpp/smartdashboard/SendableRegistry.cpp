@@ -134,6 +134,12 @@ void SendableRegistry::AddLW(Sendable* sendable, const wpi::Twine& subsystem,
   comp.subsystem = subsystem.str();
 }
 
+void SendableRegistry::AddChild(Sendable* parent, Sendable* child) {
+  std::scoped_lock lock(m_impl->mutex);
+  auto& comp = m_impl->GetOrAdd(child);
+  comp.parent = parent;
+}
+
 void SendableRegistry::AddChild(Sendable* parent, void* child) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(child);
@@ -147,6 +153,10 @@ bool SendableRegistry::Remove(Sendable* sendable) {
   UID compUid = it->getSecond();
   m_impl->components.erase(compUid - 1);
   m_impl->componentMap.erase(it);
+  // update any parent pointers
+  for (auto&& comp : m_impl->components) {
+    if (comp->parent == sendable) comp->parent = nullptr;
+  }
   return true;
 }
 
@@ -163,6 +173,10 @@ void SendableRegistry::Move(Sendable* to, Sendable* from) {
     // rebuild builder, as lambda captures can point to "from"
     comp.builder.ClearProperties();
     to->InitSendable(comp.builder);
+  }
+  // update any parent pointers
+  for (auto&& comp : m_impl->components) {
+    if (comp->parent == from) comp->parent = to;
   }
 }
 
