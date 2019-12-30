@@ -1,9 +1,8 @@
 # Build steps
 
 parameters:
-- buildOptions: ''
-- artifactName: ''
-  default: false
+  buildOptions: ''
+  artifactName: ''
 
 steps:
   - task: Gradle@2
