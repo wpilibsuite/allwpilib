@@ -1,0 +1,25 @@
+# Job for building
+
+parameters:
+- jobName: ''
+  default: false
+- vmImage: 'Ubuntu 16.04'
+- container: wpilib2020
+- buildOptions: ''
+- artifactName: ''
+  default: false
+
+jobs:
+- job: ${{ parameters.jobName }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  container: ${{ parameters.container }}
+
+  timeoutInMinutes: 0
+
+  steps:
+    - template: azure-templates/build-steps.yml
+      parameters:
+        buildOptions: ${{ parameters.buildOptions }}
+        artifactName: ${{ parameters.artifactName }}

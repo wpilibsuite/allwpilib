@@ -1,0 +1,17 @@
+# Job for mac
+
+jobs:
+- job: Mac
+  pool:
+    vmImage: 'macOS-10.14'
+
+  timeoutInMinutes: 0
+  steps:
+    - script: |
+        mkdir build
+        export JAVA_HOME=`/usr/libexec/java_home -v 11`
+      displayName: 'Setup JDK'
+
+    - template: azure-templates/build-steps.yml
+      parameters:
+        artifactName: 'Mac'

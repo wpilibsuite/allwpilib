@@ -1,0 +1,34 @@
+# Build steps
+
+parameters:
+- buildOptions: ''
+- artifactName: ''
+  default: false
+
+steps:
+  - task: Gradle@2
+    condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+    inputs:
+      workingDirectory: ''
+      gradleWrapperFile: 'gradlew'
+      gradleOptions: '-Xmx3072m'
+      publishJUnitResults: true
+      testResultsFiles: '**/TEST-*.xml'
+      tasks: 'build'
+      options: '${{ parameters.buildOptions }} -PbuildServer'
+
+  - task: Gradle@2
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+    inputs:
+      workingDirectory: ''
+      gradleWrapperFile: 'gradlew'
+      gradleOptions: '-Xmx3072m'
+      publishJUnitResults: true
+      testResultsFiles: '**/TEST-*.xml'
+      tasks: 'build'
+      options: '${{ parameters.buildOptions }} -PreleaseMode -PbuildServer'
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: ${{ parameters.artifactName }}
+      targetPath: 'build/allOutputs'
