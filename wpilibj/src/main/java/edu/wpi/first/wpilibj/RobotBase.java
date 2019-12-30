@@ -94,7 +94,11 @@ public abstract class RobotBase implements AutoCloseable {
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     inst.setNetworkIdentity("Robot");
-    inst.startServer("/home/lvuser/networktables.ini");
+    if (isReal()) {
+      inst.startServer("/home/lvuser/networktables.ini");
+    } else {
+      inst.startServer();
+    }
     m_ds = DriverStation.getInstance();
     inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
