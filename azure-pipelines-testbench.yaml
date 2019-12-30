@@ -52,7 +52,8 @@ stages:
   - template: azure-templates/build-job.yml
     parameters:
       jobName: Windows_64_Bit
-      pool: 'WPI Build'
+      pool:
+        name: 'WPI Build'
         demands:
         - agent.os -equals Windows_NT
       container: ''
@@ -62,7 +63,8 @@ stages:
 
   - template: azure-templates/build-job-win32.yml
     parameters:
-      pool: 'WPI Build'
+      pool:
+        name: 'WPI Build'
         demands:
         - agent.os -equals Windows_NT
 
