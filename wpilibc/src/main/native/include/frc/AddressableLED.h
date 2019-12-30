@@ -62,7 +62,7 @@ class AddressableLED : public ErrorBase {
      *
      * @param color The color of the LED
      */
-    void SetLED(Color color) {
+    void SetLED(const Color& color) {
       this->r = color.red * 255;
       this->g = color.green * 255;
       this->b = color.blue * 255;
@@ -73,7 +73,7 @@ class AddressableLED : public ErrorBase {
      *
      * @param color The color of the LED
      */
-    void SetLED(Color8Bit color) {
+    void SetLED(const Color8Bit& color) {
       this->r = color.red;
       this->g = color.green;
       this->b = color.blue;
