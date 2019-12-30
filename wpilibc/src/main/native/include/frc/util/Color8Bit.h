@@ -31,21 +31,21 @@ class Color8Bit {
    * @param color The color
    */
   constexpr Color8Bit(const Color& color)
-      : red(color.red * 255), green(color.green * 255), blue(color.blue * 255) {}
+      : red(color.red * 255),
+        green(color.green * 255),
+        blue(color.blue * 255) {}
 
   constexpr operator Color() const {
-    return Color(red / 255, green / 255, blue / 255);
+    return Color(red / 255.0, green / 255.0, blue / 255.0);
   }
 
   int red;
   int green;
   int blue;
-};    
+};
 
 inline bool operator==(const Color8Bit& c1, const Color8Bit& c2) {
-  return c1.red == c2.red &&
-      c1.green == c2.green &&
-      c1.blue == c2.blue;
+  return c1.red == c2.red && c1.green == c2.green && c1.blue == c2.blue;
 }
 
 }  // namespace frc
