@@ -58,7 +58,7 @@ stages:
         - agent.os -equals Windows_NT
       container: ''
       preBuild:
-      - script: "${{ agent.VisualStudio }}\\Common7\\Tools\\VsDevCmd"
+      - script: "${{ Agent.VisualStudio }}\\Common7\\Tools\\VsDevCmd"
       jdkVersionOption: '1.11'
       buildOptions: '-PskipPMD'
       artifactName: 'Win64'
