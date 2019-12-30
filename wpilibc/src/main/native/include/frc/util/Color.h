@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 namespace frc {
 
 /**
@@ -747,7 +749,9 @@ class Color {
    * @param blue Blue value (0-1)
    */
   constexpr Color(double r, double g, double b)
-      : red(round(r)), green(round(g)), blue(round(b)) {}
+      : red(roundAndClamp(r)),
+        green(roundAndClamp(g)),
+        blue(roundAndClamp(b)) {}
 
   double red;
   double green;
@@ -756,9 +760,10 @@ class Color {
  private:
   static constexpr double kPrecision = 1.0 / (1 << 12);
 
-  static constexpr double round(double value) {
-    const double rounded = static_cast<int>(value / kPrecision) + 0.5;
-    return rounded * kPrecision;
+  static constexpr double roundAndClamp(double value) {
+    const auto rounded =
+        (static_cast<int>(value / kPrecision) + 0.5) * kPrecision;
+    return std::clamp(rounded, 0.0, 1.0);
   }
 };
 

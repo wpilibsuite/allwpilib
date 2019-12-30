@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include "Color.h"
 
 namespace frc {
@@ -23,7 +25,10 @@ class Color8Bit {
    * @param green Green value (0-255)
    * @param blue Blue value (0-255)
    */
-  constexpr Color8Bit(int r, int g, int b) : red(r), green(g), blue(b) {}
+  constexpr Color8Bit(int r, int g, int b)
+      : red(std::clamp(r, 0, 255)),
+        green(std::clamp(g, 0, 255)),
+        blue(std::clamp(b, 0, 255)) {}
 
   /**
    * Constructs a Color8Bit from a Color.

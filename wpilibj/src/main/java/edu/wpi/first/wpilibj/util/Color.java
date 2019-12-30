@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj.util;
 
 import java.util.Objects;
 
+import edu.wpi.first.wpiutil.math.MathUtil;
+
 /**
  * Represents colors.
  *
@@ -753,9 +755,9 @@ public class Color {
    * @param blue  Blue value (0-1)
    */
   Color(double red, double green, double blue) {
-    this.red = round(red);
-    this.green = round(green);
-    this.blue = round(blue);
+    this.red = roundAndClamp(red);
+    this.green = roundAndClamp(green);
+    this.blue = roundAndClamp(blue);
   }
 
   /**
@@ -789,7 +791,8 @@ public class Color {
     return Objects.hash(red, green, blue);
   }
 
-  private static double round(double value) {
-    return Math.round(value / kPrecision) * kPrecision;
+  private static double roundAndClamp(double value) {
+    final var rounded = Math.round(value / kPrecision) * kPrecision;
+    return MathUtil.clamp(rounded, 0.0, 1.0);
   }
 }

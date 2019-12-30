@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj.util;
 
 import java.util.Objects;
 
+import edu.wpi.first.wpiutil.math.MathUtil;
+
 /**
  * Represents colors with 8 bits of precision.
  */
@@ -26,9 +28,9 @@ public class Color8Bit {
    * @param blue  Blue value (0-255)
    */
   public Color8Bit(int red, int green, int blue) {
-    this.red = red;
-    this.green = green;
-    this.blue = blue;
+    this.red = MathUtil.clamp(red, 0, 255);
+    this.green = MathUtil.clamp(green, 0, 255);
+    this.blue = MathUtil.clamp(blue, 0, 255);
   }
 
   /**
