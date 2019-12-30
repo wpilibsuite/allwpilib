@@ -22,5 +22,6 @@ jobs:
     - template: build-steps.yml
       parameters:
         gradleOptions: '-Xmx1024m'
+        jdkVersionOption: '1.11'
         buildOptions: '-PskipPMD'
         artifactName: 'Win32'

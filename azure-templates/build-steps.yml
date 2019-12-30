@@ -2,6 +2,7 @@
 
 parameters:
   gradleOptions: ''
+  jdkVersionOption: ''
   buildOptions: ''
   artifactName: ''
 
@@ -12,7 +13,8 @@ steps:
       workingDirectory: ''
       gradleWrapperFile: 'gradlew'
       gradleOptions: '-Xmx3072m ${{ parameters.gradleOptions }}'
-      jdkVersionOption: '1.11'
+      ${{ if ne(parameters.jdkVersionOption, '') }}:
+        jdkVersionOption: ${{ parameters.jdkVersionOption }}
       publishJUnitResults: true
       testResultsFiles: '**/TEST-*.xml'
       tasks: 'build'
@@ -24,7 +26,8 @@ steps:
       workingDirectory: ''
       gradleWrapperFile: 'gradlew'
       gradleOptions: '-Xmx3072m ${{ parameters.gradleOptions }}'
-      jdkVersionOption: '1.11'
+      ${{ if ne(parameters.jdkVersionOption, '') }}:
+        jdkVersionOption: ${{ parameters.jdkVersionOption }}
       publishJUnitResults: true
       testResultsFiles: '**/TEST-*.xml'
       tasks: 'build'
