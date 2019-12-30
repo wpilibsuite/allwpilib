@@ -17,6 +17,7 @@ jobs:
       displayName: 'Download JDK'
     - task: JavaToolInstaller@0
       inputs:
+        versionSpec: '11'
         jdkSourceOption: localDirectory
         jdkFile: 'build/jdk.zip'
         jdkDestinationDirectory: 'build/jdkinst'
