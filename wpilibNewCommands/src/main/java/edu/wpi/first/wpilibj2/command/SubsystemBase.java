@@ -76,7 +76,6 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    */
   public void addChild(String name, Sendable child) {
     SendableRegistry.addLW(child, getSubsystem(), name);
-    SendableRegistry.addChild(this, child);
   }
 
   @Override
