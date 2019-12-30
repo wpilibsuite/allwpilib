@@ -12,7 +12,7 @@ jobs:
   pool:
     vmImage: ${{ parameters.vmImage }}
 
-  - ${{ if ne(parameters.container, '') }}:
+  ${{ if ne(parameters.container, '') }}:
     container: ${{ parameters.container }}
 
   timeoutInMinutes: 0
