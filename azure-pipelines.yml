@@ -11,52 +11,85 @@ resources:
   - container: ubuntu
     image:  wpilib/ubuntu-base:18.04
 
-variables:
-- group: Artifactory-Package-Publish
-
 trigger:
   batch: true
   branches:
     include:
     - master
 
-stages:
-- stage: Build
-  jobs:
-  - template: azure-templates/build-job.yml
-    parameters:
-      jobName: Linux_Arm
-      buildOptions: '-Ponlylinuxathena'
-      artifactName: 'Athena'
+jobs:
+- template: azure-templates/build-job.yml
+  parameters:
+    jobName: Linux_Arm
+    buildOptions: '-Ponlylinuxathena'
+    artifactName: 'Athena'
 
-  - template: azure-templates/build-job.yml
-    parameters:
-      jobName: Linux_Raspbian
-      container: raspbian
-      buildOptions: '-Ponlylinuxraspbian'
-      artifactName: 'Raspbian'
+- template: azure-templates/build-job.yml
+  parameters:
+    jobName: Linux_Raspbian
+    container: raspbian
+    buildOptions: '-Ponlylinuxraspbian'
+    artifactName: 'Raspbian'
 
-  - template: azure-templates/build-job.yml
-    parameters:
-      jobName: Linux_Aarch64
-      container: aarch64
-      buildOptions: '-Ponlylinuxaarch64bionic'
-      artifactName: 'Aarch64'
+- template: azure-templates/build-job.yml
+  parameters:
+    jobName: Linux_Aarch64
+    container: aarch64
+    buildOptions: '-Ponlylinuxaarch64bionic'
+    artifactName: 'Aarch64'
 
-  - template: azure-templates/build-job.yml
-    parameters:
-      jobName: Linux
-      container: ubuntu
-      artifactName: 'Linux'
+- template: azure-templates/build-job.yml
+  parameters:
+    jobName: Linux
+    container: ubuntu
+    artifactName: 'Linux'
 
-  - template: azure-templates/build-job.yml
-    parameters:
-      jobName: Windows_64_Bit
-      vmImage: 'windows-2019'
-      container: ''
-      buildOptions: '-PskipPMD'
-      artifactName: 'Win64'
+- template: azure-templates/build-job.yml
+  parameters:
+    jobName: Windows_64_Bit
+    vmImage: 'windows-2019'
+    container: ''
+    buildOptions: '-PskipPMD'
+    artifactName: 'Win64'
 
-  - template: azure-templates/build-job-win32.yml
+- template: azure-templates/build-job-win32.yml
 
-  - template: azure-templates/build-job-mac.yml
+- template: azure-templates/build-job-mac.yml
+
+- job: CMakeBuild
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  container: wpilib2020
+
+  timeoutInMinutes: 0
+
+  steps:
+      - task: CMake@1
+        inputs:
+          cmakeArgs: '-DWITHOUT_ALLWPILIB=OFF ..'
+      - script: |
+          make -j3
+        workingDirectory: 'build'
+        displayName: 'Build'
+
+- job: Styleguide
+  pool:
+    vmImage: 'Ubuntu 16.04'
+
+  container: ubuntu
+
+  timeoutInMinutes: 0
+
+  steps:
+      - script: |
+          sudo pip3 install wpiformat
+        displayName: 'Install wpiformat'
+      - script: |
+          git checkout -b master
+          wpiformat -clang 6.0
+        displayName: 'Run wpiformat'
+      - script: |
+          # Ensure formatter made no changes
+          git --no-pager diff --exit-code HEAD
+        displayName: 'Check wpiformat Output'
