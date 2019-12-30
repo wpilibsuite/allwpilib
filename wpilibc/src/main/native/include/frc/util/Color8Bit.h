@@ -18,6 +18,8 @@ namespace frc {
  */
 class Color8Bit {
  public:
+  constexpr Color8Bit() = default;
+
   /**
    * Constructs a Color8Bit.
    *
@@ -44,9 +46,9 @@ class Color8Bit {
     return Color(red / 255.0, green / 255.0, blue / 255.0);
   }
 
-  int red;
-  int green;
-  int blue;
+  int red = 0;
+  int green = 0;
+  int blue = 0;
 };
 
 inline bool operator==(const Color8Bit& c1, const Color8Bit& c2) {

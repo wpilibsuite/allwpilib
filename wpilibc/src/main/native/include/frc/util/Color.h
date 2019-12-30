@@ -741,6 +741,8 @@ class Color {
    */
   static const Color kYellowGreen;
 
+  constexpr Color() = default;
+
   /**
    * Constructs a Color.
    *
@@ -753,9 +755,9 @@ class Color {
         green(roundAndClamp(g)),
         blue(roundAndClamp(b)) {}
 
-  double red;
-  double green;
-  double blue;
+  double red = 0.0;
+  double green = 0.0;
+  double blue = 0.0;
 
  private:
   static constexpr double kPrecision = 1.0 / (1 << 12);
