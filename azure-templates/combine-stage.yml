@@ -1,6 +1,6 @@
 
 parameters:
-  publish: false
+  publish: False
 
 stages:
 - stage: Combine
@@ -84,10 +84,11 @@ stages:
           ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
           ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
 
-      - script: |
-          echo "##vso[task.setvariable variable=UserHome]$HOME"
-        displayName: 'Set Home Variable'
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'Maven'
-          targetPath: $(UserHome)/releases
+    - script: |
+        echo "##vso[task.setvariable variable=UserHome]$HOME"
+      displayName: 'Set Home Variable'
+
+    - task: PublishPipelineArtifact@0
+      inputs:
+        artifactName: 'Maven'
+        targetPath: $(UserHome)/releases
