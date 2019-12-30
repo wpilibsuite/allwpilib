@@ -5,6 +5,7 @@ parameters:
   pool:
     vmImage: 'Ubuntu 16.04'
   container: wpilib2020
+  preBuild: []
   jdkVersionOption: ''
   buildOptions: ''
   artifactName: ''
@@ -22,6 +23,8 @@ jobs:
   timeoutInMinutes: 0
 
   steps:
+    - ${{ parameters.preBuild }}
+
     - template: build-steps.yml
       parameters:
         jdkVersionOption: ${{ parameters.jdkVersionOption }}
