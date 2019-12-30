@@ -53,6 +53,7 @@ stages:
     parameters:
       jobName: Windows_64_Bit
       vmImage: 'windows-2019'
+      container: ''
       buildOptions: '-PskipPMD'
       artifactName: 'Win64'
 
