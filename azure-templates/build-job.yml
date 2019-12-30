@@ -2,7 +2,8 @@
 
 parameters:
   jobName: ''
-  vmImage: 'Ubuntu 16.04'
+  pool:
+    vmImage: 'Ubuntu 16.04'
   container: wpilib2020
   jdkVersionOption: ''
   buildOptions: ''
@@ -10,8 +11,7 @@ parameters:
 
 jobs:
 - job: ${{ parameters.jobName }}
-  pool:
-    vmImage: ${{ parameters.vmImage }}
+  pool: ${{ parameters.pool }}
 
   ${{ if ne(parameters.container, '') }}:
     container: ${{ parameters.container }}

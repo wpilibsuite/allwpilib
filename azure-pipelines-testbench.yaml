@@ -52,13 +52,19 @@ stages:
   - template: azure-templates/build-job.yml
     parameters:
       jobName: Windows_64_Bit
-      vmImage: 'windows-2019'
+      pool: 'WPI Build'
+        demands:
+        - agent.os -equals Windows_NT
       container: ''
       jdkVersionOption: '1.11'
       buildOptions: '-PskipPMD'
       artifactName: 'Win64'
 
   - template: azure-templates/build-job-win32.yml
+    parameters:
+      pool: 'WPI Build'
+        demands:
+        - agent.os -equals Windows_NT
 
   - template: azure-templates/build-job-mac.yml
 

@@ -1,9 +1,12 @@
 # Job for win 32.
 
-jobs:
-- job: Windows_32_Bit
+parameters:
   pool:
     vmImage: 'windows-2019'
+
+jobs:
+- job: Windows_32_Bit
+  pool: ${{ parameters.pool }}
 
   timeoutInMinutes: 0
   steps:
