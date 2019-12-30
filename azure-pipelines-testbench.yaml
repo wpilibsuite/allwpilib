@@ -57,8 +57,6 @@ stages:
         demands:
         - agent.os -equals Windows_NT
       container: ''
-      preBuild:
-      - script: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\Tools\VsDevCmd.bat"
       jdkVersionOption: '1.11'
       buildOptions: '-PskipPMD'
       artifactName: 'Win64'
@@ -69,8 +67,6 @@ stages:
         name: 'WPI Build'
         demands:
         - agent.os -equals Windows_NT
-      preBuild:
-      - script: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\Tools\VsDevCmd.bat"
 
   - template: azure-templates/build-job-mac.yml
 
