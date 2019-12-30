@@ -2,10 +2,6 @@
 parameters:
   publish: false
 
-${{ if parameters.publish }}:
-  variables:
-  - group: Artifactory-Package-Publish
-
 stages:
 - stage: Combine
   jobs:
@@ -60,7 +56,6 @@ stages:
       condition: and(succeeded(), and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))))
 
     - ${{ if parameters.publish }}:
-
 # Master Builds
       - task: Gradle@2
         inputs:
