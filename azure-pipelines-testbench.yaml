@@ -58,7 +58,7 @@ stages:
         - agent.os -equals Windows_NT
       container: ''
       preBuild:
-      - script: 'C:\Program Files (x86)\Microsoft Visual Studio\BuildTools\Common7\Tools\VsDevCmd'
+      - script: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\BuildTools\\Common7\\Tools\\VsDevCmd"
       jdkVersionOption: '1.11'
       buildOptions: '-PskipPMD'
       artifactName: 'Win64'
@@ -70,7 +70,7 @@ stages:
         demands:
         - agent.os -equals Windows_NT
       preBuild:
-      - script: 'C:\Program Files (x86)\Microsoft Visual Studio\BuildTools\Common7\Tools\VsDevCmd'
+      - script: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\BuildTools\\Common7\\Tools\\VsDevCmd"
 
   - template: azure-templates/build-job-mac.yml
 
