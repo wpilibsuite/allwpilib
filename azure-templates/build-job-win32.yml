@@ -5,8 +5,8 @@ parameters:
     vmImage: 'windows-2019'
   preBuild: []
 
-extends:
-  template: build-job.yml
+jobs:
+- template: azure-templates/build-job.yml
   parameters:
     jobName: 'Windows_32_Bit'
     pool: ${{ parameters.pool }}
