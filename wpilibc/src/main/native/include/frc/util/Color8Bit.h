@@ -11,8 +11,6 @@
 
 namespace frc {
 
-class Color;
-
 /**
  * Represents colors that can be used with Addressable LEDs.
  */
@@ -32,12 +30,17 @@ class Color8Bit {
    *
    * @param color The color
    */
-  constexpr Color8Bit(Color color);
+  constexpr Color8Bit(const Color& color)
+      : red(color.red * 255), green(color.green * 255), blue(color.blue * 255) {}
+
+  constexpr operator Color() const {
+    return Color(red / 255, green / 255, blue / 255);
+  }
 
   int red;
   int green;
   int blue;
-};
+};    
 
 inline bool operator==(const Color8Bit& c1, const Color8Bit& c2) {
   return c1.red == c2.red &&
