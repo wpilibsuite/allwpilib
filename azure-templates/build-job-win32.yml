@@ -8,6 +8,9 @@ jobs:
 - job: Windows_32_Bit
   pool: ${{ parameters.pool }}
 
+  workspace:
+    clean: all
+
   timeoutInMinutes: 0
   steps:
     - powershell: |
