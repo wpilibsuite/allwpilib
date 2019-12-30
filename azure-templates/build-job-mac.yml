@@ -1,18 +1,21 @@
 # Job for mac
 
-jobs:
-- job: Mac
+parameters:
   pool:
     vmImage: 'macOS-10.14'
+  preBuild: []
 
-  timeoutInMinutes: 0
-  steps:
+extends:
+  template: build-job.yml
+  parameters:
+    jobName: 'Mac'
+    pool: ${{ parameters.pool }}
+    container: ''
+    jdkVersionOption: '1.11'
+    artifactName: 'Mac'
+    preBuild:
+    - ${{ parameters.preBuild }}
     - script: |
         mkdir build
         export JAVA_HOME=`/usr/libexec/java_home -v 11`
       displayName: 'Setup JDK'
-
-    - template: build-steps.yml
-      parameters:
-        jdkVersionOption: '1.11'
-        artifactName: 'Mac'

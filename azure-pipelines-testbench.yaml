@@ -69,6 +69,8 @@ stages:
         name: 'WPI Build'
         demands:
         - agent.os -equals Windows_NT
+      preBuild:
+      - script: C:\Program Files (x86)\Microsoft Visual Studio\BuildTools\Common7\Tools\VsDevCmd
 
   - template: azure-templates/build-job-mac.yml
 

@@ -3,16 +3,20 @@
 parameters:
   pool:
     vmImage: 'windows-2019'
+  preBuild: []
 
-jobs:
-- job: Windows_32_Bit
-  pool: ${{ parameters.pool }}
-
-  workspace:
-    clean: all
-
-  timeoutInMinutes: 0
-  steps:
+extends:
+  template: build-job.yml
+  parameters:
+    jobName: 'Windows_32_Bit'
+    pool: ${{ parameters.pool }}
+    container: ''
+    gradleOptions: '-Xmx1024m'
+    jdkVersionOption: '1.11'
+    buildOptions: '-PskipPMD'
+    artifactName: 'Win32'
+    preBuild:
+    - ${{ parameters.preBuild }}
     - powershell: |
         mkdir build
         $ProgressPreference = 'SilentlyContinue'
@@ -25,10 +29,3 @@ jobs:
         jdkFile: 'build/jdk.zip'
         jdkDestinationDirectory: 'build/jdkinst'
         jdkArchitectureOption: x86
-
-    - template: build-steps.yml
-      parameters:
-        gradleOptions: '-Xmx1024m'
-        jdkVersionOption: '1.11'
-        buildOptions: '-PskipPMD'
-        artifactName: 'Win32'

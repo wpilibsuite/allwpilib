@@ -6,6 +6,7 @@ parameters:
     vmImage: 'Ubuntu 16.04'
   container: wpilib2020
   preBuild: []
+  gradleOptions: ''
   jdkVersionOption: ''
   buildOptions: ''
   artifactName: ''
@@ -27,6 +28,7 @@ jobs:
 
     - template: build-steps.yml
       parameters:
+        gradleOptions: ${{ parameters.gradleOptions }}
         jdkVersionOption: ${{ parameters.jdkVersionOption }}
         buildOptions: ${{ parameters.buildOptions }}
         artifactName: ${{ parameters.artifactName }}
