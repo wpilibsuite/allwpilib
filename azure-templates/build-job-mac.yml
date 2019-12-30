@@ -12,6 +12,6 @@ jobs:
         export JAVA_HOME=`/usr/libexec/java_home -v 11`
       displayName: 'Setup JDK'
 
-    - template: azure-templates/build-steps.yml
+    - template: build-steps.yml
       parameters:
         artifactName: 'Mac'

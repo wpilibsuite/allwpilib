@@ -17,7 +17,7 @@ jobs:
   timeoutInMinutes: 0
 
   steps:
-    - template: azure-templates/build-steps.yml
+    - template: build-steps.yml
       parameters:
         buildOptions: ${{ parameters.buildOptions }}
         artifactName: ${{ parameters.artifactName }}

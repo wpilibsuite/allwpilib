@@ -19,7 +19,7 @@ jobs:
         jdkDestinationDirectory: 'build/jdkinst'
         jdkArchitectureOption: x86
 
-    - template: azure-templates/build-steps.yml
+    - template: build-steps.yml
       parameters:
         buildOptions: '-PskipPMD'
         artifactName: 'Win32'
