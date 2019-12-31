@@ -113,7 +113,7 @@ public class ProfiledPIDCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    m_controller.reset();
+    m_controller.reset(m_measurement.getAsDouble());
   }
 
   @Override
