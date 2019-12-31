@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 public class ProfiledPIDControllerTest {
   @Test
   @SuppressWarnings("PMD")
-  public void testStartFromNonZeroPosition() {
+ void testStartFromNonZeroPosition() {
     ProfiledPIDController controller = new ProfiledPIDController(1.0, 0.0, 0.0,
         new TrapezoidProfile.Constraints(1.0, 1.0));
 
