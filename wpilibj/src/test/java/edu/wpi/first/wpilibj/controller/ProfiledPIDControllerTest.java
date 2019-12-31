@@ -23,5 +23,4 @@ class ProfiledPIDControllerTest {
 
     assertEquals(0.0, controller.calculate(20), 0.05);
   }
-
 }
