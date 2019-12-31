@@ -312,7 +312,7 @@ class ProfiledPIDController
 
   /**
    * Reset the previous error and the integral term.
-   * @param measuredPosition the current measured position of the system. The 
+   * @param measuredPosition the current measured position of the system. The
    * velocity is assumed to be zero.
    */
   void Reset(Distance_t measuredPosition) {
