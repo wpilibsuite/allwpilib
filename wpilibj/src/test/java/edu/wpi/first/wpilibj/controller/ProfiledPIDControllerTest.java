@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
-public class ProfiledPIDControllerTest {
+class ProfiledPIDControllerTest {
   @Test
   @SuppressWarnings("PMD")
  void testStartFromNonZeroPosition() {
