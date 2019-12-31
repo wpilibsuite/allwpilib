@@ -93,7 +93,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    */
   public void enable() {
     m_enabled = true;
-    m_controller.reset();
+    m_controller.reset(getMeasurement());
   }
 
   /**

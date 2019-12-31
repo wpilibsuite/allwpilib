@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid
- * profile.
+ * profile. Users should call reset() when they first start running the controller
+ * to avoid unwanted behavior.
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public class ProfiledPIDController implements Sendable {
@@ -319,10 +320,30 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
-   * Reset the previous error, the integral term, and disable the controller.
+   * Reset the previous error and the integral term.
+   * @param measurement the current measured State of the system.
    */
-  public void reset() {
+  public void reset(TrapezoidProfile.State measurement) {
     m_controller.reset();
+    m_setpoint = measurement;
+  }
+
+  /**
+   * Reset the previous error and the integral term.
+   * @param measuredPosition the current measured position of the system.
+   * @param measuredVelocity the current measured velocity of the system.
+   */
+  public void reset(double measuredPosition, double measuredVelocity) {
+    reset(new TrapezoidProfile.State(measuredPosition, measuredVelocity));
+  }
+
+  /**
+   * Reset the previous error and the integral term.
+   * @param measuredPosition the current measured position of the system. The velocity is
+   *     assumed to be zero.
+   */
+  public void reset(double measuredPosition) {
+    reset(measuredPosition, 0.0);
   }
 
   @Override

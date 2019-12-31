@@ -46,7 +46,8 @@ class ProfiledPIDController
  public:
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and
-   * Kd.
+   * Kd. Users should call reset() when they first start running the controller
+   * to avoid unwanted behavior.
    *
    * @param Kp          The proportional coefficient.
    * @param Ki          The integral coefficient.
@@ -292,9 +293,31 @@ class ProfiledPIDController
   }
 
   /**
-   * Reset the previous error, the integral term, and disable the controller.
+   * Reset the previous error and the integral term.
+   * @param measurement the current measured State of the system.
    */
-  void Reset() { m_controller.Reset(); }
+  void Reset(State measurement) { 
+    m_controller.Reset(); 
+    m_setpoint = measurement;
+  }
+
+  /**
+   * Reset the previous error and the integral term.
+   * @param measuredPosition the current measured position of the system.
+   * @param measuredVelocity the current measured velocity of the system.
+   */
+  void Reset(Distance_t measuredPosition, Velocity_t measuredVelocity) {
+    Reset(State{measuredPosition, measuredVelocity});
+  }
+
+  /**
+   * Reset the previous error and the integral term.
+   * @param measuredPosition the current measured position of the system. The velocity is
+   *     assumed to be zero.
+   */
+  void Reset(Distance_t measuredPosition) {
+    Reset(measuredPosition, Velocity_t(0));
+  }
 
   void InitSendable(frc::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("ProfiledPIDController");

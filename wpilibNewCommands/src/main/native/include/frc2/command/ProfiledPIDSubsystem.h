@@ -62,10 +62,10 @@ class ProfiledPIDSubsystem : public SubsystemBase {
   void SetGoal(Distance_t goal) { m_goal = State{goal, Velocity_t(0)}; }
 
   /**
-   * Enables the PID control.  Resets the controller.
+   * Enables the PID control. Resets the controller.
    */
   virtual void Enable() {
-    m_controller.Reset();
+    m_controller.Reset(GetMeasurement());
     m_enabled = true;
   }
 
