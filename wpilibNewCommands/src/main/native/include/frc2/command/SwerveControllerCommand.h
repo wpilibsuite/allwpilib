@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <functional>
+#include <initializer_list>
 #include <memory>
 
 #include <frc/controller/PIDController.h>
@@ -17,6 +18,7 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/trajectory/Trajectory.h>
 #include <units/units.h>
+#include <wpi/ArrayRef.h>
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
@@ -91,6 +93,42 @@ class SwerveControllerCommand
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
       std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Constructs a new SwerveControllerCommand that when executed will follow the
+   * provided trajectory. This command will not return output voltages but
+   * rather raw module states from the position controllers which need to be put
+   * into a velocity PID.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon
+   * completion of the path- this is left to the user, since it is not
+   * appropriate for paths with nonstationary endstates.
+   *
+   * <p>Note 2: The rotation controller will calculate the rotation based on the
+   * final pose in the trajectory, not the poses at each time step.
+   *
+   * @param trajectory      The trajectory to follow.
+   * @param pose            A function that supplies the robot pose,
+   *                        provided by the odometry class.
+   * @param kinematics      The kinematics for the robot drivetrain.
+   * @param xController     The Trajectory Tracker PID controller
+   *                        for the robot's x position.
+   * @param yController     The Trajectory Tracker PID controller
+   *                        for the robot's y position.
+   * @param thetaController The Trajectory Tracker PID controller
+   *                        for angle for the robot.
+   * @param output          The raw output module states from the
+   *                        position controllers.
+   * @param requirements    The subsystems to require.
+   */
+  SwerveControllerCommand(
+      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+      frc::SwerveDriveKinematics<NumModules> kinematics,
+      frc2::PIDController xController, frc2::PIDController yController,
+      frc::ProfiledPIDController<units::radians> thetaController,
+      std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
+          output,
+      wpi::ArrayRef<Subsystem*> requirements = {});
 
   void Initialize() override;
 

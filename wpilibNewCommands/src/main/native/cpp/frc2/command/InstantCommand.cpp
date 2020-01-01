@@ -15,6 +15,12 @@ InstantCommand::InstantCommand(std::function<void()> toRun,
   AddRequirements(requirements);
 }
 
+InstantCommand::InstantCommand(std::function<void()> toRun,
+                               wpi::ArrayRef<Subsystem*> requirements)
+    : m_toRun{std::move(toRun)} {
+  AddRequirements(requirements);
+}
+
 InstantCommand::InstantCommand() : m_toRun{[] {}} {}
 
 void InstantCommand::Initialize() { m_toRun(); }

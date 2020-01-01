@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,12 @@
 
 #pragma once
 
-#include <atomic>
+#include <functional>
+#include <initializer_list>
 #include <memory>
 #include <utility>
+
+#include <wpi/ArrayRef.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"
@@ -99,7 +102,16 @@ class Trigger {
    * @paaram requirements the required subsystems.
    */
   Trigger WhenActive(std::function<void()> toRun,
-                     std::initializer_list<Subsystem*> requirements = {});
+                     std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Binds a runnable to execute when the trigger becomes active.
+   *
+   * @param toRun the runnable to execute.
+   * @paaram requirements the required subsystems.
+   */
+  Trigger WhenActive(std::function<void()> toRun,
+                     wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
@@ -151,7 +163,17 @@ class Trigger {
    */
   Trigger WhileActiveContinous(
       std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements = {});
+      std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Binds a runnable to execute repeatedly while the trigger is active.
+   *
+   * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
+   */
+  Trigger WhileActiveContinous(
+      std::function<void()> toRun,
+      wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started when the trigger becomes active, and
@@ -242,7 +264,16 @@ class Trigger {
    * @param requirements the required subsystems.
    */
   Trigger WhenInactive(std::function<void()> toRun,
-                       std::initializer_list<Subsystem*> requirements = {});
+                       std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Binds a runnable to execute when the trigger becomes inactive.
+   *
+   * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
+   */
+  Trigger WhenInactive(std::function<void()> toRun,
+                       wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
    * Binds a command to start when the trigger becomes active, and be cancelled

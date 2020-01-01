@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,13 @@ using namespace frc2;
 NotifierCommand::NotifierCommand(std::function<void()> toRun,
                                  units::second_t period,
                                  std::initializer_list<Subsystem*> requirements)
+    : m_toRun(toRun), m_notifier{std::move(toRun)}, m_period{period} {
+  AddRequirements(requirements);
+}
+
+NotifierCommand::NotifierCommand(std::function<void()> toRun,
+                                 units::second_t period,
+                                 wpi::ArrayRef<Subsystem*> requirements)
     : m_toRun(toRun), m_notifier{std::move(toRun)}, m_period{period} {
   AddRequirements(requirements);
 }
