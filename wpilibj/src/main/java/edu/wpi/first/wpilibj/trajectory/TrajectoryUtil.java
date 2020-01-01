@@ -47,6 +47,7 @@ public final class TrajectoryUtil {
    * @throws IOException if writing to the file fails
    */
   public static void toPathweaverJson(Trajectory trajectory, Path path) throws IOException {
+    Files.createDirectories(path.getParent());
     try (BufferedWriter writer = Files.newBufferedWriter(path)) {
       WRITER.writeValue(writer, trajectory.getStates().toArray(new Trajectory.State[0]));
     }
