@@ -297,7 +297,7 @@ class ProfiledPIDController
    *
    * @param measurement The current measured State of the system.
    */
-  void Reset(const State measurement) {
+  void Reset(const State& measurement) {
     m_controller.Reset();
     m_setpoint = measurement;
   }
