@@ -63,9 +63,8 @@ Trigger Trigger::WhileActiveContinous(
       wpi::makeArrayRef(requirements.begin(), requirements.end()));
 }
 
-Trigger Trigger::WhileActiveContinous(
-    std::function<void()> toRun,
-    wpi::ArrayRef<Subsystem*> requirements) {
+Trigger Trigger::WhileActiveContinous(std::function<void()> toRun,
+                                      wpi::ArrayRef<Subsystem*> requirements) {
   return WhileActiveContinous(InstantCommand(std::move(toRun), requirements));
 }
 

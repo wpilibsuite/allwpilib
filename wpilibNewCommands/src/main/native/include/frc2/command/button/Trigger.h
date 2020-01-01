@@ -161,9 +161,8 @@ class Trigger {
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
    */
-  Trigger WhileActiveContinous(
-      std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements);
+  Trigger WhileActiveContinous(std::function<void()> toRun,
+                               std::initializer_list<Subsystem*> requirements);
 
   /**
    * Binds a runnable to execute repeatedly while the trigger is active.
@@ -171,9 +170,8 @@ class Trigger {
    * @param toRun the runnable to execute.
    * @param requirements the required subsystems.
    */
-  Trigger WhileActiveContinous(
-      std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+  Trigger WhileActiveContinous(std::function<void()> toRun,
+                               wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started when the trigger becomes active, and
