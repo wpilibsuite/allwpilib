@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -294,7 +294,7 @@ class ProfiledPIDController
 
   /**
    * Reset the previous error and the integral term.
-   * 
+   *
    * @param measurement The current measured State of the system.
    */
   void Reset(const State measurement) {
@@ -304,7 +304,7 @@ class ProfiledPIDController
 
   /**
    * Reset the previous error and the integral term.
-   * 
+   *
    * @param measuredPosition The current measured position of the system.
    * @param measuredVelocity The current measured velocity of the system.
    */
@@ -314,7 +314,7 @@ class ProfiledPIDController
 
   /**
    * Reset the previous error and the integral term.
-   * 
+   *
    * @param measuredPosition The current measured position of the system. The
    * velocity is assumed to be zero.
    */

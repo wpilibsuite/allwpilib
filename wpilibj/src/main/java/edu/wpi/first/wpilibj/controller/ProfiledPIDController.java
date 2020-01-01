@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -321,7 +321,7 @@ public class ProfiledPIDController implements Sendable {
 
   /**
    * Reset the previous error and the integral term.
-   * 
+   *
    * @param measurement The current measured State of the system.
    */
   public void reset(TrapezoidProfile.State measurement) {
@@ -331,7 +331,7 @@ public class ProfiledPIDController implements Sendable {
 
   /**
    * Reset the previous error and the integral term.
-   * 
+   *
    * @param measuredPosition The current measured position of the system.
    * @param measuredVelocity The current measured velocity of the system.
    */
@@ -341,7 +341,7 @@ public class ProfiledPIDController implements Sendable {
 
   /**
    * Reset the previous error and the integral term.
-   * 
+   *
    * @param measuredPosition The current measured position of the system. The velocity is
    *     assumed to be zero.
    */
