@@ -40,7 +40,7 @@
     "commandversion": 1
   },
   {
-    "name": "Subsystem",
+    "name": "Subsystem (Old)",
     "description": "A subsystem",
     "tags": [
       "subsystem"
