@@ -321,7 +321,8 @@ public class ProfiledPIDController implements Sendable {
 
   /**
    * Reset the previous error and the integral term.
-   * @param measurement the current measured State of the system.
+   * 
+   * @param measurement The current measured State of the system.
    */
   public void reset(TrapezoidProfile.State measurement) {
     m_controller.reset();
@@ -330,8 +331,9 @@ public class ProfiledPIDController implements Sendable {
 
   /**
    * Reset the previous error and the integral term.
-   * @param measuredPosition the current measured position of the system.
-   * @param measuredVelocity the current measured velocity of the system.
+   * 
+   * @param measuredPosition The current measured position of the system.
+   * @param measuredVelocity The current measured velocity of the system.
    */
   public void reset(double measuredPosition, double measuredVelocity) {
     reset(new TrapezoidProfile.State(measuredPosition, measuredVelocity));
@@ -339,7 +341,8 @@ public class ProfiledPIDController implements Sendable {
 
   /**
    * Reset the previous error and the integral term.
-   * @param measuredPosition the current measured position of the system. The velocity is
+   * 
+   * @param measuredPosition The current measured position of the system. The velocity is
    *     assumed to be zero.
    */
   public void reset(double measuredPosition) {

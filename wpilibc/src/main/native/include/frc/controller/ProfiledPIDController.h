@@ -294,17 +294,19 @@ class ProfiledPIDController
 
   /**
    * Reset the previous error and the integral term.
-   * @param measurement the current measured State of the system.
+   * 
+   * @param measurement The current measured State of the system.
    */
-  void Reset(State measurement) {
+  void Reset(const State measurement) {
     m_controller.Reset();
     m_setpoint = measurement;
   }
 
   /**
    * Reset the previous error and the integral term.
-   * @param measuredPosition the current measured position of the system.
-   * @param measuredVelocity the current measured velocity of the system.
+   * 
+   * @param measuredPosition The current measured position of the system.
+   * @param measuredVelocity The current measured velocity of the system.
    */
   void Reset(Distance_t measuredPosition, Velocity_t measuredVelocity) {
     Reset(State{measuredPosition, measuredVelocity});
@@ -312,7 +314,8 @@ class ProfiledPIDController
 
   /**
    * Reset the previous error and the integral term.
-   * @param measuredPosition the current measured position of the system. The
+   * 
+   * @param measuredPosition The current measured position of the system. The
    * velocity is assumed to be zero.
    */
   void Reset(Distance_t measuredPosition) {
