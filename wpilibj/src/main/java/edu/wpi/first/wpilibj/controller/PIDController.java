@@ -328,7 +328,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Resets the previous error and the integral term. Also disables the controller.
+   * Resets the previous error and the integral term.
    */
   public void reset() {
     m_prevError = 0;

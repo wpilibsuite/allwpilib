@@ -118,7 +118,7 @@ class ProfiledPIDCommand
 
   ProfiledPIDCommand(const ProfiledPIDCommand& other) = default;
 
-  void Initialize() override { m_controller.Reset(); }
+  void Initialize() override { m_controller.Reset(m_measurement()); }
 
   void Execute() override {
     m_useOutput(m_controller.Calculate(m_measurement(), m_goal()),
