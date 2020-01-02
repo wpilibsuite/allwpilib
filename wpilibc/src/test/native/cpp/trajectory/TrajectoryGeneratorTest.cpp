@@ -33,3 +33,13 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
                 12_fps_sq + 0.01_fps_sq);
   }
 }
+
+TEST(TrajectoryGenertionTest, ReturnsEmptyOnMalformed) {
+  const auto t = TrajectoryGenerator::GenerateTrajectory(
+      std::vector<Pose2d>{Pose2d(0_m, 0_m, Rotation2d(0_deg)),
+                          Pose2d(1_m, 0_m, Rotation2d(180_deg))},
+      TrajectoryConfig(12_fps, 12_fps_sq));
+
+  ASSERT_EQ(t.States().size(), 1u);
+  ASSERT_EQ(t.TotalTime(), 0_s);
+}

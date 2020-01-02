@@ -31,6 +31,7 @@
 
 package edu.wpi.first.wpilibj.spline;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,36 @@ public final class SplineParameterizer {
   private static final double kMaxDtheta = 0.0872;
 
   /**
+   * A malformed spline does not actually explode the LIFO stack size. Instead, the stack size
+   * stays at a relatively small number (e.g. 30) and never decreases. Because of this, we must
+   * count iterations. Even long, complex paths don't usually go over 300 iterations, so hitting
+   * this maximum should definitely indicate something has gone wrong.
+   */
+  private static final int kMaxIterations = 5000;
+
+  @SuppressWarnings("MemberName")
+  private static class StackContents {
+    final double t1;
+    final double t0;
+
+    StackContents(double t0, double t1) {
+      this.t0 = t0;
+      this.t1 = t1;
+    }
+  }
+
+  public static class MalformedSplineException extends RuntimeException {
+    /**
+     * Create a new exception with the given message.
+     *
+     * @param message the message to pass with the exception
+     */
+    private MalformedSplineException(String message) {
+      super(message);
+    }
+  }
+
+  /**
    * Private constructor because this is a utility class.
    */
   private SplineParameterizer() {
@@ -53,7 +84,9 @@ public final class SplineParameterizer {
    * arcs until their dx, dy, and dtheta are within specific tolerances.
    *
    * @param spline The spline to parameterize.
-   * @return A vector of poses and curvatures that represents various points on the spline.
+   * @return A list of poses and curvatures that represents various points on the spline.
+   * @throws MalformedSplineException When the spline is malformed (e.g. has close adjacent points
+   *                                  with approximately opposing headings)
    */
   public static List<PoseWithCurvature> parameterize(Spline spline) {
     return parameterize(spline, 0.0, 1.0);
@@ -66,41 +99,54 @@ public final class SplineParameterizer {
    * @param spline The spline to parameterize.
    * @param t0     Starting internal spline parameter. It is recommended to use 0.0.
    * @param t1     Ending internal spline parameter. It is recommended to use 1.0.
-   * @return A vector of poses and curvatures that represents various points on the spline.
+   * @return       A list of poses and curvatures that represents various points on the spline.
+   * @throws MalformedSplineException When the spline is malformed (e.g. has close adjacent points
+   *                                  with approximately opposing headings)
    */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static List<PoseWithCurvature> parameterize(Spline spline, double t0, double t1) {
-    var arr = new ArrayList<PoseWithCurvature>();
+    var splinePoints = new ArrayList<PoseWithCurvature>();
 
-    // The parameterization does not add the first initial point. Let's add
-    // that.
-    arr.add(spline.getPoint(t0));
+    // The parameterization does not add the initial point. Let's add that.
+    splinePoints.add(spline.getPoint(t0));
 
-    getSegmentArc(spline, arr, t0, t1);
-    return arr;
-  }
+    // We use an "explicit stack" to simulate recursion, instead of a recursive function call
+    // This give us greater control, instead of a stack overflow
+    var stack = new ArrayDeque<StackContents>();
+    stack.push(new StackContents(t0, t1));
 
-  /**
-   * Breaks up the spline into arcs until the dx, dy, and theta of each arc is
-   * within tolerance.
-   *
-   * @param spline The spline to parameterize.
-   * @param vector Pointer to vector of poses.
-   * @param t0     Starting point for arc.
-   * @param t1     Ending point for arc.
-   */
-  private static void getSegmentArc(Spline spline, List<PoseWithCurvature> vector,
-                                    double t0, double t1) {
-    final var start = spline.getPoint(t0);
-    final var end = spline.getPoint(t1);
+    StackContents current;
+    PoseWithCurvature start;
+    PoseWithCurvature end;
+    int iterations = 0;
 
-    final var twist = start.poseMeters.log(end.poseMeters);
+    while (!stack.isEmpty()) {
+      current = stack.removeFirst();
+      start = spline.getPoint(current.t0);
+      end = spline.getPoint(current.t1);
 
-    if (Math.abs(twist.dy) > kMaxDy || Math.abs(twist.dx) > kMaxDx
-        || Math.abs(twist.dtheta) > kMaxDtheta) {
-      getSegmentArc(spline, vector, t0, (t0 + t1) / 2);
-      getSegmentArc(spline, vector, (t0 + t1) / 2, t1);
-    } else {
-      vector.add(spline.getPoint(t1));
+      final var twist = start.poseMeters.log(end.poseMeters);
+      if (
+          Math.abs(twist.dy) > kMaxDy
+          || Math.abs(twist.dx) > kMaxDx
+          || Math.abs(twist.dtheta) > kMaxDtheta
+      ) {
+        stack.addFirst(new StackContents((current.t0 + current.t1) / 2, current.t1));
+        stack.addFirst(new StackContents(current.t0, (current.t0 + current.t1) / 2));
+      } else {
+        splinePoints.add(spline.getPoint(current.t1));
+      }
+
+      iterations++;
+      if (iterations >= kMaxIterations) {
+        throw new MalformedSplineException(
+          "Could not parameterize a malformed spline. "
+          + "This means that you probably had two or more adjacent waypoints that were very close "
+          + "together with headings in opposing directions."
+        );
+      }
     }
+
+    return splinePoints;
   }
 }

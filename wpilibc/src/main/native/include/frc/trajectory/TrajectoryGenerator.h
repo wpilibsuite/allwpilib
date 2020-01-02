@@ -113,5 +113,8 @@ class TrajectoryGenerator {
     }
     return splinePoints;
   }
+
+ private:
+  static const Trajectory kDoNothingTrajectory;
 };
 }  // namespace frc

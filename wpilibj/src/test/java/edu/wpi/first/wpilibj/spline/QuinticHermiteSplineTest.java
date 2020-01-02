@@ -13,9 +13,11 @@ import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.spline.SplineParameterizer.MalformedSplineException;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QuinticHermiteSplineTest {
@@ -23,7 +25,7 @@ class QuinticHermiteSplineTest {
   private static final double kMaxDy = 0.00127;
   private static final double kMaxDtheta = 0.0872;
 
-  @SuppressWarnings({"ParameterName", "PMD.UnusedLocalVariable"})
+  @SuppressWarnings({ "ParameterName", "PMD.UnusedLocalVariable" })
   private void run(Pose2d a, Pose2d b) {
     // Start the timer.
     var start = System.nanoTime();
@@ -49,29 +51,27 @@ class QuinticHermiteSplineTest {
       assertAll(
           () -> assertTrue(Math.abs(twist.dx) < kMaxDx),
           () -> assertTrue(Math.abs(twist.dy) < kMaxDy),
-          () -> assertTrue(Math.abs(twist.dtheta) < kMaxDtheta)
-      );
+          () -> assertTrue(Math.abs(twist.dtheta) < kMaxDtheta));
     }
 
     // Check first point
     assertAll(
-        () -> assertEquals(a.getTranslation().getX(),
-            poses.get(0).poseMeters.getTranslation().getX(), 1E-9),
-        () -> assertEquals(a.getTranslation().getY(),
-            poses.get(0).poseMeters.getTranslation().getY(), 1E-9),
-        () -> assertEquals(a.getRotation().getRadians(),
-            poses.get(0).poseMeters.getRotation().getRadians(), 1E-9)
-    );
+        () -> assertEquals(
+            a.getTranslation().getX(), poses.get(0).poseMeters.getTranslation().getX(), 1E-9),
+        () -> assertEquals(
+            a.getTranslation().getY(), poses.get(0).poseMeters.getTranslation().getY(), 1E-9),
+        () -> assertEquals(
+            a.getRotation().getRadians(), poses.get(0).poseMeters.getRotation().getRadians(),
+            1E-9));
 
     // Check last point
     assertAll(
-        () -> assertEquals(b.getTranslation().getX(),
-            poses.get(poses.size() - 1).poseMeters.getTranslation().getX(), 1E-9),
-        () -> assertEquals(b.getTranslation().getY(),
-            poses.get(poses.size() - 1).poseMeters.getTranslation().getY(), 1E-9),
+        () -> assertEquals(b.getTranslation().getX(), poses.get(poses.size() - 1)
+            .poseMeters.getTranslation().getX(), 1E-9),
+        () -> assertEquals(b.getTranslation().getY(), poses.get(poses.size() - 1)
+            .poseMeters.getTranslation().getY(), 1E-9),
         () -> assertEquals(b.getRotation().getRadians(),
-            poses.get(poses.size() - 1).poseMeters.getRotation().getRadians(), 1E-9)
-    );
+            poses.get(poses.size() - 1).poseMeters.getRotation().getRadians(), 1E-9));
   }
 
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
@@ -89,7 +89,20 @@ class QuinticHermiteSplineTest {
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   @Test
   void testSquiggly() {
-    run(new Pose2d(0, 0, Rotation2d.fromDegrees(90)),
+    run(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(90)),
         new Pose2d(-1, 0, Rotation2d.fromDegrees(90)));
+  }
+
+  @Test
+  void testMalformed() {
+    assertThrows(MalformedSplineException.class,
+        () -> run(
+          new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+          new Pose2d(1, 0, Rotation2d.fromDegrees(180))));
+    assertThrows(MalformedSplineException.class,
+        () -> run(
+          new Pose2d(10, 10, Rotation2d.fromDegrees(90)),
+          new Pose2d(10, 11, Rotation2d.fromDegrees(-90))));
   }
 }

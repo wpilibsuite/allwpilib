@@ -8,10 +8,12 @@
 package edu.wpi.first.wpilibj.trajectory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import edu.wpi.first.hal.sim.DriverStationSim;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
 import static edu.wpi.first.wpilibj.util.Units.feetToMeters;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TrajectoryGeneratorTest {
@@ -68,5 +71,25 @@ class TrajectoryGeneratorTest {
               + 0.05)
       );
     }
+  }
+
+  @Test
+  void testMalformedTrajectory() {
+    var dsSim = new DriverStationSim();
+    dsSim.setSendError(false);
+
+    var traj =
+        TrajectoryGenerator.generateTrajectory(
+          Arrays.asList(
+            new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+            new Pose2d(1, 0, Rotation2d.fromDegrees(180))
+          ),
+          new TrajectoryConfig(feetToMeters(12), feetToMeters(12))
+        );
+
+    assertEquals(traj.getStates().size(), 1);
+    assertEquals(traj.getTotalTimeSeconds(), 0);
+
+    dsSim.setSendError(true);
   }
 }
