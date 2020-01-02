@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,6 +19,26 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     std::initializer_list<Subsystem*> requirements)
+    : m_trajectory(trajectory),
+      m_pose(pose),
+      m_kinematics(kinematics),
+      m_xController(std::make_unique<frc2::PIDController>(xController)),
+      m_yController(std::make_unique<frc2::PIDController>(yController)),
+      m_thetaController(
+          std::make_unique<frc::ProfiledPIDController<units::radians>>(
+              thetaController)),
+      m_outputStates(output) {
+  this->AddRequirements(requirements);
+}
+
+template <size_t NumModules>
+SwerveControllerCommand<NumModules>::SwerveControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::SwerveDriveKinematics<NumModules> kinematics,
+    frc2::PIDController xController, frc2::PIDController yController,
+    frc::ProfiledPIDController<units::radians> thetaController,
+    std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
+    wpi::ArrayRef<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
       m_kinematics(kinematics),

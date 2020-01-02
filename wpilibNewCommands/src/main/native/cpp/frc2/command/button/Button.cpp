@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,6 +22,12 @@ Button Button::WhenPressed(std::function<void()> toRun,
   return *this;
 }
 
+Button Button::WhenPressed(std::function<void()> toRun,
+                           wpi::ArrayRef<Subsystem*> requirements) {
+  WhenActive(std::move(toRun), requirements);
+  return *this;
+}
+
 Button Button::WhileHeld(Command* command, bool interruptible) {
   WhileActiveContinous(command, interruptible);
   return *this;
@@ -29,6 +35,12 @@ Button Button::WhileHeld(Command* command, bool interruptible) {
 
 Button Button::WhileHeld(std::function<void()> toRun,
                          std::initializer_list<Subsystem*> requirements) {
+  WhileActiveContinous(std::move(toRun), requirements);
+  return *this;
+}
+
+Button Button::WhileHeld(std::function<void()> toRun,
+                         wpi::ArrayRef<Subsystem*> requirements) {
   WhileActiveContinous(std::move(toRun), requirements);
   return *this;
 }
@@ -45,6 +57,12 @@ Button Button::WhenReleased(Command* command, bool interruptible) {
 
 Button Button::WhenReleased(std::function<void()> toRun,
                             std::initializer_list<Subsystem*> requirements) {
+  WhenInactive(std::move(toRun), requirements);
+  return *this;
+}
+
+Button Button::WhenReleased(std::function<void()> toRun,
+                            wpi::ArrayRef<Subsystem*> requirements) {
   WhenInactive(std::move(toRun), requirements);
   return *this;
 }

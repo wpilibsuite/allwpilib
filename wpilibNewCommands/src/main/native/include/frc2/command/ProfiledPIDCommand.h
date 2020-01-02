@@ -13,6 +13,7 @@
 
 #include <frc/controller/ProfiledPIDController.h>
 #include <units/units.h>
+#include <wpi/ArrayRef.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -50,7 +51,29 @@ class ProfiledPIDCommand
                      std::function<Distance_t()> measurementSource,
                      std::function<State()> goalSource,
                      std::function<void(double, State)> useOutput,
-                     std::initializer_list<Subsystem*> requirements = {})
+                     std::initializer_list<Subsystem*> requirements)
+      : m_controller{controller},
+        m_measurement{std::move(measurementSource)},
+        m_goal{std::move(goalSource)},
+        m_useOutput{std::move(useOutput)} {
+    this->AddRequirements(requirements);
+  }
+
+  /**
+   * Creates a new PIDCommand, which controls the given output with a
+   * ProfiledPIDController.
+   *
+   * @param controller        the controller that controls the output.
+   * @param measurementSource the measurement of the process variable
+   * @param goalSource   the controller's goal
+   * @param useOutput         the controller's output
+   * @param requirements      the subsystems required by this command
+   */
+  ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
+                     std::function<Distance_t()> measurementSource,
+                     std::function<State()> goalSource,
+                     std::function<void(double, State)> useOutput,
+                     wpi::ArrayRef<Subsystem*> requirements = {})
       : m_controller{controller},
         m_measurement{std::move(measurementSource)},
         m_goal{std::move(goalSource)},
@@ -73,6 +96,27 @@ class ProfiledPIDCommand
                      std::function<Distance_t()> goalSource,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
+      : ProfiledPIDCommand(controller, measurementSource,
+                           [&goalSource]() {
+                             return State{goalSource(), Velocity_t{0}};
+                           },
+                           useOutput, requirements) {}
+
+  /**
+   * Creates a new PIDCommand, which controls the given output with a
+   * ProfiledPIDController.
+   *
+   * @param controller        the controller that controls the output.
+   * @param measurementSource the measurement of the process variable
+   * @param goalSource   the controller's goal
+   * @param useOutput         the controller's output
+   * @param requirements      the subsystems required by this command
+   */
+  ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
+                     std::function<Distance_t()> measurementSource,
+                     std::function<Distance_t()> goalSource,
+                     std::function<void(double, State)> useOutput,
+                     wpi::ArrayRef<Subsystem*> requirements = {})
       : ProfiledPIDCommand(controller, measurementSource,
                            [&goalSource]() {
                              return State{goalSource(), Velocity_t{0}};
@@ -107,10 +151,45 @@ class ProfiledPIDCommand
    * @param requirements      the subsystems required by this command
    */
   ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
+                     std::function<Distance_t()> measurementSource, State goal,
+                     std::function<void(double, State)> useOutput,
+                     wpi::ArrayRef<Subsystem*> requirements = {})
+      : ProfiledPIDCommand(controller, measurementSource,
+                           [goal] { return goal; }, useOutput, requirements) {}
+
+  /**
+   * Creates a new PIDCommand, which controls the given output with a
+   * ProfiledPIDController with a constant goal.
+   *
+   * @param controller        the controller that controls the output.
+   * @param measurementSource the measurement of the process variable
+   * @param goal         the controller's goal
+   * @param useOutput         the controller's output
+   * @param requirements      the subsystems required by this command
+   */
+  ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
                      std::function<Distance_t()> measurementSource,
                      Distance_t goal,
                      std::function<void(double, State)> useOutput,
                      std::initializer_list<Subsystem*> requirements)
+      : ProfiledPIDCommand(controller, measurementSource,
+                           [goal] { return goal; }, useOutput, requirements) {}
+
+  /**
+   * Creates a new PIDCommand, which controls the given output with a
+   * ProfiledPIDController with a constant goal.
+   *
+   * @param controller        the controller that controls the output.
+   * @param measurementSource the measurement of the process variable
+   * @param goal         the controller's goal
+   * @param useOutput         the controller's output
+   * @param requirements      the subsystems required by this command
+   */
+  ProfiledPIDCommand(frc::ProfiledPIDController<Distance> controller,
+                     std::function<Distance_t()> measurementSource,
+                     Distance_t goal,
+                     std::function<void(double, State)> useOutput,
+                     wpi::ArrayRef<Subsystem*> requirements = {})
       : ProfiledPIDCommand(controller, measurementSource,
                            [goal] { return goal; }, useOutput, requirements) {}
 

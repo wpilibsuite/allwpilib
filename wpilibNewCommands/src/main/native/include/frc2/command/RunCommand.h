@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,8 @@
 
 #include <functional>
 #include <initializer_list>
+
+#include <wpi/ArrayRef.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -30,7 +32,17 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
    * @param requirements the subsystems to require
    */
   RunCommand(std::function<void()> toRun,
-             std::initializer_list<Subsystem*> requirements = {});
+             std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Creates a new RunCommand.  The Runnable will be run continuously until the
+   * command ends.  Does not run when disabled.
+   *
+   * @param toRun        the Runnable to run
+   * @param requirements the subsystems to require
+   */
+  RunCommand(std::function<void()> toRun,
+             wpi::ArrayRef<Subsystem*> requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 
