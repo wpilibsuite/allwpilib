@@ -22,7 +22,7 @@ namespace frc {
 
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
- * 
+ *
  * <p>Only 1 LED driver is currently supported by the roboRIO.
  */
 class AddressableLED : public ErrorBase {
@@ -96,7 +96,7 @@ class AddressableLED : public ErrorBase {
    *
    * <p>Calling this is an expensive call, so its best to call it once, then
    * just update data.
-   * 
+   *
    * <p>The max length is 5460 LEDs.
    *
    * @param length the strip length

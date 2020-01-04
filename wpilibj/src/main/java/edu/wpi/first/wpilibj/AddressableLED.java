@@ -14,7 +14,7 @@ import edu.wpi.first.hal.PWMJNI;
 
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
- * 
+ *
  * <p>Only 1 LED driver is currently supported by the roboRIO.
  */
 public class AddressableLED implements AutoCloseable {
@@ -46,7 +46,7 @@ public class AddressableLED implements AutoCloseable {
    * Sets the length of the LED strip.
    *
    * <p>Calling this is an expensive call, so its best to call it once, then just update data.
-   * 
+   *
    * <p>The max length is 5460 LEDs.
    *
    * @param length the strip length
