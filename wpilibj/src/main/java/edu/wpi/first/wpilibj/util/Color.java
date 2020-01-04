@@ -754,7 +754,7 @@ public class Color {
    * @param green Green value (0-1)
    * @param blue  Blue value (0-1)
    */
-  Color(double red, double green, double blue) {
+  public Color(double red, double green, double blue) {
     this.red = roundAndClamp(red);
     this.green = roundAndClamp(green);
     this.blue = roundAndClamp(blue);
