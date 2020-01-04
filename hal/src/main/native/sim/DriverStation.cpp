@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -228,6 +228,10 @@ static int& GetThreadLocalLastCount() {
   thread_local int lastCount{-1};
 #endif
   return lastCount;
+}
+
+void HAL_WaitForCachedControlData(void) {
+  HAL_WaitForCachedControlDataTimeout(0);
 }
 
 HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
