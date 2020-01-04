@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,6 +22,8 @@ namespace frc {
 
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
+ * 
+ * <p>Only 1 LED driver is currently supported by the roboRIO.
  */
 class AddressableLED : public ErrorBase {
  public:
@@ -83,7 +85,7 @@ class AddressableLED : public ErrorBase {
   /**
    * Constructs a new driver for a specific port.
    *
-   * @param port the output port to use (Must be a PWM port)
+   * @param port the output port to use (Must be a PWM header)
    */
   explicit AddressableLED(int port);
 
@@ -94,6 +96,8 @@ class AddressableLED : public ErrorBase {
    *
    * <p>Calling this is an expensive call, so its best to call it once, then
    * just update data.
+   * 
+   * <p>The max length is 5460 LEDs.
    *
    * @param length the strip length
    */
