@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -157,8 +157,10 @@ class CommandScheduler final : public frc::Sendable,
   void UnregisterSubsystem(Subsystem* subsystem);
 
   void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
+  void RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems);
 
   void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
+  void UnregisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems);
 
   /**
    * Sets the default command for a subsystem.  Registers that subsystem if it

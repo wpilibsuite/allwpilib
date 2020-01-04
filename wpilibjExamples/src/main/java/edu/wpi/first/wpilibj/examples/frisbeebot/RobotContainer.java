@@ -17,13 +17,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.frisbeebot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.examples.frisbeebot.subsystems.ShooterSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.AutoConstants.kAutoShootTimeSeconds;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.AutoConstants.kAutoTimeoutSeconds;
-import static edu.wpi.first.wpilibj.examples.frisbeebot.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -45,10 +44,10 @@ public class RobotContainer {
           // Start running the feeder
           new InstantCommand(m_shooter::runFeeder, m_shooter),
           // Shoot for the specified time
-          new WaitCommand(kAutoShootTimeSeconds))
+          new WaitCommand(AutoConstants.kAutoShootTimeSeconds))
           // Add a timeout (will end the command if, for instance, the shooter never gets up to
           // speed)
-          .withTimeout(kAutoTimeoutSeconds)
+          .withTimeout(AutoConstants.kAutoTimeoutSeconds)
           // When the command ends, turn off the shooter and the feeder
           .andThen(() -> {
             m_shooter.disable();
@@ -56,7 +55,7 @@ public class RobotContainer {
           });
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -72,7 +71,7 @@ public class RobotContainer {
         // hand, and turning controlled by the right.
         new RunCommand(() -> m_robotDrive
             .arcadeDrive(m_driverController.getY(GenericHID.Hand.kLeft),
-                m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
+                         m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
 
   }
 

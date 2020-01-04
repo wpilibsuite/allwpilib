@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hal/FRCUsageReporting.h>
 #include <units/units.h>
 
 namespace frc {
@@ -53,6 +54,13 @@ class TrapezoidProfile {
  public:
   class Constraints {
    public:
+    Constraints() {
+      HAL_Report(HALUsageReporting::kResourceType_TrapezoidProfile, 1);
+    }
+    Constraints(Velocity_t maxVelocity_, Acceleration_t maxAcceleration_)
+        : maxVelocity{maxVelocity_}, maxAcceleration{maxAcceleration_} {
+      HAL_Report(HALUsageReporting::kResourceType_TrapezoidProfile, 1);
+    }
     Velocity_t maxVelocity{0};
     Acceleration_t maxAcceleration{0};
   };

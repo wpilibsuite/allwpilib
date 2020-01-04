@@ -94,7 +94,11 @@ public abstract class RobotBase implements AutoCloseable {
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
     inst.setNetworkIdentity("Robot");
-    inst.startServer("/home/lvuser/networktables.ini");
+    if (isReal()) {
+      inst.startServer("/home/lvuser/networktables.ini");
+    } else {
+      inst.startServer();
+    }
     m_ds = DriverStation.getInstance();
     inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
@@ -317,7 +321,8 @@ public abstract class RobotBase implements AutoCloseable {
     // Needed because all the OpenCV JNI functions don't have built in loading
     CameraServerJNI.enumerateSinks();
 
-    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0,
+        WPILibVersion.Version);
 
     if (HAL.hasMain()) {
       Thread thread = new Thread(() -> {

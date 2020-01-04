@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -51,6 +51,13 @@ ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
 SequentialCommandGroup Command::BeforeStarting(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
+  return std::move(*this).BeforeStarting(
+      std::move(toRun),
+      wpi::makeArrayRef(requirements.begin(), requirements.end()));
+}
+
+SequentialCommandGroup Command::BeforeStarting(
+    std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(
       std::make_unique<InstantCommand>(std::move(toRun), requirements));
@@ -61,6 +68,13 @@ SequentialCommandGroup Command::BeforeStarting(
 SequentialCommandGroup Command::AndThen(
     std::function<void()> toRun,
     std::initializer_list<Subsystem*> requirements) && {
+  return std::move(*this).AndThen(
+      std::move(toRun),
+      wpi::makeArrayRef(requirements.begin(), requirements.end()));
+}
+
+SequentialCommandGroup Command::AndThen(
+    std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::move(*this).TransferOwnership());
   temp.emplace_back(

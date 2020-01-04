@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
@@ -68,6 +69,8 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 }
 
 CommandScheduler::CommandScheduler() : m_impl(new Impl) {
+  HAL_Report(HALUsageReporting::kResourceType_Command,
+             HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
   auto scheduler = frc::LiveWindow::GetInstance();
   scheduler->enabled = [this] {
@@ -257,8 +260,21 @@ void CommandScheduler::RegisterSubsystem(
   }
 }
 
+void CommandScheduler::RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems) {
+  for (auto* subsystem : subsystems) {
+    RegisterSubsystem(subsystem);
+  }
+}
+
 void CommandScheduler::UnregisterSubsystem(
     std::initializer_list<Subsystem*> subsystems) {
+  for (auto* subsystem : subsystems) {
+    UnregisterSubsystem(subsystem);
+  }
+}
+
+void CommandScheduler::UnregisterSubsystem(
+    wpi::ArrayRef<Subsystem*> subsystems) {
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }

@@ -7,6 +7,8 @@
 
 #include "frc/kinematics/MecanumDriveOdometry.h"
 
+#include <hal/FRCUsageReporting.h>
+
 using namespace frc;
 
 MecanumDriveOdometry::MecanumDriveOdometry(MecanumDriveKinematics kinematics,
@@ -15,6 +17,8 @@ MecanumDriveOdometry::MecanumDriveOdometry(MecanumDriveKinematics kinematics,
     : m_kinematics(kinematics), m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
+  HAL_Report(HALUsageReporting::kResourceType_Odometry,
+             HALUsageReporting::kOdometry_MecanumDrive);
 }
 
 const Pose2d& MecanumDriveOdometry::UpdateWithTime(

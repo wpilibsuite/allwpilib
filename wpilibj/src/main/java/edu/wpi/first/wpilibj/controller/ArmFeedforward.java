@@ -49,6 +49,7 @@ public class ArmFeedforward {
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
+   * @param positionRadians       The position (angle) setpoint.
    * @param velocityRadPerSec     The velocity setpoint.
    * @param accelRadPerSecSquared The acceleration setpoint.
    * @return The computed feedforward.
@@ -64,7 +65,8 @@ public class ArmFeedforward {
    * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to
    * be zero).
    *
-   * @param velocity The velocity setpoint.
+   * @param positionRadians The position (angle) setpoint.
+   * @param velocity        The velocity setpoint.
    * @return The computed feedforward.
    */
   public double calculate(double positionRadians, double velocity) {

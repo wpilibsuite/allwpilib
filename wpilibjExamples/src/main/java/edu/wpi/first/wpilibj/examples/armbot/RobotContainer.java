@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.armbot.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.armbot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj.examples.armbot.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -32,7 +32,7 @@ public class RobotContainer {
   private final ArmSubsystem m_robotArm = new ArmSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.

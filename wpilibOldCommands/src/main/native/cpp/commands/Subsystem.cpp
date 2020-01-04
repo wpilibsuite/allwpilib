@@ -101,7 +101,6 @@ void Subsystem::AddChild(const wpi::Twine& name, Sendable* child) {
 void Subsystem::AddChild(const wpi::Twine& name, Sendable& child) {
   auto& registry = SendableRegistry::GetInstance();
   registry.AddLW(&child, registry.GetSubsystem(this), name);
-  registry.AddChild(this, &child);
 }
 
 void Subsystem::AddChild(std::shared_ptr<Sendable> child) { AddChild(*child); }
@@ -112,7 +111,6 @@ void Subsystem::AddChild(Sendable& child) {
   auto& registry = SendableRegistry::GetInstance();
   registry.SetSubsystem(&child, registry.GetSubsystem(this));
   registry.EnableLiveWindow(&child);
-  registry.AddChild(this, &child);
 }
 
 void Subsystem::ConfirmCommand() {

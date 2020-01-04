@@ -14,40 +14,28 @@ import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kAVoltSecondSquaredPerRad;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kArmOffsetRads;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kCosVolts;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kEncoderDistancePerPulse;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kEncoderPorts;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kMaxAccelerationRadPerSecSquared;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kMaxVelocityRadPerSecond;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kMotorPort;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kP;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kSVolts;
-import static edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants.kVVoltSecondPerRad;
+import edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants;
 
 /**
  * A robot arm subsystem that moves with a motion profile.
  */
 public class ArmSubsystem extends ProfiledPIDSubsystem {
-  private final PWMVictorSPX m_motor = new PWMVictorSPX(kMotorPort);
-  private final Encoder m_encoder = new Encoder(kEncoderPorts[0], kEncoderPorts[1]);
+  private final PWMVictorSPX m_motor = new PWMVictorSPX(ArmConstants.kMotorPort);
+  private final Encoder m_encoder =
+      new Encoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
   private final ArmFeedforward m_feedforward =
-      new ArmFeedforward(kSVolts, kCosVolts, kVVoltSecondPerRad, kAVoltSecondSquaredPerRad);
+      new ArmFeedforward(ArmConstants.kSVolts, ArmConstants.kCosVolts,
+                         ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
 
   /**
    * Create a new ArmSubsystem.
    */
   public ArmSubsystem() {
-    super(new ProfiledPIDController(
-        kP,
-        0,
-        0,
-        new TrapezoidProfile.Constraints(kMaxVelocityRadPerSecond,
-                                         kMaxAccelerationRadPerSecSquared)));
-    m_encoder.setDistancePerPulse(kEncoderDistancePerPulse);
+    super(new ProfiledPIDController(ArmConstants.kP, 0, 0, new TrapezoidProfile.Constraints(
+        ArmConstants.kMaxVelocityRadPerSecond, ArmConstants.kMaxAccelerationRadPerSecSquared)), 0);
+    m_encoder.setDistancePerPulse(ArmConstants.kEncoderDistancePerPulse);
     // Start arm at rest in neutral position
-    setGoal(kArmOffsetRads);
+    setGoal(ArmConstants.kArmOffsetRads);
   }
 
   @Override
@@ -60,6 +48,6 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
 
   @Override
   public double getMeasurement() {
-    return m_encoder.getDistance() + kArmOffsetRads;
+    return m_encoder.getDistance() + ArmConstants.kArmOffsetRads;
   }
 }

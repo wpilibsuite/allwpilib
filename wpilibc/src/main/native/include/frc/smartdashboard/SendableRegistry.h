@@ -125,6 +125,15 @@ class SendableRegistry {
    * @param parent parent object
    * @param child child object
    */
+  void AddChild(Sendable* parent, Sendable* child);
+
+  /**
+   * Adds a child object to an object.  Adds the child object to the registry
+   * if it's not already present.
+   *
+   * @param parent parent object
+   * @param child child object
+   */
   void AddChild(Sendable* parent, void* child);
 
   /**

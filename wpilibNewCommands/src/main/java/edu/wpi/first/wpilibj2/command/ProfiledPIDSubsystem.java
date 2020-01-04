@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,10 +27,21 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    * Creates a new ProfiledPIDSubsystem.
    *
    * @param controller the ProfiledPIDController to use
+   * @param initialPosition the initial goal position of the controller
+   */
+  public ProfiledPIDSubsystem(ProfiledPIDController controller,
+                              double initialPosition) {
+    m_controller = requireNonNullParam(controller, "controller", "ProfiledPIDSubsystem");
+    setGoal(initialPosition);
+  }
+
+  /**
+   * Creates a new ProfiledPIDSubsystem.  Initial goal position is zero.
+   *
+   * @param controller the ProfiledPIDController to use
    */
   public ProfiledPIDSubsystem(ProfiledPIDController controller) {
-    requireNonNullParam(controller, "controller", "ProfiledPIDSubsystem");
-    m_controller = controller;
+    this(controller, 0);
   }
 
   @Override
@@ -82,7 +93,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    */
   public void enable() {
     m_enabled = true;
-    m_controller.reset();
+    m_controller.reset(getMeasurement());
   }
 
   /**

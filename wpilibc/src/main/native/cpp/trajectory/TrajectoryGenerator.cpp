@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,10 +9,15 @@
 
 #include <utility>
 
+#include "frc/DriverStation.h"
 #include "frc/spline/SplineHelper.h"
+#include "frc/spline/SplineParameterizer.h"
 #include "frc/trajectory/TrajectoryParameterizer.h"
 
 using namespace frc;
+
+const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
+    std::vector<Trajectory::State>{Trajectory::State()});
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
     Spline<3>::ControlVector initial,
@@ -29,9 +34,15 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     end.y[1] *= -1;
   }
 
-  auto points =
-      SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
-          initial, interiorWaypoints, end));
+  std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+  try {
+    points =
+        SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
+            initial, interiorWaypoints, end));
+  } catch (SplineParameterizer::MalformedSplineException& e) {
+    DriverStation::ReportError(e.what());
+    return kDoNothingTrajectory;
+  }
 
   // After trajectory generation, flip theta back so it's relative to the
   // field. Also fix curvature.
@@ -68,8 +79,14 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     }
   }
 
-  auto points = SplinePointsFromSplines(
-      SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
+  std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
+  try {
+    points = SplinePointsFromSplines(
+        SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
+  } catch (SplineParameterizer::MalformedSplineException& e) {
+    DriverStation::ReportError(e.what());
+    return kDoNothingTrajectory;
+  }
 
   // After trajectory generation, flip theta back so it's relative to the
   // field. Also fix curvature.

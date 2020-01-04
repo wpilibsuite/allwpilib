@@ -9,8 +9,10 @@
 
 using namespace frc2;
 
-PIDSubsystem::PIDSubsystem(PIDController controller)
-    : m_controller{controller} {}
+PIDSubsystem::PIDSubsystem(PIDController controller, double initialPosition)
+    : m_controller{controller} {
+  SetSetpoint(initialPosition);
+}
 
 void PIDSubsystem::Periodic() {
   if (m_enabled) {

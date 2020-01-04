@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hal/FRCUsageReporting.h>
+
 namespace frc {
 template <size_t NumModules>
 SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
@@ -15,6 +17,8 @@ SwerveDriveOdometry<NumModules>::SwerveDriveOdometry(
     : m_kinematics(kinematics), m_pose(initialPose) {
   m_previousAngle = m_pose.Rotation();
   m_gyroOffset = m_pose.Rotation() - gyroAngle;
+  HAL_Report(HALUsageReporting::kResourceType_Odometry,
+             HALUsageReporting::kOdometry_SwerveDrive);
 }
 
 template <size_t NumModules>

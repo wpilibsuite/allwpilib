@@ -25,21 +25,10 @@ import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems.DriveSubsystem;
-
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants.kMaxSpeedMetersPerSecond;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants.kPThetaController;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants.kPXController;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants.kPYController;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants.kThetaControllerConstraints;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kDriveKinematics;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kFeedforward;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kPFrontLeftVel;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kPFrontRightVel;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kPRearLeftVel;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants.kPRearRightVel;
-import static edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants.kDriverControllerPort;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -53,7 +42,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -96,9 +85,10 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Create config for trajectory
     TrajectoryConfig config =
-        new TrajectoryConfig(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared)
+        new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond,
+                             AutoConstants.kMaxAccelerationMetersPerSecondSquared)
             // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(kDriveKinematics);
+            .setKinematics(DriveConstants.kDriveKinematics);
 
     // An example trajectory to follow.  All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -107,7 +97,7 @@ public class RobotContainer {
         // Pass through these two interior waypoints, making an 's' curve path
         List.of(
             new Translation2d(1, 1),
-            new Translation2d(2, - 1)
+            new Translation2d(2, -1)
         ),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
@@ -118,22 +108,23 @@ public class RobotContainer {
         exampleTrajectory,
         m_robotDrive::getPose,
 
-        kFeedforward,
-        kDriveKinematics,
+        DriveConstants.kFeedforward,
+        DriveConstants.kDriveKinematics,
 
         //Position contollers
-        new PIDController(kPXController, 0, 0),
-        new PIDController(kPYController, 0, 0),
-        new ProfiledPIDController(kPThetaController, 0, 0, kThetaControllerConstraints),
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0,
+                                  AutoConstants.kThetaControllerConstraints),
 
         //Needed for normalizing wheel speeds
-        kMaxSpeedMetersPerSecond,
+        AutoConstants.kMaxSpeedMetersPerSecond,
 
         //Velocity PID's
-        new PIDController(kPFrontLeftVel, 0, 0),
-        new PIDController(kPRearLeftVel, 0, 0),
-        new PIDController(kPFrontRightVel, 0, 0),
-        new PIDController(kPRearRightVel, 0, 0),
+        new PIDController(DriveConstants.kPFrontLeftVel, 0, 0),
+        new PIDController(DriveConstants.kPRearLeftVel, 0, 0),
+        new PIDController(DriveConstants.kPFrontRightVel, 0, 0),
+        new PIDController(DriveConstants.kPRearRightVel, 0, 0),
 
         m_robotDrive::getCurrentWheelSpeeds,
 

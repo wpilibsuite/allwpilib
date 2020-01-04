@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -100,7 +100,7 @@ public class PIDController implements Sendable, AutoCloseable {
     instances++;
     SendableRegistry.addLW(this, "PIDController", instances);
 
-    HAL.report(tResourceType.kResourceType_PIDController, instances);
+    HAL.report(tResourceType.kResourceType_PIDController2, instances);
   }
 
   @Override
@@ -328,7 +328,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Resets the previous error and the integral term. Also disables the controller.
+   * Resets the previous error and the integral term.
    */
   public void reset() {
     m_prevError = 0;

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.spline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -15,9 +16,11 @@ import org.junit.jupiter.api.Test;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.spline.SplineParameterizer.MalformedSplineException;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -144,5 +147,16 @@ class CubicHermiteSplineTest {
     final var end = new Pose2d(3.0, 0.0, Rotation2d.fromDegrees(0.0));
 
     run(start, waypoints, end);
+  }
+
+  @Test
+  void testMalformed() {
+    assertThrows(MalformedSplineException.class, () -> run(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
+        new ArrayList<>(), new Pose2d(1, 0, Rotation2d.fromDegrees(180))));
+    assertThrows(MalformedSplineException.class, () -> run(
+        new Pose2d(10, 10, Rotation2d.fromDegrees(90)),
+        Arrays.asList(new Translation2d(10, 10.5)),
+        new Pose2d(10, 11, Rotation2d.fromDegrees(-90))));
   }
 }

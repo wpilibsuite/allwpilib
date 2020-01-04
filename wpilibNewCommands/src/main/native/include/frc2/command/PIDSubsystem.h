@@ -24,8 +24,9 @@ class PIDSubsystem : public SubsystemBase {
    * Creates a new PIDSubsystem.
    *
    * @param controller the PIDController to use
+   * @param initialPosition the initial setpoint of the subsystem
    */
-  explicit PIDSubsystem(PIDController controller);
+  explicit PIDSubsystem(PIDController controller, double initialPosition = 0);
 
   void Periodic() override;
 
@@ -62,7 +63,7 @@ class PIDSubsystem : public SubsystemBase {
 
  protected:
   PIDController m_controller;
-  bool m_enabled;
+  bool m_enabled{false};
 
   /**
    * Returns the measurement of the process variable used by the PIDController.

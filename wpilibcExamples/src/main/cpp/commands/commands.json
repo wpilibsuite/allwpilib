@@ -12,10 +12,11 @@
     "source": [
       "ReplaceMeEmptyClass.cpp"
     ],
-    "replacename": "ReplaceMeEmptyClass"
+    "replacename": "ReplaceMeEmptyClass",
+    "commandversion": 0
   },
   {
-    "name": "Command",
+    "name": "Command (Old)",
     "description": "Create a base command",
     "tags": [
       "command"
@@ -27,10 +28,11 @@
     "source": [
       "ReplaceMeCommand.cpp"
     ],
-    "replacename": "ReplaceMeCommand"
+    "replacename": "ReplaceMeCommand",
+    "commandversion": 1
   },
   {
-    "name": "Command Group",
+    "name": "Command Group (Old)",
     "description": "Create a command group",
     "tags": [
       "commandgroup"
@@ -42,10 +44,11 @@
     "source": [
       "ReplaceMeCommandGroup.cpp"
     ],
-    "replacename": "ReplaceMeCommandGroup"
+    "replacename": "ReplaceMeCommandGroup",
+    "commandversion": 1
   },
   {
-    "name": "Instant Command",
+    "name": "Instant Command (Old)",
     "description": "A command that runs immediately",
     "tags": [
       "instantcommand"
@@ -57,10 +60,11 @@
     "source": [
       "ReplaceMeInstantCommand.cpp"
     ],
-    "replacename": "ReplaceMeInstantCommand"
+    "replacename": "ReplaceMeInstantCommand",
+    "commandversion": 1
   },
   {
-    "name": "Subsystem",
+    "name": "Subsystem (Old)",
     "description": "A subsystem",
     "tags": [
       "subsystem"
@@ -72,10 +76,11 @@
     "source": [
       "ReplaceMeSubsystem.cpp"
     ],
-    "replacename": "ReplaceMeSubsystem"
+    "replacename": "ReplaceMeSubsystem",
+    "commandversion": 1
   },
   {
-    "name": "PID Subsystem",
+    "name": "PID Subsystem (Old)",
     "description": "A subsystem that runs a PID loop",
     "tags": [
       "pidsubsystem",
@@ -88,10 +93,11 @@
     "source": [
       "ReplaceMePIDSubsystem.cpp"
     ],
-    "replacename": "ReplaceMePIDSubsystem"
+    "replacename": "ReplaceMePIDSubsystem",
+    "commandversion": 1
   },
   {
-    "name": "Timed Command",
+    "name": "Timed Command (Old)",
     "description": "A command that runs for a specified time",
     "tags": [
       "timedcommand"
@@ -103,10 +109,11 @@
     "source": [
       "ReplaceMeTimedCommand.cpp"
     ],
-    "replacename": "ReplaceMeTimedCommand"
+    "replacename": "ReplaceMeTimedCommand",
+    "commandversion": 1
   },
   {
-    "name": "Trigger",
+    "name": "Trigger (Old)",
     "description": "A command that runs off of a trigger",
     "tags": [
       "trigger"
@@ -118,6 +125,215 @@
     "source": [
       "ReplaceMeTrigger.cpp"
     ],
-    "replacename": "ReplaceMeTrigger"
+    "replacename": "ReplaceMeTrigger",
+    "commandversion": 1
+  },
+  {
+    "name": "Command (New)",
+    "description": "A command.",
+    "tags": [
+      "command"
+    ],
+    "foldername": "command2",
+    "headers": [
+      "ReplaceMeCommand2.h"
+    ],
+    "source": [
+      "ReplaceMeCommand2.cpp"
+    ],
+    "replacename": "ReplaceMeCommand2",
+    "commandversion": 2
+  },
+  {
+    "name": "InstantCommand (New)",
+    "description": "A command that finishes instantly.",
+    "tags": [
+      "instantcommand"
+    ],
+    "foldername": "instantcommand",
+    "headers": [
+      "ReplaceMeInstantCommand2.h"
+    ],
+    "source": [
+      "ReplaceMeInstantCommand2.cpp"
+    ],
+    "replacename": "ReplaceMeInstantCommand2",
+    "commandversion": 2
+  },
+  {
+    "name": "ParallelCommandGroup (New)",
+    "description": "A command group that runs commands in parallel, ending when all commands have finished.",
+    "tags": [
+      "parallelcommandgroup"
+    ],
+    "foldername": "parallelcommandgroup",
+    "headers": [
+      "ReplaceMeParallelCommandGroup.h"
+    ],
+    "source": [
+      "ReplaceMeParallelCommandGroup.cpp"
+    ],
+    "replacename": "ReplaceMeParallelCommandGroup",
+    "commandversion": 2
+  },
+  {
+    "name": "ParallelDeadlineGroup (New)",
+    "description": "A command group that runs commands in parallel, ending when a specific command has finished.",
+    "tags": [
+      "paralleldeadlinegroup"
+    ],
+    "foldername": "paralleldeadlinegroup",
+    "headers": [
+      "ReplaceMeParallelDeadlineGroup.h"
+    ],
+    "source": [
+      "ReplaceMeParallelDeadlineGroup.cpp"
+    ],
+    "replacename": "ReplaceMeParallelDeadlineGroup",
+    "commandversion": 2
+  },
+  {
+    "name": "ParallelRaceGroup (New)",
+    "description": "A command that runs commands in parallel, ending as soon as any command has finished.",
+    "tags": [
+      "parallelracegroup"
+    ],
+    "foldername": "parallelracegroup",
+    "headers": [
+      "ReplaceMeParallelRaceGroup.h"
+    ],
+    "source": [
+      "ReplaceMeParallelRaceGroup.cpp"
+    ],
+    "replacename": "ReplaceMeParallelRaceGroup",
+    "commandversion": 2
+  },
+  {
+    "name": "PIDCommand (New)",
+    "description": "A command that runs a PIDController.",
+    "tags": [
+      "pidcommand"
+    ],
+    "foldername": "pidcommand",
+    "headers": [
+      "ReplaceMePIDCommand.h"
+    ],
+    "source": [
+      "ReplaceMePIDCommand.cpp"
+    ],
+    "replacename": "ReplaceMePIDCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "PIDSubsystem (New)",
+    "description": "A subsystem that runs a PIDController.",
+    "tags": [
+      "pidsubsystem"
+    ],
+    "foldername": "pidsubsystem2",
+    "headers": [
+      "ReplaceMePIDSubsystem2.h"
+    ],
+    "source": [
+      "ReplaceMePIDSubsystem2.cpp"
+    ],
+    "replacename": "ReplaceMePIDSubsystem2",
+    "commandversion": 2
+  },
+  {
+    "name": "ProfiledPIDCommand (New)",
+    "description": "A command that runs a ProfiledPIDController.",
+    "tags": [
+      "profiledpidcommand"
+    ],
+    "foldername": "profiledpidcommand",
+    "headers": [
+      "ReplaceMeProfiledPIDCommand.h"
+    ],
+    "source": [
+      "ReplaceMeProfiledPIDCommand.cpp"
+    ],
+    "replacename": "ReplaceMeProfiledPIDCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "ProfiledPIDSubsystem (New)",
+    "description": "A subsystem that runs a ProfiledPIDController.",
+    "tags": [
+      "profiledpidsubsystem"
+    ],
+    "foldername": "profiledpidsubsystem",
+    "headers": [
+      "ReplaceMeProfiledPIDSubsystem.h"
+    ],
+    "source": [
+      "ReplaceMeProfiledPIDSubsystem.cpp"
+    ],
+    "replacename": "ReplaceMeProfiledPIDSubsystem",
+    "commandversion": 2
+  },
+  {
+    "name": "SequentialCommandGroup (New)",
+    "description": "A command group that runs commands in sequence.",
+    "tags": [
+      "sequentialcommandgroup"
+    ],
+    "foldername": "sequentialcommandgroup",
+    "headers": [
+      "ReplaceMeSequentialCommandGroup.h"
+    ],
+    "source": [
+      "ReplaceMeSequentialCommandGroup.cpp"
+    ],
+    "replacename": "ReplaceMeSequentialCommandGroup",
+    "commandversion": 2
+  },
+  {
+    "name": "Subsystem (New)",
+    "description": "A robot subsystem.",
+    "tags": [
+      "subsystem"
+    ],
+    "foldername": "subsystem2",
+    "headers": [
+      "ReplaceMeSubsystem2.h"
+    ],
+    "source": [
+      "ReplaceMeSubsystem2.cpp"
+    ],
+    "replacename": "ReplaceMeSubsystem2",
+    "commandversion": 2
+  },
+  {
+    "name": "TrapezoidProfileCommand (New)",
+    "description": "A command that executes a trapezoidal motion profile.",
+    "tags": [
+      "trapezoidprofilecommand"
+    ],
+    "foldername": "trapezoidprofilecommand",
+    "headers": [
+      "ReplaceMeTrapezoidProfileCommand.h"
+    ],
+    "source": [
+      "ReplaceMeTrapezoidProfileCommand.cpp"
+    ],
+    "replacename": "ReplaceMeTrapezoidProfileCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "TrapezoidProfileSubsystem (New)",
+    "description": "A command that executes a trapezoidal motion profile.",
+    "tags": [
+      "trapezoidprofilesubsystem"
+    ],
+    "foldername": "trapezoidprofilesubsystem",
+    "headers": [
+      "ReplaceMeTrapezoidProfileSubsystem.h"
+    ],
+    "source": [
+      "ReplaceMeTrapezoidProfileSubsystem.cpp"
+    ],
+    "replacename": "ReplaceMeTrapezoidProfileSubsystem",
+    "commandversion": 2
   }
 ]

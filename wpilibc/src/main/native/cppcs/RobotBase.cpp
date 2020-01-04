@@ -36,7 +36,7 @@ int frc::RunHALInitialization() {
     return -1;
   }
   HAL_Report(HALUsageReporting::kResourceType_Language,
-             HALUsageReporting::kLanguage_CPlusPlus);
+             HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
   wpi::outs() << "\n********** Robot program starting **********\n";
   return 0;
 }
@@ -124,7 +124,11 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");
+#ifdef __FRC_ROBORIO__
   inst.StartServer("/home/lvuser/networktables.ini");
+#else
+  inst.StartServer();
+#endif
 
   SmartDashboard::init();
 

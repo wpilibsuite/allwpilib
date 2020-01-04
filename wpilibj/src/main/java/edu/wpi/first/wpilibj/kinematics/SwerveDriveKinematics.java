@@ -12,6 +12,9 @@ import java.util.Collections;
 
 import org.ejml.simple.SimpleMatrix;
 
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
@@ -69,6 +72,8 @@ public class SwerveDriveKinematics {
       m_inverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, +m_modules[i].getX());
     }
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
+
+    HAL.report(tResourceType.kResourceType_Kinematics, tInstances.kKinematics_SwerveDrive);
   }
 
   /**

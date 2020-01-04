@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -1366,6 +1366,30 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getNetworkMode
   (JNIEnv*, jclass, jint inst)
 {
   return nt::GetNetworkMode(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    startLocal
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_startLocal
+  (JNIEnv*, jclass, jint inst)
+{
+  nt::StartLocal(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    stopLocal
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_stopLocal
+  (JNIEnv*, jclass, jint inst)
+{
+  nt::StopLocal(inst);
 }
 
 /*
