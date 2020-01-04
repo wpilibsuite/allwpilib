@@ -106,6 +106,7 @@ task generateJavaDocs(type: Javadoc) {
     options.addStringOption "tag", "pre:a:Pre-Condition"
     options.addBooleanOption "Xdoclint:html,missing,reference,syntax", true
     options.addBooleanOption('html5', true)
+    options.addBooleanOption "-no-module-directories", true
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
     source project(':hal').sourceSets.main.java
