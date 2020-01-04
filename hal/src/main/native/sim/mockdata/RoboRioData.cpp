@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,17 +22,17 @@ void InitializeRoboRioData() {
 RoboRioData* hal::SimRoboRioData;
 void RoboRioData::ResetData() {
   fpgaButton.Reset(false);
-  vInVoltage.Reset(0.0);
+  vInVoltage.Reset(12.0);
   vInCurrent.Reset(0.0);
   userVoltage6V.Reset(6.0);
   userCurrent6V.Reset(0.0);
-  userActive6V.Reset(false);
+  userActive6V.Reset(true);
   userVoltage5V.Reset(5.0);
   userCurrent5V.Reset(0.0);
-  userActive5V.Reset(false);
+  userActive5V.Reset(true);
   userVoltage3V3.Reset(3.3);
   userCurrent3V3.Reset(0.0);
-  userActive3V3.Reset(false);
+  userActive3V3.Reset(true);
   userFaults6V.Reset(0);
   userFaults5V.Reset(0);
   userFaults3V3.Reset(0);
