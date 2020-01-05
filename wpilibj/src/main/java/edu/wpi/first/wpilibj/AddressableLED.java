@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,6 +14,8 @@ import edu.wpi.first.hal.PWMJNI;
 
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
+ *
+ * <p>Only 1 LED driver is currently supported by the roboRIO.
  */
 public class AddressableLED implements AutoCloseable {
   private final int m_pwmHandle;
@@ -22,7 +24,7 @@ public class AddressableLED implements AutoCloseable {
   /**
    * Constructs a new driver for a specific port.
    *
-   * @param port the output port to use (Must be a PWM port)
+   * @param port the output port to use (Must be a PWM header, not on MXP)
    */
   public AddressableLED(int port) {
     m_pwmHandle = PWMJNI.initializePWMPort(HAL.getPort((byte) port));
@@ -44,6 +46,8 @@ public class AddressableLED implements AutoCloseable {
    * Sets the length of the LED strip.
    *
    * <p>Calling this is an expensive call, so its best to call it once, then just update data.
+   *
+   * <p>The max length is 5460 LEDs.
    *
    * @param length the strip length
    */
