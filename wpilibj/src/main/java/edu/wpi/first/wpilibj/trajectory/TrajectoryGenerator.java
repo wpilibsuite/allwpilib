@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.spline.SplineParameterizer.MalformedSplineException
 public final class TrajectoryGenerator {
   private static final Trajectory kDoNothingTrajectory =
       new Trajectory(Arrays.asList(new Trajectory.State()));
-  private static BiConsumer<String, StackTraceElement[]> errorFunc = null;
+  private static BiConsumer<String, StackTraceElement[]> errorFunc;
 
   /**
    * Private constructor because this is a utility class.
