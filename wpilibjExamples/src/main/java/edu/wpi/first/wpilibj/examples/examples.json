@@ -551,5 +551,18 @@
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "MachineLearning",
+    "description": "An example command-based robot demonstrating the use of the machine learning tools to aim towards a game piece.",
+    "tags": [
+      "MachineLearning",
+      "NetworkTables",
+      "PID"
+    ],
+    "foldername": "machinelearning",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]
