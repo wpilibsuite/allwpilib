@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,6 +24,12 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController2, instances);
   frc::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
+}
+
+void PIDController::SetPID(double Kp, double Ki, double Kd) {
+  m_Kp = Kp;
+  m_Ki = Ki;
+  m_Kd = Kd;
 }
 
 void PIDController::SetP(double Kp) { m_Kp = Kp; }
