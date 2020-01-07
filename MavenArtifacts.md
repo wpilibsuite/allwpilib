@@ -5,8 +5,8 @@ WPILib publishes its built artifacts to our Maven server for use by downstream p
 ## Repositories
 We provide two repositories. These repositories are:
 
-* (Release)     https://first.wpi.edu/FRC/roborio/maven/release/
-* (Development) https://first.wpi.edu/FRC/roborio/maven/development/
+* (Release)     https://frcmaven.wpi.edu/artifactory/release/
+* (Development) https://frcmaven.wpi.edu/artifactory/development/
 
 The release repository is where official WPILib releases are pushed.
 The development repository is where development releases of every commit to [master](https://github.com/wpilibsuite/allwpilib/tree/master) is pushed.
