@@ -102,7 +102,7 @@ static bool IsPercentageProperty(wpi::StringRef name) {
   if (name.startswith("raw_")) name = name.substr(4);
   return name == "brightness" || name == "contrast" || name == "saturation" ||
          name == "hue" || name == "sharpness" || name == "gain" ||
-         name == "exposure_absolute";
+         name == "exposure_absolute" || name == "exposure_time_absolute";
 }
 
 static constexpr const int quirkLifeCamHd3000[] = {
@@ -112,6 +112,10 @@ static constexpr char const* quirkPS3EyePropExAuto = "auto_exposure";
 static constexpr char const* quirkPS3EyePropExValue = "exposure";
 static constexpr const int quirkPS3EyePropExAutoOn = 0;
 static constexpr const int quirkPS3EyePropExAutoOff = 1;
+static constexpr char const* quirkPiCameraPropExValue =
+    "exposure_time_absolute";
+static constexpr const int quirkPiCameraPropExAutoOn = 0;
+static constexpr const int quirkPiCameraPropExAutoOff = 1;
 
 int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
                                    int rawValue) {
@@ -1112,6 +1116,25 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     }
   }
 
+  // The Pi camera reports mode ranges, which we don't currently handle, so only
+  // provide a set of discrete modes; list based on
+  // https://picamera.readthedocs.io/en/release-1.10/fov.html
+  if (modes.empty() && m_picamera) {
+    for (VideoMode::PixelFormat pixelFormat : {VideoMode::kYUYV,
+         VideoMode::kMJPEG, VideoMode::kBGR}) {
+      modes.emplace_back(pixelFormat, 1920, 1080, 30);
+      modes.emplace_back(pixelFormat, 2592, 1944, 15);
+      modes.emplace_back(pixelFormat, 1296, 972, 42);
+      modes.emplace_back(pixelFormat, 1296, 730, 49);
+      modes.emplace_back(pixelFormat, 640, 480, 90);
+      modes.emplace_back(pixelFormat, 320, 240, 90);
+      modes.emplace_back(pixelFormat, 160, 120, 90);
+      modes.emplace_back(pixelFormat, 640, 480, 60);
+      modes.emplace_back(pixelFormat, 320, 240, 60);
+      modes.emplace_back(pixelFormat, 160, 120, 60);
+    }
+  }
+
   {
     std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
@@ -1192,6 +1215,7 @@ void UsbCameraImpl::SetQuirks() {
   wpi::StringRef desc = GetDescription(descbuf);
   m_lifecam_exposure =
       desc.endswith("LifeCam HD-3000") || desc.endswith("LifeCam Cinema (TM)");
+  m_picamera = desc.startswith("mmal service");
 
   int deviceNum = GetDeviceNum(m_path.c_str());
   if (deviceNum >= 0) {
@@ -1248,7 +1272,9 @@ void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOn, status);
-
+  } else if (m_picamera) {
+    SetProperty(GetPropertyIndex(kPropExAuto), quirkPiCameraPropExAutoOn,
+                status);
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 3, status);
   }
@@ -1258,6 +1284,9 @@ void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOff, status);  // manual
+  } else if (m_picamera) {
+    SetProperty(GetPropertyIndex(kPropExAuto), quirkPiCameraPropExAutoOff,
+                status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
@@ -1267,6 +1296,9 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOff, status);  // manual
+  } else if (m_picamera) {
+    SetProperty(GetPropertyIndex(kPropExAuto), quirkPiCameraPropExAutoOff,
+                status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
@@ -1277,6 +1309,8 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
   }
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExValue), value, status);
+  } else if (m_picamera) {
+    SetProperty(GetPropertyIndex(quirkPiCameraPropExValue), value, status);
   } else {
     SetProperty(GetPropertyIndex(kPropExValue), value, status);
   }

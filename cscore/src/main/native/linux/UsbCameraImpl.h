@@ -166,6 +166,7 @@ class UsbCameraImpl : public SourceImpl {
   // Quirks
   bool m_lifecam_exposure{false};    // Microsoft LifeCam exposure
   bool m_ps3eyecam_exposure{false};  // PS3 Eyecam exposure
+  bool m_picamera{false};            // Raspberry Pi camera
 
   //
   // Variables protected by m_mutex
