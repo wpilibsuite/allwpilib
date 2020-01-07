@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -1120,8 +1120,8 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   // provide a set of discrete modes; list based on
   // https://picamera.readthedocs.io/en/release-1.10/fov.html
   if (modes.empty() && m_picamera) {
-    for (VideoMode::PixelFormat pixelFormat : {VideoMode::kYUYV,
-         VideoMode::kMJPEG, VideoMode::kBGR}) {
+    for (VideoMode::PixelFormat pixelFormat :
+         {VideoMode::kYUYV, VideoMode::kMJPEG, VideoMode::kBGR}) {
       modes.emplace_back(pixelFormat, 1920, 1080, 30);
       modes.emplace_back(pixelFormat, 2592, 1944, 15);
       modes.emplace_back(pixelFormat, 1296, 972, 42);
