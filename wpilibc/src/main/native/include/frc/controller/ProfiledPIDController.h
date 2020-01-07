@@ -33,6 +33,7 @@ template <class Distance>
 class ProfiledPIDController
     : public Sendable,
       public SendableHelper<ProfiledPIDController<Distance>> {
+ public:
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
@@ -43,7 +44,6 @@ class ProfiledPIDController
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
 
- public:
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and
    * Kd. Users should call reset() when they first start running the controller

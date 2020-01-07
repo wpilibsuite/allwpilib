@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,6 +17,7 @@ namespace frc {
  */
 template <class Distance>
 class SimpleMotorFeedforward {
+ public:
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
   using Acceleration =
@@ -25,7 +26,6 @@ class SimpleMotorFeedforward {
   using ka_unit =
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
- public:
   constexpr SimpleMotorFeedforward() = default;
 
   /**

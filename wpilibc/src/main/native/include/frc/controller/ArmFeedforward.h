@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@ namespace frc {
  * a motor acting against the force of gravity on a beam suspended at an angle).
  */
 class ArmFeedforward {
+ public:
   using Angle = units::radians;
   using Velocity = units::radians_per_second;
   using Acceleration = units::compound_unit<units::radians_per_second,
@@ -26,7 +27,6 @@ class ArmFeedforward {
   using ka_unit =
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
- public:
   constexpr ArmFeedforward() = default;
 
   /**
