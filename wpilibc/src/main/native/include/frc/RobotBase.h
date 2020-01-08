@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -176,7 +176,6 @@ class RobotBase {
 
   static constexpr bool IsSimulation() { return !IsReal(); }
 
- protected:
   /**
    * Constructor for a generic robot program.
    *
@@ -192,6 +191,7 @@ class RobotBase {
 
   virtual ~RobotBase();
 
+ protected:
   // m_ds isn't moved in these because DriverStation is a singleton; every
   // instance of RobotBase has a reference to the same object.
   RobotBase(RobotBase&&) noexcept;
