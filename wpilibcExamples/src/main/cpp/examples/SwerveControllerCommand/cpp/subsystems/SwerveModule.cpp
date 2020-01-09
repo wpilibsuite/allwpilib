@@ -47,13 +47,25 @@ frc::SwerveModuleState SwerveModule::GetState() {
 }
 
 void SwerveModule::SetDesiredState(frc::SwerveModuleState& state) {
+
+  // Optimize swerve angle rotation because you never need to rotate more than
+  // 90 degrees. For example if you move forward and back you just want to reverse
+  // the drive motor not rotate the module 180
+  frc::SwerveModuleState finalStateAfterOptimization = state;
+  frc::Rotation2d deltaAngle{finalStateAfterOptimization.angle.Degrees() - GetState().angle.Degrees()};
+  if (units::math::abs(deltaAngle.Degrees()) > 90_deg && units::math::abs(deltaAngle.Degrees()) < 270_deg) {
+      units::degree_t finalAngle = units::math::fmod(finalStateAfterOptimization.angle.Degrees() + 180_deg, 360_deg);
+      finalStateAfterOptimization.angle = frc::Rotation2d(finalAngle);
+      finalStateAfterOptimization.speed = -finalStateAfterOptimization.speed;
+  }
+
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
-      m_driveEncoder.GetRate(), state.speed.to<double>());
+      m_driveEncoder.GetRate(), finalStateAfterOptimization.speed.to<double>());
 
   // Calculate the turning motor output from the turning PID controller.
   auto turnOutput = m_turningPIDController.Calculate(
-      units::radian_t(m_turningEncoder.Get()), state.angle.Radians());
+      units::radian_t(m_turningEncoder.Get()), finalStateAfterOptimization.angle.Radians());
 
   // Set the motor outputs.
   m_driveMotor.Set(driveOutput);
