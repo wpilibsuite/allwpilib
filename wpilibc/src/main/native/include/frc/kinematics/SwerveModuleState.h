@@ -25,5 +25,20 @@ struct SwerveModuleState {
    * Angle of the module.
    */
   Rotation2d angle;
+
+  /**
+   * Optimizes the angle of the module to make sure it doesn't 
+   * rotate more than 90 degrees from the current state
+   */
+  SwerveModuleState OptimizeModuleAngle(const SwerveModuleState& state) const {
+    frc::SwerveModuleState finalStateAfterOptimization = state;
+    frc::Rotation2d deltaAngle{finalStateAfterOptimization.angle.Degrees() - angle.Degrees()};
+    if (units::math::abs(deltaAngle.Degrees()) > 90_deg && units::math::abs(deltaAngle.Degrees()) < 270_deg) {
+        units::degree_t finalAngle = units::math::fmod(finalStateAfterOptimization.angle.Degrees() + 180_deg, 360_deg);
+        finalStateAfterOptimization.angle = frc::Rotation2d(finalAngle);
+        finalStateAfterOptimization.speed = -finalStateAfterOptimization.speed;
+    }
+    return finalStateAfterOptimization;
+  };
 };
 }  // namespace frc

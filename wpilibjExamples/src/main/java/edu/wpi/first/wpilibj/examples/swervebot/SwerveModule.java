@@ -80,12 +80,7 @@ public class SwerveModule {
     // Optimize swerve angle rotation because you never need to rotate more than
     // 90 degrees. For example if you move forward and back you just want to reverse
     // the drive motor not rotate the module 180
-    Rotation2d deltaAngle = state.angle.minus(getState().angle);
-    if (Math.abs(deltaAngle.getDegrees()) > 90 && Math.abs(deltaAngle.getDegrees()) < 270) {
-      double finalAngle = (state.angle.getDegrees() + 180) % 360;
-      state.angle = Rotation2d.fromDegrees(finalAngle);
-      state.speedMetersPerSecond = -state.speedMetersPerSecond;
-    }
+    state = getState().OptimizeModuleAngle(state);
 
     // Calculate the drive output from the drive PID controller.
     final var driveOutput = m_drivePIDController.calculate(

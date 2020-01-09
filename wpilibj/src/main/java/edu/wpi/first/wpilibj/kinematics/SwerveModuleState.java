@@ -43,6 +43,21 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
   }
 
   /**
+   * Optimizes the angle of the module to make sure it doesn't 
+   * rotate more than 90 degrees from the current state
+   */
+  public SwerveModuleState OptimizeModuleAngle(SwerveModuleState state) {
+    SwerveModuleState finalStateAfterOptimization = state;
+    Rotation2d deltaAngle = new Rotation2d(finalStateAfterOptimization.angle.getDegrees() - angle.getDegrees());
+    if (Math.abs(deltaAngle.getDegrees()) > 90 && Math.abs(deltaAngle.getDegrees()) < 270) {
+        double finalAngle = (finalStateAfterOptimization.angle.getDegrees() + 180) % 360;
+        finalStateAfterOptimization.angle = new Rotation2d(finalAngle);
+        finalStateAfterOptimization.speedMetersPerSecond = -finalStateAfterOptimization.speedMetersPerSecond;
+    }
+    return finalStateAfterOptimization;
+  }
+
+  /**
    * Compares two swerve module states. One swerve module is "greater" than the other if its speed
    * is higher than the other.
    *
