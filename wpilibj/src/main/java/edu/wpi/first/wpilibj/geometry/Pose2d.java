@@ -261,10 +261,13 @@ public class Pose2d {
     public Pose2d deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
       JsonNode node = jp.getCodec().readTree(jp);
-
-      Translation2d translation =
-              jp.getCodec().treeToValue(node.get("translation"), Translation2d.class);
-      Rotation2d rotation = jp.getCodec().treeToValue(node.get("rotation"), Rotation2d.class);
+      JsonNode translationNode = node.get("translation");
+      double translationX = translationNode.get("x").doubleValue();
+      double translationY = translationNode.get("y").doubleValue();
+      JsonNode rotationNode = node.get("rotation");
+      double radianAngle = rotationNode.get("radians").doubleValue();
+      Rotation2d rotation = new Rotation2d(radianAngle);
+      Translation2d translation = new Translation2d(translationX, translationY);
       return new Pose2d(translation, rotation);
     }
   }
