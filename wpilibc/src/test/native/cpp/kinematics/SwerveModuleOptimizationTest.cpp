@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "frc/kinematics/SwerveModuleState.h"
 #include "gtest/gtest.h"
 
@@ -7,12 +14,11 @@ static constexpr double kEpsilon = 0.01;
 
 class SwerveModuleOptimizationTest : public ::testing::Test {
  protected:
-  SwerveModuleState m_state{1_mps,Rotation2d()};
+  SwerveModuleState m_state{1_mps, Rotation2d()};
 };
 
 TEST_F(SwerveModuleOptimizationTest, NoOptimization) {
-
-  SwerveModuleState newState{1_mps,Rotation2d()};
+  SwerveModuleState newState{1_mps, Rotation2d()};
 
   SwerveModuleState finalState = m_state.OptimizeModuleAngle(newState);
 
@@ -21,7 +27,7 @@ TEST_F(SwerveModuleOptimizationTest, NoOptimization) {
 }
 
 TEST_F(SwerveModuleOptimizationTest, Turn180) {
-  SwerveModuleState newState{1_mps,Rotation2d(180_deg)};
+  SwerveModuleState newState{1_mps, Rotation2d(180_deg)};
 
   SwerveModuleState finalState = m_state.OptimizeModuleAngle(newState);
 
@@ -30,7 +36,7 @@ TEST_F(SwerveModuleOptimizationTest, Turn180) {
 }
 
 TEST_F(SwerveModuleOptimizationTest, Turn45) {
-  SwerveModuleState newState{1_mps,Rotation2d(45_deg)};
+  SwerveModuleState newState{1_mps, Rotation2d(45_deg)};
 
   SwerveModuleState finalState = m_state.OptimizeModuleAngle(newState);
 
@@ -39,7 +45,7 @@ TEST_F(SwerveModuleOptimizationTest, Turn45) {
 }
 
 TEST_F(SwerveModuleOptimizationTest, Turn135) {
-  SwerveModuleState newState{1_mps,Rotation2d(135_deg)};
+  SwerveModuleState newState{1_mps, Rotation2d(135_deg)};
 
   SwerveModuleState finalState = m_state.OptimizeModuleAngle(newState);
 

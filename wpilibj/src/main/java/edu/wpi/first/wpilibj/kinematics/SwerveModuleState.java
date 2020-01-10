@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -44,8 +44,8 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
 
   /**
    * Optimizes the angle of the module.
-   * 
-   *  @param desiredState The new state of the module. 
+   *
+   *  @param desiredState The new state of the module.
    */
   public SwerveModuleState optimizeModuleAngle(SwerveModuleState desiredState) {
     SwerveModuleState finalState = new SwerveModuleState(

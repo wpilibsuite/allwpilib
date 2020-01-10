@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -47,10 +47,9 @@ frc::SwerveModuleState SwerveModule::GetState() {
 }
 
 void SwerveModule::SetDesiredState(frc::SwerveModuleState& state) {
-
   // Optimize swerve angle rotation because you never need to rotate more than
-  // 90 degrees. For example if you move forward and back you just want to reverse
-  // the drive motor not rotate the module 180
+  // 90 degrees. For example if you move forward and back you just want to
+  // reverse the drive motor not rotate the module 180
   frc::SwerveModuleState optimizedState = GetState().OptimizeModuleAngle(state);
 
   // Calculate the drive output from the drive PID controller.

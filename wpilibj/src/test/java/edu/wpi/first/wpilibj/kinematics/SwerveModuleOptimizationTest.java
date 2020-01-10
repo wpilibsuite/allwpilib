@@ -53,7 +53,7 @@ class SwerveModuleOptimizationTest {
     );
   }
 
-  
+
   @Test
   void turn135() {
     SwerveModuleState newState = new SwerveModuleState(1, Rotation2d.fromDegrees(135));
