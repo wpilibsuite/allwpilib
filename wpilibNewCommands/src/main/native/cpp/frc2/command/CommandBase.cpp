@@ -13,7 +13,7 @@
 using namespace frc2;
 
 CommandBase::CommandBase() {
-  frc::SendableRegistry::GetInstance().AddLW(this, GetTypeName(*this));
+  frc::SendableRegistry::GetInstance().Add(this, GetTypeName(*this));
 }
 
 void CommandBase::AddRequirements(
