@@ -43,11 +43,6 @@ class CommandScheduler::Impl {
 
   bool disabled{false};
 
-  // NetworkTable entries for use in Sendable impl
-  nt::NetworkTableEntry namesEntry;
-  nt::NetworkTableEntry idsEntry;
-  nt::NetworkTableEntry cancelEntry;
-
   // Lists of user-supplied actions to be executed on scheduling events for
   // every command.
   wpi::SmallVector<Action, 4> initActions;
@@ -382,14 +377,14 @@ void CommandScheduler::OnCommandFinish(Action action) {
 
 void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
-  m_impl->namesEntry = builder.GetEntry("Names");
-  m_impl->idsEntry = builder.GetEntry("Ids");
-  m_impl->cancelEntry = builder.GetEntry("Cancel");
+  auto namesEntry = builder.GetEntry("Names");
+  auto idsEntry = builder.GetEntry("Ids");
+  auto cancelEntry = builder.GetEntry("Cancel");
 
-  builder.SetUpdateTable([this] {
+  builder.SetUpdateTable([=] {
     double tmp[1];
     tmp[0] = 0;
-    auto toCancel = m_impl->cancelEntry.GetDoubleArray(tmp);
+    auto toCancel = cancelEntry.GetDoubleArray(tmp);
     for (auto cancel : toCancel) {
       uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
       Command* command = reinterpret_cast<Command*>(ptrTmp);
@@ -397,7 +392,8 @@ void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
           m_impl->scheduledCommands.end()) {
         Cancel(command);
       }
-      m_impl->cancelEntry.SetDoubleArray(wpi::ArrayRef<double>{});
+      nt::NetworkTableEntry(cancelEntry)
+          .SetDoubleArray(wpi::ArrayRef<double>{});
     }
 
     wpi::SmallVector<std::string, 8> names;
@@ -407,8 +403,8 @@ void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
       uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command.first);
       ids.emplace_back(static_cast<double>(ptrTmp));
     }
-    m_impl->namesEntry.SetStringArray(names);
-    m_impl->idsEntry.SetDoubleArray(ids);
+    nt::NetworkTableEntry(namesEntry).SetStringArray(names);
+    nt::NetworkTableEntry(idsEntry).SetDoubleArray(ids);
   });
 }
 
