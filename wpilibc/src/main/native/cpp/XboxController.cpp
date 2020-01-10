@@ -17,25 +17,25 @@ XboxController::XboxController(int port) : GenericHID(port) {
 
 double XboxController::GetX(JoystickHand hand) const {
   if (hand == kLeftHand) {
-    return GetRawAxis(0);
+    return GetRawAxis(static_cast<int>(Axis::kLeftX));
   } else {
-    return GetRawAxis(4);
+    return GetRawAxis(static_cast<int>(Axis::kRightX));
   }
 }
 
 double XboxController::GetY(JoystickHand hand) const {
   if (hand == kLeftHand) {
-    return GetRawAxis(1);
+    return GetRawAxis(static_cast<int>(Axis::kLeftY));
   } else {
-    return GetRawAxis(5);
+    return GetRawAxis(static_cast<int>(Axis::kRightY));
   }
 }
 
 double XboxController::GetTriggerAxis(JoystickHand hand) const {
   if (hand == kLeftHand) {
-    return GetRawAxis(2);
+    return GetRawAxis(static_cast<int>(Axis::kLeftTrigger));
   } else {
-    return GetRawAxis(3);
+    return GetRawAxis(static_cast<int>(Axis::kRightTrigger));
   }
 }
 

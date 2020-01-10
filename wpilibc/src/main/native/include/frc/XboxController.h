@@ -244,6 +244,15 @@ class XboxController : public GenericHID {
     kBack = 7,
     kStart = 8
   };
+
+  enum class Axis {
+    kLeftX = 0,
+    kRightX = 4,
+    kLeftY = 1,
+    kRightY = 5,
+    kLeftTrigger = 2,
+    kRightTrigger = 3
+  };
 };
 
 }  // namespace frc
