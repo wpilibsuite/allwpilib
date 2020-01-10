@@ -54,3 +54,21 @@ TEST_F(SchedulerTest, UnregisterSubsystemTest) {
 
   EXPECT_NO_FATAL_FAILURE(scheduler.UnregisterSubsystem(&system));
 }
+
+TEST_F(SchedulerTest, SchedulerCancelAllTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  RunCommand command([] {}, {});
+  RunCommand command2([] {}, {});
+
+  int counter = 0;
+
+  scheduler.OnCommandInterrupt([&counter](const Command&) { counter++; });
+
+  scheduler.Schedule(&command);
+  scheduler.Schedule(&command2);
+  scheduler.Run();
+  scheduler.CancelAll();
+
+  EXPECT_EQ(counter, 2);
+}

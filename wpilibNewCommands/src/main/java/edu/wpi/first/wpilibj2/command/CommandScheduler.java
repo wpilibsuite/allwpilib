@@ -375,7 +375,7 @@ public final class CommandScheduler implements Sendable {
    * Cancels all commands that are currently scheduled.
    */
   public void cancelAll() {
-    for (Command command : m_scheduledCommands.keySet()) {
+    for (Command command : m_scheduledCommands.keySet().toArray(new Command[0])) {
       cancel(command);
     }
   }

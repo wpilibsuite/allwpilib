@@ -54,4 +54,22 @@ class SchedulerTest extends CommandTestBase {
     scheduler.registerSubsystem(system);
     assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
   }
+
+  @Test
+  void schedulerCancelAllTest() {
+    CommandScheduler scheduler = new CommandScheduler();
+
+    Counter counter = new Counter();
+
+    scheduler.onCommandInterrupt(command -> counter.increment());
+
+    Command command = new WaitCommand(10);
+    Command command2 = new WaitCommand(10);
+
+    scheduler.schedule(command);
+    scheduler.schedule(command2);
+    scheduler.cancelAll();
+
+    assertEquals(counter.m_counter, 2);
+  }
 }
