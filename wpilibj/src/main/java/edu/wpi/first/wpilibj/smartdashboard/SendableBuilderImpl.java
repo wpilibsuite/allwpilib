@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -55,7 +55,7 @@ public class SendableBuilderImpl implements SendableBuilder {
 
   private final List<Property> m_properties = new ArrayList<>();
   private Runnable m_safeState;
-  private Runnable m_updateTable;
+  private final List<Runnable> m_updateTables = new ArrayList<>();
   private NetworkTable m_table;
   private NetworkTableEntry m_controllableEntry;
   private boolean m_actuator;
@@ -105,8 +105,8 @@ public class SendableBuilderImpl implements SendableBuilder {
         property.m_update.accept(property.m_entry);
       }
     }
-    if (m_updateTable != null) {
-      m_updateTable.run();
+    for (Runnable updateTable : m_updateTables) {
+      updateTable.run();
     }
   }
 
@@ -207,7 +207,7 @@ public class SendableBuilderImpl implements SendableBuilder {
    */
   @Override
   public void setUpdateTable(Runnable func) {
-    m_updateTable = func;
+    m_updateTables.add(func);
   }
 
   /**
