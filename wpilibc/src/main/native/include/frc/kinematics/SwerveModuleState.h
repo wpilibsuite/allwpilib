@@ -39,6 +39,6 @@ struct SwerveModuleState {
         finalStateAfterOptimization.speed = -finalStateAfterOptimization.speed;
     }
     return finalStateAfterOptimization;
-  };
+  }
 };
 }  // namespace frc
