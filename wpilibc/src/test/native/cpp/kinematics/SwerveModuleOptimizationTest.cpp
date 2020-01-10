@@ -43,6 +43,6 @@ TEST_F(SwerveModuleOptimizationTest, Turn135) {
 
   SwerveModuleState finalState = m_state.OptimizeModuleAngle(newState);
 
-  EXPECT_NEAR(45.0, finalState.angle.Degrees().to<double>(), kEpsilon);
-  EXPECT_NEAR(1.0, finalState.speed.to<double>(), kEpsilon);
+  EXPECT_NEAR(315, finalState.angle.Degrees().to<double>(), kEpsilon);
+  EXPECT_NEAR(-1.0, finalState.speed.to<double>(), kEpsilon);
 }

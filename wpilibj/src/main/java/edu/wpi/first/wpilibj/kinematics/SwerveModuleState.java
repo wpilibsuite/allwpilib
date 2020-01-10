@@ -43,22 +43,23 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
   }
 
   /**
-   * Optimizes the angle of the module to make sure it doesn't 
-   * rotate more than 90 degrees from the current state
+   * Optimizes the angle of the module.
+   * 
+   *  @param desiredState The new state of the module. 
    */
-  public SwerveModuleState OptimizeModuleAngle(SwerveModuleState desiredState) {
-    SwerveModuleState finalStateAfterOptimization = new SwerveModuleState();
-    Rotation2d deltaAngle = Rotation2d.fromDegrees(desiredState.angle.getDegrees() - angle.getDegrees());
+  public SwerveModuleState optimizeModuleAngle(SwerveModuleState desiredState) {
+    SwerveModuleState finalState = new SwerveModuleState(
+        desiredState.speedMetersPerSecond, new Rotation2d(desiredState.angle.getRadians())
+    );
+    Rotation2d deltaAngle = Rotation2d.fromDegrees(
+        desiredState.angle.getDegrees() - this.angle.getDegrees()
+    );
     if (Math.abs(deltaAngle.getDegrees()) > 90 && Math.abs(deltaAngle.getDegrees()) < 270) {
-        double finalAngle = (angle.getDegrees() + 180) % 360;
-        finalStateAfterOptimization.angle = Rotation2d.fromDegrees(finalAngle);
-        finalStateAfterOptimization.speedMetersPerSecond = -finalStateAfterOptimization.speedMetersPerSecond;
+      double finalAngle = (finalState.angle.getDegrees() + 180) % 360;
+      finalState.angle = Rotation2d.fromDegrees(finalAngle);
+      finalState.speedMetersPerSecond = -finalState.speedMetersPerSecond;
     }
-    else {
-      finalStateAfterOptimization.angle = angle;
-      finalStateAfterOptimization.speedMetersPerSecond = speedMetersPerSecond;
-    }
-    return finalStateAfterOptimization;
+    return finalState;
   }
 
   /**
