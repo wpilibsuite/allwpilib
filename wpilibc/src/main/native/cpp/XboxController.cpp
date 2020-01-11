@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,25 +17,25 @@ XboxController::XboxController(int port) : GenericHID(port) {
 
 double XboxController::GetX(JoystickHand hand) const {
   if (hand == kLeftHand) {
-    return GetRawAxis(0);
+    return GetRawAxis(static_cast<int>(Axis::kLeftX));
   } else {
-    return GetRawAxis(4);
+    return GetRawAxis(static_cast<int>(Axis::kRightX));
   }
 }
 
 double XboxController::GetY(JoystickHand hand) const {
   if (hand == kLeftHand) {
-    return GetRawAxis(1);
+    return GetRawAxis(static_cast<int>(Axis::kLeftY));
   } else {
-    return GetRawAxis(5);
+    return GetRawAxis(static_cast<int>(Axis::kRightY));
   }
 }
 
 double XboxController::GetTriggerAxis(JoystickHand hand) const {
   if (hand == kLeftHand) {
-    return GetRawAxis(2);
+    return GetRawAxis(static_cast<int>(Axis::kLeftTrigger));
   } else {
-    return GetRawAxis(3);
+    return GetRawAxis(static_cast<int>(Axis::kRightTrigger));
   }
 }
 
