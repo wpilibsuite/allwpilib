@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@
 
 #include "wpi/Demangle.h"
 #include "wpi/SmallString.h"
+#include "wpi/StringRef.h"
 #include "wpi/raw_ostream.h"
 
 namespace wpi {
@@ -25,7 +26,11 @@ std::string GetStackTrace(int offset) {
   for (int i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
     if (i == 0 || stackTrace[i] != stackTrace[i - 1]) {
-      trace << "\tat " << Demangle(mangledSymbols[i]) << "\n";
+      // extract just function name from "pathToExe(functionName+offset)"
+      StringRef sym{mangledSymbols[i]};
+      sym = sym.split('(').second;
+      sym = sym.split('+').first;
+      trace << "\tat " << Demangle(sym) << "\n";
     }
   }
 
