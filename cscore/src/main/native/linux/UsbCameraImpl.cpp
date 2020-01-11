@@ -112,6 +112,7 @@ static constexpr char const* quirkPS3EyePropExAuto = "auto_exposure";
 static constexpr char const* quirkPS3EyePropExValue = "exposure";
 static constexpr const int quirkPS3EyePropExAutoOn = 0;
 static constexpr const int quirkPS3EyePropExAutoOff = 1;
+static constexpr char const* quirkPiCameraPropExAuto = "auto_exposure";
 static constexpr char const* quirkPiCameraPropExValue =
     "exposure_time_absolute";
 static constexpr const int quirkPiCameraPropExAutoOn = 0;
@@ -1273,8 +1274,8 @@ void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOn, status);
   } else if (m_picamera) {
-    SetProperty(GetPropertyIndex(kPropExAuto), quirkPiCameraPropExAutoOn,
-                status);
+    SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
+                quirkPiCameraPropExAutoOn, status);
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 3, status);
   }
@@ -1285,8 +1286,8 @@ void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOff, status);  // manual
   } else if (m_picamera) {
-    SetProperty(GetPropertyIndex(kPropExAuto), quirkPiCameraPropExAutoOff,
-                status);  // manual
+    SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
+                quirkPiCameraPropExAutoOff, status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
@@ -1297,8 +1298,8 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOff, status);  // manual
   } else if (m_picamera) {
-    SetProperty(GetPropertyIndex(kPropExAuto), quirkPiCameraPropExAutoOff,
-                status);  // manual
+    SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
+                quirkPiCameraPropExAutoOff, status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
