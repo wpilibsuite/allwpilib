@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -375,7 +375,7 @@ public final class CommandScheduler implements Sendable {
    * Cancels all commands that are currently scheduled.
    */
   public void cancelAll() {
-    for (Command command : m_scheduledCommands.keySet()) {
+    for (Command command : m_scheduledCommands.keySet().toArray(new Command[0])) {
       cancel(command);
     }
   }

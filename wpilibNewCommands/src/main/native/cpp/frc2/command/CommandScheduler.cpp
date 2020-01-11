@@ -15,6 +15,7 @@
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
+#include <wpi/SmallVector.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandState.h"
@@ -310,9 +311,11 @@ void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
 }
 
 void CommandScheduler::CancelAll() {
+  wpi::SmallVector<Command*, 16> commands;
   for (auto&& command : m_impl->scheduledCommands) {
-    Cancel(command.first);
+    commands.emplace_back(command.first);
   }
+  Cancel(commands);
 }
 
 double CommandScheduler::TimeSinceScheduled(const Command* command) const {
