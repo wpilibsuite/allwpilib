@@ -15,7 +15,7 @@
 
 namespace wpi {
 
-std::string Demangle(Twine mangledSymbol) {
+std::string Demangle(const Twine& mangledSymbol) {
   SmallString<128> buf;
   size_t length;
   int32_t status;

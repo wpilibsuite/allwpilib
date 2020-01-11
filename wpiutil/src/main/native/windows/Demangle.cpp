@@ -18,7 +18,7 @@
 
 namespace wpi {
 
-std::string Demangle(Twine mangledSymbol) {
+std::string Demangle(const Twine& mangledSymbol) {
   static wpi::mutex m;
   std::scoped_lock lock(m);
   SmallString<128> buf;

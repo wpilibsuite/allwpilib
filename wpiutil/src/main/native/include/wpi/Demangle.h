@@ -20,7 +20,7 @@ namespace wpi {
  * @param mangledSymbol the mangled symbol.
  * @return The demangled symbol, or mangledSymbol if demangling fails.
  */
-std::string Demangle(Twine mangledSymbol);
+std::string Demangle(const Twine& mangledSymbol);
 
 }  // namespace wpi
 
