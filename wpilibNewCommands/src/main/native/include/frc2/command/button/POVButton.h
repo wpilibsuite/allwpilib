@@ -28,7 +28,7 @@ class POVButton : public Button {
    */
   POVButton(frc::GenericHID* joystick, int angle, int povNumber = 0)
       : Button([joystick, angle, povNumber] {
-          m_joystick->GetPOV(m_povNumber) == m_angle;
+          joystick->GetPOV(m_povNumber) == m_angle;
         }) {}
 };
 }  // namespace frc2
