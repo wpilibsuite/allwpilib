@@ -48,13 +48,6 @@ class Trigger {
   Trigger(const Trigger& other);
 
   /**
-   * Returns whether the trigger is active.  Can be overridden by a subclass.
-   *
-   * @return Whether the trigger is active.
-   */
-  virtual bool Get() const { return m_isActive(); }
-
-  /**
    * Binds a command to start when the trigger becomes active.  Takes a
    * raw pointer, and so is non-owning; users are responsible for the lifespan
    * of the command.
@@ -79,11 +72,11 @@ class Trigger {
                          Command, std::remove_reference_t<T>>>>
   Trigger WhenActive(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
-        [pressedLast = Get(), *this,
+        [pressedLast = m_isActive(), *this,
          command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command)),
          interruptible]() mutable {
-          bool pressed = Get();
+          bool pressed = m_isActive();
 
           if (!pressedLast && pressed) {
             command->Schedule(interruptible);
@@ -138,11 +131,11 @@ class Trigger {
                          Command, std::remove_reference_t<T>>>>
   Trigger WhileActiveContinous(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
-        [pressedLast = Get(), *this,
+        [pressedLast = m_isActive(), *this,
          command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command)),
          interruptible]() mutable {
-          bool pressed = Get();
+          bool pressed = m_isActive();
 
           if (pressed) {
             command->Schedule(interruptible);
@@ -198,11 +191,11 @@ class Trigger {
                          Command, std::remove_reference_t<T>>>>
   Trigger WhileActiveOnce(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
-        [pressedLast = Get(), *this,
+        [pressedLast = m_isActive(), *this,
          command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command)),
          interruptible]() mutable {
-          bool pressed = Get();
+          bool pressed = m_isActive();
 
           if (!pressedLast && pressed) {
             command->Schedule(interruptible);
@@ -240,11 +233,11 @@ class Trigger {
                          Command, std::remove_reference_t<T>>>>
   Trigger WhenInactive(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
-        [pressedLast = Get(), *this,
+        [pressedLast = m_isActive(), *this,
          command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command)),
          interruptible]() mutable {
-          bool pressed = Get();
+          bool pressed = m_isActive();
 
           if (pressedLast && !pressed) {
             command->Schedule(interruptible);
@@ -298,11 +291,11 @@ class Trigger {
                          Command, std::remove_reference_t<T>>>>
   Trigger ToggleWhenActive(T&& command, bool interruptible = true) {
     CommandScheduler::GetInstance().AddButton(
-        [pressedLast = Get(), *this,
+        [pressedLast = m_isActive(), *this,
          command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command)),
          interruptible]() mutable {
-          bool pressed = Get();
+          bool pressed = m_isActive();
 
           if (!pressedLast && pressed) {
             if (command->IsScheduled()) {
@@ -333,7 +326,7 @@ class Trigger {
    * @return A trigger which is active when both component triggers are active.
    */
   Trigger operator&&(Trigger rhs) {
-    return Trigger([*this, rhs] { return Get() && rhs.Get(); });
+    return Trigger([*this, rhs] { return m_isActive() && rhs.m_isActive(); });
   }
 
   /**
@@ -342,7 +335,7 @@ class Trigger {
    * @return A trigger which is active when either component trigger is active.
    */
   Trigger operator||(Trigger rhs) {
-    return Trigger([*this, rhs] { return Get() || rhs.Get(); });
+    return Trigger([*this, rhs] { return m_isActive() || rhs.m_isActive(); });
   }
 
   /**
@@ -352,7 +345,7 @@ class Trigger {
    * and vice-versa.
    */
   Trigger operator!() {
-    return Trigger([*this] { return !Get(); });
+    return Trigger([*this] { return !m_isActive(); });
   }
 
  private:
