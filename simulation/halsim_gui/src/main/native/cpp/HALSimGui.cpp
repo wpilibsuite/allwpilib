@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -300,6 +300,12 @@ bool HALSimGui::Initialize() {
 
   // Set initial window settings
   glfwWindowHint(GLFW_MAXIMIZED, gWindowMaximized ? GLFW_TRUE : GLFW_FALSE);
+
+  if (gWindowWidth == 0 || gWindowHeight == 0) {
+    gWindowWidth = 1280;
+    gWindowHeight = 720;
+    gWindowLoadedWidthHeight = false;
+  }
 
   float windowScale = 1.0;
   if (!gWindowLoadedWidthHeight) {
