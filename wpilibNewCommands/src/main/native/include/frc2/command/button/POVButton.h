@@ -27,15 +27,8 @@ class POVButton : public Button {
    * @param povNumber The number of the POV on the joystick.
    */
   POVButton(frc::GenericHID* joystick, int angle, int povNumber = 0)
-      : m_joystick{joystick}, m_angle{angle}, m_povNumber{povNumber} {}
-
-  bool Get() const override {
-    return m_joystick->GetPOV(m_povNumber) == m_angle;
-  }
-
- private:
-  frc::GenericHID* m_joystick;
-  int m_angle;
-  int m_povNumber;
+      : Button([joystick, angle, povNumber] {
+          m_joystick->GetPOV(m_povNumber) == m_angle;
+        }) {}
 };
 }  // namespace frc2
