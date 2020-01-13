@@ -61,7 +61,7 @@ class SwerveModuleOptimizationTest {
     SwerveModuleState finalState = m_state.optimizeModuleAngle(newState);
 
     assertAll(
-        () -> assertEquals(315, finalState.angle.getDegrees(), 0.01),
+        () -> assertEquals(-45, finalState.angle.getDegrees(), 0.01),
         () -> assertEquals(-1, finalState.speedMetersPerSecond, 0.01)
     );
   }

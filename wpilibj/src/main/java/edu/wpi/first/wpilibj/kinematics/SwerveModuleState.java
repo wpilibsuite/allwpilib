@@ -55,8 +55,7 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
         desiredState.angle.getDegrees() - this.angle.getDegrees()
     );
     if (Math.abs(deltaAngle.getDegrees()) > 90 && Math.abs(deltaAngle.getDegrees()) < 270) {
-      double finalAngle = (finalState.angle.getDegrees() + 180) % 360;
-      finalState.angle = Rotation2d.fromDegrees(finalAngle);
+      finalState.angle = finalState.angle.plus(Rotation2d.fromDegrees(180));
       finalState.speedMetersPerSecond = -finalState.speedMetersPerSecond;
     }
     return finalState;

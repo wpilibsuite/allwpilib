@@ -32,14 +32,13 @@ struct SwerveModuleState {
    */
   SwerveModuleState OptimizeModuleAngle(
       const SwerveModuleState& desiredState) const {
-    frc::SwerveModuleState finalStateAfterOptimization = desiredState;
-    frc::Rotation2d deltaAngle{finalStateAfterOptimization.angle.Degrees() -
-                               angle.Degrees()};
+    SwerveModuleState finalStateAfterOptimization = desiredState;
+    Rotation2d deltaAngle{finalStateAfterOptimization.angle.Degrees() -
+                          angle.Degrees()};
     if (units::math::abs(deltaAngle.Degrees()) > 90_deg &&
         units::math::abs(deltaAngle.Degrees()) < 270_deg) {
-      units::degree_t finalAngle = units::math::fmod(
-          finalStateAfterOptimization.angle.Degrees() + 180_deg, 360_deg);
-      finalStateAfterOptimization.angle = frc::Rotation2d(finalAngle);
+      finalStateAfterOptimization.angle =
+          finalStateAfterOptimization.angle + Rotation2d(180_deg);
       finalStateAfterOptimization.speed = -finalStateAfterOptimization.speed;
     }
     return finalStateAfterOptimization;
