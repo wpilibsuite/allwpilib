@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -399,7 +399,7 @@ class Color {
   /**
    * #20B2AA.
    */
-  static const Color kLightSeagGeen;
+  static const Color kLightSeaGreen;
 
   /**
    * #87CEFA.
@@ -414,7 +414,7 @@ class Color {
   /**
    * #B0C4DE.
    */
-  static const Color kLightSteellue;
+  static const Color kLightSteelBlue;
 
   /**
    * #FFFFE0.
@@ -864,13 +864,13 @@ inline constexpr Color Color::kLightGray{0.827451f, 0.827451f, 0.827451f};
 inline constexpr Color Color::kLightGreen{0.5647059f, 0.93333334f, 0.5647059f};
 inline constexpr Color Color::kLightPink{1.0f, 0.7137255f, 0.75686276f};
 inline constexpr Color Color::kLightSalmon{1.0f, 0.627451f, 0.47843137f};
-inline constexpr Color Color::kLightSeagGeen{0.1254902f, 0.69803923f,
+inline constexpr Color Color::kLightSeaGreen{0.1254902f, 0.69803923f,
                                              0.6666667f};
 inline constexpr Color Color::kLightSkyBlue{0.5294118f, 0.80784315f,
                                             0.98039216f};
 inline constexpr Color Color::kLightSlateGray{0.46666667f, 0.53333336f, 0.6f};
-inline constexpr Color Color::kLightSteellue{0.6901961f, 0.76862746f,
-                                             0.87058824f};
+inline constexpr Color Color::kLightSteelBlue{0.6901961f, 0.76862746f,
+                                              0.87058824f};
 inline constexpr Color Color::kLightYellow{1.0f, 1.0f, 0.8784314f};
 inline constexpr Color Color::kLime{0.0f, 1.0f, 0.0f};
 inline constexpr Color Color::kLimeGreen{0.19607843f, 0.8039216f, 0.19607843f};

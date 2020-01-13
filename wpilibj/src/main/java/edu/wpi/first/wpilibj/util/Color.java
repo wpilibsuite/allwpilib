@@ -399,7 +399,7 @@ public class Color {
   /**
    * #20B2AA.
    */
-  public static final Color kLightSeagGeen = new Color(0.1254902f, 0.69803923f, 0.6666667f);
+  public static final Color kLightSeaGreen = new Color(0.1254902f, 0.69803923f, 0.6666667f);
 
   /**
    * #87CEFA.
@@ -414,7 +414,7 @@ public class Color {
   /**
    * #B0C4DE.
    */
-  public static final Color kLightSteellue = new Color(0.6901961f, 0.76862746f, 0.87058824f);
+  public static final Color kLightSteelBlue = new Color(0.6901961f, 0.76862746f, 0.87058824f);
 
   /**
    * #FFFFE0.
