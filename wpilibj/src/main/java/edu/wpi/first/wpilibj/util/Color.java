@@ -18,6 +18,61 @@ import edu.wpi.first.wpiutil.math.MathUtil;
  */
 @SuppressWarnings("MemberName")
 public class Color {
+  private static final double kPrecision = Math.pow(2, -12);
+
+  public final double red;
+  public final double green;
+  public final double blue;
+
+  /**
+   * Constructs a Color.
+   *
+   * @param red   Red value (0-1)
+   * @param green Green value (0-1)
+   * @param blue  Blue value (0-1)
+   */
+  public Color(double red, double green, double blue) {
+    this.red = roundAndClamp(red);
+    this.green = roundAndClamp(green);
+    this.blue = roundAndClamp(blue);
+  }
+
+  /**
+   * Constructs a Color from a Color8Bit.
+   *
+   * @param color The color
+   */
+  public Color(Color8Bit color) {
+    this(color.red / 255.0,
+        color.green / 255.0,
+        color.blue / 255.0);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (other == null || getClass() != other.getClass()) {
+      return false;
+    }
+
+    Color color = (Color) other;
+    return Double.compare(color.red, red) == 0
+        && Double.compare(color.green, green) == 0
+        && Double.compare(color.blue, blue) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(red, green, blue);
+  }
+
+  private static double roundAndClamp(double value) {
+    final var rounded = Math.round(value / kPrecision) * kPrecision;
+    return MathUtil.clamp(rounded, 0.0, 1.0);
+  }
+
   /*
    * FIRST Colors
    */
@@ -740,59 +795,4 @@ public class Color {
    * #9ACD32.
    */
   public static final Color kYellowGreen = new Color(0.6039216f, 0.8039216f, 0.19607843f);
-
-  public final double red;
-  public final double green;
-  public final double blue;
-
-  private static final double kPrecision = Math.pow(2, -12);
-
-  /**
-   * Constructs a Color.
-   *
-   * @param red   Red value (0-1)
-   * @param green Green value (0-1)
-   * @param blue  Blue value (0-1)
-   */
-  public Color(double red, double green, double blue) {
-    this.red = roundAndClamp(red);
-    this.green = roundAndClamp(green);
-    this.blue = roundAndClamp(blue);
-  }
-
-  /**
-   * Constructs a Color from a Color8Bit.
-   *
-   * @param color The color
-   */
-  public Color(Color8Bit color) {
-    this(color.red / 255.0,
-        color.green / 255.0,
-        color.blue / 255.0);
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    if (this == other) {
-      return true;
-    }
-    if (other == null || getClass() != other.getClass()) {
-      return false;
-    }
-
-    Color color = (Color) other;
-    return Double.compare(color.red, red) == 0
-        && Double.compare(color.green, green) == 0
-        && Double.compare(color.blue, blue) == 0;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(red, green, blue);
-  }
-
-  private static double roundAndClamp(double value) {
-    final var rounded = Math.round(value / kPrecision) * kPrecision;
-    return MathUtil.clamp(rounded, 0.0, 1.0);
-  }
 }
