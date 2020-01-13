@@ -34,6 +34,12 @@ class ColorTest {
     assertColorMatches(red, green, blue, color);
   }
 
+  @ParameterizedTest
+  @MethodSource("staticColorProvider")
+  void colorEqualsTest(double red, double green, double blue, Color color) {
+    assertEquals(color, new Color(red, green, blue));
+  }
+
   static Stream<Arguments> staticColorProvider() {
     return Stream.of(
       arguments(0.0823529412, 0.376470589, 0.7411764706, Color.kDenim),
