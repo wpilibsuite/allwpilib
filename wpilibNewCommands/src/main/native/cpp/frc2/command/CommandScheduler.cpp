@@ -9,6 +9,7 @@
 
 #include <frc/RobotState.h>
 #include <frc/WPIErrors.h>
+#include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
 #include <hal/FRCUsageReporting.h>
@@ -67,9 +68,20 @@ CommandScheduler::CommandScheduler() : m_impl(new Impl) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = [this] {
+    this->Disable();
+    this->CancelAll();
+  };
+  scheduler->disabled = [this] { this->Enable(); };
 }
 
-CommandScheduler::~CommandScheduler() {}
+CommandScheduler::~CommandScheduler() {
+  frc::SendableRegistry::GetInstance().Remove(this);
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = nullptr;
+  scheduler->disabled = nullptr;
+}
 
 CommandScheduler& CommandScheduler::GetInstance() {
   static CommandScheduler scheduler;

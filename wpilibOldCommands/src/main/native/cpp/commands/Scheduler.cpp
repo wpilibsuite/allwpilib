@@ -20,6 +20,7 @@
 #include "frc/buttons/ButtonScheduler.h"
 #include "frc/commands/Command.h"
 #include "frc/commands/Subsystem.h"
+#include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -198,9 +199,20 @@ Scheduler::Scheduler() : m_impl(new Impl) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand_Scheduler);
   SendableRegistry::GetInstance().AddLW(this, "Scheduler");
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = [this] {
+    this->SetEnabled(false);
+    this->RemoveAll();
+  };
+  scheduler->disabled = [this] { this->SetEnabled(true); };
 }
 
-Scheduler::~Scheduler() {}
+Scheduler::~Scheduler() {
+  SendableRegistry::GetInstance().Remove(this);
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = nullptr;
+  scheduler->disabled = nullptr;
+}
 
 void Scheduler::Impl::Remove(Command* command) {
   if (!commands.erase(command)) return;

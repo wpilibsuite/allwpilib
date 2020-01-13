@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 namespace frc {
@@ -21,6 +22,9 @@ class LiveWindow {
  public:
   LiveWindow(const LiveWindow&) = delete;
   LiveWindow& operator=(const LiveWindow&) = delete;
+
+  std::function<void()> enabled;
+  std::function<void()> disabled;
 
   /**
    * Get an instance of the LiveWindow main class.
