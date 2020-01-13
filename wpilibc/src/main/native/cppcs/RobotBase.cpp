@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,6 +25,7 @@
 #include "frc/WPIErrors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include "frc/trajectory/TrajectoryGenerator.h"
 
 typedef void (*SetCameraServerSharedFP)(frc::CameraServerShared* shared);
 
@@ -121,6 +122,8 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   m_threadId = std::this_thread::get_id();
 
   SetupCameraServerShared();
+  TrajectoryGenerator::SetErrorHandler(
+      [](const char* error) { DriverStation::ReportError(error); });
 
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");
