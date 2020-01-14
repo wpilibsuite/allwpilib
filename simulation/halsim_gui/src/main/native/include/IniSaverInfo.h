@@ -16,9 +16,14 @@ class NameInfo {
  public:
   NameInfo() { m_name[0] = '\0'; }
 
+  bool HasName() const { return m_name[0] != '\0'; }
+  const char* GetName() const { return m_name; }
   void GetName(char* buf, size_t size, const char* defaultName, int index);
+  void GetName(char* buf, size_t size, const char* defaultName, int index,
+               int index2);
   bool ReadIni(wpi::StringRef name, wpi::StringRef value);
   void WriteIni(ImGuiTextBuffer* out);
+  void PushEditNameId(int index);
   void PopupEditName(int index);
 
  private:

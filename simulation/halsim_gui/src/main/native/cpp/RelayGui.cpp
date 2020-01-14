@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,8 +16,12 @@
 
 #include "ExtraGuiWidgets.h"
 #include "HALSimGui.h"
+#include "IniSaver.h"
+#include "IniSaverInfo.h"
 
 using namespace halsimgui;
+
+static IniSaver<NameInfo> gRelays{"Relay"};
 
 static void DisplayRelays() {
   bool hasOutputs = false;
@@ -42,7 +46,14 @@ static void DisplayRelays() {
         forward = HALSIM_GetRelayForward(i);
       }
 
-      ImGui::Text("Relay[%d]", i);
+      auto& info = gRelays[i];
+      info.PushEditNameId(i);
+      if (info.HasName())
+        ImGui::Text("%s [%d]", info.GetName(), i);
+      else
+        ImGui::Text("Relay[%d]", i);
+      ImGui::PopID();
+      info.PopupEditName(i);
       ImGui::SameLine();
 
       // show forward and reverse as LED indicators
@@ -58,6 +69,7 @@ static void DisplayRelays() {
 }
 
 void RelayGui::Initialize() {
+  gRelays.Initialize();
   HALSimGui::AddWindow("Relays", DisplayRelays,
                        ImGuiWindowFlags_AlwaysAutoResize);
   HALSimGui::SetDefaultWindowPos("Relays", 180, 20);
