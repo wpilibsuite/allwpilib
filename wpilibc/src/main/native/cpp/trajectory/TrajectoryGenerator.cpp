@@ -9,7 +9,8 @@
 
 #include <utility>
 
-#include "frc/DriverStation.h"
+#include <wpi/raw_ostream.h>
+
 #include "frc/spline/SplineHelper.h"
 #include "frc/spline/SplineParameterizer.h"
 #include "frc/trajectory/TrajectoryParameterizer.h"
@@ -18,6 +19,14 @@ using namespace frc;
 
 const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
     std::vector<Trajectory::State>{Trajectory::State()});
+std::function<void(const char*)> TrajectoryGenerator::s_errorFunc;
+
+void TrajectoryGenerator::ReportError(const char* error) {
+  if (s_errorFunc)
+    s_errorFunc(error);
+  else
+    wpi::errs() << "TrajectoryGenerator error: " << error << "\n";
+}
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
     Spline<3>::ControlVector initial,
@@ -40,7 +49,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
         SplinePointsFromSplines(SplineHelper::CubicSplinesFromControlVectors(
             initial, interiorWaypoints, end));
   } catch (SplineParameterizer::MalformedSplineException& e) {
-    DriverStation::ReportError(e.what());
+    ReportError(e.what());
     return kDoNothingTrajectory;
   }
 
@@ -84,7 +93,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     points = SplinePointsFromSplines(
         SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
   } catch (SplineParameterizer::MalformedSplineException& e) {
-    DriverStation::ReportError(e.what());
+    ReportError(e.what());
     return kDoNothingTrajectory;
   }
 

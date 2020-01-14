@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -114,7 +115,19 @@ class TrajectoryGenerator {
     return splinePoints;
   }
 
+  /**
+   * Set error reporting function. By default, it is output to stderr.
+   *
+   * @param func Error reporting function.
+   */
+  static void SetErrorHandler(std::function<void(const char*)> func) {
+    s_errorFunc = std::move(func);
+  }
+
  private:
+  static void ReportError(const char* error);
+
   static const Trajectory kDoNothingTrajectory;
+  static std::function<void(const char*)> s_errorFunc;
 };
 }  // namespace frc
