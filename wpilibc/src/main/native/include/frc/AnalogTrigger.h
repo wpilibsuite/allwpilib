@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -99,17 +99,6 @@ class AnalogTrigger : public ErrorBase,
    *                         instantaneous reading
    */
   void SetAveraged(bool useAveragedValue);
-
-  /**
-   * Configure the analog trigger to use the duty cycle vs. raw values.
-   *
-   * If the value is true, then the duty cycle value is selected for the analog
-   * trigger, otherwise the immediate value is used.
-   *
-   * @param useDutyCycle If true, use the duty cycle value, otherwise use the
-   *                         instantaneous reading
-   */
-  void SetDutyCycle(bool useDutyCycle);
 
   /**
    * Configure the analog trigger to use a filtered value.
