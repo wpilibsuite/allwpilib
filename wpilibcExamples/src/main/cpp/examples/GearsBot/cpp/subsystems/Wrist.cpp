@@ -22,7 +22,7 @@ Wrist::Wrist() : frc2::PIDSubsystem(frc2::PIDController(kP_real, 0, 0)) {
   AddChild("Pot", &m_pot);
 }
 
-void Wrist::Log() { 
+void Wrist::Log() {
   frc::SmartDashboard::PutNumber("Wrist Angle", GetMeasurement());
 }
 
