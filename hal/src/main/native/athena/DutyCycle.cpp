@@ -75,6 +75,9 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   dutyCycleHandles->Free(dutyCycleHandle);
 }
 
+void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
+                               HAL_SimDeviceHandle device) {}
+
 int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
                                   int32_t* status) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
