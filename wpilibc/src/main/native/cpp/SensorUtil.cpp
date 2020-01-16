@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,6 +21,7 @@ using namespace frc;
 
 const int SensorUtil::kDigitalChannels = HAL_GetNumDigitalChannels();
 const int SensorUtil::kAnalogInputs = HAL_GetNumAnalogInputs();
+const int SensorUtil::kAnalogOutputs = HAL_GetNumAnalogOutputs();
 const int SensorUtil::kSolenoidChannels = HAL_GetNumSolenoidChannels();
 const int SensorUtil::kSolenoidModules = HAL_GetNumPCMModules();
 const int SensorUtil::kPwmChannels = HAL_GetNumPWMChannels();
