@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -56,9 +56,9 @@ public class GearTooth extends Counter {
     super(channel);
     enableDirectionSensing(directionSensitive);
     if (directionSensitive) {
-      HAL.report(tResourceType.kResourceType_GearTooth, channel + 1, 0, "D");
+      HALReporter.report(tResourceType.kResourceType_GearTooth, channel + 1, 0, "D");
     } else {
-      HAL.report(tResourceType.kResourceType_GearTooth, channel + 1, 0);
+      HALReporter.report(tResourceType.kResourceType_GearTooth, channel + 1, 0);
     }
     SendableRegistry.setName(this, "GearTooth", channel);
   }
@@ -75,9 +75,9 @@ public class GearTooth extends Counter {
     super(source);
     enableDirectionSensing(directionSensitive);
     if (directionSensitive) {
-      HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel() + 1, 0, "D");
+      HALReporter.report(tResourceType.kResourceType_GearTooth, source.getChannel() + 1, 0, "D");
     } else {
-      HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel() + 1, 0);
+      HALReporter.report(tResourceType.kResourceType_GearTooth, source.getChannel() + 1, 0);
     }
     SendableRegistry.setName(this, "GearTooth", source.getChannel());
   }

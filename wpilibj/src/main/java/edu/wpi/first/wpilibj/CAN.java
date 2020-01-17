@@ -12,7 +12,7 @@ import java.io.Closeable;
 import edu.wpi.first.hal.CANAPIJNI;
 import edu.wpi.first.hal.CANData;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 
 /**
  * High level class for interfacing with CAN devices conforming to
@@ -40,7 +40,7 @@ public class CAN implements Closeable {
    */
   public CAN(int deviceId) {
     m_handle = CANAPIJNI.initializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType);
-    HAL.report(tResourceType.kResourceType_CAN, deviceId + 1);
+    HALReporter.report(tResourceType.kResourceType_CAN, deviceId + 1);
   }
 
   /**
@@ -54,7 +54,7 @@ public class CAN implements Closeable {
    */
   public CAN(int deviceId, int deviceManufacturer, int deviceType) {
     m_handle = CANAPIJNI.initializeCAN(deviceManufacturer, deviceId, deviceType);
-    HAL.report(tResourceType.kResourceType_CAN, deviceId + 1);
+    HALReporter.report(tResourceType.kResourceType_CAN, deviceId + 1);
   }
 
   /**

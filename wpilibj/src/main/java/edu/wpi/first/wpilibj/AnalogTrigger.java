@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -67,7 +67,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
 
     int index = getIndex();
 
-    HAL.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
+    HALReporter.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
     SendableRegistry.addLW(this, "AnalogTrigger", index);
   }
 
@@ -83,7 +83,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
 
     int index = getIndex();
 
-    HAL.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
+    HALReporter.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
     SendableRegistry.addLW(this, "AnalogTrigger", index);
   }
 

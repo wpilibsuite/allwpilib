@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.util.Arrays;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpiutil.CircularBuffer;
 
 /**
@@ -71,7 +71,7 @@ public class LinearFilter {
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
 
     instances++;
-    HAL.report(tResourceType.kResourceType_LinearFilter, instances);
+    HALReporter.report(tResourceType.kResourceType_LinearFilter, instances);
   }
 
   /**

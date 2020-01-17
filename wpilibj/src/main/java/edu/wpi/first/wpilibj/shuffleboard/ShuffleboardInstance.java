@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -37,7 +37,7 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
     m_selectedTabEntry = m_rootMetaTable.getEntry("Selected");
-    HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+    HALReporter.report(tResourceType.kResourceType_Shuffleboard, 0);
   }
 
   @Override

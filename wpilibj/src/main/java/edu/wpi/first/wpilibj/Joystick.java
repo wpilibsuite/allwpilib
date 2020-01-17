@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 
 /**
  * Handle input from standard Joysticks connected to the Driver Station.
@@ -97,7 +97,7 @@ public class Joystick extends GenericHID {
     m_axes[Axis.kTwist.value] = kDefaultTwistChannel;
     m_axes[Axis.kThrottle.value] = kDefaultThrottleChannel;
 
-    HAL.report(tResourceType.kResourceType_Joystick, port + 1);
+    HALReporter.report(tResourceType.kResourceType_Joystick, port + 1);
   }
 
   /**

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
@@ -125,7 +125,7 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
     setAutomaticMode(originalMode);
 
     m_instances++;
-    HAL.report(tResourceType.kResourceType_Ultrasonic, m_instances);
+    HALReporter.report(tResourceType.kResourceType_Ultrasonic, m_instances);
     SendableRegistry.addLW(this, "Ultrasonic", m_echoChannel.getChannel());
   }
 

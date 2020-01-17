@@ -11,7 +11,7 @@ import java.util.StringJoiner;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -174,7 +174,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation,
                              double gyroAngle) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive,
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
                  tInstances.kRobotDrive2_KilloughCartesian, 3);
       m_reported = true;
     }
@@ -217,7 +217,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive,
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
                  tInstances.kRobotDrive2_KilloughPolar, 3);
       m_reported = true;
     }

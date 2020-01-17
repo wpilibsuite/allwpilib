@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
@@ -107,7 +107,7 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
 
     setRange(range);
 
-    HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
+    HALReporter.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
     SendableRegistry.addLW(this, "ADXL345_I2C", port.value);
   }
 

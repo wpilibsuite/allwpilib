@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
@@ -129,7 +129,7 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
     transferBuffer.put(2, (byte) (kPowerCtl_Measure | kPowerCtl_UltraLowNoise));
     m_spi.write(transferBuffer, 3);
 
-    HAL.report(tResourceType.kResourceType_ADXL362, port.value + 1);
+    HALReporter.report(tResourceType.kResourceType_ADXL362, port.value + 1);
     SendableRegistry.addLW(this, "ADXL362", port.value);
   }
 

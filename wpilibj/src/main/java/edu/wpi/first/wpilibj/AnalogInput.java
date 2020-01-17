@@ -11,6 +11,7 @@ import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.sim.AnalogInSim;
 import edu.wpi.first.hal.util.AllocationException;
@@ -49,7 +50,7 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
     final int portHandle = HAL.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
-    HAL.report(tResourceType.kResourceType_AnalogChannel, channel + 1);
+    HALReporter.report(tResourceType.kResourceType_AnalogChannel, channel + 1);
     SendableRegistry.addLW(this, "AnalogInput", channel);
   }
 

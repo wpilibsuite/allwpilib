@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.hal.DigitalGlitchFilterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -34,7 +34,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
       if (index != m_filterAllocated.length) {
         m_channelIndex = index;
         m_filterAllocated[index] = true;
-        HAL.report(tResourceType.kResourceType_DigitalGlitchFilter,
+        HALReporter.report(tResourceType.kResourceType_DigitalGlitchFilter,
             m_channelIndex + 1, 0);
         SendableRegistry.addLW(this, "DigitalGlitchFilter", index);
       }

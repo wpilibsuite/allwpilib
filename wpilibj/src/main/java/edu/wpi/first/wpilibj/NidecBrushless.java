@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -44,7 +44,7 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
     m_pwm = new PWM(pwmChannel);
     SendableRegistry.addChild(this, m_pwm);
 
-    HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel + 1);
+    HALReporter.report(tResourceType.kResourceType_NidecBrushless, pwmChannel + 1);
     SendableRegistry.addLW(this, "Nidec Brushless", pwmChannel);
   }
 

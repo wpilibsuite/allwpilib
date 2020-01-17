@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 
 /**
  * Handle input from Xbox 360 or Xbox One controllers connected to the Driver Station.
@@ -69,7 +69,7 @@ public class XboxController extends GenericHID {
   public XboxController(final int port) {
     super(port);
 
-    HAL.report(tResourceType.kResourceType_XboxController, port + 1);
+    HALReporter.report(tResourceType.kResourceType_XboxController, port + 1);
   }
 
   /**

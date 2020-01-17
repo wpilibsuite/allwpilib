@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -39,7 +39,7 @@ public class Servo extends PWM {
     setBounds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
-    HAL.report(tResourceType.kResourceType_Servo, getChannel() + 1);
+    HALReporter.report(tResourceType.kResourceType_Servo, getChannel() + 1);
     SendableRegistry.setName(this, "Servo", getChannel());
   }
 

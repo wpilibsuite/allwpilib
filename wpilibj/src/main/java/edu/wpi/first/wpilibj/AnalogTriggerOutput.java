@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
@@ -73,7 +73,7 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
 
     m_trigger = trigger;
     m_outputType = outputType;
-    HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
+    HALReporter.report(tResourceType.kResourceType_AnalogTriggerOutput,
         trigger.getIndex() + 1, outputType.value + 1);
   }
 

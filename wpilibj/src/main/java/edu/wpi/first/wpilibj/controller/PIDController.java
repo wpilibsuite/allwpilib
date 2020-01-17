@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.controller;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -100,7 +100,7 @@ public class PIDController implements Sendable, AutoCloseable {
     instances++;
     SendableRegistry.addLW(this, "PIDController", instances);
 
-    HAL.report(tResourceType.kResourceType_PIDController2, instances);
+    HALReporter.report(tResourceType.kResourceType_PIDController2, instances);
   }
 
   @Override

@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SolenoidJNI;
 import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -77,9 +78,9 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
     m_forwardMask = (byte) (1 << forwardChannel);
     m_reverseMask = (byte) (1 << reverseChannel);
 
-    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel + 1,
+    HALReporter.report(tResourceType.kResourceType_Solenoid, forwardChannel + 1,
                                    m_moduleNumber + 1);
-    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel + 1,
+    HALReporter.report(tResourceType.kResourceType_Solenoid, reverseChannel + 1,
                                    m_moduleNumber + 1);
     SendableRegistry.addLW(this, "DoubleSolenoid", m_moduleNumber, forwardChannel);
   }

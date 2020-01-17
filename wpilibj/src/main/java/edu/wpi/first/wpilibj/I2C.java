@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.hal.util.BoundaryException;
 
@@ -50,7 +50,7 @@ public class I2C implements AutoCloseable {
 
     I2CJNI.i2CInitialize((byte) port.value);
 
-    HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
+    HALReporter.report(tResourceType.kResourceType_I2C, deviceAddress);
   }
 
   @Override

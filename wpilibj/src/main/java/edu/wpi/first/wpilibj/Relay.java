@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.RelayJNI;
 import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -105,11 +106,11 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
     int portHandle = HAL.getPort((byte) m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
       m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);
-      HAL.report(tResourceType.kResourceType_Relay, m_channel + 1);
+      HALReporter.report(tResourceType.kResourceType_Relay, m_channel + 1);
     }
     if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
       m_reverseHandle = RelayJNI.initializeRelayPort(portHandle, false);
-      HAL.report(tResourceType.kResourceType_Relay, m_channel + 128);
+      HALReporter.report(tResourceType.kResourceType_Relay, m_channel + 128);
     }
 
     setSafetyEnabled(false);

@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.trajectory;
 import java.util.Objects;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 
 /**
  * A trapezoid-shaped velocity profile.
@@ -62,7 +62,7 @@ public class TrapezoidProfile {
     public double maxAcceleration;
 
     public Constraints() {
-      HAL.report(tResourceType.kResourceType_TrapezoidProfile, 1);
+      HALReporter.report(tResourceType.kResourceType_TrapezoidProfile, 1);
     }
 
     /**
@@ -74,7 +74,7 @@ public class TrapezoidProfile {
     public Constraints(double maxVelocity, double maxAcceleration) {
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
-      HAL.report(tResourceType.kResourceType_TrapezoidProfile, 1);
+      HALReporter.report(tResourceType.kResourceType_TrapezoidProfile, 1);
     }
   }
 

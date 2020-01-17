@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
@@ -95,7 +95,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
       calibrate();
     }
 
-    HAL.report(tResourceType.kResourceType_ADXRS450, port.value + 1);
+    HALReporter.report(tResourceType.kResourceType_ADXRS450, port.value + 1);
     SendableRegistry.addLW(this, "ADXRS450_Gyro", port.value);
   }
 

@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.kinematics;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -45,7 +45,7 @@ public class SwerveDriveOdometry {
     m_poseMeters = initialPose;
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPose.getRotation();
-    HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
+    HALReporter.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_SwerveDrive);
   }
 
   /**

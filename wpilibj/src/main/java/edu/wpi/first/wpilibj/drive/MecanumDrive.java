@@ -11,7 +11,7 @@ import java.util.StringJoiner;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -159,7 +159,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   @SuppressWarnings("ParameterName")
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive,
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
                  tInstances.kRobotDrive2_MecanumCartesian, 4);
       m_reported = true;
     }
@@ -206,7 +206,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumPolar, 4);
+      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+          tInstances.kRobotDrive2_MecanumPolar, 4);
       m_reported = true;
     }
 

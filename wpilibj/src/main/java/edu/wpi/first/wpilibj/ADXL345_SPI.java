@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
@@ -129,7 +129,7 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
 
     setRange(range);
 
-    HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_SPI);
+    HALReporter.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_SPI);
   }
 
   @Override

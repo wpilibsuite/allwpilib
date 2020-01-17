@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -175,7 +175,7 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
     m_pidOutput = output;
 
     instances++;
-    HAL.report(tResourceType.kResourceType_PIDController, instances);
+    HALReporter.report(tResourceType.kResourceType_PIDController, instances);
     m_tolerance = new NullTolerance();
     SendableRegistry.add(this, "PIDController", instances);
   }

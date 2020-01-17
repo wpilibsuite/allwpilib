@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.kinematics;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
@@ -46,7 +46,8 @@ public class DifferentialDriveOdometry {
     m_poseMeters = initialPoseMeters;
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
-    HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_DifferentialDrive);
+    HALReporter.report(tResourceType.kResourceType_Odometry,
+        tInstances.kOdometry_DifferentialDrive);
   }
 
   /**

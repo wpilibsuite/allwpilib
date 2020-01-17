@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -170,8 +170,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
     final double rightOutput;
 
     if (!kArcadeRatioCurve_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_ArcadeRatioCurve,
-          getNumMotors());
+      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+          tInstances.kRobotDrive_ArcadeRatioCurve, getNumMotors());
       kArcadeRatioCurve_Reported = true;
     }
     if (curve < 0) {
@@ -273,7 +273,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
     if (!kTank_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_Tank,
+      HALReporter.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_Tank,
           getNumMotors());
       kTank_Reported = true;
     }
@@ -378,8 +378,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
   public void arcadeDrive(double moveValue, double rotateValue, boolean squaredInputs) {
     // local variables to hold the computed PWM values for the motors
     if (!kArcadeStandard_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_ArcadeStandard,
-          getNumMotors());
+      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+          tInstances.kRobotDrive_ArcadeStandard, getNumMotors());
       kArcadeStandard_Reported = true;
     }
 
@@ -451,8 +451,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
   @SuppressWarnings("ParameterName")
   public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
     if (!kMecanumCartesian_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_MecanumCartesian,
-          getNumMotors());
+      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+          tInstances.kRobotDrive_MecanumCartesian, getNumMotors());
       kMecanumCartesian_Reported = true;
     }
     @SuppressWarnings("LocalVariableName")
@@ -496,8 +496,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
     if (!kMecanumPolar_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_MecanumPolar,
-          getNumMotors());
+      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+          tInstances.kRobotDrive_MecanumPolar, getNumMotors());
       kMecanumPolar_Reported = true;
     }
     // Normalized for full power along the Cartesian axes.

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -47,7 +47,7 @@ public final class SmartDashboard {
   private static final ListenerExecutor listenerExecutor = new ListenerExecutor();
 
   static {
-    HAL.report(tResourceType.kResourceType_SmartDashboard, 0);
+    HALReporter.report(tResourceType.kResourceType_SmartDashboard, 0);
   }
 
   private SmartDashboard() {

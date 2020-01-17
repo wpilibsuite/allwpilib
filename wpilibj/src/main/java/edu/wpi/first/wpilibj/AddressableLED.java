@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.AddressableLEDJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.PWMJNI;
 
 /**
@@ -29,7 +30,7 @@ public class AddressableLED implements AutoCloseable {
   public AddressableLED(int port) {
     m_pwmHandle = PWMJNI.initializePWMPort(HAL.getPort((byte) port));
     m_handle = AddressableLEDJNI.initialize(m_pwmHandle);
-    HAL.report(tResourceType.kResourceType_AddressableLEDs, port + 1);
+    HALReporter.report(tResourceType.kResourceType_AddressableLEDs, port + 1);
   }
 
   @Override

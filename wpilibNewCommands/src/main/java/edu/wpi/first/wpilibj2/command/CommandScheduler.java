@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Sendable;
@@ -85,7 +85,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
 
   CommandScheduler() {
-    HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
+    HALReporter.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
     LiveWindow.setEnabledListener(() -> {
       disable();

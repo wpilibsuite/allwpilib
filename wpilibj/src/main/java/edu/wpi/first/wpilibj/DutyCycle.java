@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DutyCycleJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -43,7 +43,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
 
     m_source = digitalSource;
     int index = getFPGAIndex();
-    HAL.report(tResourceType.kResourceType_DutyCycle, index + 1);
+    HALReporter.report(tResourceType.kResourceType_DutyCycle, index + 1);
     SendableRegistry.addLW(this, "Duty Cycle", index);
   }
 

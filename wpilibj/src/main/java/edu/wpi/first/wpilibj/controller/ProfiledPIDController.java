@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.controller;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -60,7 +60,7 @@ public class ProfiledPIDController implements Sendable {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
     instances++;
-    HAL.report(tResourceType.kResourceType_ProfiledPIDController, instances);
+    HALReporter.report(tResourceType.kResourceType_ProfiledPIDController, instances);
   }
 
   /**

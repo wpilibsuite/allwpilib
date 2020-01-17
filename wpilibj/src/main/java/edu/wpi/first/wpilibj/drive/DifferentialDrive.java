@@ -11,7 +11,7 @@ import java.util.StringJoiner;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -179,7 +179,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive,
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
                  tInstances.kRobotDrive2_DifferentialArcade, 2);
       m_reported = true;
     }
@@ -246,7 +246,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   @SuppressWarnings({"ParameterName", "PMD.CyclomaticComplexity"})
   public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive,
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
                  tInstances.kRobotDrive2_DifferentialCurvature, 2);
       m_reported = true;
     }
@@ -337,7 +337,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive,
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
                  tInstances.kRobotDrive2_DifferentialTank, 2);
       m_reported = true;
     }

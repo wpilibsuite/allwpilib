@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AccelerometerJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.sim.AccelerometerSim;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -28,7 +28,7 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
    */
   public BuiltInAccelerometer(Range range) {
     setRange(range);
-    HAL.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
+    HALReporter.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
     SendableRegistry.addLW(this, "BuiltInAccel", 0);
   }
 

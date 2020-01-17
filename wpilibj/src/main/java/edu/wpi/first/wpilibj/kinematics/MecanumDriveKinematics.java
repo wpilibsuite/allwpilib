@@ -11,7 +11,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 /**
@@ -74,7 +74,7 @@ public class MecanumDriveKinematics {
         rearLeftWheelMeters, rearRightWheelMeters);
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
-    HAL.report(tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
+    HALReporter.report(tResourceType.kResourceType_Kinematics, tInstances.kKinematics_MecanumDrive);
   }
 
   /**

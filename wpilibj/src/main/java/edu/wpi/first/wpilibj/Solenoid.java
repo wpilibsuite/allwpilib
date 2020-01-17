@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -48,7 +49,7 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
     int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
     m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
-    HAL.report(tResourceType.kResourceType_Solenoid, m_channel + 1, m_moduleNumber + 1);
+    HALReporter.report(tResourceType.kResourceType_Solenoid, m_channel + 1, m_moduleNumber + 1);
     SendableRegistry.addLW(this, "Solenoid", m_moduleNumber, m_channel);
   }
 

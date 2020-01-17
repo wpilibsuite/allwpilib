@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.EncoderJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -80,7 +80,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_pidSource = PIDSourceType.kDisplacement;
 
     int fpgaIndex = getFPGAIndex();
-    HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
+    HALReporter.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
     SendableRegistry.addLW(this, "Encoder", fpgaIndex);
   }
 

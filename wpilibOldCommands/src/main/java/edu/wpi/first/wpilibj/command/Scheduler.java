@@ -13,7 +13,7 @@ import java.util.Vector;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
@@ -94,7 +94,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
    * Instantiates a {@link Scheduler}.
    */
   private Scheduler() {
-    HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
+    HALReporter.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
     LiveWindow.setEnabledListener(() -> {
       disable();

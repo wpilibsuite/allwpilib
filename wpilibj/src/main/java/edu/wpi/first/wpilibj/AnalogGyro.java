@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AnalogGyroJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -41,7 +41,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
 
     AnalogGyroJNI.setupAnalogGyro(m_gyroHandle);
 
-    HAL.report(tResourceType.kResourceType_Gyro, m_analog.getChannel() + 1);
+    HALReporter.report(tResourceType.kResourceType_Gyro, m_analog.getChannel() + 1);
     SendableRegistry.addLW(this, "AnalogGyro", m_analog.getChannel());
   }
 

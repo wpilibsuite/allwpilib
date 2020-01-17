@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 
 /**
  * IterativeRobot implements the IterativeRobotBase robot program framework.
@@ -33,7 +34,7 @@ public class IterativeRobot extends IterativeRobotBase {
   public IterativeRobot() {
     super(kPacketPeriod);
 
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
+    HALReporter.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
   }
 
   /**

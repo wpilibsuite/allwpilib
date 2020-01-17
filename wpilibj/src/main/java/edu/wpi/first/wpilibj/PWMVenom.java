@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
@@ -42,7 +42,7 @@ public class PWMVenom extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    HAL.report(tResourceType.kResourceType_FusionVenom, getChannel() + 1);
+    HALReporter.report(tResourceType.kResourceType_FusionVenom, getChannel() + 1);
     SendableRegistry.setName(this, "PWMVenom", getChannel());
   }
 }

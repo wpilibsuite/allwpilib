@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.util.Collection;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -68,7 +68,7 @@ public final class Preferences {
     m_table.addEntryListener(
         (table, key, entry, value, flags) -> entry.setPersistent(),
         EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
-    HAL.report(tResourceType.kResourceType_Preferences, 0);
+    HALReporter.report(tResourceType.kResourceType_Preferences, 0);
   }
 
   /**

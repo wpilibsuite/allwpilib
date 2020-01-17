@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -38,7 +39,7 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
 
     m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), false);
 
-    HAL.report(tResourceType.kResourceType_DigitalOutput, channel + 1);
+    HALReporter.report(tResourceType.kResourceType_DigitalOutput, channel + 1);
     SendableRegistry.addLW(this, "DigitalOutput", channel);
   }
 

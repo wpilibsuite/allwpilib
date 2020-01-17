@@ -21,6 +21,7 @@ import edu.wpi.first.cameraserver.CameraServerSharedStore;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -46,12 +47,12 @@ public abstract class RobotBase implements AutoCloseable {
 
       @Override
       public void reportVideoServer(int id) {
-        HAL.report(tResourceType.kResourceType_PCVideoServer, id + 1);
+        HALReporter.report(tResourceType.kResourceType_PCVideoServer, id + 1);
       }
 
       @Override
       public void reportUsbCamera(int id) {
-        HAL.report(tResourceType.kResourceType_UsbCamera, id + 1);
+        HALReporter.report(tResourceType.kResourceType_UsbCamera, id + 1);
       }
 
       @Override
@@ -61,7 +62,7 @@ public abstract class RobotBase implements AutoCloseable {
 
       @Override
       public void reportAxisCamera(int id) {
-        HAL.report(tResourceType.kResourceType_AxisCamera, id + 1);
+        HALReporter.report(tResourceType.kResourceType_AxisCamera, id + 1);
       }
 
       @Override
@@ -90,6 +91,7 @@ public abstract class RobotBase implements AutoCloseable {
    * to put this code into it's own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
+    HALReporter.writeReports();
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
@@ -321,7 +323,7 @@ public abstract class RobotBase implements AutoCloseable {
     // Needed because all the OpenCV JNI functions don't have built in loading
     CameraServerJNI.enumerateSinks();
 
-    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0,
+    HALReporter.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0,
         WPILibVersion.Version);
 
     if (HAL.hasMain()) {

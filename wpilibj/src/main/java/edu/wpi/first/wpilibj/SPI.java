@@ -13,7 +13,7 @@ import java.nio.IntBuffer;
 
 import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SPIJNI;
 
 /**
@@ -47,7 +47,7 @@ public class SPI implements AutoCloseable {
 
     SPIJNI.spiInitialize(m_port);
 
-    HAL.report(tResourceType.kResourceType_SPI, port.value + 1);
+    HALReporter.report(tResourceType.kResourceType_SPI, port.value + 1);
   }
 
   @Override

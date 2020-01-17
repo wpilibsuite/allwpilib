@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.NotifierJNI;
 
 /**
@@ -45,7 +46,7 @@ public class TimedRobot extends IterativeRobotBase {
     super(period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
-    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+    HALReporter.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
   }
 
   @Override

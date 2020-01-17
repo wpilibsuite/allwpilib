@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.PWMConfigDataResult;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -65,7 +66,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
 
     PWMJNI.setPWMEliminateDeadband(m_handle, false);
 
-    HAL.report(tResourceType.kResourceType_PWM, channel + 1);
+    HALReporter.report(tResourceType.kResourceType_PWM, channel + 1);
     SendableRegistry.addLW(this, "PWM", channel);
 
     setSafetyEnabled(false);

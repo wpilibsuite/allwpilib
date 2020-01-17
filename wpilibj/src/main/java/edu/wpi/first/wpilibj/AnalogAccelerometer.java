@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -30,7 +30,7 @@ public class AnalogAccelerometer implements PIDSource, Sendable, AutoCloseable {
    * Common initialization.
    */
   private void initAccelerometer() {
-    HAL.report(tResourceType.kResourceType_Accelerometer,
+    HALReporter.report(tResourceType.kResourceType_Accelerometer,
                                    m_analogChannel.getChannel() + 1);
     SendableRegistry.addLW(this, "Accelerometer", m_analogChannel.getChannel());
   }

@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CompressorJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -39,7 +39,7 @@ public class Compressor implements Sendable, AutoCloseable {
 
     m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
 
-    HAL.report(tResourceType.kResourceType_Compressor, module + 1);
+    HALReporter.report(tResourceType.kResourceType_Compressor, module + 1);
     SendableRegistry.addLW(this, "Compressor", module);
   }
 

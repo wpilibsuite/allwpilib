@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -86,7 +86,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
 
     setMaxPeriod(0.5);
 
-    HAL.report(tResourceType.kResourceType_Counter, m_index + 1, mode.value + 1);
+    HALReporter.report(tResourceType.kResourceType_Counter, m_index + 1, mode.value + 1);
     SendableRegistry.addLW(this, "Counter", m_index);
   }
 

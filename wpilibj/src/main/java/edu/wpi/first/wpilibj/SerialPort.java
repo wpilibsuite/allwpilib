@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.nio.charset.StandardCharsets;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.SerialPortJNI;
 
 /**
@@ -120,7 +120,7 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.report(tResourceType.kResourceType_SerialPort, port.value + 1);
+    HALReporter.report(tResourceType.kResourceType_SerialPort, port.value + 1);
   }
 
   /**
@@ -151,7 +151,7 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.report(tResourceType.kResourceType_SerialPort, port.value + 1);
+    HALReporter.report(tResourceType.kResourceType_SerialPort, port.value + 1);
   }
 
   /**

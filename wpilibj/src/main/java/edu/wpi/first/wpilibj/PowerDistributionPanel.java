@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.HALReporter;
 import edu.wpi.first.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -29,7 +29,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
     SensorUtil.checkPDPModule(module);
     m_handle = PDPJNI.initializePDP(module);
 
-    HAL.report(tResourceType.kResourceType_PDP, module + 1);
+    HALReporter.report(tResourceType.kResourceType_PDP, module + 1);
     SendableRegistry.addLW(this, "PowerDistributionPanel", module);
   }
 
