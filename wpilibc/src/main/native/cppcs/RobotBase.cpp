@@ -89,8 +89,6 @@ static void SetupCameraServerShared() {
   if (symbol) {
     auto setCameraServerShared = (SetCameraServerSharedFP)symbol;
     setCameraServerShared(new WPILibCameraServerShared{});
-    wpi::outs() << "Set Camera Server Shared\n";
-    wpi::outs().flush();
   } else {
     wpi::outs() << "Camera Server Shared Symbol Missing\n";
     wpi::outs().flush();
