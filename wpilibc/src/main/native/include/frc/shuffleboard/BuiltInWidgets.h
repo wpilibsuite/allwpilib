@@ -175,7 +175,7 @@ enum class BuiltInWidgets {
    */
   kPowerDistributionPanel,
   /**
-   * Displays a SendableChooser} with a dropdown combo box with a list of
+   * Displays a SendableChooser with a dropdown combo box with a list of
    * options.
    * <br>Supported types:
    * <ul>
