@@ -230,8 +230,8 @@ enum class BuiltInWidgets {
   /**
    * Displays a command with a toggle button. Pressing the button will start the
    * command, and the button will automatically release when the command
-   * completes. <br>Supported types: <ul> <li>Command</li> <li>CommandGroup</li> <li>Any custom subclass of
-   * {@code Command} or {@code CommandGroup}</li>
+   * completes. <br>Supported types: <ul> <li>Command</li> <li>CommandGroup</li>
+   * <li>Any custom subclass of {@code Command} or {@code CommandGroup}</li>
    * </ul>
    * <br>This widget has no custom properties.
    */
