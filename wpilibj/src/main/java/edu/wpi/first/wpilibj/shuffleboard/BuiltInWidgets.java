@@ -208,10 +208,10 @@ public enum BuiltInWidgets implements WidgetType {
    * <li>{@link edu.wpi.first.wpilibj.PWMSpeedController}</li>
    * <li>{@link edu.wpi.first.wpilibj.DMC60}</li>
    * <li>{@link edu.wpi.first.wpilibj.Jaguar}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMSparkMax</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMTalonFX</li>
+   * <li>{@link edu.wpi.first.wpilibj.PWMSparkMax}</li>
+   * <li>{@link edu.wpi.first.wpilibj.PWMTalonFX}</li>
    * <li>{@link edu.wpi.first.wpilibj.PWMTalonSRX}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMVenom</li>
+   * <li>{@link edu.wpi.first.wpilibj.PWMVenom}</li>
    * <li>{@link edu.wpi.first.wpilibj.PWMVictorSPX}</li>
    * <li>{@link edu.wpi.first.wpilibj.SD540}</li>
    * <li>{@link edu.wpi.first.wpilibj.Spark}</li>
