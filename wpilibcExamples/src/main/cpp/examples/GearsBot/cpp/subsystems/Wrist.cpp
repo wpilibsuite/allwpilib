@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,9 +23,11 @@ Wrist::Wrist() : frc2::PIDSubsystem(frc2::PIDController(kP_real, 0, 0)) {
 }
 
 void Wrist::Log() {
-  // frc::SmartDashboard::PutData("Wrist Angle", &m_pot);
+  frc::SmartDashboard::PutNumber("Wrist Angle", GetMeasurement());
 }
 
 double Wrist::GetMeasurement() { return m_pot.Get(); }
 
 void Wrist::UseOutput(double output, double setpoint) { m_motor.Set(output); }
+
+void Wrist::Periodic() { Log(); }
