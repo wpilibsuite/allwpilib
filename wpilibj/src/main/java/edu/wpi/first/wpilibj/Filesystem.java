@@ -56,8 +56,8 @@ public final class Filesystem {
     if (RobotBase.isReal()) {
       return new File(getOperatingDirectory(), "deploy");
     } else {
-      return new File(getOperatingDirectory(), "src" + File.separator + "main" +
-          File.separator + "deploy");
+      return new File(getOperatingDirectory(), "src" + File.separator + "main"
+          + File.separator + "deploy");
     }
   }
 }
