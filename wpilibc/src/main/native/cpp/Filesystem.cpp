@@ -18,7 +18,7 @@ void frc::filesystem::GetLaunchDirectory(wpi::SmallVectorImpl<char>& result) {
 
 void frc::filesystem::GetOperatingDirectory(
     wpi::SmallVectorImpl<char>& result) {
-  if (RobotBase::IsReal()) {
+  if constexpr (RobotBase::IsReal()) {
     wpi::sys::path::native("/home/lvuser", result);
   } else {
     frc::filesystem::GetLaunchDirectory(result);
@@ -27,7 +27,7 @@ void frc::filesystem::GetOperatingDirectory(
 
 void frc::filesystem::GetDeployDirectory(wpi::SmallVectorImpl<char>& result) {
   frc::filesystem::GetOperatingDirectory(result);
-  if (RobotBase::IsReal()) {
+  if constexpr (RobotBase::IsReal()) {
     wpi::sys::path::append(result, "deploy");
   } else {
     wpi::sys::path::append(result, "src");
