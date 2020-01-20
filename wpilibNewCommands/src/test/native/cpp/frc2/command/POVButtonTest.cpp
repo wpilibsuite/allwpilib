@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <frc/Joystick.h>
 #include <mockdata/DriverStationData.h>
 
 #include "CommandTestBase.h"
-#include "frc/Joystick.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
