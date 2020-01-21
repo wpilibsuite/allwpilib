@@ -23,6 +23,17 @@ void NameInfo::GetName(char* buf, size_t size, const char* defaultName,
   }
 }
 
+void NameInfo::GetName(char* buf, size_t size, const char* defaultName,
+                       int index, int index2) {
+  if (m_name[0] != '\0') {
+    std::snprintf(buf, size, "%s [%d,%d]###Name%d", m_name, index, index2,
+                  index);
+  } else {
+    std::snprintf(buf, size, "%s[%d,%d]###Name%d", defaultName, index, index2,
+                  index);
+  }
+}
+
 bool NameInfo::ReadIni(wpi::StringRef name, wpi::StringRef value) {
   if (name != "name") return false;
   size_t len = (std::min)(value.size(), sizeof(m_name) - 1);
@@ -33,6 +44,12 @@ bool NameInfo::ReadIni(wpi::StringRef name, wpi::StringRef value) {
 
 void NameInfo::WriteIni(ImGuiTextBuffer* out) {
   out->appendf("name=%s\n", m_name);
+}
+
+void NameInfo::PushEditNameId(int index) {
+  char id[64];
+  std::snprintf(id, sizeof(id), "Name%d", index);
+  ImGui::PushID(id);
 }
 
 void NameInfo::PopupEditName(int index) {
