@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,51 +13,22 @@
 
 #include <hal/SimDevice.h>
 #include <imgui.h>
-#include <imgui_internal.h>
 #include <mockdata/SimDeviceData.h>
-#include <wpi/StringMap.h>
 
 #include "HALSimGui.h"
+#include "IniSaverInfo.h"
+#include "IniSaverString.h"
 
 using namespace halsimgui;
 
 namespace {
-struct ElementInfo {
-  bool open = false;
-  bool visible = true;
+struct ElementInfo : public OpenInfo {
+  bool visible = true;  // not saved
 };
 }  // namespace
 
 static std::vector<std::function<void()>> gDeviceExecutors;
-static wpi::StringMap<ElementInfo> gElements;
-
-// read/write open state to ini file
-static void* DevicesReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                             const char* name) {
-  return &gElements[name];
-}
-
-static void DevicesReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                            void* entry, const char* lineStr) {
-  ElementInfo* element = static_cast<ElementInfo*>(entry);
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
-  if (name == "open") {
-    int num;
-    if (value.getAsInteger(10, num)) return;
-    element->open = num;
-  }
-}
-
-static void DevicesWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                            ImGuiTextBuffer* out_buf) {
-  for (auto&& entry : gElements) {
-    out_buf->appendf("[Device][%s]\nopen=%d\n\n", entry.getKey().data(),
-                     entry.getValue().open ? 1 : 0);
-  }
-}
+static IniSaverString<ElementInfo> gElements{"Device"};
 
 void SimDeviceGui::Hide(const char* name) { gElements[name].visible = false; }
 
@@ -70,12 +41,13 @@ bool SimDeviceGui::StartDevice(const char* label, ImGuiTreeNodeFlags flags) {
   if (!element.visible) return false;
 
   if (ImGui::CollapsingHeader(
-          label, flags | (element.open ? ImGuiTreeNodeFlags_DefaultOpen : 0))) {
+          label,
+          flags | (element.IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0))) {
     ImGui::PushID(label);
-    element.open = true;
+    element.SetOpen(true);
     return true;
   }
-  element.open = false;
+  element.SetOpen(false);
   return false;
 }
 
@@ -201,15 +173,7 @@ static void DisplayDeviceTree() {
 }
 
 void SimDeviceGui::Initialize() {
-  // hook ini handler to save device settings
-  ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "Device";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = DevicesReadOpen;
-  iniHandler.ReadLineFn = DevicesReadLine;
-  iniHandler.WriteAllFn = DevicesWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-
+  gElements.Initialize();
   HALSimGui::AddWindow("Other Devices", DisplayDeviceTree);
   HALSimGui::SetDefaultWindowPos("Other Devices", 1025, 20);
   HALSimGui::SetDefaultWindowSize("Other Devices", 250, 695);

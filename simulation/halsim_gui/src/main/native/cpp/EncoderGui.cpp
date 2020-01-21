@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,45 +11,16 @@
 
 #include <hal/Ports.h>
 #include <imgui.h>
-#include <imgui_internal.h>
 #include <mockdata/EncoderData.h>
 #include <mockdata/SimDeviceData.h>
-#include <wpi/DenseMap.h>
-#include <wpi/StringRef.h>
 
 #include "HALSimGui.h"
+#include "IniSaver.h"
+#include "IniSaverInfo.h"
 
 using namespace halsimgui;
 
-static wpi::DenseMap<int, bool> gEncodersOpen;  // indexed by channel A
-
-// read/write open state to ini file
-static void* EncodersReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                              const char* name) {
-  int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num)) return nullptr;
-  return &gEncodersOpen[num];
-}
-
-static void EncodersReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                             void* entry, const char* lineStr) {
-  bool* element = static_cast<bool*>(entry);
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
-  if (name == "open") {
-    int num;
-    if (value.getAsInteger(10, num)) return;
-    *element = num;
-  }
-}
-
-static void EncodersWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                             ImGuiTextBuffer* out_buf) {
-  for (auto it : gEncodersOpen)
-    out_buf->appendf("[Encoder][%d]\nopen=%d\n\n", it.first, it.second ? 1 : 0);
-}
+static IniSaver<OpenInfo> gEncoders{"Encoder"};  // indexed by channel A
 
 static void DisplayEncoders() {
   bool hasAny = false;
@@ -66,10 +37,11 @@ static void DisplayEncoders() {
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
         ImGui::Text("%s", HALSIM_GetSimDeviceName(simDevice));
         ImGui::PopStyleColor();
-      } else if (ImGui::CollapsingHeader(
-                     name,
-                     gEncodersOpen[chA] ? ImGuiTreeNodeFlags_DefaultOpen : 0)) {
-        gEncodersOpen[chA] = true;
+      } else if (ImGui::CollapsingHeader(name,
+                                         gEncoders[chA].IsOpen()
+                                             ? ImGuiTreeNodeFlags_DefaultOpen
+                                             : 0)) {
+        gEncoders[chA].SetOpen(true);
 
         ImGui::PushID(i);
 
@@ -105,7 +77,7 @@ static void DisplayEncoders() {
 
         ImGui::PopID();
       } else {
-        gEncodersOpen[chA] = false;
+        gEncoders[chA].SetOpen(false);
       }
     }
   }
@@ -114,15 +86,7 @@ static void DisplayEncoders() {
 }
 
 void EncoderGui::Initialize() {
-  // hook ini handler to save settings
-  ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "Encoder";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = EncodersReadOpen;
-  iniHandler.ReadLineFn = EncodersReadLine;
-  iniHandler.WriteAllFn = EncodersWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-
+  gEncoders.Initialize();
   HALSimGui::AddWindow("Encoders", DisplayEncoders,
                        ImGuiWindowFlags_AlwaysAutoResize);
   HALSimGui::SetDefaultWindowPos("Encoders", 640, 215);
