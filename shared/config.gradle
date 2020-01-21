@@ -21,6 +21,11 @@ nativeUtils.wpi.addWarningsAsErrors()
 
 nativeUtils.setSinglePrintPerPlatform()
 
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) return
+    it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
+}
+
 model {
     components {
         all {
