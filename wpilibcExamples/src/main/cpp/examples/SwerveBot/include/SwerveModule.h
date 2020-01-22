@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <wpi/math>
 
@@ -41,4 +42,9 @@ class SwerveModule {
       0.0,
       0.0,
       {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
+
+  frc::SimpleMotorFeedforward<units::meter> m_driveFeedforward{1_V,
+                                                               3_V / 1_mps};
+  frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{
+      1_V, 0.5_V / 1_rad_per_s};
 };

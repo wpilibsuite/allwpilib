@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -40,11 +40,16 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& state) {
   const auto driveOutput = m_drivePIDController.Calculate(
       m_driveEncoder.GetRate(), state.speed.to<double>());
 
+  const auto driveFeedforward = m_driveFeedforward.Calculate(state.speed);
+
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
       units::radian_t(m_turningEncoder.Get()), state.angle.Radians());
 
+  const auto turnFeedforward = m_turnFeedforward.Calculate(
+      m_turningPIDController.GetSetpoint().velocity);
+
   // Set the motor outputs.
-  m_driveMotor.Set(driveOutput);
-  m_turningMotor.Set(turnOutput);
+  m_driveMotor.SetVoltage(units::volt_t{driveOutput} + driveFeedforward);
+  m_turningMotor.SetVoltage(units::volt_t{turnOutput} + turnFeedforward);
 }
