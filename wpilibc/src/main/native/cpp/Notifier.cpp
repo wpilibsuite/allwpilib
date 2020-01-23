@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
+#include <hal/Threads.h>
 #include <wpi/SmallString.h>
 
 #include "frc/Timer.h"
@@ -30,6 +31,42 @@ Notifier::Notifier(std::function<void()> handler) {
   m_thread = std::thread([=] {
     for (;;) {
       int32_t status = 0;
+      HAL_NotifierHandle notifier = m_notifier.load();
+      if (notifier == 0) break;
+      uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
+      if (curTime == 0 || status != 0) break;
+
+      std::function<void()> handler;
+      {
+        std::scoped_lock lock(m_processMutex);
+        handler = m_handler;
+        if (m_periodic) {
+          m_expirationTime += m_period;
+          UpdateAlarm();
+        } else {
+          // need to update the alarm to cause it to wait again
+          UpdateAlarm(UINT64_MAX);
+        }
+      }
+
+      // call callback
+      if (handler) handler();
+    }
+  });
+}
+
+Notifier::Notifier(int priority, std::function<void()> handler) {
+  if (handler == nullptr)
+    wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
+  m_handler = handler;
+  int32_t status = 0;
+  m_notifier = HAL_InitializeNotifier(&status);
+  wpi_setHALError(status);
+
+  m_thread = std::thread([=] {
+    int32_t status = 0;
+    HAL_SetCurrentThreadPriority(true, priority, &status);
+    for (;;) {
       HAL_NotifierHandle notifier = m_notifier.load();
       if (notifier == 0) break;
       uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
