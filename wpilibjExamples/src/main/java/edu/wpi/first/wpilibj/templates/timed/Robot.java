@@ -80,12 +80,40 @@ public class Robot extends TimedRobot {
         break;
     }
   }
+  
+  /**
+   * This function is called once when teleop is enabled.
+   */
+  @Override
+  public void teleopInit() {
+  }
 
   /**
    * This function is called periodically during operator control.
    */
   @Override
   public void teleopPeriodic() {
+  }
+  
+  /**
+   * This function is called once when the robot is disabled.
+   */
+  @Override
+  public void disabledInit() {
+  }
+  
+  /**
+   * This function is called periodically when disabled.
+   */
+  @Override
+  public void disabledPeriodic() {
+  }
+
+  /**
+   * This function is called once when test mode is enabled.
+   */
+  @Override
+  public void testInit() {
   }
 
   /**
