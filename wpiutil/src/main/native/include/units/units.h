@@ -4854,4 +4854,5 @@ using namespace velocity;
 using namespace acceleration;
 using namespace angle;
 using namespace voltage;
+using namespace dimensionless;
 }  // namespace units
