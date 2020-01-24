@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
         break;
     }
   }
-  
+
   /**
    * This function is called once when teleop is enabled.
    */
@@ -94,14 +94,14 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
   }
-  
+
   /**
    * This function is called once when the robot is disabled.
    */
   @Override
   public void disabledInit() {
   }
-  
+
   /**
    * This function is called periodically when disabled.
    */
