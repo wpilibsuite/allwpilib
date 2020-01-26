@@ -52,7 +52,7 @@ public final class RuntimeLoader<T> {
   }
 
   private String getLoadErrorMessage(UnsatisfiedLinkError ule) {
-    StringBuilder msg = new StringBuilder(256);
+    StringBuilder msg = new StringBuilder(512);
     msg.append(m_libraryName)
        .append(" could not be loaded from path or an embedded resource.\n"
                + "\tattempted to load for platform ")
