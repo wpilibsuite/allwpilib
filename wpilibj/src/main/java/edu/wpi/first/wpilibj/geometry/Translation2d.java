@@ -209,37 +209,4 @@ public class Translation2d {
   public int hashCode() {
     return Objects.hash(m_x, m_y);
   }
-
-  static class TranslationSerializer extends StdSerializer<Translation2d> {
-    TranslationSerializer() {
-      super(Translation2d.class);
-    }
-
-    @Override
-    public void serialize(
-            Translation2d value, JsonGenerator jgen, SerializerProvider provider)
-            throws IOException, JsonProcessingException {
-
-      jgen.writeStartObject();
-      jgen.writeNumberField("x", value.m_x);
-      jgen.writeNumberField("y", value.m_y);
-      jgen.writeEndObject();
-    }
-  }
-
-  static class TranslationDeserializer extends StdDeserializer<Translation2d> {
-    TranslationDeserializer() {
-      super(Translation2d.class);
-    }
-
-    @Override
-    public Translation2d deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
-      JsonNode node = jp.getCodec().readTree(jp);
-      double xval = node.get("x").numberValue().doubleValue();
-      double yval = node.get("y").numberValue().doubleValue();
-
-      return new Translation2d(xval, yval);
-    }
-  }
 }
