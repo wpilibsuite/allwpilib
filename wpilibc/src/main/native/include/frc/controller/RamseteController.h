@@ -102,12 +102,20 @@ class RamseteController {
   ChassisSpeeds Calculate(const Pose2d& currentPose,
                           const Trajectory::State& desiredState);
 
+  /**
+   * Enables and disables the controller for troubleshooting purposes.
+   *
+   * @param enabled If the controller is enabled or not.
+   */
+  void SetEnabled(bool enabled);
+
  private:
   double m_b;
   double m_zeta;
 
   Pose2d m_poseError;
   Pose2d m_poseTolerance;
+  bool m_enabled = true;
 };
 
 }  // namespace frc
