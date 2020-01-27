@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,11 +48,16 @@ public final class Filesystem {
    * Obtains the deploy directory of the program, which is the remote location
    * src/main/deploy is deployed to by default. On the roboRIO, this is
    * /home/lvuser/deploy. In simulation, it is where the simulation was launched
-   * from, in the subdirectory "deploy" (`pwd`/deploy).
+   * from, in the subdirectory "src/main/deploy" (`pwd`/src/main/deploy).
    *
    * @return The deploy directory
    */
   public static File getDeployDirectory() {
-    return new File(getOperatingDirectory(), "deploy");
+    if (RobotBase.isReal()) {
+      return new File(getOperatingDirectory(), "deploy");
+    } else {
+      return new File(getOperatingDirectory(), "src" + File.separator + "main"
+          + File.separator + "deploy");
+    }
   }
 }

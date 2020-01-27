@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,7 +18,7 @@ void frc::filesystem::GetLaunchDirectory(wpi::SmallVectorImpl<char>& result) {
 
 void frc::filesystem::GetOperatingDirectory(
     wpi::SmallVectorImpl<char>& result) {
-  if (RobotBase::IsReal()) {
+  if constexpr (RobotBase::IsReal()) {
     wpi::sys::path::native("/home/lvuser", result);
   } else {
     frc::filesystem::GetLaunchDirectory(result);
@@ -27,5 +27,11 @@ void frc::filesystem::GetOperatingDirectory(
 
 void frc::filesystem::GetDeployDirectory(wpi::SmallVectorImpl<char>& result) {
   frc::filesystem::GetOperatingDirectory(result);
-  wpi::sys::path::append(result, "deploy");
+  if constexpr (RobotBase::IsReal()) {
+    wpi::sys::path::append(result, "deploy");
+  } else {
+    wpi::sys::path::append(result, "src");
+    wpi::sys::path::append(result, "main");
+    wpi::sys::path::append(result, "deploy");
+  }
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -69,7 +69,13 @@ public final class SplineHelper {
       // This just makes the splines look better.
       final var scalar = 1.2 * p0.getTranslation().getDistance(p1.getTranslation());
 
-      vectors.add(getQuinticControlVector(scalar, p0));
+      // Only add the first control vector if this is the first iteration. The
+      // last control vector of this iteration is the first control vector of
+      // the next iteration.
+      if (i == 0) {
+        vectors.add(getQuinticControlVector(scalar, p0));
+      }
+
       vectors.add(getQuinticControlVector(scalar, p1));
     }
     return vectors;

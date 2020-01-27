@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
@@ -56,6 +57,9 @@ public class Drivetrain {
   private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
       getAngle());
 
+  // Gains are for example purposes only - must be determined for your own robot!
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
+
   /**
    * Constructs a MecanumDrive and resets the gyro.
    */
@@ -93,23 +97,28 @@ public class Drivetrain {
    * @param speeds The desired wheel speeds.
    */
   public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
-    final var frontLeftOutput = m_frontLeftPIDController.calculate(
+    final double frontLeftFeedforward = m_feedforward.calculate(speeds.frontLeftMetersPerSecond);
+    final double frontRightFeedforward = m_feedforward.calculate(speeds.frontRightMetersPerSecond);
+    final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeftMetersPerSecond);
+    final double backRightFeedforward = m_feedforward.calculate(speeds.rearRightMetersPerSecond);
+
+    final double frontLeftOutput = m_frontLeftPIDController.calculate(
         m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond
     );
-    final var frontRightOutput = m_frontRightPIDController.calculate(
+    final double frontRightOutput = m_frontRightPIDController.calculate(
         m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond
     );
-    final var backLeftOutput = m_backLeftPIDController.calculate(
+    final double backLeftOutput = m_backLeftPIDController.calculate(
         m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond
     );
-    final var backRightOutput = m_backRightPIDController.calculate(
+    final double backRightOutput = m_backRightPIDController.calculate(
         m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond
     );
 
-    m_frontLeftMotor.set(frontLeftOutput);
-    m_frontRightMotor.set(frontRightOutput);
-    m_backLeftMotor.set(backLeftOutput);
-    m_backRightMotor.set(backRightOutput);
+    m_frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
+    m_frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
+    m_backLeftMotor.setVoltage(backLeftOutput + backLeftFeedforward);
+    m_backRightMotor.setVoltage(backRightOutput + backRightFeedforward);
   }
 
   /**

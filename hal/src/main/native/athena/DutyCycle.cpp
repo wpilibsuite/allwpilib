@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -74,6 +74,9 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   // Just free it, the unique ptr will take care of everything else
   dutyCycleHandles->Free(dutyCycleHandle);
 }
+
+void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
+                               HAL_SimDeviceHandle device) {}
 
 int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
                                   int32_t* status) {

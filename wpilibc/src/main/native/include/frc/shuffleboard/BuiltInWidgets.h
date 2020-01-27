@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -144,7 +144,7 @@ enum class BuiltInWidgets {
    * <br>Supported types:
    * <ul>
    * <li>Number</li>
-   * <li>{@link edu.wpi.first.wpilibj.AnalogInput}</li>
+   * <li>AnalogInput</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -163,9 +163,8 @@ enum class BuiltInWidgets {
    */
   kVoltageView,
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.PowerDistributionPanel
-   * PowerDistributionPanel}. <br>Supported types: <ul> <li>{@link
-   * edu.wpi.first.wpilibj.PowerDistributionPanel}</li>
+   * Displays a PowerDistributionPanel. <br>Supported types: <ul> <li>
+   * PowerDistributionPanel</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -176,49 +175,49 @@ enum class BuiltInWidgets {
    */
   kPowerDistributionPanel,
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser
-   * SendableChooser} with a dropdown combo box with a list of options.
+   * Displays a SendableChooser with a dropdown combo box with a list of
+   * options.
    * <br>Supported types:
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser}</li>
+   * <li>SendableChooser</li>
    * </ul>
    * <br>This widget has no custom properties.
    */
   kComboBoxChooser,
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser
-   * SendableChooser} with a toggle button for each available option.
+   * Displays a SendableChooserwith a toggle button for each available option.
    * <br>Supported types:
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser}</li>
+   * <li>SendableChooser</li>
    * </ul>
    * <br>This widget has no custom properties.
    */
   kSplitButtonChooser,
   /**
-   * Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed,
-   * total travelled distance, and its distance per tick. <br>Supported types:
+   * Displays an Encoder displaying its speed,
+   * total traveled distance, and its distance per tick. <br>Supported types:
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.Encoder}</li>
+   * <li>Encoder</li>
    * </ul>
    * <br>This widget has no custom properties.
    */
   kEncoder,
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.SpeedController SpeedController}.
+   * Displays a SpeedController.
    * The speed controller will be controllable from the dashboard when test mode
    * is enabled, but will otherwise be view-only. <br>Supported types: <ul>
-   * <li>{@link edu.wpi.first.wpilibj.PWMSpeedController}</li>
-   * <li>{@link edu.wpi.first.wpilibj.DMC60}</li>
-   * <li>{@link edu.wpi.first.wpilibj.Jaguar}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMTalonSRX}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMVictorSPX}</li>
-   * <li>{@link edu.wpi.first.wpilibj.SD540}</li>
-   * <li>{@link edu.wpi.first.wpilibj.Spark}</li>
-   * <li>{@link edu.wpi.first.wpilibj.Talon}</li>
-   * <li>{@link edu.wpi.first.wpilibj.Victor}</li>
-   * <li>{@link edu.wpi.first.wpilibj.VictorSP}</li>
-   * <li>{@link edu.wpi.first.wpilibj.SpeedControllerGroup}</li>
+   * <li>PWMSpeedController</li>
+   * <li>DMC60</li>
+   * <li>Jaguar</li>
+   * <li>PWMTalonSRX</li>
+   * <li>PWMVictorSPX</li>
+   * <li>SD540</li>
+   * <li>Spark</li>
+   * <li>Talon</li>
+   * <li>Victor</li>
+   * <li>VictorSP</li>
+   * <li>SpeedControllerGroup</li>
+   * <li>Any custom subclass of {@code SpeedContorller}</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -231,10 +230,8 @@ enum class BuiltInWidgets {
   /**
    * Displays a command with a toggle button. Pressing the button will start the
    * command, and the button will automatically release when the command
-   * completes. <br>Supported types: <ul> <li>{@link
-   * edu.wpi.first.wpilibj.command.Command}</li> <li>{@link
-   * edu.wpi.first.wpilibj.command.CommandGroup}</li> <li>Any custom subclass of
-   * {@code Command} or {@code CommandGroup}</li>
+   * completes. <br>Supported types: <ul> <li>Command</li> <li>CommandGroup</li>
+   * <li>Any custom subclass of {@code Command} or {@code CommandGroup}</li>
    * </ul>
    * <br>This widget has no custom properties.
    */
@@ -243,7 +240,7 @@ enum class BuiltInWidgets {
    * Displays a PID command with a checkbox and an editor for the PIDF
    * constants. Selecting the checkbox will start the command, and the checkbox
    * will automatically deselect when the command completes. <br>Supported
-   * types: <ul> <li>{@link edu.wpi.first.wpilibj.command.PIDCommand}</li>
+   * types: <ul> <li>PIDCommand</li>
    * <li>Any custom subclass of {@code PIDCommand}</li>
    * </ul>
    * <br>This widget has no custom properties.
@@ -252,7 +249,7 @@ enum class BuiltInWidgets {
   /**
    * Displays a PID controller with an editor for the PIDF constants and a
    * toggle switch for enabling and disabling the controller. <br>Supported
-   * types: <ul> <li>{@link edu.wpi.first.wpilibj.PIDController}</li>
+   * types: <ul> <li>PIDController</li>
    * </ul>
    * <br>This widget has no custom properties.
    */
@@ -260,7 +257,7 @@ enum class BuiltInWidgets {
   /**
    * Displays an accelerometer with a number bar displaying the magnitude of the
    * acceleration and text displaying the exact value. <br>Supported types: <ul>
-   * <li>{@link edu.wpi.first.wpilibj.AnalogAccelerometer}</li>
+   * <li>AnalogAccelerometer</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -280,10 +277,8 @@ enum class BuiltInWidgets {
   kAccelerometer,
   /**
    * Displays a 3-axis accelerometer with a number bar for each axis'
-   * accleration. <br>Supported types: <ul> <li>{@link
-   * edu.wpi.first.wpilibj.ADXL345_I2C}</li> <li>{@link
-   * edu.wpi.first.wpilibj.ADXL345_SPI}</li> <li>{@link
-   * edu.wpi.first.wpilibj.ADXL362}</li>
+   * acceleration. <br>Supported types: <ul> <li>ADXL345_I2C</li> <li>
+   * ADXL345_SPI</li> <li>ADXL362</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -302,8 +297,8 @@ enum class BuiltInWidgets {
    * Displays a gyro with a dial from 0 to 360 degrees.
    * <br>Supported types:
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.ADXRS450_Gyro}</li>
-   * <li>{@link edu.wpi.first.wpilibj.AnalogGyro}</li>
+   * <li>ADXRS450_Gyro</li>
+   * <li>AnalogGyro</li>
    * <li>Any custom subclass of {@code GyroBase} (such as a MXP gyro)</li>
    * </ul>
    * <br>Custom properties:
@@ -319,8 +314,7 @@ enum class BuiltInWidgets {
   kGyro,
   /**
    * Displays a relay with toggle buttons for each supported mode (off, on,
-   * forward, reverse). <br>Supported types: <ul> <li>{@link
-   * edu.wpi.first.wpilibj.Relay}</li>
+   * forward, reverse). <br>Supported types: <ul> <li>Relay</li>
    * </ul>
    * <br>This widget has no custom properties.
    */
@@ -331,7 +325,7 @@ enum class BuiltInWidgets {
    * drivebase. The widget will be controllable if the robot is in test mode.
    * <br>Supported types:
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.drive.DifferentialDrive}</li>
+   * <li>DifferentialDrive</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -348,7 +342,7 @@ enum class BuiltInWidgets {
    * Displays a mecanum drive with a widget that displays the speed of each
    * wheel, and vectors for the direction and rotation of the drivebase. The
    * widget will be controllable if the robot is in test mode. <br>Supported
-   * types: <ul> <li>{@link edu.wpi.first.wpilibj.drive.MecanumDrive}</li>
+   * types: <ul> <li>MecanumDrive</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -361,8 +355,7 @@ enum class BuiltInWidgets {
    * Displays a camera stream.
    * <br>Supported types:
    * <ul>
-   * <li>{@link edu.wpi.cscore.VideoSource} (as long as it is streaming on an
-   * MJPEG server)</li>
+   * <li>VideoSource (as long as it is streaming on an MJPEG server)</li>
    * </ul>
    * <br>Custom properties:
    * <table>
