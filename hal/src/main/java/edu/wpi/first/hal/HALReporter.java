@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.hal;
 
 import java.util.ArrayList;
@@ -26,7 +33,7 @@ public class HALReporter {
 
   /**
    * Write all caches reports to the low level API.
-   * 
+   *
    * <p>Not for public use, called from WPILibJ.
    */
   public static void writeReports() {
@@ -43,7 +50,7 @@ public class HALReporter {
 
   /**
    * Report a usage.
-   * 
+   *
    * @param resource resource
    * @param instanceNumber instanceNumber
    */
@@ -53,7 +60,7 @@ public class HALReporter {
 
   /**
    * Report a usage.
-   * 
+   *
    * @param resource resource
    * @param instanceNumber instanceNumber
    * @param context context
@@ -64,7 +71,7 @@ public class HALReporter {
 
   /**
    * Report a usage.
-   * 
+   *
    * @param resource resource
    * @param instanceNumber instanceNumber
    * @param context context

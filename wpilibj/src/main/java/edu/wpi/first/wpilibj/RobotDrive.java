@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -170,7 +170,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
     final double rightOutput;
 
     if (!kArcadeRatioCurve_Reported) {
-      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
           tInstances.kRobotDrive_ArcadeRatioCurve, getNumMotors());
       kArcadeRatioCurve_Reported = true;
     }
@@ -378,7 +378,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
   public void arcadeDrive(double moveValue, double rotateValue, boolean squaredInputs) {
     // local variables to hold the computed PWM values for the motors
     if (!kArcadeStandard_Reported) {
-      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
           tInstances.kRobotDrive_ArcadeStandard, getNumMotors());
       kArcadeStandard_Reported = true;
     }
@@ -451,7 +451,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
   @SuppressWarnings("ParameterName")
   public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
     if (!kMecanumCartesian_Reported) {
-      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
           tInstances.kRobotDrive_MecanumCartesian, getNumMotors());
       kMecanumCartesian_Reported = true;
     }
@@ -496,7 +496,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
     if (!kMecanumPolar_Reported) {
-      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
           tInstances.kRobotDrive_MecanumPolar, getNumMotors());
       kMecanumPolar_Reported = true;
     }

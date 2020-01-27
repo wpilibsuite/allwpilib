@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -206,7 +206,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HALReporter.report(tResourceType.kResourceType_RobotDrive, 
+      HALReporter.report(tResourceType.kResourceType_RobotDrive,
           tInstances.kRobotDrive2_MecanumPolar, 4);
       m_reported = true;
     }
