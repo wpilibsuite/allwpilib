@@ -338,10 +338,10 @@ public class SendableRegistry {
       return null;
     }
     Object rv = null;
-    if (handle < comp.m_data.length) {
-      rv = comp.m_data[handle];
-    } else if (comp.m_data == null) {
+    if (comp.m_data == null) {
       comp.m_data = new Object[handle + 1];
+    } else if (handle < comp.m_data.length) {
+      rv = comp.m_data[handle];
     } else {
       comp.m_data = Arrays.copyOf(comp.m_data, handle + 1);
     }
