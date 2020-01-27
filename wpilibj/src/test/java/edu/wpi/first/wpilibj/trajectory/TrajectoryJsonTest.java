@@ -24,12 +24,6 @@ public class TrajectoryJsonTest {
         new DifferentialDriveKinematics(20), 3));
     var trajectory = TrajectoryGeneratorTest.getTrajectory(config);
 
-    try {
-      System.out.println(TrajectoryUtil.serializeTrajectory(trajectory));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     var deserialized =
         assertDoesNotThrow(() ->
             TrajectoryUtil.deserializeTrajectory(TrajectoryUtil.serializeTrajectory(trajectory)));
