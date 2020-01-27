@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj.geometry;
 import java.io.IOException;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  */
 @SuppressWarnings({"ParameterName", "MemberName"})
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Translation2d {
   private final double m_x;
   private final double m_y;
@@ -75,6 +77,7 @@ public class Translation2d {
    *
    * @return The x component of the translation.
    */
+  @JsonProperty
   public double getX() {
     return m_x;
   }
@@ -84,6 +87,7 @@ public class Translation2d {
    *
    * @return The y component of the translation.
    */
+  @JsonProperty
   public double getY() {
     return m_y;
   }

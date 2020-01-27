@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj.geometry;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Represents a 2d pose containing translational and rotational elements.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose2d {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
@@ -89,6 +91,7 @@ public class Pose2d {
    *
    * @return The translational component of the pose.
    */
+  @JsonProperty
   public Translation2d getTranslation() {
     return m_translation;
   }
@@ -98,6 +101,7 @@ public class Pose2d {
    *
    * @return The rotational component of the pose.
    */
+  @JsonProperty
   public Rotation2d getRotation() {
     return m_rotation;
   }

@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj.geometry;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * (cosine and sine).
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d {
   private final double m_value;
   private final double m_cos;
@@ -141,11 +143,12 @@ public class Rotation2d {
     );
   }
 
-  /*
+  /**
    * Returns the radian value of the rotation.
    *
    * @return The radian value of the rotation.
    */
+  @JsonProperty
   public double getRadians() {
     return m_value;
   }
