@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,14 +10,15 @@ package edu.wpi.first.wpilibj.geometry;
 import java.io.IOException;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
@@ -29,9 +30,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  * When the robot is placed on the origin, facing toward the X direction,
  * moving forward increases the X, whereas moving to the left increases the Y.
  */
-@JsonSerialize(using = Translation2d.TranslationSerializer.class)
-@JsonDeserialize(using = Translation2d.TranslationDeserializer.class)
 @SuppressWarnings({"ParameterName", "MemberName"})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Translation2d {
   private final double m_x;
   private final double m_y;
@@ -50,7 +50,9 @@ public class Translation2d {
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  public Translation2d(double x, double y) {
+  @JsonCreator
+  public Translation2d(@JsonProperty(required = true, value = "x") double x,
+                       @JsonProperty(required = true, value = "y") double y) {
     m_x = x;
     m_y = y;
   }
