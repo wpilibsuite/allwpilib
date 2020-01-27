@@ -42,7 +42,10 @@ class LinearSystemLoop {
    */
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
                    LinearQuadraticRegulator<States, Inputs>& controller,
-                   KalmanFilter<States, Inputs, Outputs>& observer);
+                   KalmanFilter<States, Inputs, Outputs>& observer)
+      : m_plant(plant), m_controller(controller), m_observer(observer) {
+    Reset();
+  }
 
   virtual ~LinearSystemLoop() = default;
 
@@ -52,55 +55,61 @@ class LinearSystemLoop {
   /**
    * Enables the controller.
    */
-  void Enable();
+  void Enable() { m_controller.Enable(); }
 
   /**
    * Disables the controller and zeros the control input.
    */
-  void Disable();
+  void Disable() { m_controller.Disable(); }
 
   /**
    * Returns the observer's state estimate x-hat.
    */
-  const Eigen::Matrix<double, States, 1>& Xhat() const;
+  const Eigen::Matrix<double, States, 1>& Xhat() const {
+    return m_observer.Xhat();
+  }
 
   /**
    * Returns an element of the observer's state estimate x-hat.
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const;
+  double Xhat(int i) const { return m_observer.Xhat(i); }
 
   /**
    * Returns the controller's next reference r.
    */
-  const Eigen::Matrix<double, States, 1>& NextR() const;
+  const Eigen::Matrix<double, States, 1>& NextR() const { return m_nextR; }
 
   /**
    * Returns an element of the controller's next reference r.
    *
    * @param i Row of r.
    */
-  double NextR(int i) const;
+  double NextR(int i) const { return NextR()(i, 0); }
 
   /**
    * Returns the controller's calculated control input u.
    */
-  Eigen::Matrix<double, Inputs, 1> U() const;
+  Eigen::Matrix<double, Inputs, 1> U() const {
+    return m_plant.ClampInput(m_controller.U());
+  }
 
   /**
    * Returns an element of the controller's calculated control input u.
    *
    * @param i Row of u.
    */
-  double U(int i) const;
+  double U(int i) const { return m_plant.ClampInput(m_controller.U())(i, 0); }
 
   /**
    * Set the initial state estimate x-hat.
    *
    * @param xHat The initial state estimate x-hat.
    */
-  void SetXhat(const Eigen::Matrix<double, States, 1>& xHat);
+  void SetXhat(const Eigen::Matrix<double, States, 1>& xHat) {
+    m_observer.SetXhat(xHat);
+  }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -108,47 +117,62 @@ class LinearSystemLoop {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value);
+  void SetXhat(int i, double value) { m_observer.SetXhat(i, value); }
 
   /**
    * Set the next reference r.
    *
    * @param nextR Next reference.
    */
-  void SetNextR(const Eigen::Matrix<double, States, 1>& nextR);
+  void SetNextR(const Eigen::Matrix<double, States, 1>& nextR) {
+    m_nextR = nextR;
+  }
 
   /**
    * Return the plant used internally.
    */
-  const LinearSystem<States, Inputs, Outputs>& Plant() const;
+  const LinearSystem<States, Inputs, Outputs>& Plant() const { return m_plant; }
 
   /**
    * Return the controller used internally.
    */
-  const LinearQuadraticRegulator<States, Inputs>& Controller() const;
+  const LinearQuadraticRegulator<States, Inputs>& Controller() const {
+    return m_controller;
+  }
 
   /**
    * Return the observer used internally.
    */
-  const KalmanFilter<States, Inputs, Outputs>& Observer() const;
+  const KalmanFilter<States, Inputs, Outputs>& Observer() const {
+    return m_observer;
+  }
 
   /**
    * Zeroes reference r, controller output u, plant output y, and state estimate
    * x-hat.
    */
-  void Reset();
+  void Reset() {
+    m_plant.Reset();
+    m_controller.Reset();
+    m_observer.Reset();
+    m_nextR.setZero();
+  }
 
   /**
    * Returns difference between reference r and x-hat.
    */
-  const Eigen::Matrix<double, States, 1> Error() const;
+  const Eigen::Matrix<double, States, 1> Error() const {
+    return m_controller.R() - m_observer.Xhat();
+  }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
    * @param y Measurement vector.
    */
-  void Correct(const Eigen::Matrix<double, Outputs, 1>& y);
+  void Correct(const Eigen::Matrix<double, Outputs, 1>& y) {
+    m_observer.Correct(m_controller.U(), y);
+  }
 
   /**
    * Sets new controller output, projects model forward, and runs observer
@@ -159,7 +183,10 @@ class LinearSystemLoop {
    *
    * @param dt Timestep for model update.
    */
-  void Predict(units::second_t dt);
+  void Predict(units::second_t dt) {
+    m_controller.Update(m_observer.Xhat(), m_nextR);
+    m_observer.Predict(m_controller.U(), dt);
+  }
 
   /**
    * Sets the current controller to be "index". This can be used for gain
@@ -167,12 +194,16 @@ class LinearSystemLoop {
    *
    * @param index The controller index.
    */
-  void SetIndex(int index);
+  void SetIndex(int index) {
+    m_plant.SetIndex(index);
+    m_controller.SetIndex(index);
+    m_observer.SetIndex(index);
+  }
 
   /**
    * Returns the current controller index.
    */
-  int GetIndex() const;
+  int GetIndex() const { return m_plant.GetIndex(); }
 
  protected:
   LinearSystem<States, Inputs, Outputs>& m_plant;
@@ -189,5 +220,3 @@ class LinearSystemLoop {
 };
 
 }  // namespace frc
-
-#include "frc/system/LinearSystemLoop.inc"

@@ -56,7 +56,7 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
 
     return SingleJointedArmSystem(motors, 1.0 / 3.0 * m * r * r, G);
   }();
-  LinearQuadraticRegulator<2, 1, 1> controller{
+  LinearQuadraticRegulator<2, 1> controller{
       plant, {0.01745, 0.08726}, {12.0}, 0.00505_s};
 
   EXPECT_NEAR(19.16, controller.K(0, 0), 1e-1);
