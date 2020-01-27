@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpiutil.math;
 
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -5,7 +12,6 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
 public class StateSpaceUtils {
-
     public static <States extends Num> Matrix<States, States> makeCovMatrix(
             Nat<States> states, Matrix<States, N1> stdDevs
     ) {

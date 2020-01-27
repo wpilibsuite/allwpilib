@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.estimator;
 
 import edu.wpi.first.wpilibj.system.RungeKuttaHelper;
@@ -170,7 +177,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
         // times the weights
         Matrix y = new Matrix(new SimpleMatrix(2 * s.getNum() + 1, dim.getNum()));
         for (int i = 0; i < 2 * s.getNum() + 1; ++i) {
-            // set the block from i, 0 to i+1, covDim 
+            // set the block from i, 0 to i+1, covDim
 
             y.template block<1, CovDim>(i, 0) =
             sigmas.template block<1, CovDim>(i, 0) - x;

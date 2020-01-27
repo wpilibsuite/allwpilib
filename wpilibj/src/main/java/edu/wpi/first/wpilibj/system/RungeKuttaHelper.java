@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.system;
 
 import edu.wpi.first.wpiutil.math.Matrix;
@@ -13,7 +20,6 @@ import java.util.function.DoubleFunction;
 import java.util.function.Function;
 
 public class RungeKuttaHelper {
-
     /**
      *
      * Performs Runge Kutta integration (4th order).

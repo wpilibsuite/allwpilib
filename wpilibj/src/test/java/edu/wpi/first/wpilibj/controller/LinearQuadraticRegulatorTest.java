@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.controller;
 
 import edu.wpi.first.wpilibj.estimator.KalmanFilter;
@@ -15,7 +22,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class LinearQuadraticRegulatorTest {
-
     public static LinearSystem<N2, N1, N1> elevatorPlant = null;
     static LinearSystem<N2, N1, N1> armPlant = null;
 

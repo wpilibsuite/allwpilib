@@ -8,10 +8,9 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
+#include <iostream>
 
 #include <Eigen/Core>
-
-#include <iostream>
 
 #include "frc/controller/LinearQuadraticRegulator.h"
 #include "frc/system/LinearSystem.h"

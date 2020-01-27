@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.estimator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,7 +29,6 @@ import java.util.List;
 import static edu.wpi.first.wpilibj.controller.LinearSystemLoopTest.kDt;
 
 public class KalmanFilterTest {
-
     @BeforeAll
     public static void setup() {
         LinearQuadraticRegulatorTest.setUp();

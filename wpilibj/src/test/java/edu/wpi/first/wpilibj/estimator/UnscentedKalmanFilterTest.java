@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.estimator;
 
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
@@ -12,7 +19,6 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
 public class UnscentedKalmanFilterTest {
-
     public static Matrix<N5, N1> getDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
         var motors = DCMotor.getCIM(2);
 
