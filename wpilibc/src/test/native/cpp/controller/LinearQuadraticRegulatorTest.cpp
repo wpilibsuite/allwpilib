@@ -78,8 +78,7 @@ TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
 
     return ElevatorSystem(motors, m, r, G);
   }();
-  LinearQuadraticRegulator<2, 1, 1> controller{
-      plant, {0.1, 0.2}, {12.0}, 0.020_s};
+  LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 0.020_s};
 
   EXPECT_NEAR(10.38, controller.K(0, 0), 1e-1);
   EXPECT_NEAR(0.69, controller.K(0, 1), 1e-1);
