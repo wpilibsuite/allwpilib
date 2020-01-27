@@ -44,7 +44,7 @@ public class HALReporter {
       allowDirectWrite = true;
     }
     for (ReportStore r : storeList) {
-      HALReporter.report(r.resource, r.instanceNumber, r.context, r.feature);
+      HAL.report(r.resource, r.instanceNumber, r.context, r.feature);
     }
   }
 
@@ -85,6 +85,6 @@ public class HALReporter {
         return 0;
       }
     }
-    return HALReporter.report(resource, instanceNumber, context, feature);
+    return HAL.report(resource, instanceNumber, context, feature);
   }
 }
