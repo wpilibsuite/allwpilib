@@ -8,7 +8,6 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
-#include <iostream>
 
 #include <Eigen/Core>
 

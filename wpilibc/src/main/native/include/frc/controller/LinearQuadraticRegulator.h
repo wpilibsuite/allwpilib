@@ -60,19 +60,17 @@ class LinearQuadraticRegulator {
                            const Eigen::Matrix<double, States, Inputs>& B,
                            const std::array<double, States>& Qelems,
                            const std::array<double, Inputs>& Relems,
-                           units::second_t dt)
-      : m_A(A), m_B(B) {
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, Inputs> discB;
-    DiscretizeAB(m_A, m_B, dt, &discA, &discB);
+                           units::second_t dt) {
+    DiscretizeAB(A, B, dt, &m_discA, &m_discB);
 
     Eigen::Matrix<double, States, States> Q = MakeCostMatrix(Qelems);
     Eigen::Matrix<double, Inputs, Inputs> R = MakeCostMatrix(Relems);
 
-    auto S = drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R);
+    Eigen::Matrix<double, States, States> S =
+        drake::math::DiscreteAlgebraicRiccatiEquation(m_discA, m_discB, Q, R);
     Eigen::Matrix<double, Inputs, Inputs> tmp =
-        discB.transpose() * S * discB + R;
-    m_K = tmp.llt().solve(discB.transpose() * S * discA);
+        m_discB.transpose() * S * m_discB + R;
+    m_K = tmp.llt().solve(m_discB.transpose() * S * m_discA);
   }
 
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
@@ -143,7 +141,8 @@ class LinearQuadraticRegulator {
    */
   void Update(const Eigen::Matrix<double, States, 1>& x) {
     if (m_enabled) {
-      m_u = m_K * (m_r - x) + m_B.householderQr().solve(m_r - m_A * m_r);
+      m_u =
+          m_K * (m_r - x) + m_discB.householderQr().solve(m_r - m_discA * m_r);
     }
   }
 
@@ -156,24 +155,25 @@ class LinearQuadraticRegulator {
   void Update(const Eigen::Matrix<double, States, 1>& x,
               const Eigen::Matrix<double, States, 1>& nextR) {
     if (m_enabled) {
-      m_u = m_K * (m_r - x) + m_B.householderQr().solve(nextR - m_A * m_r);
+      m_u = m_K * (m_r - x) +
+            m_discB.householderQr().solve(nextR - m_discA * m_r);
       m_r = nextR;
     }
   }
 
  private:
-  Eigen::Matrix<double, States, States> m_A;
-  Eigen::Matrix<double, States, Inputs> m_B;
+  Eigen::Matrix<double, States, States> m_discA;
+  Eigen::Matrix<double, States, Inputs> m_discB;
 
   bool m_enabled = false;
 
-  // Current reference.
+  // Current reference
   Eigen::Matrix<double, States, 1> m_r;
 
-  // Computed controller output.
+  // Computed controller output
   Eigen::Matrix<double, Inputs, 1> m_u;
 
-  // Controller gain.
+  // Controller gain
   Eigen::Matrix<double, Inputs, States> m_K;
 };
 

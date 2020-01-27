@@ -62,6 +62,17 @@ class DCMotor {
         Kt(stallTorque * numMotors / stallCurrent) {}
 
   /**
+   * Returns current drawn by motor with given speed and input voltage.
+   *
+   * @param speed        The current angular velocity of the motor.
+   * @param inputVoltage The voltage being applied to the motor.
+   */
+  constexpr units::ampere_t Current(units::radians_per_second_t speed,
+                                    units::volt_t inputVoltage) const {
+    return -1.0 / Kv / R * speed + 1.0 / R * inputVoltage;
+  }
+
+  /**
    * Returns instance of CIM.
    */
   static constexpr DCMotor CIM(int numMotors = 1) {
