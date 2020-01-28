@@ -114,9 +114,9 @@ public abstract class PIDSubsystem extends Subsystem {
   }
 
   /**
-   * Instantiates a {@link PIDSubsystem} that will use the given p, i, d, and f values. It will use the
-   * class name as its name. It will also space the time between PID loop calculations to be equal
-   * to the given period.
+   * Instantiates a {@link PIDSubsystem} that will use the given p, i, d, and f values. It will use
+   * the class name as its name. It will also space the time between PID loop calculations to be
+   * equal to the given period.
    *
    * @param p      the proportional value
    * @param i      the integral value
