@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -45,6 +45,10 @@ ChassisSpeeds RamseteController::Calculate(
     const Pose2d& currentPose, const Pose2d& poseRef,
     units::meters_per_second_t linearVelocityRef,
     units::radians_per_second_t angularVelocityRef) {
+  if (!m_enabled) {
+    return ChassisSpeeds{linearVelocityRef, 0_mps, angularVelocityRef};
+  }
+
   m_poseError = poseRef.RelativeTo(currentPose);
 
   // Aliases for equation readability
@@ -68,3 +72,5 @@ ChassisSpeeds RamseteController::Calculate(
   return Calculate(currentPose, desiredState.pose, desiredState.velocity,
                    desiredState.velocity * desiredState.curvature);
 }
+
+void RamseteController::SetEnabled(bool enabled) { m_enabled = enabled; }
