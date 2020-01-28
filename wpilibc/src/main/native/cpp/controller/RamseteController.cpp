@@ -73,4 +73,4 @@ ChassisSpeeds RamseteController::Calculate(
                    desiredState.velocity * desiredState.curvature);
 }
 
-void RamseteController::SetEnabled(bool enabled) { m_enabled = true; }
+void RamseteController::SetEnabled(bool enabled) { m_enabled = enabled; }
