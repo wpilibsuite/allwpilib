@@ -25,11 +25,15 @@ public class HALReporter {
       this.feature = feature;
     }
   }
+  
+  private HALReporter() {
+    throw new UnsupportedOperationException("This is a utility class!");
+  }
 
   private static final List<ReportStore> storeList = new ArrayList<>();
 
   private static final Object storeLock = new Object();
-  private static boolean allowDirectWrite = false;
+  private static boolean allowDirectWrite;
 
   /**
    * Write all caches reports to the low level API.
