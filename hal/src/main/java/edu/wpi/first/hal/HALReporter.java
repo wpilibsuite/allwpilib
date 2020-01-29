@@ -26,6 +26,11 @@ public class HALReporter {
     }
   }
 
+  @FunctionalInterface
+  private interface ReportFunc {
+    int report(int resource, int instanceNumber, int context, String feature);
+  }
+
   private HALReporter() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
@@ -33,7 +38,7 @@ public class HALReporter {
   private static final List<ReportStore> storeList = new ArrayList<>();
 
   private static final Object storeLock = new Object();
-  private static boolean allowDirectWrite;
+  private static ReportFunc reportFunc;
 
   /**
    * Write all caches reports to the low level API.
@@ -42,10 +47,10 @@ public class HALReporter {
    */
   public static void writeReports() {
     synchronized (storeLock) {
-      if (allowDirectWrite) {
+      if (reportFunc != null) {
         return;
       }
-      allowDirectWrite = true;
+      reportFunc = HAL::report;
     }
     for (ReportStore r : storeList) {
       HAL.report(r.resource, r.instanceNumber, r.context, r.feature);
@@ -83,12 +88,14 @@ public class HALReporter {
    * @return
    */
   public static int report(int resource, int instanceNumber, int context, String feature) {
+    ReportFunc localReportFunc;
     synchronized (storeLock) {
-      if (!allowDirectWrite) {
+      if (reportFunc == null) {
         storeList.add(new ReportStore(resource, instanceNumber, context, feature));
         return 0;
       }
+      localReportFunc = reportFunc;
     }
-    return HAL.report(resource, instanceNumber, context, feature);
+    return localReportFunc.report(resource, instanceNumber, context, feature);
   }
 }
