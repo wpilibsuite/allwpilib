@@ -25,7 +25,7 @@ public class HALReporter {
       this.feature = feature;
     }
   }
-  
+
   private HALReporter() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
