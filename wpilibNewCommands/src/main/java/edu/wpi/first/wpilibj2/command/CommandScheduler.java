@@ -84,7 +84,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final Map<Command, Boolean> m_toSchedule = new LinkedHashMap<>();
   private final List<Command> m_toCancel = new ArrayList<>();
 
-  private final Watchdog m_watchdog = new Watchdog(0.02, () -> {}); // Get period from IterativeRobotBase?
+  // Get period from IterativeRobotBase?
+  private final Watchdog m_watchdog = new Watchdog(0.02, () -> { });
 
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
