@@ -56,20 +56,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return instance;
   }
 
-  /**
-   * Returns the Scheduler instance.
-   *
-   * @param period Period in seconds.
-   *
-   * @return the instance
-   */
-  public static synchronized CommandScheduler getInstance(double period) {
-    if (instance == null) {
-      instance = new CommandScheduler(period);
-    }
-    return instance;
-  }
-
   //A map from commands to their scheduling state.  Also used as a set of the currently-running
   //commands.
   private final Map<Command, CommandState> m_scheduledCommands = new LinkedHashMap<>();
@@ -99,13 +85,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final Map<Command, Boolean> m_toSchedule = new LinkedHashMap<>();
   private final List<Command> m_toCancel = new ArrayList<>();
 
-  private final Watchdog m_watchdog;
+  private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> { });
 
   CommandScheduler() {
-    this(TimedRobot.kDefaultPeriod);
-  }
-
-  CommandScheduler(double period) {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
     LiveWindow.setEnabledListener(() -> {
@@ -115,7 +97,16 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     LiveWindow.setDisabledListener(() -> {
       enable();
     });
-    m_watchdog = new Watchdog(period, () -> { });
+  }
+
+  /**
+   * Changes the period of the loop overrun watchdog.  This should be be kept in sync with the
+   * TimedRobot period.
+   *
+   * @param period Period in seconds.
+   */
+  public void setPeriod(double period) {
+    m_watchdog.setTimeout(period);
   }
 
   @Override
