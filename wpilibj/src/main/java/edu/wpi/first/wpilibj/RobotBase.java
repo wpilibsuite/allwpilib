@@ -214,9 +214,8 @@ public abstract class RobotBase implements AutoCloseable {
     }
   }
 
-  private static final ReentrantLock m_runMutex = new ReentrantLock();
-  private static RobotBase m_robotCopy;
-  private static boolean m_suppressExitWarning;
+  private static volatile RobotBase m_robotCopy;
+  private static volatile boolean m_suppressExitWarning;
 
   /**
    * Run the robot main loop.
@@ -246,9 +245,9 @@ public abstract class RobotBase implements AutoCloseable {
       return;
     }
 
-    m_runMutex.lock();
+
     m_robotCopy = robot;
-    m_runMutex.unlock();
+
 
     if (isReal()) {
       try {
@@ -283,9 +282,9 @@ public abstract class RobotBase implements AutoCloseable {
           throwable.getStackTrace());
       errorOnExit = true;
     } finally {
-      m_runMutex.lock();
+
       boolean suppressExitWarning = m_suppressExitWarning;
-      m_runMutex.unlock();
+
       if (!suppressExitWarning) {
         // startCompetition never returns unless exception occurs....
         DriverStation.reportWarning("Robots should not quit, but yours did!", false);
@@ -304,9 +303,9 @@ public abstract class RobotBase implements AutoCloseable {
    * Suppress the "Robots should not quit" message.
    */
   public static void suppressExitWarning(boolean value) {
-    m_runMutex.lock();
+
     m_suppressExitWarning = value;
-    m_runMutex.unlock();
+
   }
 
   /**
@@ -333,9 +332,9 @@ public abstract class RobotBase implements AutoCloseable {
       thread.start();
       HAL.runMain();
       suppressExitWarning(true);
-      m_runMutex.lock();
+
       RobotBase robot = m_robotCopy;
-      m_runMutex.unlock();
+
       if (robot != null) {
         robot.endCompetition();
       }
