@@ -24,6 +24,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -51,6 +52,20 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   public static synchronized CommandScheduler getInstance() {
     if (instance == null) {
       instance = new CommandScheduler();
+    }
+    return instance;
+  }
+
+  /**
+   * Returns the Scheduler instance.
+   *
+   * @param period Period in seconds.
+   *
+   * @return the instance
+   */
+  public static synchronized CommandScheduler getInstance(double period) {
+    if (instance == null) {
+      instance = new CommandScheduler(period);
     }
     return instance;
   }
@@ -84,10 +99,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final Map<Command, Boolean> m_toSchedule = new LinkedHashMap<>();
   private final List<Command> m_toCancel = new ArrayList<>();
 
-  // Get period from IterativeRobotBase?
-  private final Watchdog m_watchdog = new Watchdog(0.02, () -> { });
+  private final Watchdog m_watchdog;
 
   CommandScheduler() {
+    this(TimedRobot.kDefaultPeriod);
+  }
+
+  CommandScheduler(double period) {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
     LiveWindow.setEnabledListener(() -> {
@@ -97,6 +115,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     LiveWindow.setDisabledListener(() -> {
       enable();
     });
+    m_watchdog = new Watchdog(period, () -> { });
   }
 
   @Override
