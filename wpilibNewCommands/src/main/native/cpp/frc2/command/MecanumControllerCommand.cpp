@@ -247,5 +247,5 @@ void MecanumControllerCommand::Execute() {
 void MecanumControllerCommand::End(bool interrupted) { m_timer.Stop(); }
 
 bool MecanumControllerCommand::IsFinished() {
-  return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
+  return m_timer.HasElapsed(m_trajectory.TotalTime());
 }
