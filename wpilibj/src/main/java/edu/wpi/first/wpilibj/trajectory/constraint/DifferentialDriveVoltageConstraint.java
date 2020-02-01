@@ -95,7 +95,7 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
     if ((m_kinematics.trackWidthMeters / 2) > (1 / Math.abs(curvatureRadPerMeter))) {
       if (velocityMetersPerSecond > 0) {
         minChassisAcceleration = -minChassisAcceleration;
-      } else {
+      } else if (velocityMetersPerSecond < 0) {
         maxChassisAcceleration = -maxChassisAcceleration;
       }
     }
