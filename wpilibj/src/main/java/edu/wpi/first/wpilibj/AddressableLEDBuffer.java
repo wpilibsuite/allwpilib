@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
  */
 public class AddressableLEDBuffer {
   byte[] m_buffer;
+  final AddressableLEDColorOrder m_colorOrder;
 
   /**
    * Constructs a new LED buffer with the specified length.
@@ -23,6 +24,17 @@ public class AddressableLEDBuffer {
    */
   public AddressableLEDBuffer(int length) {
     m_buffer = new byte[length * 4];
+  }
+
+  /**
+   * Constructs a new LED buffer with the specified length and color order.
+   *
+   * @param length The length of the buffer in pixels
+   * @param colorOrder The order the pixels display colors in
+   */
+  public AddressableLEDBuffer(int length, AddressableLEDColorOrder colorOrder) {
+      m_buffer = new byte[length * 4];
+      m_colorOrder = colorOrder;
   }
 
   /**
@@ -35,9 +47,38 @@ public class AddressableLEDBuffer {
    */
   @SuppressWarnings("ParameterName")
   public void setRGB(int index, int r, int g, int b) {
-    m_buffer[index * 4] = (byte) b;
-    m_buffer[(index * 4) + 1] = (byte) g;
-    m_buffer[(index * 4) + 2] = (byte) r;
+    switch (m_colorOrder) {
+      case kRGB:
+        m_buffer[index * 4] = (byte) b;
+        m_buffer[(index * 4) + 1] = (byte) g;
+        m_buffer[(index * 4) + 2] = (byte) r;
+        break;
+      case kRBG:
+        m_buffer[index * 4] = (byte) g;
+        m_buffer[(index * 4) + 1] = (byte) b;
+        m_buffer[(index * 4) + 2] = (byte) r;
+        break;
+      case kGBR:
+        m_buffer[index * 4] = (byte) r;
+        m_buffer[(index * 4) + 1] = (byte) b;
+        m_buffer[(index * 4) + 2] = (byte) g;
+        break;
+      case kGRB:
+        m_buffer[index * 4] = (byte) b;
+        m_buffer[(index * 4) + 1] = (byte) r;
+        m_buffer[(index * 4) + 2] = (byte) g;
+        break;
+      case kBRG:
+        m_buffer[index * 4] = (byte) g;
+        m_buffer[(index * 4) + 1] = (byte) r;
+        m_buffer[(index * 4) + 2] = (byte) b;
+        break;
+      case kBGR:
+        m_buffer[index * 4] = (byte) r;
+        m_buffer[(index * 4) + 1] = (byte) g;
+        m_buffer[(index * 4) + 2] = (byte) b;
+        break;
+    }
     m_buffer[(index * 4) + 3] = 0;
   }
 
