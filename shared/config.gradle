@@ -21,6 +21,11 @@ nativeUtils.wpi.addWarningsAsErrors()
 
 nativeUtils.setSinglePrintPerPlatform()
 
+nativeUtils.platformConfigs.named("osxx86-64").configure {
+    it.cppCompiler.args << "-mmacosx-version-min=10.13"
+    it.linker.args << "-headerpad_max_install_names"
+}
+
 model {
     components {
         all {
