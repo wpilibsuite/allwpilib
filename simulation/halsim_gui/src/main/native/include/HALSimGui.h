@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,6 +23,7 @@ void HALSIMGUI_SetWindowVisibility(const char* name, int32_t visibility);
 void HALSIMGUI_SetDefaultWindowPos(const char* name, float x, float y);
 void HALSIMGUI_SetDefaultWindowSize(const char* name, float width,
                                     float height);
+void HALSIMGUI_SetWindowPadding(const char* name, float x, float y);
 int HALSIMGUI_AreOutputsDisabled(void);
 
 }  // extern "C"
@@ -126,6 +127,14 @@ class HALSimGui {
    * @param height height
    */
   static void SetDefaultWindowSize(const char* name, float width, float height);
+
+  /**
+   * Sets internal padding of window added with AddWindow().
+   * @param name window name (same as name passed to AddWindow())
+   * @param x horizontal padding
+   * @param y vertical padding
+   */
+  static void SetWindowPadding(const char* name, float x, float y);
 
   /**
    * Returns true if outputs are disabled.
