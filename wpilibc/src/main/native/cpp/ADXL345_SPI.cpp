@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -20,7 +20,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
     m_simRange =
         m_simDevice.CreateEnum("Range", true, {"2G", "4G", "8G", "16G"}, 0);
     m_simX = m_simDevice.CreateDouble("X Accel", false, 0.0);
-    m_simX = m_simDevice.CreateDouble("Y Accel", false, 0.0);
+    m_simY = m_simDevice.CreateDouble("Y Accel", false, 0.0);
     m_simZ = m_simDevice.CreateDouble("Z Accel", false, 0.0);
   }
   m_spi.SetClockRate(500000);
