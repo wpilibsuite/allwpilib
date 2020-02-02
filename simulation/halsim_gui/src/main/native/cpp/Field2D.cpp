@@ -567,7 +567,7 @@ static void DisplayField2D() {
   ImVec2 cursor = ImGui::GetIO().MousePos - windowPos;
 
   int hit = 0;
-  float hitRadius = std::min(rfd.width2, rfd.length2) / 2;
+  float hitRadius = (std::min)(rfd.width2, rfd.length2) / 2;
   // only allow initiation of dragging when invisible button is hovered; this
   // prevents the window resize handles from simultaneously activating the drag
   // functionality
