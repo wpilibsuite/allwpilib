@@ -21,6 +21,10 @@ nativeUtils.wpi.addWarningsAsErrors()
 
 nativeUtils.setSinglePrintPerPlatform()
 
+nativeUtils.platformConfigs.named("osxx86-64").configure {
+    it.linker.args << "-headerpad_max_install_names"
+}
+
 model {
     components {
         all {
