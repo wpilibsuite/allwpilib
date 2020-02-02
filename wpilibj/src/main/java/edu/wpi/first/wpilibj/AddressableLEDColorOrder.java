@@ -18,4 +18,3 @@ public enum AddressableLEDColorOrder {
     kBRG,
     kBGR
 }
-
