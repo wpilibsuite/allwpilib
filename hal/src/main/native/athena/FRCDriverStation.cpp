@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -233,11 +233,11 @@ int32_t HAL_SendConsoleLine(const char* line) {
   wpi::StringRef lineRef{line};
   if (lineRef.size() <= 65536) {
     // Send directly
-    FRC_NetworkCommunication_sendConsoleLine(line);
+    return FRC_NetworkCommunication_sendConsoleLine(line);
   } else {
     // Need to truncate
     std::string newLine{line, 65536};
-    FRC_NetworkCommunication_sendConsoleLine(newLine.c_str());
+    return FRC_NetworkCommunication_sendConsoleLine(newLine.c_str());
   }
 }
 

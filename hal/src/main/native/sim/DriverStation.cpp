@@ -119,6 +119,7 @@ int32_t HAL_SendConsoleLine(const char* line) {
   }
   wpi::outs() << line << "\n";
   wpi::outs().flush();
+  return 0;
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
