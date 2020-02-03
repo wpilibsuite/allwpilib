@@ -192,6 +192,9 @@ class Encoder : public ErrorBase,
    *                  the FPGA will report the device stopped. This is expressed
    *                  in seconds.
    */
+  WPI_DEPRECATED("
+      "Use SetMinRate() in favor of this method.  This takes unscaled periods "
+      "and SetMinRate() scales using value from SetDistancePerPulse().")
   void SetMaxPeriod(double maxPeriod) override;
 
   /**

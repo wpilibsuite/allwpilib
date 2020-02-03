@@ -47,6 +47,9 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   /**
    * Constructor for TimedRobot.
    *
+   * @deprecated use unit safe constructor instead.
+   * TimedRobot(units::second_t period = kDefaultPeriod)
+   *
    * @param period Period in seconds.
    */
   WPI_DEPRECATED("Use constructor with unit-safety instead.")

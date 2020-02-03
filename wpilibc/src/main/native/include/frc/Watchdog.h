@@ -34,6 +34,9 @@ class Watchdog {
   /**
    * Watchdog constructor.
    *
+   * @deprecated use unit-safe version instead.
+   * Watchdog(units::second_t timeout, std::function<void()> callback)
+   *
    * @param timeout  The watchdog's timeout in seconds with microsecond
    *                 resolution.
    * @param callback This function is called when the timeout expires.
@@ -73,6 +76,9 @@ class Watchdog {
 
   /**
    * Sets the watchdog's timeout.
+   *
+   * @deprecated use the unit safe version instead.
+   * SetTimeout(units::second_t timeout)
    *
    * @param timeout The watchdog's timeout in seconds with microsecond
    *                resolution.
