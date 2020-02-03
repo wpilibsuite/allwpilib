@@ -103,8 +103,6 @@ class Timer {
    *
    * @param period The period to check for.
    * @return       True if the period has passed.
-   *
-   * @deprecated Use AdvanceIfElapsed instead.
    */
   bool HasPeriodPassed(units::second_t period);
 
