@@ -462,7 +462,23 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendError
     HALSIM_SetSendError([](HAL_Bool isError, int32_t errorCode,
                            HAL_Bool isLVCode, const char* details,
                            const char* location, const char* callStack,
-                           HAL_Bool printMsg) { return 1; });
+                           HAL_Bool printMsg) { return 0; });
+  }
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Method:    setSendConsoleLine
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendConsoleLine
+  (JNIEnv*, jclass, jboolean shouldSend)
+{
+  if (shouldSend) {
+    HALSIM_SetSendConsoleLine(nullptr);
+  } else {
+    HALSIM_SetSendConsoleLine([](const char* line) { return 0; });
   }
 }
 

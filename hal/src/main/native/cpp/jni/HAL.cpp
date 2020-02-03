@@ -450,6 +450,21 @@ Java_edu_wpi_first_hal_HAL_sendError
 
 /*
  * Class:     edu_wpi_first_hal_HAL
+ * Method:    sendConsoleLine
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_HAL_sendConsoleLine
+  (JNIEnv* env, jclass, jstring line)
+{
+  JStringRef lineStr{env, line};
+
+  jint returnValue = HAL_SendConsoleLine(lineStr.c_str());
+  return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
  * Method:    getPortWithModule
  * Signature: (BB)I
  */

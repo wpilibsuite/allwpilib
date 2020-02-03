@@ -18,6 +18,7 @@
 
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "HALInitializer.h"
 #include "mockdata/DriverStationDataInternal.h"
@@ -29,6 +30,8 @@ static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 static std::atomic_bool isFinalized{false};
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
+static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
+    nullptr};
 
 namespace hal {
 namespace init {
@@ -45,6 +48,10 @@ extern "C" {
 
 void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
   sendErrorHandler.store(handler);
+}
+
+void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {
+  sendConsoleLineHandler.store(handler);
 }
 
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
@@ -103,6 +110,15 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     prevMsgTime[i] = curTime;
   }
   return retval;
+}
+
+int32_t HAL_SendConsoleLine(const char* line) {
+  auto handler = sendConsoleLineHandler.load();
+  if (handler) {
+    return handler(line);
+  }
+  wpi::outs() << line << "\n";
+  wpi::outs().flush();
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {

@@ -38,6 +38,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg);
 
+int32_t HAL_SendConsoleLine(const char* line);
+
 /**
  * Gets the current control word of the driver station.
  *

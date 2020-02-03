@@ -130,6 +130,8 @@ public final class HAL extends JNIWrapper {
                                      String details, String location, String callStack,
                                      boolean printMsg);
 
+  public static native int sendConsoleLine(String line);
+
   public static native int getPortWithModule(byte module, byte channel);
 
   public static native int getPort(byte channel);

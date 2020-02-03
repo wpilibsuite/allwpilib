@@ -229,6 +229,18 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   return retval;
 }
 
+int32_t HAL_SendConsoleLine(const char* line) {
+  wpi::StringRef lineRef{line};
+  if (lineRef.size() <= 65536) {
+    // Send directly
+    FRC_NetworkCommunication_sendConsoleLine(line);
+  } else {
+    // Need to truncate
+    std::string newLine{line, 65536};
+    FRC_NetworkCommunication_sendConsoleLine(newLine.c_str());
+  }
+}
+
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   return HAL_GetControlWordInternal(controlWord);
 }
