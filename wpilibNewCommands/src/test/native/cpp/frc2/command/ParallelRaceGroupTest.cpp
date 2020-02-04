@@ -189,9 +189,9 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTestTwice) {
   scheduler.Run();
 
   EXPECT_FALSE(scheduler.IsScheduled(&group));
-  
+
   command2->SetFinished(false);
-  
+
   scheduler.Schedule(&group);
 
   scheduler.Run();
@@ -199,10 +199,9 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTestTwice) {
 
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&group));
-  
+
   command2->SetFinished(true);
   scheduler.Run();
 
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
-
