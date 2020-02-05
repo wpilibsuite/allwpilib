@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,16 +7,21 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DifferentialDriveVoltageConstraintTest {
@@ -66,5 +71,43 @@ class DifferentialDriveVoltageConstraintTest {
                                >= -maxVoltage - 0.05)
       );
     }
+  }
+
+  @Test
+  void testEndpointHighCurvature() {
+    var feedforward = new SimpleMotorFeedforward(1, 1, 3);
+
+    // Large trackwidth - need to test with radius of curvature less than half of trackwidth
+    var kinematics = new DifferentialDriveKinematics(3);
+    double maxVoltage = 10;
+    var constraint = new DifferentialDriveVoltageConstraint(feedforward,
+                                                            kinematics,
+                                                            maxVoltage);
+
+    var config = new TrajectoryConfig(12, 12).addConstraint(constraint);
+
+    // Radius of curvature should be ~1 meter.
+    assertDoesNotThrow(() -> TrajectoryGenerator.generateTrajectory(new Pose2d(1, 0,
+                                                                               Rotation2d
+                                                                                   .fromDegrees(
+                                                                                       90)),
+                                                                    new ArrayList<Translation2d>(),
+                                                                    new Pose2d(0, 1,
+                                                                               Rotation2d
+                                                                                   .fromDegrees(
+                                                                                       180)),
+                                                                    config));
+
+    assertDoesNotThrow(() -> TrajectoryGenerator.generateTrajectory(new Pose2d(0, 1,
+                                                                               Rotation2d
+                                                                                   .fromDegrees(
+                                                                                       180)),
+                                                                    new ArrayList<Translation2d>(),
+                                                                    new Pose2d(1, 0,
+                                                                               Rotation2d
+                                                                                   .fromDegrees(
+                                                                                       90)),
+                                                                    config.setReversed(true)));
+
   }
 }

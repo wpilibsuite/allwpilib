@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -56,21 +56,37 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   // outside of turn
   // If moving backward, max acceleration constraint corresponds to wheel on
   // inside of turn
-  auto maxChassisAcceleration =
-      maxWheelAcceleration /
-      (1 + m_kinematics.trackWidth * units::math::abs(curvature) *
-               wpi::sgn(speed) / (2_rad));
-  auto minChassisAcceleration =
-      minWheelAcceleration /
-      (1 - m_kinematics.trackWidth * units::math::abs(curvature) *
-               wpi::sgn(speed) / (2_rad));
+
+  // Special case handling for velocity = 0, since signum doesn't work in those
+  // cases:
+
+  units::meters_per_second_squared_t maxChassisAcceleration;
+  units::meters_per_second_squared_t minChassisAcceleration;
+
+  if (speed == 0_mps) {
+    maxChassisAcceleration =
+        maxWheelAcceleration /
+        (1 + m_kinematics.trackWidth * units::math::abs(curvature) / (2_rad));
+    minChassisAcceleration =
+        minWheelAcceleration /
+        (1 + m_kinematics.trackWidth * units::math::abs(curvature) / (2_rad));
+  } else {
+    maxChassisAcceleration =
+        maxWheelAcceleration /
+        (1 + m_kinematics.trackWidth * units::math::abs(curvature) *
+                 wpi::sgn(speed) / (2_rad));
+    minChassisAcceleration =
+        minWheelAcceleration /
+        (1 - m_kinematics.trackWidth * units::math::abs(curvature) *
+                 wpi::sgn(speed) / (2_rad));
+  }
 
   // Negate acceleration corresponding to wheel on inside of turn
   // if center of turn is inside of wheelbase
   if ((m_kinematics.trackWidth / 2) > 1_rad / units::math::abs(curvature)) {
     if (speed > 0_mps) {
       minChassisAcceleration = -minChassisAcceleration;
-    } else {
+    } else if (speed < 0_mps) {
       maxChassisAcceleration = -maxChassisAcceleration;
     }
   }
