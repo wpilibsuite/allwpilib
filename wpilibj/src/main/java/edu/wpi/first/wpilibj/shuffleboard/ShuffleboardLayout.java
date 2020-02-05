@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -56,8 +56,8 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
   }
 
   @Override
-  public SimpleWidget add(String title, Object defaultValue) throws IllegalArgumentException {
-    return m_helper.add(title, defaultValue);
+  public SimpleWidget add(String title, Object value) {
+    return m_helper.add(title, value);
   }
 
   @Override

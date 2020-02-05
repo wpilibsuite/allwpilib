@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 final class ContainerHelper {
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();
+  private final Map<String, SimpleWidget> m_simpleWidgets = new LinkedHashMap<>();
   private final List<ShuffleboardComponent<?>> m_components = new ArrayList<>();
   private final Map<String, ShuffleboardLayout> m_layouts = new LinkedHashMap<>();
 
@@ -74,15 +75,20 @@ final class ContainerHelper {
     return add(name, sendable);
   }
 
-  SimpleWidget add(String title, Object defaultValue) {
+  SimpleWidget add(String title, Object value) {
     Objects.requireNonNull(title, "Title cannot be null");
-    Objects.requireNonNull(defaultValue, "Default value cannot be null");
-    checkTitle(title);
-    checkNtType(defaultValue);
+    Objects.requireNonNull(value, "Value cannot be null");
+    // checkTitle(title); -- this is explicitly permitted to allow users to update existing values
+    checkNtType(value);
 
-    SimpleWidget widget = new SimpleWidget(m_container, title);
-    m_components.add(widget);
-    widget.getEntry().setDefaultValue(defaultValue);
+    if (!m_simpleWidgets.containsKey(title)) {
+      SimpleWidget widget = new SimpleWidget(m_container, title);
+      m_components.add(widget);
+      m_simpleWidgets.put(title, widget);
+    }
+
+    SimpleWidget widget = m_simpleWidgets.get(title);
+    widget.getEntry().setValue(value);
     return widget;
   }
 

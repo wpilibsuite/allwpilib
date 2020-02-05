@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -117,16 +117,26 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
   }
 
   /**
-   * Adds a widget to this container to display the given data.
+   * Adds a widget to this container to display the given data.  If a widget already exists with
+   * the given title, its value will be updated with the value given.
    *
-   * @param title        the title of the widget
-   * @param defaultValue the default value of the widget
+   * <p>For example:
+   * <pre>{@code
+   * public class Drivetrain extends Subsystem {
+   *   @Override
+   *   public void periodic() {
+   *     Shuffleboard.getTab("Drivetrain").add("Current Speed", myEncoder.getRate());
+   *   }
+   * }
+   * }</pre>
+   *
+   * @param title the title of the widget
+   * @param value the  value of the widget
    * @return a widget to display the sendable data
-   * @throws IllegalArgumentException if a widget already exists in this container with the given
-   *                                  title
+   *
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget add(String title, Object defaultValue) throws IllegalArgumentException;
+  SimpleWidget add(String title, Object value);
 
   /**
    * Adds a widget to this container. The widget will display the data provided by the value
