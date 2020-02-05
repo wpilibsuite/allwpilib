@@ -15,11 +15,11 @@ ParallelRaceGroup::ParallelRaceGroup(
 }
 
 void ParallelRaceGroup::Initialize() {
+  m_finished = false;
   for (auto& commandRunning : m_commands) {
     commandRunning->Initialize();
   }
   isRunning = true;
-  m_finished = false;
 }
 
 void ParallelRaceGroup::Execute() {

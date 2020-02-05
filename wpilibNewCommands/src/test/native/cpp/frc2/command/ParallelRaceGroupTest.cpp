@@ -155,7 +155,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group2));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTestTwice) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwiceTest) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
