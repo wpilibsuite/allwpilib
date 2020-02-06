@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -112,5 +112,25 @@ class LinearFilterTest {
             (DoubleFunction<Double>) LinearFilterTest::getPulseData,
             0.0)
     );
+  }
+
+  @Test
+  void derivativeFilterTest() {
+    var twoSampleDerivative = LinearFilter.derivative(2, .02);
+    var fiveSampleDerivative = LinearFilter.derivative(5, .02);
+
+    // Input stream; increases by 1 every 20ms, derivative should be 50.
+    double[] input = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    double twoSampleOutput = 0;
+    double fiveSampleOutput = 0;
+
+    for (var value : input) {
+      twoSampleOutput = twoSampleDerivative.calculate(value);
+      fiveSampleOutput = fiveSampleDerivative.calculate(value);
+    }
+
+    assertEquals(50, twoSampleOutput);
+    assertEquals(50, fiveSampleOutput);
   }
 }

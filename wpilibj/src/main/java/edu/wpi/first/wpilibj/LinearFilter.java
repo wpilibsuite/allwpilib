@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -125,9 +125,30 @@ public class LinearFilter {
     }
 
     double[] ffGains = new double[taps];
-    for (int i = 0; i < ffGains.length; i++) {
-      ffGains[i] = 1.0 / taps;
+    Arrays.fill(ffGains, 1.0 / taps);
+
+    double[] fbGains = new double[0];
+
+    return new LinearFilter(ffGains, fbGains);
+  }
+
+  /**
+   * Creates a K-tap numerical derivative filter (i.e. slope of the secant line over the past K
+   * samples).
+   *
+   * @param taps The number of samples over which to compute the derivative.
+   * @param period The period between samples, in seconds.
+   * @throws IllegalArgumentException if number of taps is less than 2.
+   */
+  public static LinearFilter derivative(int taps, double period) {
+    if (taps < 2) {
+      throw new IllegalArgumentException("Number of taps was not at least 1");
     }
+
+    double[] ffGains = new double[taps];
+    Arrays.fill(ffGains, 0);
+    ffGains[0] = 1.0 / ((taps - 1) * period);
+    ffGains[taps - 1] = -1.0 / ((taps - 1) * period);
 
     double[] fbGains = new double[0];
 
