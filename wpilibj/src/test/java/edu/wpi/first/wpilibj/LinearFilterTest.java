@@ -116,8 +116,8 @@ class LinearFilterTest {
 
   @Test
   void derivativeFilterTest() {
-    var twoSampleDerivative = LinearFilter.derivative(2, .02);
-    var fiveSampleDerivative = LinearFilter.derivative(5, .02);
+    var twoSampleDerivative = LinearFilter.derivative(2, 0.02);
+    var fiveSampleDerivative = LinearFilter.derivative(5, 0.02);
 
     // Input stream; increases by 1 every 20ms, derivative should be 50.
     double[] input = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
