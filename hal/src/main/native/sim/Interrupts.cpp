@@ -566,4 +566,9 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
   interrupt->fireOnDown = fallingEdge;
   interrupt->fireOnUp = risingEdge;
 }
+
+void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
+                                 int32_t* status) {
+  // Requires a fairly large rewrite to get working
+}
 }  // extern "C"

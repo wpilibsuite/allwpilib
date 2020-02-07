@@ -38,4 +38,6 @@ public class InterruptJNI extends JNIWrapper {
 
   public static native void setInterruptUpSourceEdge(int interruptHandle, boolean risingEdge,
                                                      boolean fallingEdge);
+
+  public static native void releaseWaitingInterrupt(int interruptHandle);
 }
