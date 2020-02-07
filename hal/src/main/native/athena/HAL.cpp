@@ -425,7 +425,8 @@ void HAL_ReleaseFPGAInterrupt(int32_t interruptNumber) {
     return;
   }
   int32_t status = 0;
-  global->writeInterruptForceNumber(static_cast<unsigned char>(interruptNumber), &status);
+  global->writeInterruptForceNumber(static_cast<unsigned char>(interruptNumber),
+                                    &status);
 }
 
 // TODO: HACKS

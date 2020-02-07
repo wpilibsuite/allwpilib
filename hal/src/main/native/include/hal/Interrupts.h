@@ -156,12 +156,13 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
 
 /**
  * Releases a waiting interrupt.
- * 
+ *
  * This will release both rising and falling waiters.
- * 
- * @param interruptHandle the interrupt handle to release 
+ *
+ * @param interruptHandle the interrupt handle to release
  */
-void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle, int32_t* status);
+void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
+                                 int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

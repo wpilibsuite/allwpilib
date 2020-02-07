@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -151,8 +151,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
 
 /**
  * Releases a waiting FPGA IRQ interrupt.
- * 
- * @param interruptHandle the interrupt handle to release 
+ *
+ * @param interruptHandle the interrupt handle to release
  */
 void HAL_ReleaseFPGAInterrupt(int32_t interruptNumber);
 
