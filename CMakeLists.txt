@@ -55,6 +55,7 @@ option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
 option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
 option(FLAT_INSTALL_WPILIB "Use a flat install directory" OFF)
 option(WITH_SIMULATION_MODULES "build simulation modules" OFF)
+set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
 
 if (NOT WITHOUT_JAVA AND NOT BUILD_SHARED_LIBS)
     message(FATAL_ERROR "
@@ -62,6 +63,15 @@ FATAL: Cannot build static libs with Java enabled.
        Static libs requires both BUILD_SHARED_LIBS=OFF and
        WITHOUT_JAVA=ON
 ")
+endif()
+
+if (WITHOUT_JAVA OR WITHOUT_CSCORE)
+    if(NOT OPENCV_JAVA_INSTALL_DIR EQUAL "")
+        message(WARNING "
+WARNING: OpenCV Java dir set but java is not enabled!
+It will be ignored.
+")
+    endif()
 endif()
 
 set( wpilib_dest wpilib)
