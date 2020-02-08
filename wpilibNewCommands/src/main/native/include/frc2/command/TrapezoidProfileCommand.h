@@ -72,7 +72,7 @@ class TrapezoidProfileCommand
   void End(bool interrupted) override { m_timer.Stop(); }
 
   bool IsFinished() override {
-    return m_timer.HasPeriodPassed(m_profile.TotalTime());
+    return m_timer.HasElapsed(m_profile.TotalTime());
   }
 
  private:
