@@ -67,7 +67,8 @@ class ExtendedKalmanFilter {
 
     m_discR = DiscretizeR(m_contR, dt);
 
-    if (IsStabilizable<States, Outputs>(discA.transpose(), C.transpose())) {
+    if (IsStabilizable<States, Outputs>(discA.transpose(), C.transpose()) &&
+        Outputs <= States) {
       m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
           discA.transpose(), C.transpose(), discQ, m_discR);
     } else {
