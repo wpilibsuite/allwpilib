@@ -61,7 +61,7 @@ class LinearQuadraticRegulator {
                            const std::array<double, States>& Qelems,
                            const std::array<double, Inputs>& Relems,
                            units::second_t dt) {
-    DiscretizeAB(A, B, dt, &m_discA, &m_discB);
+    DiscretizeAB<States, Inputs>(A, B, dt, &m_discA, &m_discB);
 
     Eigen::Matrix<double, States, States> Q = MakeCostMatrix(Qelems);
     Eigen::Matrix<double, Inputs, Inputs> R = MakeCostMatrix(Relems);

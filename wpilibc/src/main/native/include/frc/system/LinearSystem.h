@@ -239,7 +239,7 @@ class LinearSystem {
       const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) const {
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, Inputs> discB;
-    DiscretizeAB(m_A, m_B, dt, &discA, &discB);
+    DiscretizeAB<States, Inputs>(m_A, m_B, dt, &discA, &discB);
 
     return discA * x + discB * ClampInput(u);
   }
