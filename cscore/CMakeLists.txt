@@ -69,7 +69,7 @@ if (NOT WITHOUT_JAVA)
 
     #find java files, copy them locally
 
-    if(OPENCV_JAVA_INSTALL_DIR EQUAL "")
+    if("${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
         set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/OpenCV/java/)
     endif()
 

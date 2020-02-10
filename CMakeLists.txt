@@ -66,7 +66,7 @@ FATAL: Cannot build static libs with Java enabled.
 endif()
 
 if (WITHOUT_JAVA OR WITHOUT_CSCORE)
-    if(NOT OPENCV_JAVA_INSTALL_DIR EQUAL "")
+    if(NOT "${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
         message(WARNING "
 WARNING: OpenCV Java dir set but java is not enabled!
 It will be ignored.
