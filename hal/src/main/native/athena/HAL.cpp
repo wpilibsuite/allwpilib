@@ -24,6 +24,7 @@
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "ctre/ctre.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
