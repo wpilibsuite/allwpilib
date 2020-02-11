@@ -154,7 +154,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
  *
  * @param interruptHandle the interrupt handle to release
  */
-void HAL_ReleaseFPGAInterrupt(int32_t interruptNumber);
 
 #ifdef __cplusplus
 }  // extern "C"

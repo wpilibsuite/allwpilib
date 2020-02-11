@@ -78,6 +78,15 @@ void InitializeHAL() {
   InitializeThreads();
 }
 }  // namespace init
+
+void ReleaseFPGAInterrupt(int32_t interruptNumber) {
+  if (!global) {
+    return;
+  }
+  int32_t status = 0;
+  global->writeInterruptForceNumber(static_cast<unsigned char>(interruptNumber),
+                                    &status);
+}
 }  // namespace hal
 
 extern "C" {
@@ -418,15 +427,6 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
 
   return FRC_NetworkCommunication_nUsageReporting_report(
       resource, instanceNumber, context, feature);
-}
-
-void HAL_ReleaseFPGAInterrupt(int32_t interruptNumber) {
-  if (!global) {
-    return;
-  }
-  int32_t status = 0;
-  global->writeInterruptForceNumber(static_cast<unsigned char>(interruptNumber),
-                                    &status);
 }
 
 // TODO: HACKS

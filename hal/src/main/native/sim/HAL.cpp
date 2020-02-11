@@ -288,8 +288,4 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
   return 0;  // Do nothing for now
 }
 
-void HAL_ReleaseFPGAInterrupt(int32_t interruptNumber) {
-  // no op on sim
-}
-
 }  // extern "C"

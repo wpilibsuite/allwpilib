@@ -13,6 +13,7 @@
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
@@ -280,8 +281,8 @@ void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
   uint32_t interruptIndex =
       static_cast<uint32_t>(getHandleIndex(interruptHandle));
 
-  HAL_ReleaseFPGAInterrupt(interruptIndex);
-  HAL_ReleaseFPGAInterrupt(interruptIndex + 8);
+  hal::ReleaseFPGAInterrupt(interruptIndex);
+  hal::ReleaseFPGAInterrupt(interruptIndex + 8);
 }
 
 }  // extern "C"
