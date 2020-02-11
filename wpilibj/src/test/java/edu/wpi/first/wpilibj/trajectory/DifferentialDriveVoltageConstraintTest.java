@@ -88,27 +88,15 @@ class DifferentialDriveVoltageConstraintTest {
 
     // Radius of curvature should be ~1 meter.
     assertDoesNotThrow(() -> TrajectoryGenerator.generateTrajectory(
-        new Pose2d(1, 0,
-                   Rotation2d
-                       .fromDegrees(
-                           90)),
+        new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
         new ArrayList<Translation2d>(),
-        new Pose2d(0, 1,
-                   Rotation2d
-                       .fromDegrees(
-                           180)),
+        new Pose2d(0, 1, Rotation2d.fromDegrees(180)),
         config));
 
     assertDoesNotThrow(() -> TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 1,
-                   Rotation2d
-                       .fromDegrees(
-                           180)),
+        new Pose2d(0, 1, Rotation2d.fromDegrees(180)),
         new ArrayList<Translation2d>(),
-        new Pose2d(1, 0,
-                   Rotation2d
-                       .fromDegrees(
-                           90)),
+        new Pose2d(1, 0, Rotation2d.fromDegrees(90)),
         config.setReversed(true)));
 
   }
