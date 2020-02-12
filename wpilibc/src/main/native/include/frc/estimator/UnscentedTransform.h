@@ -31,19 +31,19 @@ namespace frc {
  *         passing through the transform.
  */
 template <int States, int CovDim>
-std::tuple<Eigen::Matrix<double, 1, CovDim>,
+std::tuple<Eigen::Matrix<double, CovDim, 1>,
            Eigen::Matrix<double, CovDim, CovDim>>
 UnscentedTransform(const Eigen::Matrix<double, 2 * States + 1, CovDim>& sigmas,
                    const Eigen::Matrix<double, 1, 2 * States + 1>& Wm,
                    const Eigen::Matrix<double, 1, 2 * States + 1>& Wc,
                    const Eigen::Matrix<double, CovDim, CovDim>& noiseCov =
                        Eigen::Matrix<double, CovDim, CovDim>::Zero()) {
-  // new mean is just the sum of the sigmas * weight
+  // New mean is just the sum of the sigmas * weight
   // dot = \Sigma^n_1 (W[k]*Xi[k])
   Eigen::Matrix<double, 1, CovDim> x = Wm * sigmas;
 
-  // new covariance is the sum of the outer product of the residuals
-  // times the weights
+  // New covariance is the sum of the outer product of the residuals times the
+  // weights
   Eigen::Matrix<double, 2 * States + 1, CovDim> y;
   for (int i = 0; i < 2 * States + 1; ++i) {
     y.template block<1, CovDim>(i, 0) =

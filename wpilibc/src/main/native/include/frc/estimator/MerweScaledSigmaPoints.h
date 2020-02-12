@@ -70,7 +70,7 @@ class MerweScaledSigmaPoints {
       const Eigen::Matrix<double, States, States>& P) {
     double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
     Eigen::Matrix<double, States, States> U =
-        ((lambda + States) * P).llt().matrixL();
+        ((lambda + States) * P).llt().matrixU();
 
     Eigen::Matrix<double, 2 * States + 1, States> sigmas;
     sigmas.template block<1, States>(0, 0) = x;
@@ -123,13 +123,11 @@ class MerweScaledSigmaPoints {
     double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
 
     double c = 0.5 / (States + lambda);
-    m_Wc = Eigen::Matrix<double, 1, 2 * States + 1>::Constant(c);
     m_Wm = Eigen::Matrix<double, 1, 2 * States + 1>::Constant(c);
-    for (int i = 0; i < 2 * States + 1; ++i) {
-      m_Wc(0, i) =
-          lambda / (States + lambda) + (1 - std::pow(m_alpha, 2) + beta);
-      m_Wm(0, i) = lambda / (States + lambda);
-    }
+    m_Wc = Eigen::Matrix<double, 1, 2 * States + 1>::Constant(c);
+
+    m_Wm(0, 0) = lambda / (States + lambda);
+    m_Wc(0, 0) = lambda / (States + lambda) + (1 - std::pow(m_alpha, 2) + beta);
   }
 };
 

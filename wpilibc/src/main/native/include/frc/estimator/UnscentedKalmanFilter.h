@@ -98,6 +98,7 @@ class UnscentedKalmanFilter {
   void Reset() {
     m_xHat.setZero();
     m_P.setZero();
+    m_sigmasF.setZero();
   }
 
   /**
@@ -161,10 +162,8 @@ class UnscentedKalmanFilter {
     }
 
     // Mean and covariance of prediction passed through UT
-    auto ret =
+    auto [yHat, Py] =
         UnscentedTransform<States, Rows>(sigmasH, m_pts.Wm(), m_pts.Wc(), R);
-    Eigen::Matrix<double, Rows, 1> yHat = std::get<0>(ret);
-    Eigen::Matrix<double, Rows, Rows> Py = std::get<1>(ret);
 
     // Compute cross covariance of the state and the measurements
     Eigen::Matrix<double, States, Rows> Pxy;
