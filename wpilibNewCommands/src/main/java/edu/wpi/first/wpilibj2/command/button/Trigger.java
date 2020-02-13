@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj2.command.button;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.Debouncer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -358,5 +359,24 @@ public class Trigger {
    */
   public Trigger negate() {
     return new Trigger(() -> !get());
+  }
+
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
+   * been active for longer than the specified period.
+   *
+   * @param seconds the debounce period
+   * @return the debounced trigger
+   */
+  public Trigger debounce(double seconds) {
+    return new Trigger(
+        new BooleanSupplier() {
+          Debouncer m_debouncer = new Debouncer(seconds);
+
+          @Override
+          public boolean getAsBoolean() {
+            return m_debouncer.calculate(get());
+          }
+        });
   }
 }
