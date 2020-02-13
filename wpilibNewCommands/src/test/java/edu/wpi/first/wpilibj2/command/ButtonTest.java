@@ -9,7 +9,9 @@ package edu.wpi.first.wpilibj2.command;
 
 import org.junit.jupiter.api.Test;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.InternalButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -175,5 +177,27 @@ class ButtonTest extends CommandTestBase {
     assertTrue(button1.or(button2).get());
     assertFalse(button1.negate().get());
     assertTrue(button1.and(button2.negate()).get());
+  }
+
+  @Test
+  void debounceTest() {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    MockCommandHolder commandHolder = new MockCommandHolder(true);
+    Command command = commandHolder.getMock();
+
+    InternalButton button = new InternalButton();
+    Trigger debounced = button.debounce(0.1);
+
+    debounced.whenActive(command);
+
+    button.setPressed(true);
+    scheduler.run();
+    verify(command, never()).schedule(true);
+
+    Timer.delay(0.3);
+
+    button.setPressed(true);
+    scheduler.run();
+    verify(command).schedule(true);
   }
 }

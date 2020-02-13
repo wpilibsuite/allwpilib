@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj;
 
 /**
@@ -5,7 +12,6 @@ package edu.wpi.first.wpilibj;
  * baseline for a specified period of time before the filtered value changes.
  */
 public class Debouncer {
-
   private final Timer m_timer = new Timer();
   private final double m_debounceTime;
   private final boolean m_baseline;
