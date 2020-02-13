@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DebouncerTest {
   @Test
-  void DebounceNoTriggerTest() {
+  void debounceNoTriggerTest() {
     Debouncer debouncer = new Debouncer(1);
 
     debouncer.calculate(false);
@@ -26,7 +26,7 @@ public class DebouncerTest {
   }
 
   @Test
-  void DebounceTriggerTest() {
+  void debounceTriggerTest() {
     Debouncer debouncer = new Debouncer(0.02);
 
     debouncer.calculate(false);
