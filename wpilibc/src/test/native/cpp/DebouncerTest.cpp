@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <thread>
+
 #include <units/units.h>
 
 #include "frc/Debouncer.h"
