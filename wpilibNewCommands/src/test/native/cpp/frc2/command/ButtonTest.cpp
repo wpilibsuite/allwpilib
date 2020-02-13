@@ -193,3 +193,18 @@ TEST_F(ButtonTest, RValueButtonTest) {
   scheduler.Run();
   EXPECT_EQ(counter, 1);
 }
+
+TEST_F(ButtonTest, DebounceTest) {
+  auto& scheduler = CommandScheduler::GetInstance();
+  bool pressed = false;
+  RunCommand command([]{});
+
+  Trigger([&pressed] {return pressed; }).Debounce(100_ms).WhenActive(&command);
+  pressed = true;
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&command));
+}

@@ -16,6 +16,7 @@
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"
+#include <units/units.h>
 
 namespace frc2 {
 class Command;
@@ -347,6 +348,8 @@ class Trigger {
   Trigger operator!() {
     return Trigger([*this] { return !m_isActive(); });
   }
+
+  Trigger Debounce(units::second_t debounceTime);
 
  private:
   std::function<bool()> m_isActive;
