@@ -14,26 +14,43 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DebouncerTest {
   @Test
-  void debounceNoTriggerTest() {
-    Debouncer debouncer = new Debouncer(1);
+  void debounceRisingTest() {
+    Debouncer debouncer = new Debouncer(0.02, Debouncer.DebounceType.kRising);
 
     debouncer.calculate(false);
-    debouncer.calculate(true);
-
-    Timer.delay(0.1);
-
     assertFalse(debouncer.calculate(true));
-  }
-
-  @Test
-  void debounceTriggerTest() {
-    Debouncer debouncer = new Debouncer(0.02);
-
-    debouncer.calculate(false);
-    debouncer.calculate(true);
 
     Timer.delay(0.1);
 
     assertTrue(debouncer.calculate(true));
+  }
+
+  @Test
+  void debounceFallingTest() {
+    Debouncer debouncer = new Debouncer(0.02, Debouncer.DebounceType.kFalling);
+
+    debouncer.calculate(true);
+    assertTrue(debouncer.calculate(false));
+
+    Timer.delay(0.1);
+
+    assertFalse(debouncer.calculate(false));
+  }
+
+  @Test
+  void debounceBothTest() {
+    Debouncer debouncer = new Debouncer(0.02, Debouncer.DebounceType.kBoth);
+
+    debouncer.calculate(false);
+    assertFalse(debouncer.calculate(true));
+
+    Timer.delay(0.1);
+
+    assertTrue(debouncer.calculate(true));
+    assertTrue(debouncer.calculate(false));
+
+    Timer.delay(0.1);
+
+    assertFalse(debouncer.calculate(false));
   }
 }

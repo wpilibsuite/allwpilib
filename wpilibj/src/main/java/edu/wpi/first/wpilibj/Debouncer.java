@@ -12,21 +12,40 @@ package edu.wpi.first.wpilibj;
  * baseline for a specified period of time before the filtered value changes.
  */
 public class Debouncer {
+  public enum DebounceType {
+    kRising,
+    kFalling,
+    kBoth
+  }
+
   private final Timer m_timer = new Timer();
   private final double m_debounceTime;
-  private final boolean m_baseline;
+  private final DebounceType m_debounceType;
+  private boolean m_baseline;
 
   /**
    * Creates a new Debouncer.
    *
-   * @param seconds  The number of seconds the value must change from baseline for the filtered
-   *                 value to change.
-   * @param baseline The "baseline" value of the boolean stream.
+   * @param seconds The number of seconds the value must change from baseline for the filtered
+   *                value to change.
+   * @param type    Which type of state change the debouncing will be performed on.
    */
-  public Debouncer(double seconds, boolean baseline) {
+  public Debouncer(double seconds, DebounceType type) {
     m_debounceTime = seconds;
-    m_baseline = baseline;
+    m_debounceType = type;
     m_timer.start();
+
+    switch (m_debounceType) {
+      case kBoth: // fall-through
+      case kRising:
+        m_baseline = false;
+        break;
+      case kFalling:
+        m_baseline = true;
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid debounce type!");
+    }
   }
 
   /**
@@ -36,7 +55,7 @@ public class Debouncer {
    *                value to change.
    */
   public Debouncer(double seconds) {
-    this(seconds, false);
+    this(seconds, DebounceType.kRising);
   }
 
   /**
@@ -46,12 +65,18 @@ public class Debouncer {
    * @return The debounced value of the input stream.
    */
   public boolean calculate(boolean input) {
+
     if (input == m_baseline) {
       m_timer.reset();
     }
 
+
     if (m_timer.hasElapsed(m_debounceTime)) {
-      return !m_baseline;
+      if (m_debounceType == DebounceType.kBoth) {
+        m_baseline = input;
+        m_timer.reset();
+      }
+      return input;
     } else {
       return m_baseline;
     }

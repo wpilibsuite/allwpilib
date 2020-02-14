@@ -19,14 +19,18 @@ namespace frc {
  */
 class Debouncer {
  public:
+  enum DebounceType { kRising, kFalling, kBoth };
+
   /**
    * Creates a new Debouncer.
    *
-   * @param seconds  The number of seconds the value must change from baseline
+   * @param seconds The number of seconds the value must change from baseline
    * for the filtered value to change.
-   * @param baseline The "baseline" value of the boolean stream.
+   * @param type    Which type of state change the debouncing will be performed
+   * on.
    */
-  explicit Debouncer(units::second_t debounceTime, bool baseline = false);
+  explicit Debouncer(units::second_t debounceTime,
+                     DebounceType type = DebounceType::kRising);
 
   /**
    * Applies the debouncer to the input stream.
@@ -40,5 +44,6 @@ class Debouncer {
   frc2::Timer m_timer;
   units::second_t m_debounceTime;
   bool m_baseline;
+  DebounceType m_debounceType;
 };
 }  // namespace frc

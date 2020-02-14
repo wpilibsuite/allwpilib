@@ -9,8 +9,17 @@
 
 using namespace frc;
 
-Debouncer::Debouncer(units::second_t debounceTime, bool baseline)
-    : m_debounceTime(debounceTime), m_baseline(baseline) {
+Debouncer::Debouncer(units::second_t debounceTime, DebounceType type)
+    : m_debounceTime(debounceTime), m_debounceType(type) {
+  switch (type) {
+    case DebounceType::kBoth:  // fall-through
+    case DebounceType::kRising:
+      m_baseline = false;
+      break;
+    case DebounceType::kFalling:
+      m_baseline = true;
+      break;
+  }
   m_timer.Start();
 }
 
@@ -20,7 +29,11 @@ bool Debouncer::Calculate(bool input) {
   }
 
   if (m_timer.HasElapsed(m_debounceTime)) {
-    return !m_baseline;
+    if (m_debounceType == DebounceType::kBoth) {
+      m_baseline = input;
+      m_timer.Reset();
+    }
+    return input;
   } else {
     return m_baseline;
   }
