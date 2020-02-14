@@ -14,7 +14,7 @@ RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Add commands to the autonomous command chooser
-  m_chooser.AddOption("Simple Auto", &m_simpleAuto);
+  m_chooser.SetDefaultOption("Simple Auto", &m_simpleAuto);
   m_chooser.AddOption("Complex Auto", &m_complexAuto);
 
   // Put the chooser on the dashboard

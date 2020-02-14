@@ -78,7 +78,7 @@ public class RobotContainer {
                          m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
 
     // Add commands to the autonomous command chooser
-    m_chooser.addOption("Simple Auto", m_simpleAuto);
+    m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
     m_chooser.addOption("Complex Auto", m_complexAuto);
 
     // Put the chooser on the dashboard
