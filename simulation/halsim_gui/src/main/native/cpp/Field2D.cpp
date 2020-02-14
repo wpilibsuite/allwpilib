@@ -176,14 +176,17 @@ void FieldInfo::Reset() {
 
 void FieldInfo::LoadImage() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
-    if (wpi::StringRef(m_fileOpener->result()[0]).endswith(".json")) {
-      LoadJson(m_fileOpener->result()[0]);
-    } else {
-      LoadImageImpl(m_fileOpener->result()[0]);
-      m_top = 0;
-      m_left = 0;
-      m_bottom = -1;
-      m_right = -1;
+    auto result = m_fileOpener->result();
+    if (!result.empty()) {
+      if (wpi::StringRef(result[0]).endswith(".json")) {
+        LoadJson(result[0]);
+      } else {
+        LoadImageImpl(result[0]);
+        m_top = 0;
+        m_left = 0;
+        m_bottom = -1;
+        m_right = -1;
+      }
     }
     m_fileOpener.reset();
   }
@@ -382,7 +385,8 @@ void RobotInfo::Reset() {
 
 void RobotInfo::LoadImage() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
-    LoadImageImpl(m_fileOpener->result()[0]);
+    auto result = m_fileOpener->result();
+    if (!result.empty()) LoadImageImpl(result[0]);
     m_fileOpener.reset();
   }
   if (m_texture == 0 && !m_filename.empty()) {
