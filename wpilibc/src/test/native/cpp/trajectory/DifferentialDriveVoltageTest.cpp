@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,9 @@
 
 #include <units/units.h>
 
+#include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
+#include "frc/trajectory/TrajectoryGenerator.h"
 #include "frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h"
 #include "gtest/gtest.h"
 #include "trajectory/TestTrajectory.h"
@@ -56,4 +58,27 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
     EXPECT_TRUE(feedforward.Calculate(right, point.acceleration) >
                 -maxVoltage - 0.05_V);
   }
+}
+
+TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
+  SimpleMotorFeedforward<units::meter> feedforward{1_V, 1_V / 1_mps,
+                                                   3_V / 1_mps_sq};
+  // Large trackwidth - need to test with radius of curvature less than half of
+  // trackwidth
+  const DifferentialDriveKinematics kinematics{3_m};
+  const auto maxVoltage = 10_V;
+
+  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  config.AddConstraint(
+      DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
+
+  EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
+      Pose2d{1_m, 0_m, Rotation2d{90_deg}}, std::vector<Translation2d>{},
+      Pose2d{0_m, 1_m, Rotation2d{180_deg}}, config));
+
+  config.SetReversed(true);
+
+  EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
+      Pose2d{0_m, 1_m, Rotation2d{180_deg}}, std::vector<Translation2d>{},
+      Pose2d{1_m, 0_m, Rotation2d{90_deg}}, config));
 }
