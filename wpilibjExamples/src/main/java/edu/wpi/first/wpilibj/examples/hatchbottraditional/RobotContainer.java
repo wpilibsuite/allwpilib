@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -72,7 +72,7 @@ public class RobotContainer {
             () -> m_driverController.getX(GenericHID.Hand.kRight)));
 
     // Add commands to the autonomous command chooser
-    m_chooser.addOption("Simple Auto", m_simpleAuto);
+    m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
     m_chooser.addOption("Complex Auto", m_complexAuto);
 
     // Put the chooser on the dashboard
