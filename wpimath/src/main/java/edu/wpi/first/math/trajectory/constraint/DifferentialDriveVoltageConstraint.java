@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * A class that enforces constraints on differential drive voltage expenditure based on the motor
@@ -45,85 +46,73 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
   @Override
   public double getMaxVelocityMetersPerSecond(
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
-    return Double.POSITIVE_INFINITY;
+    // Create an object to represent the current chassis speeds.
+    var chassisSpeeds =
+        new ChassisSpeeds(
+            velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter);
+
+    // Get the wheel speeds and normalize them to within the max velocity.
+    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+    wheelSpeeds.normalize(velocityMetersPerSecond);
+
+    // Return the new linear chassis speed.
+    return m_kinematics.toChassisSpeeds(wheelSpeeds).vxMetersPerSecond;
   }
 
   @Override
+  @SuppressWarnings("LocalVariableName")
   public MinMax getMinMaxAccelerationMetersPerSecondSq(
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
-    var wheelSpeeds =
-        m_kinematics.toWheelSpeeds(
-            new ChassisSpeeds(
-                velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter));
+    // Create an object to represent the current chassis speeds.
+    var chassisSpeeds =
+        new ChassisSpeeds(
+            velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter);
 
-    double maxWheelSpeed =
-        Math.max(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
-    double minWheelSpeed =
-        Math.min(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
+    // Get the wheel speeds and normalize them to within the max velocity.
+    var wheelSpeeds = m_kinematics.toWheelSpeeds(chassisSpeeds);
+    wheelSpeeds.normalize(velocityMetersPerSecond);
 
-    // Calculate maximum/minimum possible accelerations from motor dynamics
-    // and max/min wheel speeds
-    double maxWheelAcceleration =
-        m_feedforward.maxAchievableAcceleration(m_maxVoltage, maxWheelSpeed);
-    double minWheelAcceleration =
-        m_feedforward.minAchievableAcceleration(m_maxVoltage, minWheelSpeed);
+    // See section 15.1 of https://tavsys.net/controls-in-frc
+    final double Kv = m_feedforward.kv;
+    final double Ka = m_feedforward.ka;
+    final var A = SimpleMatrix.diag(-Kv / Ka, -Kv / Ka);
+    final var B = SimpleMatrix.diag(1.0 / Ka, 1.0 / Ka);
 
-    // Robot chassis turning on radius = 1/|curvature|.  Outer wheel has radius
-    // increased by half of the trackwidth T.  Inner wheel has radius decreased
-    // by half of the trackwidth.  Achassis / radius = Aouter / (radius + T/2), so
-    // Achassis = Aouter * radius / (radius + T/2) = Aouter / (1 + |curvature|T/2).
-    // Inner wheel is similar.
+    var x = new SimpleMatrix(2, 1);
+    x.set(0, 0, wheelSpeeds.leftMetersPerSecond);
+    x.set(1, 0, wheelSpeeds.rightMetersPerSecond);
 
-    // sgn(speed) term added to correctly account for which wheel is on
-    // outside of turn:
-    // If moving forward, max acceleration constraint corresponds to wheel on outside of turn
-    // If moving backward, max acceleration constraint corresponds to wheel on inside of turn
+    // Get dx/dt for min u
+    var u = new SimpleMatrix(2, 1);
+    u.set(0, 0, -m_maxVoltage);
+    u.set(1, 0, -m_maxVoltage);
+    double minAccel = getAcceleration(A, B, x, u);
 
-    // When velocity is zero, then wheel velocities are uniformly zero (robot cannot be
-    // turning on its center) - we have to treat this as a special case, as it breaks
-    // the signum function.  Both max and min acceleration are *reduced in magnitude*
-    // in this case.
+    // Get dx/dt for max u
+    u.set(0, 0, m_maxVoltage);
+    u.set(1, 0, m_maxVoltage);
+    double maxAccel = getAcceleration(A, B, x, u);
 
-    double maxChassisAcceleration;
-    double minChassisAcceleration;
+    return new MinMax(minAccel, maxAccel);
+  }
 
-    if (velocityMetersPerSecond == 0) {
-      maxChassisAcceleration =
-          maxWheelAcceleration
-              / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) / 2);
-      minChassisAcceleration =
-          minWheelAcceleration
-              / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter) / 2);
-    } else {
-      maxChassisAcceleration =
-          maxWheelAcceleration
-              / (1
-                  + m_kinematics.trackWidthMeters
-                      * Math.abs(curvatureRadPerMeter)
-                      * Math.signum(velocityMetersPerSecond)
-                      / 2);
-      minChassisAcceleration =
-          minWheelAcceleration
-              / (1
-                  - m_kinematics.trackWidthMeters
-                      * Math.abs(curvatureRadPerMeter)
-                      * Math.signum(velocityMetersPerSecond)
-                      / 2);
-    }
+  /**
+   * Returns the longitudinal acceleration of the differential drive chassis given its current wheel
+   * state and wheel input.
+   *
+   * @param A System matrix.
+   * @param B Input matrix.
+   * @param x State vector.
+   * @param u Input vector.
+   */
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
+  private double getAcceleration(SimpleMatrix A, SimpleMatrix B, SimpleMatrix x, SimpleMatrix u) {
+    final double Ks = m_feedforward.ks;
+    final double Ka = m_feedforward.ka;
 
-    // When turning about a point inside of the wheelbase (i.e. radius less than half
-    // the trackwidth), the inner wheel's direction changes, but the magnitude remains
-    // the same.  The formula above changes sign for the inner wheel when this happens.
-    // We can accurately account for this by simply negating the inner wheel.
-
-    if ((m_kinematics.trackWidthMeters / 2) > (1 / Math.abs(curvatureRadPerMeter))) {
-      if (velocityMetersPerSecond > 0) {
-        minChassisAcceleration = -minChassisAcceleration;
-      } else if (velocityMetersPerSecond < 0) {
-        maxChassisAcceleration = -maxChassisAcceleration;
-      }
-    }
-
-    return new MinMax(minChassisAcceleration, maxChassisAcceleration);
+    var xDot = A.mult(x).plus(B.mult(u));
+    xDot.set(0, 0, xDot.get(0, 0) - Ks / Ka * Math.signum(x.get(0, 0)));
+    xDot.set(1, 0, xDot.get(1, 0) - Ks / Ka * Math.signum(x.get(1, 0)));
+    return (xDot.get(0, 0) + xDot.get(1, 0)) / 2.0;
   }
 }

@@ -44,5 +44,18 @@ class DifferentialDriveVoltageConstraint : public TrajectoryConstraint {
   const SimpleMotorFeedforward<units::meter>& m_feedforward;
   const DifferentialDriveKinematics& m_kinematics;
   units::volt_t m_maxVoltage;
+
+  /**
+   * Returns the longitudinal acceleration of the differential drive chassis
+   * given its current wheel state and wheel input.
+   *
+   * @param A System matrix.
+   * @param B Input matrix.
+   * @param x State vector.
+   * @param u Input vector.
+   */
+  units::meters_per_second_squared_t GetAcceleration(
+      const Eigen::Matrix2d& A, const Eigen::Matrix2d& B,
+      const Eigen::Vector2d& x, const Eigen::Vector2d& u) const;
 };
 }  // namespace frc
