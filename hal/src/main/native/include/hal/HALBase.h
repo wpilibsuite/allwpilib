@@ -149,12 +149,6 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status);
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
 
-/**
- * Releases a waiting FPGA IRQ interrupt.
- *
- * @param interruptHandle the interrupt handle to release
- */
-
 #ifdef __cplusplus
 }  // extern "C"
 #endif
