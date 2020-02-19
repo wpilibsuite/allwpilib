@@ -69,7 +69,7 @@ public class Color {
   }
 
   private static double roundAndClamp(double value) {
-    final var rounded = Math.round(value / kPrecision) * kPrecision;
+    final var rounded = Math.round((value + kPrecision / 2) / kPrecision) * kPrecision;
     return MathUtil.clamp(rounded, 0.0, 1.0);
   }
 
