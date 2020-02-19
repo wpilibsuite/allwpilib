@@ -62,6 +62,16 @@ class IterativeRobotBase : public RobotBase {
   virtual void RobotInit();
 
   /**
+   * Robot-wide simulation initialization code should go here.
+   *
+   * Users should override this method for default Robot-wide simulation
+   * related initialization which will be called when the robot is first
+   * started. It will be called exactly one time after RobotInit is called
+   * only when the robot is in simulation.
+   */
+  virtual void SimulationInit();
+
+  /**
    * Initialization code for disabled mode should go here.
    *
    * Users should override this method for initialization code which will be
@@ -101,6 +111,13 @@ class IterativeRobotBase : public RobotBase {
    * station.
    */
   virtual void RobotPeriodic();
+
+  /**
+   * Periodic simulation code should go here.
+   *
+   * This function is called in a simulated robot after user code executes.
+   */
+  virtual void SimulationPeriodic();
 
   /**
    * Periodic code for disabled mode should go here.
