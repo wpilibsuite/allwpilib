@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,6 +24,7 @@
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "ctre/ctre.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
@@ -78,6 +79,15 @@ void InitializeHAL() {
   InitializeThreads();
 }
 }  // namespace init
+
+void ReleaseFPGAInterrupt(int32_t interruptNumber) {
+  if (!global) {
+    return;
+  }
+  int32_t status = 0;
+  global->writeInterruptForceNumber(static_cast<unsigned char>(interruptNumber),
+                                    &status);
+}
 }  // namespace hal
 
 extern "C" {
