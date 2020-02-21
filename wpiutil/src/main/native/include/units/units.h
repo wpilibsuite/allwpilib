@@ -2462,7 +2462,6 @@ namespace units
 	namespace dimensionless
 	{
 		typedef unit<std::ratio<1>, units::category::scalar_unit> scalar;
-		typedef unit<std::ratio<1>, units::category::dimensionless_unit> dimensionless;
 
 		typedef unit_t<scalar> scalar_t;
 		typedef scalar_t dimensionless_t;
