@@ -62,7 +62,7 @@ public class PIDController implements Sendable, AutoCloseable {
   // The sum of the errors for use in the integral calc
   private double m_totalError;
 
-  // The percentage or absolute error that is considered at setpoint.
+  // The absolute error that is considered at setpoint.
   private double m_positionTolerance = 0.05;
   private double m_velocityTolerance = Double.POSITIVE_INFINITY;
 
@@ -213,8 +213,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns true if the error is within the percentage of the total input range, determined by
-   * SetTolerance. This asssumes that the maximum and minimum input were set using SetInput.
+   * Returns true if the error is within the tolerance of the error.
    *
    * <p>This will return false until at least one input value has been computed.
    *
