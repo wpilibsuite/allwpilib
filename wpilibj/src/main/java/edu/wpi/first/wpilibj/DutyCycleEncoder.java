@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -65,19 +65,18 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   private void init() {
-    m_analogTrigger = new AnalogTrigger(m_dutyCycle);
-    m_counter = new Counter();
-
     m_simDevice = SimDevice.create("DutyCycleEncoder", m_dutyCycle.getFPGAIndex());
 
     if (m_simDevice != null) {
       m_simPosition = m_simDevice.createDouble("Position", false, 0.0);
       m_simIsConnected = m_simDevice.createBoolean("Connected", false, true);
+    } else {
+      m_counter = new Counter();
+      m_analogTrigger = new AnalogTrigger(m_dutyCycle);
+      m_analogTrigger.setLimitsDutyCycle(0.25, 0.75);
+      m_counter.setUpSource(m_analogTrigger, AnalogTriggerType.kRisingPulse);
+      m_counter.setDownSource(m_analogTrigger, AnalogTriggerType.kFallingPulse);
     }
-
-    m_analogTrigger.setLimitsDutyCycle(0.25, 0.75);
-    m_counter.setUpSource(m_analogTrigger, AnalogTriggerType.kRisingPulse);
-    m_counter.setDownSource(m_analogTrigger, AnalogTriggerType.kFallingPulse);
 
     SendableRegistry.addLW(this, "DutyCycle Encoder", m_dutyCycle.getSourceChannel());
   }
@@ -173,7 +172,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * Reset the Encoder distance to zero.
    */
   public void reset() {
-    m_counter.reset();
+    if (m_counter != null) {
+      m_counter.reset();
+    }
     m_positionOffset = m_dutyCycle.getOutput();
   }
 
@@ -209,8 +210,12 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    m_counter.close();
-    m_analogTrigger.close();
+    if (m_counter != null) {
+      m_counter.close();
+    }
+    if (m_analogTrigger != null) {
+      m_analogTrigger.close();
+    }
     if (m_ownsDutyCycle) {
       m_dutyCycle.close();
     }
