@@ -389,9 +389,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
-  // image 4; Fixes errors caused by multiple processes. Talk to NI about this
   nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-      nLoadOut::kTargetClass_RoboRIO;
+      nLoadOut::getTargetClass();
 
   int32_t status = 0;
   global.reset(tGlobal::create(&status));
