@@ -94,7 +94,7 @@ class Timer {
    * @param seconds The period to check.
    * @return        True if the period has passed.
    */
-  bool HasElapsed(units::second_t period);
+  bool HasElapsed(units::second_t period) const;
 
   /**
    * Check if the period specified has passed and if it has, advance the start
