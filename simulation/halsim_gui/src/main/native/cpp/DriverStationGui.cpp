@@ -250,10 +250,10 @@ void RobotJoystick::Update() {
     // on axis 2 and 3.
     axes.axes[0] = sysAxes[0];
     axes.axes[1] = sysAxes[1];
-    axes.axes[2] = 0.5 + sysAxes[4] / 2.0;
-    axes.axes[3] = 0.5 + sysAxes[5] / 2.0;
-    axes.axes[4] = sysAxes[2];
-    axes.axes[5] = sysAxes[3];
+    axes.axes[2] = 0.5 + sysAxes[2] / 2.0;
+    axes.axes[3] = 0.5 + sysAxes[3] / 2.0;
+    axes.axes[4] = sysAxes[4];
+    axes.axes[5] = sysAxes[5];
 
     // the start button for gamepads is not mapped on the FRC DriverStation
     // platforms, so remove it if present
