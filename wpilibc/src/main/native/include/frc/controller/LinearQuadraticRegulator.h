@@ -76,6 +76,8 @@ class LinearQuadraticRegulator {
     Eigen::Matrix<double, Inputs, Inputs> tmp =
         m_discB.transpose() * S * m_discB + R;
     m_K = tmp.llt().solve(m_discB.transpose() * S * m_discA);
+
+    Reset();
   }
 
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
