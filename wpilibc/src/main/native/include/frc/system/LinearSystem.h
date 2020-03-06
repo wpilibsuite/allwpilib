@@ -56,6 +56,8 @@ class LinearSystem {
 
   virtual ~LinearSystem() = default;
 
+  LinearSystem(const LinearSystem&) = default;
+  LinearSystem& operator=(const LinearSystem&) = default;
   LinearSystem(LinearSystem&&) = default;
   LinearSystem& operator=(LinearSystem&&) = default;
 
