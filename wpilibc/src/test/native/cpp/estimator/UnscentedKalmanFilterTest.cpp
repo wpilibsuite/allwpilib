@@ -38,20 +38,20 @@ Eigen::Matrix<double, 5, 1> Dynamics(const Eigen::Matrix<double, 5, 1>& x,
   auto k1 = (1 / m + units::math::pow<2>(rb) / J);
   auto k2 = (1 / m - units::math::pow<2>(rb) / J);
 
-  units::meters_per_second_t vl{x(3, 0)};
-  units::meters_per_second_t vr{x(4, 0)};
-  units::volt_t Vl{u(0, 0)};
-  units::volt_t Vr{u(1, 0)};
+  units::meters_per_second_t vl{x(3)};
+  units::meters_per_second_t vr{x(4)};
+  units::volt_t Vl{u(0)};
+  units::volt_t Vr{u(1)};
 
   Eigen::Matrix<double, 5, 1> result;
   auto v = 0.5 * (vl + vr);
-  result(0, 0) = v.to<double>() * std::cos(x(2, 0));
-  result(1, 0) = v.to<double>() * std::sin(x(2, 0));
-  result(2, 0) = ((vr - vl) / (2.0 * rb)).to<double>();
-  result(3, 0) =
+  result(0) = v.to<double>() * std::cos(x(2));
+  result(1) = v.to<double>() * std::sin(x(2));
+  result(2) = ((vr - vl) / (2.0 * rb)).to<double>();
+  result(3) =
       k1.to<double>() * ((C1 * vl).to<double>() + (C2 * Vl).to<double>()) +
       k2.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>());
-  result(4, 0) =
+  result(4) =
       k2.to<double>() * ((C1 * vl).to<double>() + (C2 * Vl).to<double>()) +
       k1.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>());
   return result;
@@ -62,7 +62,7 @@ Eigen::Matrix<double, 3, 1> LocalMeasurementModel(
     const Eigen::Matrix<double, 2, 1>& u) {
   static_cast<void>(u);
   Eigen::Matrix<double, 3, 1> y;
-  y << x(2, 0), x(3, 0), x(4, 0);
+  y << x(2), x(3), x(4);
   return y;
 }
 
@@ -71,7 +71,7 @@ Eigen::Matrix<double, 5, 1> GlobalMeasurementModel(
     const Eigen::Matrix<double, 2, 1>& u) {
   static_cast<void>(u);
   Eigen::Matrix<double, 5, 1> y;
-  y << x(0, 0), x(1, 0), x(2, 0), x(3, 0), x(4, 0);
+  y << x(0), x(1), x(2), x(3), x(4);
   return y;
 }
 }  // namespace
@@ -127,11 +127,11 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
     units::meters_per_second_t vr =
         ref.velocity * (1 + (ref.curvature * rb).to<double>());
 
-    nextR(0, 0) = ref.pose.Translation().X().to<double>();
-    nextR(1, 0) = ref.pose.Translation().Y().to<double>();
-    nextR(2, 0) = ref.pose.Rotation().Radians().to<double>();
-    nextR(3, 0) = vl.to<double>();
-    nextR(4, 0) = vr.to<double>();
+    nextR(0) = ref.pose.Translation().X().to<double>();
+    nextR(1) = ref.pose.Translation().Y().to<double>();
+    nextR(2) = ref.pose.Rotation().Radians().to<double>();
+    nextR(3) = vl.to<double>();
+    nextR(4) = vr.to<double>();
 
     auto localY = LocalMeasurementModel(observer.Xhat(),
                                         Eigen::Matrix<double, 2, 1>::Zero());

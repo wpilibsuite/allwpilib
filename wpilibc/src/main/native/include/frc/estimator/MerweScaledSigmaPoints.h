@@ -126,8 +126,8 @@ class MerweScaledSigmaPoints {
     m_Wm = Eigen::Matrix<double, 1, 2 * States + 1>::Constant(c);
     m_Wc = Eigen::Matrix<double, 1, 2 * States + 1>::Constant(c);
 
-    m_Wm(0, 0) = lambda / (States + lambda);
-    m_Wc(0, 0) = lambda / (States + lambda) + (1 - std::pow(m_alpha, 2) + beta);
+    m_Wm(0) = lambda / (States + lambda);
+    m_Wc(0) = lambda / (States + lambda) + (1 - std::pow(m_alpha, 2) + beta);
   }
 };
 

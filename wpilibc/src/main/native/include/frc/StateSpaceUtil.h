@@ -160,7 +160,7 @@ Eigen::Matrix<double, N, 1> MakeWhiteNoiseVector(
   Eigen::Matrix<double, N, 1> result;
   for (int i = 0; i < N; ++i) {
     std::normal_distribution<> distr{0.0, stdDevs[i]};
-    result(i, 0) = distr(gen);
+    result(i) = distr(gen);
   }
   return result;
 }

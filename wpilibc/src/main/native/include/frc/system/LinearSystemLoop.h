@@ -86,7 +86,7 @@ class LinearSystemLoop {
    *
    * @param i Row of r.
    */
-  double NextR(int i) const { return NextR()(i, 0); }
+  double NextR(int i) const { return NextR()(i); }
 
   /**
    * Returns the controller's calculated control input u.
@@ -100,7 +100,7 @@ class LinearSystemLoop {
    *
    * @param i Row of u.
    */
-  double U(int i) const { return m_plant.ClampInput(m_controller.U())(i, 0); }
+  double U(int i) const { return m_plant.ClampInput(m_controller.U())(i); }
 
   /**
    * Set the initial state estimate x-hat.

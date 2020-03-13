@@ -14,31 +14,31 @@
 // Tests that integrating dx/dt = e^x works.
 TEST(RungeKuttaTest, Exponential) {
   Eigen::Matrix<double, 1, 1> y0;
-  y0(0, 0) = 0.0;
+  y0(0) = 0.0;
 
   Eigen::Matrix<double, 1, 1> y1 = frc::RungeKutta(
       [](Eigen::Matrix<double, 1, 1> x) {
         Eigen::Matrix<double, 1, 1> y;
-        y(0, 0) = std::exp(x(0, 0));
+        y(0) = std::exp(x(0));
         return y;
       },
       y0, 0.1_s);
-  EXPECT_NEAR(y1(0, 0), std::exp(0.1) - std::exp(0), 1e-3);
+  EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
 // Tests that integrating dx/dt = e^x works when we provide a U.
 TEST(RungeKuttaTest, ExponentialWithU) {
   Eigen::Matrix<double, 1, 1> y0;
-  y0(0, 0) = 0.0;
+  y0(0) = 0.0;
 
   Eigen::Matrix<double, 1, 1> y1 = frc::RungeKutta(
       [](Eigen::Matrix<double, 1, 1> x, Eigen::Matrix<double, 1, 1> u) {
         Eigen::Matrix<double, 1, 1> y;
-        y(0, 0) = std::exp(u(0, 0) * x(0, 0));
+        y(0) = std::exp(u(0) * x(0));
         return y;
       },
       y0, (Eigen::Matrix<double, 1, 1>() << 1.0).finished(), 0.1_s);
-  EXPECT_NEAR(y1(0, 0), std::exp(0.1) - std::exp(0), 1e-3);
+  EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
 namespace {
@@ -63,9 +63,9 @@ TEST(RungeKuttaTest, RungeKuttaTimeVarying) {
   Eigen::Matrix<double, 1, 1> y1 = frc::RungeKuttaTimeVarying(
       [](units::second_t t, Eigen::Matrix<double, 1, 1> x) {
         return (Eigen::Matrix<double, 1, 1>()
-                << x(0, 0) * (2.0 / (std::exp(t.to<double>()) + 1.0) - 1.0))
+                << x(0) * (2.0 / (std::exp(t.to<double>()) + 1.0) - 1.0))
             .finished();
       },
       y0, 5_s, 1_s);
-  EXPECT_NEAR(y1(0, 0), RungeKuttaTimeVaryingSolution(6.0)(0, 0), 1e-3);
+  EXPECT_NEAR(y1(0), RungeKuttaTimeVaryingSolution(6.0)(0), 1e-3);
 }

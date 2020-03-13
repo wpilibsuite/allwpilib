@@ -28,9 +28,9 @@ auto NumericalJacobian(F&& f, const Eigen::Matrix<double, Cols, 1>& x) {
   // It's more expensive, but +- epsilon will be more accurate
   for (int i = 0; i < Cols; ++i) {
     Eigen::Matrix<double, Cols, 1> dX_plus = x;
-    dX_plus(i, 0) += kEpsilon;
+    dX_plus(i) += kEpsilon;
     Eigen::Matrix<double, Cols, 1> dX_minus = x;
-    dX_minus(i, 0) -= kEpsilon;
+    dX_minus(i) -= kEpsilon;
     result.col(i) = (f(dX_plus) - f(dX_minus)) / (kEpsilon * 2.0);
   }
 

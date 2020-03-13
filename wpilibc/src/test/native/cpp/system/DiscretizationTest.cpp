@@ -29,8 +29,8 @@ TEST(DiscretizationTest, DiscretizeA) {
 
   // We now have pos = vel = 1 and accel = 0, which should give us:
   Eigen::Matrix<double, 2, 1> x1Truth;
-  x1Truth(1, 0) = x0(1, 0);
-  x1Truth(0, 0) = x0(0, 0) + 1.0 * x0(1, 0);
+  x1Truth(1) = x0(1);
+  x1Truth(0) = x0(0) + 1.0 * x0(1);
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
@@ -56,8 +56,8 @@ TEST(DiscretizationTest, DiscretizeAB) {
 
   // We now have pos = vel = accel = 1, which should give us:
   Eigen::Matrix<double, 2, 1> x1Truth;
-  x1Truth(1, 0) = x0(1, 0) + 1.0 * u(0, 0);
-  x1Truth(0, 0) = x0(0, 0) + 1.0 * x0(1, 0) + 0.5 * u(0, 0);
+  x1Truth(1) = x0(1) + 1.0 * u(0);
+  x1Truth(0) = x0(0) + 1.0 * x0(1) + 0.5 * u(0);
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
