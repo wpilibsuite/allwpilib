@@ -33,4 +33,28 @@ public final class MathUtil {
   public static double clamp(double value, double low, double high) {
     return Math.max(low, Math.min(value, high));
   }
+  
+  /**
+   * Returns value clamped between low and high boundaries.
+   * This overload clamps the value between the positive and negative values of bounds, 
+   * therefore {@code clamp(val, bound)} is equivalent to {@code clamp(val, -bound, bound)}.
+   *
+   * @param value   Value to clamp.
+   * @param bounds  The absolute value of the boundaries to which to clamp value 
+   */
+  public static double clamp(double value, double bounds){
+    return clamp(value, -bounds, bounds);
+  }
+  
+  /**
+   * Returns value clamped between low and high boundaries.
+   * This overload clamps the value between the positive and negative values of bounds, 
+   * therefore {@code clamp(val, bound)} is equivalent to {@code clamp(val, -bound, bound)}.
+   *
+   * @param value   Value to clamp.
+   * @param bounds  The absolute value of the boundaries to which to clamp value 
+   */
+  public static int clamp(int value, int bounds){
+    return clamp(value, -bounds, bounds);
+  }
 }
