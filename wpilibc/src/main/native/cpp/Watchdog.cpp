@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -134,12 +134,18 @@ void Watchdog::AddEpoch(wpi::StringRef epochName) {
 }
 
 void Watchdog::PrintEpochs() {
+  using std::chrono::duration_cast;
+  using std::chrono::microseconds;
+
   auto now = hal::fpga_clock::now();
   if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
       wpi::outs() << '\t' << epoch.getKey() << ": "
-                  << wpi::format("%.6f", epoch.getValue().count() / 1.0e6)
+                  << wpi::format(
+                         "%.6f",
+                         duration_cast<microseconds>(epoch.getValue()).count() /
+                             1.0e6)
                   << "s\n";
     }
   }

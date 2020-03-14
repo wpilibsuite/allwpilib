@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,17 +26,17 @@ import java.util.concurrent.locks.ReentrantLock;
 @SuppressWarnings("PMD.TooManyMethods")
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
-  private static final long kMinPrintPeriod = 1000000; // us
+  private static final long kMinPrintPeriod = 1000000; // microseconds
 
-  private long m_startTime; // us
-  private long m_timeout; // us
-  private long m_expirationTime; // us
+  private long m_startTime; // microseconds
+  private long m_timeout; // microseconds
+  private long m_expirationTime; // microseconds
   private final Runnable m_callback;
-  private long m_lastTimeoutPrintTime; // us
-  private long m_lastEpochsPrintTime; // us
+  private long m_lastTimeoutPrintTime; // microseconds
+  private long m_lastEpochsPrintTime; // microseconds
 
   @SuppressWarnings("PMD.UseConcurrentHashMap")
-  private final Map<String, Long> m_epochs = new HashMap<>();
+  private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
   boolean m_isExpired;
 
   boolean m_suppressTimeoutMessage;
