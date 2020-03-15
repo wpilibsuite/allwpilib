@@ -47,7 +47,7 @@ ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title,
   wpi::SmallVector<char, 16> storage;
   auto titleRef = title.toStringRef(storage);
   if (m_layouts.count(titleRef) == 0) {
-    auto layout = std::make_unique<ShuffleboardLayout>(*this, type, titleRef);
+    auto layout = std::make_unique<ShuffleboardLayout>(*this, titleRef, type);
     auto ptr = layout.get();
     m_components.emplace_back(std::move(layout));
     m_layouts.insert(std::make_pair(titleRef, ptr));

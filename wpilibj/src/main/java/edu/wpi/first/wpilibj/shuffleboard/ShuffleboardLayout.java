@@ -26,8 +26,8 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
     implements ShuffleboardContainer {
   private final ContainerHelper m_helper = new ContainerHelper(this);
 
-  ShuffleboardLayout(ShuffleboardContainer parent, String name, String type) {
-    super(parent, requireNonNullParam(type, "type", "ShuffleboardLayout"), name);
+  ShuffleboardLayout(ShuffleboardContainer parent, String title, String type) {
+    super(parent, title, requireNonNullParam(type, "type", "ShuffleboardLayout"));
   }
 
   @Override
