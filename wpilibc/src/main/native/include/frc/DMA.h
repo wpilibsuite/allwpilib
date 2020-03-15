@@ -8,7 +8,7 @@
 #include <units/time.h>
 
 namespace frc {
-class Encoder;
+class QuadratureEncoder;
 class Counter;
 class DigitalSource;
 class DutyCycle;
@@ -31,8 +31,8 @@ class DMA {
   void SetTimedTrigger(units::second_t seconds);
   void SetTimedTriggerCycles(int cycles);
 
-  void AddEncoder(const Encoder* encoder);
-  void AddEncoderPeriod(const Encoder* encoder);
+  void AddEncoder(const QuadratureEncoder* encoder);
+  void AddEncoderPeriod(const QuadratureEncoder* encoder);
 
   void AddCounter(const Counter* counter);
   void AddCounterPeriod(const Counter* counter);

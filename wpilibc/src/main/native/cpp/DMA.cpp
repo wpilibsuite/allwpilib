@@ -8,7 +8,7 @@
 #include <frc/Counter.h>
 #include <frc/DigitalSource.h>
 #include <frc/DutyCycle.h>
-#include <frc/Encoder.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/PWM.h>
 #include <frc/motorcontrol/PWMMotorController.h>
 
@@ -52,13 +52,13 @@ void DMA::SetTimedTriggerCycles(int cycles) {
   FRC_CheckErrorStatus(status, "{}", "SetTimedTriggerCycles");
 }
 
-void DMA::AddEncoder(const Encoder* encoder) {
+void DMA::AddEncoder(const QuadratureEncoder* encoder) {
   int32_t status = 0;
   HAL_AddDMAEncoder(dmaHandle, encoder->m_encoder, &status);
   FRC_CheckErrorStatus(status, "{}", "AddEncoder");
 }
 
-void DMA::AddEncoderPeriod(const Encoder* encoder) {
+void DMA::AddEncoderPeriod(const QuadratureEncoder* encoder) {
   int32_t status = 0;
   HAL_AddDMAEncoderPeriod(dmaHandle, encoder->m_encoder, &status);
   FRC_CheckErrorStatus(status, "{}", "AddEncoderPeriod");

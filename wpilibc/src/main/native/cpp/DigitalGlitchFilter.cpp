@@ -14,8 +14,8 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Counter.h"
-#include "frc/Encoder.h"
 #include "frc/Errors.h"
+#include "frc/QuadratureEncoder.h"
 #include "frc/SensorUtil.h"
 
 using namespace frc;
@@ -71,7 +71,7 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requestedIndex) {
   }
 }
 
-void DigitalGlitchFilter::Add(Encoder* input) {
+void DigitalGlitchFilter::Add(QuadratureEncoder* input) {
   Add(input->m_aSource.get());
   Add(input->m_bSource.get());
 }
@@ -85,7 +85,7 @@ void DigitalGlitchFilter::Remove(DigitalSource* input) {
   DoAdd(input, 0);
 }
 
-void DigitalGlitchFilter::Remove(Encoder* input) {
+void DigitalGlitchFilter::Remove(QuadratureEncoder* input) {
   Remove(input->m_aSource.get());
   Remove(input->m_bSource.get());
 }

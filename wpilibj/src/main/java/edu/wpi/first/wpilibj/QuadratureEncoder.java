@@ -21,8 +21,9 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * Class to read quadrature encoders.
  *
  * <p>Quadrature encoders are devices that count shaft rotation and can sense direction. The output
- * of the QuadratureEncoder class is an integer that can count either up or down, and can go negative for
- * reverse direction counting. When creating Encoders, a direction can be supplied that inverts the
+ * of the QuadratureEncoder class is an integer that can count either up or down,
+ * and can go negative for reverse direction counting.
+ * When creating Encoders, a direction can be supplied that inverts the
  * sense of the output to make code more readable if the encoder is mounted such that forward
  * movement generates negative values. Quadrature encoders have two digital outputs, an A Channel
  * and a B Channel, that are out of phase with each other for direction sensing.
@@ -141,8 +142,8 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels. Using an index pulse forces 4x
-   * encoding
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels.
+   * Using an index pulse forces 4x encoding
    *
    * <p>The encoder will start counting immediately.
    *
@@ -162,8 +163,8 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels. Using an index pulse forces 4x
-   * encoding
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels.
+   * Using an index pulse forces 4x encoding
    *
    * <p>The encoder will start counting immediately.
    *
@@ -176,9 +177,11 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The QuadratureEncoder class will not allocate the
-   * digital inputs and assume that they already are counted.
+   * QuadratureEncoder constructor.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared.
+   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
+   * already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
@@ -192,9 +195,11 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The QuadratureEncoder class will not allocate the
-   * digital inputs and assume that they already are counted.
+   * QuadratureEncoder constructor.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared.
+   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
+   * already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
@@ -206,9 +211,11 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The QuadratureEncoder class will not allocate the
-   * digital inputs and assume that they already are counted.
+   * QuadratureEncoder constructor.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared.
+   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
+   * already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
@@ -238,9 +245,11 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a, b and index channels as digital inputs. This
-   * is used in the case where the digital inputs are shared. The QuadratureEncoder class will not allocate
-   * the digital inputs and assume that they already are counted.
+   * QuadratureEncoder constructor.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared.
+   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
+   * already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
@@ -259,9 +268,11 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a, b and index channels as digital inputs. This
-   * is used in the case where the digital inputs are shared. The QuadratureEncoder class will not allocate
-   * the digital inputs and assume that they already are counted.
+   * QuadratureEncoder constructor.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared.
+   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
+   * already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
@@ -269,7 +280,8 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
    * @param sourceB     the source that should be used for the b channel.
    * @param indexSource the source that should be used for the index channel.
    */
-  public QuadratureEncoder(DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource) {
+  public QuadratureEncoder(DigitalSource sourceA, DigitalSource sourceB,
+                            DigitalSource indexSource) {
     this(sourceA, sourceB, indexSource, false);
   }
 
@@ -326,8 +338,8 @@ public class QuadratureEncoder implements CounterBase, PIDSource, Sendable, Auto
   }
 
   /**
-   * Gets the current count. Returns the current count on the QuadratureEncoder. This method compensates for
-   * the decoding type.
+   * Gets the current count. Returns the current count on the QuadratureEncoder.
+   * This method compensates for the decoding type.
    *
    * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
    */
