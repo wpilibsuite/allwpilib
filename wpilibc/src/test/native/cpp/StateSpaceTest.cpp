@@ -41,7 +41,7 @@ class StateSpace : public testing::Test {
     return ElevatorSystem(motors, m, r, G);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, kDt};
-  KalmanFilter<2, 1, 1> observer{plant, kDt, {0.05, 1.0}, {0.0001}};
+  KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, kDt};
   LinearSystemLoop<2, 1, 1> loop{plant, controller, observer};
 };
 

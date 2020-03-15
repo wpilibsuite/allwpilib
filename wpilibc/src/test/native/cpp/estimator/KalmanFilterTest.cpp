@@ -19,5 +19,5 @@
 TEST(KalmanFilterTest, Flywheel) {
   auto motor = frc::DCMotor::NEO();
   auto flywheel = frc::FlywheelSystem(motor, 1_kg_sq_m, 1.0);
-  frc::KalmanFilter<1, 1, 1> kf{flywheel, 5_ms, {1}, {1}};
+  frc::KalmanFilter<1, 1, 1> kf{flywheel, {1}, {1}, 5_ms};
 }

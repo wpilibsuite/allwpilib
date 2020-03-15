@@ -45,13 +45,14 @@ class KalmanFilter {
    * Constructs a state-space observer with the given plant.
    *
    * @param plant              The plant used for the prediction step.
-   * @param dt                 Nominal discretization timestep.
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
+   * @param dt                 Nominal discretization timestep.
    */
-  KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant, units::second_t dt,
+  KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                const std::array<double, States>& stateStdDevs,
-               const std::array<double, Outputs>& measurementStdDevs) {
+               const std::array<double, Outputs>& measurementStdDevs,
+               units::second_t dt) {
     m_plant = &plant;
 
     m_contQ = MakeCovMatrix(stateStdDevs);
