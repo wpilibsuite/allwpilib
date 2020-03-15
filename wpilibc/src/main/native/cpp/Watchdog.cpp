@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,8 @@
 #include <wpi/Format.h>
 #include <wpi/PriorityQueue.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/SmallString.h>
+#include "frc/DriverStation.h"
 
 using namespace frc;
 
@@ -52,10 +54,12 @@ void Watchdog::Thread::Main() {
         if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
           watchdog->m_lastTimeoutPrintTime = now;
           if (!watchdog->m_suppressTimeoutMessage) {
-            wpi::outs() << "Watchdog not fed within "
-                        << wpi::format("%.6f",
-                                       watchdog->m_timeout.count() / 1.0e9)
-                        << "s\n";
+            wpi::SmallString<128> buf;
++            wpi::raw_svector_ostream err(buf);
++            err << "Watchdog not fed within "
++                << wpi::format("%.6f", watchdog->m_timeout.count() / 1.0e9)
++                << "s\n";
++            frc::DriverStation::ReportWarning(err.str());
           }
         }
 
@@ -138,9 +142,11 @@ void Watchdog::PrintEpochs() {
   if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
-      wpi::outs() << '\t' << epoch.getKey() << ": "
-                  << wpi::format("%.6f", epoch.getValue().count() / 1.0e6)
-                  << "s\n";
+       wpi::SmallString<128> buf;
++      wpi::raw_svector_ostream err(buf);
++      err << '\t' << epoch.getKey() + ": "
++          << wpi::format("%.6f", epoch.getValue().count() / 1.0e6) << "s\n";
++      frc::DriverStation::ReportWarning(err.str());
     }
   }
 }
