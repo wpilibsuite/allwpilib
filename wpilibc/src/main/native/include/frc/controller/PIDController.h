@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -117,7 +117,7 @@ class PIDController : public frc::Sendable,
   double GetSetpoint() const;
 
   /**
-   * Returns true if the error is within the tolerance of the error.
+   * Returns true if the error is within the tolerance of the setpoint.
    *
    * This will return false until at least one input value has been computed.
    */
