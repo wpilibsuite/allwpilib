@@ -33,4 +33,16 @@ public final class MathUtil {
   public static double clamp(double value, double low, double high) {
     return Math.max(low, Math.min(value, high));
   }
+  
+  /**
+  * Applies a deadband to a value.
+  * 
+  * @param value  The value to apply the deadband to.
+  * @param deadband The deadband to apply.
+  * @return If the value's offset from zero is smaller than the deadband, 0. 
+  * Else, will return the entered value.
+  */
+  public static double applyDeadband(double value, double deadband) {
+    return (Math.abs(value) > deadband)? value : 0;
+  }
 }
