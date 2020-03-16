@@ -132,6 +132,24 @@ public class KalmanFilter<S extends Num, I extends Num,
     return m_P.get(row, col);
   }
 
+  /**
+   * Set initial state estimate x-hat.
+   *
+   * @param xhat The state estimate x-hat.
+   */
+  public void setXhat(Matrix<S, N1> xhat) {
+    m_plant.setX(xhat);
+  }
+
+  /**
+   * Set an element of the initial state estimate x-hat.
+   *
+   * @param row     Row of x-hat.
+   * @param value Value for element of x-hat.
+   */
+  public void setXhat(int row, double value) {
+    m_plant.setX(row, value);
+  }
 
   /**
    * Returns the state estimate x-hat.
@@ -143,15 +161,6 @@ public class KalmanFilter<S extends Num, I extends Num,
   }
 
   /**
-   * Set initial state estimate x-hat.
-   *
-   * @param xhat The state estimate x-hat.
-   */
-  public void setXhat(Matrix<S, N1> xhat) {
-    m_plant.setX(xhat);
-  }
-
-  /**
    * Returns an element of the state estimate x-hat.
    *
    * @param row Row of x-hat.
@@ -159,16 +168,6 @@ public class KalmanFilter<S extends Num, I extends Num,
    */
   public double getXhat(int row) {
     return m_plant.getX(row);
-  }
-
-  /**
-   * Set an element of the initial state estimate x-hat.
-   *
-   * @param row     Row of x-hat.
-   * @param value Value for element of x-hat.
-   */
-  public void setXhat(int row, double value) {
-    m_plant.setX(row, value);
   }
 
   /**
@@ -184,6 +183,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @param u         New control input from controller.
    * @param dtSeconds Timestep for prediction.
    */
+  @SuppressWarnings("ParameterName")
   public void predict(Matrix<I, N1> u, double dtSeconds) {
     m_plant.setX(m_plant.calculateX(m_plant.getX(), u, dtSeconds));
 
@@ -201,6 +201,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @param u Same control input used in the last predict step.
    * @param y Measurement vector.
    */
+  @SuppressWarnings("ParameterName")
   public void correct(Matrix<I, N1> u, Matrix<O, N1> y) {
     correct(u, y, m_plant.getC(), m_discR);
   }
@@ -212,20 +213,20 @@ public class KalmanFilter<S extends Num, I extends Num,
    * Correct() call vary. The C matrix passed to the constructor is used if one
    * is not provided (the two-argument version of this function).
    *
-   * @param <Rows> Number of rows in the result of f(x, u).
+   * @param <R> Number of rows in the result of f(x, u).
    * @param u      Same control input used in the predict step.
    * @param y      Measurement vector.
    * @param C      Output matrix.
-   * @param R      Measurement noise covariance matrix.
+   * @param r      Measurement noise covariance matrix.
    */
-  @SuppressWarnings("LocalVariableName")
-  public <Rows extends Num> void correct(
+  @SuppressWarnings("ParameterName")
+  public <R extends Num> void correct(
           Matrix<I, N1> u,
-          Matrix<Rows, N1> y,
-          Matrix<Rows, S> C,
-          Matrix<Rows, Rows> R) {
+          Matrix<R, N1> y,
+          Matrix<R, S> C,
+          Matrix<R, R> r) {
     var x = m_plant.getX();
-    var S = C.times(m_P).times(C.transpose()).plus(R);
+    var S = C.times(m_P).times(C.transpose()).plus(r);
 
     // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
     // efficiently.

@@ -58,7 +58,8 @@
 //     *                  should apply on top of the trajectory feedforward.
 //     * @param dtSeconds The nominal dt of this controller. With command based this is 0.020.
 //     */
-//    public LTVDiffDriveController(LinearSystem plant, Matrix<N5, N1> qElms, Matrix<N2, N1> rElms, double dtSeconds) {
+//    public LTVDiffDriveController(LinearSystem plant, Matrix<N5, N1> qElms,
+//    Matrix<N2, N1> rElms, double dtSeconds) {
 //        this.m_plant = plant;
 //
 //        m_localY = MatrixUtils.zeros(Nat.N3(), Nat.N1());
@@ -104,13 +105,15 @@
 //        A.getStorage().insertIntoThis(0, 4, B);
 //        A.getStorage().setColumn(6, 0, 0, 0, 1, -1);
 //
-//        var v = (x.get(State.kLeftVelocity.value, 0) + x.get(State.kRightVelocity.value, 0)) / 2.0;
+//        var v = (x.get(State.kLeftVelocity.value, 0)
+//        + x.get(State.kRightVelocity.value, 0)) / 2.0;
 //
 //        var result = new Matrix<N10, N1>(new SimpleMatrix(10, 1));
 //        result.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
 //        result.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
 //        result.set(2, 0,
-//                ((x.get(State.kRightVelocity.value, 0) - x.get(State.kLeftVelocity.value, 0)) / (2.0 * rb)));
+//                ((x.get(State.kRightVelocity.value, 0) -
+//                x.get(State.kLeftVelocity.value, 0)) / (2.0 * rb)));
 //        result.getStorage().insertIntoThis(3, 0,
 //                A.getStorage().mult(x.getStorage().extractMatrix(3, 3 + 7, 0, 1))
 //                        .plus(B.mult(u.getStorage()))
@@ -243,7 +246,8 @@
 //                                   double linearVelocityRefMetersPerSec,
 //                                   double angularVelocityRefRadPerSec) {
 //
-//        var wheelVelocities = m_kinematics.toWheelSpeeds(new ChassisSpeeds(linearVelocityRefMetersPerSec, 0, angularVelocityRefRadPerSec));
+//        var wheelVelocities = m_kinematics.toWheelSpeeds(new ChassisSpeeds(
+//        linearVelocityRefMetersPerSec, 0, angularVelocityRefRadPerSec));
 //
 //        m_observer.correct(m_appliedU, m_localY);
 //
@@ -266,7 +270,8 @@
 //                                .getStorage()
 //                                .extractMatrix(0, 0, 5, 1)));
 //
-//        m_cappedU = getController(m_observer.getXhat().getStorage(), m_nextR.getStorage().extractMatrix(0, 0, 5, 1).plus(uff));
+//        m_cappedU = getController(m_observer.getXhat().getStorage(), m_nextR.getStorage()
+//        .extractMatrix(0, 0, 5, 1).plus(uff));
 //
 //    }
 //

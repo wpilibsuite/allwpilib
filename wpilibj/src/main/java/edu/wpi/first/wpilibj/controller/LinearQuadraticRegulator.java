@@ -1,7 +1,11 @@
 package edu.wpi.first.wpilibj.controller;
 
 import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpiutil.math.*;
+import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.Num;
+import edu.wpi.first.wpiutil.math.StateSpaceUtils;
+import edu.wpi.first.wpiutil.math.Drake;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
@@ -76,7 +80,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    * @param relms     The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
    */
-  @SuppressWarnings("ParameterName, LocalVariableName")
+  @SuppressWarnings("ParameterName")
   public LinearQuadraticRegulator(
           Nat<S> states, Nat<I> inputs,
           Matrix<S, S> A, Matrix<S, I> B,
@@ -86,6 +90,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
     this.m_A = A;
     this.m_B = B;
 
+    @SuppressWarnings("LocalVariableName")
     var size = states.getNum() + inputs.getNum();
     var Mcont = new SimpleMatrix(0, 0);
     var scaledA = m_A.times(dtSeconds);
@@ -106,18 +111,14 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
     CommonOps_DDRM.extract(Mstate.getDDRM(), 0, states.getNum(), discB.getDDRM());
 
     // make the cost matrices
+    @SuppressWarnings("LocalVariableName")
     var Q = StateSpaceUtils.makeCostMatrix(states, qelms);
     var R = StateSpaceUtils.makeCostMatrix(inputs, relms);
 
     this.m_discB = new Matrix<>(discB);
     this.m_discA = new Matrix<>(discA);
 
-    @SuppressWarnings("LocalVariableName")
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q.getStorage(), R.getStorage());
-
-//        var temp = (m_discB.transpose().getStorage().mult(S).mult(discB)).plus(R.getStorage());
-//        m_K = new Matrix<>(
-//            StateSpaceUtils.lltDecompose(temp).solve(discB.transpose().mult(S).mult(discA)));
 
     m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert()
             .mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
@@ -146,6 +147,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
     this.m_A = A;
     this.m_B = B;
 
+    @SuppressWarnings("LocalVariableName")
     var size = states.getNum() + inputs.getNum();
     var Mcont = new SimpleMatrix(0, 0);
     var scaledA = m_A.times(dtSeconds);

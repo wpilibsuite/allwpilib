@@ -24,7 +24,7 @@ public class NumericalJacobian {
    * @param x        Vector argument.
    * @return The numerical Jacobian with respect to x for f(x, u, ...).
    */
-  @SuppressWarnings("ParameterName, LocalVariableName")
+  @SuppressWarnings("ParameterName")
   public static <R extends Num, C extends Num, S extends Num> Matrix<R, C> numericalJacobian(
           Nat<R> rows,
           Nat<C> cols,
@@ -38,6 +38,7 @@ public class NumericalJacobian {
       var dxMinus = x.copy();
       dxPlus.set(i, 0, dxPlus.get(i, 0) + kEpsilon);
       dxMinus.set(i, 0, dxMinus.get(i, 0) - kEpsilon);
+      @SuppressWarnings("LocalVariableName")
       var dF = f.apply(dxPlus).minus(f.apply(dxMinus)).div(2 * kEpsilon);
 
       result.getStorage().setColumn(i, 0, dF.getStorage().getDDRM().getData());
@@ -62,7 +63,7 @@ public class NumericalJacobian {
    */
   @SuppressWarnings("ParameterName")
   public static <R extends Num, S extends Num, I extends Num, D extends Num> Matrix<R, S>
-  numericalJacobianX(
+      numericalJacobianX(
           Nat<R> rows,
           Nat<S> states,
           BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<D, N1>> f,

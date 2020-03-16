@@ -19,7 +19,9 @@ import edu.wpi.first.wpiutil.math.numbers.N3;
  */
 public class LTVUnicycleController {
 
+  @SuppressWarnings("MemberName")
   private final Matrix<N2, N3> m_K0;
+  @SuppressWarnings("MemberName")
   private final Matrix<N2, N3> m_K1;
   Pose2d m_poseError;
   Pose2d m_poseTolerance;
@@ -36,6 +38,7 @@ public class LTVUnicycleController {
    *                  should apply on top of the trajectory feedforward.
    * @param dtSeconds The nominal dt of this controller. With command based this is 0.020.
    */
+  @SuppressWarnings("ParameterName")
   public LTVUnicycleController(Matrix<N3, N1> qElms, Matrix<N2, N1> rElms, double dtSeconds) {
 
     var a0 = new MatBuilder<>(Nat.N3(), Nat.N3()).fill(0, 0, 0, 0, 0, 1e-9, 0, 0, 0);
@@ -80,8 +83,8 @@ public class LTVUnicycleController {
 
   /**
    * Returns the next output of the controller.
-   * <p>
-   * The reference pose, linear velocity, and angular velocity should come
+   *
+   * <p>The reference pose, linear velocity, and angular velocity should come
    * from a {@link Trajectory}.
    *
    * @param currentPose                   The current position of the robot.
@@ -113,6 +116,7 @@ public class LTVUnicycleController {
             m_poseError.getTranslation().getY(),
             m_poseError.getRotation().getRadians());
 
+    @SuppressWarnings("LocalVariableName")
     var u = K.times(error);
 
     return new ChassisSpeeds(
