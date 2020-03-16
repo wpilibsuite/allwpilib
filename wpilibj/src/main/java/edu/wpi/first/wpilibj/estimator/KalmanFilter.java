@@ -1,5 +1,7 @@
 package edu.wpi.first.wpilibj.estimator;
 
+
+import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -241,7 +243,7 @@ public class KalmanFilter<S extends Num, I extends Num,
     // K^T = S^T.solve(CP^T)
     // K = (S^T.solve(CP^T))^T
 
-    SimpleMatrix K = StateSpaceUtils.lltDecompose(S.transpose().getStorage())
+    SimpleMatrix K = SimpleMatrixUtils.lltDecompose(S.transpose().getStorage())
             .solve((C.times(m_P.transpose())).getStorage()).transpose();
 
     m_plant.setX(x.plus(new Matrix<>(K.mult((y.minus(new Matrix<>(C.times(x).getStorage()

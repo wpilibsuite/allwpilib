@@ -3,6 +3,7 @@ package edu.wpi.first.wpilibj.estimator;
 import edu.wpi.first.wpilibj.geometry.*;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
@@ -117,7 +118,7 @@ public class ExtendedKalmanFilterTest {
       observer.correct(u, localY.plus(StateSpaceUtils.makeWhiteNoiseVector(Nat.N3(), whiteNoiseStdDevs)));
 
       Matrix<N5, N1> rdot = nextR.minus(r).div(dtSeconds);
-      u = new Matrix<>(StateSpaceUtils.householderQrDecompose(B.getStorage())
+      u = new Matrix<>(SimpleMatrixUtils.householderQrDecompose(B.getStorage())
               .solve(rdot.minus(getDynamics(r, MatrixUtils.zeros(Nat.N2(), Nat.N1()))).getStorage()));
 
       observer.predict(u, dtSeconds);

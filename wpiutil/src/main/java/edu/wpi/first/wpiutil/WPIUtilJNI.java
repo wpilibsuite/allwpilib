@@ -53,4 +53,28 @@ public final class WPIUtilJNI {
 
   public static native void addPortForwarder(int port, String remoteHost, int remotePort);
   public static native void removePortForwarder(int port);
+
+  /**
+   * Computes the matrix exp.
+   *
+   * @param src  Array of elements of the matrix to be exponentiated.
+   * @param rows how many rows there are.
+   * @param dst  Array where the result will be stored.
+   */
+  public static native void exp(double[] src, int rows, double[] dst);
+
+  /**
+   * Returns true if (A, B) is a stabilizable pair.
+   * <p>
+   * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
+   * any, have absolute values less than one, where an eigenvalue is
+   * uncontrollable if rank(lambda * I - A, B) &lt; n where n is number of states.
+   *
+   * @param states the number of states of the system.
+   * @param inputs the number of inputs to the system.
+   * @param A      System matrix.
+   * @param B      Input matrix.
+   * @return If the system is stabilizable.
+   */
+  public static native boolean isStabilizable(int states, int inputs, double[] A, double[] B);
 }

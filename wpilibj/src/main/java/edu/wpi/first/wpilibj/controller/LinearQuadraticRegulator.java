@@ -1,11 +1,8 @@
 package edu.wpi.first.wpilibj.controller;
 
+import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.Num;
-import edu.wpi.first.wpiutil.math.StateSpaceUtils;
-import edu.wpi.first.wpiutil.math.Drake;
+import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
@@ -230,7 +227,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
   public void update(Matrix<S, N1> x) {
     if (m_enabled) {
       m_u = m_K.times(m_r.minus(x))
-              .plus(new Matrix<>(StateSpaceUtils.householderQrDecompose(m_discB.getStorage())
+              .plus(new Matrix<>(SimpleMatrixUtils.householderQrDecompose(m_discB.getStorage())
                       .solve((m_r.minus(m_discA.times(m_r))).getStorage())));
     }
   }
@@ -246,7 +243,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
     if (m_enabled) {
       Matrix<S, N1> error = m_r.minus(x);
       Matrix<I, N1> feedBack = m_K.times(error);
-      Matrix<I, N1> feedForward = new Matrix<>(StateSpaceUtils.householderQrDecompose(
+      Matrix<I, N1> feedForward = new Matrix<>(SimpleMatrixUtils.householderQrDecompose(
               m_discB.getStorage())
               .solve((nextR.minus(m_discA.times(m_r))).getStorage()));
 

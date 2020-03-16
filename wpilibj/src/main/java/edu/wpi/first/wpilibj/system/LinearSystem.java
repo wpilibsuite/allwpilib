@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.system;
 
+import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpiutil.math.numbers.N1;

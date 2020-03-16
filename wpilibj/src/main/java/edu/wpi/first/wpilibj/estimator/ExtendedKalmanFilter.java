@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.estimator;
 
+import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpilibj.system.RungeKutta;
 import edu.wpi.first.wpiutil.math.*;
@@ -243,7 +244,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
     // K = (S^T.solve(CP^T))^T
     //
     // Now we have the optimal Kalman gain
-    final var K = new Matrix<S, Rows>(StateSpaceUtils.lltDecompose(S.transpose().getStorage()).solve(C.times(m_P.transpose()).getStorage()).transpose());
+    final var K = new Matrix<S, Rows>(SimpleMatrixUtils.lltDecompose(S.transpose().getStorage()).solve(C.times(m_P.transpose()).getStorage()).transpose());
 
     m_xHat = m_xHat.plus(K.times(y.minus(h.apply(m_xHat, u))));
     m_P = MatrixUtils.eye(m_states).minus(K.times(C)).times(m_P);
