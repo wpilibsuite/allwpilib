@@ -7,63 +7,73 @@
 
 #include <jni.h>
 
+#include <Eigen/Core>
+
 #include <iostream>
 
-#include <Eigen/Core>
 #include <unsupported/Eigen/MatrixFunctions>
 
 #include "drake/math/discrete_algebraic_riccati_equation.h"
-#include "edu_wpi_first_wpiutil_math_DrakeJNI.h"
+#include "edu_wpi_first_wpilibj_math_DrakeJNI.h"
 #include "wpi/jni_util.h"
 
 using namespace wpi::java;
 
 extern "C" {
 
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+    // Check to ensure the JNI version is valid
+
+    JNIEnv* env;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+        return JNI_ERR;
+
+    // In here is also where you store things like class references
+    // if they are ever needed
+
+    return JNI_VERSION_1_6;
+}
+
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {}
+
 /*
- * Class:     edu_wpi_first_wpiutil_math_DrakeJNI
+ * Class:     edu_wpi_first_wpilibj_math_DrakeJNI
  * Method:    discreteAlgebraicRiccatiEquation
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpiutil_math_DrakeJNI_discreteAlgebraicRiccatiEquation
+Java_edu_wpi_first_wpilibj_math_DrakeJNI_discreteAlgebraicRiccatiEquation
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Amat{env->GetDoubleArrayElements(A, nullptr), states, states};
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Bmat{env->GetDoubleArrayElements(B, nullptr), states, inputs};
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Qmat{env->GetDoubleArrayElements(Q, nullptr), states, states};
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Rmat{env->GetDoubleArrayElements(R, nullptr), inputs, inputs};
+
+  jdouble* nativeA = env->GetDoubleArrayElements(A, nullptr);
+  jdouble* nativeB = env->GetDoubleArrayElements(B, nullptr);
+  jdouble* nativeQ = env->GetDoubleArrayElements(Q, nullptr);
+  jdouble* nativeR = env->GetDoubleArrayElements(R, nullptr);
+
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                  Eigen::RowMajor>> Amat{nativeA,
+                                  states, states};
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                  Eigen::RowMajor>> Bmat{nativeB,                                
+                                  states, inputs};
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                  Eigen::RowMajor>> Qmat{nativeQ,                                
+                                  states, states};
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                  Eigen::RowMajor>> Rmat{nativeR,                                
+                                  inputs, inputs};
+
   Eigen::MatrixXd result =
       drake::math::DiscreteAlgebraicRiccatiEquation(Amat, Bmat, Qmat, Rmat);
 
+  env->ReleaseDoubleArrayElements(A, nativeA, 0);
+  env->ReleaseDoubleArrayElements(B, nativeB, 0);
+  env->ReleaseDoubleArrayElements(Q, nativeQ, 0);
+  env->ReleaseDoubleArrayElements(R, nativeR, 0);
+
   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
-}
-
-/*
- * Class:     edu_wpi_first_wpiutil_math_DrakeJNI
- * Method:    exp
- * Signature: ([DI[D)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpiutil_math_DrakeJNI_exp
-  (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
-{
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Amat{env->GetDoubleArrayElements(src, nullptr), rows, rows};
-
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp =
-      Amat.exp();
-  env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
 }
 
 }  // extern "C"
