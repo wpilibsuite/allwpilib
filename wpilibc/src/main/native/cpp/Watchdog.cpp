@@ -11,6 +11,7 @@
 #include <wpi/PriorityQueue.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/SmallString.h>
+
 #include "frc/DriverStation.h"
 
 using namespace frc;
@@ -55,11 +56,11 @@ void Watchdog::Thread::Main() {
           watchdog->m_lastTimeoutPrintTime = now;
           if (!watchdog->m_suppressTimeoutMessage) {
             wpi::SmallString<128> buf;
-+            wpi::raw_svector_ostream err(buf);
-+            err << "Watchdog not fed within "
-+                << wpi::format("%.6f", watchdog->m_timeout.count() / 1.0e9)
-+                << "s\n";
-+            frc::DriverStation::ReportWarning(err.str());
+            wpi::raw_svector_ostream err(buf);
+            err << "Watchdog not fed within "
+                << wpi::format("%.6f", watchdog->m_timeout.count() / 1.0e9)
+                << "s\n";
+            frc::DriverStation::ReportWarning(err.str());
           }
         }
 
@@ -142,11 +143,11 @@ void Watchdog::PrintEpochs() {
   if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
-       wpi::SmallString<128> buf;
-+      wpi::raw_svector_ostream err(buf);
-+      err << '\t' << epoch.getKey() + ": "
-+          << wpi::format("%.6f", epoch.getValue().count() / 1.0e6) << "s\n";
-+      frc::DriverStation::ReportWarning(err.str());
+      wpi::SmallString<128> buf;
+      wpi::raw_svector_ostream err(buf);
+      err << '\t' << epoch.getKey() + ": "
+         << wpi::format("%.6f", epoch.getValue().count() / 1.0e6) << "s\n";
+     frc::DriverStation::ReportWarning(err.str());
     }
   }
 }
