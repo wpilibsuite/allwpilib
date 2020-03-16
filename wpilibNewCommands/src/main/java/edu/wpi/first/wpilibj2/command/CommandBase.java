@@ -63,7 +63,7 @@ public abstract class CommandBase implements Sendable, Command {
   * @param name name
   * @return the decorated Command
   */
-  public Command withName(String name){
+  public Command withName(String name) {
     this.setName(name);
     return this;
   }
