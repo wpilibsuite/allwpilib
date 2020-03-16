@@ -1,6 +1,7 @@
 package edu.wpi.first.wpilibj.math;
 
 import edu.wpi.first.wpiutil.RuntimeLoader;
+import edu.wpi.first.wpiutil.math.DrakeJNI;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;

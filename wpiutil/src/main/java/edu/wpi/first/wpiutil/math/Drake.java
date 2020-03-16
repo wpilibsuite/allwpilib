@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.math;
 
+import edu.wpi.first.wpiutil.math.DrakeJNI;
 import edu.wpi.first.wpiutil.math.Matrix;
 import org.ejml.simple.SimpleMatrix;
 

@@ -1,8 +1,8 @@
 package edu.wpi.first.wpilibj.estimator;
 
-import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
+import edu.wpi.first.wpiutil.math.StateSpaceUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.simple.SimpleMatrix;
 
@@ -20,11 +20,11 @@ import org.ejml.simple.SimpleMatrix;
  * [1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic
  * Inference in Dynamic State-Space Models" (Doctoral dissertation)
  */
-public class MerweScaledSigmaPoints<States extends Num> {
+public class MerweScaledSigmaPoints<S extends Num> {
 
     private final double m_alpha;
     private final int m_kappa;
-    private final States m_states;
+    private final S m_states;
     private Matrix m_Wm;
     private Matrix m_Wc;
 
@@ -38,7 +38,7 @@ public class MerweScaledSigmaPoints<States extends Num> {
      *               For Gaussian distributions, beta = 2 is optimal.
      * @param kappa  Secondary scaling parameter usually set to 0 or 3 - States.
      */
-    public MerweScaledSigmaPoints(States states, double alpha, double beta, int kappa) {
+    public MerweScaledSigmaPoints(S states, double alpha, double beta, int kappa) {
         this.m_states = states;
         this.m_alpha = alpha;
         this.m_kappa = kappa;
@@ -46,7 +46,7 @@ public class MerweScaledSigmaPoints<States extends Num> {
         computeWeights(beta);
     }
 
-    public MerweScaledSigmaPoints(States states) {
+    public MerweScaledSigmaPoints(S states) {
         this(states, 1e-3, 2, 3 - states.getNum());
     }
 
@@ -70,8 +70,8 @@ public class MerweScaledSigmaPoints<States extends Num> {
      * Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
      */
     public Matrix sigmaPoints(
-            Matrix<States, N1> x,
-            Matrix<States, States> P) {
+            Matrix<S, N1> x,
+            Matrix<S, S> P) {
 
         double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
         int states = m_states.getNum();

@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.math;
+package edu.wpi.first.wpiutil.math;
 
 import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Nat;

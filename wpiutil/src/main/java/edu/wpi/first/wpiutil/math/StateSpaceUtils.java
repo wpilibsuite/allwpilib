@@ -1,5 +1,6 @@
-package edu.wpi.first.wpilibj.math;
+package edu.wpi.first.wpiutil.math;
 
+import edu.wpi.first.wpilibj.math.StateSpaceUtilsJNI;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
@@ -12,6 +13,7 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleMatrix;
 
+import javax.swing.plaf.nimbus.State;
 import java.util.Random;
 
 public class StateSpaceUtils {
@@ -130,7 +132,7 @@ public class StateSpaceUtils {
      * @param dtSeconds Discretization timestep.
      * @return a pair representing the discrete system matrix and process noise covariance matrix.
      */
-    public static <States extends Num> Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
+    public static <States extends Num> SimpleMatrixUtils.Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
             Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds
     ) {
 
@@ -159,7 +161,7 @@ public class StateSpaceUtils {
         // Make Q symmetric if it isn't already
         var discQ = (Q.plus(Q.transpose()).div(2.0));
 
-        return new Pair<>(discA, discQ);
+        return new SimpleMatrixUtils.Pair<>(discA, discQ);
     }
 
     /**
@@ -228,7 +230,7 @@ public class StateSpaceUtils {
      * @param discB     Storage for discrete input matrix.
      * @return a Pair representing discA and diskB.
      */
-    public static <States extends Num, Inputs extends Num> Pair<Matrix<States, States>, Matrix<States, Inputs>>
+    public static <States extends Num, Inputs extends Num> SimpleMatrixUtils.Pair<Matrix<States, States>, Matrix<States, Inputs>>
     discretizeAB(Nat<States> states, Nat<Inputs> inputs,
                  Matrix<States, States> contA,
                  Matrix<States, Inputs> contB,
@@ -258,7 +260,7 @@ public class StateSpaceUtils {
         CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, 0, discA.getStorage().getDDRM());
         CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, states.getNum(), discB.getStorage().getDDRM());
 
-        return new Pair<>(discA, discB);
+        return new SimpleMatrixUtils.Pair<>(discA, discB);
     }
 
     /**
@@ -464,24 +466,6 @@ public class StateSpaceUtils {
         SimpleMatrix toReturn = new SimpleMatrix(A.numRows(), A.numRows());
         StateSpaceUtilsJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
         return toReturn;
-    }
-
-    public static class Pair<A, B> {
-        private final A m_first;
-        private final B m_second;
-
-        Pair(A first, B second) {
-            m_first = first;
-            m_second = second;
-        }
-
-        public A getFirst() {
-            return m_first;
-        }
-
-        public B getSecond() {
-            return m_second;
-        }
     }
 
 }

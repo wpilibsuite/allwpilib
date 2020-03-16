@@ -1,34 +1,30 @@
 package edu.wpi.first.wpilibj.estimator;
 
 import edu.wpi.first.wpilibj.math.Drake;
-import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpilibj.system.RungeKuttaHelper;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.MatrixUtils;
-import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.Num;
+import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
 import java.util.function.BiFunction;
 
 
-public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
+public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
 
     private final boolean m_useRungeKutta;
 
-    private final Nat<States> m_states;
-    private final Nat<Inputs> m_inputs;
-    private final Nat<Outputs> m_outputs;
+    private final Nat<S> m_states;
+    private final Nat<I> m_inputs;
+    private final Nat<O> m_outputs;
 
-    private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> m_f;
-    private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> m_h;
-    private final Matrix<States, States> m_contQ;
-    private final Matrix<Outputs, Outputs> m_contR;
-    private final Matrix<Outputs, Outputs> m_discR;
-    private final Matrix<States, States> m_initP;
-    private Matrix<States, N1> m_xHat;
-    private Matrix<States, States> m_P;
+    private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> m_f;
+    private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> m_h;
+    private final Matrix<S, S> m_contQ;
+    private final Matrix<O, O> m_contR;
+    private final Matrix<O, O> m_discR;
+    private final Matrix<S, S> m_initP;
+    private Matrix<S, N1> m_xHat;
+    private Matrix<S, S> m_P;
 
     /**
      * Constructs an extended Kalman filter.
@@ -46,13 +42,13 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      * @param dtSeconds          Nominal discretization timestep.
      */
     public ExtendedKalmanFilter(
-            Nat<States> states,
-            Nat<Inputs> inputs,
-            Nat<Outputs> outputs,
-            BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-            BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
-            Matrix<States, N1> stateStdDevs,
-            Matrix<Outputs, N1> measurementStdDevs,
+            Nat<S> states,
+            Nat<I> inputs,
+            Nat<O> outputs,
+            BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> f,
+            BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> h,
+            Matrix<S, N1> stateStdDevs,
+            Matrix<O, N1> measurementStdDevs,
             boolean useRungeKutta,
             double dtSeconds
     ) {
@@ -93,7 +89,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      *
      * @return the error covariance matrix P.
      */
-    public Matrix<States, States> getP() {
+    public Matrix<S, S> getP() {
         return m_P;
     }
 
@@ -102,7 +98,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      *
      * @param newP The new value of P to use.
      */
-    public void setP(Matrix<States, States> newP) {
+    public void setP(Matrix<S, S> newP) {
         m_P = newP;
     }
 
@@ -122,7 +118,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      *
      * @return the state estimate x-hat.
      */
-    public Matrix<States, N1> getXhat() {
+    public Matrix<S, N1> getXhat() {
         return m_xHat;
     }
 
@@ -131,7 +127,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      *
      * @param xHat The state estimate x-hat.
      */
-    public void setXhat(Matrix<States, N1> xHat) {
+    public void setXhat(Matrix<S, N1> xHat) {
         m_xHat = xHat;
     }
 
@@ -166,7 +162,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      * @param u         New control input from controller.
      * @param dtSeconds Timestep for prediction.
      */
-    public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
+    public void predict(Matrix<I, N1> u, double dtSeconds) {
         predict(u, m_f, dtSeconds);
     }
 
@@ -178,8 +174,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      * @param dtSeconds Timestep for prediction.
      */
     public void predict(
-            Matrix<Inputs, N1> u, BiFunction<Matrix<States, N1>,
-            Matrix<Inputs, N1>, Matrix<States, N1>> f,
+            Matrix<I, N1> u, BiFunction<Matrix<S, N1>,
+            Matrix<I, N1>, Matrix<S, N1>> f,
             double dtSeconds
     ) {
         // Find continuous A
@@ -205,7 +201,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      * @param u Same control input used in the predict step.
      * @param y Measurement vector.
      */
-    public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
+    public void correct(Matrix<I, N1> u, Matrix<O, N1> y) {
         correct(m_outputs, u, y, m_h, m_discR);
     }
 
@@ -225,9 +221,9 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      * @param R      Discrete measurement noise covariance matrix.
      */
     public <Rows extends Num> void correct(
-            Nat<Rows> rows, Matrix<Inputs, N1> u,
+            Nat<Rows> rows, Matrix<I, N1> u,
             Matrix<Rows, N1> y,
-            BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Rows, N1>> h,
+            BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<Rows, N1>> h,
             Matrix<Rows, Rows> R
     ) {
         final var C = NumericalJacobian.numericalJacobianX(rows, m_states, h, m_xHat, u);
@@ -248,7 +244,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         // K = (S^T.solve(CP^T))^T
         //
         // Now we have the optimal Kalman gain
-        final var K = new Matrix<States, Rows>(StateSpaceUtils.lltDecompose(S.transpose().getStorage()).solve(C.times(m_P.transpose()).getStorage()).transpose());
+        final var K = new Matrix<S, Rows>(StateSpaceUtils.lltDecompose(S.transpose().getStorage()).solve(C.times(m_P.transpose()).getStorage()).transpose());
 
         m_xHat = m_xHat.plus(K.times(y.minus(h.apply(m_xHat, u))));
         m_P = MatrixUtils.eye(m_states).minus(K.times(C)).times(m_P);
