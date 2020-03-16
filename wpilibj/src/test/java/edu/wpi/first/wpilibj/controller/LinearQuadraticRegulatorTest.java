@@ -1,48 +1,38 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.estimator.KalmanFilter;
 import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpiutil.math.MatBuilder;
+import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.simple.SimpleMatrix;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class LinearQuadraticRegulatorTest {
+
     public static LinearSystem<N2, N1, N1> elevatorPlant = null;
     static LinearSystem<N2, N1, N1> armPlant = null;
 
-    @BeforeAll
-    public static void setUp() {
-        createElevator();
+    static {
         createArm();
+        createElevator();
     }
 
-    private static void createArm() {
+    public static void createArm() {
         var motors = DCMotor.getVex775Pro(2);
 
         var m = 4.0;
         var r = 0.4;
-        var J = 1d/3d * m * r * r;
+        var J = 1d / 3d * m * r * r;
         var G = 100.0;
 
         armPlant = LinearSystem.createSingleJointedArmSystem(motors, J, G, 12.0);
     }
 
-    private static void createElevator() {
+    public static void createElevator() {
         var motors = DCMotor.getVex775Pro(2);
 
         var m = 5.0;
@@ -54,9 +44,9 @@ public class LinearQuadraticRegulatorTest {
     @Test
     public void testLQROnElevator() {
 
-        var qElms = new Vector<N2>(new SimpleMatrix(2, 1));
+        var qElms = new Matrix<N2, N1>(new SimpleMatrix(2, 1));
         qElms.getStorage().setColumn(0, 0, 0.02, 0.4);
-        var rElms = new Vector<N1>(new SimpleMatrix(1, 1));
+        var rElms = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
         rElms.getStorage().setColumn(0, 0, 12.0);
         var dt = 0.00505;
 
@@ -66,8 +56,8 @@ public class LinearQuadraticRegulatorTest {
 
         var k = controller.getK();
 
-        Assertions.assertEquals(522.153, k.get(0,0), 0.1);
-        Assertions.assertEquals(38.2, k.get(0,1), 0.1);
+        Assert.assertEquals(522.153, k.get(0, 0), 0.1);
+        Assert.assertEquals(38.2, k.get(0, 1), 0.1);
     }
 
     @Test
@@ -89,17 +79,17 @@ public class LinearQuadraticRegulatorTest {
                 new MatBuilder<>(Nat.N1(), Nat.N1()).fill(12.0),
                 kDt);
 
-        Assertions.assertEquals(10.381, regulator.getK().get(0, 0), 1e-2);
-        Assertions.assertEquals(0.6929, regulator.getK().get(0, 1), 1e-2);
+        Assert.assertEquals(10.381, regulator.getK().get(0, 0), 1e-2);
+        Assert.assertEquals(0.6929, regulator.getK().get(0, 1), 1e-2);
 
     }
 
     @Test
     public void testLQROnArm() {
 
-        var qElms = new Vector<N2>(new SimpleMatrix(2, 1));
+        var qElms = new Matrix<N2, N1>(new SimpleMatrix(2, 1));
         qElms.getStorage().setColumn(0, 0, 0.01745, 0.08726);
-        var rElms = new Vector<N1>(new SimpleMatrix(1, 1));
+        var rElms = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
         rElms.getStorage().setColumn(0, 0, 12.0);
         var dt = 0.00505;
 
@@ -109,8 +99,8 @@ public class LinearQuadraticRegulatorTest {
 
         var k = controller.getK();
 
-        Assertions.assertEquals(19.16, k.get(0,0), 0.1);
-        Assertions.assertEquals(3.32, k.get(0,1), 0.1);
+        Assert.assertEquals(19.16, k.get(0, 0), 0.1);
+        Assert.assertEquals(3.32, k.get(0, 1), 0.1);
     }
 
 }
