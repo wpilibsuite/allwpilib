@@ -11,15 +11,12 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.simple.SimpleMatrix;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class LinearSystemLoopTest {
 
@@ -172,15 +169,15 @@ public class LinearSystemLoopTest {
         Matrix<N2, N1> references = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(2.0, 0.0);
         m_loop.setNextR(references);
 
-        Assert.assertEquals(0.0, m_loop.getXHat(0), 1e-6);
-        Assert.assertEquals(0.0, m_loop.getXHat(1), 1e-6);
+        assertEquals(0.0, m_loop.getXHat(0), 1e-6);
+        assertEquals(0.0, m_loop.getXHat(1), 1e-6);
 
         for (int i = 0; i < 100; i++) {
             updateTwoState(m_loop, 0.0);
         }
 
-        Assert.assertEquals(0.0, m_loop.getXHat(0), 1e-6);
-        Assert.assertEquals(0.0, m_loop.getXHat(1), 1e-6);
+        assertEquals(0.0, m_loop.getXHat(0), 1e-6);
+        assertEquals(0.0, m_loop.getXHat(1), 1e-6);
     }
 
 }

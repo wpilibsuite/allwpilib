@@ -1,6 +1,5 @@
 package edu.wpi.first.wpilibj.estimator;
 
-import edu.wpi.first.wpilibj.math.Drake;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpiutil.math.numbers.N1;

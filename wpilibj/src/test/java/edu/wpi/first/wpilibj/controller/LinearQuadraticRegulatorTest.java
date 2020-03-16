@@ -8,8 +8,9 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.simple.SimpleMatrix;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LinearQuadraticRegulatorTest {
 
@@ -56,8 +57,8 @@ public class LinearQuadraticRegulatorTest {
 
         var k = controller.getK();
 
-        Assert.assertEquals(522.153, k.get(0, 0), 0.1);
-        Assert.assertEquals(38.2, k.get(0, 1), 0.1);
+        assertEquals(522.153, k.get(0, 0), 0.1);
+        assertEquals(38.2, k.get(0, 1), 0.1);
     }
 
     @Test
@@ -79,8 +80,8 @@ public class LinearQuadraticRegulatorTest {
                 new MatBuilder<>(Nat.N1(), Nat.N1()).fill(12.0),
                 kDt);
 
-        Assert.assertEquals(10.381, regulator.getK().get(0, 0), 1e-2);
-        Assert.assertEquals(0.6929, regulator.getK().get(0, 1), 1e-2);
+        assertEquals(10.381, regulator.getK().get(0, 0), 1e-2);
+        assertEquals(0.6929, regulator.getK().get(0, 1), 1e-2);
 
     }
 
@@ -99,8 +100,8 @@ public class LinearQuadraticRegulatorTest {
 
         var k = controller.getK();
 
-        Assert.assertEquals(19.16, k.get(0, 0), 0.1);
-        Assert.assertEquals(3.32, k.get(0, 1), 0.1);
+        assertEquals(19.16, k.get(0, 0), 0.1);
+        assertEquals(3.32, k.get(0, 1), 0.1);
     }
 
 }

@@ -239,6 +239,13 @@ model {
             }
         }
     }
+    binaries {
+        all {
+            if (toolChain in VisualCpp) {
+                cppCompiler.args '/bigobj'
+            }
+        }
+    }
 }
 
 dependencies {

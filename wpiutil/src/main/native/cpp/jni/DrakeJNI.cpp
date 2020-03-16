@@ -14,7 +14,7 @@
 #include <unsupported/Eigen/MatrixFunctions>
 
 #include "drake/math/discrete_algebraic_riccati_equation.h"
-#include "edu_wpi_first_wpilibj_math_DrakeJNI.h"
+#include "edu_wpi_first_wpiutil_math_DrakeJNI.h"
 #include "wpi/jni_util.h"
 
 using namespace wpi::java;
@@ -37,12 +37,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {}
 
 /*
- * Class:     edu_wpi_first_wpilibj_math_DrakeJNI
+ * Class:     edu_wpi_first_wpiutil_math_DrakeJNI
  * Method:    discreteAlgebraicRiccatiEquation
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_math_DrakeJNI_discreteAlgebraicRiccatiEquation
+Java_edu_wpi_first_wpiutil_math_DrakeJNI_discreteAlgebraicRiccatiEquation
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {

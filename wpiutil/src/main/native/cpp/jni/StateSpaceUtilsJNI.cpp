@@ -7,7 +7,7 @@
 #include <unsupported/Eigen/MatrixFunctions>
 
 #include "drake/math/discrete_algebraic_riccati_equation.h"
-#include "edu_wpi_first_wpilibj_math_DrakeJNI.h"
+#include "edu_wpi_first_wpiutil_math_DrakeJNI.h"
 #include "wpi/jni_util.h"
 
 #include "frc/StateSpaceUtil.h"
@@ -42,12 +42,12 @@ bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpilibj_math_DrakeJNI
+ * Class:     edu_wpi_first_wpiutil_math_DrakeJNI
  * Method:    exp
  * Signature: ([DI[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_math_StateSpaceUtilsJNI_exp
+Java_edu_wpi_first_wpiutil_math_StateSpaceUtilsJNI_exp
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
 {
 
@@ -63,7 +63,7 @@ Java_edu_wpi_first_wpilibj_math_StateSpaceUtilsJNI_exp
 }
 
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_math_StateSpaceUtilsJNI_isStabilizable
+Java_edu_wpi_first_wpiutil_math_StateSpaceUtilsJNI_isStabilizable
  (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc, jdoubleArray bSrc) {
 
     jdouble* nativeA = env->GetDoubleArrayElements(aSrc, nullptr);

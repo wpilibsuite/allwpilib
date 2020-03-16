@@ -1,6 +1,5 @@
 package edu.wpi.first.wpilibj.estimator;
 
-import edu.wpi.first.wpilibj.math.Drake;
 import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpilibj.system.RungeKuttaHelper;
 import edu.wpi.first.wpiutil.math.*;

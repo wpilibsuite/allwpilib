@@ -83,10 +83,10 @@
 namespace drake {
 namespace internal {
 // Abort the program with an error message.
-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
+[[noreturn]]
 void Abort(const char* condition, const char* func, const char* file, int line);
 // Report an assertion failure; will either Abort(...) or throw.
-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
+[[noreturn]]
 void AssertionFailed(
     const char* condition, const char* func, const char* file, int line);
 }  // namespace internal

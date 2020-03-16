@@ -1,10 +1,5 @@
 package edu.wpi.first.wpiutil.math;
 
-import edu.wpi.first.wpilibj.math.StateSpaceUtilsJNI;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.Num;
-import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -13,7 +8,6 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleMatrix;
 
-import javax.swing.plaf.nimbus.State;
 import java.util.Random;
 
 public class StateSpaceUtils {
@@ -24,7 +18,7 @@ public class StateSpaceUtils {
      * <p>
      * Each element is squared and placed on the covariance matrix diagonal.
      *
-     * @param <States> Num representing the states of the system.
+     * @param <S> Num representing the states of the system.
      * @param states   A Nat representing the states of the system.
      * @param stdDevs  For a Q matrix, its elements are the standard deviations of
      *                 each state from how the model behaves. For an R matrix, its
@@ -32,10 +26,10 @@ public class StateSpaceUtils {
      *                 measurement.
      * @return Process noise or measurement noise covariance matrix.
      */
-    public static <States extends Num> Matrix<States, States> makeCovMatrix(
-            Nat<States> states, Matrix<States, N1> stdDevs
+    public static <S extends Num> Matrix<S, S> makeCovMatrix(
+            Nat<S> states, Matrix<S, N1> stdDevs
     ) {
-        var result = new Matrix<States, States>(new SimpleMatrix(states.getNum(), states.getNum()));
+        var result = new Matrix<S, S>(new SimpleMatrix(states.getNum(), states.getNum()));
         for (int i = 0; i < states.getNum(); i++) {
             result.set(i, i, Math.pow(stdDevs.get(i, 0), 2));
         }
@@ -68,15 +62,15 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous process noise
      * covariance matrix.
      *
-     * @param <States>  A Num representing the number of states.
+     * @param <S>  A Num representing the number of states.
      * @param states    A Nat representing the number of states.
      * @param A         The system matrix A.
      * @param Q         Continuous process noise covariance matrix.
      * @param dtSeconds Discretization timestep.
      * @return The discretized process noise covariance matrix.
      */
-    public static <States extends Num> Matrix<States, States> discretizeProcessNoiseCov(
-            Nat<States> states, Matrix<States, States> A, Matrix<States, States> Q, double dtSeconds) {
+    public static <S extends Num> Matrix<S, S> discretizeProcessNoiseCov(
+            Nat<S> states, Matrix<S, S> A, Matrix<S, S> Q, double dtSeconds) {
 
         var Mgain = new SimpleMatrix(0, 0);
 
@@ -90,8 +84,8 @@ public class StateSpaceUtils {
 
         // Phi12 = phi[0:States,        States:2*States]
         // Phi22 = phi[States:2*States, States:2*States]
-        Matrix<States, States> phi12 = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
-        Matrix<States, States> phi22 = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
+        Matrix<S, S> phi12 = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
+        Matrix<S, S> phi22 = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
         CommonOps_DDRM.extract(
                 phi.getDDRM(), 0, states.getNum(), states.getNum(), states.getNum(), phi12.getStorage().getDDRM()
         );
@@ -105,12 +99,12 @@ public class StateSpaceUtils {
     /**
      * Discretizes the given continuous A matrix.
      *
-     * @param <States>  Num representing the number of states.
+     * @param <S>  Num representing the number of states.
      * @param contA     Continuous system matrix.
      * @param dtSeconds Discretization timestep.
      * @return the discrete matrix system.
      */
-    public static <States extends Num> Matrix<States, States> discretizeA(Matrix<States, States> contA, double dtSeconds) {
+    public static <S extends Num> Matrix<S, S> discretizeA(Matrix<S, S> contA, double dtSeconds) {
         return exp((contA.times(dtSeconds)));
     }
 
@@ -126,24 +120,24 @@ public class StateSpaceUtils {
      * using a taylor series to several terms and still be substantially cheaper
      * than taking the big exponential.
      *
-     * @param <States>  Nat representing the number of states.
+     * @param <S>  Nat representing the number of states.
      * @param contA     Continuous system matrix.
      * @param contQ     Continuous process noise covariance matrix.
      * @param dtSeconds Discretization timestep.
      * @return a pair representing the discrete system matrix and process noise covariance matrix.
      */
-    public static <States extends Num> SimpleMatrixUtils.Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
-            Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds
+    public static <S extends Num> SimpleMatrixUtils.Pair<Matrix<S, S>, Matrix<S, S>> discretizeAQTaylor(
+            Matrix<S, S> contA, Matrix<S, S> contQ, double dtSeconds
     ) {
 
-        Matrix<States, States> Q = (contQ.plus(contQ.transpose())).div(2.0);
+        Matrix<S, S> Q = (contQ.plus(contQ.transpose())).div(2.0);
 
-        Matrix<States, States> lastTerm = Q.copy();
+        Matrix<S, S> lastTerm = Q.copy();
         double lastCoeff = dtSeconds;
 
         // A^T^n
-        Matrix<States, States> Atn = contA.transpose();
-        Matrix<States, States> phi12 = lastTerm.times(lastCoeff);
+        Matrix<S, S> Atn = contA.transpose();
+        Matrix<S, S> phi12 = lastTerm.times(lastCoeff);
 
         // i = 6 i.e. 6th order should be enough precision
         for (int i = 2; i < 6; ++i) {
@@ -168,12 +162,12 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous measurement noise
      * covariance matrix.
      *
-     * @param <Outputs> Nat representing the number of outputs.
+     * @param <O> Nat representing the number of outputs.
      * @param R         Continuous measurement noise covariance matrix.
      * @param dtSeconds Discretization timestep.
      * @return Discretized version of the provided continuous measurement noise covariance matrix.
      */
-    public static <Outputs extends Num> Matrix<Outputs, Outputs> discretizeR(Matrix<Outputs, Outputs> R, double dtSeconds) {
+    public static <O extends Num> Matrix<O, O> discretizeR(Matrix<O, O> R, double dtSeconds) {
         return R.div(dtSeconds);
     }
 
@@ -181,13 +175,13 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous measurement noise
      * covariance matrix.
      *
-     * @param <Outputs> Num representing the size of R.
+     * @param <O> Num representing the size of R.
      * @param R         Continuous measurement noise covariance matrix.
      * @param dtSeconds Discretization timestep.
      * @return A discretized version of the provided continuous measurement noise covariance matrix.
      */
-    public static <Outputs extends Num> Matrix<Outputs, Outputs> discretizeMeasurementNoiseCov(
-            Matrix<Outputs, Outputs> R, double dtSeconds) {
+    public static <O extends Num> Matrix<O, O> discretizeMeasurementNoiseCov(
+            Matrix<O, O> R, double dtSeconds) {
         return R.div(dtSeconds);
     }
 
@@ -197,7 +191,7 @@ public class StateSpaceUtils {
      * The cost matrix is constructed using Bryson's rule. The inverse square of
      * each element in the input is taken and placed on the cost matrix diagonal.
      *
-     * @param <States> Nat representing the states of the system.
+     * @param <S> Nat representing the states of the system.
      * @param states   a Nat representing the number of States in the system.
      * @param costs    An array. For a Q matrix, its elements are the maximum allowed
      *                 excursions of the states from the reference. For an R matrix,
@@ -205,7 +199,7 @@ public class StateSpaceUtils {
      *                 inputs from no actuation.
      * @return State excursion or control effort cost matrix.
      */
-    public static <States extends Num> Matrix<States, States> makeCostMatrix(Nat<States> states, Matrix<States, N1> costs) {
+    public static <S extends Num> Matrix<S, S> makeCostMatrix(Nat<S> states, Matrix<S, N1> costs) {
         var result = new SimpleMatrix(states.getNum(), states.getNum());
         result.fill(0.0);
 
@@ -219,8 +213,8 @@ public class StateSpaceUtils {
     /**
      * Discretizes the given continuous A and B matrices.
      *
-     * @param <States>  Nat representing the states of the system.
-     * @param <Inputs>  Nat representing the inputs to the system.
+     * @param <S>  Nat representing the states of the system.
+     * @param <I>  Nat representing the inputs to the system.
      * @param states    Num representing the states of the system.
      * @param inputs    Num representing the inputs to the system.
      * @param contA     Continuous system matrix.
@@ -230,13 +224,13 @@ public class StateSpaceUtils {
      * @param discB     Storage for discrete input matrix.
      * @return a Pair representing discA and diskB.
      */
-    public static <States extends Num, Inputs extends Num> SimpleMatrixUtils.Pair<Matrix<States, States>, Matrix<States, Inputs>>
-    discretizeAB(Nat<States> states, Nat<Inputs> inputs,
-                 Matrix<States, States> contA,
-                 Matrix<States, Inputs> contB,
+    public static <S extends Num, I extends Num> SimpleMatrixUtils.Pair<Matrix<S, S>, Matrix<S, I>>
+    discretizeAB(Nat<S> states, Nat<I> inputs,
+                 Matrix<S, S> contA,
+                 Matrix<S, I> contB,
                  double dtSeconds,
-                 Matrix<States, States> discA,
-                 Matrix<States, Inputs> discB) {
+                 Matrix<S, S> discA,
+                 Matrix<S, I> discB) {
 
         SimpleMatrix Mcont = new SimpleMatrix(0, 0);
         var scaledA = contA.times(dtSeconds);
