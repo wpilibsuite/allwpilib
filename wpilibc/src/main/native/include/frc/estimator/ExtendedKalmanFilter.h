@@ -91,6 +91,13 @@ class ExtendedKalmanFilter {
   double P(int i, int j) const { return m_P(i, j); }
 
   /**
+   * Set the current error covariance matrix P.
+   *
+   * @param P The error covariance matrix P.
+   */
+  void SetP(const Eigen::Matrix<double, States, States>& P) { m_P = P; }
+
+  /**
    * Returns the state estimate x-hat.
    */
   const Eigen::Matrix<double, States, 1>& Xhat() const { return m_xHat; }
