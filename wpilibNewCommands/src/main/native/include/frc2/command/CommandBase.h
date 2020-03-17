@@ -57,6 +57,15 @@ class CommandBase : public Command,
    * @return Name
    */
   std::string GetName() const override;
+  
+  /**
+   * Decorates this Command with a name.
+   * Is an inline function for setName()
+   *
+   * @param name The name of the command.
+   * @return The decorated command.
+   */
+  Command WithName(const wpi::Twine& name);
 
   /**
    * Gets the subsystem name of this Command.
