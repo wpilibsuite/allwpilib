@@ -57,7 +57,7 @@ class CommandBase : public Command,
    * @return Name
    */
   std::string GetName() const override;
-  
+
   /**
    * Decorates this Command with a name.
    * Is an inline function for setName()
