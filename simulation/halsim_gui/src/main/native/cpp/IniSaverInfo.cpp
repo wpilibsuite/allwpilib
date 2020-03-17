@@ -14,6 +14,14 @@
 
 using namespace halsimgui;
 
+void NameInfo::GetName(char* buf, size_t size, const char* defaultName) {
+  if (m_name[0] != '\0') {
+    std::snprintf(buf, size, "%s###Name%s", m_name, defaultName);
+  } else {
+    std::snprintf(buf, size, "%s###Name%s", defaultName, defaultName);
+  }
+}
+
 void NameInfo::GetName(char* buf, size_t size, const char* defaultName,
                        int index) {
   if (m_name[0] != '\0') {
@@ -52,9 +60,28 @@ void NameInfo::PushEditNameId(int index) {
   ImGui::PushID(id);
 }
 
+void NameInfo::PushEditNameId(const char* name) {
+  char id[128];
+  std::snprintf(id, sizeof(id), "Name%s", name);
+  ImGui::PushID(id);
+}
+
 void NameInfo::PopupEditName(int index) {
   char id[64];
   std::snprintf(id, sizeof(id), "Name%d", index);
+  if (ImGui::BeginPopupContextItem(id)) {
+    ImGui::Text("Edit name:");
+    if (ImGui::InputText("##edit", m_name, sizeof(m_name),
+                         ImGuiInputTextFlags_EnterReturnsTrue))
+      ImGui::CloseCurrentPopup();
+    if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
+    ImGui::EndPopup();
+  }
+}
+
+void NameInfo::PopupEditName(const char* name) {
+  char id[128];
+  std::snprintf(id, sizeof(id), "Name%s", name);
   if (ImGui::BeginPopupContextItem(id)) {
     ImGui::Text("Edit name:");
     if (ImGui::InputText("##edit", m_name, sizeof(m_name),
