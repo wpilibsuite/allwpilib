@@ -38,7 +38,7 @@ public class LTVUnicycleController {
    *                  should apply on top of the trajectory feedforward.
    * @param dtSeconds The nominal dt of this controller. With command based this is 0.020.
    */
-  @SuppressWarnings("ParameterName")
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LTVUnicycleController(Matrix<N3, N1> qElms, Matrix<N2, N1> rElms, double dtSeconds) {
 
     var a0 = new MatBuilder<>(Nat.N3(), Nat.N3()).fill(0, 0, 0, 0, 0, 1e-9, 0, 0, 0);
@@ -63,13 +63,13 @@ public class LTVUnicycleController {
    * @return If the robot is within the specified tolerance of the
    */
   public boolean atReference() {
-    var eTranslate = m_poseError.getTranslation();
-    var eRotate = m_poseError.getRotation();
+    var translationError = m_poseError.getTranslation();
+    var rotationError = m_poseError.getRotation();
     var tolTranslate = m_poseTolerance.getTranslation();
     var tolRotate = m_poseTolerance.getRotation();
-    return Math.abs(eTranslate.getX()) < tolTranslate.getX()
-            && Math.abs(eTranslate.getY()) < tolTranslate.getY()
-            && Math.abs(eRotate.getRadians()) < tolRotate.getRadians();
+    return Math.abs(translationError.getX()) < tolTranslate.getX()
+            && Math.abs(translationError.getY()) < tolTranslate.getY()
+            && Math.abs(rotationError.getRadians()) < tolRotate.getRadians();
   }
 
   /**
@@ -104,11 +104,10 @@ public class LTVUnicycleController {
     var ky1 = m_K1.get(0, 1);
     var ktheta1 = m_K1.get(0, 2);
 
-    var v = linearVelocityRefMetersPerSec;
-    var sqrtAbsV = Math.sqrt(Math.abs(v));
-    var K = new MatBuilder<>(Nat.N2(), Nat.N3())
+    var sqrtAbsV = Math.sqrt(Math.abs(linearVelocityRefMetersPerSec));
+    var gain = new MatBuilder<>(Nat.N2(), Nat.N3())
             .fill(kx, 0, 0, 0,
-                    (ky0 + (ky1 - ky0) * sqrtAbsV) * Math.signum(v),
+                    (ky0 + (ky1 - ky0) * sqrtAbsV) * Math.signum(linearVelocityRefMetersPerSec),
                     ktheta1 * sqrtAbsV);
 
     var error = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
@@ -117,7 +116,7 @@ public class LTVUnicycleController {
             m_poseError.getRotation().getRadians());
 
     @SuppressWarnings("LocalVariableName")
-    var u = K.times(error);
+    var u = gain.times(error);
 
     return new ChassisSpeeds(
             linearVelocityRefMetersPerSec + u.get(0, 0),

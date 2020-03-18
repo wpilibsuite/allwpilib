@@ -421,46 +421,46 @@ public class StateSpaceUtils {
           Matrix<S, S> A, Matrix<S, I> B
   ) {
 
-    int n = B.getNumRows();
-    var es = A.getStorage().eig();
-
-    for (int i = 0; i < n; i++) {
-      if (es.getEigenvalue(i).real * es.getEigenvalue(i).real
-              + es.getEigenvalue(i).imaginary * es.getEigenvalue(i).imaginary
-              < 1) {
-        continue;
-      }
-
-      var tempImag = new ZMatrixRMaj(n, n);
-      var aImag = new ZMatrixRMaj(A.getNumRows(), A.getNumCols());
-      CommonOps_ZDRM.convert(A.getStorage().getDDRM(), aImag);
-      CommonOps_ZDRM.convert(SimpleMatrix.identity(n).getDDRM(), tempImag);
-      CommonOps_ZDRM.scale(es.getEigenvalue(i).real, es.getEigenvalue(i).imaginary, tempImag);
-      CommonOps_ZDRM.subtract(tempImag, aImag, tempImag);
-      var concatonated = new ZMatrixRMaj(Math.max(tempImag.getNumRows(), B.getNumRows()),
-              tempImag.getNumCols() + B.getNumCols());
-
-      // concatenate
-      for (int col = 0; col < tempImag.numCols; col++) {
-        for (int row = 0; row < tempImag.numRows; row++) {
-          var imaginary = new Complex_F64();
-          tempImag.get(row, col, imaginary);
-          concatonated.set(row, col, true, imaginary.real, imaginary.imaginary);
-        }
-      }
-
-      for (int col = tempImag.numCols; col < concatonated.numCols; col++) {
-        for (int row = 0; row < aImag.numRows; row++) {
-          var imaginary = new Complex_F64();
-          aImag.get(row, col, imaginary);
-          concatonated.set(row, col, true, imaginary.real, imaginary.imaginary);
-        }
-      }
-
-      var eDecomp = new QRDecompositionHouseholderColumn_ZDRM();
-      var eDecompSuccess = eDecomp.decompose(concatonated);
-//      if (!eDecompSuccess || concatonated.)
-    }
+//    int n = B.getNumRows();
+//    var es = A.getStorage().eig();
+//
+//    for (int i = 0; i < n; i++) {
+//      if (es.getEigenvalue(i).real * es.getEigenvalue(i).real
+//              + es.getEigenvalue(i).imaginary * es.getEigenvalue(i).imaginary
+//              < 1) {
+//        continue;
+//      }
+//
+//      var tempImag = new ZMatrixRMaj(n, n);
+//      var aImag = new ZMatrixRMaj(A.getNumRows(), A.getNumCols());
+//      CommonOps_ZDRM.convert(A.getStorage().getDDRM(), aImag);
+//      CommonOps_ZDRM.convert(SimpleMatrix.identity(n).getDDRM(), tempImag);
+//      CommonOps_ZDRM.scale(es.getEigenvalue(i).real, es.getEigenvalue(i).imaginary, tempImag);
+//      CommonOps_ZDRM.subtract(tempImag, aImag, tempImag);
+//      var concatonated = new ZMatrixRMaj(Math.max(tempImag.getNumRows(), B.getNumRows()),
+//              tempImag.getNumCols() + B.getNumCols());
+//
+//      // concatenate
+//      for (int col = 0; col < tempImag.numCols; col++) {
+//        for (int row = 0; row < tempImag.numRows; row++) {
+//          var imaginary = new Complex_F64();
+//          tempImag.get(row, col, imaginary);
+//          concatonated.set(row, col, true, imaginary.real, imaginary.imaginary);
+//        }
+//      }
+//
+//      for (int col = tempImag.numCols; col < concatonated.numCols; col++) {
+//        for (int row = 0; row < aImag.numRows; row++) {
+//          var imaginary = new Complex_F64();
+//          aImag.get(row, col, imaginary);
+//          concatonated.set(row, col, true, imaginary.real, imaginary.imaginary);
+//        }
+//      }
+//
+//      var eDecomp = new QRDecompositionHouseholderColumn_ZDRM();
+//      var eDecompSuccess = eDecomp.decompose(concatonated);
+////      if (!eDecompSuccess || concatonated.)
+//    }
 
     return WPIUtilJNI.isStabilizable(A.getNumRows(), B.getNumCols(),
             A.getStorage().getDDRM().getData(), B.getStorage().getDDRM().getData());

@@ -144,29 +144,11 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
     this.m_A = A;
     this.m_B = B;
 
-    @SuppressWarnings("LocalVariableName")
-    var size = states.getNum() + inputs.getNum();
-    var Mcont = new SimpleMatrix(0, 0);
-    var scaledA = m_A.times(dtSeconds);
-    var scaledB = m_B.times(dtSeconds);
-    Mcont = Mcont.concatColumns(scaledA.getStorage());
-    Mcont = Mcont.concatColumns(scaledB.getStorage());
-    // so our Mcont is now states x (states + inputs)
-    // and we want (states + inputs) x (states + inputs)
-    // so we want to add (inputs) many rows onto the bottom
-    Mcont = Mcont.concatRows(new SimpleMatrix(inputs.getNum(), size));
-
-    // calculate discrete A and B matrices
-    @SuppressWarnings("LocalVariableName")
-    SimpleMatrix Mstate = StateSpaceUtils.exp(Mcont);
-
-    var discA = new SimpleMatrix(states.getNum(), states.getNum());
-    var discB = new SimpleMatrix(states.getNum(), inputs.getNum());
-    CommonOps_DDRM.extract(Mstate.getDDRM(), 0, 0, discA.getDDRM());
-    CommonOps_DDRM.extract(Mstate.getDDRM(), 0, states.getNum(), discB.getDDRM());
-
-    this.m_discB = new Matrix<>(discB);
-    this.m_discA = new Matrix<>(discA);
+    Matrix<S, S> discA = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
+    Matrix<S, I> discB = new Matrix<>(new SimpleMatrix(states.getNum(), inputs.getNum()));
+    StateSpaceUtils.discretizeAB(states, inputs, A, B, dtSeconds, discA, discB);
+    this.m_discA = discA;
+    this.m_discB = discB;
 
     m_K = k;
 

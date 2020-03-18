@@ -221,7 +221,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @param C      Output matrix.
    * @param r      Measurement noise covariance matrix.
    */
-  @SuppressWarnings("ParameterName")
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
           Matrix<I, N1> u,
           Matrix<R, N1> y,

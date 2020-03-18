@@ -399,7 +399,7 @@ public class LinearSystem<S extends Num, I extends Num,
    * @param u The input to clamp.
    * @return The clamped input.
    */
-  @SuppressWarnings("ParameterName, LocalVariableName")
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public Matrix<I, N1> clampInput(Matrix<I, N1> u) {
     var result = new Matrix<I, N1>(new SimpleMatrix(m_inputs.getNum(), 1));
     for (int i = 0; i < m_inputs.getNum(); i++) {
@@ -464,7 +464,8 @@ public class LinearSystem<S extends Num, I extends Num,
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(
                     -G * G * motor.m_KtNMPerAmp
                             / (motor.m_KvRadPerSecPerVolt * motor.m_rOhms * jKgSquaredMeters)),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(G * motor.m_KtNMPerAmp / (motor.m_rOhms * jKgSquaredMeters)),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(G * motor.m_KtNMPerAmp
+                    / (motor.m_rOhms * jKgSquaredMeters)),
             MatrixUtils.eye(Nat.N1()),
             MatrixUtils.zeros(Nat.N1()),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
@@ -491,7 +492,8 @@ public class LinearSystem<S extends Num, I extends Num,
             new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
                     0, -Math.pow(G, 2) * motor.m_KtNMPerAmp
                             / (motor.m_KvRadPerSecPerVolt * motor.m_rOhms * jKgSquaredMeters)),
-            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, G * motor.m_KtNMPerAmp / (motor.m_rOhms * jKgSquaredMeters)),
+            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, G * motor.m_KtNMPerAmp
+                    / (motor.m_rOhms * jKgSquaredMeters)),
             new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1, 0),
             MatrixUtils.zeros(Nat.N1()),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
@@ -508,7 +510,7 @@ public class LinearSystem<S extends Num, I extends Num,
    *                   be clamped to it.
    * @return A LinearSystem representing the given characterized constants.
    * @see <a href="https://github.com/wpilibsuite/frc-characterization">
-   *   https://github.com/wpilibsuite/frc-characterization</a>
+   * https://github.com/wpilibsuite/frc-characterization</a>
    */
   @SuppressWarnings("ParameterName")
   public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA,

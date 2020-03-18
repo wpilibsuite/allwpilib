@@ -9,15 +9,15 @@ import org.ejml.simple.SimpleMatrix;
 /**
  * Generates sigma points and weights according to Van der Merwe's 2004
  * dissertation[1] for the UnscentedKalmanFilter class.
- * <p>
- * It parametizes the sigma points using alpha, beta, kappa terms, and is the
+ *
+ * <p>It parametizes the sigma points using alpha, beta, kappa terms, and is the
  * version seen in most publications. Unless you know better, this should be
  * your default choice.
- * <p>
- * States is the dimensionality of the state. 2*States+1 weights will be
+ *
+ * <p>States is the dimensionality of the state. 2*States+1 weights will be
  * generated.
- * <p>
- * [1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic
+ *
+ * <p>[1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic
  * Inference in Dynamic State-Space Models" (Doctoral dissertation)
  */
 public class MerweScaledSigmaPoints<S extends Num> {
@@ -76,7 +76,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
     int states = m_states.getNum();
 
-    var intermediate = P.times(lambda + m_states.getNum()).getStorage();//.llt().matrixL();
+    var intermediate = P.times(lambda + m_states.getNum()).getStorage();
     var U = SimpleMatrixUtils.lltDecompose(intermediate);
 
     // 2 * states + 1 by states
@@ -99,6 +99,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
    *
    * @param beta Incorporates prior knowledge of the distribution of the mean.
    */
+  @SuppressWarnings("LocalVariableName")
   private void computeWeights(double beta) {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
 
@@ -127,11 +128,11 @@ public class MerweScaledSigmaPoints<S extends Num> {
   /**
    * Returns an element of the weight for each sigma point for the mean.
    *
-   * @param i Element of vector to return.
+   * @param element Element of vector to return.
    * @return the element i's weight for the mean.
    */
-  public double getWm(int i) {
-    return m_wm.get(0, i);
+  public double getWm(int element) {
+    return m_wm.get(0, element);
   }
 
   /**
@@ -146,11 +147,10 @@ public class MerweScaledSigmaPoints<S extends Num> {
   /**
    * Returns an element of the weight for each sigma point for the covariance.
    *
-   * @param i Element of vector to return.
+   * @param element Element of vector to return.
    * @return The element I's weight for the covariance.
    */
-  public double getWc(int i) {
-    return m_wc.get(0, i);
+  public double getWc(int element) {
+    return m_wc.get(0, element);
   }
-
 }
