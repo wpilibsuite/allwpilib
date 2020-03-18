@@ -440,7 +440,7 @@ public class StateSpaceUtils {
       var concatonated = new ZMatrixRMaj(Math.max(tempImag.getNumRows(), B.getNumRows()),
               tempImag.getNumCols() + B.getNumCols());
 
-      // concatonate
+      // concatenate
       for (int col = 0; col < tempImag.numCols; col++) {
         for (int row = 0; row < tempImag.numRows; row++) {
           var imaginary = new Complex_F64();
