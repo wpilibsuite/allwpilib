@@ -30,7 +30,8 @@ public class KalmanFilterTest {
 
   // A swerve drive system where the states are [x, y, theta, vx, vy, vTheta]^T,
   // Y is [x, y, theta]^T and u is [ax, ay, alpha}^T
-  LinearSystem<N6, N3, N3> swerveObserverSystem = new LinearSystem<>(Nat.N6(), Nat.N3(), Nat.N3(),
+  LinearSystem<N6, N3, N3> m_swerveObserverSystem = new LinearSystem<>(Nat.N6(), Nat.N3(),
+          Nat.N3(),
           new MatBuilder<>(Nat.N6(), Nat.N6()).fill( // A
                   0, 0, 0, 1, 0, 0,
                   0, 0, 0, 0, 1, 0,
@@ -56,6 +57,7 @@ public class KalmanFilterTest {
           new MatBuilder<>(Nat.N3(), Nat.N1()).fill(4, 4, 12));
 
   @Test
+  @SuppressWarnings("LocalVariableName")
   public void testElevatorKalmanFilter() {
     var plant = LinearQuadraticRegulatorTest.elevatorPlant;
 
@@ -74,11 +76,12 @@ public class KalmanFilterTest {
   public void testSwerveKFStationary() {
 
     var random = new Random();
-    swerveObserverSystem.reset();
+    m_swerveObserverSystem.reset();
 
     var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(), Nat.N3(),
-            swerveObserverSystem,
-            new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state weights
+            m_swerveObserverSystem,
+            new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state
+            // weights
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(2, 2, 2), // measurement weights
             0.020
     );
@@ -91,8 +94,7 @@ public class KalmanFilterTest {
     for (int i = 0; i < 100; i++) {
       // the robot is at [0, 0, 0] so we just park here
       var measurement = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
-              random.nextGaussian(), random.nextGaussian(), random.nextGaussian() // std dev of [1, 1, 1]
-      );
+              random.nextGaussian(), random.nextGaussian(), random.nextGaussian());
       filter.correct(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0), measurement);
 
       // we continue to not accelerate
@@ -111,19 +113,20 @@ public class KalmanFilterTest {
 //            new SwingWrapper<>(chart).displayChart();
 //            Thread.sleep(10000000);
 //        } catch (Exception ign) {}
-    assertEquals(0.0, swerveObserverSystem.getX(0), 0.3);
-    assertEquals(0.0, swerveObserverSystem.getX(0), 0.3);
+    assertEquals(0.0, m_swerveObserverSystem.getX(0), 0.3);
+    assertEquals(0.0, m_swerveObserverSystem.getX(0), 0.3);
   }
 
   @Test
   public void testSwerveKFMovingWithoutAccelerating() {
 
     var random = new Random();
-    swerveObserverSystem.reset();
+    m_swerveObserverSystem.reset();
 
     var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(), Nat.N3(),
-            swerveObserverSystem,
-            new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state weights
+            m_swerveObserverSystem,
+            new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state
+            // weights
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(4, 4, 4), // measurement weights
             0.020
     );
@@ -134,8 +137,8 @@ public class KalmanFilterTest {
     List<Double> measurementsY = new ArrayList<>();
 
     // we set the velocity of the robot so that it's moving forward slowly
-    swerveObserverSystem.setX(0, .5);
-    swerveObserverSystem.setX(1, .5);
+    m_swerveObserverSystem.setX(0, .5);
+    m_swerveObserverSystem.setX(1, .5);
 
     for (int i = 0; i < 300; i++) {
       // the robot is at [0, 0, 0] so we just park here
@@ -164,19 +167,21 @@ public class KalmanFilterTest {
 //            Thread.sleep(10000000);
 //        } catch (Exception ign) {}
 
-    assertEquals(0.0, swerveObserverSystem.getX(0), 0.2);
-    assertEquals(0.0, swerveObserverSystem.getX(1), 0.2);
+    assertEquals(0.0, m_swerveObserverSystem.getX(0), 0.2);
+    assertEquals(0.0, m_swerveObserverSystem.getX(1), 0.2);
   }
 
   @Test
+  @SuppressWarnings("LocalVariableName")
   public void testSwerveKFMovingOverTrajectory() {
 
     var random = new Random();
-    swerveObserverSystem.reset();
+    m_swerveObserverSystem.reset();
 
     var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(), Nat.N3(),
-            swerveObserverSystem,
-            new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state weights
+            m_swerveObserverSystem,
+            new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state
+            // weights
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(4, 4, 4), // measurement weights
             0.020
     );
@@ -200,7 +205,8 @@ public class KalmanFilterTest {
       var measurement = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
               sample.poseMeters.getTranslation().getX() + random.nextGaussian() / 5d,
               sample.poseMeters.getTranslation().getY() + random.nextGaussian() / 5d,
-              sample.poseMeters.getRotation().getRadians() + random.nextGaussian() / 3d // std dev of [1, 1, 1]
+              sample.poseMeters.getRotation().getRadians() + random.nextGaussian() / 3d // std
+              // dev of [1, 1, 1]
       );
 
       var velocity = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
@@ -228,12 +234,11 @@ public class KalmanFilterTest {
 //        try {
 ////            new SwingWrapper<>(chart).displayChart();
 ////            Thread.sleep(10000000);
-//        } catch (Exception ign) {
-//        }
+//        } catch (Exception ign) { }
 
-    assertEquals(trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getTranslation().getX(),
-            swerveObserverSystem.getX(0), 0.2);
-    assertEquals(trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getTranslation().getY(),
-            swerveObserverSystem.getX(1), 0.2);
+    assertEquals(trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters
+            .getTranslation().getX(), m_swerveObserverSystem.getX(0), 0.2);
+    assertEquals(trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters
+            .getTranslation().getY(), m_swerveObserverSystem.getX(1), 0.2);
   }
 }
