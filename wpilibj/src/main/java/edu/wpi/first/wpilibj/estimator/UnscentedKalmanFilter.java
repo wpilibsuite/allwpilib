@@ -51,44 +51,31 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
     reset();
   }
 
-  public static <S extends Num, CovDim extends Num> SimpleMatrixUtils.Pair<Matrix<N1, CovDim>, Matrix<CovDim, CovDim>> unscentedTransform(
+  @SuppressWarnings("ParameterName")
+  public static <S extends Num, CovDim extends Num>
+  SimpleMatrixUtils.Pair<Matrix<N1, CovDim>, Matrix<CovDim, CovDim>> unscentedTransform(
           S s, CovDim dim, Matrix sigmas, Matrix Wm, Matrix Wc, Matrix noiseCov
   ) {
-    if (sigmas.getNumCols() != 2 * s.getNum() + 1 || sigmas.getNumCols() != dim.getNum())
+    if (sigmas.getNumCols() != 2 * s.getNum() + 1 || sigmas.getNumCols() != dim.getNum()) {
       throw new IllegalArgumentException("Sigmas must be 2 * states + 1 by covDim! Got "
               + sigmas.getNumRows() + " by " + sigmas.getNumCols());
+    }
 
-    if (Wm.getNumRows() != 1 || Wm.getNumCols() != 2 * s.getNum() + 1)
+    if (Wm.getNumRows() != 1 || Wm.getNumCols() != 2 * s.getNum() + 1) {
       throw new IllegalArgumentException("Wm must be 1 by 2 * states + 1! Got "
               + Wm.getNumRows() + " by " + Wm.getNumCols());
+    }
 
-    if (Wc.getNumRows() != 1 || Wc.getNumCols() != 2 * s.getNum() + 1)
+    if (Wc.getNumRows() != 1 || Wc.getNumCols() != 2 * s.getNum() + 1) {
       throw new IllegalArgumentException("Wc must be 1 by 2 * states + 1! Got "
               + Wc.getNumRows() + " by " + Wc.getNumCols());
+    }
 
-    if (noiseCov.getNumRows() != dim.getNum() || noiseCov.getNumCols() != dim.getNum())
+    if (noiseCov.getNumRows() != dim.getNum() || noiseCov.getNumCols() != dim.getNum()) {
       throw new IllegalArgumentException("noiseCov must be covDim by covDim! Got "
               + noiseCov.getNumRows() + " by " + noiseCov.getNumCols());
+    }
 
-//        // new mean is just the sum of the sigmas * weight
-//        // dot = \Sigma^n_1 (W[k]*Xi[k])
-//        Matrix x = Wm.times(sigmas);
-//
-//        // new covariance is the sum of the outer product of the residuals
-//        // times the weights
-//        Matrix y = new Matrix(new SimpleMatrix(2 * s.getNum() + 1, dim.getNum()));
-//        for (int i = 0; i < 2 * s.getNum() + 1; ++i) {
-//            // set the block from i, 0 to i+1, covDim
-//
-//            y.template block<1, CovDim>(i, 0) =
-//            sigmas.template block<1, CovDim>(i, 0) - x;
-//        }
-//        Matrix<CovDim, CovDim> P =
-//                y.transpose() * Eigen::DiagonalMatrix<double, 2 * States + 1>(Wc) * y;
-//
-//        P += noiseCov;
-//
-//        return std::make_tuple(x, P);
     return null;
   }
 
@@ -140,43 +127,12 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    *          the measurement vector.
    * @param R Measurement noise covariance matrix.
    */
-  public void Correct(
+  public void correct(
           Matrix<I, N1> u,
           Matrix<O, N1> y,
           BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> h,
           Matrix<O, O> R) {
 
-//        // Transform sigma points into measurement space
-//        Eigen::Matrix<double, 2 * States + 1, Rows> sigmasH;
-//        for (int i = 0; i < m_pts.NumSigmas(); ++i) {
-//            sigmasH.template block<1, Rows>(i, 0) =
-//            h(m_sigmasF.template block<1, States>(i, 0).transpose(), u);
-//        }
-//
-//        // Mean and covariance of prediction passed through UT
-//        var ret = UnscentedTransform<States, Rows>(sigmasH, m_pts.Wm(), m_pts.Wc(), R);
-//        Eigen::Matrix<double, Rows, 1> yHat = std::get<0>(ret);
-//        Eigen::Matrix<double, Rows, Rows> Py = std::get<1>(ret);
-//
-//        // Compute cross covariance of the state and the measurements
-//        Eigen::Matrix<double, States, Rows> Pxy;
-//        Pxy.setZero();
-//        for (int i = 0; i < m_pts.NumSigmas(); ++i) {
-//            Pxy += m_pts.Wc(i) *
-//                    (m_sigmasF.template block<1, States>(i, 0) - m_xHat.transpose())
-//                 .transpose() *
-//                    (sigmasH.template block<1, Rows>(i, 0) - yHat.transpose());
-//        }
-
-//        // K = P_{xy} Py^-1
-//        // K^T = P_y^T^-1 P_{xy}^T
-//        // P_y^T K^T = P_{xy}^T
-//        // K^T = P_y^T.solve(P_{xy}^T)
-//        // K = (P_y^T.solve(P_{xy}^T)^T
-//        auto K = Py.transpose().ldlt().solve(Pxy.transpose()).transpose();
-//
-//        m_xHat += K * (y - yHat);
-//        m_P -= K * Py * K.transpose();
   }
 
 
