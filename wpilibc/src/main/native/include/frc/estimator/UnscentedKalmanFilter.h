@@ -138,7 +138,7 @@ class UnscentedKalmanFilter {
    */
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
                const Eigen::Matrix<double, Outputs, 1>& y) {
-    Correct(u, y, m_h, m_R);
+    Correct<Outputs>(u, y, m_h, m_R);
   }
 
   /**

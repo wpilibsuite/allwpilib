@@ -142,7 +142,7 @@ void DiscretizeAQTaylor(const Eigen::Matrix<double, States, States>& contA,
     Atn *= contA.transpose();
   }
 
-  DiscretizeA(contA, dt, discA);
+  DiscretizeA<States>(contA, dt, discA);
   Q = *discA * phi12;
 
   // Make discrete Q symmetric if it isn't already

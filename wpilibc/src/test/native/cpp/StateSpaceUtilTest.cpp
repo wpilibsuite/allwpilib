@@ -84,20 +84,24 @@ TEST(StateSpaceUtilTest, IsStabilizable) {
   // First eigenvalue is uncontrollable and unstable.
   // Second eigenvalue is controllable and stable.
   A << 1.2, 0, 0, 0.5;
-  EXPECT_FALSE(frc::IsStabilizable(A, B));
+  bool ret = frc::IsStabilizable<2, 1>(A, B);
+  EXPECT_FALSE(ret);
 
   // First eigenvalue is uncontrollable and marginally stable.
   // Second eigenvalue is controllable and stable.
   A << 1, 0, 0, 0.5;
-  EXPECT_FALSE(frc::IsStabilizable(A, B));
+  ret = frc::IsStabilizable<2, 1>(A, B);
+  EXPECT_FALSE(ret);
 
   // First eigenvalue is uncontrollable and stable.
   // Second eigenvalue is controllable and stable.
   A << 0.2, 0, 0, 0.5;
-  EXPECT_TRUE(frc::IsStabilizable(A, B));
+  ret = frc::IsStabilizable<2, 1>(A, B);
+  EXPECT_TRUE(ret);
 
   // First eigenvalue is uncontrollable and stable.
   // Second eigenvalue is controllable and unstable.
   A << 0.2, 0, 0, 1.2;
-  EXPECT_TRUE(frc::IsStabilizable(A, B));
+  ret = frc::IsStabilizable<2, 1>(A, B);
+  EXPECT_TRUE(ret);
 }

@@ -60,9 +60,9 @@ class KalmanFilter {
 
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor(plant.A(), m_contQ, dt, &discA, &discQ);
+    DiscretizeAQTaylor<States>(plant.A(), m_contQ, dt, &discA, &discQ);
 
-    m_discR = DiscretizeR(m_contR, dt);
+    m_discR = DiscretizeR<Outputs>(m_contR, dt);
 
     if (IsStabilizable<States, Outputs>(discA.transpose(),
                                         plant.C().transpose()) &&
@@ -142,10 +142,10 @@ class KalmanFilter {
 
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor(m_plant->A(), m_contQ, dt, &discA, &discQ);
+    DiscretizeAQTaylor<States>(m_plant->A(), m_contQ, dt, &discA, &discQ);
 
     m_P = discA * m_P * discA.transpose() + discQ;
-    m_discR = DiscretizeR(m_contR, dt);
+    m_discR = DiscretizeR<Outputs>(m_contR, dt);
   }
 
   /**
@@ -156,7 +156,7 @@ class KalmanFilter {
    */
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
                const Eigen::Matrix<double, Outputs, 1>& y) {
-    Correct(u, y, m_plant->C(), m_discR);
+    Correct<Outputs>(u, y, m_plant->C(), m_discR);
   }
 
   /**

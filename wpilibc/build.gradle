@@ -195,6 +195,9 @@ model {
             tasks.withType(CppCompile) {
                 dependsOn generateCppVersion
             }
+            if (toolChain in VisualCpp) {
+                cppCompiler.args '/bigobj'
+            }
         }
         withType(GoogleTestTestSuiteBinarySpec) {
             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
