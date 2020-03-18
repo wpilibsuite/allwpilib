@@ -26,11 +26,9 @@ public class LinearSystemLoop<S extends Num, I extends Num,
         O extends Num> {
 
   private final Nat<S> m_states;
-  private final Nat<I> m_inputs;
-  private final Nat<O> m_outputs;
-  private LinearSystem<S, I, O> m_plant;
-  private LinearQuadraticRegulator<S, I, O> m_controller;
-  private KalmanFilter<S, I, O> m_observer;
+  private final LinearSystem<S, I, O> m_plant;
+  private final LinearQuadraticRegulator<S, I, O> m_controller;
+  private final KalmanFilter<S, I, O> m_observer;
   private Matrix<S, N1> m_nextR;
 
   /**
@@ -38,20 +36,16 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * observer.
    *
    * @param states     Nat representing the states of the system.
-   * @param inputs     Nat representing the inputs to the system.
-   * @param outputs    Nat representing the outputs of the system.
    * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param observer   State-space observer.
    */
-  public LinearSystemLoop(Nat<S> states, Nat<I> inputs, Nat<O> outputs,
+  public LinearSystemLoop(Nat<S> states,
                           LinearSystem<S, I, O> plant,
                           LinearQuadraticRegulator<S, I, O> controller,
                           KalmanFilter<S, I, O> observer) {
 
     this.m_states = states;
-    this.m_inputs = inputs;
-    this.m_outputs = outputs;
     this.m_plant = plant;
     this.m_controller = controller;
     this.m_observer = observer;

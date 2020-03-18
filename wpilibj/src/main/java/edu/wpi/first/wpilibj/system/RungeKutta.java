@@ -8,7 +8,11 @@ import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 
-public class RungeKutta {
+public final class RungeKutta {
+
+  private RungeKutta() {
+    // utility Class
+  }
 
   /**
    * Performs Runge Kutta integration (4th order).

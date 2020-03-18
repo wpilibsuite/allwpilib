@@ -7,6 +7,7 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.simple.SimpleMatrix;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class LinearSystem<S extends Num, I extends Num,
         O extends Num> {
 

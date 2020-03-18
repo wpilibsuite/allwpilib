@@ -9,7 +9,12 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class NumericalJacobian {
+public final class NumericalJacobian {
+
+  private NumericalJacobian() {
+    // Utility Class.
+  }
+
   private static final double kEpsilon = 1e-5;
 
   /**

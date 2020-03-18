@@ -26,7 +26,10 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
   @SuppressWarnings("MemberName")
   private final Matrix<S, I> m_B;
 
-  private boolean m_enabled = false;
+  /**
+   * If the controller is enabled. Defaults to false.
+   */
+  private boolean m_enabled;
 
   /**
    * The current reference state.

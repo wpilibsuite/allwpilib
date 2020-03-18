@@ -41,7 +41,7 @@ public class LinearSystemLoopTest {
                 Nat.N2(), Nat.N1(),
                 plant, qElms, rElms, dt);
 
-        m_loop = new LinearSystemLoop<>(Nat.N2(), Nat.N1(), Nat.N1(), plant, controller, observer);
+        m_loop = new LinearSystemLoop<>(Nat.N2(), plant, controller, observer);
     }
 
     private static void updateTwoState(LinearSystemLoop<N2, N1, N1> loop, double noise) {
@@ -108,7 +108,7 @@ public class LinearSystemLoopTest {
                 Nat.N1(), Nat.N1(),
                 plant, qElms, rElms, kDt);
 
-        var loop = new LinearSystemLoop<>(Nat.N1(), Nat.N1(), Nat.N1(), plant, controller, observer);
+        var loop = new LinearSystemLoop<>(Nat.N1(), plant, controller, observer);
 
         loop.reset();
         loop.enable();

@@ -33,16 +33,6 @@ public class KalmanFilter<S extends Num, I extends Num,
    */
   private final Nat<S> m_states;
 
-  /**
-   * The inputs of the system.
-   */
-  private final Nat<I> m_inputs;
-
-  /**
-   * The outputs of the system.
-   */
-  private final Nat<O> m_outputs;
-
   private final LinearSystem<S, I, O> m_plant;
 
   /**
@@ -90,8 +80,6 @@ public class KalmanFilter<S extends Num, I extends Num,
           double dtSeconds
   ) {
     this.m_states = states;
-    this.m_inputs = inputs;
-    this.m_outputs = outputs;
 
     this.m_plant = plant;
 

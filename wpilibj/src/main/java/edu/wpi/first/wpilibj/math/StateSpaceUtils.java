@@ -6,16 +6,18 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-import org.ejml.data.Complex_F64;
-import org.ejml.data.ZMatrixRMaj;
+import org.ejml.MatrixDimensionException;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.ejml.dense.row.CommonOps_ZDRM;
-import org.ejml.dense.row.decompose.qr.QRDecompositionHouseholderColumn_ZDRM;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.Random;
 
-public class StateSpaceUtils {
+@SuppressWarnings("PMD.TooManyMethods")
+public final class StateSpaceUtils {
+
+  private StateSpaceUtils() {
+    // Utility class
+  }
 
   /**
    * Creates a covariance matrix from the given vector for use with Kalman
@@ -325,7 +327,7 @@ public class StateSpaceUtils {
      */
 
     if (A.numRows() != A.numCols()) {
-      throw new RuntimeException("A must be square to preform expm!");
+      throw new MatrixDimensionException("A must be square to preform expm!");
     }
 
     // constants for pade approximation
