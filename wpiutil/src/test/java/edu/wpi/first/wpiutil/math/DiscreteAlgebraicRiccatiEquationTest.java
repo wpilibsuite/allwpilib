@@ -47,17 +47,12 @@ public class DiscreteAlgebraicRiccatiEquationTest {
     R1 = new SimpleMatrix(m1, m1, true, new double[]{0.25});
     solveDAREandVerify(A1, B1, Q1, R1);
 
-    //  B2 << 0, 1;
-//  Q2 << 1, 0, 0, 0;
-//  R2 << 0.3;
-
     SimpleMatrix A2, B2, Q2, R2;
     A2 = new SimpleMatrix(2, 2, true, new double[]{1, 1, 0, 1});
     B2 = new SimpleMatrix(2, 1, true, new double[]{0, 1});
     Q2 = new SimpleMatrix(2, 2, true, new double[]{1, 0, 0, 0});
     R2 = new SimpleMatrix(1, 1, true, new double[]{0.3});
     solveDAREandVerify(A2, B2, Q2, R2);
-
 
   }
 }

@@ -21,30 +21,30 @@
 
 using namespace wpi::java;
 
-// bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
-//                         const Eigen::Ref<const Eigen::MatrixXd>& B) {
-//   // This function checks if (A,B) is a stabilizable pair.
-//   // (A,B) is stabilizable if and only if the uncontrollable eigenvalues of
-//   // A, if any, have absolute values less than one, where an eigenvalue is
-//   // uncontrollable if Rank[lambda * I - A, B] < n.
-//   int n = B.rows(), m = B.cols();
-//   Eigen::EigenSolver<Eigen::MatrixXd> es(A);
-//   for (int i = 0; i < n; i++) {
-//     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
-//         es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
-//         1)
-//       continue;
+bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
+                        const Eigen::Ref<const Eigen::MatrixXd>& B) {
+  // This function checks if (A,B) is a stabilizable pair.
+  // (A,B) is stabilizable if and only if the uncontrollable eigenvalues of
+  // A, if any, have absolute values less than one, where an eigenvalue is
+  // uncontrollable if Rank[lambda * I - A, B] < n.
+  int n = B.rows(), m = B.cols();
+  Eigen::EigenSolver<Eigen::MatrixXd> es(A);
+  for (int i = 0; i < n; i++) {
+    if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
+        es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
+        1)
+      continue;
 
-//     Eigen::MatrixXcd E(n, n + m);
-//     E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(n, n) - A, B;
-//     Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr(E);
-//     if(qr.rank() != n) {
-//       return false;
-//     }
-//   }
+    Eigen::MatrixXcd E(n, n + m);
+    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(n, n) - A, B;
+    Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr(E);
+    if(qr.rank() != n) {
+      return false;
+    }
+  }
 
-//   return true;
-// }
+  return true;
+}
 
 
 extern "C" {
@@ -126,30 +126,7 @@ Java_edu_wpi_first_wpiutil_WPIUtilJNI_isStabilizable
                                    Eigen::RowMajor>> B{nativeB,
                                    states, inputs};
 
-  // bool isStabilizable = check_stabilizable(A, B);
-  bool isStabilizable = false;
-
-  // This function checks if (A,B) is a stabilizable pair.
-  // (A,B) is stabilizable if and only if the uncontrollable eigenvalues of
-  // A, if any, have absolute values less than one, where an eigenvalue is
-  // uncontrollable if Rank[lambda * I - A, B] < n.
-  int n = B.rows(), m = B.cols();
-  Eigen::EigenSolver<Eigen::MatrixXd> es(A);
-  for (int i = 0; i < n; i++) {
-    if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
-        es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
-        1)
-      continue;
-
-    Eigen::MatrixXcd E(n, n + m);
-    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(n, n) - A, B;
-    Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr(E);
-    if(qr.rank() != n) {
-      isStabilizable = false;
-    }
-  }
-
-  isStabilizable = true;
+   bool isStabilizable = check_stabilizable(A, B);
 
   env->ReleaseDoubleArrayElements(aSrc, nativeA, 0);
   env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);

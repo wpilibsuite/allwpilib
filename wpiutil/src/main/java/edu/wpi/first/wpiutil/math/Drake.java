@@ -7,9 +7,14 @@
 
 package edu.wpi.first.wpiutil.math;
 
+import edu.wpi.first.wpiutil.RuntimeLoader;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
 import edu.wpi.first.wpiutil.math.DrakeJNI;
 import edu.wpi.first.wpiutil.math.Matrix;
 import org.ejml.simple.SimpleMatrix;
+
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class Drake {
     private Drake() {

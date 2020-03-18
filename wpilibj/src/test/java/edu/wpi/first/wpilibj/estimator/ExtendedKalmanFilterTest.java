@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 public class ExtendedKalmanFilterTest {
   public static Matrix<N5, N1> getDynamics(final Matrix<N5, N1> x, final Matrix<N2, N1> u) {
     final var motors = DCMotor.getCIM(2);
@@ -62,21 +64,24 @@ public class ExtendedKalmanFilterTest {
   public void testInit() {
     double dtSeconds = 0.00505;
 
-    ExtendedKalmanFilter<N5, N2, N3> observer = new ExtendedKalmanFilter<>(Nat.N5(), Nat.N2(), Nat.N3(),
-            UnscentedKalmanFilterTest::getDynamics, UnscentedKalmanFilterTest::getLocalMeasurementModel,
-            new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.5, 0.5, 10.0, 1.0, 1.0),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0001, 0.01, 0.01), true, dtSeconds);
+    assertDoesNotThrow(() -> {
+      ExtendedKalmanFilter<N5, N2, N3> observer = new ExtendedKalmanFilter<>(Nat.N5(), Nat.N2(), Nat.N3(),
+              UnscentedKalmanFilterTest::getDynamics, UnscentedKalmanFilterTest::getLocalMeasurementModel,
+              new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.5, 0.5, 10.0, 1.0, 1.0),
+              new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0001, 0.01, 0.01), true, dtSeconds);
 
-    Matrix<N2, N1> u = new MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(12.0, 12.0);
-    observer.predict(u, dtSeconds);
+      Matrix<N2, N1> u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0);
+      observer.predict(u, dtSeconds);
 
-    var localY = getLocalMeasurementModel(observer.getXhat(), u);
-    observer.correct(u, localY);
+      var localY = getLocalMeasurementModel(observer.getXhat(), u);
+      observer.correct(u, localY);
 
-    var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
-    var R = StateSpaceUtils.makeCostMatrix(Nat.N5(),
-            new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.01, 0.01, 0.0001, 0.5, 0.5));
-    observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
+      var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
+      var R = StateSpaceUtils.makeCostMatrix(Nat.N5(),
+              new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+      observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
+    });
+
   }
 
   @Test

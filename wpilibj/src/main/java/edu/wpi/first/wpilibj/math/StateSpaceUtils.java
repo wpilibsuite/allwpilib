@@ -7,14 +7,10 @@ import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.data.Complex_F64;
-import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.ZMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.CommonOps_ZDRM;
 import org.ejml.dense.row.decompose.qr.QRDecompositionHouseholderColumn_ZDRM;
-import org.ejml.dense.row.decomposition.qr.QRDecompositionHouseholder_DDRM;
-import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
-import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.Random;
@@ -50,18 +46,18 @@ public class StateSpaceUtils {
    * intensities for each element.
    *
    * @param <N>     Num representing the dimensionality of  the noise vector to create.
-   * @param n       A Nat representing the dimensionality of  the noise vector to create.
+   * @param rows    A Nat representing the dimensionality of  the noise vector to create.
    * @param stdDevs A matrix whose elements are the standard deviations of each
    *                element of the noise vector.
    * @return White noise vector.
    */
   public static <N extends Num> Matrix<N, N1> makeWhiteNoiseVector(
-          Nat<N> n, Matrix<N, N1> stdDevs
+          Nat<N> rows, Matrix<N, N1> stdDevs
   ) {
     var rand = new Random();
 
-    Matrix<N, N1> result = new Matrix<>(new SimpleMatrix(n.getNum(), 1));
-    for (int i = 0; i < n.getNum(); i++) {
+    Matrix<N, N1> result = new Matrix<>(new SimpleMatrix(rows.getNum(), 1));
+    for (int i = 0; i < rows.getNum(); i++) {
       result.set(i, 0, rand.nextGaussian() * stdDevs.get(i, 0));
     }
     return result;
@@ -78,28 +74,31 @@ public class StateSpaceUtils {
    * @param dtSeconds Discretization timestep.
    * @return The discretized process noise covariance matrix.
    */
+  @SuppressWarnings("ParameterName")
   public static <S extends Num> Matrix<S, S> discretizeProcessNoiseCov(
           Nat<S> states, Matrix<S, S> A, Matrix<S, S> Q, double dtSeconds) {
 
-    var Mgain = new SimpleMatrix(0, 0);
+    var gain = new SimpleMatrix(0, 0);
 
     // Set up the matrix M = [[-A, Q], [0, A.T]]
-    Mgain = Mgain.concatColumns(
-            (A.times(-1)).getStorage().concatRows(new SimpleMatrix(states.getNum(), states.getNum())),
-            Q.getStorage().concatRows(A.transpose().getStorage())
+    gain = gain.concatColumns(
+            (A.times(-1)).getStorage().concatRows(new SimpleMatrix(states.getNum(),
+                    states.getNum())), Q.getStorage().concatRows(A.transpose().getStorage())
     );
 
-    var phi = SimpleMatrixUtils.expm(Mgain.scale(dtSeconds));
+    var phi = SimpleMatrixUtils.expm(gain.scale(dtSeconds));
 
     // Phi12 = phi[0:States,        States:2*States]
     // Phi22 = phi[States:2*States, States:2*States]
     Matrix<S, S> phi12 = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
     Matrix<S, S> phi22 = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
     CommonOps_DDRM.extract(
-            phi.getDDRM(), 0, states.getNum(), states.getNum(), states.getNum(), phi12.getStorage().getDDRM()
+            phi.getDDRM(), 0, states.getNum(), states.getNum(), states.getNum(),
+            phi12.getStorage().getDDRM()
     );
     CommonOps_DDRM.extract(
-            phi.getDDRM(), states.getNum(), states.getNum(), states.getNum(), states.getNum(), phi22.getStorage().getDDRM()
+            phi.getDDRM(), states.getNum(), states.getNum(), states.getNum(), states.getNum(),
+            phi22.getStorage().getDDRM()
     );
 
     return phi22.transpose().times(phi12);
@@ -114,13 +113,13 @@ public class StateSpaceUtils {
    * @return the discrete matrix system.
    */
   public static <S extends Num> Matrix<S, S> discretizeA(Matrix<S, S> contA, double dtSeconds) {
-    return exp((contA.times(dtSeconds)));
+    return exp(contA.times(dtSeconds));
   }
 
   /**
    * Discretizes the given continuous A and Q matrices.
-   * <p>
-   * Rather than solving a 2N x 2N matrix exponential like in DiscretizeQ() (which
+   *
+   * <p>Rather than solving a 2N x 2N matrix exponential like in DiscretizeQ() (which
    * is expensive), we take advantage of the structure of the block matrix of A
    * and Q.
    *
@@ -135,11 +134,11 @@ public class StateSpaceUtils {
    * @param dtSeconds Discretization timestep.
    * @return a pair representing the discrete system matrix and process noise covariance matrix.
    */
-  public static <S extends Num> SimpleMatrixUtils.Pair<Matrix<S, S>, Matrix<S, S>> discretizeAQTaylor(
-          Matrix<S, S> contA, Matrix<S, S> contQ, double dtSeconds
-  ) {
-
+  @SuppressWarnings("LocalVariableName")
+  public static <S extends Num> SimpleMatrixUtils.Pair<Matrix<S, S>, Matrix<S, S>>
+  discretizeAQTaylor(Matrix<S, S> contA, Matrix<S, S> contQ, double dtSeconds) {
     Matrix<S, S> Q = (contQ.plus(contQ.transpose())).div(2.0);
+
 
     Matrix<S, S> lastTerm = Q.copy();
     double lastCoeff = dtSeconds;
@@ -423,7 +422,6 @@ public class StateSpaceUtils {
   ) {
 
     int n = B.getNumRows();
-    int m = B.getNumCols();
     var es = A.getStorage().eig();
 
     for (int i = 0; i < n; i++) {
@@ -470,8 +468,8 @@ public class StateSpaceUtils {
 
   /**
    * Returns true if (A, B) is a stabilizable pair.
-   * <p>
-   * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
+   *
+   *  <p>(A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
    * any, have absolute values less than one, where an eigenvalue is
    * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.
    *

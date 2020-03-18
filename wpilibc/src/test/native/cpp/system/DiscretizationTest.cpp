@@ -24,7 +24,7 @@ TEST(DiscretizationTest, DiscretizeA) {
   x0 << 1, 1;
   Eigen::Matrix<double, 2, 2> discA;
 
-  frc::DiscretizeA(contA, 1_s, &discA);
+  frc::DiscretizeA<2>(contA, 1_s, &discA);
   Eigen::Matrix<double, 2, 1> x1Discrete = discA * x0;
 
   // We now have pos = vel = 1 and accel = 0, which should give us:
@@ -51,7 +51,7 @@ TEST(DiscretizationTest, DiscretizeAB) {
   Eigen::Matrix<double, 2, 2> discA;
   Eigen::Matrix<double, 2, 1> discB;
 
-  frc::DiscretizeAB(contA, contB, 1_s, &discA, &discB);
+  frc::DiscretizeAB<2, 1>(contA, contB, 1_s, &discA, &discB);
   Eigen::Matrix<double, 2, 1> x1Discrete = discA * x0 + discB * u;
 
   // We now have pos = vel = accel = 1, which should give us:
@@ -86,7 +86,7 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
 
   Eigen::Matrix<double, 2, 2> discA;
   Eigen::Matrix<double, 2, 2> discQ;
-  frc::DiscretizeAQ(contA, contQ, dt, &discA, &discQ);
+  frc::DiscretizeAQ<2>(contA, contQ, dt, &discA, &discQ);
 
   EXPECT_LT((discQIntegrated - discQ).norm(), 1e-10)
       << "Expected these to be nearly equal:\ndiscQ:\n"
@@ -118,7 +118,7 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
 
   Eigen::Matrix<double, 2, 2> discA;
   Eigen::Matrix<double, 2, 2> discQ;
-  frc::DiscretizeAQ(contA, contQ, dt, &discA, &discQ);
+  frc::DiscretizeAQ<2>(contA, contQ, dt, &discA, &discQ);
 
   EXPECT_LT((discQIntegrated - discQ).norm(), 1e-3)
       << "Expected these to be nearly equal:\ndiscQ:\n"
@@ -161,8 +161,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
       },
       Eigen::Matrix<double, 2, 2>::Zero(), 0_s, dt);
 
-  frc::DiscretizeAB(contA, contB, dt, &discA, &discB);
-  frc::DiscretizeAQTaylor(contA, contQ, dt, &discATaylor, &discQTaylor);
+  frc::DiscretizeAB<2, 1>(contA, contB, dt, &discA, &discB);
+  frc::DiscretizeAQTaylor<2>(contA, contQ, dt, &discATaylor, &discQTaylor);
 
   EXPECT_LT((discQIntegrated - discQTaylor).norm(), 1e-10)
       << "Expected these to be nearly equal:\ndiscQTaylor:\n"
@@ -212,8 +212,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
       },
       Eigen::Matrix<double, 2, 2>::Zero(), 0_s, dt);
 
-  frc::DiscretizeAB(contA, contB, dt, &discA, &discB);
-  frc::DiscretizeAQTaylor(contA, contQ, dt, &discATaylor, &discQTaylor);
+  frc::DiscretizeAB<2, 1>(contA, contB, dt, &discA, &discB);
+  frc::DiscretizeAQTaylor<2>(contA, contQ, dt, &discATaylor, &discQTaylor);
 
   EXPECT_LT((discQIntegrated - discQTaylor).norm(), 1e-3)
       << "Expected these to be nearly equal:\ndiscQTaylor:\n"
@@ -236,7 +236,7 @@ TEST(DiscretizationTest, DiscretizeR) {
   Eigen::Matrix<double, 2, 2> discRTruth;
   discRTruth << 4.0, 0.0, 0.0, 2.0;
 
-  Eigen::Matrix<double, 2, 2> discR = frc::DiscretizeR(contR, 500_ms);
+  Eigen::Matrix<double, 2, 2> discR = frc::DiscretizeR<2>(contR, 500_ms);
 
   EXPECT_LT((discRTruth - discR).norm(), 1e-10)
       << "Expected these to be nearly equal:\ndiscR:\n"
