@@ -239,9 +239,9 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   }
 
   /**
-   * Turn Automatic mode on/off for all sensors. 
-   
-   * When in Automatic mode, all sensors will fire in round robin, waiting a set time between 
+   * Turn Automatic mode on/off for all sensors.
+
+   * When in Automatic mode, all sensors will fire in round robin, waiting a set time between
    * each sensor.
    *
    * @param enabling Set to true if round robin scheduling should start for all the ultrasonic
