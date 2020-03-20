@@ -1,0 +1,32 @@
+# Lines starting with '#' are comments.
+# Each line is a file pattern followed by one or more owners.
+
+# More details are here: https://help.github.com/articles/about-codeowners/
+
+# The '*' pattern is global owners.
+
+# Order is important. The last matching pattern has the most precedence.
+
+# The folders are ordered as follows:
+# In each subsection folders are ordered by depth.
+# This should make it easy to add new rules without breaking existing ones.
+
+# Global rule:
+*  @wpilibsuite/wpilib
+
+# cscore:
+/cscore/**  @wpilibsuite/camera-server
+
+# commands:
+/wpilibNewCommands/**  @wpilibsuite/commandbased
+/wpilibOldCommands/**  @wpilibsuite/commandbased
+
+# examples:
+/wpilibjExamples/**  @wpilibsuite/wpilib @wpilibsuite/documentation
+/wpilibcExamples/**  @wpilibsuite/wpilib @wpilibsuite/documentation
+
+# ntcore:
+/ntcore/**  @wpilibsuite/network-tables
+
+# simulation:
+/simulation/**  @wpilibsuite/simulation
