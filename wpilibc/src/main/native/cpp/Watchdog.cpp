@@ -9,8 +9,8 @@
 
 #include <wpi/Format.h>
 #include <wpi/PriorityQueue.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
 
@@ -149,8 +149,11 @@ void Watchdog::PrintEpochs() {
       wpi::SmallString<128> buf;
       wpi::raw_svector_ostream err(buf);
       err << '\t' << epoch.getKey() + ": "
-         << wpi::format("%.6f", duration_cast<microseconds>(epoch.getValue()).count() / 1.0e6) << "s\n";
-     frc::DriverStation::ReportWarning(err.str());
+          << wpi::format(
+                 "%.6f",
+                 duration_cast<microseconds>(epoch.getValue()).count() / 1.0e6)
+          << "s\n";
+      frc::DriverStation::ReportWarning(err.str());
     }
   }
 }
