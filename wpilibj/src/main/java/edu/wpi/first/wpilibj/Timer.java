@@ -85,12 +85,15 @@ public class Timer {
 
   /**
    * Reset the timer by setting the time to 0. Make the timer startTime the current time so new
-   * requests will be relative now
+   * requests will be relative now. Note that this method is a no-op if the timer is already
+   * running.
    */
   public void reset() {
     synchronized (m_lock) {
-      m_accumulatedTime = 0;
-      m_startTime = getMsClock();
+      if (!m_running) {
+        m_accumulatedTime = 0;
+        m_startTime = getMsClock();
+      }
     }
   }
 
