@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -340,7 +340,7 @@ public class DriverStation {
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was pressed since the last check.
    */
-  boolean getStickButtonPressed(final int stick, final int button) {
+  public boolean getStickButtonPressed(final int stick, final int button) {
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
@@ -379,7 +379,7 @@ public class DriverStation {
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was released since the last check.
    */
-  boolean getStickButtonReleased(final int stick, final int button) {
+  public boolean getStickButtonReleased(final int stick, final int button) {
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
