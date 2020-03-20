@@ -52,6 +52,11 @@ public class Timer {
   private double m_accumulatedTime;
   private boolean m_running;
 
+  /**
+   * Lock for synchronization.
+   */
+  private final Object m_lock = new Object();
+
   @SuppressWarnings("JavadocMethod")
   public Timer() {
     reset();
@@ -68,11 +73,13 @@ public class Timer {
    *
    * @return Current time value for this timer in seconds
    */
-  public synchronized double get() {
-    if (m_running) {
-      return m_accumulatedTime + (getMsClock() - m_startTime) / 1000.0;
-    } else {
-      return m_accumulatedTime;
+  public double get() {
+    synchronized (m_lock) {
+      if (m_running) {
+        return m_accumulatedTime + (getMsClock() - m_startTime) / 1000.0;
+      } else {
+        return m_accumulatedTime;
+      }
     }
   }
 
@@ -80,18 +87,22 @@ public class Timer {
    * Reset the timer by setting the time to 0. Make the timer startTime the current time so new
    * requests will be relative now
    */
-  public synchronized void reset() {
-    m_accumulatedTime = 0;
-    m_startTime = getMsClock();
+  public void reset() {
+    synchronized (m_lock) {
+      m_accumulatedTime = 0;
+      m_startTime = getMsClock();
+    }
   }
 
   /**
    * Start the timer running. Just set the running flag to true indicating that all time requests
    * should be relative to the system clock.
    */
-  public synchronized void start() {
-    m_startTime = getMsClock();
-    m_running = true;
+  public void start() {
+    synchronized (m_lock) {
+      m_startTime = getMsClock();
+      m_running = true;
+    }
   }
 
   /**
@@ -99,9 +110,11 @@ public class Timer {
    * subsequent time requests to be read from the accumulated time rather than looking at the system
    * clock.
    */
-  public synchronized void stop() {
-    m_accumulatedTime = get();
-    m_running = false;
+  public void stop() {
+    synchronized (m_lock) {
+      m_accumulatedTime = get();
+      m_running = false;
+    }
   }
 
   /**
@@ -110,8 +123,10 @@ public class Timer {
    * @param seconds The period to check.
    * @return Whether the period has passed.
    */
-  public synchronized boolean hasElapsed(double seconds) {
-    return get() > seconds;
+  public boolean hasElapsed(double seconds) {
+    synchronized (m_lock) {
+      return get() > seconds;
+    }
   }
 
   /**
@@ -122,7 +137,7 @@ public class Timer {
    * @param period The period to check for (in seconds).
    * @return Whether the period has passed.
    */
-  public synchronized boolean hasPeriodPassed(double period) {
+  public boolean hasPeriodPassed(double period) {
     return advanceIfElapsed(period);
   }
 
@@ -134,14 +149,16 @@ public class Timer {
    * @param seconds The period to check.
    * @return Whether the period has passed.
    */
-  public synchronized boolean advanceIfElapsed(double seconds) {
-    if (get() > seconds) {
-      // Advance the start time by the period.
-      // Don't set it to the current time... we want to avoid drift.
-      m_startTime += seconds * 1000;
-      return true;
-    } else {
-      return false;
+  public boolean advanceIfElapsed(double seconds) {
+    synchronized (m_lock) {
+      if (get() > seconds) {
+        // Advance the start time by the period.
+        // Don't set it to the current time... we want to avoid drift.
+        m_startTime += seconds * 1000;
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 }

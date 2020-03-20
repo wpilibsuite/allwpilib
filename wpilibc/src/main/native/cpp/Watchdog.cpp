@@ -139,6 +139,9 @@ void Watchdog::AddEpoch(wpi::StringRef epochName) {
 }
 
 void Watchdog::PrintEpochs() {
+  using std::chrono::duration_cast;
+  using std::chrono::microseconds;
+
   auto now = hal::fpga_clock::now();
   if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
     m_lastEpochsPrintTime = now;
@@ -146,7 +149,7 @@ void Watchdog::PrintEpochs() {
       wpi::SmallString<128> buf;
       wpi::raw_svector_ostream err(buf);
       err << '\t' << epoch.getKey() + ": "
-         << wpi::format("%.6f", epoch.getValue().count() / 1.0e6) << "s\n";
+         << wpi::format("%.6f", duration_cast<microseconds>(epoch.getValue()).count() / 1.0e6) << "s\n";
      frc::DriverStation::ReportWarning(err.str());
     }
   }
