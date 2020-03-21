@@ -85,26 +85,26 @@ public class Timer {
 
   /**
    * Reset the timer by setting the time to 0. Make the timer startTime the current time so new
-   * requests will be relative now. Note that this method is a no-op if the timer is already
-   * running.
+   * requests will be relative now.
    */
   public void reset() {
     synchronized (m_lock) {
-      if (!m_running) {
-        m_accumulatedTime = 0;
-        m_startTime = getMsClock();
-      }
+      m_accumulatedTime = 0;
+      m_startTime = getMsClock();
     }
   }
 
   /**
    * Start the timer running. Just set the running flag to true indicating that all time requests
-   * should be relative to the system clock.
+   * should be relative to the system clock. Note that this method is a no-op if the timer is already
+   * running.
    */
   public void start() {
     synchronized (m_lock) {
-      m_startTime = getMsClock();
-      m_running = true;
+      if (!m_running) {
+        m_startTime = getMsClock();
+        m_running = true;
+      }
     }
   }
 
