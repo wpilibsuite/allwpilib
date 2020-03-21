@@ -1,15 +1,20 @@
 package edu.wpi.first.wpilibj.estimator;
 
+import java.util.function.BiFunction;
+
 import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpilibj.system.RungeKutta;
-import edu.wpi.first.wpiutil.math.*;
+import edu.wpi.first.wpiutil.math.Drake;
+import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.MatrixUtils;
+import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.Num;
+import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
-import java.util.function.BiFunction;
-
-
-public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
+public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
+        implements KalmanTypeFilter<S, I, O> {
 
   private final boolean m_useRungeKutta;
 
@@ -40,9 +45,11 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
    *                           the measurement vector.
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param useRungeKutta      Whether or not to numerically integrate f; intended for situations where f is continous
+   * @param useRungeKutta      Whether or not to numerically integrate f; intended for situations
+   *                           where f is continous
    * @param dtSeconds          Nominal discretization timestep.
    */
+  @SuppressWarnings("ParameterName")
   public ExtendedKalmanFilter(
           Nat<S> states,
           Nat<I> inputs,
@@ -67,8 +74,10 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
     m_contQ = StateSpaceUtils.makeCovMatrix(states, stateStdDevs);
     var contR = StateSpaceUtils.makeCovMatrix(outputs, measurementStdDevs);
 
-    final var contA = NumericalJacobian.numericalJacobianX(states, states, f, m_xHat, MatrixUtils.zeros(inputs));
-    final var C = NumericalJacobian.numericalJacobianX(outputs, states, h, m_xHat, MatrixUtils.zeros(inputs));
+    final var contA = NumericalJacobian
+            .numericalJacobianX(states, states, f, m_xHat, MatrixUtils.zeros(inputs));
+    final var C = NumericalJacobian
+            .numericalJacobianX(outputs, states, h, m_xHat, MatrixUtils.zeros(inputs));
 
     final var discPair = StateSpaceUtils.discretizeAQTaylor(contA, m_contQ, dtSeconds);
     final var discA = discPair.getFirst();
@@ -92,17 +101,9 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
    *
    * @return the error covariance matrix P.
    */
+  @Override
   public Matrix<S, S> getP() {
     return m_P;
-  }
-
-  /**
-   * Sets the entire error covariance matrix P.
-   *
-   * @param newP The new value of P to use.
-   */
-  public void setP(Matrix<S, S> newP) {
-    m_P = newP;
   }
 
   /**
@@ -112,8 +113,19 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
    * @param col Column of P.
    * @return the value of the error covariance matrix P at (i, j).
    */
+  @Override
   public double getP(int row, int col) {
     return m_P.get(row, col);
+  }
+
+  /**
+   * Sets the entire error covariance matrix P.
+   *
+   * @param newP The new value of P to use.
+   */
+  @Override
+  public void setP(Matrix<S, S> newP) {
+    m_P = newP;
   }
 
   /**
@@ -121,18 +133,9 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
    *
    * @return the state estimate x-hat.
    */
+  @Override
   public Matrix<S, N1> getXhat() {
     return m_xHat;
-  }
-
-  /**
-   * Set initial state estimate x-hat.
-   *
-   * @param xHat The state estimate x-hat.
-   */
-  @SuppressWarnings("ParameterName")
-  public void setXhat(Matrix<S, N1> xHat) {
-    m_xHat = xHat;
   }
 
   /**
@@ -141,9 +144,22 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
    * @param row Row of x-hat.
    * @return the value of the state estimate x-hat at i.
    */
+  @Override
   public double getXhat(int row) {
     return m_xHat.get(row, 0);
   }
+
+  /**
+   * Set initial state estimate x-hat.
+   *
+   * @param xHat The state estimate x-hat.
+   */
+  @SuppressWarnings("ParameterName")
+  @Override
+  public void setXhat(Matrix<S, N1> xHat) {
+    m_xHat = xHat;
+  }
+
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -151,10 +167,12 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
    * @param row   Row of x-hat.
    * @param value Value for element of x-hat.
    */
+  @Override
   public void setXhat(int row, double value) {
     m_xHat.set(row, 0, value);
   }
 
+  @Override
   public void reset() {
     m_xHat = MatrixUtils.zeros(m_states);
     m_P = m_initP;
@@ -167,6 +185,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
    * @param dtSeconds Timestep for prediction.
    */
   @SuppressWarnings("ParameterName")
+  @Override
   public void predict(Matrix<I, N1> u, double dtSeconds) {
     predict(u, m_f, dtSeconds);
   }
@@ -208,6 +227,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num> {
    * @param y Measurement vector.
    */
   @SuppressWarnings("ParameterName")
+  @Override
   public void correct(Matrix<I, N1> u, Matrix<O, N1> y) {
     correct(m_outputs, u, y, m_h, m_discR);
   }

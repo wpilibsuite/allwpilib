@@ -1,10 +1,11 @@
 package edu.wpi.first.wpilibj.estimator;
 
+import org.ejml.simple.SimpleMatrix;
+
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * Generates sigma points and weights according to Van der Merwe's 2004
@@ -66,9 +67,10 @@ public class MerweScaledSigmaPoints<S extends Num> {
    * @param x An array of the means.
    * @param P Covariance of the filter.
    * @return Two dimensional array of sigma points. Each column contains all of
-   * the sigmas for one dimension in the problem space. Ordered by
-   * Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
+   *         the sigmas for one dimension in the problem space. Ordered by
+   *         Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    */
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public Matrix sigmaPoints(
           Matrix<S, N1> x,
           Matrix<S, S> P) {
