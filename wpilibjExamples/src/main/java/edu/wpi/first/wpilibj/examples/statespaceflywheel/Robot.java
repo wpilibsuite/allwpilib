@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpiutil.math.MatBuilder;
-import edu.wpi.first.wpiutil.math.MatrixUtils;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -51,16 +50,16 @@ public class Robot extends TimedRobot {
   private final KalmanFilter<N1, N1, N1> m_observer = new KalmanFilter<>(
           Nat.N1(), Nat.N1(),
           m_flywheelPlant,
-          new MatBuilder<>(Nat.N1(), Nat.N1()).fill(3.0), // How accurate we think our model is
-          new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.01), // How accurate we think our encoder
+          VecBuilder.fill(3.0), // How accurate we think our model is
+          VecBuilder.fill(0.01), // How accurate we think our encoder
           // data is
           0.020);
 
   // The LQR combines feedback and model-based feedforward to create voltage commands.
   private final LinearQuadraticRegulator<N1, N1, N1> m_controller
           = new LinearQuadraticRegulator<>(m_flywheelPlant,
-          new MatBuilder<>(Nat.N1(), Nat.N1()).fill(8.0), // Velocity error tolerance
-          new MatBuilder<>(Nat.N1(), Nat.N1()).fill(12.0), // Control effort (voltage) tolerance
+          VecBuilder.fill(8.0), // Velocity error tolerance
+          VecBuilder.fill(12.0), // Control effort (voltage) tolerance
           0.020);
 
   // The state-space loop combines a controller, observer and plant for easy control.
@@ -106,14 +105,14 @@ public class Robot extends TimedRobot {
     // PID controller.
     if (m_joystick.getTriggerPressed()) {
       // we just pressed the trigger, so let's set our next reference
-      m_loop.setNextR(new MatBuilder<>(Nat.N1(), Nat.N1()).fill(kSpinupRadPerSec));
+      m_loop.setNextR(VecBuilder.fill(kSpinupRadPerSec));
     } else if (m_joystick.getTriggerReleased()) {
       // we just released the trigger, so let's spin down
-      m_loop.setNextR(VecBuilder.fill(kSpinupRadPerSec));
+      m_loop.setNextR(VecBuilder.fill(0.0));
     }
 
     // Correct our filter's state vector estimate with encoder data.
-    m_loop.correct(new MatBuilder<>(Nat.N1(), Nat.N1()).fill(m_encoder.getRate()));
+    m_loop.correct(VecBuilder.fill(m_encoder.getRate()));
 
     // Update our LQR and predict our model out to the next timestemp.
     m_loop.predict(dt);

@@ -17,8 +17,6 @@ import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Nat;
 
 import org.junit.jupiter.api.Test;
-import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.XYChartBuilder;
 
 public class DifferentialDrivePoseEstimatorTest {
     @Test

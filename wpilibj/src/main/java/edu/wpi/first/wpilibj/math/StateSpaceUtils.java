@@ -202,7 +202,6 @@ public final class StateSpaceUtils {
    * each element in the input is taken and placed on the cost matrix diagonal.
    *
    * @param <S>    Nat representing the states of the system.
-   * @param states a Nat representing the number of States in the system.
    * @param costs  An array. For a Q matrix, its elements are the maximum allowed
    *               excursions of the states from the reference. For an R matrix,
    *               its elements are the maximum allowed excursions of the control

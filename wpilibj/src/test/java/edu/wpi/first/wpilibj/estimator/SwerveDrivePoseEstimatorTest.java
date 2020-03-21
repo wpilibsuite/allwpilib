@@ -12,13 +12,12 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Nat;
 import org.junit.jupiter.api.Test;
-import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.XYChartBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+@SuppressWarnings("CheckStyle")
 public class SwerveDrivePoseEstimatorTest {
     @Test
     public void testAccuracy() {
@@ -84,6 +83,7 @@ public class SwerveDrivePoseEstimatorTest {
             }
 
             var xHat = estimator.updateWithTime(
+                    t,
                     groundtruthState.poseMeters.getRotation().plus(new Rotation2d(rand.nextGaussian() * 0.001)),
                     moduleStates);
 
