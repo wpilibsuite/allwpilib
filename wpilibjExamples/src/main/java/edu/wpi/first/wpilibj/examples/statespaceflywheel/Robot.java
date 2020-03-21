@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.MatrixUtils;
 import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
 /**
@@ -63,7 +64,7 @@ public class Robot extends TimedRobot {
           0.020);
 
   // The state-space loop combines a controller, observer and plant for easy control.
-  private final LinearSystemLoop<N1, N1, N1> m_loop = new LinearSystemLoop<>(
+  private final LinearSystemLoop<N1, N1, N1> m_loop = new LinearSystemLoop<>(Nat.N1(),
           m_flywheelPlant,
           m_controller,
           m_observer);
@@ -108,7 +109,7 @@ public class Robot extends TimedRobot {
       m_loop.setNextR(new MatBuilder<>(Nat.N1(), Nat.N1()).fill(kSpinupRadPerSec));
     } else if (m_joystick.getTriggerReleased()) {
       // we just released the trigger, so let's spin down
-      m_loop.setNextR(MatrixUtils.zeros(Nat.N1()));
+      m_loop.setNextR(VecBuilder.fill(kSpinupRadPerSec));
     }
 
     // Correct our filter's state vector estimate with encoder data.

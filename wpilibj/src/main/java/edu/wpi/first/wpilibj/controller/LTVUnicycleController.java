@@ -46,11 +46,11 @@ public class LTVUnicycleController {
     var b = new MatBuilder<>(Nat.N3(), Nat.N2()).fill(1, 0, 0, 0, 0, 1);
 
     m_K0 = new LinearQuadraticRegulator<N3, N2, N2>(
-            Nat.N3(), Nat.N2(), a0, b, qElms, rElms, dtSeconds
+            a0, b, qElms, rElms, dtSeconds
     ).getK();
 
     m_K1 = new LinearQuadraticRegulator<N3, N2, N2>(
-            Nat.N3(), Nat.N2(), a1, b, qElms, rElms, dtSeconds
+            a1, b, qElms, rElms, dtSeconds
     ).getK();
   }
 

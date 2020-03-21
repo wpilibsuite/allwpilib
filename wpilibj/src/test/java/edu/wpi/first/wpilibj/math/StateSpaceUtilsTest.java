@@ -10,7 +10,7 @@ public class StateSpaceUtilsTest {
 
   @Test
   public void testCostArray() {
-    var mat = StateSpaceUtils.makeCostMatrix(Nat.N3(),
+    var mat = StateSpaceUtils.makeCostMatrix(
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(1.0, 2.0, 3.0));
 
     assertEquals(1.0, mat.get(0, 0), 1e-3);

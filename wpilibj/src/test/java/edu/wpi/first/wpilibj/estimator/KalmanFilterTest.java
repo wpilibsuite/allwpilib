@@ -64,7 +64,7 @@ public class KalmanFilterTest {
     var Q = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.05, 1.0);
     var R = new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.0001);
 
-    var filter = new KalmanFilter<>(Nat.N2(), Nat.N1(), Nat.N1(), plant, Q, R, kDt);
+    var filter = new KalmanFilter<>(Nat.N2(), Nat.N1(), plant, Q, R, kDt);
 
     var p = filter.getP();
     var gain = filter.getXhat();
@@ -78,7 +78,7 @@ public class KalmanFilterTest {
     var random = new Random();
     m_swerveObserverSystem.reset();
 
-    var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(), Nat.N3(),
+    var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(),
             m_swerveObserverSystem,
             new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state
             // weights
@@ -123,7 +123,7 @@ public class KalmanFilterTest {
     var random = new Random();
     m_swerveObserverSystem.reset();
 
-    var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(), Nat.N3(),
+    var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(),
             m_swerveObserverSystem,
             new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state
             // weights
@@ -178,7 +178,7 @@ public class KalmanFilterTest {
     var random = new Random();
     m_swerveObserverSystem.reset();
 
-    var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(), Nat.N3(),
+    var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(),
             m_swerveObserverSystem,
             new MatBuilder<>(Nat.N6(), Nat.N1()).fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1), // state
             // weights

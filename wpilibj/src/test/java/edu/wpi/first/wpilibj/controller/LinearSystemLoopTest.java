@@ -27,10 +27,11 @@ public class LinearSystemLoopTest {
   private static final Random random = new Random();
   private final LinearSystemLoop<N2, N1, N1> m_loop;
 
+  @SuppressWarnings("LocalVariableName")
   public LinearSystemLoopTest() {
     LinearSystem<N2, N1, N1> plant = LinearSystem.createElevatorSystem(DCMotor.getVex775Pro(2), 5,
             0.0181864, 1.0, 12.0);
-    KalmanFilter<N2, N1, N1> observer = new KalmanFilter<>(Nat.N2(), Nat.N1(), Nat.N1(), plant,
+    KalmanFilter<N2, N1, N1> observer = new KalmanFilter<>(Nat.N2(), Nat.N1(), plant,
             new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.05, 1.0),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.0001), kDt);
 
@@ -41,7 +42,6 @@ public class LinearSystemLoopTest {
     var dt = 0.00505;
 
     var controller = new LinearQuadraticRegulator<>(
-            Nat.N2(), Nat.N1(),
             plant, qElms, rElms, dt);
 
     m_loop = new LinearSystemLoop<>(Nat.N2(), plant, controller, observer);
@@ -103,7 +103,7 @@ public class LinearSystemLoopTest {
 
     LinearSystem<N1, N1, N1> plant = LinearSystem.createFlywheelSystem(DCMotor.getNEO(2),
             0.00289, 1.0, 12.0);
-    KalmanFilter<N1, N1, N1> observer = new KalmanFilter<>(Nat.N1(), Nat.N1(), Nat.N1(), plant,
+    KalmanFilter<N1, N1, N1> observer = new KalmanFilter<>(Nat.N1(), Nat.N1(), plant,
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.01), kDt);
 
@@ -111,7 +111,6 @@ public class LinearSystemLoopTest {
     var rElms = new MatBuilder<>(Nat.N1(), Nat.N1()).fill(12.0);
 
     var controller = new LinearQuadraticRegulator<>(
-            Nat.N1(), Nat.N1(),
             plant, qElms, rElms, kDt);
 
     var loop = new LinearSystemLoop<>(Nat.N1(), plant, controller, observer);
@@ -162,8 +161,7 @@ public class LinearSystemLoopTest {
 //            new SwingWrapper<>(bigChart).displayChart();
 //            new SwingWrapper<>(smolChart).displayChart();
 //            Thread.sleep(10000000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace(); }
+//        } catch (InterruptedException e) { e.printStackTrace(); }
 
     assertEquals(loop.getError(0), 0.0, 0.1);
   }

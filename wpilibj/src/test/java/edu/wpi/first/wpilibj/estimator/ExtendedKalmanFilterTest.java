@@ -77,7 +77,7 @@ public class ExtendedKalmanFilterTest {
       observer.correct(u, localY);
 
       var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
-      var R = StateSpaceUtils.makeCostMatrix(Nat.N5(),
+      var R = StateSpaceUtils.makeCostMatrix(
               new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.01, 0.01, 0.0001, 0.5, 0.5));
       observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
     });
@@ -135,7 +135,7 @@ public class ExtendedKalmanFilterTest {
     observer.correct(u, localY);
 
     var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
-    var R = StateSpaceUtils.makeCostMatrix(Nat.N5(),
+    var R = StateSpaceUtils.makeCostMatrix(
             new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
   }

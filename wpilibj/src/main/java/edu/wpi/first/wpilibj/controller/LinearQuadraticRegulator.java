@@ -58,68 +58,58 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param states    a Nat representing the number of states.
-   * @param inputs    a Nat representing the number of inputs.
    * @param plant     The plant being controlled.
    * @param qelms     The maximum desired error tolerance for each state.
    * @param relms     The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
    */
   public LinearQuadraticRegulator(
-          Nat<S> states, Nat<I> inputs,
           LinearSystem<S, I, O> plant,
           Matrix<S, N1> qelms,
           Matrix<I, N1> relms,
           double dtSeconds
   ) {
-    this(states, inputs, plant.getA(), plant.getB(), qelms, relms, dtSeconds);
+    this(plant.getA(), plant.getB(), qelms, relms, dtSeconds);
   }
 
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param states    a Nat representing the number of states.
-   * @param inputs    a Nat representing the number of inputs.
    * @param A         Continuous system matrix of the plant being controlled.
    * @param B         Continuous input matrix of the plant being controlled.
    * @param qelms     The maximum desired error tolerance for each state.
    * @param relms     The maximum desired control effort for each input.
    * @param dtSeconds Discretization timestep.
    */
-  @SuppressWarnings("ParameterName")
-  public LinearQuadraticRegulator(
-          Nat<S> states, Nat<I> inputs,
-          Matrix<S, S> A, Matrix<S, I> B,
-          Matrix<S, N1> qelms, Matrix<I, N1> relms,
-          double dtSeconds
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
+  public LinearQuadraticRegulator(Matrix<S, S> A, Matrix<S, I> B,
+                                  Matrix<S, N1> qelms, Matrix<I, N1> relms,
+                                  double dtSeconds
   ) {
     this.m_A = A;
     this.m_B = B;
 
-    @SuppressWarnings("LocalVariableName")
-    var size = states.getNum() + inputs.getNum();
     var Mcont = new SimpleMatrix(0, 0);
     var scaledA = m_A.times(dtSeconds);
     var scaledB = m_B.times(dtSeconds);
     Mcont = Mcont.concatColumns(scaledA.getStorage());
     Mcont = Mcont.concatColumns(scaledB.getStorage());
-    // so our Mcont is now states x (states + inputs)
+    // Mcont is now states x (states + inputs)
     // and we want (states + inputs) x (states + inputs)
-    // so we want to add (inputs) many rows onto the bottom
-    Mcont = Mcont.concatRows(new SimpleMatrix(inputs.getNum(), size));
+    // so we (inputs) many rows onto the bottom
+    Mcont = Mcont.concatRows(new SimpleMatrix(B.getNumCols(), B.getNumRows() + B.getNumCols()));
 
     // calculate discrete A and B matrices
     SimpleMatrix Mstate = StateSpaceUtils.exp(Mcont);
 
-    var discA = new SimpleMatrix(states.getNum(), states.getNum());
-    var discB = new SimpleMatrix(states.getNum(), inputs.getNum());
+    var discA = new SimpleMatrix(A.getNumRows(), A.getNumCols());
+    var discB = new SimpleMatrix(B.getNumRows(), B.getNumCols());
     CommonOps_DDRM.extract(Mstate.getDDRM(), 0, 0, discA.getDDRM());
-    CommonOps_DDRM.extract(Mstate.getDDRM(), 0, states.getNum(), discB.getDDRM());
+    CommonOps_DDRM.extract(Mstate.getDDRM(), 0, A.getNumCols(), discB.getDDRM());
 
     // make the cost matrices
-    @SuppressWarnings("LocalVariableName")
-    var Q = StateSpaceUtils.makeCostMatrix(states, qelms);
-    var R = StateSpaceUtils.makeCostMatrix(inputs, relms);
+    var Q = StateSpaceUtils.makeCostMatrix(qelms);
+    var R = StateSpaceUtils.makeCostMatrix(relms);
 
     this.m_discB = new Matrix<>(discB);
     this.m_discA = new Matrix<>(discA);

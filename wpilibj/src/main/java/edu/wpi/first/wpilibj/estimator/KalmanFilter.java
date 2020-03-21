@@ -65,7 +65,6 @@ public class KalmanFilter<S extends Num, I extends Num,
    * Constructs a state-space observer with the given plant.
    *
    * @param states             A Nat representing the states of the system.
-   * @param inputs             A Nat representing the inputs to the system.
    * @param outputs            A Nat representing the outputs of the system.
    * @param plant              The plant used for the prediction step.
    * @param stateStdDevs       Standard deviations of model states.
@@ -73,7 +72,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @param dtSeconds          Nominal discretization timestep.
    */
   public KalmanFilter(
-          Nat<S> states, Nat<I> inputs, Nat<O> outputs,
+          Nat<S> states, Nat<O> outputs,
           LinearSystem<S, I, O> plant,
           Matrix<S, N1> stateStdDevs,
           Matrix<O, N1> measurementStdDevs,

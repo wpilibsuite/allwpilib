@@ -1,12 +1,15 @@
 package edu.wpi.first.wpilibj.system;
 
+import org.ejml.MatrixDimensionException;
+import org.ejml.simple.SimpleMatrix;
+
 import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.estimator.KalmanFilter;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
+import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * Combines a plant, controller, and observer for controlling a mechanism with
@@ -35,16 +38,13 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * Constructs a state-space loop with the given plant, controller, and
    * observer.
    *
-   * @param states     Nat representing the states of the system.
    * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param observer   State-space observer.
    */
-  public LinearSystemLoop(Nat<S> states,
-                          LinearSystem<S, I, O> plant,
+  public LinearSystemLoop(Nat<S> states, LinearSystem<S, I, O> plant,
                           LinearQuadraticRegulator<S, I, O> controller,
                           KalmanFilter<S, I, O> observer) {
-
     this.m_states = states;
     this.m_plant = plant;
     this.m_controller = controller;
@@ -107,7 +107,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
   /**
    * Set an element of the initial state estimate x-hat.
    *
-   * @param row     Row of x-hat.
+   * @param row   Row of x-hat.
    * @param value Value for element of x-hat.
    */
   public void setXHat(int row, double value) {
@@ -140,6 +140,21 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    */
   public void setNextR(Matrix<S, N1> nextR) {
     m_nextR = nextR;
+  }
+
+  /**
+   * Set the next reference r.
+   *
+   * @param nextR Next reference.
+   */
+  public void setNextR(double... nextR) {
+    if (nextR.length != m_nextR.getNumRows()) {
+      throw new MatrixDimensionException(String.format("The next reference does not have the "
+                      + "correct number of entries! Expected %s, but got %s.",
+              m_nextR.getNumRows(),
+              nextR.length));
+    }
+    m_nextR = new Vector<>(m_states, nextR);
   }
 
   /**
@@ -196,7 +211,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
     m_plant.reset();
     m_controller.reset();
     m_observer.reset();
-    m_nextR = new Matrix<>(new SimpleMatrix(m_states.getNum(), 1));
+    m_nextR = new Matrix<>(new SimpleMatrix(m_nextR.getNumRows(), 1));
   }
 
   /**

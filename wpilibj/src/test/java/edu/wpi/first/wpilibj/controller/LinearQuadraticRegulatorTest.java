@@ -55,7 +55,6 @@ public class LinearQuadraticRegulatorTest {
     var dt = 0.00505;
 
     var controller = new LinearQuadraticRegulator<>(
-            N2.instance, N1.instance,
             elevatorPlant, qElms, rElms, dt);
 
     var k = controller.getK();
@@ -78,7 +77,7 @@ public class LinearQuadraticRegulatorTest {
     );
 
     var regulator = new LinearQuadraticRegulator<>(
-            Nat.N2(), Nat.N1(), plant,
+            plant,
             new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.1, 0.2),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(12.0),
             dt);
@@ -99,7 +98,6 @@ public class LinearQuadraticRegulatorTest {
     var dt = 0.00505;
 
     var controller = new LinearQuadraticRegulator<>(
-            N2.instance, N1.instance,
             armPlant, qElms, rElms, dt);
 
     var k = controller.getK();

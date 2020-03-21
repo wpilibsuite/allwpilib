@@ -451,7 +451,7 @@ public class LinearSystem<S extends Num, I extends Num,
    * Create a state-space model of a flywheel system.
    *
    * @param motor            The motor (or gearbox) attached to the arm.
-   * @param jKgSquaredMeters The momoent of inertia J of the flywheel.
+   * @param jKgMetersSquared The momoent of inertia J of the flywheel.
    * @param G                The reduction between motor and drum, as a ratio of output to input.
    * @param maxVoltage       The max voltage that can be applied. Inputs greater than this will
    *                         be clamped to it.
@@ -459,14 +459,14 @@ public class LinearSystem<S extends Num, I extends Num,
    */
   @SuppressWarnings("ParameterName")
   public static LinearSystem<N1, N1, N1> createFlywheelSystem(DCMotor motor,
-                                                              double jKgSquaredMeters,
+                                                              double jKgMetersSquared,
                                                               double G, double maxVoltage) {
     return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(
                     -G * G * motor.m_KtNMPerAmp
-                            / (motor.m_KvRadPerSecPerVolt * motor.m_rOhms * jKgSquaredMeters)),
+                            / (motor.m_KvRadPerSecPerVolt * motor.m_rOhms * jKgMetersSquared)),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(G * motor.m_KtNMPerAmp
-                    / (motor.m_rOhms * jKgSquaredMeters)),
+                    / (motor.m_rOhms * jKgMetersSquared)),
             MatrixUtils.eye(Nat.N1()),
             MatrixUtils.zeros(Nat.N1()),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),

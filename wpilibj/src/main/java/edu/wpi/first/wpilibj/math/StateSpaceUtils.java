@@ -209,11 +209,11 @@ public final class StateSpaceUtils {
    *               inputs from no actuation.
    * @return State excursion or control effort cost matrix.
    */
-  public static <S extends Num> Matrix<S, S> makeCostMatrix(Nat<S> states, Matrix<S, N1> costs) {
-    var result = new SimpleMatrix(states.getNum(), states.getNum());
+  public static <S extends Num> Matrix<S, S> makeCostMatrix(Matrix<S, N1> costs) {
+    var result = new SimpleMatrix(costs.getNumRows(), costs.getNumRows());
     result.fill(0.0);
 
-    for (int i = 0; i < states.getNum(); i++) {
+    for (int i = 0; i < costs.getNumRows(); i++) {
       result.set(i, i, 1.0 / (Math.pow(costs.get(i, 0), 2)));
     }
 
