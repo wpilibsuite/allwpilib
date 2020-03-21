@@ -4857,7 +4857,6 @@ using namespace angle;
 using namespace angular_velocity;
 using namespace capacitance;
 using namespace current;
-using namespace dimensionless;
 using namespace force;
 using namespace frequency;
 using namespace impedance;
