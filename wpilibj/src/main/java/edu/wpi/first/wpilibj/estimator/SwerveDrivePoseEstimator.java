@@ -72,7 +72,7 @@ public class SwerveDrivePoseEstimator {
                     Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY
             )
     );
-    m_observer = new KalmanFilter<>(Nat.N3(), Nat.N3(), Nat.N3(), observerSystem, stateStdDevs,
+    m_observer = new KalmanFilter<>(Nat.N3(), Nat.N3(), observerSystem, stateStdDevs,
             measurementStdDevs, nominalDtSeconds);
     m_kinematics = kinematics;
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
