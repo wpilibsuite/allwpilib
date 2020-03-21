@@ -85,7 +85,7 @@ public class Timer {
 
   /**
    * Reset the timer by setting the time to 0. Make the timer startTime the current time so new
-   * requests will be relative now.
+   * requests will be relative now
    */
   public void reset() {
     synchronized (m_lock) {
