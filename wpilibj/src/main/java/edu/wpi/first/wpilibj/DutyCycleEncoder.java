@@ -41,6 +41,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    */
   public DutyCycleEncoder(int channel) {
     m_digitalInput = new DigitalInput(channel);
+    m_ownsDutyCycle = true;
     m_dutyCycle = new DutyCycle(m_digitalInput);
     init();
   }
@@ -218,11 +219,11 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     if (m_analogTrigger != null) {
       m_analogTrigger.close();
     }
-    if (m_digitalInput != null) {
-      m_digitalInput.close();
-    }
     if (m_ownsDutyCycle) {
       m_dutyCycle.close();
+    }
+    if (m_digitalInput != null) {
+      m_digitalInput.close();
     }
     if (m_simDevice != null) {
       m_simDevice.close();
