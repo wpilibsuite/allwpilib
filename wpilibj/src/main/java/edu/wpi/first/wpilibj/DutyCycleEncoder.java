@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private final DutyCycle m_dutyCycle;
   private boolean m_ownsDutyCycle;
+  private DigitalInput m_digitalInput;
   private AnalogTrigger m_analogTrigger;
   private Counter m_counter;
   private int m_frequencyThreshold = 100;
@@ -39,7 +40,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    * @param channel the channel to attach to
    */
   public DutyCycleEncoder(int channel) {
-    m_dutyCycle = new DutyCycle(new DigitalInput(channel));
+    m_digitalInput = new DigitalInput(channel);
+    m_dutyCycle = new DutyCycle(m_digitalInput);
     init();
   }
 
@@ -215,6 +217,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     }
     if (m_analogTrigger != null) {
       m_analogTrigger.close();
+    }
+    if (m_digitalInput != null) {
+      m_digitalInput.close();
     }
     if (m_ownsDutyCycle) {
       m_dutyCycle.close();
