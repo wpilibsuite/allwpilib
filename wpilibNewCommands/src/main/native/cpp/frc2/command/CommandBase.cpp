@@ -37,6 +37,11 @@ void CommandBase::SetName(const wpi::Twine& name) {
   frc::SendableRegistry::GetInstance().SetName(this, name);
 }
 
+Command CommandBase::WithName(const wpi::Twine& name) {
+  SetName(name);
+  return *this;
+}
+
 std::string CommandBase::GetName() const {
   return frc::SendableRegistry::GetInstance().GetName(this);
 }
