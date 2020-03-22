@@ -113,7 +113,7 @@ void Preferences::PutLong(wpi::StringRef key, int64_t value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutLong(wpi::StringRef key, int64_t value) {
+void Preferences::InitLong(wpi::StringRef key, int64_t value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
