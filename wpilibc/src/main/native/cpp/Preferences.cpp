@@ -59,9 +59,8 @@ void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
 }
 
 void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
-  if (!ContainsKey(key)) {
-    PutString(key, value);
-  }
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultString(value);
 }
 
 void Preferences::PutInt(wpi::StringRef key, int value) {
@@ -71,9 +70,8 @@ void Preferences::PutInt(wpi::StringRef key, int value) {
 }
 
 void Preferences::InitInt(wpi::StringRef key, int value) {
-  if (!ContainsKey(key)) {
-    PutInt(key, value);
-  }
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultDouble(value);
 }
 
 void Preferences::PutDouble(wpi::StringRef key, double value) {
@@ -83,9 +81,8 @@ void Preferences::PutDouble(wpi::StringRef key, double value) {
 }
 
 void Preferences::InitDouble(wpi::StringRef key, double value) {
-  if (!ContainsKey(key)) {
-    PutDouble(key, value);
-  }
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultDobule(value);
 }
 
 void Preferences::PutFloat(wpi::StringRef key, float value) {
@@ -95,9 +92,8 @@ void Preferences::PutFloat(wpi::StringRef key, float value) {
 }
 
 void Preferences::InitFloat(wpi::StringRef key, float value) {
-  if (!ContainsKey(key)) {
-    PutFloat(key, value);
-  }
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultDouble(value);
 }
 
 void Preferences::PutBoolean(wpi::StringRef key, bool value) {
@@ -107,9 +103,8 @@ void Preferences::PutBoolean(wpi::StringRef key, bool value) {
 }
 
 void Preferences::InitBoolean(wpi::StringRef key, bool value) {
-  if (!ContainsKey(key)) {
-    PutBoolean(key, value);
-  }
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultBoolean(value);
 }
 
 void Preferences::PutLong(wpi::StringRef key, int64_t value) {
@@ -119,9 +114,8 @@ void Preferences::PutLong(wpi::StringRef key, int64_t value) {
 }
 
 void Preferences::PutLong(wpi::StringRef key, int64_t value) {
-  if (!ContainsKey(key)) {
-    PutLong(key, value);
-  }
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultDouble(value);
 }
 
 bool Preferences::ContainsKey(wpi::StringRef key) {

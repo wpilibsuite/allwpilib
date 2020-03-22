@@ -101,9 +101,8 @@ public final class Preferences {
    * @param value The value
    */
   public void initString(String key, String value) {
-    if (!containsKey(key)) {
-      putString(key, value);
-    }
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultString(value);
   }
 
   /**
@@ -125,9 +124,8 @@ public final class Preferences {
    * @param value The value
    */
   public void initInt(String key, int value) {
-    if (!containsKey(key)) {
-      putInt(key, value);
-    }
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultDouble(value);
   }
 
   /**
@@ -149,9 +147,8 @@ public final class Preferences {
    * @param value The value
    */
   public void initDouble(String key, double value) {
-    if (!containsKey(key)) {
-      putDouble(key, value);
-    }
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultDouble(value);
   }
 
   /**
@@ -173,9 +170,8 @@ public final class Preferences {
    * @param value The value
    */
   public void initFloat(String key, float value) {
-    if (!containsKey(key)) {
-      putFloat(key, value);
-    }
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultDouble(value);
   }
 
   /**
@@ -197,9 +193,8 @@ public final class Preferences {
    * @param value The value
    */
   public void initBoolean(String key, boolean value) {
-    if (!containsKey(key)) {
-      putBoolean(key, value);
-    }
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultBoolean(value);
   }
 
   /**
@@ -221,9 +216,8 @@ public final class Preferences {
    * @param value The value
    */
   public void initLong(String key, long value) {
-    if (!containsKey(key)) {
-      putLong(key, value);
-    }
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultDouble(value);
   }
 
   /**
