@@ -127,16 +127,15 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @param requirements  The command requirements
    */
   private void initCommand(Command command, boolean interruptible, Set<Subsystem> requirements) {
+    command.initialize();
     CommandState scheduledCommand = new CommandState(interruptible);
     m_scheduledCommands.put(command, scheduledCommand);
-    command.initialize();
-    for (Subsystem requirement : requirements) {
-      m_requirements.put(requirement, command);
-    }
     for (Consumer<Command> action : m_initActions) {
       action.accept(command);
     }
-
+    for (Subsystem requirement : requirements) {
+      m_requirements.put(requirement, command);
+    }
   }
 
   /**
@@ -356,10 +355,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method of the canceled command
-   * with {@code true}, indicating they were canceled (as opposed to finishing normally).
-   *
-   * <p>Commands will be canceled even if they are not scheduled as interruptible.
+   * Cancels commands.  The scheduler will only call the interrupted method of a canceled command,
+   * not the end method (though the interrupted method may itself call the end method).  Commands
+   * will be canceled even if they are not scheduled as interruptible.
    *
    * @param commands the commands to cancel
    */
