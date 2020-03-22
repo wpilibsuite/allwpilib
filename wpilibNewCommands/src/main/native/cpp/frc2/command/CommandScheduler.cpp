@@ -215,7 +215,7 @@ void CommandScheduler::Run() {
     for (auto&& action : m_impl->executeActions) {
       action(*command);
     }
-    m_watchdog.AddEpoch(command->GetName() + "Execute()");
+    m_watchdog.AddEpoch(command->GetName() + ".Execute()");
 
     if (command->IsFinished()) {
       command->End(false);
@@ -318,7 +318,7 @@ void CommandScheduler::Cancel(Command* command) {
   for (auto&& action : m_impl->interruptActions) {
     action(*command);
   }
-  m_watchdog.AddEpoch(command->GetName() + "End(true)");
+  m_watchdog.AddEpoch(command->GetName() + ".End(true)");
   m_impl->scheduledCommands.erase(find);
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
