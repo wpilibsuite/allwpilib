@@ -7,9 +7,11 @@
 
 #include "frc2/command/CommandScheduler.h"
 
+#include <iostream>
+
 #include <frc/RobotState.h>
-#include <frc/WPIErrors.h>
 #include <frc/TimedRobot.h>
+#include <frc/WPIErrors.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
@@ -18,8 +20,6 @@
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
-
-#include <iostream>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandState.h"
@@ -67,7 +67,8 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
   return map.find(keyToCheck) != map.end();
 }
 
-CommandScheduler::CommandScheduler() : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, []{}) {
+CommandScheduler::CommandScheduler()
+    : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {}) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
@@ -250,7 +251,7 @@ void CommandScheduler::Run() {
       Schedule({subsystem.getSecond().get()});
     }
   }
-  
+
   m_watchdog.Disable();
   if (m_watchdog.IsExpired()) {
     std::cout << "CommandScheduler loop overrun." << std::endl;
@@ -318,7 +319,7 @@ void CommandScheduler::Cancel(Command* command) {
     action(*command);
   }
   m_watchdog.AddEpoch(command->GetName() + "End(true)");
-  m_impl->scheduledCommands.erase(find);    
+  m_impl->scheduledCommands.erase(find);
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {
       m_impl->requirements.erase(requirement.first);
