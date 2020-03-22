@@ -5,7 +5,7 @@ include(GenResources)
 include(CompileWarnings)
 include(AddTest)
 
-file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
+file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp src/main/native/cpp/jni/DataLogJNI.cpp)
 
 # Java bindings
 if (WITH_JAVA)
