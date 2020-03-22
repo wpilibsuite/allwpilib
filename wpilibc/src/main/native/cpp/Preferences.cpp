@@ -82,7 +82,7 @@ void Preferences::PutDouble(wpi::StringRef key, double value) {
 
 void Preferences::InitDouble(wpi::StringRef key, double value) {
   auto entry = m_table->GetEntry(key);
-  entry.SetDefaultDobule(value);
+  entry.SetDefaultDouble(value);
 }
 
 void Preferences::PutFloat(wpi::StringRef key, float value) {
