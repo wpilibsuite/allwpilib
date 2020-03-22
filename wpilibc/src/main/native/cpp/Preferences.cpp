@@ -59,7 +59,7 @@ void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
 }
 
 void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
-  if (!containsKey(key)) {
+  if (!ContainsKey(key)) {
     PutString(key, value);
   }
 }
@@ -71,7 +71,7 @@ void Preferences::PutInt(wpi::StringRef key, int value) {
 }
 
 void Preferences::InitInt(wpi::StringRef key, int value) {
-  if (!containsKey(key)) {
+  if (!ContainsKey(key)) {
     PutInt(key, value);
   }
 }
@@ -83,7 +83,7 @@ void Preferences::PutDouble(wpi::StringRef key, double value) {
 }
 
 void Preferences::InitDouble(wpi::StringRef key, double value) {
-  if (!containsKey(key)) {
+  if (!ContainsKey(key)) {
     PutDouble(key, value);
   }
 }
@@ -95,7 +95,7 @@ void Preferences::PutFloat(wpi::StringRef key, float value) {
 }
 
 void Preferences::InitFloat(wpi::StringRef key, float value) {
-  if (!containsKey(key)) {
+  if (!ContainsKey(key)) {
     PutFloat(key, value);
   }
 }
@@ -107,7 +107,7 @@ void Preferences::PutBoolean(wpi::StringRef key, bool value) {
 }
 
 void Preferences::InitBoolean(wpi::StringRef key, bool value) {
-  if (!containsKey(key)) {
+  if (!ContainsKey(key)) {
     PutBoolean(key, value);
   }
 }
@@ -119,7 +119,7 @@ void Preferences::PutLong(wpi::StringRef key, int64_t value) {
 }
 
 void Preferences::PutLong(wpi::StringRef key, int64_t value) {
-  if (!containsKey(key)) {
+  if (!ContainsKey(key)) {
     PutLong(key, value);
   }
 }
