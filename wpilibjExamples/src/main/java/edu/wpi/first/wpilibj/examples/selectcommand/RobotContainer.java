@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 
-import static java.util.Map.entry;
-
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -43,9 +41,9 @@ public class RobotContainer {
       new SelectCommand(
           // Maps selector values to commands
           Map.ofEntries(
-              entry(CommandSelector.ONE, new PrintCommand("Command one was selected!")),
-              entry(CommandSelector.TWO, new PrintCommand("Command two was selected!")),
-              entry(CommandSelector.THREE, new PrintCommand("Command three was selected!"))
+              Map.entry(CommandSelector.ONE, new PrintCommand("Command one was selected!")),
+              Map.entry(CommandSelector.TWO, new PrintCommand("Command two was selected!")),
+              Map.entry(CommandSelector.THREE, new PrintCommand("Command three was selected!"))
           ),
           this::select
       );
