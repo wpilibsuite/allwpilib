@@ -7,8 +7,6 @@
 
 #include "frc2/command/CommandScheduler.h"
 
-#include <iostream>
-
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
 #include <frc/WPIErrors.h>
@@ -20,6 +18,7 @@
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
+#include <wpi/raw_ostream.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandState.h"
@@ -68,7 +67,9 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 }
 
 CommandScheduler::CommandScheduler()
-    : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {}) {
+    : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {
+        wpi::outs() << "CommandScheduler loop time overrun.\n";
+      }) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
@@ -254,7 +255,6 @@ void CommandScheduler::Run() {
 
   m_watchdog.Disable();
   if (m_watchdog.IsExpired()) {
-    std::cout << "CommandScheduler loop overrun." << std::endl;
     m_watchdog.PrintEpochs();
   }
 }

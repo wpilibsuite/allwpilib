@@ -339,13 +339,13 @@ class CommandScheduler final : public frc::Sendable,
   // Constructor; private as this is a singleton
   CommandScheduler();
 
-  frc::Watchdog m_watchdog;
-
   void SetDefaultCommandImpl(Subsystem* subsystem,
                              std::unique_ptr<Command> command);
 
   class Impl;
   std::unique_ptr<Impl> m_impl;
+
+  frc::Watchdog m_watchdog;
 
   friend class CommandTestBase;
 };
