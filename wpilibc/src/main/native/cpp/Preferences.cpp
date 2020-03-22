@@ -58,10 +58,22 @@ void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
   entry.SetPersistent();
 }
 
+void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
+  if (!containsKey(key)) {
+    PutString(key, value);
+  }
+}
+
 void Preferences::PutInt(wpi::StringRef key, int value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::InitInt(wpi::StringRef key, int value) {
+  if (!containsKey(key)) {
+    PutInt(key, value);
+  }
 }
 
 void Preferences::PutDouble(wpi::StringRef key, double value) {
@@ -70,10 +82,22 @@ void Preferences::PutDouble(wpi::StringRef key, double value) {
   entry.SetPersistent();
 }
 
+void Preferences::InitDouble(wpi::StringRef key, double value) {
+  if (!containsKey(key)) {
+    PutDouble(key, value);
+  }
+}
+
 void Preferences::PutFloat(wpi::StringRef key, float value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::InitFloat(wpi::StringRef key, float value) {
+  if (!containsKey(key)) {
+    PutFloat(key, value);
+  }
 }
 
 void Preferences::PutBoolean(wpi::StringRef key, bool value) {
@@ -82,10 +106,22 @@ void Preferences::PutBoolean(wpi::StringRef key, bool value) {
   entry.SetPersistent();
 }
 
+void Preferences::InitBoolean(wpi::StringRef key, bool value) {
+  if (!containsKey(key)) {
+    PutBoolean(key, value);
+  }
+}
+
 void Preferences::PutLong(wpi::StringRef key, int64_t value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::PutLong(wpi::StringRef key, int64_t value) {
+  if (!containsKey(key)) {
+    PutLong(key, value);
+  }
 }
 
 bool Preferences::ContainsKey(wpi::StringRef key) {

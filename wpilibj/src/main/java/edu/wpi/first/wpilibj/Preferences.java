@@ -95,6 +95,18 @@ public final class Preferences {
   }
 
   /**
+   * Puts the given string into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initString(String key, String value) {
+    if (!containsKey(key)) {
+      putString(key, value);
+    }
+  }
+
+  /**
    * Puts the given int into the preferences table.
    *
    * @param key   the key
@@ -104,6 +116,18 @@ public final class Preferences {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given int into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initInt(String key, int value) {
+    if (!containsKey(key)) {
+      putInt(key, value);
+    }
   }
 
   /**
@@ -119,6 +143,18 @@ public final class Preferences {
   }
 
   /**
+   * Puts the given double into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initDouble(String key, double value) {
+    if (!containsKey(key)) {
+      putDouble(key, value);
+    }
+  }
+
+  /**
    * Puts the given float into the preferences table.
    *
    * @param key   the key
@@ -128,6 +164,18 @@ public final class Preferences {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given float into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initFloat(String key, float value) {
+    if (!containsKey(key)) {
+      putFloat(key, value);
+    }
   }
 
   /**
@@ -143,6 +191,18 @@ public final class Preferences {
   }
 
   /**
+   * Puts the given boolean into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initBoolean(String key, boolean value) {
+    if (!containsKey(key)) {
+      putBoolean(key, value);
+    }
+  }
+
+  /**
    * Puts the given long into the preferences table.
    *
    * @param key   the key
@@ -152,6 +212,18 @@ public final class Preferences {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given long into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initLong(String key, long value) {
+    if (!containsKey(key)) {
+      putLong(key, value);
+    }
   }
 
   /**
