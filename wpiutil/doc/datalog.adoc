@@ -1,0 +1,192 @@
+= WPILib Data Log File Format Specification, Version 1.0
+WPILib Developers <wpilib@wpi.edu>
+Revision 1.0 (0x0100), 1/2/2022
+:toc:
+:toc-placement: preamble
+:sectanchors:
+
+A simple binary logging format designed for high speed logging of timestamped data values (e.g. numeric sensor values).
+
+[[motivation]]
+== Motivation
+
+FRC robots generate a lot of real-time data of various data types (most typically numeric values, but also strings and more complex data such as camera images). While there is good support in the WPILib software ecosystem for real-time display of this data on dashboards (via NetworkTables), there is no current standard for logging of timestamped data values for offline analysis. In the absence of a standard, teams have developed various ad-hoc solutions, including CSV files.
+
+Similar to how the NetworkTables standard protocol enabled ecosystem development of multiple dashboards, it is expected that a standard format for data logging, in combination with built-in library support for easy on-robot logging of robot data, will facilitate ecosystem development of offline data analysis tools.
+
+Standard logging facilities currently available (e.g. in Java) are generally designed for string messages, not for binary data. As a binary format, this will be faster with less overhead for the typical data (e.g. numbers) coming from a robot in real time (at least dozens, if not hundreds, of data points every ~20 ms). String formatting is significantly more expensive than just copying the binary number, and is more difficult to read back into analysis tools. Latency of the actual logging to the main program is also critical in the FRC application. WPILib also needs a common logging format and implementation across both C++ and Java.
+
+[[references]]
+== References
+
+[[rfc7159,RFC7159,JSON]]
+* RFC 7159, The JavaScript Object Notation (JSON) Data Interchange Format, https://tools.ietf.org/html/rfc7159
+
+[[definitions]]
+== Definitions
+
+[[def-entry]]
+Entry:: A data channel identified by an integer ID and a string name. Entries have a specified type and may have associated metadata.
+
+[[def-entry-id]]
+Entry ID:: An unsigned 4-byte ID by which records in the log refer to an Entry, instead of using the full string key for the Entry. Entry ID 0 is reserved for control records.
+
+[[def-record]]
+Record:: Storage of a single timestamped data item in the log. A record consists of the entry ID, the data length, a 64-bit integer timestamp, and the data contents.
+
+[[def-timestamp]]
+Timestamp:: 64-bit integer microseconds. The zero time is not specified by the data format, but on an FRC robot is typically the time the robot program started.
+
+[[design]]
+== Design
+
+A data log starts with an 8-byte header, followed by 0 or more records. There is no padding between records. Each record in the file has an arbitrary length payload, is timestamped, and is associated to a particular entry (via its entry ID).
+
+Entries in the log are started using a <<control-start,Start>> control record to associate an entry ID with its name, <<data-types,type>>, and <<metadata,metadata>>. Following the Start control record, records referencing that entry ID can follow in any order (and can be mixed with records with other entry IDs). A <<control-finish,Finish>> control record may be used to indicate no further records with that entry ID will follow. Following a Finish control record, an entry ID may be reused by another Start control record. Multiple Start control records for a single entry ID without an intervening Finish control record have unspecified behavior.
+
+Entry metadata may be updated with a <<control-set-metadata,Set Metadata>> control record. This control record is only valid for a particular entry ID in between Start and Finish control records for that entry ID. The Set Metadata control record should be interpreted as completely replacing the entry's metadata contents.
+
+There is no timestamp ordering requirement for records. This is true for control records as well--a Start control record with a later timestamp may be followed by data records for that entry with earlier timestamps.
+
+Duplicate entry names should be avoided, but there is nothing in the data format itself that requires this.
+
+All values are stored in little endian order.
+
+[[header]]
+=== Header
+
+The header consists of:
+
+* 6-byte ASCII string, containing "WPILOG"
+* 2-byte (16-bit) version number
+* 4-byte (32-bit) length of extra header string
+* extra header string (arbitrary length)
+
+The most significant byte of the version indicates the major version and the least significant byte indicates the minor version. For this version of the data format, the value is thus 0x0100, indicating version 1.0.
+
+The extra header string has arbitrary contents (e.g. the contents are set by the application that wrote the data log) but it must be UTF-8 encoded.
+
+The entire header for a version 1.0 file with no extra header string will be `57 50 49 4c 4f 47 00 01 00 00 00 00`.
+
+[[record]]
+=== Records
+
+Each record consists of:
+
+* 1-byte header length bitfield
+* 1 to 4-byte (32-bit) entry ID
+* 1 to 4-byte (32-bit) payload size (in bytes)
+* 1 to 8-byte (64-bit) timestamp (in integer microseconds)
+* payload data (arbitrary length)
+
+The header length bitfield encodes the length of each header field as follows (starting from the least significant bit):
+
+* 2-bit entry ID length (00 = 1 byte, 01 = 2 bytes, 10 = 3 bytes, 11 = 4 bytes)
+* 2-bit payload size length (00 = 1 byte, to 11 = 4 bytes)
+* 3-bit timestamp length (000 = 1 byte, to 111 = 8 bytes)
+* 1-bit spare (zero)
+
+An example record for a integer entry (ID=1) value 3 at timestamp 1 second would be 14 bytes in total length:
+
+* `20` (ID length = 1 byte, payload size length = 1 byte, timestamp length = 3 bytes)
+* `01` (entry ID = 1)
+* `08` (payload size = 8 bytes)
+* `40 42 0f` (timestamp = 1,000,000 us)
+* `03 00 00 00 00 00 00 00` (value = 3)
+
+[[control-record]]
+=== Control Records
+
+Entry ID 0 is used to indicate a record is a control record. There are 3 control record types: Start, Finish, and Set metadata. The first 4 bytes of the payload data indicates the control record type.
+
+[[control-start]]
+==== Start
+
+The Start control record provides information about the specified entry ID. It must appear prior to any records using that entry ID. The format of the Start control record's payload data is as follows:
+
+* 1-byte control record type (0 for Start control records)
+* 4-byte (32-bit) entry ID of entry being started
+* 4-byte (32-bit) length of entry name string
+* entry name UTF-8 string data (arbitrary length)
+* 4-byte (32-bit) length of entry type string
+* entry <<data-types,type>> UTF-8 string data (arbitrary length)
+* 4-byte (32-bit) length of entry metadata string
+* entry <<metadata,metadata>> UTF-8 string data (arbitrary length)
+
+An example start control record for an integer entry named `test` with ID=1 is 32 bytes:
+
+* `20` (ID length = 1 byte, payload size length = 1 byte, timestamp length = 3 bytes)
+* `00` (entry ID = 0)
+* `1a` (payload size = 26 bytes)
+* `40 42 0f` (timestamp = 1,000,000 us)
+* `00` (control record type = Start (0))
+* `01 00 00 00` (entry ID 1 being started)
+* `04 00 00 00` (length of name string = 4)
+* `74 65 73 74` (entry name = `test`)
+* `05 00 00 00` (length of type string = 5)
+* `69 6e 74 66 64` (type string = `int64`)
+* `00 00 00 00` (length of metadata string = 0)
+
+[[control-finish]]
+==== Finish
+
+The Finish control record indicates the entry ID is no longer valid.  The format of the Finish control record's payload data is as follows:
+
+* 1-byte control record type (1 for Finish control records)
+* 4-byte (32-bit) entry ID of entry being completed
+
+An example finish control record for ID=1 is 11 bytes:
+
+* `20` (ID length = 1 byte, payload size length = 1 byte, timestamp length = 3 bytes)
+* `00` (entry ID = 0)
+* `05` (payload size = 5 bytes)
+* `40 42 0f` (timestamp = 1,000,000 us)
+* `01` (control record type = Finish (1))
+* `01 00 00 00` (entry ID 1 being finished)
+
+[[control-set-metadata]]
+==== Set Metadata
+
+The Set metadata control record updates the <<metadata,metadata>> for an entry. The format of the record's payload data is as follows:
+
+* 1-byte control record type (2 for Set metadata control records)
+* 4-byte (32-bit) entry ID of entry whose metadata is being updated
+* 4-byte (32-bit) length of entry metadata string
+* entry metadata string data (arbitrary length)
+
+An example set metadata control record to set metadata for ID=1 is 30 bytes:
+
+* `20` (ID length = 1 byte, payload size length = 1 byte, timestamp length = 3 bytes)
+* `00` (entry ID = 0)
+* `18` (payload size = 24 bytes)
+* `40 42 0f` (timestamp = 1,000,000 us)
+* `02` (control record type = Set Metadata (2))
+* `01 00 00 00` (setting metadata for entry ID 1)
+* `0f 00 00 00` (length of metadata string = 15)
+* `7b 22 73 6f 75 72 63 65 22 3a 22 4e 54 22 7d` (metadata string = `{"source":"NT"}`)
+
+[[data-types]]
+=== Data Types
+
+Each entry's data type is an arbitrary string. The following data types are standard and should be supported by all implementations, but other data type strings are allowed and may be supported by some implementations.
+
+[cols="1,1,3", options="header"]
+|===
+|Type String|Description|Payload Data Contents
+|`raw`|raw data|the raw data
+|`boolean`|boolean|single byte (0=false, 1=true)
+|`int64`|integer|8-byte (64-bit) signed value
+|`float`|float|4-byte (32-bit) IEEE-754 value
+|`double`|double|8-byte (64-bit) IEEE-754 value
+|`string`|string|UTF-8 encoded string data
+|`boolean[]`|array of boolean|a single byte (0=false, 1=true) for each entry in the arrayfootnote:arraylength[the array length is not stored, but is instead determined by the payload length]
+|`int64[]`|array of integer|8-byte (64-bit) signed value for each entry in the arrayfootnote:arraylength[]
+|`float[]`|array of float|4-byte (32-bit) value for each entry in the arrayfootnote:arraylength[]
+|`double[]`|array of double|8-byte (64-bit) value for each entry in the arrayfootnote:arraylength[]
+|`string[]`|array of strings|Starts with a 4-byte (32-bit) array length. Each string is stored as a 4-byte (32-bit) length followed by the UTF-8 string data
+|===
+
+[[metadata]]
+=== Metadata
+
+Each entry has an associated metadata string. If not blank, the metadata should be <<JSON,JSON>>, but may be arbitrary text. Metadata is intended to convey additional information about the entry beyond what the type conveys--for example the source of the data.
