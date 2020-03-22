@@ -15,8 +15,11 @@
 #include <frc/WPIErrors.h>
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
+#include <frc/Watchdog.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/FunctionExtras.h>
+
+#include <units/units.h>
 
 namespace frc2 {
 class Command;
@@ -45,6 +48,12 @@ class CommandScheduler final : public frc::Sendable,
   CommandScheduler& operator=(const CommandScheduler&) = delete;
 
   using Action = std::function<void(const Command&)>;
+  
+  /**
+   * Changes the period of the loop overrun watchdog. This should be kept in
+   * sync with the TimedRobot period.
+   */
+  void SetPeriod(units::second_t period);
 
   /**
    * Adds a button binding to the scheduler, which will be polled to schedule
@@ -330,6 +339,8 @@ class CommandScheduler final : public frc::Sendable,
  private:
   // Constructor; private as this is a singleton
   CommandScheduler();
+  
+  frc::Watchdog m_watchdog;
 
   void SetDefaultCommandImpl(Subsystem* subsystem,
                              std::unique_ptr<Command> command);
