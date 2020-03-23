@@ -35,7 +35,7 @@ HAL_ENUM(HAL_CANDeviceType) {
   HAL_CAN_Dev_kPowerDistribution = 8,
   HAL_CAN_Dev_kPneumatics = 9,
   HAL_CAN_Dev_kMiscellaneous = 10,
-  HAL_CAN_DEV_kIOBreakout = 11,
+  HAL_CAN_Dev_kIOBreakout = 11,
   HAL_CAN_Dev_kFirmwareUpdate = 31
 };
 
