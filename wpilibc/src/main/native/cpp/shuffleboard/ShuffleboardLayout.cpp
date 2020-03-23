@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,11 +10,11 @@
 using namespace frc;
 
 ShuffleboardLayout::ShuffleboardLayout(ShuffleboardContainer& parent,
-                                       const wpi::Twine& name,
+                                       const wpi::Twine& title,
                                        const wpi::Twine& type)
-    : ShuffleboardValue(type),
-      ShuffleboardComponent(parent, type, name),
-      ShuffleboardContainer(name) {
+    : ShuffleboardValue(title),
+      ShuffleboardComponent(parent, title, type),
+      ShuffleboardContainer(title) {
   m_isLayout = true;
 }
 
