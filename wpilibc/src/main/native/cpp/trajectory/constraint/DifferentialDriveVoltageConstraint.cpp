@@ -22,14 +22,14 @@ DifferentialDriveVoltageConstraint::DifferentialDriveVoltageConstraint(
       m_maxVoltage(maxVoltage) {}
 
 units::meters_per_second_t DifferentialDriveVoltageConstraint::MaxVelocity(
-    const Pose2d& pose, curvature_t curvature,
+    const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) {
   return units::meters_per_second_t(std::numeric_limits<double>::max());
 }
 
 TrajectoryConstraint::MinMax
 DifferentialDriveVoltageConstraint::MinMaxAcceleration(
-    const Pose2d& pose, curvature_t curvature,
+    const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t speed) {
   auto wheelSpeeds =
       m_kinematics.ToWheelSpeeds({speed, 0_mps, speed * curvature});
