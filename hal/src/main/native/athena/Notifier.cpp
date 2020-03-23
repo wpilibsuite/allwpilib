@@ -16,6 +16,7 @@
 #include <thread>
 
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
 #include "hal/HAL.h"
@@ -103,16 +104,20 @@ static void notifierThreadMain() {
   tRioStatusCode status = 0;
   tInterruptManager manager{1 << kTimerInterruptNumber, true, &status};
   while (notifierRunning) {
-    auto triggeredMask = manager.watch(0, false, &status);
+    auto triggeredMask = manager.watch(10000, false, &status);
     if (!notifierRunning) break;
+    if (triggeredMask == 0) continue;
     alarmCallback();
   }
 }
 
 static void cleanupNotifierAtExit() {
+  int32_t status = 0;
+  if (notifierAlarm) notifierAlarm->writeEnable(false, &status);
   notifierAlarm = nullptr;
   notifierRunning = false;
-  notifierThread.join();
+  hal::ReleaseFPGAInterrupt(kTimerInterruptNumber);
+  if (notifierThread.joinable()) notifierThread.join();
 }
 
 namespace hal {
@@ -183,7 +188,7 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 
     if (notifierAlarm) notifierAlarm->writeEnable(false, status);
     notifierRunning = false;
-    // TODO with new image, manually trigger notifier in FPGA
+    hal::ReleaseFPGAInterrupt(kTimerInterruptNumber);
     if (notifierThread.joinable()) notifierThread.join();
 
     std::scoped_lock lock(notifierMutex);
