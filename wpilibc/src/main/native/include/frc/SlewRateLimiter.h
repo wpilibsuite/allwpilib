@@ -25,11 +25,11 @@ namespace frc {
  */
 template <class Unit>
 class SlewRateLimiter {
-  using Unit_t = units::unit_t<Unit>;
+ public:
+   using Unit_t = units::unit_t<Unit>;
   using Rate = units::compound_unit<Unit, units::inverse<units::seconds>>;
   using Rate_t = units::unit_t<Rate>;
-
- public:
+ 
   /**
    * Creates a new SlewRateLimiter with the given rate limit and initial value.
    *
