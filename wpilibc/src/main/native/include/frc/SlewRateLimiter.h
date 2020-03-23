@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,10 +26,10 @@ namespace frc {
 template <class Unit>
 class SlewRateLimiter {
  public:
-   using Unit_t = units::unit_t<Unit>;
+  using Unit_t = units::unit_t<Unit>;
   using Rate = units::compound_unit<Unit, units::inverse<units::seconds>>;
   using Rate_t = units::unit_t<Rate>;
- 
+
   /**
    * Creates a new SlewRateLimiter with the given rate limit and initial value.
    *
