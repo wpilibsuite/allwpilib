@@ -11,6 +11,8 @@
 
 #include <units/units.h>
 
+#include <wpi/deprecated.h>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
 
@@ -19,13 +21,6 @@ class json;
 }  // namespace wpi
 
 namespace frc {
-
-/**
- * Define a unit for curvature.
- */
-using curvature_t = units::unit_t<
-    units::compound_unit<units::radian, units::inverse<units::meter>>>;
-
 /**
  * Represents a time-parameterized trajectory. The trajectory contains of
  * various States that represent the pose, curvature, time elapsed, velocity,
@@ -50,7 +45,7 @@ class Trajectory {
     Pose2d pose;
 
     // The curvature at that point of the trajectory.
-    curvature_t curvature{0.0};
+    units::curvature_t curvature{0.0};
 
     /**
      * Checks equality between this State and another object.

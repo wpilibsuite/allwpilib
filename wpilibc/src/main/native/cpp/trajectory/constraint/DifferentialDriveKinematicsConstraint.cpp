@@ -14,7 +14,7 @@ DifferentialDriveKinematicsConstraint::DifferentialDriveKinematicsConstraint(
     : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 
 units::meters_per_second_t DifferentialDriveKinematicsConstraint::MaxVelocity(
-    const Pose2d& pose, curvature_t curvature,
+    const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) {
   auto wheelSpeeds =
       m_kinematics.ToWheelSpeeds({velocity, 0_mps, velocity * curvature});
@@ -25,7 +25,7 @@ units::meters_per_second_t DifferentialDriveKinematicsConstraint::MaxVelocity(
 
 TrajectoryConstraint::MinMax
 DifferentialDriveKinematicsConstraint::MinMaxAcceleration(
-    const Pose2d& pose, curvature_t curvature,
+    const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t speed) {
   return {};
 }

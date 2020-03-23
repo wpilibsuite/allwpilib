@@ -14,7 +14,7 @@ CentripetalAccelerationConstraint::CentripetalAccelerationConstraint(
     : m_maxCentripetalAcceleration(maxCentripetalAcceleration) {}
 
 units::meters_per_second_t CentripetalAccelerationConstraint::MaxVelocity(
-    const Pose2d& pose, curvature_t curvature,
+    const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) {
   // ac = v^2 / r
   // k (curvature) = 1 / r
@@ -32,7 +32,7 @@ units::meters_per_second_t CentripetalAccelerationConstraint::MaxVelocity(
 
 TrajectoryConstraint::MinMax
 CentripetalAccelerationConstraint::MinMaxAcceleration(
-    const Pose2d& pose, curvature_t curvature,
+    const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t speed) {
   // The acceleration of the robot has no impact on the centripetal acceleration
   // of the robot.

@@ -25,7 +25,7 @@ SwerveDriveKinematicsConstraint<NumModules>::SwerveDriveKinematicsConstraint(
 template <size_t NumModules>
 units::meters_per_second_t
 SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
-    const Pose2d& pose, curvature_t curvature,
+    const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) {
   auto xVelocity = velocity * pose.Rotation().Cos();
   auto yVelocity = velocity * pose.Rotation().Sin();
@@ -41,7 +41,7 @@ SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
 template <size_t NumModules>
 TrajectoryConstraint::MinMax
 SwerveDriveKinematicsConstraint<NumModules>::MinMaxAcceleration(
-    const Pose2d& pose, curvature_t curvature,
+    const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t speed) {
   return {};
 }

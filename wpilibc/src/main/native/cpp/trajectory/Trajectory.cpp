@@ -149,5 +149,5 @@ void frc::from_json(const wpi::json& json, Trajectory::State& state) {
       units::meters_per_second_t{json.at("velocity").get<double>()};
   state.acceleration =
       units::meters_per_second_squared_t{json.at("acceleration").get<double>()};
-  state.curvature = frc::curvature_t{json.at("curvature").get<double>()};
+  state.curvature = units::curvature_t{json.at("curvature").get<double>()};
 }

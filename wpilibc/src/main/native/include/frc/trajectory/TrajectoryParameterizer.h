@@ -44,7 +44,7 @@ namespace frc {
  */
 class TrajectoryParameterizer {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 
   /**
    * Parameterize the trajectory by time. This is where the velocity profile is
@@ -82,7 +82,7 @@ class TrajectoryParameterizer {
    * the trajectory, max velocity, min acceleration and max acceleration.
    */
   struct ConstrainedState {
-    PoseWithCurvature pose = {Pose2d(), curvature_t(0.0)};
+    PoseWithCurvature pose = {Pose2d(), units::curvature_t(0.0)};
     units::meter_t distance = 0_m;
     units::meters_per_second_t maxVelocity = 0_mps;
     units::meters_per_second_squared_t minAcceleration = 0_mps_sq;
