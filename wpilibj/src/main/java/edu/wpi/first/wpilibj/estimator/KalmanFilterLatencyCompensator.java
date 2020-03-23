@@ -3,7 +3,6 @@ package edu.wpi.first.wpilibj.estimator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -54,7 +53,10 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
     }
 
     var tailMap = m_pastObserverStates.tailMap(closestEntry.getKey(), true);
-    for (var st : tailMap.values()) {
+    double lastTimestamp =
+            tailMap.firstEntry() != null ? tailMap.firstEntry().getKey() - nominalDtSeconds : 0;
+    for (var entry : tailMap.entrySet()) {
+      var st = entry.getValue();
       if (y != null) {
         observer.setP(st.errorCovariances);
         observer.setXhat(st.xHat);
@@ -63,7 +65,8 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
         // measurement time and the time that the inputs were captured at is very small
         observer.correct(st.inputs, y);
       }
-      observer.predict(st.inputs, nominalDtSeconds); // TODO: remove use of nominal dt
+      observer.predict(st.inputs, entry.getKey() - lastTimestamp);
+      lastTimestamp = entry.getKey();
 
       y = null;
     }
