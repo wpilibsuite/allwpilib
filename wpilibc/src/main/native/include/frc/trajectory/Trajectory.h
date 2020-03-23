@@ -10,7 +10,6 @@
 #include <vector>
 
 #include <units/units.h>
-#include <wpi/deprecated.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"

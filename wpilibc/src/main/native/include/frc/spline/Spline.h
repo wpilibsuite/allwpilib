@@ -13,7 +13,6 @@
 
 #include <Eigen/Core>
 #include <units/units.h>
-#include <wpi/deprecated.h>
 
 #include "frc/geometry/Pose2d.h"
 
