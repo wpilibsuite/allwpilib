@@ -59,6 +59,9 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
             ? snapshotsToUse.firstEntry().getKey() - nominalDtSeconds : 0;
     for (var entry : snapshotsToUse.entrySet()) {
       var st = entry.getValue();
+      
+      observer.predict(st.inputs, entry.getKey() - lastTimestamp);
+      lastTimestamp = entry.getKey();
       if (y != null) {
         observer.setP(st.errorCovariances);
         observer.setXhat(st.xHat);
@@ -67,8 +70,6 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
         // measurement time and the time that the inputs were captured at is very small
         observer.correct(st.inputs, y);
       }
-      observer.predict(st.inputs, entry.getKey() - lastTimestamp);
-      lastTimestamp = entry.getKey();
 
       newSnapshots.put(entry.getKey(), new ObserverState(observer, st.inputs));
 
