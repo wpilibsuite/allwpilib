@@ -9,7 +9,6 @@ package edu.wpi.first.wpiutil.math;
 
 import java.util.Objects;
 
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -92,5 +91,4 @@ public final class MatrixUtils {
   public static <D extends Num> VecBuilder<D> vec(Nat<D> dim) {
     return new VecBuilder<>(dim);
   }
-
 }

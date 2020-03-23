@@ -1,5 +1,11 @@
 package edu.wpi.first.wpilibj.estimator;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import org.junit.jupiter.api.Test;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -9,13 +15,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpiutil.math.MatBuilder;
-import edu.wpi.first.wpiutil.math.Nat;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 
 @SuppressWarnings("CheckStyle")
 public class SwerveDrivePoseEstimatorTest {
@@ -27,9 +27,11 @@ public class SwerveDrivePoseEstimatorTest {
                 new Translation2d(-1, -1),
                 new Translation2d(-1, 1)
         );
-        var estimator = new SwerveDrivePoseEstimator(new Rotation2d(), new Pose2d(), kinematics,
-                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(3, 3, 3),
-                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1));
+        var estimator = new SwerveDrivePoseEstimator(
+                new Rotation2d(), new Pose2d(), kinematics,
+                VecBuilder.fill(3, 3, 3),
+                VecBuilder.fill(0.1, 0.1, 0.1)
+        );
 
         var traj = TrajectoryGenerator.generateTrajectory(
                 List.of(new Pose2d(), new Pose2d(20, 20, Rotation2d.fromDegrees(0)),

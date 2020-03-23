@@ -4,9 +4,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
-import edu.wpi.first.wpiutil.math.MatBuilder;
+import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 
@@ -93,7 +94,7 @@ public class DifferentialDrivePoseEstimator {
 
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
-    m_observer.setXhat(poseToVector(initialPoseMeters));
+    m_observer.setXhat(StateSpaceUtils.poseToVector(initialPoseMeters));
   }
 
   @SuppressWarnings({"ParameterName", "MethodName"})
@@ -104,8 +105,8 @@ public class DifferentialDrivePoseEstimator {
     var newPose = new Pose2d(x.get(0, 0), x.get(1, 0), new Rotation2d(x.get(2, 0)))
             .exp(new Twist2d(dx, 0.0, u.get(2, 0)));
 
-    return new MatBuilder<>(Nat.N3(), Nat.N1()).fill(newPose.getTranslation().getX(),
-            newPose.getTranslation().getY(), x.get(2, 0) + u.get(2, 0));
+    return VecBuilder.fill(newPose.getTranslation().getX(), newPose.getTranslation().getY(),
+            x.get(2, 0) + u.get(2, 0));
   }
 
   /**
@@ -159,7 +160,7 @@ public class DifferentialDrivePoseEstimator {
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     m_latencyCompensator.applyPastMeasurement(
             m_observer, m_nominalDt,
-            poseToVector(visionRobotPoseMeters), timestampSeconds
+            StateSpaceUtils.poseToVector(visionRobotPoseMeters), timestampSeconds
     );
   }
 
@@ -200,7 +201,7 @@ public class DifferentialDrivePoseEstimator {
           double leftDistanceMeters, double rightDistanceMeters
   ) {
     var angle = gyroAngle.plus(m_gyroOffset);
-    var u = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(leftDistanceMeters, rightDistanceMeters,
+    var u = VecBuilder.fill(leftDistanceMeters, rightDistanceMeters,
             angle.minus(m_previousAngle).getRadians());
     m_previousAngle = angle;
 
@@ -211,14 +212,5 @@ public class DifferentialDrivePoseEstimator {
     m_observer.predict(u, dt);
 
     return getEstimatedPosition();
-  }
-
-  // TODO: Deduplicate
-  private Matrix<N3, N1> poseToVector(Pose2d pose) {
-    return new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
-            pose.getTranslation().getX(),
-            pose.getTranslation().getY(),
-            pose.getRotation().getRadians()
-    );
   }
 }
