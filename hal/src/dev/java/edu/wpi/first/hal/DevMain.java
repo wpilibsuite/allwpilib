@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+package edu.wpi.first.hal;
+
 public final class DevMain {
   public static void main(String[] args) {
 
