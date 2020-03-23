@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -40,7 +40,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   PIDSubsystem(const wpi::Twine& name, double p, double i, double d);
 
   /**
-   * Instantiates a PIDSubsystem that will use the given P, I, and D values.
+   * Instantiates a PIDSubsystem that will use the given P, I, D, and F values.
    *
    * @param name the name
    * @param p    the proportional value
@@ -51,7 +51,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   PIDSubsystem(const wpi::Twine& name, double p, double i, double d, double f);
 
   /**
-   * Instantiates a PIDSubsystem that will use the given P, I, and D values.
+   * Instantiates a PIDSubsystem that will use the given P, I, D, and F values.
    *
    * It will also space the time between PID loop calculations to be equal to
    * the given period.
@@ -78,7 +78,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   PIDSubsystem(double p, double i, double d);
 
   /**
-   * Instantiates a PIDSubsystem that will use the given P, I, and D values.
+   * Instantiates a PIDSubsystem that will use the given P, I, D, and F values.
    *
    * It will use the class name as its name.
    *
@@ -90,7 +90,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   PIDSubsystem(double p, double i, double d, double f);
 
   /**
-   * Instantiates a PIDSubsystem that will use the given P, I, and D values.
+   * Instantiates a PIDSubsystem that will use the given P, I, D, and F values.
    *
    * It will use the class name as its name. It will also space the time
    * between PID loop calculations to be equal to the given period.

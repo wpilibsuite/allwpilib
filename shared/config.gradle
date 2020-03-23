@@ -11,7 +11,7 @@ nativeUtils {
       niLibVersion = "2020.10.1"
       opencvVersion = "3.4.7-2"
       googleTestVersion = "1.9.0-4-437e100-1"
-      imguiVersion = "1.72b-2"
+      imguiVersion = "1.72b-3"
     }
   }
 }
@@ -24,6 +24,9 @@ nativeUtils.setSinglePrintPerPlatform()
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) return
     it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
+    if (it.name == 'osxx86-64') {
+        it.linker.args << "-headerpad_max_install_names"
+    }
 }
 
 model {

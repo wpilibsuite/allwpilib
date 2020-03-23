@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,7 +25,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * instantiated, it does a short calibration routine where it samples the gyro while at rest to
  * determine the default offset. This is subtracted from each sample to determine the heading.
  *
- * <p>This class is for the digital ADXRS450 gyro sensor that connects via SPI.
+ * <p>This class is for the digital ADXRS450 gyro sensor that connects via SPI. Only one instance of
+ * an ADXRS Gyro is supported.
  */
 @SuppressWarnings({"TypeName", "AbbreviationAsWordInName", "PMD.UnusedPrivateField"})
 public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable, AutoCloseable {

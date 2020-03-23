@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -102,12 +102,20 @@ class RamseteController {
   ChassisSpeeds Calculate(const Pose2d& currentPose,
                           const Trajectory::State& desiredState);
 
+  /**
+   * Enables and disables the controller for troubleshooting purposes.
+   *
+   * @param enabled If the controller is enabled or not.
+   */
+  void SetEnabled(bool enabled);
+
  private:
   double m_b;
   double m_zeta;
 
   Pose2d m_poseError;
   Pose2d m_poseTolerance;
+  bool m_enabled = true;
 };
 
 }  // namespace frc

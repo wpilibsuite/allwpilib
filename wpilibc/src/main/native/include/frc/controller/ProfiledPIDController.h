@@ -14,6 +14,7 @@
 
 #include <units/units.h>
 
+#include "frc/controller/ControllerUtil.h"
 #include "frc/controller/PIDController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -251,6 +252,20 @@ class ProfiledPIDController
    * @param measurement The current measurement of the process variable.
    */
   double Calculate(Distance_t measurement) {
+    if (m_controller.IsContinuousInputEnabled()) {
+      // Get error which is smallest distance between goal and measurement
+      auto error = frc::GetModulusError<Distance_t>(
+          m_goal.position, measurement, m_minimumInput, m_maximumInput);
+
+      // Recompute the profile goal with the smallest error, thus giving the
+      // shortest path. The goal may be outside the input range after this
+      // operation, but that's OK because the controller will still go there and
+      // report an error of zero. In other words, the setpoint only needs to be
+      // offset from the measurement by the input range modulus; they don't need
+      // to be equal.
+      m_goal.position = Distance_t{error} + measurement;
+    }
+
     frc::TrapezoidProfile<Distance> profile{m_constraints, m_goal, m_setpoint};
     m_setpoint = profile.Calculate(GetPeriod());
     return m_controller.Calculate(measurement.template to<double>(),
@@ -337,6 +352,8 @@ class ProfiledPIDController
 
  private:
   frc2::PIDController m_controller;
+  Distance_t m_minimumInput{0};
+  Distance_t m_maximumInput{0};
   typename frc::TrapezoidProfile<Distance>::State m_goal;
   typename frc::TrapezoidProfile<Distance>::State m_setpoint;
   typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;

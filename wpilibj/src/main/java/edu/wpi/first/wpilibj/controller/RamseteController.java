@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,6 +48,7 @@ public class RamseteController {
 
   private Pose2d m_poseError = new Pose2d();
   private Pose2d m_poseTolerance = new Pose2d();
+  private boolean m_enabled = true;
 
   /**
    * Construct a Ramsete unicycle controller.
@@ -111,6 +112,10 @@ public class RamseteController {
                                  Pose2d poseRef,
                                  double linearVelocityRefMeters,
                                  double angularVelocityRefRadiansPerSecond) {
+    if (!m_enabled) {
+      return new ChassisSpeeds(linearVelocityRefMeters, 0.0, angularVelocityRefRadiansPerSecond);
+    }
+
     m_poseError = poseRef.relativeTo(currentPose);
 
     // Aliases for equation readability
@@ -141,6 +146,15 @@ public class RamseteController {
   public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState) {
     return calculate(currentPose, desiredState.poseMeters, desiredState.velocityMetersPerSecond,
         desiredState.velocityMetersPerSecond * desiredState.curvatureRadPerMeter);
+  }
+
+  /**
+   * Enables and disables the controller for troubleshooting purposes.
+   *
+   * @param enabled If the controller is enabled or not.
+   */
+  public void setEnabled(boolean enabled) {
+    m_enabled = enabled;
   }
 
   /**

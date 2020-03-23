@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,8 +26,8 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
     implements ShuffleboardContainer {
   private final ContainerHelper m_helper = new ContainerHelper(this);
 
-  ShuffleboardLayout(ShuffleboardContainer parent, String name, String type) {
-    super(parent, requireNonNullParam(type, "type", "ShuffleboardLayout"), name);
+  ShuffleboardLayout(ShuffleboardContainer parent, String title, String type) {
+    super(parent, title, requireNonNullParam(type, "type", "ShuffleboardLayout"));
   }
 
   @Override

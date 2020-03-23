@@ -103,7 +103,7 @@ void SwerveControllerCommand<NumModules>::End(bool interrupted) {
 
 template <size_t NumModules>
 bool SwerveControllerCommand<NumModules>::IsFinished() {
-  return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
+  return m_timer.HasElapsed(m_trajectory.TotalTime());
 }
 
 }  // namespace frc2

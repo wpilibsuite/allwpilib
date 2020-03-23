@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -116,15 +116,22 @@ void Timer::Stop() {
   }
 }
 
+bool Timer::HasElapsed(units::second_t period) const { return Get() > period; }
+
 bool Timer::HasPeriodPassed(units::second_t period) {
+  return AdvanceIfElapsed(period);
+}
+
+bool Timer::AdvanceIfElapsed(units::second_t period) {
   if (Get() > period) {
     std::scoped_lock lock(m_mutex);
     // Advance the start time by the period.
     m_startTime += period;
     // Don't set it to the current time... we want to avoid drift.
     return true;
+  } else {
+    return false;
   }
-  return false;
 }
 
 units::second_t Timer::GetFPGATimestamp() {

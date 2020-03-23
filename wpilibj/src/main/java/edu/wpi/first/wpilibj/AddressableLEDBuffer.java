@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -116,4 +116,28 @@ public class AddressableLEDBuffer {
   public int getLength() {
     return m_buffer.length / 4;
   }
+
+  /**
+   * Gets the color at the specified index.
+   *
+   * @param index the index to get
+   * @return the LED color at the specified index
+   */
+  public Color8Bit getLED8Bit(int index) {
+    return new Color8Bit(m_buffer[index * 4 + 2] & 0xFF, m_buffer[index * 4 + 1] & 0xFF,
+                         m_buffer[index * 4] & 0xFF);
+  }
+
+  /**
+   * Gets the color at the specified index.
+   *
+   * @param index the index to get
+   * @return the LED color at the specified index
+   */
+  public Color getLED(int index) {
+    return new Color((m_buffer[index * 4 + 2] & 0xFF) / 255.0,
+                     (m_buffer[index * 4 + 1] & 0xFF) / 255.0,
+                     (m_buffer[index * 4] & 0xFF) / 255.0);
+  }
+
 }

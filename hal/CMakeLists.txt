@@ -57,7 +57,7 @@ set_property(TARGET hal PROPERTY FOLDER "libraries")
 
 install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen DESTINATION "${include_dest}/hal")
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen/ DESTINATION "${include_dest}/hal")
 
 if (MSVC OR FLAT_INSTALL_WPILIB)
     set (hal_config_dir ${wpilib_dest})

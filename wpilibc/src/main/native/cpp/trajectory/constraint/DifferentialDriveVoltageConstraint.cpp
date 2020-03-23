@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -47,30 +47,51 @@ DifferentialDriveVoltageConstraint::MinMaxAcceleration(
   // Robot chassis turning on radius = 1/|curvature|.  Outer wheel has radius
   // increased by half of the trackwidth T.  Inner wheel has radius decreased
   // by half of the trackwidth.  Achassis / radius = Aouter / (radius + T/2), so
-  // Achassis = Aouter * radius / (radius + T/2) = Aouter / (1 + |curvature|T/2)
-  // Inner wheel is similar.
+  // Achassis = Aouter * radius / (radius + T/2) = Aouter / (1 +
+  // |curvature|T/2). Inner wheel is similar.
 
   // sgn(speed) term added to correctly account for which wheel is on
   // outside of turn:
   // If moving forward, max acceleration constraint corresponds to wheel on
-  // outside of turn
-  // If moving backward, max acceleration constraint corresponds to wheel on
-  // inside of turn
-  auto maxChassisAcceleration =
-      maxWheelAcceleration /
-      (1 + m_kinematics.trackWidth * units::math::abs(curvature) *
-               wpi::sgn(speed) / (2_rad));
-  auto minChassisAcceleration =
-      minWheelAcceleration /
-      (1 - m_kinematics.trackWidth * units::math::abs(curvature) *
-               wpi::sgn(speed) / (2_rad));
+  // outside of turn If moving backward, max acceleration constraint corresponds
+  // to wheel on inside of turn
 
-  // Negate acceleration corresponding to wheel on inside of turn
-  // if center of turn is inside of wheelbase
+  // When velocity is zero, then wheel velocities are uniformly zero (robot
+  // cannot be turning on its center) - we have to treat this as a special case,
+  // as it breaks the signum function.  Both max and min acceleration are
+  // *reduced in magnitude* in this case.
+
+  units::meters_per_second_squared_t maxChassisAcceleration;
+  units::meters_per_second_squared_t minChassisAcceleration;
+
+  if (speed == 0_mps) {
+    maxChassisAcceleration =
+        maxWheelAcceleration /
+        (1 + m_kinematics.trackWidth * units::math::abs(curvature) / (2_rad));
+    minChassisAcceleration =
+        minWheelAcceleration /
+        (1 + m_kinematics.trackWidth * units::math::abs(curvature) / (2_rad));
+  } else {
+    maxChassisAcceleration =
+        maxWheelAcceleration /
+        (1 + m_kinematics.trackWidth * units::math::abs(curvature) *
+                 wpi::sgn(speed) / (2_rad));
+    minChassisAcceleration =
+        minWheelAcceleration /
+        (1 - m_kinematics.trackWidth * units::math::abs(curvature) *
+                 wpi::sgn(speed) / (2_rad));
+  }
+
+  // When turning about a point inside of the wheelbase (i.e. radius less than
+  // half the trackwidth), the inner wheel's direction changes, but the
+  // magnitude remains the same.  The formula above changes sign for the inner
+  // wheel when this happens. We can accurately account for this by simply
+  // negating the inner wheel.
+
   if ((m_kinematics.trackWidth / 2) > 1_rad / units::math::abs(curvature)) {
     if (speed > 0_mps) {
       minChassisAcceleration = -minChassisAcceleration;
-    } else {
+    } else if (speed < 0_mps) {
       maxChassisAcceleration = -maxChassisAcceleration;
     }
   }

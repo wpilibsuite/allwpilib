@@ -72,6 +72,10 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 * hal
   * wpiutil
 
+* halsim
+  * imgui
+  * wpiutil
+
 * ntcore
   * wpiutil
 
@@ -85,7 +89,6 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * opencv
   * wpiutil
 
-
 * wpilibj
   * hal
   * cameraserver
@@ -93,10 +96,35 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cscore
   * wpiutil
 
-
 * wpilibc
   * hal
   * cameraserver
   * ntcore
   * cscore
   * wpiutil
+
+* wpilibNewCommands
+  * wpilibc
+  * hal
+  * cameraserver
+  * ntcore
+  * cscore
+  * wpiutil
+
+* wpilibNewCommands
+  * wpilibc
+  * hal
+  * cameraserver
+  * ntcore
+  * cscore
+  * wpiutil
+
+### Third Party Artifacts
+
+This repository provides the builds of the following third party software.
+
+All artifacts are based at `edu.wpi.first.thirdparty.frcYEAR` in the repository.
+
+* googletest
+* imgui
+* opencv

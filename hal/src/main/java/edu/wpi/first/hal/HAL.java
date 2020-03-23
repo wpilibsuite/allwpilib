@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -129,6 +129,8 @@ public final class HAL extends JNIWrapper {
   public static native int sendError(boolean isError, int errorCode, boolean isLVCode,
                                      String details, String location, String callStack,
                                      boolean printMsg);
+
+  public static native int sendConsoleLine(String line);
 
   public static native int getPortWithModule(byte module, byte channel);
 

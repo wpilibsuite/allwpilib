@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -153,4 +153,55 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
   finished2 = true;
   EXPECT_NO_FATAL_FAILURE(scheduler.Run());
   EXPECT_FALSE(scheduler.IsScheduled(&group2));
+}
+
+TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwiceTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
+
+  MockCommand* command1 = command1Holder.get();
+  MockCommand* command2 = command2Holder.get();
+  MockCommand* command3 = command3Holder.get();
+
+  ParallelRaceGroup group{tcb::make_vector<std::unique_ptr<Command>>(
+      std::move(command1Holder), std::move(command2Holder),
+      std::move(command3Holder))};
+
+  EXPECT_CALL(*command1, Initialize()).Times(2);
+  EXPECT_CALL(*command1, Execute()).Times(5);
+  EXPECT_CALL(*command1, End(true)).Times(2);
+
+  EXPECT_CALL(*command2, Initialize()).Times(2);
+  EXPECT_CALL(*command2, Execute()).Times(5);
+  EXPECT_CALL(*command2, End(false)).Times(2);
+
+  EXPECT_CALL(*command3, Initialize()).Times(2);
+  EXPECT_CALL(*command3, Execute()).Times(5);
+  EXPECT_CALL(*command3, End(true)).Times(2);
+
+  scheduler.Schedule(&group);
+
+  scheduler.Run();
+  command2->SetFinished(true);
+  scheduler.Run();
+
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+
+  command2->SetFinished(false);
+
+  scheduler.Schedule(&group);
+
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&group));
+
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&group));
+
+  command2->SetFinished(true);
+  scheduler.Run();
+
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
 }

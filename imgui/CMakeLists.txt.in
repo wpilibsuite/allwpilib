@@ -41,3 +41,13 @@ ExternalProject_Add(proggyfonts
   INSTALL_COMMAND   ""
   TEST_COMMAND      ""
 )
+ExternalProject_Add(stb
+  GIT_REPOSITORY    https://github.com/nothings/stb.git
+  GIT_TAG           f67165c2bb2af3060ecae7d20d6f731173485ad0
+  SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/stb-src"
+  BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/stb-build"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     ""
+  INSTALL_COMMAND   ""
+  TEST_COMMAND      ""
+)

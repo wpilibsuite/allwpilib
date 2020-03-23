@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -153,6 +153,16 @@ void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interruptHandle,
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status);
+
+/**
+ * Releases a waiting interrupt.
+ *
+ * This will release both rising and falling waiters.
+ *
+ * @param interruptHandle the interrupt handle to release
+ */
+void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
+                                 int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

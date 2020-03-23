@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -89,7 +89,7 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     if (m_simDevice != null) {
       m_simRange = m_simDevice.createEnum("Range", true, new String[] {"2G", "4G", "8G", "16G"}, 0);
       m_simX = m_simDevice.createDouble("X Accel", false, 0.0);
-      m_simX = m_simDevice.createDouble("Y Accel", false, 0.0);
+      m_simY = m_simDevice.createDouble("Y Accel", false, 0.0);
       m_simZ = m_simDevice.createDouble("Z Accel", false, 0.0);
     }
     init(range);

@@ -138,5 +138,5 @@ void RamseteCommand::Execute() {
 void RamseteCommand::End(bool interrupted) { m_timer.Stop(); }
 
 bool RamseteCommand::IsFinished() {
-  return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
+  return m_timer.HasElapsed(m_trajectory.TotalTime());
 }
