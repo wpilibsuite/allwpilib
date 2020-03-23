@@ -10,20 +10,20 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num> {
   private static final int k_maxPastObserverStates = 300;
 
-  private final TreeMap<Double, ObserverState> m_pastObserverStates;
+  private final TreeMap<Double, ObserverSnapshot> m_pastObserverSnapshots;
 
   KalmanFilterLatencyCompensator() {
-    m_pastObserverStates = new TreeMap<>();
+    m_pastObserverSnapshots = new TreeMap<>();
   }
 
   @SuppressWarnings("ParameterName")
   public void addObserverState(
           KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u, double timestampSeconds
   ) {
-    m_pastObserverStates.put(timestampSeconds, new ObserverState(observer, u));
+    m_pastObserverSnapshots.put(timestampSeconds, new ObserverSnapshot(observer, u));
 
-    if (m_pastObserverStates.size() > k_maxPastObserverStates) {
-      m_pastObserverStates.remove(m_pastObserverStates.firstKey());
+    if (m_pastObserverSnapshots.size() > k_maxPastObserverStates) {
+      m_pastObserverSnapshots.remove(m_pastObserverSnapshots.firstKey());
     }
   }
 
@@ -34,11 +34,11 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
           Matrix<O, N1> y,
           double timestampSeconds
   ) {
-    var low = m_pastObserverStates.floorEntry(timestampSeconds);
-    var high = m_pastObserverStates.ceilingEntry(timestampSeconds);
+    var low = m_pastObserverSnapshots.floorEntry(timestampSeconds);
+    var high = m_pastObserverSnapshots.ceilingEntry(timestampSeconds);
 
     // Find the entry closest in time to timestampSeconds
-    Map.Entry<Double, ObserverState> closestEntry = null;
+    Map.Entry<Double, ObserverSnapshot> closestEntry = null;
     if (low != null && high != null) {
       closestEntry =
               Math.abs(timestampSeconds - low.getKey()) < Math.abs(timestampSeconds - high.getKey())
@@ -52,14 +52,14 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
       return;
     }
 
-    var newSnapshots = new TreeMap<Double, ObserverState>();
-    var snapshotsToUse = m_pastObserverStates.tailMap(closestEntry.getKey(), true);
+    var newSnapshots = new TreeMap<Double, ObserverSnapshot>();
+    var snapshotsToUse = m_pastObserverSnapshots.tailMap(closestEntry.getKey(), true);
 
     double lastTimestamp = snapshotsToUse.firstEntry() != null
             ? snapshotsToUse.firstEntry().getKey() - nominalDtSeconds : 0;
     for (var entry : snapshotsToUse.entrySet()) {
       var st = entry.getValue();
-      
+
       observer.predict(st.inputs, entry.getKey() - lastTimestamp);
       lastTimestamp = entry.getKey();
       if (y != null) {
@@ -71,27 +71,28 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
         observer.correct(st.inputs, y);
       }
 
-      newSnapshots.put(entry.getKey(), new ObserverState(observer, st.inputs));
+      newSnapshots.put(entry.getKey(), new ObserverSnapshot(observer, st.inputs));
 
       y = null;
     }
 
-    // Replace observer snapshots that haven't been corrected by a measurement for ones that have
+    // Replace observer snapshots that haven't been corrected by "y" for ones that have
+    // This is a 1:1 replacement of uncorrected to corrected snapshots
     snapshotsToUse.clear();
-    m_pastObserverStates.putAll(newSnapshots);
+    m_pastObserverSnapshots.putAll(newSnapshots);
   }
 
   /**
    * This class contains all the information about our observer at a given time.
    */
   @SuppressWarnings("MemberName")
-  public class ObserverState {
+  public class ObserverSnapshot {
     public final Matrix<S, N1> xHat;
     public final Matrix<S, S> errorCovariances;
     public final Matrix<I, N1> inputs;
 
     @SuppressWarnings("ParameterName")
-    private ObserverState(KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u) {
+    private ObserverSnapshot(KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u) {
       this.xHat = observer.getXhat();
       this.errorCovariances = observer.getP();
 
