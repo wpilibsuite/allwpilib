@@ -166,12 +166,15 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
     return image;
   Image* cur = image;
 
-  // If the source image is a JPEG, we need to decode it before we can do
-  // anything else with it.  Note that if the destination format is JPEG, we
-  // still need to do this (unless it was already a JPEG, in which case we
-  // would have returned above).
+  // If the source image is compressed, we need to decode it before we can do
+  // anything else with it.  Note that if the destination format is compressed,
+  // we still need to do this (unless it was already a compressed, in which
+  // case we would have returned above).
   if (cur->pixelFormat == VideoMode::kMJPEG) {
     cur = ConvertMJPEGToBGR(cur);
+    if (pixelFormat == VideoMode::kBGR) return cur;
+  } else if (cur->pixelFormat == VideoMode::kH264) {
+    cur = ConvertH264ToBGR(cur);
     if (pixelFormat == VideoMode::kBGR) return cur;
   }
 
@@ -215,11 +218,15 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       return ConvertBGRToGray(cur);
     case VideoMode::kBGR:
     case VideoMode::kMJPEG:
+    case VideoMode::kH264:
       if (cur->pixelFormat == VideoMode::kYUYV) {
         cur = ConvertYUYVToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         cur = ConvertRGB565ToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kGray) {
+        // We never get to this branch in a compressed destination video mode
+        // because we convert cur from compressed to BGR in the begining of
+        // this function
         if (pixelFormat == VideoMode::kBGR)
           return ConvertGrayToBGR(cur);
         else
@@ -231,11 +238,21 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       return nullptr;  // Unsupported
   }
 
-  // Compress if destination is JPEG
+  // Compress if destination is JPEG or H264
   if (pixelFormat == VideoMode::kMJPEG)
     cur = ConvertBGRToMJPEG(cur, defaultJpegQuality);
+  else if (pixelFormat == VideoMode::kH264)
+    cur = ConvertBGRToH264(cur);
 
   return cur;
+}
+
+Image* Frame::ConvertH264ToBGR(Image* image) {
+  return nullptr;
+}
+
+Image* Frame::ConvertH264ToGray(Image* image) {
+  return nullptr;
 }
 
 Image* Frame::ConvertMJPEGToBGR(Image* image) {
@@ -457,11 +474,12 @@ Image* Frame::GetImageImpl(int width, int height,
                                       << width << "x" << height << " type "
                                       << pixelFormat);
 
-  // If the source image is a JPEG, we need to decode it before we can do
-  // anything else with it.  Note that if the destination format is JPEG, we
+  // If the source image is compressed, we need to decode it before we can do
+  // anything else with it.  Note that if the destination format is compressed,
   // still need to do this (unless the width/height/compression were the same,
-  // in which case we already returned the existing JPEG above).
+  // in which case we already returned the existing compressed image above).
   if (cur->pixelFormat == VideoMode::kMJPEG) cur = ConvertMJPEGToBGR(cur);
+  else if (cur->pixelFormat == VideoMode::kH264) cur = ConvertH264ToBGR(cur);
 
   // Resize
   if (!cur->Is(width, height)) {
@@ -481,6 +499,14 @@ Image* Frame::GetImageImpl(int width, int height,
 
   // Convert to output format
   return ConvertImpl(cur, pixelFormat, requiredJpegQuality, defaultJpegQuality);
+}
+
+Image* Frame::ConvertBGRToH264(Image* image) {
+  return nullptr;
+}
+
+Image* Frame::ConvertGrayToH264(Image* image) {
+  return nullptr;
 }
 
 bool Frame::GetCv(cv::Mat& image, int width, int height) {

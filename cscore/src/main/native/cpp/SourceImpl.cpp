@@ -141,6 +141,8 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
       wpi::StringRef s(str);
       if (s.equals_lower("mjpeg")) {
         mode.pixelFormat = cs::VideoMode::kMJPEG;
+      } else if (s.equals_lower("h264")) {
+        mode.pixelFormat = cs::VideoMode::kH264;
       } else if (s.equals_lower("yuyv")) {
         mode.pixelFormat = cs::VideoMode::kYUYV;
       } else if (s.equals_lower("rgb565")) {
@@ -297,6 +299,9 @@ wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
   switch (m_mode.pixelFormat) {
     case VideoMode::kMJPEG:
       pixelFormat = "mjpeg";
+      break;
+    case VideoMode::kH264:
+      pixelFormat = "h264";
       break;
     case VideoMode::kYUYV:
       pixelFormat = "yuyv";

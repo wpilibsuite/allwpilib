@@ -18,6 +18,8 @@
 #include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
+#include <libavcodec/avcodec.h>
+
 #include "Image.h"
 #include "cscore_cpp.h"
 
@@ -30,6 +32,34 @@ class Frame {
 
  public:
   using Time = uint64_t;
+
+  class CompressionContext {
+    public:
+      const int mjpegRequiredQuality;
+      const int mjpegDefaultQuality;
+
+      const int64_t h264BitRate;
+    
+      CompressionContext(int h264BitRate = 40000, int mjpgRequiredQuality = -1, int mjpgDefaultQuality = 80) : 
+      mjpegRequiredQuality{mjpegRequiredQuality},
+      mjpegDefaultQuality{mjpegDefaultQuality},
+      h264BitRate{h264BitRate} {
+        // The OpenMAX codec is only built for Raspian so that we can use the Pi GPU encoder
+        AVCodec* h264Codec = avcodec_find_encoder_by_name("h264_omx");
+        if (!h264Codec) {
+          // No hardware-accelerated encoding is available, so we will use "libx264rgb"
+          // Note that the "libx264" encoder, which works in YUYV, is also built but not used at this time
+          h264Codec = avcodec_find_encoder_by_name("libx264rgb");
+          // XXX (for review): throw may be inappropriate here
+          if (!h264Codec) throw std::runtime_error("No H264 codecs found");
+        }
+
+        this->h264CodecContext = avcodec_alloc_context3(this->h264Codec);
+      }
+
+    private:
+      const AVCodecContext* h264CodecContext;
+  };
 
  private:
   struct Impl {
@@ -157,6 +187,8 @@ class Frame {
     return ConvertImpl(image, VideoMode::kMJPEG, requiredQuality,
                        defaultQuality);
   }
+  Image* ConvertH264ToBGR(Image* image);
+  Image* ConvertH264ToGray(Image* image);
   Image* ConvertMJPEGToBGR(Image* image);
   Image* ConvertMJPEGToGray(Image* image);
   Image* ConvertYUYVToBGR(Image* image);
@@ -166,6 +198,8 @@ class Frame {
   Image* ConvertGrayToBGR(Image* image);
   Image* ConvertBGRToMJPEG(Image* image, int quality);
   Image* ConvertGrayToMJPEG(Image* image, int quality);
+  Image* ConvertBGRToH264(Image* image);
+  Image* ConvertGrayToH264(Image* image);
 
   Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat) {
     if (pixelFormat == VideoMode::kMJPEG) return nullptr;
