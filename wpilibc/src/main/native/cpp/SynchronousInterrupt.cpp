@@ -100,7 +100,7 @@ units::second_t SynchronousInterrupt::GetRisingTimestamp() {
   int32_t status = 0;
   auto ts = HAL_ReadInterruptRisingTimestamp(m_handle, &status);
   wpi_setHALError(status);
-  units::microsecond_t ms{ts};
+  units::microsecond_t ms{static_cast<double>(ts)};
   return ms;
 }
 
@@ -109,6 +109,6 @@ units::second_t SynchronousInterrupt::GetFallingTimestamp() {
   int32_t status = 0;
   auto ts = HAL_ReadInterruptFallingTimestamp(m_handle, &status);
   wpi_setHALError(status);
-  units::microsecond_t ms{ts};
+  units::microsecond_t ms{static_cast<double>(ts)};
   return ms;
 }
