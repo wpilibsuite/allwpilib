@@ -19,6 +19,16 @@
 namespace frc {
 namespace detail {
 
+template <int Rows, int Cols, typename Matrix, typename T, typename... Ts>
+void MatrixImpl(Matrix& result, T elem, Ts... elems) {
+  constexpr int count = Rows * Cols - (sizeof...(Ts) + 1);
+
+  result(count / Cols, count % Cols) = elem;
+  if constexpr (sizeof...(Ts) > 0) {
+    MatrixImpl<Rows, Cols>(result, elems...);
+  }
+}
+
 template <typename Matrix, typename T, typename... Ts>
 void CostMatrixImpl(Matrix& result, T elem, Ts... elems) {
   result(result.rows() - (sizeof...(Ts) + 1)) = 1.0 / std::pow(elem, 2);
@@ -47,6 +57,27 @@ void WhiteNoiseVectorImpl(Matrix& result, T elem, Ts... elems) {
   }
 }
 }  // namespace detail
+
+/**
+ * Creates a matrix from the given list of elements.
+ *
+ * The elements of the matrix are filled in in row-major order.
+ *
+ * @param elems An array of elements in the matrix.
+ * @return A matrix containing the given elements.
+ */
+template <int Rows, int Cols, typename... Ts,
+          typename =
+              std::enable_if_t<std::conjunction_v<std::is_same<double, Ts>...>>>
+Eigen::Matrix<double, Rows, Cols> MakeMatrix(Ts... elems) {
+  static_assert(
+      sizeof...(elems) == Rows * Cols,
+      "Number of provided elements doesn't match matrix dimensionality");
+
+  Eigen::Matrix<double, Rows, Cols> result;
+  detail::MatrixImpl<Rows, Cols>(result, elems...);
+  return result;
+}
 
 /**
  * Creates a cost matrix from the given vector for use with LQR.

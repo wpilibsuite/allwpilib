@@ -7,38 +7,28 @@
 
 #include "frc/system/plant/LinearSystemId.h"
 
+#include "frc/StateSpaceUtil.h"
+
 namespace frc {
 
 LinearSystem<1, 1, 1> IdentifyVelocitySystem(double kV, double kA) {
-  Eigen::Matrix<double, 1, 1> A;
-  A << -kV / kA;
-  Eigen::Matrix<double, 1, 1> B;
-  B << 1.0 / kA;
-  Eigen::Matrix<double, 1, 1> C;
-  C << 1;
-  Eigen::Matrix<double, 1, 1> D;
-  D << 0;
-  Eigen::Matrix<double, 1, 1> uMin;
-  uMin << -12.0;
-  Eigen::Matrix<double, 1, 1> uMax;
-  uMax << 12.0;
+  auto A = frc::MakeMatrix<1, 1>(-kV / kA);
+  auto B = frc::MakeMatrix<1, 1>(1.0 / kA);
+  auto C = frc::MakeMatrix<1, 1>(1.0);
+  auto D = frc::MakeMatrix<1, 1>(0.0);
+  auto uMin = frc::MakeMatrix<1, 1>(-12.0);
+  auto uMax = frc::MakeMatrix<1, 1>(12.0);
 
   return LinearSystem<1, 1, 1>(A, B, C, D, uMin, uMax);
 }
 
 LinearSystem<2, 1, 1> IdentifyPositionSystem(double kV, double kA) {
-  Eigen::Matrix<double, 2, 2> A;
-  A << 0, 1, 0, -kV / kA;
-  Eigen::Matrix<double, 2, 1> B;
-  B << 0, 1.0 / kA;
-  Eigen::Matrix<double, 1, 2> C;
-  C << 1, 0;
-  Eigen::Matrix<double, 1, 1> D;
-  D << 0;
-  Eigen::Matrix<double, 1, 1> uMin;
-  uMin << -12.0;
-  Eigen::Matrix<double, 1, 1> uMax;
-  uMax << 12.0;
+  auto A = frc::MakeMatrix<2, 2>(0.0, 1.0, 0.0, -kV / kA);
+  auto B = frc::MakeMatrix<2, 1>(0.0, 1.0 / kA);
+  auto C = frc::MakeMatrix<1, 2>(1.0, 0.0);
+  auto D = frc::MakeMatrix<1, 1>(0.0);
+  auto uMin = frc::MakeMatrix<1, 1>(-12.0);
+  auto uMax = frc::MakeMatrix<1, 1>(12.0);
 
   return LinearSystem<2, 1, 1>(A, B, C, D, uMin, uMax);
 }
@@ -52,18 +42,12 @@ LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(double kVlinear, double kAlinear,
   double B1 = c * (kAlinear + kAangular);
   double B2 = c * (kAangular - kAlinear);
 
-  Eigen::Matrix<double, 2, 2> A;
-  A << A1, A2, A2, A1;
-  Eigen::Matrix<double, 2, 2> B;
-  B << B1, B2, B2, B1;
-  Eigen::Matrix<double, 2, 2> C;
-  C << 1, 0, 0, 1;
-  Eigen::Matrix<double, 2, 2> D;
-  D << 0, 0, 0, 0;
-  Eigen::Matrix<double, 2, 1> uMin;
-  uMin << -12.0, -12.0;
-  Eigen::Matrix<double, 2, 1> uMax;
-  uMax << 12.0, 12.0;
+  auto A = frc::MakeMatrix<2, 2>(A1, A2, A2, A1);
+  auto B = frc::MakeMatrix<2, 2>(B1, B2, B2, B1);
+  auto C = frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0);
+  auto D = frc::MakeMatrix<2, 2>(0.0, 0.0, 0.0, 0.0);
+  auto uMin = frc::MakeMatrix<2, 1>(-12.0, -12.0);
+  auto uMax = frc::MakeMatrix<2, 1>(12.0, 12.0);
 
   return LinearSystem<2, 2, 2>(A, B, C, D, uMin, uMax);
 }

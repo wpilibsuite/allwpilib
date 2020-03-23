@@ -9,23 +9,21 @@
 
 #include <cmath>
 
+#include "frc/StateSpaceUtil.h"
+
 namespace frc {
 
 LinearSystem<1, 1, 1> FlywheelSystem(DCMotor motor,
                                      units::kilogram_square_meter_t J,
                                      double G) {
-  Eigen::Matrix<double, 1, 1> A;
-  A << (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>();
-  Eigen::Matrix<double, 1, 1> B;
-  B << (G * motor.Kt / (motor.R * J)).to<double>();
-  Eigen::Matrix<double, 1, 1> C;
-  C << 1;
-  Eigen::Matrix<double, 1, 1> D;
-  D << 0;
-  Eigen::Matrix<double, 1, 1> uMin;
-  uMin << -12.0;
-  Eigen::Matrix<double, 1, 1> uMax;
-  uMax << 12.0;
+  auto A = frc::MakeMatrix<1, 1>(
+      (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>());
+  auto B = frc::MakeMatrix<1, 1>((G * motor.Kt / (motor.R * J)).to<double>());
+  auto C = frc::MakeMatrix<1, 1>(1.0);
+  auto D = frc::MakeMatrix<1, 1>(0.0);
+  auto uMin = frc::MakeMatrix<1, 1>(-12.0);
+  auto uMax = frc::MakeMatrix<1, 1>(12.0);
+
   return LinearSystem<1, 1, 1>(A, B, C, D, uMin, uMax);
 }
 
