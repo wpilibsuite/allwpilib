@@ -52,10 +52,12 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
       return;
     }
 
-    var tailMap = m_pastObserverStates.tailMap(closestEntry.getKey(), true);
-    double lastTimestamp =
-            tailMap.firstEntry() != null ? tailMap.firstEntry().getKey() - nominalDtSeconds : 0;
-    for (var entry : tailMap.entrySet()) {
+    var newSnapshots = new TreeMap<Double, ObserverState>();
+    var snapshotsToUse = m_pastObserverStates.tailMap(closestEntry.getKey(), true);
+
+    double lastTimestamp = snapshotsToUse.firstEntry() != null
+            ? snapshotsToUse.firstEntry().getKey() - nominalDtSeconds : 0;
+    for (var entry : snapshotsToUse.entrySet()) {
       var st = entry.getValue();
       if (y != null) {
         observer.setP(st.errorCovariances);
@@ -68,8 +70,14 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
       observer.predict(st.inputs, entry.getKey() - lastTimestamp);
       lastTimestamp = entry.getKey();
 
+      newSnapshots.put(entry.getKey(), new ObserverState(observer, st.inputs));
+
       y = null;
     }
+
+    // Replace observer snapshots that haven't been corrected by a measurement for ones that have
+    snapshotsToUse.clear();
+    m_pastObserverStates.putAll(newSnapshots);
   }
 
   /**
