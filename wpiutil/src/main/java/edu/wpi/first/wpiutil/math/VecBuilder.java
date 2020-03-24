@@ -7,7 +7,16 @@
 
 package edu.wpi.first.wpiutil.math;
 
-import edu.wpi.first.wpiutil.math.numbers.*;
+import edu.wpi.first.wpiutil.math.numbers.N1;
+import edu.wpi.first.wpiutil.math.numbers.N10;
+import edu.wpi.first.wpiutil.math.numbers.N2;
+import edu.wpi.first.wpiutil.math.numbers.N3;
+import edu.wpi.first.wpiutil.math.numbers.N4;
+import edu.wpi.first.wpiutil.math.numbers.N5;
+import edu.wpi.first.wpiutil.math.numbers.N6;
+import edu.wpi.first.wpiutil.math.numbers.N7;
+import edu.wpi.first.wpiutil.math.numbers.N8;
+import edu.wpi.first.wpiutil.math.numbers.N9;
 
 /**
  * A specialization of {@link MatBuilder} for constructing vectors (Nx1 matrices).

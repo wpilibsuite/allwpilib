@@ -58,7 +58,8 @@ public class SimpleMatrixUtils {
 
   @SuppressWarnings({"LocalVariableName", "ParameterName", "LineLength"})
   private static SimpleMatrix dispatchPade(SimpleMatrix U, SimpleMatrix V,
-                                           int nSquarings, BiFunction<SimpleMatrix, SimpleMatrix, SimpleMatrix> solveProvider) {
+                                           int nSquarings, BiFunction<SimpleMatrix, SimpleMatrix
+          , SimpleMatrix> solveProvider) {
     SimpleMatrix P = U.plus(V);
     SimpleMatrix Q = U.negative().plus(V);
 
@@ -103,8 +104,10 @@ public class SimpleMatrixUtils {
     SimpleMatrix A4 = A2.mult(A2);
     SimpleMatrix A6 = A4.mult(A2);
 
-    SimpleMatrix U = A.mult(A6.scale(b[7]).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
-    SimpleMatrix V = A6.scale(b[6]).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0]));
+    SimpleMatrix U =
+            A.mult(A6.scale(b[7]).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
+    SimpleMatrix V =
+            A6.scale(b[6]).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0]));
 
     return new Pair<>(U, V);
   }
@@ -119,8 +122,10 @@ public class SimpleMatrixUtils {
     SimpleMatrix A6 = A4.mult(A2);
     SimpleMatrix A8 = A6.mult(A2);
 
-    SimpleMatrix U = A.mult(A8.scale(b[9]).plus(A6.scale(b[7])).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
-    SimpleMatrix V = A8.scale(b[8]).plus(A6.scale(b[6])).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0]));
+    SimpleMatrix U =
+            A.mult(A8.scale(b[9]).plus(A6.scale(b[7])).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
+    SimpleMatrix V =
+            A8.scale(b[8]).plus(A6.scale(b[6])).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0]));
 
     return new Pair<>(U, V);
   }
@@ -136,8 +141,10 @@ public class SimpleMatrixUtils {
     SimpleMatrix A4 = A2.mult(A2);
     SimpleMatrix A6 = A4.mult(A2);
 
-    SimpleMatrix U = A.mult(A6.scale(b[13]).plus(A4.scale(b[11])).plus(A2.scale(b[9])).plus(A6.scale(b[7])).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
-    SimpleMatrix V = A6.mult(A6.scale(b[12]).plus(A4.scale(b[10])).plus(A2.scale(b[8]))).plus(A6.scale(b[6]).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0])));
+    SimpleMatrix U =
+            A.mult(A6.scale(b[13]).plus(A4.scale(b[11])).plus(A2.scale(b[9])).plus(A6.scale(b[7])).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
+    SimpleMatrix V =
+            A6.mult(A6.scale(b[12]).plus(A4.scale(b[10])).plus(A2.scale(b[8]))).plus(A6.scale(b[6]).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0])));
 
     return new Pair<>(U, V);
   }
@@ -152,16 +159,50 @@ public class SimpleMatrixUtils {
    * @param rows the number of rows (and columns)
    * @return the identiy matrix, rows x rows.
    */
-  private static SimpleMatrix eye(int rows) {
+  public static SimpleMatrix eye(int rows) {
     return SimpleMatrix.identity(rows);
   }
 
+  /**
+   * Decompose the given matrix using Cholesky Decomposition. If the input matrix is zeros, this
+   * will return the zero matrix.
+   *
+   * @param src The matrix to decompose.
+   * @return The decomposed matrix.
+   * @throws RuntimeException if the matrix could not be decomposed (ie. is not positive
+   *                          semidefinite).
+   */
   public static SimpleMatrix lltDecompose(SimpleMatrix src) {
+    return lltDecompose(src, false);
+  }
+
+  /**
+   * Decompose the given matrix using Cholesky Decomposition. If the input matrix is zeros, this
+   * will return the zero matrix.
+   *
+   * @param src The matrix to decompose.
+   * @param lowerTriangular if we want to decompose to the lower triangular Cholesky matrix.
+   * @return The decomposed matrix.
+   * @throws RuntimeException if the matrix could not be decomposed (ie. is not positive
+   *                          semidefinite).
+   */
+  public static SimpleMatrix lltDecompose(SimpleMatrix src, boolean lowerTriangular) {
     SimpleMatrix temp = src.copy();
+
     CholeskyDecomposition_F64<DMatrixRMaj> chol =
-            DecompositionFactory_DDRM.chol(temp.numRows(), true);
-    if (!chol.decompose(temp.getMatrix()))
-      throw new RuntimeException("Cholesky failed!");
+            DecompositionFactory_DDRM.chol(temp.numRows(), lowerTriangular);
+    if (!chol.decompose(temp.getMatrix())) {
+      // check that the input is not all zeros -- if they are, we special case and return all
+      // zeros.
+      var matData = temp.getDDRM().data;
+      var isZeros = true;
+      for (double matDatum : matData) {
+        isZeros = isZeros && Math.abs(matDatum) < 1e-6;
+      }
+      if (isZeros) return new SimpleMatrix(temp.numRows(), temp.numCols());
+
+      throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + src.toString());
+    }
 
     return SimpleMatrix.wrap(chol.getT(null));
   }
