@@ -6,7 +6,6 @@ import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
@@ -36,7 +35,7 @@ public class DifferentialDrivePoseEstimatorTest {
             new TrajectoryConfig(0.5, 2));
 
     var kinematics = new DifferentialDriveKinematics(1);
-    var rand = new Random();
+    var rand = new Random(4915);
 
     List<Double> trajXs = new ArrayList<>();
     List<Double> trajYs = new ArrayList<>();
@@ -45,12 +44,11 @@ public class DifferentialDrivePoseEstimatorTest {
     List<Double> visionXs = new ArrayList<>();
     List<Double> visionYs = new ArrayList<>();
 
-    final double dt = 0.01;
+    final double dt = 0.02;
     double t = 0.0;
 
     final double visionUpdateRate = 0.1;
     Pose2d lastVisionPose = null;
-    double lastVisionUpdateRealTimestamp = Double.NEGATIVE_INFINITY;
     double lastVisionUpdateTime = Double.NEGATIVE_INFINITY;
 
     double maxError = Double.NEGATIVE_INFINITY;
@@ -63,15 +61,14 @@ public class DifferentialDrivePoseEstimatorTest {
               groundtruthState.velocityMetersPerSecond * groundtruthState.curvatureRadPerMeter
       ));
 
-      if (lastVisionUpdateTime + visionUpdateRate < t && rand.nextBoolean()) {
+      if (lastVisionUpdateTime + visionUpdateRate + rand.nextGaussian() * 0.4 < t) {
         if (lastVisionPose != null) {
-          estimator.addVisionMeasurement(lastVisionPose, lastVisionUpdateRealTimestamp);
+          estimator.addVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
         }
         lastVisionPose = groundtruthState.poseMeters.transformBy(new Transform2d(
                 new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
                 new Rotation2d(rand.nextGaussian() * 0.01)
         ));
-        lastVisionUpdateRealTimestamp = Timer.getFPGATimestamp();
         lastVisionUpdateTime = t;
 
         visionXs.add(lastVisionPose.getTranslation().getX());
@@ -79,7 +76,8 @@ public class DifferentialDrivePoseEstimatorTest {
       }
 
       var rotNoise = new Rotation2d(rand.nextGaussian() * 0.01);
-      var xHat = estimator.update(
+      var xHat = estimator.updateWithTime(
+          t,
           groundtruthState.poseMeters.getRotation().plus(rotNoise),
           input.leftMetersPerSecond * dt + rand.nextGaussian() * 0.02,
           input.rightMetersPerSecond * dt + rand.nextGaussian() * 0.02);
