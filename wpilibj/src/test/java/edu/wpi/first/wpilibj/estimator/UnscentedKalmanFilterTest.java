@@ -12,6 +12,7 @@ import org.ejml.simple.SimpleMatrix;
 
 public class UnscentedKalmanFilterTest {
 
+  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public static Matrix<N5, N1> getDynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
     var motors = DCMotor.getCIM(2);
 
@@ -21,8 +22,8 @@ public class UnscentedKalmanFilterTest {
     var m = 63.503;
     var J = 5.6;
 
-    var C1 = -Math.pow(gHigh, 2) * motors.m_KtNMPerAmp /
-            (motors.m_KvRadPerSecPerVolt * motors.m_rOhms * r * r);
+    var C1 = -Math.pow(gHigh, 2) * motors.m_KtNMPerAmp
+            / (motors.m_KvRadPerSecPerVolt * motors.m_rOhms * r * r);
     var C2 = gHigh * motors.m_KtNMPerAmp / (motors.m_rOhms * r);
     var k1 = 1.0 / m + rb * rb / J;
     var k2 = 1.0 / m - rb * rb / J;
@@ -55,6 +56,7 @@ public class UnscentedKalmanFilterTest {
   }
 
   //    @Test
+  @SuppressWarnings("LocalVariableName")
   public void testInit() {
     UnscentedKalmanFilter<N5, N2, N3> observer = new UnscentedKalmanFilter<>(
             Nat.N5(), Nat.N2(), Nat.N3(),
@@ -66,7 +68,7 @@ public class UnscentedKalmanFilterTest {
     var u = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(12.0, 12.0);
     observer.predict(u, 0.00505);
 
-//        var localY = getLocalMeasurementModel(observer.getXhat(), u);
-//        observer.correct(u, localY);
+    var localY = getLocalMeasurementModel(observer.getXhat(), u);
+    observer.correct(u, localY);
   }
 }

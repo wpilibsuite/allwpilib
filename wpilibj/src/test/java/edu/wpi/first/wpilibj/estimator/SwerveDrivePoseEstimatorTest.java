@@ -1,6 +1,11 @@
 package edu.wpi.first.wpilibj.estimator;
 
-import edu.wpi.first.wpilibj.Timer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import org.junit.jupiter.api.Test;
+
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
@@ -9,13 +14,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpiutil.math.MatBuilder;
-import edu.wpi.first.wpiutil.math.Nat;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 
 @SuppressWarnings("CheckStyle")
 public class SwerveDrivePoseEstimatorTest {
@@ -27,16 +26,18 @@ public class SwerveDrivePoseEstimatorTest {
                 new Translation2d(-1, -1),
                 new Translation2d(-1, 1)
         );
-        var estimator = new SwerveDrivePoseEstimator(new Rotation2d(), new Pose2d(), kinematics,
-                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(3, 3, 3),
-                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1));
+        var estimator = new SwerveDrivePoseEstimator(
+                new Rotation2d(), new Pose2d(), kinematics,
+                VecBuilder.fill(3, 3, 3),
+                VecBuilder.fill(0.1, 0.1, 0.1)
+        );
 
         var traj = TrajectoryGenerator.generateTrajectory(
                 List.of(new Pose2d(), new Pose2d(20, 20, Rotation2d.fromDegrees(0)),
                         new Pose2d(23, 23, Rotation2d.fromDegrees(173)), new Pose2d(54, 54, new Rotation2d())),
                 new TrajectoryConfig(0.5, 2));
 
-        var rand = new Random(4915l);
+        var rand = new Random(4915);
 
         List<Double> trajXs = new ArrayList<>();
         List<Double> trajYs = new ArrayList<>();
@@ -45,12 +46,11 @@ public class SwerveDrivePoseEstimatorTest {
         List<Double> visionXs = new ArrayList<>();
         List<Double> visionYs = new ArrayList<>();
 
-        final double dt = 0.01;
+        final double dt = 0.02;
         double t = 0.0;
 
         final double visionUpdateRate = 0.1;
         Pose2d lastVisionPose = null;
-        double lastVisionUpdateRealTimestamp = Double.NEGATIVE_INFINITY;
         double lastVisionUpdateTime = Double.NEGATIVE_INFINITY;
 
         double maxError = Double.NEGATIVE_INFINITY;
@@ -60,12 +60,11 @@ public class SwerveDrivePoseEstimatorTest {
 
             if (lastVisionUpdateTime + visionUpdateRate < t) {
                 if (lastVisionPose != null) {
-                    estimator.addVisionMeasurement(lastVisionPose, lastVisionUpdateRealTimestamp);
+                    estimator.addVisionMeasurement(lastVisionPose, lastVisionUpdateTime);
                 }
                 lastVisionPose = groundtruthState.poseMeters.transformBy(
                         new Transform2d(new Translation2d(rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.1),
                                 new Rotation2d(rand.nextGaussian() * 0.01)));
-                lastVisionUpdateRealTimestamp = Timer.getFPGATimestamp();
                 lastVisionUpdateTime = t;
 
                 visionXs.add(lastVisionPose.getTranslation().getX());
@@ -104,18 +103,18 @@ public class SwerveDrivePoseEstimatorTest {
         System.out.println("Mean error (meters): " + errorSum / (traj.getTotalTimeSeconds() / dt));
         System.out.println("Max error (meters):  " + maxError);
 
-//        var chartBuilder = new XYChartBuilder();
-//        chartBuilder.title = "The Magic of Sensor Fusion";
-//        var chart = chartBuilder.build();
-//
-//        chart.addSeries("Vision", visionXs, visionYs);
-//        chart.addSeries("Trajectory", trajXs, trajYs);
-//        chart.addSeries("xHat", observerXs, observerYs);
-//
-//        new SwingWrapper<>(chart).displayChart();
-//        try {
-//            Thread.sleep(1000000000);
-//        } catch (InterruptedException e) {
-//        }
+        //var chartBuilder = new XYChartBuilder();
+        //chartBuilder.title = "The Magic of Sensor Fusion";
+        //var chart = chartBuilder.build();
+
+        //chart.addSeries("Vision", visionXs, visionYs);
+        //chart.addSeries("Trajectory", trajXs, trajYs);
+        //chart.addSeries("xHat", observerXs, observerYs);
+
+        //new SwingWrapper<>(chart).displayChart();
+        //try {
+        //    Thread.sleep(1000000000);
+        //} catch (InterruptedException e) {
+        //}
     }
 }

@@ -1,5 +1,12 @@
 package edu.wpi.first.wpilibj.estimator;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import org.ejml.simple.SimpleMatrix;
+import org.junit.jupiter.api.Test;
+
 import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulatorTest;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -11,12 +18,6 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 import edu.wpi.first.wpiutil.math.numbers.N6;
-import org.ejml.simple.SimpleMatrix;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 import static edu.wpi.first.wpilibj.controller.LinearSystemLoopTest.kDt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -106,13 +107,14 @@ public class KalmanFilterTest {
       xhatsY.add(filter.getXhat(1));
     }
 
-//        var chart = new XYChartBuilder().build();
-//        chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
-//        chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
-//        try {
-//            new SwingWrapper<>(chart).displayChart();
-//            Thread.sleep(10000000);
-//        } catch (Exception ign) {}
+    //var chart = new XYChartBuilder().build();
+    //chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
+    //chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
+    //try {
+    //  new SwingWrapper<>(chart).displayChart();
+    //  Thread.sleep(10000000);
+    //} catch (Exception ign) {
+    //}
     assertEquals(0.0, m_swerveObserverSystem.getX(0), 0.3);
     assertEquals(0.0, m_swerveObserverSystem.getX(0), 0.3);
   }
@@ -137,8 +139,8 @@ public class KalmanFilterTest {
     List<Double> measurementsY = new ArrayList<>();
 
     // we set the velocity of the robot so that it's moving forward slowly
-    m_swerveObserverSystem.setX(0, .5);
-    m_swerveObserverSystem.setX(1, .5);
+    m_swerveObserverSystem.setX(0, 0.5);
+    m_swerveObserverSystem.setX(1, 0.5);
 
     for (int i = 0; i < 300; i++) {
       // the robot is at [0, 0, 0] so we just park here
@@ -159,13 +161,13 @@ public class KalmanFilterTest {
       xhatsY.add(filter.getXhat(1));
     }
 
-//        var chart = new XYChartBuilder().build();
-//        chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
-//        chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
-//        try {
-//            new SwingWrapper<>(chart).displayChart();
-//            Thread.sleep(10000000);
-//        } catch (Exception ign) {}
+    //var chart = new XYChartBuilder().build();
+    //chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
+    //chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
+    //try {
+    //  new SwingWrapper<>(chart).displayChart();
+    //  Thread.sleep(10000000);
+    //} catch (Exception ign) {}
 
     assertEquals(0.0, m_swerveObserverSystem.getX(0), 0.2);
     assertEquals(0.0, m_swerveObserverSystem.getX(1), 0.2);
@@ -205,8 +207,7 @@ public class KalmanFilterTest {
       var measurement = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
               sample.poseMeters.getTranslation().getX() + random.nextGaussian() / 5d,
               sample.poseMeters.getTranslation().getY() + random.nextGaussian() / 5d,
-              sample.poseMeters.getRotation().getRadians() + random.nextGaussian() / 3d // std
-              // dev of [1, 1, 1]
+              sample.poseMeters.getRotation().getRadians() + random.nextGaussian() / 3d
       );
 
       var velocity = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
@@ -228,13 +229,14 @@ public class KalmanFilterTest {
       time += 0.020;
     }
 
-//        var chart = new XYChartBuilder().build();
-//        chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
-//        chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
-//        try {
-////            new SwingWrapper<>(chart).displayChart();
-////            Thread.sleep(10000000);
-//        } catch (Exception ign) { }
+    //var chart = new XYChartBuilder().build();
+    //chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
+    //chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
+    //try {
+    //        new SwingWrapper<>(chart).displayChart();
+    //        Thread.sleep(10000000);
+    //} catch (Exception ign) {
+    //}
 
     assertEquals(trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters
             .getTranslation().getX(), m_swerveObserverSystem.getX(0), 0.2);

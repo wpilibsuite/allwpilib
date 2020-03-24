@@ -1,18 +1,18 @@
 package edu.wpi.first.wpilibj.math;
 
-import edu.wpi.first.wpiutil.WPIUtilJNI;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.Num;
-import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
-import edu.wpi.first.wpiutil.math.numbers.N1;
+import java.util.Random;
+
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpiutil.math.*;
+import edu.wpi.first.wpiutil.math.numbers.N3;
 import org.ejml.MatrixDimensionException;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
-import java.util.Random;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
+import edu.wpi.first.wpiutil.math.numbers.N1;
 
-@SuppressWarnings("PMD.TooManyMethods")
+@SuppressWarnings({"PMD.TooManyMethods", "ParameterName"})
 public final class StateSpaceUtils {
 
   private StateSpaceUtils() {
@@ -233,6 +233,7 @@ public final class StateSpaceUtils {
    * @param discB     Storage for discrete input matrix.
    * @return a Pair representing discA and diskB.
    */
+  @SuppressWarnings("LocalVariableName")
   public static <S extends Num, I extends Num> SimpleMatrixUtils.Pair<Matrix<S, S>, Matrix<S, I>>
   discretizeAB(Nat<S> states, Nat<I> inputs,
                Matrix<S, S> contA,
@@ -289,6 +290,7 @@ public final class StateSpaceUtils {
    * @param A a square matrix.
    * @return the matrix exponential of A.
    */
+  @SuppressWarnings("LocalVariableName")
   public static SimpleMatrix scipyExpm(SimpleMatrix A) {
 
     /*
@@ -407,8 +409,8 @@ public final class StateSpaceUtils {
 
   /**
    * Returns true if (A, B) is a stabilizable pair.
-   * <p>
-   * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
+   *
+   * <p> (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
    * any, have absolute values less than one, where an eigenvalue is
    * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.
    *
@@ -483,6 +485,20 @@ public final class StateSpaceUtils {
     SimpleMatrix toReturn = new SimpleMatrix(A.numRows(), A.numRows());
     WPIUtilJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
     return toReturn;
+  }
+
+  /**
+   * Convert a {@link Pose2d} to a vector of [x, y, theta], where theta is in radians.
+   *
+   * @param pose A pose to convert to a vector.
+   * @return The given pose in vector form, with the third element, theta, in radians.
+   */
+  public static Matrix<N3, N1> poseToVector(Pose2d pose) {
+    return VecBuilder.fill(
+            pose.getTranslation().getX(),
+            pose.getTranslation().getY(),
+            pose.getRotation().getRadians()
+    );
   }
 
 }
