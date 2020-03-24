@@ -168,7 +168,7 @@ public class SwerveDrivePoseEstimator {
           double currentTimeSeconds,
           Rotation2d gyroAngle, SwerveModuleState... wheelStates
   ) {
-    double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : 0.0;
+    double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;
     m_prevTimeSeconds = currentTimeSeconds;
 
     var angle = gyroAngle.plus(m_gyroOffset);

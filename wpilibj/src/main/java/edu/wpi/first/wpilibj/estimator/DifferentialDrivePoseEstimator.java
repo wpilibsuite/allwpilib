@@ -205,7 +205,7 @@ public class DifferentialDrivePoseEstimator {
             angle.minus(m_previousAngle).getRadians());
     m_previousAngle = angle;
 
-    double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : 0.0;
+    double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;
     m_prevTimeSeconds = currentTimeSeconds;
 
     m_latencyCompensator.addObserverState(m_observer, u, currentTimeSeconds);
