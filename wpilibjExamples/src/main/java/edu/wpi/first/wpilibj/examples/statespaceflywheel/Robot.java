@@ -7,13 +7,18 @@
 
 package edu.wpi.first.wpilibj.examples.statespaceflywheel;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.estimator.KalmanFilter;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -91,6 +96,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // set the update time to the current timestamp. This will allow our dt to be correctly
+    // calculated in teleopPeriodic.
     m_lastUpdateTime = Timer.getFPGATimestamp();
   }
 
@@ -111,10 +118,11 @@ public class Robot extends TimedRobot {
       m_loop.setNextR(VecBuilder.fill(0.0));
     }
 
-    // Correct our filter's state vector estimate with encoder data.
+    // Correct our Kalman filter's state vector estimate with encoder data.
     m_loop.correct(VecBuilder.fill(m_encoder.getRate()));
 
-    // Update our LQR and predict our model out to the next timestemp.
+    // Update our LQR to generate new voltage commands and use the voltages to predict the next
+    // state with out Kalman filter.
     m_loop.predict(dt);
 
     // send the new calculated voltage to the motors.
