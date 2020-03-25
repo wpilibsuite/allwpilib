@@ -356,7 +356,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method 
+   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
    * of the canceled command with {@code true},
    * indicating they were canceled (as opposed to finishing normally).
    *
