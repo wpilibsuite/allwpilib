@@ -76,11 +76,12 @@ public class Tracer {
 
   /**
    * Prints list of epochs added so far and their times to the entered String consumer.
+   *
    * <p>This overload can be useful for logging to a file, etc.
    *
    * @param output the stream that the output is sent to
    */
-  public void printEpochs(Consumer<String> output){
+  public void printEpochs(Consumer<String> output) {
     long now = RobotController.getFPGATime();
     StringBuilder sb = new StringBuilder();
     if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
