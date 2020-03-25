@@ -36,7 +36,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   boolean m_suppressTimeoutMessage;
 
-  private Tracer m_tracer;
+  private final Tracer m_tracer;
 
   static {
     startDaemonThread(Watchdog::schedulerFunc);
