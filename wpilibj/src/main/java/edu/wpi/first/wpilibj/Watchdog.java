@@ -151,7 +151,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       StringBuilder outputBuilder = new StringBuilder();
       m_epochs.forEach((key, value) -> {
         outputBuilder.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6));
-      })
+      });
       DriverStation.reportWarning(outputBuilder.toString(), false);
     }
   }
