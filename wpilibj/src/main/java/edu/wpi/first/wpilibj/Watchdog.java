@@ -149,7 +149,9 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
       m_lastEpochsPrintTime = now;
       StringBuilder outputBuilder = new StringBuilder();
-      m_epochs.forEach((key, value) -> outputBuilder.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6)));
+      m_epochs.forEach((key, value) -> {
+        outputBuilder.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6)));
+      }
       DriverStation.reportWarning(outputBuilder.toString(), false);
     }
   }
@@ -237,7 +239,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
             if (now  - watchdog.m_lastTimeoutPrintTime > kMinPrintPeriod) {
               watchdog.m_lastTimeoutPrintTime = now;
               if (!watchdog.m_suppressTimeoutMessage) {
-                DriverStation.reportWarning(String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6), false);
+                DriverStation.reportWarning(
+                  String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout / 1.0e6), false);
               }
             }
 
