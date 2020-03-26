@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/ADXRS450_Gyro.h>
-#include <frc/Encoder.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
@@ -51,28 +51,28 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @return the front left drive encoder
    */
-  frc::Encoder& GetFrontLeftEncoder();
+  frc::QuadratureEncoder& GetFrontLeftEncoder();
 
   /**
    * Gets the rear left drive encoder.
    *
    * @return the rear left drive encoder
    */
-  frc::Encoder& GetRearLeftEncoder();
+  frc::QuadratureEncoder& GetRearLeftEncoder();
 
   /**
    * Gets the front right drive encoder.
    *
    * @return the front right drive encoder
    */
-  frc::Encoder& GetFrontRightEncoder();
+  frc::QuadratureEncoder& GetFrontRightEncoder();
 
   /**
    * Gets the rear right drive encoder.
    *
    * @return the rear right drive encoder
    */
-  frc::Encoder& GetRearRightEncoder();
+  frc::QuadratureEncoder& GetRearRightEncoder();
 
   /**
    * Gets the wheel speeds.
@@ -144,16 +144,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::MecanumDrive m_drive{m_frontLeft, m_rearLeft, m_frontRight, m_rearRight};
 
   // The front-left-side drive encoder
-  frc::Encoder m_frontLeftEncoder;
+  frc::QuadratureEncoder m_frontLeftEncoder;
 
   // The rear-left-side drive encoder
-  frc::Encoder m_rearLeftEncoder;
+  frc::QuadratureEncoder m_rearLeftEncoder;
 
   // The front-right--side drive encoder
-  frc::Encoder m_frontRightEncoder;
+  frc::QuadratureEncoder m_frontRightEncoder;
 
   // The rear-right-side drive encoder
-  frc::Encoder m_rearRightEncoder;
+  frc::QuadratureEncoder m_rearRightEncoder;
 
   // The gyro sensor
   frc::ADXRS450_Gyro m_gyro;

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/Encoder.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <wpi/numbers>
@@ -75,7 +75,7 @@ class Robot : public frc::TimedRobot {
    * and defaults to k4X. Faster (k4X) encoding gives greater positional
    * precision but more noise in the rate.
    */
-  frc::Encoder m_encoder{1, 2, false, frc::Encoder::k4X};
+  frc::QuadratureEncoder m_encoder{1, 2, false, frc::QuadratureEncoder::k4X};
 };
 
 #ifndef RUNNING_FRC_TESTS

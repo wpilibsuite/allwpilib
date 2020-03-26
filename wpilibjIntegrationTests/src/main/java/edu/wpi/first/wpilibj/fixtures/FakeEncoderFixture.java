@@ -4,13 +4,13 @@
 
 package edu.wpi.first.wpilibj.fixtures;
 
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.mockhardware.FakeEncoderSource;
 import java.util.logging.Logger;
 
 /**
  * An encoder that uses two {@link DIOCrossConnectFixture DIOCrossConnectFixtures} to test the
- * {@link Encoder}.
+ * {@link QuadratureEncoder}.
  */
 public class FakeEncoderFixture implements ITestFixture {
   private static final Logger logger = Logger.getLogger(FakeEncoderFixture.class.getName());
@@ -21,7 +21,7 @@ public class FakeEncoderFixture implements ITestFixture {
 
   private final FakeEncoderSource m_source;
   private int[] m_sourcePort = new int[2];
-  private final Encoder m_encoder;
+  private final QuadratureEncoder m_encoder;
   private int[] m_encoderPort = new int[2];
 
   /** Constructs a FakeEncoderFixture from two DIOCrossConnectFixture. */
@@ -32,7 +32,7 @@ public class FakeEncoderFixture implements ITestFixture {
     m_dio2 = dio2;
     m_allocated = false;
     m_source = new FakeEncoderSource(dio1.getOutput(), dio2.getOutput());
-    m_encoder = new Encoder(dio1.getInput(), dio2.getInput());
+    m_encoder = new QuadratureEncoder(dio1.getInput(), dio2.getInput());
   }
 
   /** Construcst a FakeEncoderFixture from a set of Digital I/O ports. */
@@ -51,14 +51,14 @@ public class FakeEncoderFixture implements ITestFixture {
     m_encoderPort[0] = inputA;
     m_encoderPort[1] = inputB;
     m_source = new FakeEncoderSource(m_dio1.getOutput(), m_dio2.getOutput());
-    m_encoder = new Encoder(m_dio1.getInput(), m_dio2.getInput());
+    m_encoder = new QuadratureEncoder(m_dio1.getInput(), m_dio2.getInput());
   }
 
   public FakeEncoderSource getFakeEncoderSource() {
     return m_source;
   }
 
-  public Encoder getEncoder() {
+  public QuadratureEncoder getEncoder() {
     return m_encoder;
   }
 
@@ -93,7 +93,7 @@ public class FakeEncoderFixture implements ITestFixture {
     m_source.close();
     logger.finer("Source freed " + m_sourcePort[0] + ",  " + m_sourcePort[1]);
     m_encoder.close();
-    logger.finer("Encoder freed " + m_encoderPort[0] + ", " + m_encoderPort[1]);
+    logger.finer("QuadratureEncoder freed " + m_encoderPort[0] + ", " + m_encoderPort[1]);
     if (m_allocated) {
       m_dio1.teardown();
       m_dio2.teardown();

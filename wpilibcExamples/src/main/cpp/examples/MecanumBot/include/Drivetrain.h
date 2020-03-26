@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/AnalogGyro.h>
-#include <frc/Encoder.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/geometry/Translation2d.h>
@@ -40,10 +40,10 @@ class Drivetrain {
   frc::PWMSparkMax m_backLeftMotor{3};
   frc::PWMSparkMax m_backRightMotor{4};
 
-  frc::Encoder m_frontLeftEncoder{0, 1};
-  frc::Encoder m_frontRightEncoder{2, 3};
-  frc::Encoder m_backLeftEncoder{4, 5};
-  frc::Encoder m_backRightEncoder{6, 7};
+  frc::QuadratureEncoder m_frontLeftEncoder{0, 1};
+  frc::QuadratureEncoder m_frontRightEncoder{2, 3};
+  frc::QuadratureEncoder m_backLeftEncoder{4, 5};
+  frc::QuadratureEncoder m_backRightEncoder{6, 7};
 
   frc::Translation2d m_frontLeftLocation{0.381_m, 0.381_m};
   frc::Translation2d m_frontRightLocation{0.381_m, -0.381_m};

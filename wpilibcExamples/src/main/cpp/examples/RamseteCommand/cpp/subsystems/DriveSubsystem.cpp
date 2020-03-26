@@ -16,12 +16,7 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]},
-      m_odometry{m_gyro.GetRotation2d()} {
-  // We need to invert one side of the drivetrain so that positive voltages
-  // result in both sides moving forward. Depending on how your robot's
-  // gearbox is constructed, you might have to invert the left side instead.
-  m_rightMotors.SetInverted(true);
-
+      m_odometry{frc::Rotation2d(units::degree_t(GetHeading()))} {
   // Set the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
@@ -31,7 +26,7 @@ DriveSubsystem::DriveSubsystem()
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
-  m_odometry.Update(m_gyro.GetRotation2d(),
+  m_odometry.Update(frc::Rotation2d(units::degree_t(GetHeading())),
                     units::meter_t(m_leftEncoder.GetDistance()),
                     units::meter_t(m_rightEncoder.GetDistance()));
 }
@@ -55,11 +50,11 @@ double DriveSubsystem::GetAverageEncoderDistance() {
   return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
 }
 
-frc::Encoder& DriveSubsystem::GetLeftEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetLeftEncoder() {
   return m_leftEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetRightEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetRightEncoder() {
   return m_rightEncoder;
 }
 

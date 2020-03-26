@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.examples.armbot.subsystems;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 /** A robot arm subsystem that moves with a motion profile. */
 public class ArmSubsystem extends ProfiledPIDSubsystem {
   private final PWMSparkMax m_motor = new PWMSparkMax(ArmConstants.kMotorPort);
-  private final Encoder m_encoder =
-      new Encoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
+  private final QuadratureEncoder m_encoder =
+      new QuadratureEncoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
   private final ArmFeedforward m_feedforward =
       new ArmFeedforward(
           ArmConstants.kSVolts, ArmConstants.kCosVolts,

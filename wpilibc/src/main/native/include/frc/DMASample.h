@@ -14,7 +14,7 @@
 #include "frc/Counter.h"
 #include "frc/DMA.h"
 #include "frc/DutyCycle.h"
-#include "frc/Encoder.h"
+#include "frc/QuadratureEncoder.h"
 
 namespace frc {
 class DMASample : public HAL_DMASample {
@@ -37,19 +37,24 @@ class DMASample : public HAL_DMASample {
     return units::second_t{static_cast<double>(GetTime()) * 1.0e-6};
   }
 
-  int32_t GetEncoderRaw(const Encoder* encoder, int32_t* status) const {
-    return HAL_GetDMASampleEncoderRaw(this, encoder->m_encoder, status);
+  int32_t GetEncoderRaw(const QuadratureEncoder* QuadratureEncoder,
+                        int32_t* status) const {
+    return HAL_GetDMASampleEncoderRaw(this, QuadratureEncoder->m_encoder,
+                                      status);
   }
 
-  double GetEncoderDistance(const Encoder* encoder, int32_t* status) const {
-    double val = GetEncoderRaw(encoder, status);
-    val *= encoder->DecodingScaleFactor();
-    val *= encoder->GetDistancePerPulse();
+  double GetEncoderDistance(const QuadratureEncoder* QuadratureEncoder,
+                            int32_t* status) const {
+    double val = GetEncoderRaw(QuadratureEncoder, status);
+    val *= QuadratureEncoder->DecodingScaleFactor();
+    val *= QuadratureEncoder->GetDistancePerPulse();
     return val;
   }
 
-  int32_t GetEncoderPeriodRaw(const Encoder* encoder, int32_t* status) const {
-    return HAL_GetDMASampleEncoderPeriodRaw(this, encoder->m_encoder, status);
+  int32_t GetEncoderPeriodRaw(const QuadratureEncoder* QuadratureEncoder,
+                              int32_t* status) const {
+    return HAL_GetDMASampleEncoderPeriodRaw(this, QuadratureEncoder->m_encoder,
+                                            status);
   }
 
   int32_t GetCounter(const Counter* counter, int32_t* status) const {

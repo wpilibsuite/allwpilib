@@ -3,14 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+#include <memory>
+
 #include <wpi/deprecated.h>
+
 #include "QuadratureEncoder.h"
 
 namespace frc {
 
 /**
  * Class to read quad encoders.
- * Deprecated : use QuadratureEncoder instead.
+ * @deprecated : use QuadratureEncoder instead.
  *
  * Quadrature encoders are devices that count shaft rotation and can sense
  * direction. The output of the QuadEncoder class is an integer that can count
@@ -26,8 +29,7 @@ namespace frc {
  */
 
 class Encoder : public QuadratureEncoder {
-  public:
-
+ public:
   /**
    * Encoder constructor.
    *
@@ -52,8 +54,8 @@ class Encoder : public QuadratureEncoder {
    *                         be double (2x) the spec'd count.
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
-  Encoder(int aChannel, int bChannel, bool reverseDirection = false, 
-        EncodingType encodingType = EncodingType::k4X);
+  Encoder(int aChannel, int bChannel, bool reverseDirection = false,
+          EncodingType encodingType = EncodingType::k4X);
 
   /**
    * Encoder constructor.
@@ -80,8 +82,8 @@ class Encoder : public QuadratureEncoder {
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
   Encoder(DigitalSource* aSource, DigitalSource* bSource,
-          bool reverseDirection = false, EncodingType encodingType = EncodingType::k4X);
-
+          bool reverseDirection = false,
+          EncodingType encodingType = EncodingType::k4X);
   /**
    * Encoder constructor.
    *
@@ -106,13 +108,13 @@ class Encoder : public QuadratureEncoder {
    *                         be double (2x) the spec'd count.
    */
   WPI_DEPRECATED("use QuadratureEncoder instead")
-  Encoder(DigitalSource& aSource, DigitalSource& bSource, bool reverseDirection = false,
+  Encoder(DigitalSource& aSource, DigitalSource& bSource,
+          bool reverseDirection = false,
           EncodingType encodingType = EncodingType::k4X);
 
-  Encoder(std::shared_ptr<DigitalSource> aSource, std::shared_ptr<DigitalSource> bSource,
-          bool reverseDirection = false, EncodingType encodingType = EncodingType::k4X);
-
-
-  
-
-} ;}
+  WPI_DEPRECATED("use QuadratureEncoder instead")
+  Encoder(std::shared_ptr<DigitalSource> aSource,
+          std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,
+          EncodingType encodingType = EncodingType::k4X);
+};
+}  // namespace frc

@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj.fixtures;
 
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -27,7 +27,7 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
   private boolean m_initialized = false;
   private boolean m_tornDown = false;
   protected T m_motor;
-  private Encoder m_encoder;
+  private QuadratureEncoder m_encoder;
   private final Counter[] m_counters = new Counter[2];
   protected DigitalInput m_alphaSource; // Stored so it can be freed at tear down
   protected DigitalInput m_betaSource;
@@ -72,7 +72,7 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
         m_alphaSource = giveDigitalInputA();
         m_betaSource = giveDigitalInputB();
 
-        m_encoder = new Encoder(m_alphaSource, m_betaSource);
+        m_encoder = new QuadratureEncoder(m_alphaSource, m_betaSource);
         m_counters[0] = new Counter(m_alphaSource);
         m_counters[1] = new Counter(m_betaSource);
         logger.fine("Creating the speed controller!");
@@ -101,7 +101,7 @@ public abstract class MotorEncoderFixture<T extends MotorController> implements 
    *
    * @return the encoder that this object refers too
    */
-  public Encoder getEncoder() {
+  public QuadratureEncoder getEncoder() {
     initialize();
     return m_encoder;
   }

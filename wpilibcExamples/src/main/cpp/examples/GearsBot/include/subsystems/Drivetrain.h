@@ -1,12 +1,15 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
 #pragma once
 
 #include <frc/AnalogGyro.h>
 #include <frc/AnalogInput.h>
-#include <frc/Encoder.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
@@ -74,8 +77,8 @@ class Drivetrain : public frc2::SubsystemBase {
 
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
-  frc::Encoder m_leftEncoder{1, 2};
-  frc::Encoder m_rightEncoder{3, 4};
+  frc::QuadratureEncoder m_leftEncoder{1, 2};
+  frc::QuadratureEncoder m_rightEncoder{3, 4};
   frc::AnalogInput m_rangefinder{6};
   frc::AnalogGyro m_gyro{1};
 };

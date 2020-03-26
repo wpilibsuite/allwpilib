@@ -16,8 +16,9 @@
 
 using namespace frc;
 
-QuadratureEncoder::QuadratureEncoder(int aChannel, int bChannel, bool reverseDirection,
-                 EncodingType encodingType) {
+QuadratureEncoder::QuadratureEncoder(int aChannel, int bChannel,
+                                     bool reverseDirection,
+                                     EncodingType encodingType) {
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
@@ -26,8 +27,10 @@ QuadratureEncoder::QuadratureEncoder(int aChannel, int bChannel, bool reverseDir
   registry.AddChild(this, m_bSource.get());
 }
 
-QuadratureEncoder::QuadratureEncoder(DigitalSource* aSource, DigitalSource* bSource,
-                 bool reverseDirection, EncodingType encodingType)
+QuadratureEncoder::QuadratureEncoder(DigitalSource* aSource,
+                                     DigitalSource* bSource,
+                                     bool reverseDirection,
+                                     EncodingType encodingType)
     : m_aSource(aSource, NullDeleter<DigitalSource>()),
       m_bSource(bSource, NullDeleter<DigitalSource>()) {
   if (m_aSource == nullptr || m_bSource == nullptr)
@@ -36,16 +39,19 @@ QuadratureEncoder::QuadratureEncoder(DigitalSource* aSource, DigitalSource* bSou
     InitEncoder(reverseDirection, encodingType);
 }
 
-QuadratureEncoder::QuadratureEncoder(DigitalSource& aSource, DigitalSource& bSource,
-                 bool reverseDirection, EncodingType encodingType)
+QuadratureEncoder::QuadratureEncoder(DigitalSource& aSource,
+                                     DigitalSource& bSource,
+                                     bool reverseDirection,
+                                     EncodingType encodingType)
     : m_aSource(&aSource, NullDeleter<DigitalSource>()),
       m_bSource(&bSource, NullDeleter<DigitalSource>()) {
   InitEncoder(reverseDirection, encodingType);
 }
 
 QuadratureEncoder::QuadratureEncoder(std::shared_ptr<DigitalSource> aSource,
-                 std::shared_ptr<DigitalSource> bSource, bool reverseDirection,
-                 EncodingType encodingType)
+                                     std::shared_ptr<DigitalSource> bSource,
+                                     bool reverseDirection,
+                                     EncodingType encodingType)
     : m_aSource(aSource), m_bSource(bSource) {
   if (m_aSource == nullptr || m_bSource == nullptr)
     wpi_setWPIError(NullParameter);
@@ -196,7 +202,8 @@ double QuadratureEncoder::PIDGet() {
   }
 }
 
-void QuadratureEncoder::SetIndexSource(int channel, QuadratureEncoder::IndexingType type) {
+void QuadratureEncoder::SetIndexSource(int channel,
+                                       QuadratureEncoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_shared<DigitalInput>(channel);
   SendableRegistry::GetInstance().AddChild(this, m_indexSource.get());
@@ -204,7 +211,7 @@ void QuadratureEncoder::SetIndexSource(int channel, QuadratureEncoder::IndexingT
 }
 
 void QuadratureEncoder::SetIndexSource(const DigitalSource& source,
-                             QuadratureEncoder::IndexingType type) {
+                                       QuadratureEncoder::IndexingType type) {
   int32_t status = 0;
   HAL_SetEncoderIndexSource(
       m_encoder, source.GetPortHandleForRouting(),
@@ -240,7 +247,8 @@ void QuadratureEncoder::InitSendable(SendableBuilder& builder) {
                             [=]() { return GetDistancePerPulse(); }, nullptr);
 }
 
-void QuadratureEncoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
+void QuadratureEncoder::InitEncoder(bool reverseDirection,
+                                    EncodingType encodingType) {
   int32_t status = 0;
   m_encoder = HAL_InitializeEncoder(
       m_aSource->GetPortHandleForRouting(),

@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/AnalogGyro.h>
-#include <frc/Encoder.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
@@ -65,8 +65,8 @@ class Drivetrain {
   frc::MotorControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
   frc::MotorControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
 
-  frc::Encoder m_leftEncoder{0, 1};
-  frc::Encoder m_rightEncoder{2, 3};
+  frc::QuadratureEncoder m_leftEncoder{0, 1};
+  frc::QuadratureEncoder m_rightEncoder{2, 3};
 
   frc2::PIDController m_leftPIDController{1.0, 0.0, 0.0};
   frc2::PIDController m_rightPIDController{1.0, 0.0, 0.0};

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc/Encoder.h>
+#include <frc/QuadratureEncoder.h>
 #include <frc/controller/ArmFeedforward.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/ProfiledPIDSubsystem.h>
@@ -25,6 +25,6 @@ class ArmSubsystem : public frc2::ProfiledPIDSubsystem<units::radians> {
 
  private:
   frc::PWMSparkMax m_motor;
-  frc::Encoder m_encoder;
+  frc::QuadratureEncoder m_encoder;
   frc::ArmFeedforward m_feedforward;
 };

@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -36,7 +35,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   frc::Joystick m_joystick{1};
-  frc::Encoder m_encoder{1, 2};
+  frc::QuadratureEncoder m_encoder{1, 2};
   frc::PWMSparkMax m_motor{1};
 
   // Create a PID controller whose setpoint's change is subject to maximum

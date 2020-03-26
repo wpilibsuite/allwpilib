@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -28,8 +28,8 @@ public class Drivetrain extends SubsystemBase {
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-  private final Encoder m_leftEncoder = new Encoder(1, 2);
-  private final Encoder m_rightEncoder = new Encoder(3, 4);
+  private final QuadratureEncoder m_leftEncoder = new QuadratureEncoder(1, 2);
+  private final QuadratureEncoder m_rightEncoder = new QuadratureEncoder(3, 4);
   private final AnalogInput m_rangefinder = new AnalogInput(6);
   private final AnalogGyro m_gyro = new AnalogGyro(1);
 
@@ -58,8 +58,8 @@ public class Drivetrain extends SubsystemBase {
 
     // Let's name the sensors on the LiveWindow
     addChild("Drive", m_drive);
-    addChild("Left Encoder", m_leftEncoder);
-    addChild("Right Encoder", m_rightEncoder);
+    addChild("Left QuadratureEncoder", m_leftEncoder);
+    addChild("Right QuadratureEncoder", m_rightEncoder);
     addChild("Rangefinder", m_rangefinder);
     addChild("Gyro", m_gyro);
   }

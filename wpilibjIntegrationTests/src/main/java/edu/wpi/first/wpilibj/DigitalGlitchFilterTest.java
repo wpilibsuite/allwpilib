@@ -31,7 +31,7 @@ public class DigitalGlitchFilterTest extends AbstractComsSetup {
     final DigitalInput input2 = new DigitalInput(2);
     final DigitalInput input3 = new DigitalInput(3);
     final DigitalInput input4 = new DigitalInput(4);
-    final Encoder encoder5 = new Encoder(5, 6);
+    final QuadratureEncoder encoder5 = new QuadratureEncoder(5, 6);
     final Counter counter7 = new Counter(7);
 
     final DigitalGlitchFilter filter1 = new DigitalGlitchFilter();

@@ -66,7 +66,6 @@ public class Encoder extends QuadratureEncoder {
                  final EncodingType encodingType) {
 
     super(channelA, channelB, reverseDirection, encodingType);
-
   }
 
   /**

@@ -73,19 +73,19 @@ void DriveSubsystem::ResetEncoders() {
   m_rearRightEncoder.Reset();
 }
 
-frc::Encoder& DriveSubsystem::GetFrontLeftEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetFrontLeftEncoder() {
   return m_frontLeftEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetRearLeftEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetRearLeftEncoder() {
   return m_rearLeftEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetFrontRightEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetFrontRightEncoder() {
   return m_frontRightEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetRearRightEncoder() {
+frc::QuadratureEncoder& DriveSubsystem::GetRearRightEncoder() {
   return m_rearRightEncoder;
 }
 

@@ -78,14 +78,15 @@ class QuadratureEncoder : public ErrorBase,
    *                         be double (2x) the spec'd count.
    */
   QuadratureEncoder(int aChannel, int bChannel, bool reverseDirection = false,
-          EncodingType encodingType = k4X);
+                    EncodingType encodingType = k4X);
 
   /**
    * QuadratureEncoder constructor.
    *
-   * Construct a QuadratureEncoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The QuadratureEncoder class will not
-   * allocate the digital inputs and assume that they already are counted.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared. The
+   * QuadratureEncoder class will not allocate the digital inputs and assume
+   * that they already are counted.
    *
    * The counter will start counting immediately.
    *
@@ -104,14 +105,16 @@ class QuadratureEncoder : public ErrorBase,
    *                         be double (2x) the spec'd count.
    */
   QuadratureEncoder(DigitalSource* aSource, DigitalSource* bSource,
-          bool reverseDirection = false, EncodingType encodingType = k4X);
+                    bool reverseDirection = false,
+                    EncodingType encodingType = k4X);
 
   /**
    * QuadratureEncoder constructor.
    *
-   * Construct a QuadratureEncoder given a and b channels as digital inputs. This is used
-   * in the case where the digital inputs are shared. The QuadratureEncoder class will not
-   * allocate the digital inputs and assume that they already are counted.
+   * Construct a QuadratureEncoder given a and b channels as digital inputs.
+   * This is used in the case where the digital inputs are shared. The
+   * QuadratureEncoder class will not allocate the digital inputs and assume
+   * that they already are counted.
    *
    * The counter will start counting immediately.
    *
@@ -130,11 +133,13 @@ class QuadratureEncoder : public ErrorBase,
    *                         be double (2x) the spec'd count.
    */
   QuadratureEncoder(DigitalSource& aSource, DigitalSource& bSource,
-          bool reverseDirection = false, EncodingType encodingType = k4X);
+                    bool reverseDirection = false,
+                    EncodingType encodingType = k4X);
 
   QuadratureEncoder(std::shared_ptr<DigitalSource> aSource,
-          std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,
-          EncodingType encodingType = k4X);
+                    std::shared_ptr<DigitalSource> bSource,
+                    bool reverseDirection = false,
+                    EncodingType encodingType = k4X);
 
   ~QuadratureEncoder() override;
 
@@ -145,11 +150,11 @@ class QuadratureEncoder : public ErrorBase,
   /**
    * Gets the current count.
    *
-   * Returns the current count on the QuadratureEncoder. This method compensates for the
-   * decoding type.
+   * Returns the current count on the QuadratureEncoder. This method compensates
+   * for the decoding type.
    *
-   * @return Current count from the QuadratureEncoder adjusted for the 1x, 2x, or 4x scale
-   *         factor.
+   * @return Current count from the QuadratureEncoder adjusted for the 1x, 2x,
+   * or 4x scale factor.
    */
   int Get() const override;
 
@@ -163,8 +168,8 @@ class QuadratureEncoder : public ErrorBase,
   /**
    * Returns the period of the most recent pulse.
    *
-   * Returns the period of the most recent QuadratureEncoder pulse in seconds. This method
-   * compensates for the decoding type.
+   * Returns the period of the most recent QuadratureEncoder pulse in seconds.
+   * This method compensates for the decoding type.
    *
    * Warning: This returns unscaled periods. Use GetRate() for rates that are
    * scaled using the value from SetDistancePerPulse().
@@ -176,10 +181,10 @@ class QuadratureEncoder : public ErrorBase,
   /**
    * Sets the maximum period for stopped detection.
    *
-   * Sets the value that represents the maximum period of the QuadratureEncoder before it
-   * will assume that the attached device is stopped. This timeout allows users
-   * to determine if the wheels or other shaft has stopped rotating.
-   * This method compensates for the decoding type.
+   * Sets the value that represents the maximum period of the QuadratureEncoder
+   * before it will assume that the attached device is stopped. This timeout
+   * allows users to determine if the wheels or other shaft has stopped
+   * rotating. This method compensates for the decoding type.
    *
    * @deprecated Use SetMinRate() in favor of this method.  This takes unscaled
    *             periods and SetMinRate() scales using value from

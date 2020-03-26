@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.frisbeebot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 public class ShooterSubsystem extends PIDSubsystem {
   private final PWMSparkMax m_shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
   private final PWMSparkMax m_feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
-  private final Encoder m_shooterEncoder =
-      new Encoder(
+  private final QuadratureEncoder m_shooterEncoder =
+      new QuadratureEncoder(
           ShooterConstants.kEncoderPorts[0],
           ShooterConstants.kEncoderPorts[1],
           ShooterConstants.kEncoderReversed);

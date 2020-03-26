@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.motorcontrolencoder;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.QuadratureEncoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,13 +29,13 @@ public class Robot extends TimedRobot {
 
   private MotorController m_motor;
   private Joystick m_joystick;
-  private Encoder m_encoder;
+  private QuadratureEncoder m_encoder;
 
   @Override
   public void robotInit() {
     m_motor = new PWMSparkMax(kMotorPort);
     m_joystick = new Joystick(kJoystickPort);
-    m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
+    m_encoder = new QuadratureEncoder(kEncoderPortA, kEncoderPortB);
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
     m_encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber("Encoder", m_encoder.getDistance());
+    SmartDashboard.putNumber("QuadratureEncoder", m_encoder.getDistance());
   }
 
   @Override
