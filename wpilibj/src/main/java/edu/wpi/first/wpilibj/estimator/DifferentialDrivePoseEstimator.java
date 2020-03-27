@@ -35,13 +35,12 @@ import edu.wpi.first.wpiutil.math.numbers.N3;
  *
  * <p>x = [[x, y, dtheta]]^T in the field coordinate system.
  *
- * <p>u = [[vx, vy, omega]]^T (robot-relative velocities) -- NB: these aren't technically system
- * inputs, but they make things considerably easier. Using "fake" inputs makes it so teams don't
- * have to worry about getting an accurate model. Basically, we suspect that it's easier for
- * teams to get good encoder data than it is for them to perform system identification well enough
- * to get a good model.
+ * <p>u = [[vx, vy, omega]]^T (robot-relative velocities) -- NB: using velocities make things
+ * considerably easier, because it means that teams don't have to worry about getting an accurate
+ * model. Basically, we suspect that it's easier for teams to get good encoder data than it is for
+ * them to perform system identification well enough to get a good model.
  *
- * <p>y = [[x, y, theta,]]^T from vision
+ * <p>y = [[x, y, theta]]^T from vision
  */
 public class DifferentialDrivePoseEstimator {
   private final ExtendedKalmanFilter<N3, N3, N3> m_observer;
@@ -104,9 +103,7 @@ public class DifferentialDrivePoseEstimator {
 
   @SuppressWarnings({"ParameterName", "MethodName"})
   private Matrix<N3, N1> f(Matrix<N3, N1> x, Matrix<N3, N1> u) {
-    // This is the continuous version of the pose exponential. We're not going to use the discrete
-    // version because Runge-Kutta can do the integration for us. Note that we do *not* add x (i.e.
-    // our diff eq starting condition)--Runge-Kutta does that for us.
+    // Apply a rotation matrix. Note that we do *not* add x--Runge-Kutta does that for us.
     var theta = x.get(2, 0);
     var toFieldRotation = new MatBuilder<>(Nat.N3(), Nat.N3()).fill(
             Math.cos(theta), -Math.sin(theta), 0,
