@@ -83,7 +83,7 @@ public class ExtendedKalmanFilterTest {
                       ExtendedKalmanFilterTest::getDynamics,
                       ExtendedKalmanFilterTest::getLocalMeasurementModel,
                       VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
-                      VecBuilder.fill(0.0001, 0.01, 0.01), true, dtSeconds);
+                      VecBuilder.fill(0.0001, 0.01, 0.01), dtSeconds);
 
       Matrix<N2, N1> u = VecBuilder.fill(12.0, 12.0);
       observer.predict(u, dtSeconds);
@@ -111,7 +111,7 @@ public class ExtendedKalmanFilterTest {
                     ExtendedKalmanFilterTest::getDynamics,
                     ExtendedKalmanFilterTest::getLocalMeasurementModel,
                     VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
-                    VecBuilder.fill(0.001, 0.01, 0.01), true, dtSeconds);
+                    VecBuilder.fill(0.001, 0.01, 0.01), dtSeconds);
 
     List<Pose2d> waypoints = Arrays.asList(new Pose2d(2.75, 22.521, new Rotation2d()),
             new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
