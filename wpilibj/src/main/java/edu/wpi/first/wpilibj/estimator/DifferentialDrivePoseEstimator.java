@@ -3,8 +3,9 @@ package edu.wpi.first.wpilibj.estimator;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Twist2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.math.StateSpaceUtils;
+import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
@@ -34,10 +35,13 @@ import edu.wpi.first.wpiutil.math.numbers.N3;
  *
  * <p>x = [[x, y, dtheta]]^T in the field coordinate system.
  *
- * <p>u = [[d_l, d_r, dtheta]]^T -- these aren't technically system inputs, but
- * they make things considerably easier.
+ * <p>u = [[vx, vy, omega]]^T (robot-relative velocities) -- NB: these aren't technically system
+ * inputs, but they make things considerably easier. Using "fake" inputs makes it so teams don't
+ * have to worry about getting an accurate model. Basically, we suspect that it's easier for
+ * teams to get good encoder data than it is for them to perform system identification well enough
+ * to get a good model.
  *
- * <p>y = [[x, y, theta]]^T
+ * <p>y = [[x, y, theta,]]^T from vision
  */
 public class DifferentialDrivePoseEstimator {
   private final ExtendedKalmanFilter<N3, N3, N3> m_observer;
@@ -89,7 +93,7 @@ public class DifferentialDrivePoseEstimator {
             Nat.N3(), Nat.N3(), Nat.N3(),
             this::f, (x, u) -> x,
             stateStdDevs, measurementStdDevs,
-            false, m_nominalDt);
+            true, m_nominalDt);
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
 
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
@@ -97,16 +101,23 @@ public class DifferentialDrivePoseEstimator {
     m_observer.setXhat(StateSpaceUtils.poseToVector(initialPoseMeters));
   }
 
+  @SuppressWarnings("ParameterName")
+  private Matrix<N3, N1> continuousPoseExponential(Matrix<N3, N1> x, Matrix<N3, N1> u) {
+    // This is the continuous version of the pose exponential. We're not going to use the discrete
+    // version because Runge-Kutta can do the integration for us. Note that we do *not* add x (i.e.
+    // our diff eq starting condition)--Runge-Kutta does that for us.
+    var theta = x.get(2, 0);
+    var toFieldRotation = new MatBuilder<>(Nat.N3(), Nat.N3()).fill(
+            Math.cos(theta), -Math.sin(theta), 0,
+            Math.sin(theta), Math.cos(theta), 0,
+            0, 0, 1
+    );
+    return toFieldRotation.times(u);
+  }
+
   @SuppressWarnings({"ParameterName", "MethodName"})
   private Matrix<N3, N1> f(Matrix<N3, N1> x, Matrix<N3, N1> u) {
-    // Diff drive forward kinematics:
-    // v_c = (v_l + v_r) / 2
-    double dx = (u.get(0, 0) + u.get(1, 0)) / 2;
-    var newPose = new Pose2d(x.get(0, 0), x.get(1, 0), new Rotation2d(x.get(2, 0)))
-            .exp(new Twist2d(dx, 0.0, u.get(2, 0)));
-
-    return VecBuilder.fill(newPose.getTranslation().getX(), newPose.getTranslation().getY(),
-            x.get(2, 0) + u.get(2, 0));
+    return continuousPoseExponential(x, u);
   }
 
   /**
@@ -168,45 +179,43 @@ public class DifferentialDrivePoseEstimator {
    * Updates the the Extended Kalman Filter using only wheel encoder information.
    * Note that this should be called every loop.
    *
-   * @param gyroAngle           The current gyro angle.
-   * @param leftDistanceMeters  The distance the left wheel has travelled since
-   *                            the last loop iteration.
-   * @param rightDistanceMeters The distance the left wheel has travelled since
-   *                            the last loop iteration.
+   * @param gyroAngle                      The current gyro angle.
+   * @param wheelVelocitiesMetersPerSecond The velocities of the wheels in meters per second.
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d update(
           Rotation2d gyroAngle,
-          double leftDistanceMeters, double rightDistanceMeters
+          DifferentialDriveWheelSpeeds wheelVelocitiesMetersPerSecond
   ) {
-    return updateWithTime(Timer.getFPGATimestamp(), gyroAngle, leftDistanceMeters,
-            rightDistanceMeters);
+    return updateWithTime(Timer.getFPGATimestamp(), gyroAngle, wheelVelocitiesMetersPerSecond);
   }
 
   /**
    * Updates the the Extended Kalman Filter using only wheel encoder information.
    * Note that this should be called every loop.
    *
-   * @param currentTimeSeconds  Time at which this method was called, in seconds.
-   * @param gyroAngle           The current gyro angle.
-   * @param leftDistanceMeters  The distance the left wheel has travelled since
-   *                            the last loop iteration.
-   * @param rightDistanceMeters The distance the left wheel has travelled since
-   *                            the last loop iteration.
+   * @param currentTimeSeconds             Time at which this method was called, in seconds.
+   * @param gyroAngle                      The current gyro angle.
+   * @param wheelVelocitiesMetersPerSecond The velocities of the wheels in meters per second.
    * @return The estimated pose of the robot in meters.
    */
   @SuppressWarnings("LocalVariableName")
   public Pose2d updateWithTime(
           double currentTimeSeconds, Rotation2d gyroAngle,
-          double leftDistanceMeters, double rightDistanceMeters
+          DifferentialDriveWheelSpeeds wheelVelocitiesMetersPerSecond
   ) {
-    var angle = gyroAngle.plus(m_gyroOffset);
-    var u = VecBuilder.fill(leftDistanceMeters, rightDistanceMeters,
-            angle.minus(m_previousAngle).getRadians());
-    m_previousAngle = angle;
-
     double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;
     m_prevTimeSeconds = currentTimeSeconds;
+
+    var angle = gyroAngle.plus(m_gyroOffset);
+    // Diff drive forward kinematics:
+    // v_c = (v_l + v_r) / 2
+    var wheelVels = wheelVelocitiesMetersPerSecond;
+    var u = VecBuilder.fill(
+            (wheelVels.leftMetersPerSecond + wheelVels.rightMetersPerSecond) / 2, 0,
+            angle.minus(m_previousAngle).getRadians() / dt
+    );
+    m_previousAngle = angle;
 
     m_latencyCompensator.addObserverState(m_observer, u, currentTimeSeconds);
     m_observer.predict(u, dt);
