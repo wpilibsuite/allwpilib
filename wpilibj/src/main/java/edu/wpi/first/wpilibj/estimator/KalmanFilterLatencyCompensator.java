@@ -60,11 +60,14 @@ class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num
     for (var entry : snapshotsToUse.entrySet()) {
       var st = entry.getValue();
 
-      observer.predict(st.inputs, entry.getKey() - lastTimestamp);
-      lastTimestamp = entry.getKey();
       if (y != null) {
         observer.setP(st.errorCovariances);
         observer.setXhat(st.xHat);
+      }
+
+      observer.predict(st.inputs, entry.getKey() - lastTimestamp);
+      lastTimestamp = entry.getKey();
+      if (y != null) {
         // Note that we correct the observer with inputs closest in time to the measurement
         // This makes the assumption that the dt is small enough that the difference between the
         // measurement time and the time that the inputs were captured at is very small
