@@ -154,13 +154,13 @@ class CvSink : public ImageSink {
 };
 
 inline CvSource::CvSource(const wpi::Twine& name, const VideoMode& mode) {
-  m_handle = CreateCvSource(name, mode, &m_status);
+  m_handle = CreateImageSource(name, mode, &m_status);
 }
 
 inline CvSource::CvSource(const wpi::Twine& name, VideoMode::PixelFormat format,
                           int width, int height, int fps) {
   m_handle =
-      CreateCvSource(name, VideoMode{format, width, height, fps}, &m_status);
+      CreateImageSource(name, VideoMode{format, width, height, fps}, &m_status);
 }
 
 inline void CvSource::PutFrame(cv::Mat& image) {
@@ -169,7 +169,7 @@ inline void CvSource::PutFrame(cv::Mat& image) {
 }
 
 inline CvSink::CvSink(const wpi::Twine& name) {
-  m_handle = CreateCvSink(name, &m_status);
+  m_handle = CreateImageSink(name, &m_status);
 }
 
 inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) const {

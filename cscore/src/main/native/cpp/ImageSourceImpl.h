@@ -5,28 +5,28 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CONFIGURABLESOURCEIMPL_H_
-#define CSCORE_CONFIGURABLESOURCEIMPL_H_
+#ifndef CSCORE_IMAGESOURCEIMPL_H_
+#define CSCORE_IMAGESOURCEIMPL_H_
 
 #include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include <opencv2/core/core.hpp>
 #include <wpi/ArrayRef.h>
 #include <wpi/Twine.h>
 
 #include "SourceImpl.h"
+#include "cscore_raw.h"
 
 namespace cs {
 
-class ConfigurableSourceImpl : public SourceImpl {
- protected:
-  ConfigurableSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
-                         Notifier& notifier, const VideoMode& mode);
-
+class ImageSourceImpl : public SourceImpl {
  public:
-  ~ConfigurableSourceImpl() override;
+  ImageSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
+                  Notifier& notifier, const VideoMode& mode);
+  ~ImageSourceImpl() override;
 
   void Start() override;
 
@@ -35,12 +35,15 @@ class ConfigurableSourceImpl : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
-  // OpenCV-specific functions
+  // Image-specific functions
   void NotifyError(const wpi::Twine& msg);
   int CreateProperty(const wpi::Twine& name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value);
   void SetEnumPropertyChoices(int property, wpi::ArrayRef<std::string> choices,
                               CS_Status* status);
+
+  void PutFrame(cv::Mat& image);
+  void PutFrame(const CS_RawFrame& image);
 
  private:
   std::atomic_bool m_connected{true};
@@ -48,4 +51,4 @@ class ConfigurableSourceImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_CONFIGURABLESOURCEIMPL_H_
+#endif  // CSCORE_IMAGESOURCEIMPL_H_

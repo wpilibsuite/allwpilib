@@ -42,11 +42,13 @@ uint64_t CS_GrabRawSinkFrame(CS_Sink sink, struct CS_RawFrame* rawImage,
 uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct CS_RawFrame* rawImage,
                                     double timeout, CS_Status* status);
 
+WPI_DEPRECATED("use CS_CreateImageSink")
 CS_Sink CS_CreateRawSink(const char* name, CS_Status* status);
 
 void CS_PutRawSourceFrame(CS_Source source, const struct CS_RawFrame* image,
                           CS_Status* status);
 
+WPI_DEPRECATED("use CS_CreateImageSource")
 CS_Source CS_CreateRawSource(const char* name, const CS_VideoMode* mode,
                              CS_Status* status);
 /** @} */
@@ -168,14 +170,14 @@ class RawSink : public ImageSink {
 };
 
 inline RawSource::RawSource(const wpi::Twine& name, const VideoMode& mode) {
-  m_handle = CreateRawSource(name, mode, &m_status);
+  m_handle = CreateImageSource(name, mode, &m_status);
 }
 
 inline RawSource::RawSource(const wpi::Twine& name,
                             VideoMode::PixelFormat format, int width,
                             int height, int fps) {
   m_handle =
-      CreateRawSource(name, VideoMode{format, width, height, fps}, &m_status);
+      CreateImageSource(name, VideoMode{format, width, height, fps}, &m_status);
 }
 
 inline void RawSource::PutFrame(RawFrame& image) {
@@ -184,7 +186,7 @@ inline void RawSource::PutFrame(RawFrame& image) {
 }
 
 inline RawSink::RawSink(const wpi::Twine& name) {
-  m_handle = CreateRawSink(name, &m_status);
+  m_handle = CreateImageSink(name, &m_status);
 }
 
 inline uint64_t RawSink::GrabFrame(RawFrame& image, double timeout) const {

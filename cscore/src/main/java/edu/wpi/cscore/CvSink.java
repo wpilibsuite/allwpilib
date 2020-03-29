@@ -24,7 +24,7 @@ public class CvSink extends ImageSink {
    * @param name Source name (arbitrary unique identifier)
    */
   public CvSink(String name) {
-    super(CameraServerCvJNI.createCvSink(name));
+    super(CameraServerJNI.createImageSink(name));
   }
 
   /**

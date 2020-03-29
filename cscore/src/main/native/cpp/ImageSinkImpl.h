@@ -5,11 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_RAWSINKIMPL_H_
-#define CSCORE_RAWSINKIMPL_H_
+#ifndef CSCORE_IMAGESINKIMPL_H_
+#define CSCORE_IMAGESINKIMPL_H_
 
 #include <stdint.h>
 
+#include <opencv2/core/core.hpp>
 #include <wpi/Twine.h>
 
 #include "Frame.h"
@@ -17,23 +18,27 @@
 #include "cscore_raw.h"
 
 namespace cs {
-class SourceImpl;
 
-class RawSinkImpl : public SinkImpl {
+class ImageSinkImpl : public SinkImpl {
  public:
-  RawSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier);
-  RawSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-              std::function<void(uint64_t time)> processFrame);
-  ~RawSinkImpl() override;
+  ImageSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+                Notifier& notifier);
+  ~ImageSinkImpl() override;
 
   void Stop();
+
+  uint64_t GrabFrame(cv::Mat& image);
+  uint64_t GrabFrame(cv::Mat& image, double timeout);
 
   uint64_t GrabFrame(CS_RawFrame& frame);
   uint64_t GrabFrame(CS_RawFrame& frame, double timeout);
 
  private:
-  uint64_t GrabFrameImpl(CS_RawFrame& rawFrame, Frame& incomingFrame);
+  Frame GetNextFrame(bool hasTimeout, double timeout);
+  uint64_t GrabFrameImpl(cv::Mat& image, Frame&& frame);
+  uint64_t GrabFrameImpl(CS_RawFrame& rawFrame, Frame&& frame);
 };
+
 }  // namespace cs
 
-#endif  // CSCORE_RAWSINKIMPL_H_
+#endif  // CSCORE_IMAGESINKIMPL_H_
