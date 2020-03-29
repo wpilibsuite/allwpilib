@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,6 +30,9 @@ class GenericHID;
  * supplied on creation of the class. Those are used for either the Drive
  * function (intended for hand created drive code, such as autonomous) or with
  * the Tank/Arcade functions intended to be used for Operator Control driving.
+ *
+ * @deprecated Use DifferentialDrive or MecanumDrive classes instead.
+ *
  */
 class RobotDrive : public MotorSafety {
  public:

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -50,9 +50,31 @@ class SendableChooser : public SendableChooserBase {
   void AddOption(wpi::StringRef name, T object);
   void SetDefaultOption(wpi::StringRef name, T object);
 
+  /**
+   * Adds the given object to the list of options.
+   *
+   * On the SmartDashboard on the desktop, the object will appear as the given
+   * name.
+   *
+   * @deprecated use AddOption(wpi::StringRef name, T object) instead.
+   *
+   * @param name   the name of the option
+   * @param object the option
+   */
   WPI_DEPRECATED("use AddOption() instead")
   void AddObject(wpi::StringRef name, T object) { AddOption(name, object); }
 
+  /**
+   * Add the given object to the list of options and marks it as the default.
+   *
+   * Functionally, this is very close to AddOption() except that it will use
+   * this as the default option if none other is explicitly selected.
+   *
+   * @deprecated use SetDefaultOption(wpi::StringRef name, T object) instead.
+   *
+   * @param name   the name of the option
+   * @param object the option
+   */
   WPI_DEPRECATED("use SetDefaultOption() instead")
   void AddDefault(wpi::StringRef name, T object) {
     SetDefaultOption(name, object);
