@@ -81,14 +81,6 @@ int ConfigurableSourceImpl::CreateProperty(const wpi::Twine& name,
   return ndx;
 }
 
-int ConfigurableSourceImpl::CreateProperty(
-    const wpi::Twine& name, CS_PropertyKind kind, int minimum, int maximum,
-    int step, int defaultValue, int value,
-    std::function<void(CS_Property property)> onChange) {
-  // TODO
-  return 0;
-}
-
 void ConfigurableSourceImpl::SetEnumPropertyChoices(
     int property, wpi::ArrayRef<std::string> choices, CS_Status* status) {
   std::scoped_lock lock(m_mutex);

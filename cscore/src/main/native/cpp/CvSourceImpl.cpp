@@ -126,21 +126,6 @@ CS_Property CreateSourceProperty(CS_Source source, const wpi::Twine& name,
   return Handle{source, property, Handle::kProperty};
 }
 
-CS_Property CreateSourcePropertyCallback(
-    CS_Source source, const wpi::Twine& name, CS_PropertyKind kind, int minimum,
-    int maximum, int step, int defaultValue, int value,
-    std::function<void(CS_Property property)> onChange, CS_Status* status) {
-  auto data = Instance::GetInstance().GetSource(source);
-  if (!data || (data->kind & SourceMask) == 0) {
-    *status = CS_INVALID_HANDLE;
-    return -1;
-  }
-  int property = static_cast<CvSourceImpl&>(*data->source)
-                     .CreateProperty(name, kind, minimum, maximum, step,
-                                     defaultValue, value, onChange);
-  return Handle{source, property, Handle::kProperty};
-}
-
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                   wpi::ArrayRef<std::string> choices,
                                   CS_Status* status) {
@@ -210,15 +195,6 @@ CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
                                     int value, CS_Status* status) {
   return cs::CreateSourceProperty(source, name, kind, minimum, maximum, step,
                                   defaultValue, value, status);
-}
-
-CS_Property CS_CreateSourcePropertyCallback(
-    CS_Source source, const char* name, enum CS_PropertyKind kind, int minimum,
-    int maximum, int step, int defaultValue, int value, void* data,
-    void (*onChange)(void* data, CS_Property property), CS_Status* status) {
-  return cs::CreateSourcePropertyCallback(
-      source, name, kind, minimum, maximum, step, defaultValue, value,
-      [=](CS_Property property) { onChange(data, property); }, status);
 }
 
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,

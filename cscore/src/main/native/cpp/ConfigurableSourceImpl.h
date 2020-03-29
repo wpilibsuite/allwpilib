@@ -9,7 +9,6 @@
 #define CSCORE_CONFIGURABLESOURCEIMPL_H_
 
 #include <atomic>
-#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -40,9 +39,6 @@ class ConfigurableSourceImpl : public SourceImpl {
   void NotifyError(const wpi::Twine& msg);
   int CreateProperty(const wpi::Twine& name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value);
-  int CreateProperty(const wpi::Twine& name, CS_PropertyKind kind, int minimum,
-                     int maximum, int step, int defaultValue, int value,
-                     std::function<void(CS_Property property)> onChange);
   void SetEnumPropertyChoices(int property, wpi::ArrayRef<std::string> choices,
                               CS_Status* status);
 
