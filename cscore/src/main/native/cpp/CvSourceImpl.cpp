@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,9 +23,8 @@
 using namespace cs;
 
 CvSourceImpl::CvSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
-                           Notifier& notifier, Telemetry& telemetry,
-                           const VideoMode& mode)
-    : ConfigurableSourceImpl{name, logger, notifier, telemetry, mode} {}
+                           Notifier& notifier, const VideoMode& mode)
+    : ConfigurableSourceImpl{name, logger, notifier, mode} {}
 
 CvSourceImpl::~CvSourceImpl() {}
 
@@ -67,9 +66,9 @@ namespace cs {
 CS_Source CreateCvSource(const wpi::Twine& name, const VideoMode& mode,
                          CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSource(CS_SOURCE_CV, std::make_shared<CvSourceImpl>(
-                                             name, inst.logger, inst.notifier,
-                                             inst.telemetry, mode));
+  return inst.CreateSource(
+      CS_SOURCE_CV,
+      std::make_shared<CvSourceImpl>(name, inst.logger, inst.notifier, mode));
 }
 
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {

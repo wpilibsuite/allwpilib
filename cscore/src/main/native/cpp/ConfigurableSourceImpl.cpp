@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,9 +19,8 @@ using namespace cs;
 ConfigurableSourceImpl::ConfigurableSourceImpl(const wpi::Twine& name,
                                                wpi::Logger& logger,
                                                Notifier& notifier,
-                                               Telemetry& telemetry,
                                                const VideoMode& mode)
-    : SourceImpl{name, logger, notifier, telemetry} {
+    : SourceImpl{name, logger, notifier} {
   m_mode = mode;
   m_videoModes.push_back(m_mode);
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,16 +22,16 @@
 using namespace cs;
 
 CvSinkImpl::CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
-                       Notifier& notifier, Telemetry& telemetry)
-    : SinkImpl{name, logger, notifier, telemetry} {
+                       Notifier& notifier)
+    : SinkImpl{name, logger, notifier} {
   m_active = true;
   // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
 }
 
 CvSinkImpl::CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
-                       Notifier& notifier, Telemetry& telemetry,
+                       Notifier& notifier,
                        std::function<void(uint64_t time)> processFrame)
-    : SinkImpl{name, logger, notifier, telemetry} {}
+    : SinkImpl{name, logger, notifier} {}
 
 CvSinkImpl::~CvSinkImpl() { Stop(); }
 
@@ -124,9 +124,8 @@ namespace cs {
 
 CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSink(
-      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
-                                               inst.telemetry));
+  return inst.CreateSink(CS_SINK_CV, std::make_shared<CvSinkImpl>(
+                                         name, inst.logger, inst.notifier));
 }
 
 CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
@@ -135,7 +134,7 @@ CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(
       CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
-                                               inst.telemetry, processFrame));
+                                               processFrame));
 }
 
 static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;

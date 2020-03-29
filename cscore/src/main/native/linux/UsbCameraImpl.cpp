@@ -36,7 +36,6 @@
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
-#include "Telemetry.h"
 #include "UsbUtil.h"
 #include "cscore_cpp.h"
 
@@ -261,9 +260,8 @@ static std::string GetDescriptionImpl(const char* cpath) {
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, Telemetry& telemetry,
-                             const wpi::Twine& path)
-    : SourceImpl{name, logger, notifier, telemetry},
+                             Notifier& notifier, const wpi::Twine& path)
+    : SourceImpl{name, logger, notifier},
       m_path{path.str()},
       m_fd{-1},
       m_command_fd{eventfd(0, 0)},
@@ -1371,9 +1369,9 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSource(CS_SOURCE_USB, std::make_shared<UsbCameraImpl>(
-                                              name, inst.logger, inst.notifier,
-                                              inst.telemetry, path));
+  return inst.CreateSource(
+      CS_SOURCE_USB,
+      std::make_shared<UsbCameraImpl>(name, inst.logger, inst.notifier, path));
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {

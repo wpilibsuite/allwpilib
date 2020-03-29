@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,12 +26,11 @@ namespace cs {
 
 class Frame;
 class Notifier;
-class Telemetry;
 
 class SinkImpl : public PropertyContainer {
  public:
   explicit SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
-                    Notifier& notifier, Telemetry& telemetry);
+                    Notifier& notifier);
   virtual ~SinkImpl();
   SinkImpl(const SinkImpl& queue) = delete;
   SinkImpl& operator=(const SinkImpl& queue) = delete;
@@ -71,7 +70,6 @@ class SinkImpl : public PropertyContainer {
  protected:
   wpi::Logger& m_logger;
   Notifier& m_notifier;
-  Telemetry& m_telemetry;
 
  private:
   std::string m_name;

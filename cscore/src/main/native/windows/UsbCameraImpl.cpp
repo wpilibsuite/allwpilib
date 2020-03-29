@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,7 +41,6 @@
 #include "Log.h"
 #include "Notifier.h"
 #include "PropertyImpl.h"
-#include "Telemetry.h"
 #include "WindowsMessagePump.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
@@ -73,9 +72,8 @@ using namespace cs;
 namespace cs {
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, Telemetry& telemetry,
-                             const wpi::Twine& path)
-    : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
+                             Notifier& notifier, const wpi::Twine& path)
+    : SourceImpl{name, logger, notifier}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
   m_deviceId = -1;
@@ -83,9 +81,8 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, Telemetry& telemetry,
-                             int deviceId)
-    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {
+                             Notifier& notifier, int deviceId)
+    : SourceImpl{name, logger, notifier}, m_deviceId(deviceId) {
   StartMessagePump();
 }
 
@@ -1039,16 +1036,16 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }
   auto& inst = Instance::GetInstance();
-  auto source = std::make_shared<UsbCameraImpl>(
-      name, inst.logger, inst.notifier, inst.telemetry, dev);
+  auto source =
+      std::make_shared<UsbCameraImpl>(name, inst.logger, inst.notifier, dev);
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  auto source = std::make_shared<UsbCameraImpl>(
-      name, inst.logger, inst.notifier, inst.telemetry, path);
+  auto source =
+      std::make_shared<UsbCameraImpl>(name, inst.logger, inst.notifier, path);
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 

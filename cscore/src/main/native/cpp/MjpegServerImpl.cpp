@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -563,10 +563,10 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
 }
 
 MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
-                                 Notifier& notifier, Telemetry& telemetry,
+                                 Notifier& notifier,
                                  const wpi::Twine& listenAddress, int port,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
-    : SinkImpl{name, logger, notifier, telemetry},
+    : SinkImpl{name, logger, notifier},
       m_listenAddress(listenAddress.str()),
       m_port(port),
       m_acceptor{std::move(acceptor)} {
@@ -960,7 +960,7 @@ CS_Sink CreateMjpegServer(const wpi::Twine& name,
   return inst.CreateSink(
       CS_SINK_MJPEG,
       std::make_shared<MjpegServerImpl>(
-          name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
+          name, inst.logger, inst.notifier, listenAddress, port,
           std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
               port,
               listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),

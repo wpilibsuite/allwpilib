@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,9 +18,8 @@
 using namespace cs;
 
 RawSourceImpl::RawSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, Telemetry& telemetry,
-                             const VideoMode& mode)
-    : ConfigurableSourceImpl{name, logger, notifier, telemetry, mode} {}
+                             Notifier& notifier, const VideoMode& mode)
+    : ConfigurableSourceImpl{name, logger, notifier, mode} {}
 
 RawSourceImpl::~RawSourceImpl() {}
 
@@ -53,9 +52,9 @@ namespace cs {
 CS_Source CreateRawSource(const wpi::Twine& name, const VideoMode& mode,
                           CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSource(CS_SOURCE_RAW, std::make_shared<RawSourceImpl>(
-                                              name, inst.logger, inst.notifier,
-                                              inst.telemetry, mode));
+  return inst.CreateSource(
+      CS_SOURCE_RAW,
+      std::make_shared<RawSourceImpl>(name, inst.logger, inst.notifier, mode));
 }
 
 void PutSourceFrame(CS_Source source, const CS_RawFrame& image,

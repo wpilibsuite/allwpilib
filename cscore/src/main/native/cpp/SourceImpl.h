@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@
 
 #include <wpi/ArrayRef.h>
 #include <wpi/Logger.h>
+#include <wpi/Signal.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
@@ -34,14 +35,12 @@ class json;
 namespace cs {
 
 class Notifier;
-class Telemetry;
 
 class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
-  SourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-             Telemetry& telemetry);
+  SourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier);
   virtual ~SourceImpl();
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
@@ -141,6 +140,12 @@ class SourceImpl : public PropertyContainer {
   std::unique_ptr<Image> AllocImage(VideoMode::PixelFormat pixelFormat,
                                     int width, int height, size_t size);
 
+  /**
+   * Signal to record telemetry.  Parameters are the telemetry kind and the
+   * quantity to record.
+   */
+  wpi::sig::Signal<CS_TelemetryKind, int64_t> recordTelemetry;
+
  protected:
   void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
@@ -165,7 +170,6 @@ class SourceImpl : public PropertyContainer {
 
   wpi::Logger& m_logger;
   Notifier& m_notifier;
-  Telemetry& m_telemetry;
 
  private:
   void ReleaseImage(std::unique_ptr<Image> image);

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,17 +15,15 @@
 
 #include "Log.h"
 #include "Notifier.h"
-#include "Telemetry.h"
 
 using namespace cs;
 
 static constexpr size_t kMaxImagesAvail = 32;
 
 SourceImpl::SourceImpl(const wpi::Twine& name, wpi::Logger& logger,
-                       Notifier& notifier, Telemetry& telemetry)
+                       Notifier& notifier)
     : m_logger(logger),
       m_notifier(notifier),
-      m_telemetry(telemetry),
       m_name{name.str()} {
   m_frame = Frame{*this, wpi::StringRef{}, 0};
 }
@@ -435,8 +433,9 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
 
 void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   // Update telemetry
-  m_telemetry.RecordSourceFrames(*this, 1);
-  m_telemetry.RecordSourceBytes(*this, static_cast<int>(image->size()));
+  recordTelemetry(CS_SOURCE_FRAMES_RECEIVED, 1);
+  recordTelemetry(CS_SOURCE_BYTES_RECEIVED,
+                  static_cast<int64_t>(image->size()));
 
   // Update frame
   {

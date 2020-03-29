@@ -32,12 +32,11 @@
 namespace cs {
 
 class Notifier;
-class Telemetry;
 
 class UsbCameraImpl : public SourceImpl {
  public:
   UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-                Telemetry& telemetry, const wpi::Twine& path);
+                const wpi::Twine& path);
   ~UsbCameraImpl() override;
 
   void Start() override;

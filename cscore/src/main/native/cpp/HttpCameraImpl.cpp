@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,15 +16,13 @@
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
-#include "Telemetry.h"
 #include "c_util.h"
 
 using namespace cs;
 
 HttpCameraImpl::HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind,
-                               wpi::Logger& logger, Notifier& notifier,
-                               Telemetry& telemetry)
-    : SourceImpl{name, logger, notifier, telemetry}, m_kind{kind} {}
+                               wpi::Logger& logger, Notifier& notifier)
+    : SourceImpl{name, logger, notifier}, m_kind{kind} {}
 
 HttpCameraImpl::~HttpCameraImpl() {
   m_active = false;
@@ -522,12 +520,12 @@ CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
   std::shared_ptr<HttpCameraImpl> source;
   switch (kind) {
     case CS_HTTP_AXIS:
-      source = std::make_shared<AxisCameraImpl>(name, inst.logger,
-                                                inst.notifier, inst.telemetry);
+      source =
+          std::make_shared<AxisCameraImpl>(name, inst.logger, inst.notifier);
       break;
     default:
       source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
-                                                inst.notifier, inst.telemetry);
+                                                inst.notifier);
       break;
   }
   if (!source->SetUrls(url.str(), status)) return 0;
@@ -542,8 +540,8 @@ CS_Source CreateHttpCamera(const wpi::Twine& name,
     *status = CS_EMPTY_VALUE;
     return 0;
   }
-  auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
-                                                 inst.notifier, inst.telemetry);
+  auto source =
+      std::make_shared<HttpCameraImpl>(name, kind, inst.logger, inst.notifier);
   if (!source->SetUrls(urls, status)) return 0;
   return inst.CreateSource(CS_SOURCE_HTTP, source);
 }

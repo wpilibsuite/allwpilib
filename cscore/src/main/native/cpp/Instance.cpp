@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -76,6 +76,10 @@ CS_Source Instance::CreateSource(CS_SourceKind kind,
                                  std::shared_ptr<SourceImpl> source) {
   auto handle = m_sources.Allocate(kind, source);
   notifier.NotifySource(source->GetName(), handle, CS_SOURCE_CREATED);
+  source->recordTelemetry.connect(
+      [this, handle](CS_TelemetryKind kind, int64_t quantity) {
+        telemetry.Record(handle, kind, quantity);
+      });
   source->Start();
   return handle;
 }
