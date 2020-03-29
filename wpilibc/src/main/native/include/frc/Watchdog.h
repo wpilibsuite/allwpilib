@@ -11,6 +11,8 @@
 #include <functional>
 #include <utility>
 
+#include "frc/Tracer.h"
+
 #include <hal/cpp/fpga_clock.h>
 #include <units/units.h>
 #include <wpi/SafeThread.h>
@@ -149,9 +151,8 @@ class Watchdog {
   hal::fpga_clock::time_point m_expirationTime;
   std::function<void()> m_callback;
   hal::fpga_clock::time_point m_lastTimeoutPrintTime = hal::fpga_clock::epoch();
-  hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
 
-  wpi::StringMap<std::chrono::nanoseconds> m_epochs;
+  Tracer m_tracer;
   bool m_isExpired = false;
 
   bool m_suppressTimeoutMessage = false;
