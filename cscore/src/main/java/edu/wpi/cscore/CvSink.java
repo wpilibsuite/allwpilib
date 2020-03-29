@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,19 +26,6 @@ public class CvSink extends ImageSink {
   public CvSink(String name) {
     super(CameraServerCvJNI.createCvSink(name));
   }
-
-  /// Create a sink for accepting OpenCV images in a separate thread.
-  /// A thread will be created that calls WaitForFrame() and calls the
-  /// processFrame() callback each time a new frame arrives.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param processFrame Frame processing function; will be called with a
-  ///        time=0 if an error occurred.  processFrame should call GetImage()
-  ///        or GetError() as needed, but should not call (except in very
-  ///        unusual circumstances) WaitForImage().
-  //public CvSink(wpi::StringRef name,
-  //       std::function<void(uint64_t time)> processFrame) {
-  //  super(CameraServerJNI.createCvSinkCallback(name, processFrame));
-  //}
 
   /**
    * Wait for the next frame and get the image.

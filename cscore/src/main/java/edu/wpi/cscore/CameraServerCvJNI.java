@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -64,8 +64,6 @@ public class CameraServerCvJNI {
   public static native void putSourceFrame(int source, long imageNativeObj);
 
   public static native int createCvSink(String name);
-  //public static native int createCvSinkCallback(String name,
-  //                            void (*processFrame)(long time));
 
   public static native long grabSinkFrame(int sink, long imageNativeObj);
   public static native long grabSinkFrameTimeout(int sink, long imageNativeObj, double timeout);

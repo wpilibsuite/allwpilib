@@ -10,13 +10,8 @@
 
 #include <stdint.h>
 
-#include <atomic>
-#include <functional>
-#include <thread>
-
 #include <opencv2/core/core.hpp>
 #include <wpi/Twine.h>
-#include <wpi/condition_variable.h>
 
 #include "Frame.h"
 #include "SinkImpl.h"
@@ -28,21 +23,12 @@ class SourceImpl;
 class CvSinkImpl : public SinkImpl {
  public:
   CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier);
-  CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-             std::function<void(uint64_t time)> processFrame);
   ~CvSinkImpl() override;
 
   void Stop();
 
   uint64_t GrabFrame(cv::Mat& image);
   uint64_t GrabFrame(cv::Mat& image, double timeout);
-
- private:
-  void ThreadMain();
-
-  std::atomic_bool m_active;  // set to false to terminate threads
-  std::thread m_thread;
-  std::function<void(uint64_t time)> m_processFrame;
 };
 
 }  // namespace cs

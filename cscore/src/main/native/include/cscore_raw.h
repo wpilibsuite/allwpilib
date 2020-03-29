@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -44,11 +44,6 @@ uint64_t CS_GrabRawSinkFrameTimeout(CS_Sink sink, struct CS_RawFrame* rawImage,
 
 CS_Sink CS_CreateRawSink(const char* name, CS_Status* status);
 
-CS_Sink CS_CreateRawSinkCallback(const char* name, void* data,
-                                 void (*processFrame)(void* data,
-                                                      uint64_t time),
-                                 CS_Status* status);
-
 void CS_PutRawSourceFrame(CS_Source source, const struct CS_RawFrame* image,
                           CS_Status* status);
 
@@ -85,9 +80,6 @@ CS_Source CreateRawSource(const wpi::Twine& name, const VideoMode& mode,
                           CS_Status* status);
 
 CS_Sink CreateRawSink(const wpi::Twine& name, CS_Status* status);
-CS_Sink CreateRawSinkCallback(const wpi::Twine& name,
-                              std::function<void(uint64_t time)> processFrame,
-                              CS_Status* status);
 
 void PutSourceFrame(CS_Source source, const CS_RawFrame& image,
                     CS_Status* status);
@@ -152,21 +144,6 @@ class RawSink : public ImageSink {
    */
   explicit RawSink(const wpi::Twine& name);
 
-  /**
-   * Create a sink for accepting raws images in a separate thread.
-   *
-   * <p>A thread will be created that calls WaitForFrame() and calls the
-   * processFrame() callback each time a new frame arrives.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param processFrame Frame processing function; will be called with a
-   *        time=0 if an error occurred.  processFrame should call GetImage()
-   *        or GetError() as needed, but should not call (except in very
-   *        unusual circumstances) WaitForImage().
-   */
-  RawSink(const wpi::Twine& name,
-          std::function<void(uint64_t time)> processFrame);
-
  protected:
   /**
    * Wait for the next frame and get the image.
@@ -208,11 +185,6 @@ inline void RawSource::PutFrame(RawFrame& image) {
 
 inline RawSink::RawSink(const wpi::Twine& name) {
   m_handle = CreateRawSink(name, &m_status);
-}
-
-inline RawSink::RawSink(const wpi::Twine& name,
-                        std::function<void(uint64_t time)> processFrame) {
-  m_handle = CreateRawSinkCallback(name, processFrame, &m_status);
 }
 
 inline uint64_t RawSink::GrabFrame(RawFrame& image, double timeout) const {

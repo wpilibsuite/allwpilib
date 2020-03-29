@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -132,21 +132,6 @@ class CvSink : public ImageSink {
   explicit CvSink(const wpi::Twine& name);
 
   /**
-   * Create a sink for accepting OpenCV images in a separate thread.
-   *
-   * <p>A thread will be created that calls WaitForFrame() and calls the
-   * processFrame() callback each time a new frame arrives.
-   *
-   * @param name Source name (arbitrary unique identifier)
-   * @param processFrame Frame processing function; will be called with a
-   *        time=0 if an error occurred.  processFrame should call GetImage()
-   *        or GetError() as needed, but should not call (except in very
-   *        unusual circumstances) WaitForImage().
-   */
-  CvSink(const wpi::Twine& name,
-         std::function<void(uint64_t time)> processFrame);
-
-  /**
    * Wait for the next frame and get the image.
    * Times out (returning 0) after timeout seconds.
    * The provided image will have three 8-bit channels stored in BGR order.
@@ -185,11 +170,6 @@ inline void CvSource::PutFrame(cv::Mat& image) {
 
 inline CvSink::CvSink(const wpi::Twine& name) {
   m_handle = CreateCvSink(name, &m_status);
-}
-
-inline CvSink::CvSink(const wpi::Twine& name,
-                      std::function<void(uint64_t time)> processFrame) {
-  m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
 }
 
 inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) const {

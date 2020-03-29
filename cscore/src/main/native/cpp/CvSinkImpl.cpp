@@ -23,26 +23,13 @@ using namespace cs;
 
 CvSinkImpl::CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
                        Notifier& notifier)
-    : SinkImpl{name, logger, notifier} {
-  m_active = true;
-  // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
-}
-
-CvSinkImpl::CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
-                       Notifier& notifier,
-                       std::function<void(uint64_t time)> processFrame)
     : SinkImpl{name, logger, notifier} {}
 
 CvSinkImpl::~CvSinkImpl() { Stop(); }
 
 void CvSinkImpl::Stop() {
-  m_active = false;
-
   // wake up any waiters by forcing an empty frame to be sent
   if (auto source = GetSource()) source->Wakeup();
-
-  // join thread
-  if (m_thread.joinable()) m_thread.join();
 }
 
 uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
@@ -97,44 +84,12 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image, double timeout) {
   return frame.GetTime();
 }
 
-// Send HTTP response and a stream of JPG-frames
-void CvSinkImpl::ThreadMain() {
-  Enable();
-  while (m_active) {
-    auto source = GetSource();
-    if (!source) {
-      // Source disconnected; sleep for one second
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-      continue;
-    }
-    SDEBUG4("waiting for frame");
-    Frame frame = source->GetNextFrame();  // blocks
-    if (!m_active) break;
-    if (!frame) {
-      // Bad frame; sleep for 10 ms so we don't consume all processor time.
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      continue;
-    }
-    // TODO m_processFrame();
-  }
-  Disable();
-}
-
 namespace cs {
 
 CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(CS_SINK_CV, std::make_shared<CvSinkImpl>(
                                          name, inst.logger, inst.notifier));
-}
-
-CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
-                             std::function<void(uint64_t time)> processFrame,
-                             CS_Status* status) {
-  auto& inst = Instance::GetInstance();
-  return inst.CreateSink(
-      CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
-                                               processFrame));
 }
 
 static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
@@ -202,13 +157,6 @@ extern "C" {
 
 CS_Sink CS_CreateCvSink(const char* name, CS_Status* status) {
   return cs::CreateCvSink(name, status);
-}
-
-CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
-                                void (*processFrame)(void* data, uint64_t time),
-                                CS_Status* status) {
-  return cs::CreateCvSinkCallback(
-      name, [=](uint64_t time) { processFrame(data, time); }, status);
 }
 
 void CS_SetSinkDescription(CS_Sink sink, const char* description,
