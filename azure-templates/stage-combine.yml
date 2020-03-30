@@ -19,7 +19,7 @@ stages:
     - script: |
         git clone https://github.com/wpilibsuite/build-tools
       displayName: 'Clone Combiner'
-    
+
     ${{ each artifact in parameters.artifacts }}:
       ${{ artifact }}:
         - task: DownloadPipelineArtifact@0
