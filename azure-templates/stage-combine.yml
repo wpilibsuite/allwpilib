@@ -22,6 +22,7 @@ stages:
 
     - ${{ each artifact in parameters.artifacts }}:
       - task: DownloadPipelineArtifact@0
+        displayName: 'DownloadPipelineArtifact ${{ artifact }}'
         inputs:
           artifactName: ${{ artifact }}
           targetPath: 'build-tools/combiner/products/build/allOutputs'
