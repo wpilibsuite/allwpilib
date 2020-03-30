@@ -38,7 +38,7 @@ stages:
           options: '-Pallwpilib'
 
 # Master Builds
-    - ${{ if and(parameters.publish, eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+    - ${{ if and(parameters.publish, eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
       - task: Gradle@2
         inputs:
           workingDirectory: 'build-tools/combiner'
