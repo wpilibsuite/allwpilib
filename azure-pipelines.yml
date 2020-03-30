@@ -65,3 +65,12 @@ stages:
   - template: azure-templates/job-styleguide.yml
 
 - template: azure-templates/combine-stage.yml
+  parameters:
+    artifacts:
+      - 'Mac'
+      - 'Win32'
+      - 'Win64'
+      - 'Linux'
+      - 'Raspbian'
+      - 'Athena'
+      - 'Aarch64'

@@ -2,6 +2,7 @@
 
 parameters:
   publish: False
+  artifacts: []
 
 stages:
 - stage: Combine
@@ -14,37 +15,16 @@ stages:
 
     steps:
     - checkout: none
+
     - script: |
         git clone https://github.com/wpilibsuite/build-tools
       displayName: 'Clone Combiner'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Mac'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Win32'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Win64'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Linux'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Raspbian'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Athena'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Aarch64'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
+    
+    ${{ each artifact in parameters.artifacts }}:
+      - task: DownloadPipelineArtifact@0
+        inputs:
+          artifactName: ${{ artifact }}
+          targetPath: 'build-tools/combiner/products/build/allOutputs'
 
 # PR Builds
     - task: Gradle@2
