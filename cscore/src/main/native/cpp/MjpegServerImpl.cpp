@@ -957,14 +957,15 @@ CS_Sink CreateMjpegServer(const wpi::Twine& name,
                           CS_Status* status) {
   auto& inst = Instance::GetInstance();
   wpi::SmallString<128> listenAddressBuf;
+  wpi::Logger& logger = inst.GetLogger();
   return inst.CreateSink(
       CS_SINK_MJPEG,
       std::make_shared<MjpegServerImpl>(
-          name, inst.logger, inst.notifier, listenAddress, port,
+          name, logger, inst.GetNotifier(), listenAddress, port,
           std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
               port,
               listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
-              inst.logger))));
+              logger))));
 }
 
 std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {

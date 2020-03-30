@@ -10,6 +10,7 @@
 #include <wpi/json.h>
 
 #include "Instance.h"
+#include "Log.h"
 #include "Notifier.h"
 #include "SourceImpl.h"
 

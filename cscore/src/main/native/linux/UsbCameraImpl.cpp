@@ -1370,8 +1370,8 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSource(
-      CS_SOURCE_USB,
-      std::make_shared<UsbCameraImpl>(name, inst.logger, inst.notifier, path));
+      CS_SOURCE_USB, std::make_shared<UsbCameraImpl>(name, inst.GetLogger(),
+                                                     inst.GetNotifier(), path));
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
@@ -1462,7 +1462,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     ::closedir(dp);
   } else {
     // *status = ;
-    WPI_ERROR(Instance::GetInstance().logger, "Could not open /dev");
+    WPI_ERROR(Instance::GetInstance().GetLogger(), "Could not open /dev");
     return retval;
   }
 

@@ -1036,16 +1036,16 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }
   auto& inst = Instance::GetInstance();
-  auto source =
-      std::make_shared<UsbCameraImpl>(name, inst.logger, inst.notifier, dev);
+  auto source = std::make_shared<UsbCameraImpl>(name, inst.GetLogger(),
+                                                inst.GetNotifier(), dev);
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  auto source =
-      std::make_shared<UsbCameraImpl>(name, inst.logger, inst.notifier, path);
+  auto source = std::make_shared<UsbCameraImpl>(name, inst.GetLogger(),
+                                                inst.GetNotifier(), path);
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 

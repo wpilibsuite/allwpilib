@@ -520,12 +520,12 @@ CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
   std::shared_ptr<HttpCameraImpl> source;
   switch (kind) {
     case CS_HTTP_AXIS:
-      source =
-          std::make_shared<AxisCameraImpl>(name, inst.logger, inst.notifier);
+      source = std::make_shared<AxisCameraImpl>(name, inst.GetLogger(),
+                                                inst.GetNotifier());
       break;
     default:
-      source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
-                                                inst.notifier);
+      source = std::make_shared<HttpCameraImpl>(name, kind, inst.GetLogger(),
+                                                inst.GetNotifier());
       break;
   }
   if (!source->SetUrls(url.str(), status)) return 0;
@@ -540,8 +540,8 @@ CS_Source CreateHttpCamera(const wpi::Twine& name,
     *status = CS_EMPTY_VALUE;
     return 0;
   }
-  auto source =
-      std::make_shared<HttpCameraImpl>(name, kind, inst.logger, inst.notifier);
+  auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.GetLogger(),
+                                                 inst.GetNotifier());
   if (!source->SetUrls(urls, status)) return 0;
   return inst.CreateSource(CS_SOURCE_HTTP, source);
 }

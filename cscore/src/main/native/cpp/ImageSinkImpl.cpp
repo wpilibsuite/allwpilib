@@ -123,8 +123,9 @@ namespace cs {
 
 CS_Sink CreateImageSink(const wpi::Twine& name, CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSink(CS_SINK_IMAGE, std::make_shared<ImageSinkImpl>(
-                                            name, inst.logger, inst.notifier));
+  return inst.CreateSink(CS_SINK_IMAGE,
+                         std::make_shared<ImageSinkImpl>(name, inst.GetLogger(),
+                                                         inst.GetNotifier()));
 }
 
 CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status) {

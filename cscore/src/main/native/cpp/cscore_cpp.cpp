@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -618,7 +618,7 @@ void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
     data->sink->SetSource(sourceData->source);
   }
   data->sourceHandle.store(source);
-  Instance::GetInstance().notifier.NotifySinkSourceChanged(
+  Instance::GetInstance().GetNotifier().NotifySinkSourceChanged(
       data->sink->GetName(), sink, source);
 }
 
@@ -668,22 +668,22 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
 //
 
 void SetListenerOnStart(std::function<void()> onStart) {
-  Instance::GetInstance().notifier.SetOnStart(onStart);
+  Instance::GetInstance().GetNotifier().SetOnStart(onStart);
 }
 
 void SetListenerOnExit(std::function<void()> onExit) {
-  Instance::GetInstance().notifier.SetOnExit(onExit);
+  Instance::GetInstance().GetNotifier().SetOnExit(onExit);
 }
 
 CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
                         int eventMask, bool immediateNotify,
                         CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  int uid = inst.notifier.AddListener(callback, eventMask);
+  auto& notifier = inst.GetNotifier();
+  int uid = notifier.AddListener(callback, eventMask);
   if ((eventMask & CS_NETWORK_INTERFACES_CHANGED) != 0) {
     // start network interface event listener
-    inst.networkListener.Start();
-    if (immediateNotify) inst.notifier.NotifyNetworkInterfacesChanged();
+    inst.StartNetworkListener(immediateNotify);
   }
   if (immediateNotify) {
     // TODO
@@ -697,7 +697,7 @@ void RemoveListener(CS_Listener handle, CS_Status* status) {
     *status = CS_INVALID_HANDLE;
     return;
   }
-  Instance::GetInstance().notifier.RemoveListener(uid);
+  Instance::GetInstance().GetNotifier().RemoveListener(uid);
 }
 
 bool NotifierDestroyed() { return Notifier::destroyed(); }
@@ -706,31 +706,31 @@ bool NotifierDestroyed() { return Notifier::destroyed(); }
 // Telemetry Functions
 //
 void SetTelemetryPeriod(double seconds) {
-  auto& inst = Instance::GetInstance();
-  inst.telemetry.Start();
-  inst.telemetry.SetPeriod(seconds);
+  auto& telemetry = Instance::GetInstance().GetTelemetry();
+  telemetry.Start();
+  telemetry.SetPeriod(seconds);
 }
 
 double GetTelemetryElapsedTime() {
-  return Instance::GetInstance().telemetry.GetElapsedTime();
+  return Instance::GetInstance().GetTelemetry().GetElapsedTime();
 }
 
 int64_t GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
                           CS_Status* status) {
-  return Instance::GetInstance().telemetry.GetValue(handle, kind, status);
+  return Instance::GetInstance().GetTelemetry().GetValue(handle, kind, status);
 }
 
 double GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
                                 CS_Status* status) {
-  return Instance::GetInstance().telemetry.GetAverageValue(handle, kind,
-                                                           status);
+  return Instance::GetInstance().GetTelemetry().GetAverageValue(handle, kind,
+                                                                status);
 }
 
 //
 // Logging Functions
 //
 void SetLogger(LogFunc func, unsigned int min_level) {
-  auto& logger = Instance::GetInstance().logger;
+  auto& logger = Instance::GetInstance().GetLogger();
   logger.SetLogger(func);
   logger.set_min_level(min_level);
 }
@@ -738,7 +738,7 @@ void SetLogger(LogFunc func, unsigned int min_level) {
 void SetDefaultLogger(unsigned int min_level) {
   auto& inst = Instance::GetInstance();
   inst.SetDefaultLogger();
-  inst.logger.set_min_level(min_level);
+  inst.GetLogger().set_min_level(min_level);
 }
 
 //

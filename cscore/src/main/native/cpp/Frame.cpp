@@ -451,7 +451,7 @@ Image* Frame::GetImageImpl(int width, int height,
   if (!cur || cur->Is(width, height, pixelFormat, requiredJpegQuality))
     return cur;
 
-  WPI_DEBUG4(Instance::GetInstance().logger,
+  WPI_DEBUG4(Instance::GetInstance().GetLogger(),
              "converting image from " << cur->width << "x" << cur->height
                                       << " type " << cur->pixelFormat << " to "
                                       << width << "x" << height << " type "
