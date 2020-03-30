@@ -20,11 +20,11 @@ stages:
         git clone https://github.com/wpilibsuite/build-tools
       displayName: 'Clone Combiner'
     
-    ${{ each artifact in parameters.artifacts }}:
-      - task: DownloadPipelineArtifact@0
-        inputs:
-          artifactName: ${{ artifact }}
-          targetPath: 'build-tools/combiner/products/build/allOutputs'
+    - ${{ each artifact in parameters.artifacts }}:
+      task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: ${{ artifact }}
+        targetPath: 'build-tools/combiner/products/build/allOutputs'
 
 # PR Builds
     - task: Gradle@2
