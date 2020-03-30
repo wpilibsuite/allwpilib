@@ -66,4 +66,5 @@ stages:
 
 - template: azure-templates/stage-combine.yml
   parameters:
+    publish: True
     artifacts: [Mac, Win32, Win64, Linux, Raspbian, Athena, Aarch64]
