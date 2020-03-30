@@ -6,7 +6,7 @@ parameters:
   preBuild: []
 
 jobs:
-- template: build-job.yml
+- template: job-build.yml
   parameters:
     jobName: 'Mac'
     pool: ${{ parameters.pool }}
