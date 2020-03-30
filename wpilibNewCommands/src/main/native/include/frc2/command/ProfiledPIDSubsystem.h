@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -62,10 +62,10 @@ class ProfiledPIDSubsystem : public SubsystemBase {
   void SetGoal(Distance_t goal) { m_goal = State{goal, Velocity_t(0)}; }
 
   /**
-   * Enables the PID control.  Resets the controller.
+   * Enables the PID control. Resets the controller.
    */
   virtual void Enable() {
-    m_controller.Reset();
+    m_controller.Reset(GetMeasurement());
     m_enabled = true;
   }
 

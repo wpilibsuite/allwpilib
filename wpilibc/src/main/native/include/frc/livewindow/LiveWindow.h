@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2012-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 namespace frc {
@@ -21,6 +22,9 @@ class LiveWindow {
  public:
   LiveWindow(const LiveWindow&) = delete;
   LiveWindow& operator=(const LiveWindow&) = delete;
+
+  std::function<void()> enabled;
+  std::function<void()> disabled;
 
   /**
    * Get an instance of the LiveWindow main class.

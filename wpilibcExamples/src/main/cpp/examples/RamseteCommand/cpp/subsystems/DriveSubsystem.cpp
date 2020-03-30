@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,6 +41,7 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
 void DriveSubsystem::TankDriveVolts(units::volt_t left, units::volt_t right) {
   m_leftMotors.SetVoltage(left);
   m_rightMotors.SetVoltage(-right);
+  m_drive.Feed();
 }
 
 void DriveSubsystem::ResetEncoders() {

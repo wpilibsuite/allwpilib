@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -166,7 +166,12 @@ SplineHelper::QuinticControlVectorsFromWaypoints(
     const auto scalar =
         1.2 * p0.Translation().Distance(p1.Translation()).to<double>();
 
-    vectors.push_back(QuinticControlVector(scalar, p0));
+    // Only add the first control vector if this is the first iteration. The
+    // last control vector of this iteration is the first control vector of
+    // the next iteration.
+    if (i == 0) {
+      vectors.push_back(QuinticControlVector(scalar, p0));
+    }
     vectors.push_back(QuinticControlVector(scalar, p1));
   }
   return vectors;

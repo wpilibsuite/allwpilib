@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -40,6 +40,8 @@ struct WindowInfo {
   ImGuiCond sizeCond = 0;
   ImVec2 pos;
   ImVec2 size;
+  bool setPadding = false;
+  ImVec2 padding;
 };
 }  // namespace
 
@@ -248,6 +250,14 @@ void HALSimGui::SetDefaultWindowSize(const char* name, float width,
   window.size = ImVec2{width, height};
 }
 
+void HALSimGui::SetWindowPadding(const char* name, float x, float y) {
+  auto it = gWindowMap.find(name);
+  if (it == gWindowMap.end()) return;
+  auto& window = gWindows[it->second];
+  window.setPadding = true;
+  window.padding = ImVec2{x, y};
+}
+
 bool HALSimGui::AreOutputsDisabled() {
   return gDisableOutputsOnDSDisable && !HALSIM_GetDriverStationEnabled();
 }
@@ -300,6 +310,12 @@ bool HALSimGui::Initialize() {
 
   // Set initial window settings
   glfwWindowHint(GLFW_MAXIMIZED, gWindowMaximized ? GLFW_TRUE : GLFW_FALSE);
+
+  if (gWindowWidth == 0 || gWindowHeight == 0) {
+    gWindowWidth = 1280;
+    gWindowHeight = 720;
+    gWindowLoadedWidthHeight = false;
+  }
 
   float windowScale = 1.0;
   if (!gWindowLoadedWidthHeight) {
@@ -515,9 +531,12 @@ void HALSimGui::Main(void*) {
           ImGui::SetNextWindowPos(window.pos, window.posCond);
         if (window.sizeCond != 0)
           ImGui::SetNextWindowSize(window.size, window.sizeCond);
+        if (window.setPadding)
+          ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, window.padding);
         if (ImGui::Begin(window.name.c_str(), &window.visible, window.flags))
           window.display();
         ImGui::End();
+        if (window.setPadding) ImGui::PopStyleVar();
       }
     }
 
@@ -589,6 +608,10 @@ void HALSIMGUI_SetDefaultWindowPos(const char* name, float x, float y) {
 void HALSIMGUI_SetDefaultWindowSize(const char* name, float width,
                                     float height) {
   HALSimGui::SetDefaultWindowSize(name, width, height);
+}
+
+void HALSIMGUI_SetWindowPadding(const char* name, float x, float y) {
+  HALSimGui::SetDefaultWindowSize(name, x, y);
 }
 
 int HALSIMGUI_AreOutputsDisabled(void) {

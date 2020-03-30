@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -239,8 +239,10 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   }
 
   /**
-   * Turn Automatic mode on/off. When in Automatic mode, all sensors will fire in round robin,
-   * waiting a set time between each sensor.
+   * Turn Automatic mode on/off for all sensors.
+   *
+   * <p>When in Automatic mode, all sensors will fire in round robin, waiting a set time between
+   * each sensor.
    *
    * @param enabling Set to true if round robin scheduling should start for all the ultrasonic
    *                 sensors. This scheduling method assures that the sensors are non-interfering
@@ -248,7 +250,7 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    *                 is preferred, it can be implemented by pinging the sensors manually and waiting
    *                 for the results to come back.
    */
-  public void setAutomaticMode(boolean enabling) {
+  public static void setAutomaticMode(boolean enabling) {
     if (enabling == m_automaticEnabled) {
       return; // ignore the case of no change
     }

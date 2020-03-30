@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,11 +15,15 @@
 #include <wpi/ArrayRef.h>
 
 #include "frc/ErrorBase.h"
+#include "util/Color.h"
+#include "util/Color8Bit.h"
 
 namespace frc {
 
 /**
  * A class for driving addressable LEDs, such as WS2812s and NeoPixels.
+ *
+ * <p>Only 1 LED driver is currently supported by the roboRIO.
  */
 class AddressableLED : public ErrorBase {
  public:
@@ -54,12 +58,34 @@ class AddressableLED : public ErrorBase {
      * @param v the v value [0-255]
      */
     void SetHSV(int h, int s, int v);
+
+    /*
+     * Sets a specific LED in the buffer.
+     *
+     * @param color The color of the LED
+     */
+    void SetLED(const Color& color) {
+      this->r = color.red * 255;
+      this->g = color.green * 255;
+      this->b = color.blue * 255;
+    }
+
+    /*
+     * Sets a specific LED in the buffer.
+     *
+     * @param color The color of the LED
+     */
+    void SetLED(const Color8Bit& color) {
+      this->r = color.red;
+      this->g = color.green;
+      this->b = color.blue;
+    }
   };
 
   /**
    * Constructs a new driver for a specific port.
    *
-   * @param port the output port to use (Must be a PWM port)
+   * @param port the output port to use (Must be a PWM header)
    */
   explicit AddressableLED(int port);
 
@@ -70,6 +96,8 @@ class AddressableLED : public ErrorBase {
    *
    * <p>Calling this is an expensive call, so its best to call it once, then
    * just update data.
+   *
+   * <p>The max length is 5460 LEDs.
    *
    * @param length the strip length
    */

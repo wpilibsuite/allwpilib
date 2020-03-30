@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -66,7 +66,7 @@ public abstract class PIDSubsystem extends Subsystem {
   }
 
   /**
-   * Instantiates a {@link PIDSubsystem} that will use the given p, i and d values.
+   * Instantiates a {@link PIDSubsystem} that will use the given p, i, d, and f values.
    *
    * @param name the name
    * @param p    the proportional value
@@ -82,7 +82,7 @@ public abstract class PIDSubsystem extends Subsystem {
   }
 
   /**
-   * Instantiates a {@link PIDSubsystem} that will use the given p, i and d values. It will also
+   * Instantiates a {@link PIDSubsystem} that will use the given p, i, d, and f values. It will also
    * space the time between PID loop calculations to be equal to the given period.
    *
    * @param name   the name
@@ -114,9 +114,9 @@ public abstract class PIDSubsystem extends Subsystem {
   }
 
   /**
-   * Instantiates a {@link PIDSubsystem} that will use the given p, i and d values. It will use the
-   * class name as its name. It will also space the time between PID loop calculations to be equal
-   * to the given period.
+   * Instantiates a {@link PIDSubsystem} that will use the given p, i, d, and f values. It will use
+   * the class name as its name. It will also space the time between PID loop calculations to be
+   * equal to the given period.
    *
    * @param p      the proportional value
    * @param i      the integral value

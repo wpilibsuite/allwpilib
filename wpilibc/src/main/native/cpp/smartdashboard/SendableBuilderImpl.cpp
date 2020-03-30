@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -32,7 +32,9 @@ void SendableBuilderImpl::UpdateTable() {
   for (auto& property : m_properties) {
     if (property.update) property.update(property.entry, time);
   }
-  if (m_updateTable) m_updateTable();
+  for (auto& updateTable : m_updateTables) {
+    updateTable();
+  }
 }
 
 void SendableBuilderImpl::StartListeners() {
@@ -71,7 +73,7 @@ void SendableBuilderImpl::SetSafeState(std::function<void()> func) {
 }
 
 void SendableBuilderImpl::SetUpdateTable(std::function<void()> func) {
-  m_updateTable = func;
+  m_updateTables.emplace_back(std::move(func));
 }
 
 nt::NetworkTableEntry SendableBuilderImpl::GetEntry(const wpi::Twine& key) {

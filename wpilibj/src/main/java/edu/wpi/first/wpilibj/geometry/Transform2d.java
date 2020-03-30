@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -77,6 +77,19 @@ public class Transform2d {
    */
   public Rotation2d getRotation() {
     return m_rotation;
+  }
+
+  /**
+   * Invert the transformation. This is useful for undoing a transformation.
+   *
+   * @return The inverted transformation.
+   */
+  public Transform2d inverse() {
+    // We are rotating the difference between the translations
+    // using a clockwise rotation matrix. This transforms the global
+    // delta into a local delta (relative to the initial pose).
+    return new Transform2d(getTranslation().unaryMinus().rotateBy(getRotation().unaryMinus()),
+        getRotation().unaryMinus());
   }
 
   @Override

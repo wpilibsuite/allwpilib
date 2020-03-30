@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,12 +9,14 @@
 
 #include <frc/RobotState.h>
 #include <frc/WPIErrors.h>
+#include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
+#include <wpi/SmallVector.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandState.h"
@@ -42,11 +44,6 @@ class CommandScheduler::Impl {
 
   bool disabled{false};
 
-  // NetworkTable entries for use in Sendable impl
-  nt::NetworkTableEntry namesEntry;
-  nt::NetworkTableEntry idsEntry;
-  nt::NetworkTableEntry cancelEntry;
-
   // Lists of user-supplied actions to be executed on scheduling events for
   // every command.
   wpi::SmallVector<Action, 4> initActions;
@@ -71,9 +68,20 @@ CommandScheduler::CommandScheduler() : m_impl(new Impl) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = [this] {
+    this->Disable();
+    this->CancelAll();
+  };
+  scheduler->disabled = [this] { this->Enable(); };
 }
 
-CommandScheduler::~CommandScheduler() {}
+CommandScheduler::~CommandScheduler() {
+  frc::SendableRegistry::GetInstance().Remove(this);
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = nullptr;
+  scheduler->disabled = nullptr;
+}
 
 CommandScheduler& CommandScheduler::GetInstance() {
   static CommandScheduler scheduler;
@@ -248,8 +256,21 @@ void CommandScheduler::RegisterSubsystem(
   }
 }
 
+void CommandScheduler::RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems) {
+  for (auto* subsystem : subsystems) {
+    RegisterSubsystem(subsystem);
+  }
+}
+
 void CommandScheduler::UnregisterSubsystem(
     std::initializer_list<Subsystem*> subsystems) {
+  for (auto* subsystem : subsystems) {
+    UnregisterSubsystem(subsystem);
+  }
+}
+
+void CommandScheduler::UnregisterSubsystem(
+    wpi::ArrayRef<Subsystem*> subsystems) {
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }
@@ -297,9 +318,11 @@ void CommandScheduler::Cancel(std::initializer_list<Command*> commands) {
 }
 
 void CommandScheduler::CancelAll() {
+  wpi::SmallVector<Command*, 16> commands;
   for (auto&& command : m_impl->scheduledCommands) {
-    Cancel(command.first);
+    commands.emplace_back(command.first);
   }
+  Cancel(commands);
 }
 
 double CommandScheduler::TimeSinceScheduled(const Command* command) const {
@@ -366,14 +389,14 @@ void CommandScheduler::OnCommandFinish(Action action) {
 
 void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
-  m_impl->namesEntry = builder.GetEntry("Names");
-  m_impl->idsEntry = builder.GetEntry("Ids");
-  m_impl->cancelEntry = builder.GetEntry("Cancel");
+  auto namesEntry = builder.GetEntry("Names");
+  auto idsEntry = builder.GetEntry("Ids");
+  auto cancelEntry = builder.GetEntry("Cancel");
 
-  builder.SetUpdateTable([this] {
+  builder.SetUpdateTable([=] {
     double tmp[1];
     tmp[0] = 0;
-    auto toCancel = m_impl->cancelEntry.GetDoubleArray(tmp);
+    auto toCancel = cancelEntry.GetDoubleArray(tmp);
     for (auto cancel : toCancel) {
       uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
       Command* command = reinterpret_cast<Command*>(ptrTmp);
@@ -381,7 +404,8 @@ void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
           m_impl->scheduledCommands.end()) {
         Cancel(command);
       }
-      m_impl->cancelEntry.SetDoubleArray(wpi::ArrayRef<double>{});
+      nt::NetworkTableEntry(cancelEntry)
+          .SetDoubleArray(wpi::ArrayRef<double>{});
     }
 
     wpi::SmallVector<std::string, 8> names;
@@ -391,8 +415,8 @@ void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
       uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command.first);
       ids.emplace_back(static_cast<double>(ptrTmp));
     }
-    m_impl->namesEntry.SetStringArray(names);
-    m_impl->idsEntry.SetDoubleArray(ids);
+    nt::NetworkTableEntry(namesEntry).SetStringArray(names);
+    nt::NetworkTableEntry(idsEntry).SetDoubleArray(ids);
   });
 }
 

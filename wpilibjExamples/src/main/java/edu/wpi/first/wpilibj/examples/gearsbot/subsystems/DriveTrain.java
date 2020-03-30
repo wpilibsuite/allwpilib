@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -120,5 +120,13 @@ public class DriveTrain extends SubsystemBase {
   public double getDistanceToObstacle() {
     // Really meters in simulation since it's a rangefinder...
     return m_rangefinder.getAverageVoltage();
+  }
+
+  /**
+   * Call log method every loop.
+   */
+  @Override
+  public void periodic() {
+    log();
   }
 }

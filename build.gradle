@@ -39,7 +39,7 @@ buildScan {
     publishAlways()
 }
 
-ext.licenseFile = files("$rootDir/LICENSE.txt", "$rootDir/ThirdPartyNotices.txt")
+ext.licenseFile = files("$rootDir/LICENSE.md", "$rootDir/ThirdPartyNotices.txt")
 
 if (project.hasProperty("publishVersion")) {
     wpilibVersioning.version.set(project.publishVersion)

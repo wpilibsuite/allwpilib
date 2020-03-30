@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -53,5 +53,23 @@ class SchedulerTest extends CommandTestBase {
 
     scheduler.registerSubsystem(system);
     assertDoesNotThrow(() -> scheduler.unregisterSubsystem(system));
+  }
+
+  @Test
+  void schedulerCancelAllTest() {
+    CommandScheduler scheduler = new CommandScheduler();
+
+    Counter counter = new Counter();
+
+    scheduler.onCommandInterrupt(command -> counter.increment());
+
+    Command command = new WaitCommand(10);
+    Command command2 = new WaitCommand(10);
+
+    scheduler.schedule(command);
+    scheduler.schedule(command2);
+    scheduler.cancelAll();
+
+    assertEquals(counter.m_counter, 2);
   }
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,10 +35,48 @@ RamseteCommand::RamseteCommand(
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::RamseteController controller,
+    frc::SimpleMotorFeedforward<units::meters> feedforward,
+    frc::DifferentialDriveKinematics kinematics,
+    std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
+    frc2::PIDController leftController, frc2::PIDController rightController,
+    std::function<void(volt_t, volt_t)> output,
+    wpi::ArrayRef<Subsystem*> requirements)
+    : m_trajectory(trajectory),
+      m_pose(pose),
+      m_controller(controller),
+      m_feedforward(feedforward),
+      m_kinematics(kinematics),
+      m_speeds(wheelSpeeds),
+      m_leftController(std::make_unique<frc2::PIDController>(leftController)),
+      m_rightController(std::make_unique<frc2::PIDController>(rightController)),
+      m_outputVolts(output),
+      m_usePID(true) {
+  AddRequirements(requirements);
+}
+
+RamseteCommand::RamseteCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::RamseteController controller,
     frc::DifferentialDriveKinematics kinematics,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
+    : m_trajectory(trajectory),
+      m_pose(pose),
+      m_controller(controller),
+      m_kinematics(kinematics),
+      m_outputVel(output),
+      m_usePID(false) {
+  AddRequirements(requirements);
+}
+
+RamseteCommand::RamseteCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::RamseteController controller,
+    frc::DifferentialDriveKinematics kinematics,
+    std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
+        output,
+    wpi::ArrayRef<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
       m_controller(controller),
@@ -100,5 +138,5 @@ void RamseteCommand::Execute() {
 void RamseteCommand::End(bool interrupted) { m_timer.Stop(); }
 
 bool RamseteCommand::IsFinished() {
-  return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
+  return m_timer.HasElapsed(m_trajectory.TotalTime());
 }

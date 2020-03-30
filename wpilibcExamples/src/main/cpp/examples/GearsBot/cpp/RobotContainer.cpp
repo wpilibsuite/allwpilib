@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,11 +24,6 @@ RobotContainer::RobotContainer()
   frc::SmartDashboard::PutData(&m_elevator);
   frc::SmartDashboard::PutData(&m_wrist);
   frc::SmartDashboard::PutData(&m_claw);
-
-  m_claw.Log();
-  m_wrist.Log();
-  m_elevator.Log();
-  m_drivetrain.Log();
 
   m_drivetrain.SetDefaultCommand(TankDrive(
       [this] { return m_joy.GetY(frc::GenericHID::JoystickHand::kLeftHand); },

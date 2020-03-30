@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -52,6 +52,11 @@ public class Timer {
   private double m_accumulatedTime;
   private boolean m_running;
 
+  /**
+   * Lock for synchronization.
+   */
+  private final Object m_lock = new Object();
+
   @SuppressWarnings("JavadocMethod")
   public Timer() {
     reset();
@@ -68,11 +73,13 @@ public class Timer {
    *
    * @return Current time value for this timer in seconds
    */
-  public synchronized double get() {
-    if (m_running) {
-      return m_accumulatedTime + (getMsClock() - m_startTime) / 1000.0;
-    } else {
-      return m_accumulatedTime;
+  public double get() {
+    synchronized (m_lock) {
+      if (m_running) {
+        return m_accumulatedTime + (getMsClock() - m_startTime) / 1000.0;
+      } else {
+        return m_accumulatedTime;
+      }
     }
   }
 
@@ -80,18 +87,25 @@ public class Timer {
    * Reset the timer by setting the time to 0. Make the timer startTime the current time so new
    * requests will be relative now
    */
-  public synchronized void reset() {
-    m_accumulatedTime = 0;
-    m_startTime = getMsClock();
+  public void reset() {
+    synchronized (m_lock) {
+      m_accumulatedTime = 0;
+      m_startTime = getMsClock();
+    }
   }
 
   /**
    * Start the timer running. Just set the running flag to true indicating that all time requests
-   * should be relative to the system clock.
+   * should be relative to the system clock. Note that this method is a no-op if the timer is
+   * already running.
    */
-  public synchronized void start() {
-    m_startTime = getMsClock();
-    m_running = true;
+  public void start() {
+    synchronized (m_lock) {
+      if (!m_running) {
+        m_startTime = getMsClock();
+        m_running = true;
+      }
+    }
   }
 
   /**
@@ -99,9 +113,23 @@ public class Timer {
    * subsequent time requests to be read from the accumulated time rather than looking at the system
    * clock.
    */
-  public synchronized void stop() {
-    m_accumulatedTime = get();
-    m_running = false;
+  public void stop() {
+    synchronized (m_lock) {
+      m_accumulatedTime = get();
+      m_running = false;
+    }
+  }
+
+  /**
+   * Check if the period specified has passed.
+   *
+   * @param seconds The period to check.
+   * @return Whether the period has passed.
+   */
+  public boolean hasElapsed(double seconds) {
+    synchronized (m_lock) {
+      return get() > seconds;
+    }
   }
 
   /**
@@ -110,15 +138,30 @@ public class Timer {
    * took to get around to checking.
    *
    * @param period The period to check for (in seconds).
-   * @return If the period has passed.
+   * @return Whether the period has passed.
    */
-  public synchronized boolean hasPeriodPassed(double period) {
-    if (get() > period) {
-      // Advance the start time by the period.
-      // Don't set it to the current time... we want to avoid drift.
-      m_startTime += period * 1000;
-      return true;
+  public boolean hasPeriodPassed(double period) {
+    return advanceIfElapsed(period);
+  }
+
+  /**
+   * Check if the period specified has passed and if it has, advance the start time by that period.
+   * This is useful to decide if it's time to do periodic work without drifting later by the time it
+   * took to get around to checking.
+   *
+   * @param seconds The period to check.
+   * @return Whether the period has passed.
+   */
+  public boolean advanceIfElapsed(double seconds) {
+    synchronized (m_lock) {
+      if (get() > seconds) {
+        // Advance the start time by the period.
+        // Don't set it to the current time... we want to avoid drift.
+        m_startTime += seconds * 1000;
+        return true;
+      } else {
+        return false;
+      }
     }
-    return false;
   }
 }

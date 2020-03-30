@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -23,7 +24,7 @@ namespace frc {
  */
 class TrajectoryGenerator {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 
   /**
    * Generates a trajectory from the given control vectors and config. This
@@ -113,5 +114,20 @@ class TrajectoryGenerator {
     }
     return splinePoints;
   }
+
+  /**
+   * Set error reporting function. By default, it is output to stderr.
+   *
+   * @param func Error reporting function.
+   */
+  static void SetErrorHandler(std::function<void(const char*)> func) {
+    s_errorFunc = std::move(func);
+  }
+
+ private:
+  static void ReportError(const char* error);
+
+  static const Trajectory kDoNothingTrajectory;
+  static std::function<void(const char*)> s_errorFunc;
 };
 }  // namespace frc

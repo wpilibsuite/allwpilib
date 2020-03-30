@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,6 +17,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -81,9 +82,6 @@ public final class Scheduler implements Sendable, AutoCloseable {
    */
   @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
   private final Vector<Command> m_additions = new Vector<>();
-  private NetworkTableEntry m_namesEntry;
-  private NetworkTableEntry m_idsEntry;
-  private NetworkTableEntry m_cancelEntry;
   /**
    * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
    * created lazily.
@@ -98,11 +96,20 @@ public final class Scheduler implements Sendable, AutoCloseable {
   private Scheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
+    LiveWindow.setEnabledListener(() -> {
+      disable();
+      removeAll();
+    });
+    LiveWindow.setDisabledListener(() -> {
+      enable();
+    });
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
+    LiveWindow.setEnabledListener(null);
+    LiveWindow.setDisabledListener(null);
   }
 
   /**
@@ -319,13 +326,13 @@ public final class Scheduler implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Scheduler");
-    m_namesEntry = builder.getEntry("Names");
-    m_idsEntry = builder.getEntry("Ids");
-    m_cancelEntry = builder.getEntry("Cancel");
+    final NetworkTableEntry namesEntry = builder.getEntry("Names");
+    final NetworkTableEntry idsEntry = builder.getEntry("Ids");
+    final NetworkTableEntry cancelEntry = builder.getEntry("Cancel");
     builder.setUpdateTable(() -> {
-      if (m_namesEntry != null && m_idsEntry != null && m_cancelEntry != null) {
+      if (namesEntry != null && idsEntry != null && cancelEntry != null) {
         // Get the commands to cancel
-        double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
+        double[] toCancel = cancelEntry.getDoubleArray(new double[0]);
         if (toCancel.length > 0) {
           for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
             for (double d : toCancel) {
@@ -334,7 +341,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
               }
             }
           }
-          m_cancelEntry.setDoubleArray(new double[0]);
+          cancelEntry.setDoubleArray(new double[0]);
         }
 
         if (m_runningCommandsChanged) {
@@ -351,8 +358,8 @@ public final class Scheduler implements Sendable, AutoCloseable {
             ids[number] = e.getData().hashCode();
             number++;
           }
-          m_namesEntry.setStringArray(commands);
-          m_idsEntry.setDoubleArray(ids);
+          namesEntry.setStringArray(commands);
+          idsEntry.setDoubleArray(ids);
         }
       }
     });

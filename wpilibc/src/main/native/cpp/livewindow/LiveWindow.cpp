@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2012-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -104,10 +104,12 @@ void LiveWindow::SetEnabled(bool enabled) {
   // Force table generation now to make sure everything is defined
   UpdateValuesUnsafe();
   if (enabled) {
+    if (this->enabled) this->enabled();
   } else {
     m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
       cbdata.builder.StopLiveWindowMode();
     });
+    if (this->disabled) this->disabled();
   }
   m_impl->enabledEntry.SetBoolean(enabled);
 }

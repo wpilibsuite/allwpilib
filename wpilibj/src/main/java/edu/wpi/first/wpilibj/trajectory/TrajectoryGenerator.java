@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,9 +8,12 @@
 package edu.wpi.first.wpilibj.trajectory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
@@ -19,12 +22,34 @@ import edu.wpi.first.wpilibj.spline.PoseWithCurvature;
 import edu.wpi.first.wpilibj.spline.Spline;
 import edu.wpi.first.wpilibj.spline.SplineHelper;
 import edu.wpi.first.wpilibj.spline.SplineParameterizer;
+import edu.wpi.first.wpilibj.spline.SplineParameterizer.MalformedSplineException;
 
 public final class TrajectoryGenerator {
+  private static final Trajectory kDoNothingTrajectory =
+      new Trajectory(Arrays.asList(new Trajectory.State()));
+  private static BiConsumer<String, StackTraceElement[]> errorFunc;
+
   /**
    * Private constructor because this is a utility class.
    */
   private TrajectoryGenerator() {
+  }
+
+  private static void reportError(String error, StackTraceElement[] stackTrace) {
+    if (errorFunc != null) {
+      errorFunc.accept(error, stackTrace);
+    } else {
+      DriverStation.reportError(error, stackTrace);
+    }
+  }
+
+  /**
+   * Set error reporting function. By default, DriverStation.reportError() is used.
+   *
+   * @param func Error reporting function, arguments are error and stackTrace.
+   */
+  public static void setErrorHandler(BiConsumer<String, StackTraceElement[]> func) {
+    errorFunc = func;
   }
 
   /**
@@ -60,9 +85,14 @@ public final class TrajectoryGenerator {
     }
 
     // Get the spline points
-    var points = splinePointsFromSplines(SplineHelper.getCubicSplinesFromControlVectors(
-        newInitial, interiorWaypoints.toArray(new Translation2d[0]), newEnd
-    ));
+    List<PoseWithCurvature> points;
+    try {
+      points = splinePointsFromSplines(SplineHelper.getCubicSplinesFromControlVectors(newInitial,
+          interiorWaypoints.toArray(new Translation2d[0]), newEnd));
+    } catch (MalformedSplineException ex) {
+      reportError(ex.getMessage(), ex.getStackTrace());
+      return kDoNothingTrajectory;
+    }
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
@@ -130,9 +160,15 @@ public final class TrajectoryGenerator {
     }
 
     // Get the spline points
-    var points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromControlVectors(
-        newControlVectors.toArray(new Spline.ControlVector[]{})
-    ));
+    List<PoseWithCurvature> points;
+    try {
+      points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromControlVectors(
+          newControlVectors.toArray(new Spline.ControlVector[]{})
+      ));
+    } catch (MalformedSplineException ex) {
+      reportError(ex.getMessage(), ex.getStackTrace());
+      return kDoNothingTrajectory;
+    }
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
@@ -171,6 +207,8 @@ public final class TrajectoryGenerator {
    *
    * @param splines The splines to parameterize.
    * @return The spline points for use in time parameterization of a trajectory.
+   * @throws MalformedSplineException When the spline is malformed (e.g. has close adjacent points
+   *                                  with approximately opposing headings)
    */
   public static List<PoseWithCurvature> splinePointsFromSplines(
       Spline[] splines) {

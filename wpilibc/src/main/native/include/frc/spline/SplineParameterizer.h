@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -33,10 +33,13 @@
 
 #include <frc/spline/Spline.h>
 
+#include <stack>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include <units/units.h>
+#include <wpi/Twine.h>
 
 namespace frc {
 
@@ -45,7 +48,12 @@ namespace frc {
  */
 class SplineParameterizer {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+
+  struct MalformedSplineException : public std::runtime_error {
+    explicit MalformedSplineException(const char* what_arg)
+        : runtime_error(what_arg) {}
+  };
 
   /**
    * Parameterizes the spline. This method breaks up the spline into various
@@ -64,14 +72,48 @@ class SplineParameterizer {
   static std::vector<PoseWithCurvature> Parameterize(const Spline<Dim>& spline,
                                                      double t0 = 0.0,
                                                      double t1 = 1.0) {
-    std::vector<PoseWithCurvature> arr;
+    std::vector<PoseWithCurvature> splinePoints;
 
-    // The parameterization does not add the first initial point. Let's add
-    // that.
-    arr.push_back(spline.GetPoint(t0));
+    // The parameterization does not add the initial point. Let's add that.
+    splinePoints.push_back(spline.GetPoint(t0));
 
-    GetSegmentArc(spline, &arr, t0, t1);
-    return arr;
+    // We use an "explicit stack" to simulate recursion, instead of a recursive
+    // function call This give us greater control, instead of a stack overflow
+    std::stack<StackContents> stack;
+    stack.emplace(StackContents{t0, t1});
+
+    StackContents current;
+    PoseWithCurvature start;
+    PoseWithCurvature end;
+    int iterations = 0;
+
+    while (!stack.empty()) {
+      current = stack.top();
+      stack.pop();
+      start = spline.GetPoint(current.t0);
+      end = spline.GetPoint(current.t1);
+
+      const auto twist = start.first.Log(end.first);
+
+      if (units::math::abs(twist.dy) > kMaxDy ||
+          units::math::abs(twist.dx) > kMaxDx ||
+          units::math::abs(twist.dtheta) > kMaxDtheta) {
+        stack.emplace(StackContents{(current.t0 + current.t1) / 2, current.t1});
+        stack.emplace(StackContents{current.t0, (current.t0 + current.t1) / 2});
+      } else {
+        splinePoints.push_back(spline.GetPoint(current.t1));
+      }
+
+      if (iterations++ >= kMaxIterations) {
+        throw MalformedSplineException(
+            "Could not parameterize a malformed spline. "
+            "This means that you probably had two or more adjacent "
+            "waypoints that were very close together with headings "
+            "in opposing directions.");
+      }
+    }
+
+    return splinePoints;
   }
 
  private:
@@ -80,33 +122,19 @@ class SplineParameterizer {
   static constexpr units::meter_t kMaxDy = 0.05_in;
   static constexpr units::radian_t kMaxDtheta = 0.0872_rad;
 
+  struct StackContents {
+    double t0;
+    double t1;
+  };
+
   /**
-   * Breaks up the spline into arcs until the dx, dy, and theta of each arc is
-   * within tolerance.
-   *
-   * @param spline The spline to parameterize.
-   * @param vector Pointer to vector of poses.
-   * @param t0 Starting point for arc.
-   * @param t1 Ending point for arc.
+   * A malformed spline does not actually explode the LIFO stack size. Instead,
+   * the stack size stays at a relatively small number (e.g. 30) and never
+   * decreases. Because of this, we must count iterations. Even long, complex
+   * paths don't usually go over 300 iterations, so hitting this maximum should
+   * definitely indicate something has gone wrong.
    */
-  template <int Dim>
-  static void GetSegmentArc(const Spline<Dim>& spline,
-                            std::vector<PoseWithCurvature>* vector, double t0,
-                            double t1) {
-    const auto start = spline.GetPoint(t0);
-    const auto end = spline.GetPoint(t1);
-
-    const auto twist = start.first.Log(end.first);
-
-    if (units::math::abs(twist.dy) > kMaxDy ||
-        units::math::abs(twist.dx) > kMaxDx ||
-        units::math::abs(twist.dtheta) > kMaxDtheta) {
-      GetSegmentArc(spline, vector, t0, (t0 + t1) / 2);
-      GetSegmentArc(spline, vector, (t0 + t1) / 2, t1);
-    } else {
-      vector->push_back(spline.GetPoint(t1));
-    }
-  }
+  static constexpr int kMaxIterations = 5000;
 
   friend class CubicHermiteSplineTest;
   friend class QuinticHermiteSplineTest;

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -176,27 +176,27 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 
     if (baseLength + detailsRef.size() + locationRef.size() +
             callStackRef.size() <=
-        65536) {
+        65535) {
       // Pass through
       retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
                                                   details, location, callStack);
-    } else if (baseLength + detailsRef.size() > 65536) {
+    } else if (baseLength + detailsRef.size() > 65535) {
       // Details too long, cut both location and stack
-      auto newLen = 65536 - baseLength;
+      auto newLen = 65535 - baseLength;
       std::string newDetails{details, newLen};
       char empty = '\0';
       retval = FRC_NetworkCommunication_sendError(
           isError, errorCode, isLVCode, newDetails.c_str(), &empty, &empty);
-    } else if (baseLength + detailsRef.size() + locationRef.size() > 65536) {
+    } else if (baseLength + detailsRef.size() + locationRef.size() > 65535) {
       // Location too long, cut stack
-      auto newLen = 65536 - baseLength - detailsRef.size();
+      auto newLen = 65535 - baseLength - detailsRef.size();
       std::string newLocation{location, newLen};
       char empty = '\0';
       retval = FRC_NetworkCommunication_sendError(
           isError, errorCode, isLVCode, details, newLocation.c_str(), &empty);
     } else {
       // Stack too long
-      auto newLen = 65536 - baseLength - detailsRef.size() - locationRef.size();
+      auto newLen = 65535 - baseLength - detailsRef.size() - locationRef.size();
       std::string newCallStack{callStack, newLen};
       retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
                                                   details, location,
@@ -227,6 +227,18 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     prevMsgTime[i] = curTime;
   }
   return retval;
+}
+
+int32_t HAL_SendConsoleLine(const char* line) {
+  wpi::StringRef lineRef{line};
+  if (lineRef.size() <= 65535) {
+    // Send directly
+    return FRC_NetworkCommunication_sendConsoleLine(line);
+  } else {
+    // Need to truncate
+    std::string newLine{line, 65535};
+    return FRC_NetworkCommunication_sendConsoleLine(newLine.c_str());
+  }
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {

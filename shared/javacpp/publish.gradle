@@ -6,7 +6,7 @@ def baseArtifactId = nativeName
 def artifactGroupId = "edu.wpi.first.${nativeName}"
 def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
 
-def licenseFile = file("$rootDir/license.txt")
+def licenseFile = file("$rootDir/license.md")
 
 task cppSourcesZip(type: Zip) {
     destinationDirectory = outputsFolder

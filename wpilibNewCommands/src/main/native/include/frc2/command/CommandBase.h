@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,7 @@
 
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
+#include <wpi/ArrayRef.h>
 #include <wpi/SmallSet.h>
 #include <wpi/Twine.h>
 
@@ -31,6 +32,13 @@ class CommandBase : public Command,
    * @param requirements the requirements to add
    */
   void AddRequirements(std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Adds the specified requirements to the command.
+   *
+   * @param requirements the requirements to add
+   */
+  void AddRequirements(wpi::ArrayRef<Subsystem*> requirements);
 
   void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -52,6 +52,46 @@ MecanumControllerCommand::MecanumControllerCommand(
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::SimpleMotorFeedforward<units::meters> feedforward,
+    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
+    frc2::PIDController yController,
+    frc::ProfiledPIDController<units::radians> thetaController,
+    units::meters_per_second_t maxWheelVelocity,
+    std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
+    frc2::PIDController frontLeftController,
+    frc2::PIDController rearLeftController,
+    frc2::PIDController frontRightController,
+    frc2::PIDController rearRightController,
+    std::function<void(units::volt_t, units::volt_t, units::volt_t,
+                       units::volt_t)>
+        output,
+    wpi::ArrayRef<Subsystem*> requirements)
+    : m_trajectory(trajectory),
+      m_pose(pose),
+      m_feedforward(feedforward),
+      m_kinematics(kinematics),
+      m_xController(std::make_unique<frc2::PIDController>(xController)),
+      m_yController(std::make_unique<frc2::PIDController>(yController)),
+      m_thetaController(
+          std::make_unique<frc::ProfiledPIDController<units::radians>>(
+              thetaController)),
+      m_maxWheelVelocity(maxWheelVelocity),
+      m_frontLeftController(
+          std::make_unique<frc2::PIDController>(frontLeftController)),
+      m_rearLeftController(
+          std::make_unique<frc2::PIDController>(rearLeftController)),
+      m_frontRightController(
+          std::make_unique<frc2::PIDController>(frontRightController)),
+      m_rearRightController(
+          std::make_unique<frc2::PIDController>(rearRightController)),
+      m_currentWheelSpeeds(currentWheelSpeeds),
+      m_outputVolts(output),
+      m_usePID(true) {
+  AddRequirements(requirements);
+}
+
+MecanumControllerCommand::MecanumControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
     frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
     frc2::PIDController yController,
     frc::ProfiledPIDController<units::radians> thetaController,
@@ -60,6 +100,30 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
+    : m_trajectory(trajectory),
+      m_pose(pose),
+      m_kinematics(kinematics),
+      m_xController(std::make_unique<frc2::PIDController>(xController)),
+      m_yController(std::make_unique<frc2::PIDController>(yController)),
+      m_thetaController(
+          std::make_unique<frc::ProfiledPIDController<units::radians>>(
+              thetaController)),
+      m_maxWheelVelocity(maxWheelVelocity),
+      m_outputVel(output),
+      m_usePID(false) {
+  AddRequirements(requirements);
+}
+
+MecanumControllerCommand::MecanumControllerCommand(
+    frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+    frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
+    frc2::PIDController yController,
+    frc::ProfiledPIDController<units::radians> thetaController,
+    units::meters_per_second_t maxWheelVelocity,
+    std::function<void(units::meters_per_second_t, units::meters_per_second_t,
+                       units::meters_per_second_t, units::meters_per_second_t)>
+        output,
+    wpi::ArrayRef<Subsystem*> requirements)
     : m_trajectory(trajectory),
       m_pose(pose),
       m_kinematics(kinematics),
@@ -183,5 +247,5 @@ void MecanumControllerCommand::Execute() {
 void MecanumControllerCommand::End(bool interrupted) { m_timer.Stop(); }
 
 bool MecanumControllerCommand::IsFinished() {
-  return m_timer.HasPeriodPassed(m_trajectory.TotalTime());
+  return m_timer.HasElapsed(m_trajectory.TotalTime());
 }

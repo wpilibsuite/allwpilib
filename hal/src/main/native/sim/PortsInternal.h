@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,7 @@ constexpr int32_t kNumAnalogOutputs = 2;
 constexpr int32_t kNumCounters = 8;
 constexpr int32_t kNumDigitalHeaders = 10;
 constexpr int32_t kNumPWMHeaders = 10;
-constexpr int32_t kNumDigitalChannels = 26;
+constexpr int32_t kNumDigitalChannels = 31;
 constexpr int32_t kNumPWMChannels = 20;
 constexpr int32_t kNumDigitalPWMOutputs = 6;
 constexpr int32_t kNumEncoders = 8;

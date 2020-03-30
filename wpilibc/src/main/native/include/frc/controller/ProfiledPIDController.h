@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,6 +14,7 @@
 
 #include <units/units.h>
 
+#include "frc/controller/ControllerUtil.h"
 #include "frc/controller/PIDController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -33,6 +34,7 @@ template <class Distance>
 class ProfiledPIDController
     : public Sendable,
       public SendableHelper<ProfiledPIDController<Distance>> {
+ public:
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
@@ -43,10 +45,10 @@ class ProfiledPIDController
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
 
- public:
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and
-   * Kd.
+   * Kd. Users should call reset() when they first start running the controller
+   * to avoid unwanted behavior.
    *
    * @param Kp          The proportional coefficient.
    * @param Ki          The integral coefficient.
@@ -250,6 +252,20 @@ class ProfiledPIDController
    * @param measurement The current measurement of the process variable.
    */
   double Calculate(Distance_t measurement) {
+    if (m_controller.IsContinuousInputEnabled()) {
+      // Get error which is smallest distance between goal and measurement
+      auto error = frc::GetModulusError<Distance_t>(
+          m_goal.position, measurement, m_minimumInput, m_maximumInput);
+
+      // Recompute the profile goal with the smallest error, thus giving the
+      // shortest path. The goal may be outside the input range after this
+      // operation, but that's OK because the controller will still go there and
+      // report an error of zero. In other words, the setpoint only needs to be
+      // offset from the measurement by the input range modulus; they don't need
+      // to be equal.
+      m_goal.position = Distance_t{error} + measurement;
+    }
+
     frc::TrapezoidProfile<Distance> profile{m_constraints, m_goal, m_setpoint};
     m_setpoint = profile.Calculate(GetPeriod());
     return m_controller.Calculate(measurement.template to<double>(),
@@ -292,9 +308,34 @@ class ProfiledPIDController
   }
 
   /**
-   * Reset the previous error, the integral term, and disable the controller.
+   * Reset the previous error and the integral term.
+   *
+   * @param measurement The current measured State of the system.
    */
-  void Reset() { m_controller.Reset(); }
+  void Reset(const State& measurement) {
+    m_controller.Reset();
+    m_setpoint = measurement;
+  }
+
+  /**
+   * Reset the previous error and the integral term.
+   *
+   * @param measuredPosition The current measured position of the system.
+   * @param measuredVelocity The current measured velocity of the system.
+   */
+  void Reset(Distance_t measuredPosition, Velocity_t measuredVelocity) {
+    Reset(State{measuredPosition, measuredVelocity});
+  }
+
+  /**
+   * Reset the previous error and the integral term.
+   *
+   * @param measuredPosition The current measured position of the system. The
+   * velocity is assumed to be zero.
+   */
+  void Reset(Distance_t measuredPosition) {
+    Reset(measuredPosition, Velocity_t(0));
+  }
 
   void InitSendable(frc::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("ProfiledPIDController");
@@ -311,6 +352,8 @@ class ProfiledPIDController
 
  private:
   frc2::PIDController m_controller;
+  Distance_t m_minimumInput{0};
+  Distance_t m_maximumInput{0};
   typename frc::TrapezoidProfile<Distance>::State m_goal;
   typename frc::TrapezoidProfile<Distance>::State m_setpoint;
   typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;

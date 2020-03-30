@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -158,6 +159,52 @@ class ParallelRaceGroupTest extends CommandTestBase {
     // at this point the sequential group should be done
     assertDoesNotThrow(() -> scheduler.run());
 
+  }
+
+  @Test
+  void parallelRaceScheduleTwiceTest() {
+    CommandScheduler scheduler = new CommandScheduler();
+
+    MockCommandHolder command1Holder = new MockCommandHolder(true);
+    Command command1 = command1Holder.getMock();
+    MockCommandHolder command2Holder = new MockCommandHolder(true);
+    Command command2 = command2Holder.getMock();
+
+    Command group = new ParallelRaceGroup(command1, command2);
+
+    scheduler.schedule(group);
+
+    verify(command1).initialize();
+    verify(command2).initialize();
+
+    command1Holder.setFinished(true);
+    scheduler.run();
+    command2Holder.setFinished(true);
+    scheduler.run();
+
+    verify(command1).execute();
+    verify(command1).end(false);
+    verify(command2).execute();
+    verify(command2).end(true);
+    verify(command2, never()).end(false);
+
+    assertFalse(scheduler.isScheduled(group));
+
+    reset(command1);
+    reset(command2);
+
+    scheduler.schedule(group);
+
+    verify(command1).initialize();
+    verify(command2).initialize();
+
+    scheduler.run();
+    scheduler.run();
+    assertTrue(scheduler.isScheduled(group));
+    command2Holder.setFinished(true);
+    scheduler.run();
+
+    assertFalse(scheduler.isScheduled(group));
   }
 
 }

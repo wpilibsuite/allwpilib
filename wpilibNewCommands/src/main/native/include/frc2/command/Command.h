@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <initializer_list>
 #include <memory>
 #include <string>
 
@@ -132,7 +133,18 @@ class Command : public frc::ErrorBase {
    */
   SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements = {}) &&;
+      std::initializer_list<Subsystem*> requirements) &&;
+
+  /**
+   * Decorates this command with a runnable to run before this command starts.
+   *
+   * @param toRun the Runnable to run
+   * @param requirements the required subsystems
+   * @return the decorated command
+   */
+  SequentialCommandGroup BeforeStarting(
+      std::function<void()> toRun,
+      wpi::ArrayRef<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -143,7 +155,18 @@ class Command : public frc::ErrorBase {
    */
   SequentialCommandGroup AndThen(
       std::function<void()> toRun,
-      std::initializer_list<Subsystem*> requirements = {}) &&;
+      std::initializer_list<Subsystem*> requirements) &&;
+
+  /**
+   * Decorates this command with a runnable to run after the command finishes.
+   *
+   * @param toRun the Runnable to run
+   * @param requirements the required subsystems
+   * @return the decorated command
+   */
+  SequentialCommandGroup AndThen(
+      std::function<void()> toRun,
+      wpi::ArrayRef<Subsystem*> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@
 #include <initializer_list>
 
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <wpi/ArrayRef.h>
 
 #include "frc2/Timer.h"
 #include "frc2/command/CommandBase.h"
@@ -42,7 +43,21 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          std::initializer_list<Subsystem*> requirements = {})
+                          std::initializer_list<Subsystem*> requirements)
+      : m_profile(profile), m_output(output) {
+    this->AddRequirements(requirements);
+  }
+
+  /**
+   * Creates a new TrapezoidProfileCommand that will execute the given
+   * TrapezoidalProfile. Output will be piped to the provided consumer function.
+   *
+   * @param profile The motion profile to execute.
+   * @param output  The consumer for the profile output.
+   */
+  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
+                          std::function<void(State)> output,
+                          wpi::ArrayRef<Subsystem*> requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
   }
@@ -57,7 +72,7 @@ class TrapezoidProfileCommand
   void End(bool interrupted) override { m_timer.Stop(); }
 
   bool IsFinished() override {
-    return m_timer.HasPeriodPassed(m_profile.TotalTime());
+    return m_timer.HasElapsed(m_profile.TotalTime());
   }
 
  private:

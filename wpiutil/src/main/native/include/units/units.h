@@ -2042,7 +2042,7 @@ namespace units
 		{
 			return detail::abs(nls::m_value - units::convert<UnitsRhs, Units>(rhs.m_value)) < std::numeric_limits<T>::epsilon() * 
 				detail::abs(nls::m_value + units::convert<UnitsRhs, Units>(rhs.m_value)) ||
-				detail::abs(nls::m_value - units::convert<UnitsRhs, Units>(rhs.m_value)) < std::numeric_limits<T>::min();
+				detail::abs(nls::m_value - units::convert<UnitsRhs, Units>(rhs.m_value)) < (std::numeric_limits<T>::min)();
 		}
 
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs, std::enable_if_t<std::is_integral<T>::value && std::is_integral<Ty>::value, int> = 0>
@@ -2656,14 +2656,14 @@ namespace units
 	constexpr bool operator==(const UNIT_LIB_DEFAULT_TYPE lhs, const Units& rhs) noexcept
 	{
 		return detail::abs(lhs - static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs)) < std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::epsilon() * detail::abs(lhs + static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs)) ||
-			detail::abs(lhs - static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs)) < std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::min();
+			detail::abs(lhs - static_cast<UNIT_LIB_DEFAULT_TYPE>(rhs)) < (std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::min)();
 	}
 
 	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
 	constexpr bool operator==(const Units& lhs, const UNIT_LIB_DEFAULT_TYPE rhs) noexcept
 	{
 		return detail::abs(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) - rhs) < std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::epsilon() * detail::abs(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) + rhs) ||
-			detail::abs(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) - rhs) < std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::min();
+			detail::abs(static_cast<UNIT_LIB_DEFAULT_TYPE>(lhs) - rhs) < (std::numeric_limits<UNIT_LIB_DEFAULT_TYPE>::min)();
 	}
 
 	template<typename Units, class = std::enable_if_t<units::traits::is_dimensionless_unit<Units>::value>>
@@ -4166,7 +4166,7 @@ namespace units
 		//----------------------------------
 
 		template<class UnitTypeLhs, class UnitTypeRhs>
-		UnitTypeLhs min(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
+		UnitTypeLhs (min)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
 		{
 			static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value, "Unit types are not compatible.");
 			UnitTypeLhs r(rhs);
@@ -4174,7 +4174,7 @@ namespace units
 		}
 
 		template<class UnitTypeLhs, class UnitTypeRhs>
-		UnitTypeLhs max(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
+		UnitTypeLhs (max)(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs)
 		{
 			static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value, "Unit types are not compatible.");
 			UnitTypeLhs r(rhs);
@@ -4806,13 +4806,13 @@ namespace std
 	class numeric_limits<units::unit_t<Units, T, NonLinearScale>>
 	{
 	public:
-		static constexpr units::unit_t<Units, T, NonLinearScale> min()
+		static constexpr units::unit_t<Units, T, NonLinearScale> (min)()
 		{
-			return units::unit_t<Units, T, NonLinearScale>(std::numeric_limits<T>::min());
+			return units::unit_t<Units, T, NonLinearScale>((std::numeric_limits<T>::min)());
 		}
-		static constexpr units::unit_t<Units, T, NonLinearScale> max()
+		static constexpr units::unit_t<Units, T, NonLinearScale> (max)()
 		{
-			return units::unit_t<Units, T, NonLinearScale>(std::numeric_limits<T>::max());
+			return units::unit_t<Units, T, NonLinearScale>((std::numeric_limits<T>::max)());
 		}
 		static constexpr units::unit_t<Units, T, NonLinearScale> lowest()
 		{
@@ -4854,4 +4854,14 @@ using namespace velocity;
 using namespace acceleration;
 using namespace angle;
 using namespace voltage;
+
+/**
+ * Define a unit for curvature.
+ */
+using curvature_t = units::unit_t<
+    units::compound_unit<units::radian, units::inverse<units::meter>>>;
+
+using dimensionless::scalar;
+using dimensionless::scalar_t;
+using dimensionless::dimensionless_t;
 }  // namespace units

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -51,13 +51,19 @@ public final class RuntimeLoader<T> {
     m_extractionRoot = extractionRoot;
   }
 
-  private String getLoadErrorMessage() {
-    StringBuilder msg = new StringBuilder(256);
+  private String getLoadErrorMessage(UnsatisfiedLinkError ule) {
+    StringBuilder msg = new StringBuilder(512);
     msg.append(m_libraryName)
        .append(" could not be loaded from path or an embedded resource.\n"
                + "\tattempted to load for platform ")
        .append(RuntimeDetector.getPlatformPath())
+       .append("\nLast Load Error: \n")
+       .append(ule.getMessage())
        .append('\n');
+    if (RuntimeDetector.isWindows()) {
+      msg.append("A common cause of this error is missing the C++ runtime.\n"
+                 + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
+    }
     return msg.toString();
   }
 
@@ -75,7 +81,7 @@ public final class RuntimeLoader<T> {
       String resname = RuntimeDetector.getLibraryResource(m_libraryName);
       try (InputStream hashIs = m_loadClass.getResourceAsStream(hashName)) {
         if (hashIs == null) {
-          throw new IOException(getLoadErrorMessage());
+          throw new IOException(getLoadErrorMessage(ule));
         }
         try (Scanner scanner = new Scanner(hashIs, StandardCharsets.UTF_8.name())) {
           String hash = scanner.nextLine();
@@ -87,7 +93,7 @@ public final class RuntimeLoader<T> {
             // If extraction failed, extract
             try (InputStream resIs = m_loadClass.getResourceAsStream(resname)) {
               if (resIs == null) {
-                throw new IOException(getLoadErrorMessage());
+                throw new IOException(getLoadErrorMessage(ule));
               }
               jniLibrary.getParentFile().mkdirs();
               try (OutputStream os = Files.newOutputStream(jniLibrary.toPath())) {
@@ -120,7 +126,7 @@ public final class RuntimeLoader<T> {
       String hash = null;
       try (InputStream is = m_loadClass.getResourceAsStream(resname)) {
         if (is == null) {
-          throw new IOException(getLoadErrorMessage());
+          throw new IOException(getLoadErrorMessage(ule));
         }
         MessageDigest md = null;
         try {
@@ -152,7 +158,7 @@ public final class RuntimeLoader<T> {
         // If extraction failed, extract
         try (InputStream resIs = m_loadClass.getResourceAsStream(resname)) {
           if (resIs == null) {
-            throw new IOException(getLoadErrorMessage());
+            throw new IOException(getLoadErrorMessage(ule));
           }
           jniLibrary.getParentFile().mkdirs();
           try (OutputStream os = Files.newOutputStream(jniLibrary.toPath())) {

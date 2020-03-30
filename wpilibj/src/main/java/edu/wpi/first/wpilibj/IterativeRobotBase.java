@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -90,6 +90,18 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /**
+   * Robot-wide simulation initialization code should go here.
+   *
+   * <p>Users should override this method for default Robot-wide simulation
+   * related initialization which will be called when the robot is first
+   * started. It will be called exactly one time after RobotInit is called
+   * only when the robot is in simulation.
+   */
+  public void simulationInit() {
+    System.out.println("Default simulationInit() method... Override me!");
+  }
+
+  /**
    * Initialization code for disabled mode should go here.
    *
    * <p>Users should override this method for initialization code which will be called each time the
@@ -144,6 +156,20 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
   }
 
+  private boolean m_spFirstRun = true;
+
+  /**
+   * Periodic simulation code should go here.
+   *
+   * <p>This function is called in a simulated robot after user code executes.
+   */
+  public void simulationPeriodic() {
+    if (m_spFirstRun) {
+      System.out.println("Default simulationPeriodic() method... Override me!");
+      m_spFirstRun = false;
+    }
+  }
+
   private boolean m_dpFirstRun = true;
 
   /**
@@ -193,6 +219,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
   }
 
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void loopFunc() {
     m_watchdog.reset();
 
@@ -264,6 +291,12 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.addEpoch("LiveWindow.updateValues()");
     Shuffleboard.update();
     m_watchdog.addEpoch("Shuffleboard.update()");
+
+    if (isSimulation()) {
+      simulationPeriodic();
+      m_watchdog.addEpoch("simulationPeriodic()");
+    }
+
     m_watchdog.disable();
 
     // Warn on loop time overruns

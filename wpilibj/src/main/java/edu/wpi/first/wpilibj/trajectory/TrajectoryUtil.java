@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -47,6 +47,7 @@ public final class TrajectoryUtil {
    * @throws IOException if writing to the file fails
    */
   public static void toPathweaverJson(Trajectory trajectory, Path path) throws IOException {
+    Files.createDirectories(path.getParent());
     try (BufferedWriter writer = Files.newBufferedWriter(path)) {
       WRITER.writeValue(writer, trajectory.getStates().toArray(new Trajectory.State[0]));
     }

@@ -44,6 +44,7 @@ Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineP
                       wpilibc/src/main/native/include/spline/SplineParameterizer.h
                       wpilibc/src/main/native/include/trajectory/TrajectoryParameterizer.h
                       wpilibc/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
+Portable File Dialogs simulation/halsim_gui/src/main/native/include/portable-file-dialogs.h
 
 
 ==============================================================================

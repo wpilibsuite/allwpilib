@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,6 +24,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -35,7 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * Subsystem#periodic()} methods to be called and for their default commands to be scheduled.
  */
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods", "PMD.TooManyFields"})
-public final class CommandScheduler implements Sendable {
+public final class CommandScheduler implements Sendable, AutoCloseable {
   /**
    * The Singleton Instance.
    */
@@ -70,11 +71,6 @@ public final class CommandScheduler implements Sendable {
 
   private boolean m_disabled;
 
-  //NetworkTable entries for use in Sendable impl
-  private NetworkTableEntry m_namesEntry;
-  private NetworkTableEntry m_idsEntry;
-  private NetworkTableEntry m_cancelEntry;
-
   //Lists of user-supplied actions to be executed on scheduling events for every command.
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
@@ -91,6 +87,20 @@ public final class CommandScheduler implements Sendable {
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
+    LiveWindow.setEnabledListener(() -> {
+      disable();
+      cancelAll();
+    });
+    LiveWindow.setDisabledListener(() -> {
+      enable();
+    });
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
+    LiveWindow.setEnabledListener(null);
+    LiveWindow.setDisabledListener(null);
   }
 
   /**
@@ -375,7 +385,7 @@ public final class CommandScheduler implements Sendable {
    * Cancels all commands that are currently scheduled.
    */
   public void cancelAll() {
-    for (Command command : m_scheduledCommands.keySet()) {
+    for (Command command : m_scheduledCommands.keySet().toArray(new Command[0])) {
       cancel(command);
     }
   }
@@ -473,12 +483,12 @@ public final class CommandScheduler implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Scheduler");
-    m_namesEntry = builder.getEntry("Names");
-    m_idsEntry = builder.getEntry("Ids");
-    m_cancelEntry = builder.getEntry("Cancel");
+    final NetworkTableEntry namesEntry = builder.getEntry("Names");
+    final NetworkTableEntry idsEntry = builder.getEntry("Ids");
+    final NetworkTableEntry cancelEntry = builder.getEntry("Cancel");
     builder.setUpdateTable(() -> {
 
-      if (m_namesEntry == null || m_idsEntry == null || m_cancelEntry == null) {
+      if (namesEntry == null || idsEntry == null || cancelEntry == null) {
         return;
       }
 
@@ -489,21 +499,21 @@ public final class CommandScheduler implements Sendable {
         ids.put((double) command.hashCode(), command);
       }
 
-      double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
+      double[] toCancel = cancelEntry.getDoubleArray(new double[0]);
       if (toCancel.length > 0) {
         for (double hash : toCancel) {
           cancel(ids.get(hash));
           ids.remove(hash);
         }
-        m_cancelEntry.setDoubleArray(new double[0]);
+        cancelEntry.setDoubleArray(new double[0]);
       }
 
       List<String> names = new ArrayList<>();
 
       ids.values().forEach(command -> names.add(command.getName()));
 
-      m_namesEntry.setStringArray(names.toArray(new String[0]));
-      m_idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
+      namesEntry.setStringArray(names.toArray(new String[0]));
+      idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
     });
   }
 }

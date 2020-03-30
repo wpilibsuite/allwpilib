@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -462,7 +462,23 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendError
     HALSIM_SetSendError([](HAL_Bool isError, int32_t errorCode,
                            HAL_Bool isLVCode, const char* details,
                            const char* location, const char* callStack,
-                           HAL_Bool printMsg) { return 1; });
+                           HAL_Bool printMsg) { return 0; });
+  }
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Method:    setSendConsoleLine
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendConsoleLine
+  (JNIEnv*, jclass, jboolean shouldSend)
+{
+  if (shouldSend) {
+    HALSIM_SetSendConsoleLine(nullptr);
+  } else {
+    HALSIM_SetSendConsoleLine([](const char* line) { return 0; });
   }
 }
 
