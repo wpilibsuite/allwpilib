@@ -1,0 +1,32 @@
+# Job for building
+
+parameters:
+  jobName: ''
+  pool:
+    vmImage: 'Ubuntu 16.04'
+  container: wpilib2020
+  preBuild: []
+
+jobs:
+- job: ${{ parameters.jobName }}
+  pool: ${{ parameters.pool }}
+
+  ${{ if ne(parameters.container, '') }}:
+    container: ${{ parameters.container }}
+
+  workspace:
+    clean: all
+
+  timeoutInMinutes: 0
+
+  steps:
+    - ${{ parameters.preBuild }}
+
+    - task: CMake@1
+      inputs:
+        cmakeArgs: '-DWITHOUT_ALLWPILIB=OFF ..'
+
+    - script: |
+        make -j3
+      workingDirectory: 'build'
+      displayName: 'Build'

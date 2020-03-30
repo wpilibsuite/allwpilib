@@ -1,7 +1,4 @@
-# Gradle
-# Build your Java projects and run tests with Gradle using a Gradle wrapper script.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/vsts/pipelines/languages/java
+# Build and testing pipeline on Azure.
 
 resources:
   containers:
@@ -14,9 +11,6 @@ resources:
   - container: ubuntu
     image:  wpilib/ubuntu-base:18.04
 
-variables:
-- group: Artifactory-Package-Publish
-
 trigger:
   batch: true
   branches:
@@ -26,392 +20,48 @@ trigger:
 stages:
 - stage: Build
   jobs:
-  - job: Linux_Arm
-    pool:
-      vmImage: 'Ubuntu 16.04'
+  - template: azure-templates/job-build.yml
+    parameters:
+      jobName: Linux_Arm
+      buildOptions: '-Ponlylinuxathena'
+      artifactName: 'Athena'
 
-    container: wpilib2020
+  - template: azure-templates/job-build.yml
+    parameters:
+      jobName: Linux_Raspbian
+      container: raspbian
+      buildOptions: '-Ponlylinuxraspbian'
+      artifactName: 'Raspbian'
 
-    timeoutInMinutes: 0
+  - template: azure-templates/job-build.yml
+    parameters:
+      jobName: Linux_Aarch64
+      container: aarch64
+      buildOptions: '-Ponlylinuxaarch64bionic'
+      artifactName: 'Aarch64'
 
-    steps:
-      - task: Gradle@2
-        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: false
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-Ponlylinuxathena -PbuildServer'
+  - template: azure-templates/job-build.yml
+    parameters:
+      jobName: Linux
+      container: ubuntu
+      artifactName: 'Linux'
 
-      - task: Gradle@2
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: false
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-Ponlylinuxathena -PreleaseMode -PbuildServer'
+  - template: azure-templates/job-build.yml
+    parameters:
+      jobName: Windows_64_Bit
+      pool:
+        vmImage: 'windows-2019'
+      container: ''
+      jdkVersionOption: '1.11'
+      buildOptions: '-PskipPMD'
+      artifactName: 'Win64'
 
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'Athena'
-          targetPath: 'build/allOutputs'
+  - template: azure-templates/job-build-win32.yml
 
-  - job: Linux_Raspbian
-    pool:
-      vmImage: 'Ubuntu 16.04'
+  - template: azure-templates/job-build-mac.yml
 
-    container: raspbian
+  - template: azure-templates/job-build-cmake.yml
 
-    timeoutInMinutes: 0
+  - template: azure-templates/job-styleguide.yml
 
-    steps:
-      - task: Gradle@2
-        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-Ponlylinuxraspbian -PbuildServer'
-
-      - task: Gradle@2
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-Ponlylinuxraspbian -PreleaseMode -PbuildServer'
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'Raspbian'
-          targetPath: 'build/allOutputs'
-
-  - job: Linux_Aarch64
-    pool:
-      vmImage: 'Ubuntu 16.04'
-
-    container: aarch64
-
-    timeoutInMinutes: 0
-
-    steps:
-      - task: Gradle@2
-        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-Ponlylinuxaarch64bionic -PbuildServer'
-
-      - task: Gradle@2
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-Ponlylinuxaarch64bionic -PreleaseMode -PbuildServer'
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'Aarch64'
-          targetPath: 'build/allOutputs'
-
-  - job: Linux
-    pool:
-      vmImage: 'Ubuntu 16.04'
-
-    container: ubuntu
-
-    timeoutInMinutes: 0
-
-    steps:
-      - task: Gradle@2
-        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-PbuildServer'
-
-      - task: Gradle@2
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-PreleaseMode -PbuildServer'
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'Linux'
-          targetPath: 'build/allOutputs'
-
-  - job: Styleguide
-    pool:
-      vmImage: 'Ubuntu 16.04'
-
-    container: ubuntu
-
-    timeoutInMinutes: 0
-
-    steps:
-        - script: |
-            sudo pip3 install wpiformat
-          displayName: 'Install wpiformat'
-        - script: |
-            git checkout -b master
-            wpiformat -clang 6.0
-          displayName: 'Run wpiformat'
-        - script: |
-            # Ensure formatter made no changes
-            git --no-pager diff --exit-code HEAD
-          displayName: 'Check wpiformat Output'
-
-  - job: CMakeBuild
-    pool:
-      vmImage: 'Ubuntu 16.04'
-
-    container: wpilib2020
-
-    timeoutInMinutes: 0
-
-    steps:
-        - task: CMake@1
-          inputs:
-            cmakeArgs: '-DWITHOUT_ALLWPILIB=OFF ..'
-        - script: |
-            make -j3
-          workingDirectory: 'build'
-          displayName: 'Build'
-
-  - job: Windows_64_Bit
-    pool:
-      vmImage: 'windows-2019'
-
-    timeoutInMinutes: 0
-    steps:
-      - task: Gradle@2
-        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          jdkVersionOption: '1.11'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-PskipPMD -PbuildServer'
-
-      - task: Gradle@2
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          jdkVersionOption: '1.11'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-PskipPMD -PreleaseMode -PbuildServer'
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'Win64'
-          targetPath: 'build/allOutputs'
-
-  - job: Windows_32_Bit
-    pool:
-      vmImage: 'windows-2019'
-
-    timeoutInMinutes: 0
-    steps:
-      - powershell: |
-          mkdir build
-          $ProgressPreference = 'SilentlyContinue'
-          wget "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jdk_x86-32_windows_hotspot_11.0.4_11.zip" -O "build\jdk.zip"
-        displayName: 'Download JDK'
-      - task: JavaToolInstaller@0
-        inputs:
-          jdkSourceOption: localDirectory
-          jdkFile: 'build/jdk.zip'
-          jdkDestinationDirectory: 'build/jdkinst'
-          jdkArchitectureOption: x86
-
-      - task: Gradle@2
-        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx1024m'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-PskipPMD -PbuildServer'
-
-      - task: Gradle@2
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx1024m'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-PskipPMD -PreleaseMode -PbuildServer'
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'Win32'
-          targetPath: 'build/allOutputs'
-
-  - job: Mac
-    pool:
-      vmImage: 'macOS-10.14'
-
-    timeoutInMinutes: 0
-    steps:
-      - script: |
-          mkdir build
-          export JAVA_HOME=`/usr/libexec/java_home -v 11`
-        displayName: 'Setup JDK'
-
-      - task: Gradle@2
-        condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          jdkVersionOption: '1.11'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-PbuildServer'
-
-      - task: Gradle@2
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-        inputs:
-          workingDirectory: ''
-          gradleWrapperFile: 'gradlew'
-          gradleOptions: '-Xmx3072m'
-          jdkVersionOption: '1.11'
-          publishJUnitResults: true
-          testResultsFiles: '**/TEST-*.xml'
-          tasks: 'build'
-          options: '-PreleaseMode -PbuildServer'
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'Mac'
-          targetPath: 'build/allOutputs'
-
-- stage: Combine
-  jobs:
-  - job: CombineJob
-    pool:
-      vmImage: 'macOS-10.14'
-
-    timeoutInMinutes: 0
-
-    steps:
-    - checkout: none
-    - script: |
-        git clone https://github.com/wpilibsuite/build-tools
-      displayName: 'Clone Combiner'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Mac'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Win32'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Win64'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Linux'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Raspbian'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Athena'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Aarch64'
-        targetPath: 'build-tools/combiner/products/build/allOutputs'
-
-# PR Builds
-    - task: Gradle@2
-      inputs:
-        workingDirectory: 'build-tools/combiner'
-        gradleWrapperFile: 'build-tools/combiner/gradlew'
-        gradleOptions: '-Xmx3072m'
-        tasks: 'publish '
-        options: '-Pallwpilib'
-      condition: and(succeeded(), and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))))
-
-# Master Builds
-    - task: Gradle@2
-      inputs:
-        workingDirectory: 'build-tools/combiner'
-        gradleWrapperFile: 'build-tools/combiner/gradlew'
-        gradleOptions: '-Xmx3072m'
-        tasks: 'publish '
-        options: '-Pallwpilib'
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-      env:
-        RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
-        ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
-        ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
-
-# Tagged Builds
-    - task: Gradle@2
-      inputs:
-        workingDirectory: 'build-tools/combiner'
-        gradleWrapperFile: 'build-tools/combiner/gradlew'
-        gradleOptions: '-Xmx3072m'
-        tasks: 'publish '
-        options: '-Pallwpilib -PreleaseRepoPublish'
-      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-      env:
-        RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
-        ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
-        ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
-
-    - script: |
-        echo "##vso[task.setvariable variable=UserHome]$HOME"
-      displayName: 'Set Home Variable'
-    - task: PublishPipelineArtifact@0
-      inputs:
-        artifactName: 'Maven'
-        targetPath: $(UserHome)/releases
+- template: azure-templates/combine-stage.yml
