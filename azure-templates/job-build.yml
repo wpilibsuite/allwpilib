@@ -26,9 +26,35 @@ jobs:
   steps:
     - ${{ parameters.preBuild }}
 
-    - template: steps-build.yml
-      parameters:
-        gradleOptions: ${{ parameters.gradleOptions }}
-        jdkVersionOption: ${{ parameters.jdkVersionOption }}
-        buildOptions: ${{ parameters.buildOptions }}
+# PR Builds
+    - ${{ if not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m ${{ parameters.gradleOptions }}'
+          ${{ if ne(parameters.jdkVersionOption, '') }}:
+            jdkVersionOption: ${{ parameters.jdkVersionOption }}
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-PbuildServer ${{ parameters.buildOptions }}'
+
+# Tagged Builds
+    - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/v') }}:
+      - task: Gradle@2
+        inputs:
+          workingDirectory: ''
+          gradleWrapperFile: 'gradlew'
+          gradleOptions: '-Xmx3072m ${{ parameters.gradleOptions }}'
+          ${{ if ne(parameters.jdkVersionOption, '') }}:
+            jdkVersionOption: ${{ parameters.jdkVersionOption }}
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          tasks: 'build'
+          options: '-PreleaseMode -PbuildServer ${{ parameters.buildOptions }}'
+
+    - task: PublishPipelineArtifact@0
+      inputs:
         artifactName: ${{ parameters.artifactName }}
+        targetPath: 'build/allOutputs'
