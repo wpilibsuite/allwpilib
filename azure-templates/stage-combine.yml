@@ -28,17 +28,7 @@ stages:
           targetPath: 'build-tools/combiner/products/build/allOutputs'
 
 # PR Builds
-    - task: Gradle@2
-      inputs:
-        workingDirectory: 'build-tools/combiner'
-        gradleWrapperFile: 'build-tools/combiner/gradlew'
-        gradleOptions: '-Xmx3072m'
-        tasks: 'publish '
-        options: '-Pallwpilib'
-      condition: and(succeeded(), and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))))
-
-    - ${{ if parameters.publish }}:
-# Master Builds
+    - ${{ if and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))) }}:
       - task: Gradle@2
         inputs:
           workingDirectory: 'build-tools/combiner'
@@ -46,25 +36,34 @@ stages:
           gradleOptions: '-Xmx3072m'
           tasks: 'publish '
           options: '-Pallwpilib'
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-        env:
-          RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
-          ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
-          ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
 
-# Tagged Builds
+# Master Builds
+    - ${{ if and(parameters.publish, eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
       - task: Gradle@2
         inputs:
           workingDirectory: 'build-tools/combiner'
           gradleWrapperFile: 'build-tools/combiner/gradlew'
           gradleOptions: '-Xmx3072m'
           tasks: 'publish '
-          options: '-Pallwpilib -PreleaseRepoPublish'
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+          options: '-Pallwpilib'
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
           ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
           ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
+
+# Tagged Builds
+      - ${{ if and(parameters.publish, startsWith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:
+        - task: Gradle@2
+          inputs:
+            workingDirectory: 'build-tools/combiner'
+            gradleWrapperFile: 'build-tools/combiner/gradlew'
+            gradleOptions: '-Xmx3072m'
+            tasks: 'publish '
+            options: '-Pallwpilib -PreleaseRepoPublish'
+          env:
+            RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
+            ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
+            ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
 
     - script: |
         echo "##vso[task.setvariable variable=UserHome]$HOME"
