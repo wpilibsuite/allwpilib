@@ -21,11 +21,10 @@ stages:
       displayName: 'Clone Combiner'
 
     - ${{ each artifact in parameters.artifacts }}:
-        ${{ artifact }}:
-          task: DownloadPipelineArtifact@0
-          inputs:
-            artifactName: ${{ artifact }}
-            targetPath: 'build-tools/combiner/products/build/allOutputs'
+      - task: DownloadPipelineArtifact@0
+        inputs:
+          artifactName: ${{ artifact }}
+          targetPath: 'build-tools/combiner/products/build/allOutputs'
 
 # PR Builds
     - task: Gradle@2
