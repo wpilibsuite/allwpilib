@@ -64,7 +64,7 @@ stages:
 
   - template: azure-templates/job-styleguide.yml
 
-- template: azure-templates/combine-stage.yml
+- template: azure-templates/stage-combine.yml
   parameters:
     artifacts:
       - 'Mac'
