@@ -31,8 +31,8 @@
 
 /wpilibOldCommands/  @wpilibsuite/commandbased
 
-/wpilibjExamples/  @wpilibsuite/wpilib @wpilibsuite/documentation
-
 /wpilibcExamples/  @wpilibsuite/wpilib @wpilibsuite/documentation
+
+/wpilibjExamples/  @wpilibsuite/wpilib @wpilibsuite/documentation
 
 /wpiutil/  @PeterJohnson
