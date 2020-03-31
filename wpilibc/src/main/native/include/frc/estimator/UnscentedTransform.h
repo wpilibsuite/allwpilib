@@ -49,7 +49,7 @@ UnscentedTransform(const Eigen::Matrix<double, 2 * States + 1, CovDim>& sigmas,
   Eigen::Matrix<double, CovDim, CovDim> P =
       y.transpose() * Eigen::DiagonalMatrix<double, 2 * States + 1>(Wc) * y;
 
-  return std::make_tuple(x, P);
+  return std::make_tuple(x.transpose(), P);
 }
 
 }  // namespace frc
