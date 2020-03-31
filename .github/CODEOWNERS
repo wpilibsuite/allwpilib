@@ -18,9 +18,9 @@
 /cscore/  @wpilibsuite/camera-server
 
 /hal/  @wpilibsuite/hardware
-/hal/src/main/include/mockdata/  @wpilibsuite/simulation
-/hal/src/main/include/simulation/  @wpilibsuite/simulation
 /hal/src/main/java/**/sim/  @wpilibsuite/simulation
+/hal/src/main/native/include/mockdata/  @wpilibsuite/simulation
+/hal/src/main/native/include/simulation/  @wpilibsuite/simulation
 /hal/src/main/native/sim/  @wpilibsuite/simulation
 
 /ntcore/  @wpilibsuite/network-tables
@@ -34,3 +34,5 @@
 /wpilibjExamples/  @wpilibsuite/wpilib @wpilibsuite/documentation
 
 /wpilibcExamples/  @wpilibsuite/wpilib @wpilibsuite/documentation
+
+/wpiutil/  @PeterJohnson
