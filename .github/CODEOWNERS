@@ -8,29 +8,26 @@
 # Order is important. The last matching pattern has the most precedence.
 
 # The folders are ordered as follows:
-# In each subsection folders are ordered by depth.
+# In each subsection folders are as a tree.
 # This should make it easy to add new rules without breaking existing ones.
 
 # Global rule:
 *  @wpilibsuite/wpilib
 
-# cscore:
 /cameraserver/**  @wpilibsuite/camera-server
+
 /cscore/**  @wpilibsuite/camera-server
 
-# commands:
-/wpilibNewCommands/**  @wpilibsuite/commandbased
-/wpilibOldCommands/**  @wpilibsuite/commandbased
-
-# examples:
-/wpilibjExamples/**  @wpilibsuite/wpilib @wpilibsuite/documentation
-/wpilibcExamples/**  @wpilibsuite/wpilib @wpilibsuite/documentation
-
-# hal:
 /hal/**  @wpilibsuite/hardware
 
-# ntcore:
 /ntcore/**  @wpilibsuite/network-tables
 
-# simulation:
 /simulation/**  @wpilibsuite/simulation
+
+/wpilibNewCommands/**  @wpilibsuite/commandbased
+
+/wpilibOldCommands/**  @wpilibsuite/commandbased
+
+/wpilibjExamples/**  @wpilibsuite/wpilib @wpilibsuite/documentation
+
+/wpilibcExamples/**  @wpilibsuite/wpilib @wpilibsuite/documentation
