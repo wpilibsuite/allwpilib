@@ -15,6 +15,7 @@
 *  @wpilibsuite/wpilib
 
 # cscore:
+/cameraserver/**  @wpilibsuite/camera-server
 /cscore/**  @wpilibsuite/camera-server
 
 # commands:
@@ -24,6 +25,9 @@
 # examples:
 /wpilibjExamples/**  @wpilibsuite/wpilib @wpilibsuite/documentation
 /wpilibcExamples/**  @wpilibsuite/wpilib @wpilibsuite/documentation
+
+# hal:
+/hal/**  @wpilibsuite/hardware
 
 # ntcore:
 /ntcore/**  @wpilibsuite/network-tables
