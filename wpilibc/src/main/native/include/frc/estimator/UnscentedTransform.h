@@ -25,7 +25,6 @@ namespace frc {
  * @param sigmas   List of sigma points.
  * @param Wm       Weights for the mean.
  * @param Wc       Weights for the covariance.
- * @param noiseCov Noise matrix added to the final computed covariance matrix.
  *
  * @return Tuple of x, mean of sigma points; P, covariance of sigma points after
  *         passing through the transform.
@@ -35,9 +34,7 @@ std::tuple<Eigen::Matrix<double, CovDim, 1>,
            Eigen::Matrix<double, CovDim, CovDim>>
 UnscentedTransform(const Eigen::Matrix<double, 2 * States + 1, CovDim>& sigmas,
                    const Eigen::Matrix<double, 1, 2 * States + 1>& Wm,
-                   const Eigen::Matrix<double, 1, 2 * States + 1>& Wc,
-                   const Eigen::Matrix<double, CovDim, CovDim>& noiseCov =
-                       Eigen::Matrix<double, CovDim, CovDim>::Zero()) {
+                   const Eigen::Matrix<double, 1, 2 * States + 1>& Wc) {
   // New mean is just the sum of the sigmas * weight
   // dot = \Sigma^n_1 (W[k]*Xi[k])
   Eigen::Matrix<double, 1, CovDim> x = Wm * sigmas;
@@ -51,8 +48,6 @@ UnscentedTransform(const Eigen::Matrix<double, 2 * States + 1, CovDim>& sigmas,
   }
   Eigen::Matrix<double, CovDim, CovDim> P =
       y.transpose() * Eigen::DiagonalMatrix<double, 2 * States + 1>(Wc) * y;
-
-  P += noiseCov;
 
   return std::make_tuple(x, P);
 }

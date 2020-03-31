@@ -17,6 +17,8 @@
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/MerweScaledSigmaPoints.h"
 #include "frc/estimator/UnscentedTransform.h"
+#include "frc/system/Discretization.h"
+#include "frc/system/NumericalJacobian.h"
 #include "frc/system/RungeKutta.h"
 
 namespace frc {
@@ -36,6 +38,7 @@ class UnscentedKalmanFilter {
    *                           the measurement vector.
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
+   * @param dt                 Nominal discretization timestep.
    */
   UnscentedKalmanFilter(std::function<Vector<States>(const Vector<States>&,
                                                      const Vector<Inputs>&)>
@@ -44,10 +47,13 @@ class UnscentedKalmanFilter {
                                                       const Vector<Inputs>&)>
                             h,
                         const std::array<double, States>& stateStdDevs,
-                        const std::array<double, Outputs>& measurementStdDevs)
+                        const std::array<double, Outputs>& measurementStdDevs,
+                        units::second_t dt)
       : m_f(f), m_h(h) {
-    m_Q = MakeCovMatrix(stateStdDevs);
-    m_R = MakeCovMatrix(measurementStdDevs);
+    m_contQ = MakeCovMatrix(stateStdDevs);
+    m_contR = MakeCovMatrix(measurementStdDevs);
+
+    m_discR = DiscretizeR(m_contR, dt);
 
     Reset();
   }
@@ -115,6 +121,13 @@ class UnscentedKalmanFilter {
    * @param dt Timestep for prediction.
    */
   void Predict(const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
+    // Discretize Q before projecting mean and covariance forward
+    Eigen::Matrix<double, States, States> contA =
+        NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
+    Eigen::Matrix<double, States, States> discA;
+    Eigen::Matrix<double, States, States> discQ;
+    DiscretizeAQTaylor(contA, m_contQ, dt, &discA, &discQ);
+
     auto sigmas = m_pts.SigmaPoints(m_xHat, m_P);
 
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
@@ -124,10 +137,13 @@ class UnscentedKalmanFilter {
           RungeKutta(m_f, x, u, dt).transpose();
     }
 
-    auto ret = UnscentedTransform<States, States>(m_sigmasF, m_pts.Wm(),
-                                                  m_pts.Wc(), m_Q);
+    auto ret =
+        UnscentedTransform<States, States>(m_sigmasF, m_pts.Wm(), m_pts.Wc());
     m_xHat = std::get<0>(ret);
     m_P = std::get<1>(ret);
+
+    m_P += discQ;
+    m_discR = DiscretizeR(m_contR, dt);
   }
 
   /**
@@ -138,7 +154,7 @@ class UnscentedKalmanFilter {
    */
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
                const Eigen::Matrix<double, Outputs, 1>& y) {
-    Correct(u, y, m_h, m_R);
+    Correct(u, y, m_h, m_discR);
   }
 
   /**
@@ -170,7 +186,8 @@ class UnscentedKalmanFilter {
 
     // Mean and covariance of prediction passed through UT
     auto [yHat, Py] =
-        UnscentedTransform<States, Rows>(sigmasH, m_pts.Wm(), m_pts.Wc(), R);
+        UnscentedTransform<States, Rows>(sigmasH, m_pts.Wm(), m_pts.Wc());
+    Py += R;
 
     // Compute cross covariance of the state and the measurements
     Eigen::Matrix<double, States, Rows> Pxy;
@@ -201,8 +218,9 @@ class UnscentedKalmanFilter {
       m_h;
   Eigen::Matrix<double, States, 1> m_xHat;
   Eigen::Matrix<double, States, States> m_P;
-  Eigen::Matrix<double, States, States> m_Q;
-  Eigen::Matrix<double, Outputs, Outputs> m_R;
+  Eigen::Matrix<double, States, States> m_contQ;
+  Eigen::Matrix<double, Outputs, Outputs> m_contR;
+  Eigen::Matrix<double, Outputs, Outputs> m_discR;
   Eigen::Matrix<double, 2 * States + 1, States> m_sigmasF;
 
   MerweScaledSigmaPoints<States> m_pts;

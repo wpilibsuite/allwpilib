@@ -82,7 +82,8 @@ TEST(UnscentedKalmanFilterTest, Init) {
   frc::UnscentedKalmanFilter<5, 2, 3> observer{Dynamics,
                                                LocalMeasurementModel,
                                                {0.5, 0.5, 10.0, 1.0, 1.0},
-                                               {0.0001, 0.01, 0.01}};
+                                               {0.0001, 0.01, 0.01},
+                                               dt};
   Eigen::Matrix<double, 2, 1> u;
   u << 12.0, 12.0;
   observer.Predict(u, dt);
@@ -102,7 +103,8 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
   frc::UnscentedKalmanFilter<5, 2, 3> observer{Dynamics,
                                                LocalMeasurementModel,
                                                {0.5, 0.5, 10.0, 1.0, 1.0},
-                                               {0.0001, 0.5, 0.5}};
+                                               {0.0001, 0.5, 0.5},
+                                               dt};
 
   auto waypoints =
       std::vector<frc::Pose2d>{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
