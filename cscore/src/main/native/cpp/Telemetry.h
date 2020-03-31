@@ -11,18 +11,16 @@
 #include <stdint.h>
 
 #include <wpi/SafeThread.h>
+#include <wpi/Signal.h>
 
 #include "cscore_cpp.h"
 
 namespace cs {
 
-class Notifier;
-
 class Telemetry {
   friend class TelemetryTest;
 
  public:
-  explicit Telemetry(Notifier& notifier) : m_notifier(notifier) {}
   ~Telemetry();
 
   void Start();
@@ -38,9 +36,10 @@ class Telemetry {
   // Telemetry events
   void Record(CS_Handle handle, CS_TelemetryKind kind, int64_t quantity);
 
- private:
-  Notifier& m_notifier;
+  // Called when telemetry updated
+  wpi::sig::Signal<> telemetryUpdated;
 
+ private:
   class Thread;
   wpi::SafeThreadOwner<Thread> m_owner;
 };

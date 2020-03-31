@@ -21,8 +21,7 @@ namespace cs {
 
 class ImageSinkImpl : public SinkImpl {
  public:
-  ImageSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
-                Notifier& notifier);
+  ImageSinkImpl(const wpi::Twine& name, wpi::Logger& logger);
   ~ImageSinkImpl() override;
 
   void Stop();

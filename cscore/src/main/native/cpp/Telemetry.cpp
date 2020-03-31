@@ -14,8 +14,6 @@
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
-#include "Instance.h"
-#include "Notifier.h"
 #include "SourceImpl.h"
 #include "cscore_cpp.h"
 
@@ -23,11 +21,11 @@ using namespace cs;
 
 class Telemetry::Thread : public wpi::SafeThread {
  public:
-  explicit Thread(Notifier& notifier) : m_notifier(notifier) {}
+  explicit Thread(Telemetry& telemetry) : m_telemetry(telemetry) {}
 
   void Main();
 
-  Notifier& m_notifier;
+  Telemetry& m_telemetry;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
   double m_period = 0.0;
@@ -48,7 +46,7 @@ int64_t Telemetry::Thread::GetValue(CS_Handle handle, CS_TelemetryKind kind,
 
 Telemetry::~Telemetry() {}
 
-void Telemetry::Start() { m_owner.Start(m_notifier); }
+void Telemetry::Start() { m_owner.Start(*this); }
 
 void Telemetry::Stop() { m_owner.Stop(); }
 
@@ -77,7 +75,7 @@ void Telemetry::Thread::Main() {
     prevTime = curTime;
 
     // notify
-    m_notifier.NotifyTelemetryUpdated();
+    m_telemetry.telemetryUpdated();
   }
 }
 

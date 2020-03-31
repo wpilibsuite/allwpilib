@@ -34,13 +34,11 @@ class json;
 
 namespace cs {
 
-class Notifier;
-
 class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
-  SourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier);
+  SourceImpl(const wpi::Twine& name, wpi::Logger& logger);
   virtual ~SourceImpl();
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
@@ -61,8 +59,8 @@ class SourceImpl : public PropertyContainer {
   }
 
   // User-visible connection status
-  void SetConnected(bool connected);
-  bool IsConnected() const { return m_connected; }
+  void SetConnected(bool isConnected);
+  bool IsConnected() const { return m_isConnected; }
 
   // Functions to keep track of the overall number of sinks connected to this
   // source.  Primarily used by sinks to determine if other sinks are using
@@ -140,6 +138,11 @@ class SourceImpl : public PropertyContainer {
   std::unique_ptr<Image> AllocImage(VideoMode::PixelFormat pixelFormat,
                                     int width, int height, size_t size);
 
+  wpi::sig::Signal<> connected;
+  wpi::sig::Signal<> disconnected;
+  wpi::sig::Signal<> videoModesUpdated;
+  wpi::sig::Signal<const VideoMode&> videoModeChanged;
+
   /**
    * Signal to record telemetry.  Parameters are the telemetry kind and the
    * quantity to record.
@@ -147,7 +150,6 @@ class SourceImpl : public PropertyContainer {
   wpi::sig::Signal<CS_TelemetryKind, int64_t> recordTelemetry;
 
  protected:
-  void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
                            const wpi::Twine& valueStr) override;
 
@@ -169,7 +171,6 @@ class SourceImpl : public PropertyContainer {
   mutable VideoMode m_mode;
 
   wpi::Logger& m_logger;
-  Notifier& m_notifier;
 
  private:
   void ReleaseImage(std::unique_ptr<Image> image);
@@ -192,7 +193,7 @@ class SourceImpl : public PropertyContainer {
   std::vector<std::unique_ptr<Frame::Impl>> m_framesAvail;
   std::vector<std::unique_ptr<Image>> m_imagesAvail;
 
-  std::atomic_bool m_connected{false};
+  std::atomic_bool m_isConnected{false};
 
   // Most recent frame (returned to callers of GetNextFrame)
   // Access protected by m_frameMutex.

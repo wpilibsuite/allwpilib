@@ -14,17 +14,13 @@
 #include <wpi/timestamp.h>
 
 #include "Log.h"
-#include "Notifier.h"
 
 using namespace cs;
 
 static constexpr size_t kMaxImagesAvail = 32;
 
-SourceImpl::SourceImpl(const wpi::Twine& name, wpi::Logger& logger,
-                       Notifier& notifier)
-    : m_logger(logger),
-      m_notifier(notifier),
-      m_name{name.str()} {
+SourceImpl::SourceImpl(const wpi::Twine& name, wpi::Logger& logger)
+    : m_logger(logger), m_name{name.str()} {
   m_frame = Frame{*this, wpi::StringRef{}, 0};
 }
 
@@ -53,12 +49,12 @@ wpi::StringRef SourceImpl::GetDescription(
   return wpi::StringRef{buf.data(), buf.size()};
 }
 
-void SourceImpl::SetConnected(bool connected) {
-  bool wasConnected = m_connected.exchange(connected);
-  if (wasConnected && !connected)
-    m_notifier.NotifySource(*this, CS_SOURCE_DISCONNECTED);
-  else if (!wasConnected && connected)
-    m_notifier.NotifySource(*this, CS_SOURCE_CONNECTED);
+void SourceImpl::SetConnected(bool isConnected) {
+  bool wasConnected = m_isConnected.exchange(isConnected);
+  if (wasConnected && !isConnected)
+    disconnected();
+  else if (!wasConnected && isConnected)
+    connected();
 }
 
 uint64_t SourceImpl::GetCurFrameTime() {
@@ -458,17 +454,6 @@ void SourceImpl::PutError(const wpi::Twine& msg, Frame::Time time) {
   m_frameCv.notify_all();
 }
 
-void SourceImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, prop.name,
-                                  propIndex, prop.propKind, prop.value,
-                                  prop.valueStr);
-  // also notify choices updated event for enum types
-  if (prop.propKind == CS_PROP_ENUM)
-    m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-                                    prop.name, propIndex, prop.propKind,
-                                    prop.value, wpi::Twine{});
-}
-
 void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
                                      const wpi::Twine& valueStr) {
   auto prop = GetProperty(property);
@@ -480,11 +465,7 @@ void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
     prop->SetValue(value);
 
   // Only notify updates after we've notified created
-  if (m_properties_cached) {
-    m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_VALUE_UPDATED,
-                                    prop->name, property, prop->propKind,
-                                    prop->value, prop->valueStr);
-  }
+  if (m_properties_cached) propertyValueUpdated(property, *prop);
 }
 
 void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {

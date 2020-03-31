@@ -25,7 +25,7 @@ namespace cs {
 class ImageSourceImpl : public SourceImpl {
  public:
   ImageSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
-                  Notifier& notifier, const VideoMode& mode);
+                  const VideoMode& mode);
   ~ImageSourceImpl() override;
 
   void Start() override;

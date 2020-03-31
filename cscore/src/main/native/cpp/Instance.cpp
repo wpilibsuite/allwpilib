@@ -50,7 +50,7 @@ static void def_log_func(unsigned int level, const char* file,
 
 class Instance::Impl {
  public:
-  Impl() : telemetry(notifier), networkListener(logger, notifier) {}
+  Impl() : networkListener(logger) {}
 
   wpi::Logger logger;
   Notifier notifier;
@@ -61,7 +61,13 @@ class Instance::Impl {
   wpi::EventLoopRunner eventLoop;
 };
 
-Instance::Instance() : m_impl(new Impl) { SetDefaultLogger(); }
+Instance::Instance() : m_impl(new Impl) {
+  SetDefaultLogger();
+  m_impl->networkListener.interfacesChanged.connect(
+      [=] { m_impl->notifier.Notify(RawEvent::kNetworkInterfacesChanged); });
+  m_impl->telemetry.telemetryUpdated.connect(
+      [=] { m_impl->notifier.Notify(RawEvent::kTelemetryUpdated); });
+}
 
 Instance::~Instance() {}
 
@@ -91,7 +97,8 @@ void Instance::SetDefaultLogger() { m_impl->logger.SetLogger(def_log_func); }
 
 void Instance::StartNetworkListener(bool immediateNotify) {
   m_impl->networkListener.Start();
-  if (immediateNotify) m_impl->notifier.NotifyNetworkInterfacesChanged();
+  if (immediateNotify)
+    m_impl->notifier.Notify(RawEvent::kNetworkInterfacesChanged);
 }
 
 std::pair<CS_Source, std::shared_ptr<SourceData>> Instance::FindSource(
@@ -114,13 +121,65 @@ std::shared_ptr<SinkData> Instance::GetSink(CS_Sink handle) {
   return m_impl->sinks.Get(handle);
 }
 
+static void NotifySourceProperty(Notifier& notifier, CS_Handle handle,
+                                 int propIndex, const PropertyImpl& prop,
+                                 RawEvent::Kind kind) {
+  notifier.Notify(RawEvent{prop.name, handle, kind,
+                           Handle{handle, propIndex, Handle::kProperty},
+                           prop.propKind, prop.value, prop.valueStr});
+}
+
+static void NotifySinkProperty(Notifier& notifier, CS_Handle handle,
+                               int propIndex, const PropertyImpl& prop,
+                               RawEvent::Kind kind) {
+  notifier.Notify(RawEvent{prop.name, handle, kind,
+                           Handle{handle, propIndex, Handle::kSinkProperty},
+                           prop.propKind, prop.value, prop.valueStr});
+}
+
 CS_Source Instance::CreateSource(CS_SourceKind kind,
                                  std::shared_ptr<SourceImpl> source) {
   auto handle = m_impl->sources.Allocate(kind, source);
-  m_impl->notifier.NotifySource(source->GetName(), handle, CS_SOURCE_CREATED);
+  m_impl->notifier.Notify(
+      RawEvent{source->GetName(), handle, RawEvent::kSourceCreated});
   source->recordTelemetry.connect(
       [this, handle](CS_TelemetryKind kind, int64_t quantity) {
         m_impl->telemetry.Record(handle, kind, quantity);
+      });
+  source->connected.connect([this, handle, source = source.get()] {
+    m_impl->notifier.Notify(
+        RawEvent{source->GetName(), handle, RawEvent::kSourceConnected});
+  });
+  source->disconnected.connect([this, handle, source = source.get()] {
+    m_impl->notifier.Notify(
+        RawEvent{source->GetName(), handle, RawEvent::kSourceDisconnected});
+  });
+  source->videoModesUpdated.connect([this, handle, source = source.get()] {
+    m_impl->notifier.Notify(RawEvent{source->GetName(), handle,
+                                     RawEvent::kSourceVideoModesUpdated});
+  });
+  source->videoModeChanged.connect(
+      [this, handle, s = source.get()](const VideoMode& mode) {
+        m_impl->notifier.Notify(RawEvent{s->GetName(), handle, mode});
+      });
+  source->propertyCreated.connect(
+      [this, handle](int propIndex, const PropertyImpl& prop) {
+        NotifySourceProperty(m_impl->notifier, handle, propIndex, prop,
+                             RawEvent::kSourcePropertyCreated);
+        // also notify choices updated event for enum types
+        if (prop.propKind == CS_PROP_ENUM)
+          NotifySourceProperty(m_impl->notifier, handle, propIndex, prop,
+                               RawEvent::kSourcePropertyChoicesUpdated);
+      });
+  source->propertyChoicesUpdated.connect(
+      [this, handle](int propIndex, const PropertyImpl& prop) {
+        NotifySourceProperty(m_impl->notifier, handle, propIndex, prop,
+                             RawEvent::kSourcePropertyChoicesUpdated);
+      });
+  source->propertyValueUpdated.connect(
+      [this, handle](int propIndex, const PropertyImpl& prop) {
+        NotifySourceProperty(m_impl->notifier, handle, propIndex, prop,
+                             RawEvent::kSourcePropertyValueUpdated);
       });
   source->Start();
   return handle;
@@ -128,20 +187,56 @@ CS_Source Instance::CreateSource(CS_SourceKind kind,
 
 CS_Sink Instance::CreateSink(CS_SinkKind kind, std::shared_ptr<SinkImpl> sink) {
   auto handle = m_impl->sinks.Allocate(kind, sink);
-  m_impl->notifier.NotifySink(sink->GetName(), handle, CS_SINK_CREATED);
+  m_impl->notifier.Notify(
+      RawEvent{sink->GetName(), handle, RawEvent::kSinkCreated});
+  sink->enabled.connect([this, handle, sink = sink.get()] {
+    m_impl->notifier.Notify(
+        RawEvent{sink->GetName(), handle, RawEvent::kSinkEnabled});
+  });
+  sink->disabled.connect([this, handle, sink = sink.get()] {
+    m_impl->notifier.Notify(
+        RawEvent{sink->GetName(), handle, RawEvent::kSinkDisabled});
+  });
+  sink->sourceChanged.connect(
+      [this, handle, sink = sink.get()](SourceImpl* source) {
+        RawEvent event{sink->GetName(), handle, RawEvent::kSinkSourceChanged};
+        if (source) event.sourceHandle = FindSource(*source).first;
+        m_impl->notifier.Notify(std::move(event));
+      });
+  sink->propertyCreated.connect(
+      [this, handle](int propIndex, const PropertyImpl& prop) {
+        NotifySinkProperty(m_impl->notifier, handle, propIndex, prop,
+                           RawEvent::kSinkPropertyCreated);
+        // also notify choices updated event for enum types
+        if (prop.propKind == CS_PROP_ENUM)
+          NotifySinkProperty(m_impl->notifier, handle, propIndex, prop,
+                             RawEvent::kSinkPropertyChoicesUpdated);
+      });
+  sink->propertyChoicesUpdated.connect(
+      [this, handle](int propIndex, const PropertyImpl& prop) {
+        NotifySinkProperty(m_impl->notifier, handle, propIndex, prop,
+                           RawEvent::kSinkPropertyChoicesUpdated);
+      });
+  sink->propertyValueUpdated.connect(
+      [this, handle](int propIndex, const PropertyImpl& prop) {
+        NotifySinkProperty(m_impl->notifier, handle, propIndex, prop,
+                           RawEvent::kSinkPropertyValueUpdated);
+      });
   return handle;
 }
 
 void Instance::DestroySource(CS_Source handle) {
-  if (auto data = m_impl->sources.Free(handle))
-    m_impl->notifier.NotifySource(data->source->GetName(), handle,
-                                  CS_SOURCE_DESTROYED);
+  if (auto data = m_impl->sources.Free(handle)) {
+    m_impl->notifier.Notify(
+        RawEvent{data->source->GetName(), handle, RawEvent::kSourceDestroyed});
+  }
 }
 
 void Instance::DestroySink(CS_Sink handle) {
-  if (auto data = m_impl->sinks.Free(handle))
-    m_impl->notifier.NotifySink(data->sink->GetName(), handle,
-                                CS_SINK_DESTROYED);
+  if (auto data = m_impl->sinks.Free(handle)) {
+    m_impl->notifier.Notify(
+        RawEvent{data->sink->GetName(), handle, RawEvent::kSinkDestroyed});
+  }
 }
 
 wpi::ArrayRef<CS_Source> Instance::EnumerateSourceHandles(

@@ -31,7 +31,7 @@ namespace cs {
 class HttpCameraImpl : public SourceImpl {
  public:
   HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind,
-                 wpi::Logger& logger, Notifier& notifier);
+                 wpi::Logger& logger);
   ~HttpCameraImpl() override;
 
   void Start() override;
@@ -149,9 +149,8 @@ class HttpCameraImpl : public SourceImpl {
 
 class AxisCameraImpl : public HttpCameraImpl {
  public:
-  AxisCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                 Notifier& notifier)
-      : HttpCameraImpl{name, CS_HTTP_AXIS, logger, notifier} {}
+  AxisCameraImpl(const wpi::Twine& name, wpi::Logger& logger)
+      : HttpCameraImpl{name, CS_HTTP_AXIS, logger} {}
 #if 0
   void SetProperty(int property, int value, CS_Status* status) override;
   void SetStringProperty(int property, const wpi::Twine& value,

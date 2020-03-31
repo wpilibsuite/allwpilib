@@ -16,7 +16,6 @@
 #include "Handle.h"
 #include "Instance.h"
 #include "Log.h"
-#include "Notifier.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
 #include "cscore_raw.h"
@@ -24,8 +23,8 @@
 using namespace cs;
 
 ImageSourceImpl::ImageSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
-                                 Notifier& notifier, const VideoMode& mode)
-    : SourceImpl{name, logger, notifier} {
+                                 const VideoMode& mode)
+    : SourceImpl{name, logger} {
   m_mode = mode;
   m_videoModes.push_back(m_mode);
 }
@@ -33,9 +32,9 @@ ImageSourceImpl::ImageSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
 ImageSourceImpl::~ImageSourceImpl() {}
 
 void ImageSourceImpl::Start() {
-  m_notifier.NotifySource(*this, CS_SOURCE_CONNECTED);
-  m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
-  m_notifier.NotifySourceVideoMode(*this, m_mode);
+  connected();
+  videoModesUpdated();
+  videoModeChanged(m_mode);
 }
 
 bool ImageSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
@@ -44,7 +43,7 @@ bool ImageSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
     m_mode = mode;
     m_videoModes[0] = mode;
   }
-  m_notifier.NotifySourceVideoMode(*this, mode);
+  videoModeChanged(mode);
   return true;
 }
 
@@ -65,23 +64,22 @@ int ImageSourceImpl::CreateProperty(const wpi::Twine& name,
                                     int maximum, int step, int defaultValue,
                                     int value) {
   std::scoped_lock lock(m_mutex);
-  int ndx = CreateOrUpdateProperty(name,
-                                   [=] {
-                                     return std::make_unique<PropertyImpl>(
-                                         name, kind, minimum, maximum, step,
-                                         defaultValue, value);
-                                   },
-                                   [&](PropertyImpl& prop) {
-                                     // update all but value
-                                     prop.propKind = kind;
-                                     prop.minimum = minimum;
-                                     prop.maximum = maximum;
-                                     prop.step = step;
-                                     prop.defaultValue = defaultValue;
-                                     value = prop.value;
-                                   });
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name, ndx,
-                                  kind, value, wpi::Twine{});
+  auto [ndx, prop] = CreateOrUpdateProperty(
+      name,
+      [=] {
+        return std::make_unique<PropertyImpl>(name, kind, minimum, maximum,
+                                              step, defaultValue, value);
+      },
+      [&](auto& prop) {
+        // update all but value
+        prop->propKind = kind;
+        prop->minimum = minimum;
+        prop->maximum = maximum;
+        prop->step = step;
+        prop->defaultValue = defaultValue;
+        value = prop->value;
+      });
+  propertyCreated(ndx, *prop);
   return ndx;
 }
 
@@ -99,9 +97,7 @@ void ImageSourceImpl::SetEnumPropertyChoices(int property,
     return;
   }
   prop->enumChoices = choices;
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-                                  prop->name, property, CS_PROP_ENUM,
-                                  prop->value, wpi::Twine{});
+  propertyChoicesUpdated(property, *prop);
 }
 
 void ImageSourceImpl::PutFrame(cv::Mat& image) {
@@ -167,9 +163,8 @@ namespace cs {
 CS_Source CreateImageSource(const wpi::Twine& name, const VideoMode& mode,
                             CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSource(
-      CS_SOURCE_IMAGE, std::make_shared<ImageSourceImpl>(
-                           name, inst.GetLogger(), inst.GetNotifier(), mode));
+  return inst.CreateSource(CS_SOURCE_IMAGE, std::make_shared<ImageSourceImpl>(
+                                                name, inst.GetLogger(), mode));
 }
 
 CS_Source CreateCvSource(const wpi::Twine& name, const VideoMode& mode,

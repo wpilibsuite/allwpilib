@@ -12,6 +12,7 @@
 #include <string>
 
 #include <wpi/Logger.h>
+#include <wpi/Signal.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/mutex.h>
@@ -25,12 +26,10 @@ class json;
 namespace cs {
 
 class Frame;
-class Notifier;
 
 class SinkImpl : public PropertyContainer {
  public:
-  explicit SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
-                    Notifier& notifier);
+  explicit SinkImpl(const wpi::Twine& name, wpi::Logger& logger);
   virtual ~SinkImpl();
   SinkImpl(const SinkImpl& queue) = delete;
   SinkImpl& operator=(const SinkImpl& queue) = delete;
@@ -42,7 +41,7 @@ class SinkImpl : public PropertyContainer {
 
   void Enable();
   void Disable();
-  void SetEnabled(bool enabled);
+  void SetEnabled(bool enable);
 
   void SetSource(std::shared_ptr<SourceImpl> source);
 
@@ -59,9 +58,12 @@ class SinkImpl : public PropertyContainer {
   std::string GetConfigJson(CS_Status* status);
   virtual wpi::json GetConfigJsonObject(CS_Status* status);
 
+  wpi::sig::Signal<> enabled;
+  wpi::sig::Signal<> disabled;
+  wpi::sig::Signal<SourceImpl*> sourceChanged;
+
  protected:
   // PropertyContainer implementation
-  void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
                            const wpi::Twine& valueStr) override;
 
@@ -69,7 +71,6 @@ class SinkImpl : public PropertyContainer {
 
  protected:
   wpi::Logger& m_logger;
-  Notifier& m_notifier;
 
  private:
   std::string m_name;

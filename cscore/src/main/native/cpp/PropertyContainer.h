@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,9 +12,11 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
+#include <wpi/Signal.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
@@ -59,6 +61,13 @@ class PropertyContainer {
                          wpi::StringRef logName, CS_Status* status);
   wpi::json GetPropertiesJsonObject(CS_Status* status);
 
+  /**
+   * Parameters are property index and property data.
+   */
+  wpi::sig::Signal<int, const PropertyImpl&> propertyCreated;
+  wpi::sig::Signal<int, const PropertyImpl&> propertyChoicesUpdated;
+  wpi::sig::Signal<int, const PropertyImpl&> propertyValueUpdated;
+
  protected:
   // Get a property; must be called with m_mutex held.
   PropertyImpl* GetProperty(int property) {
@@ -72,11 +81,12 @@ class PropertyContainer {
     return m_propertyData[property - 1].get();
   }
   // Create or update a property; must be called with m_mutex held.
-  // @tparam NewFunc functor that returns a std::unique_ptr<PropertyImpl>
-  // @tparam UpdateFunc functor that takes a PropertyImpl&.
+  // @tparam NewFunc functor, signature std::unique_ptr<PropertyImpl>().
+  // @tparam UpdateFunc functor, signature void(std::unique_ptr<PropertyImpl>&).
   template <typename NewFunc, typename UpdateFunc>
-  int CreateOrUpdateProperty(const wpi::Twine& name, NewFunc newFunc,
-                             UpdateFunc updateFunc) {
+  std::pair<int, PropertyImpl*> CreateOrUpdateProperty(const wpi::Twine& name,
+                                                       NewFunc newFunc,
+                                                       UpdateFunc updateFunc) {
     wpi::SmallVector<char, 64> nameBuf;
     int& ndx = m_properties[name.toStringRef(nameBuf)];
     if (ndx == 0) {
@@ -85,13 +95,15 @@ class PropertyContainer {
       m_propertyData.emplace_back(newFunc());
     } else {
       // update existing
-      updateFunc(*GetProperty(ndx));
+      updateFunc(m_propertyData[ndx - 1]);
     }
-    return ndx;
+    PropertyImpl* data = m_propertyData[ndx - 1].get();
+    return std::make_pair(ndx, data);
   }
   template <typename NewFunc>
-  int CreateProperty(const wpi::Twine& name, NewFunc newFunc) {
-    return CreateOrUpdateProperty(name, newFunc, [](PropertyImpl&) {});
+  std::pair<int, PropertyImpl*> CreateProperty(const wpi::Twine& name,
+                                               NewFunc newFunc) {
+    return CreateOrUpdateProperty(name, newFunc, [](auto&) {});
   }
 
   // Create an "empty" property.  This is called by GetPropertyIndex to create
@@ -105,8 +117,6 @@ class PropertyContainer {
   // CS_SOURCE_IS_DISCONNECTED if not possible to cache.
   // The default implementation simply sets m_property_cached to true.
   virtual bool CacheProperties(CS_Status* status) const;
-
-  virtual void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) = 0;
 
   // Update property value; must be called with m_mutex held.
   virtual void UpdatePropertyValue(int property, bool setString, int value,

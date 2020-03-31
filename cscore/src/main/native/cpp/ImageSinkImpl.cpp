@@ -7,6 +7,8 @@
 
 #include "ImageSinkImpl.h"
 
+#include <thread>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -15,16 +17,14 @@
 #include "Handle.h"
 #include "Instance.h"
 #include "Log.h"
-#include "Notifier.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
 #include "cscore_raw.h"
 
 using namespace cs;
 
-ImageSinkImpl::ImageSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier)
-    : SinkImpl{name, logger, notifier} {}
+ImageSinkImpl::ImageSinkImpl(const wpi::Twine& name, wpi::Logger& logger)
+    : SinkImpl{name, logger} {}
 
 ImageSinkImpl::~ImageSinkImpl() { Stop(); }
 
@@ -123,9 +123,8 @@ namespace cs {
 
 CS_Sink CreateImageSink(const wpi::Twine& name, CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  return inst.CreateSink(CS_SINK_IMAGE,
-                         std::make_shared<ImageSinkImpl>(name, inst.GetLogger(),
-                                                         inst.GetNotifier()));
+  return inst.CreateSink(
+      CS_SINK_IMAGE, std::make_shared<ImageSinkImpl>(name, inst.GetLogger()));
 }
 
 CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status) {

@@ -39,7 +39,6 @@
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
-#include "Notifier.h"
 #include "PropertyImpl.h"
 #include "WindowsMessagePump.h"
 #include "c_util.h"
@@ -72,8 +71,8 @@ using namespace cs;
 namespace cs {
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, const wpi::Twine& path)
-    : SourceImpl{name, logger, notifier}, m_path{path.str()} {
+                             const wpi::Twine& path)
+    : SourceImpl{name, logger}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
   m_deviceId = -1;
@@ -81,8 +80,8 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, int deviceId)
-    : SourceImpl{name, logger, notifier}, m_deviceId(deviceId) {
+                             int deviceId)
+    : SourceImpl{name, logger}, m_deviceId(deviceId) {
   StartMessagePump();
 }
 
@@ -678,8 +677,8 @@ void UsbCameraImpl::DeviceCacheProperty(
     rawPropPtr->propPair = *perIndex;
   }
 
-  NotifyPropertyCreated(*rawIndex, *rawPropPtr);
-  if (perPropPtr && perIndex) NotifyPropertyCreated(*perIndex, *perPropPtr);
+  propertyCreated(*rawIndex, *rawPropPtr);
+  if (perPropPtr && perIndex) propertyCreated(*perIndex, *perPropPtr);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
@@ -823,7 +822,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
       DeviceDisconnect();
       DeviceConnect();
     }
-    m_notifier.NotifySourceVideoMode(*this, newMode);
+    videoModeChanged(newMode);
     lock.lock();
   }
 
@@ -883,7 +882,7 @@ void UsbCameraImpl::DeviceCacheMode() {
 
   DeviceSetMode();
 
-  m_notifier.NotifySourceVideoMode(*this, m_mode);
+  videoModeChanged(m_mode);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceSetMode() {
@@ -960,7 +959,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
   }
-  m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
+  videoModesUpdated();
 }
 
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
@@ -1036,16 +1035,14 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }
   auto& inst = Instance::GetInstance();
-  auto source = std::make_shared<UsbCameraImpl>(name, inst.GetLogger(),
-                                                inst.GetNotifier(), dev);
+  auto source = std::make_shared<UsbCameraImpl>(name, inst.GetLogger(), dev);
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  auto source = std::make_shared<UsbCameraImpl>(name, inst.GetLogger(),
-                                                inst.GetNotifier(), path);
+  auto source = std::make_shared<UsbCameraImpl>(name, inst.GetLogger(), path);
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 

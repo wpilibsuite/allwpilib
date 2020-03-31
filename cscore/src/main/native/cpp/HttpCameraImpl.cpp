@@ -15,14 +15,13 @@
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
-#include "Notifier.h"
 #include "c_util.h"
 
 using namespace cs;
 
 HttpCameraImpl::HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind,
-                               wpi::Logger& logger, Notifier& notifier)
-    : SourceImpl{name, logger, notifier}, m_kind{kind} {}
+                               wpi::Logger& logger)
+    : SourceImpl{name, logger}, m_kind{kind} {}
 
 HttpCameraImpl::~HttpCameraImpl() {
   m_active = false;
@@ -378,9 +377,7 @@ void HttpCameraImpl::CreateProperty(const wpi::Twine& name,
       name, httpParam, viaSettings, kind, minimum, maximum, step, defaultValue,
       value));
 
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name,
-                                  m_propertyData.size() + 1, kind, value,
-                                  wpi::Twine{});
+  propertyCreated(m_propertyData.size() + 1, *m_propertyData.back());
 }
 
 template <typename T>
@@ -396,12 +393,10 @@ void HttpCameraImpl::CreateEnumProperty(
   enumChoices.clear();
   for (const auto& choice : choices) enumChoices.emplace_back(choice);
 
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name,
-                                  m_propertyData.size() + 1, CS_PROP_ENUM,
-                                  value, wpi::Twine{});
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-                                  name, m_propertyData.size() + 1, CS_PROP_ENUM,
-                                  value, wpi::Twine{});
+  int prop = m_propertyData.size() + 1;
+  auto& propImpl = *m_propertyData.back();
+  propertyCreated(prop, propImpl);
+  propertyChoicesUpdated(prop, propImpl);
 }
 
 std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
@@ -520,12 +515,10 @@ CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
   std::shared_ptr<HttpCameraImpl> source;
   switch (kind) {
     case CS_HTTP_AXIS:
-      source = std::make_shared<AxisCameraImpl>(name, inst.GetLogger(),
-                                                inst.GetNotifier());
+      source = std::make_shared<AxisCameraImpl>(name, inst.GetLogger());
       break;
     default:
-      source = std::make_shared<HttpCameraImpl>(name, kind, inst.GetLogger(),
-                                                inst.GetNotifier());
+      source = std::make_shared<HttpCameraImpl>(name, kind, inst.GetLogger());
       break;
   }
   if (!source->SetUrls(url.str(), status)) return 0;
@@ -540,8 +533,7 @@ CS_Source CreateHttpCamera(const wpi::Twine& name,
     *status = CS_EMPTY_VALUE;
     return 0;
   }
-  auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.GetLogger(),
-                                                 inst.GetNotifier());
+  auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.GetLogger());
   if (!source->SetUrls(urls, status)) return 0;
   return inst.CreateSource(CS_SOURCE_HTTP, source);
 }

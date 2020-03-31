@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -149,100 +149,9 @@ void Notifier::RemoveListener(int uid) {
   thr->m_listeners.erase(uid);
 }
 
-void Notifier::NotifySource(const wpi::Twine& name, CS_Source source,
-                            CS_EventKind kind) {
+void Notifier::Notify(RawEvent&& event) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_notifications.emplace(name, source, static_cast<RawEvent::Kind>(kind));
-  thr->m_cond.notify_one();
-}
-
-void Notifier::NotifySource(const SourceImpl& source, CS_EventKind kind) {
-  auto handleData = Instance::GetInstance().FindSource(source);
-  NotifySource(source.GetName(), handleData.first, kind);
-}
-
-void Notifier::NotifySourceVideoMode(const SourceImpl& source,
-                                     const VideoMode& mode) {
-  auto thr = m_owner.GetThread();
-  if (!thr) return;
-
-  auto handleData = Instance::GetInstance().FindSource(source);
-
-  thr->m_notifications.emplace(source.GetName(), handleData.first, mode);
-  thr->m_cond.notify_one();
-}
-
-void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                                    const wpi::Twine& propertyName,
-                                    int property, CS_PropertyKind propertyKind,
-                                    int value, const wpi::Twine& valueStr) {
-  auto thr = m_owner.GetThread();
-  if (!thr) return;
-
-  auto handleData = Instance::GetInstance().FindSource(source);
-
-  thr->m_notifications.emplace(
-      propertyName, handleData.first, static_cast<RawEvent::Kind>(kind),
-      Handle{handleData.first, property, Handle::kProperty}, propertyKind,
-      value, valueStr);
-  thr->m_cond.notify_one();
-}
-
-void Notifier::NotifySink(const wpi::Twine& name, CS_Sink sink,
-                          CS_EventKind kind) {
-  auto thr = m_owner.GetThread();
-  if (!thr) return;
-
-  thr->m_notifications.emplace(name, sink, static_cast<RawEvent::Kind>(kind));
-  thr->m_cond.notify_one();
-}
-
-void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
-  auto handleData = Instance::GetInstance().FindSink(sink);
-  NotifySink(sink.GetName(), handleData.first, kind);
-}
-
-void Notifier::NotifySinkSourceChanged(const wpi::Twine& name, CS_Sink sink,
-                                       CS_Source source) {
-  auto thr = m_owner.GetThread();
-  if (!thr) return;
-
-  RawEvent event{name, sink, RawEvent::kSinkSourceChanged};
-  event.sourceHandle = source;
-
   thr->m_notifications.emplace(std::move(event));
-  thr->m_cond.notify_one();
-}
-
-void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
-                                  const wpi::Twine& propertyName, int property,
-                                  CS_PropertyKind propertyKind, int value,
-                                  const wpi::Twine& valueStr) {
-  auto thr = m_owner.GetThread();
-  if (!thr) return;
-
-  auto handleData = Instance::GetInstance().FindSink(sink);
-
-  thr->m_notifications.emplace(
-      propertyName, handleData.first, static_cast<RawEvent::Kind>(kind),
-      Handle{handleData.first, property, Handle::kSinkProperty}, propertyKind,
-      value, valueStr);
-  thr->m_cond.notify_one();
-}
-
-void Notifier::NotifyNetworkInterfacesChanged() {
-  auto thr = m_owner.GetThread();
-  if (!thr) return;
-
-  thr->m_notifications.emplace(RawEvent::kNetworkInterfacesChanged);
-  thr->m_cond.notify_one();
-}
-
-void Notifier::NotifyTelemetryUpdated() {
-  auto thr = m_owner.GetThread();
-  if (!thr) return;
-
-  thr->m_notifications.emplace(RawEvent::kTelemetryUpdated);
   thr->m_cond.notify_one();
 }

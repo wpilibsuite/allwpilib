@@ -8,6 +8,7 @@
 #include "MjpegServerImpl.h"
 
 #include <chrono>
+#include <tuple>
 
 #include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
@@ -19,7 +20,6 @@
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
-#include "Notifier.h"
 #include "SourceImpl.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
@@ -563,10 +563,9 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
 }
 
 MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
-                                 Notifier& notifier,
                                  const wpi::Twine& listenAddress, int port,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
-    : SinkImpl{name, logger, notifier},
+    : SinkImpl{name, logger},
       m_listenAddress(listenAddress.str()),
       m_port(port),
       m_acceptor{std::move(acceptor)} {
@@ -578,21 +577,22 @@ MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
   SetDescription(desc.str());
 
   // Create properties
-  m_widthProp = CreateProperty("width", [] {
+  std::tie(m_widthProp, std::ignore) = CreateProperty("width", [] {
     return std::make_unique<PropertyImpl>("width", CS_PROP_INTEGER, 1, 0, 0);
   });
-  m_heightProp = CreateProperty("height", [] {
+  std::tie(m_heightProp, std::ignore) = CreateProperty("height", [] {
     return std::make_unique<PropertyImpl>("height", CS_PROP_INTEGER, 1, 0, 0);
   });
-  m_compressionProp = CreateProperty("compression", [] {
+  std::tie(m_compressionProp, std::ignore) = CreateProperty("compression", [] {
     return std::make_unique<PropertyImpl>("compression", CS_PROP_INTEGER, -1,
                                           100, 1, -1, -1);
   });
-  m_defaultCompressionProp = CreateProperty("default_compression", [] {
-    return std::make_unique<PropertyImpl>("default_compression",
-                                          CS_PROP_INTEGER, 0, 100, 1, 80, 80);
-  });
-  m_fpsProp = CreateProperty("fps", [] {
+  std::tie(m_defaultCompressionProp, std::ignore) =
+      CreateProperty("default_compression", [] {
+        return std::make_unique<PropertyImpl>(
+            "default_compression", CS_PROP_INTEGER, 0, 100, 1, 80, 80);
+      });
+  std::tie(m_fpsProp, std::ignore) = CreateProperty("fps", [] {
     return std::make_unique<PropertyImpl>("fps", CS_PROP_INTEGER, 1, 0, 0);
   });
 
@@ -961,7 +961,7 @@ CS_Sink CreateMjpegServer(const wpi::Twine& name,
   return inst.CreateSink(
       CS_SINK_MJPEG,
       std::make_shared<MjpegServerImpl>(
-          name, logger, inst.GetNotifier(), listenAddress, port,
+          name, logger, listenAddress, port,
           std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
               port,
               listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
