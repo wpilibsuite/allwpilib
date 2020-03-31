@@ -24,7 +24,7 @@ namespace frc {
  */
 class TrajectoryGenerator {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 
   /**
    * Generates a trajectory from the given control vectors and config. This
