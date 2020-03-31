@@ -18,7 +18,10 @@
 /cscore/  @wpilibsuite/camera-server
 
 /hal/  @wpilibsuite/hardware
-/hal/**/sim/  @wpilibsuite/simulation
+/hal/src/main/include/mockdata/  @wpilibsuite/simulation
+/hal/src/main/include/simulation/  @wpilibsuite/simulation
+/hal/src/main/java/**/sim/  @wpilibsuite/simulation
+/hal/src/main/native/sim/  @wpilibsuite/simulation
 
 /ntcore/  @wpilibsuite/network-tables
 
