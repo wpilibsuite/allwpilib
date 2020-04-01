@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.estimator;
 
+import edu.wpi.first.wpiutil.math.Nat;
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpiutil.math.Matrix;
@@ -7,11 +8,13 @@ import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
+import java.util.Arrays;
+
 /**
  * Generates sigma points and weights according to Van der Merwe's 2004
  * dissertation[1] for the UnscentedKalmanFilter class.
  *
- * <p>It parametizes the sigma points using alpha, beta, kappa terms, and is the
+ * <p>It parametrizes the sigma points using alpha, beta, kappa terms, and is the
  * version seen in most publications. Unless you know better, this should be
  * your default choice.
  *
@@ -25,7 +28,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
 
   private final double m_alpha;
   private final int m_kappa;
-  private final S m_states;
+  private final Nat<S> m_states;
   private Matrix m_wm;
   private Matrix m_wc;
 
@@ -39,7 +42,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
    *               For Gaussian distributions, beta = 2 is optimal.
    * @param kappa  Secondary scaling parameter usually set to 0 or 3 - States.
    */
-  public MerweScaledSigmaPoints(S states, double alpha, double beta, int kappa) {
+  public MerweScaledSigmaPoints(Nat<S> states, double alpha, double beta, int kappa) {
     this.m_states = states;
     this.m_alpha = alpha;
     this.m_kappa = kappa;
@@ -47,7 +50,13 @@ public class MerweScaledSigmaPoints<S extends Num> {
     computeWeights(beta);
   }
 
-  public MerweScaledSigmaPoints(S states) {
+  /**
+   * Constructs a generator for Van der Merwe scaled sigma points with default values for alpha,
+   * beta, and kappa.
+   *
+   * @param states an instance of Num that represents the number of states.
+   */
+  public MerweScaledSigmaPoints(Nat<S> states) {
     this(states, 1e-3, 2, 3 - states.getNum());
   }
 
@@ -56,7 +65,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
    *
    * @return The number of sigma points for each variable in the state x.
    */
-  public int getNumSigns() {
+  public int getNumSigmas() {
     return 2 * m_states.getNum() + 1;
   }
 
@@ -79,17 +88,20 @@ public class MerweScaledSigmaPoints<S extends Num> {
     int states = m_states.getNum();
 
     var intermediate = P.times(lambda + m_states.getNum()).getStorage();
-    var U = SimpleMatrixUtils.lltDecompose(intermediate);
+    var U = SimpleMatrixUtils.lltDecompose(intermediate); // Upper triangular
 
     // 2 * states + 1 by states
     SimpleMatrix sigmas = new SimpleMatrix(2 * m_states.getNum() + 1, m_states.getNum());
     for (int i = 0; i < states; i++) {
       sigmas.set(0, i, x.get(i, 0));
     }
-    for (int k = 0; k < m_states.getNum(); ++k) {
+    for (int k = 0; k < m_states.getNum(); k++) {
+      var xT = x.transpose().getStorage();
+      var xPlusU = xT.plus(U.extractVector(true, k));
+      var xMinusU = xT.minus(U.extractVector(true, k));
       for (int i = 0; i < states; i++) {
-        sigmas.set(k + 1 + i, 0, x.get(i, 0) + U.get(k + i, 0));
-        sigmas.set(states + k + 1 + i, 0, x.get(i, 0) - U.get(k + i, 0));
+        sigmas.set(k + 1, i, xPlusU.get(0, i));
+        sigmas.set(states + k + 1, i, xMinusU.get(0, i));
       }
     }
 
@@ -105,15 +117,19 @@ public class MerweScaledSigmaPoints<S extends Num> {
   private void computeWeights(double beta) {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
 
+    var wCBacking = new double[2 * m_states.getNum() + 1];
+    var wMBacking = new double[2 * m_states.getNum() + 1];
+
     double c = 0.5 / (m_states.getNum() + lambda);
-    var wC = new SimpleMatrix(1, 2 * m_states.getNum() + 1);
-    var wM = new SimpleMatrix(1, 2 * m_states.getNum() + 1);
-    for (int i = 0; i < 2 * m_states.getNum() + 1; ++i) {
-      m_wc.set(0, i,
-              lambda / (m_states.getNum() + lambda)
-                      + (1 - Math.pow(m_alpha, 2) + beta));
-      m_wm.set(0, i, lambda / (m_states.getNum() + lambda));
-    }
+    Arrays.fill(wCBacking, c);
+    Arrays.fill(wMBacking, c);
+
+    var wC = new SimpleMatrix(1, 2 * m_states.getNum() + 1, true, wCBacking);
+    var wM = new SimpleMatrix(1, 2 * m_states.getNum() + 1, true, wMBacking);
+
+    wC.set(0, 0, lambda / (m_states.getNum() + lambda));
+    wM.set(0, 0, lambda / (m_states.getNum() + lambda) + (1 - Math.pow(m_alpha, 2) + beta));
+
     this.m_wc = new Matrix(wC);
     this.m_wm = new Matrix(wM);
   }

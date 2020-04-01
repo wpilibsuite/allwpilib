@@ -164,8 +164,9 @@ public class SimpleMatrixUtils {
   }
 
   /**
-   * Decompose the given matrix using Cholesky Decomposition. If the input matrix is zeros, this
-   * will return the zero matrix.
+   * Decompose the given matrix using Cholesky Decomposition and return a view of the upper
+   * triangular matrix (if you want lower triangular see the other overload of this method.) If the
+   * input matrix is zeros, this will return the zero matrix.
    *
    * @param src The matrix to decompose.
    * @return The decomposed matrix.

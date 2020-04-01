@@ -18,7 +18,7 @@ namespace frc {
  * Generates sigma points and weights according to Van der Merwe's 2004
  * dissertation[1] for the UnscentedKalmanFilter class.
  *
- * It parametizes the sigma points using alpha, beta, kappa terms, and is the
+ * It parametrizes the sigma points using alpha, beta, kappa terms, and is the
  * version seen in most publications. Unless you know better, this should be
  * your default choice.
  *

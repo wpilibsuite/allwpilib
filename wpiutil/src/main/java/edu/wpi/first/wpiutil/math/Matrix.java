@@ -9,6 +9,7 @@ package edu.wpi.first.wpiutil.math;
 
 import java.util.Objects;
 
+import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
@@ -304,6 +305,28 @@ public class Matrix<R extends Num, C extends Num> {
   @SuppressWarnings("ParameterName")
   public final Matrix<R, C> epow(int b) {
     return new Matrix<>(this.m_storage.elementPower((double) b));
+  }
+
+  /**
+   * Extracts a given row into a row vector, with this Matrix as the underlying storage (i.e.
+   * changes made to this Matrix will affect the extracted vector.)
+   *
+   * @param row The row to extract a vector from.
+   * @return A row vector from the given row.
+   */
+  public final Matrix<N1, C> extractRowVector(int row) {
+    return new Matrix<>(this.m_storage.extractVector(true, row));
+  }
+
+  /**
+   * Extracts a given column into a column vector, with this Matrix as the underlying storage (i.e.
+   * changes made to this Matrix will affect the extracted vector.)
+   *
+   * @param column The column to extract a vector from.
+   * @return A column vector from the given column.
+   */
+  public final Matrix<R, N1> extractColumnVector(int column) {
+    return new Matrix<>(this.m_storage.extractVector(false, column));
   }
 
   /**
