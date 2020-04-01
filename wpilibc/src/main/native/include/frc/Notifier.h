@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -66,6 +66,9 @@ class Notifier : public ErrorBase {
    *
    * A timer event is queued for a single event after the specified delay.
    *
+   * @deprecated Use unit-safe StartSingle(units::second_t delay) method
+   * instead.
+   *
    * @param delay Seconds to wait before the handler is called.
    */
   WPI_DEPRECATED("Use unit-safe StartSingle method instead.")
@@ -86,6 +89,9 @@ class Notifier : public ErrorBase {
    * A timer event is queued for periodic event notification. Each time the
    * interrupt occurs, the event will be immediately requeued for the same time
    * interval.
+   *
+   * @deprecated Use unit-safe StartPeriodic(units::second_t period) method
+   * instead
    *
    * @param period Period in seconds to call the handler starting one period
    *               after the call to this method.

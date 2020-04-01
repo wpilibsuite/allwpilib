@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -82,15 +82,21 @@ class SPI : public ErrorBase {
   /**
    * Configure that the data is stable on the falling edge and the data
    * changes on the rising edge.
+   *
+   * @deprecated Use SetSampleDataOnTrailingEdge() instead.
+   *
    */
-  WPI_DEPRECATED("Use SetSampleDataOnTrailingEdge in most cases.")
+  WPI_DEPRECATED("Use SetSampleDataOnTrailingEdge instead.")
   void SetSampleDataOnFalling();
 
   /**
    * Configure that the data is stable on the rising edge and the data
    * changes on the falling edge.
+   *
+   * @deprecated Use SetSampleDataOnLeadingEdge() instead.
+   *
    */
-  WPI_DEPRECATED("Use SetSampleDataOnLeadingEdge in most cases")
+  WPI_DEPRECATED("Use SetSampleDataOnLeadingEdge instead")
   void SetSampleDataOnRising();
 
   /**
@@ -190,6 +196,8 @@ class SPI : public ErrorBase {
    * InitAuto() and SetAutoTransmitData() must be called before calling this
    * function.
    *
+   * @deprecated use unit-safe StartAutoRate(units::second_t period) instead.
+   *
    * @param period period between transfers, in seconds (us resolution)
    */
   WPI_DEPRECATED("Use StartAutoRate with unit-safety instead")
@@ -253,6 +261,10 @@ class SPI : public ErrorBase {
    * Blocks until numToRead words have been read or timeout expires.
    * May be called with numToRead=0 to retrieve how many words are available.
    *
+   * @deprecated Use unit safe version instead.
+   *             ReadAutoReceivedData(uint32_t* buffer, int numToRead, <!--
+   * -->         units::second_t timeout)
+   *
    * @param buffer buffer where read words are stored
    * @param numToRead number of words to read
    * @param timeout timeout in seconds (ms resolution)
@@ -303,6 +315,11 @@ class SPI : public ErrorBase {
 
   /**
    * Initialize the accumulator.
+   *
+   * @deprecated Use unit-safe version instead.
+   *             InitAccumulator(units::second_t period, int cmd, int <!--
+   * -->         xferSize, int validMask, int validValue, int dataShift, <!--
+   * -->         int dataSize, bool isSigned, bool bigEndian)
    *
    * @param period    Time between reads
    * @param cmd       SPI command to send to request data

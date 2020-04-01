@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -33,6 +33,9 @@ class Watchdog {
  public:
   /**
    * Watchdog constructor.
+   *
+   * @deprecated use unit-safe version instead.
+   * Watchdog(units::second_t timeout, std::function<void()> callback)
    *
    * @param timeout  The watchdog's timeout in seconds with microsecond
    *                 resolution.
@@ -73,6 +76,9 @@ class Watchdog {
 
   /**
    * Sets the watchdog's timeout.
+   *
+   * @deprecated use the unit safe version instead.
+   * SetTimeout(units::second_t timeout)
    *
    * @param timeout The watchdog's timeout in seconds with microsecond
    *                resolution.
