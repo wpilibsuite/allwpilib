@@ -98,7 +98,7 @@ void Watchdog::SetTimeout(units::second_t timeout) {
   using std::chrono::microseconds;
 
   m_startTime = hal::fpga_clock::now();
-  m_epochs.clear();
+  m_tracer.ClearEpochs();
 
   // Locks mutex
   auto thr = m_owner->GetThread();
@@ -128,28 +128,10 @@ bool Watchdog::IsExpired() const {
 }
 
 void Watchdog::AddEpoch(wpi::StringRef epochName) {
-  auto currentTime = hal::fpga_clock::now();
-  m_epochs[epochName] = currentTime - m_startTime;
-  m_startTime = currentTime;
+  m_tracer.AddEpoch(epochName);
 }
 
-void Watchdog::PrintEpochs() {
-  using std::chrono::duration_cast;
-  using std::chrono::microseconds;
-
-  auto now = hal::fpga_clock::now();
-  if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
-    m_lastEpochsPrintTime = now;
-    for (const auto& epoch : m_epochs) {
-      wpi::outs() << '\t' << epoch.getKey() << ": "
-                  << wpi::format(
-                         "%.6f",
-                         duration_cast<microseconds>(epoch.getValue()).count() /
-                             1.0e6)
-                  << "s\n";
-    }
-  }
-}
+void Watchdog::PrintEpochs() { m_tracer.PrintEpochs(); }
 
 void Watchdog::Reset() { Enable(); }
 
@@ -158,7 +140,7 @@ void Watchdog::Enable() {
   using std::chrono::microseconds;
 
   m_startTime = hal::fpga_clock::now();
-  m_epochs.clear();
+  m_tracer.ClearEpochs();
 
   // Locks mutex
   auto thr = m_owner->GetThread();
