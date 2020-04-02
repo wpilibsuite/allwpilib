@@ -69,13 +69,7 @@ public final class SplineHelper {
       // This just makes the splines look better.
       final var scalar = 1.2 * p0.getTranslation().getDistance(p1.getTranslation());
 
-      // Only add the first control vector if this is the first iteration. The
-      // last control vector of this iteration is the first control vector of
-      // the next iteration.
-      if (i == 0) {
-        vectors.add(getQuinticControlVector(scalar, p0));
-      }
-
+      vectors.add(getQuinticControlVector(scalar, p0));
       vectors.add(getQuinticControlVector(scalar, p1));
     }
     return vectors;
@@ -219,14 +213,15 @@ public final class SplineHelper {
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public static QuinticHermiteSpline[] getQuinticSplinesFromControlVectors(
       Spline.ControlVector[] controlVectors) {
-    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length - 1];
-    for (int i = 0; i < controlVectors.length - 1; i++) {
+    // There are twice as many control vectors are there are splines.
+    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length / 2];
+    for (int i = 0; i < controlVectors.length - 1; i += 2) {
       var xInitial = controlVectors[i].x;
       var xFinal = controlVectors[i + 1].x;
       var yInitial = controlVectors[i].y;
       var yFinal = controlVectors[i + 1].y;
-      splines[i] = new QuinticHermiteSpline(xInitial, xFinal,
-                                            yInitial, yFinal);
+      splines[i / 2] = new QuinticHermiteSpline(xInitial, xFinal,
+          yInitial, yFinal);
     }
     return splines;
   }
