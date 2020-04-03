@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,22 +23,22 @@
 
 namespace cs {
 
-class SourceImpl;
+class FramePool;
 
 class Frame {
-  friend class SourceImpl;
+  friend class FramePool;
 
  public:
   using Time = uint64_t;
 
  private:
   struct Impl {
-    explicit Impl(SourceImpl& source_) : source(source_) {}
+    explicit Impl(FramePool& framePool_) : framePool(framePool_) {}
 
     wpi::recursive_mutex mutex;
     std::atomic_int refcount{0};
     Time time{0};
-    SourceImpl& source;
+    FramePool& framePool;
     std::string error;
     wpi::SmallVector<Image*, 4> images;
     std::vector<int> compressionParams;
@@ -47,9 +47,9 @@ class Frame {
  public:
   Frame() noexcept : m_impl{nullptr} {}
 
-  Frame(SourceImpl& source, const wpi::Twine& error, Time time);
+  Frame(FramePool& framePool, const wpi::Twine& error, Time time);
 
-  Frame(SourceImpl& source, std::unique_ptr<Image> image, Time time);
+  Frame(FramePool& framePool, std::unique_ptr<Image> image, Time time);
 
   Frame(const Frame& frame) noexcept : m_impl{frame.m_impl} {
     if (m_impl) ++m_impl->refcount;

@@ -13,6 +13,7 @@
 #include <wpi/STLExtras.h>
 #include <wpi/timestamp.h>
 
+#include "FramePool.h"
 #include "Handle.h"
 #include "Instance.h"
 #include "Log.h"
@@ -111,18 +112,18 @@ void ImageSourceImpl::PutFrame(cv::Mat& image) {
   std::unique_ptr<Image> dest;
   switch (image.channels()) {
     case 1:
-      dest =
-          AllocImage(VideoMode::kGray, image.cols, image.rows, image.total());
+      dest = m_framePool.AllocImage(VideoMode::kGray, image.cols, image.rows,
+                                    image.total());
       finalImage.copyTo(dest->AsMat());
       break;
     case 3:
-      dest = AllocImage(VideoMode::kBGR, image.cols, image.rows,
-                        image.total() * 3);
+      dest = m_framePool.AllocImage(VideoMode::kBGR, image.cols, image.rows,
+                                    image.total() * 3);
       finalImage.copyTo(dest->AsMat());
       break;
     case 4:
-      dest = AllocImage(VideoMode::kBGR, image.cols, image.rows,
-                        image.total() * 3);
+      dest = m_framePool.AllocImage(VideoMode::kBGR, image.cols, image.rows,
+                                    image.total() * 3);
       cv::cvtColor(finalImage, dest->AsMat(), cv::COLOR_BGRA2BGR);
       break;
     default:
@@ -150,9 +151,9 @@ void ImageSourceImpl::PutFrame(const CS_RawFrame& image) {
       break;
   }
   cv::Mat finalImage{image.height, image.width, type, image.data};
-  std::unique_ptr<Image> dest =
-      AllocImage(static_cast<VideoMode::PixelFormat>(image.pixelFormat),
-                 image.width, image.height, image.totalData);
+  std::unique_ptr<Image> dest = m_framePool.AllocImage(
+      static_cast<VideoMode::PixelFormat>(image.pixelFormat), image.width,
+      image.height, image.totalData);
   finalImage.copyTo(dest->AsMat());
 
   SourceImpl::PutFrame(std::move(dest), wpi::Now());

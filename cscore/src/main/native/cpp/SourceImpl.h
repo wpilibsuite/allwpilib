@@ -34,9 +34,9 @@ class json;
 
 namespace cs {
 
-class SourceImpl : public PropertyContainer {
-  friend class Frame;
+class FramePool;
 
+class SourceImpl : public PropertyContainer {
  public:
   SourceImpl(const wpi::Twine& name, wpi::Logger& logger);
   virtual ~SourceImpl();
@@ -135,9 +135,6 @@ class SourceImpl : public PropertyContainer {
 
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
-  std::unique_ptr<Image> AllocImage(VideoMode::PixelFormat pixelFormat,
-                                    int width, int height, size_t size);
-
   wpi::sig::Signal<> connected;
   wpi::sig::Signal<> disconnected;
   wpi::sig::Signal<> videoModesUpdated;
@@ -171,12 +168,9 @@ class SourceImpl : public PropertyContainer {
   mutable VideoMode m_mode;
 
   wpi::Logger& m_logger;
+  FramePool& m_framePool;
 
  private:
-  void ReleaseImage(std::unique_ptr<Image> image);
-  std::unique_ptr<Frame::Impl> AllocFrameImpl();
-  void ReleaseFrameImpl(std::unique_ptr<Frame::Impl> data);
-
   std::string m_name;
   std::string m_description;
 
@@ -186,19 +180,10 @@ class SourceImpl : public PropertyContainer {
   wpi::mutex m_frameMutex;
   wpi::condition_variable m_frameCv;
 
-  bool m_destroyFrames{false};
-
-  // Pool of frames/images to reduce malloc traffic.
-  wpi::mutex m_poolMutex;
-  std::vector<std::unique_ptr<Frame::Impl>> m_framesAvail;
-  std::vector<std::unique_ptr<Image>> m_imagesAvail;
-
   std::atomic_bool m_isConnected{false};
 
   // Most recent frame (returned to callers of GetNextFrame)
   // Access protected by m_frameMutex.
-  // MUST be located below m_poolMutex as the Frame destructor calls back
-  // into SourceImpl::ReleaseImage, which locks m_poolMutex.
   Frame m_frame;
 };
 

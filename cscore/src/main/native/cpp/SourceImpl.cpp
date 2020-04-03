@@ -13,28 +13,22 @@
 #include <wpi/json.h>
 #include <wpi/timestamp.h>
 
+#include "FramePool.h"
+#include "Instance.h"
 #include "Log.h"
 
 using namespace cs;
 
-static constexpr size_t kMaxImagesAvail = 32;
-
 SourceImpl::SourceImpl(const wpi::Twine& name, wpi::Logger& logger)
-    : m_logger(logger), m_name{name.str()} {
-  m_frame = Frame{*this, wpi::StringRef{}, 0};
+    : m_logger(logger),
+      m_framePool(Instance::GetInstance().GetFramePool()),
+      m_name{name.str()} {
+  m_frame = m_framePool.MakeEmptyFrame();
 }
 
 SourceImpl::~SourceImpl() {
-  // Wake up anyone who is waiting.  This also clears the current frame,
-  // which is good because its destructor will call back into the class.
+  // Wake up anyone who is waiting.  This also clears the current frame.
   Wakeup();
-  // Set a flag so ReleaseFrame() doesn't re-add them to m_framesAvail.
-  // Put in a block so we destroy before the destructor ends.
-  {
-    m_destroyFrames = true;
-    auto frames = std::move(m_framesAvail);
-  }
-  // Everything else can clean up itself.
 }
 
 void SourceImpl::SetDescription(const wpi::Twine& description) {
@@ -80,7 +74,8 @@ Frame SourceImpl::GetNextFrame(double timeout) {
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
           [=] { return m_frame.GetTime() != oldTime; })) {
-    m_frame = Frame{*this, "timed out getting frame", wpi::Now()};
+    m_frame =
+        m_framePool.MakeErrorFrame("timed out getting frame", wpi::Now());
   }
   return m_frame;
 }
@@ -88,7 +83,7 @@ Frame SourceImpl::GetNextFrame(double timeout) {
 void SourceImpl::Wakeup() {
   {
     std::scoped_lock lock{m_frameMutex};
-    m_frame = Frame{*this, wpi::StringRef{}, 0};
+    m_frame = m_framePool.MakeEmptyFrame();
   }
   m_frameCv.notify_all();
 }
@@ -378,44 +373,9 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
   return m_videoModes;
 }
 
-std::unique_ptr<Image> SourceImpl::AllocImage(
-    VideoMode::PixelFormat pixelFormat, int width, int height, size_t size) {
-  std::unique_ptr<Image> image;
-  {
-    std::scoped_lock lock{m_poolMutex};
-    // find the smallest existing frame that is at least big enough.
-    int found = -1;
-    for (size_t i = 0; i < m_imagesAvail.size(); ++i) {
-      // is it big enough?
-      if (m_imagesAvail[i] && m_imagesAvail[i]->capacity() >= size) {
-        // is it smaller than the last found?
-        if (found < 0 ||
-            m_imagesAvail[i]->capacity() < m_imagesAvail[found]->capacity()) {
-          // yes, update
-          found = i;
-        }
-      }
-    }
-
-    // if nothing found, allocate a new buffer
-    if (found < 0)
-      image.reset(new Image{size});
-    else
-      image = std::move(m_imagesAvail[found]);
-  }
-
-  // Initialize image
-  image->SetSize(size);
-  image->pixelFormat = pixelFormat;
-  image->width = width;
-  image->height = height;
-
-  return image;
-}
-
 void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
                           int height, wpi::StringRef data, Frame::Time time) {
-  auto image = AllocImage(pixelFormat, width, height, data.size());
+  auto image = m_framePool.AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data
   SDEBUG4("Copying data to "
@@ -436,7 +396,7 @@ void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   // Update frame
   {
     std::scoped_lock lock{m_frameMutex};
-    m_frame = Frame{*this, std::move(image), time};
+    m_frame = m_framePool.MakeFrame(std::move(image), time);
   }
 
   // Signal listeners
@@ -447,7 +407,7 @@ void SourceImpl::PutError(const wpi::Twine& msg, Frame::Time time) {
   // Update frame
   {
     std::scoped_lock lock{m_frameMutex};
-    m_frame = Frame{*this, msg, time};
+    m_frame = m_framePool.MakeErrorFrame(msg, time);
   }
 
   // Signal listeners
@@ -466,42 +426,4 @@ void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
 
   // Only notify updates after we've notified created
   if (m_properties_cached) propertyValueUpdated(property, *prop);
-}
-
-void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
-  std::scoped_lock lock{m_poolMutex};
-  if (m_destroyFrames) return;
-  // Return the frame to the pool.  First try to find an empty slot, otherwise
-  // add it to the end.
-  auto it = std::find(m_imagesAvail.begin(), m_imagesAvail.end(), nullptr);
-  if (it != m_imagesAvail.end()) {
-    *it = std::move(image);
-  } else if (m_imagesAvail.size() > kMaxImagesAvail) {
-    // Replace smallest buffer; don't need to check for null because the above
-    // find would have found it.
-    auto it2 = std::min_element(
-        m_imagesAvail.begin(), m_imagesAvail.end(),
-        [](const std::unique_ptr<Image>& a, const std::unique_ptr<Image>& b) {
-          return a->capacity() < b->capacity();
-        });
-    if ((*it2)->capacity() < image->capacity()) *it2 = std::move(image);
-  } else {
-    m_imagesAvail.emplace_back(std::move(image));
-  }
-}
-
-std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
-  std::scoped_lock lock{m_poolMutex};
-
-  if (m_framesAvail.empty()) return std::make_unique<Frame::Impl>(*this);
-
-  auto impl = std::move(m_framesAvail.back());
-  m_framesAvail.pop_back();
-  return impl;
-}
-
-void SourceImpl::ReleaseFrameImpl(std::unique_ptr<Frame::Impl> impl) {
-  std::scoped_lock lock{m_poolMutex};
-  if (m_destroyFrames) return;
-  m_framesAvail.push_back(std::move(impl));
 }

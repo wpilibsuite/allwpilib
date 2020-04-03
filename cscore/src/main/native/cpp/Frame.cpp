@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,21 +13,21 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "FramePool.h"
 #include "Instance.h"
 #include "Log.h"
-#include "SourceImpl.h"
 
 using namespace cs;
 
-Frame::Frame(SourceImpl& source, const wpi::Twine& error, Time time)
-    : m_impl{source.AllocFrameImpl().release()} {
+Frame::Frame(FramePool& framePool, const wpi::Twine& error, Time time)
+    : m_impl{framePool.AllocFrameImpl().release()} {
   m_impl->refcount = 1;
   m_impl->error = error.str();
   m_impl->time = time;
 }
 
-Frame::Frame(SourceImpl& source, std::unique_ptr<Image> image, Time time)
-    : m_impl{source.AllocFrameImpl().release()} {
+Frame::Frame(FramePool& framePool, std::unique_ptr<Image> image, Time time)
+    : m_impl{framePool.AllocFrameImpl().release()} {
   m_impl->refcount = 1;
   m_impl->error.resize(0);
   m_impl->time = time;
@@ -243,8 +243,8 @@ Image* Frame::ConvertMJPEGToBGR(Image* image) {
 
   // Allocate an BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
-                                image->width * image->height * 3);
+      m_impl->framePool.AllocImage(VideoMode::kBGR, image->width, image->height,
+                                   image->width * image->height * 3);
 
   // Decode
   cv::Mat newMat = newImage->AsMat();
@@ -264,8 +264,8 @@ Image* Frame::ConvertMJPEGToGray(Image* image) {
 
   // Allocate an grayscale image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
-                                image->width * image->height);
+      m_impl->framePool.AllocImage(VideoMode::kGray, image->width,
+                                   image->height, image->width * image->height);
 
   // Decode
   cv::Mat newMat = newImage->AsMat();
@@ -285,8 +285,8 @@ Image* Frame::ConvertYUYVToBGR(Image* image) {
 
   // Allocate a BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
-                                image->width * image->height * 3);
+      m_impl->framePool.AllocImage(VideoMode::kBGR, image->width, image->height,
+                                   image->width * image->height * 3);
 
   // Convert
   cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_YUV2BGR_YUYV);
@@ -304,9 +304,9 @@ Image* Frame::ConvertBGRToRGB565(Image* image) {
   if (!image || image->pixelFormat != VideoMode::kBGR) return nullptr;
 
   // Allocate a RGB565 image
-  auto newImage =
-      m_impl->source.AllocImage(VideoMode::kRGB565, image->width, image->height,
-                                image->width * image->height * 2);
+  auto newImage = m_impl->framePool.AllocImage(
+      VideoMode::kRGB565, image->width, image->height,
+      image->width * image->height * 2);
 
   // Convert
   cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_RGB2BGR565);
@@ -325,8 +325,8 @@ Image* Frame::ConvertRGB565ToBGR(Image* image) {
 
   // Allocate a BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
-                                image->width * image->height * 3);
+      m_impl->framePool.AllocImage(VideoMode::kBGR, image->width, image->height,
+                                   image->width * image->height * 3);
 
   // Convert
   cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_BGR5652RGB);
@@ -345,8 +345,8 @@ Image* Frame::ConvertBGRToGray(Image* image) {
 
   // Allocate a Grayscale image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
-                                image->width * image->height);
+      m_impl->framePool.AllocImage(VideoMode::kGray, image->width,
+                                   image->height, image->width * image->height);
 
   // Convert
   cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_BGR2GRAY);
@@ -365,8 +365,8 @@ Image* Frame::ConvertGrayToBGR(Image* image) {
 
   // Allocate a BGR image
   auto newImage =
-      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
-                                image->width * image->height * 3);
+      m_impl->framePool.AllocImage(VideoMode::kBGR, image->width, image->height,
+                                   image->width * image->height * 3);
 
   // Convert
   cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_GRAY2BGR);
@@ -391,9 +391,9 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
   // Per Wikipedia, Q=100 on a sample image results in 8.25 bits per pixel,
   // this is a little bit more conservative in assuming 50% space savings over
   // the equivalent BGR image.
-  auto newImage =
-      m_impl->source.AllocImage(VideoMode::kMJPEG, image->width, image->height,
-                                image->width * image->height * 1.5);
+  auto newImage = m_impl->framePool.AllocImage(
+      VideoMode::kMJPEG, image->width, image->height,
+      image->width * image->height * 1.5);
 
   // Compress
   if (m_impl->compressionParams.empty()) {
@@ -422,9 +422,9 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   // Per Wikipedia, Q=100 on a sample image results in 8.25 bits per pixel,
   // this is a little bit more conservative in assuming 25% space savings over
   // the equivalent grayscale image.
-  auto newImage =
-      m_impl->source.AllocImage(VideoMode::kMJPEG, image->width, image->height,
-                                image->width * image->height * 0.75);
+  auto newImage = m_impl->framePool.AllocImage(
+      VideoMode::kMJPEG, image->width, image->height,
+      image->width * image->height * 0.75);
 
   // Compress
   if (m_impl->compressionParams.empty()) {
@@ -466,7 +466,7 @@ Image* Frame::GetImageImpl(int width, int height,
   // Resize
   if (!cur->Is(width, height)) {
     // Allocate an image.
-    auto newImage = m_impl->source.AllocImage(
+    auto newImage = m_impl->framePool.AllocImage(
         cur->pixelFormat, width, height,
         width * height * (cur->size() / (cur->width * cur->height)));
 
@@ -491,9 +491,6 @@ bool Frame::GetCv(cv::Mat& image, int width, int height) {
 }
 
 void Frame::ReleaseFrame() {
-  for (auto image : m_impl->images)
-    m_impl->source.ReleaseImage(std::unique_ptr<Image>(image));
-  m_impl->images.clear();
-  m_impl->source.ReleaseFrameImpl(std::unique_ptr<Impl>(m_impl));
+  m_impl->framePool.ReleaseFrameImpl(std::unique_ptr<Impl>(m_impl));
   m_impl = nullptr;
 }

@@ -312,20 +312,20 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     }
     case cs::VideoMode::PixelFormat::kGray:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC1, ptr, pitch);
-      dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
-                        tmpMat.total());
+      dest = m_framePool.AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
+                                    tmpMat.total());
       tmpMat.copyTo(dest->AsMat());
       break;
     case cs::VideoMode::PixelFormat::kBGR:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC3, ptr, pitch);
-      dest = AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
-                        tmpMat.total() * 3);
+      dest = m_framePool.AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
+                                    tmpMat.total() * 3);
       tmpMat.copyTo(dest->AsMat());
       break;
     case cs::VideoMode::PixelFormat::kYUYV:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
-      dest = AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
-                        tmpMat.total() * 2);
+      dest = m_framePool.AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
+                                    tmpMat.total() * 2);
       tmpMat.copyTo(dest->AsMat());
       break;
     default:

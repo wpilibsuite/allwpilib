@@ -14,6 +14,7 @@
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
 
+#include "FramePool.h"
 #include "Log.h"
 #include "NetworkListener.h"
 #include "Notifier.h"
@@ -59,6 +60,7 @@ class Instance::Impl {
   UnlimitedHandleResource<Handle, SourceData, Handle::kSource> sources;
   UnlimitedHandleResource<Handle, SinkData, Handle::kSink> sinks;
   wpi::EventLoopRunner eventLoop;
+  FramePool framePool;
 };
 
 Instance::Instance() : m_impl(new Impl) {
@@ -92,6 +94,8 @@ Notifier& Instance::GetNotifier() { return m_impl->notifier; }
 Telemetry& Instance::GetTelemetry() { return m_impl->telemetry; }
 
 wpi::EventLoopRunner& Instance::GetEventLoop() { return m_impl->eventLoop; }
+
+FramePool& Instance::GetFramePool() { return m_impl->framePool; }
 
 void Instance::SetDefaultLogger() { m_impl->logger.SetLogger(def_log_func); }
 

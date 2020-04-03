@@ -11,6 +11,7 @@
 #include <wpi/TCPConnector.h>
 #include <wpi/timestamp.h>
 
+#include "FramePool.h"
 #include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
@@ -275,7 +276,8 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
 
   // We know how big it is!  Just get a frame of the right size and read
   // the data directly into it.
-  auto image = AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0, contentLength);
+  auto image = m_framePool.AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0,
+                                      contentLength);
   is.read(image->data(), contentLength);
   if (!m_active || is.has_error()) return false;
   int width, height;

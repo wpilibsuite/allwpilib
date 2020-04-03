@@ -23,6 +23,7 @@ class SmallVectorImpl;
 
 namespace cs {
 
+class FramePool;
 class Notifier;
 class Telemetry;
 class SinkImpl;
@@ -61,6 +62,7 @@ class Instance {
   Notifier& GetNotifier();
   Telemetry& GetTelemetry();
   wpi::EventLoopRunner& GetEventLoop();
+  FramePool& GetFramePool();
 
   std::pair<CS_Sink, std::shared_ptr<SinkData>> FindSink(const SinkImpl& sink);
   std::pair<CS_Source, std::shared_ptr<SourceData>> FindSource(
