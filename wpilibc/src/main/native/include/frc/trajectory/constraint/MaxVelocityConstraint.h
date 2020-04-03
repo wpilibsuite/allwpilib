@@ -28,12 +28,12 @@ class MaxVelocityConstraint : public TrajectoryConstraint {
       : m_maxVelocity(units::math::abs(maxVelocity)) {}
 
   units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, curvature_t curvature,
+      const Pose2d& pose, units::curvature_t curvature,
       units::meters_per_second_t velocity) override {
     return m_maxVelocity;
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, curvature_t curvature,
+  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
                             units::meters_per_second_t speed) override {
     return {};
   }
