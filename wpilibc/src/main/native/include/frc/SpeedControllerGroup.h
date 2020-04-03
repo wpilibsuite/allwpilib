@@ -42,6 +42,8 @@ class SpeedControllerGroup : public Sendable,
  private:
   bool m_isInverted = false;
   std::vector<std::reference_wrapper<SpeedController>> m_speedControllers;
+
+  void Initialize();
 };
 
 }  // namespace frc

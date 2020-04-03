@@ -15,7 +15,9 @@ namespace frc {
 template <class... SpeedControllers>
 SpeedControllerGroup::SpeedControllerGroup(
     SpeedController& speedController, SpeedControllers&... speedControllers)
-    : SpeedControllerGroup(std::vector<std::reference_wrapper<SpeedController>>{
-          speedController, speedControllers...}) {}
+    : m_speedControllers(std::vector<std::reference_wrapper<SpeedController>>{
+          speedController, speedControllers...}) {
+  Initialize();
+}
 
 }  // namespace frc

@@ -12,9 +12,16 @@
 
 using namespace frc;
 
+// Can't use a delegated constructor here because of an MSVC bug.
+// https://developercommunity.visualstudio.com/content/problem/583/compiler-bug-with-delegating-a-constructor.html
+
 SpeedControllerGroup::SpeedControllerGroup(
     std::vector<std::reference_wrapper<SpeedController>>&& speedControllers)
     : m_speedControllers(std::move(speedControllers)) {
+  Initialize();
+}
+
+void SpeedControllerGroup::Initialize() {
   for (auto& speedController : m_speedControllers)
     SendableRegistry::GetInstance().AddChild(this, &speedController.get());
   static int instances = 0;
