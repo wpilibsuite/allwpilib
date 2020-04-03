@@ -10,10 +10,10 @@
 #include <atomic>
 #include <cstdlib>  // For std::atexit()
 #include <memory>
+#include <thread>
 
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <thread>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
