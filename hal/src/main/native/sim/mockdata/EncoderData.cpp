@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -65,6 +65,21 @@ DEFINE_CAPI(HAL_Bool, Direction, direction)
 DEFINE_CAPI(HAL_Bool, ReverseDirection, reverseDirection)
 DEFINE_CAPI(int32_t, SamplesToAverage, samplesToAverage)
 DEFINE_CAPI(double, DistancePerPulse, distancePerPulse)
+
+void HALSIM_SetEncoderDistance(int32_t index, double distance) {
+  auto& simData = SimEncoderData[index];
+  simData.count = distance / simData.distancePerPulse;
+}
+
+void HALSIM_SetEncoderRate(int32_t index, double rate) {
+  auto& simData = SimEncoderData[index];
+  if (rate == 0) {
+    simData.period = std::numeric_limits<double>::infinity();
+    return;
+  }
+
+  simData.period = simData.distancePerPulse / rate;
+}
 
 #define REGISTER(NAME) \
   SimEncoderData[index].NAME.RegisterCallback(callback, param, initialNotify)

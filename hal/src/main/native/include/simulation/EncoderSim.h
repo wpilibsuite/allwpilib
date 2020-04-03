@@ -156,6 +156,14 @@ class EncoderSim {
 
   void ResetData() { HALSIM_ResetEncoderData(m_index); }
 
+  void SetDistance(double distance) {
+    HALSIM_SetEncoderDistance(m_index, distance);
+  }
+
+  void SetRate(double rate) {
+    HALSIM_SetEncoderRate(m_index, rate);
+  }
+
  private:
   int m_index;
 };
