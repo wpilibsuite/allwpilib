@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -155,6 +155,16 @@ class EncoderSim {
   }
 
   void ResetData() { HALSIM_ResetEncoderData(m_index); }
+
+  void SetDistance(double distance) {
+    HALSIM_SetEncoderDistance(m_index, distance);
+  }
+
+  double GetDistance() { return HALSIM_GetEncoderDistance(m_index); }
+
+  void SetRate(double rate) { HALSIM_SetEncoderRate(m_index, rate); }
+
+  double GetRate() { return HALSIM_GetEncoderRate(m_index); }
 
  private:
   int m_index;
