@@ -160,8 +160,16 @@ class EncoderSim {
     HALSIM_SetEncoderDistance(m_index, distance);
   }
 
+  double GetDistance() {
+    return HALSIM_GetEncoderDistance(m_index);
+  }
+
   void SetRate(double rate) {
     HALSIM_SetEncoderRate(m_index, rate);
+  }
+
+  double GetRate() {
+    return HALSIM_GetEncoderRate(m_index);
   }
 
  private:

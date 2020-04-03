@@ -71,6 +71,11 @@ void HALSIM_SetEncoderDistance(int32_t index, double distance) {
   simData.count = distance / simData.distancePerPulse;
 }
 
+double HALSIM_GetEncoderDistance(int32_t index) {
+  auto& simData = SimEncoderData[index];
+  return simData.count * simData.distancePerPulse;
+}
+
 void HALSIM_SetEncoderRate(int32_t index, double rate) {
   auto& simData = SimEncoderData[index];
   if (rate == 0) {
@@ -79,6 +84,12 @@ void HALSIM_SetEncoderRate(int32_t index, double rate) {
   }
 
   simData.period = simData.distancePerPulse / rate;
+}
+
+double HALSIM_GetEncoderRate(int32_t index) {
+  auto& simData = SimEncoderData[index];
+
+  return simData.distancePerPulse / simData.period;
 }
 
 #define REGISTER(NAME) \

@@ -51,5 +51,10 @@ public class EncoderDataJNI extends JNIWrapper {
   public static native int getSamplesToAverage(int index);
   public static native void setSamplesToAverage(int index, int samplesToAverage);
 
+  public static native void setDistance(int index, double distance);
+  public static native double getDistance(int index);
+  public static native void setRate(int index, double rate);
+  public static native double getRate(int index);
+
   public static native void resetData(int index);
 }

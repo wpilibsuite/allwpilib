@@ -415,6 +415,54 @@ Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_setSamplesToAverage
 
 /*
  * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
+ * Method:    setDistance
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_setDistance
+  (JNIEnv*, jclass, jint index, jdouble value)
+{
+  HALSIM_SetEncoderDistance(index, value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
+ * Method:    getDistance
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_getDistance
+  (JNIEnv*, jclass, jint index)
+{
+  return HALSIM_GetEncoderDistance(index);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
+ * Method:    setRate
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_setRate
+  (JNIEnv*, jclass, jint index, jdouble value)
+{
+  HALSIM_SetEncoderRate(index, value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
+ * Method:    getRate
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_getRate
+  (JNIEnv*, jclass, jint index)
+{
+  return HALSIM_GetEncoderRate(index);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
  * Method:    resetData
  * Signature: (I)V
  */

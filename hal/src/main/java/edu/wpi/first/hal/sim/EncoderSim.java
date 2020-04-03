@@ -104,6 +104,22 @@ public class EncoderSim {
     EncoderDataJNI.setSamplesToAverage(m_index, samplesToAverage);
   }
 
+  public void setDistance(double distance) {
+    EncoderDataJNI.setDistance(m_index, distance);
+  }
+
+  public double getDistance() {
+    return EncoderDataJNI.getDistance(m_index);
+  }
+
+  public void setRate(double rate) {
+    EncoderDataJNI.setRate(m_index, rate);
+  }
+
+  public double getRate() {
+    return EncoderDataJNI.getRate(m_index);
+  }
+
   public void resetData() {
     EncoderDataJNI.resetData(m_index);
   }
