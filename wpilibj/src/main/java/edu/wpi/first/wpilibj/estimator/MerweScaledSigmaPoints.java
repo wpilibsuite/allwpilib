@@ -1,14 +1,12 @@
 package edu.wpi.first.wpilibj.estimator;
 
-import edu.wpi.first.wpiutil.math.Nat;
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-
-import java.util.Arrays;
 
 /**
  * Generates sigma points and weights according to Van der Merwe's 2004
@@ -83,25 +81,23 @@ public class MerweScaledSigmaPoints<S extends Num> {
   public Matrix sigmaPoints(
           Matrix<S, N1> x,
           Matrix<S, S> P) {
-
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
-    int states = m_states.getNum();
 
     var intermediate = P.times(lambda + m_states.getNum()).getStorage();
     var U = SimpleMatrixUtils.lltDecompose(intermediate); // Upper triangular
 
     // 2 * states + 1 by states
     SimpleMatrix sigmas = new SimpleMatrix(2 * m_states.getNum() + 1, m_states.getNum());
-    for (int i = 0; i < states; i++) {
+    for (int i = 0; i < m_states.getNum(); i++) {
       sigmas.set(0, i, x.get(i, 0));
     }
     for (int k = 0; k < m_states.getNum(); k++) {
       var xT = x.transpose().getStorage();
       var xPlusU = xT.plus(U.extractVector(true, k));
       var xMinusU = xT.minus(U.extractVector(true, k));
-      for (int i = 0; i < states; i++) {
+      for (int i = 0; i < m_states.getNum(); i++) {
         sigmas.set(k + 1, i, xPlusU.get(0, i));
-        sigmas.set(states + k + 1, i, xMinusU.get(0, i));
+        sigmas.set(m_states.getNum() + k + 1, i, xMinusU.get(0, i));
       }
     }
 
@@ -115,23 +111,22 @@ public class MerweScaledSigmaPoints<S extends Num> {
    */
   @SuppressWarnings("LocalVariableName")
   private void computeWeights(double beta) {
-    double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
-
     var wCBacking = new double[2 * m_states.getNum() + 1];
     var wMBacking = new double[2 * m_states.getNum() + 1];
 
+    double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
     double c = 0.5 / (m_states.getNum() + lambda);
-    Arrays.fill(wCBacking, c);
-    Arrays.fill(wMBacking, c);
 
-    var wC = new SimpleMatrix(1, 2 * m_states.getNum() + 1, true, wCBacking);
-    var wM = new SimpleMatrix(1, 2 * m_states.getNum() + 1, true, wMBacking);
+    var wM = new SimpleMatrix(1, 2 * m_states.getNum() + 1, true, wCBacking);
+    var wC = new SimpleMatrix(1, 2 * m_states.getNum() + 1, true, wMBacking);
+    wM.fill(c);
+    wC.fill(c);
 
-    wC.set(0, 0, lambda / (m_states.getNum() + lambda));
-    wM.set(0, 0, lambda / (m_states.getNum() + lambda) + (1 - Math.pow(m_alpha, 2) + beta));
+    wM.set(0, 0, lambda / (m_states.getNum() + lambda));
+    wC.set(0, 0, lambda / (m_states.getNum() + lambda) + (1 - Math.pow(m_alpha, 2) + beta));
 
-    this.m_wc = new Matrix(wC);
     this.m_wm = new Matrix(wM);
+    this.m_wc = new Matrix(wC);
   }
 
   /**

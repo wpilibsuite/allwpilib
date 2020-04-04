@@ -4,13 +4,14 @@ import java.util.function.BiFunction;
 
 import org.ejml.simple.SimpleMatrix;
 
+import edu.wpi.first.wpilibj.math.StateSpaceUtils;
+import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpilibj.system.RungeKutta;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.MatrixUtils;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
-import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
 
@@ -18,33 +19,34 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 public class UnscentedKalmanFilter<S extends Num, I extends Num,
         O extends Num> implements KalmanTypeFilter<S, I, O> {
 
+  private final Nat<S> m_states;
+  private final Nat<O> m_outputs;
+
   private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> m_f;
   private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> m_h;
-  private final Matrix<S, S> m_Q;
-  private final Matrix<O, O> m_R;
-  /**
-   * The states of the system.
-   */
-  private final Nat<S> m_states;
-  /**
-   * The outputs of the system.
-   */
-  private final Nat<O> m_outputs;
+
   private Matrix<S, N1> m_xHat;
   private Matrix<S, S> m_P;
+  private final Matrix<S, S> m_contQ;
+  private final Matrix<O, O> m_contR;
+  private Matrix<O, O> m_discR;
   private Matrix<?, S> m_sigmasF;
+
   private MerweScaledSigmaPoints<S> m_pts;
 
   /**
    * Constructs an Unscented Kalman Filter.
    *
-   * @param states             TODO
-   * @param inputs             TODO
-   * @param outputs            TODO
-   * @param f                  TODO
-   * @param h                  TODO
-   * @param stateStdDevs       TODO
-   * @param measurementStdDevs TODO
+   * @param states             A Nat representing the number of states.
+   * @param inputs             A Nat representing the number of inputs.
+   * @param outputs            A Nat representing the number of outputs.
+   * @param f                  A vector-valued function of x and u that returns
+   *                           the derivative of the state vector.
+   * @param h                  A vector-valued function of x and u that returns
+   *                           the measurement vector.
+   * @param stateStdDevs       Standard deviations of model states.
+   * @param measurementStdDevs Standard deviations of measurements.
+   * @param nominalDtSeconds   Nominal discretization timestep.
    */
   @SuppressWarnings("ParameterName")
   public UnscentedKalmanFilter(Nat<S> states, Nat<I> inputs, Nat<O> outputs,
@@ -52,24 +54,27 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
                                BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> h,
                                Matrix<S, N1> stateStdDevs,
                                Matrix<O, N1> measurementStdDevs,
-                               double nominalDt) {
+                               double nominalDtSeconds) {
     this.m_states = states;
     this.m_outputs = outputs;
 
-    m_pts = new MerweScaledSigmaPoints<>(states);
-
     m_f = f;
     m_h = h;
-    m_Q = StateSpaceUtils.makeCovMatrix(states, stateStdDevs);
-    m_R = StateSpaceUtils.makeCovMatrix(outputs, measurementStdDevs);
+
+    m_contQ = StateSpaceUtils.makeCovMatrix(states, stateStdDevs);
+    m_contR = StateSpaceUtils.makeCovMatrix(outputs, measurementStdDevs);
+
+    m_discR = StateSpaceUtils.discretizeR(m_contR, nominalDtSeconds);
+
+    m_pts = new MerweScaledSigmaPoints<>(states);
 
     reset();
   }
 
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   private static <S extends Num, C extends Num>
-  SimpleMatrixUtils.Pair<Matrix<C, N1>, Matrix<C, C>> unscentedTransform(
-          Nat<S> s, Nat<C> dim, Matrix sigmas, Matrix Wm, Matrix Wc, Matrix<C, C> noiseCov
+        SimpleMatrixUtils.Pair<Matrix<C, N1>, Matrix<C, C>> unscentedTransform(
+          Nat<S> s, Nat<C> dim, Matrix sigmas, Matrix Wm, Matrix Wc
   ) {
     if (sigmas.getNumRows() != 2 * s.getNum() + 1 || sigmas.getNumCols() != dim.getNum()) {
       throw new IllegalArgumentException("Sigmas must be 2 * states + 1 by covDim! Got "
@@ -86,11 +91,6 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
               + Wc.getNumRows() + " by " + Wc.getNumCols());
     }
 
-    if (noiseCov.getNumRows() != dim.getNum() || noiseCov.getNumCols() != dim.getNum()) {
-      throw new IllegalArgumentException("noiseCov must be covDim by covDim! Got "
-              + noiseCov.getNumRows() + " by " + noiseCov.getNumCols());
-    }
-
     // New mean is just the sum of the sigmas * weight
     // dot = \Sigma^n_1 (W[k]*Xi[k])
     Matrix<N1, C> x = Wm.times(sigmas);
@@ -99,15 +99,12 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
     // weights
     Matrix<?, C> y = new Matrix<>(new SimpleMatrix(2 * s.getNum() + 1, dim.getNum()));
     for (int i = 0; i < 2 * s.getNum() + 1; i++) {
-      Matrix<N1, C> rowBlock = y.extractRowVector(i);
-      rowBlock = rowBlock.minus(x);
+      Matrix<N1, C> rowBlock = sigmas.extractRowVector(i).minus(x);
       for (int j = 0; j < dim.getNum(); j++) {
         y.set(i, j, rowBlock.get(0, j));
       }
     }
     Matrix<C, C> P = y.transpose().times(Wc.diag()).times(y);
-
-    P = P.plus(noiseCov);
 
     return new SimpleMatrixUtils.Pair<>(x.transpose(), P);
   }
@@ -206,24 +203,28 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    */
   @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public void predict(Matrix<I, N1> u, double dtSeconds) {
+    // Discretize Q before projecting mean and covariance forward
+    Matrix<S, S> contA = NumericalJacobian.numericalJacobianX(m_states, m_states, m_f, m_xHat, u);
+    var discQ = StateSpaceUtils.discretizeAQTaylor(contA, m_contQ, dtSeconds).getSecond();
+
     var sigmas = m_pts.sigmaPoints(m_xHat, m_P);
 
     for (int i = 0; i < m_pts.getNumSigmas(); ++i) {
       Matrix<S, N1> x =
-              m_sigmasF.extractRowVector(i).transpose();
+              sigmas.extractRowVector(i).transpose();
 
       var deltaXT = RungeKutta.rungeKutta(m_f, x, u, dtSeconds).transpose();
       for (int j = 0; j < m_states.getNum(); j++) {
         m_sigmasF.set(i, j, deltaXT.get(0, j));
       }
-
-      var ret = unscentedTransform(m_states, m_states,
-              m_sigmasF, m_pts.getWm(), m_pts.getWc(), m_Q);
-
-      m_xHat = ret.getFirst();
-      m_P = ret.getSecond();
     }
 
+    var ret = unscentedTransform(m_states, m_states,
+            m_sigmasF, m_pts.getWm(), m_pts.getWc());
+
+    m_xHat = ret.getFirst();
+    m_P = ret.getSecond().plus(discQ);
+    m_discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
   }
 
   /**
@@ -235,7 +236,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
   @SuppressWarnings("ParameterName")
   @Override
   public void correct(Matrix<I, N1> u, Matrix<O, N1> y) {
-    correct(m_outputs, u, y, m_h, m_R);
+    correct(m_outputs, u, y, m_h, m_discR);
   }
 
   /**
@@ -270,9 +271,9 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
     }
 
     // Mean and covariance of prediction passed through unscented transform
-    var transRet = unscentedTransform(m_states, rows, sigmasH, m_pts.getWm(), m_pts.getWc(), R);
+    var transRet = unscentedTransform(m_states, rows, sigmasH, m_pts.getWm(), m_pts.getWc());
     var yHat = transRet.getFirst();
-    var Py = transRet.getSecond();
+    var Py = transRet.getSecond().plus(R);
 
     // Compute cross covariance of the state and the measurements
     Matrix<S, R> Pxy = MatrixUtils.zeros(m_states, rows);
@@ -293,7 +294,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
     // K^T = P_y^T.solve(P_{xy}^T)
     // K = (P_y^T.solve(P_{xy}^T)^T
     Matrix<S, R> K = new Matrix<>(
-            SimpleMatrixUtils.lltDecompose(Py.transpose().getStorage())
+            Py.transpose().getStorage()
                     .solve(Pxy.transpose().getStorage())
                     .transpose()
     );
