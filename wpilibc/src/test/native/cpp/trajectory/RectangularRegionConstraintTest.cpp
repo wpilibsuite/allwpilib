@@ -19,7 +19,6 @@ using namespace frc;
 
 TEST(RectangularRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
-  constexpr auto dt = 20_ms;
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   MaxVelocityConstraint maxVelConstraint(maxVelocity);
