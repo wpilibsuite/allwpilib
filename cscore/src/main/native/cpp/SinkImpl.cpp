@@ -76,8 +76,11 @@ void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
     }
     m_source = source;
     if (m_source) {
+      m_hasSource = true;
       m_source->AddSink();
       if (m_enabledCount > 0) m_source->EnableSink();
+    } else {
+      m_hasSource = false;
     }
   }
   SetSourceImpl(source);

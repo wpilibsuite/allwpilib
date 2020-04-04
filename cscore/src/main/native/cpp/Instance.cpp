@@ -51,7 +51,7 @@ static void def_log_func(unsigned int level, const char* file,
 
 class Instance::Impl {
  public:
-  Impl() : networkListener(logger) {}
+  Impl() : networkListener(logger), framePool(logger) {}
 
   wpi::Logger logger;
   Notifier notifier;

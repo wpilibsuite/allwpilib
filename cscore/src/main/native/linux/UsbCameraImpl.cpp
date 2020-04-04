@@ -31,6 +31,7 @@
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
+#include "FramePool.h"
 #include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
@@ -465,8 +466,9 @@ void UsbCameraImpl::CameraThreadMain() {
           good = false;
         }
         if (good) {
-          PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
-                   width, height, image, wpi::Now());  // TODO: time
+          PutFrame(m_framePool.MakeFrame(
+              static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat), width,
+              height, image, wpi::Now()));  // TODO: time
         }
       }
 

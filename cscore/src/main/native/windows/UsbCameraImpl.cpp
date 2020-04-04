@@ -35,6 +35,7 @@
 
 #include "COMCreators.h"
 #include "ComPtr.h"
+#include "FramePool.h"
 #include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
@@ -304,9 +305,9 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
   switch (mode.pixelFormat) {
     case cs::VideoMode::PixelFormat::kMJPEG: {
       // Special case
-      PutFrame(VideoMode::kMJPEG, mode.width, mode.height,
-               wpi::StringRef(reinterpret_cast<char*>(ptr), cursize),
-               wpi::Now());
+      PutFrame(m_framePool.MakeFrame(
+          VideoMode::kMJPEG, mode.width, mode.height,
+          wpi::StringRef(reinterpret_cast<char*>(ptr), cursize), wpi::Now()));
       doFinalSet = false;
       break;
     }
@@ -334,7 +335,7 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
   }
 
   if (doFinalSet) {
-    PutFrame(std::move(dest), wpi::Now());
+    PutFrame(m_framePool.MakeFrame(std::move(dest), wpi::Now()));
   }
 
   if (lock2d)

@@ -10,14 +10,21 @@
 
 #include <stdint.h>
 
+#include <atomic>
+#include <memory>
+
 #include <opencv2/core/core.hpp>
+#include <wpi/Signal.h>
 #include <wpi/Twine.h>
+#include <wpi/condition_variable.h>
 
 #include "Frame.h"
 #include "SinkImpl.h"
 #include "cscore_raw.h"
 
 namespace cs {
+
+class SourceImpl;
 
 class ImageSinkImpl : public SinkImpl {
  public:
@@ -36,6 +43,14 @@ class ImageSinkImpl : public SinkImpl {
   Frame GetNextFrame(bool hasTimeout, double timeout);
   uint64_t GrabFrameImpl(cv::Mat& image, Frame&& frame);
   uint64_t GrabFrameImpl(CS_RawFrame& rawFrame, Frame&& frame);
+
+  void SetSourceImpl(std::shared_ptr<SourceImpl> source) override;
+
+  std::atomic_bool m_active{true};
+  wpi::condition_variable m_frameCv;
+  Frame m_frame;
+  uint64_t m_lastFrameTime{0};
+  wpi::sig::ScopedConnection m_onNewFrame;
 };
 
 }  // namespace cs

@@ -88,8 +88,10 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   void SendStream(wpi::raw_socket_ostream& os);
   void ProcessRequest();
 
+  // must be called with m_mutex held
+  void SetSource(std::shared_ptr<SourceImpl> source);
+
   std::unique_ptr<wpi::NetworkStream> m_stream;
-  std::shared_ptr<SourceImpl> m_source;
   bool m_streaming = false;
   bool m_noStreaming = false;
   int m_width = 0;
@@ -101,6 +103,9 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  private:
   std::string m_name;
   wpi::Logger& m_logger;
+  std::shared_ptr<SourceImpl> m_source;
+  Frame m_frame;
+  wpi::sig::ScopedConnection m_onNewFrame;
 
   wpi::StringRef GetName() { return m_name; }
 
@@ -617,9 +622,6 @@ void MjpegServerImpl::Stop() {
     }
     connThread.Stop();
   }
-
-  // wake up connection threads by forcing an empty frame to be sent
-  if (auto source = GetSource()) source->Wakeup();
 }
 
 // Send HTTP response and a stream of JPG-frames
@@ -640,6 +642,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
   SDEBUG("Headers send, sending stream now");
 
+  Frame::Time lastSourceTime = 0;
   Frame::Time lastFrameTime = 0;
   Frame::Time timePerFrame = 0;
   if (m_fps != 0) timePerFrame = 1000000.0 / m_fps;
@@ -649,15 +652,24 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
   StartStream();
   while (m_active && !os.has_error()) {
-    auto source = GetSource();
-    if (!source) {
+    if (!m_source) {
       // Source disconnected; sleep so we don't consume all processor time.
       os << "\r\n";  // Keep connection alive
       std::this_thread::sleep_for(std::chrono::milliseconds(200));
       continue;
     }
     SDEBUG4("waiting for frame");
-    Frame frame = source->GetNextFrame(0.225);  // blocks
+    Frame frame;
+    {
+      std::unique_lock lock{m_mutex};
+      // block until frame available or timeout
+      if (m_cond.wait_for(lock, std::chrono::milliseconds(225), [&] {
+            return !m_active || m_frame.GetTime() != lastSourceTime;
+          })) {
+        frame = m_frame;
+        lastSourceTime = frame.GetTime();
+      }
+    }
     if (!m_active) break;
     if (!frame) {
       // Bad frame; sleep for 20 ms so we don't consume all processor time.
@@ -863,6 +875,23 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   SDEBUG("leaving HTTP client thread");
 }
 
+void MjpegServerImpl::ConnThread::SetSource(
+    std::shared_ptr<SourceImpl> source) {
+  if (m_source == source) return;
+  bool streaming = m_streaming;
+  if (m_source && streaming) m_source->DisableSink();
+  m_source = source;
+  if (source && streaming) m_source->EnableSink();
+
+  m_onNewFrame = source->newFrame.connect_connection([this](Frame frame) {
+    {
+      std::lock_guard lock(m_mutex);
+      m_frame = std::move(frame);
+    }
+    m_cond.notify_all();
+  });
+}
+
 // worker thread for clients that connected to this server
 void MjpegServerImpl::ConnThread::Main() {
   std::unique_lock lock(m_mutex);
@@ -923,7 +952,7 @@ void MjpegServerImpl::ServerThreadMain() {
     // Hand off connection to it
     auto thr = it->GetThread();
     thr->m_stream = std::move(stream);
-    thr->m_source = source;
+    thr->SetSource(source);
     thr->m_noStreaming = nstreams >= 10;
     thr->m_width = GetProperty(m_widthProp)->value;
     thr->m_height = GetProperty(m_heightProp)->value;
@@ -939,14 +968,7 @@ void MjpegServerImpl::ServerThreadMain() {
 void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
   std::scoped_lock lock(m_mutex);
   for (auto& connThread : m_connThreads) {
-    if (auto thr = connThread.GetThread()) {
-      if (thr->m_source != source) {
-        bool streaming = thr->m_streaming;
-        if (thr->m_source && streaming) thr->m_source->DisableSink();
-        thr->m_source = source;
-        if (source && streaming) thr->m_source->EnableSink();
-      }
-    }
+    if (auto thr = connThread.GetThread()) thr->SetSource(source);
   }
 }
 

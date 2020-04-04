@@ -131,7 +131,7 @@ void ImageSourceImpl::PutFrame(cv::Mat& image) {
                           << "-channel images not supported");
       return;
   }
-  SourceImpl::PutFrame(std::move(dest), wpi::Now());
+  SourceImpl::PutFrame(m_framePool.MakeFrame(std::move(dest), wpi::Now()));
 }
 
 void ImageSourceImpl::PutFrame(const CS_RawFrame& image) {
@@ -156,7 +156,7 @@ void ImageSourceImpl::PutFrame(const CS_RawFrame& image) {
       image.height, image.totalData);
   finalImage.copyTo(dest->AsMat());
 
-  SourceImpl::PutFrame(std::move(dest), wpi::Now());
+  SourceImpl::PutFrame(m_framePool.MakeFrame(std::move(dest), wpi::Now()));
 }
 
 namespace cs {

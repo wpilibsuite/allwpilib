@@ -7,6 +7,8 @@
 
 #include "FramePool.h"
 
+#include "Log.h"
+
 using namespace cs;
 
 static constexpr size_t kMaxImagesAvail = 32;
@@ -18,6 +20,20 @@ FramePool::~FramePool() {
     m_destroy = true;
     auto frames = std::move(m_framesAvail);
   }
+}
+
+Frame FramePool::MakeFrame(VideoMode::PixelFormat pixelFormat, int width,
+                           int height, wpi::StringRef data, Frame::Time time) {
+  auto image = AllocImage(pixelFormat, width, height, data.size());
+
+  // Copy in image data
+  DEBUG4("Copying data to "
+         << reinterpret_cast<const void*>(image->data()) << " from "
+         << reinterpret_cast<const void*>(data.data()) << " (" << data.size()
+         << " bytes)");
+  std::memcpy(image->data(), data.data(), data.size());
+
+  return MakeFrame(std::move(image), time);
 }
 
 std::unique_ptr<Image> FramePool::AllocImage(size_t size) {

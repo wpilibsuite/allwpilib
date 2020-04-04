@@ -268,8 +268,8 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
       PutError("did not receive a JPEG image", wpi::Now());
       return false;
     }
-    PutFrame(VideoMode::PixelFormat::kMJPEG, width, height, imageBuf,
-             wpi::Now());
+    PutFrame(m_framePool.MakeFrame(VideoMode::PixelFormat::kMJPEG, width,
+                                   height, imageBuf, wpi::Now()));
     ++m_frameCount;
     return true;
   }
@@ -288,7 +288,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   }
   image->width = width;
   image->height = height;
-  PutFrame(std::move(image), wpi::Now());
+  PutFrame(m_framePool.MakeFrame(std::move(image), wpi::Now()));
   ++m_frameCount;
   return true;
 }

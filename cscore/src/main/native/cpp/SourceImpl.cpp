@@ -26,11 +26,6 @@ SourceImpl::SourceImpl(const wpi::Twine& name, wpi::Logger& logger)
   m_frame = m_framePool.MakeEmptyFrame();
 }
 
-SourceImpl::~SourceImpl() {
-  // Wake up anyone who is waiting.  This also clears the current frame.
-  Wakeup();
-}
-
 void SourceImpl::SetDescription(const wpi::Twine& description) {
   std::scoped_lock lock(m_mutex);
   m_description = description.str();
@@ -59,33 +54,6 @@ uint64_t SourceImpl::GetCurFrameTime() {
 Frame SourceImpl::GetCurFrame() {
   std::unique_lock lock{m_frameMutex};
   return m_frame;
-}
-
-Frame SourceImpl::GetNextFrame() {
-  std::unique_lock lock{m_frameMutex};
-  auto oldTime = m_frame.GetTime();
-  m_frameCv.wait(lock, [=] { return m_frame.GetTime() != oldTime; });
-  return m_frame;
-}
-
-Frame SourceImpl::GetNextFrame(double timeout) {
-  std::unique_lock lock{m_frameMutex};
-  auto oldTime = m_frame.GetTime();
-  if (!m_frameCv.wait_for(
-          lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
-          [=] { return m_frame.GetTime() != oldTime; })) {
-    m_frame =
-        m_framePool.MakeErrorFrame("timed out getting frame", wpi::Now());
-  }
-  return m_frame;
-}
-
-void SourceImpl::Wakeup() {
-  {
-    std::scoped_lock lock{m_frameMutex};
-    m_frame = m_framePool.MakeEmptyFrame();
-  }
-  m_frameCv.notify_all();
 }
 
 void SourceImpl::SetBrightness(int brightness, CS_Status* status) {
@@ -373,45 +341,26 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
   return m_videoModes;
 }
 
-void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
-                          int height, wpi::StringRef data, Frame::Time time) {
-  auto image = m_framePool.AllocImage(pixelFormat, width, height, data.size());
-
-  // Copy in image data
-  SDEBUG4("Copying data to "
-          << reinterpret_cast<const void*>(image->data()) << " from "
-          << reinterpret_cast<const void*>(data.data()) << " (" << data.size()
-          << " bytes)");
-  std::memcpy(image->data(), data.data(), data.size());
-
-  PutFrame(std::move(image), time);
-}
-
-void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
-  // Update telemetry
-  recordTelemetry(CS_SOURCE_FRAMES_RECEIVED, 1);
-  recordTelemetry(CS_SOURCE_BYTES_RECEIVED,
-                  static_cast<int64_t>(image->size()));
+void SourceImpl::PutFrame(Frame frame) {
+  if (auto image = frame.GetExistingImage()) {
+    // Update telemetry
+    recordTelemetry(CS_SOURCE_FRAMES_RECEIVED, 1);
+    recordTelemetry(CS_SOURCE_BYTES_RECEIVED,
+                    static_cast<int64_t>(image->size()));
+  }
 
   // Update frame
   {
     std::scoped_lock lock{m_frameMutex};
-    m_frame = m_framePool.MakeFrame(std::move(image), time);
+    m_frame = frame;
   }
 
   // Signal listeners
-  m_frameCv.notify_all();
+  newFrame(frame);
 }
 
 void SourceImpl::PutError(const wpi::Twine& msg, Frame::Time time) {
-  // Update frame
-  {
-    std::scoped_lock lock{m_frameMutex};
-    m_frame = m_framePool.MakeErrorFrame(msg, time);
-  }
-
-  // Signal listeners
-  m_frameCv.notify_all();
+  PutFrame(m_framePool.MakeErrorFrame(msg, time));
 }
 
 void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,

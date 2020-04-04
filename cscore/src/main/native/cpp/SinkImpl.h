@@ -8,6 +8,7 @@
 #ifndef CSCORE_SINKIMPL_H_
 #define CSCORE_SINKIMPL_H_
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -50,6 +51,8 @@ class SinkImpl : public PropertyContainer {
     return m_source;
   }
 
+  bool HasSource() const { return m_hasSource; }
+
   std::string GetError() const;
   wpi::StringRef GetError(wpi::SmallVectorImpl<char>& buf) const;
 
@@ -76,6 +79,7 @@ class SinkImpl : public PropertyContainer {
   std::string m_name;
   std::string m_description;
   std::shared_ptr<SourceImpl> m_source;
+  std::atomic_bool m_hasSource{false};
   int m_enabledCount{0};
 };
 

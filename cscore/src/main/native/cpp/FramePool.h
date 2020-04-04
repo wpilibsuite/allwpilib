@@ -17,14 +17,24 @@
 #include "Frame.h"
 #include "Image.h"
 
+namespace wpi {
+class Logger;
+}  // namespace wpi
+
 namespace cs {
 
 class FramePool {
  public:
-  FramePool() = default;
+  explicit FramePool(wpi::Logger& logger) : m_logger(logger) {}
   FramePool(const FramePool&) = delete;
   FramePool& operator=(const FramePool&) = delete;
   ~FramePool();
+
+  /**
+   * Creates a frame from raw data.  Copies the data.
+   */
+  Frame MakeFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
+                  wpi::StringRef data, Frame::Time time);
 
   /**
    * Creates a frame from an already-created image.
@@ -66,6 +76,7 @@ class FramePool {
   void ReleaseFrameImpl(std::unique_ptr<Frame::Impl> data);
 
  private:
+  wpi::Logger& m_logger;
   wpi::mutex m_mutex;
   bool m_destroy = false;
   std::vector<std::unique_ptr<Frame::Impl>> m_framesAvail;

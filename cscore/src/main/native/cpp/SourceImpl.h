@@ -19,7 +19,6 @@
 #include <wpi/Signal.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
-#include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
 #include "Frame.h"
@@ -39,7 +38,7 @@ class FramePool;
 class SourceImpl : public PropertyContainer {
  public:
   SourceImpl(const wpi::Twine& name, wpi::Logger& logger);
-  virtual ~SourceImpl();
+  virtual ~SourceImpl() = default;
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
 
@@ -97,16 +96,6 @@ class SourceImpl : public PropertyContainer {
   // Gets the current frame (without waiting for a new one).
   Frame GetCurFrame();
 
-  // Blocking function that waits for the next frame and returns it.
-  Frame GetNextFrame();
-
-  // Blocking function that waits for the next frame and returns it (with
-  // timeout in seconds).  If timeout expires, returns empty frame.
-  Frame GetNextFrame(double timeout);
-
-  // Force a wakeup of all GetNextFrame() callers by sending an empty frame.
-  void Wakeup();
-
   // Standard common camera properties
   virtual void SetBrightness(int brightness, CS_Status* status);
   virtual int GetBrightness(CS_Status* status) const;
@@ -141,6 +130,11 @@ class SourceImpl : public PropertyContainer {
   wpi::sig::Signal<const VideoMode&> videoModeChanged;
 
   /**
+   * Signal that is called for each frame
+   */
+  wpi::sig::Signal_mt<Frame> newFrame;
+
+  /**
    * Signal to record telemetry.  Parameters are the telemetry kind and the
    * quantity to record.
    */
@@ -150,9 +144,7 @@ class SourceImpl : public PropertyContainer {
   void UpdatePropertyValue(int property, bool setString, int value,
                            const wpi::Twine& valueStr) override;
 
-  void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
-                wpi::StringRef data, Frame::Time time);
-  void PutFrame(std::unique_ptr<Image> image, Frame::Time time);
+  void PutFrame(Frame frame);
   void PutError(const wpi::Twine& msg, Frame::Time time);
 
   // Notification functions for corresponding atomics
@@ -178,7 +170,6 @@ class SourceImpl : public PropertyContainer {
   std::atomic_int m_numSinksEnabled{0};
 
   wpi::mutex m_frameMutex;
-  wpi::condition_variable m_frameCv;
 
   std::atomic_bool m_isConnected{false};
 

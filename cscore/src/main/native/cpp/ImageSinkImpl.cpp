@@ -29,8 +29,9 @@ ImageSinkImpl::ImageSinkImpl(const wpi::Twine& name, wpi::Logger& logger)
 ImageSinkImpl::~ImageSinkImpl() { Stop(); }
 
 void ImageSinkImpl::Stop() {
-  // wake up any waiters by forcing an empty frame to be sent
-  if (auto source = GetSource()) source->Wakeup();
+  m_active = false;
+  // wake up any waiters
+  m_frameCv.notify_all();
 }
 
 uint64_t ImageSinkImpl::GrabFrame(cv::Mat& image) {
@@ -52,16 +53,39 @@ uint64_t ImageSinkImpl::GrabFrame(CS_RawFrame& image, double timeout) {
 Frame ImageSinkImpl::GetNextFrame(bool hasTimeout, double timeout) {
   SetEnabled(true);
 
-  auto source = GetSource();
-  if (!source) {
+  if (!HasSource()) {
     // Source disconnected; sleep for one second
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    return {};
+    if (!HasSource()) return {};
   }
 
-  auto frame = hasTimeout ? source->GetNextFrame(timeout)
-                          : source->GetNextFrame();  // blocks
-  if (!frame) {
+  Frame frame;
+  if (hasTimeout) {
+    std::unique_lock lock{m_mutex};
+    // block until frame available or timeout
+    if (m_frameCv.wait_for(
+            lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
+            [this] {
+              return !m_active || m_frame.GetTime() != m_lastFrameTime;
+            })) {
+      if (m_active) {
+        frame = m_frame;
+        m_lastFrameTime = frame.GetTime();
+      }
+    }
+  } else {
+    std::unique_lock lock{m_mutex};
+    // block until frame available
+    m_frameCv.wait(lock, [this] {
+      return !m_active || m_frame.GetTime() != m_lastFrameTime;
+    });
+    if (m_active) {
+      frame = m_frame;
+      m_lastFrameTime = frame.GetTime();
+    }
+  }
+
+  if (m_active && !frame) {
     // Bad frame; sleep for 20 ms so we don't consume all processor time.
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
   }
@@ -117,6 +141,20 @@ uint64_t ImageSinkImpl::GrabFrameImpl(CS_RawFrame& rawFrame, Frame&& frame) {
             rawFrame.data);
 
   return frame.GetTime();
+}
+
+void ImageSinkImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
+  if (source) {
+    m_onNewFrame = source->newFrame.connect_connection([this](Frame frame) {
+      {
+        std::lock_guard lock(m_mutex);
+        m_frame = std::move(frame);
+      }
+      m_frameCv.notify_all();
+    });
+  } else {
+    m_onNewFrame.disconnect();
+  }
 }
 
 namespace cs {
