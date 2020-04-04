@@ -37,7 +37,7 @@ public class RectangularRegionConstraint implements TrajectoryConstraint {
   @Override
   public double getMaxVelocityMetersPerSecond(Pose2d poseMeters, double curvatureRadPerMeter,
                                               double velocityMetersPerSecond) {
-    if (isPoseWithinRegion(poseMeters)) {
+    if (isPoseInRegion(poseMeters)) {
       return m_constraint.getMaxVelocityMetersPerSecond(poseMeters, curvatureRadPerMeter,
           velocityMetersPerSecond);
     } else {
@@ -49,7 +49,7 @@ public class RectangularRegionConstraint implements TrajectoryConstraint {
   public MinMax getMinMaxAccelerationMetersPerSecondSq(Pose2d poseMeters,
                                                        double curvatureRadPerMeter,
                                                        double velocityMetersPerSecond) {
-    if (isPoseWithinRegion(poseMeters)) {
+    if (isPoseInRegion(poseMeters)) {
       return m_constraint.getMinMaxAccelerationMetersPerSecondSq(poseMeters,
           curvatureRadPerMeter, velocityMetersPerSecond);
     } else {
@@ -57,7 +57,7 @@ public class RectangularRegionConstraint implements TrajectoryConstraint {
     }
   }
 
-  private boolean isPoseWithinRegion(Pose2d robotPose) {
+  public boolean isPoseInRegion(Pose2d robotPose) {
     return robotPose.getTranslation().getX() >= m_bottomLeftPoint.getX()
         && robotPose.getTranslation().getX() <= m_topRightPoint.getX()
         && robotPose.getTranslation().getY() >= m_bottomLeftPoint.getY()

@@ -39,7 +39,7 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
   @Override
   public double getMaxVelocityMetersPerSecond(Pose2d poseMeters, double curvatureRadPerMeter,
                                               double velocityMetersPerSecond) {
-    if (isPoseWithinRegion(poseMeters)) {
+    if (isPoseInRegion(poseMeters)) {
       return m_constraint.getMaxVelocityMetersPerSecond(poseMeters, curvatureRadPerMeter,
           velocityMetersPerSecond);
     } else {
@@ -51,7 +51,7 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
   public MinMax getMinMaxAccelerationMetersPerSecondSq(Pose2d poseMeters,
                                                        double curvatureRadPerMeter,
                                                        double velocityMetersPerSecond) {
-    if (isPoseWithinRegion(poseMeters)) {
+    if (isPoseInRegion(poseMeters)) {
       return m_constraint.getMinMaxAccelerationMetersPerSecondSq(poseMeters,
           curvatureRadPerMeter, velocityMetersPerSecond);
     } else {
@@ -66,7 +66,7 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
    * @param robotPose The robot pose.
    * @return Whether the robot pose is within the constraint region.
    */
-  public boolean isPoseWithinRegion(Pose2d robotPose) {
+  public boolean isPoseInRegion(Pose2d robotPose) {
     // The region (disk) bounded by the ellipse is given by the equation:
     // ((x-h)^2)/Rx^2) + ((y-k)^2)/Ry^2) <= 1
     // If the inequality is satisfied, then it is inside the ellipse; otherwise

@@ -62,7 +62,7 @@ public class EllipticalRegionConstraintTest {
         Units.feetToMeters(2.0), Units.feetToMeters(4.0), new Rotation2d(),
         maxVelocityConstraint);
 
-    assertFalse(regionConstraintNoRotation.isPoseWithinRegion(new Pose2d(
+    assertFalse(regionConstraintNoRotation.isPoseInRegion(new Pose2d(
         Units.feetToMeters(2.1), Units.feetToMeters(1.0), new Rotation2d()
     )));
 
@@ -71,7 +71,7 @@ public class EllipticalRegionConstraintTest {
         Units.feetToMeters(2.0), Units.feetToMeters(4.0), Rotation2d.fromDegrees(90.0),
         maxVelocityConstraint);
 
-    assertTrue(regionConstraintWithRotation.isPoseWithinRegion(new Pose2d(
+    assertTrue(regionConstraintWithRotation.isPoseInRegion(new Pose2d(
         Units.feetToMeters(2.1), Units.feetToMeters(1.0), new Rotation2d()
     )));
   }

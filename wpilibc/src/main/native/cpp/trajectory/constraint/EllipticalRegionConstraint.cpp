@@ -40,7 +40,7 @@ TrajectoryConstraint::MinMax EllipticalRegionConstraint::MinMaxAcceleration(
   }
 }
 
-bool frc::EllipticalRegionConstraint::IsPoseInRegion(const Pose2d& pose) {
+bool EllipticalRegionConstraint::IsPoseInRegion(const Pose2d& pose) {
   // The region (disk) bounded by the ellipse is given by the equation:
   // ((x-h)^2)/Rx^2) + ((y-k)^2)/Ry^2) <= 1
   // If the inequality is satisfied, then it is inside the ellipse; otherwise
