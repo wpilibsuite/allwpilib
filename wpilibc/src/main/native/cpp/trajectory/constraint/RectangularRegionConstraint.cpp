@@ -11,7 +11,7 @@
 
 using namespace frc;
 
-frc::RectangularRegionConstraint::RectangularRegionConstraint(
+RectangularRegionConstraint::RectangularRegionConstraint(
     const Translation2d& bottomLeftPoint, const Translation2d& topRightPoint,
     TrajectoryConstraint* constraint)
     : m_bottomLeftPoint(bottomLeftPoint),
@@ -38,7 +38,7 @@ TrajectoryConstraint::MinMax RectangularRegionConstraint::MinMaxAcceleration(
   }
 }
 
-bool frc::RectangularRegionConstraint::IsPoseInRegion(const Pose2d& pose) {
+bool RectangularRegionConstraint::IsPoseInRegion(const Pose2d& pose) {
   return pose.Translation().X() >= m_bottomLeftPoint.X() &&
          pose.Translation().X() <= m_topRightPoint.X() &&
          pose.Translation().Y() >= m_bottomLeftPoint.Y() &&

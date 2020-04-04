@@ -17,7 +17,7 @@
 
 using namespace frc;
 
-TEST(EllipticalRegionConstraintTest, Constraint) {
+TEST(RectangularRegionConstraintTest, Constraint) {
   constexpr auto maxVelocity = 2_fps;
   constexpr auto dt = 20_ms;
 
@@ -45,7 +45,7 @@ TEST(EllipticalRegionConstraintTest, Constraint) {
   EXPECT_TRUE(exceededConstraintOutsideRegion);
 }
 
-TEST(EllipticalRegionConstraintTest, IsPoseInRegion) {
+TEST(RectangularRegionConstraintTest, IsPoseInRegion) {
   constexpr auto maxVelocity = 2_fps;
   MaxVelocityConstraint maxVelConstraint(maxVelocity);
   EllipticalRegionConstraint regionConstraint(frc::Translation2d{1_ft, 1_ft},

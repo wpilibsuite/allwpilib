@@ -57,6 +57,13 @@ public class RectangularRegionConstraint implements TrajectoryConstraint {
     }
   }
 
+  /**
+   * Returns whether the specified robot pose is within the region that the constraint
+   * is enforced in.
+   *
+   * @param robotPose The robot pose.
+   * @return Whether the robot pose is within the constraint region.
+   */
   public boolean isPoseInRegion(Pose2d robotPose) {
     return robotPose.getTranslation().getX() >= m_bottomLeftPoint.getX()
         && robotPose.getTranslation().getX() <= m_topRightPoint.getX()
