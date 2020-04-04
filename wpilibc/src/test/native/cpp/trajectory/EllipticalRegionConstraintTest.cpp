@@ -31,9 +31,7 @@ TEST(EllipticalRegionConstraintTest, Constraint) {
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
   bool exceededConstraintOutsideRegion = false;
-  for (auto time = 0_s; time < trajectory.TotalTime(); time += dt) {
-    const Trajectory::State point = trajectory.Sample(time);
-
+  for (auto& point : trajectory.States()) {
     auto translation = point.pose.Translation();
     if (translation.X() < 10_ft && translation.Y() < 5_ft) {
       EXPECT_TRUE(units::math::abs(point.velocity) < maxVelocity + 0.05_mps);

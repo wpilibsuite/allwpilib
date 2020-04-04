@@ -38,8 +38,7 @@ public class EllipticalRegionConstraintTest {
 
     // Iterate through trajectory and check constraints
     boolean exceededConstraintOutsideRegion = false;
-    for (double t = 0.0; t < trajectory.getTotalTimeSeconds(); t += 0.02) {
-      var point = trajectory.sample(t);
+    for (var point : trajectory.getStates()) {
       var translation = point.poseMeters.getTranslation();
 
       if (translation.getX() < Units.feetToMeters(10)

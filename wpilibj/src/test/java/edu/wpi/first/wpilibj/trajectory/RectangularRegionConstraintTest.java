@@ -38,10 +38,7 @@ public class RectangularRegionConstraintTest {
 
     // Iterate through trajectory and check constraints
     boolean exceededConstraintOutsideRegion = false;
-    for (double t = 0.0; t < trajectory.getTotalTimeSeconds(); t += 0.02) {
-      var point = trajectory.sample(t);
-      var translation = point.poseMeters.getTranslation();
-
+    for (var point : trajectory.getStates()) {
       if (regionConstraint.isPoseInRegion(point.poseMeters)) {
         assertTrue(Math.abs(point.velocityMetersPerSecond) < maxVelocity + 0.05);
       } else if (Math.abs(point.velocityMetersPerSecond) >= maxVelocity + 0.05) {
@@ -62,7 +59,7 @@ public class RectangularRegionConstraintTest {
     );
 
     assertFalse(regionConstraint.isPoseInRegion(new Pose2d()));
-    assertTrue(regionConstraint.isPoseInRegion(new Pose2d(Units.feetToMeters(3.0), Units.feetToMeters(14.5),
-        new Rotation2d())));
+    assertTrue(regionConstraint.isPoseInRegion(new Pose2d(Units.feetToMeters(3.0),
+        Units.feetToMeters(14.5), new Rotation2d())));
   }
 }
