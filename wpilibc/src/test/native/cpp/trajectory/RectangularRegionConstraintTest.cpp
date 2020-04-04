@@ -23,9 +23,9 @@ TEST(RectangularRegionConstraintTest, Constraint) {
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   MaxVelocityConstraint maxVelConstraint(maxVelocity);
-  EllipticalRegionConstraint regionConstraint(frc::Translation2d{1_ft, 1_ft},
-                                              frc::Translation2d{5_ft, 27_ft},
-                                              &maxVelConstraint);
+  RectangularRegionConstraint regionConstraint(frc::Translation2d{1_ft, 1_ft},
+                                               frc::Translation2d{5_ft, 27_ft},
+                                               &maxVelConstraint);
   config.AddConstraint(regionConstraint);
 
   auto trajectory = TestTrajectory::GetTrajectory(config);
@@ -34,7 +34,6 @@ TEST(RectangularRegionConstraintTest, Constraint) {
   for (auto time = 0_s; time < trajectory.TotalTime(); time += dt) {
     const Trajectory::State point = trajectory.Sample(time);
 
-    auto translation = point.pose.Translation();
     if (regionConstraint.IsPoseInRegion(point.pose)) {
       EXPECT_TRUE(units::math::abs(point.velocity) < maxVelocity + 0.05_mps);
     } else if (units::math::abs(point.velocity) >= maxVelocity + 0.05_mps) {
@@ -48,9 +47,9 @@ TEST(RectangularRegionConstraintTest, Constraint) {
 TEST(RectangularRegionConstraintTest, IsPoseInRegion) {
   constexpr auto maxVelocity = 2_fps;
   MaxVelocityConstraint maxVelConstraint(maxVelocity);
-  EllipticalRegionConstraint regionConstraint(frc::Translation2d{1_ft, 1_ft},
-                                              frc::Translation2d{5_ft, 27_ft},
-                                              &maxVelConstraint);
+  RectangularRegionConstraint regionConstraint(frc::Translation2d{1_ft, 1_ft},
+                                               frc::Translation2d{5_ft, 27_ft},
+                                               &maxVelConstraint);
 
   EXPECT_FALSE(regionConstraint.IsPoseInRegion(Pose2d()));
   EXPECT_TRUE(
