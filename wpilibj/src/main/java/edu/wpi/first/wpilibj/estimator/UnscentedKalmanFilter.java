@@ -74,7 +74,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   private static <S extends Num, C extends Num>
         SimpleMatrixUtils.Pair<Matrix<C, N1>, Matrix<C, C>> unscentedTransform(
-          Nat<S> s, Nat<C> dim, Matrix sigmas, Matrix Wm, Matrix Wc
+          Nat<S> s, Nat<C> dim, Matrix<?, C> sigmas, Matrix<N1, ?> Wm, Matrix<N1, ?> Wc
   ) {
     if (sigmas.getNumRows() != 2 * s.getNum() + 1 || sigmas.getNumCols() != dim.getNum()) {
       throw new IllegalArgumentException("Sigmas must be 2 * states + 1 by covDim! Got "
@@ -93,18 +93,16 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
 
     // New mean is just the sum of the sigmas * weight
     // dot = \Sigma^n_1 (W[k]*Xi[k])
-    Matrix<N1, C> x = Wm.times(sigmas);
+    Matrix<N1, C> x = Wm.times(changeBoundsUnchecked(sigmas));
 
     // New covariance is the sum of the outer product of the residuals times the
     // weights
     Matrix<?, C> y = new Matrix<>(new SimpleMatrix(2 * s.getNum() + 1, dim.getNum()));
     for (int i = 0; i < 2 * s.getNum() + 1; i++) {
-      Matrix<N1, C> rowBlock = sigmas.extractRowVector(i).minus(x);
-      for (int j = 0; j < dim.getNum(); j++) {
-        y.set(i, j, rowBlock.get(0, j));
-      }
+      y.setRow(i, sigmas.extractRowVector(i).minus(x));
     }
-    Matrix<C, C> P = y.transpose().times(Wc.diag()).times(y);
+    Matrix<C, C> P = y.transpose().times(changeBoundsUnchecked(Wc.diag()))
+            .times(changeBoundsUnchecked(y));
 
     return new SimpleMatrixUtils.Pair<>(x.transpose(), P);
   }
@@ -213,10 +211,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
       Matrix<S, N1> x =
               sigmas.extractRowVector(i).transpose();
 
-      var deltaXT = RungeKutta.rungeKutta(m_f, x, u, dtSeconds).transpose();
-      for (int j = 0; j < m_states.getNum(); j++) {
-        m_sigmasF.set(i, j, deltaXT.get(0, j));
-      }
+      m_sigmasF.setRow(i, RungeKutta.rungeKutta(m_f, x, u, dtSeconds).transpose());
     }
 
     var ret = unscentedTransform(m_states, m_states,
@@ -265,9 +260,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
               m_sigmasF.extractRowVector(i).transpose(),
               u
       );
-      for (int j = 0; j < rows.getNum(); j++) {
-        sigmasH.set(i, j, hRet.get(j, 0));
-      }
+      sigmasH.setRow(i, hRet.transpose());
     }
 
     // Mean and covariance of prediction passed through unscented transform
@@ -301,6 +294,11 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
 
     m_xHat = m_xHat.plus(K.times(y.minus(yHat)));
     m_P = m_P.minus(K.times(Py).times(K.transpose()));
+  }
+
+  private static <R extends Num, C extends Num>
+        Matrix<R, C> changeBoundsUnchecked(Matrix<?, ?> mat) {
+    return new Matrix<>(mat.getStorage());
   }
 
 

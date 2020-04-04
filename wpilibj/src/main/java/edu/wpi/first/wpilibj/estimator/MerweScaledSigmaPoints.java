@@ -27,8 +27,8 @@ public class MerweScaledSigmaPoints<S extends Num> {
   private final double m_alpha;
   private final int m_kappa;
   private final Nat<S> m_states;
-  private Matrix m_wm;
-  private Matrix m_wc;
+  private Matrix<N1, ?> m_wm;
+  private Matrix<N1, ?> m_wc;
 
   /**
    * Constructs a generator for Van der Merwe scaled sigma points.
@@ -78,7 +78,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
    *         Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public Matrix sigmaPoints(
+  public Matrix<?, S> sigmaPoints(
           Matrix<S, N1> x,
           Matrix<S, S> P) {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
@@ -88,17 +88,13 @@ public class MerweScaledSigmaPoints<S extends Num> {
 
     // 2 * states + 1 by states
     SimpleMatrix sigmas = new SimpleMatrix(2 * m_states.getNum() + 1, m_states.getNum());
-    for (int i = 0; i < m_states.getNum(); i++) {
-      sigmas.set(0, i, x.get(i, 0));
-    }
+    sigmas.setRow(0, 0, x.getStorage().getDDRM().getData());
     for (int k = 0; k < m_states.getNum(); k++) {
       var xT = x.transpose().getStorage();
-      var xPlusU = xT.plus(U.extractVector(true, k));
-      var xMinusU = xT.minus(U.extractVector(true, k));
-      for (int i = 0; i < m_states.getNum(); i++) {
-        sigmas.set(k + 1, i, xPlusU.get(0, i));
-        sigmas.set(m_states.getNum() + k + 1, i, xMinusU.get(0, i));
-      }
+      var xPlusU = xT.plus(U.extractVector(true, k)).getDDRM().getData();
+      var xMinusU = xT.minus(U.extractVector(true, k)).getDDRM().getData();
+      sigmas.setRow(k + 1, 0, xPlusU);
+      sigmas.setRow(m_states.getNum() + k + 1, 0, xMinusU);
     }
 
     return new Matrix<>(sigmas);
@@ -125,8 +121,8 @@ public class MerweScaledSigmaPoints<S extends Num> {
     wM.set(0, 0, lambda / (m_states.getNum() + lambda));
     wC.set(0, 0, lambda / (m_states.getNum() + lambda) + (1 - Math.pow(m_alpha, 2) + beta));
 
-    this.m_wm = new Matrix(wM);
-    this.m_wc = new Matrix(wC);
+    this.m_wm = new Matrix<>(wM);
+    this.m_wc = new Matrix<>(wC);
   }
 
   /**
@@ -134,7 +130,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
    *
    * @return the weight for each sigma point for the mean.
    */
-  public Matrix getWm() {
+  public Matrix<N1, ?> getWm() {
     return m_wm;
   }
 
@@ -153,7 +149,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
    *
    * @return the weight for each sigma point for the covariance.
    */
-  public Matrix getWc() {
+  public Matrix<N1, ?> getWc() {
     return m_wc;
   }
 

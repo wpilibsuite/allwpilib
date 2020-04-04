@@ -68,6 +68,26 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
   /**
+   * Sets a row to a given row vector.
+   *
+   * @param row The row to set.
+   * @param val The row vector to set the given row to.
+   */
+  public final void setRow(int row, Matrix<N1, C> val) {
+    this.m_storage.setRow(row, 0, val.getStorage().getDDRM().getData());
+  }
+
+  /**
+   * Sets a column to a given column vector.
+   *
+   * @param column The column to set.
+   * @param val    The column vector to set the given row to.
+   */
+  public final void setColumn(int column, Matrix<R, N1> val) {
+    this.m_storage.setColumn(column, 0, val.getStorage().getDDRM().getData());
+  }
+
+  /**
    * If a vector then a square matrix is returned
    * if a matrix then a vector of diagonal elements is returned.
    *
