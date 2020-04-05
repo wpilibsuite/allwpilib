@@ -12,9 +12,9 @@
 using namespace frc;
 
 EllipticalRegionConstraint::EllipticalRegionConstraint(
-    const Translation2d& origin, units::meter_t xWidth, units::meter_t yWidth,
+    const Translation2d& center, units::meter_t xWidth, units::meter_t yWidth,
     const Rotation2d& rotation, TrajectoryConstraint* constraint)
-    : m_origin(origin),
+    : m_center(center),
       m_radii(xWidth / 2.0, yWidth / 2.0),
       m_constraint(constraint) {
   m_radii = m_radii.RotateBy(rotation);
@@ -46,9 +46,9 @@ bool EllipticalRegionConstraint::IsPoseInRegion(const Pose2d& pose) {
   // If the inequality is satisfied, then it is inside the ellipse; otherwise
   // it is outside the ellipse.
   // Both sides have been multiplied by Rx^2 * Ry^2 for efficiency reasons.
-  return units::math::pow<2>(pose.Translation().X() - m_origin.X()) *
+  return units::math::pow<2>(pose.Translation().X() - m_center.X()) *
                  units::math::pow<2>(m_radii.Y()) +
-             units::math::pow<2>(pose.Translation().Y() - m_origin.Y()) *
+             units::math::pow<2>(pose.Translation().Y() - m_center.Y()) *
                  units::math::pow<2>(m_radii.X()) <=
          units::math::pow<2>(m_radii.X()) * units::math::pow<2>(m_radii.Y());
 }

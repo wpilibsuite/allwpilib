@@ -22,14 +22,14 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
   /**
    * Constructs a new EllipticalRegionConstraint.
    *
-   * @param origin The origin of the ellipse in which to enforce the constraint.
+   * @param center The center of the ellipse in which to enforce the constraint.
    * @param xWidth The width of the ellipse in which to enforce the constraint.
    * @param yWidth The height of the ellipse in which to enforce the constraint.
    * @param rotation The rotation to apply to all radii around the origin.
    * @param constraint The constraint to enforce when the robot is within the
    * region.
    */
-  EllipticalRegionConstraint(const Translation2d& origin, units::meter_t xWidth,
+  EllipticalRegionConstraint(const Translation2d& center, units::meter_t xWidth,
                              units::meter_t yWidth, const Rotation2d& rotation,
                              TrajectoryConstraint* constraint);
 
@@ -50,7 +50,7 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
   bool IsPoseInRegion(const Pose2d& pose);
 
  private:
-  Translation2d m_origin;
+  Translation2d m_center;
   Translation2d m_radii;
   TrajectoryConstraint* m_constraint;
 };

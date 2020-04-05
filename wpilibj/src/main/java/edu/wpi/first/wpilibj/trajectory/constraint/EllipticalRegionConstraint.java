@@ -15,23 +15,23 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
  * Enforces a particular constraint only within an elliptical region.
  */
 public class EllipticalRegionConstraint implements TrajectoryConstraint {
-  private final Translation2d m_origin;
+  private final Translation2d m_center;
   private final Translation2d m_radii;
   private final TrajectoryConstraint m_constraint;
 
   /**
    * Constructs a new EllipticalRegionConstraint.
    *
-   * @param origin     The origin of the ellipse in which to enforce the constraint.
+   * @param center     The center of the ellipse in which to enforce the constraint.
    * @param xWidth     The width of the ellipse in which to enforce the constraint.
    * @param yWidth     The height of the ellipse in which to enforce the constraint.
    * @param rotation   The rotation to apply to all radii around the origin.
    * @param constraint The constraint to enforce when the robot is within the region.
    */
   @SuppressWarnings("ParameterName")
-  public EllipticalRegionConstraint(Translation2d origin, double xWidth, double yWidth,
+  public EllipticalRegionConstraint(Translation2d center, double xWidth, double yWidth,
                                     Rotation2d rotation, TrajectoryConstraint constraint) {
-    m_origin = origin;
+    m_center = center;
     m_radii = new Translation2d(xWidth / 2.0, yWidth / 2.0).rotateBy(rotation);
     m_constraint = constraint;
   }
@@ -72,9 +72,9 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
     // If the inequality is satisfied, then it is inside the ellipse; otherwise
     // it is outside the ellipse.
     // Both sides have been multiplied by Rx^2 * Ry^2 for efficiency reasons.
-    return Math.pow(robotPose.getTranslation().getX() - m_origin.getX(), 2)
+    return Math.pow(robotPose.getTranslation().getX() - m_center.getX(), 2)
         * Math.pow(m_radii.getY(), 2)
-        + Math.pow(robotPose.getTranslation().getY() - m_origin.getY(), 2)
+        + Math.pow(robotPose.getTranslation().getY() - m_center.getY(), 2)
         * Math.pow(m_radii.getX(), 2) <= Math.pow(m_radii.getX(), 2) * Math.pow(m_radii.getY(), 2);
   }
 }
