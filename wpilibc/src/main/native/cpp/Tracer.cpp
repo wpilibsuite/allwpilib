@@ -8,7 +8,10 @@
 #include "frc/Tracer.h"
 
 #include <wpi/Format.h>
+#include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
+
+#include "frc/DriverStation.h"
 
 using namespace frc;
 
@@ -28,6 +31,13 @@ void Tracer::AddEpoch(wpi::StringRef epochName) {
 }
 
 void Tracer::PrintEpochs() {
+  wpi::SmallString<128> buf;
+  wpi::raw_svector_ostream os(buf);
+  PrintEpochs(os);
+  if (!buf.empty()) DriverStation::ReportWarning(buf);
+}
+
+void Tracer::PrintEpochs(wpi::raw_ostream& os) {
   using std::chrono::duration_cast;
   using std::chrono::microseconds;
 
@@ -35,12 +45,11 @@ void Tracer::PrintEpochs() {
   if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
-      wpi::outs() << '\t' << epoch.getKey() << ": "
-                  << wpi::format(
-                         "%.6f",
-                         duration_cast<microseconds>(epoch.getValue()).count() /
-                             1.0e6)
-                  << "s\n";
+      os << '\t' << epoch.getKey() << ": "
+         << wpi::format(
+                "%.6f",
+                duration_cast<microseconds>(epoch.getValue()).count() / 1.0e6)
+         << "s\n";
     }
   }
 }

@@ -14,6 +14,10 @@
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
 
+namespace wpi {
+class raw_ostream;
+}  // namespace wpi
+
 namespace frc {
 /**
  * A class for keeping track of how much time it takes for different parts of
@@ -51,9 +55,16 @@ class Tracer {
   void AddEpoch(wpi::StringRef epochName);
 
   /**
-   * Prints list of epochs added so far and their times.
+   * Prints list of epochs added so far and their times to the DriverStation.
    */
   void PrintEpochs();
+
+  /**
+   * Prints list of epochs added so far and their times to a stream.
+   *
+   * @param os output stream
+   */
+  void PrintEpochs(wpi::raw_ostream& os);
 
  private:
   static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
