@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 /**
- * Enforces a particular constraint within a rectangular region.
+ * Enforces a particular constraint only within a rectangular region.
  */
 public class RectangularRegionConstraint implements TrajectoryConstraint {
   private final Translation2d m_bottomLeftPoint;

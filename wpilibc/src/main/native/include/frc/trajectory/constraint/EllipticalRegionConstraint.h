@@ -15,7 +15,7 @@
 
 namespace frc {
 /**
- * Enforces a particular constraint within an elliptical region.
+ * Enforces a particular constraint only within an elliptical region.
  */
 class EllipticalRegionConstraint : public TrajectoryConstraint {
  public:

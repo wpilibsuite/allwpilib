@@ -13,7 +13,7 @@
 
 namespace frc {
 /**
- * Represents a constraint that enforces a max velocity. This can be coupled
+ * Represents a constraint that enforces a max velocity. This can be composed
  * with the EllipticalRegionConstraint or RectangularRegionConstraint to enforce
  * a max velocity within a region.
  */

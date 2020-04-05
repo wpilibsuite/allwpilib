@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 /**
- * Enforces a particular constraint within an elliptical region.
+ * Enforces a particular constraint only within an elliptical region.
  */
 public class EllipticalRegionConstraint implements TrajectoryConstraint {
   private final Translation2d m_origin;

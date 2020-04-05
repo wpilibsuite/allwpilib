@@ -15,7 +15,7 @@
 
 namespace frc {
 /**
- * Enforces a particular constraint within a rectangular region.
+ * Enforces a particular constraint only within a rectangular region.
  */
 class RectangularRegionConstraint : public TrajectoryConstraint {
  public:

@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.trajectory.constraint;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 
 /**
- * Represents a constraint that enforces a max velocity. This can be coupled with the
+ * Represents a constraint that enforces a max velocity. This can be composed with the
  * {@link EllipticalRegionConstraint} or {@link RectangularRegionConstraint} to enforce
  * a max velocity in a region.
  */
