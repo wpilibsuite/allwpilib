@@ -13,7 +13,7 @@ using namespace frc;
 
 EllipticalRegionConstraint::EllipticalRegionConstraint(
     const Translation2d& center, units::meter_t xWidth, units::meter_t yWidth,
-    const Rotation2d& rotation, TrajectoryConstraint* constraint)
+    const Rotation2d& rotation, TrajectoryConstraint& constraint)
     : m_center(center),
       m_radii(xWidth / 2.0, yWidth / 2.0),
       m_constraint(constraint) {
@@ -24,7 +24,7 @@ units::meters_per_second_t EllipticalRegionConstraint::MaxVelocity(
     const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) {
   if (IsPoseInRegion(pose)) {
-    return m_constraint->MaxVelocity(pose, curvature, velocity);
+    return m_constraint.MaxVelocity(pose, curvature, velocity);
   } else {
     return units::meters_per_second_t(std::numeric_limits<double>::infinity());
   }
@@ -34,7 +34,7 @@ TrajectoryConstraint::MinMax EllipticalRegionConstraint::MinMaxAcceleration(
     const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t speed) {
   if (IsPoseInRegion(pose)) {
-    return m_constraint->MinMaxAcceleration(pose, curvature, speed);
+    return m_constraint.MinMaxAcceleration(pose, curvature, speed);
   } else {
     return {};
   }

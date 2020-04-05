@@ -24,7 +24,7 @@ TEST(EllipticalRegionConstraintTest, Constraint) {
   MaxVelocityConstraint maxVelConstraint(maxVelocity);
   EllipticalRegionConstraint regionConstraint(frc::Translation2d{5_ft, 2.5_ft},
                                               10_ft, 5_ft, Rotation2d(180_deg),
-                                              &maxVelConstraint);
+                                              maxVelConstraint);
   config.AddConstraint(regionConstraint);
 
   auto trajectory = TestTrajectory::GetTrajectory(config);
@@ -47,13 +47,13 @@ TEST(EllipticalRegionConstraintTest, IsPoseInRegion) {
   MaxVelocityConstraint maxVelConstraint(maxVelocity);
   EllipticalRegionConstraint regionConstraintNoRotation(
       frc::Translation2d{1_ft, 1_ft}, 2_ft, 4_ft, Rotation2d(0_deg),
-      &maxVelConstraint);
+      maxVelConstraint);
   EXPECT_FALSE(regionConstraintNoRotation.IsPoseInRegion(
       frc::Pose2d(2.1_ft, 1_ft, 0_rad)));
 
   EllipticalRegionConstraint regionConstraintWithRotation(
       frc::Translation2d{1_ft, 1_ft}, 2_ft, 4_ft, Rotation2d(90_deg),
-      &maxVelConstraint);
+      maxVelConstraint);
   EXPECT_TRUE(regionConstraintWithRotation.IsPoseInRegion(
       frc::Pose2d(2.1_ft, 1_ft, 0_rad)));
 }

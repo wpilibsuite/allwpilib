@@ -24,7 +24,7 @@ TEST(RectangularRegionConstraintTest, Constraint) {
   MaxVelocityConstraint maxVelConstraint(maxVelocity);
   RectangularRegionConstraint regionConstraint(frc::Translation2d{1_ft, 1_ft},
                                                frc::Translation2d{5_ft, 27_ft},
-                                               &maxVelConstraint);
+                                               maxVelConstraint);
   config.AddConstraint(regionConstraint);
 
   auto trajectory = TestTrajectory::GetTrajectory(config);
@@ -46,7 +46,7 @@ TEST(RectangularRegionConstraintTest, IsPoseInRegion) {
   MaxVelocityConstraint maxVelConstraint(maxVelocity);
   RectangularRegionConstraint regionConstraint(frc::Translation2d{1_ft, 1_ft},
                                                frc::Translation2d{5_ft, 27_ft},
-                                               &maxVelConstraint);
+                                               maxVelConstraint);
 
   EXPECT_FALSE(regionConstraint.IsPoseInRegion(Pose2d()));
   EXPECT_TRUE(

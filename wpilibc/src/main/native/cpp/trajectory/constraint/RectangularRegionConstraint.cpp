@@ -13,7 +13,7 @@ using namespace frc;
 
 RectangularRegionConstraint::RectangularRegionConstraint(
     const Translation2d& bottomLeftPoint, const Translation2d& topRightPoint,
-    TrajectoryConstraint* constraint)
+    TrajectoryConstraint& constraint)
     : m_bottomLeftPoint(bottomLeftPoint),
       m_topRightPoint(topRightPoint),
       m_constraint(constraint) {}
@@ -22,7 +22,7 @@ units::meters_per_second_t RectangularRegionConstraint::MaxVelocity(
     const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t velocity) {
   if (IsPoseInRegion(pose)) {
-    return m_constraint->MaxVelocity(pose, curvature, velocity);
+    return m_constraint.MaxVelocity(pose, curvature, velocity);
   } else {
     return units::meters_per_second_t(std::numeric_limits<double>::infinity());
   }
@@ -32,7 +32,7 @@ TrajectoryConstraint::MinMax RectangularRegionConstraint::MinMaxAcceleration(
     const Pose2d& pose, units::curvature_t curvature,
     units::meters_per_second_t speed) {
   if (IsPoseInRegion(pose)) {
-    return m_constraint->MinMaxAcceleration(pose, curvature, speed);
+    return m_constraint.MinMaxAcceleration(pose, curvature, speed);
   } else {
     return {};
   }
