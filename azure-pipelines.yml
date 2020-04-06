@@ -11,6 +11,9 @@ resources:
   - container: ubuntu
     image:  wpilib/ubuntu-base:18.04
 
+variables:
+- group: Artifactory-Package-Publish
+
 trigger:
   batch: true
   branches:
@@ -67,4 +70,6 @@ stages:
 - template: azure-templates/stage-combine.yml
   parameters:
     publish: True
+    publishUserName: $(PublishUserName)
+    publishPassword: $(PublishPassword)
     artifacts: [Mac, Win32, Win64, Linux, Raspbian, Athena, Aarch64]
