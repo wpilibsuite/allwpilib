@@ -51,8 +51,10 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gl3w-src
 
 set(imgui_srcdir ${CMAKE_CURRENT_BINARY_DIR}/imgui-src)
 file(GLOB imgui_sources ${imgui_srcdir}/*.cpp)
-add_library(imgui STATIC ${imgui_sources} ${imgui_srcdir}/examples/imgui_impl_glfw.cpp ${imgui_srcdir}/examples/imgui_impl_opengl3.cpp ${CMAKE_CURRENT_BINARY_DIR}/imgui_ProggyDotted.cpp ${CMAKE_CURRENT_BINARY_DIR}/stb_image.cpp)
+set(implot_srcdir ${CMAKE_CURRENT_BINARY_DIR}/implot-src)
+file(GLOB implot_sources ${implot_srcdir}/*.cpp)
+add_library(imgui STATIC ${imgui_sources} ${implot_sources} ${imgui_srcdir}/examples/imgui_impl_glfw.cpp ${imgui_srcdir}/examples/imgui_impl_opengl3.cpp ${CMAKE_CURRENT_BINARY_DIR}/imgui_ProggyDotted.cpp ${CMAKE_CURRENT_BINARY_DIR}/stb_image.cpp)
 target_link_libraries(imgui PUBLIC gl3w glfw)
-target_include_directories(imgui PUBLIC "$<BUILD_INTERFACE:${imgui_srcdir}>" "$<BUILD_INTERFACE:${imgui_srcdir}/examples>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/stb-src>")
+target_include_directories(imgui PUBLIC "$<BUILD_INTERFACE:${imgui_srcdir}>" "$<BUILD_INTERFACE:${implot_srcdir}>" "$<BUILD_INTERFACE:${imgui_srcdir}/examples>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/stb-src>")
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
