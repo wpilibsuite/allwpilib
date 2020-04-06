@@ -4,6 +4,9 @@ parameters:
   publish: False
   artifacts: []
 
+variables:
+- group: Artifactory-Package-Publish
+
 stages:
 - stage: Combine
   jobs:
