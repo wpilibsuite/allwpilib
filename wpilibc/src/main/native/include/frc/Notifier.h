@@ -12,6 +12,7 @@
 #include <atomic>
 #include <functional>
 #include <thread>
+#include <type_traits>
 #include <utility>
 
 #include <hal/Types.h>
@@ -34,9 +35,31 @@ class Notifier : public ErrorBase {
    */
   explicit Notifier(std::function<void()> handler);
 
-  template <typename Callable, typename Arg, typename... Args>
+  template <
+      typename Callable, typename Arg, typename... Args,
+      typename = std::enable_if_t<std::is_invocable_v<Callable, Arg, Args...>>>
   Notifier(Callable&& f, Arg&& arg, Args&&... args)
       : Notifier(std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
+                           std::forward<Args>(args)...)) {}
+
+  /**
+   * Create a Notifier for timer event notification.
+   *
+   * This overload makes the underlying thread run with a real-time priority.
+   * This is useful for reducing scheduling jitter on processes which are
+   * sensitive to timing variance, like model-based control.
+   *
+   * @param priority The FIFO real-time scheduler priority ([0..100] where a
+   *                 lower number represents higher priority).
+   * @param handler  The handler is called at the notification time which is set
+   *                 using StartSingle or StartPeriodic.
+   */
+  explicit Notifier(int priority, std::function<void()> handler);
+
+  template <typename Callable, typename Arg, typename... Args>
+  Notifier(int priority, Callable&& f, Arg&& arg, Args&&... args)
+      : Notifier(priority,
+                 std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
                            std::forward<Args>(args)...)) {}
 
   /**
