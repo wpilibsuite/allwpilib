@@ -83,13 +83,15 @@ public class Tracer {
    */
   public void printEpochs(Consumer<String> output) {
     long now = RobotController.getFPGATime();
-    StringBuilder sb = new StringBuilder();
-    if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
+    if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
+      StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;
       m_epochs.forEach((key, value) -> {
         sb.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6));
       });
+      if (sb.length() > 0) {
+        output.accept(sb.toString());
+      }
     }
-    output.accept(sb.toString());
   }
 }
