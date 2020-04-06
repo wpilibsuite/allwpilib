@@ -2,10 +2,9 @@
 
 parameters:
   publish: False
+  publishUserName: ''
+  publishPassword: ''
   artifacts: []
-
-variables:
-- group: Artifactory-Package-Publish
 
 stages:
 - stage: Combine
@@ -51,8 +50,8 @@ stages:
           options: '-Pallwpilib'
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
-          ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
-          ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
+          ARTIFACTORY_PUBLISH_USERNAME: $(publishUserName)
+          ARTIFACTORY_PUBLISH_PASSWORD: $(publishPassword)
 
 # Tagged Builds
       - ${{ if and(parameters.publish, startsWith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:
@@ -65,8 +64,8 @@ stages:
             options: '-Pallwpilib -PreleaseRepoPublish'
           env:
             RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
-            ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
-            ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
+            ARTIFACTORY_PUBLISH_USERNAME: $(publishUserName)
+            ARTIFACTORY_PUBLISH_PASSWORD: $(publishPassword)
 
     - script: |
         echo "##vso[task.setvariable variable=UserHome]$HOME"
