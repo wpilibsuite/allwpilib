@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-
 /**
  * The Shuffleboard class provides a mechanism with which data can be added and laid out in the
  * Shuffleboard dashboard application from a robot program. Tabs and layouts can be specified, as
