@@ -15,20 +15,34 @@ import edu.wpi.first.wpilibj.DriverStation;
 /**
  * Controls Shuffleboard recordings via NetworkTables.
  */
-final class RecordingController {
+public final class RecordingController {
   private static final String kRecordingTableName = "/Shuffleboard/.recording/";
   private static final String kRecordingControlKey = kRecordingTableName + "RecordData";
   private static final String kRecordingFileNameFormatKey = kRecordingTableName + "FileNameFormat";
   private static final String kEventMarkerTableName = kRecordingTableName + "events";
 
+  private static RecordingController s_defaultInstance;
+
   private final NetworkTableEntry m_recordingControlEntry;
   private final NetworkTableEntry m_recordingFileNameFormatEntry;
   private final NetworkTable m_eventsTable;
 
-  RecordingController(NetworkTableInstance ntInstance) {
+  public RecordingController(NetworkTableInstance ntInstance) {
     m_recordingControlEntry = ntInstance.getEntry(kRecordingControlKey);
     m_recordingFileNameFormatEntry = ntInstance.getEntry(kRecordingFileNameFormatKey);
     m_eventsTable = ntInstance.getTable(kEventMarkerTableName);
+  }
+
+  /**
+   * Get global default instance.
+   *
+   * @return Global default instance
+   */
+  public static synchronized RecordingController getDefault() {
+    if (s_defaultInstance == null) {
+      s_defaultInstance = new RecordingController(NetworkTableInstance.getDefault());
+    }
+    return s_defaultInstance;
   }
 
   public void startRecording() {

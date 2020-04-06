@@ -13,7 +13,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
  *
  * <p>This class is package-private to minimize API surface area.
  */
-interface ShuffleboardRoot {
+public interface ShuffleboardRoot {
 
   /**
    * Gets the tab with the given title, creating it if it does not already exist.

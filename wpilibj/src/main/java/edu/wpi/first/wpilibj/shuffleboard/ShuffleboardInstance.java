@@ -19,7 +19,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
-final class ShuffleboardInstance implements ShuffleboardRoot {
+public final class ShuffleboardInstance implements ShuffleboardRoot {
+  private static ShuffleboardInstance s_defaultInstance;
+
   private final Map<String, ShuffleboardTab> m_tabs = new LinkedHashMap<>();
 
   private boolean m_tabsChanged = false; // NOPMD redundant field initializer
@@ -32,12 +34,23 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
    *
    * @param ntInstance the NetworkTables instance to use
    */
-  ShuffleboardInstance(NetworkTableInstance ntInstance) {
+  public ShuffleboardInstance(NetworkTableInstance ntInstance) {
     requireNonNullParam(ntInstance, "ntInstance", "ShuffleboardInstance");
     m_rootTable = ntInstance.getTable(Shuffleboard.kBaseTableName);
     m_rootMetaTable = m_rootTable.getSubTable(".metadata");
     m_selectedTabEntry = m_rootMetaTable.getEntry("Selected");
     HAL.report(tResourceType.kResourceType_Shuffleboard, 0);
+  }
+  /**
+   * Get global default instance.
+   *
+   * @return Global default instance
+   */
+  public static synchronized ShuffleboardInstance getDefault() {
+    if (s_defaultInstance == null) {
+      s_defaultInstance = new ShuffleboardInstance(NetworkTableInstance.getDefault());
+    }
+    return s_defaultInstance;
   }
 
   @Override
