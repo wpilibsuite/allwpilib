@@ -18,9 +18,10 @@ props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ig
 
 include 'wpiutil'
 include 'cscore'
+include 'hal'
 /*
 include 'ntcore'
-include 'hal'
+
 
 include 'wpilibc'
 include 'wpilibcExamples'
