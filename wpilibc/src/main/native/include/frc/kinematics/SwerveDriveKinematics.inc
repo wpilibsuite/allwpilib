@@ -19,7 +19,7 @@ template <size_t NumModules>
 std::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     const ChassisSpeeds& chassisSpeeds) const {
-  return ToSwerveModuleStates(ChassisSpeeds, m_inverseKinematics);
+  return ToSwerveModuleStates(chassisSpeeds, m_inverseKinematics);
 }
 
 template <size_t NumModules>
