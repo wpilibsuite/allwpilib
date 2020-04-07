@@ -84,6 +84,27 @@ class SwerveDriveKinematics {
    * chassis velocity. This method is often used to convert joystick values into
    * module speeds and angles.
    *
+   * @param chassisSpeeds The desired chassis speed.
+   *
+   * @return An array containing the module states. Use caution because these
+   * module states are not normalized. Sometimes, a user input may cause one of
+   * the module speeds to go above the attainable max velocity. Use the
+   * <NormalizeWheelSpeeds> function to rectify this issue. In addition, you can
+   * leverage the power of C++17 to directly assign the module states to
+   * variables:
+   *
+   * @code{.cpp}
+   * auto [fl, fr, bl, br] = kinematics.ToSwerveModuleStates(chassisSpeeds);
+   * @endcode
+   */
+  std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
+      const ChassisSpeeds& chassisSpeeds) const;
+
+  /**
+   * Performs inverse kinematics to return the module states from a desired
+   * chassis velocity. This method is often used to convert joystick values into
+   * module speeds and angles.
+   *
    * This function also supports variable centers of rotation. During normal
    * operations, the center of rotation is usually the same as the physical
    * center of the robot; therefore, the argument is defaulted to that use case.
@@ -108,7 +129,7 @@ class SwerveDriveKinematics {
    */
   std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation = Translation2d());
+      const Translation2d& centerOfRotation);
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -123,7 +144,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   template <typename... ModuleStates>
-  ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates);
+  ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -139,7 +160,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   ChassisSpeeds ToChassisSpeeds(
-      std::array<SwerveModuleState, NumModules> moduleStates);
+      std::array<SwerveModuleState, NumModules> moduleStates) const;
 
   /**
    * Normalizes the wheel speeds using some max attainable speed. Sometimes,
@@ -162,6 +183,10 @@ class SwerveDriveKinematics {
   Eigen::HouseholderQR<Eigen::Matrix<double, NumModules * 2, 3>>
       m_forwardKinematics;
   std::array<Translation2d, NumModules> m_modules;
+
+  std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
+      const ChassisSpeeds& chassisSpeeds,
+      Eigen::Matrix<double, NumModules * 2, 3> inverseKinematics) const;
 
   Translation2d m_previousCoR;
 };

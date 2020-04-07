@@ -15,7 +15,7 @@ MecanumDriveKinematicsConstraint::MecanumDriveKinematicsConstraint(
 
 units::meters_per_second_t MecanumDriveKinematicsConstraint::MaxVelocity(
     const Pose2d& pose, units::curvature_t curvature,
-    units::meters_per_second_t velocity) {
+    units::meters_per_second_t velocity) const {
   auto xVelocity = velocity * pose.Rotation().Cos();
   auto yVelocity = velocity * pose.Rotation().Sin();
   auto wheelSpeeds =
@@ -30,6 +30,6 @@ units::meters_per_second_t MecanumDriveKinematicsConstraint::MaxVelocity(
 TrajectoryConstraint::MinMax
 MecanumDriveKinematicsConstraint::MinMaxAcceleration(
     const Pose2d& pose, units::curvature_t curvature,
-    units::meters_per_second_t speed) {
+    units::meters_per_second_t speed) const {
   return {};
 }
