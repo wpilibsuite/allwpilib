@@ -37,7 +37,7 @@ jobs:
             jdkVersionOption: ${{ parameters.jdkVersionOption }}
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
-          tasks: 'wpiutil:build'
+          tasks: ':cscore:runCscoreTestWindowsx86-64DebugGoogleTestExe'
           options: '-PbuildServer ${{ parameters.buildOptions }}'
 
 # Tagged Builds
