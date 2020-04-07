@@ -61,7 +61,7 @@ void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
 
 MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
     const ChassisSpeeds& chassisSpeeds,
-    Eigen::Matrix<double, 4, 3> inverseKinematics) const {
+    const Eigen::Matrix<double, 4, 3>& inverseKinematics) const {
   Eigen::Vector3d chassisSpeedsVector;
   chassisSpeedsVector << chassisSpeeds.vx.to<double>(),
       chassisSpeeds.vy.to<double>(), chassisSpeeds.omega.to<double>();
