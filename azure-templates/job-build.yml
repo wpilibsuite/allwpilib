@@ -37,7 +37,7 @@ jobs:
             jdkVersionOption: ${{ parameters.jdkVersionOption }}
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
-          tasks: ':hal:test'
+          tasks: ':wpiutil:test'
           options: '-PbuildServer --info ${{ parameters.buildOptions }}'
 
 # Tagged Builds
@@ -54,10 +54,10 @@ jobs:
           tasks: 'build'
           options: '-PreleaseMode -PbuildServer ${{ parameters.buildOptions }}'
 
-    - powershell: ls hal\build\install\halDev\windowsx86-64\lib\
+    - powershell: ls wpiutil\build\install\wpiutilDev\windowsx86-64\lib\
       condition: always()
 
-    - script: hal\build\install\halDev\windowsx86-64\lib\halDev.exe
+    - script: wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe
       condition: always()
 
     - task: PublishPipelineArtifact@0
