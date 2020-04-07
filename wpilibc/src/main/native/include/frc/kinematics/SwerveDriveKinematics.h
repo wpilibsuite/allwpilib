@@ -84,27 +84,6 @@ class SwerveDriveKinematics {
    * chassis velocity. This method is often used to convert joystick values into
    * module speeds and angles.
    *
-   * @param chassisSpeeds The desired chassis speed.
-   *
-   * @return An array containing the module states. Use caution because these
-   * module states are not normalized. Sometimes, a user input may cause one of
-   * the module speeds to go above the attainable max velocity. Use the
-   * <NormalizeWheelSpeeds> function to rectify this issue. In addition, you can
-   * leverage the power of C++17 to directly assign the module states to
-   * variables:
-   *
-   * @code{.cpp}
-   * auto [fl, fr, bl, br] = kinematics.ToSwerveModuleStates(chassisSpeeds);
-   * @endcode
-   */
-  std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
-      const ChassisSpeeds& chassisSpeeds) const;
-
-  /**
-   * Performs inverse kinematics to return the module states from a desired
-   * chassis velocity. This method is often used to convert joystick values into
-   * module speeds and angles.
-   *
    * This function also supports variable centers of rotation. During normal
    * operations, the center of rotation is usually the same as the physical
    * center of the robot; therefore, the argument is defaulted to that use case.
@@ -129,7 +108,7 @@ class SwerveDriveKinematics {
    */
   std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation);
+      const Translation2d& centerOfRotation = Translation2d()) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -179,16 +158,12 @@ class SwerveDriveKinematics {
       units::meters_per_second_t attainableMaxSpeed);
 
  private:
-  Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
+  mutable Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Eigen::Matrix<double, NumModules * 2, 3>>
       m_forwardKinematics;
   std::array<Translation2d, NumModules> m_modules;
 
-  std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
-      const ChassisSpeeds& chassisSpeeds,
-      const Eigen::Matrix<double, NumModules * 2, 3>& inverseKinematics) const;
-
-  Translation2d m_previousCoR;
+  mutable Translation2d m_previousCoR;
 };
 }  // namespace frc
 

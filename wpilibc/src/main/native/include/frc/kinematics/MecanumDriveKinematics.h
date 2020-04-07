@@ -75,27 +75,6 @@ class MecanumDriveKinematics {
    * chassis velocity. This method is often used to convert joystick values into
    * wheel speeds.
    *
-   * @param chassisSpeeds The desired chassis speed.
-   *
-   * @return The wheel speeds. Use caution because they are not normalized.
-   *         Sometimes, a user input may cause one of the wheel speeds to go
-   *         above the attainable max velocity. Use the
-   *         MecanumDriveWheelSpeeds::Normalize() function to rectify this
-   *         issue. In addition, you can leverage the power of C++17 to directly
-   *         assign the wheel speeds to variables:
-   *
-   * @code{.cpp}
-   * auto [fl, fr, bl, br] = kinematics.ToWheelSpeeds(chassisSpeeds);
-   * @endcode
-   */
-  MecanumDriveWheelSpeeds ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds) const;
-
-  /**
-   * Performs inverse kinematics to return the wheel speeds from a desired
-   * chassis velocity. This method is often used to convert joystick values into
-   * wheel speeds.
-   *
    * This function also supports variable centers of rotation. During normal
    * operations, the center of rotation is usually the same as the physical
    * center of the robot; therefore, the argument is defaulted to that use case.
@@ -120,8 +99,9 @@ class MecanumDriveKinematics {
    * auto [fl, fr, bl, br] = kinematics.ToWheelSpeeds(chassisSpeeds);
    * @endcode
    */
-  MecanumDriveWheelSpeeds ToWheelSpeeds(const ChassisSpeeds& chassisSpeeds,
-                                        const Translation2d& centerOfRotation);
+  MecanumDriveWheelSpeeds ToWheelSpeeds(
+      const ChassisSpeeds& chassisSpeeds,
+      const Translation2d& centerOfRotation = Translation2d()) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -137,14 +117,14 @@ class MecanumDriveKinematics {
       const MecanumDriveWheelSpeeds& wheelSpeeds) const;
 
  private:
-  Eigen::Matrix<double, 4, 3> m_inverseKinematics;
+  mutable Eigen::Matrix<double, 4, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Eigen::Matrix<double, 4, 3>> m_forwardKinematics;
   Translation2d m_frontLeftWheel;
   Translation2d m_frontRightWheel;
   Translation2d m_rearLeftWheel;
   Translation2d m_rearRightWheel;
 
-  Translation2d m_previousCoR;
+  mutable Translation2d m_previousCoR;
 
   /**
    * Construct inverse kinematics matrix from wheel locations.
@@ -159,11 +139,7 @@ class MecanumDriveKinematics {
    *           center of the robot.
    */
   void SetInverseKinematics(Translation2d fl, Translation2d fr,
-                            Translation2d rl, Translation2d rr);
-
-  MecanumDriveWheelSpeeds ToWheelSpeeds(
-      const ChassisSpeeds& chassisSpeeds,
-      const Eigen::Matrix<double, 4, 3>& inverseKinematics) const;
+                            Translation2d rl, Translation2d rr) const;
 };
 
 }  // namespace frc

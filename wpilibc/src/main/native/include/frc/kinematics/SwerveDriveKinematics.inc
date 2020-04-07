@@ -18,14 +18,8 @@ SwerveDriveKinematics(Translation2d, Wheels...)
 template <size_t NumModules>
 std::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
-    const ChassisSpeeds& chassisSpeeds) const {
-  return ToSwerveModuleStates(chassisSpeeds, m_inverseKinematics);
-}
-
-template <size_t NumModules>
-std::array<SwerveModuleState, NumModules>
-SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
-    const ChassisSpeeds& chassisSpeeds, const Translation2d& centerOfRotation) {
+    const ChassisSpeeds& chassisSpeeds,
+    const Translation2d& centerOfRotation) const {
   // We have a new center of rotation. We need to compute the matrix again.
   if (centerOfRotation != m_previousCoR) {
     for (size_t i = 0; i < NumModules; i++) {
@@ -37,7 +31,28 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     }
     m_previousCoR = centerOfRotation;
   }
-  return ToSwerveModuleStates(chassisSpeeds, m_inverseKinematics);
+
+  Eigen::Vector3d chassisSpeedsVector;
+  chassisSpeedsVector << chassisSpeeds.vx.to<double>(),
+      chassisSpeeds.vy.to<double>(), chassisSpeeds.omega.to<double>();
+
+  Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix =
+      m_inverseKinematics * chassisSpeedsVector;
+  std::array<SwerveModuleState, NumModules> moduleStates;
+
+  for (size_t i = 0; i < NumModules; i++) {
+    units::meters_per_second_t x =
+        units::meters_per_second_t{moduleStatesMatrix(i * 2, 0)};
+    units::meters_per_second_t y =
+        units::meters_per_second_t{moduleStatesMatrix(i * 2 + 1, 0)};
+
+    auto speed = units::math::hypot(x, y);
+    Rotation2d rotation{x.to<double>(), y.to<double>()};
+
+    moduleStates[i] = {speed, rotation};
+  }
+
+  return moduleStates;
 }
 
 template <size_t NumModules>
@@ -91,33 +106,6 @@ void SwerveDriveKinematics<NumModules>::NormalizeWheelSpeeds(
       module.speed = module.speed / realMaxSpeed * attainableMaxSpeed;
     }
   }
-}
-
-template <size_t NumModules>
-std::array<SwerveModuleState, NumModules>
-SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
-    const ChassisSpeeds& chassisSpeeds,
-    const Eigen::Matrix<double, NumModules * 2, 3>& inverseKinematics) const {
-  Eigen::Vector3d chassisSpeedsVector;
-  chassisSpeedsVector << chassisSpeeds.vx.to<double>(),
-      chassisSpeeds.vy.to<double>(), chassisSpeeds.omega.to<double>();
-
-  Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix =
-      inverseKinematics * chassisSpeedsVector;
-  std::array<SwerveModuleState, NumModules> moduleStates;
-
-  for (size_t i = 0; i < NumModules; i++) {
-    units::meters_per_second_t x =
-        units::meters_per_second_t{moduleStatesMatrix(i * 2, 0)};
-    units::meters_per_second_t y =
-        units::meters_per_second_t{moduleStatesMatrix(i * 2 + 1, 0)};
-
-    auto speed = units::math::hypot(x, y);
-    Rotation2d rotation{x.to<double>(), y.to<double>()};
-
-    moduleStates[i] = {speed, rotation};
-  }
-  return moduleStates;
 }
 
 }  // namespace frc
