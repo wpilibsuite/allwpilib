@@ -54,6 +54,9 @@ jobs:
           tasks: 'build'
           options: '-PreleaseMode -PbuildServer ${{ parameters.buildOptions }}'
 
+    - powershell: ls hal\build\install\halDev\windowsx86-64\lib\
+      condition: always()
+
     - task: PublishPipelineArtifact@0
       inputs:
         artifactName: ${{ parameters.artifactName }}
