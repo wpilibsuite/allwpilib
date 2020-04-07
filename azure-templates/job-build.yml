@@ -38,7 +38,7 @@ jobs:
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
           tasks: ':cscore:runCscoreTestWindowsx86-64DebugGoogleTestExe :cscore:test'
-          options: '-PbuildServer ${{ parameters.buildOptions }}'
+          options: '-PbuildServer --info ${{ parameters.buildOptions }}'
 
 # Tagged Builds
     - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/v') }}:

@@ -39,7 +39,7 @@ public class CameraServerJNI {
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
-        System.exit(1);
+        //System.exit(1);
       }
       libraryLoaded = true;
     }
