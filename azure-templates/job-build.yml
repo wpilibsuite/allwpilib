@@ -37,7 +37,7 @@ jobs:
             jdkVersionOption: ${{ parameters.jdkVersionOption }}
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
-          tasks: ':cscore:runCscoreTestWindowsx86-64DebugGoogleTestExe :cscore:test'
+          tasks: ':hal:test'
           options: '-PbuildServer --info ${{ parameters.buildOptions }}'
 
 # Tagged Builds
