@@ -57,6 +57,9 @@ jobs:
     - powershell: ls hal\build\install\halDev\windowsx86-64\lib\
       condition: always()
 
+    - script: hal\build\install\halDev\windowsx86-64\lib\halDev.exe
+      condition: always()
+
     - task: PublishPipelineArtifact@0
       inputs:
         artifactName: ${{ parameters.artifactName }}
