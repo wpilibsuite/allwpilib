@@ -29,7 +29,7 @@ public final class WPIUtilJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader = new RuntimeLoader<>("wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
+        loader = new RuntimeLoader<>("wpiutild", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
