@@ -37,7 +37,7 @@ jobs:
             jdkVersionOption: ${{ parameters.jdkVersionOption }}
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
-          tasks: 'wpiutil:test'
+          tasks: 'wpiutil:build'
           options: '-PbuildServer ${{ parameters.buildOptions }}'
 
 # Tagged Builds

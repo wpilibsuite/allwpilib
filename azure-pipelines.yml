@@ -25,32 +25,6 @@ stages:
   jobs:
   - template: azure-templates/job-build.yml
     parameters:
-      jobName: Linux_Arm
-      buildOptions: '-Ponlylinuxathena'
-      artifactName: 'Athena'
-
-  - template: azure-templates/job-build.yml
-    parameters:
-      jobName: Linux_Raspbian
-      container: raspbian
-      buildOptions: '-Ponlylinuxraspbian'
-      artifactName: 'Raspbian'
-
-  - template: azure-templates/job-build.yml
-    parameters:
-      jobName: Linux_Aarch64
-      container: aarch64
-      buildOptions: '-Ponlylinuxaarch64bionic'
-      artifactName: 'Aarch64'
-
-  - template: azure-templates/job-build.yml
-    parameters:
-      jobName: Linux
-      container: ubuntu
-      artifactName: 'Linux'
-
-  - template: azure-templates/job-build.yml
-    parameters:
       jobName: Windows_64_Bit
       pool:
         vmImage: 'windows-2019'
@@ -59,17 +33,4 @@ stages:
       buildOptions: '-PskipPMD'
       artifactName: 'Win64'
 
-  - template: azure-templates/job-build-win32.yml
 
-  - template: azure-templates/job-build-mac.yml
-
-  - template: azure-templates/job-build-cmake.yml
-
-  - template: azure-templates/job-styleguide.yml
-
-- template: azure-templates/stage-combine.yml
-  parameters:
-    publish: True
-    publishUserName: $(PublishUserName)
-    publishPassword: $(PublishPassword)
-    artifacts: [Mac, Win32, Win64, Linux, Raspbian, Athena, Aarch64]
