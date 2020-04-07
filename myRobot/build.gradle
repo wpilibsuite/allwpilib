@@ -57,7 +57,7 @@ deploy {
         javaArtifact('myRobotJava') {
             jar = 'shadowJar'
             postdeploy << { ctx ->
-                ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
+                ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=MH_INLINE_SIZED_EXACT -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
                 ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
             }
         }
