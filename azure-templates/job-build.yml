@@ -60,7 +60,17 @@ jobs:
     - script: |
         "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe +sls
         "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutiljni.dll +sls
-        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cbd.exe" -g -G wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe
+        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe" -g -G wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe
+      condition: always()
+
+    - script: |
+        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe +sls
+        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutiljni.dll +sls
+        copy Program.java wpiutil\build\install\wpiutilDev\windowsx86-64\lib\Program.java
+        cd wpiutil\build\install\wpiutilDev\windowsx86-64\lib
+
+        "C:\Program Files\Java\zulu-11-azure-jdk_11.33.15-11.0.4-win_x64\bin\javac.exe" Program.java
+        "C:\Program Files\Java\zulu-11-azure-jdk_11.33.15-11.0.4-win_x64\bin\java.exe" "-Djava.library.path=." Program
       condition: always()
 
     - task: PublishPipelineArtifact@0
