@@ -26,12 +26,6 @@ jobs:
   steps:
     - ${{ parameters.preBuild }}
 
-    - task: PublishPipelineArtifact@0
-      condition: always()
-      inputs:
-        artifactName: JDK
-        targetPath: 'C:\Program Files\Java\zulu-11-azure-jdk_11.33.15-11.0.4-win_x64\'
-
 # PR Builds
     - ${{ if not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:
       - task: Gradle@2
@@ -65,6 +59,7 @@ jobs:
 
     - script: |
         "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe +sls
+        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutiljni.dll +sls
         "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\windbg.exe" -g -G wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe
       condition: always()
 
