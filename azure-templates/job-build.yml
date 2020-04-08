@@ -58,7 +58,7 @@ jobs:
       condition: always()
 
     - script: |
-        gflags.exe -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe +sls
+        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe +sls
         wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe
       condition: always()
 
