@@ -7,11 +7,16 @@
 
 #include <iostream>
 
-#include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
-#include "wpi/hostname.h"
+#include <windows.h>
 
 int main() {
-  wpi::StringRef v1("Hello");
-  std::cout << v1.lower() << std::endl;
+  HMODULE module = LoadLibraryA("wpiutiljni.dll");
+
+  if (!module) {
+    DWORD lastError = GetLastError();
+    std::cout << (int)lastError << std::endl;
+
+  } else {
+    std::cout << "Loaded correctly" << std::endl;
+  }
 }
