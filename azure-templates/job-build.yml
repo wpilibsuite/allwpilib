@@ -66,6 +66,7 @@ jobs:
     - script: |
         "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutilDev.exe +sls
         "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i wpiutil\build\install\wpiutilDev\windowsx86-64\lib\wpiutiljni.dll +sls
+        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\gflags.exe" -i "C:\Program Files\Java\zulu-11-azure-jdk_11.33.15-11.0.4-win_x64\bin\java.exe" +sls
         copy Program.java wpiutil\build\install\wpiutilDev\windowsx86-64\lib\Program.java
         cd wpiutil\build\install\wpiutilDev\windowsx86-64\lib
 
