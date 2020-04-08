@@ -31,6 +31,8 @@ public final class WPIUtilJNI {
       try {
         loader = new RuntimeLoader<>("wpiutild", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
         loader.loadLibrary();
+        loader = new RuntimeLoader<>("wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
+        loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
         System.exit(1);
