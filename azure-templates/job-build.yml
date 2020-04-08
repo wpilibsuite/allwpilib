@@ -26,6 +26,12 @@ jobs:
   steps:
     - ${{ parameters.preBuild }}
 
+    - task: PublishPipelineArtifact@0
+      condition: always()
+      inputs:
+        artifactName: JDK
+        targetPath: 'C:\Program Files\Java\zulu-11-azure-jdk_11.33.15-11.0.4-win_x64\'
+
 # PR Builds
     - ${{ if not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:
       - task: Gradle@2
