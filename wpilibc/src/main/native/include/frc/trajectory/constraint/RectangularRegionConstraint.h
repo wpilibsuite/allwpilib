@@ -31,7 +31,7 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
    */
   RectangularRegionConstraint(const Translation2d& bottomLeftPoint,
                               const Translation2d& topRightPoint,
-                              TrajectoryConstraint& constraint);
+                              const TrajectoryConstraint& constraint);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
@@ -52,6 +52,6 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
  private:
   Translation2d m_bottomLeftPoint;
   Translation2d m_topRightPoint;
-  TrajectoryConstraint& m_constraint;
+  const TrajectoryConstraint& m_constraint;
 };
 }  // namespace frc

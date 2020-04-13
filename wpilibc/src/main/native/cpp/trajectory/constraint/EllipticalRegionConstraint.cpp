@@ -13,7 +13,7 @@ using namespace frc;
 
 EllipticalRegionConstraint::EllipticalRegionConstraint(
     const Translation2d& center, units::meter_t xWidth, units::meter_t yWidth,
-    const Rotation2d& rotation, TrajectoryConstraint& constraint)
+    const Rotation2d& rotation, const TrajectoryConstraint& constraint)
     : m_center(center),
       m_radii(xWidth / 2.0, yWidth / 2.0),
       m_constraint(constraint) {

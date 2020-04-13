@@ -13,7 +13,7 @@ using namespace frc;
 
 RectangularRegionConstraint::RectangularRegionConstraint(
     const Translation2d& bottomLeftPoint, const Translation2d& topRightPoint,
-    TrajectoryConstraint& constraint)
+    const TrajectoryConstraint& constraint)
     : m_bottomLeftPoint(bottomLeftPoint),
       m_topRightPoint(topRightPoint),
       m_constraint(constraint) {}
