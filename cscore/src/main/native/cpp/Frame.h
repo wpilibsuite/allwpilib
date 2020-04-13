@@ -18,8 +18,6 @@
 #include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
-#include <libavcodec/avcodec.h>
-
 #include "Image.h"
 #include "cscore_cpp.h"
 
@@ -32,34 +30,6 @@ class Frame {
 
  public:
   using Time = uint64_t;
-
-  class CompressionContext {
-    public:
-      const int mjpegRequiredQuality;
-      const int mjpegDefaultQuality;
-
-      const int64_t h264BitRate;
-    
-      CompressionContext(int h264BitRate = 40000, int mjpgRequiredQuality = -1, int mjpgDefaultQuality = 80) : 
-      mjpegRequiredQuality{mjpegRequiredQuality},
-      mjpegDefaultQuality{mjpegDefaultQuality},
-      h264BitRate{h264BitRate} {
-        // The OpenMAX codec is only built for Raspian so that we can use the Pi GPU encoder
-        AVCodec* h264Codec = avcodec_find_encoder_by_name("h264_omx");
-        if (!h264Codec) {
-          // No hardware-accelerated encoding is available, so we will use "libx264rgb"
-          // Note that the "libx264" encoder, which works in YUYV, is also built but not used at this time
-          h264Codec = avcodec_find_encoder_by_name("libx264rgb");
-          // XXX (for review): throw may be inappropriate here
-          if (!h264Codec) throw std::runtime_error("No H264 codecs found");
-        }
-
-        this->h264CodecContext = avcodec_alloc_context3(this->h264Codec);
-      }
-
-    private:
-      const AVCodecContext* h264CodecContext;
-  };
 
  private:
   struct Impl {
