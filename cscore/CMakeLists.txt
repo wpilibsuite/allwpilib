@@ -6,8 +6,8 @@ include(AddTest)
 include(FindPkgConfig)
 
 find_package( OpenCV REQUIRED )
-pkg_check_modules(X264 IMPORTED_TARGET x264)
-pkg_check_modules(LIBAVCODEC IMPORTED_TARGET libavcodec)
+pkg_check_modules(X264 REQUIRED IMPORTED_TARGET x264)
+pkg_check_modules(LIBAVCODEC REQUIRED IMPORTED_TARGET libavcodec)
 
 file(GLOB
     cscore_native_src src/main/native/cpp/*.cpp)
