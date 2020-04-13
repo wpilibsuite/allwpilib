@@ -20,7 +20,7 @@ RectangularRegionConstraint::RectangularRegionConstraint(
 
 units::meters_per_second_t RectangularRegionConstraint::MaxVelocity(
     const Pose2d& pose, units::curvature_t curvature,
-    units::meters_per_second_t velocity) {
+    units::meters_per_second_t velocity) const {
   if (IsPoseInRegion(pose)) {
     return m_constraint.MaxVelocity(pose, curvature, velocity);
   } else {
@@ -30,7 +30,7 @@ units::meters_per_second_t RectangularRegionConstraint::MaxVelocity(
 
 TrajectoryConstraint::MinMax RectangularRegionConstraint::MinMaxAcceleration(
     const Pose2d& pose, units::curvature_t curvature,
-    units::meters_per_second_t speed) {
+    units::meters_per_second_t speed) const {
   if (IsPoseInRegion(pose)) {
     return m_constraint.MinMaxAcceleration(pose, curvature, speed);
   } else {
@@ -38,7 +38,7 @@ TrajectoryConstraint::MinMax RectangularRegionConstraint::MinMaxAcceleration(
   }
 }
 
-bool RectangularRegionConstraint::IsPoseInRegion(const Pose2d& pose) {
+bool RectangularRegionConstraint::IsPoseInRegion(const Pose2d& pose) const {
   return pose.Translation().X() >= m_bottomLeftPoint.X() &&
          pose.Translation().X() <= m_topRightPoint.X() &&
          pose.Translation().Y() >= m_bottomLeftPoint.Y() &&
