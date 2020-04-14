@@ -31,14 +31,14 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
    */
   EllipticalRegionConstraint(const Translation2d& center, units::meter_t xWidth,
                              units::meter_t yWidth, const Rotation2d& rotation,
-                             TrajectoryConstraint& constraint);
+                             const TrajectoryConstraint& constraint);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) override;
+      units::meters_per_second_t velocity) const override;
 
   MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) override;
+                            units::meters_per_second_t speed) const override;
 
   /**
    * Returns whether the specified robot pose is within the region that the
@@ -47,11 +47,11 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
    * @param pose The robot pose.
    * @return Whether the robot pose is within the constraint region.
    */
-  bool IsPoseInRegion(const Pose2d& pose);
+  bool IsPoseInRegion(const Pose2d& pose) const;
 
  private:
   Translation2d m_center;
   Translation2d m_radii;
-  TrajectoryConstraint& m_constraint;
+  const TrajectoryConstraint& m_constraint;
 };
 }  // namespace frc

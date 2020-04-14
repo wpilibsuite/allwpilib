@@ -60,7 +60,7 @@ class TrajectoryConstraint {
    */
   virtual units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) = 0;
+      units::meters_per_second_t velocity) const = 0;
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory
@@ -74,6 +74,6 @@ class TrajectoryConstraint {
    */
   virtual MinMax MinMaxAcceleration(const Pose2d& pose,
                                     units::curvature_t curvature,
-                                    units::meters_per_second_t speed) = 0;
+                                    units::meters_per_second_t speed) const = 0;
 };
 }  // namespace frc

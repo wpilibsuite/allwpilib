@@ -29,10 +29,10 @@ class CentripetalAccelerationConstraint : public TrajectoryConstraint {
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) override;
+      units::meters_per_second_t velocity) const override;
 
   MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) override;
+                            units::meters_per_second_t speed) const override;
 
  private:
   units::meters_per_second_squared_t m_maxCentripetalAcceleration;
