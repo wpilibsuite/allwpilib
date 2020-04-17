@@ -9,58 +9,83 @@
 
 using namespace cs;
 
-CompressionContext::CompressionContext(int h264BitRate, int mjpgRequiredQuality, int mjpgDefaultQuality) :
-        mjpegRequiredQuality{mjpegRequiredQuality},
-        mjpegDefaultQuality{mjpegDefaultQuality},
-        h264BitRate{h264BitRate} {
+CompressionContext::CompressionContext(int h264BitRate, int mjpegRequiredQuality, int mjpegDefaultQuality) :
+        m_mjpegRequiredQuality{mjpegRequiredQuality},
+        m_mjpegDefaultQuality{mjpegDefaultQuality},
+        m_h264BitRate{h264BitRate} {
+    if (m_h264EncodingCodec && m_h264DecodingCodec) return;
+
     // The OpenMAX codec is only built for Raspian (so that we can use the Pi GPU encoder)
-    h264Codec = avcodec_find_encoder_by_name("h264_omx");
-    if (!h264Codec) {
+    m_h264EncodingCodec = avcodec_find_encoder_by_name("h264_omx");
+    if (!m_h264EncodingCodec) {
         // No hardware-accelerated encoding is available, so we will use "libx264rgb"
         // Note that the "libx264" encoder, which works in YUYV, is also built but not used at this time
-        h264Codec = avcodec_find_encoder_by_name("libx264rgb");
+        m_h264EncodingCodec = avcodec_find_encoder_by_name("libx264rgb");
         // XXX (for review): throw may be inappropriate here
-        if (!h264Codec) throw std::runtime_error("No compatible H264 codecs found");
+        if (!m_h264EncodingCodec) throw std::runtime_error("No compatible H264 codecs for encoding found");
+    }
+
+    // Same situation as above
+    m_h264DecodingCodec = avcodec_find_decoder_by_name("h264_omx");
+    if (!m_h264DecodingCodec) {
+        m_h264DecodingCodec = avcodec_find_decoder_by_name("libx264rgb");
+        if (!m_h264DecodingCodec) throw std::runtime_error("No compatible H264 codecs for decoding found");
     }
 }
 
-CompressionContext::H264Context CompressionContext::GetH264Context(int width, int height) {
+const CompressionContext::H264Context& CompressionContext::GetH264Context(int width, int height, int fps) const {
     H264Context ret;
-    for (auto ctx : h264CodecContexts) {
-        if (ctx.codecContext->width == width && ctx.codecContext->height == height) ret = ctx;
+    for (auto ctx : m_h264Contexts) {
+        // We only return a premade context if its width, height, fps, and bitrate match
+        // This means that the user changing settings to many different values will result in tons of different contexts
+        if (ctx.encodingContext->width == width && ctx.encodingContext->height == height && ctx.encodingContext->framerate.den == fps
+            && ctx.encodingContext->bit_rate == m_h264BitRate)
+            ret = ctx;
     }
-    if (!ret.codecContext) {
+    if (!ret.encodingContext) {
+        // Set up encoding
         // XXX (for review): once again not sure if throw is appropriate here
-        ret.codecContext = avcodec_alloc_context3(this->h264Codec);
-        if (!ret.codecContext) throw std::runtime_error("Could not allocate video codec context");
+        ret.encodingContext = avcodec_alloc_context3(this->m_h264EncodingCodec);
+        if (!ret.encodingContext) throw std::runtime_error("Could not allocate encoding codec context");
 
-        ret.codecContext->bit_rate = h264BitRate;
+        ret.encodingContext->bit_rate = m_h264BitRate;
 
-        ret.codecContext->width = width;
-        ret.codecContext->height = height;
+        ret.encodingContext->width = width;
+        ret.encodingContext->height = height;
 
         // Set FPS
-        // TODO: variable fps?
-        ret.codecContext->time_base = AVRational{1, 25};
-        ret.codecContext->framerate = AVRational{25, 1};
+        // TODO: Framerate is probably a little variable... Is this a problem?
+        ret.encodingContext->time_base = AVRational{1, fps};
+        ret.encodingContext->framerate = AVRational{fps, 1};
 
         // Emit one intra frame every ten frames
-        ret.codecContext->gop_size = 10;
+        ret.encodingContext->gop_size = 10;
         // Max number of B-frames between non-B-frames
         // Only important thing for us is that the output is delayed by this number of frames+1
-        ret.codecContext->max_b_frames = 1;
+        ret.encodingContext->max_b_frames = 1;
         // 24-bit (total) BGR is always what we're going to be converting from
-        // TODO: we're using libx264rgb so is bgr->rgb going to be a performance issue?
-        ret.codecContext->pix_fmt = AV_PIX_FMT_BGR24;
+        // TODO: we're using libx264rgb so is bgr->rgb going to be a performance issue? Does libavcodec even do this for us?
+        ret.encodingContext->pix_fmt = AV_PIX_FMT_BGR24;
 
         // Optimize encoding for minimal latency
-        // TODO: do we need any other options set?
-        av_opt_set(ret.codecContext->priv_data, "tune", "zerolatency", 0);
-        av_opt_set(ret.codecContext->priv_data, "preset", "ultrafast", 0);
+        // TODO: do we need any other options set for low latency?
+        av_opt_set(ret.encodingContext->priv_data, "tune", "zerolatency", 0);
+        av_opt_set(ret.encodingContext->priv_data, "preset", "ultrafast", 0);
 
-        int err = avcodec_open2(ret.codecContext, h264Codec, nullptr);
-        if (err < 0) throw std::runtime_error("Couldn't open codec");
+        int err = avcodec_open2(ret.encodingContext, m_h264EncodingCodec, nullptr);
+        if (err < 0) throw std::runtime_error("Couldn't open encoding codec");
 
+        // Set up decoding
+        ret.parser = av_parser_init(m_h264DecodingCodec->id);
+        if (!ret.parser) throw std::runtime_error("Couldn't find decoding parser");
+
+        ret.decodingContext = avcodec_alloc_context3(m_h264DecodingCodec);
+        if (!ret.encodingContext) throw std::runtime_error("Could not allocate decoding codec context");
+
+        err = avcodec_open2(ret.decodingContext, m_h264DecodingCodec, nullptr);
+        if (err < 0) throw std::runtime_error("Couldn't open decoding codec");
+
+        // Set up shared input and output buffers
         ret.frame = av_frame_alloc();
         if (!ret.frame) throw std::runtime_error("Couldn't allocate an input video frame");
         err = av_frame_get_buffer(ret.frame, 32);
@@ -70,5 +95,6 @@ CompressionContext::H264Context CompressionContext::GetH264Context(int width, in
         if (!ret.packet) throw std::runtime_error("Couldn't allocate an output video packet");
     }
 
-    return ret;
+    m_h264Contexts.emplace_back(ret);
+    return m_h264Contexts.back();
 }

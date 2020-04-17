@@ -13,6 +13,10 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+extern "C" {
+    #include <libavcodec/avcodec.h>
+}
+
 #include "FramePool.h"
 #include "Instance.h"
 #include "Log.h"
@@ -225,12 +229,14 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
         cur = ConvertRGB565ToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kGray) {
         // We never get to this branch in a compressed destination video mode
-        // because we convert cur from compressed to BGR in the begining of
+        // because we convert cur from compressed to BGR in the beginning of
         // this function
         if (pixelFormat == VideoMode::kBGR)
           return ConvertGrayToBGR(cur);
-        else
+        else if (pixelFormat == VideoMode::kMJPEG)
           return ConvertGrayToMJPEG(cur, defaultJpegQuality);
+        else if (pixelFormat == VideoMode::kH264)
+          return ConvertGrayToH264(cur);
       }
       break;
     case VideoMode::kYUYV:
@@ -248,6 +254,24 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
 }
 
 Image* Frame::ConvertH264ToBGR(Image* image) {
+  if (!image || !m_impl || image->pixelFormat != VideoMode::kH264) return nullptr;
+  std::scoped_lock lock(m_impl->mutex);
+
+  // TODO: This can't be the right way to get FPS??
+  auto compressionCtx = m_impl->source.GetCompressionContext().GetH264Context(image->width, image->height, m_impl->source.GetVideoMode(0).fps);
+
+  int ret;
+
+  ret = avcodec_send_packet(compressionCtx.decodingContext, compressionCtx.packet);
+  if (ret < 0) return nullptr; // TODO: Logging?
+
+  while (ret >= 0) {
+      ret = avcodec_receive_frame(compressionCtx.decodingContext, compressionCtx.frame);
+      if (ret == AVERROR(EAGAIN) ||ret == AVERROR_EOF) {
+          return
+      }
+  }
+
   return nullptr;
 }
 
@@ -459,6 +483,45 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   return rv;
 }
 
+Image* Frame::ConvertBGRToH264(Image* image) {
+    if (image->pixelFormat != VideoMode::kBGR) return nullptr;
+    if (!m_impl) return nullptr;
+    std::scoped_lock lock(m_impl->mutex);
+
+    // TODO: Figure out a good conservative size estimate; right now we assume compression is probably no worse than JPEG.
+    auto newImage =
+        m_impl->source.AllocImage(VideoMode::kH264, image->width, image->height,
+                            image->width * image->height * 0.75);
+
+    // TODO: This can't be the right way to get FPS??
+    auto compressionCtx = m_impl->source.GetCompressionContext().GetH264Context(image->width, image->height, m_impl->source.GetVideoMode(0).fps);
+    compressionCtx.frame->data[0] = reinterpret_cast<uint8_t *>(image->data());
+
+    int ret;
+
+    ret = avcodec_send_frame(compressionCtx.encodingContext, compressionCtx.frame);
+    if (ret < 0) return nullptr; // TODO: Should we log this failure?
+
+    while (ret >= 0) {
+        ret = avcodec_receive_packet(compressionCtx.encodingContext, compressionCtx.packet);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            // We're done encoding the frame we just sent... Usually we only have to go through the loop once to get to this point.
+            Image* rv = newImage.release();
+            m_impl->images.push_back(rv);
+            return rv;
+        } else if (ret < 0) {
+            // TODO: Should we log this failure?
+            return nullptr;
+        }
+
+        newImage->vec().insert(newImage->vec().end(), compressionCtx.packet->data, compressionCtx.packet->data + compressionCtx.packet->size);
+    }
+}
+
+Image* Frame::ConvertGrayToH264(Image* image) {
+    return nullptr;
+}
+
 Image* Frame::GetImageImpl(int width, int height,
                            VideoMode::PixelFormat pixelFormat,
                            int requiredJpegQuality, int defaultJpegQuality) {
@@ -499,14 +562,6 @@ Image* Frame::GetImageImpl(int width, int height,
 
   // Convert to output format
   return ConvertImpl(cur, pixelFormat, requiredJpegQuality, defaultJpegQuality);
-}
-
-Image* Frame::ConvertBGRToH264(Image* image) {
-  return nullptr;
-}
-
-Image* Frame::ConvertGrayToH264(Image* image) {
-  return nullptr;
 }
 
 bool Frame::GetCv(cv::Mat& image, int width, int height) {

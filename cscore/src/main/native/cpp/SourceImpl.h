@@ -25,6 +25,7 @@
 #include "Handle.h"
 #include "Image.h"
 #include "PropertyContainer.h"
+#include "CompressionContext.h"
 #include "cscore_cpp.h"
 
 namespace wpi {
@@ -110,6 +111,9 @@ class SourceImpl : public PropertyContainer {
   VideoMode GetVideoMode(CS_Status* status) const;
   virtual bool SetVideoMode(const VideoMode& mode, CS_Status* status) = 0;
 
+  // Compression settings
+  const CompressionContext& GetCompressionContext() const { return m_compressionCtx; };
+
   // These have default implementations but can be overridden for custom
   // or optimized behavior.
   virtual bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
@@ -176,6 +180,8 @@ class SourceImpl : public PropertyContainer {
   // Most recent frame (returned to callers of GetNextFrame)
   // Access protected by m_frameMutex.
   Frame m_frame;
+
+  CompressionContext m_compressionCtx;
 };
 
 }  // namespace cs

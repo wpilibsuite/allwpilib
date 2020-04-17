@@ -10,9 +10,11 @@
 
 #include <wpi/SmallVector.h>
 
-#include <libavcodec/avcodec.h>
+extern "C" {
+    #include <libavcodec/avcodec.h>
 
-#include <libavutil/opt.h>
+    #include <libavutil/opt.h>
+};
 
 namespace cs {
 
@@ -20,34 +22,48 @@ class CompressionContext {
 public:
     struct H264Context {
         // Stores encoder settings and data
-        AVCodecContext* codecContext;
+        AVCodecContext* encodingContext;
+        // Stores decoder settings and data
+        AVCodecContext* decodingContext;
+
+        // Parser for decoding
+        AVCodecParserContext* parser;
 
         // Both frame and packet have contents that change per-frame... We keep them here so we don't allocate new ones every frame.
-        // Frame stores the raw input image in our pix_fmt (currently BGR24)
+        // If we're encoding, frame stores the raw input image in our given pix_fmt (currently BGR24)
+        // If we're decoding, frame stores the raw output image
         AVFrame* frame;
         // Packet stores output bytes from the encoder
         AVPacket* packet;
 
         ~H264Context() {
-            if (codecContext != nullptr) avcodec_free_context(&codecContext);
+            if (encodingContext != nullptr) avcodec_free_context(&encodingContext);
+            if (decodingContext != nullptr) avcodec_free_context(&decodingContext);
             if (frame != nullptr) av_frame_free(&frame);
             if (packet != nullptr) av_packet_free(&packet);
         }
     };
 
 public:
-    const int mjpegRequiredQuality;
-    const int mjpegDefaultQuality;
+    CompressionContext(int h264BitRate = 40000, int mjpegRequiredQuality = -1, int mjpegDefaultQuality = 80);
 
-    const int64_t h264BitRate;
+    void SetH264BitRate(int64_t bitrate) { m_h264BitRate = bitrate; }
 
-    CompressionContext(int h264BitRate = 40000, int mjpgRequiredQual = -1, int mjpgDefaultQuality = 80);
+    void SetMJPEGQuality(int requiredQuality, int defaultQuality) {
+        m_mjpegRequiredQuality = requiredQuality;
+        m_mjpegDefaultQuality = defaultQuality;
+    }
 
-    H264Context GetH264Context(int width, int height);
+    const H264Context& GetH264Context(int width, int height, int fps) const;
 
 private:
-    const AVCodec* h264Codec;
-    wpi::SmallVector<H264Context, 4> h264CodecContexts;
+    int m_mjpegRequiredQuality;
+    int m_mjpegDefaultQuality;
+
+    int64_t m_h264BitRate;
+    static const AVCodec* m_h264EncodingCodec;
+    static const AVCodec* m_h264DecodingCodec;
+    wpi::SmallVector<H264Context, 4> m_h264Contexts;
 };
 
 }  // namespace cs
