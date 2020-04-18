@@ -21,7 +21,7 @@ class CircularBufferTest {
 
   @Test
   void addFirstTest() {
-    CircularBuffer queue = new CircularBuffer(8);
+    var queue = new CircularBuffer<Double>(8);
 
     for (double value : m_values) {
       queue.addFirst(value);
@@ -34,7 +34,7 @@ class CircularBufferTest {
 
   @Test
   void addLastTest() {
-    CircularBuffer queue = new CircularBuffer(8);
+    var queue = new CircularBuffer<Double>(8);
 
     for (double value : m_values) {
       queue.addLast(value);
@@ -47,7 +47,7 @@ class CircularBufferTest {
 
   @Test
   void pushPopTest() {
-    CircularBuffer queue = new CircularBuffer(3);
+    var queue = new CircularBuffer<Double>(3);
 
     // Insert three elements into the buffer
     queue.addLast(1.0);
@@ -90,8 +90,8 @@ class CircularBufferTest {
   }
 
   @Test
-  void resetTest() {
-    CircularBuffer queue = new CircularBuffer(5);
+  void clearTest() {
+    var queue = new CircularBuffer<Integer>(5);
 
     for (int i = 0; i < 6; i++) {
       queue.addLast(i);
@@ -99,14 +99,12 @@ class CircularBufferTest {
 
     queue.clear();
 
-    for (int i = 0; i < 5; i++) {
-      assertEquals(0.0, queue.get(i), 0.00005);
-    }
+    assertEquals(0, queue.size());
   }
 
   @Test
   void resizeTest() {
-    CircularBuffer queue = new CircularBuffer(5);
+    var queue = new CircularBuffer<Double>(5);
 
     /* Buffer contains {1, 2, 3, _, _}
      *                  ^ front

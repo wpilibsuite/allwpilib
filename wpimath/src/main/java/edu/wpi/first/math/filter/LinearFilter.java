@@ -48,8 +48,8 @@ import org.ejml.simple.SimpleMatrix;
  * to make sure calculate() gets called at the desired, constant frequency!
  */
 public class LinearFilter {
-  private final CircularBuffer m_inputs;
-  private final CircularBuffer m_outputs;
+  private final CircularBuffer<Double> m_inputs;
+  private final CircularBuffer<Double> m_outputs;
   private final double[] m_inputGains;
   private final double[] m_outputGains;
 
@@ -61,11 +61,19 @@ public class LinearFilter {
    * @param ffGains The "feedforward" or FIR gains.
    * @param fbGains The "feedback" or IIR gains.
    */
+  @SuppressWarnings("PMD.ForLoopCanBeForeach")
   public LinearFilter(double[] ffGains, double[] fbGains) {
-    m_inputs = new CircularBuffer(ffGains.length);
-    m_outputs = new CircularBuffer(fbGains.length);
+    m_inputs = new CircularBuffer<>(ffGains.length);
+    m_outputs = new CircularBuffer<>(fbGains.length);
     m_inputGains = Arrays.copyOf(ffGains, ffGains.length);
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
+
+    for (int i = 0; i < ffGains.length; ++i) {
+      m_inputs.addFirst(0.0);
+    }
+    for (int i = 0; i < fbGains.length; ++i) {
+      m_outputs.addFirst(0.0);
+    }
 
     instances++;
     MathSharedStore.reportUsage(MathUsageId.kFilter_Linear, instances);

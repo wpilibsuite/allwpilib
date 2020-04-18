@@ -15,7 +15,7 @@ import java.util.List;
  * processing, LIDAR, or ultrasonic sensors).
  */
 public class MedianFilter {
-  private final CircularBuffer m_valueBuffer;
+  private final CircularBuffer<Double> m_valueBuffer;
   private final List<Double> m_orderedValues;
   private final int m_size;
 
@@ -26,7 +26,7 @@ public class MedianFilter {
    */
   public MedianFilter(int size) {
     // Circular buffer of values currently in the window, ordered by time
-    m_valueBuffer = new CircularBuffer(size);
+    m_valueBuffer = new CircularBuffer<>(size);
     // List of values currently in the window, ordered by value
     m_orderedValues = new ArrayList<>(size);
     // Size of rolling window

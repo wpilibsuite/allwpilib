@@ -50,3 +50,13 @@ TEST(MedianFilterTest, MedianFilterFullTestOdd) {
 
   EXPECT_EQ(filter.Calculate(99), 5);
 }
+
+TEST(MedianFilterTest, MedianFilterBool) {
+  frc::MedianFilter<bool> filter{5};
+
+  filter.Calculate(true);
+  filter.Calculate(false);
+  filter.Calculate(true);
+
+  EXPECT_EQ(filter.Calculate(true), true);
+}
