@@ -270,7 +270,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramTeleop();
       teleopPeriodic();
       m_watchdog.addEpoch("teleopPeriodic()");
-    } else if (m_controlWord.getTest()) {
+    } else {
       // Call TestInit() if we are now just entering test mode from either a different mode or from
       // power-on.
       if (m_lastMode != Mode.kTest) {
@@ -284,9 +284,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramTest();
       testPeriodic();
       m_watchdog.addEpoch("testPeriodic()");
-    } else {
-      DriverStation.reportError("For some reason, the current mode is none of the four robot"
-                                 + " operation modes.", true);
+                       + " operation modes.", true);
     }
 
     robotPeriodic();
