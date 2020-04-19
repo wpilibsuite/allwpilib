@@ -12,6 +12,7 @@ public class BooleanMajorityFilter {
   private final boolean[] m_values;
   private int m_index;
   private final double m_percentage;
+
   /**
    * Creates a new BooleanMajorityFilter.
    *
@@ -20,27 +21,27 @@ public class BooleanMajorityFilter {
    * @throws IllegalArgumentException if size is smaller than 1 or percentage is out of range
    */
   public BooleanMajorityFilter(int size, double percentage) {
-    if(size < 1){
+    if (size < 1) {
       throw new IllegalArgumentException("Must have a size of above zero");
     }
-    if(percentage > 1.0 || percentage < 0.0){
+    if (percentage > 1.0 || percentage < 0.0) {
       throw new IllegalArgumentException("True percentage must be between 0 and 1");
     }
     m_percentage = percentage;
     //values in rolling window, ordered by time in a cycle
     m_values = new boolean[size];
     Arrays.fill(m_values, false);
-    // Size of rolling window
     //rotating index
     m_index = 0;
   }
+
   /**
    * Creates a new BooleanMajorityFilter.
    *
    * @param size The number of votes in the moving window, must be positive
    * @throws IllegalArgumentException if size is smaller than 1
    */
-  public BooleanMajorityFilter(int size){
+  public BooleanMajorityFilter(int size) {
     this(size, 0.5);
   }
 
@@ -49,7 +50,7 @@ public class BooleanMajorityFilter {
    *
    * @param next The next input value.
    * @return The majority vote of the moving window, updated to include the next value.
-   * If tied, returns false.
+   If tied, returns false.
    *
    */
   public boolean calculate(boolean next) {

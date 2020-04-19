@@ -2,7 +2,9 @@ package edu.wpi.first.wpilibj;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BooleanMajorityFilterTest {
   @Test
@@ -27,9 +29,9 @@ class BooleanMajorityFilterTest {
 
   @Test
   void zero() {
-    assertThrows(IllegalArgumentException.class,
-            () -> new BooleanMajorityFilter(0, -3));
+    assertThrows(IllegalArgumentException.class, () -> new BooleanMajorityFilter(0, -3));
   }
+
   @Test
   void singleton() {
     BooleanMajorityFilter filter = new BooleanMajorityFilter(1);
