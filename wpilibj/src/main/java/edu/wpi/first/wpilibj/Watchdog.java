@@ -8,8 +8,6 @@
 package edu.wpi.first.wpilibj;
 
 import java.io.Closeable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -33,13 +31,12 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   private long m_expirationTime; // microseconds
   private final Runnable m_callback;
   private long m_lastTimeoutPrintTime; // microseconds
-  private long m_lastEpochsPrintTime; // microseconds
 
-  @SuppressWarnings("PMD.UseConcurrentHashMap")
-  private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
   boolean m_isExpired;
 
   boolean m_suppressTimeoutMessage;
+
+  private final Tracer m_tracer;
 
   static {
     startDaemonThread(Watchdog::schedulerFunc);
@@ -58,6 +55,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public Watchdog(double timeout, Runnable callback) {
     m_timeout = (long) (timeout * 1.0e6);
     m_callback = callback;
+    m_tracer = new Tracer();
   }
 
   @Override
@@ -87,7 +85,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    */
   public void setTimeout(double timeout) {
     m_startTime = RobotController.getFPGATime();
-    m_epochs.clear();
+    m_tracer.clearEpochs();
 
     m_queueMutex.lock();
     try {
@@ -130,30 +128,20 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Adds time since last epoch to the list printed by printEpochs().
    *
-   * <p>Epochs are a way to partition the time elapsed so that when overruns occur, one can
-   * determine which parts of an operation consumed the most time.
+   * @see Tracer#addEpoch(String)
    *
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
-    long currentTime = RobotController.getFPGATime();
-    m_epochs.put(epochName, currentTime - m_startTime);
-    m_startTime = currentTime;
+    m_tracer.addEpoch(epochName);
   }
 
   /**
    * Prints list of epochs added so far and their times.
+   * @see Tracer#printEpochs()
    */
   public void printEpochs() {
-    long now = RobotController.getFPGATime();
-    if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
-      m_lastEpochsPrintTime = now;
-      StringBuilder outputBuilder = new StringBuilder();
-      m_epochs.forEach((key, value) -> {
-        outputBuilder.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6));
-      });
-      DriverStation.reportWarning(outputBuilder.toString(), false);
-    }
+    m_tracer.printEpochs();
   }
 
   /**
@@ -170,7 +158,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    */
   public void enable() {
     m_startTime = RobotController.getFPGATime();
-    m_epochs.clear();
+    m_tracer.clearEpochs();
 
     m_queueMutex.lock();
     try {

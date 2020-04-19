@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,6 +31,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * <p> This will also interact with {@link NetworkTable} by creating a table called "Preferences"
  * with all the key-value pairs. </p>
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public final class Preferences {
   /**
    * The Preferences table name.
@@ -95,6 +96,17 @@ public final class Preferences {
   }
 
   /**
+   * Puts the given string into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initString(String key, String value) {
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultString(value);
+  }
+
+  /**
    * Puts the given int into the preferences table.
    *
    * @param key   the key
@@ -104,6 +116,17 @@ public final class Preferences {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given int into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initInt(String key, int value) {
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultDouble(value);
   }
 
   /**
@@ -119,6 +142,17 @@ public final class Preferences {
   }
 
   /**
+   * Puts the given double into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initDouble(String key, double value) {
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultDouble(value);
+  }
+
+  /**
    * Puts the given float into the preferences table.
    *
    * @param key   the key
@@ -128,6 +162,17 @@ public final class Preferences {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given float into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initFloat(String key, float value) {
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultDouble(value);
   }
 
   /**
@@ -143,6 +188,17 @@ public final class Preferences {
   }
 
   /**
+   * Puts the given boolean into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initBoolean(String key, boolean value) {
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultBoolean(value);
+  }
+
+  /**
    * Puts the given long into the preferences table.
    *
    * @param key   the key
@@ -152,6 +208,17 @@ public final class Preferences {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given long into the preferences table if it doesn't already exist.
+   *
+   * @param key   The key
+   * @param value The value
+   */
+  public void initLong(String key, long value) {
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDefaultDouble(value);
   }
 
   /**

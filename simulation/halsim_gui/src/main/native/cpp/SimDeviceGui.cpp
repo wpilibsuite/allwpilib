@@ -22,7 +22,16 @@
 using namespace halsimgui;
 
 namespace {
-struct ElementInfo : public OpenInfo {
+struct ElementInfo : public NameInfo, public OpenInfo {
+  bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
+    if (NameInfo::ReadIni(name, value)) return true;
+    if (OpenInfo::ReadIni(name, value)) return true;
+    return false;
+  }
+  void WriteIni(ImGuiTextBuffer* out) {
+    NameInfo::WriteIni(out);
+    OpenInfo::WriteIni(out);
+  }
   bool visible = true;  // not saved
 };
 }  // namespace
@@ -40,15 +49,16 @@ bool SimDeviceGui::StartDevice(const char* label, ImGuiTreeNodeFlags flags) {
   auto& element = gElements[label];
   if (!element.visible) return false;
 
-  if (ImGui::CollapsingHeader(
-          label,
-          flags | (element.IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0))) {
-    ImGui::PushID(label);
-    element.SetOpen(true);
-    return true;
-  }
-  element.SetOpen(false);
-  return false;
+  char name[128];
+  element.GetName(name, sizeof(name), label);
+
+  bool open = ImGui::CollapsingHeader(
+      name, flags | (element.IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0));
+  element.SetOpen(open);
+  element.PopupEditName(label);
+
+  if (open) ImGui::PushID(label);
+  return open;
 }
 
 void SimDeviceGui::FinishDevice() { ImGui::PopID(); }

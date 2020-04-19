@@ -4,6 +4,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
 
     ext {
         includeWpiutil = true
+        includeNtCore = true
         pluginName = 'halsim_gui'
     }
 

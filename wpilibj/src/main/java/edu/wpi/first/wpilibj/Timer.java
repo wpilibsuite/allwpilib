@@ -96,12 +96,15 @@ public class Timer {
 
   /**
    * Start the timer running. Just set the running flag to true indicating that all time requests
-   * should be relative to the system clock.
+   * should be relative to the system clock. Note that this method is a no-op if the timer is
+   * already running.
    */
   public void start() {
     synchronized (m_lock) {
-      m_startTime = getMsClock();
-      m_running = true;
+      if (!m_running) {
+        m_startTime = getMsClock();
+        m_running = true;
+      }
     }
   }
 

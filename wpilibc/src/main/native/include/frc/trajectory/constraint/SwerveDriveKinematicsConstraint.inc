@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,8 +25,8 @@ SwerveDriveKinematicsConstraint<NumModules>::SwerveDriveKinematicsConstraint(
 template <size_t NumModules>
 units::meters_per_second_t
 SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
-    const Pose2d& pose, curvature_t curvature,
-    units::meters_per_second_t velocity) {
+    const Pose2d& pose, units::curvature_t curvature,
+    units::meters_per_second_t velocity) const {
   auto xVelocity = velocity * pose.Rotation().Cos();
   auto yVelocity = velocity * pose.Rotation().Sin();
   auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
@@ -41,8 +41,8 @@ SwerveDriveKinematicsConstraint<NumModules>::MaxVelocity(
 template <size_t NumModules>
 TrajectoryConstraint::MinMax
 SwerveDriveKinematicsConstraint<NumModules>::MinMaxAcceleration(
-    const Pose2d& pose, curvature_t curvature,
-    units::meters_per_second_t speed) {
+    const Pose2d& pose, units::curvature_t curvature,
+    units::meters_per_second_t speed) const {
   return {};
 }
 
