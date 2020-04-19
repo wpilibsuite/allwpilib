@@ -19,6 +19,7 @@
 #include "EncoderGui.h"
 #include "Field2D.h"
 #include "HALSimGui.h"
+#include "NetworkTablesGui.h"
 #include "PDPGui.h"
 #include "PWMGui.h"
 #include "RelayGui.h"
@@ -44,6 +45,7 @@ __declspec(dllexport)
   HALSimGui::Add(DIOGui::Initialize);
   HALSimGui::Add(EncoderGui::Initialize);
   HALSimGui::Add(Field2D::Initialize);
+  HALSimGui::Add(NetworkTablesGui::Initialize);
   HALSimGui::Add(PDPGui::Initialize);
   HALSimGui::Add(PWMGui::Initialize);
   HALSimGui::Add(RelayGui::Initialize);

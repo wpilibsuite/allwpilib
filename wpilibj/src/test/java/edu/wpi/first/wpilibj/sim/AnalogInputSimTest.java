@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,7 +27,7 @@ class AnalogInputSimTest {
     HAL.initialize(500, 0);
 
     AnalogInput input = new AnalogInput(5);
-    AnalogInSim inputSim = input.getSimObject();
+    AnalogInSim inputSim = new AnalogInSim(5);
 
     for (double i = 0; i < 5.0; i += 0.1) {
       inputSim.setVoltage(0);

@@ -48,6 +48,43 @@ public class Color {
         color.blue / 255.0);
   }
 
+  /**
+   * Creates a Color from HSV values.
+   *
+   * @param h The h value [0-180]
+   * @param s The s value [0-255]
+   * @param v The v value [0-255]
+   * @return The color
+   */
+  @SuppressWarnings("ParameterName")
+  public static Color fromHSV(int h, int s, int v) {
+    if (s == 0) {
+      return new Color(v / 255.0, v / 255.0, v / 255.0);
+    }
+
+    final int region = h / 30;
+    final int remainder = (h - (region * 30)) * 6;
+
+    final int p = (v * (255 - s)) >> 8;
+    final int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
+    final int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region) {
+      case 0:
+        return new Color(v / 255.0, t / 255.0, p / 255.0);
+      case 1:
+        return new Color(q / 255.0, v / 255.0, p / 255.0);
+      case 2:
+        return new Color(p / 255.0, v / 255.0, t / 255.0);
+      case 3:
+        return new Color(p / 255.0, q / 255.0, v / 255.0);
+      case 4:
+        return new Color(t / 255.0, p / 255.0, v / 255.0);
+      default:
+        return new Color(v / 255.0, p / 255.0, q / 255.0);
+    }
+  }
+
   @Override
   public boolean equals(Object other) {
     if (this == other) {

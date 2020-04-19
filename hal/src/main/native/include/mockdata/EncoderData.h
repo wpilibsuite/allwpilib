@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -92,6 +92,11 @@ void HALSIM_SetEncoderDistancePerPulse(int32_t index, double distancePerPulse);
 void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
                                         HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify);
+
+void HALSIM_SetEncoderDistance(int32_t index, double distance);
+double HALSIM_GetEncoderDistance(int32_t index);
+void HALSIM_SetEncoderRate(int32_t index, double rate);
+double HALSIM_GetEncoderRate(int32_t index);
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -755,6 +755,42 @@ class Color {
         green(roundAndClamp(g)),
         blue(roundAndClamp(b)) {}
 
+  /**
+   * Creates a Color from HSV values.
+   *
+   * @param h The h value [0-180]
+   * @param s The s value [0-255]
+   * @param v The v value [0-255]
+   * @return The color
+   */
+  static constexpr Color FromHSV(int h, int s, int v) {
+    if (s == 0) {
+      return {v / 255.0, v / 255.0, v / 255.0};
+    }
+
+    int region = h / 30;
+    int remainder = (h - (region * 30)) * 6;
+
+    int p = (v * (255 - s)) >> 8;
+    int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
+    int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region) {
+      case 0:
+        return Color(v / 255.0, t / 255.0, p / 255.0);
+      case 1:
+        return Color(q / 255.0, v / 255.0, p / 255.0);
+      case 2:
+        return Color(p / 255.0, v / 255.0, t / 255.0);
+      case 3:
+        return Color(p / 255.0, q / 255.0, v / 255.0);
+      case 4:
+        return Color(t / 255.0, p / 255.0, v / 255.0);
+      default:
+        return Color(v / 255.0, p / 255.0, q / 255.0);
+    }
+  }
+
   double red = 0.0;
   double green = 0.0;
   double blue = 0.0;
