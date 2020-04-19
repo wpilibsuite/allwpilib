@@ -284,7 +284,6 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramTest();
       testPeriodic();
       m_watchdog.addEpoch("testPeriodic()");
-                       + " operation modes.", true);
     }
 
     robotPeriodic();
