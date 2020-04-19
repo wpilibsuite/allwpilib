@@ -14,12 +14,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+
 /**
  * Represents a 2d pose containing translational and rotational elements.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose2d {
+public class Pose2d implements Sendable {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 
@@ -230,5 +233,13 @@ public class Pose2d {
   @Override
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setActuator(false);
+    builder.addDoubleProperty("x", m_translation::getX, null);
+    builder.addDoubleProperty("y", m_translation::getY, null);
+    builder.addDoubleProperty("rotation", m_rotation::getDegrees, null);
   }
 }
