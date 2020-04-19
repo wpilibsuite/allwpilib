@@ -256,7 +256,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramAutonomous();
       autonomousPeriodic();
       m_watchdog.addEpoch("autonomousPeriodic()");
-    } else if (isTeleop(m_controlWord)) {
+    } else if (!m_controlWord.getTest()) {//we checked disabled and auto, if it isn't test - it's teleop.
       // Call TeleopInit() if we are now just entering teleop mode from either a different mode or
       // from power-on.
       if (m_lastMode != Mode.kTeleop) {
@@ -310,10 +310,6 @@ public abstract class IterativeRobotBase extends RobotBase {
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
-  }
-
-  private boolean isTeleop(ControlWord ctrlWord){
-    return ctrlWord.getEnabled() && !ctrlWord.getTest() && !ctrlWord.getAutonomous();
   }
 
   private void printLoopOverrunMessage() {
