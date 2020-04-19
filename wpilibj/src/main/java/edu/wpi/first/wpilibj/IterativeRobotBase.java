@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -44,6 +45,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public abstract class IterativeRobotBase extends RobotBase {
+  private ControlWord m_controlWord;
   protected double m_period;
 
   private enum Mode {
@@ -65,6 +67,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   protected IterativeRobotBase(double period) {
     m_period = period;
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+    m_controlWord = new ControlWord();
   }
 
   /**
@@ -221,10 +224,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void loopFunc() {
+    HAL.getControlWord(m_controlWord);
     m_watchdog.reset();
 
     // Call the appropriate function depending upon the current robot mode
-    if (isDisabled()) {
+    if (!m_controlWord.getEnabled()) {
       // Call DisabledInit() if we are now just entering disabled mode from either a different mode
       // or from power-on.
       if (m_lastMode != Mode.kDisabled) {
@@ -238,7 +242,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramDisabled();
       disabledPeriodic();
       m_watchdog.addEpoch("disablePeriodic()");
-    } else if (isAutonomous()) {
+    } else if (m_controlWord.getAutonomous()) {
       // Call AutonomousInit() if we are now just entering autonomous mode from either a different
       // mode or from power-on.
       if (m_lastMode != Mode.kAutonomous) {
@@ -252,7 +256,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramAutonomous();
       autonomousPeriodic();
       m_watchdog.addEpoch("autonomousPeriodic()");
-    } else if (isOperatorControl()) {
+    } else if (isTeleop(m_controlWord)) {
       // Call TeleopInit() if we are now just entering teleop mode from either a different mode or
       // from power-on.
       if (m_lastMode != Mode.kTeleop) {
@@ -266,7 +270,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       HAL.observeUserProgramTeleop();
       teleopPeriodic();
       m_watchdog.addEpoch("teleopPeriodic()");
-    } else if (isTest()) {
+    } else if (m_controlWord.getTest()) {
       // Call TestInit() if we are now just entering test mode from either a different mode or from
       // power-on.
       if (m_lastMode != Mode.kTest) {
@@ -306,6 +310,10 @@ public abstract class IterativeRobotBase extends RobotBase {
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+  }
+
+  private boolean isTeleop(ControlWord ctrlWord){
+    return ctrlWord.getEnabled() && !ctrlWord.getTest() && !ctrlWord.getAutonomous();
   }
 
   private void printLoopOverrunMessage() {
