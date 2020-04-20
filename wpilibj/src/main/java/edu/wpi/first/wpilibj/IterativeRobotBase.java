@@ -45,7 +45,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public abstract class IterativeRobotBase extends RobotBase {
-  private ControlWord m_controlWord;
+  private final ControlWord m_controlWord;
   protected double m_period;
 
   private enum Mode {
