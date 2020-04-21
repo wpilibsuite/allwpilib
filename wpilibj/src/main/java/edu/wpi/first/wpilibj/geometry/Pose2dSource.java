@@ -4,14 +4,16 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.geometry;
+
+import java.util.function.Supplier;
+
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import java.util.function.Supplier;
 
 /**
  * A wrapper class of a <code>{@literal Supplier<Pose2d>}</code> and implements the {@code Sendable}
@@ -24,7 +26,7 @@ public class Pose2dSource implements Sendable, Supplier<Pose2d> {
   private final Supplier<Pose2d> m_source;
 
   /**
-   * Creates a {@code Pose2dSource} that wraps the given source
+   * Creates a {@code Pose2dSource} that wraps the given source.
    * @param source the source of the poses, i.e the odometry's
    * {@link DifferentialDriveOdometry#getPoseMeters() getPoseMeters()} method.
    */
