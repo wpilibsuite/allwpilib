@@ -49,9 +49,9 @@ public class Pose2dSource implements Sendable, Supplier<Pose2d> {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setActuator(false);
-    builder.addDoubleProperty("x_meters", () -> m_source.get().getTranslation().getX(), null);
-    builder.addDoubleProperty("y_meters", () -> m_source.get().getTranslation().getY(), null);
-    builder.addDoubleProperty("rotation_degrees", () -> m_source.get().getRotation().getDegrees(), null);
+    builder.addDoubleProperty("x_meters", () -> get().getTranslation().getX(), null);
+    builder.addDoubleProperty("y_meters", () -> get().getTranslation().getY(), null);
+    builder.addDoubleProperty("rotation_degrees", () -> get().getRotation().getDegrees(), null);
   }
 
   @Override
