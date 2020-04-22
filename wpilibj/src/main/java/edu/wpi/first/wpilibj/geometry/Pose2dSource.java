@@ -29,20 +29,30 @@ public class Pose2dSource implements Sendable, Supplier<Pose2d> {
    * Creates a {@code Pose2dSource} that wraps the given source.
    * @param source the source of the poses, i.e the odometry's
    * {@link DifferentialDriveOdometry#getPoseMeters() getPoseMeters()} method.
+   * @param name the name to associate with this Pose2dSource in LiveWindow.
+   Defaults to {@code "Robot Pose"}.
    */
-  public Pose2dSource(Supplier<Pose2d> source) {
+  public Pose2dSource(Supplier<Pose2d> source, String name) {
     m_source = source;
 
-    SendableRegistry.addLW(this, "Robot Pose");
+    SendableRegistry.addLW(this, name);
+  }
+
+  /**
+   * Creates a {@code Pose2dSource} that wraps the given source.
+   * @param source the source of the poses, i.e the odometry's
+   * {@link DifferentialDriveOdometry#getPoseMeters() getPoseMeters()} method.
+   */
+  public Pose2dSource(Supplier<Pose2d> source) {
+    this(source, "Robot Pose");
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    Pose2d currentPose = m_source.get();
     builder.setActuator(false);
-    builder.addDoubleProperty("x", currentPose.getTranslation()::getX, null);
-    builder.addDoubleProperty("y", currentPose.getTranslation()::getY, null);
-    builder.addDoubleProperty("rotation", currentPose.getRotation()::getDegrees, null);
+    builder.addDoubleProperty("x", () -> m_source.get().getTranslation().getX(), null);
+    builder.addDoubleProperty("y", m_source.get().getTranslation()::getY, null);
+    builder.addDoubleProperty("rotation", m_source.get().getRotation()::getDegrees, null);
   }
 
   @Override
