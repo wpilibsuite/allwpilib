@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj.geometry;
 
 import java.util.function.Supplier;
 
-
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -26,8 +25,8 @@ public class Pose2dSource implements Sendable, Supplier<Pose2d> {
 
   /**
    * Creates a {@code Pose2dSource} that wraps the given source.
-   * @param source the source of the poses, i.e the odometry's
-   * {@link edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry#getPoseMeters() getPoseMeters()} method.
+   * @param source the source of the poses, i.e the odometry's {@link
+   *  edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry#getPoseMeters() getPose()} method.
    * @param name the name to associate with this Pose2dSource in LiveWindow.
    Defaults to {@code "Robot Pose"}.
    */
@@ -39,8 +38,8 @@ public class Pose2dSource implements Sendable, Supplier<Pose2d> {
 
   /**
    * Creates a {@code Pose2dSource} that wraps the given source.
-   * @param source the source of the poses, i.e the odometry's
-   * {@link edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry#getPoseMeters() getPoseMeters()} method.
+   * @param source the source of the poses, i.e the odometry's {@link
+   *  edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry#getPoseMeters() getPose()} method.
    */
   public Pose2dSource(Supplier<Pose2d> source) {
     this(source, "Robot Pose");
