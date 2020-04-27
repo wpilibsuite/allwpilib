@@ -103,8 +103,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
                           LinearQuadraticRegulator<States, Inputs, Outputs> controller,
                           LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
                           KalmanFilter<States, Inputs, Outputs> observer,
-                          double maxVoltageVolts
-  ) {
+                          double maxVoltageVolts) {
     this(plant, controller, feedforward,
           observer, u -> StateSpaceUtil.normalizeInputVector(u, maxVoltageVolts));
   }

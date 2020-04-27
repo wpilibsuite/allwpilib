@@ -9,7 +9,6 @@ package edu.wpi.first.wpiutil.math;
 
 import java.util.Objects;
 
-
 import org.ejml.MatrixDimensionException;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -22,8 +21,7 @@ import org.ejml.simple.SimpleMatrix;
 import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
-/**
- * A shape-safe wrapper over Efficient Java Matrix Library (EJML) matrices.
+/*
  *
  * <p>This class is intended to be used alongside the state space library.
  *
@@ -227,7 +225,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @param value The scalar value to multiply by.
    * @return A new matrix with all the elements multiplied by the given value.
    */
-  public final Matrix<R, C> times(double value) {
+  public Matrix<R, C> times(double value) {
     return new Matrix<>(this.m_storage.scale(value));
   }
 

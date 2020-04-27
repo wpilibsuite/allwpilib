@@ -48,8 +48,19 @@ public class DCMotor {
 
     this.m_rOhms = nominalVoltageVolts / stallCurrentAmps;
     this.m_KvRadPerSecPerVolt = freeSpeedRadPerSec / (nominalVoltageVolts - m_rOhms
-            * freeCurrentAmps);
+      * freeCurrentAmps);
     this.m_KtNMPerAmp = stallTorqueNewtonMeters / stallCurrentAmps;
+  }
+
+  /**
+   * Estimate the current being drawn by this motor.
+   *
+   * @param speedRadiansPerSec The speed of the rotor.
+   * @param voltageInputVolts  The input voltage.
+   */
+  public double getCurrent(double speedRadiansPerSec, double voltageInputVolts) {
+    return -1.0 / m_KvRadPerSecPerVolt / m_rOhms * speedRadiansPerSec
+      + 1.0 / m_rOhms * voltageInputVolts;
   }
 
   /**
@@ -59,8 +70,8 @@ public class DCMotor {
    */
   public static DCMotor getCIM(int numMotors) {
     return new DCMotor(12,
-            2.42 * numMotors, 133,
-            2.7, Units.rotationsPerMinuteToRadiansPerSecond(5310));
+      2.42 * numMotors, 133,
+      2.7, Units.rotationsPerMinuteToRadiansPerSecond(5310));
   }
 
   /**
@@ -70,8 +81,8 @@ public class DCMotor {
    */
   public static DCMotor getVex775Pro(int numMotors) {
     return gearbox(new DCMotor(12,
-            0.71, 134,
-            0.7, Units.rotationsPerMinuteToRadiansPerSecond(18730)), numMotors);
+      0.71, 134,
+      0.7, Units.rotationsPerMinuteToRadiansPerSecond(18730)), numMotors);
   }
 
   /**
@@ -81,7 +92,7 @@ public class DCMotor {
    */
   public static DCMotor getNEO(int numMotors) {
     return gearbox(new DCMotor(12, 2.6,
-            105, 1.8, Units.rotationsPerMinuteToRadiansPerSecond(5676)), numMotors);
+      105, 1.8, Units.rotationsPerMinuteToRadiansPerSecond(5676)), numMotors);
   }
 
   /**
@@ -91,7 +102,7 @@ public class DCMotor {
    */
   public static DCMotor getMiniCIM(int numMotors) {
     return gearbox(new DCMotor(12, 1.41, 89, 3,
-            Units.rotationsPerMinuteToRadiansPerSecond(5840)), numMotors);
+      Units.rotationsPerMinuteToRadiansPerSecond(5840)), numMotors);
   }
 
   /**
@@ -101,7 +112,7 @@ public class DCMotor {
    */
   public static DCMotor getBag(int numMotors) {
     return gearbox(new DCMotor(12, 0.43, 53, 1.8,
-            Units.rotationsPerMinuteToRadiansPerSecond(13180)), numMotors);
+      Units.rotationsPerMinuteToRadiansPerSecond(13180)), numMotors);
   }
 
   /**
@@ -111,7 +122,7 @@ public class DCMotor {
    */
   public static DCMotor getAndymarkRs775_125(int numMotors) {
     return gearbox(new DCMotor(12, 0.28, 18, 1.6,
-            Units.rotationsPerMinuteToRadiansPerSecond(5800.0)), numMotors);
+      Units.rotationsPerMinuteToRadiansPerSecond(5800.0)), numMotors);
   }
 
   /**
@@ -121,7 +132,7 @@ public class DCMotor {
    */
   public static DCMotor getBanebotsRs775(int numMotors) {
     return gearbox(new DCMotor(12, 0.72, 97, 2.7,
-            Units.rotationsPerMinuteToRadiansPerSecond(13050.0)), numMotors);
+      Units.rotationsPerMinuteToRadiansPerSecond(13050.0)), numMotors);
   }
 
   /**
@@ -131,7 +142,7 @@ public class DCMotor {
    */
   public static DCMotor getAndymark9015(int numMotors) {
     return gearbox(new DCMotor(12, 0.36, 71, 3.7,
-            Units.rotationsPerMinuteToRadiansPerSecond(14270.0)), numMotors);
+      Units.rotationsPerMinuteToRadiansPerSecond(14270.0)), numMotors);
   }
 
   /**
@@ -141,7 +152,7 @@ public class DCMotor {
    */
   public static DCMotor getBanebotsRs550(int numMotors) {
     return gearbox(new DCMotor(12, 0.38, 84, 0.4,
-            Units.rotationsPerMinuteToRadiansPerSecond(19000.0)), numMotors);
+      Units.rotationsPerMinuteToRadiansPerSecond(19000.0)), numMotors);
   }
 
   /**
@@ -151,7 +162,7 @@ public class DCMotor {
    */
   public static DCMotor getNeo550(int numMotors) {
     return gearbox(new DCMotor(12, 0.97, 100, 1.4,
-            Units.rotationsPerMinuteToRadiansPerSecond(11000.0)), numMotors);
+      Units.rotationsPerMinuteToRadiansPerSecond(11000.0)), numMotors);
   }
 
   /**
@@ -161,11 +172,11 @@ public class DCMotor {
    */
   public static DCMotor getFalcon500(int numMotors) {
     return gearbox(new DCMotor(12, 4.69, 257, 1.5,
-            Units.rotationsPerMinuteToRadiansPerSecond(6380.0)), numMotors);
+      Units.rotationsPerMinuteToRadiansPerSecond(6380.0)), numMotors);
   }
 
   private static DCMotor gearbox(DCMotor motor, double numMotors) {
     return new DCMotor(motor.m_nominalVoltageVolts, motor.m_stallTorqueNewtonMeters * numMotors,
-            motor.m_stallCurrentAmps, motor.m_freeCurrentAmps, motor.m_freeSpeedRadPerSec);
+      motor.m_stallCurrentAmps, motor.m_freeCurrentAmps, motor.m_freeSpeedRadPerSec);
   }
 }

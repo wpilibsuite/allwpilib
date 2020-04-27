@@ -53,4 +53,15 @@ public final class MathUtil {
 
     return theta;
   }
+
+  /**
+   * Perform linear interpolation between two values.
+   * @param startValue The value to start at.
+   * @param endValue The value to end at.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   */
+  @SuppressWarnings("ParameterName")
+  public static double interpolate(double startValue, double endValue, double t) {
+    return startValue + (endValue - startValue) * MathUtil.clamp(t, 0, 1);
+  }
 }

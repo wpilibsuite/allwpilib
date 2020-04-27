@@ -191,18 +191,6 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    *
    * @return The calculated feedforward.
    */
-  public Matrix<Inputs, N1> calculate(Matrix<States, N1> nextR) {
-    return calculate(m_r, nextR);
-  }
-
-  /**
-   * Calculate the feedforward with current and future reference vectors.
-   *
-   * @param r     The reference state of the current timestep (k).
-   * @param nextR The reference state of the future timestep (k + dt).
-   *
-   * @return The calculated feedforward.
-   */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
     var rDot = (nextR.minus(r)).div(m_dt);

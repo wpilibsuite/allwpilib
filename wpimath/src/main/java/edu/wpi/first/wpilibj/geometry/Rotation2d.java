@@ -14,13 +14,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.wpiutil.math.MathUtil;
+
 /**
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Rotation2d {
+public class Rotation2d implements Interpolatable<Rotation2d> {
   private final double m_value;
   private final double m_cos;
   private final double m_sin;
@@ -211,5 +214,11 @@ public class Rotation2d {
   @Override
   public int hashCode() {
     return Objects.hash(m_value);
+  }
+
+  @Override
+  @SuppressWarnings("ParameterName")
+  public Rotation2d interpolate(Rotation2d endValue, double t) {
+    return new Rotation2d(MathUtil.interpolate(this.getRadians(), endValue.getRadians(), t));
   }
 }

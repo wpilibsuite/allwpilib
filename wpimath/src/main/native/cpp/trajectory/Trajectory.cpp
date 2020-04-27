@@ -7,6 +7,7 @@
 
 #include "frc/trajectory/Trajectory.h"
 
+#include <wpi/MathExtras.h>
 #include <wpi/json.h>
 
 #include "units/math.h"
@@ -26,7 +27,7 @@ bool Trajectory::State::operator!=(const Trajectory::State& other) const {
 Trajectory::State Trajectory::State::Interpolate(State endValue,
                                                  double i) const {
   // Find the new [t] value.
-  const auto newT = Lerp(t, endValue.t, i);
+  const auto newT = wpi::Lerp(t, endValue.t, i);
 
   // Find the delta time between the current state and the interpolated state.
   const auto deltaT = newT - t;
@@ -57,8 +58,8 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
       newS / endValue.pose.Translation().Distance(pose.Translation());
 
   return {newT, newV, acceleration,
-          Lerp(pose, endValue.pose, interpolationFrac),
-          Lerp(curvature, endValue.curvature, interpolationFrac)};
+          wpi::Lerp(pose, endValue.pose, interpolationFrac),
+          wpi::Lerp(curvature, endValue.curvature, interpolationFrac)};
 }
 
 Trajectory::Trajectory(const std::vector<State>& states) : m_states(states) {
