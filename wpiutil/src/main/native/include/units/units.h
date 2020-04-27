@@ -1,34 +1,34 @@
 //--------------------------------------------------------------------------------------------------
-// 
+//
 //	Units: A compile-time c++14 unit conversion library with no dependencies
 //
 //--------------------------------------------------------------------------------------------------
 //
 // The MIT License (MIT)
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
-// and associated documentation files (the "Software"), to deal in the Software without 
-// restriction, including without limitation the rights to use, copy, modify, merge, publish, 
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all copies or 
+//
+// The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 //--------------------------------------------------------------------------------------------------
-// 
+//
 // Copyright (c) 2016 Nic Holthaus
-// 
+//
 //--------------------------------------------------------------------------------------------------
 //
 // ATTRIBUTION:
-// Parts of this work have been adapted from: 
+// Parts of this work have been adapted from:
 // http://stackoverflow.com/questions/35069778/create-comparison-trait-for-template-classes-whose-parameters-are-in-a-different
 // http://stackoverflow.com/questions/28253399/check-traits-for-all-variadic-template-arguments/28253503
 // http://stackoverflow.com/questions/36321295/rational-approximation-of-square-root-of-stdratio-at-compile-time?noredirect=1#comment60266601_36321295
@@ -36,7 +36,7 @@
 //--------------------------------------------------------------------------------------------------
 //
 /// @file	units.h
-/// @brief	Complete implementation of `units` - a compile-time, header-only, unit conversion 
+/// @brief	Complete implementation of `units` - a compile-time, header-only, unit conversion
 ///			library built on c++14 with no dependencies.
 //
 //--------------------------------------------------------------------------------------------------
@@ -79,6 +79,10 @@
 #include <cstdint>
 #include <cmath>
 #include <limits>
+
+#ifndef UNIT_LIB_DISABLE_IOSTREAM
+#define UNIT_LIB_DISABLE_IOSTREAM
+#endif
 
 #if !defined(UNIT_LIB_DISABLE_IOSTREAM)
 	#include <iostream>
@@ -200,7 +204,7 @@ namespace units
  /**
   * @def		UNIT_ADD_NAME(namespaceName,nameSingular,abbreviation)
   * @brief		Macro for generating constexpr names/abbreviations for units.
-  * @details	The macro generates names for units. E.g. name() of 1_m would be "meter", and 
+  * @details	The macro generates names for units. E.g. name() of 1_m would be "meter", and
   *				abbreviation would be "m".
   * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
   *				are placed in the `units::literals` namespace.
@@ -454,7 +458,7 @@ namespace units
 
 	/**
 	 * @defgroup	UnitManipulators Unit Manipulators
-	 * @brief		Defines a series of classes used to manipulate unit types, such as `inverse<>`, `squared<>`, and metric prefixes. 
+	 * @brief		Defines a series of classes used to manipulate unit types, such as `inverse<>`, `squared<>`, and metric prefixes.
 	 *				Unit manipulators can be chained together, e.g. `inverse<squared<pico<time::seconds>>>` to
 	 *				represent picoseconds^-2.
 	 */
@@ -591,8 +595,8 @@ namespace units
 	template<bool... Args>
 	struct all_true : std::is_same<units::bool_pack<true, Args...>, units::bool_pack<Args..., true>> {};
 	/** @endcond */	// DOXYGEN IGNORE
-	
-	/** 
+
+	/**
 	 * @brief namespace representing type traits which can access the properties of types provided by the units library.
 	 */
 	namespace traits
@@ -601,8 +605,8 @@ namespace units
 		/**
 		 * @ingroup		TypeTraits
 		 * @brief		Traits class defining the properties of units.
-		 * @details		The units library determines certain properties of the units passed to 
-		 *				them and what they represent by using the members of the corresponding 
+		 * @details		The units library determines certain properties of the units passed to
+		 *				them and what they represent by using the members of the corresponding
 		 *				unit_traits instantiation.
 		 */
 		template<class T>
@@ -774,7 +778,7 @@ namespace units
 		typedef base_unit<detail::meter_ratio<0>,	std::ratio<0>,	std::ratio<0>,	std::ratio<0>,	std::ratio<0>,	std::ratio<0>,	std::ratio<0>,	std::ratio<1>>						luminous_intensity_unit; 		///< Represents an SI base unit of luminous intensity
 
 		// SI DERIVED UNIT TYPES
-		//					METERS			KILOGRAMS		SECONDS			RADIANS			AMPERES			KELVIN			MOLE			CANDELA			BYTE		---		CATEGORY	
+		//					METERS			KILOGRAMS		SECONDS			RADIANS			AMPERES			KELVIN			MOLE			CANDELA			BYTE		---		CATEGORY
 		typedef base_unit<detail::meter_ratio<0>,	std::ratio<0>,	std::ratio<0>,	std::ratio<2>,	std::ratio<0>,	std::ratio<0>,	std::ratio<0>,	std::ratio<0>>						solid_angle_unit;				///< Represents an SI derived unit of solid angle
 		typedef base_unit<detail::meter_ratio<0>,	std::ratio<0>,	std::ratio<-1>>																										frequency_unit;					///< Represents an SI derived unit of frequency
 		typedef base_unit<detail::meter_ratio<1>,	std::ratio<0>,	std::ratio<-1>>																										velocity_unit;					///< Represents an SI derived unit of velocity
@@ -797,7 +801,7 @@ namespace units
 		typedef base_unit<detail::meter_ratio<0>,	std::ratio<0>,	std::ratio<-1>>																										radioactivity_unit;				///< Represents an SI derived unit of radioactivity
 
 		// OTHER UNIT TYPES
-		//					METERS			KILOGRAMS		SECONDS			RADIANS			AMPERES			KELVIN			MOLE			CANDELA			BYTE		---		CATEGORY			
+		//					METERS			KILOGRAMS		SECONDS			RADIANS			AMPERES			KELVIN			MOLE			CANDELA			BYTE		---		CATEGORY
 		typedef base_unit<detail::meter_ratio<2>,	std::ratio<1>,	std::ratio<-2>>																										torque_unit;					///< Represents an SI derived unit of torque
 		typedef base_unit<detail::meter_ratio<2>>																																		area_unit;						///< Represents an SI derived unit of area
 		typedef base_unit<detail::meter_ratio<3>>																																		volume_unit;					///< Represents an SI derived unit of volume
@@ -1308,13 +1312,13 @@ namespace units
 	 * @details		Calculates a rational approximation of the square root of the ratio. The error
 	 *				in the calculation is bounded by 1/epsilon (Eps). E.g. for the default value
 	 *				of 10000000000, the maximum error will be a/10000000000, or 1e-8, or said another way,
-	 *				the error will be on the order of 10^-9. Since these calculations are done at 
+	 *				the error will be on the order of 10^-9. Since these calculations are done at
 	 *				compile time, it is advisable to set epsilon to the highest value that does not
-	 *				cause an integer overflow in the calculation. If you can't compile `ratio_sqrt` 
+	 *				cause an integer overflow in the calculation. If you can't compile `ratio_sqrt`
 	 *				due to overflow errors, reducing the value of epsilon sufficiently will correct
 	 *				the problem.\n\n
 	 *				`ratio_sqrt` is guaranteed to converge for all values of `Ratio` which do not
-	 *				overflow. 
+	 *				overflow.
 	 * @note		This function provides a rational approximation, _NOT_ an exact value.
 	 * @tparam		Ratio	ratio to take the square root of. This can represent any rational value,
 	 *						_not_ just integers or values with integer roots.
@@ -1346,7 +1350,7 @@ namespace units
 	}
 	/** @endcond */	// END DOXYGEN IGNORE
 
-	/**	 
+	/**
 	 * @ingroup		UnitManipulators
 	 * @brief		represents the square root of type `class U`.
 	 * @details		Calculates a rational approximation of the square root of the unit. The error
@@ -1362,7 +1366,7 @@ namespace units
 	 * @tparam		U	`unit` type to take the square root of.
 	 * @tparam		Eps	Value of epsilon, which represents the inverse of the maximum allowable
 	 *					error. This value should be chosen to be as high as possible before
-	 *					integer overflow errors occur in the compiler. 
+	 *					integer overflow errors occur in the compiler.
 	 * @note		USE WITH CAUTION. The is an approximate value. In general, squared<sqrt<meter>> != meter,
 	 *				i.e. the operation is not reversible, and it will result in propogated approximations.
 	 *				Use only when absolutely necessary.
@@ -1751,7 +1755,7 @@ namespace units
 			typedef void value_type;
 			typedef void unit_type;
 		};
-	
+
 		/**
 		 * @ingroup		TypeTraits
 		 * @brief		Trait for accessing the publically defined types of `units::unit_t`
@@ -1792,7 +1796,7 @@ namespace units
 		{};
 	}
 
-	//---------------------------------- 
+	//----------------------------------
 	//	UNIT TYPE
 	//----------------------------------
 
@@ -1918,7 +1922,7 @@ namespace units
 		 *						no additional args are necessary.
 		 */
 		template<class... Args>
-		inline explicit constexpr unit_t(const T value, const Args&... args) noexcept : nls(value, args...) 
+		inline explicit constexpr unit_t(const T value, const Args&... args) noexcept : nls(value, args...)
 		{
 
 		}
@@ -1929,7 +1933,7 @@ namespace units
 		 * @param[in]	value value of the unit_t
 		 */
 		template<class Ty, class = typename std::enable_if<traits::is_dimensionless_unit<Units>::value && std::is_arithmetic<Ty>::value>::type>
-		inline constexpr unit_t(const Ty value) noexcept : nls(value) 
+		inline constexpr unit_t(const Ty value) noexcept : nls(value)
 		{
 
 		}
@@ -1940,8 +1944,8 @@ namespace units
 		 * @param[in]	value value of the unit_t
 		 */
 		template<class Rep, class Period, class = std::enable_if_t<std::is_arithmetic<Rep>::value && traits::is_ratio<Period>::value>>
-		inline constexpr unit_t(const std::chrono::duration<Rep, Period>& value) noexcept : 
-		nls(units::convert<unit<std::ratio<1,1000000000>, category::time_unit>, Units>(static_cast<T>(std::chrono::duration_cast<std::chrono::nanoseconds>(value).count()))) 
+		inline constexpr unit_t(const std::chrono::duration<Rep, Period>& value) noexcept :
+		nls(units::convert<unit<std::ratio<1,1000000000>, category::time_unit>, Units>(static_cast<T>(std::chrono::duration_cast<std::chrono::nanoseconds>(value).count())))
 		{
 
 		}
@@ -1965,7 +1969,7 @@ namespace units
 		 */
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs>
 		inline unit_t& operator=(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) noexcept
-		{		
+		{
 			nls::m_value = units::convert<UnitsRhs, Units, T>(rhs.m_value);
 			return *this;
 		}
@@ -2040,7 +2044,7 @@ namespace units
 		template<class UnitsRhs, typename Ty, template<typename> class NlsRhs, std::enable_if_t<std::is_floating_point<T>::value || std::is_floating_point<Ty>::value, int> = 0>
 		inline constexpr bool operator==(const unit_t<UnitsRhs, Ty, NlsRhs>& rhs) const noexcept
 		{
-			return detail::abs(nls::m_value - units::convert<UnitsRhs, Units>(rhs.m_value)) < std::numeric_limits<T>::epsilon() * 
+			return detail::abs(nls::m_value - units::convert<UnitsRhs, Units>(rhs.m_value)) < std::numeric_limits<T>::epsilon() *
 				detail::abs(nls::m_value + units::convert<UnitsRhs, Units>(rhs.m_value)) ||
 				detail::abs(nls::m_value - units::convert<UnitsRhs, Units>(rhs.m_value)) < (std::numeric_limits<T>::min)();
 		}
@@ -2115,8 +2119,8 @@ namespace units
 		 * @details		only enabled for scalar unit types.
 		 */
 		template<class Ty, std::enable_if_t<traits::is_dimensionless_unit<Units>::value && std::is_arithmetic<Ty>::value, int> = 0>
-		inline constexpr operator Ty() const noexcept 
-		{ 
+		inline constexpr operator Ty() const noexcept
+		{
 			// this conversion also resolves any PI exponents, by converting from a non-zero PI ratio to a zero-pi ratio.
 			return static_cast<Ty>(units::convert<Units, unit<std::ratio<1>, units::category::scalar_unit>>((*this)()));
 		}
@@ -2181,7 +2185,7 @@ namespace units
 	inline constexpr UnitType make_unit(const T value) noexcept
 	{
 		static_assert(traits::is_unit_t<UnitType>::value, "Template parameter `UnitType` must be a unit type (_t).");
-		
+
 		return UnitType(value);
 	}
 
@@ -2193,7 +2197,7 @@ namespace units
 		os << convert<Units, BaseUnits>(obj());
 
 		if (traits::unit_traits<Units>::base_unit_type::meter_ratio::num != 0) { os << " m"; }
-		if (traits::unit_traits<Units>::base_unit_type::meter_ratio::num != 0 && 
+		if (traits::unit_traits<Units>::base_unit_type::meter_ratio::num != 0 &&
 			traits::unit_traits<Units>::base_unit_type::meter_ratio::num != 1) { os << "^" << traits::unit_traits<Units>::base_unit_type::meter_ratio::num; }
 		if (traits::unit_traits<Units>::base_unit_type::meter_ratio::den != 1) { os << "/"   << traits::unit_traits<Units>::base_unit_type::meter_ratio::den; }
 
@@ -2218,7 +2222,7 @@ namespace units
 		if (traits::unit_traits<Units>::base_unit_type::kelvin_ratio::den != 1) { os << "/" << traits::unit_traits<Units>::base_unit_type::kelvin_ratio::den; }
 
 		if (traits::unit_traits<Units>::base_unit_type::mole_ratio::num != 0) { os << " mol"; }
-		if (traits::unit_traits<Units>::base_unit_type::mole_ratio::num != 0 && 
+		if (traits::unit_traits<Units>::base_unit_type::mole_ratio::num != 0 &&
 			traits::unit_traits<Units>::base_unit_type::mole_ratio::num != 1) { os << "^" << traits::unit_traits<Units>::base_unit_type::mole_ratio::num; }
 		if (traits::unit_traits<Units>::base_unit_type::mole_ratio::den != 1) { os << "/" << traits::unit_traits<Units>::base_unit_type::mole_ratio::den; }
 
@@ -2245,7 +2249,7 @@ namespace units
 	inline unit_t<Units, T, NonLinearScale>& operator+=(unit_t<Units, T, NonLinearScale>& lhs, const RhsType& rhs) noexcept
 	{
 		static_assert(traits::is_convertible_unit_t<unit_t<Units, T, NonLinearScale>, RhsType>::value ||
-			(traits::is_dimensionless_unit<decltype(lhs)>::value && std::is_arithmetic<RhsType>::value), 
+			(traits::is_dimensionless_unit<decltype(lhs)>::value && std::is_arithmetic<RhsType>::value),
 			"parameters are not compatible units.");
 
 		lhs = lhs + rhs;
@@ -2337,16 +2341,16 @@ namespace units
 
 	//------------------------------
 	//	UNIT_CAST
-	//------------------------------	
-	
-	/** 
+	//------------------------------
+
+	/**
 	 * @ingroup		Conversion
 	 * @brief		Casts a unit container to an arithmetic type.
 	 * @details		unit_cast can be used to remove the strong typing from a unit class, and convert it
 	 *				to a built-in arithmetic type. This may be useful for compatibility with libraries
-	 *				and legacy code that don't support `unit_t` types. E.g 
+	 *				and legacy code that don't support `unit_t` types. E.g
 	 * @code		meter_t unitVal(5);
-	 *  double value = units::unit_cast<double>(unitVal);	// value = 5.0 
+	 *  double value = units::unit_cast<double>(unitVal);	// value = 5.0
 	 * @endcode
 	 * @tparam		T		Type to cast the unit type to. Must be a built-in arithmetic type.
 	 * @param		value	Unit value to cast.
@@ -2422,7 +2426,7 @@ namespace units
 	//----------------------------------
 
 	// Non-linear transforms are used to pre and post scale units which are defined in terms of non-
-	// linear functions of their current value. A good example of a non-linear scale would be a 
+	// linear functions of their current value. A good example of a non-linear scale would be a
 	// logarithmic or decibel scale
 
 	//------------------------------
@@ -2439,7 +2443,7 @@ namespace units
 	template<typename T>
 	struct linear_scale
 	{
-		inline constexpr linear_scale() = default;													///< default constructor.		
+		inline constexpr linear_scale() = default;													///< default constructor.
 		inline constexpr linear_scale(const linear_scale&) = default;
 		inline ~linear_scale() = default;
 		inline linear_scale& operator=(const linear_scale&) = default;
@@ -2451,7 +2455,7 @@ namespace units
 		inline constexpr linear_scale(const T& value, Args&&...) noexcept : m_value(value) {}	///< constructor.
 		inline constexpr T operator()() const noexcept { return m_value; }							///< returns value.
 
-		T m_value;																					///< linearized value.	
+		T m_value;																					///< linearized value.
 	};
 
 	//----------------------------------
@@ -2469,13 +2473,13 @@ namespace units
 	}
 
 // ignore the redeclaration of the default template parameters
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #	pragma warning(push)
 #	pragma warning(disable : 4348)
 #endif
 	UNIT_ADD_CATEGORY_TRAIT(scalar)
 	UNIT_ADD_CATEGORY_TRAIT(dimensionless)
-#if defined(_MSC_VER) 
+#if defined(_MSC_VER)
 #	pragma warning(pop)
 #endif
 
@@ -2546,7 +2550,7 @@ namespace units
 		return  unit_t<compound_unit<squared<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>>>
 			(lhs() * convert<UnitsRhs, UnitsLhs>(rhs()));
 	}
-	
+
 	/// Multiplication type for non-convertible unit_t types with a linear scale. @returns the multiplied value, whose type is a compound unit of the left and right hand side values.
 	template<class UnitTypeLhs, class UnitTypeRhs,
 		std::enable_if_t<!traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value && traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value && !traits::is_dimensionless_unit<UnitTypeLhs>::value && !traits::is_dimensionless_unit<UnitTypeRhs>::value, int> = 0>
@@ -2602,7 +2606,7 @@ namespace units
 		return dimensionless::scalar_t(lhs() / convert<UnitsRhs, UnitsLhs>(rhs()));
 	}
 
-	/// Division for non-convertible unit_t types with a linear scale. @returns the lhs divided by the rhs, with a compound unit type of lhs/rhs 
+	/// Division for non-convertible unit_t types with a linear scale. @returns the lhs divided by the rhs, with a compound unit type of lhs/rhs
 	template<class UnitTypeLhs, class UnitTypeRhs,
 		std::enable_if_t<!traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value && traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value && !traits::is_dimensionless_unit<UnitTypeLhs>::value && !traits::is_dimensionless_unit<UnitTypeRhs>::value, int> = 0>
 		inline constexpr auto operator/(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept ->  unit_t<compound_unit<typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type, inverse<typename units::traits::unit_t_traits<UnitTypeRhs>::unit_type>>>
@@ -2806,7 +2810,7 @@ namespace units
 		inline constexpr decibel_scale(const T value, std::true_type, Args&&...) noexcept : m_value(value) {}
 		inline constexpr T operator()() const noexcept { return 10 * std::log10(m_value); }
 
-		T m_value;	///< linearized value	
+		T m_value;	///< linearized value
 	};
 
 	//------------------------------
@@ -2908,7 +2912,7 @@ namespace units
 		/**
 		* @ingroup		TypeTraits
 		* @brief		Trait for accessing the publically defined types of `units::unit_value_t_traits`
-		* @details		The units library determines certain properties of the `unit_value_t` types passed to 
+		* @details		The units library determines certain properties of the `unit_value_t` types passed to
 		*				them and what they represent by using the members of the corresponding `unit_value_t_traits`
 		*				instantiation.
 		*/
@@ -2931,7 +2935,7 @@ namespace units
 			typedef void unit_type;
 			typedef void ratio;
 		};
-	
+
 		/**
 		 * @ingroup		TypeTraits
 		 * @brief		Trait for accessing the publically defined types of `units::unit_value_t_traits`
@@ -2955,7 +2959,7 @@ namespace units
 	/**
 	 * @ingroup		UnitContainers
 	 * @brief		Stores a rational unit value as a compile-time constant
-	 * @details		unit_value_t is useful for performing compile-time arithmetic on known 
+	 * @details		unit_value_t is useful for performing compile-time arithmetic on known
 	 *				unit quantities.
 	 * @tparam		Units	units represented by the `unit_value_t`
 	 * @tparam		Num		numerator of the represented value.
@@ -2980,16 +2984,16 @@ namespace units
 		/**
 		 * @ingroup		TypeTraits
 		 * @brief		Trait which tests whether a type is a unit_value_t representing the given unit type.
-		 * @details		e.g. `is_unit_value_t<meters, myType>::value` would test that `myType` is a 
+		 * @details		e.g. `is_unit_value_t<meters, myType>::value` would test that `myType` is a
 		 *				`unit_value_t<meters>`.
 		 * @tparam		Units	units that the `unit_value_t` is supposed to have.
 		 * @tparam		T		type to test.
 		 */
 		template<typename T, typename Units = typename traits::unit_value_t_traits<T>::unit_type>
-		struct is_unit_value_t : std::integral_constant<bool, 
+		struct is_unit_value_t : std::integral_constant<bool,
 			std::is_base_of<units::detail::_unit_value_t<Units>, T>::value>
 		{};
-	
+
 		/**
 		 * @ingroup		TypeTraits
 		 * @brief		Trait which tests whether type T is a unit_value_t with a unit type in the given category.
@@ -3061,7 +3065,7 @@ namespace units
 		/** @cond */	// DOXYGEN IGNORE
 		// value if PI isn't involved
 		static constexpr const unit_t<unit_type> value(std::false_type) noexcept
-		{ 
+		{
 			return unit_t<unit_type>((UNIT_LIB_DEFAULT_TYPE)ratio::num / ratio::den);
 		}
 
@@ -3137,12 +3141,12 @@ namespace units
 	template<class U1, class U2>
 	struct unit_value_multiply : units::detail::unit_value_arithmetic<U1, U2>,
 		units::detail::_unit_value_t<typename std::conditional<traits::is_convertible_unit<typename traits::unit_value_t_traits<U1>::unit_type,
-			typename traits::unit_value_t_traits<U2>::unit_type>::value, compound_unit<squared<typename traits::unit_value_t_traits<U1>::unit_type>>, 
+			typename traits::unit_value_t_traits<U2>::unit_type>::value, compound_unit<squared<typename traits::unit_value_t_traits<U1>::unit_type>>,
 			compound_unit<typename traits::unit_value_t_traits<U1>::unit_type, typename traits::unit_value_t_traits<U2>::unit_type>>::type>
 	{
 		/** @cond */	// DOXYGEN IGNORE
 		using Base = units::detail::unit_value_arithmetic<U1, U2>;
-		
+
 		using unit_type = std::conditional_t<traits::is_convertible_unit<typename Base::_UNIT1, typename Base::_UNIT2>::value, compound_unit<squared<typename Base::_UNIT1>>, compound_unit<typename Base::_UNIT1, typename Base::_UNIT2>>;
 		using ratio = std::conditional_t<traits::is_convertible_unit<typename Base::_UNIT1, typename Base::_UNIT2>::value, std::ratio_multiply<typename Base::_RATIO1, typename Base::_RATIO2CONV>, std::ratio_multiply<typename Base::_RATIO1, typename Base::_RATIO2>>;
 		/** @endcond */	// END DOXYGEN IGNORE
@@ -3187,12 +3191,12 @@ namespace units
 	template<class U1, class U2>
 	struct unit_value_divide : units::detail::unit_value_arithmetic<U1, U2>,
 		units::detail::_unit_value_t<typename std::conditional<traits::is_convertible_unit<typename traits::unit_value_t_traits<U1>::unit_type,
-		typename traits::unit_value_t_traits<U2>::unit_type>::value, dimensionless::scalar, compound_unit<typename traits::unit_value_t_traits<U1>::unit_type, 
+		typename traits::unit_value_t_traits<U2>::unit_type>::value, dimensionless::scalar, compound_unit<typename traits::unit_value_t_traits<U1>::unit_type,
 		inverse<typename traits::unit_value_t_traits<U2>::unit_type>>>::type>
 	{
 		/** @cond */	// DOXYGEN IGNORE
 		using Base = units::detail::unit_value_arithmetic<U1, U2>;
-		
+
 		using unit_type = std::conditional_t<traits::is_convertible_unit<typename Base::_UNIT1, typename Base::_UNIT2>::value, dimensionless::scalar, compound_unit<typename Base::_UNIT1, inverse<typename Base::_UNIT2>>>;
 		using ratio = std::conditional_t<traits::is_convertible_unit<typename Base::_UNIT1, typename Base::_UNIT2>::value, std::ratio_divide<typename Base::_RATIO1, typename Base::_RATIO2CONV>, std::ratio_divide<typename Base::_RATIO1, typename Base::_RATIO2>>;
 		/** @endcond */	// END DOXYGEN IGNORE
@@ -3274,7 +3278,7 @@ namespace units
 	/**
 	 * @ingroup		CompileTimeUnitManipulators
 	 * @brief		calculates square root of unit_value_t at compile-time
-	 * @details		The resulting unit will the square root `unit_type` of `U1`	 
+	 * @details		The resulting unit will the square root `unit_type` of `U1`
 	 * @tparam		U1	`unit_value_t` to take the square root of.
 	 * @sa			unit_value_t_traits to access information about the properties of the class,
 	 *				such as it's unit type and rational value.
@@ -3456,7 +3460,7 @@ namespace units
 	 */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_CURRENT_UNITS)
 	UNIT_ADD_WITH_METRIC_PREFIXES(current, ampere, amperes, A, unit<std::ratio<1>, units::category::current_unit>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(current)
 #endif
 
@@ -3499,7 +3503,7 @@ namespace units
 	 */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_SUBSTANCE_UNITS)
 	UNIT_ADD(substance, mole, moles, mol, unit<std::ratio<1>, units::category::substance_unit>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(substance)
 #endif
 
@@ -3517,7 +3521,7 @@ namespace units
 	 */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_LUMINOUS_INTENSITY_UNITS)
 	UNIT_ADD_WITH_METRIC_PREFIXES(luminous_intensity, candela, candelas, cd, unit<std::ratio<1>, units::category::luminous_intensity_unit>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(luminous_intensity)
 #endif
 
@@ -3577,7 +3581,7 @@ namespace units
 	UNIT_ADD(velocity, miles_per_hour, miles_per_hour, mph, compound_unit<length::miles, inverse<time::hour>>)
 	UNIT_ADD(velocity, kilometers_per_hour, kilometers_per_hour, kph, compound_unit<length::kilometers, inverse<time::hour>>)
 	UNIT_ADD(velocity, knot, knots, kts, compound_unit<length::nauticalMiles, inverse<time::hour>>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(velocity)
 #endif
 
@@ -3663,7 +3667,7 @@ namespace units
 	UNIT_ADD(pressure, atmosphere, atmospheres, atm, unit<std::ratio<101325>, pascals>)
 	UNIT_ADD(pressure, pounds_per_square_inch, pounds_per_square_inch, psi, compound_unit<force::pounds, inverse<squared<length::inch>>>)
 	UNIT_ADD(pressure, torr, torrs, torr, unit<std::ratio<1, 760>, atmospheres>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(pressure)
 #endif
 
@@ -3729,7 +3733,7 @@ namespace units
 	UNIT_ADD(power, horsepower, horsepower, hp, unit<std::ratio<7457, 10>, watts>)
 	UNIT_ADD_DECIBEL(power, watt, dBW)
 	UNIT_ADD_DECIBEL(power, milliwatt, dBm)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(power)
 #endif
 
@@ -3749,7 +3753,7 @@ namespace units
 	UNIT_ADD_WITH_METRIC_PREFIXES(voltage, volt, volts, V, unit<std::ratio<1>, units::category::voltage_unit>)
 	UNIT_ADD(voltage, statvolt, statvolts, statV, unit<std::ratio<1000000, 299792458>, volts>)
 	UNIT_ADD(voltage, abvolt, abvolts, abV, unit<std::ratio<1, 100000000>, volts>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(voltage)
 #endif
 
@@ -3767,7 +3771,7 @@ namespace units
 	 */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_CAPACITANCE_UNITS)
 	UNIT_ADD_WITH_METRIC_PREFIXES(capacitance, farad, farads, F, unit<std::ratio<1>, units::category::capacitance_unit>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(capacitance)
 #endif
 
@@ -3785,7 +3789,7 @@ namespace units
 	 */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_IMPEDANCE_UNITS)
 	UNIT_ADD_WITH_METRIC_PREFIXES(impedance, ohm, ohms, Ohm, unit<std::ratio<1>, units::category::impedance_unit>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(impedance)
 #endif
 
@@ -3803,7 +3807,7 @@ namespace units
 	 */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_CONDUCTANCE_UNITS)
 	UNIT_ADD_WITH_METRIC_PREFIXES(conductance, siemens, siemens, S, unit<std::ratio<1>, units::category::conductance_unit>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(conductance)
 #endif
 
@@ -3842,7 +3846,7 @@ namespace units
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_MAGNETIC_FIELD_STRENGTH_UNITS)
 	UNIT_ADD_WITH_METRIC_PREFIXES(magnetic_field_strength, tesla, teslas, Te, unit<std::ratio<1>, units::category::magnetic_field_strength_unit>)
 	UNIT_ADD(magnetic_field_strength, gauss, gauss, G, compound_unit<magnetic_flux::maxwell, inverse<squared<length::centimeter>>>)
-		
+
 	UNIT_ADD_CATEGORY_TRAIT(magnetic_field_strength)
 #endif
 
@@ -3878,7 +3882,7 @@ namespace units
 	 */
 #if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_LUMINOUS_FLUX_UNITS)
 	UNIT_ADD_WITH_METRIC_PREFIXES(luminous_flux, lumen, lumens, lm, unit<std::ratio<1>, units::category::luminous_flux_unit>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(luminous_flux)
 #endif
 
@@ -3899,7 +3903,7 @@ namespace units
 	UNIT_ADD(illuminance, footcandle, footcandles, fc, compound_unit<luminous_flux::lumen, inverse<squared<length::foot>>>)
 	UNIT_ADD(illuminance, lumens_per_square_inch, lumens_per_square_inch, lm_per_in_sq, compound_unit<luminous_flux::lumen, inverse<squared<length::inch>>>)
 	UNIT_ADD(illuminance, phot, phots, ph, compound_unit<luminous_flux::lumens, inverse<squared<length::centimeter>>>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(illuminance)
 #endif
 
@@ -3946,7 +3950,7 @@ namespace units
 	UNIT_ADD(torque, foot_poundal, foot_poundals, ftpdl, compound_unit<length::foot, force::poundal>)
 	UNIT_ADD(torque, inch_pound, inch_pounds, inlb, compound_unit<length::inch, force::pounds>)
 	UNIT_ADD(torque, meter_kilogram, meter_kilograms, mkgf, compound_unit<length::meter, force::kiloponds>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(torque)
 #endif
 
@@ -3970,7 +3974,7 @@ namespace units
 	UNIT_ADD(area, square_kilometer, square_kilometers, sq_km, squared<length::kilometers>)
 	UNIT_ADD(area, hectare, hectares, ha, unit<std::ratio<10000>, square_meters>)
 	UNIT_ADD(area, acre, acres, acre, unit<std::ratio<43560>, square_feet>)
-	
+
 	UNIT_ADD_CATEGORY_TRAIT(area)
 #endif
 
@@ -4189,7 +4193,7 @@ namespace units
 		 * @ingroup		UnitMath
 		 * @brief		Compute cosine
 		 * @details		The input value can be in any unit of angle, including radians or degrees.
-		 * @tparam		AngleUnit	any `unit_t` type of `category::angle_unit`. 
+		 * @tparam		AngleUnit	any `unit_t` type of `category::angle_unit`.
 		 * @param[in]	angle		angle to compute the cosine of
 		 * @returns		Returns the cosine of <i>angle</i>
 		 */
@@ -4270,9 +4274,9 @@ namespace units
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Compute arc tangent
-		 * @details		Returns the principal value of the arc tangent of x, expressed in radians. 
-		 *				Notice that because of the sign ambiguity, the function cannot determine with 
-		 *				certainty in which quadrant the angle falls only by its tangent value. See 
+		 * @details		Returns the principal value of the arc tangent of x, expressed in radians.
+		 *				Notice that because of the sign ambiguity, the function cannot determine with
+		 *				certainty in which quadrant the angle falls only by its tangent value. See
 		 *				atan2 for an alternative that takes a fractional argument instead.
 		 * @tparam		AngleUnit	any `unit_t` type of `category::angle_unit`.
 		 * @param[in]	x		Value whose arc tangent is computed, in the interval [-1,+1].
@@ -4398,8 +4402,8 @@ namespace units
 		 * @ingroup		UnitMath
 		 * @brief		Compute arc hyperbolic tangent
 		 * @details		Returns the arc hyperbolic tangent of x, expressed in radians.
-		 * @param[in]	x	Value whose arc hyperbolic tangent is computed, in the interval [-1,+1]. 
-		 *					If the argument is out of this interval, a domain error occurs. For 
+		 * @param[in]	x	Value whose arc hyperbolic tangent is computed, in the interval [-1,+1].
+		 *					If the argument is out of this interval, a domain error occurs. For
 		 *					values of -1 and +1, a pole error may occur.
 		 * @returns		units::angle::radian_t
 		 */
@@ -4418,7 +4422,7 @@ namespace units
 
 		// it makes NO SENSE to put dimensioned units into a transcendental function, and if you think it does you are
 		// demonstrably wrong. https://en.wikipedia.org/wiki/Transcendental_function#Dimensional_analysis
-		
+
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Compute exponential function
@@ -4439,7 +4443,7 @@ namespace units
 		 * @ingroup		UnitMath
 		 * @brief		Compute natural logarithm
 		 * @details		Returns the natural logarithm of x.
-		 * @param[in]	x	scalar value whose logarithm is calculated. If the argument is negative, a 
+		 * @param[in]	x	scalar value whose logarithm is calculated. If the argument is negative, a
 		 *					domain error occurs.
 		 * @sa			log10 for more common base-10 logarithms
 		 * @returns		Natural logarithm of x.
@@ -4455,7 +4459,7 @@ namespace units
 		 * @ingroup		UnitMath
 		 * @brief		Compute common logarithm
 		 * @details		Returns the common (base-10) logarithm of x.
-		 * @param[in]	x	Value whose logarithm is calculated. If the argument is negative, a 
+		 * @param[in]	x	Value whose logarithm is calculated. If the argument is negative, a
 		 *					domain error occurs.
 		 * @returns		Common logarithm of x.
 		 */
@@ -4469,8 +4473,8 @@ namespace units
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Break into fractional and integral parts.
-		 * @details		The integer part is stored in the object pointed by intpart, and the 
-		 *				fractional part is returned by the function. Both parts have the same sign 
+		 * @details		The integer part is stored in the object pointed by intpart, and the
+		 *				fractional part is returned by the function. Both parts have the same sign
 		 *				as x.
 		 * @param[in]	x		scalar value to break into parts.
 		 * @param[in]	intpart Pointer to an object (of the same type as x) where the integral part
@@ -4505,7 +4509,7 @@ namespace units
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Compute exponential minus one
-		 * @details		Returns e raised to the power x minus one: e^x-1. For small magnitude values 
+		 * @details		Returns e raised to the power x minus one: e^x-1. For small magnitude values
 		 *				of x, expm1 may be more accurate than exp(x)-1.
 		 * @param[in]	x	Value of the exponent.
 		 * @returns		e raised to the power of x, minus one.
@@ -4520,9 +4524,9 @@ namespace units
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Compute logarithm plus one
-		 * @details		Returns the natural logarithm of one plus x. For small magnitude values of 
+		 * @details		Returns the natural logarithm of one plus x. For small magnitude values of
 		 *				x, logp1 may be more accurate than log(1+x).
-		 * @param[in]	x	Value whose logarithm is calculated. If the argument is less than -1, a 
+		 * @param[in]	x	Value whose logarithm is calculated. If the argument is less than -1, a
 		 *					domain error occurs.
 		 * @returns		The natural logarithm of (1+x).
 		 */
@@ -4532,12 +4536,12 @@ namespace units
 			static_assert(traits::is_dimensionless_unit<ScalarUnit>::value, "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
 			return dimensionless::scalar_t(std::log1p(x()));
 		}
-		
+
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Compute binary logarithm
 		 * @details		Returns the binary (base-2) logarithm of x.
-		 * @param[in]	x	Value whose logarithm is calculated. If the argument is negative, a 
+		 * @param[in]	x	Value whose logarithm is calculated. If the argument is negative, a
 		 *					domain error occurs.
 		 * @returns		The binary logarithm of x: log2x.
 		 */
@@ -4551,7 +4555,7 @@ namespace units
 		//----------------------------------
 		//	POWER FUNCTIONS
 		//----------------------------------
-		
+
 		/* pow is implemented earlier in the library since a lot of the unit definitions depend on it */
 
 		/**
@@ -4637,7 +4641,7 @@ namespace units
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Truncate value
-		 * @details		Rounds x toward zero, returning the nearest integral value that is not 
+		 * @details		Rounds x toward zero, returning the nearest integral value that is not
 		 *				larger in magnitude than x. Effectively rounds towards 0.
 		 * @param[in]	x	Value to truncate
 		 * @returns		The nearest integral value that is not larger in magnitude than x.
@@ -4664,13 +4668,13 @@ namespace units
 		}
 
 		//----------------------------------
-		//	FLOATING POINT MANIPULATION 
+		//	FLOATING POINT MANIPULATION
 		//----------------------------------
 
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Copy sign
-		 * @details		Returns a value with the magnitude and dimension of x, and the sign of y. 
+		 * @details		Returns a value with the magnitude and dimension of x, and the sign of y.
 		 *				Values x and y do not have to be compatible units.
 		 * @param[in]	x	Value with the magnitude of the resulting value.
 		 * @param[in]	y	Value with the sign of the resulting value.
@@ -4690,9 +4694,9 @@ namespace units
 		}
 
 		//----------------------------------
-		//	MIN / MAX / DIFFERENCE 
+		//	MIN / MAX / DIFFERENCE
 		//----------------------------------
-		
+
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Positive difference
@@ -4748,7 +4752,7 @@ namespace units
 		//----------------------------------
 		//	OTHER FUNCTIONS
 		//----------------------------------
-		
+
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Compute absolute value
@@ -4778,7 +4782,7 @@ namespace units
 		/**
 		 * @ingroup		UnitMath
 		 * @brief		Multiply-add
-		 * @details		Returns x*y+z. The function computes the result without losing precision in 
+		 * @details		Returns x*y+z. The function computes the result without losing precision in
 		 *				any intermediate result. The resulting unit type is a compound unit of x* y.
 		 * @param[in]	x	Values to be multiplied.
 		 * @param[in]	y	Values to be multiplied.
