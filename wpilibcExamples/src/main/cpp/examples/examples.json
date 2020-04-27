@@ -542,5 +542,74 @@
     "foldername": "RamseteController",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "StateSpaceFlywheel",
+    "description": "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.",
+    "tags": [
+      "StateSpaceFlywheel",
+      "Flywheel",
+      "State Space",
+      "Model",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "StateSpaceFlywheel",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceFlywheelSysId",
+    "description": "An example state-space controller demonstrating the use of FRC Characterization's System Identification for controlling a flywheel.",
+    "tags": [
+      "StateSpaceFlywheelSysId",
+      "FRC Characterization",
+      "Flywheel",
+      "Characterization",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "StateSpaceFlywheelSysId",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceElevator",
+    "description": "An example state-space controller demonstrating the use of FRC Characterization's System Identification for controlling a flywheel.",
+    "tags": [
+      "Elevator",
+      "State Space",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "StateSpaceElevator",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceArm",
+    "description": "An example state-space controller demonstrating the use of FRC Characterization's System Identification for controlling a flywheel.",
+    "tags": [
+      "Arm",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick"
+    ],
+    "foldername": "StateSpaceArm",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]

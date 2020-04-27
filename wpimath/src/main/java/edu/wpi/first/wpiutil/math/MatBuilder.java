@@ -34,7 +34,7 @@ public class MatBuilder<R extends Num, C extends Num> {
       throw new IllegalArgumentException("Invalid matrix data provided. Wanted " + this.m_rows.getNum()
           + " x " + this.m_cols.getNum() + " matrix, but got " + data.length + " elements");
     } else {
-      return new Matrix<>(new SimpleMatrix(this.m_rows.getNum(), this.m_cols.getNum(), true, data));
+      return new Matrix<R, C>(new SimpleMatrix(this.m_rows.getNum(), this.m_cols.getNum(), true, data));
     }
   }
 
