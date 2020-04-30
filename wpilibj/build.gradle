@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
@@ -144,22 +142,11 @@ model {
                                 test.dependsOn it.tasks.install
                                 test.systemProperty 'java.library.path', filePath
                                 test.environment 'LD_LIBRARY_PATH', filePath
-
-                                // Workaround for Azure issue
-                                if (OperatingSystem.current().isWindows() && System.getenv('AGENT_ID') != null) {
-                                    test.environment 'PATH', filePath
-                                }
-
                                 test.workingDir filePath
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
                                 run.environment 'LD_LIBRARY_PATH', filePath
                                 run.workingDir filePath
-
-                                // Workaround for Azure issue
-                                if (OperatingSystem.current().isWindows() && System.getenv('AGENT_ID') != null) {
-                                    run.environment 'PATH', filePath
-                                }
 
                                 found = true
                             }
