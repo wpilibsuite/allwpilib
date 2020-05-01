@@ -9,10 +9,9 @@
 #include <frc/I2C.h>
 #include <frc/TimedRobot.h>
 #include <wpi/Format.h>
-#include <wpi/StringRef.h>
 #include <wpi/SmallString.h>
+#include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
-
 
 /**
  * This is a sample program demonstrating how to communicate to a light
@@ -33,9 +32,8 @@ class Robot : public frc::TimedRobot {
     wpi::SmallString<128> data;
     wpi::raw_svector_ostream os(data);
     os << (m_ds.GetAlliance() == frc::DriverStation::Alliance::kRed ? "R" : "B")
-      << (m_ds.IsEnabled() ? "E" : "D")
-      << (m_ds.IsAutonomous() ? "A" : "T")
-      << wpi::format("%03d", m_ds.GetMatchTime());
+       << (m_ds.IsEnabled() ? "E" : "D") << (m_ds.IsAutonomous() ? "A" : "T")
+       << wpi::format("%03d", m_ds.GetMatchTime());
 
     arduino.WriteBulk((uint8_t *) data.data(), data.size());
   }
@@ -43,8 +41,6 @@ class Robot : public frc::TimedRobot {
  private:
   int deviceAddress = 4;
   frc::I2C arduino{frc::I2C::Port::kOnboard, deviceAddress};
-
-
 };
 
 #ifndef RUNNING_FRC_TESTS
