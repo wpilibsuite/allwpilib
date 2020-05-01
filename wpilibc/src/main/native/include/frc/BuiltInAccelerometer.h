@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,9 +9,12 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/interfaces/Accelerometer.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Built-in accelerometer.
@@ -19,8 +22,9 @@ namespace frc {
  * This class allows access to the roboRIO's internal accelerometer.
  */
 class BuiltInAccelerometer : public ErrorBase,
-                             public SendableBase,
-                             public Accelerometer {
+                             public Accelerometer,
+                             public Sendable,
+                             public SendableHelper<BuiltInAccelerometer> {
  public:
   /**
    * Constructor.

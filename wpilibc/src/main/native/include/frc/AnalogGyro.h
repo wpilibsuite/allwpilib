@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,8 @@
 #include <hal/Types.h>
 
 #include "frc/GyroBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -100,7 +102,7 @@ class AnalogGyro : public GyroBase {
    */
   AnalogGyro(std::shared_ptr<AnalogInput> channel, int center, double offset);
 
-  virtual ~AnalogGyro();
+  ~AnalogGyro() override;
 
   AnalogGyro(AnalogGyro&& rhs);
   AnalogGyro& operator=(AnalogGyro&& rhs);
@@ -188,7 +190,7 @@ class AnalogGyro : public GyroBase {
   std::shared_ptr<AnalogInput> m_analog;
 
  private:
-  HAL_GyroHandle m_gyroHandle = HAL_kInvalidHandle;
+  hal::Handle<HAL_GyroHandle> m_gyroHandle;
 };
 
 }  // namespace frc

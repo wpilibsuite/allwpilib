@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,9 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/Notifier.h>
 
 #include "frc/Timer.h"
 #include "frc/Utility.h"
@@ -22,10 +24,14 @@ using namespace frc;
 void TimedRobot::StartCompetition() {
   RobotInit();
 
+  if (IsSimulation()) {
+    SimulationInit();
+  }
+
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
 
-  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
+  m_expirationTime = units::second_t{Timer::GetFPGATimestamp()} + m_period;
   UpdateAlarm();
 
   // Loop forever, calling the appropriate mode-dependent function
@@ -43,12 +49,22 @@ void TimedRobot::StartCompetition() {
   }
 }
 
-double TimedRobot::GetPeriod() const { return m_period; }
+void TimedRobot::EndCompetition() {
+  int32_t status = 0;
+  HAL_StopNotifier(m_notifier, &status);
+}
 
-TimedRobot::TimedRobot(double period) : IterativeRobotBase(period) {
+units::second_t TimedRobot::GetPeriod() const {
+  return units::second_t(m_period);
+}
+
+TimedRobot::TimedRobot(double period) : TimedRobot(units::second_t(period)) {}
+
+TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
+  HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Timed);
@@ -58,30 +74,14 @@ TimedRobot::~TimedRobot() {
   int32_t status = 0;
 
   HAL_StopNotifier(m_notifier, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   HAL_CleanNotifier(m_notifier, &status);
-}
-
-TimedRobot::TimedRobot(TimedRobot&& rhs)
-    : IterativeRobotBase(std::move(rhs)),
-      m_expirationTime(std::move(rhs.m_expirationTime)) {
-  std::swap(m_notifier, rhs.m_notifier);
-}
-
-TimedRobot& TimedRobot::operator=(TimedRobot&& rhs) {
-  IterativeRobotBase::operator=(std::move(rhs));
-  ErrorBase::operator=(std::move(rhs));
-
-  std::swap(m_notifier, rhs.m_notifier);
-  m_expirationTime = std::move(rhs.m_expirationTime);
-
-  return *this;
 }
 
 void TimedRobot::UpdateAlarm() {
   int32_t status = 0;
   HAL_UpdateNotifierAlarm(
       m_notifier, static_cast<uint64_t>(m_expirationTime * 1e6), &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }

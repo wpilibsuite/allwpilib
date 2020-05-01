@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,6 +18,7 @@
 
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "HALInitializer.h"
 #include "mockdata/DriverStationDataInternal.h"
@@ -28,7 +29,9 @@ static wpi::condition_variable* newDSDataAvailableCond;
 static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 static std::atomic_bool isFinalized{false};
-static HALSIM_SendErrorHandler sendErrorHandler{nullptr};
+static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
+static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
+    nullptr};
 
 namespace hal {
 namespace init {
@@ -42,16 +45,26 @@ void InitializeDriverStation() {
 using namespace hal;
 
 extern "C" {
+
+void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
+  sendErrorHandler.store(handler);
+}
+
+void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {
+  sendConsoleLineHandler.store(handler);
+}
+
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
-  if (sendErrorHandler)
-    return sendErrorHandler(isError, errorCode, isLVCode, details, location,
-                            callStack, printMsg);
+  auto errorHandler = sendErrorHandler.load();
+  if (errorHandler)
+    return errorHandler(isError, errorCode, isLVCode, details, location,
+                        callStack, printMsg);
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard<wpi::mutex> lock(msgMutex);
+  std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -97,6 +110,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     prevMsgTime[i] = curTime;
   }
   return retval;
+}
+
+int32_t HAL_SendConsoleLine(const char* line) {
+  auto handler = sendConsoleLineHandler.load();
+  if (handler) {
+    return handler(line);
+  }
+  wpi::outs() << line << "\n";
+  wpi::outs().flush();
+  return 0;
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
@@ -204,7 +227,11 @@ static void InitLastCountKey(void) {
 }
 #endif
 
-HAL_Bool HAL_IsNewControlData(void) {
+static int& GetThreadLocalLastCount() {
+  // There is a rollover error condition here. At Packet# = n * (uintmax), this
+  // will return false when instead it should return true. However, this at a
+  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
+  // worth the cycles to check.
 #ifdef __APPLE__
   pthread_once(&lastCountKeyOnce, InitLastCountKey);
   int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
@@ -217,13 +244,47 @@ HAL_Bool HAL_IsNewControlData(void) {
 #else
   thread_local int lastCount{-1};
 #endif
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
+  return lastCount;
+}
+
+void HAL_WaitForCachedControlData(void) {
+  HAL_WaitForCachedControlDataTimeout(0);
+}
+
+HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
+  int& lastCount = GetThreadLocalLastCount();
+  std::unique_lock lock(newDSDataAvailableMutex);
+  int currentCount = newDSDataAvailableCounter;
+  if (lastCount != currentCount) {
+    lastCount = currentCount;
+    return true;
+  }
+
+  if (isFinalized.load()) {
+    return false;
+  }
+
+  auto timeoutTime =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+
+  while (newDSDataAvailableCounter == currentCount) {
+    if (timeout > 0) {
+      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
+      if (timedOut == std::cv_status::timeout) {
+        return false;
+      }
+    } else {
+      newDSDataAvailableCond->wait(lock);
+    }
+  }
+  return true;
+}
+
+HAL_Bool HAL_IsNewControlData(void) {
+  int& lastCount = GetThreadLocalLastCount();
   int currentCount = 0;
   {
-    std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
+    std::scoped_lock lock(newDSDataAvailableMutex);
     currentCount = newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;
@@ -240,7 +301,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
+  std::unique_lock lock(newDSDataAvailableMutex);
   int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
@@ -262,7 +323,7 @@ static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return 0;
-  std::lock_guard<wpi::mutex> lock(newDSDataAvailableMutex);
+  std::scoped_lock lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
   newDSDataAvailableCond->notify_all();
@@ -276,7 +337,7 @@ void HAL_InitializeDriverStation(void) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

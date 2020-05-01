@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,8 +10,12 @@
 #include <hal/Types.h>
 
 #include "frc/SolenoidBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
@@ -20,7 +24,9 @@ namespace frc {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public SolenoidBase {
+class DoubleSolenoid : public SolenoidBase,
+                       public Sendable,
+                       public SendableHelper<DoubleSolenoid> {
  public:
   enum Value { kOff, kForward, kReverse };
 
@@ -45,8 +51,8 @@ class DoubleSolenoid : public SolenoidBase {
 
   ~DoubleSolenoid() override;
 
-  DoubleSolenoid(DoubleSolenoid&& rhs);
-  DoubleSolenoid& operator=(DoubleSolenoid&& rhs);
+  DoubleSolenoid(DoubleSolenoid&&) = default;
+  DoubleSolenoid& operator=(DoubleSolenoid&&) = default;
 
   /**
    * Set the value of a solenoid.
@@ -91,8 +97,8 @@ class DoubleSolenoid : public SolenoidBase {
   int m_reverseChannel;  // The reverse channel on the module to control.
   int m_forwardMask;     // The mask for the forward channel.
   int m_reverseMask;     // The mask for the reverse channel.
-  HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
-  HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
+  hal::Handle<HAL_SolenoidHandle> m_forwardHandle;
+  hal::Handle<HAL_SolenoidHandle> m_reverseHandle;
 };
 
 }  // namespace frc

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -102,6 +102,22 @@ public class EncoderSim {
   }
   public void setSamplesToAverage(int samplesToAverage) {
     EncoderDataJNI.setSamplesToAverage(m_index, samplesToAverage);
+  }
+
+  public void setDistance(double distance) {
+    EncoderDataJNI.setDistance(m_index, distance);
+  }
+
+  public double getDistance() {
+    return EncoderDataJNI.getDistance(m_index);
+  }
+
+  public void setRate(double rate) {
+    EncoderDataJNI.setRate(m_index, rate);
+  }
+
+  public double getRate() {
+    return EncoderDataJNI.getRate(m_index);
   }
 
   public void resetData() {

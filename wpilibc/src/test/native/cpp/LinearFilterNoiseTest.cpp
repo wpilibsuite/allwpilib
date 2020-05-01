@@ -11,11 +11,14 @@
 #include <memory>
 #include <random>
 
+#include <units/units.h>
+#include <wpi/math>
+
 #include "gtest/gtest.h"
 
 // Filter constants
-static constexpr double kFilterStep = 0.005;
-static constexpr double kFilterTime = 2.0;
+static constexpr units::second_t kFilterStep = 0.005_s;
+static constexpr units::second_t kFilterTime = 2.0_s;
 static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
 static constexpr int32_t kMovAvgTaps = 6;
 
@@ -36,27 +39,26 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 static double GetData(double t) {
-  constexpr double kPi = 3.14159265358979323846;
-  return 100.0 * std::sin(2.0 * kPi * t);
+  return 100.0 * std::sin(2.0 * wpi::math::pi * t);
 }
 
 class LinearFilterNoiseTest
     : public testing::TestWithParam<LinearFilterNoiseTestType> {
  protected:
-  std::unique_ptr<frc::LinearFilter> m_filter;
+  std::unique_ptr<frc::LinearFilter<double>> m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
       case TEST_SINGLE_POLE_IIR: {
-        m_filter = std::make_unique<frc::LinearFilter>(
-            frc::LinearFilter::SinglePoleIIR(kSinglePoleIIRTimeConstant,
-                                             kFilterStep));
+        m_filter = std::make_unique<frc::LinearFilter<double>>(
+            frc::LinearFilter<double>::SinglePoleIIR(kSinglePoleIIRTimeConstant,
+                                                     kFilterStep));
         break;
       }
 
       case TEST_MOVAVG: {
-        m_filter = std::make_unique<frc::LinearFilter>(
-            frc::LinearFilter::MovingAverage(kMovAvgTaps));
+        m_filter = std::make_unique<frc::LinearFilter<double>>(
+            frc::LinearFilter<double>::MovingAverage(kMovAvgTaps));
         break;
       }
     }
@@ -74,8 +76,8 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
   std::mt19937 gen{rd()};
   std::normal_distribution<double> distr{0.0, 10.0};
 
-  for (double t = 0; t < kFilterTime; t += kFilterStep) {
-    double theory = GetData(t);
+  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
+    double theory = GetData(t.to<double>());
     double noise = distr(gen);
     filterError += std::abs(m_filter->Calculate(theory + noise) - theory);
     noiseGenError += std::abs(noise - theory);

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -181,7 +181,7 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   if (*status != 0) return;
 
   gyro->center = static_cast<int32_t>(
-      static_cast<double>(value) / static_cast<double>(count) + .5);
+      static_cast<double>(value) / static_cast<double>(count) + 0.5);
 
   gyro->offset = static_cast<double>(value) / static_cast<double>(count) -
                  static_cast<double>(gyro->center);

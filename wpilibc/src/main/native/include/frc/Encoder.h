@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,12 +15,16 @@
 #include "frc/CounterBase.h"
 #include "frc/ErrorBase.h"
 #include "frc/PIDSource.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalSource;
 class DigitalGlitchFilter;
+class SendableBuilder;
+class DMA;
+class DMASample;
 
 /**
  * Class to read quad encoders.
@@ -38,9 +42,13 @@ class DigitalGlitchFilter;
  * to be zeroed before use.
  */
 class Encoder : public ErrorBase,
-                public SendableBase,
                 public CounterBase,
-                public PIDSource {
+                public PIDSource,
+                public Sendable,
+                public SendableHelper<Encoder> {
+  friend class DMA;
+  friend class DMASample;
+
  public:
   enum IndexingType {
     kResetWhileHigh,
@@ -133,8 +141,8 @@ class Encoder : public ErrorBase,
 
   ~Encoder() override;
 
-  Encoder(Encoder&& rhs);
-  Encoder& operator=(Encoder&& rhs);
+  Encoder(Encoder&&) = default;
+  Encoder& operator=(Encoder&&) = default;
 
   // CounterBase interface
   /**
@@ -184,6 +192,9 @@ class Encoder : public ErrorBase,
    *                  the FPGA will report the device stopped. This is expressed
    *                  in seconds.
    */
+  WPI_DEPRECATED(
+      "Use SetMinRate() in favor of this method.  This takes unscaled periods "
+      "and SetMinRate() scales using value from SetDistancePerPulse().")
   void SetMaxPeriod(double maxPeriod) override;
 
   /**
@@ -329,6 +340,13 @@ class Encoder : public ErrorBase,
   void SetIndexSource(const DigitalSource& source,
                       IndexingType type = kResetOnRisingEdge);
 
+  /**
+   * Indicates this encoder is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
+
   int GetFPGAIndex() const;
 
   void InitSendable(SendableBuilder& builder) override;
@@ -362,7 +380,7 @@ class Encoder : public ErrorBase,
   std::shared_ptr<DigitalSource> m_aSource;  // The A phase of the quad encoder
   std::shared_ptr<DigitalSource> m_bSource;  // The B phase of the quad encoder
   std::shared_ptr<DigitalSource> m_indexSource = nullptr;
-  HAL_EncoderHandle m_encoder = HAL_kInvalidHandle;
+  hal::Handle<HAL_EncoderHandle> m_encoder;
 
   friend class DigitalGlitchFilter;
 };

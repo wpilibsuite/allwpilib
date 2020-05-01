@@ -2,14 +2,6 @@ apply plugin: 'cpp'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
 
-ext {
-    chipObjectComponents = ["$pluginName".toString(), "${pluginName}Dev".toString(), "${pluginName}Test".toString()]
-    netCommComponents = ["$pluginName".toString(), "${pluginName}Dev".toString(), "${pluginName}Test".toString()]
-    useNiJava = false
-}
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
 if (!project.hasProperty('onlylinuxathena')) {
     ext.skiplinuxathena = true
     apply from: "${rootDir}/shared/config.gradle"
@@ -57,13 +49,16 @@ if (!project.hasProperty('onlylinuxathena')) {
                     }
                 }
                 binaries.all {
-                    if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
+                    if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')  && !project.hasProperty('onlylinuxaarch64bionic')) {
                         project(':hal').addHalDependency(it, 'shared')
                         lib library: pluginName
                         if (project.hasProperty('includeNtCore')) {
                             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                         }
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                            nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                        }
                     } else {
                         it.buildable = false
                     }
@@ -78,7 +73,7 @@ if (!project.hasProperty('onlylinuxathena')) {
 model {
     tasks {
         def c = $.components
-        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
             project.tasks.create('runCpp', Exec) {
                 group = 'WPILib'
                 description = "Run the ${pluginName}Dev executable"

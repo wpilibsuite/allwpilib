@@ -5,14 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <algorithm>
+
 #include "TestBench.h"
 #include "frc/Encoder.h"
 #include "frc/Jaguar.h"
-#include "frc/PIDController.h"
+#include "frc/LinearFilter.h"
+#include "frc/Notifier.h"
 #include "frc/Talon.h"
 #include "frc/Timer.h"
 #include "frc/Victor.h"
-#include "frc/filters/LinearDigitalFilter.h"
+#include "frc/controller/PIDController.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -45,7 +48,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
   SpeedController* m_speedController;
   Encoder* m_encoder;
-  LinearDigitalFilter* m_filter;
+  LinearFilter<double>* m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
@@ -67,8 +70,8 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
                                 TestBench::kTalonEncoderChannelB);
         break;
     }
-    m_filter = new LinearDigitalFilter(
-        LinearDigitalFilter::MovingAverage(*m_encoder, 50));
+    m_filter =
+        new LinearFilter<double>(LinearFilter<double>::MovingAverage(50));
   }
 
   void TearDown() override {
@@ -139,22 +142,25 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
 TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
   double goal = 1000;
-  m_encoder->SetPIDSourceType(PIDSourceType::kDisplacement);
-  PIDController pid(0.001, 0.0005, 0.0, m_encoder, m_speedController);
-  pid.SetAbsoluteTolerance(50.0);
-  pid.SetOutputRange(-0.2, 0.2);
-  pid.SetSetpoint(goal);
+  frc2::PIDController pidController(0.001, 0.01, 0.0);
+  pidController.SetTolerance(50.0);
+  pidController.SetIntegratorRange(-0.2, 0.2);
+  pidController.SetSetpoint(goal);
 
-  /* 10 seconds should be plenty time to get to the setpoint */
-  pid.Enable();
+  /* 10 seconds should be plenty time to get to the reference */
+  frc::Notifier pidRunner{[this, &pidController] {
+    auto speed = pidController.Calculate(m_encoder->GetDistance());
+    m_speedController->Set(std::clamp(speed, -0.2, 0.2));
+  }};
+  pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
-  pid.Disable();
+  pidRunner.Stop();
 
-  RecordProperty("PIDError", pid.GetError());
+  RecordProperty("PIDError", pidController.GetPositionError());
 
-  EXPECT_TRUE(pid.OnTarget())
+  EXPECT_TRUE(pidController.AtSetpoint())
       << "PID loop did not converge within 10 seconds. Goal was: " << goal
-      << " Error was: " << pid.GetError();
+      << " Error was: " << pidController.GetPositionError();
 }
 
 /**
@@ -163,21 +169,24 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
-  m_encoder->SetPIDSourceType(PIDSourceType::kRate);
-  PIDController pid(1e-5, 0.0, 3e-5, 8e-5, m_filter, m_speedController);
-  pid.SetAbsoluteTolerance(200.0);
-  pid.SetOutputRange(-0.3, 0.3);
-  pid.SetSetpoint(600);
+  frc2::PIDController pidController(1e-5, 0.0, 0.0006);
+  pidController.SetTolerance(200.0);
+  pidController.SetSetpoint(600);
 
-  /* 10 seconds should be plenty time to get to the setpoint */
-  pid.Enable();
+  /* 10 seconds should be plenty time to get to the reference */
+  frc::Notifier pidRunner{[this, &pidController] {
+    auto speed =
+        pidController.Calculate(m_filter->Calculate(m_encoder->GetRate()));
+    m_speedController->Set(std::clamp(speed, -0.3, 0.3));
+  }};
+  pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
-  pid.Disable();
-  RecordProperty("PIDError", pid.GetError());
+  pidRunner.Stop();
+  RecordProperty("PIDError", pidController.GetPositionError());
 
-  EXPECT_TRUE(pid.OnTarget())
+  EXPECT_TRUE(pidController.AtSetpoint())
       << "PID loop did not converge within 10 seconds. Goal was: " << 600
-      << " Error was: " << pid.GetError();
+      << " Error was: " << pidController.GetPositionError();
 }
 
 /**

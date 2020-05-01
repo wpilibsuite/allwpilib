@@ -12,7 +12,8 @@
 #include <cstring>
 #include <set>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
@@ -40,13 +41,13 @@ GlobalErrors& GlobalErrors::GetInstance() {
 
 void GlobalErrors::Insert(const Error& error) {
   GlobalErrors& inst = GetInstance();
-  std::lock_guard<wpi::mutex> lock(inst.mutex);
+  std::scoped_lock lock(inst.mutex);
   inst.lastError = &(*inst.errors.insert(error).first);
 }
 
 void GlobalErrors::Insert(Error&& error) {
   GlobalErrors& inst = GetInstance();
-  std::lock_guard<wpi::mutex> lock(inst.mutex);
+  std::scoped_lock lock(inst.mutex);
   inst.lastError = &(*inst.errors.insert(std::move(error)).first);
 }
 
@@ -165,14 +166,14 @@ void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
 
 Error ErrorBase::GetGlobalError() {
   auto& inst = GlobalErrors::GetInstance();
-  std::lock_guard<wpi::mutex> mutex(inst.mutex);
+  std::scoped_lock mutex(inst.mutex);
   if (!inst.lastError) return Error{};
   return *inst.lastError;
 }
 
 std::vector<Error> ErrorBase::GetGlobalErrors() {
   auto& inst = GlobalErrors::GetInstance();
-  std::lock_guard<wpi::mutex> mutex(inst.mutex);
+  std::scoped_lock mutex(inst.mutex);
   std::vector<Error> rv;
   for (auto&& error : inst.errors) rv.push_back(error);
   return rv;
@@ -180,7 +181,7 @@ std::vector<Error> ErrorBase::GetGlobalErrors() {
 
 void ErrorBase::ClearGlobalErrors() {
   auto& inst = GlobalErrors::GetInstance();
-  std::lock_guard<wpi::mutex> mutex(inst.mutex);
+  std::scoped_lock mutex(inst.mutex);
   inst.errors.clear();
   inst.lastError = nullptr;
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hal/FRCUsageReporting.h>
 #include <units/units.h>
 
 namespace frc {
@@ -40,18 +41,34 @@ namespace frc {
  * `Calculate()` and to determine when the profile has completed via
  * `IsFinished()`.
  */
+template <class Distance>
 class TrapezoidProfile {
  public:
+  using Distance_t = units::unit_t<Distance>;
+  using Velocity =
+      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  using Velocity_t = units::unit_t<Velocity>;
+  using Acceleration =
+      units::compound_unit<Velocity, units::inverse<units::seconds>>;
+  using Acceleration_t = units::unit_t<Acceleration>;
+
   class Constraints {
    public:
-    units::meters_per_second_t maxVelocity = 0_mps;
-    units::meters_per_second_squared_t maxAcceleration = 0_mps_sq;
+    Constraints() {
+      HAL_Report(HALUsageReporting::kResourceType_TrapezoidProfile, 1);
+    }
+    Constraints(Velocity_t maxVelocity_, Acceleration_t maxAcceleration_)
+        : maxVelocity{maxVelocity_}, maxAcceleration{maxAcceleration_} {
+      HAL_Report(HALUsageReporting::kResourceType_TrapezoidProfile, 1);
+    }
+    Velocity_t maxVelocity{0};
+    Acceleration_t maxAcceleration{0};
   };
 
   class State {
    public:
-    units::meter_t position = 0_m;
-    units::meters_per_second_t velocity = 0_mps;
+    Distance_t position{0};
+    Velocity_t velocity{0};
     bool operator==(const State& rhs) const {
       return position == rhs.position && velocity == rhs.velocity;
     }
@@ -66,7 +83,12 @@ class TrapezoidProfile {
    * @param initial     The initial state (usually the current state).
    */
   TrapezoidProfile(Constraints constraints, State goal,
-                   State initial = State{0_m, 0_mps});
+                   State initial = State{Distance_t(0), Velocity_t(0)});
+
+  TrapezoidProfile(const TrapezoidProfile&) = default;
+  TrapezoidProfile& operator=(const TrapezoidProfile&) = default;
+  TrapezoidProfile(TrapezoidProfile&&) = default;
+  TrapezoidProfile& operator=(TrapezoidProfile&&) = default;
 
   /**
    * Calculate the correct position and velocity for the profile at a time t
@@ -81,7 +103,7 @@ class TrapezoidProfile {
    *
    * @param target The target distance.
    */
-  units::second_t TimeLeftUntil(units::meter_t target) const;
+  units::second_t TimeLeftUntil(Distance_t target) const;
 
   /**
    * Returns the total time the profile takes to reach the goal.
@@ -130,5 +152,6 @@ class TrapezoidProfile {
   units::second_t m_endFullSpeed;
   units::second_t m_endDeccel;
 };
-
 }  // namespace frc
+
+#include "TrapezoidProfile.inc"

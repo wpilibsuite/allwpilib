@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -50,6 +50,11 @@ public class EncoderDataJNI extends JNIWrapper {
   public static native void cancelSamplesToAverageCallback(int index, int uid);
   public static native int getSamplesToAverage(int index);
   public static native void setSamplesToAverage(int index, int samplesToAverage);
+
+  public static native void setDistance(int index, double distance);
+  public static native double getDistance(int index);
+  public static native void setRate(int index, double rate);
+  public static native double getRate(int index);
 
   public static native void resetData(int index);
 }

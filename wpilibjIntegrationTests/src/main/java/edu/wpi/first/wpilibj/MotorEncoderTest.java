@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,10 +19,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class MotorEncoderTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(MotorEncoderTest.class.getName());
 
-  private static final double MOTOR_RUNTIME = .25;
+  private static final double MOTOR_RUNTIME = 0.25;
 
   // private static final List<MotorEncoderFixture> pairs = new
   // ArrayList<MotorEncoderFixture>();
@@ -67,14 +68,15 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Before
   public void setUp() {
     double initialSpeed = me.getMotor().get();
-    assertTrue(me.getType() + " Did not start with an initial speed of 0 instead got: "
-        + initialSpeed, Math.abs(initialSpeed) < 0.001);
+    assertTrue(
+        me.getType() + " Did not start with an initial speed of 0 instead got: " + initialSpeed,
+        Math.abs(initialSpeed) < 0.001);
     me.setup();
 
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     me.reset();
     encodersResetCheck(me);
   }
@@ -107,7 +109,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testIncrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(.2);
+    me.getMotor().set(0.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not incremented: start: " + startValue + "; current: "
@@ -123,7 +125,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testDecrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(-.2);
+    me.getMotor().set(-0.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not decremented: start: " + startValue + "; current: "
@@ -138,7 +140,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     final int counter1Start = me.getCounters()[0].get();
     final int counter2Start = me.getCounters()[1].get();
 
-    me.getMotor().set(.75);
+    me.getMotor().set(0.75);
     Timer.delay(MOTOR_RUNTIME);
     int counter1End = me.getCounters()[0].get();
     int counter2End = me.getCounters()[1].get();
@@ -175,42 +177,47 @@ public class MotorEncoderTest extends AbstractComsSetup {
 
   @Test
   public void testPositionPIDController() {
-    me.getEncoder().setPIDSourceType(PIDSourceType.kDisplacement);
-    PIDController pid = new PIDController(0.001, 0.0005, 0, me.getEncoder(), me.getMotor());
-    pid.setAbsoluteTolerance(50.0);
-    pid.setOutputRange(-0.2, 0.2);
-    pid.setSetpoint(1000);
+    PIDController pidController = new PIDController(0.001, 0.0005, 0);
+    pidController.setTolerance(50.0);
+    pidController.setIntegratorRange(-0.2, 0.2);
+    pidController.setSetpoint(1000);
 
-    pid.enable();
+    Notifier pidRunner = new Notifier(() -> {
+      var speed = pidController.calculate(me.getEncoder().getDistance());
+      me.getMotor().set(MathUtil.clamp(speed, -0.2, 0.2));
+    });
+
+    pidRunner.startPeriodic(pidController.getPeriod());
     Timer.delay(10.0);
-    pid.disable();
+    pidRunner.stop();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The current error was" + pid
-            .getError(), pid.onTarget());
+        "PID loop did not reach reference within 10 seconds. The current error was" + pidController
+            .getPositionError(), pidController.atSetpoint());
 
-    pid.close();
+    pidRunner.close();
   }
 
   @Test
   public void testVelocityPIDController() {
-    me.getEncoder().setPIDSourceType(PIDSourceType.kRate);
-    LinearDigitalFilter filter = LinearDigitalFilter.movingAverage(me.getEncoder(), 50);
-    PIDController pid =
-        new PIDController(1e-5, 0.0, 3e-5, 8e-5, filter, me.getMotor());
-    pid.setAbsoluteTolerance(200);
-    pid.setOutputRange(-0.3, 0.3);
-    pid.setSetpoint(600);
+    LinearFilter filter = LinearFilter.movingAverage(50);
+    PIDController pidController = new PIDController(1e-5, 0.0, 0.0006);
+    pidController.setTolerance(200);
+    pidController.setSetpoint(600);
 
-    pid.enable();
+    Notifier pidRunner = new Notifier(() -> {
+      var speed = filter.calculate(me.getEncoder().getRate());
+      me.getMotor().set(MathUtil.clamp(speed, -0.3, 0.3));
+    });
+
+    pidRunner.startPeriodic(pidController.getPeriod());
     Timer.delay(10.0);
-    pid.disable();
+    pidRunner.stop();
 
-    assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getError(),
-        pid.onTarget());
+    assertTrue("PID loop did not reach reference within 10 seconds. The error was: " + pidController
+        .getPositionError(), pidController.atSetpoint());
 
-    pid.close();
+    pidRunner.close();
   }
 
   /**
@@ -229,8 +236,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
         me.getCounters()[1].get(), 0);
     Timer.delay(0.5); // so this doesn't fail with the 0.5 second default
     // timeout on the encoders
-    assertTrue(me.getType() + " Encoder.getStopped() returned false after the motor was reset.", me
-        .getEncoder().getStopped());
+    assertTrue(me.getType() + " Encoder.getStopped() returned false after the motor was reset.",
+        me.getEncoder().getStopped());
   }
 
 }

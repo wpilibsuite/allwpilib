@@ -86,7 +86,7 @@ CTR_Code CtreCanNode::GetRx(uint32_t arbId,uint8_t * dataBytes, uint32_t timeout
 	if(timeoutMs > 999)
 		timeoutMs = 999;
 	FRC_NetworkCommunication_CANSessionMux_receiveMessage(&arbId,kFullMessageIDMask,dataBytes,&len,&timeStamp,&status);
-	std::lock_guard<wpi::mutex> lock(_lck);
+	std::scoped_lock lock(_lck);
 	if(status == 0){
 		/* fresh update */
 		rxEvent_t & r = _rxRxEvents[arbId]; /* lookup entry or make a default new one with all zeroes */

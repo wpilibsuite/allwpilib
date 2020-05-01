@@ -6,6 +6,8 @@ apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
 
+evaluationDependsOn(':hal')
+
 apply from: '../shared/config.gradle'
 
 ext.examplesMap = [:]
@@ -30,6 +32,10 @@ templatesTree.list(new FilenameFilter() {
     templatesMap.put(it, [])
 }
 
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
+    cppCompiler.args.remove('-Wno-error=deprecated-declarations')
+    cppCompiler.args.add('-Werror=deprecated-declarations')
+}
 
 ext {
     sharedCvConfigs = examplesMap + templatesMap + [commands: []]
@@ -40,21 +46,6 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-ext {
-    chipObjectComponents = ['commands']
-    netCommComponents = ['commands']
-    examplesMap.each { key, value ->
-        chipObjectComponents << key.toString()
-        netCommComponents << key.toString()
-    }
-    templatesMap.each { key, value ->
-        chipObjectComponents << key.toString()
-        netCommComponents << key.toString()
-    }
-}
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
 model {
     components {
         commands(NativeLibrarySpec) {
@@ -63,6 +54,8 @@ model {
                     binary.buildable = false
                     return
                 }
+                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -88,17 +81,16 @@ model {
             "${key}"(NativeExecutableSpec) {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
+                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                    lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    if (binary.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
-                        lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
-                        lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
-                        lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
-                        lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
                     }
                 }
                 sources {
@@ -131,6 +123,8 @@ model {
             "${key}"(NativeExecutableSpec) {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
+                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                    lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
@@ -144,11 +138,8 @@ model {
                             cppCompiler.args "/wd4996"
                         }
                     }
-                    if (binary.targetPlatform.name != nativeUtils.wpi.platforms.roborio) {
-                        lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
-                        lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
-                        lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
-                        lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
                     }
                 }
                 sources {
@@ -176,41 +167,19 @@ model {
                 binary.tasks.install.doLast {
                     if (binary.targetPlatform.operatingSystem.isWindows()) {
                         // Windows batch scripts
-                        def fileName = binary.component.name + 'LowFi.bat'
-                        def file = new File(installDir + fileName)
-                        file.withWriter { out ->
-                            out.println '@ECHO OFF'
-                            out.print 'SET HALSIM_EXTENSIONS='
-                            out.print '"' + new File(installDir + 'lib\\halsim_lowfi.dll').toString() + '";'
-                            out.println '"' + new File(installDir + 'lib\\halsim_ds_nt.dll').toString() + '"'
-                            out.println runFile + ' %*'
-                        }
-
-                        fileName = binary.component.name + 'LowFiRealDS.bat'
+                        fileName = binary.component.name + 'RealDS.bat'
                         file = new File(installDir + fileName)
                         file.withWriter { out ->
                             out.println '@ECHO OFF'
                             out.print 'SET HALSIM_EXTENSIONS='
-                            out.print '"' + new File(installDir + 'lib\\halsim_lowfi.dll').toString() + '";'
                             out.println '"' + new File(installDir + 'lib\\halsim_ds_socket.dll').toString() + '"'
                             out.println runFile + ' %*'
                         }
                     } else {
-                        def fileName = binary.component.name + 'LowFi.sh'
-                        def file = new File(installDir + fileName)
-
-                        file.withWriter { out ->
-                            out.print 'export HALSIM_EXTENSIONS='
-                            out.print '"' + new File(installDir + '/lib/libhalsim_lowfi.so').toString() + '";'
-                            out.println '"' + new File(installDir + '/lib/libhalsim_ds_nt.so').toString() + '"'
-                            out.println runFile + ' "$@"'
-                        }
-
-                        fileName = binary.component.name + 'LowFiRealDS.sh'
+                        fileName = binary.component.name + 'RealDS.sh'
                         file = new File(installDir + fileName)
                         file.withWriter { out ->
                             out.print 'export HALSIM_EXTENSIONS='
-                            out.print '"' + new File(installDir + '/lib/libhalsim_lowfi.so').toString() + '":'
                             out.println '"' + new File(installDir + '/lib/libhalsim_ds_socket.so').toString() + '"'
                             out.println runFile + ' "$@"'
                         }
@@ -223,6 +192,25 @@ model {
 }
 apply from: 'publish.gradle'
 
+model {
+    tasks {
+        def c = $.components
+        project.tasks.register('buildDesktopCpp') { compileTask->
+            def systemArch = getCurrentArch()
+            c.each {
+                if (it in NativeExecutableSpec && it.name) {
+                    it.binaries.each {
+                        def arch = it.targetPlatform.name
+                        if (arch == systemArch && it.buildType.name == 'debug') {
+                            compileTask.dependsOn it.tasks.link
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 ext {
     templateDirectory = new File("$projectDir/src/main/cpp/templates/")
     templateFile = new File("$projectDir/src/main/cpp/templates/templates.json")
@@ -232,4 +220,7 @@ ext {
     commandFile = new File("$projectDir/src/main/cpp/commands/commands.json")
 }
 
+ext {
+    isCppCommands = true
+}
 apply from: "${rootDir}/shared/examplecheck.gradle"

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,9 @@
 package edu.wpi.first.wpilibj.trajectory;
 
 import java.util.Objects;
+
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 
 /**
  * A trapezoid-shaped velocity profile.
@@ -59,11 +62,19 @@ public class TrapezoidProfile {
     public double maxAcceleration;
 
     public Constraints() {
+      HAL.report(tResourceType.kResourceType_TrapezoidProfile, 1);
     }
 
+    /**
+     * Construct constraints for a TrapezoidProfile.
+     *
+     * @param maxVelocity maximum velocity
+     * @param maxAcceleration maximum acceleration
+     */
     public Constraints(double maxVelocity, double maxAcceleration) {
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
+      HAL.report(tResourceType.kResourceType_TrapezoidProfile, 1);
     }
   }
 
@@ -162,7 +173,7 @@ public class TrapezoidProfile {
    */
   @SuppressWarnings("ParameterName")
   public State calculate(double t) {
-    State result = m_initial;
+    State result = new State(m_initial.position, m_initial.velocity);
 
     if (t < m_endAccel) {
       result.velocity += t * m_constraints.maxAcceleration;
@@ -279,7 +290,6 @@ public class TrapezoidProfile {
    * @param initial     The initial state (usually the current state).
    * @param goal        The desired state when the profile is complete.
    */
-  @SuppressWarnings("LocalVariableName")
   private static boolean shouldFlipAcceleration(State initial, State goal) {
     return initial.position > goal.position;
   }

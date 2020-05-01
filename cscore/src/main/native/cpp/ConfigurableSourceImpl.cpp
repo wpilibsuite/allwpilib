@@ -37,7 +37,7 @@ void ConfigurableSourceImpl::Start() {
 bool ConfigurableSourceImpl::SetVideoMode(const VideoMode& mode,
                                           CS_Status* status) {
   {
-    std::lock_guard<wpi::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
     m_mode = mode;
     m_videoModes[0] = mode;
   }
@@ -61,10 +61,10 @@ int ConfigurableSourceImpl::CreateProperty(const wpi::Twine& name,
                                            CS_PropertyKind kind, int minimum,
                                            int maximum, int step,
                                            int defaultValue, int value) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   int ndx = CreateOrUpdateProperty(name,
                                    [=] {
-                                     return wpi::make_unique<PropertyImpl>(
+                                     return std::make_unique<PropertyImpl>(
                                          name, kind, minimum, maximum, step,
                                          defaultValue, value);
                                    },
@@ -92,7 +92,7 @@ int ConfigurableSourceImpl::CreateProperty(
 
 void ConfigurableSourceImpl::SetEnumPropertyChoices(
     int property, wpi::ArrayRef<std::string> choices, CS_Status* status) {
-  std::lock_guard<wpi::mutex> lock(m_mutex);
+  std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -105,7 +105,7 @@ class Servo : public PWM {
   static constexpr double kMinServoAngle = 0.0;
 
   static constexpr double kDefaultMaxServoPWM = 2.4;
-  static constexpr double kDefaultMinServoPWM = .6;
+  static constexpr double kDefaultMinServoPWM = 0.6;
 };
 
 }  // namespace frc

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,8 @@
 
 #include <memory>
 #include <string>
+
+#include <wpi/deprecated.h>
 
 #include "frc/Counter.h"
 
@@ -20,6 +22,8 @@ namespace frc {
  * Implements the gear tooth sensor supplied by FIRST. Currently there is no
  * reverse sensing on the gear tooth sensor, but in future versions we might
  * implement the necessary timing in the FPGA to sense direction.
+ *
+ * @deprecated No longer used per FMS usage reporting
  */
 class GearTooth : public Counter {
  public:
@@ -34,6 +38,9 @@ class GearTooth : public Counter {
    * @param directionSensitive True to enable the pulse length decoding in
    *                           hardware to specify count direction.
    */
+  WPI_DEPRECATED(
+      "The only sensor this works with is no longer available and no teams use "
+      "it according to FMS usage reporting.")
   explicit GearTooth(int channel, bool directionSensitive = false);
 
   /**
@@ -46,6 +53,9 @@ class GearTooth : public Counter {
    * @param directionSensitive True to enable the pulse length decoding in
    *                           hardware to specify count direction.
    */
+  WPI_DEPRECATED(
+      "The only sensor this works with is no longer available and no teams use "
+      "it according to FMS usage reporting.")
   explicit GearTooth(DigitalSource* source, bool directionSensitive = false);
 
   /**
@@ -58,6 +68,9 @@ class GearTooth : public Counter {
    * @param directionSensitive True to enable the pulse length decoding in
    *                           hardware to specify count direction.
    */
+  WPI_DEPRECATED(
+      "The only sensor this works with is no longer available and no teams use "
+      "it according to FMS usage reporting.")
   explicit GearTooth(std::shared_ptr<DigitalSource> source,
                      bool directionSensitive = false);
 

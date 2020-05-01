@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -39,18 +39,18 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
 
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
     analogIO = TestBench.getAnalogCrossConnectFixture();
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     analogIO.teardown();
     analogIO = null;
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     analogIO.setup();
   }
 
@@ -132,6 +132,8 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
 
     // Then the counter should be at 50
     assertEquals("Analog trigger counter did not count 50 ticks", 50, counter.get());
+
+    counter.close();
   }
 
   @Test(expected = RuntimeException.class)

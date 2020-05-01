@@ -103,6 +103,7 @@ static int uv__create_stdio_pipe_pair(uv_loop_t* loop,
   DWORD client_access = 0;
   HANDLE child_pipe = INVALID_HANDLE_VALUE;
   int err;
+  BOOL overlap;
 
   if (flags & UV_READABLE_PIPE) {
     /* The server needs inbound access too, otherwise CreateNamedPipe() won't
@@ -115,8 +116,6 @@ static int uv__create_stdio_pipe_pair(uv_loop_t* loop,
     server_access |= PIPE_ACCESS_INBOUND;
     client_access |= GENERIC_WRITE | FILE_READ_ATTRIBUTES;
   }
-
-  BOOL overlap;
 
   /* Create server pipe handle. */
   err = uv_stdio_pipe_server(loop,

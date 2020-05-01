@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.hal.NotifierJNI;
+
+import static java.util.Objects.requireNonNull;
 
 public class Notifier implements AutoCloseable {
   // The thread waiting on the HAL alarm.
@@ -85,6 +87,8 @@ public class Notifier implements AutoCloseable {
    *            using StartSingle or StartPeriodic.
    */
   public Notifier(Runnable run) {
+    requireNonNull(run);
+
     m_handler = run;
     m_notifier.set(NotifierJNI.initializeNotifier());
 
@@ -132,6 +136,16 @@ public class Notifier implements AutoCloseable {
               + "the exception above.", false);
     });
     m_thread.start();
+  }
+
+  /**
+   * Sets the name of the notifier.  Used for debugging purposes only.
+   *
+   * @param name Name
+   */
+  public void setName(String name) {
+    m_thread.setName(name);
+    NotifierJNI.setNotifierName(m_notifier.get(), name);
   }
 
   /**
@@ -193,6 +207,12 @@ public class Notifier implements AutoCloseable {
    * function will block until the handler call is complete.
    */
   public void stop() {
-    NotifierJNI.cancelNotifierAlarm(m_notifier.get());
+    m_processLock.lock();
+    try {
+      m_periodic = false;
+      NotifierJNI.cancelNotifierAlarm(m_notifier.get());
+    } finally {
+      m_processLock.unlock();
+    }
   }
 }

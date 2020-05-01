@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+#include <wpi/deprecated.h>
 
 namespace frc {
 
@@ -15,9 +17,12 @@ namespace frc {
  * Common interface for controllers. Controllers run control loops, the most
  * common are PID controllers and their variants, but this includes anything
  * that is controlling an actuator in a separate thread.
+ *
+ * @deprecated Only used by the deprecated PIDController
  */
 class Controller {
  public:
+  WPI_DEPRECATED("Only used by the deprecated PIDController")
   Controller() = default;
   virtual ~Controller() = default;
 

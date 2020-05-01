@@ -11,13 +11,15 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 
 dependencies {
-    compile project(':wpilibj')
+    implementation project(':wpilibj')
 
-    compile project(':hal')
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    compile project(':cameraserver')
+    implementation project(':hal')
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':cameraserver')
+    implementation project(':wpilibOldCommands')
+    implementation project(':wpilibNewCommands')
 }
 
 if (!project.hasProperty('skipPMD')) {
@@ -33,8 +35,12 @@ if (!project.hasProperty('skipPMD')) {
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Werror"
     }
+}
+
+tasks.register('buildDesktopJava') {
+    it.dependsOn tasks.withType(JavaCompile)
 }
 
 apply from: 'publish.gradle'
@@ -48,4 +54,7 @@ ext {
     commandFile = new File("$projectDir/src/main/java/edu/wpi/first/wpilibj/commands/commands.json")
 }
 
+ext {
+    isCppCommands = false
+}
 apply from: "${rootDir}/shared/examplecheck.gradle"

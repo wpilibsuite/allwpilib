@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,7 @@
 #include <cmath>
 #include <cstddef>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/Base.h"
 #include "frc/SpeedController.h"
@@ -25,16 +25,6 @@ void RobotDriveBase::SetDeadband(double deadband) { m_deadband = deadband; }
 void RobotDriveBase::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
 
 void RobotDriveBase::FeedWatchdog() { Feed(); }
-
-double RobotDriveBase::Limit(double value) {
-  if (value > 1.0) {
-    return 1.0;
-  }
-  if (value < -1.0) {
-    return -1.0;
-  }
-  return value;
-}
 
 double RobotDriveBase::ApplyDeadband(double value, double deadband) {
   if (std::abs(value) > deadband) {

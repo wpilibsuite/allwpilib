@@ -23,9 +23,7 @@ class WatchdogTest {
   void enableDisableTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     System.out.println("Run 1");
     watchdog.enable();
@@ -63,15 +61,15 @@ class WatchdogTest {
 
     assertEquals(1, watchdogCounter.get(),
         "Watchdog either didn't trigger or triggered more than once");
+
+    watchdog.close();
   }
 
   @Test
   void resetTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     watchdog.enable();
     try {
@@ -88,15 +86,15 @@ class WatchdogTest {
     watchdog.disable();
 
     assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
+
+    watchdog.close();
   }
 
   @Test
   void setTimeoutTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(1.0, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(1.0, () -> watchdogCounter.addAndGet(1));
 
     watchdog.enable();
     try {
@@ -118,6 +116,8 @@ class WatchdogTest {
 
     assertEquals(1, watchdogCounter.get(),
         "Watchdog either didn't trigger or triggered more than once");
+
+    watchdog.close();
   }
 
   @Test
@@ -140,15 +140,15 @@ class WatchdogTest {
 
     watchdog.reset();
     assertFalse(watchdog.isExpired());
+
+    watchdog.close();
   }
 
   @Test
   void epochsTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    final Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    });
+    final Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1));
 
     System.out.println("Run 1");
     watchdog.enable();
@@ -187,6 +187,8 @@ class WatchdogTest {
     watchdog.disable();
 
     assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
+
+    watchdog.close();
   }
 
   @Test
@@ -194,12 +196,8 @@ class WatchdogTest {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);
 
-    final Watchdog watchdog1 = new Watchdog(0.2, () -> {
-      watchdogCounter1.addAndGet(1);
-    });
-    final Watchdog watchdog2 = new Watchdog(0.6, () -> {
-      watchdogCounter2.addAndGet(1);
-    });
+    final Watchdog watchdog1 = new Watchdog(0.2, () -> watchdogCounter1.addAndGet(1));
+    final Watchdog watchdog2 = new Watchdog(0.6, () -> watchdogCounter2.addAndGet(1));
 
     watchdog2.enable();
     try {
@@ -223,5 +221,8 @@ class WatchdogTest {
     assertEquals(1, watchdogCounter1.get(),
         "Watchdog either didn't trigger or triggered more than once");
     assertEquals(0, watchdogCounter2.get(), "Watchdog triggered early");
+
+    watchdog1.close();
+    watchdog2.close();
   }
 }

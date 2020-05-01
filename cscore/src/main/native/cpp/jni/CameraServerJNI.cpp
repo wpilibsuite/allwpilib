@@ -5,6 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <exception>
+
+#include <opencv2/core/core.hpp>
 #include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
 #include <wpi/raw_ostream.h>
@@ -33,6 +36,7 @@ static JClass rawFrameCls;
 static JException videoEx;
 static JException nullPointerEx;
 static JException unsupportedEx;
+static JException exceptionEx;
 // Thread-attached environment for listener callbacks.
 static JNIEnv* listenerEnv = nullptr;
 
@@ -45,7 +49,8 @@ static const JClassInit classes[] = {
 static const JExceptionInit exceptions[] = {
     {"edu/wpi/cscore/VideoException", &videoEx},
     {"java/lang/NullPointerException", &nullPointerEx},
-    {"java/lang/UnsupportedOperationException", &unsupportedEx}};
+    {"java/lang/UnsupportedOperationException", &unsupportedEx},
+    {"java/lang/Exception", &exceptionEx}};
 
 static void ListenerOnStart() {
   if (!jvm) return;
@@ -65,6 +70,30 @@ static void ListenerOnExit() {
   listenerEnv = nullptr;
   if (!jvm) return;
   jvm->DetachCurrentThread();
+}
+
+/// throw java exception
+static void ThrowJavaException(JNIEnv* env, const std::exception* e) {
+  wpi::SmallString<128> what;
+  jclass je = 0;
+
+  if (e) {
+    const char* exception_type = "std::exception";
+
+    if (dynamic_cast<const cv::Exception*>(e)) {
+      exception_type = "cv::Exception";
+      je = env->FindClass("org/opencv/core/CvException");
+    }
+
+    what = exception_type;
+    what += ": ";
+    what += e->what();
+  } else {
+    what = "unknown exception";
+  }
+
+  if (!je) je = exceptionEx;
+  env->ThrowNew(je, what.c_str());
 }
 
 extern "C" {
@@ -194,13 +223,14 @@ static inline bool CheckStatus(JNIEnv* env, CS_Status status) {
 static jobject MakeJObject(JNIEnv* env, const cs::UsbCameraInfo& info) {
   static jmethodID constructor = env->GetMethodID(
       usbCameraInfoCls, "<init>",
-      "(ILjava/lang/String;Ljava/lang/String;[Ljava/lang/String;)V");
+      "(ILjava/lang/String;Ljava/lang/String;[Ljava/lang/String;II)V");
   JLocal<jstring> path(env, MakeJString(env, info.path));
   JLocal<jstring> name(env, MakeJString(env, info.name));
   JLocal<jobjectArray> otherPaths(env, MakeJStringArray(env, info.otherPaths));
   return env->NewObject(usbCameraInfoCls, constructor,
                         static_cast<jint>(info.dev), path.obj(), name.obj(),
-                        otherPaths.obj());
+                        otherPaths.obj(), static_cast<jint>(info.vendorId),
+                        static_cast<jint>(info.productId));
 }
 
 static jobject MakeJObject(JNIEnv* env, const cs::VideoMode& videoMode) {
@@ -1095,10 +1125,16 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_cscore_CameraServerCvJNI_putSourceFrame
   (JNIEnv* env, jclass, jint source, jlong imageNativeObj)
 {
-  cv::Mat& image = *((cv::Mat*)imageNativeObj);
-  CS_Status status = 0;
-  cs::PutSourceFrame(source, image, &status);
-  CheckStatus(env, status);
+  try {
+    cv::Mat& image = *((cv::Mat*)imageNativeObj);
+    CS_Status status = 0;
+    cs::PutSourceFrame(source, image, &status);
+    CheckStatus(env, status);
+  } catch (const std::exception& e) {
+    ThrowJavaException(env, &e);
+  } catch (...) {
+    ThrowJavaException(env, 0);
+  }
 }
 
 // int width, int height, int pixelFormat, int totalData
@@ -1554,11 +1590,19 @@ JNIEXPORT jlong JNICALL
 Java_edu_wpi_cscore_CameraServerCvJNI_grabSinkFrame
   (JNIEnv* env, jclass, jint sink, jlong imageNativeObj)
 {
-  cv::Mat& image = *((cv::Mat*)imageNativeObj);
-  CS_Status status = 0;
-  auto rv = cs::GrabSinkFrame(sink, image, &status);
-  CheckStatus(env, status);
-  return rv;
+  try {
+    cv::Mat& image = *((cv::Mat*)imageNativeObj);
+    CS_Status status = 0;
+    auto rv = cs::GrabSinkFrame(sink, image, &status);
+    CheckStatus(env, status);
+    return rv;
+  } catch (const std::exception& e) {
+    ThrowJavaException(env, &e);
+    return 0;
+  } catch (...) {
+    ThrowJavaException(env, 0);
+    return 0;
+  }
 }
 
 /*
@@ -1570,11 +1614,19 @@ JNIEXPORT jlong JNICALL
 Java_edu_wpi_cscore_CameraServerCvJNI_grabSinkFrameTimeout
   (JNIEnv* env, jclass, jint sink, jlong imageNativeObj, jdouble timeout)
 {
-  cv::Mat& image = *((cv::Mat*)imageNativeObj);
-  CS_Status status = 0;
-  auto rv = cs::GrabSinkFrameTimeout(sink, image, timeout, &status);
-  CheckStatus(env, status);
-  return rv;
+  try {
+    cv::Mat& image = *((cv::Mat*)imageNativeObj);
+    CS_Status status = 0;
+    auto rv = cs::GrabSinkFrameTimeout(sink, image, timeout, &status);
+    CheckStatus(env, status);
+    return rv;
+  } catch (const std::exception& e) {
+    ThrowJavaException(env, &e);
+    return 0;
+  } catch (...) {
+    ThrowJavaException(env, 0);
+    return 0;
+  }
 }
 
 static void SetRawFrameData(JNIEnv* env, jobject rawFrameObj,

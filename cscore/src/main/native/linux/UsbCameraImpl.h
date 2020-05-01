@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -164,7 +164,9 @@ class UsbCameraImpl : public SourceImpl {
   std::thread m_cameraThread;
 
   // Quirks
-  bool m_lifecam_exposure{false};  // Microsoft LifeCam exposure
+  bool m_lifecam_exposure{false};    // Microsoft LifeCam exposure
+  bool m_ps3eyecam_exposure{false};  // PS3 Eyecam exposure
+  bool m_picamera{false};            // Raspberry Pi camera
 
   //
   // Variables protected by m_mutex

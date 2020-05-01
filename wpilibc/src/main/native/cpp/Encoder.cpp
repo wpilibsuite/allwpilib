@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,11 +11,11 @@
 
 #include <hal/Encoder.h>
 #include <hal/FRCUsageReporting.h>
-#include <hal/HALBase.h>
 
 #include "frc/DigitalInput.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -24,8 +24,9 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
-  AddChild(m_aSource);
-  AddChild(m_bSource);
+  auto& registry = SendableRegistry::GetInstance();
+  registry.AddChild(this, m_aSource.get());
+  registry.AddChild(this, m_bSource.get());
 }
 
 Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
@@ -58,39 +59,14 @@ Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
 Encoder::~Encoder() {
   int32_t status = 0;
   HAL_FreeEncoder(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-}
-
-Encoder::Encoder(Encoder&& rhs)
-    : ErrorBase(std::move(rhs)),
-      SendableBase(std::move(rhs)),
-      CounterBase(std::move(rhs)),
-      PIDSource(std::move(rhs)),
-      m_aSource(std::move(rhs.m_aSource)),
-      m_bSource(std::move(rhs.m_bSource)),
-      m_indexSource(std::move(rhs.m_indexSource)) {
-  std::swap(m_encoder, rhs.m_encoder);
-}
-
-Encoder& Encoder::operator=(Encoder&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-  SendableBase::operator=(std::move(rhs));
-  CounterBase::operator=(std::move(rhs));
-  PIDSource::operator=(std::move(rhs));
-
-  m_aSource = std::move(rhs.m_aSource);
-  m_bSource = std::move(rhs.m_bSource);
-  m_indexSource = std::move(rhs.m_indexSource);
-  std::swap(m_encoder, rhs.m_encoder);
-
-  return *this;
+  wpi_setHALError(status);
 }
 
 int Encoder::Get() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetEncoder(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
@@ -98,14 +74,14 @@ void Encoder::Reset() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_ResetEncoder(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 double Encoder::GetPeriod() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetEncoderPeriod(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
@@ -113,14 +89,14 @@ void Encoder::SetMaxPeriod(double maxPeriod) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 bool Encoder::GetStopped() const {
   if (StatusIsFatal()) return true;
   int32_t status = 0;
   bool value = HAL_GetEncoderStopped(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
@@ -128,7 +104,7 @@ bool Encoder::GetDirection() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value = HAL_GetEncoderDirection(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
@@ -136,14 +112,14 @@ int Encoder::GetRaw() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetEncoderRaw(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
 int Encoder::GetEncodingScale() const {
   int32_t status = 0;
   int val = HAL_GetEncoderEncodingScale(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return val;
 }
 
@@ -151,7 +127,7 @@ double Encoder::GetDistance() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetEncoderDistance(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
@@ -159,7 +135,7 @@ double Encoder::GetRate() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetEncoderRate(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
@@ -167,21 +143,21 @@ void Encoder::SetMinRate(double minRate) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderMinRate(m_encoder, minRate, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void Encoder::SetDistancePerPulse(double distancePerPulse) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 double Encoder::GetDistancePerPulse() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double distancePerPulse = HAL_GetEncoderDistancePerPulse(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return distancePerPulse;
 }
 
@@ -189,7 +165,7 @@ void Encoder::SetReverseDirection(bool reverseDirection) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderReverseDirection(m_encoder, reverseDirection, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void Encoder::SetSamplesToAverage(int samplesToAverage) {
@@ -201,13 +177,13 @@ void Encoder::SetSamplesToAverage(int samplesToAverage) {
   }
   int32_t status = 0;
   HAL_SetEncoderSamplesToAverage(m_encoder, samplesToAverage, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 int Encoder::GetSamplesToAverage() const {
   int32_t status = 0;
   int result = HAL_GetEncoderSamplesToAverage(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return result;
 }
 
@@ -226,7 +202,7 @@ double Encoder::PIDGet() {
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_shared<DigitalInput>(channel);
-  AddChild(m_indexSource);
+  SendableRegistry::GetInstance().AddChild(this, m_indexSource.get());
   SetIndexSource(*m_indexSource.get(), type);
 }
 
@@ -237,20 +213,24 @@ void Encoder::SetIndexSource(const DigitalSource& source,
       m_encoder, source.GetPortHandleForRouting(),
       (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(),
       (HAL_EncoderIndexingType)type, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
+}
+
+void Encoder::SetSimDevice(HAL_SimDeviceHandle device) {
+  HAL_SetEncoderSimDevice(m_encoder, device);
 }
 
 int Encoder::GetFPGAIndex() const {
   int32_t status = 0;
   int val = HAL_GetEncoderFPGAIndex(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return val;
 }
 
 void Encoder::InitSendable(SendableBuilder& builder) {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X)
     builder.SetSmartDashboardType("Quadrature Encoder");
   else
@@ -271,17 +251,18 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
       m_bSource->GetPortHandleForRouting(),
       (HAL_AnalogTriggerType)m_bSource->GetAnalogTriggerTypeForRouting(),
       reverseDirection, (HAL_EncoderEncodingType)encodingType, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
-  HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
+  HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
              encodingType);
-  SetName("Encoder", m_aSource->GetChannel());
+  SendableRegistry::GetInstance().AddLW(this, "Encoder",
+                                        m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double val = HAL_GetEncoderDecodingScaleFactor(m_encoder, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return val;
 }

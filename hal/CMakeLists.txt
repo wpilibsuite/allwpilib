@@ -25,6 +25,7 @@ string(REPLACE ";" "\n" usage_reporting_types_cpp "${usage_reporting_types_cpp}"
 string(REPLACE ";" "\n" usage_reporting_instances_cpp "${usage_reporting_instances_cpp}")
 
 file(GLOB
+    hal_shared_native_src src/main/native/cpp/*.cpp
     hal_shared_native_src src/main/native/cpp/cpp/*.cpp
     hal_shared_native_src src/main/native/cpp/handles/*.cpp
     hal_sim_native_src src/main/native/sim/*.cpp
@@ -56,7 +57,7 @@ set_property(TARGET hal PROPERTY FOLDER "libraries")
 
 install(TARGETS hal EXPORT hal DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/hal")
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen DESTINATION "${include_dest}/hal")
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gen/ DESTINATION "${include_dest}/hal")
 
 if (MSVC OR FLAT_INSTALL_WPILIB)
     set (hal_config_dir ${wpilib_dest})

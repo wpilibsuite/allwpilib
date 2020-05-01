@@ -17,7 +17,7 @@ import edu.wpi.first.hal.util.AllocationException;
  * Base for sensors to be used with interrupts.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class InterruptableSensorBase extends SendableBase {
+public abstract class InterruptableSensorBase implements AutoCloseable {
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {
     kTimeout(0x0), kRisingEdge(0x1), kFallingEdge(0x100), kBoth(0x101);
@@ -61,7 +61,6 @@ public abstract class InterruptableSensorBase extends SendableBase {
 
   @Override
   public void close() {
-    super.close();
     if (m_interrupt != 0) {
       cancelInterrupts();
     }
@@ -84,11 +83,10 @@ public abstract class InterruptableSensorBase extends SendableBase {
   /**
    * Request one of the 8 interrupts asynchronously on this digital input.
    *
-   * @param handler The {@link InterruptHandler} that contains the method {@link
-   *                InterruptHandlerFunction#onInterrupt(boolean, boolean)} that will be called
-   *                whenever there is an interrupt on this device. Request interrupts in synchronous
-   *                mode where the user program interrupt handler will be called when an interrupt
-   *                occurs. The default is interrupt on rising edges only.
+   * @param handler The {@link Consumer} that will be called whenever there is an interrupt on this
+   *                device. Request interrupts in synchronous mode where the user program interrupt
+   *                handler will be called when an interrupt occurs. The default is interrupt on
+   *                rising edges only.
    */
   public void requestInterrupts(Consumer<WaitResult> handler) {
     if (m_interrupt != 0) {

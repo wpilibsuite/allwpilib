@@ -236,6 +236,8 @@ typedef struct CS_UsbCameraInfo {
   char* name;
   int otherPathsCount;
   char** otherPaths;
+  int vendorId;
+  int productId;
 } CS_UsbCameraInfo;
 
 /**

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,16 +11,20 @@
 #include <vector>
 
 #include "frc/SpeedController.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SpeedControllerGroup : public SendableBase, public SpeedController {
+class SpeedControllerGroup : public Sendable,
+                             public SpeedController,
+                             public SendableHelper<SpeedControllerGroup> {
  public:
   template <class... SpeedControllers>
   explicit SpeedControllerGroup(SpeedController& speedController,
                                 SpeedControllers&... speedControllers);
-  ~SpeedControllerGroup() override = default;
+  explicit SpeedControllerGroup(
+      std::vector<std::reference_wrapper<SpeedController>>&& speedControllers);
 
   SpeedControllerGroup(SpeedControllerGroup&&) = default;
   SpeedControllerGroup& operator=(SpeedControllerGroup&&) = default;
@@ -38,6 +42,8 @@ class SpeedControllerGroup : public SendableBase, public SpeedController {
  private:
   bool m_isInverted = false;
   std::vector<std::reference_wrapper<SpeedController>> m_speedControllers;
+
+  void Initialize();
 };
 
 }  // namespace frc

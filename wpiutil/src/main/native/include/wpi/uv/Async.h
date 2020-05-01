@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,7 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/STLExtras.h"
 #include "wpi/Signal.h"
 #include "wpi/mutex.h"
 #include "wpi/uv/Handle.h"
@@ -69,8 +68,8 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
     int err =
         uv_async_init(loop->GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
           auto& h = *static_cast<Async*>(handle->data);
-          std::lock_guard<wpi::mutex> lock(h.m_mutex);
-          for (auto&& v : h.m_data) apply_tuple(h.wakeup, v);
+          std::scoped_lock lock(h.m_mutex);
+          for (auto&& v : h.m_data) std::apply(h.wakeup, v);
           h.m_data.clear();
         });
     if (err < 0) {
@@ -97,7 +96,7 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
     }
 
     {
-      std::lock_guard<wpi::mutex> lock(m_mutex);
+      std::scoped_lock lock(m_mutex);
       m_data.emplace_back(std::forward_as_tuple(std::forward<U>(u)...));
     }
     if (loop) this->Invoke(&uv_async_send, this->GetRaw());

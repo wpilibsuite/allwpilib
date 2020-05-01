@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,9 +8,10 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.Map;
-import java.util.Objects;
 
 import edu.wpi.first.networktables.NetworkTable;
+
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A generic component in Shuffleboard.
@@ -30,8 +31,8 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
   private int m_height = -1;
 
   protected ShuffleboardComponent(ShuffleboardContainer parent, String title, String type) {
-    m_parent = Objects.requireNonNull(parent, "Parent cannot be null");
-    m_title = Objects.requireNonNull(title, "Title cannot be null");
+    m_parent = requireNonNullParam(parent, "parent", "ShuffleboardComponent");
+    m_title = requireNonNullParam(title, "title", "ShuffleboardComponent");
     m_type = type;
   }
 

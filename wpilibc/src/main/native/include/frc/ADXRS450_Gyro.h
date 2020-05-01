@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,8 @@
 #pragma once
 
 #include <stdint.h>
+
+#include <hal/SimDevice.h>
 
 #include "frc/GyroBase.h"
 #include "frc/SPI.h"
@@ -25,6 +27,7 @@ namespace frc {
  * determine the heading.
  *
  * This class is for the digital ADXRS450 gyro sensor that connects via SPI.
+ * Only one instance of an ADXRS Gyro is supported.
  */
 class ADXRS450_Gyro : public GyroBase {
  public:
@@ -40,7 +43,7 @@ class ADXRS450_Gyro : public GyroBase {
    */
   explicit ADXRS450_Gyro(SPI::Port port);
 
-  virtual ~ADXRS450_Gyro() = default;
+  ~ADXRS450_Gyro() override = default;
 
   ADXRS450_Gyro(ADXRS450_Gyro&&) = default;
   ADXRS450_Gyro& operator=(ADXRS450_Gyro&&) = default;
@@ -93,6 +96,10 @@ class ADXRS450_Gyro : public GyroBase {
 
  private:
   SPI m_spi;
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simAngle;
+  hal::SimDouble m_simRate;
 
   uint16_t ReadRegister(int reg);
 };

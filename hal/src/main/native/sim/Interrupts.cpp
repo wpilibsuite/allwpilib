@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,12 +19,12 @@
 #include "PortsInternal.h"
 #include "hal/AnalogTrigger.h"
 #include "hal/Errors.h"
+#include "hal/Value.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "mockdata/AnalogInDataInternal.h"
 #include "mockdata/DIODataInternal.h"
-#include "mockdata/HAL_Value.h"
 
 #ifdef _WIN32
 #pragma warning(disable : 4996 4018 6297 26451 4334)
@@ -223,7 +223,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
   {
-    std::unique_lock<wpi::mutex> lock(waitMutex);
+    std::unique_lock lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {
@@ -287,7 +287,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
   {
-    std::unique_lock<wpi::mutex> lock(waitMutex);
+    std::unique_lock lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {
@@ -565,5 +565,10 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
 
   interrupt->fireOnDown = fallingEdge;
   interrupt->fireOnUp = risingEdge;
+}
+
+void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
+                                 int32_t* status) {
+  // Requires a fairly large rewrite to get working
 }
 }  // extern "C"

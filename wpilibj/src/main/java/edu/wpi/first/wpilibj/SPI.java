@@ -47,13 +47,7 @@ public class SPI implements AutoCloseable {
 
     SPIJNI.spiInitialize(m_port);
 
-    HAL.report(tResourceType.kResourceType_SPI, port.value);
-  }
-
-
-  @Deprecated
-  public void free() {
-    close();
+    HAL.report(tResourceType.kResourceType_SPI, port.value + 1);
   }
 
   @Override
@@ -428,6 +422,17 @@ public class SPI implements AutoCloseable {
    */
   public int getAutoDroppedCount() {
     return SPIJNI.spiGetAutoDroppedCount(m_port);
+  }
+
+  /**
+   * Configure the Auto SPI Stall time between reads.
+   *
+   * @param csToSclkTicks the number of ticks to wait before asserting the cs pin
+   * @param stallTicks the number of ticks to stall for
+   * @param pow2BytesPerRead the number of bytes to read before stalling
+   */
+  public void configureAutoStall(int csToSclkTicks, int stallTicks, int pow2BytesPerRead) {
+    SPIJNI.spiConfigureAutoStall(m_port, csToSclkTicks, stallTicks, pow2BytesPerRead);
   }
 
   private static final int kAccumulateDepth = 2048;

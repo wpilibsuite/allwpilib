@@ -1,11 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+#include <units/units.h>
+#include <wpi/deprecated.h>
 
 #include "frc/RobotBase.h"
 #include "frc/Watchdog.h"
@@ -59,6 +62,16 @@ class IterativeRobotBase : public RobotBase {
   virtual void RobotInit();
 
   /**
+   * Robot-wide simulation initialization code should go here.
+   *
+   * Users should override this method for default Robot-wide simulation
+   * related initialization which will be called when the robot is first
+   * started. It will be called exactly one time after RobotInit is called
+   * only when the robot is in simulation.
+   */
+  virtual void SimulationInit();
+
+  /**
    * Initialization code for disabled mode should go here.
    *
    * Users should override this method for initialization code which will be
@@ -100,6 +113,13 @@ class IterativeRobotBase : public RobotBase {
   virtual void RobotPeriodic();
 
   /**
+   * Periodic simulation code should go here.
+   *
+   * This function is called in a simulated robot after user code executes.
+   */
+  virtual void SimulationPeriodic();
+
+  /**
    * Periodic code for disabled mode should go here.
    *
    * Users should override this method for code which will be called each time a
@@ -135,22 +155,33 @@ class IterativeRobotBase : public RobotBase {
    */
   virtual void TestPeriodic();
 
- protected:
   /**
    * Constructor for IterativeRobotBase.
    *
    * @param period Period in seconds.
+   *
+   * @deprecated Use IterativeRobotBase(units::second_t period) with unit-safety
+   * instead
    */
+  WPI_DEPRECATED("Use constructor with unit-safety instead.")
   explicit IterativeRobotBase(double period);
+
+  /**
+   * Constructor for IterativeRobotBase.
+   *
+   * @param period Period.
+   */
+  explicit IterativeRobotBase(units::second_t period);
 
   virtual ~IterativeRobotBase() = default;
 
+ protected:
   IterativeRobotBase(IterativeRobotBase&&) = default;
   IterativeRobotBase& operator=(IterativeRobotBase&&) = default;
 
   void LoopFunc();
 
-  double m_period;
+  units::second_t m_period;
 
  private:
   enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };

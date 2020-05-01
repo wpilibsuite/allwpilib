@@ -1,0 +1,5 @@
+add_subdirectory(halsim_gui)
+#add_subdirectory(gz_msgs)
+#add_subdirectory(frc_gazebo_plugins)
+#add_subdirectory(halsim_gazebo)
+add_subdirectory(halsim_ds_socket)

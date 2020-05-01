@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,6 +25,7 @@ import edu.wpi.first.hal.HAL;
 @Deprecated
 public class IterativeRobot extends IterativeRobotBase {
   private static final double kPacketPeriod = 0.02;
+  private volatile boolean m_exit;
 
   /**
    * Create a new IterativeRobot.
@@ -42,15 +43,31 @@ public class IterativeRobot extends IterativeRobotBase {
   public void startCompetition() {
     robotInit();
 
+    if (isSimulation()) {
+      simulationInit();
+    }
+
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
-    while (true) {
+    while (!Thread.currentThread().isInterrupted()) {
       // Wait for new data to arrive
       m_ds.waitForData();
+      if (m_exit) {
+        break;
+      }
 
       loopFunc();
     }
+  }
+
+  /**
+   * Ends the main loop in startCompetition().
+   */
+  @Override
+  public void endCompetition() {
+    m_exit = true;
+    m_ds.wakeupWaitForData();
   }
 }

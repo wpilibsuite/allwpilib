@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -218,7 +218,7 @@ public final class NetworkTable {
     final int prefixLen = m_path.length() + 1;
     final NetworkTable parent = this;
 
-    return m_inst.addEntryListener(m_pathWithSep, new Consumer<EntryNotification>() {
+    return m_inst.addEntryListener(m_pathWithSep, new Consumer<>() {
       final Set<String> m_notifiedTables = new HashSet<>();
 
       @Override
@@ -358,7 +358,7 @@ public final class NetworkTable {
    *
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
+   * @return False if the table key exists with a different type
    */
   boolean setDefaultValue(String key, NetworkTableValue defaultValue) {
     return getEntry(key).setDefaultValue(defaultValue);

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -66,7 +66,7 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
-  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
+  std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     *status = RESOURCE_IS_ALLOCATED;
@@ -86,7 +86,7 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
   if (index < 0 || index >= size) {
     return nullptr;
   }
-  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
+  std::scoped_lock lock(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
   return m_structures[index];
@@ -100,7 +100,7 @@ void IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Free(
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) return;
   // lock and deallocated handle
-  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
+  std::scoped_lock lock(m_handleMutexes[index]);
   m_structures[index].reset();
 }
 
@@ -109,7 +109,7 @@ template <typename THandle, typename TStruct, int16_t size,
 void IndexedClassedHandleResource<THandle, TStruct, size,
                                   enumValue>::ResetHandles() {
   for (int i = 0; i < size; i++) {
-    std::lock_guard<wpi::mutex> lock(m_handleMutexes[i]);
+    std::scoped_lock lock(m_handleMutexes[i]);
     m_structures[i].reset();
   }
   HandleBase::ResetHandles();

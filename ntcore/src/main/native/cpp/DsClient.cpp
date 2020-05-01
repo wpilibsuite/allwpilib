@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -63,7 +63,7 @@ void DsClient::Thread::Main() {
         std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
     unsigned int port;
     {
-      std::unique_lock<wpi::mutex> lock(m_mutex);
+      std::unique_lock lock(m_mutex);
       m_cond.wait_until(lock, timeout_time, [&] { return !m_active; });
       port = m_port;
     }

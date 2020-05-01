@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -70,13 +70,13 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
+  public static void tearDownAfterClass() {
     dio.teardown();
     dio = null;
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     dio.reset();
   }
 
@@ -87,7 +87,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   public void testSetHigh() {
     dio.getOutput().set(true);
     assertTrue("DIO Not High after no delay", dio.getInput().get());
-    Timer.delay(.02);
+    Timer.delay(0.02);
     assertTrue("DIO Not High after .05s delay", dio.getInput().get());
   }
 
@@ -98,7 +98,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
   public void testSetLow() {
     dio.getOutput().set(false);
     assertFalse("DIO Not Low after no delay", dio.getInput().get());
-    Timer.delay(.02);
+    Timer.delay(0.02);
     assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
   }
 

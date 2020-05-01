@@ -9,9 +9,10 @@
 
 #include <chrono>
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Power.h>
-#include <hal/cpp/Log.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
@@ -146,7 +147,7 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
         "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
-  std::unique_lock<wpi::mutex> lock(m_buttonEdgeMutex);
+  std::unique_lock lock(m_buttonEdgeMutex);
   // If button was pressed, clear flag and return true
   if (m_joystickButtonsPressed[stick] & 1 << (button - 1)) {
     m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
@@ -175,7 +176,7 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
         "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
-  std::unique_lock<wpi::mutex> lock(m_buttonEdgeMutex);
+  std::unique_lock lock(m_buttonEdgeMutex);
   // If button was released, clear flag and return true
   if (m_joystickButtonsReleased[stick] & 1 << (button - 1)) {
     m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
@@ -336,6 +337,12 @@ bool DriverStation::IsDisabled() const {
   return !(controlWord.enabled && controlWord.dsAttached);
 }
 
+bool DriverStation::IsEStopped() const {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return controlWord.eStop;
+}
+
 bool DriverStation::IsAutonomous() const {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
@@ -440,7 +447,7 @@ bool DriverStation::WaitForData(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<wpi::mutex> lock(m_waitForDataMutex);
+  std::unique_lock lock(m_waitForDataMutex);
   int currentCount = m_waitForDataCounter;
   while (m_waitForDataCounter == currentCount) {
     if (timeout > 0) {
@@ -468,11 +475,18 @@ double DriverStation::GetBatteryVoltage() const {
   return voltage;
 }
 
+void DriverStation::WakeupWaitForData() {
+  std::scoped_lock waitLock(m_waitForDataMutex);
+  // Nofify all threads
+  m_waitForDataCounter++;
+  m_waitForDataCond.notify_all();
+}
+
 void DriverStation::GetData() {
   {
     // Compute the pressed and released buttons
     HAL_JoystickButtons currentButtons;
-    std::unique_lock<wpi::mutex> lock(m_buttonEdgeMutex);
+    std::unique_lock lock(m_buttonEdgeMutex);
 
     for (int32_t i = 0; i < kJoystickPorts; i++) {
       HAL_GetJoystickButtons(i, &currentButtons);
@@ -489,13 +503,7 @@ void DriverStation::GetData() {
     }
   }
 
-  {
-    std::lock_guard<wpi::mutex> waitLock(m_waitForDataMutex);
-    // Nofify all threads
-    m_waitForDataCounter++;
-    m_waitForDataCond.notify_all();
-  }
-
+  WakeupWaitForData();
   SendMatchData();
 }
 

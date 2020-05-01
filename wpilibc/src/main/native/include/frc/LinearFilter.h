@@ -7,12 +7,15 @@
 
 #pragma once
 
+#include <cassert>
+#include <cmath>
 #include <initializer_list>
 #include <vector>
 
+#include <hal/FRCUsageReporting.h>
+#include <units/units.h>
 #include <wpi/ArrayRef.h>
-
-#include "frc/circular_buffer.h"
+#include <wpi/circular_buffer.h>
 
 namespace frc {
 
@@ -66,6 +69,7 @@ namespace frc {
  * Combining this with Note 1 - the impetus is on YOU as a developer to make
  * sure Calculate() gets called at the desired, constant frequency!
  */
+template <class T>
 class LinearFilter {
  public:
   /**
@@ -74,7 +78,15 @@ class LinearFilter {
    * @param ffGains The "feed forward" or FIR gains.
    * @param fbGains The "feed back" or IIR gains.
    */
-  LinearFilter(wpi::ArrayRef<double> ffGains, wpi::ArrayRef<double> fbGains);
+  LinearFilter(wpi::ArrayRef<double> ffGains, wpi::ArrayRef<double> fbGains)
+      : m_inputs(ffGains.size()),
+        m_outputs(fbGains.size()),
+        m_inputGains(ffGains),
+        m_outputGains(fbGains) {
+    static int instances = 0;
+    instances++;
+    HAL_Report(HALUsageReporting::kResourceType_LinearFilter, instances);
+  }
 
   /**
    * Create a linear FIR or IIR filter.
@@ -86,9 +98,6 @@ class LinearFilter {
                std::initializer_list<double> fbGains)
       : LinearFilter(wpi::makeArrayRef(ffGains.begin(), ffGains.end()),
                      wpi::makeArrayRef(fbGains.begin(), fbGains.end())) {}
-
-  LinearFilter(LinearFilter&&) = default;
-  LinearFilter& operator=(LinearFilter&&) = default;
 
   // Static methods to create commonly used filters
   /**
@@ -102,7 +111,11 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter SinglePoleIIR(double timeConstant, double period);
+  static LinearFilter<T> SinglePoleIIR(double timeConstant,
+                                       units::second_t period) {
+    double gain = std::exp(-period.to<double>() / timeConstant);
+    return LinearFilter(1.0 - gain, -gain);
+  }
 
   /**
    * Creates a first-order high-pass filter of the form:<br>
@@ -115,7 +128,10 @@ class LinearFilter {
    * @param period       The period in seconds between samples taken by the
    *                     user.
    */
-  static LinearFilter HighPass(double timeConstant, double period);
+  static LinearFilter<T> HighPass(double timeConstant, units::second_t period) {
+    double gain = std::exp(-period.to<double>() / timeConstant);
+    return LinearFilter({gain, -gain}, {-gain});
+  }
 
   /**
    * Creates a K-tap FIR moving average filter of the form:<br>
@@ -126,12 +142,20 @@ class LinearFilter {
    * @param taps The number of samples to average over. Higher = smoother but
    *             slower
    */
-  static LinearFilter MovingAverage(int taps);
+  static LinearFilter<T> MovingAverage(int taps) {
+    assert(taps > 0);
+
+    std::vector<double> gains(taps, 1.0 / taps);
+    return LinearFilter(gains, {});
+  }
 
   /**
    * Reset the filter state.
    */
-  void Reset();
+  void Reset() {
+    m_inputs.reset();
+    m_outputs.reset();
+  }
 
   /**
    * Calculates the next value of the filter.
@@ -140,11 +164,29 @@ class LinearFilter {
    *
    * @return The filtered value at this step
    */
-  double Calculate(double input);
+  T Calculate(T input) {
+    T retVal = T(0.0);
+
+    // Rotate the inputs
+    m_inputs.push_front(input);
+
+    // Calculate the new value
+    for (size_t i = 0; i < m_inputGains.size(); i++) {
+      retVal += m_inputs[i] * m_inputGains[i];
+    }
+    for (size_t i = 0; i < m_outputGains.size(); i++) {
+      retVal -= m_outputs[i] * m_outputGains[i];
+    }
+
+    // Rotate the outputs
+    m_outputs.push_front(retVal);
+
+    return retVal;
+  }
 
  private:
-  circular_buffer<double> m_inputs{0};
-  circular_buffer<double> m_outputs{0};
+  wpi::circular_buffer<T> m_inputs;
+  wpi::circular_buffer<T> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };

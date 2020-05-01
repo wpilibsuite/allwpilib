@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -69,6 +69,33 @@ void Udp::Bind6(const Twine& ip, unsigned int port, unsigned int flags) {
     Bind(reinterpret_cast<const sockaddr&>(addr), flags);
 }
 
+void Udp::Connect(const Twine& ip, unsigned int port) {
+  sockaddr_in addr;
+  int err = NameToAddr(ip, port, &addr);
+  if (err < 0)
+    ReportError(err);
+  else
+    Connect(reinterpret_cast<const sockaddr&>(addr));
+}
+
+void Udp::Connect6(const Twine& ip, unsigned int port) {
+  sockaddr_in6 addr;
+  int err = NameToAddr(ip, port, &addr);
+  if (err < 0)
+    ReportError(err);
+  else
+    Connect(reinterpret_cast<const sockaddr&>(addr));
+}
+
+sockaddr_storage Udp::GetPeer() {
+  sockaddr_storage name;
+  int len = sizeof(name);
+  if (!Invoke(&uv_udp_getpeername, GetRaw(), reinterpret_cast<sockaddr*>(&name),
+              &len))
+    std::memset(&name, 0, sizeof(name));
+  return name;
+}
+
 sockaddr_storage Udp::GetSock() {
   sockaddr_storage name;
   int len = sizeof(name);
@@ -109,6 +136,22 @@ void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
 void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
                std::function<void(MutableArrayRef<Buffer>, Error)> callback) {
   Send(addr, bufs, std::make_shared<CallbackUdpSendReq>(bufs, callback));
+}
+
+void Udp::Send(ArrayRef<Buffer> bufs, const std::shared_ptr<UdpSendReq>& req) {
+  if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
+             nullptr, [](uv_udp_send_t* r, int status) {
+               auto& h = *static_cast<UdpSendReq*>(r->data);
+               if (status < 0) h.ReportError(status);
+               h.complete(Error(status));
+               h.Release();  // this is always a one-shot
+             }))
+    req->Keep();
+}
+
+void Udp::Send(ArrayRef<Buffer> bufs,
+               std::function<void(MutableArrayRef<Buffer>, Error)> callback) {
+  Send(bufs, std::make_shared<CallbackUdpSendReq>(bufs, callback));
 }
 
 void Udp::StartRecv() {

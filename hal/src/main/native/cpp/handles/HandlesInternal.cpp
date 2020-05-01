@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,7 @@ static wpi::SmallVector<HandleBase*, 32>* globalHandles = nullptr;
 static wpi::mutex globalHandleMutex;
 HandleBase::HandleBase() {
   static wpi::SmallVector<HandleBase*, 32> gH;
-  std::lock_guard<wpi::mutex> lock(globalHandleMutex);
+  std::scoped_lock lock(globalHandleMutex);
   if (!globalHandles) {
     globalHandles = &gH;
   }
@@ -30,7 +30,7 @@ HandleBase::HandleBase() {
   }
 }
 HandleBase::~HandleBase() {
-  std::lock_guard<wpi::mutex> lock(globalHandleMutex);
+  std::scoped_lock lock(globalHandleMutex);
   auto index = std::find(globalHandles->begin(), globalHandles->end(), this);
   if (index != globalHandles->end()) {
     *index = nullptr;
@@ -43,7 +43,7 @@ void HandleBase::ResetHandles() {
   }
 }
 void HandleBase::ResetGlobalHandles() {
-  std::unique_lock<wpi::mutex> lock(globalHandleMutex);
+  std::unique_lock lock(globalHandleMutex);
   for (auto&& i : *globalHandles) {
     if (i != nullptr) {
       lock.unlock();

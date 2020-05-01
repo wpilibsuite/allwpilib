@@ -9,14 +9,16 @@ cppSrcFileInclude {
 }
 
 includeOtherLibs {
-  ^HAL/
   ^cameraserver/
   ^cscore
   ^frc/
+  ^frc2/
+  ^hal/
   ^networktables/
   ^ntcore
   ^opencv2/
   ^support/
+  ^units/
   ^vision/
   ^wpi/
 }

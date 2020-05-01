@@ -24,7 +24,7 @@ TEST(WatchdogTest, EnableDisable) {
 #endif
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(0.4, [&] { watchdogCounter++; });
+  Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
   wpi::outs() << "Run 1\n";
   watchdog.Enable();
@@ -59,7 +59,7 @@ TEST(WatchdogTest, Reset) {
 #endif
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(0.4, [&] { watchdogCounter++; });
+  Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
   watchdog.Enable();
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -77,11 +77,11 @@ TEST(WatchdogTest, SetTimeout) {
 #endif
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(1.0, [&] { watchdogCounter++; });
+  Watchdog watchdog(1.0_s, [&] { watchdogCounter++; });
 
   watchdog.Enable();
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  watchdog.SetTimeout(0.2);
+  watchdog.SetTimeout(0.2_s);
 
   EXPECT_EQ(0.2, watchdog.GetTimeout());
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
@@ -98,7 +98,7 @@ TEST(WatchdogTest, DISABLED_IsExpired) {
 #else
 TEST(WatchdogTest, IsExpired) {
 #endif
-  Watchdog watchdog(0.2, [] {});
+  Watchdog watchdog(0.2_s, [] {});
   EXPECT_FALSE(watchdog.IsExpired());
   watchdog.Enable();
 
@@ -120,7 +120,7 @@ TEST(WatchdogTest, Epochs) {
 #endif
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(0.4, [&] { watchdogCounter++; });
+  Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
   wpi::outs() << "Run 1\n";
   watchdog.Enable();
@@ -153,8 +153,8 @@ TEST(WatchdogTest, MultiWatchdog) {
   uint32_t watchdogCounter1 = 0;
   uint32_t watchdogCounter2 = 0;
 
-  Watchdog watchdog1(0.2, [&] { watchdogCounter1++; });
-  Watchdog watchdog2(0.6, [&] { watchdogCounter2++; });
+  Watchdog watchdog1(0.2_s, [&] { watchdogCounter1++; });
+  Watchdog watchdog2(0.6_s, [&] { watchdogCounter2++; });
 
   watchdog2.Enable();
   std::this_thread::sleep_for(std::chrono::milliseconds(200));

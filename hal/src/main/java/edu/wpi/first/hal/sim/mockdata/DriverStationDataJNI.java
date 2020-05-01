@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,6 +48,9 @@ public class DriverStationDataJNI extends JNIWrapper {
   public static native void setMatchInfo(String eventName, String gameSpecificMessage, int matchNumber, int replayNumber, int matchType);
   public static native void registerAllCallbacks(NotifyCallback callback, boolean initialNotify);
   public static native void notifyNewData();
+
+  public static native void setSendError(boolean shouldSend);
+  public static native void setSendConsoleLine(boolean shouldSend);
 
   public static native void resetData();
 }

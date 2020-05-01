@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -51,7 +51,7 @@ public class PCMTest extends AbstractComsSetup {
   private static DigitalInput fakeSolenoid2;
 
   @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
+  public static void setUpBeforeClass() {
     compressor = new Compressor();
 
     fakePressureSwitch = new DigitalOutput(11);
@@ -62,9 +62,7 @@ public class PCMTest extends AbstractComsSetup {
   }
 
   @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-    compressor.close();
-
+  public static void tearDownAfterClass() {
     fakePressureSwitch.close();
     fakeCompressor.close();
 
@@ -73,7 +71,7 @@ public class PCMTest extends AbstractComsSetup {
   }
 
   @Before
-  public void reset() throws Exception {
+  public void reset() {
     compressor.stop();
     fakePressureSwitch.set(false);
   }

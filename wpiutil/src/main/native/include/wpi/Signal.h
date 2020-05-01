@@ -548,9 +548,7 @@ public:
     }
 
     SignalBase & operator=(SignalBase && o) {
-        lock_type lock1(m_mutex, std::defer_lock);
-        lock_type lock2(o.m_mutex, std::defer_lock);
-        std::lock(lock1, lock2);
+        std::scoped_lock lock(m_mutex, o.m_mutex);
 
         std::swap(m_func, o.m_func);
         m_block.store(o.m_block.exchange(m_block.load()));

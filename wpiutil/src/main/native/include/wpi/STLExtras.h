@@ -57,15 +57,6 @@ using ValueOfRange = typename std::remove_reference<decltype(
 //     Extra additions to <type_traits>
 //===----------------------------------------------------------------------===//
 
-template <typename T>
-struct negation : std::integral_constant<bool, !bool(T::value)> {};
-
-template <typename...> struct conjunction : std::true_type {};
-template <typename B1> struct conjunction<B1> : B1 {};
-template <typename B1, typename... Bn>
-struct conjunction<B1, Bn...>
-    : std::conditional<bool(B1::value), conjunction<Bn...>, B1>::type {};
-
 template <typename T> struct make_const_ptr {
   using type =
       typename std::add_pointer<typename std::add_const<T>::type>::type;
@@ -436,10 +427,6 @@ bool all_of(R &&range, UnaryPredicate P);
 template <typename R, typename UnaryPredicate>
 bool any_of(R &&range, UnaryPredicate P);
 
-template <size_t... I> struct index_sequence;
-
-template <class... Ts> struct index_sequence_for;
-
 namespace detail {
 
 using std::declval;
@@ -474,38 +461,38 @@ struct zip_common : public zip_traits<ZipType, Iters...> {
   std::tuple<Iters...> iterators;
 
 protected:
-  template <size_t... Ns> value_type deref(index_sequence<Ns...>) const {
+  template <size_t... Ns> value_type deref(std::index_sequence<Ns...>) const {
     return value_type(*std::get<Ns>(iterators)...);
   }
 
   template <size_t... Ns>
-  decltype(iterators) tup_inc(index_sequence<Ns...>) const {
+  decltype(iterators) tup_inc(std::index_sequence<Ns...>) const {
     return std::tuple<Iters...>(std::next(std::get<Ns>(iterators))...);
   }
 
   template <size_t... Ns>
-  decltype(iterators) tup_dec(index_sequence<Ns...>) const {
+  decltype(iterators) tup_dec(std::index_sequence<Ns...>) const {
     return std::tuple<Iters...>(std::prev(std::get<Ns>(iterators))...);
   }
 
 public:
   zip_common(Iters &&... ts) : iterators(std::forward<Iters>(ts)...) {}
 
-  value_type operator*() { return deref(index_sequence_for<Iters...>{}); }
+  value_type operator*() { return deref(std::index_sequence_for<Iters...>{}); }
 
   const value_type operator*() const {
-    return deref(index_sequence_for<Iters...>{});
+    return deref(std::index_sequence_for<Iters...>{});
   }
 
   ZipType &operator++() {
-    iterators = tup_inc(index_sequence_for<Iters...>{});
+    iterators = tup_inc(std::index_sequence_for<Iters...>{});
     return *reinterpret_cast<ZipType *>(this);
   }
 
   ZipType &operator--() {
     static_assert(Base::IsBidirectional,
                   "All inner iterators must be at least bidirectional.");
-    iterators = tup_dec(index_sequence_for<Iters...>{});
+    iterators = tup_dec(std::index_sequence_for<Iters...>{});
     return *reinterpret_cast<ZipType *>(this);
   }
 };
@@ -524,7 +511,7 @@ struct zip_first : public zip_common<zip_first<Iters...>, Iters...> {
 template <typename... Iters>
 class zip_shortest : public zip_common<zip_shortest<Iters...>, Iters...> {
   template <size_t... Ns>
-  bool test(const zip_shortest<Iters...> &other, index_sequence<Ns...>) const {
+  bool test(const zip_shortest<Iters...> &other, std::index_sequence<Ns...>) const {
     return all_of(std::initializer_list<bool>{std::get<Ns>(this->iterators) !=
                                               std::get<Ns>(other.iterators)...},
                   identity<bool>{});
@@ -536,7 +523,7 @@ public:
   zip_shortest(Iters &&... ts) : Base(std::forward<Iters>(ts)...) {}
 
   bool operator==(const zip_shortest<Iters...> &other) const {
-    return !test(other, index_sequence_for<Iters...>{});
+    return !test(other, std::index_sequence_for<Iters...>{});
   }
 };
 
@@ -552,18 +539,18 @@ public:
 private:
   std::tuple<Args...> ts;
 
-  template <size_t... Ns> iterator begin_impl(index_sequence<Ns...>) const {
+  template <size_t... Ns> iterator begin_impl(std::index_sequence<Ns...>) const {
     return iterator(std::begin(std::get<Ns>(ts))...);
   }
-  template <size_t... Ns> iterator end_impl(index_sequence<Ns...>) const {
+  template <size_t... Ns> iterator end_impl(std::index_sequence<Ns...>) const {
     return iterator(std::end(std::get<Ns>(ts))...);
   }
 
 public:
   zippy(Args &&... ts_) : ts(std::forward<Args>(ts_)...) {}
 
-  iterator begin() const { return begin_impl(index_sequence_for<Args...>{}); }
-  iterator end() const { return end_impl(index_sequence_for<Args...>{}); }
+  iterator begin() const { return begin_impl(std::index_sequence_for<Args...>{}); }
+  iterator end() const { return end_impl(std::index_sequence_for<Args...>{}); }
 };
 
 } // end namespace detail
@@ -633,20 +620,20 @@ private:
 
   template <size_t... Ns>
   bool test(const zip_longest_iterator<Iters...> &other,
-            index_sequence<Ns...>) const {
+            std::index_sequence<Ns...>) const {
     return wpi::any_of(
         std::initializer_list<bool>{std::get<Ns>(this->iterators) !=
                                     std::get<Ns>(other.iterators)...},
         identity<bool>{});
   }
 
-  template <size_t... Ns> value_type deref(index_sequence<Ns...>) const {
+  template <size_t... Ns> value_type deref(std::index_sequence<Ns...>) const {
     return value_type(
         deref_or_none(std::get<Ns>(iterators), std::get<Ns>(end_iterators))...);
   }
 
   template <size_t... Ns>
-  decltype(iterators) tup_inc(index_sequence<Ns...>) const {
+  decltype(iterators) tup_inc(std::index_sequence<Ns...>) const {
     return std::tuple<Iters...>(
         next_or_end(std::get<Ns>(iterators), std::get<Ns>(end_iterators))...);
   }
@@ -656,17 +643,17 @@ public:
       : iterators(std::forward<Iters>(ts.first)...),
         end_iterators(std::forward<Iters>(ts.second)...) {}
 
-  value_type operator*() { return deref(index_sequence_for<Iters...>{}); }
+  value_type operator*() { return deref(std::index_sequence_for<Iters...>{}); }
 
-  value_type operator*() const { return deref(index_sequence_for<Iters...>{}); }
+  value_type operator*() const { return deref(std::index_sequence_for<Iters...>{}); }
 
   zip_longest_iterator<Iters...> &operator++() {
-    iterators = tup_inc(index_sequence_for<Iters...>{});
+    iterators = tup_inc(std::index_sequence_for<Iters...>{});
     return *this;
   }
 
   bool operator==(const zip_longest_iterator<Iters...> &other) const {
-    return !test(other, index_sequence_for<Iters...>{});
+    return !test(other, std::index_sequence_for<Iters...>{});
   }
 };
 
@@ -683,12 +670,12 @@ public:
 private:
   std::tuple<Args...> ts;
 
-  template <size_t... Ns> iterator begin_impl(index_sequence<Ns...>) const {
+  template <size_t... Ns> iterator begin_impl(std::index_sequence<Ns...>) const {
     return iterator(std::make_pair(adl_begin(std::get<Ns>(ts)),
                                    adl_end(std::get<Ns>(ts)))...);
   }
 
-  template <size_t... Ns> iterator end_impl(index_sequence<Ns...>) const {
+  template <size_t... Ns> iterator end_impl(std::index_sequence<Ns...>) const {
     return iterator(std::make_pair(adl_end(std::get<Ns>(ts)),
                                    adl_end(std::get<Ns>(ts)))...);
   }
@@ -696,8 +683,8 @@ private:
 public:
   zip_longest_range(Args &&... ts_) : ts(std::forward<Args>(ts_)...) {}
 
-  iterator begin() const { return begin_impl(index_sequence_for<Args...>{}); }
-  iterator end() const { return end_impl(index_sequence_for<Args...>{}); }
+  iterator begin() const { return begin_impl(std::index_sequence_for<Args...>{}); }
+  iterator end() const { return end_impl(std::index_sequence_for<Args...>{}); }
 };
 } // namespace detail
 
@@ -753,7 +740,7 @@ class concat_iterator
   /// Increments the first non-end iterator.
   ///
   /// It is an error to call this with all iterators at the end.
-  template <size_t... Ns> void increment(index_sequence<Ns...>) {
+  template <size_t... Ns> void increment(std::index_sequence<Ns...>) {
     // Build a sequence of functions to increment each iterator if possible.
     bool (concat_iterator::*IncrementHelperFns[])() = {
         &concat_iterator::incrementHelper<Ns>...};
@@ -782,7 +769,7 @@ class concat_iterator
   /// reference.
   ///
   /// It is an error to call this with all iterators at the end.
-  template <size_t... Ns> ValueT &get(index_sequence<Ns...>) const {
+  template <size_t... Ns> ValueT &get(std::index_sequence<Ns...>) const {
     // Build a sequence of functions to get from iterator if possible.
     ValueT *(concat_iterator::*GetHelperFns[])() const = {
         &concat_iterator::getHelper<Ns>...};
@@ -807,11 +794,11 @@ public:
   using BaseT::operator++;
 
   concat_iterator &operator++() {
-    increment(index_sequence_for<IterTs...>());
+    increment(std::index_sequence_for<IterTs...>());
     return *this;
   }
 
-  ValueT &operator*() const { return get(index_sequence_for<IterTs...>()); }
+  ValueT &operator*() const { return get(std::index_sequence_for<IterTs...>()); }
 
   bool operator==(const concat_iterator &RHS) const {
     return Begins == RHS.Begins && Ends == RHS.Ends;
@@ -834,10 +821,10 @@ public:
 private:
   std::tuple<RangeTs...> Ranges;
 
-  template <size_t... Ns> iterator begin_impl(index_sequence<Ns...>) {
+  template <size_t... Ns> iterator begin_impl(std::index_sequence<Ns...>) {
     return iterator(std::get<Ns>(Ranges)...);
   }
-  template <size_t... Ns> iterator end_impl(index_sequence<Ns...>) {
+  template <size_t... Ns> iterator end_impl(std::index_sequence<Ns...>) {
     return iterator(make_range(std::end(std::get<Ns>(Ranges)),
                                std::end(std::get<Ns>(Ranges)))...);
   }
@@ -846,8 +833,8 @@ public:
   concat_range(RangeTs &&... Ranges)
       : Ranges(std::forward<RangeTs>(Ranges)...) {}
 
-  iterator begin() { return begin_impl(index_sequence_for<RangeTs...>{}); }
-  iterator end() { return end_impl(index_sequence_for<RangeTs...>{}); }
+  iterator begin() { return begin_impl(std::index_sequence_for<RangeTs...>{}); }
+  iterator end() { return end_impl(std::index_sequence_for<RangeTs...>{}); }
 };
 
 } // end namespace detail
@@ -895,28 +882,6 @@ struct on_first {
     return func(lhs.first, rhs.first);
   }
 };
-
-// A subset of N3658. More stuff can be added as-needed.
-
-/// Represents a compile-time sequence of integers.
-template <class T, T... I> struct integer_sequence {
-  using value_type = T;
-
-  static constexpr size_t size() { return sizeof...(I); }
-};
-
-/// Alias for the common case of a sequence of size_ts.
-template <size_t... I>
-struct index_sequence : integer_sequence<std::size_t, I...> {};
-
-template <std::size_t N, std::size_t... I>
-struct build_index_impl : build_index_impl<N - 1, N - 1, I...> {};
-template <std::size_t... I>
-struct build_index_impl<0, I...> : index_sequence<I...> {};
-
-/// Creates a compile-time integer sequence for a parameter pack.
-template <class... Ts>
-struct index_sequence_for : build_index_impl<sizeof...(Ts)> {};
 
 /// Utility type to build an inheritance chain that makes it easy to rank
 /// overload candidates.
@@ -1210,41 +1175,6 @@ void erase_if(Container &C, UnaryPredicate P) {
 //     Extra additions to <memory>
 //===----------------------------------------------------------------------===//
 
-// Implement make_unique according to N3656.
-
-/// Constructs a `new T()` with the given args and returns a
-///        `unique_ptr<T>` which owns the object.
-///
-/// Example:
-///
-///     auto p = make_unique<int>();
-///     auto p = make_unique<std::tuple<int, int>>(0, 1);
-template <class T, class... Args>
-typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T>>::type
-make_unique(Args &&... args) {
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
-/// Constructs a `new T[n]` with the given args and returns a
-///        `unique_ptr<T[]>` which owns the object.
-///
-/// \param n size of the new array.
-///
-/// Example:
-///
-///     auto p = make_unique<int[]>(2); // value-initializes the array with 0's.
-template <class T>
-typename std::enable_if<std::is_array<T>::value && std::extent<T>::value == 0,
-                        std::unique_ptr<T>>::type
-make_unique(size_t n) {
-  return std::unique_ptr<T>(new typename std::remove_extent<T>::type[n]());
-}
-
-/// This function isn't used and is only here to provide better compile errors.
-template <class T, class... Args>
-typename std::enable_if<std::extent<T>::value != 0>::type
-make_unique(Args &&...) = delete;
-
 struct FreeDeleter {
   void operator()(void* v) {
     ::free(v);
@@ -1255,20 +1185,6 @@ template<typename First, typename Second>
 struct pair_hash {
   size_t operator()(const std::pair<First, Second> &P) const {
     return std::hash<First>()(P.first) * 31 + std::hash<Second>()(P.second);
-  }
-};
-
-/// A functor like C++14's std::less<void> in its absence.
-struct less {
-  template <typename A, typename B> bool operator()(A &&a, B &&b) const {
-    return std::forward<A>(a) < std::forward<B>(b);
-  }
-};
-
-/// A functor like C++14's std::equal<void> in its absence.
-struct equal {
-  template <typename A, typename B> bool operator()(A &&a, B &&b) const {
-    return std::forward<A>(a) == std::forward<B>(b);
   }
 };
 
@@ -1391,31 +1307,6 @@ private:
 ///
 template <typename R> detail::enumerator<R> enumerate(R &&TheRange) {
   return detail::enumerator<R>(std::forward<R>(TheRange));
-}
-
-namespace detail {
-
-template <typename F, typename Tuple, std::size_t... I>
-auto apply_tuple_impl(F &&f, Tuple &&t, index_sequence<I...>)
-    -> decltype(std::forward<F>(f)(std::get<I>(std::forward<Tuple>(t))...)) {
-  return std::forward<F>(f)(std::get<I>(std::forward<Tuple>(t))...);
-}
-
-} // end namespace detail
-
-/// Given an input tuple (a1, a2, ..., an), pass the arguments of the
-/// tuple variadically to f as if by calling f(a1, a2, ..., an) and
-/// return the result.
-template <typename F, typename Tuple>
-auto apply_tuple(F &&f, Tuple &&t) -> decltype(detail::apply_tuple_impl(
-    std::forward<F>(f), std::forward<Tuple>(t),
-    build_index_impl<
-        std::tuple_size<typename std::decay<Tuple>::type>::value>{})) {
-  using Indices = build_index_impl<
-      std::tuple_size<typename std::decay<Tuple>::type>::value>;
-
-  return detail::apply_tuple_impl(std::forward<F>(f), std::forward<Tuple>(t),
-                                  Indices{});
 }
 
 /// Return true if the sequence [Begin, End) has exactly N items. Runs in O(N)

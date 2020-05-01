@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,6 +48,7 @@ class DispatcherBase : public IDispatcher {
   virtual ~DispatcherBase();
 
   unsigned int GetNetworkMode() const;
+  void StartLocal();
   void StartServer(const Twine& persist_filename,
                    std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   void StartClient();

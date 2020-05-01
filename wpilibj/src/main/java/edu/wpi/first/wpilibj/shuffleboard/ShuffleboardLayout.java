@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,13 +9,14 @@ package edu.wpi.first.wpilibj.shuffleboard;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
+
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts.
@@ -25,8 +26,8 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
     implements ShuffleboardContainer {
   private final ContainerHelper m_helper = new ContainerHelper(this);
 
-  ShuffleboardLayout(ShuffleboardContainer parent, String name, String type) {
-    super(parent, Objects.requireNonNull(type, "Layout type must be specified"), name);
+  ShuffleboardLayout(ShuffleboardContainer parent, String title, String type) {
+    super(parent, title, requireNonNullParam(type, "type", "ShuffleboardLayout"));
   }
 
   @Override

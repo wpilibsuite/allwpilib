@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,8 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/drive/RobotDriveBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -62,7 +64,9 @@ class SpeedController;
  * RobotDrive#MecanumDrive_Polar(double, double, double) if a
  * deadband of 0 is used.
  */
-class MecanumDrive : public RobotDriveBase {
+class MecanumDrive : public RobotDriveBase,
+                     public Sendable,
+                     public SendableHelper<MecanumDrive> {
  public:
   /**
    * Construct a MecanumDrive.
@@ -133,10 +137,10 @@ class MecanumDrive : public RobotDriveBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController& m_frontLeftMotor;
-  SpeedController& m_rearLeftMotor;
-  SpeedController& m_frontRightMotor;
-  SpeedController& m_rearRightMotor;
+  SpeedController* m_frontLeftMotor;
+  SpeedController* m_rearLeftMotor;
+  SpeedController* m_frontRightMotor;
+  SpeedController* m_rearRightMotor;
 
   double m_rightSideInvertMultiplier = -1.0;
 

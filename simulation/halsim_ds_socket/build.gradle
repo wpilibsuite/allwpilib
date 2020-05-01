@@ -21,7 +21,7 @@ apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 model {
     testSuites {
         def comps = $.components
-        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian')) {
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
             "${pluginName}Test"(GoogleTestTestSuiteSpec) {
                 for(NativeComponentSpec c : comps) {
                     if (c.name == pluginName) {
@@ -48,6 +48,9 @@ model {
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib library: pluginName, linkage: 'shared'
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+            }
         }
     }
 }

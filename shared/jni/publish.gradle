@@ -1,13 +1,6 @@
 import java.security.MessageDigest
 apply plugin: 'maven-publish'
 
-def pubVersion
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
-
 def outputsFolder = file("$buildDir/outputs")
 
 def baseArtifactId = nativeName
@@ -15,11 +8,11 @@ def artifactGroupId = "edu.wpi.first.${nativeName}"
 def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
 def jniBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jni_CLS"
 
-def licenseFile = file("$rootDir/license.txt")
+def licenseFile = file("$rootDir/license.md")
 
 task cppSourcesZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "sources"
     duplicatesStrategy = 'exclude'
 
@@ -48,8 +41,8 @@ task cppSourcesZip(type: Zip) {
 }
 
 task cppHeadersZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "headers"
 
     from(licenseFile) {
@@ -95,11 +88,6 @@ model {
             }
         })
 
-        def allJniTask
-        if (!project.hasProperty('jenkinsBuild')) {
-            allJniTask = createAllCombined(jniTaskList, "${nativeName}JNI", jniBaseName, Jar, project)
-        }
-
         publications {
             cpp(MavenPublication) {
                 taskList.each {
@@ -110,20 +98,16 @@ model {
 
                 artifactId = "${baseArtifactId}-cpp"
                 groupId artifactGroupId
-                version pubVersion
+                version wpilibVersioning.version.get()
             }
             jni(MavenPublication) {
                 jniTaskList.each {
                     artifact it
                 }
 
-                if (!project.hasProperty('jenkinsBuild')) {
-                    artifact allJniTask
-                }
-
                 artifactId = "${baseArtifactId}-jni"
                 groupId artifactGroupId
-                version pubVersion
+                version wpilibVersioning.version.get()
             }
         }
     }

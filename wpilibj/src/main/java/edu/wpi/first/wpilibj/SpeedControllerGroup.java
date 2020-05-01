@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,12 +7,15 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Allows multiple {@link SpeedController} objects to be linked together.
  */
-public class SpeedControllerGroup extends SendableBase implements SpeedController {
+public class SpeedControllerGroup implements SpeedController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final SpeedController[] m_speedControllers;
   private static int instances;
@@ -27,13 +30,28 @@ public class SpeedControllerGroup extends SendableBase implements SpeedControlle
                               SpeedController... speedControllers) {
     m_speedControllers = new SpeedController[speedControllers.length + 1];
     m_speedControllers[0] = speedController;
-    addChild(speedController);
     for (int i = 0; i < speedControllers.length; i++) {
       m_speedControllers[i + 1] = speedControllers[i];
-      addChild(speedControllers[i]);
+    }
+    init();
+  }
+
+  public SpeedControllerGroup(SpeedController[] speedControllers) {
+    m_speedControllers = Arrays.copyOf(speedControllers, speedControllers.length);
+    init();
+  }
+
+  private void init() {
+    for (SpeedController controller : m_speedControllers) {
+      SendableRegistry.addChild(this, controller);
     }
     instances++;
-    setName("SpeedControllerGroup", instances);
+    SendableRegistry.addLW(this, "SpeedControllerGroup", instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   @Override

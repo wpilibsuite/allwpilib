@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,7 @@
 
 #include <uv.h>
 
+#include <initializer_list>
 #include <memory>
 #include <string>
 
@@ -243,6 +244,11 @@ class Process final : public HandleImpl<Process, uv_process_t> {
   static std::shared_ptr<Process> SpawnArray(Loop& loop, const Twine& file,
                                              ArrayRef<Option> options);
 
+  static std::shared_ptr<Process> SpawnArray(
+      Loop& loop, const Twine& file, std::initializer_list<Option> options) {
+    return SpawnArray(loop, file, makeArrayRef(options.begin(), options.end()));
+  }
+
   template <typename... Args>
   static std::shared_ptr<Process> Spawn(Loop& loop, const Twine& file,
                                         const Args&... options) {
@@ -265,6 +271,12 @@ class Process final : public HandleImpl<Process, uv_process_t> {
   static std::shared_ptr<Process> SpawnArray(const std::shared_ptr<Loop>& loop,
                                              const Twine& file,
                                              ArrayRef<Option> options) {
+    return SpawnArray(*loop, file, options);
+  }
+
+  static std::shared_ptr<Process> SpawnArray(
+      const std::shared_ptr<Loop>& loop, const Twine& file,
+      std::initializer_list<Option> options) {
     return SpawnArray(*loop, file, options);
   }
 

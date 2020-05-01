@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,6 +24,7 @@
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "ctre/ctre.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
@@ -42,6 +43,7 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeHAL() {
+  InitializeAddressableLED();
   InitializeAccelerometer();
   InitializeAnalogAccumulator();
   InitializeAnalogGyro();
@@ -56,11 +58,14 @@ void InitializeHAL() {
   InitializeCounter();
   InitializeDigitalInternal();
   InitializeDIO();
+  InitializeDMA();
+  InitializeDutyCycle();
   InitializeEncoder();
   InitializeFPGAEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
   InitialzeInterrupts();
+  InitializeMain();
   InitializeNotifier();
   InitializePCMInternal();
   InitializePDP();
@@ -74,6 +79,16 @@ void InitializeHAL() {
   InitializeThreads();
 }
 }  // namespace init
+
+void ReleaseFPGAInterrupt(int32_t interruptNumber) {
+  if (!global) {
+    return;
+  }
+  int32_t status = 0;
+  global->writeInterruptForceNumber(static_cast<unsigned char>(interruptNumber),
+                                    &status);
+  global->strobeInterruptForceOnce(&status);
+}
 }  // namespace hal
 
 extern "C" {
@@ -211,6 +226,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return ERR_FRCSystem_NetCommNotResponding_MESSAGE;
     case ERR_FRCSystem_NoDSConnection:
       return ERR_FRCSystem_NoDSConnection_MESSAGE;
+    case HAL_CAN_BUFFER_OVERRUN:
+      return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
+    case HAL_LED_CHANNEL_ERROR:
+      return HAL_LED_CHANNEL_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
@@ -252,6 +271,28 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   return (upper2 << 32) + lower;
 }
 
+uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
+  // Capture the current FPGA time.  This will give us the upper half of the
+  // clock.
+  uint64_t fpga_time = HAL_GetFPGATime(status);
+  if (*status != 0) return 0;
+
+  // Now, we need to detect the case where the lower bits rolled over after we
+  // sampled.  In that case, the upper bits will be 1 bigger than they should
+  // be.
+
+  // Break it into lower and upper portions.
+  uint32_t lower = fpga_time & 0xffffffffull;
+  uint64_t upper = (fpga_time >> 32) & 0xffffffff;
+
+  // The time was sampled *before* the current time, so roll it back.
+  if (lower < unexpanded_lower) {
+    --upper;
+  }
+
+  return (upper << 32) + static_cast<uint64_t>(unexpanded_lower);
+}
+
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -274,24 +315,6 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
     return false;
   }
   return !(watchdog->readStatus_PowerAlive(status));
-}
-
-void HAL_BaseInitialize(int32_t* status) {
-  static std::atomic_bool initialized{false};
-  static wpi::mutex initializeMutex;
-  // Initial check, as if it's true initialization has finished
-  if (initialized) return;
-
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
-  // Second check in case another thread was waiting
-  if (initialized) return;
-  // image 4; Fixes errors caused by multiple processes. Talk to NI about this
-  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-      nLoadOut::kTargetClass_RoboRIO;
-
-  global.reset(tGlobal::create(status));
-  watchdog.reset(tSysWatchdog::create(status));
-  initialized = true;
 }
 
 static bool killExistingProgram(int timeout, int mode) {
@@ -341,7 +364,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   // Initial check, as if it's true initialization has finished
   if (initialized) return true;
 
-  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
 
@@ -367,8 +390,13 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     setNewDataSem(nullptr);
   });
 
+  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
+      nLoadOut::getTargetClass();
+
   int32_t status = 0;
-  HAL_BaseInitialize(&status);
+  global.reset(tGlobal::create(&status));
+  watchdog.reset(tSysWatchdog::create(&status));
+
   if (status != 0) return false;
 
   HAL_InitializeDriverStation();

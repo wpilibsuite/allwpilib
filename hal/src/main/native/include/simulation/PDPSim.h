@@ -1,13 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-
-#ifndef __FRC_ROBORIO__
 
 #include <memory>
 #include <utility>
@@ -81,6 +79,14 @@ class PDPSim {
     HALSIM_SetPDPCurrent(m_index, channel, current);
   }
 
+  void GetAllCurrents(double* currents) {
+    HALSIM_GetPDPAllCurrents(m_index, currents);
+  }
+
+  void SetAllCurrents(const double* currents) {
+    HALSIM_SetPDPAllCurrents(m_index, currents);
+  }
+
   void ResetData() { HALSIM_ResetPDPData(m_index); }
 
  private:
@@ -88,4 +94,3 @@ class PDPSim {
 };
 }  // namespace sim
 }  // namespace frc
-#endif  // __FRC_ROBORIO__

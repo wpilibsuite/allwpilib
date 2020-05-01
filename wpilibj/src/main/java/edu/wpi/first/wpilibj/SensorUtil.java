@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -84,7 +84,7 @@ public final class SensorUtil {
         .append(kPCMModules)
         .append(", Requested: ")
         .append(moduleNumber);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
@@ -101,7 +101,7 @@ public final class SensorUtil {
         .append(kDigitalChannels)
         .append(", Requested: ")
         .append(channel);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
@@ -118,7 +118,7 @@ public final class SensorUtil {
         .append(kRelayChannels)
         .append(", Requested: ")
         .append(channel);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
@@ -135,7 +135,7 @@ public final class SensorUtil {
         .append(kPwmChannels)
         .append(", Requested: ")
         .append(channel);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
@@ -152,7 +152,7 @@ public final class SensorUtil {
         .append(kAnalogInputChannels)
         .append(", Requested: ")
         .append(channel);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
@@ -169,7 +169,7 @@ public final class SensorUtil {
         .append(kAnalogOutputChannels)
         .append(", Requested: ")
         .append(channel);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
@@ -185,7 +185,7 @@ public final class SensorUtil {
         .append(kSolenoidChannels)
         .append(", Requested: ")
         .append(channel);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
@@ -202,7 +202,7 @@ public final class SensorUtil {
         .append(kPDPChannels)
         .append(", Requested: ")
         .append(channel);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 
@@ -218,7 +218,7 @@ public final class SensorUtil {
         .append(kPDPModules)
         .append(", Requested: ")
         .append(module);
-      throw new IndexOutOfBoundsException(buf.toString());
+      throw new IllegalArgumentException(buf.toString());
     }
   }
 

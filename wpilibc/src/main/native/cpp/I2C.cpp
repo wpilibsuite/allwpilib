@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,7 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/I2C.h>
 
 #include "frc/WPIErrors.h"
@@ -20,34 +20,19 @@ I2C::I2C(Port port, int deviceAddress)
     : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
   HAL_InitializeI2C(m_port, &status);
-  // wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  // wpi_setHALError(status);
 
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
 
 I2C::~I2C() { HAL_CloseI2C(m_port); }
 
-I2C::I2C(I2C&& rhs)
-    : ErrorBase(std::move(rhs)),
-      m_deviceAddress(std::move(rhs.m_deviceAddress)) {
-  std::swap(m_port, rhs.m_port);
-}
-
-I2C& I2C::operator=(I2C&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-
-  std::swap(m_port, rhs.m_port);
-  m_deviceAddress = std::move(rhs.m_deviceAddress);
-
-  return *this;
-}
-
 bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
                       int receiveSize) {
   int32_t status = 0;
   status = HAL_TransactionI2C(m_port, m_deviceAddress, dataToSend, sendSize,
                               dataReceived, receiveSize);
-  // wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  // wpi_setHALError(status);
   return status < 0;
 }
 

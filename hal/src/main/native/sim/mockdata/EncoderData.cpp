@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,7 +22,9 @@ void InitializeEncoderData() {
 EncoderData* hal::SimEncoderData;
 void EncoderData::ResetData() {
   digitalChannelA = 0;
+  digitalChannelB = 0;
   initialized.Reset(false);
+  simDevice = 0;
   count.Reset(0);
   period.Reset(std::numeric_limits<double>::max());
   reset.Reset(false);
@@ -38,8 +40,16 @@ void HALSIM_ResetEncoderData(int32_t index) {
   SimEncoderData[index].ResetData();
 }
 
-int16_t HALSIM_GetDigitalChannelA(int32_t index) {
+int32_t HALSIM_GetEncoderDigitalChannelA(int32_t index) {
   return SimEncoderData[index].digitalChannelA;
+}
+
+int32_t HALSIM_GetEncoderDigitalChannelB(int32_t index) {
+  return SimEncoderData[index].digitalChannelB;
+}
+
+HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) {
+  return SimEncoderData[index].simDevice;
 }
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                  \
@@ -55,6 +65,32 @@ DEFINE_CAPI(HAL_Bool, Direction, direction)
 DEFINE_CAPI(HAL_Bool, ReverseDirection, reverseDirection)
 DEFINE_CAPI(int32_t, SamplesToAverage, samplesToAverage)
 DEFINE_CAPI(double, DistancePerPulse, distancePerPulse)
+
+void HALSIM_SetEncoderDistance(int32_t index, double distance) {
+  auto& simData = SimEncoderData[index];
+  simData.count = distance / simData.distancePerPulse;
+}
+
+double HALSIM_GetEncoderDistance(int32_t index) {
+  auto& simData = SimEncoderData[index];
+  return simData.count * simData.distancePerPulse;
+}
+
+void HALSIM_SetEncoderRate(int32_t index, double rate) {
+  auto& simData = SimEncoderData[index];
+  if (rate == 0) {
+    simData.period = std::numeric_limits<double>::infinity();
+    return;
+  }
+
+  simData.period = simData.distancePerPulse / rate;
+}
+
+double HALSIM_GetEncoderRate(int32_t index) {
+  auto& simData = SimEncoderData[index];
+
+  return simData.distancePerPulse / simData.period;
+}
 
 #define REGISTER(NAME) \
   SimEncoderData[index].NAME.RegisterCallback(callback, param, initialNotify)

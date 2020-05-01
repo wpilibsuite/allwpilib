@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -75,6 +75,9 @@ HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
   return channel < kNumAnalogInputs && channel >= 0;
 }
 
+void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
+                                 HAL_SimDeviceHandle device) {}
+
 void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need double comparison with epsilon.
@@ -149,7 +152,7 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
   readSelect.Channel = port->channel;
   readSelect.Averaged = false;
 
-  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
+  std::scoped_lock lock(analogRegisterWindowMutex);
   analogInputSystem->writeReadSelect(readSelect, status);
   analogInputSystem->strobeLatchOutput(status);
   return static_cast<int16_t>(analogInputSystem->readOutput(status));
@@ -166,7 +169,7 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
   readSelect.Channel = port->channel;
   readSelect.Averaged = true;
 
-  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
+  std::scoped_lock lock(analogRegisterWindowMutex);
   analogInputSystem->writeReadSelect(readSelect, status);
   analogInputSystem->strobeLatchOutput(status);
   return static_cast<int32_t>(analogInputSystem->readOutput(status));
@@ -198,6 +201,14 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
   return voltage;
 }
 
+double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
+                                 int32_t rawValue, int32_t* status) {
+  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analogPortHandle, status);
+  int32_t offset = HAL_GetAnalogOffset(analogPortHandle, status);
+  double voltage = LSBWeight * 1.0e-9 * rawValue - offset * 1.0e-9;
+  return voltage;
+}
+
 double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
                                    int32_t* status) {
   int32_t value = HAL_GetAnalogAverageValue(analogPortHandle, status);
@@ -213,26 +224,38 @@ double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
 
 int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
                                int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  int32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
-      0, port->channel, status);  // XXX: aiSystemIndex == 0?
-  return lsbWeight;
+  // On the roboRIO, LSB is the same for all channels. So the channel lookup can
+  // be avoided
+  return FRC_NetworkCommunication_nAICalibration_getLSBWeight(0, 0, status);
+
+  // Keep the old code for future hardware
+
+  // auto port = analogInputHandles->Get(analogPortHandle);
+  // if (port == nullptr) {
+  //   *status = HAL_HANDLE_ERROR;
+  //   return 0;
+  // }
+  // int32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
+  //     0, port->channel, status);  // XXX: aiSystemIndex == 0?
+  // return lsbWeight;
 }
 
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
-      0, port->channel, status);  // XXX: aiSystemIndex == 0?
-  return offset;
+  // On the roboRIO, offset is the same for all channels. So the channel lookup
+  // can be avoided
+  return FRC_NetworkCommunication_nAICalibration_getOffset(0, 0, status);
+
+  // Keep the old code for future hardware
+
+  // auto port = analogInputHandles->Get(analogPortHandle);
+  // if (port == nullptr) {
+  //   *status = HAL_HANDLE_ERROR;
+  //   return 0;
+  // }
+  // int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
+  //     0, port->channel, status);  // XXX: aiSystemIndex == 0?
+  // return offset;
 }
 
 }  // extern "C"

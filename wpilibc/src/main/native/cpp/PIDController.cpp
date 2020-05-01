@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,7 +31,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
                              double period)
     : PIDBase(Kp, Ki, Kd, Kf, source, output) {
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
-  m_controlLoop->StartPeriodic(period);
+  m_controlLoop->StartPeriodic(units::second_t(period));
 }
 
 PIDController::~PIDController() {
@@ -41,7 +41,7 @@ PIDController::~PIDController() {
 
 void PIDController::Enable() {
   {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    std::scoped_lock lock(m_thisMutex);
     m_enabled = true;
   }
 }
@@ -49,9 +49,9 @@ void PIDController::Enable() {
 void PIDController::Disable() {
   {
     // Ensures m_enabled modification and PIDWrite() call occur atomically
-    std::lock_guard<wpi::mutex> pidWriteLock(m_pidWriteMutex);
+    std::scoped_lock pidWriteLock(m_pidWriteMutex);
     {
-      std::lock_guard<wpi::mutex> mainLock(m_thisMutex);
+      std::scoped_lock mainLock(m_thisMutex);
       m_enabled = false;
     }
 
@@ -68,7 +68,7 @@ void PIDController::SetEnabled(bool enable) {
 }
 
 bool PIDController::IsEnabled() const {
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  std::scoped_lock lock(m_thisMutex);
   return m_enabled;
 }
 

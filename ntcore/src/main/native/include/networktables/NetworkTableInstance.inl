@@ -81,6 +81,10 @@ inline unsigned int NetworkTableInstance::GetNetworkMode() const {
   return ::nt::GetNetworkMode(m_handle);
 }
 
+inline void NetworkTableInstance::StartLocal() { ::nt::StartLocal(m_handle); }
+
+inline void NetworkTableInstance::StopLocal() { ::nt::StopLocal(m_handle); }
+
 inline void NetworkTableInstance::StartServer(const Twine& persist_filename,
                                               const char* listen_address,
                                               unsigned int port) {

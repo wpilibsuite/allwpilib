@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,8 +14,8 @@
 #include <wpi/FileSystem.h>
 #include <wpi/StringRef.h>
 
-#include "../visa/visa.h"
 #include "hal/Errors.h"
+#include "visa/visa.h"
 
 constexpr const char* OnboardResourceVISA = "ASRL1::INSTR";
 constexpr const char* MxpResourceVISA = "ASRL2::INSTR";
@@ -275,7 +275,7 @@ done:
 
 int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
   // Hold lock whenever we're using the names array
-  std::lock_guard<wpi::mutex> lock(m_nameMutex);
+  std::scoped_lock lock(m_nameMutex);
 
   std::string portString = m_usbNames[port - 2];
 

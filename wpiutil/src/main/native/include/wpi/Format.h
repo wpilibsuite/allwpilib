@@ -24,13 +24,13 @@
 #define WPIUTIL_WPI_FORMAT_H
 
 #include "wpi/ArrayRef.h"
-#include "wpi/STLExtras.h"
 #include "wpi/StringRef.h"
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
 #include <optional>
 #include <tuple>
+#include <utility>
 
 namespace wpi {
 
@@ -93,7 +93,7 @@ class format_object final : public format_object_base {
 
   template <std::size_t... Is>
   int snprint_tuple(char *Buffer, unsigned BufferSize,
-                    index_sequence<Is...>) const {
+                    std::index_sequence<Is...>) const {
 #ifdef _MSC_VER
     return _snprintf_s(Buffer, BufferSize, BufferSize, Fmt, std::get<Is>(Vals)...);
 #else
@@ -115,7 +115,7 @@ public:
   }
 
   int snprint(char *Buffer, unsigned BufferSize) const override {
-    return snprint_tuple(Buffer, BufferSize, index_sequence_for<Ts...>());
+    return snprint_tuple(Buffer, BufferSize, std::index_sequence_for<Ts...>());
   }
 };
 

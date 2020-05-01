@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -43,6 +43,7 @@ public class TimedRobot extends IterativeRobotBase {
    */
   protected TimedRobot(double period) {
     super(period);
+    NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
   }
@@ -62,6 +63,10 @@ public class TimedRobot extends IterativeRobotBase {
   public void startCompetition() {
     robotInit();
 
+    if (isSimulation()) {
+      simulationInit();
+    }
+
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
@@ -80,6 +85,14 @@ public class TimedRobot extends IterativeRobotBase {
 
       loopFunc();
     }
+  }
+
+  /**
+   * Ends the main loop in startCompetition().
+   */
+  @Override
+  public void endCompetition() {
+    NotifierJNI.stopNotifier(m_notifier);
   }
 
   /**

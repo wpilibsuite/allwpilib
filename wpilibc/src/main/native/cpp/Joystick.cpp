@@ -9,14 +9,13 @@
 
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <wpi/math>
 
 #include "frc/DriverStation.h"
 #include "frc/WPIErrors.h"
 
 using namespace frc;
-
-constexpr double kPi = 3.14159265358979323846;
 
 Joystick::Joystick(int port) : GenericHID(port) {
   m_axes[Axis::kX] = kDefaultXChannel;
@@ -25,7 +24,7 @@ Joystick::Joystick(int port) : GenericHID(port) {
   m_axes[Axis::kTwist] = kDefaultTwistChannel;
   m_axes[Axis::kThrottle] = kDefaultThrottleChannel;
 
-  HAL_Report(HALUsageReporting::kResourceType_Joystick, port);
+  HAL_Report(HALUsageReporting::kResourceType_Joystick, port + 1);
 }
 
 void Joystick::SetXChannel(int channel) { m_axes[Axis::kX] = channel; }
@@ -91,5 +90,5 @@ double Joystick::GetDirectionRadians() const {
 }
 
 double Joystick::GetDirectionDegrees() const {
-  return (180 / kPi) * GetDirectionRadians();
+  return (180 / wpi::math::pi) * GetDirectionRadians();
 }

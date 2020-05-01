@@ -9,16 +9,9 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gtest/
-  ni-libraries/include/
-  ni-libraries/lib/
   FRCNetComm\.java$
-  simulation/frc_gazebo_plugins/frcgazebo/
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
-}
-
-modifiableFileExclude {
-  \.so$
+  simulation/halsim_gui/src/main/native/include/portable-file-dialogs\.h$
 }
 
 repoRootNameOverride {
@@ -29,6 +22,7 @@ includeOtherLibs {
   ^cameraserver/
   ^cscore
   ^hal/
+  ^imgui
   ^mockdata/
   ^networktables/
   ^ntcore

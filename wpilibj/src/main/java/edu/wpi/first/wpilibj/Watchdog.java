@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,8 +8,6 @@
 package edu.wpi.first.wpilibj;
 
 import java.io.Closeable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -26,23 +24,22 @@ import java.util.concurrent.locks.ReentrantLock;
 @SuppressWarnings("PMD.TooManyMethods")
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
-  private static final long kMinPrintPeriod = 1000000; // us
+  private static final long kMinPrintPeriod = 1000000; // microseconds
 
-  private long m_startTime; // us
-  private long m_timeout; // us
-  private long m_expirationTime; // us
+  private long m_startTime; // microseconds
+  private long m_timeout; // microseconds
+  private long m_expirationTime; // microseconds
   private final Runnable m_callback;
-  private long m_lastTimeoutPrintTime; // us
-  private long m_lastEpochsPrintTime; // us
+  private long m_lastTimeoutPrintTime; // microseconds
 
-  @SuppressWarnings("PMD.UseConcurrentHashMap")
-  private final Map<String, Long> m_epochs = new HashMap<>();
   boolean m_isExpired;
 
   boolean m_suppressTimeoutMessage;
 
+  private final Tracer m_tracer;
+
   static {
-    startDaemonThread(() -> schedulerFunc());
+    startDaemonThread(Watchdog::schedulerFunc);
   }
 
   private static final PriorityQueue<Watchdog> m_watchdogs = new PriorityQueue<>();
@@ -58,6 +55,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public Watchdog(double timeout, Runnable callback) {
     m_timeout = (long) (timeout * 1.0e6);
     m_callback = callback;
+    m_tracer = new Tracer();
   }
 
   @Override
@@ -69,13 +67,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   public int compareTo(Watchdog rhs) {
     // Elements with sooner expiration times are sorted as lesser. The head of
     // Java's PriorityQueue is the least element.
-    if (m_expirationTime < rhs.m_expirationTime) {
-      return -1;
-    } else if (m_expirationTime > rhs.m_expirationTime) {
-      return 1;
-    } else {
-      return 0;
-    }
+    return Long.compare(m_expirationTime, rhs.m_expirationTime);
   }
 
   /**
@@ -93,7 +85,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    */
   public void setTimeout(double timeout) {
     m_startTime = RobotController.getFPGATime();
-    m_epochs.clear();
+    m_tracer.clearEpochs();
 
     m_queueMutex.lock();
     try {
@@ -136,28 +128,20 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Adds time since last epoch to the list printed by printEpochs().
    *
-   * <p>Epochs are a way to partition the time elapsed so that when overruns occur, one can
-   * determine which parts of an operation consumed the most time.
+   * @see Tracer#addEpoch(String)
    *
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
-    long currentTime = RobotController.getFPGATime();
-    m_epochs.put(epochName, currentTime - m_startTime);
-    m_startTime = currentTime;
+    m_tracer.addEpoch(epochName);
   }
 
   /**
    * Prints list of epochs added so far and their times.
+   * @see Tracer#printEpochs()
    */
   public void printEpochs() {
-    long now = RobotController.getFPGATime();
-    if (now  - m_lastEpochsPrintTime > kMinPrintPeriod) {
-      m_lastEpochsPrintTime = now;
-      m_epochs.forEach((key, value) -> {
-        System.out.format("\t%s: %.6fs\n", key, value / 1.0e6);
-      });
-    }
+    m_tracer.printEpochs();
   }
 
   /**
@@ -174,7 +158,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    */
   public void enable() {
     m_startTime = RobotController.getFPGATime();
-    m_epochs.clear();
+    m_tracer.clearEpochs();
 
     m_queueMutex.lock();
     try {
@@ -221,11 +205,12 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
 
+  @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
   private static void schedulerFunc() {
     m_queueMutex.lock();
 
     try {
-      while (true) {
+      while (!Thread.currentThread().isInterrupted()) {
         if (m_watchdogs.size() > 0) {
           boolean timedOut = !awaitUntil(m_schedulerWaiter, m_watchdogs.peek().m_expirationTime);
           if (timedOut) {

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -411,6 +411,54 @@ Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_setSamplesToAverage
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetEncoderSamplesToAverage(index, value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
+ * Method:    setDistance
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_setDistance
+  (JNIEnv*, jclass, jint index, jdouble value)
+{
+  HALSIM_SetEncoderDistance(index, value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
+ * Method:    getDistance
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_getDistance
+  (JNIEnv*, jclass, jint index)
+{
+  return HALSIM_GetEncoderDistance(index);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
+ * Method:    setRate
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_setRate
+  (JNIEnv*, jclass, jint index, jdouble value)
+{
+  HALSIM_SetEncoderRate(index, value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_EncoderDataJNI
+ * Method:    getRate
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_EncoderDataJNI_getRate
+  (JNIEnv*, jclass, jint index)
+{
+  return HALSIM_GetEncoderRate(index);
 }
 
 /*
