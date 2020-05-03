@@ -144,11 +144,11 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
     }
     command->Initialize();
     m_impl->scheduledCommands[command] = CommandState{interruptible};
-    for (auto&& action : m_impl->initActions) {
-      action(*command);
-    }
     for (auto&& requirement : requirements) {
       m_impl->requirements[requirement] = command;
+    }
+    for (auto&& action : m_impl->initActions) {
+      action(*command);
     }
     m_watchdog.AddEpoch(command->GetName() + ".Initialize()");
   }

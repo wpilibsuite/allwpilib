@@ -209,33 +209,36 @@ class CommandScheduler final : public frc::Sendable,
   Command* GetDefaultCommand(const Subsystem* subsystem) const;
 
   /**
-   * Cancels a command.  The scheduler will only call the interrupted method of
-   * a canceled command, not the end method (though the interrupted method may
-   * itself call the end method).  Commands will be canceled even if they are
-   * not scheduled as interruptible.
-   *
-   * @param command the command to cancel
-   */
+  * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
+  * of the canceled command with {@code true},
+  * indicating they were canceled (as opposed to finishing normally).
+  *
+  * <p>Commands will be canceled even if they are not scheduled as interruptible.
+  *
+  * @param commands the commands to cancel
+  */
   void Cancel(Command* command);
 
   /**
-   * Cancels commands.  The scheduler will only call the interrupted method of a
-   * canceled command, not the end method (though the interrupted method may
-   * itself call the end method).  Commands will be canceled even if they are
-   * not scheduled as interruptible.
-   *
-   * @param commands the commands to cancel
-   */
+  * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
+  * of the canceled command with {@code true},
+  * indicating they were canceled (as opposed to finishing normally).
+  *
+  * <p>Commands will be canceled even if they are not scheduled as interruptible.
+  *
+  * @param commands the commands to cancel
+  */
   void Cancel(wpi::ArrayRef<Command*> commands);
 
   /**
-   * Cancels commands.  The scheduler will only call the interrupted method of a
-   * canceled command, not the end method (though the interrupted method may
-   * itself call the end method).  Commands will be canceled even if they are
-   * not scheduled as interruptible.
-   *
-   * @param commands the commands to cancel
-   */
+  * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
+  * of the canceled command with {@code true},
+  * indicating they were canceled (as opposed to finishing normally).
+  *
+  * <p>Commands will be canceled even if they are not scheduled as interruptible.
+  *
+  * @param commands the commands to cancel
+  */
   void Cancel(std::initializer_list<Command*> commands);
 
   /**
