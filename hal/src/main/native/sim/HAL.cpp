@@ -17,6 +17,7 @@
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"
+#include "mockdata/DriverStationData.h"
 #include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
@@ -253,7 +254,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
-  return true;  // Figure out if we need to handle this
+  return HALSIM_GetDriverStationEnabled();
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {

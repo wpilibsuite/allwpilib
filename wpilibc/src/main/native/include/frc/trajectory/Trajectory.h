@@ -129,7 +129,7 @@ class Trajectory {
 
  private:
   std::vector<State> m_states;
-  units::second_t m_totalTime;
+  units::second_t m_totalTime = 0_s;
 
   /**
    * Linearly interpolates between two values.
