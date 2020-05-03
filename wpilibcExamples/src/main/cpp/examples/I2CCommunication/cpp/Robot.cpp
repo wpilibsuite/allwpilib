@@ -40,16 +40,12 @@ class Robot : public frc::TimedRobot {
       << (m_ds.IsAutonomous() ? "A" : "T")
       << wpi::format("%03d", m_ds.GetMatchTime());
 
-    writeData(data);
+    arduino.WriteBulk((uint8_t *) data.data(), data.size());
   }
 
  private:
     int deviceAddress = 4;
     frc::I2C arduino{frc::I2C::Port::kOnboard, deviceAddress};
-    
-    void writeData(wpi::StringRef data){
-      arduino.Transaction(data.bytes, data.bytes.size, nullptr, 0);
-    }
 };
 
 #ifndef RUNNING_FRC_TESTS
