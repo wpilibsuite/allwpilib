@@ -267,7 +267,8 @@
       "I2C"
     ],
     "foldername": "I2CCommunication",
-    "gradlebase": "cpp"
+    "gradlebase": "cpp",
+    "commandversion": 1
   },
   {
     "name": "Axis Camera Sample",
