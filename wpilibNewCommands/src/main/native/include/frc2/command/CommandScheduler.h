@@ -209,33 +209,36 @@ class CommandScheduler final : public frc::Sendable,
   Command* GetDefaultCommand(const Subsystem* subsystem) const;
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
-   * of the canceled command with {@code true},
-   * indicating they were canceled (as opposed to finishing normally).
+   * Cancels commands. The scheduler will only call {@link Command#end(boolean)}
+   * method of the canceled command with {@code true}, indicating they were
+   * canceled (as opposed to finishing normally).
    *
-   * <p>Commands will be canceled even if they are not scheduled as interruptible.
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
    *
    * @param commands the commands to cancel
    */
   void Cancel(Command* command);
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
-   * of the canceled command with {@code true},
-   * indicating they were canceled (as opposed to finishing normally).
+   * Cancels commands. The scheduler will only call {@link Command#end(boolean)}
+   * method of the canceled command with {@code true}, indicating they were
+   * canceled (as opposed to finishing normally).
    *
-   * <p>Commands will be canceled even if they are not scheduled as interruptible.
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
    *
    * @param commands the commands to cancel
    */
   void Cancel(wpi::ArrayRef<Command*> commands);
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
-   * of the canceled command with {@code true},
-   * indicating they were canceled (as opposed to finishing normally).
+   * Cancels commands. The scheduler will only call {@link Command#end(boolean)}
+   * method of the canceled command with {@code true}, indicating they were
+   * canceled (as opposed to finishing normally).
    *
-   * <p>Commands will be canceled even if they are not scheduled as interruptible.
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
    *
    * @param commands the commands to cancel
    */
