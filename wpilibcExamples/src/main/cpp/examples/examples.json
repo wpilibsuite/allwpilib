@@ -723,6 +723,7 @@
       "Field2d"
     ],
     "foldername": "SimpleDifferentialDriveSimulation",
+    "commandversion": 1,
     "gradlebase": "cpp",
     "mainclass": "Main",
     "commandversion": 2
