@@ -209,8 +209,8 @@ class CommandScheduler final : public frc::Sendable,
   Command* GetDefaultCommand(const Subsystem* subsystem) const;
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)}
-   * method of the canceled command with {@code true}, indicating they were
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
    * canceled (as opposed to finishing normally).
    *
    * <p>Commands will be canceled even if they are not scheduled as
@@ -221,8 +221,8 @@ class CommandScheduler final : public frc::Sendable,
   void Cancel(Command* command);
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)}
-   * method of the canceled command with {@code true}, indicating they were
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
    * canceled (as opposed to finishing normally).
    *
    * <p>Commands will be canceled even if they are not scheduled as
@@ -233,8 +233,8 @@ class CommandScheduler final : public frc::Sendable,
   void Cancel(wpi::ArrayRef<Command*> commands);
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)}
-   * method of the canceled command with {@code true}, indicating they were
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
    * canceled (as opposed to finishing normally).
    *
    * <p>Commands will be canceled even if they are not scheduled as
