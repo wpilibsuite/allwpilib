@@ -61,7 +61,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   private final Map<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
   private final int m_instance;
-  private final List<BiConsumer<String, V>> m_selectedListeners
+  private final List<BiConsumer<String, V>> m_selectionListeners
       = Collections.synchronizedList(new ArrayList<>());
   private static final AtomicInteger s_instances = new AtomicInteger();
 
@@ -153,11 +153,12 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
    * Adds a listener to be called when the selected option is changed.
    *
    * @param listener The listener to be called with the new value
+   * @throws NullPointerException if listener is null.
    */
-  public void addSelectionChangedListener(final BiConsumer<String, V> listener) {
+  public void addSelectionListener(final BiConsumer<String, V> listener) {
     Objects.requireNonNull(listener);
 
-    m_selectedListeners.add(listener);
+    m_selectionListeners.add(listener);
   }
 
   /**
@@ -166,8 +167,17 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
    * @param listener The listener to remove
    * @return true if the remove was successful
    */
-  public boolean removeSelectionChangedListener(final BiConsumer<String, V> listener) {
-    return m_selectedListeners.remove(listener);
+  public boolean removeSelectionListener(final BiConsumer<String, V> listener) {
+    return m_selectionListeners.remove(listener);
+  }
+
+  /**
+   * Removes all the selection listeners.
+   *
+   * @see #removeSelectionListener(BiConsumer)
+   */
+  public void removeAllSelectionListeners() {
+    m_selectionListeners.clear();
   }
 
   private String m_selected;
@@ -202,9 +212,9 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
       m_mutex.lock();
       try {
         m_selected = val;
-        synchronized (m_selectedListeners) {
+        synchronized (m_selectionListeners) {
           V selectionValue = getSelected();
-          for (BiConsumer<String, V> listener : m_selectedListeners) {
+          for (BiConsumer<String, V> listener : m_selectionListeners) {
             listener.accept(m_selected, selectionValue);
           }
         }
