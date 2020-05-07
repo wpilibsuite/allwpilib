@@ -35,7 +35,7 @@ class Robot : public frc::TimedRobot {
        << (m_ds.IsEnabled() ? "E" : "D") << (m_ds.IsAutonomous() ? "A" : "T")
        << wpi::format("%03d", m_ds.GetMatchTime());
 
-    arduino.WriteBulk((uint8_t *) data.data(), data.size());
+    arduino.WriteBulk(reinterpret_cast<uint8_t*>(data.data()), data.size());
   }
 
  private:
