@@ -266,6 +266,13 @@ public final class TrajectoryParameterizer {
           state.pose.poseMeters, state.pose.curvatureRadPerMeter,
           state.maxVelocityMetersPerSecond * factor);
 
+      if (minMaxAccel.minAccelerationMetersPerSecondSq
+          > minMaxAccel.maxAccelerationMetersPerSecondSq) {
+        throw new RuntimeException("The constraint's min acceleration was greater than its" +
+            "max acceleration. \n Offending Constraint: " + constraint.getClass().getName() +
+            "\n If the offending constraint was packaged with WPILib, please file a bug report.");
+      }
+
       state.minAccelerationMetersPerSecondSq = Math.max(state.minAccelerationMetersPerSecondSq,
           reverse ? -minMaxAccel.maxAccelerationMetersPerSecondSq
               : minMaxAccel.minAccelerationMetersPerSecondSq);
