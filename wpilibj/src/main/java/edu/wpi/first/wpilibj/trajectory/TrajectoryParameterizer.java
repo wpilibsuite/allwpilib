@@ -257,6 +257,7 @@ public final class TrajectoryParameterizer {
     return new Trajectory(states);
   }
 
+  @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
   private static void enforceAccelerationLimits(boolean reverse,
                                                 List<TrajectoryConstraint> constraints,
                                                 ConstrainedState state) {
