@@ -236,7 +236,8 @@ public final class TrajectoryParameterizer {
           // delta_x = v * t
           dt = ds / velocityMetersPerSecond;
         } else {
-          throw new RuntimeException("Something went wrong");
+          throw new RuntimeException("Something went wrong at iteration " + i
+              + " of time parameterization.");
         }
       }
 
