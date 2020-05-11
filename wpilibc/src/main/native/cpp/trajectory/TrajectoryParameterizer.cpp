@@ -31,6 +31,8 @@
 
 #include "frc/trajectory/TrajectoryParameterizer.h"
 
+#include <string>
+
 using namespace frc;
 
 Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
@@ -186,7 +188,8 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
         // delta_x = v * t
         dt = ds / v;
       } else {
-        throw std::runtime_error("Something went wrong at iteration" + i +
+        throw std::runtime_error("Something went wrong at iteration" +
+                                 std::to_string(i) +
                                  " of time parameterization.");
       }
     }
