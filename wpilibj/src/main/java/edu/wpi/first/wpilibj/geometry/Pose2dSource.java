@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * <p>Can also be used as a <code>{@literal Supplier<Pose2d>}</code> in the RamseteCommand
  * constructor.
  */
-public class Pose2dSource implements Sendable, Supplier<Pose2d> {
+public class Pose2dSource implements Sendable, Supplier<Pose2d>, AutoCloseable {
   private final Supplier<Pose2d> m_source;
 
   /**
@@ -48,13 +48,18 @@ public class Pose2dSource implements Sendable, Supplier<Pose2d> {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setActuator(false);
-    builder.addDoubleProperty("x_meters", () -> get().getTranslation().getX(), null);
-    builder.addDoubleProperty("y_meters", () -> get().getTranslation().getY(), null);
-    builder.addDoubleProperty("rotation_degrees", () -> get().getRotation().getDegrees(), null);
+    builder.addDoubleProperty("x", () -> get().getTranslation().getX(), null);
+    builder.addDoubleProperty("y", () -> get().getTranslation().getY(), null);
+    builder.addDoubleProperty("rotation", () -> get().getRotation().getDegrees(), null);
   }
 
   @Override
   public Pose2d get() {
     return m_source.get();
+  }
+
+  @Override
+  public void close() throws Exception {
+    SendableRegistry.remove(this);
   }
 }
