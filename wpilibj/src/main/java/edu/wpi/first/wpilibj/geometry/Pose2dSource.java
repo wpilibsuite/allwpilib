@@ -48,9 +48,9 @@ public class Pose2dSource implements Sendable, Supplier<Pose2d>, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setActuator(false);
-    builder.addDoubleProperty("x", () -> get().getTranslation().getX(), null);
-    builder.addDoubleProperty("y", () -> get().getTranslation().getY(), null);
-    builder.addDoubleProperty("rotation", () -> get().getRotation().getDegrees(), null);
+    builder.addDoubleProperty("X", () -> get().getTranslation().getX(), null);
+    builder.addDoubleProperty("Y", () -> get().getTranslation().getY(), null);
+    builder.addDoubleProperty("Rotation", () -> get().getRotation().getDegrees(), null);
   }
 
   @Override
