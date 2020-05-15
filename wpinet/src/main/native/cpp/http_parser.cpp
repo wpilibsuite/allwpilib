@@ -179,6 +179,7 @@ static const char *method_strings[] =
   {
 #define XX(num, name, string) #string,
   HTTP_METHOD_MAP(XX)
+  RTSP_METHOD_MAP(XX)
 #undef XX
   };
 
@@ -285,11 +286,21 @@ enum state
 
   , s_start_req_or_res
   , s_res_or_resp_H
+  , s_start_req_or_res_rtsp
+  , s_res_or_resp_rtsp_R
+  , s_start_req_or_res_maybe_rtsp
+  , s_res_or_resp_maybe_rtsp_RE
   , s_start_res
   , s_res_H
   , s_res_HT
   , s_res_HTT
   , s_res_HTTP
+  , s_start_res_rtsp
+  , s_res_rtsp_R
+  , s_res_rtsp_RT
+  , s_res_rtsp_RTS
+  , s_res_rtsp_RTSP
+  , s_start_res_maybe_rtsp
   , s_res_http_major
   , s_res_http_dot
   , s_res_http_minor
@@ -301,8 +312,12 @@ enum state
   , s_res_line_almost_done
 
   , s_start_req
+  , s_start_req_rtsp
+  , s_start_req_maybe_rtsp
 
   , s_req_method
+  , s_req_method_rtsp
+  , s_req_method_maybe_rtsp
   , s_req_spaces_before_url
   , s_req_schema
   , s_req_schema_slash
@@ -320,6 +335,10 @@ enum state
   , s_req_http_HT
   , s_req_http_HTT
   , s_req_http_HTTP
+  , s_req_rtsp_R
+  , s_req_rtsp_RT
+  , s_req_rtsp_RTS
+  , s_req_rtsp_RTSP
   , s_req_http_major
   , s_req_http_dot
   , s_req_http_minor
@@ -448,8 +467,18 @@ enum http_host_state
 #define IS_HEADER_CHAR(ch)                                                     \
   (ch == CR || ch == LF || ch == 9 || ((unsigned char)ch > 31 && ch != 127))
 
-#define start_state (parser->type == HTTP_REQUEST ? s_start_req : s_start_res)
-
+static int http_start_state(http_parser* parser)
+{
+  switch (parser->type) {
+    case HTTP_REQUEST: return s_start_req;
+    case HTTP_RESPONSE: return s_start_res;
+    case RTSP_REQUEST: return s_start_req_rtsp;
+    case RTSP_RESPONSE: return s_start_res_rtsp;
+    case HTTP_RTSP_REQUEST: return s_start_req_maybe_rtsp;
+    case HTTP_RTSP_RESPONSE: return s_start_res_maybe_rtsp;
+    default: return s_start_res;
+  }
+}
 
 #if HTTP_PARSER_STRICT
 # define STRICT_CHECK(cond)                                          \
@@ -459,10 +488,10 @@ do {                                                                 \
     goto error;                                                      \
   }                                                                  \
 } while (0)
-# define NEW_MESSAGE() (http_should_keep_alive(parser) ? start_state : s_dead)
+# define NEW_MESSAGE() (http_should_keep_alive(parser) ? http_start_state(parser) : s_dead)
 #else
 # define STRICT_CHECK(cond)
-# define NEW_MESSAGE() start_state
+# define NEW_MESSAGE() http_start_state(parser)
 #endif
 
 
@@ -670,8 +699,14 @@ size_t http_parser_execute (http_parser *parser,
 
       case s_dead:
       case s_start_req_or_res:
+      case s_start_req_or_res_rtsp:
+      case s_start_req_or_res_maybe_rtsp:
       case s_start_res:
+      case s_start_res_rtsp:
+      case s_start_res_maybe_rtsp:
       case s_start_req:
+      case s_start_req_rtsp:
+      case s_start_req_maybe_rtsp:
         return 0;
 
       default:
@@ -762,6 +797,93 @@ reexecute:
         }
         break;
 
+      case s_start_req_or_res_rtsp:
+      {
+        if (ch == CR || ch == LF)
+          break;
+        parser->flags = 0;
+        parser->content_length = ULLONG_MAX;
+
+        if (ch == 'R') {
+          UPDATE_STATE(s_res_or_resp_rtsp_R);
+
+          CALLBACK_NOTIFY(message_begin);
+        } else {
+          parser->type = RTSP_REQUEST;
+          UPDATE_STATE(s_start_req_rtsp);
+          REEXECUTE();
+        }
+
+        break;
+      }
+
+      case s_res_or_resp_rtsp_R:
+        if (ch == 'T') {
+          parser->type = RTSP_RESPONSE;
+          UPDATE_STATE(s_res_rtsp_RT);
+        } else {
+          if (UNLIKELY(ch != 'E')) {
+            SET_ERRNO(HPE_INVALID_CONSTANT);
+            goto error;
+          }
+
+          if (parser->type == HTTP_RTSP_BOTH) {
+            UPDATE_STATE(s_res_or_resp_maybe_rtsp_RE);
+          } else {
+            parser->type = RTSP_REQUEST;
+            parser->method = RTSP_REDIRECT;
+            parser->index = 2;
+            UPDATE_STATE(s_req_method_rtsp);
+          }
+        }
+        break;
+
+      case s_start_req_or_res_maybe_rtsp:
+      {
+        if (ch == CR || ch == LF)
+          break;
+        parser->flags = 0;
+        parser->content_length = ULLONG_MAX;
+
+        if (ch == 'H') {
+          UPDATE_STATE(s_res_or_resp_H);
+
+          CALLBACK_NOTIFY(message_begin);
+        } else if (ch == 'R') {
+          UPDATE_STATE(s_res_or_resp_rtsp_R);
+
+          CALLBACK_NOTIFY(message_begin);
+        } else {
+          parser->type = HTTP_RTSP_REQUEST;
+          UPDATE_STATE(s_start_req_maybe_rtsp);
+          REEXECUTE();
+        }
+
+        break;
+      }
+
+      case s_res_or_resp_maybe_rtsp_RE:
+        if (ch == 'B') {
+          parser->type = HTTP_REQUEST;
+          parser->method = HTTP_REBIND;
+          parser->index = 3;
+          UPDATE_STATE(s_req_method);
+        } else if (ch == 'D') {
+          parser->type = RTSP_REQUEST;
+          parser->method = RTSP_REDIRECT;
+          parser->index = 3;
+          UPDATE_STATE(s_req_method_rtsp);
+        } else if (ch == 'P') {
+          parser->type = HTTP_REQUEST;
+          parser->method = HTTP_REPORT;
+          parser->index = 3;
+          UPDATE_STATE(s_req_method);
+        } else {
+          SET_ERRNO(HPE_INVALID_CONSTANT);
+          goto error;
+        }
+        break;
+
       case s_start_res:
       {
         parser->flags = 0;
@@ -804,6 +926,77 @@ reexecute:
         STRICT_CHECK(ch != '/');
         UPDATE_STATE(s_res_http_major);
         break;
+
+      case s_start_res_rtsp:
+      {
+        parser->flags = 0;
+        parser->content_length = ULLONG_MAX;
+
+        switch (ch) {
+          case 'R':
+            UPDATE_STATE(s_res_rtsp_R);
+            break;
+
+          case CR:
+          case LF:
+            break;
+
+          default:
+            SET_ERRNO(HPE_INVALID_CONSTANT);
+            goto error;
+        }
+
+        CALLBACK_NOTIFY(message_begin);
+        break;
+      }
+
+      case s_res_rtsp_R:
+        STRICT_CHECK(ch != 'T');
+        UPDATE_STATE(s_res_rtsp_RT);
+        break;
+
+      case s_res_rtsp_RT:
+        STRICT_CHECK(ch != 'S');
+        UPDATE_STATE(s_res_rtsp_RTS);
+        break;
+
+      case s_res_rtsp_RTS:
+        STRICT_CHECK(ch != 'P');
+        UPDATE_STATE(s_res_rtsp_RTSP);
+        break;
+
+      case s_res_rtsp_RTSP:
+        STRICT_CHECK(ch != '/');
+        parser->rtsp = 1;
+        UPDATE_STATE(s_res_http_major);
+        break;
+
+      case s_start_res_maybe_rtsp:
+      {
+        parser->flags = 0;
+        parser->content_length = ULLONG_MAX;
+
+        switch (ch) {
+          case 'H':
+            UPDATE_STATE(s_res_H);
+            break;
+
+          case 'R':
+            UPDATE_STATE(s_res_rtsp_R);
+            break;
+
+          case CR:
+          case LF:
+            break;
+
+          default:
+            SET_ERRNO(HPE_INVALID_CONSTANT);
+            goto error;
+        }
+
+        CALLBACK_NOTIFY(message_begin);
+        break;
+      }
 
       case s_res_http_major:
         if (UNLIKELY(!IS_NUM(ch))) {
@@ -967,6 +1160,82 @@ reexecute:
         break;
       }
 
+      case s_start_req_rtsp:
+      {
+        if (ch == CR || ch == LF)
+          break;
+        parser->flags = 0;
+        parser->content_length = ULLONG_MAX;
+
+        if (UNLIKELY(!IS_ALPHA(ch))) {
+          SET_ERRNO(HPE_INVALID_METHOD);
+          goto error;
+        }
+
+        parser->method = (enum rtsp_method) 0;
+        parser->index = 1;
+        switch (ch) {
+          case 'D': parser->method = RTSP_DESCRIBE; break;
+          case 'G': parser->method = RTSP_GET_PARAMETER; break;
+          case 'O': parser->method = RTSP_OPTIONS; break;
+          case 'P': parser->method = RTSP_PAUSE; /* or PLAY, PLAY_NOTIFY */ break;
+          case 'R': parser->method = RTSP_REDIRECT; break;
+          case 'S': parser->method = RTSP_SETUP; /* or SET_PARAMETER */ break;
+          case 'T': parser->method = RTSP_TEARDOWN; break;
+          default:
+            SET_ERRNO(HPE_INVALID_METHOD);
+            goto error;
+        }
+        UPDATE_STATE(s_req_method_rtsp);
+
+        CALLBACK_NOTIFY(message_begin);
+
+        break;
+      }
+
+      case s_start_req_maybe_rtsp:
+      {
+        if (ch == CR || ch == LF)
+          break;
+        parser->flags = 0;
+        parser->content_length = ULLONG_MAX;
+
+        if (UNLIKELY(!IS_ALPHA(ch))) {
+          SET_ERRNO(HPE_INVALID_METHOD);
+          goto error;
+        }
+
+        parser->method = (enum http_method) 0;
+        parser->index = 1;
+        switch (ch) {
+          case 'A': parser->method = HTTP_ACL; break;
+          case 'B': parser->method = HTTP_BIND; break;
+          case 'C': parser->method = HTTP_CONNECT; /* or COPY, CHECKOUT */ break;
+          case 'D': parser->method = HTTP_DELETE; /* or DESCRIBE */ break;
+          case 'G': parser->method = HTTP_GET; /* or GET_PARAMETER */ break;
+          case 'H': parser->method = HTTP_HEAD; break;
+          case 'L': parser->method = HTTP_LOCK; /* or LINK */ break;
+          case 'M': parser->method = HTTP_MKCOL; /* or MOVE, MKACTIVITY, MERGE, M-SEARCH, MKCALENDAR */ break;
+          case 'N': parser->method = HTTP_NOTIFY; break;
+          case 'O': parser->method = HTTP_OPTIONS; break;
+          case 'P': parser->method = HTTP_POST;
+            /* or PROPFIND|PROPPATCH|PUT|PATCH|PURGE|PAUSE|PLAY|PLAY_NOTIFY */
+            break;
+          case 'R': parser->method = HTTP_REPORT; /* or REBIND, REDIRECT */ break;
+          case 'S': parser->method = HTTP_SUBSCRIBE; /* or SEARCH, SOURCE, SETUP, SET_PARAMETER */ break;
+          case 'T': parser->method = HTTP_TRACE; /* or TEARDOWN */ break;
+          case 'U': parser->method = HTTP_UNLOCK; /* or UNSUBSCRIBE, UNBIND, UNLINK */ break;
+          default:
+            SET_ERRNO(HPE_INVALID_METHOD);
+            goto error;
+        }
+        UPDATE_STATE(s_req_method_maybe_rtsp);
+
+        CALLBACK_NOTIFY(message_begin);
+
+        break;
+      }
+
       case s_req_method:
       {
         const char *matcher;
@@ -1006,6 +1275,111 @@ reexecute:
             XX(UNLOCK,    2, 'S', UNSUBSCRIBE)
             XX(UNLOCK,    2, 'B', UNBIND)
             XX(UNLOCK,    3, 'I', UNLINK)
+#undef XX
+            default:
+              SET_ERRNO(HPE_INVALID_METHOD);
+              goto error;
+          }
+        } else {
+          SET_ERRNO(HPE_INVALID_METHOD);
+          goto error;
+        }
+
+        ++parser->index;
+        break;
+      }
+
+      case s_req_method_rtsp:
+      {
+        const char *matcher;
+        if (UNLIKELY(ch == '\0')) {
+          SET_ERRNO(HPE_INVALID_METHOD);
+          goto error;
+        }
+
+        matcher = method_strings[parser->method];
+        if (ch == ' ' && matcher[parser->index] == '\0') {
+          UPDATE_STATE(s_req_spaces_before_url);
+        } else if (ch == matcher[parser->index]) {
+          ; /* nada */
+        } else if ((ch >= 'A' && ch <= 'Z') || ch == '-' || ch == '_') {
+
+          switch (parser->method << 16 | parser->index << 8 | ch) {
+#define XX(meth, pos, ch, new_meth) \
+            case (RTSP_##meth << 16 | pos << 8 | ch): \
+              parser->method = RTSP_##new_meth; break;
+
+            XX(PAUSE,     1, 'L', PLAY)
+            XX(PLAY,      4, '_', PLAY_NOTIFY)
+            XX(SETUP,     3, '_', SET_PARAMETER)
+#undef XX
+            default:
+              SET_ERRNO(HPE_INVALID_METHOD);
+              goto error;
+          }
+        } else {
+          SET_ERRNO(HPE_INVALID_METHOD);
+          goto error;
+        }
+
+        ++parser->index;
+        break;
+      }
+
+      case s_req_method_maybe_rtsp:
+      {
+        const char *matcher;
+        if (UNLIKELY(ch == '\0')) {
+          SET_ERRNO(HPE_INVALID_METHOD);
+          goto error;
+        }
+
+        matcher = method_strings[parser->method];
+        if (ch == ' ' && matcher[parser->index] == '\0') {
+          UPDATE_STATE(s_req_spaces_before_url);
+        } else if (ch == matcher[parser->index]) {
+          ; /* nada */
+        } else if ((ch >= 'A' && ch <= 'Z') || ch == '-') {
+
+          switch (parser->method << 16 | parser->index << 8 | ch) {
+#define XX(meth, pos, ch, new_meth) \
+            case (HTTP_##meth << 16 | pos << 8 | ch): \
+              parser->method = HTTP_##new_meth; break;
+
+            XX(POST,      1, 'U', PUT)
+            XX(POST,      1, 'A', PATCH)
+            XX(POST,      1, 'R', PROPFIND)
+            XX(PUT,       2, 'R', PURGE)
+            XX(CONNECT,   1, 'H', CHECKOUT)
+            XX(CONNECT,   2, 'P', COPY)
+            XX(MKCOL,     1, 'O', MOVE)
+            XX(MKCOL,     1, 'E', MERGE)
+            XX(MKCOL,     1, '-', MSEARCH)
+            XX(MKCOL,     2, 'A', MKACTIVITY)
+            XX(MKCOL,     3, 'A', MKCALENDAR)
+            XX(SUBSCRIBE, 1, 'E', SEARCH)
+            XX(SUBSCRIBE, 1, 'O', SOURCE)
+            XX(REPORT,    2, 'B', REBIND)
+            XX(PROPFIND,  4, 'P', PROPPATCH)
+            XX(LOCK,      1, 'I', LINK)
+            XX(UNLOCK,    2, 'S', UNSUBSCRIBE)
+            XX(UNLOCK,    2, 'B', UNBIND)
+            XX(UNLOCK,    3, 'I', UNLINK)
+#undef XX
+
+#define XX(meth, pos, ch, new_meth) \
+            case (meth << 16 | pos << 8 | ch): \
+              parser->method = RTSP_##new_meth; break;
+
+            XX(HTTP_DELETE,    2, 'S', DESCRIBE)
+            XX(HTTP_GET,       3, '_', GET_PARAMETER)
+            XX(HTTP_POST,      1, 'L', PLAY)
+            XX(RTSP_PLAY,      4, '_', PLAY_NOTIFY)
+            XX(HTTP_PATCH,     2, 'U', PAUSE)
+            XX(HTTP_REPORT,    2, 'D', REDIRECT)
+            XX(HTTP_SEARCH,    2, 'T', SETUP)
+            XX(RTSP_SETUP,     3, '_', SET_PARAMETER)
+            XX(HTTP_TRACE,     1, 'E', TEARDOWN)
 #undef XX
             default:
               SET_ERRNO(HPE_INVALID_METHOD);
@@ -1096,7 +1470,20 @@ reexecute:
       case s_req_http_start:
         switch (ch) {
           case 'H':
+            if (parser->type == RTSP_REQUEST || parser->type == RTSP_RESPONSE ||
+                parser->type == RTSP_BOTH) {
+              SET_ERRNO(HPE_INVALID_CONSTANT);
+              goto error;
+            }
             UPDATE_STATE(s_req_http_H);
+            break;
+          case 'R':
+            if (parser->type == HTTP_REQUEST || parser->type == HTTP_RESPONSE ||
+                parser->type == HTTP_BOTH) {
+              SET_ERRNO(HPE_INVALID_CONSTANT);
+              goto error;
+            }
+            UPDATE_STATE(s_req_rtsp_R);
             break;
           case ' ':
             break;
@@ -1123,6 +1510,30 @@ reexecute:
 
       case s_req_http_HTTP:
         STRICT_CHECK(ch != '/');
+        UPDATE_STATE(s_req_http_major);
+        break;
+
+      case s_req_rtsp_R:
+        STRICT_CHECK(ch != 'T');
+        UPDATE_STATE(s_req_rtsp_RT);
+        break;
+
+      case s_req_rtsp_RT:
+        STRICT_CHECK(ch != 'S');
+        UPDATE_STATE(s_req_rtsp_RTS);
+        break;
+
+      case s_req_rtsp_RTS:
+        STRICT_CHECK(ch != 'P');
+        UPDATE_STATE(s_req_rtsp_RTSP);
+        break;
+
+      case s_req_rtsp_RTSP:
+        STRICT_CHECK(ch != '/');
+        parser->rtsp = 1;
+        if (parser->method == HTTP_OPTIONS) {
+          parser->method = RTSP_OPTIONS;
+        }
         UPDATE_STATE(s_req_http_major);
         break;
 
@@ -2091,8 +2502,8 @@ http_message_needs_eof (const http_parser *parser)
 int
 http_should_keep_alive (const http_parser *parser)
 {
-  if (parser->http_major > 0 && parser->http_minor > 0) {
-    /* HTTP/1.1 */
+  if (parser->rtsp || (parser->http_major > 0 && parser->http_minor > 0)) {
+    /* RTSP or HTTP/1.1 */
     if (parser->flags & F_CONNECTION_CLOSE) {
       return 0;
     }
@@ -2124,6 +2535,23 @@ http_status_str (enum http_status s)
   }
 }
 
+const char *
+rtsp_method_str (enum rtsp_method m)
+{
+  return ELEM_AT(method_strings, m, "<unknown>");
+}
+
+const char *
+rtsp_status_str (enum rtsp_status s)
+{
+  switch (s) {
+#define XX(num, name, string) case RTSP_STATUS_##name: return #string;
+    RTSP_STATUS_MAP(XX)
+#undef XX
+    default: return "<unknown>";
+  }
+}
+
 void
 http_parser_init (http_parser *parser, enum http_parser_type t)
 {
@@ -2131,7 +2559,35 @@ http_parser_init (http_parser *parser, enum http_parser_type t)
   memset(parser, 0, sizeof(*parser));
   parser->data = data;
   parser->type = t;
-  parser->state = (t == HTTP_REQUEST ? s_start_req : (t == HTTP_RESPONSE ? s_start_res : s_start_req_or_res));
+  switch (t) {
+    case HTTP_REQUEST:
+      parser->state = s_start_req;
+      break;
+    case HTTP_RESPONSE:
+      parser->state = s_start_res;
+      break;
+    case HTTP_BOTH:
+      parser->state = s_start_req_or_res;
+      break;
+    case RTSP_REQUEST:
+      parser->state = s_start_req_rtsp;
+      break;
+    case RTSP_RESPONSE:
+      parser->state = s_start_res_rtsp;
+      break;
+    case RTSP_BOTH:
+      parser->state = s_start_req_or_res_rtsp;
+      break;
+    case HTTP_RTSP_REQUEST:
+      parser->state = s_start_req_maybe_rtsp;
+      break;
+    case HTTP_RTSP_RESPONSE:
+      parser->state = s_start_res_maybe_rtsp;
+      break;
+    case HTTP_RTSP_BOTH:
+      parser->state = s_start_req_or_res_maybe_rtsp;
+      break;
+  }
   parser->http_errno = HPE_OK;
 }
 

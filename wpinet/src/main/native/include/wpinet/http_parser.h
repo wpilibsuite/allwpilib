@@ -76,11 +76,37 @@ typedef int (*http_cb) (http_parser*);
 
 
 /* Status Codes */
-#define HTTP_STATUS_MAP(XX)                                                 \
+#define HTTP_RTSP_STATUS_MAP(XX)                                            \
   XX(100, CONTINUE,                        Continue)                        \
+  XX(200, OK,                              OK)                              \
+  XX(301, MOVED_PERMANENTLY,               Moved Permanently)               \
+  XX(302, FOUND,                           Found)                           \
+  XX(303, SEE_OTHER,                       See Other)                       \
+  XX(304, NOT_MODIFIED,                    Not Modified)                    \
+  XX(305, USE_PROXY,                       Use Proxy)                       \
+  XX(400, BAD_REQUEST,                     Bad Request)                     \
+  XX(401, UNAUTHORIZED,                    Unauthorized)                    \
+  XX(402, PAYMENT_REQUIRED,                Payment Required)                \
+  XX(403, FORBIDDEN,                       Forbidden)                       \
+  XX(404, NOT_FOUND,                       Not Found)                       \
+  XX(405, METHOD_NOT_ALLOWED,              Method Not Allowed)              \
+  XX(406, NOT_ACCEPTABLE,                  Not Acceptable)                  \
+  XX(407, PROXY_AUTHENTICATION_REQUIRED,   Proxy Authentication Required)   \
+  XX(408, REQUEST_TIMEOUT,                 Request Timeout)                 \
+  XX(410, GONE,                            Gone)                            \
+  XX(412, PRECONDITION_FAILED,             Precondition Failed)             \
+  XX(414, URI_TOO_LONG,                    URI Too Long)                    \
+  XX(415, UNSUPPORTED_MEDIA_TYPE,          Unsupported Media Type)          \
+  XX(500, INTERNAL_SERVER_ERROR,           Internal Server Error)           \
+  XX(501, NOT_IMPLEMENTED,                 Not Implemented)                 \
+  XX(502, BAD_GATEWAY,                     Bad Gateway)                     \
+  XX(503, SERVICE_UNAVAILABLE,             Service Unavailable)             \
+  XX(504, GATEWAY_TIMEOUT,                 Gateway Timeout)                 \
+
+#define HTTP_STATUS_MAP(XX)                                                 \
+  HTTP_RTSP_STATUS_MAP(XX)                                                  \
   XX(101, SWITCHING_PROTOCOLS,             Switching Protocols)             \
   XX(102, PROCESSING,                      Processing)                      \
-  XX(200, OK,                              OK)                              \
   XX(201, CREATED,                         Created)                         \
   XX(202, ACCEPTED,                        Accepted)                        \
   XX(203, NON_AUTHORITATIVE_INFORMATION,   Non-Authoritative Information)   \
@@ -91,29 +117,11 @@ typedef int (*http_cb) (http_parser*);
   XX(208, ALREADY_REPORTED,                Already Reported)                \
   XX(226, IM_USED,                         IM Used)                         \
   XX(300, MULTIPLE_CHOICES,                Multiple Choices)                \
-  XX(301, MOVED_PERMANENTLY,               Moved Permanently)               \
-  XX(302, FOUND,                           Found)                           \
-  XX(303, SEE_OTHER,                       See Other)                       \
-  XX(304, NOT_MODIFIED,                    Not Modified)                    \
-  XX(305, USE_PROXY,                       Use Proxy)                       \
   XX(307, TEMPORARY_REDIRECT,              Temporary Redirect)              \
   XX(308, PERMANENT_REDIRECT,              Permanent Redirect)              \
-  XX(400, BAD_REQUEST,                     Bad Request)                     \
-  XX(401, UNAUTHORIZED,                    Unauthorized)                    \
-  XX(402, PAYMENT_REQUIRED,                Payment Required)                \
-  XX(403, FORBIDDEN,                       Forbidden)                       \
-  XX(404, NOT_FOUND,                       Not Found)                       \
-  XX(405, METHOD_NOT_ALLOWED,              Method Not Allowed)              \
-  XX(406, NOT_ACCEPTABLE,                  Not Acceptable)                  \
-  XX(407, PROXY_AUTHENTICATION_REQUIRED,   Proxy Authentication Required)   \
-  XX(408, REQUEST_TIMEOUT,                 Request Timeout)                 \
   XX(409, CONFLICT,                        Conflict)                        \
-  XX(410, GONE,                            Gone)                            \
   XX(411, LENGTH_REQUIRED,                 Length Required)                 \
-  XX(412, PRECONDITION_FAILED,             Precondition Failed)             \
   XX(413, PAYLOAD_TOO_LARGE,               Payload Too Large)               \
-  XX(414, URI_TOO_LONG,                    URI Too Long)                    \
-  XX(415, UNSUPPORTED_MEDIA_TYPE,          Unsupported Media Type)          \
   XX(416, RANGE_NOT_SATISFIABLE,           Range Not Satisfiable)           \
   XX(417, EXPECTATION_FAILED,              Expectation Failed)              \
   XX(421, MISDIRECTED_REQUEST,             Misdirected Request)             \
@@ -125,11 +133,6 @@ typedef int (*http_cb) (http_parser*);
   XX(429, TOO_MANY_REQUESTS,               Too Many Requests)               \
   XX(431, REQUEST_HEADER_FIELDS_TOO_LARGE, Request Header Fields Too Large) \
   XX(451, UNAVAILABLE_FOR_LEGAL_REASONS,   Unavailable For Legal Reasons)   \
-  XX(500, INTERNAL_SERVER_ERROR,           Internal Server Error)           \
-  XX(501, NOT_IMPLEMENTED,                 Not Implemented)                 \
-  XX(502, BAD_GATEWAY,                     Bad Gateway)                     \
-  XX(503, SERVICE_UNAVAILABLE,             Service Unavailable)             \
-  XX(504, GATEWAY_TIMEOUT,                 Gateway Timeout)                 \
   XX(505, HTTP_VERSION_NOT_SUPPORTED,      HTTP Version Not Supported)      \
   XX(506, VARIANT_ALSO_NEGOTIATES,         Variant Also Negotiates)         \
   XX(507, INSUFFICIENT_STORAGE,            Insufficient Storage)            \
@@ -141,6 +144,38 @@ enum http_status
   {
 #define XX(num, name, string) HTTP_STATUS_##name = num,
   HTTP_STATUS_MAP(XX)
+#undef XX
+  };
+
+#define RTSP_STATUS_MAP(XX)                                                 \
+  HTTP_RTSP_STATUS_MAP(XX)                                                  \
+  XX(413, REQUEST_MESSAGE_BODY_TOO_LARGE,  Request Message Body Too Large)  \
+  XX(451, PARAMETER_NOT_UNDERSTOOD,        Parameter Not Understood)        \
+  XX(453, NOT_ENOUGH_BANDWIDTH,            Not Enough Bandwidth)            \
+  XX(454, SESSION_NOT_FOUND,               Session Not Found)               \
+  XX(455, METHOD_NOT_VALID_IN_THIS_STATE,  Method Not Valid in This State)  \
+  XX(456, HEADER_FIELD_NOT_VALID,          Header Field Not Valid)          \
+  XX(457, INVALID_RANGE,                   Invalid Range)                   \
+  XX(458, PARAMETER_IS_READ_ONLY,          Parameter Is Read-Only)          \
+  XX(459, AGGREGATE_OPERATION_NOT_ALLOWED, Aggregate Operation Not Allowed) \
+  XX(460, ONLY_AGGREGATE_OPERATION_ALLOWED, Only Aggregate Operation Allowed) \
+  XX(461, UNSUPPORTED_TRANSPORT,           Unsupported Transport)           \
+  XX(462, DESTINATION_UNREACHABLE,         Destination Unreachable)         \
+  XX(463, DESTINATION_PROHIBITED,          Destination Prohibited)          \
+  XX(464, DATA_TRANSPORT_NOT_READY_YET,    Data Transport Not Ready Yet)    \
+  XX(465, NOTIFICATION_REASON_UNKNOWN,     Notification Reason Unknown)     \
+  XX(466, KEY_MANAGEMENT_ERROR,            Key Management Error)            \
+  XX(470, CONNECTION_AUTHENTICATION_REQUIRED, Connection Authentication Required)  \
+  XX(471, CONNECTION_CREDENTIALS_NOT_ACCEPTED, Connection Credentials Not Accepted)  \
+  XX(472, FAILURE_TO_ESTABLISH_SECURE_CONNECTION, Failure to Establish Secure Connection)  \
+  XX(505, RTSP_VERSION_NOT_SUPPORTED,      RTSP Version Not Supported)      \
+  XX(551, OPTION_NOT_SUPPORTED,            Option Not Supported)            \
+  XX(553, PROXY_UNAVAILABLE,               Proxy Unavailable)               \
+
+enum rtsp_status
+  {
+#define XX(num, name, string) RTSP_STATUS_##name = num,
+  RTSP_STATUS_MAP(XX)
 #undef XX
   };
 
@@ -197,9 +232,37 @@ enum http_method
 #undef XX
   };
 
+/* Request Methods */
+#define RTSP_METHOD_MAP(XX)              \
+  XX(34,  DESCRIBE,      DESCRIBE)       \
+  XX(35,  GET_PARAMETER, GET_PARAMETER)  \
+  XX(36,  OPTIONS,       OPTIONS)        \
+  XX(37,  PAUSE,         PAUSE)          \
+  XX(38,  PLAY,          PLAY)           \
+  XX(39,  PLAY_NOTIFY,   PLAY_NOTIFY)    \
+  XX(40,  REDIRECT,      REDIRECT)       \
+  XX(41,  SETUP,         SETUP)          \
+  XX(42,  SET_PARAMETER, SET_PARAMETER)  \
+  XX(43,  TEARDOWN,      TEARDOWN)       \
 
-enum http_parser_type { HTTP_REQUEST, HTTP_RESPONSE, HTTP_BOTH };
+enum rtsp_method
+  {
+#define XX(num, name, string) RTSP_##name = num,
+  RTSP_METHOD_MAP(XX)
+#undef XX
+  };
 
+enum http_parser_type
+  { HTTP_REQUEST
+  , HTTP_RESPONSE
+  , HTTP_BOTH
+  , RTSP_REQUEST
+  , RTSP_RESPONSE
+  , RTSP_BOTH
+  , HTTP_RTSP_REQUEST
+  , HTTP_RTSP_RESPONSE
+  , HTTP_RTSP_BOTH
+  };
 
 /* Flag values for http_parser.flags field */
 enum flags
@@ -278,7 +341,8 @@ enum http_errno {
 
 struct http_parser {
   /** PRIVATE **/
-  unsigned int type : 2;         /* enum http_parser_type */
+  unsigned int rtsp : 1;         /* 1 if RTSP, 0 if HTTP */
+  unsigned int type : 4;         /* enum http_parser_type */
   unsigned int flags : 8;        /* F_* values from 'flags' enum; semi-public */
   unsigned int state : 7;        /* enum state from http_parser.c */
   unsigned int header_state : 7; /* enum header_state from http_parser.c */
@@ -395,6 +459,12 @@ const char *http_method_str(enum http_method m);
 
 /* Returns a string version of the HTTP status code. */
 const char *http_status_str(enum http_status s);
+
+/* Returns a string version of the RTSP method. */
+const char *rtsp_method_str(enum rtsp_method m);
+
+/* Returns a string version of the RTSP status code. */
+const char *rtsp_status_str(enum rtsp_status s);
 
 /* Return a string name of the given error */
 const char *http_errno_name(enum http_errno err);
