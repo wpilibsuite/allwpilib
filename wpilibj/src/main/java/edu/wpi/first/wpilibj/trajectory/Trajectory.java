@@ -328,4 +328,14 @@ public class Trajectory {
     String stateList = m_states.stream().map(State::toString).collect(Collectors.joining(", \n"));
     return String.format("Trajectory - Seconds: %.2f, States:\n%s", m_totalTimeSeconds, stateList);
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_states);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof Trajectory && m_states.equals(((Trajectory) obj).getStates());
+  }
 }

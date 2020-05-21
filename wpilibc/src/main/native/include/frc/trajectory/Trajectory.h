@@ -127,6 +127,22 @@ class Trajectory {
    */
   Pose2d InitialPose() const { return Sample(0_s).pose; }
 
+  /**
+   * Checks equality between this Trajectory and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Trajectory& other) const;
+
+  /**
+   * Checks inequality between this Trajectory and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are inequal.
+   */
+  bool operator!=(const Trajectory& other) const;
+
  private:
   std::vector<State> m_states;
   units::second_t m_totalTime = 0_s;
