@@ -104,8 +104,8 @@ public class RamseteController {
    *
    * @param currentPose                        The current pose.
    * @param poseRef                            The desired pose.
-   * @param linearVelocityRefMeters            The desired linear velocity in meters.
-   * @param angularVelocityRefRadiansPerSecond The desired angular velocity in meters.
+   * @param linearVelocityRefMeters            The desired linear velocity in meters per second.
+   * @param angularVelocityRefRadiansPerSecond The desired angular velocity in radians per second.
    */
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(Pose2d currentPose,
