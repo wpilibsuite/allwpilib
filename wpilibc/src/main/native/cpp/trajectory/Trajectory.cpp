@@ -153,9 +153,9 @@ void frc::from_json(const wpi::json& json, Trajectory::State& state) {
 }
 
 bool Trajectory::operator==(const Trajectory& other) const {
-    return m_states == other.States();
+  return m_states == other.States();
 }
 
 bool Trajectory::operator!=(const Trajectory& other) const {
-    return !operator==(other);
+  return !operator==(other);
 }

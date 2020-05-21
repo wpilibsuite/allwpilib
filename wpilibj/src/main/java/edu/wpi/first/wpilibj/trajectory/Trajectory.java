@@ -331,7 +331,7 @@ public class Trajectory {
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_states);
+    return m_states.hashCode();
   }
 
   @Override
