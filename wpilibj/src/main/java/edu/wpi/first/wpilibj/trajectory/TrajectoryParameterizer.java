@@ -69,8 +69,7 @@ public final class TrajectoryParameterizer {
    * @return The trajectory.
    */
   @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.CyclomaticComplexity",
-      "PMD.NPathComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-      "PMD.AvoidThrowingRawExceptionTypes"})
+      "PMD.NPathComplexity", "PMD.AvoidInstantiatingObjectsInLoops"})
   public static Trajectory timeParameterizeTrajectory(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,
@@ -236,7 +235,7 @@ public final class TrajectoryParameterizer {
           // delta_x = v * t
           dt = ds / velocityMetersPerSecond;
         } else {
-          throw new RuntimeException("Something went wrong at iteration " + i
+          throw new TrajectoryGenerationException("Something went wrong at iteration " + i
               + " of time parameterization.");
         }
       }
@@ -257,7 +256,6 @@ public final class TrajectoryParameterizer {
     return new Trajectory(states);
   }
 
-  @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
   private static void enforceAccelerationLimits(boolean reverse,
                                                 List<TrajectoryConstraint> constraints,
                                                 ConstrainedState state) {
@@ -270,8 +268,9 @@ public final class TrajectoryParameterizer {
 
       if (minMaxAccel.minAccelerationMetersPerSecondSq
           > minMaxAccel.maxAccelerationMetersPerSecondSq) {
-        throw new RuntimeException("The constraint's min acceleration was greater than its "
-            + "max acceleration.\n Offending Constraint: " + constraint.getClass().getName()
+        throw new TrajectoryGenerationException("The constraint's min acceleration "
+            + "was greater than its max acceleration.\n Offending Constraint: "
+            + constraint.getClass().getName()
             + "\n If the offending constraint was packaged with WPILib, please file a bug report.");
       }
 
@@ -307,6 +306,12 @@ public final class TrajectoryParameterizer {
 
     ConstrainedState() {
       pose = new PoseWithCurvature();
+    }
+  }
+
+  public static class TrajectoryGenerationException extends RuntimeException {
+    public TrajectoryGenerationException(String message) {
+      super(message);
     }
   }
 }
