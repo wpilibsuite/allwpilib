@@ -14,15 +14,15 @@
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
-/**
- * A class that enforces constraints on the differential drive kinematics.
- * This can be used to ensure that the trajectory is constructed so that the
- * commanded velocities for both sides of the drivetrain stay below a certain
- * limit.
- */
 namespace frc {
 
 template <size_t NumModules>
+
+/**
+ * A class that enforces constraints on the swerve drive kinematics.
+ * This can be used to ensure that the trajectory is constructed so that the
+ * commanded velocities of the wheels stay below a certain limit.
+ */
 class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
   SwerveDriveKinematicsConstraint(
