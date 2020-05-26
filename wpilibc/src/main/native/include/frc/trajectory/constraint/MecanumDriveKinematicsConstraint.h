@@ -14,7 +14,6 @@
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
-
 namespace frc {
 /**
  * A class that enforces constraints on the mecanum drive kinematics.
