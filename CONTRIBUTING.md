@@ -49,7 +49,7 @@ Changes should be submitted as a Pull Request against the master branch of WPILi
 
 ### Merge Process
 
-When you first submit changes, Azure DevOps will attempt to run `./gradlew check` on your change. If this fails, you will need to fix any issues that it sees. Once Azure passes, we will begin the review process in more earnest. One or more WPILib team members will review your change. This will be a back-and-forth process with the WPILib team and the greater community. Once we are satisfied that your change is ready, we will allow our Jenkins instance to test it. This will run the full gamut of checks, including integration tests on actual hardware. Once all tests have passed and the team is satisfied, we will merge your change into the WPILib repository.
+When you first submit changes, Azure DevOps will attempt to run `./gradlew check` on your change. If this fails, you will need to fix any issues that it sees. Once Azure passes, we will begin the review process in more earnest. One or more WPILib team members will review your change. This will be a back-and-forth process with the WPILib team and the greater community. Once we are satisfied that your change is ready, we will allow our hosted instance to test it. This will run the full gamut of checks, including integration tests on actual hardware. Once all tests have passed and the team is satisfied, we will merge your change into the WPILib repository.
 
 ## Licensing
 
