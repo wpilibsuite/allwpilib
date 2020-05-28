@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -327,5 +327,15 @@ public class Trajectory {
   public String toString() {
     String stateList = m_states.stream().map(State::toString).collect(Collectors.joining(", \n"));
     return String.format("Trajectory - Seconds: %.2f, States:\n%s", m_totalTimeSeconds, stateList);
+  }
+
+  @Override
+  public int hashCode() {
+    return m_states.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof Trajectory && m_states.equals(((Trajectory) obj).getStates());
   }
 }
