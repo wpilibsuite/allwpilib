@@ -27,6 +27,14 @@ public class Trajectory {
   private final List<State> m_states;
 
   /**
+   * Constructs an empty trajectory.
+   */
+  public Trajectory() {
+    m_states = new ArrayList<>();
+    m_totalTimeSeconds = 0.0;
+  }
+
+  /**
    * Constructs a trajectory from a vector of states.
    *
    * @param states A vector of states.
