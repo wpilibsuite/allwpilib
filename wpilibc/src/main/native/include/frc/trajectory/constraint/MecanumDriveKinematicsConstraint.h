@@ -14,13 +14,13 @@
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 
+namespace frc {
 /**
- * A class that enforces constraints on the differential drive kinematics.
+ * A class that enforces constraints on the mecanum drive kinematics.
  * This can be used to ensure that the trajectory is constructed so that the
- * commanded velocities for both sides of the drivetrain stay below a certain
+ * commanded velocities for wheels of the drivetrain stay below a certain
  * limit.
  */
-namespace frc {
 class MecanumDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
   MecanumDriveKinematicsConstraint(MecanumDriveKinematics kinematics,
