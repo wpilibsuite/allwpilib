@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,9 @@
 #ifndef WPIUTIL_WPI_HTTPUTIL_H_
 #define WPIUTIL_WPI_HTTPUTIL_H_
 
+#include <initializer_list>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -58,6 +60,230 @@ bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
 // @return False if error occurred on input stream, true if boundary found.
 bool FindMultipartBoundary(wpi::raw_istream& is, StringRef boundary,
                            std::string* saveBuf);
+
+/**
+ * Map for looking up elements of the query portion of a URI.  Does not
+ * handle multiple elements with the same name.  This is a reference type;
+ * it does not make a copy of the query string, so it is important that the
+ * query string has a lifetime at least as long as this object.
+ */
+class HttpQueryMap {
+ public:
+  /**
+   * Constructs an empty map (with no entries).
+   */
+  HttpQueryMap() = default;
+
+  /**
+   * Constructs from an escaped query string.  Note: does not make a copy of
+   * the query string, so it must not be a temporary.
+   *
+   * @param query query string
+   */
+  explicit HttpQueryMap(StringRef query);
+
+  /**
+   * Gets an element of the query string.  Both the name and the returned
+   * value are unescaped strings.
+   *
+   * @param name name (unescaped)
+   * @param buf result buffer for value
+   * @return Optional unescaped value.  Returns an empty optional if the
+   *         name is not present in the query map.
+   */
+  std::optional<StringRef> Get(StringRef name,
+                               SmallVectorImpl<char>& buf) const;
+
+ private:
+  StringMap<StringRef> m_elems;
+};
+
+class HttpPathRef;
+
+/**
+ * Class for HTTP path matching.  A root path is represented as a single
+ * empty element, otherwise the path consists of each non-empty element
+ * between the '/' characters:
+ *  - "" -> []
+ *  - "/" -> [""]
+ *  - "/foo" -> ["foo"]
+ *  - "/foo/bar" -> ["foo", "bar"]
+ *  - "/foo//bar/" -> ["foo", "bar"]
+ *
+ * All path elements are unescaped.
+ */
+class HttpPath {
+ public:
+  /**
+   * Constructs an empty HTTP path.
+   */
+  HttpPath() = default;
+
+  /**
+   * Constructs a HTTP path from an escaped path string.  Makes a copy of the
+   * path, so it's safe to be a temporary.
+   */
+  explicit HttpPath(StringRef path);
+
+  /**
+   * Evaluates to true if the path is not empty.
+   */
+  explicit operator bool() const { return !empty(); }
+
+  /**
+   * Returns true if the path has no elements.
+   */
+  bool empty() const { return m_pathEnds.empty(); }
+
+  /**
+   * Returns number of elements in the path.
+   */
+  size_t size() const { return m_pathEnds.size(); }
+
+  /**
+   * Returns true if the path exactly matches the provided match list.
+   *
+   * @param match match list
+   * @return True if path equals match list
+   */
+  bool equals(std::initializer_list<StringRef> match) const {
+    return equals(0, makeArrayRef(match.begin(), match.end()));
+  }
+  bool equals(ArrayRef<StringRef> match) const { return equals(0, match); }
+  bool equals(StringRef match) const { return equals(0, makeArrayRef(match)); }
+
+  /**
+   * Returns true if the elements of the path starting at the "start" element
+   * match the provided match list, and there are no additional elements.
+   *
+   * @param start element to start matching at
+   * @param match match list
+   * @return True if match
+   */
+  bool equals(size_t start, std::initializer_list<StringRef> match) const {
+    return equals(start, makeArrayRef(match.begin(), match.end()));
+  }
+  bool equals(size_t start, ArrayRef<StringRef> match) const {
+    if (m_pathEnds.size() != (start + match.size())) return false;
+    return startswith(start, match);
+  }
+  bool equals(size_t start, StringRef match) const {
+    return equals(start, makeArrayRef(match));
+  }
+
+  /**
+   * Returns true if the first elements of the path match the provided match
+   * list.  The path may have additional elements.
+   *
+   * @param match match list
+   * @return True if path starts with match list
+   */
+  bool startswith(std::initializer_list<StringRef> match) const {
+    return startswith(0, makeArrayRef(match.begin(), match.end()));
+  }
+  bool startswith(ArrayRef<StringRef> match) const {
+    return startswith(0, match);
+  }
+  bool startswith(StringRef match) const {
+    return startswith(0, makeArrayRef(match));
+  }
+
+  /**
+   * Returns true if the elements of the path starting at the "start" element
+   * match the provided match list.  The path may have additional elements.
+   *
+   * @param start element to start matching at
+   * @param match match list
+   * @return True if path starting at the start element matches the match list
+   */
+  bool startswith(size_t start, std::initializer_list<StringRef> match) const {
+    return startswith(start, makeArrayRef(match.begin(), match.end()));
+  }
+
+  bool startswith(size_t start, ArrayRef<StringRef> match) const;
+
+  bool startswith(size_t start, StringRef match) const {
+    return startswith(start, makeArrayRef(match));
+  }
+
+  /**
+   * Gets a single element of the path.
+   */
+  StringRef operator[](size_t n) const {
+    return m_pathBuf.slice(n == 0 ? 0 : m_pathEnds[n - 1], m_pathEnds[n]);
+  }
+
+  /**
+   * Returns a path reference with the first N elements of the path removed.
+   */
+  HttpPathRef drop_front(size_t n) const;
+
+ private:
+  SmallString<128> m_pathBuf;
+  SmallVector<size_t, 16> m_pathEnds;
+};
+
+/**
+ * Proxy reference object for a portion of a HttpPath.
+ */
+class HttpPathRef {
+ public:
+  HttpPathRef() = default;
+  /*implicit*/ HttpPathRef(const HttpPath& path,  // NOLINT(runtime/explicit)
+                           size_t start = 0)
+      : m_path(&path), m_start(start) {}
+
+  explicit operator bool() const { return !empty(); }
+  bool empty() const { return m_path && m_path->size() == m_start; }
+  size_t size() const { return m_path ? m_path->size() - m_start : 0; }
+
+  bool equals(std::initializer_list<StringRef> match) const {
+    return equals(0, makeArrayRef(match.begin(), match.end()));
+  }
+  bool equals(ArrayRef<StringRef> match) const { return equals(0, match); }
+  bool equals(StringRef match) const { return equals(0, makeArrayRef(match)); }
+
+  bool equals(size_t start, std::initializer_list<StringRef> match) const {
+    return equals(start, makeArrayRef(match.begin(), match.end()));
+  }
+  bool equals(size_t start, ArrayRef<StringRef> match) const {
+    return m_path ? m_path->equals(m_start + start, match) : false;
+  }
+  bool equals(size_t start, StringRef match) const {
+    return equals(start, makeArrayRef(match));
+  }
+
+  bool startswith(std::initializer_list<StringRef> match) const {
+    return startswith(0, makeArrayRef(match.begin(), match.end()));
+  }
+  bool startswith(ArrayRef<StringRef> match) const {
+    return startswith(0, match);
+  }
+  bool startswith(StringRef match) const {
+    return startswith(0, makeArrayRef(match));
+  }
+
+  bool startswith(size_t start, std::initializer_list<StringRef> match) const {
+    return startswith(start, makeArrayRef(match.begin(), match.end()));
+  }
+  bool startswith(size_t start, ArrayRef<StringRef> match) const {
+    return m_path ? m_path->startswith(m_start + start, match) : false;
+  }
+  bool startswith(size_t start, StringRef match) const {
+    return startswith(start, makeArrayRef(match));
+  }
+
+  StringRef operator[](size_t n) const {
+    return m_path ? m_path->operator[](m_start + n) : StringRef{};
+  }
+  HttpPathRef drop_front(size_t n) const {
+    return m_path ? m_path->drop_front(m_start + n) : HttpPathRef{};
+  }
+
+ private:
+  const HttpPath* m_path = nullptr;
+  size_t m_start = 0;
+};
 
 class HttpLocation {
  public:

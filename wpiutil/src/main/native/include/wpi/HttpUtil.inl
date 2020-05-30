@@ -12,6 +12,10 @@
 
 namespace wpi {
 
+inline HttpPathRef HttpPath::drop_front(size_t n) const {
+  return HttpPathRef(*this, n);
+}
+
 template <typename T>
 HttpRequest::HttpRequest(const HttpLocation& loc, const T& extraParams)
     : host{loc.host}, port{loc.port} {

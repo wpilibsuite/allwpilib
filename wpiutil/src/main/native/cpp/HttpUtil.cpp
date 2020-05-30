@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -84,6 +84,63 @@ StringRef EscapeURI(const Twine& str, SmallVectorImpl<char>& buf,
   }
 
   return StringRef{buf.data(), buf.size()};
+}
+
+HttpQueryMap::HttpQueryMap(wpi::StringRef query) {
+  wpi::SmallVector<wpi::StringRef, 16> queryElems;
+  query.split(queryElems, '&', 100, false);
+  for (auto elem : queryElems) {
+    auto [nameEsc, valueEsc] = elem.split('=');
+    wpi::SmallString<64> nameBuf;
+    bool err = false;
+    auto name = wpi::UnescapeURI(nameEsc, nameBuf, &err);
+    // note: ignores duplicates
+    if (!err) m_elems.try_emplace(name, valueEsc);
+  }
+}
+
+std::optional<wpi::StringRef> HttpQueryMap::Get(
+    wpi::StringRef name, wpi::SmallVectorImpl<char>& buf) const {
+  auto it = m_elems.find(name);
+  if (it == m_elems.end()) return {};
+  bool err = false;
+  auto val = wpi::UnescapeURI(it->second, buf, &err);
+  if (err) return {};
+  return val;
+}
+
+HttpPath::HttpPath(wpi::StringRef path) {
+  // special-case root path to be a single empty element
+  if (path == "/") {
+    m_pathEnds.emplace_back(0);
+    return;
+  }
+  wpi::SmallVector<wpi::StringRef, 16> pathElems;
+  path.split(pathElems, '/', 100, false);
+  for (auto elem : pathElems) {
+    wpi::SmallString<64> buf;
+    bool err = false;
+    auto val = wpi::UnescapeURI(elem, buf, &err);
+    if (err) {
+      m_pathEnds.clear();
+      return;
+    }
+    m_pathBuf += val;
+    m_pathEnds.emplace_back(m_pathBuf.size());
+  }
+}
+
+bool HttpPath::startswith(size_t start, ArrayRef<StringRef> match) const {
+  if (m_pathEnds.size() < (start + match.size())) return false;
+  bool first = start == 0;
+  auto p = m_pathEnds.begin() + start;
+  for (auto m : match) {
+    auto val = m_pathBuf.slice(first ? 0 : *(p - 1), *p);
+    if (val != m) return false;
+    first = false;
+    ++p;
+  }
+  return true;
 }
 
 bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
