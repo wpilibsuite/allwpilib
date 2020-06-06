@@ -66,12 +66,14 @@ class UsbCameraImpl : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
-  std::string GetPath() { return m_path; }
+  void SetPath(const wpi::Twine& path, CS_Status* status);
+  std::string GetPath() const;
 
   // Messages passed to/from camera thread
   struct Message {
     enum Kind {
       kNone = 0,
+      kCmdSetPath,
       kCmdSetMode,
       kCmdSetPixelFormat,
       kCmdSetResolution,
@@ -132,6 +134,8 @@ class UsbCameraImpl : public SourceImpl {
                                   const Message& msg);
   CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::mutex>& lock,
                                       const Message& msg);
+  CS_StatusValue DeviceCmdSetPath(std::unique_lock<wpi::mutex>& lock,
+                                  const Message& msg);
 
   // Property helper functions
   int RawToPercentage(const UsbCameraProperty& rawProp, int rawValue);
@@ -152,11 +156,6 @@ class UsbCameraImpl : public SourceImpl {
   static constexpr int kNumBuffers = 4;
   std::array<UsbCameraBuffer, kNumBuffers> m_buffers;
 
-  //
-  // Path never changes, so not protected by mutex.
-  //
-  std::string m_path;
-
   std::atomic_int m_fd;
   std::atomic_int m_command_fd;  // for command eventfd
 
@@ -176,6 +175,9 @@ class UsbCameraImpl : public SourceImpl {
   mutable std::vector<Message> m_commands;
   mutable std::vector<std::pair<std::thread::id, CS_StatusValue>> m_responses;
   mutable wpi::condition_variable m_responseCv;
+
+  // Path
+  std::string m_path;
 };
 
 }  // namespace cs

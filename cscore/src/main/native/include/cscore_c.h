@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -338,6 +338,7 @@ void CS_SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
  * @defgroup cscore_usbcamera_cfunc UsbCamera Source Functions
  * @{
  */
+void CS_SetUsbCameraPath(CS_Source source, const char* path, CS_Status* status);
 char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);
 CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status);
 /** @} */
