@@ -13,7 +13,7 @@
 
 namespace halsim {
 
-typedef struct {
+struct DSCommJoystickPacket {
   HAL_JoystickAxes axes;
   HAL_JoystickButtons buttons;
   HAL_JoystickPOVs povs;
@@ -26,6 +26,6 @@ typedef struct {
   }
 
   void ResetTcp() { std::memset(&descriptor, 0, sizeof(descriptor)); }
-} DSCommJoystickPacket;
+};
 
 }  // namespace halsim
