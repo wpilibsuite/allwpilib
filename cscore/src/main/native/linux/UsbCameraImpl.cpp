@@ -223,6 +223,25 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
   return true;
 }
 
+static bool IsVideoCaptureDevice(const char* cpath) {
+  int fd = open(cpath, O_RDWR);
+  if (fd < 0) return false;
+
+  struct v4l2_capability vcap;
+  std::memset(&vcap, 0, sizeof(vcap));
+  if (DoIoctl(fd, VIDIOC_QUERYCAP, &vcap) < 0) {
+    close(fd);
+    return false;
+  }
+  close(fd);
+
+  return (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE) != 0 &&
+         (vcap.capabilities & V4L2_CAP_STREAMING) != 0 &&
+         ((vcap.capabilities & V4L2_CAP_DEVICE_CAPS) == 0 ||
+          ((vcap.device_caps & V4L2_CAP_VIDEO_CAPTURE) != 0 &&
+           (vcap.device_caps & V4L2_CAP_STREAMING) != 0));
+}
+
 static int GetDeviceNum(const char* cpath) {
   wpi::StringRef path{cpath};
   std::string pathBuf;
@@ -1452,6 +1471,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
       wpi::SmallString<32> path{"/dev/"};
       path += fname;
       info.path = path.str();
+
+      if (!IsVideoCaptureDevice(path.c_str())) continue;
 
       info.name = GetDescriptionImpl(path.c_str());
       if (info.name.empty()) continue;
