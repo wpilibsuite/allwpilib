@@ -465,6 +465,7 @@ void UsbCameraImpl::CameraThreadMain() {
         int height = m_mode.height;
         bool good = true;
         if (m_c922_h264 && m_mode.pixelFormat == VideoMode::kH264) {
+          // TODO
         }
         if (m_mode.pixelFormat == VideoMode::kMJPEG &&
             !GetJpegSize(image, &width, &height)) {

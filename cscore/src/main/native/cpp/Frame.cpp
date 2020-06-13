@@ -14,8 +14,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 extern "C" {
-    #include <libavcodec/avcodec.h>
-}
+#include <libavcodec/avcodec.h>
+}  // extern "C"
 
 #include "FramePool.h"
 #include "Instance.h"
@@ -60,9 +60,9 @@ Image* Frame::GetNearestImage(int width, int height) const {
   return m_impl->images.empty() ? nullptr : m_impl->images[0];
 }
 
-Image* Frame::GetNearestImage(int width, int height,
-                              VideoMode::PixelFormat pixelFormat,
-                              const CompressionContext::CompressionSettings& compressionSettings) const {
+Image* Frame::GetNearestImage(
+    int width, int height, VideoMode::PixelFormat pixelFormat,
+    const CompressionContext::CompressionSettings& compressionSettings) const {
   if (!m_impl) return nullptr;
   std::scoped_lock lock(m_impl->mutex);
   Image* found = nullptr;
@@ -163,9 +163,10 @@ Image* Frame::GetNearestImage(int width, int height,
   return m_impl->images.empty() ? nullptr : m_impl->images[0];
 }
 
-Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat, const CompressionContext& compressionContext) {
-  if (!image ||
-      image->Is(image->width, image->height, pixelFormat, compressionContext.GetCompressionSettings()))
+Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat,
+                      const CompressionContext& compressionContext) {
+  if (!image || image->Is(image->width, image->height, pixelFormat,
+                          compressionContext.GetCompressionSettings()))
     return image;
   Image* cur = image;
 
@@ -230,11 +231,13 @@ Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat, const Co
         // We never get to this branch in a compressed source video mode
         // because we convert cur from compressed to BGR in the beginning of
         // this function.
-        if (pixelFormat == VideoMode::kBGR)
+        if (pixelFormat == VideoMode::kBGR) {
           return ConvertGrayToBGR(cur);
-        else if (pixelFormat == VideoMode::kMJPEG)
-          return ConvertGrayToMJPEG(cur, compressionContext.GetCompressionSettings().jpegDefaultQuality);
-        else if (pixelFormat == VideoMode::kH264) {
+        } else if (pixelFormat == VideoMode::kMJPEG) {
+          return ConvertGrayToMJPEG(
+              cur,
+              compressionContext.GetCompressionSettings().jpegDefaultQuality);
+        } else if (pixelFormat == VideoMode::kH264) {
           cur = ConvertGrayToBGR(cur);
           return ConvertBGRToH264(cur, compressionContext);
         }
@@ -247,42 +250,51 @@ Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat, const Co
 
   // Compress if destination is JPEG or H264
   if (pixelFormat == VideoMode::kMJPEG)
-    cur = ConvertBGRToMJPEG(cur, compressionContext.GetCompressionSettings().jpegDefaultQuality);
+    cur = ConvertBGRToMJPEG(
+        cur, compressionContext.GetCompressionSettings().jpegDefaultQuality);
   else if (pixelFormat == VideoMode::kH264)
     cur = ConvertBGRToH264(cur, compressionContext);
 
   return cur;
 }
 
-Image* Frame::ConvertH264ToBGR(Image* image, const CompressionContext& compressionContext) {
-  if (!image || !m_impl || image->pixelFormat != VideoMode::kH264) return nullptr;
-    std::scoped_lock lock(m_impl->mutex);
+Image* Frame::ConvertH264ToBGR(Image* image,
+                               const CompressionContext& compressionContext) {
+  if (!image || !m_impl || image->pixelFormat != VideoMode::kH264)
+    return nullptr;
+  std::scoped_lock lock(m_impl->mutex);
 
   // Allocate an BGR image
   auto newImage =
-          m_impl->framePool.AllocImage(VideoMode::kBGR, image->width, image->height,
-                  image->width * image->height * 3);
+      m_impl->framePool.AllocImage(VideoMode::kBGR, image->width, image->height,
+                                   image->width * image->height * 3);
 
-  auto compressionCtx = compressionContext.GetH264Context(image->width, image->height, 0); // TODO: Pipe in FPS
+  auto compressionCtx = compressionContext.GetH264Context(
+      image->width, image->height, 0);  // TODO: Pipe in FPS
 
   int ret;
 
   // Send raw H264-encoded bytes to libavcodec
-  ret = avcodec_send_packet(compressionCtx.decodingContext, compressionCtx.packet);
+  ret = avcodec_send_packet(compressionCtx.decodingContext,
+                            compressionCtx.packet);
   if (ret < 0) {
-      WPI_WARNING(Instance::GetInstance().GetLogger(),
-              "Couldn't send H264 packet to be decoded by libavcodec");
-      return nullptr;
+    WPI_WARNING(Instance::GetInstance().GetLogger(),
+                "Couldn't send H264 packet to be decoded by libavcodec");
+    return nullptr;
   }
 
   // Get decoded bytes back
   while (ret >= 0) {
-      ret = avcodec_receive_frame(compressionCtx.decodingContext, compressionCtx.frame);
-      if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-          return nullptr; // TODO: Is this the appropriate response when we reach the end of the image?
-      }
+    ret = avcodec_receive_frame(compressionCtx.decodingContext,
+                                compressionCtx.frame);
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+      return nullptr;  // TODO: Is this the appropriate response when we reach
+                       // the end of the image?
+    }
 
-      newImage->vec().insert(newImage->vec().end(), compressionCtx.packet->data, compressionCtx.packet->data + compressionCtx.packet->size);
+    newImage->vec().insert(
+        newImage->vec().end(), compressionCtx.packet->data,
+        compressionCtx.packet->data + compressionCtx.packet->size);
   }
   // TODO: Probably need to do some more work on handling bad packets here
 
@@ -435,8 +447,7 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
   } else {
     m_impl->mjpegParams[1] = quality;
   }
-  cv::imencode(".jpg", image->AsMat(), newImage->vec(),
-               m_impl->mjpegParams);
+  cv::imencode(".jpg", image->AsMat(), newImage->vec(), m_impl->mjpegParams);
 
   // Save the result
   Image* rv = newImage.release();
@@ -467,8 +478,7 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   } else {
     m_impl->mjpegParams[1] = quality;
   }
-  cv::imencode(".jpg", image->AsMat(), newImage->vec(),
-               m_impl->mjpegParams);
+  cv::imencode(".jpg", image->AsMat(), newImage->vec(), m_impl->mjpegParams);
 
   // Save the result
   Image* rv = newImage.release();
@@ -477,57 +487,66 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
   return rv;
 }
 
-Image* Frame::ConvertBGRToH264(Image* image, const CompressionContext& compressionContext) {
-    if (!m_impl || image->pixelFormat != VideoMode::kBGR) return nullptr;
-    std::scoped_lock lock(m_impl->mutex);
+Image* Frame::ConvertBGRToH264(Image* image,
+                               const CompressionContext& compressionContext) {
+  if (!m_impl || image->pixelFormat != VideoMode::kBGR) return nullptr;
+  std::scoped_lock lock(m_impl->mutex);
 
-    // TODO: Figure out a good conservative size estimate; right now we assume compression is probably no worse than JPEG.
-    auto newImage =
-        m_impl->framePool.AllocImage(VideoMode::kH264, image->width, image->height,
-                            image->width * image->height * 0.75);
+  // TODO: Figure out a good conservative size estimate; right now we assume
+  // compression is probably no worse than JPEG.
+  auto newImage = m_impl->framePool.AllocImage(
+      VideoMode::kH264, image->width, image->height,
+      image->width * image->height * 0.75);
 
-    auto h264Ctx = compressionContext.GetH264Context(image->width, image->height, 0); // TODO: Pipe in FPS
-    h264Ctx.frame->data[0] = reinterpret_cast<uint8_t *>(image->data());
+  auto h264Ctx = compressionContext.GetH264Context(image->width, image->height,
+                                                   0);  // TODO: Pipe in FPS
+  h264Ctx.frame->data[0] = reinterpret_cast<uint8_t*>(image->data());
 
-    int ret;
+  int ret;
 
-    // Send raw BGR image data to libavcodec
-    ret = avcodec_send_frame(h264Ctx.encodingContext, h264Ctx.frame);
-    if (ret < 0) {
-        WPI_WARNING(Instance::GetInstance().GetLogger(),
+  // Send raw BGR image data to libavcodec
+  ret = avcodec_send_frame(h264Ctx.encodingContext, h264Ctx.frame);
+  if (ret < 0) {
+    WPI_WARNING(Instance::GetInstance().GetLogger(),
                 "Couldn't send frame to be encoded by libavcodec");
-        return nullptr;
+    return nullptr;
+  }
+
+  // Get back H264-encoded bytes
+  while (ret >= 0) {
+    ret = avcodec_receive_packet(h264Ctx.encodingContext, h264Ctx.packet);
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+      // We're done encoding the frame we just sent... Usually we only have to
+      // go through the loop once to get to this point.
+      Image* rv = newImage.release();
+      m_impl->images.push_back(rv);
+      return rv;
+    } else if (ret < 0) {
+      WPI_WARNING(Instance::GetInstance().GetLogger(),
+                  "Couldn't receive encoded packet from libavcodec");
+      return nullptr;
     }
 
-    // Get back H264-encoded bytes
-    while (ret >= 0) {
-        ret = avcodec_receive_packet(h264Ctx.encodingContext, h264Ctx.packet);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-            // We're done encoding the frame we just sent... Usually we only have to go through the loop once to get to this point.
-            Image* rv = newImage.release();
-            m_impl->images.push_back(rv);
-            return rv;
-        } else if (ret < 0) {
-            WPI_WARNING(Instance::GetInstance().GetLogger(),
-                       "Couldn't receive encoded packet from libavcodec");
-            return nullptr;
-        }
+    newImage->vec().insert(newImage->vec().end(), h264Ctx.packet->data,
+                           h264Ctx.packet->data + h264Ctx.packet->size);
+  }
 
-        newImage->vec().insert(newImage->vec().end(), h264Ctx.packet->data, h264Ctx.packet->data + h264Ctx.packet->size);
-    }
-
-    // Save the result
-    Image* rv = newImage.release();
-    rv->h264Bitrate = compressionContext.GetCompressionSettings().h264Bitrate;
-    m_impl->images.push_back(rv);
-    return rv;
+  // Save the result
+  Image* rv = newImage.release();
+  rv->h264Bitrate = compressionContext.GetCompressionSettings().h264Bitrate;
+  m_impl->images.push_back(rv);
+  return rv;
 }
 
-Image* Frame::GetImage(int width, int height, VideoMode::PixelFormat pixelFormat, const CompressionContext& compressionContext) {
+Image* Frame::GetImage(int width, int height,
+                       VideoMode::PixelFormat pixelFormat,
+                       const CompressionContext& compressionContext) {
   if (!m_impl) return nullptr;
   std::scoped_lock lock(m_impl->mutex);
-  Image* cur = GetNearestImage(width, height, pixelFormat, compressionContext.GetCompressionSettings());
-  if (!cur || cur->Is(width, height, pixelFormat, compressionContext.GetCompressionSettings()))
+  Image* cur = GetNearestImage(width, height, pixelFormat,
+                               compressionContext.GetCompressionSettings());
+  if (!cur || cur->Is(width, height, pixelFormat,
+                      compressionContext.GetCompressionSettings()))
     return cur;
 
   WPI_DEBUG4(Instance::GetInstance().GetLogger(),
@@ -540,8 +559,10 @@ Image* Frame::GetImage(int width, int height, VideoMode::PixelFormat pixelFormat
   // anything else with it.  Note that if the destination format is compressed,
   // still need to do this (unless the width/height/compression were the same,
   // in which case we already returned the existing compressed image above).
-  if (cur->pixelFormat == VideoMode::kMJPEG) cur = ConvertMJPEGToBGR(cur);
-  else if (cur->pixelFormat == VideoMode::kH264) cur = ConvertH264ToBGR(cur, compressionContext);
+  if (cur->pixelFormat == VideoMode::kMJPEG)
+    cur = ConvertMJPEGToBGR(cur);
+  else if (cur->pixelFormat == VideoMode::kH264)
+    cur = ConvertH264ToBGR(cur, compressionContext);
 
   // It's possible that we passed a malformed frame to be decoded
   if (!cur) return nullptr;
@@ -566,8 +587,10 @@ Image* Frame::GetImage(int width, int height, VideoMode::PixelFormat pixelFormat
   return Convert(cur, pixelFormat, compressionContext);
 }
 
-bool Frame::GetCv(cv::Mat& image, int width, int height, const CompressionContext& compressionContext) {
-  Image* rawImage = GetImage(width, height, VideoMode::kBGR, compressionContext);
+bool Frame::GetCv(cv::Mat& image, int width, int height,
+                  const CompressionContext& compressionContext) {
+  Image* rawImage =
+      GetImage(width, height, VideoMode::kBGR, compressionContext);
   if (!rawImage) return false;
   rawImage->AsMat().copyTo(image);
   return true;

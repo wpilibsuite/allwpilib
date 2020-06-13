@@ -22,11 +22,11 @@
 #include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
+#include "CompressionContext.h"
 #include "Frame.h"
 #include "Handle.h"
 #include "Image.h"
 #include "PropertyContainer.h"
-#include "CompressionContext.h"
 #include "cscore_cpp.h"
 
 namespace wpi {
@@ -82,27 +82,28 @@ class SourceImpl : public PropertyContainer {
   // to get source frames.
   int GetNumSinksEnabled() const { return m_numSinksEnabled; }
 
-  // Sinks must ask for a specific pixel format. This is so the source can perform the conversions to all requested pixel formats ahead of time.
+  // Sinks must ask for a specific pixel format. This is so the source can
+  // perform the conversions to all requested pixel formats ahead of time.
   void EnableSink(VideoMode::PixelFormat outputPixelFormat) {
     ++m_numSinksEnabled;
     NumSinksEnabledChanged();
 
     int& numRegisteredOnPixFmt = m_outputPixelFormats[outputPixelFormat];
-    if (!numRegisteredOnPixFmt)
-        numRegisteredOnPixFmt = 0;
+    if (!numRegisteredOnPixFmt) numRegisteredOnPixFmt = 0;
     ++numRegisteredOnPixFmt;
   }
 
-  // TODO (for review): I don't love requiring the user to pass in the pixel format that they were using if they wish to disable their sink... We could return a handle instead, but that feels like it overcomplicates things.
+  // TODO (for review): I don't love requiring the user to pass in the pixel
+  // format that they were using if they wish to disable their sink... We could
+  // return a handle instead, but that feels like it overcomplicates things.
   // Perhaps the answer is to register a output pixel formats differently?
   void DisableSink(VideoMode::PixelFormat outputPixelFormat) {
     --m_numSinksEnabled;
     NumSinksEnabledChanged();
 
-      int& numRegisteredOnPixFmt = m_outputPixelFormats[outputPixelFormat];
-      if (!numRegisteredOnPixFmt)
-          numRegisteredOnPixFmt = 0;
-      --numRegisteredOnPixFmt;
+    int& numRegisteredOnPixFmt = m_outputPixelFormats[outputPixelFormat];
+    if (!numRegisteredOnPixFmt) numRegisteredOnPixFmt = 0;
+    --numRegisteredOnPixFmt;
   }
 
   // Standard common camera properties
@@ -119,8 +120,11 @@ class SourceImpl : public PropertyContainer {
   VideoMode GetVideoMode(CS_Status* status) const;
   virtual bool SetVideoMode(const VideoMode& mode, CS_Status* status) = 0;
 
-  // The compression context is mostly useful because it can be used to manipulate compression settings
-  const CompressionContext& GetCompressionContext() const { return m_compressionCtx; };
+  // The compression context is mostly useful because it can be used to
+  // manipulate compression settings
+  const CompressionContext& GetCompressionContext() const {
+    return m_compressionCtx;
+  }
 
   // These have default implementations but can be overridden for custom
   // or optimized behavior.
@@ -181,8 +185,12 @@ class SourceImpl : public PropertyContainer {
   std::atomic_int m_strategy{CS_CONNECTION_AUTO_MANAGE};
   std::atomic_int m_numSinksEnabled{0};
 
-  // Although a source only has one selected video mode (i.e. it may only get one resolution, pixel format, and FPS from the camera at a time), the source may convert images into a different pixel format for consumption by a sink.
-  // An example scenario involves a source that outputs raw BGR data and has a sink that wants H264-encoded data; in this case the sink registers itself with the source and requests that data.
+  // Although a source only has one selected video mode (i.e. it may only get
+  // one resolution, pixel format, and FPS from the camera at a time), the
+  // source may convert images into a different pixel format for consumption by
+  // a sink. An example scenario involves a source that outputs raw BGR data and
+  // has a sink that wants H264-encoded data; in this case the sink registers
+  // itself with the source and requests that data.
   std::map<VideoMode::PixelFormat, int> m_outputPixelFormats;
 
   std::atomic_bool m_isConnected{false};

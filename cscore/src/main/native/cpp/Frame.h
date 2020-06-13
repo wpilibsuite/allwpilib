@@ -102,15 +102,19 @@ class Frame {
 
   int GetOriginalJpegQuality() const {
     Image* image = GetExistingImage();
-    if (!image) return 0;
-    else return image->jpegQuality;
+    if (!image)
+      return 0;
+    else
+      return image->jpegQuality;
   }
 
-    int GetOriginalH264Bitrate() const {
-      Image* image = GetExistingImage();
-      if (!image) return 0;
-      else return image->h264Bitrate;
-    }
+  int GetOriginalH264Bitrate() const {
+    Image* image = GetExistingImage();
+    if (!image)
+      return 0;
+    else
+      return image->h264Bitrate;
+  }
 
   Image* GetExistingImage(size_t i = 0) const {
     if (!m_impl) return nullptr;
@@ -138,9 +142,9 @@ class Frame {
     return nullptr;
   }
 
-  Image* GetExistingImage(int width, int height,
-                          VideoMode::PixelFormat pixelFormat,
-                          const CompressionContext::CompressionSettings& settings) const {
+  Image* GetExistingImage(
+      int width, int height, VideoMode::PixelFormat pixelFormat,
+      const CompressionContext::CompressionSettings& settings) const {
     if (!m_impl) return nullptr;
     std::scoped_lock lock(m_impl->mutex);
     for (auto i : m_impl->images) {
@@ -150,21 +154,26 @@ class Frame {
   }
 
   Image* GetNearestImage(int width, int height) const;
-  Image* GetNearestImage(int width, int height,
-                         VideoMode::PixelFormat pixelFormat,
-                         const CompressionContext::CompressionSettings& compressionSettings) const;
+  Image* GetNearestImage(
+      int width, int height, VideoMode::PixelFormat pixelFormat,
+      const CompressionContext::CompressionSettings& compressionSettings) const;
 
-  Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat, const CompressionContext& compressionContext);
+  Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat,
+                 const CompressionContext& compressionContext);
 
-  Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat, const CompressionContext& compressionContext);
+  Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat,
+                  const CompressionContext& compressionContext);
 
   bool GetCv(cv::Mat& image, const CompressionContext& compressionContext) {
-    return GetCv(image, GetOriginalWidth(), GetOriginalHeight(), compressionContext);
+    return GetCv(image, GetOriginalWidth(), GetOriginalHeight(),
+                 compressionContext);
   }
-  bool GetCv(cv::Mat& image, int width, int height, const CompressionContext& compressionContext);
+  bool GetCv(cv::Mat& image, int width, int height,
+             const CompressionContext& compressionContext);
 
  private:
-  Image* ConvertH264ToBGR(Image* image, const CompressionContext& compressionContext);
+  Image* ConvertH264ToBGR(Image* image,
+                          const CompressionContext& compressionContext);
   Image* ConvertMJPEGToBGR(Image* image);
   Image* ConvertYUYVToBGR(Image* image);
   Image* ConvertBGRToRGB565(Image* image);
@@ -173,7 +182,8 @@ class Frame {
   Image* ConvertGrayToBGR(Image* image);
   Image* ConvertBGRToMJPEG(Image* image, int quality);
   Image* ConvertGrayToMJPEG(Image* image, int quality);
-  Image* ConvertBGRToH264(Image* image, const CompressionContext& compressionContext);
+  Image* ConvertBGRToH264(Image* image,
+                          const CompressionContext& compressionContext);
 
   void DecRef() {
     if (m_impl && --(m_impl->refcount) == 0) ReleaseFrame();

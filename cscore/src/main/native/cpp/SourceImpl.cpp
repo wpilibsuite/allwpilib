@@ -342,13 +342,14 @@ void SourceImpl::PutFrame(Frame frame) {
                     static_cast<int64_t>(image->size()));
   }
 
-  // TODO: This needs to be moved to another thread so that PutFrame doesn't block
+  // TODO: This needs to be moved to another thread so that PutFrame doesn't
+  // block
   Image* originalImage = frame.GetExistingImage(0);
   if (originalImage) {
-      for (auto &&it : m_outputPixelFormats) {
-          VideoMode::PixelFormat fmt = it.first;
-          frame.Convert(originalImage, fmt, m_compressionCtx);
-      }
+    for (auto&& it : m_outputPixelFormats) {
+      VideoMode::PixelFormat fmt = it.first;
+      frame.Convert(originalImage, fmt, m_compressionCtx);
+    }
   }
 
   // Signal listeners

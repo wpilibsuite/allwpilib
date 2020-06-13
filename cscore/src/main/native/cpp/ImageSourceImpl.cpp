@@ -145,7 +145,8 @@ void ImageSourceImpl::PutFrame(const CS_RawFrame& image) {
       type = CV_8UC3;
       break;
     case VideoMode::kGray:
-    // These compression schemes are treated as opaque when they're in a cv::Mat, so we say that they're "single-channel"
+    // These compression schemes are treated as opaque when they're in a
+    // cv::Mat, so we say that they're "single-channel"
     case VideoMode::kMJPEG:
     case VideoMode::kH264:
     default:
