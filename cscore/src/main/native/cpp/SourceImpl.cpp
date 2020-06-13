@@ -22,9 +22,7 @@ using namespace cs;
 SourceImpl::SourceImpl(const wpi::Twine& name, wpi::Logger& logger)
     : m_logger(logger),
       m_framePool(Instance::GetInstance().GetFramePool()),
-      m_name{name.str()} {
-  m_frame = m_framePool.MakeEmptyFrame();
-}
+      m_name{name.str()} {}
 
 void SourceImpl::SetDescription(const wpi::Twine& description) {
   std::scoped_lock lock(m_mutex);
@@ -44,16 +42,6 @@ void SourceImpl::SetConnected(bool isConnected) {
     disconnected();
   else if (!wasConnected && isConnected)
     connected();
-}
-
-uint64_t SourceImpl::GetCurFrameTime() {
-  std::unique_lock lock{m_frameMutex};
-  return m_frame.GetTime();
-}
-
-Frame SourceImpl::GetCurFrame() {
-  std::unique_lock lock{m_frameMutex};
-  return m_frame;
 }
 
 void SourceImpl::SetBrightness(int brightness, CS_Status* status) {
@@ -354,10 +342,13 @@ void SourceImpl::PutFrame(Frame frame) {
                     static_cast<int64_t>(image->size()));
   }
 
-  // Update frame
-  {
-    std::scoped_lock lock{m_frameMutex};
-    m_frame = frame;
+  // TODO: This needs to be moved to another thread so that PutFrame doesn't block
+  Image* originalImage = frame.GetExistingImage(0);
+  if (originalImage) {
+      for (auto &&it : m_outputPixelFormats) {
+          VideoMode::PixelFormat fmt = it.first;
+          frame.Convert(originalImage, fmt, m_compressionCtx);
+      }
   }
 
   // Signal listeners

@@ -702,7 +702,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
     int width = m_width != 0 ? m_width : frame.GetOriginalWidth();
     int height = m_height != 0 ? m_height : frame.GetOriginalHeight();
-    Image* image = frame.GetImageMJPEG(
+    Image* image = frame.GetImage(
         width, height, m_compression,
         m_compression == -1 ? m_defaultCompression : m_compression);
     if (!image) {

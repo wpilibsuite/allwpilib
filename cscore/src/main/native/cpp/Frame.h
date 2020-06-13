@@ -18,6 +18,7 @@
 #include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
+#include "CompressionContext.h"
 #include "Image.h"
 #include "cscore_cpp.h"
 
@@ -41,7 +42,7 @@ class Frame {
     FramePool& framePool;
     std::string error;
     wpi::SmallVector<Image*, 4> images;
-    std::vector<int> compressionParams;
+    std::vector<int> mjpegParams;
   };
 
  public:
@@ -100,11 +101,16 @@ class Frame {
   }
 
   int GetOriginalJpegQuality() const {
-    if (!m_impl) return 0;
-    std::scoped_lock lock(m_impl->mutex);
-    if (m_impl->images.empty()) return 0;
-    return m_impl->images[0]->jpegQuality;
+    Image* image = GetExistingImage();
+    if (!image) return 0;
+    else return image->jpegQuality;
   }
+
+    int GetOriginalH264Bitrate() const {
+      Image* image = GetExistingImage();
+      if (!image) return 0;
+      else return image->h264Bitrate;
+    }
 
   Image* GetExistingImage(size_t i = 0) const {
     if (!m_impl) return nullptr;
@@ -134,11 +140,11 @@ class Frame {
 
   Image* GetExistingImage(int width, int height,
                           VideoMode::PixelFormat pixelFormat,
-                          int jpegQuality) const {
+                          const CompressionContext::CompressionSettings& settings) const {
     if (!m_impl) return nullptr;
     std::scoped_lock lock(m_impl->mutex);
     for (auto i : m_impl->images) {
-      if (i->Is(width, height, pixelFormat, jpegQuality)) return i;
+      if (i->Is(width, height, pixelFormat, settings)) return i;
     }
     return nullptr;
   }
@@ -146,21 +152,20 @@ class Frame {
   Image* GetNearestImage(int width, int height) const;
   Image* GetNearestImage(int width, int height,
                          VideoMode::PixelFormat pixelFormat,
-                         int jpegQuality = -1) const;
+                         const CompressionContext::CompressionSettings& compressionSettings) const;
 
-  Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat) {
-    if (pixelFormat == VideoMode::kMJPEG) return nullptr;
-    return ConvertImpl(image, pixelFormat, -1, 80);
+  Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat, const CompressionContext& compressionContext);
+
+  Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat, const CompressionContext& compressionContext);
+
+  bool GetCv(cv::Mat& image, const CompressionContext& compressionContext) {
+    return GetCv(image, GetOriginalWidth(), GetOriginalHeight(), compressionContext);
   }
-  Image* ConvertToMJPEG(Image* image, int requiredQuality,
-                        int defaultQuality = 80) {
-    return ConvertImpl(image, VideoMode::kMJPEG, requiredQuality,
-                       defaultQuality);
-  }
-  Image* ConvertH264ToBGR(Image* image);
-  Image* ConvertH264ToGray(Image* image);
+  bool GetCv(cv::Mat& image, int width, int height, const CompressionContext& compressionContext);
+
+ private:
+  Image* ConvertH264ToBGR(Image* image, const CompressionContext& compressionContext);
   Image* ConvertMJPEGToBGR(Image* image);
-  Image* ConvertMJPEGToGray(Image* image);
   Image* ConvertYUYVToBGR(Image* image);
   Image* ConvertBGRToRGB565(Image* image);
   Image* ConvertRGB565ToBGR(Image* image);
@@ -168,29 +173,8 @@ class Frame {
   Image* ConvertGrayToBGR(Image* image);
   Image* ConvertBGRToMJPEG(Image* image, int quality);
   Image* ConvertGrayToMJPEG(Image* image, int quality);
-  Image* ConvertBGRToH264(Image* image);
-  Image* ConvertGrayToH264(Image* image);
+  Image* ConvertBGRToH264(Image* image, const CompressionContext& compressionContext);
 
-  Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat) {
-    if (pixelFormat == VideoMode::kMJPEG) return nullptr;
-    return GetImageImpl(width, height, pixelFormat, -1, 80);
-  }
-  Image* GetImageMJPEG(int width, int height, int requiredQuality,
-                       int defaultQuality = 80) {
-    return GetImageImpl(width, height, VideoMode::kMJPEG, requiredQuality,
-                        defaultQuality);
-  }
-
-  bool GetCv(cv::Mat& image) {
-    return GetCv(image, GetOriginalWidth(), GetOriginalHeight());
-  }
-  bool GetCv(cv::Mat& image, int width, int height);
-
- private:
-  Image* ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
-                     int requiredJpegQuality, int defaultJpegQuality);
-  Image* GetImageImpl(int width, int height, VideoMode::PixelFormat pixelFormat,
-                      int requiredJpegQuality, int defaultJpegQuality);
   void DecRef() {
     if (m_impl && --(m_impl->refcount) == 0) ReleaseFrame();
   }

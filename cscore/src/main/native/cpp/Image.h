@@ -63,7 +63,9 @@ class Image {
         type = CV_8UC3;
         break;
       case VideoMode::kGray:
+      // These compression schemes are treated as opaque when they're in a cv::Mat, so we say that they're "single-channel"
       case VideoMode::kMJPEG:
+      case VideoMode::kH264:
       default:
         type = CV_8UC1;
         break;
@@ -79,13 +81,17 @@ class Image {
   bool Is(int width_, int height_, VideoMode::PixelFormat pixelFormat_) {
     return width == width_ && height == height_ && pixelFormat == pixelFormat_;
   }
-  bool Is(int width_, int height_, VideoMode::PixelFormat pixelFormat_,
-          int jpegQuality_) {
+  bool Is(int width_, int height_, VideoMode::PixelFormat pixelFormat_, const CompressionContext::CompressionSettings& settings) {
     // Consider +/-5 on JPEG quality to be "close enough"
+    // Consider +/-500 on H264 bitrate to be "close enough"
+    int jpegQuality_ = settings.jpegRequiredQuality;
+    int h264Bitrate_ = settings.h264Bitrate;
     return width == width_ && height == height_ &&
            pixelFormat == pixelFormat_ &&
            (pixelFormat != VideoMode::kMJPEG || jpegQuality_ == -1 ||
-            (jpegQuality != -1 && std::abs(jpegQuality - jpegQuality_) <= 5));
+            std::abs(jpegQuality - jpegQuality_) <= 5) &&
+           (pixelFormat != VideoMode::kH264 || h264Bitrate == h264Bitrate_ ||
+            std::abs(h264Bitrate - h264Bitrate_) <= 500);
   }
   bool IsLarger(int width_, int height_) {
     return width >= width_ && height >= height_;
@@ -104,6 +110,7 @@ class Image {
   int width{0};
   int height{0};
   int jpegQuality{-1};
+  int h264Bitrate{-1};
 };
 
 }  // namespace cs

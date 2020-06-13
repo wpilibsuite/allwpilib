@@ -9,10 +9,8 @@
 
 using namespace cs;
 
-CompressionContext::CompressionContext(int h264BitRate, int mjpegRequiredQuality, int mjpegDefaultQuality) :
-        m_mjpegRequiredQuality{mjpegRequiredQuality},
-        m_mjpegDefaultQuality{mjpegDefaultQuality},
-        m_h264BitRate{h264BitRate} {
+CompressionContext::CompressionContext() :
+        m_compressionSettings{defaultCompressionSettings} {
     if (m_h264EncodingCodec && m_h264DecodingCodec) return;
 
     // The OpenMAX codec is only built for Raspian (so that we can use the Pi GPU encoder)
@@ -21,7 +19,7 @@ CompressionContext::CompressionContext(int h264BitRate, int mjpegRequiredQuality
         // No hardware-accelerated encoding is available, so we will use "libx264rgb"
         // Note that the "libx264" encoder, which works in YUYV, is also built but not used at this time
         m_h264EncodingCodec = avcodec_find_encoder_by_name("libx264rgb");
-        // XXX (for review): throw may be inappropriate here
+        // TODO (for review): throw may be inappropriate here
         if (!m_h264EncodingCodec) throw std::runtime_error("No compatible H264 codecs for encoding found");
     }
 
@@ -34,21 +32,23 @@ CompressionContext::CompressionContext(int h264BitRate, int mjpegRequiredQuality
 }
 
 const CompressionContext::H264Context& CompressionContext::GetH264Context(int width, int height, int fps) const {
+    std::lock_guard lock{m_mutex};
+
     H264Context ret;
     for (auto ctx : m_h264Contexts) {
         // We only return a premade context if its width, height, fps, and bitrate match
         // This means that the user changing settings to many different values will result in tons of different contexts
         if (ctx.encodingContext->width == width && ctx.encodingContext->height == height && ctx.encodingContext->framerate.den == fps
-            && ctx.encodingContext->bit_rate == m_h264BitRate)
+            && ctx.encodingContext->bit_rate == m_compressionSettings.h264Bitrate)
             ret = ctx;
     }
     if (!ret.encodingContext) {
         // Set up encoding
-        // XXX (for review): once again not sure if throw is appropriate here
+        // TODO (for review): once again not sure if throw is appropriate here
         ret.encodingContext = avcodec_alloc_context3(this->m_h264EncodingCodec);
         if (!ret.encodingContext) throw std::runtime_error("Could not allocate encoding codec context");
 
-        ret.encodingContext->bit_rate = m_h264BitRate;
+        ret.encodingContext->bit_rate = m_compressionSettings.h264Bitrate;
 
         ret.encodingContext->width = width;
         ret.encodingContext->height = height;
@@ -95,6 +95,6 @@ const CompressionContext::H264Context& CompressionContext::GetH264Context(int wi
         if (!ret.packet) throw std::runtime_error("Couldn't allocate an output video packet");
     }
 
-    m_h264Contexts.emplace_back(ret);
+    m_h264Contexts.emplace_back(std::move(ret));
     return m_h264Contexts.back();
 }
