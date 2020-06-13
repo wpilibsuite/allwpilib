@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,10 +30,10 @@ public class SimDeviceDataJNI extends JNIWrapper {
     }
 
     @SuppressWarnings("MemberName")
-    String name;
+    public String name;
 
     @SuppressWarnings("MemberName")
-    int handle;
+    public int handle;
   }
   public static native SimDeviceInfo[] enumerateSimDevices(String prefix);
 
@@ -54,16 +54,16 @@ public class SimDeviceDataJNI extends JNIWrapper {
     }
 
     @SuppressWarnings("MemberName")
-    String name;
+    public String name;
 
     @SuppressWarnings("MemberName")
-    int handle;
+    public int handle;
 
     @SuppressWarnings("MemberName")
-    boolean readonly;
+    public boolean readonly;
 
     @SuppressWarnings("MemberName")
-    HALValue value;
+    public HALValue value;
   }
   public static native SimValueInfo[] enumerateSimValues(int device);
 
