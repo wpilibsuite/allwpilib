@@ -53,9 +53,9 @@ public class ExampleSmartMotorController implements SpeedController {
   /**
    * Places this motor controller in follower mode.
    *
-   * @param master The master to follow.
+   * @param leader The leader to follow.
    */
-  public void follow(ExampleSmartMotorController master) {
+  public void follow(ExampleSmartMotorController leader) {
   }
 
   /**

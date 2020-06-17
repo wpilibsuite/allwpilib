@@ -10,7 +10,7 @@ package edu.wpi.first.wpilibj.fixtures;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
- * Master interface for all test fixtures. This ensures that all test fixtures have setup and
+ * Common interface for all test fixtures. This ensures that all test fixtures have setup and
  * teardown methods, to ensure that the tests run properly. Test fixtures should be modeled around
  * the content of a test, rather than the actual physical layout of the testing board. They should
  * obtain references to hardware from the {@link TestBench} class, which is a singleton. Testing
