@@ -42,7 +42,7 @@ class PIDSubsystem : public SubsystemBase {
    *
    * @return the setpoint for the subsystem
    */
-  double GetSetpoint();
+  double GetSetpoint() const;
 
   /**
    * Enables the PID control.  Resets the controller.

@@ -22,7 +22,7 @@ void PIDSubsystem::Periodic() {
 
 void PIDSubsystem::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
 
-double PIDSubsystem::GetSetpoint() { return m_setpoint; }
+double PIDSubsystem::GetSetpoint() const { return m_setpoint; }
 
 void PIDSubsystem::Enable() {
   m_controller.Reset();
