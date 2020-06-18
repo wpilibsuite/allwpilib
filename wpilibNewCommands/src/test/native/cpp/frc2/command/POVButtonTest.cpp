@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/Joystick.h>
-#include <mockdata/DriverStationData.h>
+#include <hal/simulation/DriverStationData.h>
 
 #include "CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"

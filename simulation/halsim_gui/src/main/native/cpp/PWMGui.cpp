@@ -12,9 +12,9 @@
 #include <memory>
 
 #include <hal/Ports.h>
+#include <hal/simulation/AddressableLEDData.h>
+#include <hal/simulation/PWMData.h>
 #include <imgui.h>
-#include <mockdata/AddressableLEDData.h>
-#include <mockdata/PWMData.h>
 
 #include "HALSimGui.h"
 #include "IniSaver.h"

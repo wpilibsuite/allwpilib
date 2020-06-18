@@ -17,7 +17,7 @@
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"
-#include "mockdata/DriverStationData.h"
+#include "hal/simulation/DriverStationData.h"
 #include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;

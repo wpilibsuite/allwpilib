@@ -8,20 +8,20 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI.h"
-#include "mockdata/AnalogTriggerData.h"
+#include "edu_wpi_first_hal_simulation_AnalogTriggerDataJNI.h"
+#include "hal/simulation/AnalogTriggerData.h"
 
 using namespace hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_registerInitializedCallback
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -30,12 +30,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_registerInitializedCall
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_cancelInitializedCallback
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -43,36 +43,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_cancelInitializedCallba
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_getInitialized
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAnalogTriggerInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_setInitialized
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetAnalogTriggerInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    registerTriggerLowerBoundCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_registerTriggerLowerBoundCallback
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_registerTriggerLowerBoundCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -81,12 +81,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_registerTriggerLowerBou
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    cancelTriggerLowerBoundCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_cancelTriggerLowerBoundCallback
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_cancelTriggerLowerBoundCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(
@@ -94,36 +94,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_cancelTriggerLowerBound
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    getTriggerLowerBound
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_getTriggerLowerBound
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_getTriggerLowerBound
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAnalogTriggerTriggerLowerBound(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    setTriggerLowerBound
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_setTriggerLowerBound
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_setTriggerLowerBound
   (JNIEnv*, jclass, jint index, jdouble value)
 {
   HALSIM_SetAnalogTriggerTriggerLowerBound(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    registerTriggerUpperBoundCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_registerTriggerUpperBoundCallback
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_registerTriggerUpperBoundCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -132,12 +132,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_registerTriggerUpperBou
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    cancelTriggerUpperBoundCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_cancelTriggerUpperBoundCallback
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_cancelTriggerUpperBoundCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(
@@ -145,36 +145,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_cancelTriggerUpperBound
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    getTriggerUpperBound
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_getTriggerUpperBound
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_getTriggerUpperBound
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAnalogTriggerTriggerUpperBound(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    setTriggerUpperBound
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_setTriggerUpperBound
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_setTriggerUpperBound
   (JNIEnv*, jclass, jint index, jdouble value)
 {
   HALSIM_SetAnalogTriggerTriggerUpperBound(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogTriggerDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogTriggerDataJNI_resetData
+Java_edu_wpi_first_hal_simulation_AnalogTriggerDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetAnalogTriggerData(index);

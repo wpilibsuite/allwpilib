@@ -12,9 +12,9 @@
 #include <wpi/jni_util.h>
 
 #include "CallbackStore.h"
-#include "edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI.h"
-#include "mockdata/DriverStationData.h"
-#include "mockdata/MockHooks.h"
+#include "edu_wpi_first_hal_simulation_DriverStationDataJNI.h"
+#include "hal/simulation/DriverStationData.h"
+#include "hal/simulation/MockHooks.h"
 
 using namespace hal;
 using namespace wpi::java;
@@ -22,12 +22,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    registerEnabledCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerEnabledCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerEnabledCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
@@ -36,12 +36,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerEnabledCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    cancelEnabledCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelEnabledCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelEnabledCallback
   (JNIEnv* env, jclass, jint handle)
 {
   return sim::FreeCallbackNoIndex(env, handle,
@@ -49,36 +49,36 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelEnabledCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    getEnabled
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_getEnabled
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getEnabled
   (JNIEnv*, jclass)
 {
   return HALSIM_GetDriverStationEnabled();
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setEnabled
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setEnabled
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setEnabled
   (JNIEnv*, jclass, jboolean value)
 {
   HALSIM_SetDriverStationEnabled(value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    registerAutonomousCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerAutonomousCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerAutonomousCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
@@ -87,12 +87,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerAutonomousCallb
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    cancelAutonomousCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelAutonomousCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelAutonomousCallback
   (JNIEnv* env, jclass, jint handle)
 {
   return sim::FreeCallbackNoIndex(
@@ -100,36 +100,36 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelAutonomousCallbac
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    getAutonomous
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_getAutonomous
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getAutonomous
   (JNIEnv*, jclass)
 {
   return HALSIM_GetDriverStationAutonomous();
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setAutonomous
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setAutonomous
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setAutonomous
   (JNIEnv*, jclass, jboolean value)
 {
   HALSIM_SetDriverStationAutonomous(value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    registerTestCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerTestCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerTestCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
@@ -137,12 +137,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerTestCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    cancelTestCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelTestCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelTestCallback
   (JNIEnv* env, jclass, jint handle)
 {
   return sim::FreeCallbackNoIndex(env, handle,
@@ -150,36 +150,36 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelTestCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    getTest
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_getTest
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getTest
   (JNIEnv*, jclass)
 {
   return HALSIM_GetDriverStationTest();
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setTest
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setTest
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setTest
   (JNIEnv*, jclass, jboolean value)
 {
   HALSIM_SetDriverStationTest(value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    registerEStopCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerEStopCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerEStopCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
@@ -187,12 +187,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerEStopCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    cancelEStopCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelEStopCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelEStopCallback
   (JNIEnv* env, jclass, jint handle)
 {
   return sim::FreeCallbackNoIndex(env, handle,
@@ -200,36 +200,36 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelEStopCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    getEStop
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_getEStop
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getEStop
   (JNIEnv*, jclass)
 {
   return HALSIM_GetDriverStationEStop();
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setEStop
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setEStop
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setEStop
   (JNIEnv*, jclass, jboolean value)
 {
   HALSIM_SetDriverStationEStop(value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    registerFmsAttachedCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerFmsAttachedCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerFmsAttachedCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
@@ -238,12 +238,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerFmsAttachedCall
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    cancelFmsAttachedCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelFmsAttachedCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelFmsAttachedCallback
   (JNIEnv* env, jclass, jint handle)
 {
   return sim::FreeCallbackNoIndex(
@@ -251,36 +251,36 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelFmsAttachedCallba
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    getFmsAttached
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_getFmsAttached
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getFmsAttached
   (JNIEnv*, jclass)
 {
   return HALSIM_GetDriverStationFmsAttached();
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setFmsAttached
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setFmsAttached
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setFmsAttached
   (JNIEnv*, jclass, jboolean value)
 {
   HALSIM_SetDriverStationFmsAttached(value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    registerDsAttachedCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerDsAttachedCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerDsAttachedCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
@@ -289,12 +289,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerDsAttachedCallb
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    cancelDsAttachedCallback
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelDsAttachedCallback
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelDsAttachedCallback
   (JNIEnv* env, jclass, jint handle)
 {
   return sim::FreeCallbackNoIndex(
@@ -302,36 +302,36 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_cancelDsAttachedCallbac
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    getDsAttached
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_getDsAttached
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getDsAttached
   (JNIEnv*, jclass)
 {
   return HALSIM_GetDriverStationDsAttached();
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setDsAttached
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setDsAttached
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setDsAttached
   (JNIEnv*, jclass, jboolean value)
 {
   HALSIM_SetDriverStationDsAttached(value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickAxes
  * Signature: (B[F)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setJoystickAxes
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxes
   (JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray)
 {
   HAL_JoystickAxes axes;
@@ -351,12 +351,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setJoystickAxes
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickPOVs
  * Signature: (B[S)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setJoystickPOVs
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVs
   (JNIEnv* env, jclass, jbyte joystickNum, jshortArray povsArray)
 {
   HAL_JoystickPOVs povs;
@@ -376,12 +376,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setJoystickPOVs
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickButtons
  * Signature: (BII)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setJoystickButtons
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtons
   (JNIEnv* env, jclass, jbyte joystickNum, jint buttons, jint count)
 {
   if (count > 32) {
@@ -394,12 +394,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setJoystickButtons
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setMatchInfo
  * Signature: (Ljava/lang/String;Ljava/lang/String;III)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setMatchInfo
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchInfo
   (JNIEnv* env, jclass, jstring eventName, jstring gameSpecificMessage,
    jint matchNumber, jint replayNumber, jint matchType)
 {
@@ -420,12 +420,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setMatchInfo
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    registerAllCallbacks
  * Signature: (Ljava/lang/Object;Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerAllCallbacks
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerAllCallbacks
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   sim::AllocateCallbackNoIndex(
@@ -437,24 +437,24 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_registerAllCallbacks
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    notifyNewData
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_notifyNewData
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_notifyNewData
   (JNIEnv*, jclass)
 {
   HALSIM_NotifyDriverStationNewData();
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setSendError
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendError
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setSendError
   (JNIEnv*, jclass, jboolean shouldSend)
 {
   if (shouldSend) {
@@ -468,12 +468,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendError
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setSendConsoleLine
  * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendConsoleLine
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setSendConsoleLine
   (JNIEnv*, jclass, jboolean shouldSend)
 {
   if (shouldSend) {
@@ -484,12 +484,12 @@ Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_setSendConsoleLine
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    resetData
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_DriverStationDataJNI_resetData
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_resetData
   (JNIEnv*, jclass)
 {
   HALSIM_ResetDriverStationData();

@@ -13,11 +13,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import edu.wpi.first.hal.sim.DriverStationSim;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 
 import static edu.wpi.first.wpilibj.util.Units.feetToMeters;
