@@ -26,4 +26,6 @@ public class DigitalPWMDataJNI extends JNIWrapper {
   public static native void setPin(int index, int pin);
 
   public static native void resetData(int index);
+
+  public static native int findForChannel(int channel);
 }

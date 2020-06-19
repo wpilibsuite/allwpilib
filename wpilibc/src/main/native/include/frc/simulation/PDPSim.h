@@ -13,12 +13,30 @@
 #include <hal/simulation/PDPData.h>
 
 #include "CallbackStore.h"
+#include "frc/PowerDistributionPanel.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated Power Distribution Panel (PDP).
+ */
 class PDPSim {
  public:
-  explicit PDPSim(int index) { m_index = index; }
+  /**
+   * Constructs from a PDP module number (CAN ID).
+   *
+   * @param module module number
+   */
+  explicit PDPSim(int module = 0) : m_index{module} {}
+
+  /**
+   * Constructs from a PowerDistributionPanel object.
+   *
+   * @param pdp PowerDistributionPanel to simulate
+   */
+  explicit PDPSim(const PowerDistributionPanel& pdp)
+      : m_index{pdp.GetModule()} {}
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) {

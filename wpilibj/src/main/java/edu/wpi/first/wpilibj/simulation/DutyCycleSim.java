@@ -9,12 +9,52 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.DutyCycleDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.DutyCycle;
+import java.util.NoSuchElementException;
 
+/**
+ * Class to control a simulated duty cycle digital input.
+ */
 public class DutyCycleSim {
   private final int m_index;
 
-  public DutyCycleSim(int index) {
+  /**
+   * Constructs from a DutyCycle object.
+   *
+   * @param dutyCycle DutyCycle to simulate
+   */
+  public DutyCycleSim(DutyCycle dutyCycle) {
+    m_index = dutyCycle.getFPGAIndex();
+  }
+
+  private DutyCycleSim(int index) {
     m_index = index;
+  }
+
+  /**
+   * Creates a DutyCycleSim for a digital input channel.
+   *
+   * @param channel digital input channel
+   * @return Simulated object
+   * @throws NoSuchElementException if no DutyCycle is configured for that channel
+   */
+  public static DutyCycleSim createForChannel(int channel) {
+    int index = DutyCycleDataJNI.findForChannel(channel);
+    if (index < 0) {
+      throw new NoSuchElementException("no duty cycle found for channel " + channel);
+    }
+    return new DutyCycleSim(index);
+  }
+
+  /**
+   * Creates a DutyCycleSim for a simulated index.
+   * The index is incremented for each simulated DutyCycle.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  public static DutyCycleSim createForIndex(int index) {
+    return new DutyCycleSim(index);
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

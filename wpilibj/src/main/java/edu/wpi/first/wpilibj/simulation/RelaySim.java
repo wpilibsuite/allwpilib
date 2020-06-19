@@ -9,12 +9,30 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.RelayDataJNI;
+import edu.wpi.first.wpilibj.Relay;
 
+/**
+ * Class to control a simulated relay.
+ */
 public class RelaySim {
   private final int m_index;
 
-  public RelaySim(int index) {
-    m_index = index;
+  /**
+   * Constructs from a Relay object.
+   *
+   * @param relay Relay to simulate
+   */
+  public RelaySim(Relay relay) {
+    m_index = relay.getChannel();
+  }
+
+  /**
+   * Constructs from a relay channel number.
+   *
+   * @param channel Channel number
+   */
+  public RelaySim(int channel) {
+    m_index = channel;
   }
 
   public CallbackStore registerInitializedForwardCallback(NotifyCallback callback, boolean initialNotify) {

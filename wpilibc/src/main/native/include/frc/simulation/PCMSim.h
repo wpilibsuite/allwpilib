@@ -13,12 +13,32 @@
 #include <hal/simulation/PCMData.h>
 
 #include "CallbackStore.h"
+#include "frc/Compressor.h"
+#include "frc/SensorUtil.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated Pneumatic Control Module (PCM).
+ */
 class PCMSim {
  public:
-  explicit PCMSim(int index) { m_index = index; }
+  /**
+   * Constructs from a PCM module number (CAN ID).
+   *
+   * @param module module number
+   */
+  explicit PCMSim(int module = SensorUtil::GetDefaultSolenoidModule())
+      : m_index{module} {}
+
+  /**
+   * Constructs from a Compressor object.
+   *
+   * @param compressor Compressor connected to PCM to simulate
+   */
+  explicit PCMSim(const Compressor& compressor)
+      : m_index{compressor.GetModule()} {}
 
   std::unique_ptr<CallbackStore> RegisterSolenoidInitializedCallback(
       int channel, NotifyCallback callback, bool initialNotify) {

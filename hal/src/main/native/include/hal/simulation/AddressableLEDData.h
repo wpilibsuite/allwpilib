@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel);
+
 void HALSIM_ResetAddressableLEDData(int32_t index);
 
 int32_t HALSIM_RegisterAddressableLEDInitializedCallback(

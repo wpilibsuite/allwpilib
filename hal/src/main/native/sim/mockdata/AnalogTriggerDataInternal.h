@@ -31,6 +31,7 @@ class AnalogTriggerData {
   SimDataValue<HALSIM_AnalogTriggerMode, MakeTriggerModeValue,
                GetTriggerModeName>
       triggerMode{static_cast<HALSIM_AnalogTriggerMode>(0)};
+  std::atomic<int32_t> inputPort;
 
   virtual void ResetData();
 };

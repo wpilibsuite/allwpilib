@@ -9,12 +9,30 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.AnalogGyroDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.AnalogGyro;
 
+/**
+ * Class to control a simulated analog gyro.
+ */
 public class AnalogGyroSim {
   private final int m_index;
 
-  public AnalogGyroSim(int index) {
-    m_index = index;
+  /**
+   * Constructs from an AnalogGyro object.
+   *
+   * @param gyro AnalogGyro to simulate
+   */
+  public AnalogGyroSim(AnalogGyro gyro) {
+    m_index = gyro.getAnalogInput().getChannel();
+  }
+
+  /**
+   * Constructs from an analog input channel number.
+   *
+   * @param channel Channel number
+   */
+  public AnalogGyroSim(int channel) {
+    m_index = channel;
   }
 
   public CallbackStore registerAngleCallback(NotifyCallback callback, boolean initialNotify) {

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -184,7 +184,16 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, A
    *
    * @param volts The size of the deadband in volts
    */
-  void setDeadband(double volts) {
+  public void setDeadband(double volts) {
     AnalogGyroJNI.setAnalogGyroDeadband(m_gyroHandle, volts);
+  }
+
+  /**
+   * Gets the analog input for the gyro.
+   *
+   * @return AnalogInput
+   */
+  public AnalogInput getAnalogInput() {
+    return m_analog;
   }
 }

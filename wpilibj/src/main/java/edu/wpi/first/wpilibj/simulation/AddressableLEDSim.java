@@ -10,12 +10,61 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.AddressableLEDDataJNI;
 import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.AddressableLED;
+import java.util.NoSuchElementException;
 
+/**
+ * Class to control a simulated addressable LED.
+ */
 public class AddressableLEDSim {
   private final int m_index;
 
-  public AddressableLEDSim(int index) {
+  /**
+   * Constructs for the first addressable LED.
+   */
+  public AddressableLEDSim() {
+    m_index = 0;
+  }
+
+  /**
+   * Constructs from an AddressableLED object.
+   *
+   * @param addressableLED AddressableLED to simulate
+   */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  public AddressableLEDSim(AddressableLED addressableLED) {
+    // there is only support for a single AddressableLED, so no lookup
+    m_index = 0;
+  }
+
+  private AddressableLEDSim(int index) {
     m_index = index;
+  }
+
+  /**
+   * Creates an AddressableLEDSim for a PWM channel.
+   *
+   * @param pwmChannel PWM channel
+   * @return Simulated object
+   * @throws NoSuchElementException if no AddressableLED is configured for that channel
+   */
+  public static AddressableLEDSim createForChannel(int pwmChannel) {
+    int index = AddressableLEDDataJNI.findForChannel(pwmChannel);
+    if (index < 0) {
+      throw new NoSuchElementException("no addressable LED found for PWM channel " + pwmChannel);
+    }
+    return new AddressableLEDSim(index);
+  }
+
+  /**
+   * Creates an AddressableLEDSim for a simulated index.
+   * The index is incremented for each simulated AddressableLED.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  public static AddressableLEDSim createForIndex(int index) {
+    return new AddressableLEDSim(index);
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

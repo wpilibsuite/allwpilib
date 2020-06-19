@@ -16,8 +16,8 @@ import edu.wpi.first.hal.simulation.SpiReadAutoReceiveBufferCallback;
 public class SPISim {
   private final int m_index;
 
-  public SPISim(int index) {
-    m_index = index;
+  public SPISim() {
+    m_index = 0;
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

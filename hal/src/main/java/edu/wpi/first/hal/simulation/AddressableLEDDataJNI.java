@@ -36,4 +36,6 @@ public class AddressableLEDDataJNI extends JNIWrapper {
   public static native void setData(int index, byte[] data);
 
   public static native void resetData(int index);
+
+  public static native int findForChannel(int channel);
 }

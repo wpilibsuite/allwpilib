@@ -204,6 +204,8 @@ void Compressor::ClearAllPCMStickyFaults() {
   }
 }
 
+int Compressor::GetModule() const { return m_module; }
+
 void Compressor::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Compressor");
   builder.AddBooleanProperty(

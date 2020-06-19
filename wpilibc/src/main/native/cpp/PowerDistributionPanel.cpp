@@ -25,7 +25,7 @@ PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 /**
  * Initialize the PDP.
  */
-PowerDistributionPanel::PowerDistributionPanel(int module) {
+PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
   int32_t status = 0;
   m_handle = HAL_InitializePDP(module, &status);
   if (status != 0) {
@@ -135,6 +135,8 @@ void PowerDistributionPanel::ClearStickyFaults() {
     wpi_setWPIErrorWithContext(Timeout, "");
   }
 }
+
+int PowerDistributionPanel::GetModule() const { return m_module; }
 
 void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");

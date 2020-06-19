@@ -7,18 +7,52 @@
 
 #pragma once
 
+#include <exception>
 #include <memory>
 #include <utility>
 
 #include <hal/simulation/DutyCycleData.h>
 
 #include "CallbackStore.h"
+#include "frc/DutyCycle.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated duty cycle digital input.
+ */
 class DutyCycleSim {
  public:
-  explicit DutyCycleSim(int index) { m_index = index; }
+  /**
+   * Constructs from a DutyCycle object.
+   *
+   * @param dutyCycle DutyCycle to simulate
+   */
+  explicit DutyCycleSim(const DutyCycle& dutyCycle)
+      : m_index{dutyCycle.GetFPGAIndex()} {}
+
+  /**
+   * Creates a DutyCycleSim for a digital input channel.
+   *
+   * @param channel digital input channel
+   * @return Simulated object
+   * @throws std::out_of_range if no DutyCycle is configured for that channel
+   */
+  static DutyCycleSim CreateForChannel(int channel) {
+    int index = HALSIM_FindDutyCycleForChannel(channel);
+    if (index < 0) throw std::out_of_range("no duty cycle found for channel");
+    return DutyCycleSim{index};
+  }
+
+  /**
+   * Creates a DutyCycleSim for a simulated index.
+   * The index is incremented for each simulated DutyCycle.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  static DutyCycleSim CreateForIndex(int index) { return DutyCycleSim{index}; }
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) {
@@ -66,6 +100,8 @@ class DutyCycleSim {
   void ResetData() { HALSIM_ResetDutyCycleData(m_index); }
 
  private:
+  explicit DutyCycleSim(int index) : m_index{index} {}
+
   int m_index;
 };
 }  // namespace sim

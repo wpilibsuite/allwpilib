@@ -7,18 +7,56 @@
 
 #pragma once
 
+#include <exception>
 #include <memory>
 #include <utility>
 
 #include <hal/simulation/AnalogTriggerData.h>
 
 #include "CallbackStore.h"
+#include "frc/AnalogTrigger.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated analog trigger.
+ */
 class AnalogTriggerSim {
  public:
-  explicit AnalogTriggerSim(int index) { m_index = index; }
+  /**
+   * Constructs from an AnalogTrigger object.
+   *
+   * @param analogTrigger AnalogTrigger to simulate
+   */
+  explicit AnalogTriggerSim(const AnalogTrigger& analogTrigger)
+      : m_index{analogTrigger.GetIndex()} {}
+
+  /**
+   * Creates an AnalogTriggerSim for an analog input channel.
+   *
+   * @param channel analog input channel
+   * @return Simulated object
+   * @throws std::out_of_range if no AnalogTrigger is configured for that
+   *         channel
+   */
+  static AnalogTriggerSim CreateForChannel(int channel) {
+    int index = HALSIM_FindAnalogTriggerForChannel(channel);
+    if (index < 0)
+      throw std::out_of_range("no analog trigger found for channel");
+    return AnalogTriggerSim{index};
+  }
+
+  /**
+   * Creates an AnalogTriggerSim for a simulated index.
+   * The index is incremented for each simulated AnalogTrigger.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  static AnalogTriggerSim CreateForIndex(int index) {
+    return AnalogTriggerSim{index};
+  }
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) {
@@ -76,6 +114,8 @@ class AnalogTriggerSim {
   void ResetData() { HALSIM_ResetAnalogTriggerData(m_index); }
 
  private:
+  explicit AnalogTriggerSim(int index) : m_index{index} {}
+
   int m_index;
 };
 }  // namespace sim

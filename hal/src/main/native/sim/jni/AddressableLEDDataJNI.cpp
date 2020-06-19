@@ -291,4 +291,16 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_resetData
   HALSIM_ResetAddressableLEDData(index);
 }
 
+/*
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Method:    findForChannel
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_findForChannel
+  (JNIEnv*, jclass, jint channel)
+{
+  return HALSIM_FindAddressableLEDForChannel(channel);
+}
+
 }  // extern "C"

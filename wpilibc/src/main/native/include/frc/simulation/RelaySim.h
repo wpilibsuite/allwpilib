@@ -13,12 +13,29 @@
 #include <hal/simulation/RelayData.h>
 
 #include "CallbackStore.h"
+#include "frc/Relay.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated relay.
+ */
 class RelaySim {
  public:
-  explicit RelaySim(int index) { m_index = index; }
+  /**
+   * Constructs from a Relay object.
+   *
+   * @param relay Relay to simulate
+   */
+  explicit RelaySim(const Relay& relay) : m_index{relay.GetChannel()} {}
+
+  /**
+   * Constructs from a relay channel number.
+   *
+   * @param channel Channel number
+   */
+  explicit RelaySim(int channel) : m_index{channel} {}
 
   std::unique_ptr<CallbackStore> RegisterInitializedForwardCallback(
       NotifyCallback callback, bool initialNotify) {

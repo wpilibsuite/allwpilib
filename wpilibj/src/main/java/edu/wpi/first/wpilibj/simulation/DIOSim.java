@@ -9,12 +9,40 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.DIODataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 
+/**
+ * Class to control a simulated digital input or output.
+ */
 public class DIOSim {
   private final int m_index;
 
-  public DIOSim(int index) {
-    m_index = index;
+  /**
+   * Constructs from a DigitalInput object.
+   *
+   * @param input DigitalInput to simulate
+   */
+  public DIOSim(DigitalInput input) {
+    m_index = input.getChannel();
+  }
+
+  /**
+   * Constructs from a DigitalOutput object.
+   *
+   * @param output DigitalOutput to simulate
+   */
+  public DIOSim(DigitalOutput output) {
+    m_index = output.getChannel();
+  }
+
+  /**
+   * Constructs from an digital I/O channel number.
+   *
+   * @param channel Channel number
+   */
+  public DIOSim(int channel) {
+    m_index = channel;
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

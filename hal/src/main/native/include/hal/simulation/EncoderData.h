@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+int32_t HALSIM_FindEncoderForChannel(int32_t channel);
+
 void HALSIM_ResetEncoderData(int32_t index);
 int32_t HALSIM_GetEncoderDigitalChannelA(int32_t index);
 int32_t HALSIM_GetEncoderDigitalChannelB(int32_t index);

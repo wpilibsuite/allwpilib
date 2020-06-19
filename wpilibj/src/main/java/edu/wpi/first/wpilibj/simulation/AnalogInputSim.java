@@ -9,12 +9,31 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.AnalogInDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.AnalogInput;
 
-public class AnalogInSim {
+/**
+ * Class to control a simulated analog input.
+ */
+@SuppressWarnings("PMD.TooManyMethods")
+public class AnalogInputSim {
   private final int m_index;
 
-  public AnalogInSim(int index) {
-    m_index = index;
+  /**
+   * Constructs from an AnalogInput object.
+   *
+   * @param analogInput AnalogInput to simulate
+   */
+  public AnalogInputSim(AnalogInput analogInput) {
+    m_index = analogInput.getChannel();
+  }
+
+  /**
+   * Constructs from an analog input channel number.
+   *
+   * @param channel Channel number
+   */
+  public AnalogInputSim(int channel) {
+    m_index = channel;
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

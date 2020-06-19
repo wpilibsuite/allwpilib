@@ -13,12 +13,31 @@
 #include <hal/simulation/AnalogGyroData.h>
 
 #include "CallbackStore.h"
+#include "frc/AnalogGyro.h"
+#include "frc/AnalogInput.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated analog gyro.
+ */
 class AnalogGyroSim {
  public:
-  explicit AnalogGyroSim(int index) { m_index = index; }
+  /**
+   * Constructs from an AnalogGyro object.
+   *
+   * @param gyro AnalogGyro to simulate
+   */
+  explicit AnalogGyroSim(const AnalogGyro& gyro)
+      : m_index{gyro.GetAnalogInput()->GetChannel()} {}
+
+  /**
+   * Constructs from an analog input channel number.
+   *
+   * @param channel Channel number
+   */
+  explicit AnalogGyroSim(int channel) : m_index{channel} {}
 
   std::unique_ptr<CallbackStore> RegisterAngleCallback(NotifyCallback callback,
                                                        bool initialNotify) {

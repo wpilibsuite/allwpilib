@@ -9,12 +9,30 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.PWMDataJNI;
+import edu.wpi.first.wpilibj.PWM;
 
+/**
+ * Class to control a simulated PWM output.
+ */
 public class PWMSim {
   private final int m_index;
 
-  public PWMSim(int index) {
-    m_index = index;
+  /**
+   * Constructs from a PWM object.
+   *
+   * @param pwm PWM to simulate
+   */
+  public PWMSim(PWM pwm) {
+    m_index = pwm.getChannel();
+  }
+
+  /**
+   * Constructs from a PWM channel number.
+   *
+   * @param channel Channel number
+   */
+  public PWMSim(int channel) {
+    m_index = channel;
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
