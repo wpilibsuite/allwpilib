@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,16 +17,16 @@ import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.ExampleSmartMotorCon
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final ExampleSmartMotorController m_leftMaster =
+  private final ExampleSmartMotorController m_leftLeader =
       new ExampleSmartMotorController(DriveConstants.kLeftMotor1Port);
 
-  private final ExampleSmartMotorController m_leftSlave =
+  private final ExampleSmartMotorController m_leftFollower =
       new ExampleSmartMotorController(DriveConstants.kLeftMotor2Port);
 
-  private final ExampleSmartMotorController m_rightMaster =
+  private final ExampleSmartMotorController m_rightLeader =
       new ExampleSmartMotorController(DriveConstants.kRightMotor1Port);
 
-  private final ExampleSmartMotorController m_rightSlave =
+  private final ExampleSmartMotorController m_rightFollower =
       new ExampleSmartMotorController(DriveConstants.kRightMotor2Port);
 
   private final SimpleMotorFeedforward m_feedforward =
@@ -35,17 +35,17 @@ public class DriveSubsystem extends SubsystemBase {
                                  DriveConstants.kaVoltSecondsSquaredPerMeter);
 
   // The robot's drive
-  private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMaster, m_rightMaster);
+  private final DifferentialDrive m_drive = new DifferentialDrive(m_leftLeader, m_rightLeader);
 
   /**
    * Creates a new DriveSubsystem.
    */
   public DriveSubsystem() {
-    m_leftSlave.follow(m_leftMaster);
-    m_rightSlave.follow(m_rightMaster);
+    m_leftFollower.follow(m_leftLeader);
+    m_rightFollower.follow(m_rightLeader);
 
-    m_leftMaster.setPID(DriveConstants.kp, 0, 0);
-    m_rightMaster.setPID(DriveConstants.kp, 0, 0);
+    m_leftLeader.setPID(DriveConstants.kp, 0, 0);
+    m_rightLeader.setPID(DriveConstants.kp, 0, 0);
   }
 
   /**
@@ -65,10 +65,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @param right The right wheel state.
    */
   public void setDriveStates(TrapezoidProfile.State left, TrapezoidProfile.State right) {
-    m_leftMaster.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition,
+    m_leftLeader.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition,
                              left.position,
                              m_feedforward.calculate(left.velocity));
-    m_rightMaster.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition,
+    m_rightLeader.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition,
                               right.position,
                               m_feedforward.calculate(right.velocity));
   }
@@ -79,7 +79,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the left encoder distance
    */
   public double getLeftEncoderDistance() {
-    return m_leftMaster.getEncoderDistance();
+    return m_leftLeader.getEncoderDistance();
   }
 
   /**
@@ -88,15 +88,15 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the right encoder distance
    */
   public double getRightEncoderDistance() {
-    return m_rightMaster.getEncoderDistance();
+    return m_rightLeader.getEncoderDistance();
   }
 
   /**
    * Resets the drive encoders.
    */
   public void resetEncoders() {
-    m_leftMaster.resetEncoder();
-    m_rightMaster.resetEncoder();
+    m_leftLeader.resetEncoder();
+    m_rightLeader.resetEncoder();
   }
 
   /**
