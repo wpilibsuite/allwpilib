@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -106,6 +106,18 @@ jmethodID GetSpiReadAutoReceiveBufferCallback() {
 }  // namespace sim
 
 extern "C" {
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
+ * Method:    setRuntimeType
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_setRuntimeType
+  (JNIEnv*, jclass, jint type)
+{
+  HALSIM_SetRuntimeType(static_cast<HAL_RuntimeType>(type));
+}
+
 /*
  * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
  * Method:    waitForProgramStart

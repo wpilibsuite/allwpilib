@@ -22,6 +22,8 @@
 
 using namespace hal;
 
+static HAL_RuntimeType runtimeType{HAL_Mock};
+
 namespace hal {
 namespace init {
 void InitializeHAL() {
@@ -215,7 +217,9 @@ const char* HAL_GetErrorMessage(int32_t code) {
   }
 }
 
-HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Mock; }
+HAL_RuntimeType HAL_GetRuntimeType(void) { return runtimeType; }
+
+void HALSIM_SetRuntimeType(HAL_RuntimeType type) { runtimeType = type; }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
   return 2018;  // Automatically script this at some point
