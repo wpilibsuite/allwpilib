@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,17 +10,19 @@
 
 #include <atomic>
 #include <cstddef>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
 #include <wpi/Logger.h>
+#include <wpi/Signal.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
-#include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
+#include "CompressionContext.h"
 #include "Frame.h"
 #include "Handle.h"
 #include "Image.h"
@@ -33,16 +35,12 @@ class json;
 
 namespace cs {
 
-class Notifier;
-class Telemetry;
+class FramePool;
 
 class SourceImpl : public PropertyContainer {
-  friend class Frame;
-
  public:
-  SourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-             Telemetry& telemetry);
-  virtual ~SourceImpl();
+  SourceImpl(const wpi::Twine& name, wpi::Logger& logger);
+  virtual ~SourceImpl() = default;
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
 
@@ -62,8 +60,8 @@ class SourceImpl : public PropertyContainer {
   }
 
   // User-visible connection status
-  void SetConnected(bool connected);
-  bool IsConnected() const { return m_connected; }
+  void SetConnected(bool isConnected);
+  bool IsConnected() const { return m_isConnected; }
 
   // Functions to keep track of the overall number of sinks connected to this
   // source.  Primarily used by sinks to determine if other sinks are using
@@ -84,31 +82,29 @@ class SourceImpl : public PropertyContainer {
   // to get source frames.
   int GetNumSinksEnabled() const { return m_numSinksEnabled; }
 
-  void EnableSink() {
+  // Sinks must ask for a specific pixel format. This is so the source can
+  // perform the conversions to all requested pixel formats ahead of time.
+  void EnableSink(VideoMode::PixelFormat outputPixelFormat) {
     ++m_numSinksEnabled;
     NumSinksEnabledChanged();
+
+    int& numRegisteredOnPixFmt = m_outputPixelFormats[outputPixelFormat];
+    if (!numRegisteredOnPixFmt) numRegisteredOnPixFmt = 0;
+    ++numRegisteredOnPixFmt;
   }
 
-  void DisableSink() {
+  // TODO (for review): I don't love requiring the user to pass in the pixel
+  // format that they were using if they wish to disable their sink... We could
+  // return a handle instead, but that feels like it overcomplicates things.
+  // Perhaps the answer is to register a output pixel formats differently?
+  void DisableSink(VideoMode::PixelFormat outputPixelFormat) {
     --m_numSinksEnabled;
     NumSinksEnabledChanged();
+
+    int& numRegisteredOnPixFmt = m_outputPixelFormats[outputPixelFormat];
+    if (!numRegisteredOnPixFmt) numRegisteredOnPixFmt = 0;
+    --numRegisteredOnPixFmt;
   }
-
-  // Gets the current frame time (without waiting for a new one).
-  uint64_t GetCurFrameTime();
-
-  // Gets the current frame (without waiting for a new one).
-  Frame GetCurFrame();
-
-  // Blocking function that waits for the next frame and returns it.
-  Frame GetNextFrame();
-
-  // Blocking function that waits for the next frame and returns it (with
-  // timeout in seconds).  If timeout expires, returns empty frame.
-  Frame GetNextFrame(double timeout);
-
-  // Force a wakeup of all GetNextFrame() callers by sending an empty frame.
-  void Wakeup();
 
   // Standard common camera properties
   virtual void SetBrightness(int brightness, CS_Status* status);
@@ -124,6 +120,12 @@ class SourceImpl : public PropertyContainer {
   VideoMode GetVideoMode(CS_Status* status) const;
   virtual bool SetVideoMode(const VideoMode& mode, CS_Status* status) = 0;
 
+  // The compression context is mostly useful because it can be used to
+  // manipulate compression settings
+  const CompressionContext& GetCompressionContext() const {
+    return m_compressionCtx;
+  }
+
   // These have default implementations but can be overridden for custom
   // or optimized behavior.
   virtual bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
@@ -138,17 +140,27 @@ class SourceImpl : public PropertyContainer {
 
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
-  std::unique_ptr<Image> AllocImage(VideoMode::PixelFormat pixelFormat,
-                                    int width, int height, size_t size);
+  wpi::sig::Signal<> connected;
+  wpi::sig::Signal<> disconnected;
+  wpi::sig::Signal<> videoModesUpdated;
+  wpi::sig::Signal<const VideoMode&> videoModeChanged;
+
+  /**
+   * Signal that is called for each frame
+   */
+  wpi::sig::Signal_mt<Frame> newFrame;
+
+  /**
+   * Signal to record telemetry.  Parameters are the telemetry kind and the
+   * quantity to record.
+   */
+  wpi::sig::Signal<CS_TelemetryKind, int64_t> recordTelemetry;
 
  protected:
-  void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
                            const wpi::Twine& valueStr) override;
 
-  void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
-                wpi::StringRef data, Frame::Time time);
-  void PutFrame(std::unique_ptr<Image> image, Frame::Time time);
+  void PutFrame(Frame frame);
   void PutError(const wpi::Twine& msg, Frame::Time time);
 
   // Notification functions for corresponding atomics
@@ -164,37 +176,26 @@ class SourceImpl : public PropertyContainer {
   mutable VideoMode m_mode;
 
   wpi::Logger& m_logger;
-  Notifier& m_notifier;
-  Telemetry& m_telemetry;
+  FramePool& m_framePool;
 
  private:
-  void ReleaseImage(std::unique_ptr<Image> image);
-  std::unique_ptr<Frame::Impl> AllocFrameImpl();
-  void ReleaseFrameImpl(std::unique_ptr<Frame::Impl> data);
-
   std::string m_name;
   std::string m_description;
 
   std::atomic_int m_strategy{CS_CONNECTION_AUTO_MANAGE};
   std::atomic_int m_numSinksEnabled{0};
 
-  wpi::mutex m_frameMutex;
-  wpi::condition_variable m_frameCv;
+  // Although a source only has one selected video mode (i.e. it may only get
+  // one resolution, pixel format, and FPS from the camera at a time), the
+  // source may convert images into a different pixel format for consumption by
+  // a sink. An example scenario involves a source that outputs raw BGR data and
+  // has a sink that wants H264-encoded data; in this case the sink registers
+  // itself with the source and requests that data.
+  std::map<VideoMode::PixelFormat, int> m_outputPixelFormats;
 
-  bool m_destroyFrames{false};
+  std::atomic_bool m_isConnected{false};
 
-  // Pool of frames/images to reduce malloc traffic.
-  wpi::mutex m_poolMutex;
-  std::vector<std::unique_ptr<Frame::Impl>> m_framesAvail;
-  std::vector<std::unique_ptr<Image>> m_imagesAvail;
-
-  std::atomic_bool m_connected{false};
-
-  // Most recent frame (returned to callers of GetNextFrame)
-  // Access protected by m_frameMutex.
-  // MUST be located below m_poolMutex as the Frame destructor calls back
-  // into SourceImpl::ReleaseImage, which locks m_poolMutex.
-  Frame m_frame;
+  CompressionContext m_compressionCtx;
 };
 
 }  // namespace cs

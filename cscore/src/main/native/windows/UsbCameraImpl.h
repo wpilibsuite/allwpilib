@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -43,10 +43,9 @@ namespace cs {
 class UsbCameraImpl : public SourceImpl,
                       public std::enable_shared_from_this<UsbCameraImpl> {
  public:
-  UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-                Telemetry& telemetry, const wpi::Twine& path);
-  UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-                Telemetry& telemetry, int deviceId);
+  UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
+                const wpi::Twine& path);
+  UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger, int deviceId);
   ~UsbCameraImpl() override;
 
   void Start();

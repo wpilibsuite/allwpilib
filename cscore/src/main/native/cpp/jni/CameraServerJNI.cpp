@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -544,37 +544,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createHttpCameraMulti
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerCvJNI
- * Method:    createCvSource
- * Signature: (Ljava/lang/String;IIII)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerCvJNI_createCvSource
-  (JNIEnv* env, jclass, jstring name, jint pixelFormat, jint width, jint height,
-   jint fps)
-{
-  if (!name) {
-    nullPointerEx.Throw(env, "name cannot be null");
-    return 0;
-  }
-  CS_Status status = 0;
-  auto val = cs::CreateCvSource(
-      JStringRef{env, name}.str(),
-      cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(pixelFormat),
-                    static_cast<int>(width), static_cast<int>(height),
-                    static_cast<int>(fps)},
-      &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    createRawSource
+ * Method:    createImageSource
  * Signature: (Ljava/lang/String;IIII)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createRawSource
+Java_edu_wpi_cscore_CameraServerJNI_createImageSource
   (JNIEnv* env, jclass, jstring name, jint pixelFormat, jint width, jint height,
    jint fps)
 {
@@ -583,7 +558,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createRawSource
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateRawSource(
+  auto val = cs::CreateImageSource(
       JStringRef{env, name}.str(),
       cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(pixelFormat),
                     static_cast<int>(width), static_cast<int>(height),
@@ -1306,31 +1281,12 @@ Java_edu_wpi_cscore_CameraServerJNI_createMjpegServer
 }
 
 /*
- * Class:     edu_wpi_cscore_CameraServerCvJNI
- * Method:    createCvSink
- * Signature: (Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerCvJNI_createCvSink
-  (JNIEnv* env, jclass, jstring name)
-{
-  if (!name) {
-    nullPointerEx.Throw(env, "name cannot be null");
-    return 0;
-  }
-  CS_Status status = 0;
-  auto val = cs::CreateCvSink(JStringRef{env, name}.str(), &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    createRawSink
+ * Method:    createImageSink
  * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_cscore_CameraServerJNI_createRawSink
+Java_edu_wpi_cscore_CameraServerJNI_createImageSink
   (JNIEnv* env, jclass, jstring name)
 {
   if (!name) {
@@ -1338,7 +1294,7 @@ Java_edu_wpi_cscore_CameraServerJNI_createRawSink
     return 0;
   }
   CS_Status status = 0;
-  auto val = cs::CreateRawSink(JStringRef{env, name}.str(), &status);
+  auto val = cs::CreateImageSink(JStringRef{env, name}.str(), &status);
   CheckStatus(env, status);
   return val;
 }

@@ -75,6 +75,7 @@ ext {
                 }
             }
         }
+        nativeUtils.useRequiredLibrary(it, 'ffmpeg_static')
     }
 }
 

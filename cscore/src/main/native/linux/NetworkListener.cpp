@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,39 +21,36 @@
 #include <wpi/SafeThread.h>
 
 #include "Log.h"
-#include "Notifier.h"
 
 using namespace cs;
 
 class NetworkListener::Impl {
  public:
-  Impl(wpi::Logger& logger, Notifier& notifier)
-      : m_logger(logger), m_notifier(notifier) {}
+  explicit Impl(wpi::Logger& logger) : m_logger(logger) {}
 
   wpi::Logger& m_logger;
-  Notifier& m_notifier;
 
   class Thread : public wpi::SafeThread {
    public:
-    Thread(wpi::Logger& logger, Notifier& notifier)
-        : m_logger(logger), m_notifier(notifier) {}
+    Thread(wpi::Logger& logger, NetworkListener& listener)
+        : m_logger(logger), m_listener(listener) {}
     void Main();
 
     wpi::Logger& m_logger;
-    Notifier& m_notifier;
+    NetworkListener& m_listener;
     int m_command_fd = -1;
   };
 
   wpi::SafeThreadOwner<Thread> m_owner;
 };
 
-NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
-    : m_impl(std::make_unique<Impl>(logger, notifier)) {}
+NetworkListener::NetworkListener(wpi::Logger& logger)
+    : m_impl(std::make_unique<Impl>(logger)) {}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
 void NetworkListener::Start() {
-  m_impl->m_owner.Start(m_impl->m_logger, m_impl->m_notifier);
+  m_impl->m_owner.Start(m_impl->m_logger, *this);
 }
 
 void NetworkListener::Stop() {
@@ -138,7 +135,7 @@ void NetworkListener::Impl::Thread::Main() {
       if (nh->nlmsg_type == NLMSG_DONE) break;
       if (nh->nlmsg_type == RTM_NEWLINK || nh->nlmsg_type == RTM_DELLINK ||
           nh->nlmsg_type == RTM_NEWADDR || nh->nlmsg_type == RTM_DELADDR) {
-        m_notifier.NotifyNetworkInterfacesChanged();
+        m_listener.interfacesChanged();
       }
     }
   }

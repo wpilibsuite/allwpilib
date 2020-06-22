@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,20 +11,18 @@
 #include <wpi/TCPConnector.h>
 #include <wpi/timestamp.h>
 
+#include "FramePool.h"
 #include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
-#include "Notifier.h"
-#include "Telemetry.h"
 #include "c_util.h"
 
 using namespace cs;
 
 HttpCameraImpl::HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind,
-                               wpi::Logger& logger, Notifier& notifier,
-                               Telemetry& telemetry)
-    : SourceImpl{name, logger, notifier, telemetry}, m_kind{kind} {}
+                               wpi::Logger& logger)
+    : SourceImpl{name, logger}, m_kind{kind} {}
 
 HttpCameraImpl::~HttpCameraImpl() {
   m_active = false;
@@ -270,15 +268,16 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
       PutError("did not receive a JPEG image", wpi::Now());
       return false;
     }
-    PutFrame(VideoMode::PixelFormat::kMJPEG, width, height, imageBuf,
-             wpi::Now());
+    PutFrame(m_framePool.MakeFrame(VideoMode::PixelFormat::kMJPEG, width,
+                                   height, imageBuf, wpi::Now()));
     ++m_frameCount;
     return true;
   }
 
   // We know how big it is!  Just get a frame of the right size and read
   // the data directly into it.
-  auto image = AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0, contentLength);
+  auto image = m_framePool.AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0,
+                                      contentLength);
   is.read(image->data(), contentLength);
   if (!m_active || is.has_error()) return false;
   int width, height;
@@ -289,7 +288,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   }
   image->width = width;
   image->height = height;
-  PutFrame(std::move(image), wpi::Now());
+  PutFrame(m_framePool.MakeFrame(std::move(image), wpi::Now()));
   ++m_frameCount;
   return true;
 }
@@ -380,9 +379,7 @@ void HttpCameraImpl::CreateProperty(const wpi::Twine& name,
       name, httpParam, viaSettings, kind, minimum, maximum, step, defaultValue,
       value));
 
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name,
-                                  m_propertyData.size() + 1, kind, value,
-                                  wpi::Twine{});
+  propertyCreated(m_propertyData.size() + 1, *m_propertyData.back());
 }
 
 template <typename T>
@@ -398,12 +395,10 @@ void HttpCameraImpl::CreateEnumProperty(
   enumChoices.clear();
   for (const auto& choice : choices) enumChoices.emplace_back(choice);
 
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name,
-                                  m_propertyData.size() + 1, CS_PROP_ENUM,
-                                  value, wpi::Twine{});
-  m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-                                  name, m_propertyData.size() + 1, CS_PROP_ENUM,
-                                  value, wpi::Twine{});
+  int prop = m_propertyData.size() + 1;
+  auto& propImpl = *m_propertyData.back();
+  propertyCreated(prop, propImpl);
+  propertyChoicesUpdated(prop, propImpl);
 }
 
 std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
@@ -522,12 +517,10 @@ CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
   std::shared_ptr<HttpCameraImpl> source;
   switch (kind) {
     case CS_HTTP_AXIS:
-      source = std::make_shared<AxisCameraImpl>(name, inst.logger,
-                                                inst.notifier, inst.telemetry);
+      source = std::make_shared<AxisCameraImpl>(name, inst.GetLogger());
       break;
     default:
-      source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
-                                                inst.notifier, inst.telemetry);
+      source = std::make_shared<HttpCameraImpl>(name, kind, inst.GetLogger());
       break;
   }
   if (!source->SetUrls(url.str(), status)) return 0;
@@ -542,8 +535,7 @@ CS_Source CreateHttpCamera(const wpi::Twine& name,
     *status = CS_EMPTY_VALUE;
     return 0;
   }
-  auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
-                                                 inst.notifier, inst.telemetry);
+  auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.GetLogger());
   if (!source->SetUrls(urls, status)) return 0;
   return inst.CreateSource(CS_SOURCE_HTTP, source);
 }

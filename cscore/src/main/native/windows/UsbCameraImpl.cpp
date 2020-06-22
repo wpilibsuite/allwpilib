@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,13 +35,12 @@
 
 #include "COMCreators.h"
 #include "ComPtr.h"
+#include "FramePool.h"
 #include "Handle.h"
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
-#include "Notifier.h"
 #include "PropertyImpl.h"
-#include "Telemetry.h"
 #include "WindowsMessagePump.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
@@ -73,9 +72,8 @@ using namespace cs;
 namespace cs {
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, Telemetry& telemetry,
                              const wpi::Twine& path)
-    : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
+    : SourceImpl{name, logger}, m_path{path.str()} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
   m_deviceId = -1;
@@ -83,9 +81,8 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
 }
 
 UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                             Notifier& notifier, Telemetry& telemetry,
                              int deviceId)
-    : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {
+    : SourceImpl{name, logger}, m_deviceId(deviceId) {
   StartMessagePump();
 }
 
@@ -308,28 +305,28 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
   switch (mode.pixelFormat) {
     case cs::VideoMode::PixelFormat::kMJPEG: {
       // Special case
-      PutFrame(VideoMode::kMJPEG, mode.width, mode.height,
-               wpi::StringRef(reinterpret_cast<char*>(ptr), cursize),
-               wpi::Now());
+      PutFrame(m_framePool.MakeFrame(
+          VideoMode::kMJPEG, mode.width, mode.height,
+          wpi::StringRef(reinterpret_cast<char*>(ptr), cursize), wpi::Now()));
       doFinalSet = false;
       break;
     }
     case cs::VideoMode::PixelFormat::kGray:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC1, ptr, pitch);
-      dest = AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
-                        tmpMat.total());
+      dest = m_framePool.AllocImage(VideoMode::kGray, tmpMat.cols, tmpMat.rows,
+                                    tmpMat.total());
       tmpMat.copyTo(dest->AsMat());
       break;
     case cs::VideoMode::PixelFormat::kBGR:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC3, ptr, pitch);
-      dest = AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
-                        tmpMat.total() * 3);
+      dest = m_framePool.AllocImage(VideoMode::kBGR, tmpMat.cols, tmpMat.rows,
+                                    tmpMat.total() * 3);
       tmpMat.copyTo(dest->AsMat());
       break;
     case cs::VideoMode::PixelFormat::kYUYV:
       tmpMat = cv::Mat(mode.height, mode.width, CV_8UC2, ptr, pitch);
-      dest = AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
-                        tmpMat.total() * 2);
+      dest = m_framePool.AllocImage(VideoMode::kYUYV, tmpMat.cols, tmpMat.rows,
+                                    tmpMat.total() * 2);
       tmpMat.copyTo(dest->AsMat());
       break;
     default:
@@ -338,7 +335,7 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
   }
 
   if (doFinalSet) {
-    PutFrame(std::move(dest), wpi::Now());
+    PutFrame(m_framePool.MakeFrame(std::move(dest), wpi::Now()));
   }
 
   if (lock2d)
@@ -681,8 +678,8 @@ void UsbCameraImpl::DeviceCacheProperty(
     rawPropPtr->propPair = *perIndex;
   }
 
-  NotifyPropertyCreated(*rawIndex, *rawPropPtr);
-  if (perPropPtr && perIndex) NotifyPropertyCreated(*perIndex, *perPropPtr);
+  propertyCreated(*rawIndex, *rawPropPtr);
+  if (perPropPtr && perIndex) propertyCreated(*perIndex, *perPropPtr);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
@@ -826,7 +823,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
       DeviceDisconnect();
       DeviceConnect();
     }
-    m_notifier.NotifySourceVideoMode(*this, newMode);
+    videoModeChanged(newMode);
     lock.lock();
   }
 
@@ -886,7 +883,7 @@ void UsbCameraImpl::DeviceCacheMode() {
 
   DeviceSetMode();
 
-  m_notifier.NotifySourceVideoMode(*this, m_mode);
+  videoModeChanged(m_mode);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceSetMode() {
@@ -963,7 +960,7 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
   }
-  m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
+  videoModesUpdated();
 }
 
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
@@ -1039,16 +1036,14 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
     return CreateUsbCameraPath(name, devices[dev].path, status);
   }
   auto& inst = Instance::GetInstance();
-  auto source = std::make_shared<UsbCameraImpl>(
-      name, inst.logger, inst.notifier, inst.telemetry, dev);
+  auto source = std::make_shared<UsbCameraImpl>(name, inst.GetLogger(), dev);
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
 CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  auto source = std::make_shared<UsbCameraImpl>(
-      name, inst.logger, inst.notifier, inst.telemetry, path);
+  auto source = std::make_shared<UsbCameraImpl>(name, inst.GetLogger(), path);
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 

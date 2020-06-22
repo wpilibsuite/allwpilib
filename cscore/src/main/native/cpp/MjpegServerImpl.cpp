@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,6 +8,7 @@
 #include "MjpegServerImpl.h"
 
 #include <chrono>
+#include <tuple>
 
 #include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
@@ -19,7 +20,6 @@
 #include "Instance.h"
 #include "JpegUtil.h"
 #include "Log.h"
-#include "Notifier.h"
 #include "SourceImpl.h"
 #include "c_util.h"
 #include "cscore_cpp.h"
@@ -88,8 +88,10 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   void SendStream(wpi::raw_socket_ostream& os);
   void ProcessRequest();
 
+  // must be called with m_mutex held
+  void SetSource(std::shared_ptr<SourceImpl> source);
+
   std::unique_ptr<wpi::NetworkStream> m_stream;
-  std::shared_ptr<SourceImpl> m_source;
   bool m_streaming = false;
   bool m_noStreaming = false;
   int m_width = 0;
@@ -101,6 +103,9 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  private:
   std::string m_name;
   wpi::Logger& m_logger;
+  std::shared_ptr<SourceImpl> m_source;
+  Frame m_frame;
+  wpi::sig::ScopedConnection m_onNewFrame;
 
   wpi::StringRef GetName() { return m_name; }
 
@@ -563,10 +568,9 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
 }
 
 MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
-                                 Notifier& notifier, Telemetry& telemetry,
                                  const wpi::Twine& listenAddress, int port,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
-    : SinkImpl{name, logger, notifier, telemetry},
+    : SinkImpl{name, logger},
       m_listenAddress(listenAddress.str()),
       m_port(port),
       m_acceptor{std::move(acceptor)} {
@@ -578,21 +582,22 @@ MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
   SetDescription(desc.str());
 
   // Create properties
-  m_widthProp = CreateProperty("width", [] {
+  std::tie(m_widthProp, std::ignore) = CreateProperty("width", [] {
     return std::make_unique<PropertyImpl>("width", CS_PROP_INTEGER, 1, 0, 0);
   });
-  m_heightProp = CreateProperty("height", [] {
+  std::tie(m_heightProp, std::ignore) = CreateProperty("height", [] {
     return std::make_unique<PropertyImpl>("height", CS_PROP_INTEGER, 1, 0, 0);
   });
-  m_compressionProp = CreateProperty("compression", [] {
+  std::tie(m_compressionProp, std::ignore) = CreateProperty("compression", [] {
     return std::make_unique<PropertyImpl>("compression", CS_PROP_INTEGER, -1,
                                           100, 1, -1, -1);
   });
-  m_defaultCompressionProp = CreateProperty("default_compression", [] {
-    return std::make_unique<PropertyImpl>("default_compression",
-                                          CS_PROP_INTEGER, 0, 100, 1, 80, 80);
-  });
-  m_fpsProp = CreateProperty("fps", [] {
+  std::tie(m_defaultCompressionProp, std::ignore) =
+      CreateProperty("default_compression", [] {
+        return std::make_unique<PropertyImpl>(
+            "default_compression", CS_PROP_INTEGER, 0, 100, 1, 80, 80);
+      });
+  std::tie(m_fpsProp, std::ignore) = CreateProperty("fps", [] {
     return std::make_unique<PropertyImpl>("fps", CS_PROP_INTEGER, 1, 0, 0);
   });
 
@@ -617,9 +622,6 @@ void MjpegServerImpl::Stop() {
     }
     connThread.Stop();
   }
-
-  // wake up connection threads by forcing an empty frame to be sent
-  if (auto source = GetSource()) source->Wakeup();
 }
 
 // Send HTTP response and a stream of JPG-frames
@@ -640,6 +642,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
   SDEBUG("Headers send, sending stream now");
 
+  Frame::Time lastSourceTime = 0;
   Frame::Time lastFrameTime = 0;
   Frame::Time timePerFrame = 0;
   if (m_fps != 0) timePerFrame = 1000000.0 / m_fps;
@@ -649,15 +652,24 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
   StartStream();
   while (m_active && !os.has_error()) {
-    auto source = GetSource();
-    if (!source) {
+    if (!m_source) {
       // Source disconnected; sleep so we don't consume all processor time.
       os << "\r\n";  // Keep connection alive
       std::this_thread::sleep_for(std::chrono::milliseconds(200));
       continue;
     }
     SDEBUG4("waiting for frame");
-    Frame frame = source->GetNextFrame(0.225);  // blocks
+    Frame frame;
+    {
+      std::unique_lock lock{m_mutex};
+      // block until frame available or timeout
+      if (m_cond.wait_for(lock, std::chrono::milliseconds(225), [&] {
+            return !m_active || m_frame.GetTime() != lastSourceTime;
+          })) {
+        frame = m_frame;
+        lastSourceTime = frame.GetTime();
+      }
+    }
     if (!m_active) break;
     if (!frame) {
       // Bad frame; sleep for 20 ms so we don't consume all processor time.
@@ -690,7 +702,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
     int width = m_width != 0 ? m_width : frame.GetOriginalWidth();
     int height = m_height != 0 ? m_height : frame.GetOriginalHeight();
-    Image* image = frame.GetImageMJPEG(
+    Image* image = frame.GetImage(
         width, height, m_compression,
         m_compression == -1 ? m_defaultCompression : m_compression);
     if (!image) {
@@ -863,6 +875,23 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   SDEBUG("leaving HTTP client thread");
 }
 
+void MjpegServerImpl::ConnThread::SetSource(
+    std::shared_ptr<SourceImpl> source) {
+  if (m_source == source) return;
+  bool streaming = m_streaming;
+  if (m_source && streaming) m_source->DisableSink();
+  m_source = source;
+  if (source && streaming) m_source->EnableSink();
+
+  m_onNewFrame = source->newFrame.connect_connection([this](Frame frame) {
+    {
+      std::lock_guard lock(m_mutex);
+      m_frame = std::move(frame);
+    }
+    m_cond.notify_all();
+  });
+}
+
 // worker thread for clients that connected to this server
 void MjpegServerImpl::ConnThread::Main() {
   std::unique_lock lock(m_mutex);
@@ -923,7 +952,7 @@ void MjpegServerImpl::ServerThreadMain() {
     // Hand off connection to it
     auto thr = it->GetThread();
     thr->m_stream = std::move(stream);
-    thr->m_source = source;
+    thr->SetSource(source);
     thr->m_noStreaming = nstreams >= 10;
     thr->m_width = GetProperty(m_widthProp)->value;
     thr->m_height = GetProperty(m_heightProp)->value;
@@ -939,14 +968,7 @@ void MjpegServerImpl::ServerThreadMain() {
 void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
   std::scoped_lock lock(m_mutex);
   for (auto& connThread : m_connThreads) {
-    if (auto thr = connThread.GetThread()) {
-      if (thr->m_source != source) {
-        bool streaming = thr->m_streaming;
-        if (thr->m_source && streaming) thr->m_source->DisableSink();
-        thr->m_source = source;
-        if (source && streaming) thr->m_source->EnableSink();
-      }
-    }
+    if (auto thr = connThread.GetThread()) thr->SetSource(source);
   }
 }
 
@@ -957,14 +979,15 @@ CS_Sink CreateMjpegServer(const wpi::Twine& name,
                           CS_Status* status) {
   auto& inst = Instance::GetInstance();
   wpi::SmallString<128> listenAddressBuf;
+  wpi::Logger& logger = inst.GetLogger();
   return inst.CreateSink(
       CS_SINK_MJPEG,
       std::make_shared<MjpegServerImpl>(
-          name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
+          name, logger, listenAddress, port,
           std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
               port,
               listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
-              inst.logger))));
+              logger))));
 }
 
 std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {

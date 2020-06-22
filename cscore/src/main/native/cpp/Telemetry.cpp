@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,8 +14,6 @@
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
-#include "Instance.h"
-#include "Notifier.h"
 #include "SourceImpl.h"
 #include "cscore_cpp.h"
 
@@ -23,11 +21,11 @@ using namespace cs;
 
 class Telemetry::Thread : public wpi::SafeThread {
  public:
-  explicit Thread(Notifier& notifier) : m_notifier(notifier) {}
+  explicit Thread(Telemetry& telemetry) : m_telemetry(telemetry) {}
 
   void Main();
 
-  Notifier& m_notifier;
+  Telemetry& m_telemetry;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_current;
   double m_period = 0.0;
@@ -48,7 +46,7 @@ int64_t Telemetry::Thread::GetValue(CS_Handle handle, CS_TelemetryKind kind,
 
 Telemetry::~Telemetry() {}
 
-void Telemetry::Start() { m_owner.Start(m_notifier); }
+void Telemetry::Start() { m_owner.Start(*this); }
 
 void Telemetry::Stop() { m_owner.Stop(); }
 
@@ -77,7 +75,7 @@ void Telemetry::Thread::Main() {
     prevTime = curTime;
 
     // notify
-    m_notifier.NotifyTelemetryUpdated();
+    m_telemetry.telemetryUpdated();
   }
 }
 
@@ -117,20 +115,9 @@ double Telemetry::GetAverageValue(CS_Handle handle, CS_TelemetryKind kind,
   return thr->GetValue(handle, kind, status) / thr->m_elapsed;
 }
 
-void Telemetry::RecordSourceBytes(const SourceImpl& source, int quantity) {
+void Telemetry::Record(CS_Handle handle, CS_TelemetryKind kind,
+                       int64_t quantity) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  auto handleData = Instance::GetInstance().FindSource(source);
-  thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
-                                static_cast<int>(CS_SOURCE_BYTES_RECEIVED))] +=
-      quantity;
-}
-
-void Telemetry::RecordSourceFrames(const SourceImpl& source, int quantity) {
-  auto thr = m_owner.GetThread();
-  if (!thr) return;
-  auto handleData = Instance::GetInstance().FindSource(source);
-  thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
-                                static_cast<int>(CS_SOURCE_FRAMES_RECEIVED))] +=
-      quantity;
+  thr->m_current[std::make_pair(handle, static_cast<int>(kind))] += quantity;
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,7 +24,7 @@ public class RawSource extends ImageSource {
    * @param mode Video mode being generated
    */
   public RawSource(String name, VideoMode mode) {
-    super(CameraServerJNI.createRawSource(name,
+    super(CameraServerJNI.createImageSource(name,
         mode.pixelFormat.getValue(),
         mode.width, mode.height,
         mode.fps));

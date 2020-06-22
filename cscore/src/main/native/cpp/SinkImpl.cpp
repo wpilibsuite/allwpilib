@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,18 +9,13 @@
 
 #include <wpi/json.h>
 
-#include "Instance.h"
-#include "Notifier.h"
+#include "Log.h"
 #include "SourceImpl.h"
 
 using namespace cs;
 
-SinkImpl::SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
-                   Notifier& notifier, Telemetry& telemetry)
-    : m_logger(logger),
-      m_notifier(notifier),
-      m_telemetry(telemetry),
-      m_name{name.str()} {}
+SinkImpl::SinkImpl(const wpi::Twine& name, wpi::Logger& logger)
+    : m_logger(logger), m_name{name.str()} {}
 
 SinkImpl::~SinkImpl() {
   if (m_source) {
@@ -45,7 +40,7 @@ void SinkImpl::Enable() {
   ++m_enabledCount;
   if (m_enabledCount == 1) {
     if (m_source) m_source->EnableSink();
-    m_notifier.NotifySink(*this, CS_SINK_ENABLED);
+    enabled();
   }
 }
 
@@ -54,20 +49,20 @@ void SinkImpl::Disable() {
   --m_enabledCount;
   if (m_enabledCount == 0) {
     if (m_source) m_source->DisableSink();
-    m_notifier.NotifySink(*this, CS_SINK_DISABLED);
+    disabled();
   }
 }
 
-void SinkImpl::SetEnabled(bool enabled) {
+void SinkImpl::SetEnabled(bool enable) {
   std::scoped_lock lock(m_mutex);
-  if (enabled && m_enabledCount == 0) {
+  if (enable && m_enabledCount == 0) {
     if (m_source) m_source->EnableSink();
     m_enabledCount = 1;
-    m_notifier.NotifySink(*this, CS_SINK_ENABLED);
-  } else if (!enabled && m_enabledCount > 0) {
+    enabled();
+  } else if (!enable && m_enabledCount > 0) {
     if (m_source) m_source->DisableSink();
     m_enabledCount = 0;
-    m_notifier.NotifySink(*this, CS_SINK_DISABLED);
+    disabled();
   }
 }
 
@@ -81,11 +76,15 @@ void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
     }
     m_source = source;
     if (m_source) {
+      m_hasSource = true;
       m_source->AddSink();
       if (m_enabledCount > 0) m_source->EnableSink();
+    } else {
+      m_hasSource = false;
     }
   }
   SetSourceImpl(source);
+  sourceChanged(source.get());
 }
 
 std::string SinkImpl::GetError() const {
@@ -141,17 +140,6 @@ wpi::json SinkImpl::GetConfigJsonObject(CS_Status* status) {
   return j;
 }
 
-void SinkImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
-  m_notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CREATED, prop.name,
-                                propIndex, prop.propKind, prop.value,
-                                prop.valueStr);
-  // also notify choices updated event for enum types
-  if (prop.propKind == CS_PROP_ENUM)
-    m_notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CHOICES_UPDATED,
-                                  prop.name, propIndex, prop.propKind,
-                                  prop.value, wpi::Twine{});
-}
-
 void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
                                    const wpi::Twine& valueStr) {
   auto prop = GetProperty(property);
@@ -163,11 +151,7 @@ void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
     prop->SetValue(value);
 
   // Only notify updates after we've notified created
-  if (m_properties_cached) {
-    m_notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_VALUE_UPDATED,
-                                  prop->name, property, prop->propKind,
-                                  prop->value, prop->valueStr);
-  }
+  if (m_properties_cached) propertyValueUpdated(property, *prop);
 }
 
 void SinkImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {}

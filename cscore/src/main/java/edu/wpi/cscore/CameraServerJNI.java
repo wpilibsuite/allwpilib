@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -79,7 +79,11 @@ public class CameraServerJNI {
   public static native int createUsbCameraPath(String name, String path);
   public static native int createHttpCamera(String name, String url, int kind);
   public static native int createHttpCameraMulti(String name, String[] urls, int kind);
-  public static native int createRawSource(String name, int pixelFormat, int width, int height, int fps);
+  public static native int createImageSource(String name, int pixelFormat, int width, int height, int fps);
+  @Deprecated
+  public static int createRawSource(String name, int pixelFormat, int width, int height, int fps) {
+    return createImageSource(name, pixelFormat, width, height, fps);
+  }
 
   //
   // Source Functions
@@ -149,7 +153,11 @@ public class CameraServerJNI {
   //
   public static native int createMjpegServer(String name, String listenAddress, int port);
 
-  public static native int createRawSink(String name);
+  public static native int createImageSink(String name);
+  @Deprecated
+  public static int createRawSink(String name) {
+    return createImageSink(name);
+  }
 
   //
   // Sink Functions

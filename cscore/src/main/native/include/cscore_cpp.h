@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,6 +18,7 @@
 #include <wpi/SmallVector.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
+#include <wpi/deprecated.h>
 
 #include "cscore_c.h"
 
@@ -72,7 +73,8 @@ struct VideoMode : public CS_VideoMode {
     kYUYV = CS_PIXFMT_YUYV,
     kRGB565 = CS_PIXFMT_RGB565,
     kBGR = CS_PIXFMT_BGR,
-    kGray = CS_PIXFMT_GRAY
+    kGray = CS_PIXFMT_GRAY,
+    kH264 = CS_PIXFMT_H264
   };
   VideoMode() {
     pixelFormat = 0;
@@ -205,6 +207,9 @@ CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
 CS_Source CreateHttpCamera(const wpi::Twine& name,
                            wpi::ArrayRef<std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status);
+CS_Source CreateImageSource(const wpi::Twine& name, const VideoMode& mode,
+                            CS_Status* status);
+WPI_DEPRECATED("use CreateImageSource")
 CS_Source CreateCvSource(const wpi::Twine& name, const VideoMode& mode,
                          CS_Status* status);
 /** @} */
@@ -289,7 +294,7 @@ std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_opencv_source_func OpenCV Source Functions
+ * @defgroup cscore_image_source_func Image Source Functions
  * @{
  */
 void NotifySourceError(CS_Source source, const wpi::Twine& msg,
@@ -313,11 +318,9 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 CS_Sink CreateMjpegServer(const wpi::Twine& name,
                           const wpi::Twine& listenAddress, int port,
                           CS_Status* status);
+CS_Sink CreateImageSink(const wpi::Twine& name, CS_Status* status);
+WPI_DEPRECATED("use CreateImageSink")
 CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status);
-CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
-                             std::function<void(uint64_t time)> processFrame,
-                             CS_Status* status);
-
 /** @} */
 
 /**
@@ -357,7 +360,7 @@ int GetMjpegServerPort(CS_Sink sink, CS_Status* status);
 /** @} */
 
 /**
- * @defgroup cscore_opencv_sink_func OpenCV Sink Functions
+ * @defgroup cscore_image_sink_func Image Sink Functions
  * @{
  */
 void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,

@@ -14,6 +14,21 @@ nativeUtils {
       imguiVersion = "1.72b-3"
     }
   }
+  dependencyConfigs {
+    ffmpeg {
+      groupId = "edu.wpi.first.thirdparty.frc2020"
+      artifactId = "ffmpeg-cpp"
+      headerClassifier = "headers"
+      sourceClassifier = "sources"
+      ext = "zip"
+      version = "1.0-1"
+      // If the shared dependencies are used at runtime, or just linking
+      // Defaults to true
+      sharedUsedAtRuntime = true
+      sharedPlatforms << "linuxx86-64"
+      staticPlatforms << "linuxx86-64"
+    }
+  }
 }
 
 nativeUtils.wpi.addWarnings()

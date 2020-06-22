@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,9 +15,6 @@
 #include "cscore_cpp.h"
 
 namespace cs {
-
-class SinkImpl;
-class SourceImpl;
 
 class Notifier {
   friend class NotifierTest;
@@ -38,25 +35,8 @@ class Notifier {
                   int eventMask);
   void RemoveListener(int uid);
 
-  // Notification events
-  void NotifySource(const wpi::Twine& name, CS_Source source,
-                    CS_EventKind kind);
-  void NotifySource(const SourceImpl& source, CS_EventKind kind);
-  void NotifySourceVideoMode(const SourceImpl& source, const VideoMode& mode);
-  void NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                            const wpi::Twine& propertyName, int property,
-                            CS_PropertyKind propertyKind, int value,
-                            const wpi::Twine& valueStr);
-  void NotifySink(const wpi::Twine& name, CS_Sink sink, CS_EventKind kind);
-  void NotifySink(const SinkImpl& sink, CS_EventKind kind);
-  void NotifySinkSourceChanged(const wpi::Twine& name, CS_Sink sink,
-                               CS_Source source);
-  void NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
-                          const wpi::Twine& propertyName, int property,
-                          CS_PropertyKind propertyKind, int value,
-                          const wpi::Twine& valueStr);
-  void NotifyNetworkInterfacesChanged();
-  void NotifyTelemetryUpdated();
+  void Notify(RawEvent&& event);
+  void Notify(RawEvent::Kind eventKind) { Notify(RawEvent{eventKind}); }
 
  private:
   class Thread;

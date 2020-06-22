@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -151,7 +151,7 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
   if (!quiet && retval < 0) {
     wpi::SmallString<64> localfile{file};
     localfile.push_back('\0');
-    WPI_ERROR(Instance::GetInstance().logger,
+    WPI_ERROR(Instance::GetInstance().GetLogger(),
               "ioctl " << name << " failed at " << basename(localfile.data())
                        << ":" << line << ": " << std::strerror(errno));
   }

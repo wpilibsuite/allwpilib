@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,20 +19,12 @@
 
 #include <netioapi.h>  // NOLINT(build/include_order)
 
-#include "Instance.h"
-#include "Log.h"
-#include "Notifier.h"
-
 #pragma comment(lib, "Iphlpapi.lib")
 
 using namespace cs;
 
 class NetworkListener::Impl {
  public:
-  Impl(wpi::Logger& logger, Notifier& notifier)
-      : m_logger(logger), m_notifier(notifier) {}
-  wpi::Logger& m_logger;
-  Notifier& m_notifier;
   HANDLE eventHandle = 0;
 };
 
@@ -40,17 +32,17 @@ class NetworkListener::Impl {
 static void WINAPI OnInterfaceChange(PVOID callerContext,
                                      PMIB_IPINTERFACE_ROW row,
                                      MIB_NOTIFICATION_TYPE notificationType) {
-  Notifier* notifier = reinterpret_cast<Notifier*>(callerContext);
-  notifier->NotifyNetworkInterfacesChanged();
+  NetworkListener* listener = reinterpret_cast<NetworkListener*>(callerContext);
+  listener->interfacesChanged();
 }
 
-NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
-    : m_impl(std::make_unique<Impl>(logger, notifier)) {}
+NetworkListener::NetworkListener(wpi::Logger& logger)
+    : m_impl(std::make_unique<Impl>()) {}
 
 NetworkListener::~NetworkListener() { Stop(); }
 
 void NetworkListener::Start() {
-  NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, &m_impl->m_notifier, true,
+  NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, this, true,
                           &m_impl->eventHandle);
 }
 
