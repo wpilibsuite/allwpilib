@@ -1,7 +1,0 @@
-description = "A simulation shared object that simply prints robot behaviors"
-
-ext {
-    pluginName = 'halsim_print'
-}
-
-apply from: "${rootDir}/shared/plugins/setupBuild.gradle"

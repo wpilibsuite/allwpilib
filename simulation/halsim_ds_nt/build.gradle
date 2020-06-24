@@ -1,9 +1,0 @@
-description = "A simulation shared object that uses NetworkTables to act as a stand-in for the FRC Driver Station"
-
-ext {
-    includeNtCore = true
-    includeWpiutil = true
-    pluginName = 'halsim_ds_nt'
-}
-
-apply from: "${rootDir}/shared/plugins/setupBuild.gradle"

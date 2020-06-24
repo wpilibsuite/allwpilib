@@ -24,6 +24,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -83,6 +85,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final Map<Command, Boolean> m_toSchedule = new LinkedHashMap<>();
   private final List<Command> m_toCancel = new ArrayList<>();
 
+  private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> { });
 
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
@@ -94,6 +97,16 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     LiveWindow.setDisabledListener(() -> {
       enable();
     });
+  }
+
+  /**
+   * Changes the period of the loop overrun watchdog.  This should be be kept in sync with the
+   * TimedRobot period.
+   *
+   * @param period Period in seconds.
+   */
+  public void setPeriod(double period) {
+    m_watchdog.setTimeout(period);
   }
 
   @Override
@@ -127,15 +140,17 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @param requirements  The command requirements
    */
   private void initCommand(Command command, boolean interruptible, Set<Subsystem> requirements) {
-    command.initialize();
     CommandState scheduledCommand = new CommandState(interruptible);
     m_scheduledCommands.put(command, scheduledCommand);
-    for (Consumer<Command> action : m_initActions) {
-      action.accept(command);
-    }
+    command.initialize();
     for (Subsystem requirement : requirements) {
       m_requirements.put(requirement, command);
     }
+    for (Consumer<Command> action : m_initActions) {
+      action.accept(command);
+    }
+
+    m_watchdog.addEpoch(command.getName() + ".initialize()");
   }
 
   /**
@@ -233,16 +248,19 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     if (m_disabled) {
       return;
     }
+    m_watchdog.reset();
 
     //Run the periodic method of all registered subsystems.
     for (Subsystem subsystem : m_subsystems.keySet()) {
       subsystem.periodic();
+      m_watchdog.addEpoch(subsystem.getClass().getSimpleName() + ".periodic()");
     }
 
     //Poll buttons for new commands to add.
     for (Runnable button : m_buttons) {
       button.run();
     }
+    m_watchdog.addEpoch("buttons.run()");
 
     m_inRunLoop = true;
     //Run scheduled commands, remove finished commands.
@@ -257,6 +275,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         }
         m_requirements.keySet().removeAll(command.getRequirements());
         iterator.remove();
+        m_watchdog.addEpoch(command.getName() + ".end(true)");
         continue;
       }
 
@@ -264,6 +283,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       for (Consumer<Command> action : m_executeActions) {
         action.accept(command);
       }
+      m_watchdog.addEpoch(command.getName() + ".execute()");
       if (command.isFinished()) {
         command.end(false);
         for (Consumer<Command> action : m_finishActions) {
@@ -272,6 +292,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
         iterator.remove();
 
         m_requirements.keySet().removeAll(command.getRequirements());
+        m_watchdog.addEpoch(command.getName() + ".end(false)");
       }
     }
     m_inRunLoop = false;
@@ -294,6 +315,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
           && subsystemCommand.getValue() != null) {
         schedule(subsystemCommand.getValue());
       }
+    }
+
+    m_watchdog.disable();
+    if (m_watchdog.isExpired()) {
+      System.out.println("CommandScheduler loop overrun");
+      m_watchdog.printEpochs();
     }
   }
 
@@ -355,9 +382,11 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Cancels commands.  The scheduler will only call the interrupted method of a canceled command,
-   * not the end method (though the interrupted method may itself call the end method).  Commands
-   * will be canceled even if they are not scheduled as interruptible.
+   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
+   * of the canceled command with {@code true},
+   * indicating they were canceled (as opposed to finishing normally).
+   *
+   * <p>Commands will be canceled even if they are not scheduled as interruptible.
    *
    * @param commands the commands to cancel
    */
@@ -378,6 +407,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       }
       m_scheduledCommands.remove(command);
       m_requirements.keySet().removeAll(command.getRequirements());
+      m_watchdog.addEpoch(command.getName() + ".end(true)");
     }
   }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,7 @@
 
 namespace halsim {
 
-typedef struct {
+struct DSCommJoystickPacket {
   HAL_JoystickAxes axes;
   HAL_JoystickButtons buttons;
   HAL_JoystickPOVs povs;
@@ -26,6 +26,6 @@ typedef struct {
   }
 
   void ResetTcp() { std::memset(&descriptor, 0, sizeof(descriptor)); }
-} DSCommJoystickPacket;
+};
 
 }  // namespace halsim

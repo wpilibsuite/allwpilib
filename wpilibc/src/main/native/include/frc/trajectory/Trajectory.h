@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,13 +19,6 @@ class json;
 }  // namespace wpi
 
 namespace frc {
-
-/**
- * Define a unit for curvature.
- */
-using curvature_t = units::unit_t<
-    units::compound_unit<units::radian, units::inverse<units::meter>>>;
-
 /**
  * Represents a time-parameterized trajectory. The trajectory contains of
  * various States that represent the pose, curvature, time elapsed, velocity,
@@ -50,7 +43,7 @@ class Trajectory {
     Pose2d pose;
 
     // The curvature at that point of the trajectory.
-    curvature_t curvature{0.0};
+    units::curvature_t curvature{0.0};
 
     /**
      * Checks equality between this State and another object.
@@ -134,9 +127,25 @@ class Trajectory {
    */
   Pose2d InitialPose() const { return Sample(0_s).pose; }
 
+  /**
+   * Checks equality between this Trajectory and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are equal.
+   */
+  bool operator==(const Trajectory& other) const;
+
+  /**
+   * Checks inequality between this Trajectory and another object.
+   *
+   * @param other The other object.
+   * @return Whether the two objects are inequal.
+   */
+  bool operator!=(const Trajectory& other) const;
+
  private:
   std::vector<State> m_states;
-  units::second_t m_totalTime;
+  units::second_t m_totalTime = 0_s;
 
   /**
    * Linearly interpolates between two values.

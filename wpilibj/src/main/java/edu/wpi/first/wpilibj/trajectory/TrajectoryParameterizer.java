@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -69,8 +69,7 @@ public final class TrajectoryParameterizer {
    * @return The trajectory.
    */
   @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.CyclomaticComplexity",
-      "PMD.NPathComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-      "PMD.AvoidThrowingRawExceptionTypes"})
+      "PMD.NPathComplexity", "PMD.AvoidInstantiatingObjectsInLoops"})
   public static Trajectory timeParameterizeTrajectory(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,
@@ -236,7 +235,8 @@ public final class TrajectoryParameterizer {
           // delta_x = v * t
           dt = ds / velocityMetersPerSecond;
         } else {
-          throw new RuntimeException("Something went wrong");
+          throw new TrajectoryGenerationException("Something went wrong at iteration " + i
+              + " of time parameterization.");
         }
       }
 
@@ -265,6 +265,14 @@ public final class TrajectoryParameterizer {
       final var minMaxAccel = constraint.getMinMaxAccelerationMetersPerSecondSq(
           state.pose.poseMeters, state.pose.curvatureRadPerMeter,
           state.maxVelocityMetersPerSecond * factor);
+
+      if (minMaxAccel.minAccelerationMetersPerSecondSq
+          > minMaxAccel.maxAccelerationMetersPerSecondSq) {
+        throw new TrajectoryGenerationException("The constraint's min acceleration "
+            + "was greater than its max acceleration.\n Offending Constraint: "
+            + constraint.getClass().getName()
+            + "\n If the offending constraint was packaged with WPILib, please file a bug report.");
+      }
 
       state.minAccelerationMetersPerSecondSq = Math.max(state.minAccelerationMetersPerSecondSq,
           reverse ? -minMaxAccel.maxAccelerationMetersPerSecondSq
@@ -298,6 +306,12 @@ public final class TrajectoryParameterizer {
 
     ConstrainedState() {
       pose = new PoseWithCurvature();
+    }
+  }
+
+  public static class TrajectoryGenerationException extends RuntimeException {
+    public TrajectoryGenerationException(String message) {
+      super(message);
     }
   }
 }

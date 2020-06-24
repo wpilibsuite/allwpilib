@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -149,5 +149,13 @@ void frc::from_json(const wpi::json& json, Trajectory::State& state) {
       units::meters_per_second_t{json.at("velocity").get<double>()};
   state.acceleration =
       units::meters_per_second_squared_t{json.at("acceleration").get<double>()};
-  state.curvature = frc::curvature_t{json.at("curvature").get<double>()};
+  state.curvature = units::curvature_t{json.at("curvature").get<double>()};
+}
+
+bool Trajectory::operator==(const Trajectory& other) const {
+  return m_states == other.States();
+}
+
+bool Trajectory::operator!=(const Trajectory& other) const {
+  return !operator==(other);
 }

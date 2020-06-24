@@ -60,13 +60,13 @@ class Drivetrain {
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  frc::PWMVictorSPX m_leftMaster{1};
+  frc::PWMVictorSPX m_leftLeader{1};
   frc::PWMVictorSPX m_leftFollower{2};
-  frc::PWMVictorSPX m_rightMaster{3};
+  frc::PWMVictorSPX m_rightLeader{3};
   frc::PWMVictorSPX m_rightFollower{4};
 
-  frc::SpeedControllerGroup m_leftGroup{m_leftMaster, m_leftFollower};
-  frc::SpeedControllerGroup m_rightGroup{m_rightMaster, m_rightFollower};
+  frc::SpeedControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
+  frc::SpeedControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
 
   frc::Encoder m_leftEncoder{0, 1};
   frc::Encoder m_rightEncoder{2, 3};

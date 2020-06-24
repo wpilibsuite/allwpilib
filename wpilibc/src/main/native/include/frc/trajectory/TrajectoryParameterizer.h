@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -44,7 +44,7 @@ namespace frc {
  */
 class TrajectoryParameterizer {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 
   /**
    * Parameterize the trajectory by time. This is where the velocity profile is
@@ -82,7 +82,7 @@ class TrajectoryParameterizer {
    * the trajectory, max velocity, min acceleration and max acceleration.
    */
   struct ConstrainedState {
-    PoseWithCurvature pose = {Pose2d(), curvature_t(0.0)};
+    PoseWithCurvature pose = {Pose2d(), units::curvature_t(0.0)};
     units::meter_t distance = 0_m;
     units::meters_per_second_t maxVelocity = 0_mps;
     units::meters_per_second_squared_t minAcceleration = 0_mps_sq;
