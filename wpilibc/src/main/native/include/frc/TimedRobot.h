@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hal/Types.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/deprecated.h>
 
 #include "frc/ErrorBase.h"

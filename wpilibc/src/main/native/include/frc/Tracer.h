@@ -10,7 +10,6 @@
 #include <chrono>
 
 #include <hal/cpp/fpga_clock.h>
-#include <units/units.h>
 #include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
 

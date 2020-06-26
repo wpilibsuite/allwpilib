@@ -7,6 +7,8 @@
 
 #include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
 
+#include <units/math.h>
+
 using namespace frc;
 
 CentripetalAccelerationConstraint::CentripetalAccelerationConstraint(

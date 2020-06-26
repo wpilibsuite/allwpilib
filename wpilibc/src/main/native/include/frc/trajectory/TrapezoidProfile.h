@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hal/FRCUsageReporting.h>
-#include <units/units.h>
+#include <units/time.h>
 
 namespace frc {
 

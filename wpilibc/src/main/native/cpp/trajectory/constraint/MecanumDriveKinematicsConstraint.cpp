@@ -7,6 +7,8 @@
 
 #include "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
 
+#include <units/math.h>
+
 using namespace frc;
 
 MecanumDriveKinematicsConstraint::MecanumDriveKinematicsConstraint(

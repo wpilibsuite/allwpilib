@@ -9,6 +9,8 @@
 
 #include <algorithm>
 
+#include <units/math.h>
+
 namespace frc {
 
 template <class... Wheels>

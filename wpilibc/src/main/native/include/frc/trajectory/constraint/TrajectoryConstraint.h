@@ -9,7 +9,9 @@
 
 #include <limits>
 
-#include <units/units.h>
+#include <units/acceleration.h>
+#include <units/curvature.h>
+#include <units/velocity.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/spline/Spline.h"

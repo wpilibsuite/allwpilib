@@ -12,7 +12,8 @@
 #include <vector>
 
 #include <Eigen/Core>
-#include <units/units.h>
+#include <units/curvature.h>
+#include <units/length.h>
 
 #include "frc/geometry/Pose2d.h"
 

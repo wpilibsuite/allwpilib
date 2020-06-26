@@ -13,6 +13,7 @@ generatedFileExclude {
   src/main/native/cpp/llvm/
   src/main/native/eigeninclude/
   src/main/native/include/llvm/
+  src/main/native/include/units/base\.h$
   src/main/native/include/units/units\.h$
   src/main/native/include/unsupported/
   src/main/native/include/wpi/AlignOf\.h$

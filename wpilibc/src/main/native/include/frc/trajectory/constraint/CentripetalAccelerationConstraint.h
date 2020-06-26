@@ -7,7 +7,9 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/acceleration.h>
+#include <units/curvature.h>
+#include <units/velocity.h>
 
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 

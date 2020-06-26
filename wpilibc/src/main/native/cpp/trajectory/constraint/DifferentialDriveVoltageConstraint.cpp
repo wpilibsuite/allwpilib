@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <limits>
 
+#include <units/math.h>
 #include <wpi/MathExtras.h>
 
 using namespace frc;

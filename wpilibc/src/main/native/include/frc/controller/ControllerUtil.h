@@ -10,7 +10,7 @@
 #include <cmath>
 #include <type_traits>
 
-#include <units/units.h>
+#include <units/math.h>
 
 namespace frc {
 

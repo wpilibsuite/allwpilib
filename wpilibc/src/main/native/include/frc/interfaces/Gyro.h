@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/angle.h>
 
 #include "frc/geometry/Rotation2d.h"
 

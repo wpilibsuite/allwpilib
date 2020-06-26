@@ -12,7 +12,7 @@
 #include <memory>
 
 #include <hal/SPITypes.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/deprecated.h>
 

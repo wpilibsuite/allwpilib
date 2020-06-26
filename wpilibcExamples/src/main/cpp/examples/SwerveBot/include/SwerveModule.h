@@ -13,6 +13,10 @@
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <units/angular_velocity.h>
+#include <units/time.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 #include <wpi/math>
 
 class SwerveModule {
@@ -43,8 +47,8 @@ class SwerveModule {
       0.0,
       {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
 
-  frc::SimpleMotorFeedforward<units::meter> m_driveFeedforward{1_V,
-                                                               3_V / 1_mps};
+  frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{1_V,
+                                                                3_V / 1_mps};
   frc::SimpleMotorFeedforward<units::radians> m_turnFeedforward{
       1_V, 0.5_V / 1_rad_per_s};
 };

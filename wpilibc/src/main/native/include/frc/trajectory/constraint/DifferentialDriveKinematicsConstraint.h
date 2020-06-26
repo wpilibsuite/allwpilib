@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/velocity.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <units/units.h>
+#include <units/length.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"

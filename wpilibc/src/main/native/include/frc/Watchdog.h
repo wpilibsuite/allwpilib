@@ -12,7 +12,7 @@
 #include <utility>
 
 #include <hal/cpp/fpga_clock.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/SafeThread.h>
 #include <wpi/StringRef.h>
 #include <wpi/deprecated.h>

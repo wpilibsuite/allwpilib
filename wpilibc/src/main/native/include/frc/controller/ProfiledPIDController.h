@@ -12,7 +12,7 @@
 #include <functional>
 #include <limits>
 
-#include <units/units.h>
+#include <units/time.h>
 
 #include "frc/controller/ControllerUtil.h"
 #include "frc/controller/PIDController.h"
