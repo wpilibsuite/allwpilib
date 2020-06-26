@@ -7,17 +7,10 @@
 
 #pragma once
 
-#include <atomic>
+#include "CommonInitializer.h"
 
 namespace hal {
 namespace init {
-extern std::atomic_bool HAL_IsInitialized;
-extern void RunInitialize();
-static inline void CheckInit() {
-  if (HAL_IsInitialized.load(std::memory_order_relaxed)) return;
-  RunInitialize();
-}
-
 extern void InitializeAccelerometerData();
 extern void InitializeAddressableLEDData();
 extern void InitializeAnalogGyroData();

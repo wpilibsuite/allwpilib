@@ -51,6 +51,7 @@ target_include_directories(hal PUBLIC
 target_include_directories(hal PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/gen>
                             $<INSTALL_INTERFACE:${include_dest}/hal>)
+target_include_directories(hal PRIVATE src/main/native/cpp)
 target_link_libraries(hal PUBLIC wpiutil)
 
 set_property(TARGET hal PROPERTY FOLDER "libraries")

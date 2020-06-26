@@ -7,19 +7,43 @@
 
 package edu.wpi.first.hal.simulation;
 
+import edu.wpi.first.hal.I2CBus;
 import edu.wpi.first.hal.JNIWrapper;
 
 public class I2CDataJNI extends JNIWrapper {
-  public static native int registerInitializedCallback(int index, NotifyCallback callback, boolean initialNotify);
-  public static native void cancelInitializedCallback(int index, int uid);
-  public static native boolean getInitialized(int index);
-  public static native void setInitialized(int index, boolean initialized);
+  public static class NativeI2CDevice implements I2CDevice {
+    public NativeI2CDevice(long impl) {
+      m_impl = impl;
+    }
 
-  public static native int registerReadCallback(int index, BufferCallback callback);
-  public static native void cancelReadCallback(int index, int uid);
+    public boolean initialize() {
+      return nativeDeviceInitialize(m_impl);
+    }
 
-  public static native int registerWriteCallback(int index, ConstBufferCallback callback);
-  public static native void cancelWriteCallback(int index, int uid);
+    public int transaction(byte[] dataToSend, int sendSize, byte[] dataReceived,
+                           int receiveSize) {
+      return nativeDeviceTransaction(m_impl, dataToSend, sendSize, dataReceived,
+                                     receiveSize);
+    }
 
-  public static native void resetData(int index);
+    public int write(byte[] dataToSend, int sendSize) {
+      return nativeDeviceWrite(m_impl, dataToSend, sendSize);
+    }
+
+    public int read(byte[] buffer, int count) {
+      return nativeDeviceRead(m_impl, buffer, count);
+    }
+
+    private long m_impl;
+  }
+
+  public static native I2CBus getSimBus();
+  public static native boolean registerDevice(int bus, int deviceAddress, I2CDevice device);
+  public static native I2CDevice unregisterDevice(int bus, int deviceAddress);
+
+  private static native boolean nativeDeviceInitialize(long impl);
+  private static native int nativeDeviceTransaction(long impl, byte[] dataToSend, int sendSize,
+                                                    byte[] dataReceived, int receiveSize);
+  private static native int nativeDeviceWrite(long impl, byte[] dataToSend, int sendSize);
+  private static native int nativeDeviceRead(long impl, byte[] buffer, int count);
 }

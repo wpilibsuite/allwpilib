@@ -12,35 +12,18 @@ import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.hal.simulation.I2CDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 
-public class I2CSim {
-  private final int m_index;
+public class I2CSim implements AutoCloseable {
+  private final int m_bus;
+  private final int m_deviceAddress;
 
-  public I2CSim(int index) {
-    m_index = index;
-  }
-
-  public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = I2CDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, I2CDataJNI::cancelInitializedCallback);
-  }
-  public boolean getInitialized() {
-    return I2CDataJNI.getInitialized(m_index);
-  }
-  public void setInitialized(boolean initialized) {
-    I2CDataJNI.setInitialized(m_index, initialized);
+  public I2CSim(int bus, int deviceAddress, I2CDevice device) {
+    m_bus = bus;
+    m_deviceAddress = deviceAddress;
+    I2CDataJNI.registerDevice(bus, deviceAddress, device);
   }
 
-  public CallbackStore registerReadCallback(BufferCallback callback) {
-    int uid = I2CDataJNI.registerReadCallback(m_index, callback);
-    return new CallbackStore(m_index, uid, I2CDataJNI::cancelReadCallback);
-  }
-
-  public CallbackStore registerWriteCallback(ConstBufferCallback callback) {
-    int uid = I2CDataJNI.registerWriteCallback(m_index, callback);
-    return new CallbackStore(m_index, uid, I2CDataJNI::cancelWriteCallback);
-  }
-
-  public void resetData() {
-    I2CDataJNI.resetData(m_index);
+  @Override
+  public void close() {
+    I2CDataJNI.unregisterDevice(m_bus, m_deviceAddress);
   }
 }

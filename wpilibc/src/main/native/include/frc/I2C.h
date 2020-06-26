@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,7 +23,7 @@ namespace frc {
  */
 class I2C : public ErrorBase {
  public:
-  enum Port { kOnboard = 0, kMXP };
+  enum Port { kOnboard = HAL_I2C_RIO_kOnboard, kMXP = HAL_I2C_RIO_kMXP };
 
   /**
    * Constructor.
@@ -31,7 +31,7 @@ class I2C : public ErrorBase {
    * @param port          The I2C port to which the device is connected.
    * @param deviceAddress The address of the device on the I2C bus.
    */
-  I2C(Port port, int deviceAddress);
+  I2C(int port, int deviceAddress);
 
   ~I2C() override;
 
@@ -137,8 +137,7 @@ class I2C : public ErrorBase {
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
-  hal::I2CPort m_port;
-  int m_deviceAddress;
+  HAL_I2CHandle m_handle;
 };
 
 }  // namespace frc

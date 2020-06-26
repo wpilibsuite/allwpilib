@@ -43,6 +43,8 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeHAL() {
+  InitializeCommonI2C();
+
   InitializeAddressableLED();
   InitializeAccelerometer();
   InitializeAnalogAccumulator();

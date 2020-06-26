@@ -7,9 +7,7 @@
 
 #include <jni.h>
 
-#include "BufferCallbackStore.h"
 #include "CallbackStore.h"
-#include "ConstBufferCallbackStore.h"
 #include "edu_wpi_first_hal_simulation_I2CDataJNI.h"
 #include "hal/simulation/I2CData.h"
 
@@ -19,115 +17,145 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    registerInitializedCallback
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerInitializedCallback
-  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterI2CInitializedCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    cancelInitializedCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_cancelInitializedCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelI2CInitializedCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    getInitialized
- * Signature: (I)Z
+ * Method:    registerBus
+ * Signature: (ILedu/wpi/first/hal/sim/I2CBus;)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_getInitialized
-  (JNIEnv*, jclass, jint index)
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerBus
+  (JNIEnv *, jclass, jint bus, jobject impl)
 {
-  return HALSIM_GetI2CInitialized(index);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    setInitialized
- * Signature: (IZ)V
+ * Method:    getSystemBus
+ * Signature: (I)Ledu/wpi/first/hal/sim/mockdata/I2CDataJNI/NativeI2CBus;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_getSystemBus
+  (JNIEnv *, jclass, jint bus)
+{
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Method:    getSimBus
+ * Signature: ()Ledu/wpi/first/hal/sim/mockdata/I2CDataJNI/NativeI2CBus;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_getSimBus
+  (JNIEnv *, jclass)
+{
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Method:    unregisterBus
+ * Signature: (I)Ledu/wpi/first/hal/sim/I2CBus;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_unregisterBus
+  (JNIEnv *, jclass, jint bus)
+{
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Method:    registerDevice
+ * Signature: (IILedu/wpi/first/hal/sim/I2CDevice;)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerDevice
+  (JNIEnv *, jclass, jint bus, jint deviceAddress, jobject device)
+{
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Method:    unregisterDevice
+ * Signature: (II)Ledu/wpi/first/hal/sim/I2CDevice;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_unregisterDevice
+  (JNIEnv *, jclass, jint bus, jint deviceAddress)
+{
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Method:    nativeOpenBus
+ * Signature: (JJI)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_nativeOpenBus
+  (JNIEnv *, jclass, jlong impl, jlong data, jint bus)
+{
+  int32_t status = 0;
+  bool result = reinterpret_cast<HALSIM_I2CBus*>(impl)->OpenBus(
+      reinterpret_cast<void*>(data), bus, &status);
+
+  return result;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Method:    nativeCloseBus
+ * Signature: (JJI)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_setInitialized
-  (JNIEnv*, jclass, jint index, jboolean value)
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_nativeCloseBus
+  (JNIEnv *, jclass, jlong impl, jlong data, jint bus)
 {
-  HALSIM_SetI2CInitialized(index, value);
+  return reinterpret_cast<HALSIM_I2CBus*>(impl)->CloseBus(
+      reinterpret_cast<void*>(data), bus);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    registerReadCallback
- * Signature: (ILjava/lang/Object;)I
+ * Method:    nativeInitialize
+ * Signature: (JJI)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_nativeInitialize
+  (JNIEnv *, jclass, jlong impl, jlong data, jint deviceAddress)
+{
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
+ * Method:    nativeTransaction
+ * Signature: (JJI[BI[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerReadCallback
-  (JNIEnv* env, jclass, jint index, jobject callback)
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_nativeTransaction
+  (JNIEnv *, jclass, jlong impl, jlong data, jint deviceAddress,
+   jbyteArray dataToSend, jint sendSize, jbyteArray dataReceived,
+   jint receiveSize)
 {
-  return sim::AllocateBufferCallback(env, index, callback,
-                                     &HALSIM_RegisterI2CReadCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    cancelReadCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_cancelReadCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  sim::FreeBufferCallback(env, handle, index, &HALSIM_CancelI2CReadCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    registerWriteCallback
- * Signature: (ILjava/lang/Object;)I
+ * Method:    nativeWrite
+ * Signature: (JJI[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_registerWriteCallback
-  (JNIEnv* env, jclass, jint index, jobject callback)
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_nativeWrite
+  (JNIEnv *, jclass, jlong impl, jlong data, jint deviceAddress,
+   jbyteArray dataToSend, jint sendSize)
 {
-  return sim::AllocateConstBufferCallback(env, index, callback,
-                                          &HALSIM_RegisterI2CWriteCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    cancelWriteCallback
- * Signature: (II)V
+ * Method:    nativeRead
+ * Signature: (JJI[BI)I
  */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_cancelWriteCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_I2CDataJNI_nativeRead
+  (JNIEnv *, jclass, jlong impl, jlong data, jint deviceAddress,
+   jbyteArray buffer, jint count)
 {
-  sim::FreeConstBufferCallback(env, handle, index,
-                               &HALSIM_CancelI2CWriteCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_I2CDataJNI
- * Method:    resetData
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_I2CDataJNI_resetData
-  (JNIEnv*, jclass, jint index)
-{
-  HALSIM_ResetI2CData(index);
 }
 
 }  // extern "C"

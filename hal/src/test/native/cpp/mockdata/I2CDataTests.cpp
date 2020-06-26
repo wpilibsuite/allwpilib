@@ -12,7 +12,7 @@
 #include "hal/simulation/I2CData.h"
 
 namespace hal {
-
+#if 0
 std::string gTestI2CCallbackName;
 HAL_Value gTestI2CCallbackValue;
 
@@ -39,5 +39,5 @@ TEST(I2CSimTests, TestI2CInitialization) {
   HAL_InitializeI2C(port, &status);
   EXPECT_STREQ("Initialized", gTestI2CCallbackName.c_str());
 }
-
+#endif
 }  // namespace hal

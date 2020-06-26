@@ -1,17 +1,27 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HALInitializer.h"
+#pragma once
 
-#include "hal/HAL.h"
+#include <atomic>
 
 namespace hal {
 namespace init {
-std::atomic_bool HAL_IsInitialized{false};
-void RunInitialize() { HAL_Initialize(500, 0); }
+
+extern std::atomic_bool HAL_IsInitialized;
+
+void RunInitialize();
+
+static inline void CheckInit() {
+  if (HAL_IsInitialized.load(std::memory_order_relaxed)) return;
+  RunInitialize();
+}
+
+extern void InitializeCommonI2C();
+
 }  // namespace init
 }  // namespace hal

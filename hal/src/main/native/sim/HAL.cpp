@@ -32,6 +32,8 @@ static HAL_RuntimeType runtimeType{HAL_Mock};
 namespace hal {
 namespace init {
 void InitializeHAL() {
+  InitializeCommonI2C();
+
   InitializeAccelerometerData();
   InitializeAddressableLEDData();
   InitializeAnalogGyroData();
