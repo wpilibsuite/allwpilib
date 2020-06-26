@@ -62,7 +62,7 @@ ext {
 
     nativeName = 'hal'
     setBaseName = 'wpiHal'
-    devMain = 'DevMain'
+    devMain = 'edu.wpi.first.hal.DevMain'
     niLibraries = true
     generatedHeaders = "$buildDir/generated/headers"
     jniSplitSetup = {
