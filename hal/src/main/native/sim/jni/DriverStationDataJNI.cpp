@@ -16,6 +16,7 @@
 #include "mockdata/DriverStationData.h"
 #include "mockdata/MockHooks.h"
 
+using namespace hal;
 using namespace wpi::java;
 
 extern "C" {

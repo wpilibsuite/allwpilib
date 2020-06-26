@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,13 +17,15 @@
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "mockdata/NotifyListener.h"
 
+using namespace hal;
+using namespace hal::sim;
 using namespace wpi::java;
-using namespace sim;
 
 static hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
                                     hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
+namespace hal {
 namespace sim {
 void InitializeConstBufferStore() {
   static hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
@@ -32,6 +34,7 @@ void InitializeConstBufferStore() {
   callbackHandles = &cb;
 }
 }  // namespace sim
+}  // namespace hal
 
 void ConstBufferCallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);

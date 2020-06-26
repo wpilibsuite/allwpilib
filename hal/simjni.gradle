@@ -67,6 +67,7 @@ task generateAthenaSimFiles() {
             out.println '''
 static JavaVM* jvm = nullptr;
 
+namespace hal {
 namespace sim {
 jint SimOnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
@@ -83,6 +84,7 @@ void SimOnUnload(JavaVM * vm, void* reserved) {
   if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
   jvm = nullptr;
+}
 }
 }
 

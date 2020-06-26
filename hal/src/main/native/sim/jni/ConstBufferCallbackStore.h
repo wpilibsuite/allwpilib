@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,6 +17,7 @@
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "mockdata/NotifyListener.h"
 
+namespace hal {
 namespace sim {
 class ConstBufferCallbackStore {
  public:
@@ -44,3 +45,4 @@ SIM_JniHandle AllocateConstBufferCallback(
 void FreeConstBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                              FreeConstBufferCallbackFunc freeCallback);
 }  // namespace sim
+}  // namespace hal

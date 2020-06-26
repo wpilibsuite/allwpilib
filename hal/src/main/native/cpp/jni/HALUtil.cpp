@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -73,7 +73,7 @@ static const JExceptionInit exceptions[] = {
      &canNotInitializedExCls},
     {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls}};
 
-namespace frc {
+namespace hal {
 
 void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
                                  int32_t status) {
@@ -304,14 +304,14 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
 
 JavaVM* GetJVM() { return jvm; }
 
-}  // namespace frc
-
 namespace sim {
 jint SimOnLoad(JavaVM* vm, void* reserved);
 void SimOnUnload(JavaVM* vm, void* reserved);
 }  // namespace sim
 
-using namespace frc;
+}  // namespace hal
+
+using namespace hal;
 
 extern "C" {
 

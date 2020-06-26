@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,6 +12,8 @@
 #include "ConstBufferCallbackStore.h"
 #include "edu_wpi_first_hal_sim_mockdata_I2CDataJNI.h"
 #include "mockdata/I2CData.h"
+
+using namespace hal;
 
 extern "C" {
 
