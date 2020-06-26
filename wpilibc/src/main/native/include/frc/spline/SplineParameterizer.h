@@ -48,7 +48,7 @@ namespace frc {
  */
 class SplineParameterizer {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 
   struct MalformedSplineException : public std::runtime_error {
     explicit MalformedSplineException(const char* what_arg)

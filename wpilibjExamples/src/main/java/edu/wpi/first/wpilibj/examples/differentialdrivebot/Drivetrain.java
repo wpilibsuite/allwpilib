@@ -31,18 +31,18 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final SpeedController m_leftMaster = new PWMVictorSPX(1);
+  private final SpeedController m_leftLeader = new PWMVictorSPX(1);
   private final SpeedController m_leftFollower = new PWMVictorSPX(2);
-  private final SpeedController m_rightMaster = new PWMVictorSPX(3);
+  private final SpeedController m_rightLeader = new PWMVictorSPX(3);
   private final SpeedController m_rightFollower = new PWMVictorSPX(4);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 
   private final SpeedControllerGroup m_leftGroup
-      = new SpeedControllerGroup(m_leftMaster, m_leftFollower);
+      = new SpeedControllerGroup(m_leftLeader, m_leftFollower);
   private final SpeedControllerGroup m_rightGroup
-      = new SpeedControllerGroup(m_rightMaster, m_rightFollower);
+      = new SpeedControllerGroup(m_rightLeader, m_rightFollower);
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 

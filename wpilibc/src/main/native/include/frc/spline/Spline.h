@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,17 +12,11 @@
 #include <vector>
 
 #include <Eigen/Core>
+#include <units/units.h>
 
 #include "frc/geometry/Pose2d.h"
 
 namespace frc {
-
-/**
- * Define a unit for curvature.
- */
-using curvature_t = units::unit_t<
-    units::compound_unit<units::radian, units::inverse<units::meter>>>;
-
 /**
  * Represents a two-dimensional parametric spline that interpolates between two
  * points.
@@ -32,7 +26,7 @@ using curvature_t = units::unit_t<
 template <int Degree>
 class Spline {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 
   Spline() = default;
 
@@ -99,7 +93,7 @@ class Spline {
 
     return {
         {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d(dx, dy)},
-        curvature_t(curvature)};
+        units::curvature_t(curvature)};
   }
 
  protected:

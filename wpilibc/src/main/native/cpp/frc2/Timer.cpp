@@ -36,9 +36,6 @@ units::second_t GetTime() {
 
 using namespace frc2;
 
-// for compatibility with msvc12--see C2864
-const units::second_t Timer::kRolloverTime = units::second_t((1ll << 32) / 1e6);
-
 Timer::Timer() { Reset(); }
 
 Timer::Timer(const Timer& rhs)
@@ -77,13 +74,6 @@ units::second_t Timer::Get() const {
 
   std::scoped_lock lock(m_mutex);
   if (m_running) {
-    // If the current time is before the start time, then the FPGA clock rolled
-    // over. Compensate by adding the ~71 minutes that it takes to roll over to
-    // the current time.
-    if (currentTime < m_startTime) {
-      currentTime += kRolloverTime;
-    }
-
     result = (currentTime - m_startTime) + m_accumulatedTime;
   } else {
     result = m_accumulatedTime;

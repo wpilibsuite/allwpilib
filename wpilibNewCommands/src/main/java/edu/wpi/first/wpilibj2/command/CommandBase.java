@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -54,6 +54,18 @@ public abstract class CommandBase implements Sendable, Command {
   @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
+  }
+
+  /**
+  * Decorates this Command with a name.
+  * Is an inline function for #setName(String);
+  *
+  * @param name name
+  * @return the decorated Command
+  */
+  public Command withName(String name) {
+    this.setName(name);
+    return this;
   }
 
   /**

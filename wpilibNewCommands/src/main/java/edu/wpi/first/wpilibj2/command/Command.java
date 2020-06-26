@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -36,6 +36,9 @@ public interface Command {
   /**
    * The action to take when the command ends.  Called when either the command finishes normally,
    * or when it interrupted/canceled.
+   *
+   * <p>Do not schedule commands here that share requirements with this command.
+   * Use {@link #andThen(Command...)} instead.
    *
    * @param interrupted whether the command was interrupted/canceled
    */
