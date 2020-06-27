@@ -59,7 +59,7 @@ public final class CombinedRuntimeLoader {
    * @return                List of all libraries that were extracted
    * @throws IOException    Thrown if resource not found or file could not be extracted
    */
-  @SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnnecessaryCastRule"})
+  @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnnecessaryCastRule"})
   public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
     TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
@@ -92,7 +92,7 @@ public final class CombinedRuntimeLoader {
 
     List<String> extractedFiles = new ArrayList<>();
 
-    byte[] buffer = new byte[0xFFFF]; // 64K copy buffer
+    byte[] buffer = new byte[0x10000]; // 64K copy buffer
 
     for (var file : fileList) {
       try (var stream = clazz.getResourceAsStream(file)) {
@@ -172,6 +172,5 @@ public final class CombinedRuntimeLoader {
     for (var library : librariesToLoad) {
       loadLibrary(library, extractedFiles);
     }
-
   }
 }
