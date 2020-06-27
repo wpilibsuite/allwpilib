@@ -11,7 +11,7 @@ nativeUtils {
       niLibVersion = "2020.10.1"
       opencvVersion = "3.4.7-3"
       googleTestVersion = "1.9.0-4-437e100-1"
-      imguiVersion = "1.72b-4"
+      imguiVersion = "1.76-2"
     }
   }
 }
