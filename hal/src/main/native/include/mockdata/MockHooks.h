@@ -7,9 +7,11 @@
 
 #pragma once
 
+#include "hal/HALBase.h"
 #include "hal/Types.h"
 
 extern "C" {
+void HALSIM_SetRuntimeType(HAL_RuntimeType type);
 void HALSIM_WaitForProgramStart(void);
 void HALSIM_SetProgramStarted(void);
 HAL_Bool HALSIM_GetProgramStarted(void);

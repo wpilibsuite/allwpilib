@@ -110,6 +110,18 @@ jmethodID GetSpiReadAutoReceiveBufferCallback() {
 extern "C" {
 /*
  * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
+ * Method:    setRuntimeType
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_sim_mockdata_SimulatorJNI_setRuntimeType
+  (JNIEnv*, jclass, jint type)
+{
+  HALSIM_SetRuntimeType(static_cast<HAL_RuntimeType>(type));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_sim_mockdata_SimulatorJNI
  * Method:    waitForProgramStart
  * Signature: ()V
  */

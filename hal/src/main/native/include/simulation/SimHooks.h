@@ -12,6 +12,8 @@
 namespace frc {
 namespace sim {
 
+void SetRuntimeType(HAL_RuntimeType type) { HALSIM_SetRuntimeType(type); }
+
 void WaitForProgramStart() { HALSIM_WaitForProgramStart(); }
 
 void SetProgramStarted() { HALSIM_SetProgramStarted(); }
