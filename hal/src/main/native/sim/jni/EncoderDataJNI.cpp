@@ -11,6 +11,8 @@
 #include "edu_wpi_first_hal_sim_mockdata_EncoderDataJNI.h"
 #include "mockdata/EncoderData.h"
 
+using namespace hal;
+
 extern "C" {
 
 /*

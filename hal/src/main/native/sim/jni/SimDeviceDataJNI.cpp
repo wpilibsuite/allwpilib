@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -20,6 +20,7 @@
 #include "edu_wpi_first_hal_sim_mockdata_SimDeviceDataJNI.h"
 #include "mockdata/SimDeviceData.h"
 
+using namespace hal;
 using namespace wpi::java;
 
 static JClass simDeviceInfoCls;
@@ -259,6 +260,7 @@ void CallbackJNI::FreeCallback(JNIEnv* env, int32_t uid) {
   store->Free(env);
 }
 
+namespace hal {
 namespace sim {
 
 bool InitializeSimDeviceDataJNI(JNIEnv* env) {
@@ -295,6 +297,7 @@ void FreeSimDeviceDataJNI(JNIEnv* env) {
 }
 
 }  // namespace sim
+}  // namespace hal
 
 extern "C" {
 

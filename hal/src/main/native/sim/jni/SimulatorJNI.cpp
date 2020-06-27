@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,6 +31,7 @@ static jmethodID bufferCallbackCallback;
 static jmethodID constBufferCallbackCallback;
 static jmethodID spiReadAutoReceiveBufferCallbackCallback;
 
+namespace hal {
 namespace sim {
 jint SimOnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
@@ -104,6 +105,7 @@ jmethodID GetSpiReadAutoReceiveBufferCallback() {
   return spiReadAutoReceiveBufferCallbackCallback;
 }
 }  // namespace sim
+}  // namespace hal
 
 extern "C" {
 /*
