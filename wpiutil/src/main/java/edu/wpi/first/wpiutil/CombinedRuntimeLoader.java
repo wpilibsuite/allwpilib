@@ -24,46 +24,52 @@ public final class CombinedRuntimeLoader {
   private CombinedRuntimeLoader() {
   }
 
+  private static String extractionDirectory;
+
+  public static synchronized String getExtractionDirectory() {
+    return extractionDirectory;
+  }
+
+  private static synchronized void setExtractionDirectory(String directory) {
+    extractionDirectory = directory;
+  }
+
   public static native boolean addDllSearchDirectory(String directory);
 
   private static String getLoadErrorMessage(String libraryName, UnsatisfiedLinkError ule) {
     StringBuilder msg = new StringBuilder(512);
-    msg.append(libraryName)
-       .append(" could not be loaded from path\n"
-               + "\tattempted to load for platform ")
-       .append(RuntimeDetector.getPlatformPath())
-       .append("\nLast Load Error: \n")
-       .append(ule.getMessage())
-       .append('\n');
+    msg.append(libraryName).append(" could not be loaded from path\n"
+        + "\tattempted to load for platform ")
+        .append(RuntimeDetector.getPlatformPath())
+        .append("\nLast Load Error: \n")
+        .append(ule.getMessage())
+        .append('\n');
     if (RuntimeDetector.isWindows()) {
       msg.append("A common cause of this error is missing the C++ runtime.\n"
-                 + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
+          + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
     }
     return msg.toString();
   }
 
   /**
-   * Load a list of native libraries out of a single directory.
-   * 
-   * @param <T> The class where the resources would be located
-   * @param clazz The actual class object
-   * @param librariesToLoad List of libraries to load
-   * @throws IOException Throws an IOException if not found
+   * Extract a list of native libraries.
+   * @param <T>             The class where the resources would be located
+   * @param clazz           The actual class object
+   * @param resourceName    The resource name on the classpath to use for file lookup
+   * @return                List of all libraries that were extracted
+   * @throws IOException    Thrown if resource not found or file could not be extracted
    */
-  @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnnecessaryCastRule",
-      "PMD.PreserveStackTrace", "PMD.CyclomaticComplexity"})
-  public static <T> void loadLibraries(Class<T> clazz, String... librariesToLoad) 
+  @SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnnecessaryCastRule"})
+  public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
-    // Extract everything
     TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
     };
     ObjectMapper mapper = new ObjectMapper();
     Map<String, Object> map;
-    try (var stream = clazz.getResourceAsStream("/ResourceInformation.json")) {
+    try (var stream = clazz.getResourceAsStream(resourceName)) {
       map = mapper.readValue(stream, typeRef);
     }
 
-    String hash = (String) map.get("hash");
     var platformPath = Paths.get(RuntimeDetector.getPlatformPath());
     var platform = platformPath.getName(0).toString();
     var arch = platformPath.getName(1).toString();
@@ -72,9 +78,17 @@ public final class CombinedRuntimeLoader {
 
     var fileList = platformMap.get(arch);
 
-    var defaultExtractionRoot = RuntimeLoader.getDefaultExtractionRoot();
-    var extractionPath = Paths.get(defaultExtractionRoot, platform, arch, hash);
-    var extractionPathString = extractionPath.toString();
+    var extractionPathString = getExtractionDirectory();
+
+    if (extractionPathString == null) {
+      String hash = (String) map.get("hash");
+
+      var defaultExtractionRoot = RuntimeLoader.getDefaultExtractionRoot();
+      var extractionPath = Paths.get(defaultExtractionRoot, platform, arch, hash);
+      extractionPathString = extractionPath.toString();
+
+      setExtractionDirectory(extractionPathString);
+    }
 
     List<String> extractedFiles = new ArrayList<>();
 
@@ -83,7 +97,7 @@ public final class CombinedRuntimeLoader {
     for (var file : fileList) {
       try (var stream = clazz.getResourceAsStream(file)) {
         Objects.requireNonNull(stream);
-        
+
         var outputFile = Paths.get(extractionPathString, new File(file).getName());
         extractedFiles.add(outputFile.toString());
         if (outputFile.toFile().exists()) {
@@ -100,27 +114,64 @@ public final class CombinedRuntimeLoader {
       }
     }
 
+    return extractedFiles;
+  }
+
+  /**
+   * Load a single library from a list of extracted files.
+   * @param libraryName The library name to load
+   * @param extractedFiles The extracted files to search
+   * @throws IOException If library was not found
+   */
+  public static void loadLibrary(String libraryName, List<String> extractedFiles)
+      throws IOException {
+    String currentPath = null;
+    try {
+      for (var extractedFile : extractedFiles) {
+        if (extractedFile.contains(libraryName)) {
+          // Load it
+          currentPath = extractedFile;
+          System.load(extractedFile);
+          return;
+        }
+      }
+      throw new IOException("Could not find library " + libraryName);
+    } catch (UnsatisfiedLinkError ule) {
+      throw new IOException(getLoadErrorMessage(currentPath, ule));
+    }
+  }
+
+  /**
+   * Load a list of native libraries out of a single directory.
+   *
+   * @param <T>             The class where the resources would be located
+   * @param clazz           The actual class object
+   * @param librariesToLoad List of libraries to load
+   * @throws IOException Throws an IOException if not found
+   */
+  public static <T> void loadLibraries(Class<T> clazz, String... librariesToLoad)
+      throws IOException {
+    // Extract everything
+
+    var extractedFiles = extractLibraries(clazz, "/ResourceInformation.json");
+
     String currentPath = "";
 
     try {
       if (RuntimeDetector.isWindows()) {
+        var extractionPathString = getExtractionDirectory();
         // Load windows, set dll directory
         currentPath = Paths.get(extractionPathString, "WindowsLoaderHelper.dll").toString();
         System.load(currentPath);
         addDllSearchDirectory(extractionPathString);
       }
-
-      for (var library : librariesToLoad) {
-        for (var extractedFile : extractedFiles) {
-          if (extractedFile.contains(library)) {
-            // Load it
-            currentPath = extractedFile;
-            System.load(extractedFile);
-          }
-        }
-      }
     } catch (UnsatisfiedLinkError ule) {
       throw new IOException(getLoadErrorMessage(currentPath, ule));
     }
+
+    for (var library : librariesToLoad) {
+      loadLibrary(library, extractedFiles);
+    }
+
   }
 }
