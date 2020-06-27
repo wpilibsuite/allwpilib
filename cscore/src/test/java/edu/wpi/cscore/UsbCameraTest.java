@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -56,6 +56,6 @@ class UsbCameraTest {
   private static int getNonexistentCameraDev() {
     return Arrays.stream(CameraServerJNI.enumerateUsbCameras())
         .mapToInt(info -> info.dev)
-        .max().orElse(-1) + 1;
+        .max().orElse(-1) + 20;
   }
 }
