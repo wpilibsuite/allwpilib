@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 package edu.wpi.first.wpilibj.interfaces;
+
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 /**
  * Interface for yaw rate gyros.
@@ -27,7 +29,7 @@ public interface Gyro extends AutoCloseable {
   void reset();
 
   /**
-   * Return the actual angle in degrees that the robot is currently facing.
+   * Return the heading of the robot in degrees.
    *
    * <p>The angle is based on the current accumulator value corrected by the oversampling rate, the
    * gyro type and the A/D calibration values. The angle is continuous, that is it will continue
@@ -35,8 +37,7 @@ public interface Gyro extends AutoCloseable {
    * the gyro output as it sweeps past from 360 to 0 on the second time around.
    *
    * <p>The angle is expected to increase as the gyro turns clockwise when looked
-   * at from the top. It needs to follow NED axis conventions in order to work
-   * properly with dependent control loops.
+   * at from the top. It needs to follow the NED axis convention.
    *
    * <p>This heading is based on integration of the returned rate from the gyro.
    *
@@ -50,10 +51,29 @@ public interface Gyro extends AutoCloseable {
    * <p>The rate is based on the most recent reading of the gyro analog value
    *
    * <p>The rate is expected to be positive as the gyro turns clockwise when looked
-   * at from the top. It needs to follow NED axis conventions in order to work
-   * properly with dependent control loops.
+   * at from the top. It needs to follow the NED axis convention.
    *
    * @return the current rate in degrees per second
    */
   double getRate();
+
+  /**
+   * Return the heading of the robot as a {@link edu.wpi.first.wpilibj.geometry.Rotation2d}.
+   *
+   * <p>The angle is based on the current accumulator value corrected by the oversampling rate, the
+   * gyro type and the A/D calibration values. The angle is continuous, that is it will continue
+   * from 360 to 361 degrees. This allows algorithms that wouldn't want to see a discontinuity in
+   * the gyro output as it sweeps past from 360 to 0 on the second time around.
+   *
+   * <p>The angle is expected to increase as the gyro turns counterclockwise
+   * when looked at from the top. It needs to follow the NWU axis convention.
+   *
+   * <p>This heading is based on integration of the returned rate from the gyro.
+   *
+   * @return the current heading of the robot as a
+   *         {@link edu.wpi.first.wpilibj.geometry.Rotation2d}.
+   */
+  default Rotation2d getRotation2d() {
+    return new Rotation2d(-getAngle());
+  }
 }

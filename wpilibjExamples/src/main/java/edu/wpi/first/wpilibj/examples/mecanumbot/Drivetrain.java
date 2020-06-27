@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
@@ -55,7 +54,7 @@ public class Drivetrain {
   );
 
   private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
-      getAngle());
+      m_gyro.getRotation2d());
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
@@ -65,16 +64,6 @@ public class Drivetrain {
    */
   public Drivetrain() {
     m_gyro.reset();
-  }
-
-  /**
-   * Returns the angle of the robot as a Rotation2d.
-   *
-   * @return The angle of the robot.
-   */
-  public Rotation2d getAngle() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return Rotation2d.fromDegrees(-m_gyro.getAngle());
   }
 
   /**
@@ -133,7 +122,7 @@ public class Drivetrain {
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var mecanumDriveWheelSpeeds = m_kinematics.toWheelSpeeds(
         fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rot, getAngle()
+            xSpeed, ySpeed, rot, m_gyro.getRotation2d()
         ) : new ChassisSpeeds(xSpeed, ySpeed, rot)
     );
     mecanumDriveWheelSpeeds.normalize(kMaxSpeed);
@@ -144,6 +133,6 @@ public class Drivetrain {
    * Updates the field relative position of the robot.
    */
   public void updateOdometry() {
-    m_odometry.update(getAngle(), getCurrentState());
+    m_odometry.update(m_gyro.getRotation2d(), getCurrentState());
   }
 }
