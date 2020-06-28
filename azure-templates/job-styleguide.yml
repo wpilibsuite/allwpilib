@@ -21,13 +21,13 @@ jobs:
         sudo apt-get update -q
         sudo apt-get install gnupg lsb-release software-properties-common -y
         chmod +x azure-templates/clang-format.sh
-        sudo ./azure-templates/clang-format.sh 9
+        sudo ./azure-templates/clang-format.sh 10
         sudo pip3 install wpiformat
       displayName: 'Install wpiformat'
 
     - script: |
         git checkout -b master
-        wpiformat -clang 9
+        wpiformat -clang 10
       displayName: 'Run wpiformat'
 
     - script: |
