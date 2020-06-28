@@ -99,7 +99,7 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
@@ -141,7 +141,7 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
