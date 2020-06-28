@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -206,13 +206,14 @@ void Compressor::ClearAllPCMStickyFaults() {
 
 void Compressor::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Compressor");
-  builder.AddBooleanProperty("Enabled", [=]() { return Enabled(); },
-                             [=](bool value) {
-                               if (value)
-                                 Start();
-                               else
-                                 Stop();
-                             });
+  builder.AddBooleanProperty(
+      "Enabled", [=]() { return Enabled(); },
+      [=](bool value) {
+        if (value)
+          Start();
+        else
+          Stop();
+      });
   builder.AddBooleanProperty(
       "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);
 }

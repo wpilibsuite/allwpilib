@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -120,9 +120,9 @@ void MecanumDrive::InitSendable(SendableBuilder& builder) {
       [=](double value) {
         m_frontRightMotor->Set(value * m_rightSideInvertMultiplier);
       });
-  builder.AddDoubleProperty("Rear Left Motor Speed",
-                            [=]() { return m_rearLeftMotor->Get(); },
-                            [=](double value) { m_rearLeftMotor->Set(value); });
+  builder.AddDoubleProperty(
+      "Rear Left Motor Speed", [=]() { return m_rearLeftMotor->Get(); },
+      [=](double value) { m_rearLeftMotor->Set(value); });
   builder.AddDoubleProperty(
       "Rear Right Motor Speed",
       [=]() { return m_rearRightMotor->Get() * m_rightSideInvertMultiplier; },

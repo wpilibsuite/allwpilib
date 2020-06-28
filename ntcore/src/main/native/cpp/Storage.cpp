@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -1053,14 +1053,15 @@ unsigned int Storage::CallRpc(unsigned int local_id, StringRef params) {
     conn_info.last_update = wpi::Now();
     conn_info.protocol_version = 0x0300;
     unsigned int call_uid = msg->seq_num_uid();
-    m_rpc_server.ProcessRpc(local_id, call_uid, name, msg->str(), conn_info,
-                            [=](StringRef result) {
-                              std::scoped_lock lock(m_mutex);
-                              m_rpc_results.insert(std::make_pair(
-                                  RpcIdPair{local_id, call_uid}, result));
-                              m_rpc_results_cond.notify_all();
-                            },
-                            rpc_uid);
+    m_rpc_server.ProcessRpc(
+        local_id, call_uid, name, msg->str(), conn_info,
+        [=](StringRef result) {
+          std::scoped_lock lock(m_mutex);
+          m_rpc_results.insert(
+              std::make_pair(RpcIdPair{local_id, call_uid}, result));
+          m_rpc_results_cond.notify_all();
+        },
+        rpc_uid);
   } else {
     auto dispatcher = m_dispatcher;
     lock.unlock();

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -139,10 +139,11 @@ void PowerDistributionPanel::ClearStickyFaults() {
 void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
   for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
-    builder.AddDoubleProperty("Chan" + wpi::Twine(i),
-                              [=]() { return GetCurrent(i); }, nullptr);
+    builder.AddDoubleProperty(
+        "Chan" + wpi::Twine(i), [=]() { return GetCurrent(i); }, nullptr);
   }
-  builder.AddDoubleProperty("Voltage", [=]() { return GetVoltage(); }, nullptr);
-  builder.AddDoubleProperty("TotalCurrent", [=]() { return GetTotalCurrent(); },
-                            nullptr);
+  builder.AddDoubleProperty(
+      "Voltage", [=]() { return GetVoltage(); }, nullptr);
+  builder.AddDoubleProperty(
+      "TotalCurrent", [=]() { return GetTotalCurrent(); }, nullptr);
 }

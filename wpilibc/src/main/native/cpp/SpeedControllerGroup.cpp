@@ -66,6 +66,6 @@ void SpeedControllerGroup::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");
   builder.SetActuator(true);
   builder.SetSafeState([=]() { StopMotor(); });
-  builder.AddDoubleProperty("Value", [=]() { return Get(); },
-                            [=](double value) { Set(value); });
+  builder.AddDoubleProperty(
+      "Value", [=]() { return Get(); }, [=](double value) { Set(value); });
 }
