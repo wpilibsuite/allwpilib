@@ -8,20 +8,20 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "edu_wpi_first_hal_sim_mockdata_PWMDataJNI.h"
-#include "mockdata/PWMData.h"
+#include "edu_wpi_first_hal_simulation_PWMDataJNI.h"
+#include "hal/simulation/PWMData.h"
 
 using namespace hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerInitializedCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -29,12 +29,12 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelInitializedCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -42,36 +42,36 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_getInitialized
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_setInitialized
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetPWMInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    registerRawValueCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerRawValueCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerRawValueCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -79,12 +79,12 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerRawValueCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    cancelRawValueCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelRawValueCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelRawValueCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -92,36 +92,36 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelRawValueCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    getRawValue
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_getRawValue
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_getRawValue
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMRawValue(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    setRawValue
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_setRawValue
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_setRawValue
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetPWMRawValue(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    registerSpeedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerSpeedCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerSpeedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -129,48 +129,48 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerSpeedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    cancelSpeedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelSpeedCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelSpeedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index, &HALSIM_CancelPWMSpeedCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    getSpeed
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_getSpeed
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_getSpeed
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMSpeed(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    setSpeed
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_setSpeed
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_setSpeed
   (JNIEnv*, jclass, jint index, jdouble value)
 {
   HALSIM_SetPWMSpeed(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    registerPositionCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerPositionCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerPositionCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -178,12 +178,12 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerPositionCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    cancelPositionCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelPositionCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelPositionCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -191,36 +191,36 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelPositionCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    getPosition
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_getPosition
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_getPosition
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMPosition(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    setPosition
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_setPosition
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_setPosition
   (JNIEnv*, jclass, jint index, jdouble value)
 {
   HALSIM_SetPWMPosition(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    registerPeriodScaleCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerPeriodScaleCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerPeriodScaleCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -228,12 +228,12 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerPeriodScaleCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    cancelPeriodScaleCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelPeriodScaleCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelPeriodScaleCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -241,36 +241,36 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelPeriodScaleCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    getPeriodScale
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_getPeriodScale
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_getPeriodScale
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMPeriodScale(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    setPeriodScale
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_setPeriodScale
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_setPeriodScale
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetPWMPeriodScale(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    registerZeroLatchCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerZeroLatchCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_registerZeroLatchCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -278,12 +278,12 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_registerZeroLatchCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    cancelZeroLatchCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelZeroLatchCallback
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_cancelZeroLatchCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -291,36 +291,36 @@ Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_cancelZeroLatchCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    getZeroLatch
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_getZeroLatch
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_getZeroLatch
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetPWMZeroLatch(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    setZeroLatch
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_setZeroLatch
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_setZeroLatch
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetPWMZeroLatch(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_PWMDataJNI
+ * Class:     edu_wpi_first_hal_simulation_PWMDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_PWMDataJNI_resetData
+Java_edu_wpi_first_hal_simulation_PWMDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetPWMData(index);

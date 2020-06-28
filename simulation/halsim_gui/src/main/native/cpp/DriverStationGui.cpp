@@ -11,10 +11,10 @@
 #include <string>
 
 #include <GLFW/glfw3.h>
+#include <hal/simulation/DriverStationData.h>
+#include <hal/simulation/MockHooks.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <mockdata/DriverStationData.h>
-#include <mockdata/MockHooks.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>

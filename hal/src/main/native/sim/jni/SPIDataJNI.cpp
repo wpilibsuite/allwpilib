@@ -11,20 +11,20 @@
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
 #include "SpiReadAutoReceiveBufferCallbackStore.h"
-#include "edu_wpi_first_hal_sim_mockdata_SPIDataJNI.h"
-#include "mockdata/SPIData.h"
+#include "edu_wpi_first_hal_simulation_SPIDataJNI.h"
+#include "hal/simulation/SPIData.h"
 
 using namespace hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_registerInitializedCallback
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -32,12 +32,12 @@ Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_registerInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_cancelInitializedCallback
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -45,36 +45,36 @@ Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_cancelInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_getInitialized
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetSPIInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_setInitialized
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetSPIInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    registerReadCallback
  * Signature: (ILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_registerReadCallback
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_registerReadCallback
   (JNIEnv* env, jclass, jint index, jobject callback)
 {
   return sim::AllocateBufferCallback(env, index, callback,
@@ -82,24 +82,24 @@ Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_registerReadCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    cancelReadCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_cancelReadCallback
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_cancelReadCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   sim::FreeBufferCallback(env, handle, index, &HALSIM_CancelSPIReadCallback);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    registerWriteCallback
  * Signature: (ILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_registerWriteCallback
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_registerWriteCallback
   (JNIEnv* env, jclass, jint index, jobject callback)
 {
   return sim::AllocateConstBufferCallback(env, index, callback,
@@ -107,12 +107,12 @@ Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_registerWriteCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    cancelWriteCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_cancelWriteCallback
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_cancelWriteCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   sim::FreeConstBufferCallback(env, handle, index,
@@ -120,12 +120,12 @@ Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_cancelWriteCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    registerReadAutoReceiveBufferCallback
  * Signature: (ILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_registerReadAutoReceiveBufferCallback
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_registerReadAutoReceiveBufferCallback
   (JNIEnv* env, jclass, jint index, jobject callback)
 {
   return sim::AllocateSpiBufferCallback(
@@ -133,12 +133,12 @@ Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_registerReadAutoReceiveBufferCall
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    cancelReadAutoReceiveBufferCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_cancelReadAutoReceiveBufferCallback
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_cancelReadAutoReceiveBufferCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   sim::FreeSpiBufferCallback(env, handle, index,
@@ -146,12 +146,12 @@ Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_cancelReadAutoReceiveBufferCallba
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_SPIDataJNI
+ * Class:     edu_wpi_first_hal_simulation_SPIDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_SPIDataJNI_resetData
+Java_edu_wpi_first_hal_simulation_SPIDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetSPIData(index);

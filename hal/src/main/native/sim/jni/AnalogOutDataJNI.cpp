@@ -8,20 +8,20 @@
 #include <jni.h>
 
 #include "CallbackStore.h"
-#include "edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI.h"
-#include "mockdata/AnalogOutData.h"
+#include "edu_wpi_first_hal_simulation_AnalogOutDataJNI.h"
+#include "hal/simulation/AnalogOutData.h"
 
 using namespace hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    registerVoltageCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_registerVoltageCallback
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_registerVoltageCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -29,12 +29,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_registerVoltageCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    cancelVoltageCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_cancelVoltageCallback
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_cancelVoltageCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -42,36 +42,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_cancelVoltageCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    getVoltage
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_getVoltage
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_getVoltage
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAnalogOutVoltage(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    setVoltage
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_setVoltage
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_setVoltage
   (JNIEnv*, jclass, jint index, jdouble value)
 {
   HALSIM_SetAnalogOutVoltage(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_registerInitializedCallback
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -79,12 +79,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_registerInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_cancelInitializedCallback
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -92,36 +92,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_cancelInitializedCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_getInitialized
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAnalogOutInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_setInitialized
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetAnalogOutInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AnalogOutDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AnalogOutDataJNI_resetData
+Java_edu_wpi_first_hal_simulation_AnalogOutDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetAnalogOutData(index);

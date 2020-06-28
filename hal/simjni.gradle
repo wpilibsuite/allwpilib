@@ -33,7 +33,7 @@ task generateAthenaSimFiles() {
         dirs.each {
             def tree = fileTree(dir: it)
             tree.each { file ->
-                if (!file.name.contains('edu_wpi_first_hal_sim_mockdata_')) {
+                if (!file.name.contains('edu_wpi_first_hal_simulation_')) {
                     return
                 }
                 boolean reading = false

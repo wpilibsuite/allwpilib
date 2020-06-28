@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,8 +19,8 @@
 #include <wpi/spinlock.h>
 
 #include "hal/Value.h"
-#include "mockdata/SimCallbackRegistry.h"
-#include "mockdata/SimDeviceData.h"
+#include "hal/simulation/SimCallbackRegistry.h"
+#include "hal/simulation/SimDeviceData.h"
 
 namespace hal {
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,7 +22,7 @@
 #include "hal/HAL.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/UnlimitedHandleResource.h"
-#include "mockdata/NotifierData.h"
+#include "hal/simulation/NotifierData.h"
 
 namespace {
 struct Notifier {

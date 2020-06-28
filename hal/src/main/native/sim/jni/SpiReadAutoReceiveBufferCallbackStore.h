@@ -15,8 +15,8 @@
 #include "hal/Types.h"
 #include "hal/Value.h"
 #include "hal/handles/UnlimitedHandleResource.h"
-#include "mockdata/NotifyListener.h"
-#include "mockdata/SPIData.h"
+#include "hal/simulation/NotifyListener.h"
+#include "hal/simulation/SPIData.h"
 
 namespace hal {
 namespace sim {

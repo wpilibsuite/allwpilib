@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,7 @@
 #include "hal/HAL.h"
 #include "hal/PWM.h"
 #include "hal/handles/HandlesInternal.h"
-#include "mockdata/PWMData.h"
+#include "hal/simulation/PWMData.h"
 
 namespace hal {
 

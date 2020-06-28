@@ -9,8 +9,8 @@
 
 #include "CallbackStore.h"
 #include "ConstBufferCallbackStore.h"
-#include "edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI.h"
-#include "mockdata/AddressableLEDData.h"
+#include "edu_wpi_first_hal_simulation_AddressableLEDDataJNI.h"
+#include "hal/simulation/AddressableLEDData.h"
 
 static_assert(sizeof(jbyte) * 4 == sizeof(HAL_AddressableLEDData));
 
@@ -20,12 +20,12 @@ using namespace wpi::java;
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    registerInitializedCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerInitializedCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -34,12 +34,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerInitializedCal
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelInitializedCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelInitializedCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -47,36 +47,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelInitializedCallb
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    getInitialized
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_getInitialized
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getInitialized
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAddressableLEDInitialized(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    setInitialized
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_setInitialized
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setInitialized
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetAddressableLEDInitialized(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    registerOutputPortCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerOutputPortCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerOutputPortCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(
@@ -85,12 +85,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerOutputPortCall
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelOutputPortCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelOutputPortCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelOutputPortCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -98,36 +98,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelOutputPortCallba
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    getOutputPort
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_getOutputPort
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getOutputPort
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAddressableLEDOutputPort(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    setOutputPort
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_setOutputPort
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setOutputPort
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetAddressableLEDOutputPort(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    registerLengthCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerLengthCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerLengthCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -135,12 +135,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerLengthCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelLengthCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelLengthCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelLengthCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -148,36 +148,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelLengthCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    getLength
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_getLength
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getLength
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAddressableLEDLength(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    setLength
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_setLength
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setLength
   (JNIEnv*, jclass, jint index, jint value)
 {
   HALSIM_SetAddressableLEDLength(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    registerRunningCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerRunningCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerRunningCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
@@ -185,12 +185,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerRunningCallbac
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelRunningCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelRunningCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelRunningCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
@@ -198,36 +198,36 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelRunningCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    getRunning
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_getRunning
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getRunning
   (JNIEnv*, jclass, jint index)
 {
   return HALSIM_GetAddressableLEDRunning(index);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    setRunning
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_setRunning
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setRunning
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetAddressableLEDRunning(index, value);
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    registerDataCallback
  * Signature: (ILjava/lang/Object;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerDataCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_registerDataCallback
   (JNIEnv* env, jclass, jint index, jobject callback)
 {
   return sim::AllocateConstBufferCallback(
@@ -235,12 +235,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_registerDataCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    cancelDataCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelDataCallback
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_cancelDataCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   sim::FreeConstBufferCallback(env, handle, index,
@@ -248,12 +248,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_cancelDataCallback
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    getData
  * Signature: (I)[B
  */
 JNIEXPORT jbyteArray JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_getData
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getData
   (JNIEnv* env, jclass, jint index)
 {
   auto data =
@@ -264,12 +264,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_getData
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    setData
  * Signature: (I[B)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_setData
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setData
   (JNIEnv* env, jclass, jint index, jbyteArray arr)
 {
   JByteArrayRef jArrRef{env, arr};
@@ -280,12 +280,12 @@ Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_setData
 }
 
 /*
- * Class:     edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    resetData
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_sim_mockdata_AddressableLEDDataJNI_resetData
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_resetData
   (JNIEnv*, jclass, jint index)
 {
   HALSIM_ResetAddressableLEDData(index);

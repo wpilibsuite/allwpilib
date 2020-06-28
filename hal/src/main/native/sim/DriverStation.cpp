@@ -21,8 +21,8 @@
 #include <wpi/raw_ostream.h>
 
 #include "HALInitializer.h"
+#include "hal/simulation/MockHooks.h"
 #include "mockdata/DriverStationDataInternal.h"
-#include "mockdata/MockHooks.h"
 
 static wpi::mutex msgMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
