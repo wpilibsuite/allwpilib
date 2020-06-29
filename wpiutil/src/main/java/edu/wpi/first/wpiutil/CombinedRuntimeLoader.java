@@ -34,7 +34,7 @@ public final class CombinedRuntimeLoader {
     extractionDirectory = directory;
   }
 
-  public static native boolean addDllSearchDirectory(String directory);
+  public static native String setDllDirectory(String directory);
 
   private static String getLoadErrorMessage(String libraryName, UnsatisfiedLinkError ule) {
     StringBuilder msg = new StringBuilder(512);
@@ -126,7 +126,12 @@ public final class CombinedRuntimeLoader {
   public static void loadLibrary(String libraryName, List<String> extractedFiles)
       throws IOException {
     String currentPath = null;
+    String oldDllDirectory = null;
     try {
+      if (RuntimeDetector.isWindows()) {
+        var extractionPathString = getExtractionDirectory();
+        oldDllDirectory = setDllDirectory(extractionPathString);
+      }
       for (var extractedFile : extractedFiles) {
         if (extractedFile.contains(libraryName)) {
           // Load it
@@ -138,6 +143,11 @@ public final class CombinedRuntimeLoader {
       throw new IOException("Could not find library " + libraryName);
     } catch (UnsatisfiedLinkError ule) {
       throw new IOException(getLoadErrorMessage(currentPath, ule));
+    }
+    finally {
+      if (oldDllDirectory != null) {
+        setDllDirectory(oldDllDirectory);
+      }
     }
   }
 
@@ -163,7 +173,6 @@ public final class CombinedRuntimeLoader {
         // Load windows, set dll directory
         currentPath = Paths.get(extractionPathString, "WindowsLoaderHelper.dll").toString();
         System.load(currentPath);
-        addDllSearchDirectory(extractionPathString);
       }
     } catch (UnsatisfiedLinkError ule) {
       throw new IOException(getLoadErrorMessage(currentPath, ule));
