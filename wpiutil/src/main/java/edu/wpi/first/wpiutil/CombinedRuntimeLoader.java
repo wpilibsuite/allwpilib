@@ -143,8 +143,7 @@ public final class CombinedRuntimeLoader {
       throw new IOException("Could not find library " + libraryName);
     } catch (UnsatisfiedLinkError ule) {
       throw new IOException(getLoadErrorMessage(currentPath, ule));
-    }
-    finally {
+    } finally {
       if (oldDllDirectory != null) {
         setDllDirectory(oldDllDirectory);
       }
