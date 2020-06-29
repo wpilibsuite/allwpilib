@@ -10,6 +10,11 @@
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
+#ifdef _WIN32
+#include <Windows.h>
+#pragma comment(lib, "Winmm.lib")
+#endif  // _WIN32
+
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
@@ -285,6 +290,23 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   HAL_InitializeDriverStation();
 
   initialized = true;
+
+// Set Timer Precision to 1ms on Windows
+#ifdef _WIN32
+  TIMECAPS tc;
+  if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+    UINT target = min(1, tc.wPeriodMin);
+    timeBeginPeriod(target);
+    std::atexit([]() {
+      TIMECAPS tc;
+      if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+        UINT target = min(1, tc.wPeriodMin);
+        timeEndPeriod(target);
+      }
+    });
+  }
+#endif  // _WIN32
+
   return true;  // Add initialization if we need to at a later point
 }
 
