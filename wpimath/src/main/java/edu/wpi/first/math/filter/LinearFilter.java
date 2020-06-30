@@ -150,7 +150,9 @@ public class LinearFilter {
     double retVal = 0.0;
 
     // Rotate the inputs
-    m_inputs.addFirst(input);
+    if (m_inputGains.length > 0) {
+      m_inputs.addFirst(input);
+    }
 
     // Calculate the new value
     for (int i = 0; i < m_inputGains.length; i++) {
@@ -161,7 +163,9 @@ public class LinearFilter {
     }
 
     // Rotate the outputs
-    m_outputs.addFirst(retVal);
+    if (m_outputGains.length > 0) {
+      m_outputs.addFirst(retVal);
+    }
 
     return retVal;
   }

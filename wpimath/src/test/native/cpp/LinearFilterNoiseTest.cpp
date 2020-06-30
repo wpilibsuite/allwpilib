@@ -5,7 +5,6 @@
 #include "frc/LinearFilter.h"  // NOLINT(build/include_order)
 
 #include <cmath>
-#include <memory>
 #include <random>
 
 #include <wpi/numbers>
@@ -14,26 +13,12 @@
 #include "units/time.h"
 
 // Filter constants
-static constexpr units::second_t kFilterStep = 0.005_s;
-static constexpr units::second_t kFilterTime = 2.0_s;
+static constexpr auto kFilterStep = 5_ms;
+static constexpr auto kFilterTime = 2_s;
 static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
 static constexpr int32_t kMovAvgTaps = 6;
 
-enum LinearFilterNoiseTestType { TEST_SINGLE_POLE_IIR, TEST_MOVAVG };
-
-std::ostream& operator<<(std::ostream& os,
-                         const LinearFilterNoiseTestType& type) {
-  switch (type) {
-    case TEST_SINGLE_POLE_IIR:
-      os << "LinearFilter SinglePoleIIR";
-      break;
-    case TEST_MOVAVG:
-      os << "LinearFilter MovingAverage";
-      break;
-  }
-
-  return os;
-}
+enum LinearFilterNoiseTestType { kTestSinglePoleIIR, kTestMovAvg };
 
 static double GetData(double t) {
   return 100.0 * std::sin(2.0 * wpi::numbers::pi * t);
@@ -42,24 +27,17 @@ static double GetData(double t) {
 class LinearFilterNoiseTest
     : public testing::TestWithParam<LinearFilterNoiseTestType> {
  protected:
-  std::unique_ptr<frc::LinearFilter<double>> m_filter;
-
-  void SetUp() override {
+  frc::LinearFilter<double> m_filter = [=] {
     switch (GetParam()) {
-      case TEST_SINGLE_POLE_IIR: {
-        m_filter = std::make_unique<frc::LinearFilter<double>>(
-            frc::LinearFilter<double>::SinglePoleIIR(kSinglePoleIIRTimeConstant,
-                                                     kFilterStep));
+      case kTestSinglePoleIIR:
+        return frc::LinearFilter<double>::SinglePoleIIR(
+            kSinglePoleIIRTimeConstant, kFilterStep);
         break;
-      }
-
-      case TEST_MOVAVG: {
-        m_filter = std::make_unique<frc::LinearFilter<double>>(
-            frc::LinearFilter<double>::MovingAverage(kMovAvgTaps));
+      default:
+        return frc::LinearFilter<double>::MovingAverage(kMovAvgTaps);
         break;
-      }
     }
-  }
+  }();
 };
 
 /**
@@ -76,7 +54,7 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
   for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
     double theory = GetData(t.to<double>());
     double noise = distr(gen);
-    filterError += std::abs(m_filter->Calculate(theory + noise) - theory);
+    filterError += std::abs(m_filter.Calculate(theory + noise) - theory);
     noiseGenError += std::abs(noise - theory);
   }
 
@@ -88,4 +66,4 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
 }
 
 INSTANTIATE_TEST_SUITE_P(Test, LinearFilterNoiseTest,
-                         testing::Values(TEST_SINGLE_POLE_IIR, TEST_MOVAVG));
+                         testing::Values(kTestSinglePoleIIR, kTestMovAvg));
