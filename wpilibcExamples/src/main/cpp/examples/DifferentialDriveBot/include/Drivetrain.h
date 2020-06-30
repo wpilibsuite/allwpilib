@@ -37,14 +37,6 @@ class Drivetrain {
     m_rightEncoder.Reset();
   }
 
-  /**
-   * Get the robot angle as a Rotation2d.
-   */
-  frc::Rotation2d GetAngle() const {
-    // Negating the angle because WPILib Gyros are CW positive.
-    return frc::Rotation2d(units::degree_t(-m_gyro.GetAngle()));
-  }
-
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
@@ -77,7 +69,7 @@ class Drivetrain {
   frc::AnalogGyro m_gyro{0};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
-  frc::DifferentialDriveOdometry m_odometry{GetAngle()};
+  frc::DifferentialDriveOdometry m_odometry{m_gyro.GetRotation2d()};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

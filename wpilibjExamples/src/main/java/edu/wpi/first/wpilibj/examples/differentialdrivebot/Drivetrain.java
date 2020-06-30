@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -73,17 +72,7 @@ public class Drivetrain {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
 
-    m_odometry = new DifferentialDriveOdometry(getAngle());
-  }
-
-  /**
-   * Returns the angle of the robot as a Rotation2d.
-   *
-   * @return The angle of the robot.
-   */
-  public Rotation2d getAngle() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return Rotation2d.fromDegrees(-m_gyro.getAngle());
+    m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
   }
 
   /**
@@ -119,6 +108,7 @@ public class Drivetrain {
    * Updates the field-relative position.
    */
   public void updateOdometry() {
-    m_odometry.update(getAngle(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+    m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(),
+        m_rightEncoder.getDistance());
   }
 }

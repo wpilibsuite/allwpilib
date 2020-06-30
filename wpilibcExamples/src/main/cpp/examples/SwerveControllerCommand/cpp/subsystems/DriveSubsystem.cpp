@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -37,15 +37,13 @@ DriveSubsystem::DriveSubsystem()
           kRearRightDriveEncoderPorts,    kRearRightTurningEncoderPorts,
           kRearRightDriveEncoderReversed, kRearRightTurningEncoderReversed},
 
-      m_odometry{kDriveKinematics,
-                 frc::Rotation2d(units::degree_t(GetHeading())),
-                 frc::Pose2d()} {}
+      m_odometry{kDriveKinematics, m_gyro.GetRotation2d(), frc::Pose2d()} {}
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
-  m_odometry.Update(frc::Rotation2d(units::degree_t(GetHeading())),
-                    m_frontLeft.GetState(), m_rearLeft.GetState(),
-                    m_frontRight.GetState(), m_rearRight.GetState());
+  m_odometry.Update(m_gyro.GetRotation2d(), m_frontLeft.GetState(),
+                    m_rearLeft.GetState(), m_frontRight.GetState(),
+                    m_rearRight.GetState());
 }
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
@@ -54,8 +52,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                            bool fieldRelative) {
   auto states = kDriveKinematics.ToSwerveModuleStates(
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot,
-                          frc::Rotation2d(units::degree_t(GetHeading())))
+                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
   kDriveKinematics.NormalizeWheelSpeeds(&states, AutoConstants::kMaxSpeed);
@@ -85,15 +82,13 @@ void DriveSubsystem::ResetEncoders() {
   m_rearRight.ResetEncoders();
 }
 
-double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1. : 1.);
+units::degree_t DriveSubsystem::GetHeading() const {
+  return m_gyro.GetRotation2d().Degrees();
 }
 
 void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
 
-double DriveSubsystem::GetTurnRate() {
-  return m_gyro.GetRate() * (kGyroReversed ? -1. : 1.);
-}
+double DriveSubsystem::GetTurnRate() { return -m_gyro.GetRate(); }
 
 frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
@@ -62,7 +61,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Odometry class for tracking robot pose
   MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(DriveConstants.kDriveKinematics, getAngle());
+      new MecanumDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
 
   /**
    * Creates a new DriveSubsystem.
@@ -75,20 +74,10 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
   }
 
-  /**
-   * Returns the angle of the robot as a Rotation2d.
-   *
-   * @return The angle of the robot.
-   */
-  public Rotation2d getAngle() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return Rotation2d.fromDegrees(m_gyro.getAngle() * (DriveConstants.kGyroReversed ? 1.0 : -1.0));
-  }
-
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(getAngle(),
+    m_odometry.update(m_gyro.getRotation2d(),
                       new MecanumDriveWheelSpeeds(
                           m_frontLeftEncoder.getRate(),
                           m_rearLeftEncoder.getRate(),
@@ -111,7 +100,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, getAngle());
+    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
   }
 
   /**
@@ -227,10 +216,10 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from 180 to 180
+   * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return m_gyro.getRotation2d().getDegrees();
   }
 
   /**
@@ -239,6 +228,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return -m_gyro.getRate();
   }
 }

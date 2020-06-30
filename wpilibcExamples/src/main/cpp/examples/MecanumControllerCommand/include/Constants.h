@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,8 +49,6 @@ constexpr double kWheelDiameterMeters = .15;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterMeters * wpi::math::pi) / static_cast<double>(kEncoderCPR);
-
-constexpr bool kGyroReversed = false;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
