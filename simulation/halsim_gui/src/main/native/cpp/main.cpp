@@ -27,6 +27,7 @@
 #include "SimDeviceGui.h"
 #include "SolenoidGui.h"
 #include "TimingGui.h"
+#include "Assembly2D.h"
 
 using namespace halsimgui;
 
@@ -45,6 +46,7 @@ __declspec(dllexport)
   HALSimGui::Add(DIOGui::Initialize);
   HALSimGui::Add(EncoderGui::Initialize);
   HALSimGui::Add(Field2D::Initialize);
+  HALSimGui::Add(Assembly2D::Initialize);
   HALSimGui::Add(NetworkTablesGui::Initialize);
   HALSimGui::Add(PDPGui::Initialize);
   HALSimGui::Add(PWMGui::Initialize);
