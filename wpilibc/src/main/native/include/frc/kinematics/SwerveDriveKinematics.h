@@ -13,7 +13,7 @@
 #include <Eigen/Core>
 #include <Eigen/QR>
 #include <hal/FRCUsageReporting.h>
-#include <units/units.h>
+#include <units/velocity.h>
 
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"

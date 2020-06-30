@@ -38,7 +38,10 @@
 #include <utility>
 #include <vector>
 
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/curvature.h>
+#include <units/length.h>
+#include <units/math.h>
 #include <wpi/Twine.h>
 
 namespace frc {

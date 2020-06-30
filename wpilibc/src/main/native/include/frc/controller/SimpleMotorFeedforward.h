@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/time.h>
+#include <units/voltage.h>
 #include <wpi/MathExtras.h>
 
 namespace frc {

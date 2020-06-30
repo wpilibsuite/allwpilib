@@ -9,6 +9,8 @@
 
 #include <limits>
 
+#include <units/math.h>
+
 using namespace frc;
 
 EllipticalRegionConstraint::EllipticalRegionConstraint(

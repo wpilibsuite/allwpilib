@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/length.h>
+#include <units/voltage.h>
 
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"

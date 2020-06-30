@@ -12,7 +12,7 @@
 #include <utility>
 
 #include <frc/controller/ProfiledPIDController.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/ArrayRef.h>
 
 #include "frc2/command/CommandBase.h"

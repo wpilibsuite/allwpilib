@@ -7,7 +7,10 @@
 
 #include <vector>
 
-#include <units/units.h>
+#include <units/acceleration.h>
+#include <units/length.h>
+#include <units/math.h>
+#include <units/velocity.h>
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/MaxVelocityConstraint.h"

@@ -33,6 +33,8 @@
 
 #include <string>
 
+#include <units/math.h>
+
 using namespace frc;
 
 Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(

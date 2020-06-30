@@ -17,7 +17,8 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/trajectory/Trajectory.h>
-#include <units/units.h>
+#include <units/length.h>
+#include <units/voltage.h>
 #include <wpi/ArrayRef.h>
 
 #include "frc2/Timer.h"

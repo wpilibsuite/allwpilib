@@ -10,7 +10,7 @@
 #include <functional>
 #include <limits>
 
-#include <units/units.h>
+#include <units/time.h>
 
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"

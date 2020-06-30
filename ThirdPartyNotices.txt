@@ -36,7 +36,7 @@ CoreUI                wpiutil/src/main/native/resources/coreui-*
 Feather Icons         wpiutil/src/main/native/resources/feather-*
 jQuery                wpiutil/src/main/native/resources/jquery-*
 popper.js             wpiutil/src/main/native/resources/popper-*
-units                 wpiutil/src/main/native/include/units/units.h
+units                 wpiutil/src/main/native/include/units/
 Eigen                 wpiutil/src/main/native/eigeninclude/
 StackWalker           wpiutil/src/main/native/windows/StackWalker.*
 Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineParameterizer.java

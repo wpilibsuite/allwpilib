@@ -7,7 +7,10 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/math.h>
+#include <units/voltage.h>
 #include <wpi/MathExtras.h>
 
 namespace frc {

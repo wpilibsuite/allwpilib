@@ -16,7 +16,7 @@
 #include <frc/Watchdog.h>
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/FunctionExtras.h>
 

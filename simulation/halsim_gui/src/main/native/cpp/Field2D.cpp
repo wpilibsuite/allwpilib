@@ -16,7 +16,8 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <hal/simulation/SimDeviceData.h>
 #include <imgui_internal.h>
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/length.h>
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/json.h>

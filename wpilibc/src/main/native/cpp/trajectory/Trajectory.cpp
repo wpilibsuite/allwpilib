@@ -7,6 +7,7 @@
 
 #include "frc/trajectory/Trajectory.h"
 
+#include <units/math.h>
 #include <wpi/json.h>
 
 using namespace frc;
