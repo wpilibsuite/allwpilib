@@ -31,7 +31,7 @@ class static_circular_buffer {
     using pointer = T*;
     using reference = T&;
 
-    explicit iterator(static_circular_buffer* buffer, size_t index)
+    iterator(static_circular_buffer* buffer, size_t index)
         : m_buffer(buffer), m_index(index) {}
 
     iterator& operator++() {
@@ -43,11 +43,11 @@ class static_circular_buffer {
       ++(*this);
       return retval;
     }
-    bool operator==(iterator other) const {
+    bool operator==(const iterator& other) const {
       return m_buffer == other.m_buffer && m_index == other.m_index;
     }
-    bool operator!=(iterator other) const { return !(*this == other); }
-    reference operator*() const { return (*m_buffer)[m_index]; }
+    bool operator!=(const iterator& other) const { return !(*this == other); }
+    reference operator*() { return (*m_buffer)[m_index]; }
 
    private:
     static_circular_buffer* m_buffer;
@@ -62,7 +62,7 @@ class static_circular_buffer {
     using pointer = T*;
     using const_reference = const T&;
 
-    explicit const_iterator(const static_circular_buffer* buffer, size_t index)
+    const_iterator(const static_circular_buffer* buffer, size_t index)
         : m_buffer(buffer), m_index(index) {}
 
     const_iterator& operator++() {
@@ -74,10 +74,12 @@ class static_circular_buffer {
       ++(*this);
       return retval;
     }
-    bool operator==(const_iterator other) const {
+    bool operator==(const const_iterator& other) const {
       return m_buffer == other.m_buffer && m_index == other.m_index;
     }
-    bool operator!=(const_iterator other) const { return !(*this == other); }
+    bool operator!=(const const_iterator& other) const {
+      return !(*this == other);
+    }
     const_reference operator*() const { return (*m_buffer)[m_index]; }
 
    private:
@@ -92,6 +94,11 @@ class static_circular_buffer {
 
   const_iterator begin() const { return const_iterator(this, 0); }
   const_iterator end() const {
+    return const_iterator(this, ::wpi::static_circular_buffer<T, N>::size());
+  }
+
+  const_iterator cbegin() const { return const_iterator(this, 0); }
+  const_iterator cend() const {
     return const_iterator(this, ::wpi::static_circular_buffer<T, N>::size());
   }
 
@@ -127,8 +134,9 @@ class static_circular_buffer {
   const T& back() const { return m_data[(m_front + m_length - 1) % N]; }
 
   /**
-   * Push new value onto front of the buffer. The value at the back is
-   * overwritten if the buffer is full.
+   * Push a new value onto the front of the buffer.
+   *
+   * The value at the back is overwritten if the buffer is full.
    */
   void push_front(T value) {
     m_front = ModuloDec(m_front);
@@ -141,11 +149,47 @@ class static_circular_buffer {
   }
 
   /**
-   * Push new value onto back of the buffer. The value at the front is
-   * overwritten if the buffer is full.
+   * Push a new value onto the back of the buffer.
+   *
+   * The value at the front is overwritten if the buffer is full.
    */
   void push_back(T value) {
     m_data[(m_front + m_length) % N] = value;
+
+    if (m_length < N) {
+      m_length++;
+    } else {
+      // Increment front if buffer is full to maintain size
+      m_front = ModuloInc(m_front);
+    }
+  }
+
+  /**
+   * Push a new value onto the front of the buffer that is constructed with the
+   * provided constructor arguments.
+   *
+   * The value at the back is overwritten if the buffer is full.
+   */
+  template <class... Args>
+  void emplace_front(Args&&... args) {
+    m_front = ModuloDec(m_front);
+
+    m_data[m_front] = T{args...};
+
+    if (m_length < N) {
+      m_length++;
+    }
+  }
+
+  /**
+   * Push a new value onto the back of the buffer that is constructed with the
+   * provided constructor arguments.
+   *
+   * The value at the front is overwritten if the buffer is full.
+   */
+  template <class... Args>
+  void emplace_back(Args&&... args) {
+    m_data[(m_front + m_length) % N] = T{args...};
 
     if (m_length < N) {
       m_length++;

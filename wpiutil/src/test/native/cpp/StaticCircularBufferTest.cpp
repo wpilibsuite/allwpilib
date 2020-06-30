@@ -28,7 +28,7 @@ TEST(StaticCircularBufferTest, PushFrontTest) {
     queue.push_front(value);
   }
 
-  for (size_t i = 0; i < pushFrontOut.size(); i++) {
+  for (size_t i = 0; i < pushFrontOut.size(); ++i) {
     EXPECT_EQ(pushFrontOut[i], queue[i]);
   }
 }
@@ -40,7 +40,31 @@ TEST(StaticCircularBufferTest, PushBackTest) {
     queue.push_back(value);
   }
 
-  for (size_t i = 0; i < pushBackOut.size(); i++) {
+  for (size_t i = 0; i < pushBackOut.size(); ++i) {
+    EXPECT_EQ(pushBackOut[i], queue[i]);
+  }
+}
+
+TEST(StaticCircularBufferTest, EmplaceFrontTest) {
+  wpi::static_circular_buffer<double, 8> queue;
+
+  for (auto& value : values) {
+    queue.emplace_front(value);
+  }
+
+  for (size_t i = 0; i < pushFrontOut.size(); ++i) {
+    EXPECT_EQ(pushFrontOut[i], queue[i]);
+  }
+}
+
+TEST(StaticCircularBufferTest, EmplaceBackTest) {
+  wpi::static_circular_buffer<double, 8> queue;
+
+  for (auto& value : values) {
+    queue.emplace_back(value);
+  }
+
+  for (size_t i = 0; i < pushBackOut.size(); ++i) {
     EXPECT_EQ(pushBackOut[i], queue[i]);
   }
 }
@@ -91,7 +115,7 @@ TEST(StaticCircularBufferTest, PushPopTest) {
 TEST(StaticCircularBufferTest, ResetTest) {
   wpi::static_circular_buffer<double, 5> queue;
 
-  for (size_t i = 1; i < 6; i++) {
+  for (size_t i = 1; i < 6; ++i) {
     queue.push_back(i);
   }
 
