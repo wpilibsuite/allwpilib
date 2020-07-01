@@ -74,17 +74,7 @@ public class Drivetrain {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
 
-    m_odometry = new DifferentialDriveOdometry(getAngle());
-  }
-
-  /**
-   * Returns the angle of the robot as a Rotation2d.
-   *
-   * @return The angle of the robot.
-   */
-  public Rotation2d getAngle() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return Rotation2d.fromDegrees(-m_gyro.getAngle());
+    m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
   }
 
   /**
@@ -120,7 +110,8 @@ public class Drivetrain {
    * Updates the field-relative position.
    */
   public void updateOdometry() {
-    m_odometry.update(getAngle(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+    m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(),
+        m_rightEncoder.getDistance());
   }
 
   /**
@@ -128,7 +119,7 @@ public class Drivetrain {
    * @param pose The position to reset to.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, getAngle());
+    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
   }
 
   /**
