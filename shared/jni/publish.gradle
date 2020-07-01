@@ -113,7 +113,7 @@ model {
         }
 
         if (project.hasProperty('cvStaticBuild') && project.getProperty('cvStaticBuild') == true) {
-            def jniCvTaskList = createComponentZipTasks($.components, ["${nativeName}JNICvStatic"], jniCvStaticBaseName, Jar, project, { task, value ->
+            def jniCvTaskList = createComponentZipTasks($.components, ["${nativeName}JNICvStatic"], jniCvStaticBaseName, Zip, project, { task, value ->
                 value.each { binary ->
                     if (binary.buildable) {
                         if (binary instanceof SharedLibraryBinarySpec) {
