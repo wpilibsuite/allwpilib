@@ -33,12 +33,15 @@ using namespace halsimgui;
 namespace {
 
 }
-
+int counter = 0;
 static void DisplayField2D() {
-
+  ImGui::InvisibleButton("field", ImGui::GetContentRegionAvail());
   ImVec2 windowPos = ImGui::GetWindowPos();
   auto drawList = ImGui::GetWindowDrawList();
-  drawList->AddCircle(windowPos, 100, IM_COL32(0, 255, 0, 255));
+  drawList->AddCircle(windowPos, counter++, IM_COL32(0, 255, 0, 255));
+  if(counter > 1000){
+    counter = 0;
+  }
 }
 
 
@@ -49,7 +52,7 @@ void Assembly2D::Initialize() {
   iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
   HALSimGui::AddWindow("2D Assembly", DisplayField2D);
-  HALSimGui::SetWindowVisibility("2D Assembly", HALSimGui::kHide);
+  // HALSimGui::SetWindowVisibility("2D Assembly", HALSimGui::kHide);
   HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
   HALSimGui::SetDefaultWindowSize("2D Assembly", 400, 200);
   HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
