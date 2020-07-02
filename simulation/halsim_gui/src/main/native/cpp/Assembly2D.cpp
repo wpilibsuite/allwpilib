@@ -30,20 +30,51 @@
 
 using namespace halsimgui;
 
-namespace {
-
-}
 int counter = 0;
-static void DisplayField2D() {
+static void DisplayAssembly2D() {
   ImGui::InvisibleButton("field", ImGui::GetContentRegionAvail());
   ImVec2 windowPos = ImGui::GetWindowPos();
   auto drawList = ImGui::GetWindowDrawList();
   drawList->AddCircle(windowPos, counter++, IM_COL32(0, 255, 0, 255));
-  if(counter > 1000){
+  if (counter > 1000) {
     counter = 0;
   }
 }
 
+void static readJson(std::string jFile) {
+  // std::ifstream jsonRead(jFile);
+  // wpi::json jsonObject;
+  // jsonRead >> jsonObject;
+  std::string name;
+    // open config file
+  std::error_code ec;
+  wpi::raw_fd_istream is(jFile, ec);
+  if (ec) {
+    wpi::errs() << "could not open '" << jFile << "': " << ec.message()
+                << '\n';
+  }
+
+  // parse file
+  wpi::json j;
+  try {
+    j = wpi::json::parse(is);
+  } catch (const wpi::json::parse_error& e) {
+    wpi::errs() << "byte " << e.byte << ": " << e.what() << '\n';
+  }
+
+  // top level must be an object
+  if (!j.is_object()) {
+    wpi::errs() << "must be JSON object\n";
+  }
+
+  // team number
+  try {
+    name = j.at("name").get<std::string>();
+  } catch (const wpi::json::exception& e) {
+    wpi::errs() << "could not read team number: " << e.what() << '\n';
+  }
+  wpi::outs() << name << "\n";
+}
 
 void Assembly2D::Initialize() {
   // hook ini handler to save settings
@@ -51,9 +82,9 @@ void Assembly2D::Initialize() {
   iniHandler.TypeName = "2D Assembly";
   iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-  HALSimGui::AddWindow("2D Assembly", DisplayField2D);
-  // HALSimGui::SetWindowVisibility("2D Assembly", HALSimGui::kHide);
+  HALSimGui::AddWindow("2D Assembly", DisplayAssembly2D);
   HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
   HALSimGui::SetDefaultWindowSize("2D Assembly", 400, 200);
   HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
+  readJson("/home/gabe/github/allwpilib/Assembly2D.json");
 }
