@@ -13,6 +13,7 @@
 #include "gtest/gtest.h"
 #include "units/acceleration.h"
 #include "units/angle.h"
+#include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
 #include "units/area.h"
 #include "units/capacitance.h"
@@ -52,6 +53,7 @@
 
 using namespace units::acceleration;
 using namespace units::angle;
+using namespace units::angular_acceleration;
 using namespace units::angular_velocity;
 using namespace units::area;
 using namespace units::capacitance;
@@ -1926,6 +1928,7 @@ TEST_F(UnitConversion, acceleration) {
   test = convert<standard_gravity, meters_per_second_squared>(1.0);
   EXPECT_NEAR(9.80665, test, 5.0e-10);
 }
+
 TEST_F(UnitConversion, force) {
   double test;
 

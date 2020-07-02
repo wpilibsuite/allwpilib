@@ -18,6 +18,7 @@
 
 #include "units/acceleration.h"
 #include "units/angle.h"
+#include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
 #include "units/area.h"
 #include "units/capacitance.h"
