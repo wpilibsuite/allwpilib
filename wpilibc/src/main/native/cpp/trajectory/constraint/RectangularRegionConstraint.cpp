@@ -39,8 +39,6 @@ TrajectoryConstraint::MinMax RectangularRegionConstraint::MinMaxAcceleration(
 }
 
 bool RectangularRegionConstraint::IsPoseInRegion(const Pose2d& pose) const {
-  return pose.Translation().X() >= m_bottomLeftPoint.X() &&
-         pose.Translation().X() <= m_topRightPoint.X() &&
-         pose.Translation().Y() >= m_bottomLeftPoint.Y() &&
-         pose.Translation().Y() <= m_topRightPoint.Y();
+  return pose.X() >= m_bottomLeftPoint.X() && pose.X() <= m_topRightPoint.X() &&
+         pose.Y() >= m_bottomLeftPoint.Y() && pose.Y() <= m_topRightPoint.Y();
 }

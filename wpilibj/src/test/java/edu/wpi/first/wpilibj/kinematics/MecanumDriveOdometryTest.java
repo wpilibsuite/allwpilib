@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -37,8 +37,8 @@ class MecanumDriveOdometryTest {
     var secondPose = m_odometry.updateWithTime(0.0, new Rotation2d(), wheelSpeeds);
 
     assertAll(
-        () -> assertEquals(secondPose.getTranslation().getX(), 0.0, 0.01),
-        () -> assertEquals(secondPose.getTranslation().getY(), 0.0, 0.01),
+        () -> assertEquals(secondPose.getX(), 0.0, 0.01),
+        () -> assertEquals(secondPose.getY(), 0.0, 0.01),
         () -> assertEquals(secondPose.getRotation().getDegrees(), 0.0, 0.01)
     );
   }
@@ -52,8 +52,8 @@ class MecanumDriveOdometryTest {
     var pose = m_odometry.updateWithTime(0.10, new Rotation2d(), wheelSpeeds);
 
     assertAll(
-        () -> assertEquals(5.0 / 10.0, pose.getTranslation().getX(), 0.01),
-        () -> assertEquals(0, pose.getTranslation().getY(), 0.01),
+        () -> assertEquals(5.0 / 10.0, pose.getX(), 0.01),
+        () -> assertEquals(0, pose.getY(), 0.01),
         () -> assertEquals(0.0, pose.getRotation().getDegrees(), 0.01)
     );
   }
@@ -68,8 +68,8 @@ class MecanumDriveOdometryTest {
     final var pose = m_odometry.updateWithTime(1.0, Rotation2d.fromDegrees(90.0), wheelSpeeds);
 
     assertAll(
-        () -> assertEquals(12.0, pose.getTranslation().getX(), 0.01),
-        () -> assertEquals(12.0, pose.getTranslation().getY(), 0.01),
+        () -> assertEquals(12.0, pose.getX(), 0.01),
+        () -> assertEquals(12.0, pose.getY(), 0.01),
         () -> assertEquals(90.0, pose.getRotation().getDegrees(), 0.01)
     );
   }
@@ -85,8 +85,8 @@ class MecanumDriveOdometryTest {
     var pose = m_odometry.updateWithTime(1.0, gyro, speeds);
 
     assertAll(
-        () -> assertEquals(5.0, pose.getTranslation().getX(), 0.1),
-        () -> assertEquals(0.00, pose.getTranslation().getY(), 0.1),
+        () -> assertEquals(5.0, pose.getX(), 0.1),
+        () -> assertEquals(0.00, pose.getY(), 0.1),
         () -> assertEquals(0.00, pose.getRotation().getRadians(), 0.1)
     );
   }

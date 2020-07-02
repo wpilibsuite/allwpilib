@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -20,10 +20,8 @@ TEST(Pose2dTest, TransformBy) {
 
   const auto transformed = initial + transform;
 
-  EXPECT_NEAR(transformed.Translation().X().to<double>(),
-              1 + 5 / std::sqrt(2.0), kEpsilon);
-  EXPECT_NEAR(transformed.Translation().Y().to<double>(),
-              2 + 5 / std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(transformed.X().to<double>(), 1 + 5 / std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(transformed.Y().to<double>(), 2 + 5 / std::sqrt(2.0), kEpsilon);
   EXPECT_NEAR(transformed.Rotation().Degrees().to<double>(), 50.0, kEpsilon);
 }
 
@@ -33,10 +31,9 @@ TEST(Pose2dTest, RelativeTo) {
 
   const auto finalRelativeToInitial = final.RelativeTo(initial);
 
-  EXPECT_NEAR(finalRelativeToInitial.Translation().X().to<double>(),
-              5.0 * std::sqrt(2.0), kEpsilon);
-  EXPECT_NEAR(finalRelativeToInitial.Translation().Y().to<double>(), 0.0,
+  EXPECT_NEAR(finalRelativeToInitial.X().to<double>(), 5.0 * std::sqrt(2.0),
               kEpsilon);
+  EXPECT_NEAR(finalRelativeToInitial.Y().to<double>(), 0.0, kEpsilon);
   EXPECT_NEAR(finalRelativeToInitial.Rotation().Degrees().to<double>(), 0.0,
               kEpsilon);
 }
@@ -59,8 +56,7 @@ TEST(Pose2dTest, Minus) {
 
   const auto transform = final - initial;
 
-  EXPECT_NEAR(transform.Translation().X().to<double>(), 5.0 * std::sqrt(2.0),
-              kEpsilon);
-  EXPECT_NEAR(transform.Translation().Y().to<double>(), 0.0, kEpsilon);
+  EXPECT_NEAR(transform.X().to<double>(), 5.0 * std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(transform.Y().to<double>(), 0.0, kEpsilon);
   EXPECT_NEAR(transform.Rotation().Degrees().to<double>(), 0.0, kEpsilon);
 }

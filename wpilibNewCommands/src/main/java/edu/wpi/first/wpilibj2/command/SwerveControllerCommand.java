@@ -120,12 +120,12 @@ public class SwerveControllerCommand extends CommandBase {
     var poseError = desiredPose.relativeTo(m_pose.get());
 
     double targetXVel = m_xController.calculate(
-        m_pose.get().getTranslation().getX(),
-        desiredPose.getTranslation().getX());
+        m_pose.get().getX(),
+        desiredPose.getX());
 
     double targetYVel = m_yController.calculate(
-        m_pose.get().getTranslation().getY(),
-        desiredPose.getTranslation().getY());
+        m_pose.get().getY(),
+        desiredPose.getY());
 
     // The robot will go to the desired rotation of the final pose in the trajectory,
     // not following the poses at individual states.

@@ -263,15 +263,15 @@ public final class SplineHelper {
 
   private static Spline.ControlVector getCubicControlVector(double scalar, Pose2d point) {
     return new Spline.ControlVector(
-        new double[]{point.getTranslation().getX(), scalar * point.getRotation().getCos()},
-        new double[]{point.getTranslation().getY(), scalar * point.getRotation().getSin()}
+        new double[]{point.getX(), scalar * point.getRotation().getCos()},
+        new double[]{point.getY(), scalar * point.getRotation().getSin()}
     );
   }
 
   private static Spline.ControlVector getQuinticControlVector(double scalar, Pose2d point) {
     return new Spline.ControlVector(
-        new double[]{point.getTranslation().getX(), scalar * point.getRotation().getCos(), 0.0},
-        new double[]{point.getTranslation().getY(), scalar * point.getRotation().getSin(), 0.0}
+        new double[]{point.getX(), scalar * point.getRotation().getCos(), 0.0},
+        new double[]{point.getY(), scalar * point.getRotation().getSin(), 0.0}
     );
   }
 }
