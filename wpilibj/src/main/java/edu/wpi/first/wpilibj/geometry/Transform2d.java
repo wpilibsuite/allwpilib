@@ -71,6 +71,24 @@ public class Transform2d {
   }
 
   /**
+   * Returns the X component of the transformation's translation.
+   *
+   * @return The x component of the transformation's translation.
+   */
+  public double getX() {
+    return m_translation.getX();
+  }
+
+  /**
+   * Returns the Y component of the transformation's translation.
+   *
+   * @return The y component of the transformation's translation.
+   */
+  public double getY() {
+    return m_translation.getY();
+  }
+
+  /**
    * Returns the rotational component of the transformation.
    *
    * @return Reference to the rotational component of the transform.
