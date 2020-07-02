@@ -41,17 +41,21 @@ static void DisplayAssembly2D() {
   }
 }
 
+struct BodyConfig {
+  std::string name;
+  std::string type;
+};
+
 void static readJson(std::string jFile) {
   // std::ifstream jsonRead(jFile);
   // wpi::json jsonObject;
   // jsonRead >> jsonObject;
   std::string name;
-    // open config file
+  // open config file
   std::error_code ec;
   wpi::raw_fd_istream is(jFile, ec);
   if (ec) {
-    wpi::errs() << "could not open '" << jFile << "': " << ec.message()
-                << '\n';
+    wpi::errs() << "could not open '" << jFile << "': " << ec.message() << '\n';
   }
 
   // parse file
@@ -67,14 +71,56 @@ void static readJson(std::string jFile) {
     wpi::errs() << "must be JSON object\n";
   }
 
-  // team number
+  // // team number
+  // try {
+  //   name = j.at("name").get<std::string>();
+  // } catch (const wpi::json::exception& e) {
+  //   wpi::errs() << "could not read team number: " << e.what() << '\n';
+  // }
+
+  BodyConfig tmpBodyConfig;
+  BodyConfig c;
   try {
-    name = j.at("name").get<std::string>();
+    for (auto&& body : j.at("body")) {
+      try {
+        c.name = body.at("name").get<std::string>();
+      } catch (const wpi::json::exception& e) {
+        wpi::errs() << "could not read body name: " << e.what() << '\n';
+      }
+
+      // path
+      try {
+        c.type = body.at("type").get<std::string>();
+      } catch (const wpi::json::exception& e) {
+        wpi::errs() << "camera '" << c.name
+                    << "': could not type path: " << e.what() << '\n';
+      }
+    }
   } catch (const wpi::json::exception& e) {
-    wpi::errs() << "could not read team number: " << e.what() << '\n';
+    wpi::errs() << "could not read body: " << e.what() << '\n';
   }
-  wpi::outs() << name << "\n";
+  wpi::outs() << c.name << " " << c.type << "\n";
 }
+
+// BodyConfig static ReadBody(const wpi::json& config) {
+//   BodyConfig c;
+
+//   // name
+//   try {
+//     c.name = config.at("name").get<std::string>();
+//   } catch (const wpi::json::exception& e) {
+//     wpi::errs() << "could not read body name: " << e.what() << '\n';
+//   }
+
+//   // path
+//   try {
+//     c.type = config.at("type").get<std::string>();
+//   } catch (const wpi::json::exception& e) {
+//     wpi::errs() << "camera '" << c.name
+//                 << "': could not type path: " << e.what() << '\n';
+//   }
+//   return BodyConfig
+// }
 
 void Assembly2D::Initialize() {
   // hook ini handler to save settings

@@ -1,8 +1,6 @@
 {
-    "name": "mainLine",
     "body": [{
         "name": "mainLine",
-        "type": "line",
-        "angle": 0
+        "type": "line"
     }]
 }
