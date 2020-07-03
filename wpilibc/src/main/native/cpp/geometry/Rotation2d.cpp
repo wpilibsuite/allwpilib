@@ -19,6 +19,11 @@ Rotation2d::Rotation2d(units::radian_t value)
       m_cos(units::math::cos(value)),
       m_sin(units::math::sin(value)) {}
 
+Rotation2d::Rotation2d(units::degree_t value)
+    : m_value(value),
+      m_cos(units::math::cos(value)),
+      m_sin(units::math::sin(value)) {}
+
 Rotation2d::Rotation2d(double x, double y) {
   const auto magnitude = std::hypot(x, y);
   if (magnitude > 1e-6) {

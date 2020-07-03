@@ -34,6 +34,13 @@ class Rotation2d {
   Rotation2d(units::radian_t value);  // NOLINT(runtime/explicit)
 
   /**
+   * Constructs a Rotation2d with the given degree value.
+   *
+   * @param value The value of the angle in degrees.
+   */
+  Rotation2d(units::degree_t value);  // NOLINT(runtime/explicit)
+
+  /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
    * components. The x and y don't have to be normalized.
    *
@@ -174,7 +181,7 @@ class Rotation2d {
   double Tan() const { return m_sin / m_cos; }
 
  private:
-  units::radian_t m_value = 0_deg;
+  units::radian_t m_value = 0_rad;
   double m_cos = 1;
   double m_sin = 0;
 };
