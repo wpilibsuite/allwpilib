@@ -119,8 +119,8 @@ public class RamseteController {
     m_poseError = poseRef.relativeTo(currentPose);
 
     // Aliases for equation readability
-    final double eX = m_poseError.getTranslation().getX();
-    final double eY = m_poseError.getTranslation().getY();
+    final double eX = m_poseError.getX();
+    final double eY = m_poseError.getY();
     final double eTheta = m_poseError.getRotation().getRadians();
     final double vRef = linearVelocityRefMeters;
     final double omegaRef = angularVelocityRefRadiansPerSecond;

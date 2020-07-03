@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,8 +25,8 @@ class Pose2dTest {
     var transformed = initial.plus(transformation);
 
     assertAll(
-        () -> assertEquals(transformed.getTranslation().getX(), 1 + 5.0 / Math.sqrt(2.0), kEpsilon),
-        () -> assertEquals(transformed.getTranslation().getY(), 2 + 5.0 / Math.sqrt(2.0), kEpsilon),
+        () -> assertEquals(transformed.getX(), 1 + 5.0 / Math.sqrt(2.0), kEpsilon),
+        () -> assertEquals(transformed.getY(), 2 + 5.0 / Math.sqrt(2.0), kEpsilon),
         () -> assertEquals(transformed.getRotation().getDegrees(), 50.0, kEpsilon)
     );
   }
@@ -39,9 +39,9 @@ class Pose2dTest {
     var finalRelativeToInitial = last.relativeTo(initial);
 
     assertAll(
-        () -> assertEquals(finalRelativeToInitial.getTranslation().getX(), 5.0 * Math.sqrt(2.0),
+        () -> assertEquals(finalRelativeToInitial.getX(), 5.0 * Math.sqrt(2.0),
             kEpsilon),
-        () -> assertEquals(finalRelativeToInitial.getTranslation().getY(), 0.0, kEpsilon),
+        () -> assertEquals(finalRelativeToInitial.getY(), 0.0, kEpsilon),
         () -> assertEquals(finalRelativeToInitial.getRotation().getDegrees(), 0.0, kEpsilon)
     );
   }
@@ -67,8 +67,8 @@ class Pose2dTest {
     final var transform = last.minus(initial);
 
     assertAll(
-        () -> assertEquals(transform.getTranslation().getX(), 5.0 * Math.sqrt(2.0), kEpsilon),
-        () -> assertEquals(transform.getTranslation().getY(), 0.0, kEpsilon),
+        () -> assertEquals(transform.getX(), 5.0 * Math.sqrt(2.0), kEpsilon),
+        () -> assertEquals(transform.getY(), 0.0, kEpsilon),
         () -> assertEquals(transform.getRotation().getDegrees(), 0.0, kEpsilon)
     );
   }

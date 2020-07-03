@@ -54,18 +54,14 @@ class QuinticHermiteSplineTest : public ::testing::Test {
     }
 
     // Check first point.
-    EXPECT_NEAR(poses.front().first.Translation().X().to<double>(),
-                a.Translation().X().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.front().first.Translation().Y().to<double>(),
-                a.Translation().Y().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.front().first.X().to<double>(), a.X().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.front().first.Y().to<double>(), a.Y().to<double>(), 1E-9);
     EXPECT_NEAR(poses.front().first.Rotation().Radians().to<double>(),
                 a.Rotation().Radians().to<double>(), 1E-9);
 
     // Check last point.
-    EXPECT_NEAR(poses.back().first.Translation().X().to<double>(),
-                b.Translation().X().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.back().first.Translation().Y().to<double>(),
-                b.Translation().Y().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.back().first.X().to<double>(), b.X().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.back().first.Y().to<double>(), b.Y().to<double>(), 1E-9);
     EXPECT_NEAR(poses.back().first.Rotation().Radians().to<double>(),
                 b.Rotation().Radians().to<double>(), 1E-9);
 

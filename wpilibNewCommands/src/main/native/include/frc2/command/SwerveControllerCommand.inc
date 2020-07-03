@@ -68,12 +68,12 @@ void SwerveControllerCommand<NumModules>::Execute() {
 
   auto m_poseError = m_desiredPose.RelativeTo(m_pose());
 
-  auto targetXVel = units::meters_per_second_t(m_xController->Calculate(
-      (m_pose().Translation().X().template to<double>()),
-      (m_desiredPose.Translation().X().template to<double>())));
-  auto targetYVel = units::meters_per_second_t(m_yController->Calculate(
-      (m_pose().Translation().Y().template to<double>()),
-      (m_desiredPose.Translation().Y().template to<double>())));
+  auto targetXVel = units::meters_per_second_t(
+      m_xController->Calculate((m_pose().X().template to<double>()),
+                               (m_desiredPose.X().template to<double>())));
+  auto targetYVel = units::meters_per_second_t(
+      m_yController->Calculate((m_pose().Y().template to<double>()),
+                               (m_desiredPose.Y().template to<double>())));
 
   // Profiled PID Controller only takes meters as setpoint and measurement
   // The robot will go to the desired rotation of the final pose in the

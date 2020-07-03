@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -102,6 +102,20 @@ class Pose2d {
    * @return Reference to the translational component of the pose.
    */
   const Translation2d& Translation() const { return m_translation; }
+
+  /**
+   * Returns the X component of the pose's translation.
+   *
+   * @return The x component of the pose's translation.
+   */
+  units::meter_t X() const { return m_translation.X(); }
+
+  /**
+   * Returns the Y component of the pose's translation.
+   *
+   * @return The y component of the pose's translation.
+   */
+  units::meter_t Y() const { return m_translation.Y(); }
 
   /**
    * Returns the underlying rotation.

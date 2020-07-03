@@ -25,9 +25,9 @@ class Transform2dTest {
     var untransformed = transformed.plus(transformation.inverse());
 
     assertAll(
-        () -> assertEquals(initial.getTranslation().getX(), untransformed.getTranslation().getX(),
+        () -> assertEquals(initial.getX(), untransformed.getX(),
                            kEpsilon),
-        () -> assertEquals(initial.getTranslation().getY(), untransformed.getTranslation().getY(),
+        () -> assertEquals(initial.getY(), untransformed.getY(),
                            kEpsilon),
         () -> assertEquals(initial.getRotation().getDegrees(),
                            untransformed.getRotation().getDegrees(), kEpsilon)

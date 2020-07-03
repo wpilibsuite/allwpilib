@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,8 +34,8 @@ TEST_F(SwerveDriveOdometryTest, TwoIterations) {
   auto pose = m_odometry.UpdateWithTime(0.1_s, Rotation2d(), state, state,
                                         state, state);
 
-  EXPECT_NEAR(0.5, pose.Translation().X().to<double>(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Translation().Y().to<double>(), kEpsilon);
+  EXPECT_NEAR(0.5, pose.X().to<double>(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Y().to<double>(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Rotation().Degrees().to<double>(), kEpsilon);
 }
 
@@ -52,8 +52,8 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
   auto pose =
       m_odometry.UpdateWithTime(1_s, Rotation2d(90_deg), fl, fr, bl, br);
 
-  EXPECT_NEAR(12.0, pose.Translation().X().to<double>(), kEpsilon);
-  EXPECT_NEAR(12.0, pose.Translation().Y().to<double>(), kEpsilon);
+  EXPECT_NEAR(12.0, pose.X().to<double>(), kEpsilon);
+  EXPECT_NEAR(12.0, pose.Y().to<double>(), kEpsilon);
   EXPECT_NEAR(90.0, pose.Rotation().Degrees().to<double>(), kEpsilon);
 }
 
@@ -68,7 +68,7 @@ TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
   auto pose = m_odometry.UpdateWithTime(0.1_s, Rotation2d(90_deg), state, state,
                                         state, state);
 
-  EXPECT_NEAR(0.5, pose.Translation().X().to<double>(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Translation().Y().to<double>(), kEpsilon);
+  EXPECT_NEAR(0.5, pose.X().to<double>(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Y().to<double>(), kEpsilon);
   EXPECT_NEAR(0.0, pose.Rotation().Degrees().to<double>(), kEpsilon);
 }

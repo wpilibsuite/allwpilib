@@ -97,6 +97,24 @@ public class Pose2d {
   }
 
   /**
+   * Returns the X component of the pose's translation.
+   *
+   * @return The x component of the pose's translation.
+   */
+  public double getX() {
+    return m_translation.getX();
+  }
+
+  /**
+   * Returns the Y component of the pose's translation.
+   *
+   * @return The y component of the pose's translation.
+   */
+  public double getY() {
+    return m_translation.getY();
+  }
+
+  /**
    * Returns the rotational component of the transformation.
    *
    * @return The rotational component of the pose.
