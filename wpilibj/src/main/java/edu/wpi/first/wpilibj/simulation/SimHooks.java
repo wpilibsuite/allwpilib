@@ -5,7 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.hal.simulation;
+package edu.wpi.first.wpilibj.simulation;
+
+import edu.wpi.first.hal.simulation.SimulatorJNI;
 
 public final class SimHooks {
   private SimHooks() {
@@ -21,6 +23,10 @@ public final class SimHooks {
 
   public static void setProgramStarted() {
     SimulatorJNI.setProgramStarted();
+  }
+
+  public static boolean getProgramStarted() {
+    return SimulatorJNI.getProgramStarted();
   }
 
   public static void restartTiming() {

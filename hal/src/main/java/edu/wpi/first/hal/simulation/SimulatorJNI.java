@@ -13,6 +13,7 @@ public class SimulatorJNI extends JNIWrapper {
   public static native void setRuntimeType(int type);
   public static native void waitForProgramStart();
   public static native void setProgramStarted();
+  public static native boolean getProgramStarted();
   public static native void restartTiming();
   public static native void pauseTiming();
   public static native void resumeTiming();
