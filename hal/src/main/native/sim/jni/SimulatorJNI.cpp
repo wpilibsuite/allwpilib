@@ -148,6 +148,18 @@ Java_edu_wpi_first_hal_simulation_SimulatorJNI_setProgramStarted
 
 /*
  * Class:     edu_wpi_first_hal_simulation_SimulatorJNI
+ * Method:    getProgramStarted
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_simulation_SimulatorJNI_getProgramStarted
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetProgramStarted();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimulatorJNI
  * Method:    restartTiming
  * Signature: ()V
  */
