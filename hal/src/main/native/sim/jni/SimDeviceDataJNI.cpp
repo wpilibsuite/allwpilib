@@ -305,6 +305,30 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Method:    setSimDeviceEnabled
+ * Signature: (Ljava/lang/String;Z)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_setSimDeviceEnabled
+  (JNIEnv* env, jclass, jstring prefix, jboolean enabled)
+{
+  HALSIM_SetSimDeviceEnabled(JStringRef{env, prefix}.c_str(), enabled);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Method:    isSimDeviceEnabled
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_isSimDeviceEnabled
+  (JNIEnv* env, jclass, jstring name)
+{
+  return HALSIM_IsSimDeviceEnabled(JStringRef{env, name}.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
  * Method:    registerSimDeviceCreatedCallback
  * Signature: (Ljava/lang/String;Ljava/lang/Object;Z)I
  */

@@ -49,12 +49,43 @@ SimDeviceData::Value* SimDeviceData::LookupValue(HAL_SimValueHandle handle) {
   return deviceImpl->values[handle].get();
 }
 
+void SimDeviceData::SetDeviceEnabled(const char* prefix, bool enabled) {
+  std::scoped_lock lock(m_mutex);
+  auto it =
+      std::find_if(m_prefixEnabled.begin(), m_prefixEnabled.end(),
+                   [=](const auto& elem) { return elem.first == prefix; });
+  if (it != m_prefixEnabled.end()) {
+    it->second = enabled;
+    return;
+  }
+  m_prefixEnabled.emplace_back(prefix, enabled);
+  // keep it sorted by name
+  // string comparison sorts shorter before longer, so reverse the sort
+  std::sort(m_prefixEnabled.begin(), m_prefixEnabled.end(),
+            [](const auto& l, const auto& r) { return l.first >= r.first; });
+}
+
+bool SimDeviceData::IsDeviceEnabled(const char* name) {
+  std::scoped_lock lock(m_mutex);
+  for (const auto& elem : m_prefixEnabled) {
+    if (wpi::StringRef{name}.startswith(elem.first)) return elem.second;
+  }
+  return true;
+}
+
 HAL_SimDeviceHandle SimDeviceData::CreateDevice(const char* name) {
   std::scoped_lock lock(m_mutex);
 
+  // don't create if disabled
+  for (const auto& elem : m_prefixEnabled) {
+    if (wpi::StringRef{name}.startswith(elem.first)) {
+      if (elem.second) break;  // enabled
+      return 0;                // disabled
+    }
+  }
+
   // check for duplicates and don't overwrite them
-  auto it = m_deviceMap.find(name);
-  if (it != m_deviceMap.end()) return 0;
+  if (m_deviceMap.count(name) > 0) return 0;
 
   // don't allow more than 4096 devices (limit driven by 12-bit allocation in
   // value changed callback uid)
@@ -326,11 +357,20 @@ void SimDeviceData::ResetData() {
   std::scoped_lock lock(m_mutex);
   m_devices.clear();
   m_deviceMap.clear();
+  m_prefixEnabled.clear();
   m_deviceCreated.Reset();
   m_deviceFreed.Reset();
 }
 
 extern "C" {
+
+void HALSIM_SetSimDeviceEnabled(const char* prefix, HAL_Bool enabled) {
+  SimSimDeviceData->SetDeviceEnabled(prefix, enabled);
+}
+
+HAL_Bool HALSIM_IsSimDeviceEnabled(const char* name) {
+  return SimSimDeviceData->IsDeviceEnabled(name);
+}
 
 int32_t HALSIM_RegisterSimDeviceCreatedCallback(
     const char* prefix, void* param, HALSIM_SimDeviceCallback callback,

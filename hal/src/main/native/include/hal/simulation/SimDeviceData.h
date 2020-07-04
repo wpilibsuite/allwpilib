@@ -23,6 +23,9 @@ typedef void (*HALSIM_SimValueCallback)(const char* name, void* param,
 extern "C" {
 #endif
 
+void HALSIM_SetSimDeviceEnabled(const char* prefix, HAL_Bool enabled);
+HAL_Bool HALSIM_IsSimDeviceEnabled(const char* name);
+
 int32_t HALSIM_RegisterSimDeviceCreatedCallback(
     const char* prefix, void* param, HALSIM_SimDeviceCallback callback,
     HAL_Bool initialNotify);
