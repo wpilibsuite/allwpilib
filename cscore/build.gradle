@@ -18,7 +18,7 @@ apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 model {
     components {
         cscoreJNICvStatic(JniNativeLibrarySpec) {
-            baseName = 'cscore-jnicvstatic'
+            baseName = 'cscorejnicvstatic'
 
             enableCheckTask true
             javaCompileTasks << compileJava
@@ -46,6 +46,13 @@ model {
                 }
                 lib library: "${nativeName}", linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+
+                if (it.targetPlatform.operatingSystem.linux) {
+                    it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
+                } else if (it.targetPlatform.operatingSystem.macOsX) {
+                    it.linker.args '-exported_symbols_list'
+                    it.linker.args file('src/main/native/MacSymbolScript.txt').toString()
+                }
             }
         }
     }
