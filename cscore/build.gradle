@@ -49,7 +49,7 @@ model {
 
                 if (it.targetPlatform.operatingSystem.linux) {
                     it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
-                } else if (it.targetPlatform.operatingSystem.masOsX) {
+                } else if (it.targetPlatform.operatingSystem.macOsX) {
                     it.linker.args '-exported_symbols_list'
                     it.linker.args file('src/main/native/MacSymbolScript.txt')
                 }
