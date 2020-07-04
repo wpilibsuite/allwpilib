@@ -21,6 +21,8 @@ enum HALSIM_AnalogTriggerMode : int32_t {
 extern "C" {
 #endif
 
+int32_t HALSIM_FindAnalogTriggerForChannel(int32_t channel);
+
 void HALSIM_ResetAnalogTriggerData(int32_t index);
 int32_t HALSIM_RegisterAnalogTriggerInitializedCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,

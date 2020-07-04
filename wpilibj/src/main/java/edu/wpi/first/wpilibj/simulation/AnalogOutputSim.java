@@ -9,12 +9,30 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.AnalogOutDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.AnalogOutput;
 
-public class AnalogOutSim {
+/**
+ * Class to control a simulated analog output.
+ */
+public class AnalogOutputSim {
   private final int m_index;
 
-  public AnalogOutSim(int index) {
-    m_index = index;
+  /**
+   * Constructs from an AnalogOutput object.
+   *
+   * @param analogOutput AnalogOutput to simulate
+   */
+  public AnalogOutputSim(AnalogOutput analogOutput) {
+    m_index = analogOutput.getChannel();
+  }
+
+  /**
+   * Constructs from an analog output channel number.
+   *
+   * @param channel Channel number
+   */
+  public AnalogOutputSim(int channel) {
+    m_index = channel;
   }
 
   public CallbackStore registerVoltageCallback(NotifyCallback callback, boolean initialNotify) {

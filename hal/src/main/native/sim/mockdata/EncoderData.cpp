@@ -36,6 +36,16 @@ void EncoderData::ResetData() {
 }
 
 extern "C" {
+int32_t HALSIM_FindEncoderForChannel(int32_t channel) {
+  for (int i = 0; i < kNumEncoders; ++i) {
+    if (!SimEncoderData[i].initialized) continue;
+    if (SimEncoderData[i].digitalChannelA == channel ||
+        SimEncoderData[i].digitalChannelB == channel)
+      return i;
+  }
+  return -1;
+}
+
 void HALSIM_ResetEncoderData(int32_t index) {
   SimEncoderData[index].ResetData();
 }

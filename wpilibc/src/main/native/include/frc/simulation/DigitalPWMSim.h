@@ -7,18 +7,57 @@
 
 #pragma once
 
+#include <exception>
 #include <memory>
 #include <utility>
 
 #include <hal/simulation/DigitalPWMData.h>
 
 #include "CallbackStore.h"
+#include "frc/DigitalOutput.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated digital PWM output.
+ *
+ * This is for duty cycle PWM outputs on a DigitalOutput, not for the servo
+ * style PWM outputs on a PWM channel.
+ */
 class DigitalPWMSim {
  public:
-  explicit DigitalPWMSim(int index) { m_index = index; }
+  /**
+   * Constructs from a DigitalOutput object.
+   *
+   * @param digitalOutput DigitalOutput to simulate
+   */
+  explicit DigitalPWMSim(const DigitalOutput& digitalOutput)
+      : m_index{digitalOutput.GetChannel()} {}
+
+  /**
+   * Creates an DigitalPWMSim for a digital I/O channel.
+   *
+   * @param channel DIO channel
+   * @return Simulated object
+   * @throws std::out_of_range if no Digital PWM is configured for that channel
+   */
+  static DigitalPWMSim CreateForChannel(int channel) {
+    int index = HALSIM_FindDigitalPWMForChannel(channel);
+    if (index < 0) throw std::out_of_range("no digital PWM found for channel");
+    return DigitalPWMSim{index};
+  }
+
+  /**
+   * Creates an DigitalPWMSim for a simulated index.
+   * The index is incremented for each simulated DigitalPWM.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  static DigitalPWMSim CreateForIndex(int index) {
+    return DigitalPWMSim{index};
+  }
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) {
@@ -68,6 +107,8 @@ class DigitalPWMSim {
   void ResetData() { HALSIM_ResetDigitalPWMData(m_index); }
 
  private:
+  explicit DigitalPWMSim(int index) : m_index{index} {}
+
   int m_index;
 };
 }  // namespace sim

@@ -26,7 +26,7 @@ class AnalogInputSimTest {
     HAL.initialize(500, 0);
 
     AnalogInput input = new AnalogInput(5);
-    AnalogInSim inputSim = new AnalogInSim(5);
+    AnalogInputSim inputSim = new AnalogInputSim(input);
 
     for (double i = 0; i < 5.0; i += 0.1) {
       inputSim.setVoltage(0);

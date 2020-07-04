@@ -13,12 +13,30 @@
 #include <hal/simulation/AnalogOutData.h>
 
 #include "CallbackStore.h"
+#include "frc/AnalogOutput.h"
 
 namespace frc {
 namespace sim {
-class AnalogOutSim {
+
+/**
+ * Class to control a simulated analog output.
+ */
+class AnalogOutputSim {
  public:
-  explicit AnalogOutSim(int index) { m_index = index; }
+  /**
+   * Constructs from an AnalogOutput object.
+   *
+   * @param analogOutput AnalogOutput to simulate
+   */
+  explicit AnalogOutputSim(const AnalogOutput& analogOutput)
+      : m_index{analogOutput.GetChannel()} {}
+
+  /**
+   * Constructs from an analog output channel number.
+   *
+   * @param channel Channel number
+   */
+  explicit AnalogOutputSim(int channel) : m_index{channel} {}
 
   std::unique_ptr<CallbackStore> RegisterVoltageCallback(
       NotifyCallback callback, bool initialNotify) {

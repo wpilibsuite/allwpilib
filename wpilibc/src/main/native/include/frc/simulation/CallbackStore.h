@@ -16,12 +16,17 @@ namespace frc {
 namespace sim {
 
 using NotifyCallback = std::function<void(wpi::StringRef, const HAL_Value*)>;
+using ConstBufferCallback = std::function<void(
+    wpi::StringRef, const unsigned char* buffer, unsigned int count)>;
 typedef void (*CancelCallbackFunc)(int32_t index, int32_t uid);
 typedef void (*CancelCallbackNoIndexFunc)(int32_t uid);
 typedef void (*CancelCallbackChannelFunc)(int32_t index, int32_t channel,
                                           int32_t uid);
 
 void CallbackStoreThunk(const char* name, void* param, const HAL_Value* value);
+void ConstBufferCallbackStoreThunk(const char* name, void* param,
+                                   const unsigned char* buffer,
+                                   unsigned int count);
 
 class CallbackStore {
  public:
@@ -51,6 +56,33 @@ class CallbackStore {
     cancelType = Channel;
   }
 
+  CallbackStore(int32_t i, ConstBufferCallback cb,
+                CancelCallbackNoIndexFunc ccf) {
+    index = i;
+    constBufferCallback = cb;
+    this->ccnif = ccf;
+    cancelType = NoIndex;
+  }
+
+  CallbackStore(int32_t i, int32_t u, ConstBufferCallback cb,
+                CancelCallbackFunc ccf) {
+    index = i;
+    uid = u;
+    constBufferCallback = cb;
+    this->ccf = ccf;
+    cancelType = Normal;
+  }
+
+  CallbackStore(int32_t i, int32_t c, int32_t u, ConstBufferCallback cb,
+                CancelCallbackChannelFunc ccf) {
+    index = i;
+    channel = c;
+    uid = u;
+    constBufferCallback = cb;
+    this->cccf = ccf;
+    cancelType = Channel;
+  }
+
   ~CallbackStore() {
     switch (cancelType) {
       case Normal:
@@ -70,12 +102,17 @@ class CallbackStore {
   friend void CallbackStoreThunk(const char* name, void* param,
                                  const HAL_Value* value);
 
+  friend void ConstBufferCallbackStoreThunk(const char* name, void* param,
+                                            const unsigned char* buffer,
+                                            unsigned int count);
+
  private:
   int32_t index;
   int32_t channel;
   int32_t uid;
 
   NotifyCallback callback;
+  ConstBufferCallback constBufferCallback;
   union {
     CancelCallbackFunc ccf;
     CancelCallbackChannelFunc cccf;

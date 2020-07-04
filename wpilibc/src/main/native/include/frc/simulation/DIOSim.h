@@ -13,12 +13,37 @@
 #include <hal/simulation/DIOData.h>
 
 #include "CallbackStore.h"
+#include "frc/DigitalInput.h"
+#include "frc/DigitalOutput.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated digital input or output.
+ */
 class DIOSim {
  public:
-  explicit DIOSim(int index) { m_index = index; }
+  /**
+   * Constructs from a DigitalInput object.
+   *
+   * @param input DigitalInput to simulate
+   */
+  explicit DIOSim(const DigitalInput& input) : m_index{input.GetChannel()} {}
+
+  /**
+   * Constructs from a DigitalOutput object.
+   *
+   * @param output DigitalOutput to simulate
+   */
+  explicit DIOSim(const DigitalOutput& output) : m_index{output.GetChannel()} {}
+
+  /**
+   * Constructs from an digital I/O channel number.
+   *
+   * @param channel Channel number
+   */
+  explicit DIOSim(int channel) : m_index{channel} {}
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) {

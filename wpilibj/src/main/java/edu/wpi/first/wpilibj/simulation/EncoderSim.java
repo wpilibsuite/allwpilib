@@ -9,12 +9,54 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.EncoderDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.Encoder;
+import java.util.NoSuchElementException;
 
+/**
+ * Class to control a simulated encoder.
+ */
+@SuppressWarnings("PMD.TooManyMethods")
 public class EncoderSim {
   private final int m_index;
 
-  public EncoderSim(int index) {
+  /**
+   * Constructs from an Encoder object.
+   *
+   * @param encoder Encoder to simulate
+   */
+  public EncoderSim(Encoder encoder) {
+    m_index = encoder.getFPGAIndex();
+  }
+
+  private EncoderSim(int index) {
     m_index = index;
+  }
+
+  /**
+   * Creates an EncoderSim for a digital input channel.  Encoders take two
+   * channels, so either one may be specified.
+   *
+   * @param channel digital input channel
+   * @return Simulated object
+   * @throws NoSuchElementException if no Encoder is configured for that channel
+   */
+  public static EncoderSim createForChannel(int channel) {
+    int index = EncoderDataJNI.findForChannel(channel);
+    if (index < 0) {
+      throw new NoSuchElementException("no encoder found for channel " + channel);
+    }
+    return new EncoderSim(index);
+  }
+
+  /**
+   * Creates an EncoderSim for a simulated index.
+   * The index is incremented for each simulated Encoder.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  public static EncoderSim createForIndex(int index) {
+    return new EncoderSim(index);
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

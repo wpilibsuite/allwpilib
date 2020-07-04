@@ -13,12 +13,30 @@
 #include <hal/simulation/AnalogInData.h>
 
 #include "CallbackStore.h"
+#include "frc/AnalogInput.h"
 
 namespace frc {
 namespace sim {
-class AnalogInSim {
+
+/**
+ * Class to control a simulated analog input.
+ */
+class AnalogInputSim {
  public:
-  explicit AnalogInSim(int index) { m_index = index; }
+  /**
+   * Constructs from an AnalogInput object.
+   *
+   * @param analogInput AnalogInput to simulate
+   */
+  explicit AnalogInputSim(const AnalogInput& analogInput)
+      : m_index{analogInput.GetChannel()} {}
+
+  /**
+   * Constructs from an analog input channel number.
+   *
+   * @param channel Channel number
+   */
+  explicit AnalogInputSim(int channel) : m_index{channel} {}
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) {

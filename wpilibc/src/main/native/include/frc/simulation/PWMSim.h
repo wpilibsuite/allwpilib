@@ -13,12 +13,29 @@
 #include <hal/simulation/PWMData.h>
 
 #include "CallbackStore.h"
+#include "frc/PWM.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated PWM output.
+ */
 class PWMSim {
  public:
-  explicit PWMSim(int index) { m_index = index; }
+  /**
+   * Constructs from a PWM object.
+   *
+   * @param pwm PWM to simulate
+   */
+  explicit PWMSim(const PWM& pwm) : m_index{pwm.GetChannel()} {}
+
+  /**
+   * Constructs from a PWM channel number.
+   *
+   * @param channel Channel number
+   */
+  explicit PWMSim(int channel) : m_index{channel} {}
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) {

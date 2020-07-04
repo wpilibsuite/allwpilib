@@ -9,12 +9,55 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.DigitalPWMDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.DigitalOutput;
+import java.util.NoSuchElementException;
 
+/**
+ * Class to control a simulated digital PWM output.
+ *
+ * <p>This is for duty cycle PWM outputs on a DigitalOutput, not for the servo
+ * style PWM outputs on a PWM channel.
+ */
 public class DigitalPWMSim {
   private final int m_index;
 
-  public DigitalPWMSim(int index) {
+  /**
+   * Constructs from a DigitalOutput object.
+   *
+   * @param digitalOutput DigitalOutput to simulate
+   */
+  public DigitalPWMSim(DigitalOutput digitalOutput) {
+    m_index = digitalOutput.getChannel();
+  }
+
+  private DigitalPWMSim(int index) {
     m_index = index;
+  }
+
+  /**
+   * Creates an DigitalPWMSim for a digital I/O channel.
+   *
+   * @param channel DIO channel
+   * @return Simulated object
+   * @throws NoSuchElementException if no Digital PWM is configured for that channel
+   */
+  public static DigitalPWMSim createForChannel(int channel) {
+    int index = DigitalPWMDataJNI.findForChannel(channel);
+    if (index < 0) {
+      throw new NoSuchElementException("no digital PWM found for channel " + channel);
+    }
+    return new DigitalPWMSim(index);
+  }
+
+  /**
+   * Creates an DigitalPWMSim for a simulated index.
+   * The index is incremented for each simulated DigitalPWM.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  public static DigitalPWMSim createForIndex(int index) {
+    return new DigitalPWMSim(index);
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

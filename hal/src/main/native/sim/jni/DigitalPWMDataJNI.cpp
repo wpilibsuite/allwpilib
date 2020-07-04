@@ -177,4 +177,16 @@ Java_edu_wpi_first_hal_simulation_DigitalPWMDataJNI_resetData
   HALSIM_ResetDigitalPWMData(index);
 }
 
+/*
+ * Class:     edu_wpi_first_hal_simulation_DigitalPWMDataJNI
+ * Method:    findForChannel
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DigitalPWMDataJNI_findForChannel
+  (JNIEnv*, jclass, jint channel)
+{
+  return HALSIM_FindDigitalPWMForChannel(channel);
+}
+
 }  // extern "C"

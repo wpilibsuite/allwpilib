@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+int32_t HALSIM_FindDutyCycleForChannel(int32_t channel);
+
 void HALSIM_ResetDutyCycleData(int32_t index);
 int32_t HALSIM_GetDutyCycleDigitalChannel(int32_t index);
 

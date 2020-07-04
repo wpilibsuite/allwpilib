@@ -11,3 +11,10 @@ void frc::sim::CallbackStoreThunk(const char* name, void* param,
                                   const HAL_Value* value) {
   reinterpret_cast<CallbackStore*>(param)->callback(name, value);
 }
+
+void frc::sim::ConstBufferCallbackStoreThunk(const char* name, void* param,
+                                             const unsigned char* buffer,
+                                             unsigned int count) {
+  reinterpret_cast<CallbackStore*>(param)->constBufferCallback(name, buffer,
+                                                               count);
+}

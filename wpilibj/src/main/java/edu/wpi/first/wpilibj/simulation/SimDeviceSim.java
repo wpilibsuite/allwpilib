@@ -15,9 +15,17 @@ import edu.wpi.first.hal.simulation.SimDeviceCallback;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.hal.simulation.SimValueCallback;
 
+/**
+ * Class to control the simulation side of a SimDevice.
+ */
 public class SimDeviceSim {
   private final int m_handle;
 
+  /**
+   * Constructs a SimDeviceSim.
+   *
+   * @param name name of the SimDevice
+   */
   public SimDeviceSim(String name) {
     m_handle = SimDeviceDataJNI.getSimDeviceHandle(name);
   }

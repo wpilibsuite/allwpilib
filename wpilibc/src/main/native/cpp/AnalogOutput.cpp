@@ -65,7 +65,7 @@ double AnalogOutput::GetVoltage() const {
   return voltage;
 }
 
-int AnalogOutput::GetChannel() { return m_channel; }
+int AnalogOutput::GetChannel() const { return m_channel; }
 
 void AnalogOutput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Output");

@@ -475,4 +475,16 @@ Java_edu_wpi_first_hal_simulation_EncoderDataJNI_resetData
   HALSIM_ResetEncoderData(index);
 }
 
+/*
+ * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI
+ * Method:    findForChannel
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_EncoderDataJNI_findForChannel
+  (JNIEnv*, jclass, jint channel)
+{
+  return HALSIM_FindEncoderForChannel(channel);
+}
+
 }  // extern "C"

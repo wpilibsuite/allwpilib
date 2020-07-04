@@ -9,12 +9,37 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.PDPDataJNI;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
+/**
+ * Class to control a simulated Power Distribution Panel (PDP).
+ */
 public class PDPSim {
   private final int m_index;
 
-  public PDPSim(int index) {
-    m_index = index;
+  /**
+   * Constructs for the default PDP.
+   */
+  public PDPSim() {
+    m_index = 0;
+  }
+
+  /**
+   * Constructs from a PDP module number (CAN ID).
+   *
+   * @param module module number
+   */
+  public PDPSim(int module) {
+    m_index = module;
+  }
+
+  /**
+   * Constructs from a PowerDistributionPanel object.
+   *
+   * @param pdp PowerDistributionPanel to simulate
+   */
+  public PDPSim(PowerDistributionPanel pdp) {
+    m_index = pdp.getModule();
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

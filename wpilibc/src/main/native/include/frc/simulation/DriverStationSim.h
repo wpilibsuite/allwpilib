@@ -16,9 +16,13 @@
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated driver station.
+ */
 class DriverStationSim {
  public:
-  std::unique_ptr<CallbackStore> RegisterEnabledCallback(
+  static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
       NotifyCallback callback, bool initialNotify) {
     auto store = std::make_unique<CallbackStore>(
         -1, callback, &HALSIM_CancelDriverStationEnabledCallback);
@@ -27,11 +31,13 @@ class DriverStationSim {
     return store;
   }
 
-  bool GetEnabled() const { return HALSIM_GetDriverStationEnabled(); }
+  static bool GetEnabled() { return HALSIM_GetDriverStationEnabled(); }
 
-  void SetEnabled(bool enabled) { HALSIM_SetDriverStationEnabled(enabled); }
+  static void SetEnabled(bool enabled) {
+    HALSIM_SetDriverStationEnabled(enabled);
+  }
 
-  std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
+  static std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
       NotifyCallback callback, bool initialNotify) {
     auto store = std::make_unique<CallbackStore>(
         -1, callback, &HALSIM_CancelDriverStationAutonomousCallback);
@@ -40,14 +46,14 @@ class DriverStationSim {
     return store;
   }
 
-  bool GetAutonomous() const { return HALSIM_GetDriverStationAutonomous(); }
+  static bool GetAutonomous() { return HALSIM_GetDriverStationAutonomous(); }
 
-  void SetAutonomous(bool autonomous) {
+  static void SetAutonomous(bool autonomous) {
     HALSIM_SetDriverStationAutonomous(autonomous);
   }
 
-  std::unique_ptr<CallbackStore> RegisterTestCallback(NotifyCallback callback,
-                                                      bool initialNotify) {
+  static std::unique_ptr<CallbackStore> RegisterTestCallback(
+      NotifyCallback callback, bool initialNotify) {
     auto store = std::make_unique<CallbackStore>(
         -1, callback, &HALSIM_CancelDriverStationTestCallback);
     store->SetUid(HALSIM_RegisterDriverStationTestCallback(
@@ -55,12 +61,12 @@ class DriverStationSim {
     return store;
   }
 
-  bool GetTest() const { return HALSIM_GetDriverStationTest(); }
+  static bool GetTest() { return HALSIM_GetDriverStationTest(); }
 
-  void SetTest(bool test) { HALSIM_SetDriverStationTest(test); }
+  static void SetTest(bool test) { HALSIM_SetDriverStationTest(test); }
 
-  std::unique_ptr<CallbackStore> RegisterEStopCallback(NotifyCallback callback,
-                                                       bool initialNotify) {
+  static std::unique_ptr<CallbackStore> RegisterEStopCallback(
+      NotifyCallback callback, bool initialNotify) {
     auto store = std::make_unique<CallbackStore>(
         -1, callback, &HALSIM_CancelDriverStationEStopCallback);
     store->SetUid(HALSIM_RegisterDriverStationEStopCallback(
@@ -68,11 +74,11 @@ class DriverStationSim {
     return store;
   }
 
-  bool GetEStop() const { return HALSIM_GetDriverStationEStop(); }
+  static bool GetEStop() { return HALSIM_GetDriverStationEStop(); }
 
-  void SetEStop(bool eStop) { HALSIM_SetDriverStationEStop(eStop); }
+  static void SetEStop(bool eStop) { HALSIM_SetDriverStationEStop(eStop); }
 
-  std::unique_ptr<CallbackStore> RegisterFmsAttachedCallback(
+  static std::unique_ptr<CallbackStore> RegisterFmsAttachedCallback(
       NotifyCallback callback, bool initialNotify) {
     auto store = std::make_unique<CallbackStore>(
         -1, callback, &HALSIM_CancelDriverStationFmsAttachedCallback);
@@ -81,13 +87,13 @@ class DriverStationSim {
     return store;
   }
 
-  bool GetFmsAttached() const { return HALSIM_GetDriverStationFmsAttached(); }
+  static bool GetFmsAttached() { return HALSIM_GetDriverStationFmsAttached(); }
 
-  void SetFmsAttached(bool fmsAttached) {
+  static void SetFmsAttached(bool fmsAttached) {
     HALSIM_SetDriverStationFmsAttached(fmsAttached);
   }
 
-  std::unique_ptr<CallbackStore> RegisterDsAttachedCallback(
+  static std::unique_ptr<CallbackStore> RegisterDsAttachedCallback(
       NotifyCallback callback, bool initialNotify) {
     auto store = std::make_unique<CallbackStore>(
         -1, callback, &HALSIM_CancelDriverStationDsAttachedCallback);
@@ -96,15 +102,15 @@ class DriverStationSim {
     return store;
   }
 
-  bool GetDsAttached() const { return HALSIM_GetDriverStationDsAttached(); }
+  static bool GetDsAttached() { return HALSIM_GetDriverStationDsAttached(); }
 
-  void SetDsAttached(bool dsAttached) {
+  static void SetDsAttached(bool dsAttached) {
     HALSIM_SetDriverStationDsAttached(dsAttached);
   }
 
-  void NotifyNewData() { HALSIM_NotifyDriverStationNewData(); }
+  static void NotifyNewData() { HALSIM_NotifyDriverStationNewData(); }
 
-  void ResetData() { HALSIM_ResetDriverStationData(); }
+  static void ResetData() { HALSIM_ResetDriverStationData(); }
 };
 }  // namespace sim
 }  // namespace frc

@@ -13,12 +13,28 @@
 #include <hal/simulation/AccelerometerData.h>
 
 #include "CallbackStore.h"
+#include "frc/BuiltInAccelerometer.h"
 
 namespace frc {
 namespace sim {
-class AccelerometerSim {
+
+/**
+ * Class to control a simulated built-in accelerometer.
+ */
+class BuiltInAccelerometerSim {
  public:
-  explicit AccelerometerSim(int index) { m_index = index; }
+  /**
+   * Constructs for the first built-in accelerometer.
+   */
+  BuiltInAccelerometerSim() : m_index{0} {}
+
+  /**
+   * Constructs from a BuiltInAccelerometer object.
+   *
+   * @param accel BuiltInAccelerometer to simulate
+   */
+  explicit BuiltInAccelerometerSim(const BuiltInAccelerometer& accel)
+      : m_index{0} {}
 
   std::unique_ptr<CallbackStore> RegisterActiveCallback(NotifyCallback callback,
                                                         bool initialNotify) {

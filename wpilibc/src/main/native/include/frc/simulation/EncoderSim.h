@@ -7,18 +7,53 @@
 
 #pragma once
 
+#include <exception>
 #include <memory>
 #include <utility>
 
 #include <hal/simulation/EncoderData.h>
 
 #include "CallbackStore.h"
+#include "frc/Encoder.h"
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control a simulated encoder.
+ */
 class EncoderSim {
  public:
-  explicit EncoderSim(int index) { m_index = index; }
+  /**
+   * Constructs from an Encoder object.
+   *
+   * @param encoder Encoder to simulate
+   */
+  explicit EncoderSim(const Encoder& encoder)
+      : m_index{encoder.GetFPGAIndex()} {}
+
+  /**
+   * Creates an EncoderSim for a digital input channel.  Encoders take two
+   * channels, so either one may be specified.
+   *
+   * @param channel digital input channel
+   * @return Simulated object
+   * @throws NoSuchElementException if no Encoder is configured for that channel
+   */
+  static EncoderSim CreateForChannel(int channel) {
+    int index = HALSIM_FindEncoderForChannel(channel);
+    if (index < 0) throw std::out_of_range("no encoder found for channel");
+    return EncoderSim{index};
+  }
+
+  /**
+   * Creates an EncoderSim for a simulated index.
+   * The index is incremented for each simulated Encoder.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  static EncoderSim CreateForIndex(int index) { return EncoderSim{index}; }
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) {
@@ -168,6 +203,8 @@ class EncoderSim {
   double GetRate() { return HALSIM_GetEncoderRate(m_index); }
 
  private:
+  explicit EncoderSim(int index) : m_index{index} {}
+
   int m_index;
 };
 }  // namespace sim

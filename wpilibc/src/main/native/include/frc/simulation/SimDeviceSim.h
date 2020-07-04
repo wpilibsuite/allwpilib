@@ -20,8 +20,17 @@
 
 namespace frc {
 namespace sim {
+
+/**
+ * Class to control the simulation side of a SimDevice.
+ */
 class SimDeviceSim {
  public:
+  /**
+   * Constructs a SimDeviceSim.
+   *
+   * @param name name of the SimDevice
+   */
   explicit SimDeviceSim(const char* name)
       : m_handle{HALSIM_GetSimDeviceHandle(name)} {}
 

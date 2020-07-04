@@ -9,12 +9,38 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.PCMDataJNI;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.SensorUtil;
 
+/**
+ * Class to control a simulated Pneumatic Control Module (PCM).
+ */
 public class PCMSim {
   private final int m_index;
 
-  public PCMSim(int index) {
-    m_index = index;
+  /**
+   * Constructs for the default PCM.
+   */
+  public PCMSim() {
+    m_index = SensorUtil.getDefaultSolenoidModule();
+  }
+
+  /**
+   * Constructs from a PCM module number (CAN ID).
+   *
+   * @param module module number
+   */
+  public PCMSim(int module) {
+    m_index = module;
+  }
+
+  /**
+   * Constructs from a Compressor object.
+   *
+   * @param compressor Compressor connected to PCM to simulate
+   */
+  public PCMSim(Compressor compressor) {
+    m_index = compressor.getModule();
   }
 
   public CallbackStore registerSolenoidInitializedCallback(int channel, NotifyCallback callback, boolean initialNotify) {

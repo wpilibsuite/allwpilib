@@ -177,4 +177,16 @@ Java_edu_wpi_first_hal_simulation_DutyCycleDataJNI_resetData
   HALSIM_ResetDutyCycleData(index);
 }
 
+/*
+ * Class:     edu_wpi_first_hal_simulation_DutyCycleDataJNI
+ * Method:    findForChannel
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DutyCycleDataJNI_findForChannel
+  (JNIEnv*, jclass, jint channel)
+{
+  return HALSIM_FindDutyCycleForChannel(channel);
+}
+
 }  // extern "C"

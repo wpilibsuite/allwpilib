@@ -9,12 +9,52 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.AnalogTriggerDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.AnalogTrigger;
+import java.util.NoSuchElementException;
 
+/**
+ * Class to control a simulated analog trigger.
+ */
 public class AnalogTriggerSim {
   private final int m_index;
 
-  public AnalogTriggerSim(int index) {
+  /**
+   * Constructs from an AnalogTrigger object.
+   *
+   * @param analogTrigger AnalogTrigger to simulate
+   */
+  public AnalogTriggerSim(AnalogTrigger analogTrigger) {
+    m_index = analogTrigger.getIndex();
+  }
+
+  private AnalogTriggerSim(int index) {
     m_index = index;
+  }
+
+  /**
+   * Creates an AnalogTriggerSim for an analog input channel.
+   *
+   * @param channel analog input channel
+   * @return Simulated object
+   * @throws NoSuchElementException if no AnalogTrigger is configured for that channel
+   */
+  public static AnalogTriggerSim createForChannel(int channel) {
+    int index = AnalogTriggerDataJNI.findForChannel(channel);
+    if (index < 0) {
+      throw new NoSuchElementException("no analog trigger found for channel " + channel);
+    }
+    return new AnalogTriggerSim(index);
+  }
+
+  /**
+   * Creates an AnalogTriggerSim for a simulated index.
+   * The index is incremented for each simulated AnalogTrigger.
+   *
+   * @param index simulator index
+   * @return Simulated object
+   */
+  public static AnalogTriggerSim createForIndex(int index) {
+    return new AnalogTriggerSim(index);
   }
 
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {

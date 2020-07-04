@@ -5,16 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <exception>
+
 #include <hal/HAL.h>
 
-#include "frc/simulation/AccelerometerSim.h"
+#include "frc/simulation/AddressableLEDSim.h"
 #include "frc/simulation/AnalogGyroSim.h"
-#include "frc/simulation/AnalogInSim.h"
-#include "frc/simulation/AnalogOutSim.h"
+#include "frc/simulation/AnalogInputSim.h"
+#include "frc/simulation/AnalogOutputSim.h"
 #include "frc/simulation/AnalogTriggerSim.h"
+#include "frc/simulation/BuiltInAccelerometerSim.h"
 #include "frc/simulation/DIOSim.h"
 #include "frc/simulation/DigitalPWMSim.h"
 #include "frc/simulation/DriverStationSim.h"
+#include "frc/simulation/DutyCycleSim.h"
 #include "frc/simulation/EncoderSim.h"
 #include "frc/simulation/PCMSim.h"
 #include "frc/simulation/PDPSim.h"
@@ -28,16 +32,17 @@ using namespace frc::sim;
 
 TEST(SimInitializationTests, TestAllInitialize) {
   HAL_Initialize(500, 0);
-  AccelerometerSim acsim{0};
+  BuiltInAccelerometerSim biacsim;
   AnalogGyroSim agsim{0};
-  AnalogInSim aisim{0};
-  AnalogOutSim aosim{0};
-  AnalogTriggerSim atsim{0};
-  DigitalPWMSim dpsim{0};
+  AnalogInputSim aisim{0};
+  AnalogOutputSim aosim{0};
+  EXPECT_THROW(AnalogTriggerSim::CreateForChannel(0), std::out_of_range);
+  EXPECT_THROW(DigitalPWMSim::CreateForChannel(0), std::out_of_range);
   DIOSim diosim{0};
   DriverStationSim dssim;
   (void)dssim;
-  EncoderSim esim{0};
+  EncoderSim esim = EncoderSim::CreateForIndex(0);
+  (void)esim;
   PCMSim pcmsim{0};
   PDPSim pdpsim{0};
   PWMSim pwmsim{0};
@@ -45,4 +50,7 @@ TEST(SimInitializationTests, TestAllInitialize) {
   RoboRioSim rrsim;
   (void)rrsim;
   SPIAccelerometerSim sasim{0};
+  DutyCycleSim dcsim = DutyCycleSim::CreateForIndex(0);
+  (void)dcsim;
+  AddressableLEDSim adLED;
 }

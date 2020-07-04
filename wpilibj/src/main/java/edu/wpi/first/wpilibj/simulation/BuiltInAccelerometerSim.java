@@ -9,11 +9,28 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.AccelerometerDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 
-public class AccelerometerSim {
+/**
+ * Class to control a simulated built-in accelerometer.
+ */
+public class BuiltInAccelerometerSim {
   private final int m_index;
 
-  public AccelerometerSim() {
+  /**
+   * Constructs for the first built-in accelerometer.
+   */
+  public BuiltInAccelerometerSim() {
+    m_index = 0;
+  }
+
+  /**
+   * Constructs from a BuiltInAccelerometer object.
+   *
+   * @param accel BuiltInAccelerometer to simulate
+   */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  public BuiltInAccelerometerSim(BuiltInAccelerometer accel) {
     m_index = 0;
   }
 
