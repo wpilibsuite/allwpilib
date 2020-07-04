@@ -11,6 +11,9 @@ import edu.wpi.first.hal.HALValue;
 import edu.wpi.first.hal.JNIWrapper;
 
 public class SimDeviceDataJNI extends JNIWrapper {
+  public static native void setSimDeviceEnabled(String prefix, boolean enabled);
+  public static native boolean isSimDeviceEnabled(String name);
+
   public static native int registerSimDeviceCreatedCallback(String prefix, SimDeviceCallback callback, boolean initialNotify);
   public static native void cancelSimDeviceCreatedCallback(int uid);
 
