@@ -42,6 +42,7 @@ TEST(SimInitializationTests, TestAllInitialize) {
   PDPSim pdpsim{0};
   PWMSim pwmsim{0};
   RelaySim rsim{0};
-  RoboRioSim rrsim{0};
+  RoboRioSim rrsim;
+  (void)rrsim;
   SPIAccelerometerSim sasim{0};
 }

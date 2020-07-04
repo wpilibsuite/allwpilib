@@ -16,102 +16,99 @@ using namespace halsimgui;
 
 static void DisplayRoboRio() {
   ImGui::Button("User Button");
-  HALSIM_SetRoboRioFPGAButton(0, ImGui::IsItemActive());
+  HALSIM_SetRoboRioFPGAButton(ImGui::IsItemActive());
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
 
   if (ImGui::CollapsingHeader("RoboRIO Input")) {
     {
-      double val = HALSIM_GetRoboRioVInVoltage(0);
+      double val = HALSIM_GetRoboRioVInVoltage();
       if (ImGui::InputDouble("Voltage (V)", &val))
-        HALSIM_SetRoboRioVInVoltage(0, val);
+        HALSIM_SetRoboRioVInVoltage(val);
     }
 
     {
-      double val = HALSIM_GetRoboRioVInCurrent(0);
+      double val = HALSIM_GetRoboRioVInCurrent();
       if (ImGui::InputDouble("Current (A)", &val))
-        HALSIM_SetRoboRioVInCurrent(0, val);
+        HALSIM_SetRoboRioVInCurrent(val);
     }
   }
 
   if (ImGui::CollapsingHeader("6V Rail")) {
     {
-      double val = HALSIM_GetRoboRioUserVoltage6V(0);
+      double val = HALSIM_GetRoboRioUserVoltage6V();
       if (ImGui::InputDouble("Voltage (V)", &val))
-        HALSIM_SetRoboRioUserVoltage6V(0, val);
+        HALSIM_SetRoboRioUserVoltage6V(val);
     }
 
     {
-      double val = HALSIM_GetRoboRioUserCurrent6V(0);
+      double val = HALSIM_GetRoboRioUserCurrent6V();
       if (ImGui::InputDouble("Current (A)", &val))
-        HALSIM_SetRoboRioUserCurrent6V(0, val);
+        HALSIM_SetRoboRioUserCurrent6V(val);
     }
 
     {
       static const char* options[] = {"inactive", "active"};
-      int val = HALSIM_GetRoboRioUserActive6V(0) ? 1 : 0;
+      int val = HALSIM_GetRoboRioUserActive6V() ? 1 : 0;
       if (ImGui::Combo("Active", &val, options, 2))
-        HALSIM_SetRoboRioUserActive6V(0, val);
+        HALSIM_SetRoboRioUserActive6V(val);
     }
 
     {
-      int val = HALSIM_GetRoboRioUserFaults6V(0);
-      if (ImGui::InputInt("Faults", &val))
-        HALSIM_SetRoboRioUserFaults6V(0, val);
+      int val = HALSIM_GetRoboRioUserFaults6V();
+      if (ImGui::InputInt("Faults", &val)) HALSIM_SetRoboRioUserFaults6V(val);
     }
   }
 
   if (ImGui::CollapsingHeader("5V Rail")) {
     {
-      double val = HALSIM_GetRoboRioUserVoltage5V(0);
+      double val = HALSIM_GetRoboRioUserVoltage5V();
       if (ImGui::InputDouble("Voltage (V)", &val))
-        HALSIM_SetRoboRioUserVoltage5V(0, val);
+        HALSIM_SetRoboRioUserVoltage5V(val);
     }
 
     {
-      double val = HALSIM_GetRoboRioUserCurrent5V(0);
+      double val = HALSIM_GetRoboRioUserCurrent5V();
       if (ImGui::InputDouble("Current (A)", &val))
-        HALSIM_SetRoboRioUserCurrent5V(0, val);
+        HALSIM_SetRoboRioUserCurrent5V(val);
     }
 
     {
       static const char* options[] = {"inactive", "active"};
-      int val = HALSIM_GetRoboRioUserActive5V(0) ? 1 : 0;
+      int val = HALSIM_GetRoboRioUserActive5V() ? 1 : 0;
       if (ImGui::Combo("Active", &val, options, 2))
-        HALSIM_SetRoboRioUserActive5V(0, val);
+        HALSIM_SetRoboRioUserActive5V(val);
     }
 
     {
-      int val = HALSIM_GetRoboRioUserFaults5V(0);
-      if (ImGui::InputInt("Faults", &val))
-        HALSIM_SetRoboRioUserFaults5V(0, val);
+      int val = HALSIM_GetRoboRioUserFaults5V();
+      if (ImGui::InputInt("Faults", &val)) HALSIM_SetRoboRioUserFaults5V(val);
     }
   }
 
   if (ImGui::CollapsingHeader("3.3V Rail")) {
     {
-      double val = HALSIM_GetRoboRioUserVoltage3V3(0);
+      double val = HALSIM_GetRoboRioUserVoltage3V3();
       if (ImGui::InputDouble("Voltage (V)", &val))
-        HALSIM_SetRoboRioUserVoltage3V3(0, val);
+        HALSIM_SetRoboRioUserVoltage3V3(val);
     }
 
     {
-      double val = HALSIM_GetRoboRioUserCurrent3V3(0);
+      double val = HALSIM_GetRoboRioUserCurrent3V3();
       if (ImGui::InputDouble("Current (A)", &val))
-        HALSIM_SetRoboRioUserCurrent3V3(0, val);
+        HALSIM_SetRoboRioUserCurrent3V3(val);
     }
 
     {
       static const char* options[] = {"inactive", "active"};
-      int val = HALSIM_GetRoboRioUserActive3V3(0) ? 1 : 0;
+      int val = HALSIM_GetRoboRioUserActive3V3() ? 1 : 0;
       if (ImGui::Combo("Active", &val, options, 2))
-        HALSIM_SetRoboRioUserActive3V3(0, val);
+        HALSIM_SetRoboRioUserActive3V3(val);
     }
 
     {
-      int val = HALSIM_GetRoboRioUserFaults3V3(0);
-      if (ImGui::InputInt("Faults", &val))
-        HALSIM_SetRoboRioUserFaults3V3(0, val);
+      int val = HALSIM_GetRoboRioUserFaults3V3();
+      if (ImGui::InputInt("Faults", &val)) HALSIM_SetRoboRioUserFaults3V3(val);
     }
   }
 
