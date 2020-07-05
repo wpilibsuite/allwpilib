@@ -1,6 +1,28 @@
 {
-    "body": [{
-        "name": "mainLine",
-        "type": "line"
-    }]
+  "windowHeight": 1000,
+  "windowWidth": 1000,
+  "body": [
+    {
+      "name": "mainLine",
+      "type": "line",
+      "startLocation": -200,
+      "length": 200,
+      "color": "blue",
+      "children":[
+        {
+          "name": "subline",
+          "type": "line",
+          "length": 200,
+          "color": "red"
+        }
+      ]
+    },
+    {
+      "name": "mainLine2",
+      "type": "line",
+      "startLocation": 300,
+      "length": 100,
+      "color": "green"
+    }
+  ]
 }

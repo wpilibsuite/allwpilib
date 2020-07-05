@@ -14,6 +14,7 @@
 #include <imgui.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
+
 #include <imgui_internal.h>
 #include <mockdata/SimDeviceData.h>
 #include <units/units.h>
@@ -22,115 +23,142 @@
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
+#include <list>
+#include <list>
+#include <string>
 
 #include "GuiUtil.h"
 #include "HALSimGui.h"
 #include "SimDeviceGui.h"
 #include "portable-file-dialogs.h"
+#include "../include/HALSimGui.h"
 
 using namespace halsimgui;
 
-int counter = 0;
-static void DisplayAssembly2D() {
-  ImGui::InvisibleButton("field", ImGui::GetContentRegionAvail());
-  ImVec2 windowPos = ImGui::GetWindowPos();
-  auto drawList = ImGui::GetWindowDrawList();
-  drawList->AddCircle(windowPos, counter++, IM_COL32(0, 255, 0, 255));
-  if (counter > 1000) {
-    counter = 0;
-  }
-}
-
 struct BodyConfig {
-  std::string name;
-  std::string type;
+    std::string name;
+    std::string type;
+    int startLocation;
+    int length;
+    std::string color;
 };
 
-void static readJson(std::string jFile) {
-  // std::ifstream jsonRead(jFile);
-  // wpi::json jsonObject;
-  // jsonRead >> jsonObject;
-  std::string name;
-  // open config file
-  std::error_code ec;
-  wpi::raw_fd_istream is(jFile, ec);
-  if (ec) {
-    wpi::errs() << "could not open '" << jFile << "': " << ec.message() << '\n';
-  }
+int counter = 0;
+std::list<BodyConfig> bodyConfigList;
 
-  // parse file
-  wpi::json j;
-  try {
-    j = wpi::json::parse(is);
-  } catch (const wpi::json::parse_error& e) {
-    wpi::errs() << "byte " << e.byte << ": " << e.what() << '\n';
-  }
-
-  // top level must be an object
-  if (!j.is_object()) {
-    wpi::errs() << "must be JSON object\n";
-  }
-
-  // // team number
-  // try {
-  //   name = j.at("name").get<std::string>();
-  // } catch (const wpi::json::exception& e) {
-  //   wpi::errs() << "could not read team number: " << e.what() << '\n';
-  // }
-
-  BodyConfig tmpBodyConfig;
-  BodyConfig c;
-  try {
-    for (auto&& body : j.at("body")) {
-      try {
-        c.name = body.at("name").get<std::string>();
-      } catch (const wpi::json::exception& e) {
-        wpi::errs() << "could not read body name: " << e.what() << '\n';
-      }
-
-      // path
-      try {
-        c.type = body.at("type").get<std::string>();
-      } catch (const wpi::json::exception& e) {
-        wpi::errs() << "camera '" << c.name
-                    << "': could not type path: " << e.what() << '\n';
-      }
+ImColor ColorToIM_COL32(std::string color){
+    if(color == "blue"){
+        return IM_COL32(0, 0, 255, 255);
     }
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "could not read body: " << e.what() << '\n';
-  }
-  wpi::outs() << c.name << " " << c.type << "\n";
+    else if(color == "green"){
+        return IM_COL32(0, 255, 0, 255);
+    }
+    else if(color == "red"){
+        return IM_COL32(255, 0, 0, 255);
+    }
+    return IM_COL32(255, 255, 255, 255);
 }
 
-// BodyConfig static ReadBody(const wpi::json& config) {
-//   BodyConfig c;
+static void DisplayAssembly2D() {
+    ImVec2 windowPos = ImGui::GetWindowPos();
+    auto drawList = ImGui::GetWindowDrawList();
+    for (BodyConfig const &bodyConfig : bodyConfigList) {
+        if (bodyConfig.type == "line") {
+            drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+                                                 ImGui::GetWindowHeight()),
+                              windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+                                                 ImGui::GetWindowHeight() - bodyConfig.length),
+                              ColorToIM_COL32(bodyConfig.color), 1);
+        }
+        else if (bodyConfig.type == "circle") {
+            drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+                                                 ImGui::GetWindowHeight()),
+                              windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+                                                 ImGui::GetWindowHeight() - bodyConfig.length),
+                              ColorToIM_COL32(bodyConfig.color), 1);
+        }
+    }
+}
 
-//   // name
-//   try {
-//     c.name = config.at("name").get<std::string>();
-//   } catch (const wpi::json::exception& e) {
-//     wpi::errs() << "could not read body name: " << e.what() << '\n';
-//   }
 
-//   // path
-//   try {
-//     c.type = config.at("type").get<std::string>();
-//   } catch (const wpi::json::exception& e) {
-//     wpi::errs() << "camera '" << c.name
-//                 << "': could not type path: " << e.what() << '\n';
-//   }
-//   return BodyConfig
-// }
+
+static std::list<BodyConfig> readJson(std::string jFile) {
+    std::list<BodyConfig> cList;
+    std::error_code ec;
+    wpi::raw_fd_istream is(jFile, ec);
+    if (ec) {
+        wpi::errs() << "could not open '" << jFile << "': " << ec.message() << '\n';
+    }
+
+    // parse file
+    wpi::json j;
+    try {
+        j = wpi::json::parse(is);
+    } catch (const wpi::json::parse_error &e) {
+        wpi::errs() << "byte " << e.byte << ": " << e.what() << '\n';
+    }
+
+    // top level must be an object
+    if (!j.is_object()) {
+        wpi::errs() << "must be JSON object\n";
+    }
+
+
+    try {
+        for (auto &&body : j.at("body")) {
+            BodyConfig c;
+            try {
+                c.name = body.at("name").get<std::string>();
+            } catch (const wpi::json::exception &e) {
+                wpi::errs() << "could not read body name: " << e.what() << '\n';
+            }
+
+            // path
+            try {
+                c.type = body.at("type").get<std::string>();
+            } catch (const wpi::json::exception &e) {
+                wpi::errs() << "camera '" << c.name << "': could not type path: " << e.what() << '\n';
+            }
+            // path
+            try {
+                c.startLocation = body.at("startLocation").get<int>();
+            } catch (const wpi::json::exception &e) {
+                wpi::errs() << "startLocation '" << c.name << "': could not find startLocation path: " << e.what()
+                            << '\n';
+            }
+            try {
+                c.length = body.at("length").get<int>();
+            } catch (const wpi::json::exception &e) {
+                wpi::errs() << "length '" << c.name << "': could not find length path: " << e.what() << '\n';
+            }
+            try {
+                c.color = body.at("color").get<std::string>();
+            } catch (const wpi::json::exception &e) {
+                wpi::errs() << "color '" << c.name << "': could not find color path: " << e.what() << '\n';
+            }
+            cList.push_back(c);
+        }
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "could not read body: " << e.what() << '\n';
+    }
+    return cList;
+}
 
 void Assembly2D::Initialize() {
-  // hook ini handler to save settings
-  ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "2D Assembly";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-  HALSimGui::AddWindow("2D Assembly", DisplayAssembly2D);
-  HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
-  HALSimGui::SetDefaultWindowSize("2D Assembly", 400, 200);
-  HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
-  readJson("/home/gabe/github/allwpilib/Assembly2D.json");
+    // hook ini handler to save settings
+    bodyConfigList = readJson("/home/gabe/github/allwpilib/Assembly2D.json");
+    ImGuiSettingsHandler iniHandler;
+    iniHandler.TypeName = "2D Assembly";
+    iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
+    ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+    HALSimGui::AddWindow("2D Assembly", DisplayAssembly2D);
+    HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
+    HALSimGui::SetDefaultWindowSize("2D Assembly", 400, 200);
+    HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
+
+
+    for (BodyConfig const &bodyConfig : bodyConfigList) {
+        wpi::outs() << bodyConfig.name << " " << bodyConfig.type << " " << bodyConfig.startLocation << " "
+                    << bodyConfig.length << "\n";
+    }
 }
