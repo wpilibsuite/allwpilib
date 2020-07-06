@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -67,9 +67,9 @@ class HttpServerConnection {
    *                      be set to false.
    * @param extra Extra HTTP headers to send, including final "\r\n"
    */
-  void BuildHeader(raw_ostream& os, int code, const Twine& codeText,
-                   const Twine& contentType, uint64_t contentLength,
-                   const Twine& extra = Twine{});
+  virtual void BuildHeader(raw_ostream& os, int code, const Twine& codeText,
+                           const Twine& contentType, uint64_t contentLength,
+                           const Twine& extra = Twine{});
 
   /**
    * Send data to client.
@@ -94,8 +94,9 @@ class HttpServerConnection {
    * @param content Response message content
    * @param extraHeader Extra HTTP headers to send, including final "\r\n"
    */
-  void SendResponse(int code, const Twine& codeText, const Twine& contentType,
-                    StringRef content, const Twine& extraHeader = Twine{});
+  virtual void SendResponse(int code, const Twine& codeText,
+                            const Twine& contentType, StringRef content,
+                            const Twine& extraHeader = Twine{});
 
   /**
    * Send HTTP response from static data, along with other header information
@@ -111,9 +112,10 @@ class HttpServerConnection {
    * @param gzipped True if content is gzip compressed
    * @param extraHeader Extra HTTP headers to send, including final "\r\n"
    */
-  void SendStaticResponse(int code, const Twine& codeText,
-                          const Twine& contentType, StringRef content,
-                          bool gzipped, const Twine& extraHeader = Twine{});
+  virtual void SendStaticResponse(int code, const Twine& codeText,
+                                  const Twine& contentType, StringRef content,
+                                  bool gzipped,
+                                  const Twine& extraHeader = Twine{});
 
   /**
    * Send error header and message.
@@ -124,7 +126,7 @@ class HttpServerConnection {
    * @param code HTTP error code (e.g. 404)
    * @param message Additional message text
    */
-  void SendError(int code, const Twine& message = Twine{});
+  virtual void SendError(int code, const Twine& message = Twine{});
 
   /** The HTTP request. */
   HttpParser m_request{HttpParser::kRequest};
