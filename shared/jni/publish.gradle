@@ -122,6 +122,12 @@ model {
                             task.from(binary.sharedLibraryFile) {
                                 into nativeUtils.getPlatformPath(binary) + '/shared'
                             }
+                            def sharedPath = binary.sharedLibraryFile.absolutePath
+                            sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
+
+                            task.from(new File(sharedPath + '.pdb')) {
+                                into nativeUtils.getPlatformPath(binary) + '/shared'
+                            }
                         }
                     }
                 }
