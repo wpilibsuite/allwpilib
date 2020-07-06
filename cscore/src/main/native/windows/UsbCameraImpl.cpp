@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -196,6 +196,20 @@ void UsbCameraImpl::NumSinksChanged() {
 void UsbCameraImpl::NumSinksEnabledChanged() {
   m_messagePump->PostWindowMessage<Message::Kind, Message*>(
       SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
+}
+
+void UsbCameraImpl::SetPath(const wpi::Twine& path, CS_Status* status) {
+  Message msg{Message::kCmdSetPath};
+  msg.dataStr = path.str();
+  auto result =
+      m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
+          SetCameraMessage, msg.kind, &msg);
+  *status = result;
+}
+
+std::string UsbCameraImpl::GetPath() const {
+  std::scoped_lock lock(m_mutex);
+  return m_path;
 }
 
 void UsbCameraImpl::StartMessagePump() {
@@ -705,6 +719,16 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
       DeviceStreamOn();
     }
     return CS_OK;
+  } else if (msgKind == Message::kCmdSetPath) {
+    {
+      std::scoped_lock lock(m_mutex);
+      m_path = msg->dataStr;
+      std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+      m_widePath = utf8_conv.from_bytes(m_path.c_str());
+    }
+    DeviceDisconnect();
+    DeviceConnect();
+    return CS_OK;
   } else {
     return CS_OK;
   }
@@ -1050,6 +1074,16 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
   auto source = std::make_shared<UsbCameraImpl>(
       name, inst.logger, inst.notifier, inst.telemetry, path);
   return inst.CreateSource(CS_SOURCE_USB, source);
+}
+
+void SetUsbCameraPath(CS_Source source, const wpi::Twine& path,
+                      CS_Status* status) {
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data || data->kind != CS_SOURCE_USB) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  static_cast<UsbCameraImpl&>(*data->source).SetPath(path, status);
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {

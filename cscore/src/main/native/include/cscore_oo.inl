@@ -259,6 +259,11 @@ inline std::vector<UsbCameraInfo> UsbCamera::EnumerateUsbCameras() {
   return ::cs::EnumerateUsbCameras(&status);
 }
 
+inline void UsbCamera::SetPath(const wpi::Twine& path) {
+  m_status = 0;
+  return ::cs::SetUsbCameraPath(m_handle, path, &m_status);
+}
+
 inline std::string UsbCamera::GetPath() const {
   m_status = 0;
   return ::cs::GetUsbCameraPath(m_handle, &m_status);
