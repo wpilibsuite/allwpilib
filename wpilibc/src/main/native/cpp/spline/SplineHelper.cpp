@@ -63,10 +63,14 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
         yInitial[1]);
     if (waypoints.size() > 4) {
       for (size_t i = 1; i <= waypoints.size() - 4; ++i) {
-        dx.emplace_back(3 * (waypoints[i + 1].X().to<double>() -
-                             waypoints[i - 1].X().to<double>()));
-        dy.emplace_back(3 * (waypoints[i + 1].Y().to<double>() -
-                             waypoints[i - 1].Y().to<double>()));
+        // dx and dy represent the derivatives of the internal waypoints. The
+        // derivative of the second internal waypoint should involve the third
+        // and first internal waypoint, which have indices of 1 and 3 in the
+        // waypoints list (which contains ALL waypoints).
+        dx.emplace_back(3 * (waypoints[i + 2].X().to<double>() -
+                             waypoints[i].X().to<double>()));
+        dy.emplace_back(3 * (waypoints[i + 2].Y().to<double>() -
+                             waypoints[i].Y().to<double>()));
       }
     }
     dx.emplace_back(3 * (waypoints[waypoints.size() - 1].X().to<double>() -

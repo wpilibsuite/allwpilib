@@ -145,8 +145,11 @@ public final class SplineHelper {
 
       if (newWaypts.length > 4) {
         for (int i = 1; i <= newWaypts.length - 4; i++) {
-          dx[i] = 3 * (newWaypts[i + 1].getX() - newWaypts[i - 1].getX());
-          dy[i] = 3 * (newWaypts[i + 1].getY() - newWaypts[i - 1].getY());
+          // dx and dy represent the derivatives of the internal waypoints. The derivative
+          // of the second internal waypoint should involve the third and first internal waypoint,
+          // which have indices of 1 and 3 in the newWaypts list (which contains ALL waypoints).
+          dx[i] = 3 * (newWaypts[i + 2].getX() - newWaypts[i].getX());
+          dy[i] = 3 * (newWaypts[i + 2].getY() - newWaypts[i].getY());
         }
       }
 
