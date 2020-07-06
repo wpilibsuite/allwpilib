@@ -284,8 +284,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   hal::init::HAL_IsInitialized.store(true);
 
-  wpi::outs().SetUnbuffered();
-  if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
 
@@ -306,6 +304,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     });
   }
 #endif  // _WIN32
+
+  wpi::outs().SetUnbuffered();
+  if (HAL_LoadExtensions() < 0) return false;
 
   return true;  // Add initialization if we need to at a later point
 }
