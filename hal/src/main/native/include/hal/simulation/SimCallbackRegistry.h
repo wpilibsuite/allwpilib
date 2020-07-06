@@ -152,4 +152,42 @@ class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
     DATA->LOWERNAME.Cancel(uid);                                              \
   }
 
+/**
+ * Define a stub standard C API for SimCallbackRegistry.
+ *
+ * Functions defined:
+ * - int32 NS_RegisterCAPINAMECallback(
+ *      int32_t index, TYPE callback, void* param)
+ * - void NS_CancelCAPINAMECallback(int32_t index, int32_t uid)
+ *
+ * @param TYPE the underlying callback type (e.g. HAL_BufferCallback)
+ * @param NS the "namespace" (e.g. HALSIM)
+ * @param CAPINAME the C API name (usually first letter capitalized)
+ */
+#define HAL_SIMCALLBACKREGISTRY_STUB_CAPI(TYPE, NS, CAPINAME)             \
+  int32_t NS##_Register##CAPINAME##Callback(int32_t index, TYPE callback, \
+                                            void* param) {                \
+    return 0;                                                             \
+  }                                                                       \
+                                                                          \
+  void NS##_Cancel##CAPINAME##Callback(int32_t index, int32_t uid) {}
+
+/**
+ * Define a stub standard C API for SimCallbackRegistry (no index variant).
+ *
+ * Functions defined:
+ * - int32 NS_RegisterCAPINAMECallback(TYPE callback, void* param)
+ * - void NS_CancelCAPINAMECallback(int32_t uid)
+ *
+ * @param TYPE the underlying callback type (e.g. HAL_BufferCallback)
+ * @param NS the "namespace" (e.g. HALSIM)
+ * @param CAPINAME the C API name (usually first letter capitalized)
+ */
+#define HAL_SIMCALLBACKREGISTRY_STUB_CAPI_NOINDEX(TYPE, NS, CAPINAME)     \
+  int32_t NS##_Register##CAPINAME##Callback(TYPE callback, void* param) { \
+    return 0;                                                             \
+  }                                                                       \
+                                                                          \
+  void NS##_Cancel##CAPINAME##Callback(int32_t uid) {}
+
 }  // namespace hal

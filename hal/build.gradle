@@ -69,33 +69,6 @@ ext {
         it.tasks.withType(AbstractNativeSourceCompileTask) {
             it.dependsOn generateUsageReporting
         }
-        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-            it.sources {
-                athenaJniCpp(CppSourceSet) {
-                    source {
-                        srcDirs = ["${rootDir}/shared/singlelib", "$buildDir/generated/cpp"]
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                    }
-                }
-            }
-        } else {
-            it.sources {
-                simJniCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/sim'
-                        include '**/jni/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                    }
-                }
-            }
-        }
     }
     splitSetup = {
         it.tasks.withType(AbstractNativeSourceCompileTask) {
@@ -107,7 +80,6 @@ ext {
                     source {
                         srcDirs = ['src/main/native/athena']
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -121,7 +93,6 @@ ext {
                     source {
                         srcDirs 'src/main/native/sim'
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -134,7 +105,6 @@ ext {
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
-apply from: 'simjni.gradle'
 
 sourceSets.main.java.srcDir "${buildDir}/generated/java/"
 
@@ -150,12 +120,6 @@ cppSourcesZip {
     from('src/main/native/sim') {
         into '/sim'
     }
-
-    from("$buildDir/generated/cpp") {
-        into '/athena/jni'
-    }
-
-    dependsOn generateAthenaSimFiles
 }
 
 cppHeadersZip {
