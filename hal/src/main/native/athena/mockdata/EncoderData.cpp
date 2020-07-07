@@ -10,7 +10,7 @@
 #include "hal/simulation/SimDataValue.h"
 
 extern "C" {
-int32_t HALSIM_FindEncoderForChannel(int32_t channel) { return -1; }
+int32_t HALSIM_FindEncoderForChannel(int32_t channel) { return 0; }
 
 void HALSIM_ResetEncoderData(int32_t index) {}
 
