@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -47,6 +47,14 @@ class Subsystem {
    * handled here.
    */
   virtual void Periodic();
+
+  /**
+   * This method is called periodically by the CommandScheduler.  Useful for
+   * updating subsystem-specific state that needs to be maintained for
+   * simulations, such as for updating simulation classes and setting simulated
+   * sensor readings.
+   */
+  virtual void SimulationPeriodic();
 
   /**
    * Sets the default Command of the subsystem.  The default command will be

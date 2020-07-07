@@ -7,6 +7,7 @@
 
 #include "frc2/command/CommandScheduler.h"
 
+#include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
 #include <frc/WPIErrors.h>
@@ -192,6 +193,9 @@ void CommandScheduler::Run() {
   // Run the periodic method of all registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
     subsystem.getFirst()->Periodic();
+    if (frc::RobotBase::IsSimulation()) {
+      subsystem.getFirst()->SimulationPeriodic();
+    }
     m_watchdog.AddEpoch("Subsystem Periodic()");
   }
 
