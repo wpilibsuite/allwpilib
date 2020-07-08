@@ -224,4 +224,90 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
                                                                              \
   void NS##_Set##CAPINAME(TYPE LOWERNAME) { DATA->LOWERNAME = LOWERNAME; }
 
+/**
+ * Define a stub standard C API for simulation data.
+ *
+ * Functions defined:
+ * - int32 NS_RegisterCAPINAMECallback(
+ *      int32_t index, HAL_NotifyCallback callback, void* param,
+ *      HAL_Bool initialNotify)
+ * - void NS_CancelCAPINAMECallback(int32_t index, int32_t uid)
+ * - TYPE NS_GetCAPINAME(int32_t index)
+ * - void NS_SetCAPINAME(int32_t index, TYPE value)
+ *
+ * @param TYPE the underlying value type (e.g. double)
+ * @param NS the "namespace" (e.g. HALSIM)
+ * @param CAPINAME the C API name (usually first letter capitalized)
+ * @param RETURN what to return from the Get function
+ */
+#define HAL_SIMDATAVALUE_STUB_CAPI(TYPE, NS, CAPINAME, RETURN)        \
+  int32_t NS##_Register##CAPINAME##Callback(                          \
+      int32_t index, HAL_NotifyCallback callback, void* param,        \
+      HAL_Bool initialNotify) {                                       \
+    return 0;                                                         \
+  }                                                                   \
+                                                                      \
+  void NS##_Cancel##CAPINAME##Callback(int32_t index, int32_t uid) {} \
+                                                                      \
+  TYPE NS##_Get##CAPINAME(int32_t index) { return RETURN; }           \
+                                                                      \
+  void NS##_Set##CAPINAME(int32_t index, TYPE) {}
+
+/**
+ * Define a stub standard C API for simulation data (channel variant).
+ *
+ * Functions defined:
+ * - int32 NS_RegisterCAPINAMECallback(
+ *      int32_t index, int32_t channel, HAL_NotifyCallback callback,
+ *      void* param, HAL_Bool initialNotify)
+ * - void NS_CancelCAPINAMECallback(int32_t index, int32_t channel, int32_t uid)
+ * - TYPE NS_GetCAPINAME(int32_t index, int32_t channel)
+ * - void NS_SetCAPINAME(int32_t index, int32_t channel, TYPE value)
+ *
+ * @param TYPE the underlying value type (e.g. double)
+ * @param NS the "namespace" (e.g. HALSIM)
+ * @param CAPINAME the C API name (usually first letter capitalized)
+ * @param RETURN what to return from the Get function
+ */
+#define HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(TYPE, NS, CAPINAME, RETURN)       \
+  int32_t NS##_Register##CAPINAME##Callback(                                 \
+      int32_t index, int32_t channel, HAL_NotifyCallback callback,           \
+      void* param, HAL_Bool initialNotify) {                                 \
+    return 0;                                                                \
+  }                                                                          \
+                                                                             \
+  void NS##_Cancel##CAPINAME##Callback(int32_t index, int32_t channel,       \
+                                       int32_t uid) {}                       \
+                                                                             \
+  TYPE NS##_Get##CAPINAME(int32_t index, int32_t channel) { return RETURN; } \
+                                                                             \
+  void NS##_Set##CAPINAME(int32_t index, int32_t channel, TYPE) {}
+
+/**
+ * Define a stub standard C API for simulation data (no index variant).
+ *
+ * Functions defined:
+ * - int32 NS_RegisterCAPINAMECallback(
+ *      HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify)
+ * - void NS_CancelCAPINAMECallback(int32_t uid)
+ * - TYPE NS_GetCAPINAME(void)
+ * - void NS_SetCAPINAME(TYPE value)
+ *
+ * @param TYPE the underlying value type (e.g. double)
+ * @param NS the "namespace" (e.g. HALSIM)
+ * @param CAPINAME the C API name (usually first letter capitalized)
+ * @param RETURN what to return from the Get function
+ */
+#define HAL_SIMDATAVALUE_STUB_CAPI_NOINDEX(TYPE, NS, CAPINAME, RETURN)    \
+  int32_t NS##_Register##CAPINAME##Callback(                              \
+      HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) { \
+    return 0;                                                             \
+  }                                                                       \
+                                                                          \
+  void NS##_Cancel##CAPINAME##Callback(int32_t uid) {}                    \
+                                                                          \
+  TYPE NS##_Get##CAPINAME(void) { return RETURN; }                        \
+                                                                          \
+  void NS##_Set##CAPINAME(TYPE) {}
+
 }  // namespace hal
