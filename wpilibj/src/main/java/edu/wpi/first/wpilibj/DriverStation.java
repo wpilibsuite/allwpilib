@@ -164,6 +164,7 @@ public class DriverStation {
   private final Lock m_waitForDataMutex;
   private final Condition m_waitForDataCond;
   private int m_waitForDataCount;
+  private final ThreadLocal<Integer> m_lastCount = ThreadLocal.withInitial(() -> 0);
 
   // Robot state status variables
   private boolean m_userInDisabled;
@@ -696,7 +697,17 @@ public class DriverStation {
    * @return True if the control data has been updated since the last call.
    */
   public boolean isNewControlData() {
-    return HAL.isNewControlData();
+    m_waitForDataMutex.lock();
+    try {
+      int currentCount = m_waitForDataCount;
+      if (m_lastCount.get() != currentCount) {
+        m_lastCount.set(currentCount);
+        return true;
+      }
+    } finally {
+      m_waitForDataMutex.unlock();
+    }
+    return false;
   }
 
   /**
@@ -849,6 +860,9 @@ public class DriverStation {
 
   /**
    * Wait for new data from the driver station.
+   *
+   * <p>Checks if new control data has arrived since the last waitForData call
+   * on the current thread. If new data has not arrived, returns immediately.
    */
   public void waitForData() {
     waitForData(0);
@@ -857,6 +871,9 @@ public class DriverStation {
   /**
    * Wait for new data or for timeout, which ever comes first. If timeout is 0, wait for new data
    * only.
+   *
+   * <p>Checks if new control data has arrived since the last waitForData call
+   * on the current thread. If new data has not arrived, returns immediately.
    *
    * @param timeout The maximum time in seconds to wait.
    * @return true if there is new data, otherwise false
@@ -867,6 +884,10 @@ public class DriverStation {
     m_waitForDataMutex.lock();
     try {
       int currentCount = m_waitForDataCount;
+      if (m_lastCount.get() != currentCount) {
+        m_lastCount.set(currentCount);
+        return true;
+      }
       while (m_waitForDataCount == currentCount) {
         if (timeout > 0) {
           long now = RobotController.getFPGATime();
@@ -886,6 +907,7 @@ public class DriverStation {
           m_waitForDataCond.await();
         }
       }
+      m_lastCount.set(m_waitForDataCount);
       // Return true if we have received a proper signal
       return true;
     } catch (InterruptedException ex) {

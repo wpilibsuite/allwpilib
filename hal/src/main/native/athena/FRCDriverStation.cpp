@@ -359,35 +359,8 @@ static int& GetThreadLocalLastCount() {
   return lastCount;
 }
 
-void HAL_WaitForCachedControlData(void) {
-  HAL_WaitForCachedControlDataTimeout(0);
-}
-
-HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter.load();
-  if (lastCount != currentCount) {
-    lastCount = currentCount;
-    return true;
-  }
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-
-  std::unique_lock lock{*newDSDataAvailableMutex};
-  while (newDSDataAvailableCounter.load() == currentCount) {
-    if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      newDSDataAvailableCond->wait(lock);
-    }
-  }
-  return true;
-}
-
 HAL_Bool HAL_IsNewControlData(void) {
+  std::unique_lock lock{*newDSDataAvailableMutex};
   int& lastCount = GetThreadLocalLastCount();
   int currentCount = newDSDataAvailableCounter.load();
   if (lastCount == currentCount) return false;
@@ -406,11 +379,16 @@ void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
  * time has passed. Returns true on new data, false on timeout.
  */
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
+  std::unique_lock lock{*newDSDataAvailableMutex};
+  int& lastCount = GetThreadLocalLastCount();
+  int currentCount = newDSDataAvailableCounter.load();
+  if (lastCount != currentCount) {
+    lastCount = currentCount;
+    return true;
+  }
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  int currentCount = newDSDataAvailableCounter.load();
-  std::unique_lock lock{*newDSDataAvailableMutex};
   while (newDSDataAvailableCounter.load() == currentCount) {
     if (timeout > 0) {
       auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
@@ -421,6 +399,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
       newDSDataAvailableCond->wait(lock);
     }
   }
+  lastCount = newDSDataAvailableCounter.load();
   return true;
 }
 
