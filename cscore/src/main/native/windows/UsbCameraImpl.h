@@ -118,9 +118,6 @@ class UsbCameraImpl : public SourceImpl,
   bool CacheProperties(CS_Status* status) const override;
 
  private:
-  // The camera processing thread
-  void CameraThreadMain();
-
   LRESULT PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
   bool CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
