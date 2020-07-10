@@ -990,6 +990,27 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
+static void ParseVidAndPid(wpi::StringRef path, int* pid, int* vid) {
+  auto vidIndex = path.find_lower("vid_");
+  auto pidIndex = path.find_lower("pid_");
+
+  if (vidIndex != wpi::StringRef::npos) {
+    auto vidSlice = path.slice(vidIndex + 4, vidIndex + 8);
+    uint16_t val = 0;
+    if (!vidSlice.getAsInteger(16, val)) {
+      *vid = val;
+    }
+  }
+
+  if (pidIndex != wpi::StringRef::npos) {
+    auto pidSlice = path.slice(pidIndex + 4, pidIndex + 8);
+    uint16_t val = 0;
+    if (!pidSlice.getAsInteger(16, val)) {
+      *pid = val;
+    }
+  }
+}
+
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   std::vector<UsbCameraInfo> retval;
 
@@ -1036,6 +1057,10 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
         sizeof(buf) / sizeof(WCHAR), NULL);
     info.path = utf8_conv.to_bytes(buf);
+
+    // Try to parse path from symbolic link
+    ParseVidAndPid(info.path, &info.productId, &info.vendorId);
+
     retval.emplace_back(std::move(info));
   }
 
@@ -1104,7 +1129,10 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   }
 
   info.path = static_cast<UsbCameraImpl&>(*data->source).GetPath();
-  // TODO: dev and name
+  wpi::SmallVector<char, 64> buf;
+  info.name = static_cast<UsbCameraImpl&>(*data->source).GetDescription(buf);
+  ParseVidAndPid(info.path, &info.productId, &info.vendorId);
+  info.dev = -1;  // We have lost dev information by this point in time.
   return info;
 }
 
