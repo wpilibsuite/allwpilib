@@ -1,5 +1,5 @@
 jobs:
-- job: Windows CMake
+- job: Windows_CMake
   pool:
     vmImage: 'windows-2019'
 
