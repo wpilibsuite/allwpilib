@@ -64,10 +64,10 @@ if (NOT WITHOUT_JAVA)
 
   execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil RESULT_VARIABLE generateResult)
   if(NOT (generateResult EQUAL "0"))
-    # Try python3
+    # Try python
     execute_process(COMMAND python ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil RESULT_VARIABLE generateResult)
     if(NOT (generateResult EQUAL "0"))
-      message(FATAL_ERROR "python3 generate_numbers.py failed")
+      message(FATAL_ERROR "python and python3 generate_numbers.py failed")
     endif()
   endif()
 
