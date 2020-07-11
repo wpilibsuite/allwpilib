@@ -1,11 +1,10 @@
-
-variables:
-  vcpkgGitRef: 544f8e4593764f78faa94bac2adb81cca5232943
-
 jobs:
 - job: Windows CMake
   pool:
     vmImage: 'windows-2019'
+
+  variables:
+    vcpkgGitRef: 544f8e4593764f78faa94bac2adb81cca5232943
 
   steps:
     - task: Cache@2
