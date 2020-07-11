@@ -62,11 +62,13 @@ if (NOT WITHOUT_JAVA)
 
   set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${EJML_JARS})
 
-  execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil RESULT_VARIABLE generateResult OUTPUT_VARIABLE generateOutput ERROR_VARIABLE generateError)
+  execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil RESULT_VARIABLE generateResult)
   if(NOT (generateResult EQUAL "0"))
-    message(STATUS ${generateOutput})
-    message(STATUS ${generateError})
-    message(FATAL_ERROR "python3 generate_numbers.py failed")
+    # Try python3
+    execute_process(COMMAND python ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil RESULT_VARIABLE generateResult)
+    if(NOT (generateResult EQUAL "0"))
+      message(FATAL_ERROR "python3 generate_numbers.py failed")
+    endif()
   endif()
 
   set(CMAKE_JNI_TARGET true)
