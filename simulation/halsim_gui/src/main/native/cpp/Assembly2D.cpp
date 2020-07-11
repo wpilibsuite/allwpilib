@@ -26,6 +26,7 @@
 #include <list>
 #include <list>
 #include <string>
+#include <cmath>
 
 #include "GuiUtil.h"
 #include "HALSimGui.h"
@@ -59,27 +60,67 @@ ImColor ColorToIM_COL32(std::string color) {
     return IM_COL32(255, 255, 255, 255);
 }
 
-static void DisplayAssembly2D() {
-    ImVec2 windowPos = ImGui::GetWindowPos();
-    auto drawList = ImGui::GetWindowDrawList();
-    for (BodyConfig const &bodyConfig : bodyConfigList) {
-        if (bodyConfig.type == "line") {
-            drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-                                                 ImGui::GetWindowHeight()),
-                              windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-                                                 ImGui::GetWindowHeight() - bodyConfig.length),
-                              ColorToIM_COL32(bodyConfig.color), 1);
-        } else if (bodyConfig.type == "circle") {
-            drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-                                                 ImGui::GetWindowHeight()),
-                              windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-                                                 ImGui::GetWindowHeight() - bodyConfig.length),
-                              ColorToIM_COL32(bodyConfig.color), 1);
-        }
-    }
+
+//void CreateDrawList(ImDrawList* drawList, ImVec2 startLocation){
+//    if (bodyConfig.type == "line") {
+//        drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+//                                             ImGui::GetWindowHeight()),
+//                          windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+//                                             ImGui::GetWindowHeight() - bodyConfig.length),
+//                          ColorToIM_COL32(bodyConfig.color), 1);
+//    } else if (bodyConfig.type == "circle") {
+//        drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+//                                             ImGui::GetWindowHeight()),
+//                          windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+//                                             ImGui::GetWindowHeight() - bodyConfig.length),
+//                          ColorToIM_COL32(bodyConfig.color), 1);
+//    }
+//}
+
+//ImVec2 void Translate(ImVec2 vectorToTrans){
+//
+//}
+
+static void
+DrawLine(int startXLocation, int startYLocation, int length, int angle, ImDrawList *drawList, ImVec2 windowPos) {
+    angle -= 90;
+    drawList->AddLine(windowPos + ImVec2(startXLocation, startYLocation),
+                      windowPos + ImVec2(startXLocation + length * std::cos(angle * 3.14159 / 180),
+                                         startYLocation + length * std::sin(angle * 3.14159 / 180)),
+                      IM_COL32(255, 255, 0, 255), 1);
 }
 
-BodyConfig readSubJson(wpi::json const& body) {
+static void DisplayAssembly2D() {
+    ImVec2 windowPos = ImGui::GetWindowPos();
+    ImDrawList *drawList = ImGui::GetWindowDrawList();
+//    for (BodyConfig const &bodyConfig : bodyConfigList) {
+//        drawList->AddLine(windowPos + ImVec2(100, 100),
+//                          windowPos + ImVec2(200, 100),
+//                          ColorToIM_COL32(bodyConfig.color), 1);
+    drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
+                                         ImGui::GetWindowHeight()),
+                      windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
+                                         ImGui::GetWindowHeight() - 200),
+                      IM_COL32(255, 0, 0, 255), 1);
+    DrawLine(ImGui::GetWindowWidth() / 2 + 0, ImGui::GetWindowHeight() - 200, 100, -90, drawList, windowPos);
+//        CreateDrawList(drawList, ImVec2(bodyConfig.startLocation, ImGui::GetWindowHeight()))
+//        if (bodyConfig.type == "line") {
+//            drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+//                                                 ImGui::GetWindowHeight()),
+//                              windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+//                                                 ImGui::GetWindowHeight() - bodyConfig.length),
+//                              ColorToIM_COL32(bodyConfig.color), 1);
+//        } else if (bodyConfig.type == "circle") {
+//            drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+//                                                 ImGui::GetWindowHeight()),
+//                              windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
+//                                                 ImGui::GetWindowHeight() - bodyConfig.length),
+//                              ColorToIM_COL32(bodyConfig.color), 1);
+//        }
+//    }
+}
+
+BodyConfig readSubJson(wpi::json const &body) {
 
     BodyConfig c;
     try {
@@ -87,14 +128,11 @@ BodyConfig readSubJson(wpi::json const& body) {
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "could not read body name: " << e.what() << '\n';
     }
-
-    // path
     try {
         c.type = body.at("type").get<std::string>();
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "camera '" << c.name << "': could not type path: " << e.what() << '\n';
     }
-    // path
     try {
         c.startLocation = body.at("startLocation").get<int>();
     } catch (const wpi::json::exception &e) {
@@ -144,8 +182,6 @@ static std::list<BodyConfig> readJson(std::string jFile) {
     }
     return cList;
 }
-
-
 
 void Assembly2D::Initialize() {
     // hook ini handler to save settings
