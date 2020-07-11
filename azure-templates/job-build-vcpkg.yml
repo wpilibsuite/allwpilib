@@ -20,6 +20,7 @@ jobs:
     - task: run-cmake@0
       displayName: Build With CMake
       inputs:
-        cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
+        cmakeListsOrSettingsJson: 'CMakeListsTxtAdvanced'
         vcpkgTriplet: '$(RUNVCPKG_VCPKG_TRIPLET)'
         useVcpkgToolchainFile: true
+        cmakeAppendedArgs: '-DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF'
