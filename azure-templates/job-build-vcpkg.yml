@@ -1,0 +1,28 @@
+
+variables:
+  vcpkgGitRef: 544f8e4593764f78faa94bac2adb81cca5232943
+
+jobs:
+- job: Windows CMake
+  pool:
+    vmImage: 'windows-2019'
+
+  steps:
+    - task: Cache@2
+      displayName: Cache vcpkg
+      inputs:
+        key: $(Build.SourcesDirectory)/azure-templates/vcpkg_x64-windows.txt | "$(vcpkgGitCommitId)" | "$(Agent.OS)"
+        path: '$(Build.BinariesDirectory)/vcpkg'
+    - task: run-vcpkg@0
+      displayName: Run vcpkg
+      inputs:
+        vcpkgArguments: $(Build.SourcesDirectory)/azure-templates/vcpkg_x64-windows.txt
+        vcpkgGitCommitId: $(vcpkgGitRef)
+    - task: run-cmake
+      displayName: Build With CMake
+      inputs:
+        cmakeListsOrSettingsJson: 'CMakeLists.txt'
+        vcpkgTriplet: '$(RUNVCPKG_VCPKG_TRIPLET)'
+        useVcpkgToolchainFile: true
+
+
