@@ -15,7 +15,7 @@ jobs:
     - task: run-vcpkg@0
       displayName: Run vcpkg
       inputs:
-        vcpkgArguments: $(Build.SourcesDirectory)/azure-templates/vcpkg_x64-windows.txt
+        vcpkgArguments: @$(Build.SourcesDirectory)/azure-templates/vcpkg_x64-windows.txt
         vcpkgGitCommitId: $(vcpkgGitRef)
     - task: run-cmake@0
       displayName: Build With CMake
