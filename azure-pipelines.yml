@@ -62,14 +62,14 @@ stages:
       artifactName: 'Win64'
       preBuild:
       - powershell: |
-          choco install gitlink
+          choco install gitlink --pre
         displayName: Install gitlink
 
   - template: azure-templates/job-build-win32.yml
     parameters:
       preBuild:
       - powershell: |
-          choco install gitlink
+          choco install gitlink --pre
         displayName: Install gitlink
 
   - template: azure-templates/job-build-mac.yml
