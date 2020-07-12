@@ -25,12 +25,10 @@ class Gyro {
   Gyro& operator=(Gyro&&) = default;
 
   /**
-   * Calibrate the gyro by running for a number of samples and computing the
-   * center value. Then use the center value as the Accumulator center value for
-   * subsequent measurements. It's important to make sure that the robot is not
-   * moving while the centering calculations are in progress, this is typically
+   * Calibrate the gyro. It's important to make sure that the robot is not
+   * moving while the calibration is in progress, this is typically
    * done when the robot is first turned on while it's sitting at rest before
-   * the competition starts.
+   * the match starts.
    */
   virtual void Calibrate() = 0;
 
@@ -44,11 +42,9 @@ class Gyro {
   /**
    * Return the heading of the robot in degrees.
    *
-   * The angle is based on the current accumulator value corrected by the
-   * oversampling rate, the gyro type and the A/D calibration values. The angle
-   * is continuous, that is it will continue from 360 to 361 degrees. This
-   * allows algorithms that wouldn't want to see a discontinuity in the gyro
-   * output as it sweeps past from 360 to 0 on the second time around.
+   * The angle is continuous, that is it will continue from 360 to 361 degrees.
+   * This allows algorithms that wouldn't want to see a discontinuity in the
+   * gyro output as it sweeps past from 360 to 0 on the second time around.
    *
    * The angle is expected to increase as the gyro turns clockwise when looked
    * at from the top. It needs to follow the NED axis convention.
@@ -73,11 +69,9 @@ class Gyro {
   /**
    * Return the heading of the robot as a Rotation2d.
    *
-   * The angle is based on the current accumulator value corrected by the
-   * oversampling rate, the gyro type and the A/D calibration values. The angle
-   * is continuous, that is it will continue from 360 to 361 degrees. This
-   * allows algorithms that wouldn't want to see a discontinuity in the gyro
-   * output as it sweeps past from 360 to 0 on the second time around.
+   * The angle is continuous, that is it will continue from 360 to 361 degrees.
+   * This allows algorithms that wouldn't want to see a discontinuity in the
+   * gyro output as it sweeps past from 360 to 0 on the second time around.
    *
    * The angle is expected to increase as the gyro turns counterclockwise when
    * looked at from the top. It needs to follow the NWU axis convention.
