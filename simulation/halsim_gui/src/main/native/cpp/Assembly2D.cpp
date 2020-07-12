@@ -60,64 +60,37 @@ ImColor ColorToIM_COL32(std::string color) {
     return IM_COL32(255, 255, 255, 255);
 }
 
+std::tuple<float, float, float>
+DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
+         ImColor color) {
 
-//void CreateDrawList(ImDrawList* drawList, ImVec2 startLocation){
-//    if (bodyConfig.type == "line") {
-//        drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-//                                             ImGui::GetWindowHeight()),
-//                          windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-//                                             ImGui::GetWindowHeight() - bodyConfig.length),
-//                          ColorToIM_COL32(bodyConfig.color), 1);
-//    } else if (bodyConfig.type == "circle") {
-//        drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-//                                             ImGui::GetWindowHeight()),
-//                          windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-//                                             ImGui::GetWindowHeight() - bodyConfig.length),
-//                          ColorToIM_COL32(bodyConfig.color), 1);
-//    }
-//}
-
-//ImVec2 void Translate(ImVec2 vectorToTrans){
-//
-//}
-
-static void
-DrawLine(int startXLocation, int startYLocation, int length, int angle, ImDrawList *drawList, ImVec2 windowPos) {
-    angle -= 90;
+    double radAngle = (angle - 90) * 3.14159 / 180;
+    double xEnd = startXLocation + length * std::cos(radAngle);
+    double yEnd = startYLocation + length * std::sin(radAngle);
     drawList->AddLine(windowPos + ImVec2(startXLocation, startYLocation),
-                      windowPos + ImVec2(startXLocation + length * std::cos(angle * 3.14159 / 180),
-                                         startYLocation + length * std::sin(angle * 3.14159 / 180)),
-                      IM_COL32(255, 255, 0, 255), 1);
+                      windowPos + ImVec2(xEnd, yEnd),
+                      color, 1);
+    return {xEnd, yEnd, angle};
 }
+
+int angleCount = 0;
 
 static void DisplayAssembly2D() {
     ImVec2 windowPos = ImGui::GetWindowPos();
     ImDrawList *drawList = ImGui::GetWindowDrawList();
-//    for (BodyConfig const &bodyConfig : bodyConfigList) {
-//        drawList->AddLine(windowPos + ImVec2(100, 100),
-//                          windowPos + ImVec2(200, 100),
-//                          ColorToIM_COL32(bodyConfig.color), 1);
     drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
                                          ImGui::GetWindowHeight()),
                       windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
                                          ImGui::GetWindowHeight() - 200),
                       IM_COL32(255, 0, 0, 255), 1);
-    DrawLine(ImGui::GetWindowWidth() / 2 + 0, ImGui::GetWindowHeight() - 200, 100, -90, drawList, windowPos);
-//        CreateDrawList(drawList, ImVec2(bodyConfig.startLocation, ImGui::GetWindowHeight()))
-//        if (bodyConfig.type == "line") {
-//            drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-//                                                 ImGui::GetWindowHeight()),
-//                              windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-//                                                 ImGui::GetWindowHeight() - bodyConfig.length),
-//                              ColorToIM_COL32(bodyConfig.color), 1);
-//        } else if (bodyConfig.type == "circle") {
-//            drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-//                                                 ImGui::GetWindowHeight()),
-//                              windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation,
-//                                                 ImGui::GetWindowHeight() - bodyConfig.length),
-//                              ColorToIM_COL32(bodyConfig.color), 1);
-//        }
-//    }
+    auto[firstXEnd, firstYEnd, firstAngle] = DrawLine(ImGui::GetWindowWidth() / 2 + 0, ImGui::GetWindowHeight() - 200,
+                                                      100,
+                                                      angleCount, drawList,
+                                                      windowPos, IM_COL32(255, 255, 255, 255));
+    auto[secondXEnd, secondYEnd, secondAngle] = DrawLine(firstXEnd, firstYEnd, 100, angleCount + 90 + firstAngle,
+                                                         drawList, windowPos, IM_COL32(255, 255, 0, 255));
+    DrawLine(secondXEnd, secondYEnd, 200, angleCount + 45 + secondAngle, drawList, windowPos, IM_COL32(0, 255, 0, 255));
+    angleCount++;
 }
 
 BodyConfig readSubJson(wpi::json const &body) {
