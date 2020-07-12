@@ -60,8 +60,17 @@ stages:
       jdkVersionOption: '1.11'
       buildOptions: '-PskipPMD'
       artifactName: 'Win64'
+      preBuild:
+      - powershell: |
+          choco install gitlink
+        displayName: Install gitlink
 
   - template: azure-templates/job-build-win32.yml
+    parameters:
+      preBuild:
+      - powershell: |
+          choco install gitlink
+        displayName: Install gitlink
 
   - template: azure-templates/job-build-mac.yml
 

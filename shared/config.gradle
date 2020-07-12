@@ -18,8 +18,10 @@ nativeUtils {
 
 nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
+nativeUtils.wpi.addReleaseSymbolGeneration()
 
 nativeUtils.setSinglePrintPerPlatform()
+nativeUtils.enableGitLink()
 
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) return
