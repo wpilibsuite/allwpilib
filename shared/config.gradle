@@ -148,6 +148,11 @@ ext.includeStandardZipFormat = { task, value ->
                 task.from(binary.staticLibraryFile) {
                     into nativeUtils.getPlatformPath(binary) + '/static'
                 }
+                def staticPath = binary.staticLibraryFile.absolutePath
+                staticPath = staticPath.substring(0, staticPath.length() - 4)
+                task.from(new File(staticPath + '.pdb')) {
+                    into nativeUtils.getPlatformPath(binary) + '/static'
+                }
             }
         }
     }
