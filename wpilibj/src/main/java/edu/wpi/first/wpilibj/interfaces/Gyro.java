@@ -74,6 +74,6 @@ public interface Gyro extends AutoCloseable {
    *         {@link edu.wpi.first.wpilibj.geometry.Rotation2d}.
    */
   default Rotation2d getRotation2d() {
-    return new Rotation2d(-getAngle());
+    return Rotation2d.fromDegrees(-getAngle());
   }
 }
