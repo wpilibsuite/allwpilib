@@ -21,7 +21,7 @@ nativeUtils.wpi.addWarningsAsErrors()
 nativeUtils.wpi.addReleaseSymbolGeneration()
 
 nativeUtils.setSinglePrintPerPlatform()
-nativeUtils.enableGitLink()
+nativeUtils.enableSourceLink()
 
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) return
@@ -151,6 +151,10 @@ ext.includeStandardZipFormat = { task, value ->
                 def staticPath = binary.staticLibraryFile.absolutePath
                 staticPath = staticPath.substring(0, staticPath.length() - 4)
                 task.from(new File(staticPath + '.pdb')) {
+                    into nativeUtils.getPlatformPath(binary) + '/static'
+                }
+                def sourceLinkFile = new File(binary.staticLibraryFile.parentFile, "SourceLink.json")
+                task.from(sourceLinkFile) {
                     into nativeUtils.getPlatformPath(binary) + '/static'
                 }
             }
