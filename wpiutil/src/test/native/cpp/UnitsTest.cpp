@@ -2979,11 +2979,15 @@ TEST_F(UnitMath, abs) {
   EXPECT_EQ(meter_t(10.0), abs(meter_t(10.0)));
 }
 
-TEST_F(UnitMath, fma) {
-  meter_t x(2.0);
-  meter_t y(3.0);
-  square_meter_t z(1.0);
-  EXPECT_EQ(square_meter_t(7.0), fma(x, y, z));
+TEST_F(UnitMath, normalize) {
+  EXPECT_EQ(NormalizeAngle(radian_t(5 * wpi::math::pi)),
+      radian_t(wpi::math::pi));
+  EXPECT_EQ(NormalizeAngle(radian_t(-5 * wpi::math::pi)),
+      radian_t(wpi::math::pi));
+  EXPECT_EQ(NormalizeAngle(radian_t(wpi::math::pi / 2)),
+      radian_t(wpi::math::pi / 2));
+  EXPECT_EQ(NormalizeAngle(radian_t(-wpi::math::pi / 2)),
+      radian_t(-wpi::math::pi / 2));
 }
 
 // Constexpr
