@@ -8,12 +8,14 @@
       "startLocation": -200,
       "length": 200,
       "color": "blue",
+      "angle": 0,
       "children":[
         {
           "name": "subline",
           "type": "line",
           "length": 200,
-          "color": "red"
+          "color": "red",
+          "angle": 0
         }
       ]
     },
@@ -22,7 +24,8 @@
       "type": "line",
       "startLocation": 300,
       "length": 100,
-      "color": "green"
+      "color": "green",
+      "angle": 0
     }
   ]
 }

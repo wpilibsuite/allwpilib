@@ -32,8 +32,7 @@
 #include "HALSimGui.h"
 #include "SimDeviceGui.h"
 #include "portable-file-dialogs.h"
-#include "../include/HALSimGui.h"
-#include "../../../../../../wpiutil/src/main/native/include/wpi/json.h"
+#include <mockdata/EncoderData.h>
 
 using namespace halsimgui;
 
@@ -83,14 +82,17 @@ static void DisplayAssembly2D() {
                       windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
                                          ImGui::GetWindowHeight() - 200),
                       IM_COL32(255, 0, 0, 255), 1);
-    auto[firstXEnd, firstYEnd, firstAngle] = DrawLine(ImGui::GetWindowWidth() / 2 + 0, ImGui::GetWindowHeight() - 200,
-                                                      100,
-                                                      angleCount, drawList,
-                                                      windowPos, IM_COL32(255, 255, 255, 255));
-    auto[secondXEnd, secondYEnd, secondAngle] = DrawLine(firstXEnd, firstYEnd, 100, angleCount + 90 + firstAngle,
-                                                         drawList, windowPos, IM_COL32(255, 255, 0, 255));
-    DrawLine(secondXEnd, secondYEnd, 200, angleCount + 45 + secondAngle, drawList, windowPos, IM_COL32(0, 255, 0, 255));
-    angleCount++;
+//    auto[firstXEnd, firstYEnd, firstAngle] =
+    DrawLine(ImGui::GetWindowWidth() / 2 + 0, ImGui::GetWindowHeight() - 200,
+             100,
+             HALSIM_GetEncoderCount(0), drawList,
+             windowPos, IM_COL32(255, 255, 255, 255));
+//    auto[secondXEnd, secondYEnd, secondAngle] = DrawLine(firstXEnd, firstYEnd, 100, angleCount + 90 + firstAngle,
+//                                                         drawList, windowPos, IM_COL32(255, 255, 0, 255));
+//    DrawLine(secondXEnd, secondYEnd, 200, angleCount + 45 + secondAngle, drawList, windowPos, IM_COL32(0, 255, 0, 255));
+//    angleCount++;
+//    double distance = HALSIM_GetEncoderCount(0);
+//    std::cout << distance;
 }
 
 BodyConfig readSubJson(wpi::json const &body) {
