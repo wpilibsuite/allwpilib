@@ -124,7 +124,7 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
 
 static wpi::mutex* newDSDataAvailableMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
-static std::atomic_int newDSDataAvailableCounter{0};
+static int newDSDataAvailableCounter{0};
 
 namespace hal {
 namespace init {
@@ -355,14 +355,14 @@ static int& GetThreadLocalLastCount() {
   // will return false when instead it should return true. However, this at a
   // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
   // worth the cycles to check.
-  thread_local int lastCount{-1};
+  thread_local int lastCount{0};
   return lastCount;
 }
 
 HAL_Bool HAL_IsNewControlData(void) {
-  std::unique_lock lock{*newDSDataAvailableMutex};
+  std::scoped_lock lock{*newDSDataAvailableMutex};
   int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter.load();
+  int currentCount = newDSDataAvailableCounter;
   if (lastCount == currentCount) return false;
   lastCount = currentCount;
   return true;
@@ -381,7 +381,7 @@ void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock lock{*newDSDataAvailableMutex};
   int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter.load();
+  int currentCount = newDSDataAvailableCounter;
   if (lastCount != currentCount) {
     lastCount = currentCount;
     return true;
@@ -389,7 +389,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  while (newDSDataAvailableCounter.load() == currentCount) {
+  while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
       auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
       if (timedOut == std::cv_status::timeout) {
@@ -399,7 +399,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
       newDSDataAvailableCond->wait(lock);
     }
   }
-  lastCount = newDSDataAvailableCounter.load();
+  lastCount = newDSDataAvailableCounter;
   return true;
 }
 
@@ -410,8 +410,9 @@ static void newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return;
+  std::scoped_lock lock{*newDSDataAvailableMutex};
   // Notify all threads
-  newDSDataAvailableCounter.fetch_add(1);
+  ++newDSDataAvailableCounter;
   newDSDataAvailableCond->notify_all();
 }
 
