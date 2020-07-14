@@ -45,6 +45,7 @@ struct BodyConfig {
     int startLocation;
     int length;
     std::string color;
+    int angle;
     std::list<BodyConfig> children;
 };
 
@@ -75,30 +76,34 @@ DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDra
     return {xEnd, yEnd, angle};
 }
 
-//static void buildDrawList(ImDrawList *drawList){
-//
-//}
+static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *drawList, int previousAngle,
+                          const std::list<BodyConfig> &subBodyConfigs, ImVec2 windowPos) {
+    for (BodyConfig const &bodyConfig : subBodyConfigs) {
+//        auto[XEnd, YEnd, angle] =
+                DrawLine(startXLocation, startYLocation,
+                                           bodyConfig.length,
+                                           HALSIM_GetEncoderCount(0) + bodyConfig.angle +
+                                           previousAngle, drawList,
+                                           windowPos, ColorToIM_COL32(bodyConfig.color));
+
+//        wpi::outs() << bodyConfig.children.size();
+
+//        if (bodyConfig.children.size() != 0) {
+//            buildDrawList(XEnd, YEnd, drawList, angle,
+//                          bodyConfig.children, windowPos);
+//            wpi::outs() << "Not null";
+//        }
+    }
+}
 
 static void DisplayAssembly2D() {
     ImVec2 windowPos = ImGui::GetWindowPos();
     ImDrawList *drawList = ImGui::GetWindowDrawList();
 
-    drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
-                                         ImGui::GetWindowHeight()),
-                      windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
-                                         ImGui::GetWindowHeight() - 200),
-                      IM_COL32(255, 0, 0, 255), 1);
-//    auto[firstXEnd, firstYEnd, firstAngle] =
-    DrawLine(ImGui::GetWindowWidth() / 2 + 0, ImGui::GetWindowHeight() - 200,
-             100,
-             HALSIM_GetEncoderCount(0), drawList,
-             windowPos, IM_COL32(255, 255, 255, 255));
-//    auto[secondXEnd, secondYEnd, secondAngle] = DrawLine(firstXEnd, firstYEnd, 100, angleCount + 90 + firstAngle,
-//                                                         drawList, windowPos, IM_COL32(255, 255, 0, 255));
-//    DrawLine(secondXEnd, secondYEnd, 200, angleCount + 45 + secondAngle, drawList, windowPos, IM_COL32(0, 255, 0, 255));
-//    angleCount++;
-//    double distance = HALSIM_GetEncoderCount(0);
-//    std::cout << distance;
+    for (BodyConfig const &bodyConfig : bodyConfigList) {
+        buildDrawList(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation, ImGui::GetWindowHeight(), drawList, 0,
+                      bodyConfig.children, windowPos);
+    }
 }
 
 BodyConfig readSubJson(wpi::json const &body) {
@@ -129,6 +134,19 @@ BodyConfig readSubJson(wpi::json const &body) {
         c.color = body.at("color").get<std::string>();
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "color '" << c.name << "': could not find color path: " << e.what() << '\n';
+    }
+    try {
+        c.angle = body.at("angle").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "angle '" << c.name << "': could not find angle path: " << e.what() << '\n';
+    }
+    try {
+        for (wpi::json const &child : body.at("children")) {
+            c.children.push_back(readSubJson(child));
+            wpi::outs() << "Reading Child \n";
+        }
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "could not read body: " << e.what() << '\n';
     }
     return c;
 }
@@ -175,21 +193,9 @@ static std::list<BodyConfig> readJson(std::string jFile) {
 }
 
 void Assembly2D::Initialize() {
-    // hook ini handler to save settings
     bodyConfigList = readJson("/home/gabe/github/allwpilib/Assembly2D.json");
-//    ImGuiSettingsHandler iniHandler;
-//    iniHandler.TypeName = "2D Assembly";
-//    iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-//    ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-//    HALSimGui::SetWindowVisibility("2D Field View", HALSimGui::kHide);
     HALSimGui::AddWindow("2D Assembly", DisplayAssembly2D);
     HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
     HALSimGui::SetDefaultWindowSize("2D Assembly", 600, 600);
     HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
-
-
-    for (BodyConfig const &bodyConfig : bodyConfigList) {
-        wpi::outs() << bodyConfig.name << " " << bodyConfig.type << " " << bodyConfig.startLocation << " "
-                    << bodyConfig.length << "\n";
-    }
 }

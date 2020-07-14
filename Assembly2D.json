@@ -5,9 +5,9 @@
     {
       "name": "mainLine",
       "type": "line",
-      "startLocation": -200,
+      "startLocation": 0,
       "length": 200,
-      "color": "blue",
+      "color": "red",
       "angle": 0,
       "children":[
         {
@@ -15,7 +15,7 @@
           "type": "line",
           "length": 200,
           "color": "red",
-          "angle": 0
+          "angle": 180
         }
       ]
     },
