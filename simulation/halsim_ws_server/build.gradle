@@ -1,11 +1,11 @@
 if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
 
-    description = "A plugin that interacts with a remote robot over WebSockets"
+    description = "WebSocket Server Extension"
 
     ext {
         includeWpiutil = true
         includeNtCore = true
-        pluginName = 'halsim_ws'
+        pluginName = 'halsim_ws_server'
     }
 
     apply plugin: 'google-test-test-suite'

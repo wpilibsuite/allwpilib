@@ -7,7 +7,12 @@
 #include "DIOProvider.h"
 #include "AnalogProvider.h"
 
+#include <WSProviderContainer.h>
+#include <WSProvider_Analog.h>
+
 static ProviderContainer providers;
+
+static wpilibws::ProviderContainer providers2;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -25,10 +30,13 @@ int HALSIM_InitExtension(void) {
   }
 
   WSRegisterFunc registerFunc = std::bind(&ProviderContainer::Add, &providers, std::placeholders::_1, std::placeholders::_2);
-
+  wpilibws::WSRegisterFunc regFunc = std::bind(&wpilibws::ProviderContainer::Add, &providers2, std::placeholders::_1, std::placeholders::_2);
+  
   DIOProvider::Initialize(registerFunc);
   AnalogInProvider::Initialize(registerFunc);
   AnalogOutProvider::Initialize(registerFunc);
+
+  wpilibws::HALSimWSProviderAnalogIn::Initialize(regFunc);
 
   HAL_SetMain(nullptr, HALSimWS::Main, HALSimWS::Exit);
 
