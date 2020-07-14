@@ -36,6 +36,9 @@
 
 using namespace halsimgui;
 
+static int windowWidth = 100;
+static int windowHeight = 100;
+
 struct BodyConfig {
     std::string name;
     std::string type;
@@ -72,11 +75,14 @@ DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDra
     return {xEnd, yEnd, angle};
 }
 
-int angleCount = 0;
+//static void buildDrawList(ImDrawList *drawList){
+//
+//}
 
 static void DisplayAssembly2D() {
     ImVec2 windowPos = ImGui::GetWindowPos();
     ImDrawList *drawList = ImGui::GetWindowDrawList();
+
     drawList->AddLine(windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
                                          ImGui::GetWindowHeight()),
                       windowPos + ImVec2(ImGui::GetWindowWidth() / 2 + 0,
@@ -155,19 +161,30 @@ static std::list<BodyConfig> readJson(std::string jFile) {
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "could not read body: " << e.what() << '\n';
     }
+    try {
+        windowHeight = j.at("windowHeight").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "Could not find windowHeight path: " << e.what() << '\n';
+    }
+    try {
+        windowWidth = j.at("windowWidth").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "Could not find windowWidth path: " << e.what() << '\n';
+    }
     return cList;
 }
 
 void Assembly2D::Initialize() {
     // hook ini handler to save settings
     bodyConfigList = readJson("/home/gabe/github/allwpilib/Assembly2D.json");
-    ImGuiSettingsHandler iniHandler;
-    iniHandler.TypeName = "2D Assembly";
-    iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-    ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+//    ImGuiSettingsHandler iniHandler;
+//    iniHandler.TypeName = "2D Assembly";
+//    iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
+//    ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+//    HALSimGui::SetWindowVisibility("2D Field View", HALSimGui::kHide);
     HALSimGui::AddWindow("2D Assembly", DisplayAssembly2D);
     HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
-    HALSimGui::SetDefaultWindowSize("2D Assembly", 400, 200);
+    HALSimGui::SetDefaultWindowSize("2D Assembly", 600, 600);
     HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
 
 
