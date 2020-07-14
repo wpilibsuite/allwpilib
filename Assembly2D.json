@@ -7,15 +7,24 @@
       "type": "line",
       "startLocation": 0,
       "length": 200,
-      "color": "red",
+      "color": "blue",
       "angle": 0,
       "children":[
         {
           "name": "subline",
           "type": "line",
           "length": 200,
-          "color": "red",
-          "angle": 180
+          "color": "green",
+          "angle": 0,
+          "children":[
+            {
+              "name": "subline",
+              "type": "line",
+              "length": 200,
+              "color": "red",
+              "angle": 0
+            }
+          ]
         }
       ]
     },

@@ -67,6 +67,7 @@ std::tuple<float, float, float>
 DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
          ImColor color) {
 
+    wpi::outs() << "Made it into DrawLine";
     double radAngle = (angle - 90) * 3.14159 / 180;
     double xEnd = startXLocation + length * std::cos(radAngle);
     double yEnd = startYLocation + length * std::sin(radAngle);
@@ -77,22 +78,19 @@ DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDra
 }
 
 static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *drawList, int previousAngle,
-                          const std::list<BodyConfig> &subBodyConfigs, ImVec2 windowPos) {
-    for (BodyConfig const &bodyConfig : subBodyConfigs) {
-//        auto[XEnd, YEnd, angle] =
-                DrawLine(startXLocation, startYLocation,
-                                           bodyConfig.length,
-                                           HALSIM_GetEncoderCount(0) + bodyConfig.angle +
-                                           previousAngle, drawList,
-                                           windowPos, ColorToIM_COL32(bodyConfig.color));
+                          BodyConfig bodyConfig, ImVec2 windowPos) {
+    auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
+                                       bodyConfig.length,
+                                       HALSIM_GetEncoderCount(0) + bodyConfig.angle +
+                                       previousAngle, drawList,
+                                       windowPos, ColorToIM_COL32(bodyConfig.color));
 
 //        wpi::outs() << bodyConfig.children.size();
 
-//        if (bodyConfig.children.size() != 0) {
-//            buildDrawList(XEnd, YEnd, drawList, angle,
-//                          bodyConfig.children, windowPos);
-//            wpi::outs() << "Not null";
-//        }
+    if (bodyConfig.children.size() != 0) {
+        buildDrawList(XEnd, YEnd, drawList, angle,
+                      bodyConfig.children, windowPos);
+        wpi::outs() << "Not null";
     }
 }
 
@@ -100,9 +98,11 @@ static void DisplayAssembly2D() {
     ImVec2 windowPos = ImGui::GetWindowPos();
     ImDrawList *drawList = ImGui::GetWindowDrawList();
 
+//    wpi::outs() << "size " << bodyConfigList.size();
+
     for (BodyConfig const &bodyConfig : bodyConfigList) {
         buildDrawList(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation, ImGui::GetWindowHeight(), drawList, 0,
-                      bodyConfig.children, windowPos);
+                      bodyConfig, windowPos);
     }
 }
 
@@ -198,4 +198,9 @@ void Assembly2D::Initialize() {
     HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
     HALSimGui::SetDefaultWindowSize("2D Assembly", 600, 600);
     HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
+
+    for (BodyConfig const &bodyConfig : bodyConfigList) {
+        wpi::outs() << bodyConfig.name << " " << bodyConfig.type << " " << bodyConfig.startLocation << " "
+                    << bodyConfig.length << "\n";
+    }
 }
