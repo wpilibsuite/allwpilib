@@ -46,6 +46,8 @@ struct BodyConfig {
     int length;
     std::string color;
     int angle;
+    int maxAngle = 999;
+    int minAngle = -999;
     std::list<BodyConfig> children;
 };
 
@@ -66,8 +68,6 @@ ImColor ColorToIM_COL32(std::string color) {
 std::tuple<float, float, float>
 DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
          ImColor color) {
-
-    wpi::outs() << "Made it into DrawLine";
     double radAngle = (angle - 90) * 3.14159 / 180;
     double xEnd = startXLocation + length * std::cos(radAngle);
     double yEnd = startYLocation + length * std::sin(radAngle);
@@ -78,19 +78,25 @@ DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDra
 }
 
 static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *drawList, int previousAngle,
-                          BodyConfig bodyConfig, ImVec2 windowPos) {
-    auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
-                                       bodyConfig.length,
-                                       HALSIM_GetEncoderCount(0) + bodyConfig.angle +
-                                       previousAngle, drawList,
-                                       windowPos, ColorToIM_COL32(bodyConfig.color));
+                          const std::list<BodyConfig> &subBodyConfigs, ImVec2 windowPos) {
+    for (BodyConfig const &bodyConfig : subBodyConfigs) {
+        int angleToGoTo = HALSIM_GetEncoderCount(0) + bodyConfig.angle +
+                          previousAngle;
 
-//        wpi::outs() << bodyConfig.children.size();
+        if (bodyConfig.maxAngle < HALSIM_GetEncoderCount(0) + bodyConfig.angle) {
+            angleToGoTo = bodyConfig.maxAngle;
+        } else if (HALSIM_GetEncoderCount(0) + bodyConfig.angle < bodyConfig.minAngle) {
+            angleToGoTo = bodyConfig.minAngle;
+        }
 
-    if (bodyConfig.children.size() != 0) {
-        buildDrawList(XEnd, YEnd, drawList, angle,
-                      bodyConfig.children, windowPos);
-        wpi::outs() << "Not null";
+        auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
+                                           bodyConfig.length, angleToGoTo, drawList,
+                                           windowPos, ColorToIM_COL32(bodyConfig.color));
+
+        if (bodyConfig.children.size() != 0) {
+            buildDrawList(XEnd, YEnd, drawList, angle,
+                          bodyConfig.children, windowPos);
+        }
     }
 }
 
@@ -100,10 +106,10 @@ static void DisplayAssembly2D() {
 
 //    wpi::outs() << "size " << bodyConfigList.size();
 
-    for (BodyConfig const &bodyConfig : bodyConfigList) {
-        buildDrawList(ImGui::GetWindowWidth() / 2 + bodyConfig.startLocation, ImGui::GetWindowHeight(), drawList, 0,
-                      bodyConfig, windowPos);
-    }
+//    for (BodyConfig const &bodyConfig : bodyConfigList) {
+    buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(), drawList, 0,
+                  bodyConfigList, windowPos);
+//    }
 }
 
 BodyConfig readSubJson(wpi::json const &body) {
@@ -139,6 +145,16 @@ BodyConfig readSubJson(wpi::json const &body) {
         c.angle = body.at("angle").get<int>();
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "angle '" << c.name << "': could not find angle path: " << e.what() << '\n';
+    }
+    try {
+        c.maxAngle = body.at("maxAngle").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "maxAngle '" << c.name << "': could not find maxAngle path: " << e.what() << '\n';
+    }
+    try {
+        c.minAngle = body.at("minAngle").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "minAngle '" << c.name << "': could not find minAngle path: " << e.what() << '\n';
     }
     try {
         for (wpi::json const &child : body.at("children")) {

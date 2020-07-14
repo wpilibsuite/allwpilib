@@ -9,6 +9,8 @@
       "length": 200,
       "color": "blue",
       "angle": 0,
+      "minAngle": -30,
+      "maxAngle": 30,
       "children":[
         {
           "name": "subline",
@@ -16,25 +18,26 @@
           "length": 200,
           "color": "green",
           "angle": 0,
+          "minAngle": -30,
+          "maxAngle": 30,
           "children":[
             {
               "name": "subline",
               "type": "line",
               "length": 200,
               "color": "red",
-              "angle": 0
+              "angle": -45
+            },
+            {
+              "name": "subline",
+              "type": "line",
+              "length": 200,
+              "color": "red",
+              "angle": 45
             }
           ]
         }
       ]
-    },
-    {
-      "name": "mainLine2",
-      "type": "line",
-      "startLocation": 300,
-      "length": 100,
-      "color": "green",
-      "angle": 0
     }
   ]
 }
