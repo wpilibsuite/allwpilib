@@ -7,10 +7,14 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "frc/GenericHID.h"
-#include "frc/simulation/DriverStationSim.h"
 
 namespace frc {
+
+class GenericHID;
+
 namespace sim {
 
 /**
@@ -23,71 +27,45 @@ class GenericHIDSim {
    *
    * @param joystick joystick to simulate
    */
-  explicit GenericHIDSim(const GenericHID& joystick)
-      : m_port{joystick.GetPort()} {}
+  explicit GenericHIDSim(const GenericHID& joystick);
 
   /**
    * Constructs from a joystick port number.
    *
    * @param port port number
    */
-  explicit GenericHIDSim(int port) : m_port{port} {}
+  explicit GenericHIDSim(int port);
 
   /**
    * Updates joystick data so that new values are visible to the user program.
    */
-  void NotifyNewData() { DriverStationSim::NotifyNewData(); }
+  void NotifyNewData();
 
-  void SetRawButton(int button, bool value) {
-    DriverStationSim::SetJoystickButton(m_port, button, value);
-  }
+  void SetRawButton(int button, bool value);
 
-  void SetRawAxis(int axis, double value) {
-    DriverStationSim::SetJoystickAxis(m_port, axis, value);
-  }
+  void SetRawAxis(int axis, double value);
 
-  void SetPOV(int pov, int value) {
-    DriverStationSim::SetJoystickPOV(m_port, pov, value);
-  }
+  void SetPOV(int pov, int value);
 
-  void SetPOV(int value) { SetPOV(0, value); }
+  void SetPOV(int value);
 
-  void SetAxisCount(int count) {
-    DriverStationSim::SetJoystickAxisCount(m_port, count);
-  }
+  void SetAxisCount(int count);
 
-  void SetPOVCount(int count) {
-    DriverStationSim::SetJoystickPOVCount(m_port, count);
-  }
+  void SetPOVCount(int count);
 
-  void SetButtonCount(int count) {
-    DriverStationSim::SetJoystickButtonCount(m_port, count);
-  }
+  void SetButtonCount(int count);
 
-  void SetType(GenericHID::HIDType type) {
-    DriverStationSim::SetJoystickType(m_port, type);
-  }
+  void SetType(GenericHID::HIDType type);
 
-  void SetName(const char* name) {
-    DriverStationSim::SetJoystickName(m_port, name);
-  }
+  void SetName(const char* name);
 
-  void SetAxisType(int axis, int type) {
-    DriverStationSim::SetJoystickAxisType(m_port, axis, type);
-  }
+  void SetAxisType(int axis, int type);
 
-  bool GetOutput(int outputNumber) {
-    int64_t outputs = GetOutputs();
-    return (outputs & (static_cast<int64_t>(1) << (outputNumber - 1))) != 0;
-  }
+  bool GetOutput(int outputNumber);
 
-  int64_t GetOutputs() { return DriverStationSim::GetJoystickOutputs(m_port); }
+  int64_t GetOutputs();
 
-  double GetRumble(GenericHID::RumbleType type) {
-    int value = DriverStationSim::GetJoystickRumble(
-        m_port, type == GenericHID::kLeftRumble ? 0 : 1);
-    return value / 65535.0;
-  }
+  double GetRumble(GenericHID::RumbleType type);
 
  protected:
   int m_port;

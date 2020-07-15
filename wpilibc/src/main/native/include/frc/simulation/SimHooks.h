@@ -7,30 +7,30 @@
 
 #pragma once
 
-#include <hal/simulation/MockHooks.h>
+#include <stdint.h>
+
+#include <hal/HALBase.h>
 
 namespace frc {
 namespace sim {
 
-inline void SetRuntimeType(HAL_RuntimeType type) {
-  HALSIM_SetRuntimeType(type);
-}
+void SetRuntimeType(HAL_RuntimeType type);
 
-inline void WaitForProgramStart() { HALSIM_WaitForProgramStart(); }
+void WaitForProgramStart();
 
-inline void SetProgramStarted() { HALSIM_SetProgramStarted(); }
+void SetProgramStarted();
 
-inline bool GetProgramStarted() { return HALSIM_GetProgramStarted(); }
+bool GetProgramStarted();
 
-inline void RestartTiming() { HALSIM_RestartTiming(); }
+void RestartTiming();
 
-inline void PauseTiming() { HALSIM_PauseTiming(); }
+void PauseTiming();
 
-inline void ResumeTiming() { HALSIM_ResumeTiming(); }
+void ResumeTiming();
 
-inline bool IsTimingPaused() { return HALSIM_IsTimingPaused(); }
+bool IsTimingPaused();
 
-inline void StepTiming(uint64_t delta) { HALSIM_StepTiming(delta); }
+void StepTiming(uint64_t delta);
 
 }  // namespace sim
 }  // namespace frc

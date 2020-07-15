@@ -7,16 +7,14 @@
 
 #pragma once
 
-#include <exception>
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/DutyCycleData.h>
-
-#include "CallbackStore.h"
-#include "frc/DutyCycle.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
+
+class DutyCycle;
+
 namespace sim {
 
 /**
@@ -29,8 +27,7 @@ class DutyCycleSim {
    *
    * @param dutyCycle DutyCycle to simulate
    */
-  explicit DutyCycleSim(const DutyCycle& dutyCycle)
-      : m_index{dutyCycle.GetFPGAIndex()} {}
+  explicit DutyCycleSim(const DutyCycle& dutyCycle);
 
   /**
    * Creates a DutyCycleSim for a digital input channel.
@@ -39,11 +36,7 @@ class DutyCycleSim {
    * @return Simulated object
    * @throws std::out_of_range if no DutyCycle is configured for that channel
    */
-  static DutyCycleSim CreateForChannel(int channel) {
-    int index = HALSIM_FindDutyCycleForChannel(channel);
-    if (index < 0) throw std::out_of_range("no duty cycle found for channel");
-    return DutyCycleSim{index};
-  }
+  static DutyCycleSim CreateForChannel(int channel);
 
   /**
    * Creates a DutyCycleSim for a simulated index.
@@ -52,52 +45,30 @@ class DutyCycleSim {
    * @param index simulator index
    * @return Simulated object
    */
-  static DutyCycleSim CreateForIndex(int index) { return DutyCycleSim{index}; }
+  static DutyCycleSim CreateForIndex(int index);
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelDutyCycleInitializedCallback);
-    store->SetUid(HALSIM_RegisterDutyCycleInitializedCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetInitialized() const {
-    return HALSIM_GetDutyCycleInitialized(m_index);
-  }
+  bool GetInitialized() const;
 
-  void SetInitialized(bool initialized) {
-    HALSIM_SetDutyCycleInitialized(m_index, initialized);
-  }
+  void SetInitialized(bool initialized);
 
   std::unique_ptr<CallbackStore> RegisterFrequencyCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelDutyCycleFrequencyCallback);
-    store->SetUid(HALSIM_RegisterDutyCycleFrequencyCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  int GetFrequency() const { return HALSIM_GetDutyCycleFrequency(m_index); }
+  int GetFrequency() const;
 
-  void SetFrequency(int count) { HALSIM_SetDutyCycleFrequency(m_index, count); }
+  void SetFrequency(int count);
 
   std::unique_ptr<CallbackStore> RegisterOutputCallback(NotifyCallback callback,
-                                                        bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelDutyCycleOutputCallback);
-    store->SetUid(HALSIM_RegisterDutyCycleOutputCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                        bool initialNotify);
 
-  double GetOutput() const { return HALSIM_GetDutyCycleOutput(m_index); }
+  double GetOutput() const;
 
-  void SetOutput(double period) { HALSIM_SetDutyCycleOutput(m_index, period); }
+  void SetOutput(double period);
 
-  void ResetData() { HALSIM_ResetDutyCycleData(m_index); }
+  void ResetData();
 
  private:
   explicit DutyCycleSim(int index) : m_index{index} {}

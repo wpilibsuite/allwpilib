@@ -30,74 +30,29 @@ void ConstBufferCallbackStoreThunk(const char* name, void* param,
 
 class CallbackStore {
  public:
-  CallbackStore(int32_t i, NotifyCallback cb, CancelCallbackNoIndexFunc ccf) {
-    index = i;
-    callback = cb;
-    this->ccnif = ccf;
-    cancelType = NoIndex;
-  }
+  CallbackStore(int32_t i, NotifyCallback cb, CancelCallbackNoIndexFunc ccf);
 
   CallbackStore(int32_t i, int32_t u, NotifyCallback cb,
-                CancelCallbackFunc ccf) {
-    index = i;
-    uid = u;
-    callback = cb;
-    this->ccf = ccf;
-    cancelType = Normal;
-  }
+                CancelCallbackFunc ccf);
 
   CallbackStore(int32_t i, int32_t c, int32_t u, NotifyCallback cb,
-                CancelCallbackChannelFunc ccf) {
-    index = i;
-    channel = c;
-    uid = u;
-    callback = cb;
-    this->cccf = ccf;
-    cancelType = Channel;
-  }
+                CancelCallbackChannelFunc ccf);
 
   CallbackStore(int32_t i, ConstBufferCallback cb,
-                CancelCallbackNoIndexFunc ccf) {
-    index = i;
-    constBufferCallback = cb;
-    this->ccnif = ccf;
-    cancelType = NoIndex;
-  }
+                CancelCallbackNoIndexFunc ccf);
 
   CallbackStore(int32_t i, int32_t u, ConstBufferCallback cb,
-                CancelCallbackFunc ccf) {
-    index = i;
-    uid = u;
-    constBufferCallback = cb;
-    this->ccf = ccf;
-    cancelType = Normal;
-  }
+                CancelCallbackFunc ccf);
 
   CallbackStore(int32_t i, int32_t c, int32_t u, ConstBufferCallback cb,
-                CancelCallbackChannelFunc ccf) {
-    index = i;
-    channel = c;
-    uid = u;
-    constBufferCallback = cb;
-    this->cccf = ccf;
-    cancelType = Channel;
-  }
+                CancelCallbackChannelFunc ccf);
 
-  ~CallbackStore() {
-    switch (cancelType) {
-      case Normal:
-        ccf(index, uid);
-        break;
-      case Channel:
-        cccf(index, channel, uid);
-        break;
-      case NoIndex:
-        ccnif(uid);
-        break;
-    }
-  }
+  CallbackStore(const CallbackStore&) = delete;
+  CallbackStore& operator=(const CallbackStore&) = delete;
 
-  void SetUid(int32_t uid) { this->uid = uid; }
+  ~CallbackStore();
+
+  void SetUid(int32_t uid);
 
   friend void CallbackStoreThunk(const char* name, void* param,
                                  const HAL_Value* value);

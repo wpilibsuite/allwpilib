@@ -8,15 +8,11 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
-
-#include "CallbackStore.h"
 
 namespace frc {
 namespace sim {
@@ -31,33 +27,17 @@ class SimDeviceSim {
    *
    * @param name name of the SimDevice
    */
-  explicit SimDeviceSim(const char* name)
-      : m_handle{HALSIM_GetSimDeviceHandle(name)} {}
+  explicit SimDeviceSim(const char* name);
 
-  hal::SimValue GetValue(const char* name) const {
-    return HALSIM_GetSimValueHandle(m_handle, name);
-  }
+  hal::SimValue GetValue(const char* name) const;
 
-  hal::SimDouble GetDouble(const char* name) const {
-    return HALSIM_GetSimValueHandle(m_handle, name);
-  }
+  hal::SimDouble GetDouble(const char* name) const;
 
-  hal::SimEnum GetEnum(const char* name) const {
-    return HALSIM_GetSimValueHandle(m_handle, name);
-  }
+  hal::SimEnum GetEnum(const char* name) const;
 
-  hal::SimBoolean GetBoolean(const char* name) const {
-    return HALSIM_GetSimValueHandle(m_handle, name);
-  }
+  hal::SimBoolean GetBoolean(const char* name) const;
 
-  static std::vector<std::string> GetEnumOptions(hal::SimEnum val) {
-    int32_t numOptions;
-    const char** options = HALSIM_GetSimValueEnumOptions(val, &numOptions);
-    std::vector<std::string> rv;
-    rv.reserve(numOptions);
-    for (int32_t i = 0; i < numOptions; ++i) rv.emplace_back(options[i]);
-    return rv;
-  }
+  static std::vector<std::string> GetEnumOptions(hal::SimEnum val);
 
   template <typename F>
   void EnumerateValues(F callback) const {
@@ -80,7 +60,7 @@ class SimDeviceSim {
         });
   }
 
-  static void ResetData() { HALSIM_ResetSimDeviceData(); }
+  static void ResetData();
 
  private:
   HAL_SimDeviceHandle m_handle;

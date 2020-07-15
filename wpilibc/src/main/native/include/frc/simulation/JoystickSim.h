@@ -7,10 +7,12 @@
 
 #pragma once
 
-#include "frc/Joystick.h"
 #include "frc/simulation/GenericHIDSim.h"
 
 namespace frc {
+
+class Joystick;
+
 namespace sim {
 
 /**
@@ -23,59 +25,28 @@ class JoystickSim : public GenericHIDSim {
    *
    * @param joystick joystick to simulate
    */
-  explicit JoystickSim(const Joystick& joystick)
-      : GenericHIDSim{joystick}, m_joystick{&joystick} {
-    // default to a reasonable joystick configuration
-    SetAxisCount(5);
-    SetButtonCount(12);
-    SetPOVCount(1);
-  }
+  explicit JoystickSim(const Joystick& joystick);
 
   /**
    * Constructs from a joystick port number.
    *
    * @param port port number
    */
-  explicit JoystickSim(int port) : GenericHIDSim{port} {
-    // default to a reasonable joystick configuration
-    SetAxisCount(5);
-    SetButtonCount(12);
-    SetPOVCount(1);
-  }
+  explicit JoystickSim(int port);
 
-  void SetX(double value) {
-    SetRawAxis(
-        m_joystick ? m_joystick->GetXChannel() : Joystick::kDefaultXChannel,
-        value);
-  }
+  void SetX(double value);
 
-  void SetY(double value) {
-    SetRawAxis(
-        m_joystick ? m_joystick->GetYChannel() : Joystick::kDefaultYChannel,
-        value);
-  }
+  void SetY(double value);
 
-  void SetZ(double value) {
-    SetRawAxis(
-        m_joystick ? m_joystick->GetZChannel() : Joystick::kDefaultZChannel,
-        value);
-  }
+  void SetZ(double value);
 
-  void SetTwist(double value) {
-    SetRawAxis(m_joystick ? m_joystick->GetTwistChannel()
-                          : Joystick::kDefaultTwistChannel,
-               value);
-  }
+  void SetTwist(double value);
 
-  void SetThrottle(double value) {
-    SetRawAxis(m_joystick ? m_joystick->GetThrottleChannel()
-                          : Joystick::kDefaultThrottleChannel,
-               value);
-  }
+  void SetThrottle(double value);
 
-  void SetTrigger(bool state) { SetRawButton(1, state); }
+  void SetTrigger(bool state);
 
-  void SetTop(bool state) { SetRawButton(2, state); }
+  void SetTop(bool state);
 
  private:
   const Joystick* m_joystick = nullptr;

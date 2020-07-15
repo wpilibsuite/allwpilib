@@ -7,16 +7,14 @@
 
 #pragma once
 
-#include <exception>
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/DigitalPWMData.h>
-
-#include "CallbackStore.h"
-#include "frc/DigitalOutput.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
+
+class DigitalOutput;
+
 namespace sim {
 
 /**
@@ -32,8 +30,7 @@ class DigitalPWMSim {
    *
    * @param digitalOutput DigitalOutput to simulate
    */
-  explicit DigitalPWMSim(const DigitalOutput& digitalOutput)
-      : m_index{digitalOutput.GetChannel()} {}
+  explicit DigitalPWMSim(const DigitalOutput& digitalOutput);
 
   /**
    * Creates an DigitalPWMSim for a digital I/O channel.
@@ -42,11 +39,7 @@ class DigitalPWMSim {
    * @return Simulated object
    * @throws std::out_of_range if no Digital PWM is configured for that channel
    */
-  static DigitalPWMSim CreateForChannel(int channel) {
-    int index = HALSIM_FindDigitalPWMForChannel(channel);
-    if (index < 0) throw std::out_of_range("no digital PWM found for channel");
-    return DigitalPWMSim{index};
-  }
+  static DigitalPWMSim CreateForChannel(int channel);
 
   /**
    * Creates an DigitalPWMSim for a simulated index.
@@ -55,56 +48,30 @@ class DigitalPWMSim {
    * @param index simulator index
    * @return Simulated object
    */
-  static DigitalPWMSim CreateForIndex(int index) {
-    return DigitalPWMSim{index};
-  }
+  static DigitalPWMSim CreateForIndex(int index);
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelDigitalPWMInitializedCallback);
-    store->SetUid(HALSIM_RegisterDigitalPWMInitializedCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetInitialized() const {
-    return HALSIM_GetDigitalPWMInitialized(m_index);
-  }
+  bool GetInitialized() const;
 
-  void SetInitialized(bool initialized) {
-    HALSIM_SetDigitalPWMInitialized(m_index, initialized);
-  }
+  void SetInitialized(bool initialized);
 
   std::unique_ptr<CallbackStore> RegisterDutyCycleCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelDigitalPWMDutyCycleCallback);
-    store->SetUid(HALSIM_RegisterDigitalPWMDutyCycleCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  double GetDutyCycle() const { return HALSIM_GetDigitalPWMDutyCycle(m_index); }
+  double GetDutyCycle() const;
 
-  void SetDutyCycle(double dutyCycle) {
-    HALSIM_SetDigitalPWMDutyCycle(m_index, dutyCycle);
-  }
+  void SetDutyCycle(double dutyCycle);
 
   std::unique_ptr<CallbackStore> RegisterPinCallback(NotifyCallback callback,
-                                                     bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelDigitalPWMPinCallback);
-    store->SetUid(HALSIM_RegisterDigitalPWMPinCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                     bool initialNotify);
 
-  int GetPin() const { return HALSIM_GetDigitalPWMPin(m_index); }
+  int GetPin() const;
 
-  void SetPin(int pin) { HALSIM_SetDigitalPWMPin(m_index, pin); }
+  void SetPin(int pin);
 
-  void ResetData() { HALSIM_ResetDigitalPWMData(m_index); }
+  void ResetData();
 
  private:
   explicit DigitalPWMSim(int index) : m_index{index} {}

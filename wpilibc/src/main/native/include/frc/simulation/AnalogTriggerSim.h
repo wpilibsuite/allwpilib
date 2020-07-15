@@ -7,16 +7,14 @@
 
 #pragma once
 
-#include <exception>
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/AnalogTriggerData.h>
-
-#include "CallbackStore.h"
-#include "frc/AnalogTrigger.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
+
+class AnalogTrigger;
+
 namespace sim {
 
 /**
@@ -29,8 +27,7 @@ class AnalogTriggerSim {
    *
    * @param analogTrigger AnalogTrigger to simulate
    */
-  explicit AnalogTriggerSim(const AnalogTrigger& analogTrigger)
-      : m_index{analogTrigger.GetIndex()} {}
+  explicit AnalogTriggerSim(const AnalogTrigger& analogTrigger);
 
   /**
    * Creates an AnalogTriggerSim for an analog input channel.
@@ -40,12 +37,7 @@ class AnalogTriggerSim {
    * @throws std::out_of_range if no AnalogTrigger is configured for that
    *         channel
    */
-  static AnalogTriggerSim CreateForChannel(int channel) {
-    int index = HALSIM_FindAnalogTriggerForChannel(channel);
-    if (index < 0)
-      throw std::out_of_range("no analog trigger found for channel");
-    return AnalogTriggerSim{index};
-  }
+  static AnalogTriggerSim CreateForChannel(int channel);
 
   /**
    * Creates an AnalogTriggerSim for a simulated index.
@@ -54,64 +46,30 @@ class AnalogTriggerSim {
    * @param index simulator index
    * @return Simulated object
    */
-  static AnalogTriggerSim CreateForIndex(int index) {
-    return AnalogTriggerSim{index};
-  }
+  static AnalogTriggerSim CreateForIndex(int index);
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAnalogTriggerInitializedCallback);
-    store->SetUid(HALSIM_RegisterAnalogTriggerInitializedCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetInitialized() const {
-    return HALSIM_GetAnalogTriggerInitialized(m_index);
-  }
+  bool GetInitialized() const;
 
-  void SetInitialized(bool initialized) {
-    HALSIM_SetAnalogTriggerInitialized(m_index, initialized);
-  }
+  void SetInitialized(bool initialized);
 
   std::unique_ptr<CallbackStore> RegisterTriggerLowerBoundCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback,
-        &HALSIM_CancelAnalogTriggerTriggerLowerBoundCallback);
-    store->SetUid(HALSIM_RegisterAnalogTriggerTriggerLowerBoundCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  double GetTriggerLowerBound() const {
-    return HALSIM_GetAnalogTriggerTriggerLowerBound(m_index);
-  }
+  double GetTriggerLowerBound() const;
 
-  void SetTriggerLowerBound(double triggerLowerBound) {
-    HALSIM_SetAnalogTriggerTriggerLowerBound(m_index, triggerLowerBound);
-  }
+  void SetTriggerLowerBound(double triggerLowerBound);
 
   std::unique_ptr<CallbackStore> RegisterTriggerUpperBoundCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback,
-        &HALSIM_CancelAnalogTriggerTriggerUpperBoundCallback);
-    store->SetUid(HALSIM_RegisterAnalogTriggerTriggerUpperBoundCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  double GetTriggerUpperBound() const {
-    return HALSIM_GetAnalogTriggerTriggerUpperBound(m_index);
-  }
+  double GetTriggerUpperBound() const;
 
-  void SetTriggerUpperBound(double triggerUpperBound) {
-    HALSIM_SetAnalogTriggerTriggerUpperBound(m_index, triggerUpperBound);
-  }
+  void SetTriggerUpperBound(double triggerUpperBound);
 
-  void ResetData() { HALSIM_ResetAnalogTriggerData(m_index); }
+  void ResetData();
 
  private:
   explicit AnalogTriggerSim(int index) : m_index{index} {}
