@@ -45,6 +45,38 @@ void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {}
 
 void HALSIM_NotifyDriverStationNewData(void) {}
 
+void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state) {}
+
+void HALSIM_SetJoystickAxis(int32_t stick, int32_t axis, double value) {}
+
+void HALSIM_SetJoystickPOV(int32_t stick, int32_t pov, int32_t value) {}
+
+void HALSIM_SetJoystickButtonsValue(int32_t stick, uint32_t buttons) {}
+
+void HALSIM_SetJoystickAxisCount(int32_t stick, int32_t count) {}
+
+void HALSIM_SetJoystickPOVCount(int32_t stick, int32_t count) {}
+
+void HALSIM_SetJoystickButtonCount(int32_t stick, int32_t count) {}
+
+void HALSIM_SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {}
+
+void HALSIM_SetJoystickType(int32_t stick, int32_t type) {}
+
+void HALSIM_SetJoystickName(int32_t stick, const char* name) {}
+
+void HALSIM_SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type) {}
+
+void HALSIM_SetGameSpecificMessage(const char* message) {}
+
+void HALSIM_SetEventName(const char* name) {}
+
+void HALSIM_SetMatchType(HAL_MatchType type) {}
+
+void HALSIM_SetMatchNumber(int32_t matchNumber) {}
+
+void HALSIM_SetReplayNumber(int32_t replayNumber) {}
+
 void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify) {}
