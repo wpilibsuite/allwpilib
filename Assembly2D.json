@@ -6,7 +6,7 @@
       "name": "mainLine",
       "type": "line",
       "startLocation": 0,
-      "length": 200,
+      "length": 100,
       "color": "blue",
       "angle": 0,
       "minAngle": -30,
@@ -15,25 +15,70 @@
         {
           "name": "subline",
           "type": "line",
-          "length": 200,
+          "length": 100,
           "color": "green",
           "angle": 0,
           "minAngle": -30,
           "maxAngle": 30,
+          "encoder": 0,
           "children":[
             {
               "name": "subline",
               "type": "line",
-              "length": 200,
+              "length": 100,
               "color": "red",
-              "angle": -45
+              "angle": -45,
+              "children":[{
+                "name": "subline",
+                "type": "line",
+                "length": 20,
+                "color": "green",
+                "angle": 20
+              },
+                {
+                  "name": "subline",
+                  "type": "line",
+                  "length": 20,
+                  "color": "green",
+                  "angle": -20
+                },
+                {
+                  "name": "subline",
+                  "type": "line",
+                  "length": 50,
+                  "color": "green",
+                  "angle": 0
+                }
+              ]
             },
             {
               "name": "subline",
               "type": "line",
-              "length": 200,
+              "length": 100,
               "color": "red",
-              "angle": 45
+              "angle": 45,
+              "children":[{
+                "name": "subline",
+                "type": "line",
+                "length": 20,
+                "color": "green",
+                "angle": 20
+              },
+                {
+                  "name": "subline",
+                  "type": "line",
+                  "length": 20,
+                  "color": "green",
+                  "angle": -20
+                },
+                {
+                  "name": "subline",
+                  "type": "line",
+                  "length": 50,
+                  "color": "green",
+                  "angle": 0
+                }
+              ]
             }
           ]
         }

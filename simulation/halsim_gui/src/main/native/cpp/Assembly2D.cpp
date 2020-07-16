@@ -84,9 +84,9 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
                           previousAngle;
 
         if (bodyConfig.maxAngle < HALSIM_GetEncoderCount(0) + bodyConfig.angle) {
-            angleToGoTo = bodyConfig.maxAngle;
+            angleToGoTo = bodyConfig.maxAngle + previousAngle;
         } else if (HALSIM_GetEncoderCount(0) + bodyConfig.angle < bodyConfig.minAngle) {
-            angleToGoTo = bodyConfig.minAngle;
+            angleToGoTo = bodyConfig.minAngle + previousAngle;
         }
 
         auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
