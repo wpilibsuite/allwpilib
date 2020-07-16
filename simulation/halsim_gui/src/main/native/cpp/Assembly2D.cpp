@@ -41,15 +41,17 @@ using namespace halsimgui;
 int windowWidth = 100;
 int windowHeight = 100;
 
-static std::vector<std::string> listOfColors = {"white", "silver", "gray", "black", "red", "maroon", "yellow", "olive", "lime",
-                                       "green", "aqua", "teal", "blue" , "navy", "fuchsia", "purple"};
+static std::vector<std::string> listOfColors = {"white", "silver", "gray", "black", "red", "maroon", "yellow", "olive",
+                                                "lime",
+                                                "green", "aqua", "teal", "blue", "navy", "fuchsia", "purple"};
 
 static std::vector<ImColor> listOfRGB = {IM_COL32(255, 255, 255, 255), IM_COL32(192, 192, 192, 255),
-                                IM_COL32(128, 128, 128, 255), IM_COL32(0, 0, 0, 255), IM_COL32(255, 0, 0, 255),
-                                IM_COL32(128, 0, 0, 255), IM_COL32(255, 255, 0, 255), IM_COL32(128, 128, 0, 255),
-                                IM_COL32(0, 255, 0, 255), IM_COL32(0, 128, 0, 255), IM_COL32(0, 255, 255, 255),
-                                IM_COL32(0, 128, 128, 255), IM_COL32(0, 0, 255, 255), IM_COL32(0, 0, 128, 255),
-                                IM_COL32(255, 0, 255, 255), IM_COL32(128, 0, 128, 255)};
+                                         IM_COL32(128, 128, 128, 255), IM_COL32(0, 0, 0, 255), IM_COL32(255, 0, 0, 255),
+                                         IM_COL32(128, 0, 0, 255), IM_COL32(255, 255, 0, 255),
+                                         IM_COL32(128, 128, 0, 255),
+                                         IM_COL32(0, 255, 0, 255), IM_COL32(0, 128, 0, 255), IM_COL32(0, 255, 255, 255),
+                                         IM_COL32(0, 128, 128, 255), IM_COL32(0, 0, 255, 255), IM_COL32(0, 0, 128, 255),
+                                         IM_COL32(255, 0, 255, 255), IM_COL32(128, 0, 128, 255)};
 
 std::map<std::string, ImColor> colorLookUpTable;
 
@@ -91,9 +93,15 @@ DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDra
 static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *drawList, int previousAngle,
                           const std::list<BodyConfig> &subBodyConfigs, ImVec2 windowPos) {
     for (BodyConfig const &bodyConfig : subBodyConfigs) {
+        int minSize;
+        if(ImGui::GetWindowHeight() > ImGui::GetWindowWidth()){
+            minSize = ImGui::GetWindowWidth();
+        }else{
+            minSize = ImGui::GetWindowHeight();
+        }
+
         int angleToGoTo = HALSIM_GetEncoderCount(0) + bodyConfig.angle +
                           previousAngle;
-
         if (bodyConfig.maxAngle < HALSIM_GetEncoderCount(0) + bodyConfig.angle) {
             angleToGoTo = bodyConfig.maxAngle + previousAngle;
         } else if (HALSIM_GetEncoderCount(0) + bodyConfig.angle < bodyConfig.minAngle) {
@@ -101,7 +109,7 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
         }
 
         auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
-                                           bodyConfig.length, angleToGoTo, drawList,
+                                           (minSize / 100)  * bodyConfig.length, angleToGoTo, drawList,
                                            windowPos, colorLookUpTable[bodyConfig.color], bodyConfig.lineWidth);
 
         if (bodyConfig.children.size() != 0) {
@@ -114,17 +122,11 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
 static void DisplayAssembly2D() {
     ImVec2 windowPos = ImGui::GetWindowPos();
     ImDrawList *drawList = ImGui::GetWindowDrawList();
-
-//    wpi::outs() << "size " << bodyConfigList.size();
-
-//    for (BodyConfig const &bodyConfig : bodyConfigList) {
     buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(), drawList, 0,
                   bodyConfigList, windowPos);
-//    }
 }
 
 BodyConfig readSubJson(wpi::json const &body) {
-
     BodyConfig c;
     try {
         c.name = body.at("name").get<std::string>();
