@@ -33,11 +33,32 @@
 #include "SimDeviceGui.h"
 #include "portable-file-dialogs.h"
 #include <mockdata/EncoderData.h>
+#include <vector>
+#include <map>
 
 using namespace halsimgui;
 
-static int windowWidth = 100;
-static int windowHeight = 100;
+int windowWidth = 100;
+int windowHeight = 100;
+
+static std::vector<std::string> listOfColors = {"white", "silver", "gray", "black", "red", "maroon", "yellow", "olive", "lime",
+                                       "green", "aqua", "teal", "blue" , "navy", "fuchsia", "purple"};
+
+static std::vector<ImColor> listOfRGB = {IM_COL32(255, 255, 255, 255), IM_COL32(192, 192, 192, 255),
+                                IM_COL32(128, 128, 128, 255), IM_COL32(0, 0, 0, 255), IM_COL32(255, 0, 0, 255),
+                                IM_COL32(128, 0, 0, 255), IM_COL32(255, 255, 0, 255), IM_COL32(128, 128, 0, 255),
+                                IM_COL32(0, 255, 0, 255), IM_COL32(0, 128, 0, 255), IM_COL32(0, 255, 255, 255),
+                                IM_COL32(0, 128, 128, 255), IM_COL32(0, 0, 255, 255), IM_COL32(0, 0, 128, 255),
+                                IM_COL32(255, 0, 255, 255), IM_COL32(128, 0, 128, 255)};
+
+std::map<std::string, ImColor> colorLookUpTable;
+
+
+static void buildColorTable() {
+    for (int i = 0; i < (int) listOfColors.size(); i++) {
+        colorLookUpTable[listOfColors[i]] = listOfRGB[i];
+    }
+}
 
 struct BodyConfig {
     std::string name;
@@ -53,17 +74,6 @@ struct BodyConfig {
 
 int counter = 0;
 std::list<BodyConfig> bodyConfigList;
-
-ImColor ColorToIM_COL32(std::string color) {
-    if (color == "blue") {
-        return IM_COL32(0, 0, 255, 255);
-    } else if (color == "green") {
-        return IM_COL32(0, 255, 0, 255);
-    } else if (color == "red") {
-        return IM_COL32(255, 0, 0, 255);
-    }
-    return IM_COL32(255, 255, 255, 255);
-}
 
 std::tuple<float, float, float>
 DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
@@ -91,7 +101,7 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
 
         auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
                                            bodyConfig.length, angleToGoTo, drawList,
-                                           windowPos, ColorToIM_COL32(bodyConfig.color));
+                                           windowPos, colorLookUpTable[bodyConfig.color]);
 
         if (bodyConfig.children.size() != 0) {
             buildDrawList(XEnd, YEnd, drawList, angle,
@@ -209,6 +219,7 @@ static std::list<BodyConfig> readJson(std::string jFile) {
 }
 
 void Assembly2D::Initialize() {
+    buildColorTable();
     bodyConfigList = readJson("/home/gabe/github/allwpilib/Assembly2D.json");
     HALSimGui::AddWindow("2D Assembly", DisplayAssembly2D);
     HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
