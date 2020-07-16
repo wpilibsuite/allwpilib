@@ -8,13 +8,11 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/DriverStationData.h>
-#include <hal/simulation/MockHooks.h>
+#include <hal/DriverStationTypes.h>
 
-#include "CallbackStore.h"
 #include "frc/DriverStation.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
 namespace sim {
@@ -25,160 +23,80 @@ namespace sim {
 class DriverStationSim {
  public:
   static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        -1, callback, &HALSIM_CancelDriverStationEnabledCallback);
-    store->SetUid(HALSIM_RegisterDriverStationEnabledCallback(
-        &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  static bool GetEnabled() { return HALSIM_GetDriverStationEnabled(); }
+  static bool GetEnabled();
 
-  static void SetEnabled(bool enabled) {
-    HALSIM_SetDriverStationEnabled(enabled);
-  }
+  static void SetEnabled(bool enabled);
 
   static std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        -1, callback, &HALSIM_CancelDriverStationAutonomousCallback);
-    store->SetUid(HALSIM_RegisterDriverStationAutonomousCallback(
-        &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  static bool GetAutonomous() { return HALSIM_GetDriverStationAutonomous(); }
+  static bool GetAutonomous();
 
-  static void SetAutonomous(bool autonomous) {
-    HALSIM_SetDriverStationAutonomous(autonomous);
-  }
+  static void SetAutonomous(bool autonomous);
 
   static std::unique_ptr<CallbackStore> RegisterTestCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        -1, callback, &HALSIM_CancelDriverStationTestCallback);
-    store->SetUid(HALSIM_RegisterDriverStationTestCallback(
-        &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  static bool GetTest() { return HALSIM_GetDriverStationTest(); }
+  static bool GetTest();
 
-  static void SetTest(bool test) { HALSIM_SetDriverStationTest(test); }
+  static void SetTest(bool test);
 
   static std::unique_ptr<CallbackStore> RegisterEStopCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        -1, callback, &HALSIM_CancelDriverStationEStopCallback);
-    store->SetUid(HALSIM_RegisterDriverStationEStopCallback(
-        &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  static bool GetEStop() { return HALSIM_GetDriverStationEStop(); }
+  static bool GetEStop();
 
-  static void SetEStop(bool eStop) { HALSIM_SetDriverStationEStop(eStop); }
+  static void SetEStop(bool eStop);
 
   static std::unique_ptr<CallbackStore> RegisterFmsAttachedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        -1, callback, &HALSIM_CancelDriverStationFmsAttachedCallback);
-    store->SetUid(HALSIM_RegisterDriverStationFmsAttachedCallback(
-        &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  static bool GetFmsAttached() { return HALSIM_GetDriverStationFmsAttached(); }
+  static bool GetFmsAttached();
 
-  static void SetFmsAttached(bool fmsAttached) {
-    HALSIM_SetDriverStationFmsAttached(fmsAttached);
-  }
+  static void SetFmsAttached(bool fmsAttached);
 
   static std::unique_ptr<CallbackStore> RegisterDsAttachedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        -1, callback, &HALSIM_CancelDriverStationDsAttachedCallback);
-    store->SetUid(HALSIM_RegisterDriverStationDsAttachedCallback(
-        &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  static bool GetDsAttached() { return HALSIM_GetDriverStationDsAttached(); }
+  static bool GetDsAttached();
 
-  static void SetDsAttached(bool dsAttached) {
-    HALSIM_SetDriverStationDsAttached(dsAttached);
-  }
+  static void SetDsAttached(bool dsAttached);
 
   static std::unique_ptr<CallbackStore> RegisterAllianceStationIdCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        -1, callback, &HALSIM_CancelDriverStationAllianceStationIdCallback);
-    store->SetUid(HALSIM_RegisterDriverStationAllianceStationIdCallback(
-        &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  static HAL_AllianceStationID GetAllianceStationId() {
-    return HALSIM_GetDriverStationAllianceStationId();
-  }
+  static HAL_AllianceStationID GetAllianceStationId();
 
-  static void SetAllianceStationId(HAL_AllianceStationID allianceStationId) {
-    HALSIM_SetDriverStationAllianceStationId(allianceStationId);
-  }
+  static void SetAllianceStationId(HAL_AllianceStationID allianceStationId);
 
   static std::unique_ptr<CallbackStore> RegisterMatchTimeCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        -1, callback, &HALSIM_CancelDriverStationMatchTimeCallback);
-    store->SetUid(HALSIM_RegisterDriverStationMatchTimeCallback(
-        &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  static double GetMatchTime() { return HALSIM_GetDriverStationMatchTime(); }
+  static double GetMatchTime();
 
-  static void SetMatchTime(double matchTime) {
-    HALSIM_SetDriverStationMatchTime(matchTime);
-  }
+  static void SetMatchTime(double matchTime);
 
   /**
    * Updates DriverStation data so that new values are visible to the user
    * program.
    */
-  static void NotifyNewData() {
-    HALSIM_NotifyDriverStationNewData();
-    DriverStation::GetInstance().WaitForData();
-  }
+  static void NotifyNewData();
 
   /**
    * Sets suppression of DriverStation::ReportError and ReportWarning messages.
    *
    * @param shouldSend If false then messages will be suppressed.
    */
-  static void SetSendError(bool shouldSend) {
-    if (shouldSend) {
-      HALSIM_SetSendError(nullptr);
-    } else {
-      HALSIM_SetSendError([](HAL_Bool isError, int32_t errorCode,
-                             HAL_Bool isLVCode, const char* details,
-                             const char* location, const char* callStack,
-                             HAL_Bool printMsg) { return 0; });
-    }
-  }
+  static void SetSendError(bool shouldSend);
 
   /**
    * Sets suppression of DriverStation::SendConsoleLine messages.
    *
    * @param shouldSend If false then messages will be suppressed.
    */
-  static void SetSendConsoleLine(bool shouldSend) {
-    if (shouldSend) {
-      HALSIM_SetSendConsoleLine(nullptr);
-    } else {
-      HALSIM_SetSendConsoleLine([](const char* line) { return 0; });
-    }
-  }
+  static void SetSendConsoleLine(bool shouldSend);
 
   /**
    * Gets the joystick outputs.
@@ -186,13 +104,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @return The joystick outputs
    */
-  static int64_t GetJoystickOutputs(int stick) {
-    int64_t outputs = 0;
-    int32_t leftRumble;
-    int32_t rightRumble;
-    HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
-    return outputs;
-  }
+  static int64_t GetJoystickOutputs(int stick);
 
   /**
    * Gets the joystick rumble.
@@ -201,13 +113,7 @@ class DriverStationSim {
    * @param rumbleNum Rumble to get (0=left, 1=right)
    * @return The joystick rumble value
    */
-  static int GetJoystickRumble(int stick, int rumbleNum) {
-    int64_t outputs;
-    int32_t leftRumble = 0;
-    int32_t rightRumble = 0;
-    HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
-    return rumbleNum == 0 ? leftRumble : rightRumble;
-  }
+  static int GetJoystickRumble(int stick, int rumbleNum);
 
   /**
    * Sets the state of one joystick button. Button indexes begin at 1.
@@ -216,9 +122,7 @@ class DriverStationSim {
    * @param button The button index, beginning at 1
    * @param state The state of the joystick button
    */
-  static void SetJoystickButton(int stick, int button, bool state) {
-    HALSIM_SetJoystickButton(stick, button, state);
-  }
+  static void SetJoystickButton(int stick, int button, bool state);
 
   /**
    * Gets the value of the axis on a joystick.
@@ -227,9 +131,7 @@ class DriverStationSim {
    * @param axis The analog axis number
    * @param value The value of the axis on the joystick
    */
-  static void SetJoystickAxis(int stick, int axis, double value) {
-    HALSIM_SetJoystickAxis(stick, axis, value);
-  }
+  static void SetJoystickAxis(int stick, int axis, double value);
 
   /**
    * Gets the state of a POV on a joystick.
@@ -238,9 +140,7 @@ class DriverStationSim {
    * @param pov The POV number
    * @param value the angle of the POV in degrees, or -1 for not pressed
    */
-  static void SetJoystickPOV(int stick, int pov, int value) {
-    HALSIM_SetJoystickPOV(stick, pov, value);
-  }
+  static void SetJoystickPOV(int stick, int pov, int value);
 
   /**
    * Sets the state of all the buttons on a joystick.
@@ -248,9 +148,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param buttons The bitmap state of the buttons on the joystick
    */
-  static void SetJoystickButtons(int stick, uint32_t buttons) {
-    HALSIM_SetJoystickButtonsValue(stick, buttons);
-  }
+  static void SetJoystickButtons(int stick, uint32_t buttons);
 
   /**
    * Sets the number of axes for a joystick.
@@ -258,9 +156,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of axes on the indicated joystick
    */
-  static void SetJoystickAxisCount(int stick, int count) {
-    HALSIM_SetJoystickAxisCount(stick, count);
-  }
+  static void SetJoystickAxisCount(int stick, int count);
 
   /**
    * Sets the number of POVs for a joystick.
@@ -268,9 +164,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of POVs on the indicated joystick
    */
-  static void SetJoystickPOVCount(int stick, int count) {
-    HALSIM_SetJoystickPOVCount(stick, count);
-  }
+  static void SetJoystickPOVCount(int stick, int count);
 
   /**
    * Sets the number of buttons for a joystick.
@@ -278,9 +172,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param count The number of buttons on the indicated joystick
    */
-  static void SetJoystickButtonCount(int stick, int count) {
-    HALSIM_SetJoystickButtonCount(stick, count);
-  }
+  static void SetJoystickButtonCount(int stick, int count);
 
   /**
    * Sets the value of isXbox for a joystick.
@@ -288,9 +180,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param isXbox The value of isXbox
    */
-  static void SetJoystickIsXbox(int stick, bool isXbox) {
-    HALSIM_SetJoystickIsXbox(stick, isXbox);
-  }
+  static void SetJoystickIsXbox(int stick, bool isXbox);
 
   /**
    * Sets the value of type for a joystick.
@@ -298,9 +188,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param type The value of type
    */
-  static void SetJoystickType(int stick, int type) {
-    HALSIM_SetJoystickType(stick, type);
-  }
+  static void SetJoystickType(int stick, int type);
 
   /**
    * Sets the name of a joystick.
@@ -308,9 +196,7 @@ class DriverStationSim {
    * @param stick The joystick number
    * @param name The value of name
    */
-  static void SetJoystickName(int stick, const char* name) {
-    HALSIM_SetJoystickName(stick, name);
-  }
+  static void SetJoystickName(int stick, const char* name);
 
   /**
    * Sets the types of Axes for a joystick.
@@ -319,54 +205,44 @@ class DriverStationSim {
    * @param axis The target axis
    * @param type The type of axis
    */
-  static void SetJoystickAxisType(int stick, int axis, int type) {
-    HALSIM_SetJoystickAxisType(stick, axis, type);
-  }
+  static void SetJoystickAxisType(int stick, int axis, int type);
 
   /**
    * Sets the game specific message.
    *
    * @param message the game specific message
    */
-  static void SetGameSpecificMessage(const char* message) {
-    HALSIM_SetGameSpecificMessage(message);
-  }
+  static void SetGameSpecificMessage(const char* message);
 
   /**
    * Sets the event name.
    *
    * @param name the event name
    */
-  static void SetEventName(const char* name) { HALSIM_SetEventName(name); }
+  static void SetEventName(const char* name);
 
   /**
    * Sets the match type.
    *
    * @param type the match type
    */
-  static void SetMatchType(DriverStation::MatchType type) {
-    HALSIM_SetMatchType(static_cast<HAL_MatchType>(static_cast<int>(type)));
-  }
+  static void SetMatchType(DriverStation::MatchType type);
 
   /**
    * Sets the match number.
    *
    * @param matchNumber the match number
    */
-  static void SetMatchNumber(int matchNumber) {
-    HALSIM_SetMatchNumber(matchNumber);
-  }
+  static void SetMatchNumber(int matchNumber);
 
   /**
    * Sets the replay number.
    *
    * @param replayNumber the replay number
    */
-  static void SetReplayNumber(int replayNumber) {
-    HALSIM_SetReplayNumber(replayNumber);
-  }
+  static void SetReplayNumber(int replayNumber);
 
-  static void ResetData() { HALSIM_ResetDriverStationData(); }
+  static void ResetData();
 };
 }  // namespace sim
 }  // namespace frc

@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/Joystick.h>
-#include <hal/simulation/DriverStationData.h>
+#include <frc/simulation/JoystickSim.h>
 
 #include "CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"
@@ -19,11 +19,9 @@ using namespace frc2;
 class POVButtonTest : public CommandTestBase {};
 
 TEST_F(POVButtonTest, SetPOVTest) {
-  HAL_JoystickPOVs povs;
-  povs.count = 1;
-  povs.povs[0] = 0;
-  HALSIM_SetJoystickPOVs(1, &povs);
-  HALSIM_NotifyDriverStationNewData();
+  frc::sim::JoystickSim joysim(1);
+  joysim.SetPOV(0);
+  joysim.NotifyNewData();
 
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
@@ -35,9 +33,8 @@ TEST_F(POVButtonTest, SetPOVTest) {
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 
-  povs.povs[0] = 90;
-  HALSIM_SetJoystickPOVs(1, &povs);
-  HALSIM_NotifyDriverStationNewData();
+  joysim.SetPOV(90);
+  joysim.NotifyNewData();
 
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command));

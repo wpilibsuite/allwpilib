@@ -8,14 +8,13 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/AnalogOutData.h>
-
-#include "CallbackStore.h"
-#include "frc/AnalogOutput.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
+
+class AnalogOutput;
+
 namespace sim {
 
 /**
@@ -28,49 +27,30 @@ class AnalogOutputSim {
    *
    * @param analogOutput AnalogOutput to simulate
    */
-  explicit AnalogOutputSim(const AnalogOutput& analogOutput)
-      : m_index{analogOutput.GetChannel()} {}
+  explicit AnalogOutputSim(const AnalogOutput& analogOutput);
 
   /**
    * Constructs from an analog output channel number.
    *
    * @param channel Channel number
    */
-  explicit AnalogOutputSim(int channel) : m_index{channel} {}
+  explicit AnalogOutputSim(int channel);
 
   std::unique_ptr<CallbackStore> RegisterVoltageCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAnalogOutVoltageCallback);
-    store->SetUid(HALSIM_RegisterAnalogOutVoltageCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  double GetVoltage() const { return HALSIM_GetAnalogOutVoltage(m_index); }
+  double GetVoltage() const;
 
-  void SetVoltage(double voltage) {
-    HALSIM_SetAnalogOutVoltage(m_index, voltage);
-  }
+  void SetVoltage(double voltage);
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAnalogOutInitializedCallback);
-    store->SetUid(HALSIM_RegisterAnalogOutInitializedCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetInitialized() const {
-    return HALSIM_GetAnalogOutInitialized(m_index);
-  }
+  bool GetInitialized() const;
 
-  void SetInitialized(bool initialized) {
-    HALSIM_SetAnalogOutInitialized(m_index, initialized);
-  }
+  void SetInitialized(bool initialized);
 
-  void ResetData() { HALSIM_ResetAnalogOutData(m_index); }
+  void ResetData();
 
  private:
   int m_index;
