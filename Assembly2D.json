@@ -62,7 +62,8 @@
                 "type": "line",
                 "length": 20,
                 "color": "green",
-                "angle": 20
+                "angle": 20,
+                "lineWidth": 10
               },
                 {
                   "name": "subline",

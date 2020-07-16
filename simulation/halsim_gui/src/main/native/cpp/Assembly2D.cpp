@@ -62,14 +62,15 @@ static void buildColorTable() {
 
 struct BodyConfig {
     std::string name;
-    std::string type;
-    int startLocation;
-    int length;
-    std::string color;
-    int angle;
+    std::string type = "line";
+    int startLocation = 0;
+    int length = 100;
+    std::string color = "green";
+    int angle = 0;
     int maxAngle = 999;
     int minAngle = -999;
     std::list<BodyConfig> children;
+    int lineWidth = 1;
 };
 
 int counter = 0;
@@ -77,13 +78,13 @@ std::list<BodyConfig> bodyConfigList;
 
 std::tuple<float, float, float>
 DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
-         ImColor color) {
+         ImColor color, int lineWidth) {
     double radAngle = (angle - 90) * 3.14159 / 180;
     double xEnd = startXLocation + length * std::cos(radAngle);
     double yEnd = startYLocation + length * std::sin(radAngle);
     drawList->AddLine(windowPos + ImVec2(startXLocation, startYLocation),
                       windowPos + ImVec2(xEnd, yEnd),
-                      color, 1);
+                      color, lineWidth);
     return {xEnd, yEnd, angle};
 }
 
@@ -101,7 +102,7 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
 
         auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
                                            bodyConfig.length, angleToGoTo, drawList,
-                                           windowPos, colorLookUpTable[bodyConfig.color]);
+                                           windowPos, colorLookUpTable[bodyConfig.color], bodyConfig.lineWidth);
 
         if (bodyConfig.children.size() != 0) {
             buildDrawList(XEnd, YEnd, drawList, angle,
@@ -165,6 +166,11 @@ BodyConfig readSubJson(wpi::json const &body) {
         c.minAngle = body.at("minAngle").get<int>();
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "minAngle '" << c.name << "': could not find minAngle path: " << e.what() << '\n';
+    }
+    try {
+        c.lineWidth = body.at("lineWidth").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "lineWidth '" << c.name << "': could not find lineWidth path: " << e.what() << '\n';
     }
     try {
         for (wpi::json const &child : body.at("children")) {
