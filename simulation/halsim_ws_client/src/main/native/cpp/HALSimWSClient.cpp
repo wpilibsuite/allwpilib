@@ -174,7 +174,13 @@ void HALSimWS::CloseWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws
 }
 
 void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
-  // TODO Implement
+  // TODO might need a different format?
+  for (auto iter = msg.cbegin(); iter != msg.cend(); ++iter) {
+    auto provider = m_providers.Get(iter.key());
+    if (provider) {
+      provider->OnNetValueChanged(iter.value());
+    }
+  }
 }
 
 }
