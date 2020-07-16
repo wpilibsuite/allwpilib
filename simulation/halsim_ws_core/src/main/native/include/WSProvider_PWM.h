@@ -22,4 +22,4 @@ class HALSimWSProviderPWM : public HALSimWSHalChanProvider {
   wpi::json OnSimValueChanged(const char* cbName) override;
 };
 
-}
+}  // namespace wpilibws

@@ -20,10 +20,10 @@ void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderDigitalPWM::OnSimValueChanged(const char* cbName) {
   return {
-      {"<init", (bool)HALSIM_GetDigitalPWMInitialized(m_channel)},
+      {"<init", static_cast<bool>(HALSIM_GetDigitalPWMInitialized(m_channel))},
       {"<dio_pin", HALSIM_GetDigitalPWMPin(m_channel)},
       {"<duty_cycle", HALSIM_GetDigitalPWMDutyCycle(m_channel)},
   };
 }
 
-}
+}  // namespace wpilibws

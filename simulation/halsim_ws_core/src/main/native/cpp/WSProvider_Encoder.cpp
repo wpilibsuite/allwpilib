@@ -20,13 +20,13 @@ void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderEncoder::OnSimValueChanged(const char* cbName) {
   return {
-      {"<init", (bool)HALSIM_GetEncoderInitialized(m_channel)},
+      {"<init", static_cast<bool>(HALSIM_GetEncoderInitialized(m_channel))},
       {">count", HALSIM_GetEncoderCount(m_channel)},
       {">period", HALSIM_GetEncoderPeriod(m_channel)},
-      {"<reset", (bool)HALSIM_GetEncoderReset(m_channel)},
+      {"<reset", static_cast<bool>(HALSIM_GetEncoderReset(m_channel))},
       {"<max_period", HALSIM_GetEncoderMaxPeriod(m_channel)},
       {"<reverse_direction",
-       (bool)HALSIM_GetEncoderReverseDirection(m_channel)},
+       static_cast<bool>(HALSIM_GetEncoderReverseDirection(m_channel))},
       {"<samples_to_avg", HALSIM_GetEncoderSamplesToAverage(m_channel)},
   };
 }
@@ -41,4 +41,4 @@ void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::json& json) {
   }
 }
 
-}
+}  // namespace wpilibws

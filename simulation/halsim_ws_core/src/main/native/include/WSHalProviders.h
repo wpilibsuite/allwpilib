@@ -7,24 +7,23 @@
 
 #pragma once
 
-#include <string>
 #include <functional>
+#include <memory>
+#include <string>
 
 #include <hal/simulation/NotifyListener.h>
-
-#include <wpi/mutex.h>
 #include <wpi/json.h>
+#include <wpi/mutex.h>
 
 #include "WSBaseProvider.h"
 
 namespace wpilibws {
 
 typedef void (*HALCbRegisterIndexedFunc)(int32_t index,
-                                        HAL_NotifyCallback callback,
-                                        void* param, HAL_Bool initialNotify);
+                                         HAL_NotifyCallback callback,
+                                         void* param, HAL_Bool initialNotify);
 typedef void (*HALCbRegisterSingleFunc)(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify);
-
 
 // provider generates diffs based on values
 class HALSimWSHalProvider : public HALSimWSBaseProvider {
@@ -70,4 +69,4 @@ void CreateSingleProvider(const std::string& key,
 
 #include "WSHalProviders.inl"
 
-}
+}  // namespace wpilibws

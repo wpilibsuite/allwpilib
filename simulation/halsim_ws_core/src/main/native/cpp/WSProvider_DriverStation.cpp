@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <algorithm>
-
 #include "WSProvider_DriverStation.h"
+
+#include <algorithm>
 
 #include <hal/DriverStation.h>
 #include <hal/Ports.h>
@@ -35,7 +35,7 @@ wpi::json HALSimWSProviderDriverStation::OnSimValueChanged(const char* cbName) {
     HAL_GetJoystickButtons(i, &buttons);
     std::vector<bool> buttons_v((size_t)buttons.count);
     for (uint8_t i = 0; i < buttons.count; i++) {
-      buttons_v[i] = (bool)(buttons.buttons & 1 << (i - 1));
+      buttons_v[i] = static_cast<bool>(buttons.buttons & 1 << (i - 1));
     }
 
     HAL_JoystickPOVs povs;
@@ -72,12 +72,12 @@ wpi::json HALSimWSProviderDriverStation::OnSimValueChanged(const char* cbName) {
   }
 
   return {
-      {">enabled", (bool)HALSIM_GetDriverStationEnabled()},
-      {">autonomous", (bool)HALSIM_GetDriverStationAutonomous()},
-      {">test", (bool)HALSIM_GetDriverStationTest()},
-      {">estop", (bool)HALSIM_GetDriverStationEStop()},
-      {">fms", (bool)HALSIM_GetDriverStationFmsAttached()},
-      {">ds", (bool)HALSIM_GetDriverStationDsAttached()},
+      {">enabled", static_cast<bool>(HALSIM_GetDriverStationEnabled())},
+      {">autonomous", static_cast<bool>(HALSIM_GetDriverStationAutonomous())},
+      {">test", static_cast<bool>(HALSIM_GetDriverStationTest())},
+      {">estop", static_cast<bool>(HALSIM_GetDriverStationEStop())},
+      {">fms", static_cast<bool>(HALSIM_GetDriverStationFmsAttached())},
+      {">ds", static_cast<bool>(HALSIM_GetDriverStationDsAttached())},
       {"<match_time", HALSIM_GetDriverStationMatchTime()},
       {">station", station},
       {"joysticks", joysticks},
@@ -164,4 +164,4 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
   HALSIM_NotifyDriverStationNewData();
 }
 
-}
+}  // namespace wpilibws

@@ -6,8 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HALSimHttpConnection.h"
-#include "HALSimWSServer.h"
-#include "mimetypes.h"
 
 #include <uv.h>
 
@@ -18,6 +16,9 @@
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Request.h>
+
+#include "HALSimWSServer.h"
+#include "mimetypes.h"
 
 namespace uv = wpi::uv;
 
@@ -218,9 +219,10 @@ void HALSimHttpConnection::SendFileResponse(int code,
   // close after write completes if we aren't keeping alive
   // since we're using sendfile, set socket to blocking
   m_stream.SetBlocking(true);
-  Sendfile(m_stream.GetLoopRef(), uv_open_osfhandle(outfd), infd, 0, status.getSize(),
+  Sendfile(m_stream.GetLoopRef(), uv_open_osfhandle(outfd), infd, 0,
+           status.getSize(),
            [infd, closeAfter = !m_keepAlive, stream = &m_stream] {
-            //  ::close(infd);
+             //  ::close(infd);
              if (closeAfter)
                stream->Close();
              else
@@ -284,4 +286,4 @@ void HALSimHttpConnection::Log(int code) {
               << code << "\n";
 }
 
-}
+}  // namespace wpilibws

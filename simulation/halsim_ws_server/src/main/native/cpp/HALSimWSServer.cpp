@@ -5,16 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HALSimWSServer.h"
+
 #include <wpi/FileSystem.h>
 #include <wpi/Path.h>
-#include <wpi/raw_uv_ostream.h>
 #include <wpi/Twine.h>
 #include <wpi/UrlParser.h>
 #include <wpi/WebSocketServer.h>
+#include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Loop.h>
 #include <wpi/uv/Tcp.h>
 
-#include "HALSimWSServer.h"
 #include "HALSimHttpConnection.h"
 
 namespace uv = wpi::uv;
@@ -27,7 +28,7 @@ bool HALSimWeb::Initialize() {
   // determine where to get static content from
   wpi::SmallVector<char, 64> tmp;
 
-  const char* webroot_sys = getenv("HALSIMWEB_SYSROOT");
+  const char* webroot_sys = std::getenv("HALSIMWEB_SYSROOT");
   if (webroot_sys != NULL) {
     wpi::StringRef tstr(webroot_sys);
     tmp.append(tstr.begin(), tstr.end());
@@ -39,7 +40,7 @@ bool HALSimWeb::Initialize() {
   m_webroot_sys = wpi::Twine(tmp).str();
 
   tmp.clear();
-  const char* webroot_user = getenv("HALSIMWEB_USERROOT");
+  const char* webroot_user = std::getenv("HALSIMWEB_USERROOT");
   if (webroot_user != NULL) {
     wpi::StringRef tstr(webroot_user);
     tmp.append(tstr.begin(), tstr.end());
@@ -79,9 +80,9 @@ void HALSimWeb::MainLoop() {
   m_server->connection.connect([this, srv = m_server.get()] {
     auto tcp = srv->Accept();
     if (!tcp) return;
+
     auto conn = std::make_shared<HALSimHttpConnection>(tcp, m_webroot_sys,
                                                        m_webroot_user);
-    
   });
 
   // start listening for incoming connections
@@ -94,6 +95,7 @@ void HALSimWeb::MainLoop() {
 void HALSimWeb::Exit(void* param) {
   auto inst = GetInstance();
   if (!inst) return;
+
   auto loop = inst->m_loop;
   loop->Walk([](uv::Handle& h) {
     h.SetLoopClosing(true);
@@ -101,7 +103,8 @@ void HALSimWeb::Exit(void* param) {
   });
 }
 
-bool HALSimWeb::RegisterWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
+bool HALSimWeb::RegisterWebsocket(
+    std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
   if (m_hws.lock()) {
     return false;
   }
@@ -116,7 +119,8 @@ bool HALSimWeb::RegisterWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection>
   return true;
 }
 
-void HALSimWeb::CloseWebsocket(std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
+void HALSimWeb::CloseWebsocket(
+    std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
   if (hws == m_hws.lock()) {
     m_hws.reset();
   }
@@ -132,4 +136,4 @@ void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
   }
 }
 
-}
+}  // namespace wpilibws

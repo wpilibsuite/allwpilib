@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <shared_mutex>
 
 #include <wpi/StringMap.h>
@@ -54,4 +55,4 @@ class ProviderContainer {
   wpi::StringMap<std::shared_ptr<HALSimWSBaseProvider>> m_providers;
 };
 
-}
+}  // namespace wpilibws

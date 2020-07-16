@@ -20,18 +20,18 @@ void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderDIO::OnSimValueChanged(const char* cbName) {
   return {
-      {"<init", (bool)HALSIM_GetDIOInitialized(m_channel)},
-      {"<>value", (bool)HALSIM_GetDIOValue(m_channel)},
+      {"<init", static_cast<bool>(HALSIM_GetDIOInitialized(m_channel))},
+      {"<>value", static_cast<bool>(HALSIM_GetDIOValue(m_channel))},
       {"<pulse_length", HALSIM_GetDIOPulseLength(m_channel)},
-      {"<input", (bool)HALSIM_GetDIOIsInput(m_channel)},
+      {"<input", static_cast<bool>(HALSIM_GetDIOIsInput(m_channel))},
   };
 }
 
 void HALSimWSProviderDIO::OnNetValueChanged(const wpi::json& json) {
   wpi::json::const_iterator it;
   if ((it = json.find("<>value")) != json.end()) {
-    HALSIM_SetDIOValue(m_channel, (bool)it.value());
+    HALSIM_SetDIOValue(m_channel, static_cast<bool>(it.value()));
   }
 }
 
-}
+}  // namespace wpilibws

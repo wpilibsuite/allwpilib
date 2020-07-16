@@ -8,14 +8,14 @@
 #pragma once
 
 #include <memory>
-
-#include <wpi/StringMap.h>
-
-#include "WSProviderContainer.h"
-#include "WSBaseProvider.h"
+#include <string>
 
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
+#include <wpi/StringMap.h>
+
+#include "WSBaseProvider.h"
+#include "WSProviderContainer.h"
 
 namespace wpilibws {
 
@@ -35,14 +35,15 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
   void Initialize();
 
-  void OnNetworkConnected(std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;
+  void OnNetworkConnected(
+      std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;
   void OnNetValueChanged(const wpi::json& json) override;
 
  private:
   static void OnValueCreatedStatic(const char* name, void* param,
                                    HAL_SimValueHandle handle, HAL_Bool readonly,
                                    const struct HAL_Value* value) {
-    ((HALSimWSProviderSimDevice*)param)
+    (reinterpret_cast<HALSimWSProviderSimDevice*>(param))
         ->OnValueCreated(name, handle, readonly, value);
   }
   void OnValueCreated(const char* name, HAL_SimValueHandle handle,
@@ -51,7 +52,7 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
   static void OnValueChangedStatic(const char* name, void* param,
                                    HAL_SimValueHandle handle, HAL_Bool readonly,
                                    const struct HAL_Value* value) {
-    auto valueData = (SimDeviceValueData*)param;
+    auto valueData = (reinterpret_cast<SimDeviceValueData*>(param));
     valueData->device->OnValueChanged(valueData, value);
   }
   void OnValueChanged(SimDeviceValueData* valueData,
@@ -65,24 +66,26 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
 class HALSimWSProviderSimDevices {
  public:
-  HALSimWSProviderSimDevices(ProviderContainer& providers)
+  explicit HALSimWSProviderSimDevices(ProviderContainer& providers)
       : m_providers(providers) {}
   void Initialize();
 
  private:
   static void DeviceCreatedCallbackStatic(const char* name, void* param,
                                           HAL_SimDeviceHandle handle) {
-    ((HALSimWSProviderSimDevices*)param)->DeviceCreatedCallback(name, handle);
+    (reinterpret_cast<HALSimWSProviderSimDevices*>(param))
+        ->DeviceCreatedCallback(name, handle);
   }
   void DeviceCreatedCallback(const char* name, HAL_SimDeviceHandle handle);
 
   static void DeviceFreedCallbackStatic(const char* name, void* param,
                                         HAL_SimDeviceHandle handle) {
-    ((HALSimWSProviderSimDevices*)param)->DeviceFreedCallback(name, handle);
+    (reinterpret_cast<HALSimWSProviderSimDevices*>(param))
+        ->DeviceFreedCallback(name, handle);
   }
   void DeviceFreedCallback(const char* name, HAL_SimDeviceHandle handle);
 
   ProviderContainer& m_providers;
 };
 
-}
+}  // namespace wpilibws

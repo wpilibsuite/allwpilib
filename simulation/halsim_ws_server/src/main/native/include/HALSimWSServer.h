@@ -10,16 +10,15 @@
 #include <memory>
 #include <string>
 
+#include <WSBaseProvider.h>
+#include <WSProviderContainer.h>
+#include <wpi/StringMap.h>
 #include <wpi/json.h>
 #include <wpi/mutex.h>
-#include <wpi/StringMap.h>
-#include <wpi/uv/Buffer.h>
 #include <wpi/uv/AsyncFunction.h>
+#include <wpi/uv/Buffer.h>
 #include <wpi/uv/Loop.h>
 #include <wpi/uv/Tcp.h>
-
-#include <WSProviderContainer.h>
-#include <WSBaseProvider.h>
 
 namespace wpilibws {
 
@@ -32,7 +31,7 @@ class HALSimWeb {
     g_instance = inst;
   }
 
-  HALSimWeb(ProviderContainer& providers) : m_providers(providers) {}
+  explicit HALSimWeb(ProviderContainer& providers) : m_providers(providers) {}
 
   HALSimWeb(const HALSimWeb&) = delete;
   HALSimWeb& operator=(const HALSimWeb&) = delete;
@@ -68,4 +67,4 @@ class HALSimWeb {
   std::string m_webroot_user;
 };
 
-}
+}  // namespace wpilibws

@@ -1,8 +1,16 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "HALSimWSClientConnection.h"
-#include "HALSimWSClient.h"
 
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
+
+#include "HALSimWSClient.h"
 
 namespace uv = wpi::uv;
 
@@ -13,9 +21,11 @@ void HALSimWSClientConnection::Initialize() {
   auto self = this->shared_from_this();
 
   auto hws = HALSimWS::GetInstance();
-  std::string reqHost = hws->GetTargetHost() + ":" + std::to_string(hws->GetTargetPort());
+  std::string reqHost =
+      hws->GetTargetHost() + ":" + std::to_string(hws->GetTargetPort());
 
-  auto ws = wpi::WebSocket::CreateClient(*m_stream, hws->GetTargetUri(), reqHost);
+  auto ws =
+      wpi::WebSocket::CreateClient(*m_stream, hws->GetTargetUri(), reqHost);
 
   ws->SetData(self);
 
@@ -27,10 +37,11 @@ void HALSimWSClientConnection::Initialize() {
 
     m_buffers = std::make_unique<BufferPool>();
 
-    m_exec = UvExecFunc::Create(m_stream->GetLoop(), [](auto out, LoopFunc func) {
-      func();
-      out.set_value();
-    });
+    m_exec =
+        UvExecFunc::Create(m_stream->GetLoop(), [](auto out, LoopFunc func) {
+          func();
+          out.set_value();
+        });
 
     auto hws = HALSimWS::GetInstance();
     if (!hws) {
@@ -56,8 +67,7 @@ void HALSimWSClientConnection::Initialize() {
     wpi::json j;
     try {
       j = wpi::json::parse(msg);
-    }
-    catch (const wpi::json::parse_error& e) {
+    } catch (const wpi::json::parse_error& e) {
       std::string err("JSON parse failed: ");
       err += e.what();
       wpi::errs() << err << "\n";
@@ -86,9 +96,9 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
   }
   wpi::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
-                          std::lock_guard lock(m_buffers_mutex);
-                          return m_buffers->Allocate();
-                        }};
+                           std::lock_guard lock(m_buffers_mutex);
+                           return m_buffers->Allocate();
+                         }};
 
   os << msg;
 
@@ -108,4 +118,4 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
   });
 }
 
-}
+}  // namespace wpilibws

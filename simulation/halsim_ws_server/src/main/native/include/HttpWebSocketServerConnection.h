@@ -5,20 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_H_
-#define WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_H_
+#ifndef WPILIB_SIMULATION_HALSIM_WS_SERVER_SRC_MAIN_NATIVE_INCLUDE_HTTPWEBSOCKETSERVERCONNECTION_H_
+#define WPILIB_SIMULATION_HALSIM_WS_SERVER_SRC_MAIN_NATIVE_INCLUDE_HTTPWEBSOCKETSERVERCONNECTION_H_
 
 #include <initializer_list>
 #include <memory>
 #include <string>
 
-#include "wpi/ArrayRef.h"
-#include "wpi/HttpServerConnection.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
-#include "wpi/WebSocket.h"
-#include "wpi/WebSocketServer.h"
-#include "wpi/uv/Stream.h"
+#include <wpi/ArrayRef.h>
+#include <wpi/HttpServerConnection.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringRef.h>
+#include <wpi/WebSocket.h>
+#include <wpi/WebSocketServer.h>
+#include <wpi/uv/Stream.h>
 
 namespace wpi {
 
@@ -91,4 +91,4 @@ class HttpWebSocketServerConnection
 
 #include "HttpWebSocketServerConnection.inl"
 
-#endif  // WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_H_
+#endif  // WPILIB_SIMULATION_HALSIM_WS_SERVER_SRC_MAIN_NATIVE_INCLUDE_HTTPWEBSOCKETSERVERCONNECTION_H_

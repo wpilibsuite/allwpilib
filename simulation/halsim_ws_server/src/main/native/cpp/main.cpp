@@ -7,9 +7,6 @@
 
 #include <iostream>
 
-#include <hal/Main.h>
-
-#include "HALSimWSServer.h"
 #include <WSProviderContainer.h>
 #include <WSProvider_Analog.h>
 #include <WSProvider_DIO.h>
@@ -18,8 +15,11 @@
 #include <WSProvider_PWM.h>
 #include <WSProvider_Relay.h>
 #include <WSProvider_RoboRIO.h>
-#include <WSProvider_dPWM.h>
 #include <WSProvider_SimDevice.h>
+#include <WSProvider_dPWM.h>
+#include <hal/Main.h>
+
+#include "HALSimWSServer.h"
 
 using namespace std::placeholders;
 using namespace wpilibws;

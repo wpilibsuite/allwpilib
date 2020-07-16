@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <hal/Ports.h>
-
 #include "WSProvider_SimDevice.h"
+
+#include <hal/Ports.h>
 
 namespace wpilibws {
 
@@ -45,7 +45,7 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
       value.type = vd->second->valueType;
       switch (value.type) {
         case HAL_BOOLEAN:
-          value.data.v_boolean = (bool)it.value() ? 1 : 0;
+          value.data.v_boolean = static_cast<bool>(it.value()) ? 1 : 0;
           break;
         case HAL_DOUBLE:
           value.data.v_double = it.value();
@@ -140,4 +140,4 @@ void HALSimWSProviderSimDevices::Initialize() {
       "", this, HALSimWSProviderSimDevices::DeviceFreedCallbackStatic);
 }
 
-}
+}  // namespace wpilibws

@@ -23,4 +23,4 @@ class HALSimWSProviderDIO : public HALSimWSHalChanProvider {
   void OnNetValueChanged(const wpi::json& json) override;
 };
 
-}
+}  // namespace wpilibws

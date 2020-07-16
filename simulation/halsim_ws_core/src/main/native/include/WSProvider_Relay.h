@@ -11,7 +11,7 @@
 
 #include "WSHalProviders.h"
 
-namespace wpilibws{
+namespace wpilibws {
 
 class HALSimWSProviderRelay : public HALSimWSHalChanProvider {
  public:
@@ -22,4 +22,4 @@ class HALSimWSProviderRelay : public HALSimWSHalChanProvider {
   wpi::json OnSimValueChanged(const char* cbName) override;
 };
 
-}
+}  // namespace wpilibws

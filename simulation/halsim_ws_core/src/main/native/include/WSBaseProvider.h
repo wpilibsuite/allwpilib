@@ -28,7 +28,8 @@ class HALSimWSBaseProvider {
   // Called when the websocket connects. The provider should send
   // initial data to the websocket and store the SendFunc to
   // use for later sends
-  virtual void OnNetworkConnected(std::shared_ptr<HALSimBaseWebSocketConnection> ws) = 0;
+  virtual void OnNetworkConnected(
+      std::shared_ptr<HALSimBaseWebSocketConnection> ws) = 0;
 
   // network -> sim
   virtual void OnNetValueChanged(const wpi::json& json);
@@ -39,4 +40,4 @@ class HALSimWSBaseProvider {
   std::string m_key;
 };
 
-}
+}  // namespace wpilibws

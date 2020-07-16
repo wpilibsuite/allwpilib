@@ -1,4 +1,9 @@
-
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
 #include "mimetypes.h"
 
@@ -6,7 +11,6 @@
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
 static wpi::StringMap<std::string> mimeTypes{
-
     // text
     {"css", "text/css"},
     {"csv", "text/csv"},

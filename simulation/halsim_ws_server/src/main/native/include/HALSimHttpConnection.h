@@ -13,11 +13,10 @@
 #include <vector>
 
 #include <HALSimBaseWebSocketConnection.h>
-
 #include <wpi/json.h>
 #include <wpi/mutex.h>
-#include <wpi/uv/Buffer.h>
 #include <wpi/uv/AsyncFunction.h>
+#include <wpi/uv/Buffer.h>
 
 #include "HttpWebSocketServerConnection.h"
 
@@ -47,7 +46,7 @@ class HALSimHttpConnection
 
  protected:
   void ProcessRequest() override;
-  virtual bool IsValidWsUpgrade(wpi::StringRef protocol) override;
+  bool IsValidWsUpgrade(wpi::StringRef protocol) override;
   void ProcessWsUpgrade() override;
   void SendFileResponse(int code, const wpi::Twine& codeText,
                         const wpi::Twine& contentType,
@@ -73,4 +72,4 @@ class HALSimHttpConnection
   std::mutex m_buffers_mutex;
 };
 
-}
+}  // namespace wpilibws

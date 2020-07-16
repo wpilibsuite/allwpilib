@@ -19,11 +19,13 @@ void HALSimWSProviderRelay::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderRelay::OnSimValueChanged(const char* cbName) {
   return {
-      {"<init_fwd", (bool)HALSIM_GetRelayInitializedForward(m_channel)},
-      {"<init_rev", (bool)HALSIM_GetRelayInitializedReverse(m_channel)},
-      {"<fwd", (bool)HALSIM_GetRelayForward(m_channel)},
-      {"<rev", (bool)HALSIM_GetRelayReverse(m_channel)},
+      {"<init_fwd",
+       static_cast<bool>(HALSIM_GetRelayInitializedForward(m_channel))},
+      {"<init_rev",
+       static_cast<bool>(HALSIM_GetRelayInitializedReverse(m_channel))},
+      {"<fwd", static_cast<bool>(HALSIM_GetRelayForward(m_channel))},
+      {"<rev", static_cast<bool>(HALSIM_GetRelayReverse(m_channel))},
   };
 }
 
-}
+}  // namespace wpilibws

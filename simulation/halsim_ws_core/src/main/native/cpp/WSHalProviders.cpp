@@ -86,4 +86,4 @@ HALSimWSHalChanProvider::HALSimWSHalChanProvider(int32_t channel,
                                                  const std::string& key)
     : HALSimWSHalProvider(key), m_channel(channel) {}
 
-}
+}  // namespace wpilibws

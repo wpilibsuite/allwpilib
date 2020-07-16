@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INL_
-#define WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INL_
+#ifndef WPILIB_SIMULATION_HALSIM_WS_SERVER_SRC_MAIN_NATIVE_INCLUDE_HTTPWEBSOCKETSERVERCONNECTION_INL_
+#define WPILIB_SIMULATION_HALSIM_WS_SERVER_SRC_MAIN_NATIVE_INCLUDE_HTTPWEBSOCKETSERVERCONNECTION_INL_
 
 #include <memory>
 
@@ -51,4 +51,4 @@ HttpWebSocketServerConnection<Derived>::HttpWebSocketServerConnection(
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INL_
+#endif  // WPILIB_SIMULATION_HALSIM_WS_SERVER_SRC_MAIN_NATIVE_INCLUDE_HTTPWEBSOCKETSERVERCONNECTION_INL_

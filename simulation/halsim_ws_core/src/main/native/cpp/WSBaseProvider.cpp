@@ -16,4 +16,4 @@ void HALSimWSBaseProvider::OnNetValueChanged(const wpi::json& json) {
   // empty
 }
 
-}
+}  // namespace wpilibws

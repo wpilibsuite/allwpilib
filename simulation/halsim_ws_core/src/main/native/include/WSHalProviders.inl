@@ -7,6 +7,10 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+#include <utility>
+
 template <typename T>
 void CreateProviders(const std::string& prefix, int numChannels,
                      HALCbRegisterIndexedFunc halRegisterFunc,

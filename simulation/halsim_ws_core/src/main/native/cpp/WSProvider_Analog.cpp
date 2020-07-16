@@ -21,7 +21,7 @@ void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderAnalogIn::OnSimValueChanged(const char* cbName) {
   return {
-      {"<init", (bool)HALSIM_GetAnalogInInitialized(m_channel)},
+      {"<init", static_cast<bool>(HALSIM_GetAnalogInInitialized(m_channel))},
       {"<avg_bits", HALSIM_GetAnalogInAverageBits(m_channel)},
       {"<oversample_bits", HALSIM_GetAnalogInOversampleBits(m_channel)},
       {">voltage", HALSIM_GetAnalogInVoltage(m_channel)},
@@ -29,7 +29,8 @@ wpi::json HALSimWSProviderAnalogIn::OnSimValueChanged(const char* cbName) {
           "accum",
           {
               {"<init",
-               (bool)HALSIM_GetAnalogInAccumulatorInitialized(m_channel)},
+               static_cast<bool>(
+                   HALSIM_GetAnalogInAccumulatorInitialized(m_channel))},
               {">value", HALSIM_GetAnalogInAccumulatorValue(m_channel)},
               {">count", HALSIM_GetAnalogInAccumulatorCount(m_channel)},
               {"<center", HALSIM_GetAnalogInAccumulatorCenter(m_channel)},
@@ -66,4 +67,4 @@ wpi::json HALSimWSProviderAnalogOut::OnSimValueChanged(const char* cbName) {
           {"<voltage", HALSIM_GetAnalogOutVoltage(m_channel)}};
 }
 
-}
+}  // namespace wpilibws

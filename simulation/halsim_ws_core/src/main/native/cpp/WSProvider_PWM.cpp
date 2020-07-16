@@ -20,13 +20,13 @@ void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderPWM::OnSimValueChanged(const char* cbName) {
   return {
-      {"<init", (bool)HALSIM_GetPWMInitialized(m_channel)},
+      {"<init", static_cast<bool>(HALSIM_GetPWMInitialized(m_channel))},
       {"<speed", HALSIM_GetPWMSpeed(m_channel)},
       {"<position", HALSIM_GetPWMPosition(m_channel)},
       {"<raw", HALSIM_GetPWMRawValue(m_channel)},
       {"<period_scale", HALSIM_GetPWMPeriodScale(m_channel)},
-      {"<zero_latch", (bool)HALSIM_GetPWMZeroLatch(m_channel)},
+      {"<zero_latch", static_cast<bool>(HALSIM_GetPWMZeroLatch(m_channel))},
   };
 }
 
-}
+}  // namespace wpilibws
