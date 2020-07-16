@@ -11,8 +11,11 @@ namespace wpilibws {
 void HALSimWSClientConnection::Initialize() {
   // Get a shared pointer to ourselves
   auto self = this->shared_from_this();
-  // TODO This should be done via environment args
-  auto ws = wpi::WebSocket::CreateClient(*m_stream, "/wpilibws", "localhost:8080");
+
+  auto hws = HALSimWS::GetInstance();
+  std::string reqHost = hws->GetTargetHost() + ":" + std::to_string(hws->GetTargetPort());
+
+  auto ws = wpi::WebSocket::CreateClient(*m_stream, hws->GetTargetUri(), reqHost);
 
   ws->SetData(self);
 
