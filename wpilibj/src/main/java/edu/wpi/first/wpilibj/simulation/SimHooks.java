@@ -45,7 +45,7 @@ public final class SimHooks {
     return SimulatorJNI.isTimingPaused();
   }
 
-  public static void stepTiming(long delta) {
-    SimulatorJNI.stepTiming(delta);
+  public static void stepTiming(double deltaSeconds) {
+    SimulatorJNI.stepTiming((long) (deltaSeconds * 1e6));
   }
 }

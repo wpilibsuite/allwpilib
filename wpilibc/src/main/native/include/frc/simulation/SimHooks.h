@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <hal/HALBase.h>
+#include <units/time.h>
 
 namespace frc {
 namespace sim {
@@ -30,7 +31,7 @@ void ResumeTiming();
 
 bool IsTimingPaused();
 
-void StepTiming(uint64_t delta);
+void StepTiming(units::second_t delta);
 
 }  // namespace sim
 }  // namespace frc

@@ -28,7 +28,9 @@ void ResumeTiming() { HALSIM_ResumeTiming(); }
 
 bool IsTimingPaused() { return HALSIM_IsTimingPaused(); }
 
-void StepTiming(uint64_t delta) { HALSIM_StepTiming(delta); }
+void StepTiming(units::second_t delta) {
+  HALSIM_StepTiming(static_cast<uint64_t>(delta.to<double>() * 1e6));
+}
 
 }  // namespace sim
 }  // namespace frc
