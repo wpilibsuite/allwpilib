@@ -93,6 +93,11 @@ HAL_Bool HALSIM_IsTimingPaused(void) { return IsTimingPaused(); }
 
 void HALSIM_StepTiming(uint64_t delta) {
   StepTiming(delta);
+  WakeupWaitNotifiers();
+}
+
+void HALSIM_StepTimingAsync(uint64_t delta) {
+  StepTiming(delta);
   WakeupNotifiers();
 }
 }  // extern "C"

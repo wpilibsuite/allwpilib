@@ -9,10 +9,12 @@ package edu.wpi.first.wpilibj2.command;
 
 import java.util.ArrayList;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -31,13 +33,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MecanumControllerCommandTest {
-  @BeforeAll
-  static void setupAll() {
+  @BeforeEach
+  void setupAll() {
+    HAL.initialize(500, 0);
     SimHooks.pauseTiming();
   }
 
-  @AfterAll
-  static void cleanupAll() {
+  @AfterEach
+  void cleanupAll() {
     SimHooks.resumeTiming();
   }
 
@@ -86,6 +89,7 @@ class MecanumControllerCommandTest {
   }
 
   @Test
+  @ResourceLock("timing")
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   void testReachesReference() {
     final var subsystem = new Subsystem() {};

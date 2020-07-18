@@ -1,9 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
+
+#include <frc/simulation/SimHooks.h>
 
 #include "CommandTestBase.h"
 #include "frc2/command/InstantCommand.h"
@@ -18,6 +20,8 @@ class CommandDecoratorTest : public CommandTestBase {};
 TEST_F(CommandDecoratorTest, WithTimeoutTest) {
   CommandScheduler scheduler = GetScheduler();
 
+  frc::sim::PauseTiming();
+
   auto command = RunCommand([] {}, {}).WithTimeout(100_ms);
 
   scheduler.Schedule(&command);
@@ -25,10 +29,12 @@ TEST_F(CommandDecoratorTest, WithTimeoutTest) {
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(150));
+  frc::sim::StepTiming(150_ms);
 
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
+
+  frc::sim::ResumeTiming();
 }
 
 TEST_F(CommandDecoratorTest, WithInterruptTest) {

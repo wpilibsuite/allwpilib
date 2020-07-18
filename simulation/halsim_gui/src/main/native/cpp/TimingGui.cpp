@@ -32,7 +32,8 @@ static void DisplayTiming() {
   if (ImGui::Button("Step")) {
     HALSIM_PauseTiming();
     uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
-    if (nextTimeout != UINT64_MAX) HALSIM_StepTiming(nextTimeout - curTime);
+    if (nextTimeout != UINT64_MAX)
+      HALSIM_StepTimingAsync(nextTimeout - curTime);
   }
   ImGui::PopButtonRepeat();
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);

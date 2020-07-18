@@ -12,12 +12,13 @@
 #include <units/velocity.h>
 
 #include "frc/SlewRateLimiter.h"
+#include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
 
 TEST(SlewRateLimiterTest, SlewRateLimitTest) {
   frc::SlewRateLimiter<units::meters> limiter(1_mps);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  frc::sim::StepTiming(1.0_s);
 
   EXPECT_TRUE(limiter.Calculate(2_m) < 2_m);
 }
@@ -25,7 +26,7 @@ TEST(SlewRateLimiterTest, SlewRateLimitTest) {
 TEST(SlewRateLimiterTest, SlewRateNoLimitTest) {
   frc::SlewRateLimiter<units::meters> limiter(1_mps);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  frc::sim::StepTiming(1.0_s);
 
   EXPECT_EQ(limiter.Calculate(0.5_m), 0.5_m);
 }

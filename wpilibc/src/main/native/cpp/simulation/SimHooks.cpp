@@ -32,5 +32,9 @@ void StepTiming(units::second_t delta) {
   HALSIM_StepTiming(static_cast<uint64_t>(delta.to<double>() * 1e6));
 }
 
+void StepTimingAsync(units::second_t delta) {
+  HALSIM_StepTimingAsync(static_cast<uint64_t>(delta.to<double>() * 1e6));
+}
+
 }  // namespace sim
 }  // namespace frc

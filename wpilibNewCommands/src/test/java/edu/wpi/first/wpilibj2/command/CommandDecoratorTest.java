@@ -8,15 +8,20 @@
 package edu.wpi.first.wpilibj2.command;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CommandDecoratorTest extends CommandTestBase {
   @Test
+  @ResourceLock("timing")
   void withTimeoutTest() {
+    HAL.initialize(500, 0);
+    SimHooks.pauseTiming();
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Command command1 = new WaitCommand(10);
 
@@ -28,10 +33,12 @@ class CommandDecoratorTest extends CommandTestBase {
       assertFalse(scheduler.isScheduled(command1));
       assertTrue(scheduler.isScheduled(timeout));
 
-      Timer.delay(3);
+      SimHooks.stepTiming(3);
       scheduler.run();
 
       assertFalse(scheduler.isScheduled(timeout));
+    } finally {
+      SimHooks.resumeTiming();
     }
   }
 
