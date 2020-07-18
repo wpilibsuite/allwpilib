@@ -80,7 +80,7 @@ struct BodyConfig {
 
 std::list<BodyConfig> bodyConfigList;
 
-HAL_SimDeviceHandle assembly2DHandle = HALSIM_GetSimDeviceHandle("Field2D");
+HAL_SimDeviceHandle assembly2DHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
 
 std::tuple<float, float, float> DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
          ImColor color, const BodyConfig &bodyConfig, const std::string &previousPath) {
@@ -112,7 +112,7 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
         }
 
         // Calculate the next angle to go to
-        int angleToGoTo = HALSIM_GetEncoderCount(0) + bodyConfig.angle + previousAngle;
+        int angleToGoTo = HALSIM_GetSimValueHandle(assembly2DHandle, bodyConfig.name.c_str()) + bodyConfig.angle + previousAngle;
 
         // Hard stop -- This probably should be taken out
 //        if (bodyConfig.maxAngle < HALSIM_GetEncoderCount(0) + bodyConfig.angle) {
@@ -141,10 +141,10 @@ static void DisplayAssembly2D() {
                   bodyConfigList, windowPos);
 }
 
-BodyConfig readSubJson(wpi::json const &body) {
+BodyConfig readSubJson(const std::string& name, wpi::json const &body) {
     BodyConfig c;
     try {
-        c.name = body.at("name").get<std::string>();
+        c.name = name + body.at("name").get<std::string>() + "/";
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "could not read body name: " << e.what() << '\n';
     }
@@ -191,8 +191,8 @@ BodyConfig readSubJson(wpi::json const &body) {
     }
     try {
         for (wpi::json const &child : body.at("children")) {
-            c.children.push_back(readSubJson(child));
-            wpi::outs() << "Reading Child \n";
+            c.children.push_back(readSubJson(c.name, child));
+            wpi::outs() << "Reading Child with name " << c.name << '\n';
         }
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "could not read body: " << e.what() << '\n';
@@ -222,7 +222,7 @@ static std::list<BodyConfig> readJson(std::string jFile) {
     }
     try {
         for (wpi::json const &body : j.at("body")) {
-            cList.push_back(readSubJson(body));
+            cList.push_back(readSubJson("/", body));
         }
 
     } catch (const wpi::json::exception &e) {

@@ -3,7 +3,7 @@
   "windowWidth": 10,
   "body": [
     {
-      "name": "mainLine",
+      "name": "one",
       "type": "line",
       "startLocation": 0,
       "length": 10,
@@ -13,7 +13,7 @@
       "maxAngle": 30,
       "children":[
         {
-          "name": "subline",
+          "name": "two",
           "type": "line",
           "length": 10,
           "color": "green",
@@ -23,27 +23,27 @@
           "encoder": 0,
           "children":[
             {
-              "name": "subline",
+              "name": "three",
               "type": "line",
               "length": 10,
               "color": "red",
               "angle": -45,
               "children":[{
-                "name": "subline",
+                "name": "four",
                 "type": "line",
                 "length": 20,
                 "color": "green",
                 "angle": 20
               },
                 {
-                  "name": "subline",
+                  "name": "five",
                   "type": "line",
                   "length": 2,
                   "color": "green",
                   "angle": -20
                 },
                 {
-                  "name": "subline",
+                  "name": "six",
                   "type": "line",
                   "length": 5,
                   "color": "green",
@@ -52,13 +52,13 @@
               ]
             },
             {
-              "name": "subline",
+              "name": "seven",
               "type": "line",
               "length": 10,
               "color": "red",
               "angle": 45,
               "children":[{
-                "name": "subline",
+                "name": "eight",
                 "type": "line",
                 "length": 20,
                 "color": "green",
@@ -66,14 +66,14 @@
                 "lineWidth": 10
               },
                 {
-                  "name": "subline",
+                  "name": "nine",
                   "type": "line",
                   "length": 20,
                   "color": "green",
                   "angle": -20
                 },
                 {
-                  "name": "subline",
+                  "name": "ten",
                   "type": "line",
                   "length": 10,
                   "color": "green",
