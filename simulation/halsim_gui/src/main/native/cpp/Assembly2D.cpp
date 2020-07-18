@@ -23,18 +23,20 @@
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
-#include <list>
-#include <list>
-#include <string>
-#include <cmath>
+
 
 #include "GuiUtil.h"
 #include "HALSimGui.h"
 #include "SimDeviceGui.h"
 #include "portable-file-dialogs.h"
 #include <mockdata/EncoderData.h>
+
 #include <vector>
 #include <map>
+#include <list>
+#include <list>
+#include <string>
+#include <cmath>
 
 using namespace halsimgui;
 
@@ -48,8 +50,8 @@ static std::vector<std::string> listOfColors = {"white", "silver", "gray", "blac
 static std::vector<ImColor> listOfRGB = {IM_COL32(255, 255, 255, 255), IM_COL32(192, 192, 192, 255),
                                          IM_COL32(128, 128, 128, 255), IM_COL32(0, 0, 0, 255), IM_COL32(255, 0, 0, 255),
                                          IM_COL32(128, 0, 0, 255), IM_COL32(255, 255, 0, 255),
-                                         IM_COL32(128, 128, 0, 255),
-                                         IM_COL32(0, 255, 0, 255), IM_COL32(0, 128, 0, 255), IM_COL32(0, 255, 255, 255),
+                                         IM_COL32(128, 128, 0, 255), IM_COL32(0, 255, 0, 255), IM_COL32(0, 128, 0, 255),
+                                         IM_COL32(0, 255, 255, 255),
                                          IM_COL32(0, 128, 128, 255), IM_COL32(0, 0, 255, 255), IM_COL32(0, 0, 128, 255),
                                          IM_COL32(255, 0, 255, 255), IM_COL32(128, 0, 128, 255)};
 
@@ -69,49 +71,62 @@ struct BodyConfig {
     int length = 100;
     std::string color = "green";
     int angle = 0;
+    // These were for the hard stop, but I don't think we should have them anymore
     int maxAngle = 999;
     int minAngle = -999;
     std::list<BodyConfig> children;
     int lineWidth = 1;
 };
 
-int counter = 0;
 std::list<BodyConfig> bodyConfigList;
 
-std::tuple<float, float, float>
-DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
-         ImColor color, int lineWidth) {
+HAL_SimDeviceHandle assembly2DHandle = HALSIM_GetSimDeviceHandle("Field2D");
+
+std::tuple<float, float, float> DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
+         ImColor color, const BodyConfig &bodyConfig, const std::string &previousPath) {
+    // Find the current path do the ligament
+    std::string currentPath = previousPath + bodyConfig.name;
+    // Find the angle in radians
     double radAngle = (angle - 90) * 3.14159 / 180;
+    // Get the start X and Y location
     double xEnd = startXLocation + length * std::cos(radAngle);
     double yEnd = startYLocation + length * std::sin(radAngle);
+    // Add the line to the drawList
     drawList->AddLine(windowPos + ImVec2(startXLocation, startYLocation),
                       windowPos + ImVec2(xEnd, yEnd),
-                      color, lineWidth);
+                      color, bodyConfig.lineWidth);
+    // Return the end X, Y, and angle
     return {xEnd, yEnd, angle};
 }
 
 static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *drawList, int previousAngle,
                           const std::list<BodyConfig> &subBodyConfigs, ImVec2 windowPos) {
     for (BodyConfig const &bodyConfig : subBodyConfigs) {
+
+        // Get the smallest of width or height
         int minSize;
-        if(ImGui::GetWindowHeight() > ImGui::GetWindowWidth()){
+        if (ImGui::GetWindowHeight() > ImGui::GetWindowWidth()) {
             minSize = ImGui::GetWindowWidth();
-        }else{
+        } else {
             minSize = ImGui::GetWindowHeight();
         }
 
-        int angleToGoTo = HALSIM_GetEncoderCount(0) + bodyConfig.angle +
-                          previousAngle;
-        if (bodyConfig.maxAngle < HALSIM_GetEncoderCount(0) + bodyConfig.angle) {
-            angleToGoTo = bodyConfig.maxAngle + previousAngle;
-        } else if (HALSIM_GetEncoderCount(0) + bodyConfig.angle < bodyConfig.minAngle) {
-            angleToGoTo = bodyConfig.minAngle + previousAngle;
-        }
+        // Calculate the next angle to go to
+        int angleToGoTo = HALSIM_GetEncoderCount(0) + bodyConfig.angle + previousAngle;
 
+        // Hard stop -- This probably should be taken out
+//        if (bodyConfig.maxAngle < HALSIM_GetEncoderCount(0) + bodyConfig.angle) {
+//            angleToGoTo = bodyConfig.maxAngle + previousAngle;
+//        } else if (HALSIM_GetEncoderCount(0) + bodyConfig.angle < bodyConfig.minAngle) {
+//            angleToGoTo = bodyConfig.minAngle + previousAngle;
+//        }
+
+        // Draw the first line and get the ending coordinates
         auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
-                                           (minSize / 100)  * bodyConfig.length, angleToGoTo, drawList,
-                                           windowPos, colorLookUpTable[bodyConfig.color], bodyConfig.lineWidth);
+                                           (minSize / 100) * bodyConfig.length, angleToGoTo, drawList,
+                                           windowPos, colorLookUpTable[bodyConfig.color], bodyConfig, "");
 
+        // If the line has children then draw them with the stating points being the end of the parent
         if (bodyConfig.children.size() != 0) {
             buildDrawList(XEnd, YEnd, drawList, angle,
                           bodyConfig.children, windowPos);

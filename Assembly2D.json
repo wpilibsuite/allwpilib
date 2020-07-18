@@ -6,7 +6,7 @@
       "name": "mainLine",
       "type": "line",
       "startLocation": 0,
-      "length": 100,
+      "length": 10,
       "color": "blue",
       "angle": 0,
       "minAngle": -30,
@@ -15,7 +15,7 @@
         {
           "name": "subline",
           "type": "line",
-          "length": 100,
+          "length": 10,
           "color": "green",
           "angle": 0,
           "minAngle": -30,
@@ -25,7 +25,7 @@
             {
               "name": "subline",
               "type": "line",
-              "length": 100,
+              "length": 10,
               "color": "red",
               "angle": -45,
               "children":[{
@@ -38,14 +38,14 @@
                 {
                   "name": "subline",
                   "type": "line",
-                  "length": 20,
+                  "length": 2,
                   "color": "green",
                   "angle": -20
                 },
                 {
                   "name": "subline",
                   "type": "line",
-                  "length": 50,
+                  "length": 5,
                   "color": "green",
                   "angle": 0
                 }
@@ -54,7 +54,7 @@
             {
               "name": "subline",
               "type": "line",
-              "length": 100,
+              "length": 10,
               "color": "red",
               "angle": 45,
               "children":[{
@@ -75,7 +75,7 @@
                 {
                   "name": "subline",
                   "type": "line",
-                  "length": 50,
+                  "length": 10,
                   "color": "green",
                   "angle": 0
                 }

@@ -14,6 +14,7 @@
 #include <imgui.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
+
 #include <imgui_internal.h>
 #include <mockdata/SimDeviceData.h>
 #include <units/units.h>
