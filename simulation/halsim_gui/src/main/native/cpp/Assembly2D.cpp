@@ -71,16 +71,11 @@ struct BodyConfig {
     int length = 100;
     std::string color = "green";
     int angle = 0;
-    // These were for the hard stop, but I don't think we should have them anymore
-    int maxAngle = 999;
-    int minAngle = -999;
     std::list<BodyConfig> children;
     int lineWidth = 1;
 };
 
 std::list<BodyConfig> bodyConfigList;
-
-//HAL_SimDeviceHandle assembly2DHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
 
 std::tuple<float, float, float>
 DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
@@ -119,7 +114,7 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
 
 
         if (m_devHandle == 0) m_devHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
-        if (m_devHandle == 0) return;
+//        if (m_devHandle == 0) return;
 
         if (!m_aHandle) m_aHandle = HALSIM_GetSimValueHandle(m_devHandle, bodyConfig.name.c_str());
         if (m_aHandle) m_a = m_aHandle.Get();
@@ -128,13 +123,6 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
 
         // Calculate the next angle to go to
         int angleToGoTo = m_a + bodyConfig.angle + previousAngle;
-
-        // Hard stop -- This probably should be taken out
-//        if (bodyConfig.maxAngle < HALSIM_GetEncoderCount(0) + bodyConfig.angle) {
-//            angleToGoTo = bodyConfig.maxAngle + previousAngle;
-//        } else if (HALSIM_GetEncoderCount(0) + bodyConfig.angle < bodyConfig.minAngle) {
-//            angleToGoTo = bodyConfig.minAngle + previousAngle;
-//        }
 
         // Draw the first line and get the ending coordinates
         auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
@@ -190,16 +178,6 @@ BodyConfig readSubJson(const std::string &name, wpi::json const &body) {
         wpi::errs() << "angle '" << c.name << "': could not find angle path: " << e.what() << '\n';
     }
     try {
-        c.maxAngle = body.at("maxAngle").get<int>();
-    } catch (const wpi::json::exception &e) {
-        wpi::errs() << "maxAngle '" << c.name << "': could not find maxAngle path: " << e.what() << '\n';
-    }
-    try {
-        c.minAngle = body.at("minAngle").get<int>();
-    } catch (const wpi::json::exception &e) {
-        wpi::errs() << "minAngle '" << c.name << "': could not find minAngle path: " << e.what() << '\n';
-    }
-    try {
         c.lineWidth = body.at("lineWidth").get<int>();
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "lineWidth '" << c.name << "': could not find lineWidth path: " << e.what() << '\n';
@@ -218,6 +196,7 @@ BodyConfig readSubJson(const std::string &name, wpi::json const &body) {
 static std::list<BodyConfig> readJson(std::string jFile) {
     std::list<BodyConfig> cList;
     std::error_code ec;
+    std::string name;
     wpi::raw_fd_istream is(jFile, ec);
     if (ec) {
         wpi::errs() << "could not open '" << jFile << "': " << ec.message() << '\n';
@@ -236,8 +215,13 @@ static std::list<BodyConfig> readJson(std::string jFile) {
         wpi::errs() << "must be JSON object\n";
     }
     try {
+        name = j.at("name").get<std::string>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "name '" << name << "': could not find name path: " << e.what() << '\n';
+    }
+    try {
         for (wpi::json const &body : j.at("body")) {
-            cList.push_back(readSubJson("/", body));
+            cList.push_back(readSubJson("/" + name + "/", body));
         }
 
     } catch (const wpi::json::exception &e) {
@@ -263,9 +247,4 @@ void Assembly2D::Initialize() {
     HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
     HALSimGui::SetDefaultWindowSize("2D Assembly", 600, 600);
     HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
-
-    for (BodyConfig const &bodyConfig : bodyConfigList) {
-        wpi::outs() << bodyConfig.name << " " << bodyConfig.type << " " << bodyConfig.startLocation << " "
-                    << bodyConfig.length << "\n";
-    }
 }

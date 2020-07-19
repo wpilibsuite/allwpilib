@@ -1,6 +1,8 @@
 {
   "windowHeight": 10,
   "windowWidth": 10,
+  "name":  "JasonOne",
+  "backgroundColor": "green",
   "body": [
     {
       "name": "one",
@@ -17,71 +19,7 @@
           "type": "line",
           "length": 10,
           "color": "green",
-          "angle": 0,
-          "minAngle": -30,
-          "maxAngle": 30,
-          "encoder": 0,
-          "children":[
-            {
-              "name": "three",
-              "type": "line",
-              "length": 10,
-              "color": "red",
-              "angle": -45,
-              "children":[{
-                "name": "four",
-                "type": "line",
-                "length": 20,
-                "color": "green",
-                "angle": 20
-              },
-                {
-                  "name": "five",
-                  "type": "line",
-                  "length": 2,
-                  "color": "green",
-                  "angle": -20
-                },
-                {
-                  "name": "six",
-                  "type": "line",
-                  "length": 5,
-                  "color": "green",
-                  "angle": 0
-                }
-              ]
-            },
-            {
-              "name": "seven",
-              "type": "line",
-              "length": 10,
-              "color": "red",
-              "angle": 45,
-              "children":[{
-                "name": "eight",
-                "type": "line",
-                "length": 20,
-                "color": "green",
-                "angle": 20,
-                "lineWidth": 10
-              },
-                {
-                  "name": "nine",
-                  "type": "line",
-                  "length": 20,
-                  "color": "green",
-                  "angle": -20
-                },
-                {
-                  "name": "ten",
-                  "type": "line",
-                  "length": 10,
-                  "color": "green",
-                  "angle": 0
-                }
-              ]
-            }
-          ]
+          "angle": 0
         }
       ]
     }
