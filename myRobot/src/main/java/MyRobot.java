@@ -59,5 +59,9 @@ public class MyRobot extends TimedRobot {
   @Override
   public void robotPeriodic() {
   assembly2D.setLigamentPose("/one/", counter++);
+  if(counter > 90){
+    counter = -90;
+  }
+  assembly2D.setLigamentPose("/one/two/", counter / 4);
   }
 }

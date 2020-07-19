@@ -80,9 +80,10 @@ struct BodyConfig {
 
 std::list<BodyConfig> bodyConfigList;
 
-HAL_SimDeviceHandle assembly2DHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
+//HAL_SimDeviceHandle assembly2DHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
 
-std::tuple<float, float, float> DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
+std::tuple<float, float, float>
+DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDrawList *drawList, ImVec2 windowPos,
          ImColor color, const BodyConfig &bodyConfig, const std::string &previousPath) {
     // Find the current path do the ligament
     std::string currentPath = previousPath + bodyConfig.name;
@@ -99,24 +100,34 @@ std::tuple<float, float, float> DrawLine(int startXLocation, int startYLocation,
     return {xEnd, yEnd, angle};
 }
 
+HAL_SimDeviceHandle m_devHandle = 0;
+
+
 static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *drawList, int previousAngle,
                           const std::list<BodyConfig> &subBodyConfigs, ImVec2 windowPos) {
     for (BodyConfig const &bodyConfig : subBodyConfigs) {
-
+        hal::SimDouble m_aHandle;
+        double m_a;
         // Get the smallest of width or height
         int minSize;
+
         if (ImGui::GetWindowHeight() > ImGui::GetWindowWidth()) {
             minSize = ImGui::GetWindowWidth();
         } else {
             minSize = ImGui::GetWindowHeight();
         }
-        if(bodyConfig.name == "/one/"){
-            wpi::outs() << bodyConfig.name << " " << HALSIM_GetSimValueHandle(assembly2DHandle, bodyConfig.name.c_str()) << "\n";
 
-        }
+
+        if (m_devHandle == 0) m_devHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
+        if (m_devHandle == 0) return;
+
+        if (!m_aHandle) m_aHandle = HALSIM_GetSimValueHandle(m_devHandle, bodyConfig.name.c_str());
+        if (m_aHandle) m_a = m_aHandle.Get();
+        else m_a = 0;
+        wpi::outs() << bodyConfig.name << " " << std::to_string(m_a) << "\n";
 
         // Calculate the next angle to go to
-        int angleToGoTo = HALSIM_GetSimValueHandle(assembly2DHandle, bodyConfig.name.c_str()) + bodyConfig.angle + previousAngle;
+        int angleToGoTo = m_a + bodyConfig.angle + previousAngle;
 
         // Hard stop -- This probably should be taken out
 //        if (bodyConfig.maxAngle < HALSIM_GetEncoderCount(0) + bodyConfig.angle) {
@@ -145,7 +156,7 @@ static void DisplayAssembly2D() {
                   bodyConfigList, windowPos);
 }
 
-BodyConfig readSubJson(const std::string& name, wpi::json const &body) {
+BodyConfig readSubJson(const std::string &name, wpi::json const &body) {
     BodyConfig c;
     try {
         c.name = name + body.at("name").get<std::string>() + "/";
