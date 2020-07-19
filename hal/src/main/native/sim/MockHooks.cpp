@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,6 +19,7 @@ static std::atomic<bool> programStarted{false};
 
 static std::atomic<uint64_t> programStartTime{0};
 static std::atomic<uint64_t> programPauseTime{0};
+static std::atomic<uint64_t> programStepTime{0};
 
 namespace hal {
 namespace init {
@@ -29,6 +30,7 @@ void InitializeMockHooks() {}
 namespace hal {
 void RestartTiming() {
   programStartTime = wpi::Now();
+  programStepTime = 0;
   if (programPauseTime != 0) programPauseTime = programStartTime.load();
 }
 
@@ -45,14 +47,12 @@ void ResumeTiming() {
 
 bool IsTimingPaused() { return programPauseTime != 0; }
 
-void StepTiming(uint64_t delta) {
-  if (programPauseTime != 0) programPauseTime += delta;
-}
+void StepTiming(uint64_t delta) { programStepTime += delta; }
 
 int64_t GetFPGATime() {
   uint64_t curTime = programPauseTime;
   if (curTime == 0) curTime = wpi::Now();
-  return curTime - programStartTime;
+  return curTime + programStepTime - programStartTime;
 }
 
 double GetFPGATimestamp() { return GetFPGATime() * 1.0e-6; }

@@ -8,10 +8,10 @@
 #include "AnalogInputGui.h"
 
 #include <hal/Ports.h>
+#include <hal/simulation/AnalogGyroData.h>
+#include <hal/simulation/AnalogInData.h>
+#include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
-#include <mockdata/AnalogGyroData.h>
-#include <mockdata/AnalogInData.h>
-#include <mockdata/SimDeviceData.h>
 
 #include "HALSimGui.h"
 #include "IniSaver.h"

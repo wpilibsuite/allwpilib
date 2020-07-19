@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -67,6 +67,15 @@ class MatchDataSender {
 using namespace frc;
 
 static constexpr double kJoystickUnpluggedMessageInterval = 1.0;
+
+static int& GetDSLastCount() {
+  // There is a rollover error condition here. At Packet# = n * (uintmax), this
+  // will return false when instead it should return true. However, this at a
+  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
+  // worth the cycles to check.
+  thread_local int lastCount{0};
+  return lastCount;
+}
 
 DriverStation::~DriverStation() {
   m_isRunning = false;
@@ -367,7 +376,14 @@ bool DriverStation::IsDSAttached() const {
   return controlWord.dsAttached;
 }
 
-bool DriverStation::IsNewControlData() const { return HAL_IsNewControlData(); }
+bool DriverStation::IsNewControlData() const {
+  std::unique_lock lock(m_waitForDataMutex);
+  int& lastCount = GetDSLastCount();
+  int currentCount = m_waitForDataCounter;
+  if (lastCount == currentCount) return false;
+  lastCount = currentCount;
+  return true;
+}
 
 bool DriverStation::IsFMSAttached() const {
   HAL_ControlWord controlWord;
@@ -448,7 +464,12 @@ bool DriverStation::WaitForData(double timeout) {
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
   std::unique_lock lock(m_waitForDataMutex);
+  int& lastCount = GetDSLastCount();
   int currentCount = m_waitForDataCounter;
+  if (lastCount != currentCount) {
+    lastCount = currentCount;
+    return true;
+  }
   while (m_waitForDataCounter == currentCount) {
     if (timeout > 0) {
       auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
@@ -459,6 +480,7 @@ bool DriverStation::WaitForData(double timeout) {
       m_waitForDataCond.wait(lock);
     }
   }
+  lastCount = m_waitForDataCounter;
   return true;
 }
 

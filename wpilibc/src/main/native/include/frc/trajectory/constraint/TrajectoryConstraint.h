@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,9 @@
 
 #include <limits>
 
-#include <units/units.h>
+#include <units/acceleration.h>
+#include <units/curvature.h>
+#include <units/velocity.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/spline/Spline.h"
@@ -59,8 +61,8 @@ class TrajectoryConstraint {
    * @return The absolute maximum velocity.
    */
   virtual units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, curvature_t curvature,
-      units::meters_per_second_t velocity) = 0;
+      const Pose2d& pose, units::curvature_t curvature,
+      units::meters_per_second_t velocity) const = 0;
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory
@@ -72,7 +74,8 @@ class TrajectoryConstraint {
    *
    * @return The min and max acceleration bounds.
    */
-  virtual MinMax MinMaxAcceleration(const Pose2d& pose, curvature_t curvature,
-                                    units::meters_per_second_t speed) = 0;
+  virtual MinMax MinMaxAcceleration(const Pose2d& pose,
+                                    units::curvature_t curvature,
+                                    units::meters_per_second_t speed) const = 0;
 };
 }  // namespace frc

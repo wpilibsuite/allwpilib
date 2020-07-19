@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -101,7 +101,7 @@ class MecanumDriveKinematics {
    */
   MecanumDriveWheelSpeeds ToWheelSpeeds(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation = Translation2d());
+      const Translation2d& centerOfRotation = Translation2d()) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -113,17 +113,18 @@ class MecanumDriveKinematics {
    *
    * @return The resulting chassis speed.
    */
-  ChassisSpeeds ToChassisSpeeds(const MecanumDriveWheelSpeeds& wheelSpeeds);
+  ChassisSpeeds ToChassisSpeeds(
+      const MecanumDriveWheelSpeeds& wheelSpeeds) const;
 
  private:
-  Eigen::Matrix<double, 4, 3> m_inverseKinematics;
+  mutable Eigen::Matrix<double, 4, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Eigen::Matrix<double, 4, 3>> m_forwardKinematics;
   Translation2d m_frontLeftWheel;
   Translation2d m_frontRightWheel;
   Translation2d m_rearLeftWheel;
   Translation2d m_rearRightWheel;
 
-  Translation2d m_previousCoR;
+  mutable Translation2d m_previousCoR;
 
   /**
    * Construct inverse kinematics matrix from wheel locations.
@@ -138,7 +139,7 @@ class MecanumDriveKinematics {
    *           center of the robot.
    */
   void SetInverseKinematics(Translation2d fl, Translation2d fr,
-                            Translation2d rl, Translation2d rr);
+                            Translation2d rl, Translation2d rr) const;
 };
 
 }  // namespace frc

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -107,10 +107,10 @@ class MecanumControllerCommandTest {
     command.end(true);
 
     assertAll(
-        () -> assertEquals(endState.poseMeters.getTranslation().getX(),
-          getRobotPose().getTranslation().getX(), kxTolerance),
-        () -> assertEquals(endState.poseMeters.getTranslation().getY(),
-          getRobotPose().getTranslation().getY(), kyTolerance),
+        () -> assertEquals(endState.poseMeters.getX(),
+          getRobotPose().getX(), kxTolerance),
+        () -> assertEquals(endState.poseMeters.getY(),
+          getRobotPose().getY(), kyTolerance),
         () -> assertEquals(endState.poseMeters.getRotation().getRadians(),
           getRobotPose().getRotation().getRadians(), kAngularTolerance)
     );

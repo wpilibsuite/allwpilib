@@ -130,11 +130,11 @@ void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
 
 void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
-  builder.AddDoubleProperty("Distance", [this] { return this->GetDistance(); },
-                            nullptr);
-  builder.AddDoubleProperty("Distance Per Rotation",
-                            [this] { return this->GetDistancePerRotation(); },
-                            nullptr);
-  builder.AddDoubleProperty("Is Connected",
-                            [this] { return this->IsConnected(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance", [this] { return this->GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance Per Rotation",
+      [this] { return this->GetDistancePerRotation(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Is Connected", [this] { return this->IsConnected(); }, nullptr);
 }

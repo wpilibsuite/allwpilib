@@ -104,8 +104,8 @@ public class RamseteController {
    *
    * @param currentPose                        The current pose.
    * @param poseRef                            The desired pose.
-   * @param linearVelocityRefMeters            The desired linear velocity in meters.
-   * @param angularVelocityRefRadiansPerSecond The desired angular velocity in meters.
+   * @param linearVelocityRefMeters            The desired linear velocity in meters per second.
+   * @param angularVelocityRefRadiansPerSecond The desired angular velocity in radians per second.
    */
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(Pose2d currentPose,
@@ -119,8 +119,8 @@ public class RamseteController {
     m_poseError = poseRef.relativeTo(currentPose);
 
     // Aliases for equation readability
-    final double eX = m_poseError.getTranslation().getX();
-    final double eY = m_poseError.getTranslation().getY();
+    final double eX = m_poseError.getX();
+    final double eY = m_poseError.getY();
     final double eTheta = m_poseError.getRotation().getRadians();
     final double vRef = linearVelocityRefMeters;
     final double omegaRef = angularVelocityRefRadiansPerSecond;

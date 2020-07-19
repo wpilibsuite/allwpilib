@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/time.h>
+#include <units/voltage.h>
 #include <wpi/MathExtras.h>
 
 namespace frc {
@@ -68,7 +69,8 @@ class SimpleMotorFeedforward {
    * @return The maximum possible velocity at the given acceleration.
    */
   constexpr units::unit_t<Velocity> MaxAchievableVelocity(
-      units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+      units::volt_t maxVoltage,
+      units::unit_t<Acceleration> acceleration) const {
     // Assume max velocity is positive
     return (maxVoltage - kS - kA * acceleration) / kV;
   }
@@ -85,7 +87,8 @@ class SimpleMotorFeedforward {
    * @return The minimum possible velocity at the given acceleration.
    */
   constexpr units::unit_t<Velocity> MinAchievableVelocity(
-      units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
+      units::volt_t maxVoltage,
+      units::unit_t<Acceleration> acceleration) const {
     // Assume min velocity is positive, ks flips sign
     return (-maxVoltage + kS - kA * acceleration) / kV;
   }
@@ -102,7 +105,7 @@ class SimpleMotorFeedforward {
    * @return The maximum possible acceleration at the given velocity.
    */
   constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
+      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) const {
     return (maxVoltage - kS * wpi::sgn(velocity) - kV * velocity) / kA;
   }
 
@@ -118,7 +121,7 @@ class SimpleMotorFeedforward {
    * @return The minimum possible acceleration at the given velocity.
    */
   constexpr units::unit_t<Acceleration> MinAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
+      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) const {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,6 +31,14 @@ public interface Subsystem {
    * by Commands, and which will be handled here.
    */
   default void periodic() {
+  }
+
+  /**
+   * This method is called periodically by the {@link CommandScheduler}.  Useful for updating
+   * subsystem-specific state that needs to be maintained for simulations, such as for updating
+   * {@link edu.wpi.first.wpilibj.simulation} classes and setting simulated sensor readings.
+   */
+  default void simulationPeriodic() {
   }
 
   /**

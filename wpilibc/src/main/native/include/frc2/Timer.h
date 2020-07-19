@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
@@ -143,9 +143,6 @@ class Timer {
    * @return Time remaining in current match period (auto or teleop)
    */
   static units::second_t GetMatchTime();
-
-  // The time, in seconds, at which the 32-bit FPGA timestamp rolls over to 0
-  static const units::second_t kRolloverTime;
 
  private:
   units::second_t m_startTime = 0_s;

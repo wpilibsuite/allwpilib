@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
+
+#include <units/math.h>
 
 using namespace frc;
 
@@ -14,8 +16,8 @@ MecanumDriveKinematicsConstraint::MecanumDriveKinematicsConstraint(
     : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 
 units::meters_per_second_t MecanumDriveKinematicsConstraint::MaxVelocity(
-    const Pose2d& pose, curvature_t curvature,
-    units::meters_per_second_t velocity) {
+    const Pose2d& pose, units::curvature_t curvature,
+    units::meters_per_second_t velocity) const {
   auto xVelocity = velocity * pose.Rotation().Cos();
   auto yVelocity = velocity * pose.Rotation().Sin();
   auto wheelSpeeds =
@@ -29,7 +31,7 @@ units::meters_per_second_t MecanumDriveKinematicsConstraint::MaxVelocity(
 
 TrajectoryConstraint::MinMax
 MecanumDriveKinematicsConstraint::MinMaxAcceleration(
-    const Pose2d& pose, curvature_t curvature,
-    units::meters_per_second_t speed) {
+    const Pose2d& pose, units::curvature_t curvature,
+    units::meters_per_second_t speed) const {
   return {};
 }

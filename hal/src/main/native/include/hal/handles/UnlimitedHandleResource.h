@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -44,6 +44,9 @@ class UnlimitedHandleResource : public HandleBase {
   UnlimitedHandleResource& operator=(const UnlimitedHandleResource&) = delete;
 
   THandle Allocate(std::shared_ptr<TStruct> structure);
+  int16_t GetIndex(THandle handle) {
+    return getHandleTypedIndex(handle, enumValue, m_version);
+  }
   std::shared_ptr<TStruct> Get(THandle handle);
   /* Returns structure previously at that handle (or nullptr if none) */
   std::shared_ptr<TStruct> Free(THandle handle);
@@ -81,7 +84,7 @@ THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
-  int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
+  int16_t index = GetIndex(handle);
   std::scoped_lock lock(m_handleMutex);
   if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
     return nullptr;
@@ -91,7 +94,7 @@ UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(THandle handle) {
-  int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
+  int16_t index = GetIndex(handle);
   std::scoped_lock lock(m_handleMutex);
   if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
     return nullptr;

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -63,9 +63,9 @@ class RamseteControllerTest {
     // must be final or effectively final.
     final var finalRobotPose = robotPose;
     assertAll(
-        () -> assertEquals(endPose.getTranslation().getX(), finalRobotPose.getTranslation().getX(),
+        () -> assertEquals(endPose.getX(), finalRobotPose.getX(),
             kTolerance),
-        () -> assertEquals(endPose.getTranslation().getY(), finalRobotPose.getTranslation().getY(),
+        () -> assertEquals(endPose.getY(), finalRobotPose.getY(),
             kTolerance),
         () -> assertEquals(0.0,
             boundRadians(endPose.getRotation().getRadians()

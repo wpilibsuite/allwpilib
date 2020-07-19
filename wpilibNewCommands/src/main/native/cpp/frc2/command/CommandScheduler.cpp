@@ -7,7 +7,9 @@
 
 #include "frc2/command/CommandScheduler.h"
 
+#include <frc/RobotBase.h>
 #include <frc/RobotState.h>
+#include <frc/TimedRobot.h>
 #include <frc/WPIErrors.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
@@ -17,6 +19,7 @@
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
+#include <wpi/raw_ostream.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandState.h"
@@ -64,7 +67,10 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
   return map.find(keyToCheck) != map.end();
 }
 
-CommandScheduler::CommandScheduler() : m_impl(new Impl) {
+CommandScheduler::CommandScheduler()
+    : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {
+        wpi::outs() << "CommandScheduler loop time overrun.\n";
+      }) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
@@ -86,6 +92,10 @@ CommandScheduler::~CommandScheduler() {
 CommandScheduler& CommandScheduler::GetInstance() {
   static CommandScheduler scheduler;
   return scheduler;
+}
+
+void CommandScheduler::SetPeriod(units::second_t period) {
+  m_watchdog.SetTimeout(period);
 }
 
 void CommandScheduler::AddButton(wpi::unique_function<void()> button) {
@@ -135,12 +145,13 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
     }
     command->Initialize();
     m_impl->scheduledCommands[command] = CommandState{interruptible};
-    for (auto&& action : m_impl->initActions) {
-      action(*command);
-    }
     for (auto&& requirement : requirements) {
       m_impl->requirements[requirement] = command;
     }
+    for (auto&& action : m_impl->initActions) {
+      action(*command);
+    }
+    m_watchdog.AddEpoch(command->GetName() + ".Initialize()");
   }
 }
 
@@ -177,15 +188,22 @@ void CommandScheduler::Run() {
     return;
   }
 
+  m_watchdog.Reset();
+
   // Run the periodic method of all registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
     subsystem.getFirst()->Periodic();
+    if (frc::RobotBase::IsSimulation()) {
+      subsystem.getFirst()->SimulationPeriodic();
+    }
+    m_watchdog.AddEpoch("Subsystem Periodic()");
   }
 
   // Poll buttons for new commands to add.
   for (auto&& button : m_impl->buttons) {
     button();
   }
+  m_watchdog.AddEpoch("buttons.Run()");
 
   m_impl->inRunLoop = true;
   // Run scheduled commands, remove finished commands.
@@ -202,6 +220,7 @@ void CommandScheduler::Run() {
     for (auto&& action : m_impl->executeActions) {
       action(*command);
     }
+    m_watchdog.AddEpoch(command->GetName() + ".Execute()");
 
     if (command->IsFinished()) {
       command->End(false);
@@ -214,6 +233,7 @@ void CommandScheduler::Run() {
       }
 
       m_impl->scheduledCommands.erase(iterator);
+      m_watchdog.AddEpoch(command->GetName() + ".End(false)");
     }
   }
   m_impl->inRunLoop = false;
@@ -235,6 +255,11 @@ void CommandScheduler::Run() {
     if (s == m_impl->requirements.end() && subsystem.getSecond()) {
       Schedule({subsystem.getSecond().get()});
     }
+  }
+
+  m_watchdog.Disable();
+  if (m_watchdog.IsExpired()) {
+    m_watchdog.PrintEpochs();
   }
 }
 
@@ -297,6 +322,7 @@ void CommandScheduler::Cancel(Command* command) {
   for (auto&& action : m_impl->interruptActions) {
     action(*command);
   }
+  m_watchdog.AddEpoch(command->GetName() + ".End(true)");
   m_impl->scheduledCommands.erase(find);
   for (auto&& requirement : m_impl->requirements) {
     if (requirement.second == command) {

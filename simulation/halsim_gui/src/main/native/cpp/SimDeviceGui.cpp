@@ -12,8 +12,8 @@
 #include <vector>
 
 #include <hal/SimDevice.h>
+#include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
-#include <mockdata/SimDeviceData.h>
 
 #include "HALSimGui.h"
 #include "IniSaverInfo.h"

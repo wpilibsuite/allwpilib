@@ -13,8 +13,8 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeRoboRioData() {
-  static RoboRioData srrd[1];
-  ::hal::SimRoboRioData = srrd;
+  static RoboRioData srrd;
+  ::hal::SimRoboRioData = &srrd;
 }
 }  // namespace init
 }  // namespace hal
@@ -39,13 +39,11 @@ void RoboRioData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetRoboRioData(int32_t index) {
-  SimRoboRioData[index].ResetData();
-}
+void HALSIM_ResetRoboRioData(void) { SimRoboRioData->ResetData(); }
 
-#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                  \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, RoboRio##CAPINAME, \
-                               SimRoboRioData, LOWERNAME)
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
+  HAL_SIMDATAVALUE_DEFINE_CAPI_NOINDEX(TYPE, HALSIM, RoboRio##CAPINAME, \
+                                       SimRoboRioData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, FPGAButton, fpgaButton)
 DEFINE_CAPI(double, VInVoltage, vInVoltage)
@@ -64,10 +62,9 @@ DEFINE_CAPI(int32_t, UserFaults5V, userFaults5V)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 
 #define REGISTER(NAME) \
-  SimRoboRioData[index].NAME.RegisterCallback(callback, param, initialNotify)
+  SimRoboRioData->NAME.RegisterCallback(callback, param, initialNotify)
 
-void HALSIM_RegisterRoboRioAllCallbacks(int32_t index,
-                                        HAL_NotifyCallback callback,
+void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify) {
   REGISTER(fpgaButton);
   REGISTER(vInVoltage);

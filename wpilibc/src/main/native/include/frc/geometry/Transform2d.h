@@ -47,6 +47,20 @@ class Transform2d {
   const Translation2d& Translation() const { return m_translation; }
 
   /**
+   * Returns the X component of the transformation's translation.
+   *
+   * @return The x component of the transformation's translation.
+   */
+  units::meter_t X() const { return m_translation.X(); }
+
+  /**
+   * Returns the Y component of the transformation's translation.
+   *
+   * @return The y component of the transformation's translation.
+   */
+  units::meter_t Y() const { return m_translation.Y(); }
+
+  /**
    * Returns the rotational component of the transformation.
    *
    * @return Reference to the rotational component of the transform.

@@ -10,6 +10,11 @@
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
+#ifdef _WIN32
+#include <Windows.h>
+#pragma comment(lib, "Winmm.lib")
+#endif  // _WIN32
+
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
@@ -17,9 +22,12 @@
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/simulation/DriverStationData.h"
 #include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
+
+static HAL_RuntimeType runtimeType{HAL_Mock};
 
 namespace hal {
 namespace init {
@@ -214,7 +222,9 @@ const char* HAL_GetErrorMessage(int32_t code) {
   }
 }
 
-HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Mock; }
+HAL_RuntimeType HAL_GetRuntimeType(void) { return runtimeType; }
+
+void HALSIM_SetRuntimeType(HAL_RuntimeType type) { runtimeType = type; }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
   return 2018;  // Automatically script this at some point
@@ -253,7 +263,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
-  return true;  // Figure out if we need to handle this
+  return HALSIM_GetDriverStationEnabled();
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
@@ -274,12 +284,30 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   hal::init::HAL_IsInitialized.store(true);
 
-  wpi::outs().SetUnbuffered();
-  if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
 
   initialized = true;
+
+// Set Timer Precision to 1ms on Windows
+#ifdef _WIN32
+  TIMECAPS tc;
+  if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+    UINT target = min(1, tc.wPeriodMin);
+    timeBeginPeriod(target);
+    std::atexit([]() {
+      TIMECAPS tc;
+      if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+        UINT target = min(1, tc.wPeriodMin);
+        timeEndPeriod(target);
+      }
+    });
+  }
+#endif  // _WIN32
+
+  wpi::outs().SetUnbuffered();
+  if (HAL_LoadExtensions() < 0) return false;
+
   return true;  // Add initialization if we need to at a later point
 }
 

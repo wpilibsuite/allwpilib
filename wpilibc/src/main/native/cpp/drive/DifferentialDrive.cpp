@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -216,9 +216,9 @@ void DifferentialDrive::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("DifferentialDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
-  builder.AddDoubleProperty("Left Motor Speed",
-                            [=]() { return m_leftMotor->Get(); },
-                            [=](double value) { m_leftMotor->Set(value); });
+  builder.AddDoubleProperty(
+      "Left Motor Speed", [=]() { return m_leftMotor->Get(); },
+      [=](double value) { m_leftMotor->Set(value); });
   builder.AddDoubleProperty(
       "Right Motor Speed",
       [=]() { return m_rightMotor->Get() * m_rightSideInvertMultiplier; },

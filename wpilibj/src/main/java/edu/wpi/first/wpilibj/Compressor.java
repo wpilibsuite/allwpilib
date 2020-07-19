@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -194,6 +194,15 @@ public class Compressor implements Sendable, AutoCloseable {
    */
   public void clearAllPCMStickyFaults() {
     CompressorJNI.clearAllPCMStickyFaults(m_module);
+  }
+
+  /**
+   * Gets the module number (CAN ID).
+   *
+   * @return Module number
+   */
+  public int getModule() {
+    return m_module;
   }
 
   @Override

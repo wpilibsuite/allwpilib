@@ -13,7 +13,7 @@
 #include <string>
 
 #include <frc/ErrorBase.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>

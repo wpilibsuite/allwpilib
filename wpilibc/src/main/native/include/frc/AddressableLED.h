@@ -11,7 +11,7 @@
 
 #include <hal/AddressableLEDTypes.h>
 #include <hal/Types.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/ArrayRef.h>
 
 #include "frc/ErrorBase.h"

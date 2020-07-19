@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,7 +13,7 @@
 #include <Eigen/Core>
 #include <Eigen/QR>
 #include <hal/FRCUsageReporting.h>
-#include <units/units.h>
+#include <units/velocity.h>
 
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
@@ -108,7 +108,7 @@ class SwerveDriveKinematics {
    */
   std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
-      const Translation2d& centerOfRotation = Translation2d());
+      const Translation2d& centerOfRotation = Translation2d()) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -123,7 +123,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   template <typename... ModuleStates>
-  ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates);
+  ChassisSpeeds ToChassisSpeeds(ModuleStates&&... wheelStates) const;
 
   /**
    * Performs forward kinematics to return the resulting chassis state from the
@@ -139,7 +139,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   ChassisSpeeds ToChassisSpeeds(
-      std::array<SwerveModuleState, NumModules> moduleStates);
+      std::array<SwerveModuleState, NumModules> moduleStates) const;
 
   /**
    * Normalizes the wheel speeds using some max attainable speed. Sometimes,
@@ -158,12 +158,12 @@ class SwerveDriveKinematics {
       units::meters_per_second_t attainableMaxSpeed);
 
  private:
-  Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
+  mutable Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Eigen::Matrix<double, NumModules * 2, 3>>
       m_forwardKinematics;
   std::array<Translation2d, NumModules> m_modules;
 
-  Translation2d m_previousCoR;
+  mutable Translation2d m_previousCoR;
 };
 }  // namespace frc
 

@@ -1,12 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_OO_INL_
-#define CSCORE_OO_INL_
+#ifndef CSCORE_CSCORE_OO_INL_
+#define CSCORE_CSCORE_OO_INL_
+
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace cs {
 
@@ -76,7 +80,7 @@ inline VideoProperty::VideoProperty(CS_Property handle) : m_handle(handle) {
 }
 
 inline VideoProperty::VideoProperty(CS_Property handle, Kind kind)
-  : m_status(0), m_handle(handle), m_kind(kind) {}
+    : m_status(0), m_handle(handle), m_kind(kind) {}
 
 inline VideoSource::VideoSource(const VideoSource& source)
     : m_handle(source.m_handle == 0 ? 0
@@ -255,6 +259,11 @@ inline std::vector<UsbCameraInfo> UsbCamera::EnumerateUsbCameras() {
   return ::cs::EnumerateUsbCameras(&status);
 }
 
+inline void UsbCamera::SetPath(const wpi::Twine& path) {
+  m_status = 0;
+  return ::cs::SetUsbCameraPath(m_handle, path, &m_status);
+}
+
 inline std::string UsbCamera::GetPath() const {
   m_status = 0;
   return ::cs::GetUsbCameraPath(m_handle, &m_status);
@@ -394,10 +403,10 @@ inline void ImageSource::SetDescription(const wpi::Twine& description) {
 }
 
 inline VideoProperty ImageSource::CreateProperty(const wpi::Twine& name,
-                                              VideoProperty::Kind kind,
-                                              int minimum, int maximum,
-                                              int step, int defaultValue,
-                                              int value) {
+                                                 VideoProperty::Kind kind,
+                                                 int minimum, int maximum,
+                                                 int step, int defaultValue,
+                                                 int value) {
   m_status = 0;
   return VideoProperty{CreateSourceProperty(
       m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(kind)),
@@ -405,34 +414,40 @@ inline VideoProperty ImageSource::CreateProperty(const wpi::Twine& name,
 }
 
 inline VideoProperty ImageSource::CreateIntegerProperty(const wpi::Twine& name,
-                                                    int minimum, int maximum,
-                                                    int step, int defaultValue,
-                                                    int value) {
+                                                        int minimum,
+                                                        int maximum, int step,
+                                                        int defaultValue,
+                                                        int value) {
   m_status = 0;
   return VideoProperty{CreateSourceProperty(
-      m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(VideoProperty::Kind::kInteger)),
+      m_handle, name,
+      static_cast<CS_PropertyKind>(
+          static_cast<int>(VideoProperty::Kind::kInteger)),
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
 inline VideoProperty ImageSource::CreateBooleanProperty(const wpi::Twine& name,
-                                                     bool defaultValue,
-                                                     bool value) {
+                                                        bool defaultValue,
+                                                        bool value) {
   m_status = 0;
   return VideoProperty{CreateSourceProperty(
-      m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(VideoProperty::Kind::kBoolean)),
+      m_handle, name,
+      static_cast<CS_PropertyKind>(
+          static_cast<int>(VideoProperty::Kind::kBoolean)),
       0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
 }
 
-inline VideoProperty ImageSource::CreateStringProperty(const wpi::Twine& name,
-                                                    const wpi::Twine& value) {
+inline VideoProperty ImageSource::CreateStringProperty(
+    const wpi::Twine& name, const wpi::Twine& value) {
   m_status = 0;
-  auto prop = VideoProperty{CreateSourceProperty(
-      m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(VideoProperty::Kind::kString)),
-      0, 0, 0, 0, 0, &m_status)};
+  auto prop = VideoProperty{
+      CreateSourceProperty(m_handle, name,
+                           static_cast<CS_PropertyKind>(
+                               static_cast<int>(VideoProperty::Kind::kString)),
+                           0, 0, 0, 0, 0, &m_status)};
   prop.SetString(value);
   return prop;
 }
-
 
 inline void ImageSource::SetEnumPropertyChoices(
     const VideoProperty& property, wpi::ArrayRef<std::string> choices) {
@@ -441,8 +456,8 @@ inline void ImageSource::SetEnumPropertyChoices(
 }
 
 template <typename T>
-inline void ImageSource::SetEnumPropertyChoices(const VideoProperty& property,
-                                             std::initializer_list<T> choices) {
+inline void ImageSource::SetEnumPropertyChoices(
+    const VideoProperty& property, std::initializer_list<T> choices) {
   std::vector<std::string> vec;
   vec.reserve(choices.size());
   for (const auto& choice : choices) vec.emplace_back(choice);
@@ -618,4 +633,4 @@ inline VideoListener::~VideoListener() {
 
 }  // namespace cs
 
-#endif  /* CSCORE_OO_INL_ */
+#endif  // CSCORE_CSCORE_OO_INL_

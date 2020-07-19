@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,8 +19,8 @@
 #include <wpi/spinlock.h>
 
 #include "hal/Value.h"
-#include "mockdata/SimCallbackRegistry.h"
-#include "mockdata/SimDeviceData.h"
+#include "hal/simulation/SimCallbackRegistry.h"
+#include "hal/simulation/SimDeviceData.h"
 
 namespace hal {
 
@@ -150,6 +150,7 @@ class SimDeviceData {
 
   wpi::UidVector<std::shared_ptr<Device>, 4> m_devices;
   wpi::StringMap<std::weak_ptr<Device>> m_deviceMap;
+  std::vector<std::pair<std::string, bool>> m_prefixEnabled;
 
   wpi::recursive_spinlock m_mutex;
 
@@ -161,6 +162,9 @@ class SimDeviceData {
   Value* LookupValue(HAL_SimValueHandle handle);
 
  public:
+  void SetDeviceEnabled(const char* prefix, bool enabled);
+  bool IsDeviceEnabled(const char* name);
+
   HAL_SimDeviceHandle CreateDevice(const char* name);
   void FreeDevice(HAL_SimDeviceHandle handle);
   HAL_SimValueHandle CreateValue(HAL_SimDeviceHandle device, const char* name,

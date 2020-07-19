@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -243,6 +243,8 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
 
 bool DispatcherBase::IsConnected() const {
   if (!m_active) return false;
+
+  if (m_networkMode == NT_NET_MODE_LOCAL) return true;
 
   std::scoped_lock lock(m_user_mutex);
   for (auto& conn : m_connections) {

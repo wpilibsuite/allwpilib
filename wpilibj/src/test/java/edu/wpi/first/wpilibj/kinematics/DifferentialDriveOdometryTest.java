@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,8 +26,8 @@ class DifferentialDriveOdometryTest {
     var pose = m_odometry.update(Rotation2d.fromDegrees(135.0), 0.0, 5 * Math.PI);
 
     assertAll(
-        () -> assertEquals(pose.getTranslation().getX(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getTranslation().getY(), 5.0, kEpsilon),
+        () -> assertEquals(pose.getX(), 5.0, kEpsilon),
+        () -> assertEquals(pose.getY(), 5.0, kEpsilon),
         () -> assertEquals(pose.getRotation().getDegrees(), 90.0, kEpsilon)
     );
   }

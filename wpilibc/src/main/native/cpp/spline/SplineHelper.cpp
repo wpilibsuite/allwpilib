@@ -63,10 +63,14 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
         yInitial[1]);
     if (waypoints.size() > 4) {
       for (size_t i = 1; i <= waypoints.size() - 4; ++i) {
-        dx.emplace_back(3 * (waypoints[i + 1].X().to<double>() -
-                             waypoints[i - 1].X().to<double>()));
-        dy.emplace_back(3 * (waypoints[i + 1].Y().to<double>() -
-                             waypoints[i - 1].Y().to<double>()));
+        // dx and dy represent the derivatives of the internal waypoints. The
+        // derivative of the second internal waypoint should involve the third
+        // and first internal waypoint, which have indices of 1 and 3 in the
+        // waypoints list (which contains ALL waypoints).
+        dx.emplace_back(3 * (waypoints[i + 2].X().to<double>() -
+                             waypoints[i].X().to<double>()));
+        dy.emplace_back(3 * (waypoints[i + 2].Y().to<double>() -
+                             waypoints[i].Y().to<double>()));
       }
     }
     dx.emplace_back(3 * (waypoints[waypoints.size() - 1].X().to<double>() -
@@ -123,7 +127,9 @@ std::vector<QuinticHermiteSpline>
 SplineHelper::QuinticSplinesFromControlVectors(
     const std::vector<Spline<5>::ControlVector>& controlVectors) {
   std::vector<QuinticHermiteSpline> splines;
-  for (size_t i = 0; i < controlVectors.size() - 1; ++i) {
+  // There are twice as many control vectors are there are splines,
+  // so we increment the counter by 2.
+  for (size_t i = 0; i < controlVectors.size() - 1; i += 2) {
     auto& xInitial = controlVectors[i].x;
     auto& yInitial = controlVectors[i].y;
     auto& xFinal = controlVectors[i + 1].x;
@@ -166,12 +172,7 @@ SplineHelper::QuinticControlVectorsFromWaypoints(
     const auto scalar =
         1.2 * p0.Translation().Distance(p1.Translation()).to<double>();
 
-    // Only add the first control vector if this is the first iteration. The
-    // last control vector of this iteration is the first control vector of
-    // the next iteration.
-    if (i == 0) {
-      vectors.push_back(QuinticControlVector(scalar, p0));
-    }
+    vectors.push_back(QuinticControlVector(scalar, p0));
     vectors.push_back(QuinticControlVector(scalar, p1));
   }
   return vectors;

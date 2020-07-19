@@ -69,13 +69,7 @@ public final class SplineHelper {
       // This just makes the splines look better.
       final var scalar = 1.2 * p0.getTranslation().getDistance(p1.getTranslation());
 
-      // Only add the first control vector if this is the first iteration. The
-      // last control vector of this iteration is the first control vector of
-      // the next iteration.
-      if (i == 0) {
-        vectors.add(getQuinticControlVector(scalar, p0));
-      }
-
+      vectors.add(getQuinticControlVector(scalar, p0));
       vectors.add(getQuinticControlVector(scalar, p1));
     }
     return vectors;
@@ -151,8 +145,11 @@ public final class SplineHelper {
 
       if (newWaypts.length > 4) {
         for (int i = 1; i <= newWaypts.length - 4; i++) {
-          dx[i] = 3 * (newWaypts[i + 1].getX() - newWaypts[i - 1].getX());
-          dy[i] = 3 * (newWaypts[i + 1].getY() - newWaypts[i - 1].getY());
+          // dx and dy represent the derivatives of the internal waypoints. The derivative
+          // of the second internal waypoint should involve the third and first internal waypoint,
+          // which have indices of 1 and 3 in the newWaypts list (which contains ALL waypoints).
+          dx[i] = 3 * (newWaypts[i + 2].getX() - newWaypts[i].getX());
+          dy[i] = 3 * (newWaypts[i + 2].getY() - newWaypts[i].getY());
         }
       }
 
@@ -219,14 +216,15 @@ public final class SplineHelper {
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public static QuinticHermiteSpline[] getQuinticSplinesFromControlVectors(
       Spline.ControlVector[] controlVectors) {
-    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length - 1];
-    for (int i = 0; i < controlVectors.length - 1; i++) {
+    // There are twice as many control vectors are there are splines.
+    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length / 2];
+    for (int i = 0; i < controlVectors.length - 1; i += 2) {
       var xInitial = controlVectors[i].x;
       var xFinal = controlVectors[i + 1].x;
       var yInitial = controlVectors[i].y;
       var yFinal = controlVectors[i + 1].y;
-      splines[i] = new QuinticHermiteSpline(xInitial, xFinal,
-                                            yInitial, yFinal);
+      splines[i / 2] = new QuinticHermiteSpline(xInitial, xFinal,
+          yInitial, yFinal);
     }
     return splines;
   }
@@ -268,15 +266,15 @@ public final class SplineHelper {
 
   private static Spline.ControlVector getCubicControlVector(double scalar, Pose2d point) {
     return new Spline.ControlVector(
-        new double[]{point.getTranslation().getX(), scalar * point.getRotation().getCos()},
-        new double[]{point.getTranslation().getY(), scalar * point.getRotation().getSin()}
+        new double[]{point.getX(), scalar * point.getRotation().getCos()},
+        new double[]{point.getY(), scalar * point.getRotation().getSin()}
     );
   }
 
   private static Spline.ControlVector getQuinticControlVector(double scalar, Pose2d point) {
     return new Spline.ControlVector(
-        new double[]{point.getTranslation().getX(), scalar * point.getRotation().getCos(), 0.0},
-        new double[]{point.getTranslation().getY(), scalar * point.getRotation().getSin(), 0.0}
+        new double[]{point.getX(), scalar * point.getRotation().getCos(), 0.0},
+        new double[]{point.getY(), scalar * point.getRotation().getSin(), 0.0}
     );
   }
 }

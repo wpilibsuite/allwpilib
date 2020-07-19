@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,11 +12,12 @@
 #include <utility>
 
 #include <hal/cpp/fpga_clock.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/SafeThread.h>
-#include <wpi/StringMap.h>
 #include <wpi/StringRef.h>
 #include <wpi/deprecated.h>
+
+#include "frc/Tracer.h"
 
 namespace frc {
 
@@ -33,6 +34,9 @@ class Watchdog {
  public:
   /**
    * Watchdog constructor.
+   *
+   * @deprecated use unit-safe version instead.
+   * Watchdog(units::second_t timeout, std::function<void()> callback)
    *
    * @param timeout  The watchdog's timeout in seconds with microsecond
    *                 resolution.
@@ -73,6 +77,9 @@ class Watchdog {
 
   /**
    * Sets the watchdog's timeout.
+   *
+   * @deprecated use the unit safe version instead.
+   * SetTimeout(units::second_t timeout)
    *
    * @param timeout The watchdog's timeout in seconds with microsecond
    *                resolution.
@@ -149,9 +156,8 @@ class Watchdog {
   hal::fpga_clock::time_point m_expirationTime;
   std::function<void()> m_callback;
   hal::fpga_clock::time_point m_lastTimeoutPrintTime = hal::fpga_clock::epoch();
-  hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
 
-  wpi::StringMap<std::chrono::nanoseconds> m_epochs;
+  Tracer m_tracer;
   bool m_isExpired = false;
 
   bool m_suppressTimeoutMessage = false;

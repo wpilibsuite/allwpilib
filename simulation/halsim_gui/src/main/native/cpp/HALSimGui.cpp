@@ -12,12 +12,12 @@
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
+#include <hal/simulation/DriverStationData.h>
 #include <imgui.h>
 #include <imgui_ProggyDotted.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
-#include <mockdata/DriverStationData.h>
 #include <wpi/StringMap.h>
 #include <wpi/raw_ostream.h>
 
@@ -580,7 +580,8 @@ void HALSIMGUI_AddExecute(void* param, void (*execute)(void*)) {
 void HALSIMGUI_AddWindow(const char* name, void* param, void (*display)(void*),
                          int32_t flags) {
   if (display) {
-    HALSimGui::AddWindow(name, [=] { display(param); }, flags);
+    HALSimGui::AddWindow(
+        name, [=] { display(param); }, flags);
   }
 }
 

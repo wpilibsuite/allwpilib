@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -97,10 +97,8 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
   m_timer.Stop();
   command.End(false);
 
-  EXPECT_NEAR_UNITS(endState.pose.Translation().X(),
-                    getRobotPose().Translation().X(), kxTolerance);
-  EXPECT_NEAR_UNITS(endState.pose.Translation().Y(),
-                    getRobotPose().Translation().Y(), kyTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.X(), getRobotPose().X(), kxTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.Y(), getRobotPose().Y(), kyTolerance);
   EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(),
                     getRobotPose().Rotation().Radians(), kAngularTolerance);
 }

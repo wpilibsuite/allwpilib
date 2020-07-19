@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -236,11 +236,12 @@ void Encoder::InitSendable(SendableBuilder& builder) {
   else
     builder.SetSmartDashboardType("Encoder");
 
-  builder.AddDoubleProperty("Speed", [=]() { return GetRate(); }, nullptr);
-  builder.AddDoubleProperty("Distance", [=]() { return GetDistance(); },
-                            nullptr);
-  builder.AddDoubleProperty("Distance per Tick",
-                            [=]() { return GetDistancePerPulse(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Speed", [=]() { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance", [=]() { return GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance per Tick", [=]() { return GetDistancePerPulse(); }, nullptr);
 }
 
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {

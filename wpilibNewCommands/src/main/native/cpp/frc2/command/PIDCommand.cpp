@@ -37,15 +37,17 @@ PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> measurementSource,
                        double setpoint, std::function<void(double)> useOutput,
                        std::initializer_list<Subsystem*> requirements)
-    : PIDCommand(controller, measurementSource, [setpoint] { return setpoint; },
-                 useOutput, requirements) {}
+    : PIDCommand(
+          controller, measurementSource, [setpoint] { return setpoint; },
+          useOutput, requirements) {}
 
 PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> measurementSource,
                        double setpoint, std::function<void(double)> useOutput,
                        wpi::ArrayRef<Subsystem*> requirements)
-    : PIDCommand(controller, measurementSource, [setpoint] { return setpoint; },
-                 useOutput, requirements) {}
+    : PIDCommand(
+          controller, measurementSource, [setpoint] { return setpoint; },
+          useOutput, requirements) {}
 
 void PIDCommand::Initialize() { m_controller.Reset(); }
 

@@ -9,7 +9,11 @@
 #include <memory>
 #include <vector>
 
-#include <units/units.h>
+#include <units/acceleration.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"

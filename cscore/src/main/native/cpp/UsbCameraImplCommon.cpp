@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -42,6 +42,11 @@ CS_Source CS_CreateUsbCameraDev(const char* name, int dev, CS_Status* status) {
 CS_Source CS_CreateUsbCameraPath(const char* name, const char* path,
                                  CS_Status* status) {
   return cs::CreateUsbCameraPath(name, path, status);
+}
+
+void CS_SetUsbCameraPath(CS_Source source, const char* path,
+                         CS_Status* status) {
+  cs::SetUsbCameraPath(source, path, status);
 }
 
 char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status) {

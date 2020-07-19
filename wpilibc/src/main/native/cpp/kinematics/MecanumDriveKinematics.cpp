@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,8 @@
 using namespace frc;
 
 MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
-    const ChassisSpeeds& chassisSpeeds, const Translation2d& centerOfRotation) {
+    const ChassisSpeeds& chassisSpeeds,
+    const Translation2d& centerOfRotation) const {
   // We have a new center of rotation. We need to compute the matrix again.
   if (centerOfRotation != m_previousCoR) {
     auto fl = m_frontLeftWheel - centerOfRotation;
@@ -39,7 +40,7 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
 }
 
 ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
-    const MecanumDriveWheelSpeeds& wheelSpeeds) {
+    const MecanumDriveWheelSpeeds& wheelSpeeds) const {
   Eigen::Matrix<double, 4, 1> wheelSpeedsMatrix;
   // clang-format off
   wheelSpeedsMatrix << wheelSpeeds.frontLeft.to<double>(), wheelSpeeds.frontRight.to<double>(),
@@ -57,7 +58,7 @@ ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
 void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
                                                   Translation2d fr,
                                                   Translation2d rl,
-                                                  Translation2d rr) {
+                                                  Translation2d rr) const {
   // clang-format off
   m_inverseKinematics << 1, -1, (-(fl.X() + fl.Y())).template to<double>(),
                          1,  1, (fr.X() - fr.Y()).template to<double>(),

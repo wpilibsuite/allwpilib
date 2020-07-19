@@ -1,12 +1,15 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_RPCCALL_INL_
-#define NT_RPCCALL_INL_
+#ifndef NTCORE_NETWORKTABLES_RPCCALL_INL_
+#define NTCORE_NETWORKTABLES_RPCCALL_INL_
+
+#include <string>
+#include <utility>
 
 #include "ntcore_cpp.h"
 
@@ -45,4 +48,4 @@ inline void RpcCall::CancelResult() {
 
 }  // namespace nt
 
-#endif  // NT_RPCCALL_INL_
+#endif  // NTCORE_NETWORKTABLES_RPCCALL_INL_

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,16 +9,19 @@
 
 #include <algorithm>
 
+#include <units/math.h>
+
 namespace frc {
 
 template <class... Wheels>
 SwerveDriveKinematics(Translation2d, Wheels...)
-    ->SwerveDriveKinematics<1 + sizeof...(Wheels)>;
+    -> SwerveDriveKinematics<1 + sizeof...(Wheels)>;
 
 template <size_t NumModules>
 std::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
-    const ChassisSpeeds& chassisSpeeds, const Translation2d& centerOfRotation) {
+    const ChassisSpeeds& chassisSpeeds,
+    const Translation2d& centerOfRotation) const {
   // We have a new center of rotation. We need to compute the matrix again.
   if (centerOfRotation != m_previousCoR) {
     for (size_t i = 0; i < NumModules; i++) {
@@ -57,7 +60,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
 template <size_t NumModules>
 template <typename... ModuleStates>
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
-    ModuleStates&&... wheelStates) {
+    ModuleStates&&... wheelStates) const {
   static_assert(sizeof...(wheelStates) == NumModules,
                 "Number of modules is not consistent with number of wheel "
                 "locations provided in constructor.");
@@ -69,7 +72,7 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 
 template <size_t NumModules>
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
-    std::array<SwerveModuleState, NumModules> moduleStates) {
+    std::array<SwerveModuleState, NumModules> moduleStates) const {
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix;
 
   for (size_t i = 0; i < NumModules; i++) {

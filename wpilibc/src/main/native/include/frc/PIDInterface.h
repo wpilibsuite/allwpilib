@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,11 @@
 
 namespace frc {
 
+/**
+ * Interface for PID Control Loop.
+ *
+ * @deprecated All APIs which use this have been deprecated.
+ */
 class PIDInterface {
  public:
   WPI_DEPRECATED("All APIs which use this have been deprecated.")

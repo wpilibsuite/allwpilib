@@ -11,8 +11,8 @@
 #include <cstring>
 
 #include <hal/Ports.h>
+#include <hal/simulation/RelayData.h>
 #include <imgui.h>
-#include <mockdata/RelayData.h>
 
 #include "ExtraGuiWidgets.h"
 #include "HALSimGui.h"

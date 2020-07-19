@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,6 +28,16 @@ void AnalogTriggerData::ResetData() {
 }
 
 extern "C" {
+
+int32_t HALSIM_FindAnalogTriggerForChannel(int32_t channel) {
+  for (int i = 0; i < kNumAnalogTriggers; ++i) {
+    if (SimAnalogTriggerData[i].initialized &&
+        SimAnalogTriggerData[i].inputPort == channel)
+      return i;
+  }
+  return -1;
+}
+
 void HALSIM_ResetAnalogTriggerData(int32_t index) {
   SimAnalogTriggerData[index].ResetData();
 }

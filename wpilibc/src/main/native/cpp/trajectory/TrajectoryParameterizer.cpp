@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,6 +30,10 @@
  */
 
 #include "frc/trajectory/TrajectoryParameterizer.h"
+
+#include <string>
+
+#include <units/math.h>
 
 using namespace frc;
 
@@ -186,8 +190,9 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
         // delta_x = v * t
         dt = ds / v;
       } else {
-        throw std::runtime_error(
-            "Something went wrong during trajectory generation.");
+        throw std::runtime_error("Something went wrong at iteration " +
+                                 std::to_string(i) +
+                                 " of time parameterization.");
       }
     }
 
@@ -212,6 +217,14 @@ void TrajectoryParameterizer::EnforceAccelerationLimits(
 
     auto minMaxAccel = constraint->MinMaxAcceleration(
         state->pose.first, state->pose.second, state->maxVelocity * factor);
+
+    if (minMaxAccel.minAcceleration > minMaxAccel.maxAcceleration) {
+      throw std::runtime_error(
+          "The constraint's min acceleration was greater than its max "
+          "acceleration. To debug this, remove all constraints from the config "
+          "and add each one individually. If the offending constraint was "
+          "packaged with WPILib, please file a bug report.");
+    }
 
     state->minAcceleration = units::math::max(
         state->minAcceleration,

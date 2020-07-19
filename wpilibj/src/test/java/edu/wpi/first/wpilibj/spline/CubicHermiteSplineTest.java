@@ -71,10 +71,10 @@ class CubicHermiteSplineTest {
 
     // Check first point
     assertAll(
-        () -> assertEquals(a.getTranslation().getX(),
-            poses.get(0).poseMeters.getTranslation().getX(), 1E-9),
-        () -> assertEquals(a.getTranslation().getY(),
-            poses.get(0).poseMeters.getTranslation().getY(), 1E-9),
+        () -> assertEquals(a.getX(),
+            poses.get(0).poseMeters.getX(), 1E-9),
+        () -> assertEquals(a.getY(),
+            poses.get(0).poseMeters.getY(), 1E-9),
         () -> assertEquals(a.getRotation().getRadians(),
             poses.get(0).poseMeters.getRotation().getRadians(), 1E-9)
     );
@@ -95,10 +95,10 @@ class CubicHermiteSplineTest {
 
     // Check last point
     assertAll(
-        () -> assertEquals(b.getTranslation().getX(),
-            poses.get(poses.size() - 1).poseMeters.getTranslation().getX(), 1E-9),
-        () -> assertEquals(b.getTranslation().getY(),
-            poses.get(poses.size() - 1).poseMeters.getTranslation().getY(), 1E-9),
+        () -> assertEquals(b.getX(),
+            poses.get(poses.size() - 1).poseMeters.getX(), 1E-9),
+        () -> assertEquals(b.getY(),
+            poses.get(poses.size() - 1).poseMeters.getY(), 1E-9),
         () -> assertEquals(b.getRotation().getRadians(),
             poses.get(poses.size() - 1).poseMeters.getRotation().getRadians(), 1E-9)
     );

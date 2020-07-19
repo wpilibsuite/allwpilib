@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,8 +11,8 @@
 
 #include <wpi/spinlock.h>
 
-#include "mockdata/DriverStationData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/DriverStationData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 struct JoystickOutputStore;
@@ -57,6 +57,25 @@ class DriverStationData {
   void SetMatchInfo(const HAL_MatchInfo* info);
 
   void NotifyNewData();
+
+  void SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
+  void SetJoystickAxis(int32_t stick, int32_t axis, double value);
+  void SetJoystickPOV(int32_t stick, int32_t pov, int32_t value);
+  void SetJoystickButtons(int32_t stick, uint32_t buttons);
+  void SetJoystickAxisCount(int32_t stick, int32_t count);
+  void SetJoystickPOVCount(int32_t stick, int32_t count);
+  void SetJoystickButtonCount(int32_t stick, int32_t count);
+
+  void SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox);
+  void SetJoystickType(int32_t stick, int32_t type);
+  void SetJoystickName(int32_t stick, const char* name);
+  void SetJoystickAxisType(int32_t stick, int32_t axis, int32_t type);
+
+  void SetGameSpecificMessage(const char* message);
+  void SetEventName(const char* name);
+  void SetMatchType(HAL_MatchType type);
+  void SetMatchNumber(int32_t matchNumber);
+  void SetReplayNumber(int32_t replayNumber);
 
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetEnabledName> enabled{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetAutonomousName> autonomous{false};

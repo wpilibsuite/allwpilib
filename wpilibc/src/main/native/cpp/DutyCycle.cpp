@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -93,8 +93,8 @@ int DutyCycle::GetSourceChannel() const { return m_source->GetChannel(); }
 
 void DutyCycle::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
-  builder.AddDoubleProperty("Frequency",
-                            [this] { return this->GetFrequency(); }, nullptr);
-  builder.AddDoubleProperty("Output", [this] { return this->GetOutput(); },
-                            nullptr);
+  builder.AddDoubleProperty(
+      "Frequency", [this] { return this->GetFrequency(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Output", [this] { return this->GetOutput(); }, nullptr);
 }

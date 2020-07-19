@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "mockdata/RoboRioData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/RoboRioData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class RoboRioData {

@@ -8,9 +8,9 @@
 #include "EncoderGui.h"
 
 #include <hal/Ports.h>
+#include <hal/simulation/EncoderData.h>
+#include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
-#include <mockdata/EncoderData.h>
-#include <mockdata/SimDeviceData.h>
 
 #include "HALSimGui.h"
 #include "IniSaver.h"
@@ -95,6 +95,16 @@ static void DisplayEncoders() {
           if (ImGui::Combo("Direction", &direction, options, 2))
             HALSIM_SetEncoderDirection(i, direction);
           ImGui::PopID();
+
+          // distance
+          double distance = HALSIM_GetEncoderDistance(i);
+          if (ImGui::InputDouble("Distance", &distance, 0, 0, "%.6g"))
+            HALSIM_SetEncoderDistance(i, distance);
+
+          // rate
+          double rate = HALSIM_GetEncoderRate(i);
+          if (ImGui::InputDouble("Rate", &rate, 0, 0, "%.6g"))
+            HALSIM_SetEncoderRate(i, rate);
         }
       }
     }
