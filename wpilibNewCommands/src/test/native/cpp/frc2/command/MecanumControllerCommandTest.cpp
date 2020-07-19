@@ -9,14 +9,13 @@
 #include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/Subsystem.h>
 
-#include <iostream>
-
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
+#include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <wpi/math>
 
@@ -60,6 +59,10 @@ class MecanumControllerCommandTest : public ::testing::Test {
   frc::MecanumDriveOdometry m_odometry{m_kinematics, 0_rad,
                                        frc::Pose2d{0_m, 0_m, 0_rad}};
 
+  void SetUp() override { frc::sim::PauseTiming(); }
+
+  void TearDown() override { frc::sim::ResumeTiming(); }
+
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
     return frc::MecanumDriveWheelSpeeds{m_frontLeftSpeed, m_frontRightSpeed,
                                         m_rearLeftSpeed, m_rearRightSpeed};
@@ -72,7 +75,7 @@ class MecanumControllerCommandTest : public ::testing::Test {
 };
 
 TEST_F(MecanumControllerCommandTest, ReachesReference) {
-  frc2::Subsystem subsystem{};
+  frc2::Subsystem subsystem;
 
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};
@@ -99,10 +102,12 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
 
   m_timer.Reset();
   m_timer.Start();
+
   command.Initialize();
   while (!command.IsFinished()) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
+    frc::sim::StepTiming(5_ms);
   }
   m_timer.Stop();
   command.End(false);
