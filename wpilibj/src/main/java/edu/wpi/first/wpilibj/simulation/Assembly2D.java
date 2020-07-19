@@ -12,10 +12,11 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import java.util.HashMap;
 
 public class Assembly2D {
   SimDevice m_device = SimDevice.create("Assembly2D");
-  HashMap<String, SimDouble> createdItems = new HashMap<String>();
+  HashMap<String, SimDouble> createdItems = new HashMap<String, SimDouble>();
 
   /**
      * Set/Create the angle of a ligament
@@ -23,9 +24,10 @@ public class Assembly2D {
      * @param ligamentPath json path to the ligament
      * @param angle        to set the ligament
      */
-  public void setLigamentPose(String ligamentPath, int angle) {
+  public void setLigamentPose(String ligamentPath, float angle) {
     if (m_device != null) {
-        if(!createdItems.contains(ligamentPath)){
+//        System.out.println(ligamentPath + " " + angle);
+        if(!createdItems.containsKey(ligamentPath)){
             createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
         } else{
             createdItems.get(ligamentPath).set(angle);

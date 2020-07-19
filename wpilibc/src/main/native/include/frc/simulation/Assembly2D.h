@@ -26,10 +26,10 @@ namespace frc {
          * @param ligamentPath json path to the ligament
         * @param angle to set the ligament
          */
-        void SetLigamentPose(std::string ligamentPath, int angle);
+        void SetLigamentPose(std::string ligamentPath, float angle);
 
     private:
-        std::map<std::string, SimDouble> createdItems;
+        std::map<std::string, hal::SimDouble> createdItems;
         hal::SimDevice m_device;
     };
 

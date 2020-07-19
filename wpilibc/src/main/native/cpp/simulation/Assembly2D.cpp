@@ -14,10 +14,10 @@ using namespace frc;
 
 Assembly2D::Assembly2D() : m_device{"Assembly2D"} {}
 
-void Assembly2D::SetLigamentPose(std::string ligamentPath, int angle) {
+void Assembly2D::SetLigamentPose(std::string ligamentPath, float angle) {
     if (m_device) {
         if (!createdItems.count(ligamentPath)) {
-            createdItems[ligamentPath] = m_device.CreateDouble(ligamentPath, false, angle);
+            createdItems[ligamentPath] = m_device.CreateDouble(ligamentPath.c_str(), false, angle);
         }
     } else {
         createdItems[ligamentPath].Set(angle);

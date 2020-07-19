@@ -110,6 +110,10 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
         } else {
             minSize = ImGui::GetWindowHeight();
         }
+        if(bodyConfig.name == "/one/"){
+            wpi::outs() << bodyConfig.name << " " << HALSIM_GetSimValueHandle(assembly2DHandle, bodyConfig.name.c_str()) << "\n";
+
+        }
 
         // Calculate the next angle to go to
         int angleToGoTo = HALSIM_GetSimValueHandle(assembly2DHandle, bodyConfig.name.c_str()) + bodyConfig.angle + previousAngle;
