@@ -1,0 +1,114 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#include "frc/simulation/PWMSim.h"
+
+#include <memory>
+#include <utility>
+
+#include <hal/simulation/PWMData.h>
+
+#include "frc/PWM.h"
+
+using namespace frc;
+using namespace frc::sim;
+
+PWMSim::PWMSim(const PWM& pwm) : m_index{pwm.GetChannel()} {}
+
+PWMSim::PWMSim(int channel) : m_index{channel} {}
+
+std::unique_ptr<CallbackStore> PWMSim::RegisterInitializedCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      m_index, -1, callback, &HALSIM_CancelPWMInitializedCallback);
+  store->SetUid(HALSIM_RegisterPWMInitializedCallback(
+      m_index, &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+bool PWMSim::GetInitialized() const {
+  return HALSIM_GetPWMInitialized(m_index);
+}
+
+void PWMSim::SetInitialized(bool initialized) {
+  HALSIM_SetPWMInitialized(m_index, initialized);
+}
+
+std::unique_ptr<CallbackStore> PWMSim::RegisterRawValueCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      m_index, -1, callback, &HALSIM_CancelPWMRawValueCallback);
+  store->SetUid(HALSIM_RegisterPWMRawValueCallback(m_index, &CallbackStoreThunk,
+                                                   store.get(), initialNotify));
+  return store;
+}
+
+int PWMSim::GetRawValue() const { return HALSIM_GetPWMRawValue(m_index); }
+
+void PWMSim::SetRawValue(int rawValue) {
+  HALSIM_SetPWMRawValue(m_index, rawValue);
+}
+
+std::unique_ptr<CallbackStore> PWMSim::RegisterSpeedCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(m_index, -1, callback,
+                                               &HALSIM_CancelPWMSpeedCallback);
+  store->SetUid(HALSIM_RegisterPWMSpeedCallback(m_index, &CallbackStoreThunk,
+                                                store.get(), initialNotify));
+  return store;
+}
+
+double PWMSim::GetSpeed() const { return HALSIM_GetPWMSpeed(m_index); }
+
+void PWMSim::SetSpeed(double speed) { HALSIM_SetPWMSpeed(m_index, speed); }
+
+std::unique_ptr<CallbackStore> PWMSim::RegisterPositionCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      m_index, -1, callback, &HALSIM_CancelPWMPositionCallback);
+  store->SetUid(HALSIM_RegisterPWMPositionCallback(m_index, &CallbackStoreThunk,
+                                                   store.get(), initialNotify));
+  return store;
+}
+
+double PWMSim::GetPosition() const { return HALSIM_GetPWMPosition(m_index); }
+
+void PWMSim::SetPosition(double position) {
+  HALSIM_SetPWMPosition(m_index, position);
+}
+
+std::unique_ptr<CallbackStore> PWMSim::RegisterPeriodScaleCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      m_index, -1, callback, &HALSIM_CancelPWMPeriodScaleCallback);
+  store->SetUid(HALSIM_RegisterPWMPeriodScaleCallback(
+      m_index, &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+int PWMSim::GetPeriodScale() const { return HALSIM_GetPWMPeriodScale(m_index); }
+
+void PWMSim::SetPeriodScale(int periodScale) {
+  HALSIM_SetPWMPeriodScale(m_index, periodScale);
+}
+
+std::unique_ptr<CallbackStore> PWMSim::RegisterZeroLatchCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      m_index, -1, callback, &HALSIM_CancelPWMZeroLatchCallback);
+  store->SetUid(HALSIM_RegisterPWMZeroLatchCallback(
+      m_index, &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+bool PWMSim::GetZeroLatch() const { return HALSIM_GetPWMZeroLatch(m_index); }
+
+void PWMSim::SetZeroLatch(bool zeroLatch) {
+  HALSIM_SetPWMZeroLatch(m_index, zeroLatch);
+}
+
+void PWMSim::ResetData() { HALSIM_ResetPWMData(m_index); }

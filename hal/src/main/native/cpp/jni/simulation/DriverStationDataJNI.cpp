@@ -327,6 +327,109 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setDsAttached
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    registerAllianceStationIdCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerAllianceStationIdCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterDriverStationAllianceStationIdCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    cancelAllianceStationIdCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelAllianceStationIdCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(
+      env, handle, &HALSIM_CancelDriverStationAllianceStationIdCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getAllianceStationId
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getAllianceStationId
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetDriverStationAllianceStationId();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setAllianceStationId
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setAllianceStationId
+  (JNIEnv*, jclass, jint value)
+{
+  HALSIM_SetDriverStationAllianceStationId(
+      static_cast<HAL_AllianceStationID>(value));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    registerMatchTimeCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_registerMatchTimeCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterDriverStationMatchTimeCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    cancelMatchTimeCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_cancelMatchTimeCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(env, handle,
+                                  &HALSIM_CancelDriverStationMatchTimeCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getMatchTime
+ * Signature: ()D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getMatchTime
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetDriverStationMatchTime();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setMatchTime
+ * Signature: (D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchTime
+  (JNIEnv*, jclass, jdouble value)
+{
+  HALSIM_SetDriverStationMatchTime(value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
  * Method:    setJoystickAxes
  * Signature: (B[F)V
  */
@@ -391,6 +494,38 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtons
   joystickButtons.count = count;
   joystickButtons.buttons = buttons;
   HALSIM_SetJoystickButtons(joystickNum, &joystickButtons);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getJoystickOutputs
+ * Signature: (I)J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getJoystickOutputs
+  (JNIEnv* env, jclass, jint stick)
+{
+  int64_t outputs = 0;
+  int32_t leftRumble;
+  int32_t rightRumble;
+  HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
+  return outputs;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    getJoystickRumble
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_getJoystickRumble
+  (JNIEnv* env, jclass, jint stick, jint rumbleNum)
+{
+  int64_t outputs;
+  int32_t leftRumble = 0;
+  int32_t rightRumble = 0;
+  HALSIM_GetJoystickOutputs(stick, &outputs, &leftRumble, &rightRumble);
+  return rumbleNum == 0 ? leftRumble : rightRumble;
 }
 
 /*
@@ -481,6 +616,198 @@ Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setSendConsoleLine
   } else {
     HALSIM_SetSendConsoleLine([](const char* line) { return 0; });
   }
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickButton
+ * Signature: (IIZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButton
+  (JNIEnv*, jclass, jint stick, jint button, jboolean state)
+{
+  HALSIM_SetJoystickButton(stick, button, state);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickAxis
+ * Signature: (IID)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxis
+  (JNIEnv*, jclass, jint stick, jint axis, jdouble value)
+{
+  HALSIM_SetJoystickAxis(stick, axis, value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickPOV
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOV
+  (JNIEnv*, jclass, jint stick, jint pov, jint value)
+{
+  HALSIM_SetJoystickPOV(stick, pov, value);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickButtonsValue
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonsValue
+  (JNIEnv*, jclass, jint stick, jint buttons)
+{
+  HALSIM_SetJoystickButtonsValue(stick, buttons);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickAxisCount
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxisCount
+  (JNIEnv*, jclass, jint stick, jint count)
+{
+  HALSIM_SetJoystickAxisCount(stick, count);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickPOVCount
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickPOVCount
+  (JNIEnv*, jclass, jint stick, jint count)
+{
+  HALSIM_SetJoystickPOVCount(stick, count);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickButtonCount
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickButtonCount
+  (JNIEnv*, jclass, jint stick, jint count)
+{
+  HALSIM_SetJoystickButtonCount(stick, count);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickIsXbox
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickIsXbox
+  (JNIEnv*, jclass, jint stick, jboolean isXbox)
+{
+  HALSIM_SetJoystickIsXbox(stick, isXbox);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickType
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickType
+  (JNIEnv*, jclass, jint stick, jint type)
+{
+  HALSIM_SetJoystickType(stick, type);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickName
+  (JNIEnv* env, jclass, jint stick, jstring name)
+{
+  HALSIM_SetJoystickName(stick, JStringRef{env, name}.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setJoystickAxisType
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setJoystickAxisType
+  (JNIEnv*, jclass, jint stick, jint axis, jint type)
+{
+  HALSIM_SetJoystickAxisType(stick, axis, type);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setGameSpecificMessage
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setGameSpecificMessage
+  (JNIEnv* env, jclass, jstring message)
+{
+  HALSIM_SetGameSpecificMessage(JStringRef{env, message}.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setEventName
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setEventName
+  (JNIEnv* env, jclass, jstring name)
+{
+  HALSIM_SetEventName(JStringRef{env, name}.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setMatchType
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchType
+  (JNIEnv*, jclass, jint type)
+{
+  HALSIM_SetMatchType(static_cast<HAL_MatchType>(static_cast<int>(type)));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setMatchNumber
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setMatchNumber
+  (JNIEnv*, jclass, jint matchNumber)
+{
+  HALSIM_SetMatchNumber(matchNumber);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DriverStationDataJNI
+ * Method:    setReplayNumber
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DriverStationDataJNI_setReplayNumber
+  (JNIEnv*, jclass, jint replayNumber)
+{
+  HALSIM_SetReplayNumber(replayNumber);
 }
 
 /*

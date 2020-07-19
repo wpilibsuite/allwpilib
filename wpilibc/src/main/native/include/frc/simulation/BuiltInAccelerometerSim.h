@@ -8,14 +8,15 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/AccelerometerData.h>
+#include <hal/Accelerometer.h>
 
-#include "CallbackStore.h"
-#include "frc/BuiltInAccelerometer.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
+
+class BuiltInAccelerometer;
+
 namespace sim {
 
 /**
@@ -26,88 +27,51 @@ class BuiltInAccelerometerSim {
   /**
    * Constructs for the first built-in accelerometer.
    */
-  BuiltInAccelerometerSim() : m_index{0} {}
+  BuiltInAccelerometerSim();
 
   /**
    * Constructs from a BuiltInAccelerometer object.
    *
    * @param accel BuiltInAccelerometer to simulate
    */
-  explicit BuiltInAccelerometerSim(const BuiltInAccelerometer& accel)
-      : m_index{0} {}
+  explicit BuiltInAccelerometerSim(const BuiltInAccelerometer& accel);
 
   std::unique_ptr<CallbackStore> RegisterActiveCallback(NotifyCallback callback,
-                                                        bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAccelerometerActiveCallback);
-    store->SetUid(HALSIM_RegisterAccelerometerActiveCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                        bool initialNotify);
 
-  bool GetActive() const { return HALSIM_GetAccelerometerActive(m_index); }
+  bool GetActive() const;
 
-  void SetActive(bool active) {
-    HALSIM_SetAccelerometerActive(m_index, active);
-  }
+  void SetActive(bool active);
 
   std::unique_ptr<CallbackStore> RegisterRangeCallback(NotifyCallback callback,
-                                                       bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAccelerometerRangeCallback);
-    store->SetUid(HALSIM_RegisterAccelerometerRangeCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                       bool initialNotify);
 
-  HAL_AccelerometerRange GetRange() const {
-    return HALSIM_GetAccelerometerRange(m_index);
-  }
+  HAL_AccelerometerRange GetRange() const;
 
-  void SetRange(HAL_AccelerometerRange range) {
-    HALSIM_SetAccelerometerRange(m_index, range);
-  }
+  void SetRange(HAL_AccelerometerRange range);
 
   std::unique_ptr<CallbackStore> RegisterXCallback(NotifyCallback callback,
-                                                   bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAccelerometerXCallback);
-    store->SetUid(HALSIM_RegisterAccelerometerXCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                   bool initialNotify);
 
-  double GetX() const { return HALSIM_GetAccelerometerX(m_index); }
+  double GetX() const;
 
-  void SetX(double x) { HALSIM_SetAccelerometerX(m_index, x); }
+  void SetX(double x);
 
   std::unique_ptr<CallbackStore> RegisterYCallback(NotifyCallback callback,
-                                                   bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAccelerometerYCallback);
-    store->SetUid(HALSIM_RegisterAccelerometerYCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                   bool initialNotify);
 
-  double GetY() const { return HALSIM_GetAccelerometerY(m_index); }
+  double GetY() const;
 
-  void SetY(double y) { HALSIM_SetAccelerometerY(m_index, y); }
+  void SetY(double y);
 
   std::unique_ptr<CallbackStore> RegisterZCallback(NotifyCallback callback,
-                                                   bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAccelerometerZCallback);
-    store->SetUid(HALSIM_RegisterAccelerometerZCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                   bool initialNotify);
 
-  double GetZ() const { return HALSIM_GetAccelerometerZ(m_index); }
+  double GetZ() const;
 
-  void SetZ(double z) { HALSIM_SetAccelerometerZ(m_index, z); }
+  void SetZ(double z);
 
-  void ResetData() { HALSIM_ResetAccelerometerData(m_index); }
+  void ResetData();
 
  private:
   int m_index;

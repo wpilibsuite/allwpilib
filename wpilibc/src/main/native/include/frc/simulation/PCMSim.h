@@ -8,15 +8,13 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/PCMData.h>
-
-#include "CallbackStore.h"
-#include "frc/Compressor.h"
-#include "frc/SensorUtil.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
+
+class Compressor;
+
 namespace sim {
 
 /**
@@ -25,151 +23,78 @@ namespace sim {
 class PCMSim {
  public:
   /**
+   * Constructs with the default PCM module number (CAN ID).
+   */
+  PCMSim();
+
+  /**
    * Constructs from a PCM module number (CAN ID).
    *
    * @param module module number
    */
-  explicit PCMSim(int module = SensorUtil::GetDefaultSolenoidModule())
-      : m_index{module} {}
+  explicit PCMSim(int module);
 
   /**
    * Constructs from a Compressor object.
    *
    * @param compressor Compressor connected to PCM to simulate
    */
-  explicit PCMSim(const Compressor& compressor)
-      : m_index{compressor.GetModule()} {}
+  explicit PCMSim(const Compressor& compressor);
 
   std::unique_ptr<CallbackStore> RegisterSolenoidInitializedCallback(
-      int channel, NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, channel, -1, callback,
-        &HALSIM_CancelPCMSolenoidInitializedCallback);
-    store->SetUid(HALSIM_RegisterPCMSolenoidInitializedCallback(
-        m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      int channel, NotifyCallback callback, bool initialNotify);
 
-  bool GetSolenoidInitialized(int channel) const {
-    return HALSIM_GetPCMSolenoidInitialized(m_index, channel);
-  }
+  bool GetSolenoidInitialized(int channel) const;
 
-  void SetSolenoidInitialized(int channel, bool solenoidInitialized) {
-    HALSIM_SetPCMSolenoidInitialized(m_index, channel, solenoidInitialized);
-  }
+  void SetSolenoidInitialized(int channel, bool solenoidInitialized);
 
   std::unique_ptr<CallbackStore> RegisterSolenoidOutputCallback(
-      int channel, NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, channel, -1, callback,
-        &HALSIM_CancelPCMSolenoidOutputCallback);
-    store->SetUid(HALSIM_RegisterPCMSolenoidOutputCallback(
-        m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      int channel, NotifyCallback callback, bool initialNotify);
 
-  bool GetSolenoidOutput(int channel) const {
-    return HALSIM_GetPCMSolenoidOutput(m_index, channel);
-  }
+  bool GetSolenoidOutput(int channel) const;
 
-  void SetSolenoidOutput(int channel, bool solenoidOutput) {
-    HALSIM_SetPCMSolenoidOutput(m_index, channel, solenoidOutput);
-  }
+  void SetSolenoidOutput(int channel, bool solenoidOutput);
 
   std::unique_ptr<CallbackStore> RegisterCompressorInitializedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelPCMCompressorInitializedCallback);
-    store->SetUid(HALSIM_RegisterPCMCompressorInitializedCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetCompressorInitialized() const {
-    return HALSIM_GetPCMCompressorInitialized(m_index);
-  }
+  bool GetCompressorInitialized() const;
 
-  void SetCompressorInitialized(bool compressorInitialized) {
-    HALSIM_SetPCMCompressorInitialized(m_index, compressorInitialized);
-  }
+  void SetCompressorInitialized(bool compressorInitialized);
 
   std::unique_ptr<CallbackStore> RegisterCompressorOnCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelPCMCompressorOnCallback);
-    store->SetUid(HALSIM_RegisterPCMCompressorOnCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetCompressorOn() const { return HALSIM_GetPCMCompressorOn(m_index); }
+  bool GetCompressorOn() const;
 
-  void SetCompressorOn(bool compressorOn) {
-    HALSIM_SetPCMCompressorOn(m_index, compressorOn);
-  }
+  void SetCompressorOn(bool compressorOn);
 
   std::unique_ptr<CallbackStore> RegisterClosedLoopEnabledCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelPCMClosedLoopEnabledCallback);
-    store->SetUid(HALSIM_RegisterPCMClosedLoopEnabledCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetClosedLoopEnabled() const {
-    return HALSIM_GetPCMClosedLoopEnabled(m_index);
-  }
+  bool GetClosedLoopEnabled() const;
 
-  void SetClosedLoopEnabled(bool closedLoopEnabled) {
-    HALSIM_SetPCMClosedLoopEnabled(m_index, closedLoopEnabled);
-  }
+  void SetClosedLoopEnabled(bool closedLoopEnabled);
 
   std::unique_ptr<CallbackStore> RegisterPressureSwitchCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelPCMPressureSwitchCallback);
-    store->SetUid(HALSIM_RegisterPCMPressureSwitchCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetPressureSwitch() const {
-    return HALSIM_GetPCMPressureSwitch(m_index);
-  }
+  bool GetPressureSwitch() const;
 
-  void SetPressureSwitch(bool pressureSwitch) {
-    HALSIM_SetPCMPressureSwitch(m_index, pressureSwitch);
-  }
+  void SetPressureSwitch(bool pressureSwitch);
 
   std::unique_ptr<CallbackStore> RegisterCompressorCurrentCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelPCMCompressorCurrentCallback);
-    store->SetUid(HALSIM_RegisterPCMCompressorCurrentCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  double GetCompressorCurrent() const {
-    return HALSIM_GetPCMCompressorCurrent(m_index);
-  }
+  double GetCompressorCurrent() const;
 
-  void SetCompressorCurrent(double compressorCurrent) {
-    HALSIM_SetPCMCompressorCurrent(m_index, compressorCurrent);
-  }
+  void SetCompressorCurrent(double compressorCurrent);
 
-  uint8_t GetAllSolenoidOutputs() {
-    uint8_t ret = 0;
-    HALSIM_GetPCMAllSolenoids(m_index, &ret);
-    return ret;
-  }
+  uint8_t GetAllSolenoidOutputs() const;
 
-  void SetAllSolenoidOutputs(uint8_t outputs) {
-    HALSIM_SetPCMAllSolenoids(m_index, outputs);
-  }
+  void SetAllSolenoidOutputs(uint8_t outputs);
 
-  void ResetData() { HALSIM_ResetPCMData(m_index); }
+  void ResetData();
 
  private:
   int m_index;

@@ -8,86 +8,51 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/SPIAccelerometerData.h>
-
-#include "CallbackStore.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
 namespace sim {
 class SPIAccelerometerSim {
  public:
-  explicit SPIAccelerometerSim(int index) { m_index = index; }
+  explicit SPIAccelerometerSim(int index);
 
   std::unique_ptr<CallbackStore> RegisterActiveCallback(NotifyCallback callback,
-                                                        bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelSPIAccelerometerActiveCallback);
-    store->SetUid(HALSIM_RegisterSPIAccelerometerActiveCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                        bool initialNotify);
 
-  bool GetActive() const { return HALSIM_GetSPIAccelerometerActive(m_index); }
+  bool GetActive() const;
 
-  void SetActive(bool active) {
-    HALSIM_SetSPIAccelerometerActive(m_index, active);
-  }
+  void SetActive(bool active);
 
   std::unique_ptr<CallbackStore> RegisterRangeCallback(NotifyCallback callback,
-                                                       bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelSPIAccelerometerRangeCallback);
-    store->SetUid(HALSIM_RegisterSPIAccelerometerRangeCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                       bool initialNotify);
 
-  int GetRange() const { return HALSIM_GetSPIAccelerometerRange(m_index); }
+  int GetRange() const;
 
-  void SetRange(int range) { HALSIM_SetSPIAccelerometerRange(m_index, range); }
+  void SetRange(int range);
 
   std::unique_ptr<CallbackStore> RegisterXCallback(NotifyCallback callback,
-                                                   bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelSPIAccelerometerXCallback);
-    store->SetUid(HALSIM_RegisterSPIAccelerometerXCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                   bool initialNotify);
 
-  double GetX() const { return HALSIM_GetSPIAccelerometerX(m_index); }
+  double GetX() const;
 
-  void SetX(double x) { HALSIM_SetSPIAccelerometerX(m_index, x); }
+  void SetX(double x);
 
   std::unique_ptr<CallbackStore> RegisterYCallback(NotifyCallback callback,
-                                                   bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelSPIAccelerometerYCallback);
-    store->SetUid(HALSIM_RegisterSPIAccelerometerYCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                   bool initialNotify);
 
-  double GetY() const { return HALSIM_GetSPIAccelerometerY(m_index); }
+  double GetY() const;
 
-  void SetY(double y) { HALSIM_SetSPIAccelerometerY(m_index, y); }
+  void SetY(double y);
 
   std::unique_ptr<CallbackStore> RegisterZCallback(NotifyCallback callback,
-                                                   bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelSPIAccelerometerZCallback);
-    store->SetUid(HALSIM_RegisterSPIAccelerometerZCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                   bool initialNotify);
 
-  double GetZ() const { return HALSIM_GetSPIAccelerometerZ(m_index); }
+  double GetZ() const;
 
-  void SetZ(double z) { HALSIM_SetSPIAccelerometerZ(m_index, z); }
+  void SetZ(double z);
 
-  void ResetData() { HALSIM_ResetSPIAccelerometerData(m_index); }
+  void ResetData();
 
  private:
   int m_index;

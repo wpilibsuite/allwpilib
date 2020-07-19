@@ -8,14 +8,13 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/PDPData.h>
-
-#include "CallbackStore.h"
-#include "frc/PowerDistributionPanel.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
+
+class PowerDistributionPanel;
+
 namespace sim {
 
 /**
@@ -28,85 +27,48 @@ class PDPSim {
    *
    * @param module module number
    */
-  explicit PDPSim(int module = 0) : m_index{module} {}
+  explicit PDPSim(int module = 0);
 
   /**
    * Constructs from a PowerDistributionPanel object.
    *
    * @param pdp PowerDistributionPanel to simulate
    */
-  explicit PDPSim(const PowerDistributionPanel& pdp)
-      : m_index{pdp.GetModule()} {}
+  explicit PDPSim(const PowerDistributionPanel& pdp);
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelPDPInitializedCallback);
-    store->SetUid(HALSIM_RegisterPDPInitializedCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetInitialized() const { return HALSIM_GetPDPInitialized(m_index); }
+  bool GetInitialized() const;
 
-  void SetInitialized(bool initialized) {
-    HALSIM_SetPDPInitialized(m_index, initialized);
-  }
+  void SetInitialized(bool initialized);
 
   std::unique_ptr<CallbackStore> RegisterTemperatureCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelPDPTemperatureCallback);
-    store->SetUid(HALSIM_RegisterPDPTemperatureCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  double GetTemperature() const { return HALSIM_GetPDPTemperature(m_index); }
+  double GetTemperature() const;
 
-  void SetTemperature(double temperature) {
-    HALSIM_SetPDPTemperature(m_index, temperature);
-  }
+  void SetTemperature(double temperature);
 
   std::unique_ptr<CallbackStore> RegisterVoltageCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelPDPVoltageCallback);
-    store->SetUid(HALSIM_RegisterPDPVoltageCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  double GetVoltage() const { return HALSIM_GetPDPVoltage(m_index); }
+  double GetVoltage() const;
 
-  void SetVoltage(double voltage) { HALSIM_SetPDPVoltage(m_index, voltage); }
+  void SetVoltage(double voltage);
 
   std::unique_ptr<CallbackStore> RegisterCurrentCallback(
-      int channel, NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, channel, -1, callback, &HALSIM_CancelPDPCurrentCallback);
-    store->SetUid(HALSIM_RegisterPDPCurrentCallback(
-        m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      int channel, NotifyCallback callback, bool initialNotify);
 
-  double GetCurrent(int channel) const {
-    return HALSIM_GetPDPCurrent(m_index, channel);
-  }
+  double GetCurrent(int channel) const;
 
-  void SetCurrent(int channel, double current) {
-    HALSIM_SetPDPCurrent(m_index, channel, current);
-  }
+  void SetCurrent(int channel, double current);
 
-  void GetAllCurrents(double* currents) {
-    HALSIM_GetPDPAllCurrents(m_index, currents);
-  }
+  void GetAllCurrents(double* currents) const;
 
-  void SetAllCurrents(const double* currents) {
-    HALSIM_SetPDPAllCurrents(m_index, currents);
-  }
+  void SetAllCurrents(const double* currents);
 
-  void ResetData() { HALSIM_ResetPDPData(m_index); }
+  void ResetData();
 
  private:
   int m_index;

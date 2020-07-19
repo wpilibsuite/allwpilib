@@ -8,15 +8,13 @@
 #pragma once
 
 #include <memory>
-#include <utility>
 
-#include <hal/simulation/AnalogGyroData.h>
-
-#include "CallbackStore.h"
-#include "frc/AnalogGyro.h"
-#include "frc/AnalogInput.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
+
+class AnalogGyro;
+
 namespace sim {
 
 /**
@@ -29,60 +27,37 @@ class AnalogGyroSim {
    *
    * @param gyro AnalogGyro to simulate
    */
-  explicit AnalogGyroSim(const AnalogGyro& gyro)
-      : m_index{gyro.GetAnalogInput()->GetChannel()} {}
+  explicit AnalogGyroSim(const AnalogGyro& gyro);
 
   /**
    * Constructs from an analog input channel number.
    *
    * @param channel Channel number
    */
-  explicit AnalogGyroSim(int channel) : m_index{channel} {}
+  explicit AnalogGyroSim(int channel);
 
   std::unique_ptr<CallbackStore> RegisterAngleCallback(NotifyCallback callback,
-                                                       bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAnalogGyroAngleCallback);
-    store->SetUid(HALSIM_RegisterAnalogGyroAngleCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                       bool initialNotify);
 
-  double GetAngle() const { return HALSIM_GetAnalogGyroAngle(m_index); }
+  double GetAngle() const;
 
-  void SetAngle(double angle) { HALSIM_SetAnalogGyroAngle(m_index, angle); }
+  void SetAngle(double angle);
 
   std::unique_ptr<CallbackStore> RegisterRateCallback(NotifyCallback callback,
-                                                      bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAnalogGyroRateCallback);
-    store->SetUid(HALSIM_RegisterAnalogGyroRateCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+                                                      bool initialNotify);
 
-  double GetRate() const { return HALSIM_GetAnalogGyroRate(m_index); }
+  double GetRate() const;
 
-  void SetRate(double rate) { HALSIM_SetAnalogGyroRate(m_index, rate); }
+  void SetRate(double rate);
 
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
-      NotifyCallback callback, bool initialNotify) {
-    auto store = std::make_unique<CallbackStore>(
-        m_index, -1, callback, &HALSIM_CancelAnalogGyroInitializedCallback);
-    store->SetUid(HALSIM_RegisterAnalogGyroInitializedCallback(
-        m_index, &CallbackStoreThunk, store.get(), initialNotify));
-    return store;
-  }
+      NotifyCallback callback, bool initialNotify);
 
-  bool GetInitialized() const {
-    return HALSIM_GetAnalogGyroInitialized(m_index);
-  }
+  bool GetInitialized() const;
 
-  void SetInitialized(bool initialized) {
-    HALSIM_SetAnalogGyroInitialized(m_index, initialized);
-  }
+  void SetInitialized(bool initialized);
 
-  void ResetData() { HALSIM_ResetAnalogGyroData(m_index); }
+  void ResetData();
 
  private:
   int m_index;

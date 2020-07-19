@@ -11,7 +11,6 @@
 #include <utility>
 
 #include <frc/simulation/DriverStationSim.h>
-#include <hal/simulation/MockHooks.h>
 
 #include "ErrorConfirmer.h"
 #include "frc2/command/CommandGroupBase.h"
