@@ -9,8 +9,6 @@
 #include <frc2/command/Subsystem.h>
 #include <frc2/command/SwerveControllerCommand.h>
 
-#include <iostream>
-
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
@@ -18,6 +16,7 @@
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <wpi/math>
 
@@ -60,6 +59,10 @@ class SwerveControllerCommandTest : public ::testing::Test {
   frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 0_rad,
                                          frc::Pose2d{0_m, 0_m, 0_rad}};
 
+  void SetUp() override { frc::sim::PauseTiming(); }
+
+  void TearDown() override { frc::sim::ResumeTiming(); }
+
   std::array<frc::SwerveModuleState, 4> getCurrentWheelSpeeds() {
     return m_moduleStates;
   }
@@ -71,7 +74,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
 };
 
 TEST_F(SwerveControllerCommandTest, ReachesReference) {
-  frc2::Subsystem subsystem{};
+  frc2::Subsystem subsystem;
 
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};
@@ -89,10 +92,12 @@ TEST_F(SwerveControllerCommandTest, ReachesReference) {
 
   m_timer.Reset();
   m_timer.Start();
+
   command.Initialize();
   while (!command.IsFinished()) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
+    frc::sim::StepTiming(5_ms);
   }
   m_timer.Stop();
   command.End(false);
