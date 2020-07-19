@@ -12,6 +12,11 @@ import java.util.function.BiConsumer;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+/**
+ * Class for handling asynchrounous interrupts.
+ *
+ * <p>Synchronous interrupts are handled by the SynchronousInterrupt class.
+ */
 public class AsynchronousInterrupt implements AutoCloseable {
   private final BiConsumer<Boolean, Boolean> m_callback;
   private final SynchronousInterrupt m_interrupt;
@@ -19,17 +24,37 @@ public class AsynchronousInterrupt implements AutoCloseable {
   private final AtomicBoolean m_keepRunning = new AtomicBoolean(false);
   private Thread m_thread;
 
+  /**
+   * Construct a new asynchronous interrupt using a Digital Source.
+   *
+   * <p>At construction, the interrupt will trigger on the rising edge.
+   *
+   * <p>Callbacks will not be triggered until enable() is called.
+   *
+   * @param source The digital source to use.
+   * @param callback The callback to call on an interrupt
+   */
   public AsynchronousInterrupt(DigitalSource source, BiConsumer<Boolean, Boolean> callback) {
     m_callback = requireNonNullParam(callback, "callback", "AsynchronousInterrupt");
     m_interrupt = new SynchronousInterrupt(source);
   }
 
+  /**
+   * Closes the interrupt.
+   *
+   * <p>This does not close the associated digital source.
+   *
+   * <p>This will disable the interrupt if it is enabled.
+   */
   @Override
   public void close() throws Exception {
     disable();
     m_interrupt.close();
   }
 
+  /**
+   * Enable interrupts to trigger.
+   */
   public void enable() {
     if (m_keepRunning.get()) {
       return;
@@ -39,6 +64,9 @@ public class AsynchronousInterrupt implements AutoCloseable {
     m_thread = new Thread(this::threadMain);
   }
 
+  /**
+   * Disable interrupts from triggering.
+   */
   public void disable() {
     m_keepRunning.set(false);
     m_interrupt.wakeupWaitingInterrupt();
@@ -55,14 +83,36 @@ public class AsynchronousInterrupt implements AutoCloseable {
     }
   }
 
+  /**
+   * Set which edges to trigger the interrupt on.
+   *
+   * @param risingEdge Trigger on rising edge
+   * @param fallingEdge Trigger on falling edge
+   */
   public void setInterruptEdges(boolean risingEdge, boolean fallingEdge) {
     m_interrupt.setInterruptEdges(risingEdge, fallingEdge);
   }
 
+  /**
+   * Get the timestamp of the last rising edge.
+   *
+   * <p>This function does not require the interrupt to be enabled to work.
+   *
+   * <p>This only works if rising edge was configured using setInterruptEdges.
+   * @return the timestamp in seconds relative to getFPGATime
+   */
   public double getRisingTimestamp() {
     return m_interrupt.getRisingTimestamp();
   }
 
+  /**
+   * Get the timestamp of the last falling edge.
+   *
+   * <p>This function does not require the interrupt to be enabled to work.
+   *
+   * <p>This only works if falling edge was configured using setInterruptEdges.
+   * @return the timestamp in seconds relative to getFPGATime
+   */
   public double getFallingTimestamp() {
     return m_interrupt.getFallingTimestamp();
   }

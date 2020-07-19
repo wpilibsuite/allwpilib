@@ -15,6 +15,11 @@
 #include <utility>
 
 namespace frc {
+/**
+ * Class for handling sychronous interrupts.
+ *
+ * <p>Asynchronous interrupts are handled by the AsynchronousInterrupt class.
+ */
 class AsynchronousInterrupt {
   explicit AsynchronousInterrupt(DigitalSource& source,
                                  std::function<void(bool, bool)> callback);

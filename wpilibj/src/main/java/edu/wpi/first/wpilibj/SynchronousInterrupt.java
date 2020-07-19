@@ -7,13 +7,17 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Objects;
-
 import edu.wpi.first.hal.InterruptJNI;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+/**
+ * Class for handling sychronous interrupts.
+ *
+ * <p>Asynchronous interrupts are handled by the AsynchronousInterrupt class.
+ */
 public class SynchronousInterrupt implements AutoCloseable {
+  @SuppressWarnings("PMD.SingularField")
   private final DigitalSource m_source;
   private final int m_handle;
 
@@ -41,23 +45,55 @@ public class SynchronousInterrupt implements AutoCloseable {
     }
   }
 
+  /**
+   * Constructs a new synchronous interrupt using a DigitalSource.
+   *
+   * <p>At construction, the interrupt will trigger on the rising edge.
+   *
+   * @param source The digital source to use.
+   */
   public SynchronousInterrupt(DigitalSource source) {
     m_source = requireNonNullParam(source, "source", "SynchronousInterrupt");
     m_handle = InterruptJNI.initializeInterrupts(true);
     InterruptJNI.requestInterrupts(m_handle, m_source.getPortHandleForRouting(),
-      m_source.getAnalogTriggerTypeForRouting());
+        m_source.getAnalogTriggerTypeForRouting());
+    InterruptJNI.setInterruptUpSourceEdge(m_handle, true, false);
   }
 
-
+  /**
+   * Closes the interrupt.
+   *
+   * <p>This does not close the associated digital source.
+   */
   @Override
   public void close() throws Exception {
     InterruptJNI.cleanInterrupts(m_handle);
   }
 
+  /**
+   * Wait for interrupt that returns the raw result value from the hardware.
+   *
+   * <p>Used by AsynchronousInterrupt. Users prefer to use waitForInterrupt.
+   *
+   * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
+   * @param ignorePrevious True to ignore if a previous interrupt has occured,
+   *     and only wait for a new trigger. False will consider if an interrupt has occured
+   *     since the last time the interrupt was read.
+   * @return The raw hardware interrupt result
+   */
   int waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
     return InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
   }
 
+  /**
+   * Wait for an interrupt.
+   *
+   * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
+   * @param ignorePrevious True to ignore if a previous interrupt has occured,
+   *     and only wait for a new trigger. False will consider if an interrupt has occured
+   *     since the last time the interrupt was read.
+   * @return Result of which edges were triggered, or if an timeout occured.
+   */
   public WaitResult waitForInterrupt(double timeoutSeconds, boolean ignorePrevious) {
     int result = InterruptJNI.waitForInterrupt(m_handle, timeoutSeconds, ignorePrevious);
 
@@ -70,18 +106,39 @@ public class SynchronousInterrupt implements AutoCloseable {
     return WaitResult.getValue(rising, falling);
   }
 
+  /**
+   * Set which edges to trigger the interrupt on.
+   *
+   * @param risingEdge Trigger on rising edge
+   * @param fallingEdge Trigger on falling edge
+   */
   public void setInterruptEdges(boolean risingEdge, boolean fallingEdge) {
     InterruptJNI.setInterruptUpSourceEdge(m_handle, risingEdge, fallingEdge);
   }
 
+  /**
+   * Get the timestamp of the last rising edge.
+   *
+   * <p>This only works if rising edge was configured using setInterruptEdges.
+   * @return the timestamp in seconds relative to getFPGATime
+   */
   public double getRisingTimestamp() {
     return InterruptJNI.readInterruptRisingTimestamp(m_handle) * 1e-6;
   }
 
+  /**
+   * Get the timestamp of the last falling edge.
+   *
+   * <p>This only works if falling edge was configured using setInterruptEdges.
+   * @return the timestamp in seconds relative to getFPGATime
+   */
   public double getFallingTimestamp() {
     return InterruptJNI.readInterruptFallingTimestamp(m_handle) * 1e-6;
   }
 
+  /**
+   * Force triggering of any waiting interrupt, which will be seen as a timeout.
+   */
   public void wakeupWaitingInterrupt() {
     InterruptJNI.releaseWaitingInterrupt(m_handle);
   }
