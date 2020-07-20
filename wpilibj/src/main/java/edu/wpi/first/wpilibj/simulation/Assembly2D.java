@@ -27,7 +27,7 @@ public class Assembly2D {
   public void setLigamentAngle(String ligamentPath, float angle) {
       ligamentPath = ligamentPath + "angle/";
     if (m_device != null) {
-        System.out.println("java: " + ligamentPath + " " + angle);
+//        System.out.println("java: " + ligamentPath + " " + angle);
         if(!createdItems.containsKey(ligamentPath)){
             createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
         } else{
@@ -44,7 +44,7 @@ public class Assembly2D {
      */
   public void setLigamentLength(String ligamentPath, float length) {
       ligamentPath = ligamentPath + "length/";
-      System.out.println("java length : " + ligamentPath + " " + length);
+//      System.out.println("java length : " + ligamentPath + " " + length);
     if (m_device != null) {
         if(!createdItems.containsKey(ligamentPath)){
             createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));

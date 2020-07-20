@@ -105,30 +105,31 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
         hal::SimDouble m_lHandle;
         double m_a = 0;
         double m_l = 0;
+
         // Get the smallest of width or height
         int minSize;
 
-        if (ImGui::GetWindowHeight() > ImGui::GetWindowWidth()) {
-            minSize = ImGui::GetWindowWidth();
-        } else {
-            minSize = ImGui::GetWindowHeight();
-        }
+        // Find the min size of the window
+        minSize = ImGui::GetWindowHeight() > ImGui::GetWindowWidth() ?
+                ImGui::GetWindowWidth() : ImGui::GetWindowHeight();
 
 
         if (m_devHandle == 0) m_devHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
-//        if (m_devHandle == 0) return;
 
+        // Get the length
         if (!m_lHandle) m_lHandle = HALSIM_GetSimValueHandle(m_devHandle, (bodyConfig.name + "length/").c_str());
         if (m_lHandle) m_l = m_lHandle.Get();
-//        else m_l = bodyConfig.length;
+        if (m_l <= 0) {
+            m_l = bodyConfig.length;
+        }
+
+        // Get the angle
         if (!m_aHandle) m_aHandle = HALSIM_GetSimValueHandle(m_devHandle, (bodyConfig.name + "angle/").c_str());
         if (m_aHandle) m_a = m_aHandle.Get();
         else m_a = 0;
-        wpi::outs() << (bodyConfig.name + "length/").c_str() << " " << std::to_string(m_l) << "\n";
+//        wpi::outs() << (bodyConfig.name + "length/").c_str() << " " << std::to_string(m_l) << "\n";
 
-        if(m_l <= 0){
-            m_l = bodyConfig.length;
-        }
+
         // Calculate the next angle to go to
         int angleToGoTo = m_a + bodyConfig.angle + previousAngle;
 
