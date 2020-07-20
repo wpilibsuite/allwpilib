@@ -116,10 +116,10 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
         if (m_devHandle == 0) m_devHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
 //        if (m_devHandle == 0) return;
 
-        if (!m_aHandle) m_aHandle = HALSIM_GetSimValueHandle(m_devHandle, bodyConfig.name.c_str());
+        if (!m_aHandle) m_aHandle = HALSIM_GetSimValueHandle(m_devHandle, (bodyConfig.name + "angle/").c_str());
         if (m_aHandle) m_a = m_aHandle.Get();
         else m_a = 0;
-        wpi::outs() << bodyConfig.name << " " << std::to_string(m_a) << "\n";
+        wpi::outs() << (bodyConfig.name + "angle/").c_str() << " " << std::to_string(m_a) << "\n";
 
         // Calculate the next angle to go to
         int angleToGoTo = m_a + bodyConfig.angle + previousAngle;
@@ -226,16 +226,6 @@ static std::list<BodyConfig> readJson(std::string jFile) {
 
     } catch (const wpi::json::exception &e) {
         wpi::errs() << "could not read body: " << e.what() << '\n';
-    }
-    try {
-        windowHeight = j.at("windowHeight").get<int>();
-    } catch (const wpi::json::exception &e) {
-        wpi::errs() << "Could not find windowHeight path: " << e.what() << '\n';
-    }
-    try {
-        windowWidth = j.at("windowWidth").get<int>();
-    } catch (const wpi::json::exception &e) {
-        wpi::errs() << "Could not find windowWidth path: " << e.what() << '\n';
     }
     return cList;
 }

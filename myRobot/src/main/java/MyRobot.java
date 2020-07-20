@@ -58,10 +58,10 @@ public class MyRobot extends TimedRobot {
      */
   @Override
   public void robotPeriodic() {
-  assembly2D.setLigamentPose("/JasonOne/one/", counter++);
+  assembly2D.setLigamentAngle("/JasonOne/one/", counter++);
   if(counter > 90){
     counter = -90;
   }
-  assembly2D.setLigamentPose("/JasonOne/one/two/", counter / 4);
+  assembly2D.setLigamentAngle("/JasonOne/one/two/", counter / 4);
   }
 }
