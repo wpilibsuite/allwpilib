@@ -102,7 +102,9 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
                           const std::list<BodyConfig> &subBodyConfigs, ImVec2 windowPos) {
     for (BodyConfig const &bodyConfig : subBodyConfigs) {
         hal::SimDouble m_aHandle;
-        double m_a;
+        hal::SimDouble m_lHandle;
+        double m_a = 0;
+        double m_l = 0;
         // Get the smallest of width or height
         int minSize;
 
@@ -116,17 +118,23 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
         if (m_devHandle == 0) m_devHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
 //        if (m_devHandle == 0) return;
 
+        if (!m_lHandle) m_lHandle = HALSIM_GetSimValueHandle(m_devHandle, (bodyConfig.name + "length/").c_str());
+        if (m_lHandle) m_l = m_lHandle.Get();
+//        else m_l = bodyConfig.length;
         if (!m_aHandle) m_aHandle = HALSIM_GetSimValueHandle(m_devHandle, (bodyConfig.name + "angle/").c_str());
         if (m_aHandle) m_a = m_aHandle.Get();
         else m_a = 0;
-        wpi::outs() << (bodyConfig.name + "angle/").c_str() << " " << std::to_string(m_a) << "\n";
+        wpi::outs() << (bodyConfig.name + "length/").c_str() << " " << std::to_string(m_l) << "\n";
 
+        if(m_l <= 0){
+            m_l = bodyConfig.length;
+        }
         // Calculate the next angle to go to
         int angleToGoTo = m_a + bodyConfig.angle + previousAngle;
 
         // Draw the first line and get the ending coordinates
         auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
-                                           (minSize / 100) * bodyConfig.length, angleToGoTo, drawList,
+                                           (minSize / 100) * m_l, angleToGoTo, drawList,
                                            windowPos, colorLookUpTable[bodyConfig.color], bodyConfig, "");
 
         // If the line has children then draw them with the stating points being the end of the parent

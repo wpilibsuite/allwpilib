@@ -9,8 +9,6 @@
       "length": 10,
       "color": "blue",
       "angle": 0,
-      "minAngle": -30,
-      "maxAngle": 30,
       "children":[
         {
           "name": "two",

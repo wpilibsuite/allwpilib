@@ -44,6 +44,7 @@ public class Assembly2D {
      */
   public void setLigamentLength(String ligamentPath, float length) {
       ligamentPath = ligamentPath + "length/";
+      System.out.println("java length : " + ligamentPath + " " + length);
     if (m_device != null) {
         if(!createdItems.containsKey(ligamentPath)){
             createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));

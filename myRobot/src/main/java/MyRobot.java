@@ -63,5 +63,6 @@ public class MyRobot extends TimedRobot {
     counter = -90;
   }
   assembly2D.setLigamentAngle("/JasonOne/one/two/", counter / 4);
+  assembly2D.setLigamentLength("/JasonOne/one/two/", counter);
   }
 }
