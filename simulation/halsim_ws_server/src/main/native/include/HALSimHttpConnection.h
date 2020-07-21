@@ -42,7 +42,7 @@ class HALSimHttpConnection
 
  public:
   // callable from any thread
-  void OnSimValueChanged(const wpi::json& msg);
+  void OnSimValueChanged(const wpi::json& msg) override;
 
  protected:
   void ProcessRequest() override;

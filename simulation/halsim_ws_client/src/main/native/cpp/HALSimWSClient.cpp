@@ -88,7 +88,7 @@ bool HALSimWS::Initialize() {
       });
 
   m_tcp_client->closed.connect(
-      [this]() { wpi::errs() << "TCP connection closed\n"; });
+      []() { wpi::errs() << "TCP connection closed\n"; });
 
   // Set up the connection timer
   m_connect_timer = uv::Timer::Create(m_loop);

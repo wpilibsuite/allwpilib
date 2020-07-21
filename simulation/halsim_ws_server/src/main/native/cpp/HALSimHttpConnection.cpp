@@ -222,7 +222,9 @@ void HALSimHttpConnection::SendFileResponse(int code,
   Sendfile(m_stream.GetLoopRef(), uv_open_osfhandle(outfd), infd, 0,
            status.getSize(),
            [infd, closeAfter = !m_keepAlive, stream = &m_stream] {
-             //  ::close(infd);
+             wpi::sys::fs::file_t file = uv_get_osfhandle(infd);
+             wpi::sys::fs::closeFile(file);
+
              if (closeAfter)
                stream->Close();
              else
