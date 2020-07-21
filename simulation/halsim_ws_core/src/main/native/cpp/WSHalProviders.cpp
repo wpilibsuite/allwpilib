@@ -75,15 +75,17 @@ void HALSimWSHalProvider::OnSimCallback(const char* cbName) {
     auto ws = m_ws.lock();
     if (ws) {
       wpi::json netValue = {
-          {m_key, diff},
-      };
+          {"type", m_type}, {"device", m_deviceId}, {"data", diff}};
       ws->OnSimValueChanged(netValue);
     }
   }
 }
 
 HALSimWSHalChanProvider::HALSimWSHalChanProvider(int32_t channel,
-                                                 const std::string& key)
-    : HALSimWSHalProvider(key), m_channel(channel) {}
+                                                 const std::string& key,
+                                                 const std::string& type)
+    : HALSimWSHalProvider(key, type), m_channel(channel) {
+  m_deviceId = std::to_string(channel);
+}
 
 }  // namespace wpilibws

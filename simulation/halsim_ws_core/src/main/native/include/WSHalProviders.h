@@ -48,7 +48,8 @@ class HALSimWSHalProvider : public HALSimWSBaseProvider {
 // provider generates per-channel diffs
 class HALSimWSHalChanProvider : public HALSimWSHalProvider {
  public:
-  explicit HALSimWSHalChanProvider(int32_t channel, const std::string& key);
+  explicit HALSimWSHalChanProvider(int32_t channel, const std::string& key,
+                                   const std::string& type);
 
  protected:
   int32_t m_channel;

@@ -19,7 +19,8 @@ namespace wpilibws {
 
 class HALSimWSBaseProvider {
  public:
-  explicit HALSimWSBaseProvider(const std::string& key);
+  explicit HALSimWSBaseProvider(const std::string& key,
+                                const std::string& type = "");
   virtual ~HALSimWSBaseProvider() {}
 
   HALSimWSBaseProvider(const HALSimWSBaseProvider&) = delete;
@@ -34,10 +35,16 @@ class HALSimWSBaseProvider {
   // network -> sim
   virtual void OnNetValueChanged(const wpi::json& json);
 
+  const std::string GetDeviceType() { return m_type; }
+  const std::string GetDeviceId() { return m_deviceId; }
+
  protected:
   // sim -> network
   std::weak_ptr<HALSimBaseWebSocketConnection> m_ws;
   std::string m_key;
+
+  std::string m_type;
+  std::string m_deviceId = "";
 };
 
 }  // namespace wpilibws

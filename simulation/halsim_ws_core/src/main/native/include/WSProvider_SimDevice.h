@@ -30,8 +30,11 @@ struct SimDeviceValueData {
 
 class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
  public:
-  HALSimWSProviderSimDevice(HAL_SimDeviceHandle handle, const std::string& key)
-      : HALSimWSBaseProvider(key), m_handle(handle) {}
+  HALSimWSProviderSimDevice(HAL_SimDeviceHandle handle, const std::string& key,
+                            const std::string& deviceId)
+      : HALSimWSBaseProvider(key, "SimDevices"), m_handle(handle) {
+    m_deviceId = deviceId;
+  }
 
   void Initialize();
 

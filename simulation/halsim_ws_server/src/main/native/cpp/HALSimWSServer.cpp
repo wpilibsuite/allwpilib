@@ -127,12 +127,21 @@ void HALSimWeb::CloseWebsocket(
 }
 
 void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
-  // TODO: error handling for bad keys
-  for (auto iter = msg.cbegin(); iter != msg.cend(); ++iter) {
-    auto provider = m_providers.Get(iter.key());
+  // Look for "type" and "device" fields so that we can
+  // generate the key
+
+  try {
+    std::string type = msg.at("type").get<std::string>();
+    std::string device = msg.at("device").get<std::string>();
+    auto data = msg.at("data");
+
+    auto key = type + "/" + device;
+    auto provider = m_providers.Get(key);
     if (provider) {
-      provider->OnNetValueChanged(iter.value());
+      provider->OnNetValueChanged(data);
     }
+  } catch (wpi::json::exception& e) {
+    wpi::errs() << "Error with incoming message: " << e.what() << "\n";
   }
 }
 

@@ -123,7 +123,8 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
 void HALSimWSProviderSimDevices::DeviceCreatedCallback(
     const char* name, HAL_SimDeviceHandle handle) {
   auto key = (wpi::Twine("SimDevices/") + name).str();
-  auto dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key);
+  auto dev = std::make_shared<HALSimWSProviderSimDevice>(
+      handle, key, wpi::Twine(name).str());
   m_providers.Add(key, dev);
   dev->Initialize();
 }
