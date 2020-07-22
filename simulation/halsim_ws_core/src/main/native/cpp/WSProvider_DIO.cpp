@@ -19,12 +19,30 @@ void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 wpi::json HALSimWSProviderDIO::OnSimValueChanged(const char* cbName) {
-  return {
-      {"<init", static_cast<bool>(HALSIM_GetDIOInitialized(m_channel))},
-      {"<>value", static_cast<bool>(HALSIM_GetDIOValue(m_channel))},
-      {"<pulse_length", HALSIM_GetDIOPulseLength(m_channel)},
-      {"<input", static_cast<bool>(HALSIM_GetDIOIsInput(m_channel))},
-  };
+  std::string cbType(cbName);
+
+  if (cbType == "Initialized") {
+    return {
+      {"<init", static_cast<bool>(HALSIM_GetDIOInitialized(m_channel))}
+    };
+  }
+  else if (cbType == "Value") {
+    return {
+      {"<>value", static_cast<bool>(HALSIM_GetDIOValue(m_channel))}
+    };
+  }
+  else if (cbType == "PulseLength") {
+    return {
+      {"<pulse_length", HALSIM_GetDIOPulseLength(m_channel)}
+    };
+  }
+  else if (cbType == "IsInput") {
+    return {
+      {"<input", static_cast<bool>(HALSIM_GetDIOIsInput(m_channel))}
+    };
+  }
+
+  return {};
 }
 
 void HALSimWSProviderDIO::OnNetValueChanged(const wpi::json& json) {

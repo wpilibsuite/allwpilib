@@ -13,6 +13,8 @@
 #include <hal/Ports.h>
 #include <hal/simulation/DriverStationData.h>
 
+#include <wpi/raw_ostream.h>
+
 namespace wpilibws {
 
 void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
@@ -25,63 +27,72 @@ void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 wpi::json HALSimWSProviderDriverStation::OnSimValueChanged(const char* cbName) {
-  wpi::json joysticks;
-  for (int i = 0; i < HAL_kMaxJoysticks; i++) {
-    HAL_JoystickAxes axes;
-    HAL_GetJoystickAxes(i, &axes);
-    std::vector<float> axes_v(axes.axes, axes.axes + axes.count);
+  std::string cbType(cbName);
 
-    HAL_JoystickButtons buttons;
-    HAL_GetJoystickButtons(i, &buttons);
-    std::vector<bool> buttons_v((size_t)buttons.count);
-    for (uint8_t i = 0; i < buttons.count; i++) {
-      buttons_v[i] = static_cast<bool>(buttons.buttons & 1 << (i - 1));
+  if (cbType == "Enabled") {
+    return {
+      {">enabled", static_cast<bool>(HALSIM_GetDriverStationEnabled())}
+    };
+  }
+  else if (cbType == "Autonomous") {
+    return {
+      {">autonomous", static_cast<bool>(HALSIM_GetDriverStationAutonomous())},
+    };
+  }
+  else if (cbType == "Test") {
+    return {
+      {">test", static_cast<bool>(HALSIM_GetDriverStationTest())}
+    };
+  }
+  else if (cbType == "EStop") {
+    return {
+      {">estop", static_cast<bool>(HALSIM_GetDriverStationEStop())}
+    };
+  }
+  else if (cbType == "FmsAttached") {
+    return {
+      {">fms", static_cast<bool>(HALSIM_GetDriverStationFmsAttached())}
+    };
+  }
+  else if (cbType == "DsAttached") {
+    return {
+      {">ds", static_cast<bool>(HALSIM_GetDriverStationDsAttached())}
+    };
+  }
+  else if (cbType == "AllianceStationId") {
+    std::string station;
+    switch (HALSIM_GetDriverStationAllianceStationId()) {
+      case HAL_AllianceStationID_kRed1:
+        station = "red1";
+        break;
+      case HAL_AllianceStationID_kBlue1:
+        station = "blue1";
+        break;
+      case HAL_AllianceStationID_kRed2:
+        station = "red2";
+        break;
+      case HAL_AllianceStationID_kBlue2:
+        station = "blue2";
+        break;
+      case HAL_AllianceStationID_kRed3:
+        station = "red3";
+        break;
+      case HAL_AllianceStationID_kBlue3:
+        station = "blue3";
+        break;
     }
 
-    HAL_JoystickPOVs povs;
-    HAL_GetJoystickPOVs(i, &povs);
-    std::vector<int16_t> povs_v(povs.povs, povs.povs + povs.count);
-
-    joysticks[std::to_string(i)] = {
-        {">buttons", buttons_v},
-        {">povs", povs_v},
-        {">axes", axes_v},
+    return {
+      {">station", station}
+    };
+  }
+  else if (cbType == "MatchTime") {
+    return {
+      {"<match_time", HALSIM_GetDriverStationMatchTime()}
     };
   }
 
-  std::string station;
-  switch (HALSIM_GetDriverStationAllianceStationId()) {
-    case HAL_AllianceStationID_kRed1:
-      station = "red1";
-      break;
-    case HAL_AllianceStationID_kBlue1:
-      station = "blue1";
-      break;
-    case HAL_AllianceStationID_kRed2:
-      station = "red2";
-      break;
-    case HAL_AllianceStationID_kBlue2:
-      station = "blue2";
-      break;
-    case HAL_AllianceStationID_kRed3:
-      station = "red3";
-      break;
-    case HAL_AllianceStationID_kBlue3:
-      station = "blue3";
-      break;
-  }
-
-  return {
-      {">enabled", static_cast<bool>(HALSIM_GetDriverStationEnabled())},
-      {">autonomous", static_cast<bool>(HALSIM_GetDriverStationAutonomous())},
-      {">test", static_cast<bool>(HALSIM_GetDriverStationTest())},
-      {">estop", static_cast<bool>(HALSIM_GetDriverStationEStop())},
-      {">fms", static_cast<bool>(HALSIM_GetDriverStationFmsAttached())},
-      {">ds", static_cast<bool>(HALSIM_GetDriverStationDsAttached())},
-      {"<match_time", HALSIM_GetDriverStationMatchTime()},
-      {">station", station},
-      {"joysticks", joysticks},
-  };
+  return {};
 }
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
@@ -126,7 +137,16 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
     auto joysticks = it.value();
     for (auto jit = joysticks.cbegin(); jit != joysticks.cend(); ++jit) {
       auto stick = jit.value();
-      auto num = std::stoi(jit.key());
+
+      int num;
+      try {
+        num = std::stoi(jit.key());
+      }
+      catch (const std::invalid_argument& err) {
+        wpi::errs() << "Error converting Joystick number. Skipping. "
+                    << err.what() << "\n";
+        continue;
+      }
 
       if ((it = stick.find(">axes")) != stick.end()) {
         HAL_JoystickAxes axes{};

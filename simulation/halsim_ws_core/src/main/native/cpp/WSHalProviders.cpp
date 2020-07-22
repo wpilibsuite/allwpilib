@@ -9,41 +9,11 @@
 
 namespace wpilibws {
 
-static void performDiff(const wpi::json& last, const wpi::json& result,
-                        wpi::json& out) {
-  for (auto iter = result.cbegin(); iter != result.cend(); ++iter) {
-    auto key = iter.key();
-    auto value = iter.value();
-    auto otherIter = last.find(key);
-    if (otherIter == last.end()) {
-      out[key] = value;
-    } else {
-      auto otherValue = otherIter.value();
-
-      // object comparisons should recurse
-      if (value.type() == wpi::json::value_t::object) {
-        wpi::json vout;
-        performDiff(otherValue, value, vout);
-        if (!vout.empty()) {
-          out[key] = vout;
-        }
-
-        // everything else is just a comparison
-        // .. this would be inefficient with an array of objects, so don't do
-        // that!
-      } else if (otherValue != value) {
-        out[key] = value;
-      }
-    }
-  }
-}
-
 void HALSimWSHalProvider::OnNetworkConnected(
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
   {
     std::lock_guard lock(mutex);
-    // previous values don't matter anymore
-    last.clear();
+    
     // store a weak reference to the websocket object
     m_ws = ws;
   }
@@ -51,7 +21,7 @@ void HALSimWSHalProvider::OnNetworkConnected(
   // trigger a send of the current state
   // -> even if this gets called before, it's ok, because we cleared the
   //    state above atomically
-  OnSimCallback("");
+  OnSimCallback(""); // TODO Should we send a full state message?
 }
 
 void HALSimWSHalProvider::OnStaticSimCallback(const char* name, void* param,
@@ -60,22 +30,18 @@ void HALSimWSHalProvider::OnStaticSimCallback(const char* name, void* param,
 }
 
 void HALSimWSHalProvider::OnSimCallback(const char* cbName) {
-  wpi::json diff;
-
   // Ensures all operations are performed in-order
   // -> this includes the network send
   std::lock_guard lock(mutex);
 
+  // OnSimValueChanged will only return the values of interest
+  // so we won't need to diff
   auto result = OnSimValueChanged(cbName);
-  performDiff(last, result, diff);
-  last = std::move(result);
-
-  // send it out if it's not empty
-  if (!diff.empty()) {
+  if (!result.empty()) {
     auto ws = m_ws.lock();
     if (ws) {
       wpi::json netValue = {
-          {"type", m_type}, {"device", m_deviceId}, {"data", diff}};
+          {"type", m_type}, {"device", m_deviceId}, {"data", result}};
       ws->OnSimValueChanged(netValue);
     }
   }

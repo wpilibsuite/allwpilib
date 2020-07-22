@@ -19,14 +19,40 @@ void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 wpi::json HALSimWSProviderPWM::OnSimValueChanged(const char* cbName) {
-  return {
-      {"<init", static_cast<bool>(HALSIM_GetPWMInitialized(m_channel))},
-      {"<speed", HALSIM_GetPWMSpeed(m_channel)},
-      {"<position", HALSIM_GetPWMPosition(m_channel)},
-      {"<raw", HALSIM_GetPWMRawValue(m_channel)},
-      {"<period_scale", HALSIM_GetPWMPeriodScale(m_channel)},
-      {"<zero_latch", static_cast<bool>(HALSIM_GetPWMZeroLatch(m_channel))},
-  };
+  std::string cbType(cbName);
+
+  if (cbType == "Initialized") {
+    return {
+      {"<init", static_cast<bool>(HALSIM_GetPWMInitialized(m_channel))}
+    };
+  }
+  else if (cbType == "Speed") {
+    return {
+      {"<speed", HALSIM_GetPWMSpeed(m_channel)}
+    };
+  }
+  else if (cbType == "Position") {
+    return {
+      {"<position", HALSIM_GetPWMPosition(m_channel)}
+    };
+  }
+  else if (cbType == "RawValue") {
+    return {
+      {"<raw", HALSIM_GetPWMRawValue(m_channel)}
+    };
+  }
+  else if (cbType == "PeriodScale") {
+    return {
+      {"<period_scale", HALSIM_GetPWMPeriodScale(m_channel)}
+    };
+  }
+  else if (cbType == "ZeroLatch") {
+    return {
+      {"<zero_latch", static_cast<bool>(HALSIM_GetPWMZeroLatch(m_channel))}
+    };
+  }
+
+  return {};
 }
 
 }  // namespace wpilibws

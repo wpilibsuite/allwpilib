@@ -15,6 +15,7 @@
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Loop.h>
 #include <wpi/uv/Tcp.h>
+#include <wpi/SmallString.h>
 
 #include "HALSimHttpConnection.h"
 
@@ -26,12 +27,13 @@ std::shared_ptr<HALSimWeb> HALSimWeb::g_instance;
 
 bool HALSimWeb::Initialize() {
   // determine where to get static content from
-  wpi::SmallVector<char, 64> tmp;
+  // wpi::SmallVector<char, 64> tmp;
+  wpi::SmallString<64> tmp;
 
   const char* webroot_sys = std::getenv("HALSIMWEB_SYSROOT");
   if (webroot_sys != NULL) {
     wpi::StringRef tstr(webroot_sys);
-    tmp.append(tstr.begin(), tstr.end());
+    tmp.append(tstr);
   } else {
     wpi::sys::fs::current_path(tmp);
     wpi::sys::path::append(tmp, "sim");
@@ -43,7 +45,7 @@ bool HALSimWeb::Initialize() {
   const char* webroot_user = std::getenv("HALSIMWEB_USERROOT");
   if (webroot_user != NULL) {
     wpi::StringRef tstr(webroot_user);
-    tmp.append(tstr.begin(), tstr.end());
+    tmp.append(tstr);
   } else {
     wpi::sys::fs::current_path(tmp);
     wpi::sys::path::append(tmp, "sim", "user");

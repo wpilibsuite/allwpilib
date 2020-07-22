@@ -42,8 +42,9 @@ __declspec(dllexport)
     return -1;
   }
 
-  WSRegisterFunc registerFunc =
-      std::bind(&ProviderContainer::Add, &providers, _1, _2);
+  WSRegisterFunc registerFunc = [&](auto key, auto provider) {
+    providers.Add(key, provider);
+  };
 
   HALSimWSProviderAnalogIn::Initialize(registerFunc);
   HALSimWSProviderAnalogOut::Initialize(registerFunc);

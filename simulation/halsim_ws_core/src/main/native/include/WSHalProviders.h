@@ -42,7 +42,6 @@ class HALSimWSHalProvider : public HALSimWSBaseProvider {
  protected:
   // mutex protects last
   wpi::mutex mutex;
-  wpi::json last;
 };
 
 // provider generates per-channel diffs

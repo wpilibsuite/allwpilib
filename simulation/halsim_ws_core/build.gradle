@@ -1,48 +1,3 @@
-// if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
-
-//     description = "WS Core"
-
-//     ext {
-//         includeWpiutil = true
-//         includeNtCore = false
-//         pluginName = 'halsim_ws_core'
-//     }
-
-//     apply plugin: 'google-test-test-suite'
-
-
-//     ext {
-//         staticGtestConfigs = [:]
-//     }
-
-//     staticGtestConfigs["${pluginName}Test"] = []
-//     apply from: "${rootDir}/shared/googletest.gradle"
-
-//     apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
-
-//     model {
-//         binaries {
-//             all {
-//                 // nativeUtils.useRequiredLibrary(it, 'imgui_static')
-//                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
-//                     it.buildable = false
-//                     return
-//                 }
-
-//                 // lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "shared"
-//                 // if (it.targetPlatform.operatingSystem.isWindows()) {
-//                 //     it.linker.args << 'Gdi32.lib' << 'Shell32.lib'
-//                 // } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-//                 //     it.linker.args << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo'
-//                 // } else {
-//                 //     it.linker.args << '-lX11'
-//                 // }
-//             }
-//         }
-//     }
-// }
-
-
 apply plugin: 'cpp'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
@@ -84,10 +39,6 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     }
                 }
                 binaries.all {
-                    // if (it instanceof StaticLibraryBinarySpec) {
-                    //     it.buildable = false
-                    //     return
-                    // }
                     project(':hal').addHalDependency(it, 'shared')
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
 
@@ -97,18 +48,10 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
         }
         binaries {
             all {
-                // nativeUtils.useRequiredLibrary(it, 'imgui_static')
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
                     it.buildable = false
                     return
                 }
-                // if (it.targetPlatform.operatingSystem.isWindows()) {
-                //     it.linker.args << 'Gdi32.lib' << 'Shell32.lib'
-                // } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                //     it.linker.args << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo'
-                // } else {
-                //     it.linker.args << '-lX11'
-                // }
             }
         }
     }

@@ -18,7 +18,7 @@
 #include <wpi/uv/AsyncFunction.h>
 #include <wpi/uv/Buffer.h>
 
-#include "HttpWebSocketServerConnection.h"
+#include <wpi/HttpWebSocketServerConnection.h>
 
 namespace wpilibws {
 

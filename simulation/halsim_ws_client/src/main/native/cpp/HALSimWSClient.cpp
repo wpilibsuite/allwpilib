@@ -8,6 +8,7 @@
 #include "HALSimWSClient.h"
 
 #include <wpi/raw_ostream.h>
+#include <wpi/SmallString.h>
 #include <wpi/uv/util.h>
 
 #include "HALSimWSClientConnection.h"
@@ -22,13 +23,13 @@ namespace wpilibws {
 std::shared_ptr<HALSimWS> HALSimWS::g_instance;
 
 bool HALSimWS::Initialize() {
-  wpi::SmallVector<char, 64> tmp;
+  wpi::SmallString<64> tmp;
 
   const char* host = std::getenv("HALSIMWS_HOST");
   if (host != NULL) {
     wpi::StringRef hoststr(host);
-    tmp.append(hoststr.begin(), hoststr.end());
-    m_host = wpi::Twine(hoststr).str();
+    tmp.append(hoststr);
+    m_host = tmp.str();
   } else {
     m_host = "localhost";
   }
@@ -37,10 +38,9 @@ bool HALSimWS::Initialize() {
   const char* port = std::getenv("HALSIMWS_PORT");
   if (port != NULL) {
     wpi::StringRef portstr(port);
-    tmp.append(portstr.begin(), portstr.end());
-
+    tmp.append(portstr);
     try {
-      m_port = std::stoi(wpi::Twine(portstr).str());
+      m_port = std::stoi(tmp.str());
     } catch (const std::invalid_argument& err) {
       wpi::errs() << "Error decoding HALSIMWS_PORT. Defaulting to 8080. ("
                   << err.what() << ")\n";
@@ -54,8 +54,8 @@ bool HALSimWS::Initialize() {
   const char* uri = std::getenv("HALSIMWS_URI");
   if (uri != NULL) {
     wpi::StringRef uristr(uri);
-    tmp.append(uristr.begin(), uristr.end());
-    m_uri = wpi::Twine(uristr).str();
+    tmp.append(uristr);
+    m_uri = tmp.str();
   } else {
     m_uri = "/wpilibws";
   }

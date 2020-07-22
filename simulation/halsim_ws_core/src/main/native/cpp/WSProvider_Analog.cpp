@@ -20,24 +20,79 @@ void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 wpi::json HALSimWSProviderAnalogIn::OnSimValueChanged(const char* cbName) {
-  return {
-      {"<init", static_cast<bool>(HALSIM_GetAnalogInInitialized(m_channel))},
-      {"<avg_bits", HALSIM_GetAnalogInAverageBits(m_channel)},
-      {"<oversample_bits", HALSIM_GetAnalogInOversampleBits(m_channel)},
-      {">voltage", HALSIM_GetAnalogInVoltage(m_channel)},
+  std::string cbType(cbName);
+  if (cbType == "Initialized") {
+    return {
+      {"<init", static_cast<bool>(HALSIM_GetAnalogInInitialized(m_channel))}
+    };
+  }
+  else if (cbType == "AverageBits") {
+    return {
+      {"<avg_bits", HALSIM_GetAnalogInAverageBits(m_channel)}
+    };
+  }
+  else if (cbType == "OversampleBits") {
+    return {
+      {"<oversample_bits", HALSIM_GetAnalogInOversampleBits(m_channel)}
+    };
+  }
+  else if (cbType == "Voltage") {
+    return {
+      {">voltage", HALSIM_GetAnalogInVoltage(m_channel)}
+    };
+  }
+  else if (cbType == "AccumulatorInitialized") {
+    return {
       {
-          "accum",
-          {
-              {"<init",
-               static_cast<bool>(
-                   HALSIM_GetAnalogInAccumulatorInitialized(m_channel))},
-              {">value", HALSIM_GetAnalogInAccumulatorValue(m_channel)},
-              {">count", HALSIM_GetAnalogInAccumulatorCount(m_channel)},
-              {"<center", HALSIM_GetAnalogInAccumulatorCenter(m_channel)},
-              {"<deadband", HALSIM_GetAnalogInAccumulatorDeadband(m_channel)},
-          },
-      },
-  };
+        "accum",
+        {
+          {"<init", static_cast<bool>(HALSIM_GetAnalogInAccumulatorInitialized(m_channel))}
+        }
+      }
+    };
+  }
+  else if (cbType == "AccumulatorValue") {
+    return {
+      {
+        "accum",
+        {
+          {">value", HALSIM_GetAnalogInAccumulatorValue(m_channel)}
+        }
+      }
+    };
+  }
+  else if (cbType == "AccumulatorCount") {
+    return {
+      {
+        "accum",
+        {
+          {">count", HALSIM_GetAnalogInAccumulatorCount(m_channel)}
+        }
+      }
+    };
+  }
+  else if (cbType == "AccumulatorCenter") {
+    return {
+      {
+        "accum",
+        {
+          {"<center", HALSIM_GetAnalogInAccumulatorCenter(m_channel)}
+        }
+      }
+    };
+  }
+  else if (cbType == "AccumulatorDeadband") {
+    return {
+      {
+        "accum",
+        {
+          {"<deadband", HALSIM_GetAnalogInAccumulatorDeadband(m_channel)}
+        }
+      }
+    };
+  }
+  
+  return {};
 }
 
 void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::json& json) {
@@ -63,8 +118,20 @@ void HALSimWSProviderAnalogOut::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 wpi::json HALSimWSProviderAnalogOut::OnSimValueChanged(const char* cbName) {
-  return {{"<init", HALSIM_GetAnalogOutInitialized(m_channel)},
-          {"<voltage", HALSIM_GetAnalogOutVoltage(m_channel)}};
+  std::string cbType(cbName);
+
+  if (cbType == "Initialized") {
+    return {
+      {"<init", HALSIM_GetAnalogOutInitialized(m_channel)}
+    };
+  }
+  else if (cbType == "Voltage") {
+    return {
+      {"<voltage", HALSIM_GetAnalogOutVoltage(m_channel)}
+    };
+  }
+
+  return {};
 }
 
 }  // namespace wpilibws

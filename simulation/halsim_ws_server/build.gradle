@@ -23,20 +23,13 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     model {
         binaries {
             all {
-                // nativeUtils.useRequiredLibrary(it, 'imgui_static')
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
                     it.buildable = false
                     return
                 }
 
                 lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
-                // if (it.targetPlatform.operatingSystem.isWindows()) {
-                //     it.linker.args << 'Gdi32.lib' << 'Shell32.lib'
-                // } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                //     it.linker.args << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo'
-                // } else {
-                //     it.linker.args << '-lX11'
-                // }
+                
             }
         }
     }
