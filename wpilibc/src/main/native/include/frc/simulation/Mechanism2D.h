@@ -16,9 +16,9 @@
 #include <map>
 
 namespace frc {
-    class Assembly2D {
+    class Mechanism2D {
     public:
-        Assembly2D();
+        Mechanism2D();
 
         /**
          * Set/Create the angle of a ligament

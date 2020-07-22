@@ -7,14 +7,14 @@
 
 
 
-#include "frc/simulation/Assembly2D.h"
+#include "frc/simulation/Mechanism2D.h"
 
 using namespace frc;
 
 
-Assembly2D::Assembly2D() : m_device{"Assembly2D"} {}
+Mechanism2D::Mechanism2D() : m_device{"Mechanism2D"} {}
 
-void Assembly2D::SetLigamentPose(std::string ligamentPath, float angle) {
+void Mechanism2D::SetLigamentPose(std::string ligamentPath, float angle) {
     if (m_device) {
         if (!createdItems.count(ligamentPath)) {
             createdItems[ligamentPath] = m_device.CreateDouble(ligamentPath.c_str(), false, angle);

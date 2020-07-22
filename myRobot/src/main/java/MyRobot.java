@@ -8,13 +8,13 @@
 import edu.wpi.first.wpilibj.CounterBase;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.simulation.Assembly2D;
+import edu.wpi.first.wpilibj.simulation.Mechanism2D;
 
 @SuppressWarnings("all")
 public class MyRobot extends TimedRobot {
 
     int counter = 0;
-    Assembly2D assembly2D = new Assembly2D();
+    Mechanism2D mechanism2D = new Mechanism2D();
   /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -58,11 +58,11 @@ public class MyRobot extends TimedRobot {
      */
   @Override
   public void robotPeriodic() {
-  assembly2D.setLigamentAngle("/JasonOne/one/", counter++);
+  mechanism2D.setLigamentAngle("/JasonOne/one/", counter++);
   if(counter > 90){
     counter = -90;
   }
-  assembly2D.setLigamentAngle("/JasonOne/one/two/", counter / 4);
-  assembly2D.setLigamentLength("/JasonOne/one/two/", counter);
+  mechanism2D.setLigamentAngle("/JasonOne/one/two/", counter / 4);
+  mechanism2D.setLigamentLength("/JasonOne/one/two/", counter);
   }
 }

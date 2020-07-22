@@ -9,7 +9,7 @@
 
 namespace halsimgui {
 
-class Assembly2D {
+class Mechanism2D {
  public:
   static void Initialize();
 };

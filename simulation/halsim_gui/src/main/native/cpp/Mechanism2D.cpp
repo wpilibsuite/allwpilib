@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Assembly2D.h"
+#include "Mechanism2D.h"
 
 #include <cmath>
 
@@ -43,24 +43,36 @@ using namespace halsimgui;
 int windowWidth = 100;
 int windowHeight = 100;
 
-static std::vector<std::string> listOfColors = {"white", "silver", "gray", "black", "red", "maroon", "yellow", "olive",
-                                                "lime",
-                                                "green", "aqua", "teal", "blue", "navy", "fuchsia", "purple"};
+static struct NamedColor {
+    const char *name;
+    ImColor value;
+}
 
-static std::vector<ImColor> listOfRGB = {IM_COL32(255, 255, 255, 255), IM_COL32(192, 192, 192, 255),
-                                         IM_COL32(128, 128, 128, 255), IM_COL32(0, 0, 0, 255), IM_COL32(255, 0, 0, 255),
-                                         IM_COL32(128, 0, 0, 255), IM_COL32(255, 255, 0, 255),
-                                         IM_COL32(128, 128, 0, 255), IM_COL32(0, 255, 0, 255), IM_COL32(0, 128, 0, 255),
-                                         IM_COL32(0, 255, 255, 255),
-                                         IM_COL32(0, 128, 128, 255), IM_COL32(0, 0, 255, 255), IM_COL32(0, 0, 128, 255),
-                                         IM_COL32(255, 0, 255, 255), IM_COL32(128, 0, 128, 255)};
+staticColors[] = {
+        {"white",   IM_COL32(255, 255, 255, 255)},
+        {"silver",  IM_COL32(192, 192, 192, 255)},
+        {"gray",    IM_COL32(128, 128, 128, 255)},
+        {"black",   IM_COL32(0, 0, 0, 255)},
+        {"red",     IM_COL32(255, 0, 0, 255)},
+        {"maroon",  IM_COL32(128, 0, 0, 255)},
+        {"yellow",  IM_COL32(255, 255, 0, 255)},
+        {"olive",   IM_COL32(128, 128, 0, 255)},
+        {"lime",    IM_COL32(0, 255, 0, 255)},
+        {"green",   IM_COL32(0, 128, 0, 255)},
+        {"aqua",    IM_COL32(0, 255, 255, 255)},
+        {"teal",    IM_COL32(0, 128, 128, 255)},
+        {"blue",    IM_COL32(0, 0, 255, 255)},
+        {"navy",    IM_COL32(0, 0, 128, 255)},
+        {"fuchsia", IM_COL32(255, 0, 255, 255)},
+        {"purple",  IM_COL32(128, 0, 128, 255)}
+};
 
-std::map<std::string, ImColor> colorLookUpTable;
+wpi::StringMap<ImColor> colorLookUpTable;
 
 
 static void buildColorTable() {
-    for (int i = 0; i < (int) listOfColors.size(); i++) {
-        colorLookUpTable[listOfColors[i]] = listOfRGB[i];
+    for (auto&& namedColor : staticColors) {
+        colorLookUpTable.try_emplace(namedColor.name, namedColor.value);
     }
 }
 
@@ -111,10 +123,10 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
 
         // Find the min size of the window
         minSize = ImGui::GetWindowHeight() > ImGui::GetWindowWidth() ?
-                ImGui::GetWindowWidth() : ImGui::GetWindowHeight();
+                  ImGui::GetWindowWidth() : ImGui::GetWindowHeight();
 
 
-        if (m_devHandle == 0) m_devHandle = HALSIM_GetSimDeviceHandle("Assembly2D");
+        if (m_devHandle == 0) m_devHandle = HALSIM_GetSimDeviceHandle("Mechanism2D");
 
         // Get the length
         if (!m_lHandle) m_lHandle = HALSIM_GetSimValueHandle(m_devHandle, (bodyConfig.name + "length/").c_str());
@@ -239,11 +251,11 @@ static std::list<BodyConfig> readJson(std::string jFile) {
     return cList;
 }
 
-void Assembly2D::Initialize() {
+void Mechanism2D::Initialize() {
     buildColorTable();
-    bodyConfigList = readJson("/home/gabe/github/allwpilib/Assembly2D.json");
-    HALSimGui::AddWindow("2D Assembly", DisplayAssembly2D);
-    HALSimGui::SetDefaultWindowPos("2D Assembly", 200, 200);
-    HALSimGui::SetDefaultWindowSize("2D Assembly", 600, 600);
-    HALSimGui::SetWindowPadding("2D Assembly", 0, 0);
+    bodyConfigList = readJson("/home/gabe/github/allwpilib/Mechanism2D.json");
+    HALSimGui::AddWindow("Mechanism 2D", DisplayAssembly2D);
+    HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
+    HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
+    HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
 }

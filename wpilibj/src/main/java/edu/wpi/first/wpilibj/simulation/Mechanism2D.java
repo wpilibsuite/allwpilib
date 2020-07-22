@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import java.util.HashMap;
 
-public class Assembly2D {
-  SimDevice m_device = SimDevice.create("Assembly2D");
+public class Mechanism2D {
+  SimDevice m_device = SimDevice.create("Mechanism2D");
   HashMap<String, SimDouble> createdItems = new HashMap<String, SimDouble>();
 
   /**
