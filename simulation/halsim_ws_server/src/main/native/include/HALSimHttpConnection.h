@@ -13,12 +13,11 @@
 #include <vector>
 
 #include <HALSimBaseWebSocketConnection.h>
+#include <wpi/HttpWebSocketServerConnection.h>
 #include <wpi/json.h>
 #include <wpi/mutex.h>
 #include <wpi/uv/AsyncFunction.h>
 #include <wpi/uv/Buffer.h>
-
-#include <wpi/HttpWebSocketServerConnection.h>
 
 namespace wpilibws {
 

@@ -9,13 +9,13 @@
 
 #include <wpi/FileSystem.h>
 #include <wpi/Path.h>
+#include <wpi/SmallString.h>
 #include <wpi/Twine.h>
 #include <wpi/UrlParser.h>
 #include <wpi/WebSocketServer.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Loop.h>
 #include <wpi/uv/Tcp.h>
-#include <wpi/SmallString.h>
 
 #include "HALSimHttpConnection.h"
 

@@ -13,7 +13,7 @@ void HALSimWSHalProvider::OnNetworkConnected(
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
   {
     std::lock_guard lock(mutex);
-    
+
     // store a weak reference to the websocket object
     m_ws = ws;
   }
@@ -21,7 +21,7 @@ void HALSimWSHalProvider::OnNetworkConnected(
   // trigger a send of the current state
   // -> even if this gets called before, it's ok, because we cleared the
   //    state above atomically
-  OnSimCallback(""); // TODO Should we send a full state message?
+  OnSimCallback("");  // TODO Should we send a full state message?
 }
 
 void HALSimWSHalProvider::OnStaticSimCallback(const char* name, void* param,

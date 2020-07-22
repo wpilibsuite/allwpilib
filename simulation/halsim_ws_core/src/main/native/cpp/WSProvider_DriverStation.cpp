@@ -12,7 +12,6 @@
 #include <hal/DriverStation.h>
 #include <hal/Ports.h>
 #include <hal/simulation/DriverStationData.h>
-
 #include <wpi/raw_ostream.h>
 
 namespace wpilibws {
@@ -30,36 +29,20 @@ wpi::json HALSimWSProviderDriverStation::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
 
   if (cbType == "Enabled") {
+    return {{">enabled", static_cast<bool>(HALSIM_GetDriverStationEnabled())}};
+  } else if (cbType == "Autonomous") {
     return {
-      {">enabled", static_cast<bool>(HALSIM_GetDriverStationEnabled())}
+        {">autonomous", static_cast<bool>(HALSIM_GetDriverStationAutonomous())},
     };
-  }
-  else if (cbType == "Autonomous") {
-    return {
-      {">autonomous", static_cast<bool>(HALSIM_GetDriverStationAutonomous())},
-    };
-  }
-  else if (cbType == "Test") {
-    return {
-      {">test", static_cast<bool>(HALSIM_GetDriverStationTest())}
-    };
-  }
-  else if (cbType == "EStop") {
-    return {
-      {">estop", static_cast<bool>(HALSIM_GetDriverStationEStop())}
-    };
-  }
-  else if (cbType == "FmsAttached") {
-    return {
-      {">fms", static_cast<bool>(HALSIM_GetDriverStationFmsAttached())}
-    };
-  }
-  else if (cbType == "DsAttached") {
-    return {
-      {">ds", static_cast<bool>(HALSIM_GetDriverStationDsAttached())}
-    };
-  }
-  else if (cbType == "AllianceStationId") {
+  } else if (cbType == "Test") {
+    return {{">test", static_cast<bool>(HALSIM_GetDriverStationTest())}};
+  } else if (cbType == "EStop") {
+    return {{">estop", static_cast<bool>(HALSIM_GetDriverStationEStop())}};
+  } else if (cbType == "FmsAttached") {
+    return {{">fms", static_cast<bool>(HALSIM_GetDriverStationFmsAttached())}};
+  } else if (cbType == "DsAttached") {
+    return {{">ds", static_cast<bool>(HALSIM_GetDriverStationDsAttached())}};
+  } else if (cbType == "AllianceStationId") {
     std::string station;
     switch (HALSIM_GetDriverStationAllianceStationId()) {
       case HAL_AllianceStationID_kRed1:
@@ -82,14 +65,9 @@ wpi::json HALSimWSProviderDriverStation::OnSimValueChanged(const char* cbName) {
         break;
     }
 
-    return {
-      {">station", station}
-    };
-  }
-  else if (cbType == "MatchTime") {
-    return {
-      {"<match_time", HALSIM_GetDriverStationMatchTime()}
-    };
+    return {{">station", station}};
+  } else if (cbType == "MatchTime") {
+    return {{"<match_time", HALSIM_GetDriverStationMatchTime()}};
   }
 
   return {};
@@ -141,8 +119,7 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
       int num;
       try {
         num = std::stoi(jit.key());
-      }
-      catch (const std::invalid_argument& err) {
+      } catch (const std::invalid_argument& err) {
         wpi::errs() << "Error converting Joystick number. Skipping. "
                     << err.what() << "\n";
         continue;

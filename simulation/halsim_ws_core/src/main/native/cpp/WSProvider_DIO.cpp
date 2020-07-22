@@ -22,24 +22,13 @@ wpi::json HALSimWSProviderDIO::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
 
   if (cbType == "Initialized") {
-    return {
-      {"<init", static_cast<bool>(HALSIM_GetDIOInitialized(m_channel))}
-    };
-  }
-  else if (cbType == "Value") {
-    return {
-      {"<>value", static_cast<bool>(HALSIM_GetDIOValue(m_channel))}
-    };
-  }
-  else if (cbType == "PulseLength") {
-    return {
-      {"<pulse_length", HALSIM_GetDIOPulseLength(m_channel)}
-    };
-  }
-  else if (cbType == "IsInput") {
-    return {
-      {"<input", static_cast<bool>(HALSIM_GetDIOIsInput(m_channel))}
-    };
+    return {{"<init", static_cast<bool>(HALSIM_GetDIOInitialized(m_channel))}};
+  } else if (cbType == "Value") {
+    return {{"<>value", static_cast<bool>(HALSIM_GetDIOValue(m_channel))}};
+  } else if (cbType == "PulseLength") {
+    return {{"<pulse_length", HALSIM_GetDIOPulseLength(m_channel)}};
+  } else if (cbType == "IsInput") {
+    return {{"<input", static_cast<bool>(HALSIM_GetDIOIsInput(m_channel))}};
   }
 
   return {};

@@ -7,8 +7,8 @@
 
 #include "HALSimWSClient.h"
 
-#include <wpi/raw_ostream.h>
 #include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 #include <wpi/uv/util.h>
 
 #include "HALSimWSClientConnection.h"
