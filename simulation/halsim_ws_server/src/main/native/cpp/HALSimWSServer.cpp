@@ -104,6 +104,7 @@ void HALSimWeb::MainLoop() {
 
     auto conn = std::make_shared<HALSimHttpConnection>(tcp, m_webroot_sys,
                                                        m_webroot_user);
+    tcp->SetData(conn);
   });
 
   // start listening for incoming connections

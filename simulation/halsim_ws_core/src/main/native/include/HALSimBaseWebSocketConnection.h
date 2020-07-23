@@ -18,10 +18,6 @@ class HALSimBaseWebSocketConnection
  public:
   virtual void OnSimValueChanged(const wpi::json& msg) = 0;
 
-  std::shared_ptr<HALSimBaseWebSocketConnection> GetSharedFromThis() {
-    return shared_from_this();
-  }
-
  protected:
   virtual ~HALSimBaseWebSocketConnection() {}
 };

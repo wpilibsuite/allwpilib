@@ -165,7 +165,6 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
   try {
     auto& type = msg.at("type").get_ref<const std::string&>();
     auto& device = msg.at("device").get_ref<const std::string&>();
-    auto data = msg.at("data");
 
     wpi::SmallString<64> key;
     key.append(type);
@@ -174,7 +173,7 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
 
     auto provider = m_providers.Get(key.str());
     if (provider) {
-      provider->OnNetValueChanged(data);
+      provider->OnNetValueChanged(msg.at("data"));
     }
   } catch (wpi::json::exception& e) {
     wpi::errs() << "Error with incoming message: " << e.what() << "\n";

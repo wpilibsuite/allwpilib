@@ -52,7 +52,8 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
       return;
     }
 
-    if (!hws->RegisterWebsocket(GetSharedFromThis())) {
+    if (!hws->RegisterWebsocket(
+            HALSimBaseWebSocketConnection::shared_from_this())) {
       Log(409);
       m_websocket->Fail(409, "Only a single simulation websocket is allowed");
       return;
@@ -90,7 +91,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 
       auto hws = HALSimWeb::GetInstance();
       if (hws) {
-        hws->CloseWebsocket(GetSharedFromThis());
+        hws->CloseWebsocket(HALSimBaseWebSocketConnection::shared_from_this());
       }
     }
   });
@@ -249,7 +250,7 @@ void HALSimHttpConnection::ProcessRequest() {
       !path.contains("..")) {
     // convert to fs native representation
     wpi::SmallVector<char, 32> nativePath;
-    wpi::sys::path::native(path, nativePath, wpi::sys::path::Style::posix);
+    wpi::sys::path::native(path, nativePath);
 
     if (path.startswith("/user/")) {
       std::string prefix = (wpi::sys::path::get_separator() + "user" +
