@@ -19,8 +19,6 @@ void HALSimWSHalProvider::OnNetworkConnected(
   }
 
   // trigger a send of the current state
-  // -> even if this gets called before, it's ok, because we cleared the
-  //    state above atomically
   OnSimCallback("");  // TODO Should we send a full state message?
 }
 

@@ -5,8 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <iostream>
-
 #include <WSProviderContainer.h>
 #include <WSProvider_Analog.h>
 #include <WSProvider_DIO.h>
@@ -18,6 +16,7 @@
 #include <WSProvider_SimDevice.h>
 #include <WSProvider_dPWM.h>
 #include <hal/Main.h>
+#include <wpi/raw_ostream.h>
 
 #include "HALSimWSServer.h"
 
@@ -34,7 +33,7 @@ extern "C" {
 __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
-  std::cout << "Websocket Simulator Initializing." << std::endl;
+  wpi::outs() << "Websocket Simulator Initializing.\n";
   auto hsw = std::make_shared<HALSimWeb>(providers);
   HALSimWeb::SetInstance(hsw);
 
@@ -60,7 +59,7 @@ __declspec(dllexport)
 
   HAL_SetMain(nullptr, HALSimWeb::Main, HALSimWeb::Exit);
 
-  std::cout << "Websocket Simulator Initialized!" << std::endl;
+  wpi::outs() << "Websocket Simulator Initialized!\n";
   return 0;
 }
 }  // extern "C"

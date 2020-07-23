@@ -13,8 +13,7 @@
 
 #include "HALSimWSClientConnection.h"
 
-#define MAX_TCP_CONNECT_ATTEMPTS 5
-#define TCP_CONNECT_ATTEMPT_TIMEOUT_MS 1000
+static constexpr int kTcpConnectAttemptTimeout = 1000;
 
 namespace uv = wpi::uv;
 
@@ -23,24 +22,17 @@ namespace wpilibws {
 std::shared_ptr<HALSimWS> HALSimWS::g_instance;
 
 bool HALSimWS::Initialize() {
-  wpi::SmallString<64> tmp;
-
   const char* host = std::getenv("HALSIMWS_HOST");
   if (host != NULL) {
-    wpi::StringRef hoststr(host);
-    tmp.append(hoststr);
-    m_host = tmp.str();
+    m_host = host;
   } else {
     m_host = "localhost";
   }
 
-  tmp.clear();
   const char* port = std::getenv("HALSIMWS_PORT");
   if (port != NULL) {
-    wpi::StringRef portstr(port);
-    tmp.append(portstr);
     try {
-      m_port = std::stoi(tmp.str());
+      m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
       wpi::errs() << "Error decoding HALSIMWS_PORT. Defaulting to 8080. ("
                   << err.what() << ")\n";
@@ -50,12 +42,9 @@ bool HALSimWS::Initialize() {
     m_port = 8080;
   }
 
-  tmp.clear();
   const char* uri = std::getenv("HALSIMWS_URI");
   if (uri != NULL) {
-    wpi::StringRef uristr(uri);
-    tmp.append(uristr);
-    m_uri = tmp.str();
+    m_uri = uri;
   } else {
     m_uri = "/wpilibws";
   }
@@ -84,7 +73,7 @@ bool HALSimWS::Initialize() {
         }
 
         // If we weren't previously connected, attempt a reconnection
-        m_connect_timer->Start(uv::Timer::Time(TCP_CONNECT_ATTEMPT_TIMEOUT_MS));
+        m_connect_timer->Start(uv::Timer::Time(kTcpConnectAttemptTimeout));
       });
 
   m_tcp_client->closed.connect(
@@ -110,7 +99,7 @@ void HALSimWS::Main(void* param) {
 
 void HALSimWS::MainLoop() {
   // Set up the timer to attempt connection
-  m_connect_timer->timeout.connect([this]() { AttemptConnect(); });
+  m_connect_timer->timeout.connect([this] { AttemptConnect(); });
 
   // Run the initial connect immediately
   m_connect_timer->Start(uv::Timer::Time(0));
@@ -121,13 +110,7 @@ void HALSimWS::MainLoop() {
 void HALSimWS::AttemptConnect() {
   m_connect_attempts++;
 
-  if (m_connect_attempts > MAX_TCP_CONNECT_ATTEMPTS) {
-    m_loop->Stop();
-    return;
-  }
-
-  wpi::errs() << "Attempt #" << m_connect_attempts << " of "
-              << MAX_TCP_CONNECT_ATTEMPTS << "\n";
+  wpi::errs() << "Connection Attempt " << m_connect_attempts << "\n";
 
   struct sockaddr_in dest;
   uv::NameToAddr(m_host, m_port, &dest);
@@ -180,12 +163,16 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
   // generate the key
 
   try {
-    std::string type = msg.at("type").get<std::string>();
-    std::string device = msg.at("device").get<std::string>();
+    auto& type = msg.at("type").get_ref<const std::string&>();
+    auto& device = msg.at("device").get_ref<const std::string&>();
     auto data = msg.at("data");
 
-    auto key = type + "/" + device;
-    auto provider = m_providers.Get(key);
+    wpi::SmallString<64> key;
+    key.append(type);
+    key.append("/");
+    key.append(device);
+
+    auto provider = m_providers.Get(key.str());
     if (provider) {
       provider->OnNetValueChanged(data);
     }

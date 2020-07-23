@@ -30,7 +30,7 @@ bool HALSimWeb::Initialize() {
   // wpi::SmallVector<char, 64> tmp;
   wpi::SmallString<64> tmp;
 
-  const char* webroot_sys = std::getenv("HALSIMWEB_SYSROOT");
+  const char* webroot_sys = std::getenv("HALSIMWS_SYSROOT");
   if (webroot_sys != NULL) {
     wpi::StringRef tstr(webroot_sys);
     tmp.append(tstr);
@@ -42,7 +42,7 @@ bool HALSimWeb::Initialize() {
   m_webroot_sys = wpi::Twine(tmp).str();
 
   tmp.clear();
-  const char* webroot_user = std::getenv("HALSIMWEB_USERROOT");
+  const char* webroot_user = std::getenv("HALSIMWS_USERROOT");
   if (webroot_user != NULL) {
     wpi::StringRef tstr(webroot_user);
     tmp.append(tstr);
@@ -52,6 +52,26 @@ bool HALSimWeb::Initialize() {
   }
   wpi::sys::fs::make_absolute(tmp);
   m_webroot_user = wpi::Twine(tmp).str();
+
+  const char* uri = std::getenv("HALSIMWS_URI");
+  if (uri != NULL) {
+    m_uri = uri;
+  } else {
+    m_uri = "/wpilibws";
+  }
+
+  const char* port = std::getenv("HALSIMWS_PORT");
+  if (port != NULL) {
+    try {
+      m_port = std::stoi(port);
+    } catch (const std::invalid_argument& err) {
+      wpi::errs() << "Error decoding HALSIMWS_PORT. Defaulting to 8080. ("
+                  << err.what() << ")\n";
+      m_port = 8080;
+    }
+  } else {
+    m_port = 8080;
+  }
 
   // create libuv things
   m_loop = uv::Loop::Create();
@@ -67,8 +87,7 @@ bool HALSimWeb::Initialize() {
     return false;
   }
 
-  // TODO: configurable port
-  m_server->Bind("", 8080);
+  m_server->Bind("", m_port);
   return true;
 }
 
@@ -89,8 +108,8 @@ void HALSimWeb::MainLoop() {
 
   // start listening for incoming connections
   m_server->Listen();
-  wpi::errs() << "Listening at http://localhost:8080\n";
-
+  wpi::errs() << "Listening at http://localhost:" << m_port << "\n";
+  wpi::errs() << "WebSocket URI: " << m_uri << "\n";
   m_loop->Run();
 }
 

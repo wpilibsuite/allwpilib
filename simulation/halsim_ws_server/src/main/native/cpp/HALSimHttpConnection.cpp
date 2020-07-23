@@ -10,6 +10,7 @@
 #include <uv.h>
 
 #include <wpi/FileSystem.h>
+#include <wpi/MimeTypes.h>
 #include <wpi/Path.h>
 #include <wpi/SmallVector.h>
 #include <wpi/UrlParser.h>
@@ -18,14 +19,14 @@
 #include <wpi/uv/Request.h>
 
 #include "HALSimWSServer.h"
-#include "mimetypes.h"
 
 namespace uv = wpi::uv;
 
 namespace wpilibws {
 
 bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
-  if (m_request.GetUrl() != "/ws") {
+  auto hws = HALSimWeb::GetInstance();
+  if (m_request.GetUrl() != hws->GetServerUri()) {
     MySendError(404, "invalid websocket address");
     return false;
   }
@@ -268,7 +269,7 @@ void HALSimHttpConnection::ProcessRequest() {
         wpi::sys::fs::is_directory(nativePath)) {
       MySendError(404, "Resource '" + path + "' not found");
     } else {
-      auto contentType = MimeTypeFromPath(path);
+      auto contentType = wpi::MimeTypeFromPath(path);
       SendFileResponse(200, "OK", contentType, nativePath);
     }
   } else {

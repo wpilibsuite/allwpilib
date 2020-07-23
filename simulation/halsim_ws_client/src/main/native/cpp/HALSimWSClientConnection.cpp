@@ -71,6 +71,7 @@ void HALSimWSClientConnection::Initialize() {
       std::string err("JSON parse failed: ");
       err += e.what();
       wpi::errs() << err << "\n";
+      m_websocket->Fail(1003, err);
       return;
     }
 

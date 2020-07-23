@@ -39,8 +39,8 @@ class HALSimWS {
 
   void OnNetValueChanged(const wpi::json& msg);
 
-  const std::string GetTargetHost() { return m_host; }
-  const std::string GetTargetUri() { return m_uri; }
+  std::string GetTargetHost() const { return m_host; }
+  std::string GetTargetUri() const { return m_uri; }
   int GetTargetPort() { return m_port; }
 
  private:

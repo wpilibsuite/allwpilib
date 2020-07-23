@@ -46,6 +46,9 @@ class HALSimWeb {
   // network -> sim
   void OnNetValueChanged(const wpi::json& msg);
 
+  std::string GetServerUri() const { return m_uri; }
+  int GetServerPort() { return m_port; }
+
  private:
   static std::shared_ptr<HALSimWeb> g_instance;
 
@@ -65,6 +68,9 @@ class HALSimWeb {
   std::string m_webroot_sys;
   // -> /user
   std::string m_webroot_user;
+
+  std::string m_uri;
+  int m_port;
 };
 
 }  // namespace wpilibws
