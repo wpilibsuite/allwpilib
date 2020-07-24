@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -177,47 +177,45 @@ public class MotorEncoderTest extends AbstractComsSetup {
 
   @Test
   public void testPositionPIDController() {
-    PIDController pidController = new PIDController(0.001, 0.0005, 0);
-    pidController.setTolerance(50.0);
-    pidController.setIntegratorRange(-0.2, 0.2);
-    pidController.setSetpoint(1000);
+    try (PIDController pidController = new PIDController(0.001, 0.0005, 0)) {
+      pidController.setTolerance(50.0);
+      pidController.setIntegratorRange(-0.2, 0.2);
+      pidController.setSetpoint(1000);
 
-    Notifier pidRunner = new Notifier(() -> {
-      var speed = pidController.calculate(me.getEncoder().getDistance());
-      me.getMotor().set(MathUtil.clamp(speed, -0.2, 0.2));
-    });
+      try (Notifier pidRunner = new Notifier(() -> {
+        var speed = pidController.calculate(me.getEncoder().getDistance());
+        me.getMotor().set(MathUtil.clamp(speed, -0.2, 0.2));
+      })) {
+        pidRunner.startPeriodic(pidController.getPeriod());
+        Timer.delay(10.0);
+        pidRunner.stop();
 
-    pidRunner.startPeriodic(pidController.getPeriod());
-    Timer.delay(10.0);
-    pidRunner.stop();
-
-    assertTrue(
-        "PID loop did not reach reference within 10 seconds. The current error was" + pidController
-            .getPositionError(), pidController.atSetpoint());
-
-    pidRunner.close();
+        assertTrue(
+            "PID loop did not reach reference within 10 seconds. The current error was"
+            + pidController.getPositionError(), pidController.atSetpoint());
+      }
+    }
   }
 
   @Test
   public void testVelocityPIDController() {
     LinearFilter filter = LinearFilter.movingAverage(50);
-    PIDController pidController = new PIDController(1e-5, 0.0, 0.0006);
-    pidController.setTolerance(200);
-    pidController.setSetpoint(600);
+    try (PIDController pidController = new PIDController(1e-5, 0.0, 0.0006)) {
+      pidController.setTolerance(200);
+      pidController.setSetpoint(600);
 
-    Notifier pidRunner = new Notifier(() -> {
-      var speed = filter.calculate(me.getEncoder().getRate());
-      me.getMotor().set(MathUtil.clamp(speed, -0.3, 0.3));
-    });
+      try (Notifier pidRunner = new Notifier(() -> {
+        var speed = filter.calculate(me.getEncoder().getRate());
+        me.getMotor().set(MathUtil.clamp(speed, -0.3, 0.3));
+      })) {
+        pidRunner.startPeriodic(pidController.getPeriod());
+        Timer.delay(10.0);
+        pidRunner.stop();
 
-    pidRunner.startPeriodic(pidController.getPeriod());
-    Timer.delay(10.0);
-    pidRunner.stop();
-
-    assertTrue("PID loop did not reach reference within 10 seconds. The error was: " + pidController
-        .getPositionError(), pidController.atSetpoint());
-
-    pidRunner.close();
+        assertTrue("PID loop did not reach reference within 10 seconds. The error was: "
+            + pidController.getPositionError(), pidController.atSetpoint());
+      }
+    }
   }
 
   /**

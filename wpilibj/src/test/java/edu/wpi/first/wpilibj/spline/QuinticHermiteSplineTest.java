@@ -28,7 +28,7 @@ class QuinticHermiteSplineTest {
   @SuppressWarnings({ "ParameterName", "PMD.UnusedLocalVariable" })
   private void run(Pose2d a, Pose2d b) {
     // Start the timer.
-    var start = System.nanoTime();
+    //var start = System.nanoTime();
 
     // Generate and parameterize the spline.
     var controlVectors = SplineHelper.getQuinticControlVectorsFromWaypoints(List.of(a, b));
@@ -37,10 +37,10 @@ class QuinticHermiteSplineTest {
     var poses = SplineParameterizer.parameterize(spline);
 
     // End the timer.
-    var end = System.nanoTime();
+    //var end = System.nanoTime();
 
     // Calculate the duration (used when benchmarking)
-    var durationMicroseconds = (end - start) / 1000.0;
+    //var durationMicroseconds = (end - start) / 1000.0;
 
     for (int i = 0; i < poses.size() - 1; i++) {
       var p0 = poses.get(i);
