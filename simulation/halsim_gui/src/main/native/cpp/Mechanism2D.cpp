@@ -6,37 +6,21 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Mechanism2D.h"
-
 #include <cmath>
-
-#include <GL/gl3w.h>
 #include <hal/SimDevice.h>
 #include <imgui.h>
-
 #define IMGUI_DEFINE_MATH_OPERATORS
-
 #include <imgui_internal.h>
 #include <mockdata/SimDeviceData.h>
 #include <units/units.h>
-#include <wpi/Path.h>
-#include <wpi/SmallString.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
-
-
-#include "GuiUtil.h"
 #include "HALSimGui.h"
-#include "SimDeviceGui.h"
-#include "portable-file-dialogs.h"
-#include <mockdata/EncoderData.h>
-
-#include <vector>
 #include <map>
 #include <list>
-#include <list>
 #include <string>
-#include <cmath>
+#include <wpi/math>
 
 using namespace halsimgui;
 
@@ -79,6 +63,7 @@ static void buildColorTable() {
 struct BodyConfig {
     std::string name;
     std::string type = "line";
+    // TODO: use this
     int startLocation = 0;
     int length = 100;
     std::string color = "green";
@@ -95,7 +80,7 @@ DrawLine(int startXLocation, int startYLocation, int length, double angle, ImDra
     // Find the current path do the ligament
     std::string currentPath = previousPath + bodyConfig.name;
     // Find the angle in radians
-    double radAngle = (angle - 90) * 3.14159 / 180;
+    double radAngle = (angle - 90) * wpi::math::pi / 180;
     // Get the start X and Y location
     double xEnd = startXLocation + length * std::cos(radAngle);
     double yEnd = startYLocation + length * std::sin(radAngle);
@@ -119,7 +104,7 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
         double m_l = 0;
 
         // Get the smallest of width or height
-        int minSize;
+        double minSize;
 
         // Find the min size of the window
         minSize = ImGui::GetWindowHeight() > ImGui::GetWindowWidth() ?
@@ -143,16 +128,16 @@ static void buildDrawList(int startXLocation, int startYLocation, ImDrawList *dr
 
 
         // Calculate the next angle to go to
-        int angleToGoTo = m_a + bodyConfig.angle + previousAngle;
+        double angleToGoTo = m_a + bodyConfig.angle + previousAngle;
 
         // Draw the first line and get the ending coordinates
-        auto[XEnd, YEnd, angle] = DrawLine(startXLocation, startYLocation,
-                                           (minSize / 100) * m_l, angleToGoTo, drawList,
+        auto[xEnd, yEnd, angle] = DrawLine(startXLocation, startYLocation,
+                                           minSize / 100 * m_l, angleToGoTo, drawList,
                                            windowPos, colorLookUpTable[bodyConfig.color], bodyConfig, "");
 
         // If the line has children then draw them with the stating points being the end of the parent
-        if (bodyConfig.children.size() != 0) {
-            buildDrawList(XEnd, YEnd, drawList, angle,
+        if (!bodyConfig.children.empty()) {
+            buildDrawList(xEnd, yEnd, drawList, angle,
                           bodyConfig.children, windowPos);
         }
     }
@@ -221,6 +206,7 @@ static std::list<BodyConfig> readJson(std::string jFile) {
     wpi::raw_fd_istream is(jFile, ec);
     if (ec) {
         wpi::errs() << "could not open '" << jFile << "': " << ec.message() << '\n';
+        return cList;
     }
 
     // parse file

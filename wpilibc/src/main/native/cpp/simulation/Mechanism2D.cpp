@@ -13,9 +13,11 @@ using namespace frc;
 
 
 Mechanism2D::Mechanism2D() : m_device{"Mechanism2D"} {}
-
-void Mechanism2D::SetLigamentPose(std::string ligamentPath, float angle) {
+//std::string angleString = "angle/"
+void Mechanism2D::SetLigamentAngle(std::string ligamentPath, float angle) {
     if (m_device) {
+        ligamentPath = ligamentPath + "angle/";
+
         if (!createdItems.count(ligamentPath)) {
             createdItems[ligamentPath] = m_device.CreateDouble(ligamentPath.c_str(), false, angle);
         }
@@ -24,3 +26,15 @@ void Mechanism2D::SetLigamentPose(std::string ligamentPath, float angle) {
     }
 }
 
+void Mechanism2D::SetLigamentALength(std::string ligamentPath, float length) {
+    if (m_device) {
+        ligamentPath = ligamentPath + "length/";
+
+        if (!createdItems.count(ligamentPath)) {
+            createdItems[ligamentPath] = m_device.CreateDouble(ligamentPath.c_str(), false, length);
+        }
+    } else {
+        createdItems[ligamentPath].Set(length);
+    }
+}
+// State space PR

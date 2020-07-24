@@ -14,6 +14,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include <string>
 #include <map>
+#include <wpi/StringMap.h>
 
 namespace frc {
     class Mechanism2D {
@@ -24,12 +25,20 @@ namespace frc {
          * Set/Create the angle of a ligament
          *
          * @param ligamentPath json path to the ligament
-        * @param angle to set the ligament
+         * @param angle to set the ligament
          */
-        void SetLigamentPose(std::string ligamentPath, float angle);
+        void SetLigamentAngle(std::string ligamentPath, float angle);
+
+        /**
+         * Set/Create the length of a ligament
+         *
+         * @param ligamentPath json path to the ligament
+         * @param length to set the ligament
+         */
+        void SetLigamentALength(std::string ligamentPath, float length);
 
     private:
-        std::map<std::string, hal::SimDouble> createdItems;
+        wpi::StringMap<hal::SimDouble> createdItems;
         hal::SimDevice m_device;
     };
 
