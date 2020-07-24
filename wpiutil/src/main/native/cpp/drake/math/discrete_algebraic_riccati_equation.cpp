@@ -18,8 +18,8 @@ template <typename T>
 int sgn(T val) {
   return (T(0) < val) - (val < T(0));
 }
-void check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
-                        const Eigen::Ref<const Eigen::MatrixXd>& B) {
+void check_stabilizable(const Eigen::MatrixXd& A,
+                        const Eigen::MatrixXd& B) {
   // This function checks if (A,B) is a stabilizable pair.
   // (A,B) is stabilizable if and only if the uncontrollable eigenvalues of
   // A, if any, have absolute values less than one, where an eigenvalue is
@@ -37,8 +37,8 @@ void check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
     DRAKE_THROW_UNLESS(qr.rank() == n);
   }
 }
-void check_detectable(const Eigen::Ref<const Eigen::MatrixXd>& A,
-                      const Eigen::Ref<const Eigen::MatrixXd>& Q) {
+void check_detectable(const Eigen::MatrixXd& A,
+                      const Eigen::MatrixXd& Q) {
   // This function check if (A,C) is a detectable pair, where Q = C' * C.
   // (A,C) is detectable if and only if the unobservable eigenvalues of A,
   // if any, have absolute values less than one, where an eigenvalue is
@@ -62,7 +62,8 @@ void check_detectable(const Eigen::Ref<const Eigen::MatrixXd>& A,
 //     [ b ]   [   0   ]
 // The implementation is based on
 // https://en.wikipedia.org/wiki/Givens_rotation#Stable_calculation
-void Givens_rotation(double a, double b, Eigen::Ref<Eigen::Matrix2d> R,
+template <typename Mat>
+void Givens_rotation(double a, double b, Eigen::Block<Mat, 2, 2> R,
                      double eps = 1e-10) {
   double c, s;
   if (fabs(b) < eps) {
@@ -86,8 +87,8 @@ void Givens_rotation(double a, double b, Eigen::Ref<Eigen::Matrix2d> R,
 }
 
 // The arguments S, T, and Z will be changed.
-void swap_block_11(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
-                   Eigen::Ref<Eigen::MatrixXd> Z, int p) {
+void swap_block_11(Eigen::MatrixXd& S, Eigen::MatrixXd& T,
+                   Eigen::MatrixXd& Z, int p) {
   // Dooren, Case I, p124-125.
   int n2 = S.rows();
   Eigen::Matrix2d A = S.block<2, 2>(p, p);
@@ -107,8 +108,8 @@ void swap_block_11(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
 }
 
 // The arguments S, T, and Z will be changed.
-void swap_block_21(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
-                   Eigen::Ref<Eigen::MatrixXd> Z, int p) {
+void swap_block_21(Eigen::MatrixXd& S, Eigen::MatrixXd& T,
+                   Eigen::MatrixXd& Z, int p) {
   // Dooren, Case II, p126-127.
   int n2 = S.rows();
   Eigen::Matrix3d A = S.block<3, 3>(p, p);
@@ -144,8 +145,8 @@ void swap_block_21(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
 }
 
 // The arguments S, T, and Z will be changed.
-void swap_block_12(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
-                   Eigen::Ref<Eigen::MatrixXd> Z, int p) {
+void swap_block_12(Eigen::MatrixXd& S, Eigen::MatrixXd& T,
+                   Eigen::MatrixXd& Z, int p) {
   int n2 = S.rows();
   // Swap the role of S and T.
   Eigen::MatrixXd Z1 = Eigen::MatrixXd::Identity(n2, n2);
@@ -191,8 +192,8 @@ void swap_block_12(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
 }
 
 // The arguments S, T, and Z will be changed.
-void swap_block_22(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
-                   Eigen::Ref<Eigen::MatrixXd> Z, int p) {
+void swap_block_22(Eigen::MatrixXd& S, Eigen::MatrixXd& T,
+                   Eigen::MatrixXd& Z, int p) {
   // Direct Swapping Algorithm based on
   // "Numerical Methods for General and Structured Eigenvalue Problems" by
   // Daniel Kressner, p108-111.
@@ -268,8 +269,8 @@ void swap_block_22(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
 // Dooren, 1981 ( http://epubs.siam.org/doi/pdf/10.1137/0902010 ), and
 // "Numerical Methods for General and Structured Eigenvalue Problems" by
 // Daniel Kressner, 2005.
-void swap_block(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
-                Eigen::Ref<Eigen::MatrixXd> Z, int p, int q, int q_block_size,
+void swap_block(Eigen::MatrixXd& S, Eigen::MatrixXd& T,
+                Eigen::MatrixXd& Z, int p, int q, int q_block_size,
                 double eps = 1e-10) {
   int p_tmp = q, p_block_size;
   while (p_tmp-- > p) {
@@ -313,8 +314,8 @@ void swap_block(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
 // "A generalized eigenvalue approach for solving Riccati equations" by P. Van
 // Dooren, 1981, and "Numerical Methods for General and Structured Eigenvalue
 // Problems" by Daniel Kressner, 2005.
-void reorder_eigen(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
-                   Eigen::Ref<Eigen::MatrixXd> Z, double eps = 1e-10) {
+void reorder_eigen(Eigen::MatrixXd& S, Eigen::MatrixXd& T,
+                   Eigen::MatrixXd& Z, double eps = 1e-10) {
   // abs(a) < eps => a = 0
   int n2 = S.rows();
   int n = n2 / 2, p = 0, q = 0;
@@ -408,10 +409,10 @@ void reorder_eigen(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
  */
 
 Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
-    const Eigen::Ref<const Eigen::MatrixXd>& A,
-    const Eigen::Ref<const Eigen::MatrixXd>& B,
-    const Eigen::Ref<const Eigen::MatrixXd>& Q,
-    const Eigen::Ref<const Eigen::MatrixXd>& R) {
+    const Eigen::MatrixXd& A,
+    const Eigen::MatrixXd& B,
+    const Eigen::MatrixXd& Q,
+    const Eigen::MatrixXd& R) {
   int n = B.rows(), m = B.cols();
 
   DRAKE_DEMAND(m <= n);

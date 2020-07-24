@@ -23,10 +23,10 @@ namespace math {
 /// by Thrasyvoulos Pappas, Alan J. Laub, and Nils R. Sandell
 ///
 Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
-    const Eigen::Ref<const Eigen::MatrixXd>& A,
-    const Eigen::Ref<const Eigen::MatrixXd>& B,
-    const Eigen::Ref<const Eigen::MatrixXd>& Q,
-    const Eigen::Ref<const Eigen::MatrixXd>& R);
+    const Eigen::MatrixXd& A,
+    const Eigen::MatrixXd& B,
+    const Eigen::MatrixXd& Q,
+    const Eigen::MatrixXd& R);
 }  // namespace math
 }  // namespace drake
 

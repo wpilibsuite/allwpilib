@@ -13,10 +13,10 @@ using Eigen::MatrixXd;
 namespace drake {
 namespace math {
 namespace {
-void SolveDAREandVerify(const Eigen::Ref<const MatrixXd>& A,
-                        const Eigen::Ref<const MatrixXd>& B,
-                        const Eigen::Ref<const MatrixXd>& Q,
-                        const Eigen::Ref<const MatrixXd>& R) {
+void SolveDAREandVerify(const MatrixXd& A,
+                        const MatrixXd& B,
+                        const MatrixXd& Q,
+                        const MatrixXd& R) {
   MatrixXd X = DiscreteAlgebraicRiccatiEquation(A, B, Q, R);
   // Check that X is positive semi-definite.
   EXPECT_TRUE(
