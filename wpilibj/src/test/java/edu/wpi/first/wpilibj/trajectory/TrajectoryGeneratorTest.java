@@ -75,8 +75,7 @@ class TrajectoryGeneratorTest {
 
   @Test
   void testMalformedTrajectory() {
-    var dsSim = new DriverStationSim();
-    dsSim.setSendError(false);
+    DriverStationSim.setSendError(false);
 
     var traj =
         TrajectoryGenerator.generateTrajectory(
@@ -90,6 +89,6 @@ class TrajectoryGeneratorTest {
     assertEquals(traj.getStates().size(), 1);
     assertEquals(traj.getTotalTimeSeconds(), 0);
 
-    dsSim.setSendError(true);
+    DriverStationSim.setSendError(true);
   }
 }

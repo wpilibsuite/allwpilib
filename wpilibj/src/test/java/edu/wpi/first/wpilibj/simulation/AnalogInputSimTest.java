@@ -25,21 +25,18 @@ class AnalogInputSimTest {
   void setCallbackTest() {
     HAL.initialize(500, 0);
 
-    AnalogInput input = new AnalogInput(5);
-    AnalogInputSim inputSim = new AnalogInputSim(input);
+    try (AnalogInput input = new AnalogInput(5)) {
+      AnalogInputSim inputSim = new AnalogInputSim(input);
 
-    for (double i = 0; i < 5.0; i += 0.1) {
-      inputSim.setVoltage(0);
+      for (double i = 0; i < 5.0; i += 0.1) {
+        inputSim.setVoltage(0);
 
-      assertEquals(input.getVoltage(), 0, 0.001);
+        assertEquals(input.getVoltage(), 0, 0.001);
 
-      inputSim.setVoltage(i);
+        inputSim.setVoltage(i);
 
-      assertEquals(input.getVoltage(), i, 0.001);
-
+        assertEquals(input.getVoltage(), i, 0.001);
+      }
     }
-
-    input.close();
-
   }
 }

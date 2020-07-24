@@ -34,38 +34,36 @@ class AnalogOutputSimTest {
     HAL.initialize(500, 0);
 
 
-    AnalogOutput output = new AnalogOutput(0);
-    output.setVoltage(0.5);
+    try (AnalogOutput output = new AnalogOutput(0)) {
+      output.setVoltage(0.5);
 
-    AnalogOutputSim outputSim = new AnalogOutputSim(output);
+      AnalogOutputSim outputSim = new AnalogOutputSim(output);
 
-    DoubleStore store = new DoubleStore();
+      DoubleStore store = new DoubleStore();
 
-    try (CallbackStore cb = outputSim.registerVoltageCallback((name, value) -> {
-      store.m_wasTriggered = true;
-      store.m_wasCorrectType = true;
-      store.m_setValue = value.getDouble();
-    }, false)) {
-      assertFalse(store.m_wasTriggered);
+      try (CallbackStore cb = outputSim.registerVoltageCallback((name, value) -> {
+        store.m_wasTriggered = true;
+        store.m_wasCorrectType = true;
+        store.m_setValue = value.getDouble();
+      }, false)) {
+        assertFalse(store.m_wasTriggered);
 
-      for (double i = 0.1; i < 5.0; i += 0.1) {
-        store.reset();
+        for (double i = 0.1; i < 5.0; i += 0.1) {
+          store.reset();
 
-        output.setVoltage(0);
+          output.setVoltage(0);
 
-        assertTrue(store.m_wasTriggered);
-        assertEquals(store.m_setValue, 0, 0.001);
+          assertTrue(store.m_wasTriggered);
+          assertEquals(store.m_setValue, 0, 0.001);
 
-        store.reset();
+          store.reset();
 
-        output.setVoltage(i);
+          output.setVoltage(i);
 
-        assertTrue(store.m_wasTriggered);
-        assertEquals(store.m_setValue, i, 0.001);
-
+          assertTrue(store.m_wasTriggered);
+          assertEquals(store.m_setValue, i, 0.001);
+        }
       }
     }
-
-    output.close();
   }
 }

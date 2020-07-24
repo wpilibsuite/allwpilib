@@ -32,7 +32,7 @@ class CubicHermiteSplineTest {
   @SuppressWarnings({"ParameterName", "PMD.UnusedLocalVariable"})
   private void run(Pose2d a, List<Translation2d> waypoints, Pose2d b) {
     // Start the timer.
-    var start = System.nanoTime();
+    //var start = System.nanoTime();
 
     // Generate and parameterize the spline.
     var controlVectors =
@@ -51,10 +51,10 @@ class CubicHermiteSplineTest {
     }
 
     // End the timer.
-    var end = System.nanoTime();
+    //var end = System.nanoTime();
 
     // Calculate the duration (used when benchmarking)
-    var durationMicroseconds = (end - start) / 1000.0;
+    //var durationMicroseconds = (end - start) / 1000.0;
 
     for (int i = 0; i < poses.size() - 1; i++) {
       var p0 = poses.get(i);

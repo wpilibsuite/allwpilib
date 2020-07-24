@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,94 +18,94 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RobotDisabledCommandTest extends CommandTestBase {
   @Test
   void robotDisabledCommandCancelTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      MockCommandHolder holder = new MockCommandHolder(false);
+      Command mockCommand = holder.getMock();
 
-    MockCommandHolder holder = new MockCommandHolder(false);
-    Command mockCommand = holder.getMock();
+      scheduler.schedule(mockCommand);
 
-    scheduler.schedule(mockCommand);
+      assertTrue(scheduler.isScheduled(mockCommand));
 
-    assertTrue(scheduler.isScheduled(mockCommand));
+      setDSEnabled(false);
 
-    setDSEnabled(false);
+      scheduler.run();
 
-    scheduler.run();
+      assertFalse(scheduler.isScheduled(mockCommand));
 
-    assertFalse(scheduler.isScheduled(mockCommand));
-
-    setDSEnabled(true);
+      setDSEnabled(true);
+    }
   }
 
   @Test
   void runWhenDisabledTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      MockCommandHolder holder = new MockCommandHolder(true);
+      Command mockCommand = holder.getMock();
 
-    MockCommandHolder holder = new MockCommandHolder(true);
-    Command mockCommand = holder.getMock();
+      scheduler.schedule(mockCommand);
 
-    scheduler.schedule(mockCommand);
+      assertTrue(scheduler.isScheduled(mockCommand));
 
-    assertTrue(scheduler.isScheduled(mockCommand));
+      setDSEnabled(false);
 
-    setDSEnabled(false);
+      scheduler.run();
 
-    scheduler.run();
-
-    assertTrue(scheduler.isScheduled(mockCommand));
+      assertTrue(scheduler.isScheduled(mockCommand));
+    }
   }
 
   @Test
   void sequentialGroupRunWhenDisabledTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      MockCommandHolder command1Holder = new MockCommandHolder(true);
+      Command command1 = command1Holder.getMock();
+      MockCommandHolder command2Holder = new MockCommandHolder(true);
+      Command command2 = command2Holder.getMock();
+      MockCommandHolder command3Holder = new MockCommandHolder(true);
+      Command command3 = command3Holder.getMock();
+      MockCommandHolder command4Holder = new MockCommandHolder(false);
+      Command command4 = command4Holder.getMock();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true);
-    Command command2 = command2Holder.getMock();
-    MockCommandHolder command3Holder = new MockCommandHolder(true);
-    Command command3 = command3Holder.getMock();
-    MockCommandHolder command4Holder = new MockCommandHolder(false);
-    Command command4 = command4Holder.getMock();
+      Command runWhenDisabled = new SequentialCommandGroup(command1, command2);
+      Command dontRunWhenDisabled = new SequentialCommandGroup(command3, command4);
 
-    Command runWhenDisabled = new SequentialCommandGroup(command1, command2);
-    Command dontRunWhenDisabled = new SequentialCommandGroup(command3, command4);
+      scheduler.schedule(runWhenDisabled);
+      scheduler.schedule(dontRunWhenDisabled);
 
-    scheduler.schedule(runWhenDisabled);
-    scheduler.schedule(dontRunWhenDisabled);
+      setDSEnabled(false);
 
-    setDSEnabled(false);
+      scheduler.run();
 
-    scheduler.run();
-
-    assertTrue(scheduler.isScheduled(runWhenDisabled));
-    assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
+      assertTrue(scheduler.isScheduled(runWhenDisabled));
+      assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
+    }
   }
 
   @Test
   void parallelGroupRunWhenDisabledTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      MockCommandHolder command1Holder = new MockCommandHolder(true);
+      Command command1 = command1Holder.getMock();
+      MockCommandHolder command2Holder = new MockCommandHolder(true);
+      Command command2 = command2Holder.getMock();
+      MockCommandHolder command3Holder = new MockCommandHolder(true);
+      Command command3 = command3Holder.getMock();
+      MockCommandHolder command4Holder = new MockCommandHolder(false);
+      Command command4 = command4Holder.getMock();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true);
-    Command command2 = command2Holder.getMock();
-    MockCommandHolder command3Holder = new MockCommandHolder(true);
-    Command command3 = command3Holder.getMock();
-    MockCommandHolder command4Holder = new MockCommandHolder(false);
-    Command command4 = command4Holder.getMock();
+      Command runWhenDisabled = new ParallelCommandGroup(command1, command2);
+      Command dontRunWhenDisabled = new ParallelCommandGroup(command3, command4);
 
-    Command runWhenDisabled = new ParallelCommandGroup(command1, command2);
-    Command dontRunWhenDisabled = new ParallelCommandGroup(command3, command4);
+      scheduler.schedule(runWhenDisabled);
+      scheduler.schedule(dontRunWhenDisabled);
 
-    scheduler.schedule(runWhenDisabled);
-    scheduler.schedule(dontRunWhenDisabled);
+      setDSEnabled(false);
 
-    setDSEnabled(false);
+      scheduler.run();
 
-    scheduler.run();
-
-    assertTrue(scheduler.isScheduled(runWhenDisabled));
-    assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
+      assertTrue(scheduler.isScheduled(runWhenDisabled));
+      assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
+    }
   }
 
   @Test
@@ -121,15 +121,15 @@ class RobotDisabledCommandTest extends CommandTestBase {
     MockCommandHolder command4Holder = new MockCommandHolder(false);
     Command command4 = command4Holder.getMock();
 
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Command runWhenDisabled = new ConditionalCommand(command1, command2, () -> true);
+      Command dontRunWhenDisabled = new ConditionalCommand(command3, command4, () -> true);
 
-    Command runWhenDisabled = new ConditionalCommand(command1, command2, () -> true);
-    Command dontRunWhenDisabled = new ConditionalCommand(command3, command4, () -> true);
+      scheduler.schedule(runWhenDisabled, dontRunWhenDisabled);
 
-    scheduler.schedule(runWhenDisabled, dontRunWhenDisabled);
-
-    assertTrue(scheduler.isScheduled(runWhenDisabled));
-    assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
+      assertTrue(scheduler.isScheduled(runWhenDisabled));
+      assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
+    }
   }
 
   @Test
@@ -148,12 +148,12 @@ class RobotDisabledCommandTest extends CommandTestBase {
     Command runWhenDisabled = new SelectCommand(Map.of(1, command1, 2, command2), () -> 1);
     Command dontRunWhenDisabled = new SelectCommand(Map.of(1, command3, 2, command4), () -> 1);
 
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      scheduler.schedule(runWhenDisabled, dontRunWhenDisabled);
 
-    scheduler.schedule(runWhenDisabled, dontRunWhenDisabled);
-
-    assertTrue(scheduler.isScheduled(runWhenDisabled));
-    assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
+      assertTrue(scheduler.isScheduled(runWhenDisabled));
+      assertFalse(scheduler.isScheduled(dontRunWhenDisabled));
+    }
   }
 
   @Test
@@ -169,15 +169,15 @@ class RobotDisabledCommandTest extends CommandTestBase {
     MockCommandHolder command4Holder = new MockCommandHolder(false);
     Command command4 = command4Holder.getMock();
 
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Command runWhenDisabled = new ConditionalCommand(command1, command2, () -> true);
+      Command dontRunWhenDisabled = new ConditionalCommand(command3, command4, () -> true);
 
-    Command runWhenDisabled = new ConditionalCommand(command1, command2, () -> true);
-    Command dontRunWhenDisabled = new ConditionalCommand(command3, command4, () -> true);
+      Command parallel = parallel(runWhenDisabled, dontRunWhenDisabled);
 
-    Command parallel = parallel(runWhenDisabled, dontRunWhenDisabled);
+      scheduler.schedule(parallel);
 
-    scheduler.schedule(parallel);
-
-    assertFalse(scheduler.isScheduled(runWhenDisabled));
+      assertFalse(scheduler.isScheduled(runWhenDisabled));
+    }
   }
 }
