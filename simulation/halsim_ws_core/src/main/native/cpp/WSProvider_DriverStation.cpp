@@ -27,22 +27,42 @@ void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderDriverStation::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
+  bool sendDiffOnly = (cbType != "");
 
-  if (cbType == "Enabled") {
-    return {{">enabled", static_cast<bool>(HALSIM_GetDriverStationEnabled())}};
-  } else if (cbType == "Autonomous") {
-    return {
-        {">autonomous", static_cast<bool>(HALSIM_GetDriverStationAutonomous())},
-    };
-  } else if (cbType == "Test") {
-    return {{">test", static_cast<bool>(HALSIM_GetDriverStationTest())}};
-  } else if (cbType == "EStop") {
-    return {{">estop", static_cast<bool>(HALSIM_GetDriverStationEStop())}};
-  } else if (cbType == "FmsAttached") {
-    return {{">fms", static_cast<bool>(HALSIM_GetDriverStationFmsAttached())}};
-  } else if (cbType == "DsAttached") {
-    return {{">ds", static_cast<bool>(HALSIM_GetDriverStationDsAttached())}};
-  } else if (cbType == "AllianceStationId") {
+  wpi::json result;
+
+  if (cbType == "Enabled" || !sendDiffOnly) {
+    result[">enabled"] = static_cast<bool>(HALSIM_GetDriverStationEnabled());
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "Autonomous" || !sendDiffOnly) {
+    result[">autonomous"] =
+        static_cast<bool>(HALSIM_GetDriverStationAutonomous());
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "Test" || !sendDiffOnly) {
+    result[">test"] = static_cast<bool>(HALSIM_GetDriverStationTest());
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "EStop" || !sendDiffOnly) {
+    result[">estop"] = static_cast<bool>(HALSIM_GetDriverStationEStop());
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "FmsAttached" || !sendDiffOnly) {
+    result[">fms"] = static_cast<bool>(HALSIM_GetDriverStationFmsAttached());
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "DsAttached" || !sendDiffOnly) {
+    result[">ds"] = static_cast<bool>(HALSIM_GetDriverStationDsAttached());
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "AllianceStationId" || !sendDiffOnly) {
     std::string station;
     switch (HALSIM_GetDriverStationAllianceStationId()) {
       case HAL_AllianceStationID_kRed1:
@@ -65,12 +85,16 @@ wpi::json HALSimWSProviderDriverStation::OnSimValueChanged(const char* cbName) {
         break;
     }
 
-    return {{">station", station}};
-  } else if (cbType == "MatchTime") {
-    return {{"<match_time", HALSIM_GetDriverStationMatchTime()}};
+    result[">station"] = station;
+    if (sendDiffOnly) return result;
   }
 
-  return {};
+  if (cbType == "MatchTime" || !sendDiffOnly) {
+    result["<match_time"] = HALSIM_GetDriverStationMatchTime();
+    if (sendDiffOnly) return result;
+  }
+
+  return result;
 }
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {

@@ -20,17 +20,27 @@ void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderDigitalPWM::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
+  bool sendDiffOnly = (cbType != "");
 
-  if (cbType == "Initialized") {
-    return {{"<init",
-             static_cast<bool>(HALSIM_GetDigitalPWMInitialized(m_channel))}};
-  } else if (cbType == "DutyCycle") {
-    return {{"<duty_cycle", HALSIM_GetDigitalPWMDutyCycle(m_channel)}};
-  } else if (cbType == "Pin") {
-    return {{"<dio_pin", HALSIM_GetDigitalPWMPin(m_channel)}};
+  wpi::json result;
+
+  if (cbType == "Initialized" || !sendDiffOnly) {
+    result["<init"] =
+        static_cast<bool>(HALSIM_GetDigitalPWMInitialized(m_channel));
+    if (sendDiffOnly) return result;
   }
 
-  return {};
+  if (cbType == "DutyCycle" || !sendDiffOnly) {
+    result["<duty_cycle"] = HALSIM_GetDigitalPWMDutyCycle(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "Pin" || !sendDiffOnly) {
+    result["<dio_pin"] = HALSIM_GetDigitalPWMPin(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  return result;
 }
 
 }  // namespace wpilibws

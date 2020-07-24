@@ -19,7 +19,7 @@ void HALSimWSHalProvider::OnNetworkConnected(
   }
 
   // trigger a send of the current state
-  OnSimCallback("");  // TODO Should we send a full state message?
+  OnSimCallback("");
 }
 
 void HALSimWSHalProvider::OnStaticSimCallback(const char* name, void* param,

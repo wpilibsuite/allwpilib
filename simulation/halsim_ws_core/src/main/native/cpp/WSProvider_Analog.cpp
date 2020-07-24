@@ -21,36 +21,74 @@ void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderAnalogIn::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
-  if (cbType == "Initialized") {
-    return {
-        {"<init", static_cast<bool>(HALSIM_GetAnalogInInitialized(m_channel))}};
-  } else if (cbType == "AverageBits") {
-    return {{"<avg_bits", HALSIM_GetAnalogInAverageBits(m_channel)}};
-  } else if (cbType == "OversampleBits") {
-    return {{"<oversample_bits", HALSIM_GetAnalogInOversampleBits(m_channel)}};
-  } else if (cbType == "Voltage") {
-    return {{">voltage", HALSIM_GetAnalogInVoltage(m_channel)}};
-  } else if (cbType == "AccumulatorInitialized") {
-    return {
-        {"accum",
-         {{"<init", static_cast<bool>(HALSIM_GetAnalogInAccumulatorInitialized(
-                        m_channel))}}}};
-  } else if (cbType == "AccumulatorValue") {
-    return {
-        {"accum", {{">value", HALSIM_GetAnalogInAccumulatorValue(m_channel)}}}};
-  } else if (cbType == "AccumulatorCount") {
-    return {
-        {"accum", {{">count", HALSIM_GetAnalogInAccumulatorCount(m_channel)}}}};
-  } else if (cbType == "AccumulatorCenter") {
-    return {{"accum",
-             {{"<center", HALSIM_GetAnalogInAccumulatorCenter(m_channel)}}}};
-  } else if (cbType == "AccumulatorDeadband") {
-    return {
-        {"accum",
-         {{"<deadband", HALSIM_GetAnalogInAccumulatorDeadband(m_channel)}}}};
+  bool sendDiffOnly = (cbType != "");
+
+  wpi::json result;
+
+  if (cbType == "Initialized" || !sendDiffOnly) {
+    result["<init"] =
+        static_cast<bool>(HALSIM_GetAnalogInInitialized(m_channel));
+    if (sendDiffOnly) return result;
   }
 
-  return {};
+  if (cbType == "AverageBits" || !sendDiffOnly) {
+    result["<avg_bit"] = HALSIM_GetAnalogInAverageBits(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "OversampleBits" || !sendDiffOnly) {
+    result["<oversample_bits"] = HALSIM_GetAnalogInOversampleBits(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "Voltage" || !sendDiffOnly) {
+    result[">voltage"] = HALSIM_GetAnalogInVoltage(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "AccumulatorInitialized" || !sendDiffOnly) {
+    if (result.find("accum") == result.end()) {
+      result["accum"] = wpi::json({});
+    }
+    result["accum"]["<init"] =
+        static_cast<bool>(HALSIM_GetAnalogInAccumulatorInitialized(m_channel));
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "AccumulatorValue" || !sendDiffOnly) {
+    if (result.find("accum") == result.end()) {
+      result["accum"] = wpi::json({});
+    }
+    result["accum"][">value"] = HALSIM_GetAnalogInAccumulatorValue(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "AccumulatorCount" || !sendDiffOnly) {
+    if (result.find("accum") == result.end()) {
+      result["accum"] = wpi::json({});
+    }
+    result["accum"][">count"] = HALSIM_GetAnalogInAccumulatorCount(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "AccumulatorCenter" || !sendDiffOnly) {
+    if (result.find("accum") == result.end()) {
+      result["accum"] = wpi::json({});
+    }
+    result["accum"]["<center"] = HALSIM_GetAnalogInAccumulatorCenter(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "AccumulatorDeadband" || !sendDiffOnly) {
+    if (result.find("accum") == result.end()) {
+      result["accum"] = wpi::json({});
+    }
+    result["accum"]["<deadband"] =
+        HALSIM_GetAnalogInAccumulatorDeadband(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  return result;
 }
 
 void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::json& json) {
@@ -77,14 +115,22 @@ void HALSimWSProviderAnalogOut::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderAnalogOut::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
+  bool sendDiffOnly = (cbType != "");
 
-  if (cbType == "Initialized") {
-    return {{"<init", HALSIM_GetAnalogOutInitialized(m_channel)}};
-  } else if (cbType == "Voltage") {
-    return {{"<voltage", HALSIM_GetAnalogOutVoltage(m_channel)}};
+  wpi::json result;
+
+  if (cbType == "Initialized" || !sendDiffOnly) {
+    result["<init"] =
+        static_cast<bool>(HALSIM_GetAnalogOutInitialized(m_channel));
+    if (sendDiffOnly) return result;
   }
 
-  return {};
+  if (cbType == "Voltage" || !sendDiffOnly) {
+    result["<voltage"] = HALSIM_GetAnalogOutVoltage(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  return result;
 }
 
 }  // namespace wpilibws

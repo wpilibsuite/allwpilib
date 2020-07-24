@@ -19,20 +19,33 @@ void HALSimWSProviderRelay::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderRelay::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
+  bool sendDiffOnly = (cbType != "");
 
-  if (cbType == "InitializedForward") {
-    return {{"<init_fwd",
-             static_cast<bool>(HALSIM_GetRelayInitializedForward(m_channel))}};
-  } else if (cbType == "InitializedReverse") {
-    return {{"<init_rev",
-             static_cast<bool>(HALSIM_GetRelayInitializedReverse(m_channel))}};
-  } else if (cbType == "Forward") {
-    return {{"<fwd", static_cast<bool>(HALSIM_GetRelayForward(m_channel))}};
-  } else if (cbType == "Reverse") {
-    return {{"<rev", static_cast<bool>(HALSIM_GetRelayReverse(m_channel))}};
+  wpi::json result;
+
+  if (cbType == "InitializedForward" || !sendDiffOnly) {
+    result["<init_fwd"] =
+        static_cast<bool>(HALSIM_GetRelayInitializedForward(m_channel));
+    if (sendDiffOnly) return result;
   }
 
-  return {};
+  if (cbType == "InitializedReverse" || !sendDiffOnly) {
+    result["<init_rev"] =
+        static_cast<bool>(HALSIM_GetRelayInitializedReverse(m_channel));
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "Forward" || !sendDiffOnly) {
+    result["<fwd"] = static_cast<bool>(HALSIM_GetRelayForward(m_channel));
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "Reverse" || !sendDiffOnly) {
+    result["<rev"] = static_cast<bool>(HALSIM_GetRelayReverse(m_channel));
+    if (sendDiffOnly) return result;
+  }
+
+  return result;
 }
 
 }  // namespace wpilibws

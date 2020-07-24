@@ -20,18 +20,31 @@ void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderDIO::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
+  bool sendDiffOnly = (cbType != "");
 
-  if (cbType == "Initialized") {
-    return {{"<init", static_cast<bool>(HALSIM_GetDIOInitialized(m_channel))}};
-  } else if (cbType == "Value") {
-    return {{"<>value", static_cast<bool>(HALSIM_GetDIOValue(m_channel))}};
-  } else if (cbType == "PulseLength") {
-    return {{"<pulse_length", HALSIM_GetDIOPulseLength(m_channel)}};
-  } else if (cbType == "IsInput") {
-    return {{"<input", static_cast<bool>(HALSIM_GetDIOIsInput(m_channel))}};
+  wpi::json result;
+
+  if (cbType == "Initialized" || !sendDiffOnly) {
+    result["<init"] = static_cast<bool>(HALSIM_GetDIOInitialized(m_channel));
+    if (sendDiffOnly) return result;
   }
 
-  return {};
+  if (cbType == "Value" || !sendDiffOnly) {
+    result["<>value"] = static_cast<bool>(HALSIM_GetDIOValue(m_channel));
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "PulseLength" || !sendDiffOnly) {
+    result["<pulse_length"] = HALSIM_GetDIOPulseLength(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "IsInput" || !sendDiffOnly) {
+    result["<input"] = static_cast<bool>(HALSIM_GetDIOIsInput(m_channel));
+    if (sendDiffOnly) return result;
+  }
+
+  return result;
 }
 
 void HALSimWSProviderDIO::OnNetValueChanged(const wpi::json& json) {

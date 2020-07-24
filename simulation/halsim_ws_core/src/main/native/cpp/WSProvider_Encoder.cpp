@@ -20,26 +20,43 @@ void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
 
 wpi::json HALSimWSProviderEncoder::OnSimValueChanged(const char* cbName) {
   std::string cbType(cbName);
+  bool sendDiffOnly = (cbType != "");
 
-  if (cbType == "Initialized") {
-    return {
-        {"<init", static_cast<bool>(HALSIM_GetEncoderInitialized(m_channel))}};
-  } else if (cbType == "Count") {
-    return {{">count", HALSIM_GetEncoderCount(m_channel)}};
-  } else if (cbType == "Period") {
-    return {{">period", HALSIM_GetEncoderPeriod(m_channel)}};
-  } else if (cbType == "Reset") {
-    return {{"<reset", static_cast<bool>(HALSIM_GetEncoderReset(m_channel))}};
-  } else if (cbType == "MaxPeriod") {
-    return {{"<max_period", HALSIM_GetEncoderMaxPeriod(m_channel)}};
-  } else if (cbType == "ReverseDirection") {
-    return {{"<reverse_direction",
-             static_cast<bool>(HALSIM_GetEncoderReverseDirection(m_channel))}};
-  } else if (cbType == "SamplesToAverage") {
-    return {{"<samples_to_avg", HALSIM_GetEncoderSamplesToAverage(m_channel)}};
+  wpi::json result;
+
+  if (cbType == "Initialized" || !sendDiffOnly) {
+    result["<init"] =
+        static_cast<bool>(HALSIM_GetEncoderInitialized(m_channel));
+    if (sendDiffOnly) return result;
   }
 
-  return {};
+  if (cbType == "Count" || !sendDiffOnly) {
+    result[">count"] = HALSIM_GetEncoderCount(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "Period" || !sendDiffOnly) {
+    result[">period"] = HALSIM_GetEncoderPeriod(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "Reset" || !sendDiffOnly) {
+    result["<reset"] = static_cast<bool>(HALSIM_GetEncoderReset(m_channel));
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "ReverseDirection" || !sendDiffOnly) {
+    result["<reverse_direction"] =
+        static_cast<bool>(HALSIM_GetEncoderReverseDirection(m_channel));
+    if (sendDiffOnly) return result;
+  }
+
+  if (cbType == "SamplesToAverage" || !sendDiffOnly) {
+    result["<samples_to_avg"] = HALSIM_GetEncoderSamplesToAverage(m_channel);
+    if (sendDiffOnly) return result;
+  }
+
+  return result;
 }
 
 void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::json& json) {
