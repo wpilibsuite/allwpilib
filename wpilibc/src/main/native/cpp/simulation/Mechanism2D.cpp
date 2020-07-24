@@ -5,36 +5,35 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-
-
 #include "frc/simulation/Mechanism2D.h"
+
+#include <wpi/raw_ostream.h>
 
 using namespace frc;
 
-
 Mechanism2D::Mechanism2D() : m_device{"Mechanism2D"} {}
-//std::string angleString = "angle/"
-void Mechanism2D::SetLigamentAngle(std::string ligamentPath, float angle) {
-    if (m_device) {
-        ligamentPath = ligamentPath + "angle/";
 
-        if (!createdItems.count(ligamentPath)) {
-            createdItems[ligamentPath] = m_device.CreateDouble(ligamentPath.c_str(), false, angle);
-        }
-    } else {
-        createdItems[ligamentPath].Set(angle);
+void Mechanism2D::SetLigamentAngle(std::string ligamentPath, float angle) {
+  if (m_device) {
+    ligamentPath = ligamentPath + "angle/";
+    wpi::outs() << ligamentPath;
+    if (!createdItems.count(ligamentPath)) {
+      createdItems[ligamentPath] =
+          m_device.CreateDouble(ligamentPath.c_str(), false, angle);
     }
+  } else {
+    createdItems[ligamentPath].Set(angle);
+  }
 }
 
 void Mechanism2D::SetLigamentALength(std::string ligamentPath, float length) {
-    if (m_device) {
-        ligamentPath = ligamentPath + "length/";
-
-        if (!createdItems.count(ligamentPath)) {
-            createdItems[ligamentPath] = m_device.CreateDouble(ligamentPath.c_str(), false, length);
-        }
-    } else {
-        createdItems[ligamentPath].Set(length);
+  if (m_device) {
+    ligamentPath = ligamentPath + "length/";
+    if (!createdItems.count(ligamentPath)) {
+      createdItems[ligamentPath] =
+          m_device.CreateDouble(ligamentPath.c_str(), false, length);
     }
+  } else {
+    createdItems[ligamentPath].Set(length);
+  }
 }
-// State space PR
