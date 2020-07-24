@@ -138,6 +138,7 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
 
   if (notifierRefCount.fetch_add(1) == 0) {
     std::scoped_lock lock(notifierMutex);
+    notifierRunning = true;
     notifierThread = std::thread(notifierThreadMain);
     notifierAlarm.reset(tAlarm::create(status));
   }
