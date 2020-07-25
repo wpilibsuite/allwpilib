@@ -13,13 +13,12 @@
 
 namespace wpilibws {
 
-class HALSimBaseWebSocketConnection
-    : public std::enable_shared_from_this<HALSimBaseWebSocketConnection> {
+class HALSimBaseWebSocketConnection {
  public:
   virtual void OnSimValueChanged(const wpi::json& msg) = 0;
 
  protected:
-  virtual ~HALSimBaseWebSocketConnection() {}
+  virtual ~HALSimBaseWebSocketConnection() = default;
 };
 
 }  // namespace wpilibws

@@ -11,6 +11,6 @@ target_link_libraries(halsim_ws_server PUBLIC hal halsim_ws_core)
 
 target_include_directories(halsim_ws_server PRIVATE src/main/native/include)
 
-set_property(TARGET halsim_ws_server PROEPRTY FOLDER "libraries")
+set_property(TARGET halsim_ws_server PROPERTY FOLDER "libraries")
 
 install(TARGETS halsim_ws_server EXPORT halsim_ws_server DESTINATION "${main_lib_dest}")

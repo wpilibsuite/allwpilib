@@ -52,8 +52,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
       return;
     }
 
-    if (!hws->RegisterWebsocket(
-            HALSimBaseWebSocketConnection::shared_from_this())) {
+    if (!hws->RegisterWebsocket(shared_from_this())) {
       Log(409);
       m_websocket->Fail(409, "Only a single simulation websocket is allowed");
       return;
@@ -91,7 +90,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 
       auto hws = HALSimWeb::GetInstance();
       if (hws) {
-        hws->CloseWebsocket(HALSimBaseWebSocketConnection::shared_from_this());
+        hws->CloseWebsocket(shared_from_this());
       }
     }
   });

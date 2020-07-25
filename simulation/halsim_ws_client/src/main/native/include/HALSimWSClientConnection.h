@@ -21,7 +21,9 @@ namespace wpilibws {
 
 class HALSimWS;
 
-class HALSimWSClientConnection : public HALSimBaseWebSocketConnection {
+class HALSimWSClientConnection
+    : public HALSimBaseWebSocketConnection,
+      public std::enable_shared_from_this<HALSimWSClientConnection> {
  public:
   using BufferPool = wpi::uv::SimpleBufferPool<4>;
   using LoopFunc = std::function<void(void)>;
