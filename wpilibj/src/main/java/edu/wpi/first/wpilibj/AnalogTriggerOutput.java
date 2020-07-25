@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -44,6 +44,7 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
   /**
    * Exceptions dealing with improper operation of the Analog trigger output.
    */
+  @SuppressWarnings("serial")
   public static class AnalogTriggerOutputException extends RuntimeException {
     /**
      * Create a new exception with the given message.
