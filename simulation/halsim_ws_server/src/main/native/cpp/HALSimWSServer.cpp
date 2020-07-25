@@ -79,8 +79,9 @@ bool HALSimWeb::Initialize() {
     return false;
   }
 
-  m_loop->error.connect(
-      [](uv::Error err) { wpi::errs() << "uv ERROR: " << err.str() << '\n'; });
+  m_loop->error.connect([](uv::Error err) {
+    wpi::errs() << "HALSim WS Server libuv ERROR: " << err.str() << '\n';
+  });
 
   m_server = uv::Tcp::Create(m_loop);
   if (!m_server) {
@@ -109,8 +110,8 @@ void HALSimWeb::MainLoop() {
 
   // start listening for incoming connections
   m_server->Listen();
-  wpi::errs() << "Listening at http://localhost:" << m_port << "\n";
-  wpi::errs() << "WebSocket URI: " << m_uri << "\n";
+  wpi::outs() << "Listening at http://localhost:" << m_port << "\n";
+  wpi::outs() << "WebSocket URI: " << m_uri << "\n";
   m_loop->Run();
 }
 

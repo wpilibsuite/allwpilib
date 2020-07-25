@@ -54,8 +54,9 @@ bool HALSimWS::Initialize() {
     return false;
   }
 
-  m_loop->error.connect(
-      [](uv::Error err) { wpi::errs() << "uv Error: " << err.str() << "\n"; });
+  m_loop->error.connect([](uv::Error err) {
+    wpi::errs() << "HALSim WS Client libuv Error: " << err.str() << "\n";
+  });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
   if (!m_tcp_client) {
@@ -77,7 +78,7 @@ bool HALSimWS::Initialize() {
       });
 
   m_tcp_client->closed.connect(
-      []() { wpi::errs() << "TCP connection closed\n"; });
+      []() { wpi::outs() << "TCP connection closed\n"; });
 
   // Set up the connection timer
   m_connect_timer = uv::Timer::Create(m_loop);
@@ -85,8 +86,8 @@ bool HALSimWS::Initialize() {
     return false;
   }
 
-  wpi::errs() << "HALSimWS Initialized\n";
-  wpi::errs() << "Will attempt to connect to: " << m_host << ":" << m_port
+  wpi::outs() << "HALSimWS Initialized\n";
+  wpi::outs() << "Will attempt to connect to: " << m_host << ":" << m_port
               << " " << m_uri << "\n";
 
   return true;
@@ -110,7 +111,7 @@ void HALSimWS::MainLoop() {
 void HALSimWS::AttemptConnect() {
   m_connect_attempts++;
 
-  wpi::errs() << "Connection Attempt " << m_connect_attempts << "\n";
+  wpi::outs() << "Connection Attempt " << m_connect_attempts << "\n";
 
   struct sockaddr_in dest;
   uv::NameToAddr(m_host, m_port, &dest);

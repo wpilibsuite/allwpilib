@@ -55,7 +55,7 @@ void HALSimWSClientConnection::Initialize() {
     }
 
     m_ws_connected = true;
-    wpi::errs() << "HALSimWS: WebSocket Connected\n";
+    wpi::outs() << "HALSimWS: WebSocket Connected\n";
   });
 
   m_websocket->text.connect([this](wpi::StringRef msg, bool) {
@@ -80,7 +80,7 @@ void HALSimWSClientConnection::Initialize() {
 
   m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
     if (m_ws_connected) {
-      wpi::errs() << "HALSimWS: Websocket Disconnected\n";
+      wpi::outs() << "HALSimWS: Websocket Disconnected\n";
       m_ws_connected = false;
 
       auto hws = HALSimWS::GetInstance();
