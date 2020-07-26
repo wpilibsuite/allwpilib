@@ -103,6 +103,8 @@ void HALSimWeb::MainLoop() {
     auto tcp = srv->Accept();
     if (!tcp) return;
 
+    tcp->SetNoDelay(true);
+
     auto conn = std::make_shared<HALSimHttpConnection>(tcp, m_webroot_sys,
                                                        m_webroot_user);
     tcp->SetData(conn);

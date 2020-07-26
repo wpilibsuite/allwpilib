@@ -63,6 +63,8 @@ bool HALSimWS::Initialize() {
     return false;
   }
 
+  m_tcp_client->SetNoDelay(true);
+
   // Hook up TCP client events
   m_tcp_client->error.connect(
       [this, socket = m_tcp_client.get()](wpi::uv::Error err) {
