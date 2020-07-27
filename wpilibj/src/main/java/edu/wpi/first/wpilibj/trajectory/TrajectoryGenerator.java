@@ -232,6 +232,7 @@ public final class TrajectoryGenerator {
   }
 
   // Work around type erasure signatures
+  @SuppressWarnings("serial")
   public static class ControlVectorList extends ArrayList<Spline.ControlVector> {
     public ControlVectorList(int initialCapacity) {
       super(initialCapacity);
