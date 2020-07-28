@@ -48,7 +48,7 @@ class MyRobot : public frc::TimedRobot {
    */
   void RobotPeriodic() override {
     mechanism2D.SetLigamentAngle("/JasonOne/one/", counter++);
-    wpi::outs() << counter;
+    wpi::outs() << "MyRobot.cpp " << counter << "\n";
   }
 };
 
