@@ -33,36 +33,9 @@ int windowWidth = 100;
 int windowHeight = 100;
 
 static HAL_SimDeviceHandle devHandle = 0;
-
-static struct NamedColor {
-  const char* name;
-  ImColor value;
-}
-
-staticColors[] = {{"white", IM_COL32(255, 255, 255, 255)},
-                  {"silver", IM_COL32(192, 192, 192, 255)},
-                  {"gray", IM_COL32(128, 128, 128, 255)},
-                  {"black", IM_COL32(0, 0, 0, 255)},
-                  {"red", IM_COL32(255, 0, 0, 255)},
-                  {"maroon", IM_COL32(128, 0, 0, 255)},
-                  {"yellow", IM_COL32(255, 255, 0, 255)},
-                  {"olive", IM_COL32(128, 128, 0, 255)},
-                  {"lime", IM_COL32(0, 255, 0, 255)},
-                  {"green", IM_COL32(0, 128, 0, 255)},
-                  {"aqua", IM_COL32(0, 255, 255, 255)},
-                  {"teal", IM_COL32(0, 128, 128, 255)},
-                  {"blue", IM_COL32(0, 0, 255, 255)},
-                  {"navy", IM_COL32(0, 0, 128, 255)},
-                  {"fuchsia", IM_COL32(255, 0, 255, 255)},
-                  {"purple", IM_COL32(128, 0, 128, 255)}};
-
 wpi::StringMap<ImColor> colorLookUpTable;
-
-static void buildColorTable() {
-  for (auto&& namedColor : staticColors) {
-    colorLookUpTable.try_emplace(namedColor.name, namedColor.value);
-  }
-}
+std::unique_ptr<pfd::open_file> m_fileOpener;
+std::string previousJsonLocation = "Not empty";
 
 struct BodyConfig {
   std::string name;
@@ -75,6 +48,7 @@ struct BodyConfig {
   std::vector<BodyConfig> children;
   int lineWidth = 1;
 };
+std::vector<BodyConfig> bodyConfigVector;
 
 struct DrawLineStruct {
   float xEnd;
@@ -82,19 +56,86 @@ struct DrawLineStruct {
   float angle;
 };
 
-std::vector<BodyConfig> bodyConfigVector;
-std::unique_ptr<pfd::open_file> m_fileOpener;
+static struct NamedColor {
+  const char* name;
+  ImColor value;
+} staticColors[] = {{"white", IM_COL32(255, 255, 255, 255)},
+                    {"silver", IM_COL32(192, 192, 192, 255)},
+                    {"gray", IM_COL32(128, 128, 128, 255)},
+                    {"black", IM_COL32(0, 0, 0, 255)},
+                    {"red", IM_COL32(255, 0, 0, 255)},
+                    {"maroon", IM_COL32(128, 0, 0, 255)},
+                    {"yellow", IM_COL32(255, 255, 0, 255)},
+                    {"olive", IM_COL32(128, 128, 0, 255)},
+                    {"lime", IM_COL32(0, 255, 0, 255)},
+                    {"green", IM_COL32(0, 128, 0, 255)},
+                    {"aqua", IM_COL32(0, 255, 255, 255)},
+                    {"teal", IM_COL32(0, 128, 128, 255)},
+                    {"blue", IM_COL32(0, 0, 255, 255)},
+                    {"navy", IM_COL32(0, 0, 128, 255)},
+                    {"fuchsia", IM_COL32(255, 0, 255, 255)},
+                    {"purple", IM_COL32(128, 0, 128, 255)}};
 
-std::string GetJsonFileLocation() {
+static void buildColorTable() {
+  for (auto&& namedColor : staticColors) {
+    colorLookUpTable.try_emplace(namedColor.name, namedColor.value);
+  }
+}
+
+class Mechanism2DInfo {
+ public:
+  std::string jsonLocation = "";
+};
+
+static Mechanism2DInfo mechanism2DInfo;
+
+bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
+  if (name == "jsonLocation") {
+    mechanism2DInfo.jsonLocation = value;
+  } else {
+    return false;
+  }
+  return true;
+}
+
+void WriteIni(ImGuiTextBuffer* out) {
+  out->appendf("[Mechanism2D][Mechanism]\njsonLocation=%s\n\n",
+               mechanism2DInfo.jsonLocation.c_str());
+}
+
+// read/write settings to ini file
+static void* Mechanism2DReadOpen(ImGuiContext* ctx,
+                                   ImGuiSettingsHandler* handler,
+                                   const char* name) {
+  if (name == wpi::StringRef{"Mechanism2D"}) return &mechanism2DInfo;
+  return nullptr;
+}
+
+static void Mechanism2DReadLine(ImGuiContext* ctx,
+                                  ImGuiSettingsHandler* handler, void* entry,
+                                  const char* lineStr) {
+  wpi::StringRef line{lineStr};
+  auto [name, value] = line.split('=');
+  name = name.trim();
+  value = value.trim();
+  if (entry == &mechanism2DInfo) ReadIni(name, value);
+}
+
+static void Mechanism2DWriteAll(ImGuiContext* ctx,
+                                  ImGuiSettingsHandler* handler,
+                                  ImGuiTextBuffer* out_buf) {
+  WriteIni(out_buf);
+}
+
+void GetJsonFileLocation() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
     if (!result.empty()) {
-      return result[0];
+      mechanism2DInfo.jsonLocation = result[0];
     } else {
       wpi::errs() << "Can not find json file!!!";
     }
   }
-  return "";
 }
 
 DrawLineStruct DrawLine(float startXLocation, float startYLocation, int length,
@@ -263,15 +304,20 @@ static void OptionMenuLocateJson() {
     if (ImGui::MenuItem("Load Json")) {
       m_fileOpener = std::make_unique<pfd::open_file>(
           "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"});
-      wpi::outs() << "Opened:" << GetJsonFileLocation();
     }
     ImGui::EndMenu();
   }
 }
 
 static void DisplayAssembly2D() {
-  if (!GetJsonFileLocation().empty()) {
-    readJson(GetJsonFileLocation());
+  GetJsonFileLocation();
+  if (!mechanism2DInfo.jsonLocation.empty()) {
+    // Only read the json file if it changed
+    if (mechanism2DInfo.jsonLocation != previousJsonLocation) {
+      bodyConfigVector.clear();
+      readJson(mechanism2DInfo.jsonLocation);
+    }
+    previousJsonLocation = mechanism2DInfo.jsonLocation;
     ImVec2 windowPos = ImGui::GetWindowPos();
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(),
@@ -280,6 +326,15 @@ static void DisplayAssembly2D() {
 }
 
 void Mechanism2D::Initialize() {
+  // hook ini handler to save settings
+  ImGuiSettingsHandler iniHandler;
+  iniHandler.TypeName = "Simulator2D";
+  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
+  iniHandler.ReadOpenFn = Mechanism2DReadOpen;
+  iniHandler.ReadLineFn = Mechanism2DReadLine;
+  iniHandler.WriteAllFn = Mechanism2DWriteAll;
+  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+
   buildColorTable();
   HALSimGui::AddWindow("Mechanism 2D", DisplayAssembly2D);
   HALSimGui::AddOptionMenu(OptionMenuLocateJson);
