@@ -48,9 +48,10 @@ public class Mechanism2D {
     if (m_device != null) {
         if(!createdItems.containsKey(ligamentPath)){
             createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));
-        } else{
-            createdItems.get(ligamentPath).set(length);
         }
+//        else{
+            createdItems.get(ligamentPath).set(length);
+//        }
     }
   }
 }

@@ -22,9 +22,8 @@ void Mechanism2D::SetLigamentAngle(std::string ligamentPath, float angle) {
       createdItems[ligamentPath] =
           m_device.CreateDouble(ligamentPath.c_str(), false, angle);
     }
-  } else {
-    createdItems[ligamentPath].Set(angle);
   }
+    createdItems[ligamentPath].Set(angle);
 }
 
 void Mechanism2D::SetLigamentALength(std::string ligamentPath, float length) {

@@ -25,6 +25,7 @@
 #include <list>
 #include <string>
 #include <wpi/math>
+#include "portable-file-dialogs.h"
 
 using namespace halsimgui;
 
@@ -82,6 +83,19 @@ struct DrawLineStruct {
 };
 
 std::vector<BodyConfig> bodyConfigVector;
+std::unique_ptr<pfd::open_file> m_fileOpener;
+
+std::string GetJsonFileLocation() {
+  if (m_fileOpener && m_fileOpener->ready(0)) {
+    auto result = m_fileOpener->result();
+    if (!result.empty()) {
+      return result[0];
+    } else {
+      wpi::errs() << "Can not find json file!!!";
+    }
+  }
+  return "";
+}
 
 DrawLineStruct DrawLine(float startXLocation, float startYLocation, int length,
                         float angle, ImDrawList* drawList, ImVec2 windowPos,
@@ -144,8 +158,8 @@ static void buildDrawList(float startXLocation, float startYLocation,
                  colorLookUpTable[bodyConfig.color], bodyConfig, "");
 
     // For debugging
-    wpi::outs() << "cpp/Mechanism2D.cpp" << (bodyConfig.name + "angle/").c_str() << " "
-                << std::to_string(angle) << "\n";
+    wpi::outs() << "cpp/Mechanism2D.cpp" << (bodyConfig.name + "angle/").c_str()
+                << " " << std::to_string(angle) << "\n";
 
     // If the line has children then draw them with the stating points being the
     // end of the parent
@@ -154,13 +168,6 @@ static void buildDrawList(float startXLocation, float startYLocation,
                     bodyConfig.children, windowPos);
     }
   }
-}
-
-static void DisplayAssembly2D() {
-  ImVec2 windowPos = ImGui::GetWindowPos();
-  ImDrawList* drawList = ImGui::GetWindowDrawList();
-  buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(), drawList,
-                0, bodyConfigVector, windowPos);
 }
 
 BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
@@ -217,14 +224,12 @@ BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   return c;
 }
 
-static std::vector<BodyConfig> readJson(std::string jFile) {
-  std::vector<BodyConfig> cVector;
+void readJson(std::string jFile) {
   std::error_code ec;
   std::string name;
   wpi::raw_fd_istream is(jFile, ec);
   if (ec) {
     wpi::errs() << "could not open '" << jFile << "': " << ec.message() << '\n';
-    return cVector;
   }
   // parse file
   wpi::json j;
@@ -245,19 +250,39 @@ static std::vector<BodyConfig> readJson(std::string jFile) {
   }
   try {
     for (wpi::json const& body : j.at("body")) {
-      cVector.push_back(readSubJson("/" + name + "/", body));
+      bodyConfigVector.push_back(readSubJson("/" + name + "/", body));
     }
 
   } catch (const wpi::json::exception& e) {
     wpi::errs() << "could not read body: " << e.what() << '\n';
   }
-  return cVector;
+}
+
+static void OptionMenuLocateJson() {
+  if (ImGui::BeginMenu("Mechanism2D")) {
+    if (ImGui::MenuItem("Load Json")) {
+      m_fileOpener = std::make_unique<pfd::open_file>(
+          "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"});
+      wpi::outs() << "Opened:" << GetJsonFileLocation();
+    }
+    ImGui::EndMenu();
+  }
+}
+
+static void DisplayAssembly2D() {
+  if (!GetJsonFileLocation().empty()) {
+    readJson(GetJsonFileLocation());
+    ImVec2 windowPos = ImGui::GetWindowPos();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(),
+                  drawList, 0, bodyConfigVector, windowPos);
+  }
 }
 
 void Mechanism2D::Initialize() {
   buildColorTable();
-  bodyConfigVector = readJson("/home/gabe/github/allwpilib/Mechanism2D.json");
   HALSimGui::AddWindow("Mechanism 2D", DisplayAssembly2D);
+  HALSimGui::AddOptionMenu(OptionMenuLocateJson);
   HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
   HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
   HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
