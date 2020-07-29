@@ -18,10 +18,10 @@ Mechanism2D::Mechanism2D() : m_device{"Mechanism2D"} {}
 void Mechanism2D::SetLigamentAngle(const wpi::Twine& ligamentPath, float angle) {
   if (m_device) {
     wpi::SmallString<64> fullPathBuf;
-    wpi::StringRef fullPath = (ligamentPath + "angle/").toStringRef(fullPathBuf);
+    wpi::StringRef fullPath = (ligamentPath + "angle/").toNullTerminatedStringRef(fullPathBuf);
     if (!createdItems.count(fullPath)) {
       createdItems[fullPath] =
-          m_device.CreateDouble(fullPath, false, angle);
+          m_device.CreateDouble(fullPath.data(), false, angle);
     }
     createdItems[fullPath].Set(angle);
   }
@@ -30,10 +30,10 @@ void Mechanism2D::SetLigamentAngle(const wpi::Twine& ligamentPath, float angle) 
 void Mechanism2D::SetLigamentLength(const wpi::Twine& ligamentPath, float length) {
   if (m_device) {
     wpi::SmallString<64> fullPathBuf;
-    wpi::StringRef fullPath = (ligamentPath + "length/").toStringRef(fullPathBuf);
+    wpi::StringRef fullPath = (ligamentPath + "length/").toNullTerminatedStringRef(fullPathBuf);
     if (!createdItems.count(fullPath)) {
       createdItems[fullPath] =
-          m_device.CreateDouble(fullPath, false, length);
+          m_device.CreateDouble(fullPath.data(), false, length);
     }
     createdItems[fullPath].Set(length);
   }
