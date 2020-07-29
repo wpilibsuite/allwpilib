@@ -198,10 +198,6 @@ static void buildDrawList(float startXLocation, float startYLocation,
                  angleToGoTo, drawList, windowPos,
                  colorLookUpTable[bodyConfig.color], bodyConfig, "");
 
-    // For debugging
-    wpi::outs() << "cpp/Mechanism2D.cpp" << (bodyConfig.name + "angle/").c_str()
-                << " " << std::to_string(angle) << "\n";
-
     // If the line has children then draw them with the stating points being the
     // end of the parent
     if (!bodyConfig.children.empty()) {

@@ -16,14 +16,12 @@ Mechanism2D::Mechanism2D() : m_device{"Mechanism2D"} {}
 void Mechanism2D::SetLigamentAngle(std::string ligamentPath, float angle) {
   if (m_device) {
     ligamentPath = ligamentPath + "angle/";
-    wpi::outs() << "simulation/Mechanism2D.cpp" << ligamentPath << " " << createdItems.lookup(ligamentPath) << "\n";
-    if (createdItems.count(ligamentPath)) {
-      wpi::outs() << ligamentPath << " was created!!!!! \n";
+    if (!createdItems.count(ligamentPath)) {
       createdItems[ligamentPath] =
           m_device.CreateDouble(ligamentPath.c_str(), false, angle);
     }
   }
-    createdItems[ligamentPath].Set(angle);
+  createdItems[ligamentPath].Set(angle);
 }
 
 void Mechanism2D::SetLigamentALength(std::string ligamentPath, float length) {
@@ -33,7 +31,6 @@ void Mechanism2D::SetLigamentALength(std::string ligamentPath, float length) {
       createdItems[ligamentPath] =
           m_device.CreateDouble(ligamentPath.c_str(), false, length);
     }
-  } else {
-    createdItems[ligamentPath].Set(length);
   }
+  createdItems[ligamentPath].Set(length);
 }

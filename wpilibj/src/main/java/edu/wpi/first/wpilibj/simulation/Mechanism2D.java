@@ -30,9 +30,10 @@ public class Mechanism2D {
 //        System.out.println("java: " + ligamentPath + " " + angle);
         if(!createdItems.containsKey(ligamentPath)){
             createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
-        } else{
-            createdItems.get(ligamentPath).set(angle);
         }
+//        else{
+            createdItems.get(ligamentPath).set(angle);
+//        }
     }
   }
 
@@ -49,9 +50,7 @@ public class Mechanism2D {
         if(!createdItems.containsKey(ligamentPath)){
             createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));
         }
-//        else{
             createdItems.get(ligamentPath).set(length);
-//        }
     }
   }
 }
