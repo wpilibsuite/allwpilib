@@ -16,7 +16,6 @@
 
 #include <imgui_internal.h>
 #include <mockdata/SimDeviceData.h>
-#include <units/units.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
@@ -27,9 +26,6 @@
 
 using namespace halsimgui;
 
-int windowWidth = 100;
-int windowHeight = 100;
-
 static HAL_SimDeviceHandle devHandle = 0;
 static wpi::StringMap<ImColor> colorLookUpTable;
 static std::unique_ptr<pfd::open_file> m_fileOpener;
@@ -38,8 +34,6 @@ static std::string previousJsonLocation = "Not empty";
 struct BodyConfig {
   std::string name;
   std::string type = "line";
-  // TODO: use this
-  int startLocation = 0;
   int length = 100;
   std::string color = "green";
   int angle = 0;
@@ -103,15 +97,15 @@ void WriteIni(ImGuiTextBuffer* out) {
 
 // read/write settings to ini file
 static void* Mechanism2DReadOpen(ImGuiContext* ctx,
-                                   ImGuiSettingsHandler* handler,
-                                   const char* name) {
+                                 ImGuiSettingsHandler* handler,
+                                 const char* name) {
   if (name == wpi::StringRef{"Mechanism2D"}) return &mechanism2DInfo;
   return nullptr;
 }
 
 static void Mechanism2DReadLine(ImGuiContext* ctx,
-                                  ImGuiSettingsHandler* handler, void* entry,
-                                  const char* lineStr) {
+                                ImGuiSettingsHandler* handler, void* entry,
+                                const char* lineStr) {
   wpi::StringRef line{lineStr};
   auto [name, value] = line.split('=');
   name = name.trim();
@@ -120,8 +114,8 @@ static void Mechanism2DReadLine(ImGuiContext* ctx,
 }
 
 static void Mechanism2DWriteAll(ImGuiContext* ctx,
-                                  ImGuiSettingsHandler* handler,
-                                  ImGuiTextBuffer* out_buf) {
+                                ImGuiSettingsHandler* handler,
+                                ImGuiTextBuffer* out_buf) {
   WriteIni(out_buf);
 }
 
@@ -211,18 +205,6 @@ BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
     c.name = name + body.at("name").get<std::string>() + "/";
   } catch (const wpi::json::exception& e) {
     wpi::errs() << "could not read body name: " << e.what() << '\n';
-  }
-  try {
-    c.type = body.at("type").get<std::string>();
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "camera '" << c.name
-                << "': could not type path: " << e.what() << '\n';
-  }
-  try {
-    c.startLocation = body.at("startLocation").get<int>();
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "startLocation '" << c.name
-                << "': could not find startLocation path: " << e.what() << '\n';
   }
   try {
     c.length = body.at("length").get<int>();

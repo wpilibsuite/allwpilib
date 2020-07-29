@@ -19,6 +19,7 @@
 #include "EncoderGui.h"
 #include "Field2D.h"
 #include "HALSimGui.h"
+#include "Mechanism2D.h"
 #include "NetworkTablesGui.h"
 #include "PDPGui.h"
 #include "PWMGui.h"
@@ -27,7 +28,6 @@
 #include "SimDeviceGui.h"
 #include "SolenoidGui.h"
 #include "TimingGui.h"
-#include "Mechanism2D.h"
 
 using namespace halsimgui;
 
