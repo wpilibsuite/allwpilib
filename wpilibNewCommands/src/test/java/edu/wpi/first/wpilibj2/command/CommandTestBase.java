@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import edu.wpi.first.hal.sim.DriverStationSim;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,11 +33,10 @@ public abstract class CommandTestBase {
   }
 
   public void setDSEnabled(boolean enabled) {
-    DriverStationSim sim = new DriverStationSim();
-    sim.setDsAttached(true);
+    DriverStationSim.setDsAttached(true);
 
-    sim.setEnabled(enabled);
-    sim.notifyNewData();
+    DriverStationSim.setEnabled(enabled);
+    DriverStationSim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (DriverStation.getInstance().isEnabled() != enabled) {
       try {

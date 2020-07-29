@@ -8,9 +8,9 @@
 #include "EncoderGui.h"
 
 #include <hal/Ports.h>
+#include <hal/simulation/EncoderData.h>
+#include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
-#include <mockdata/EncoderData.h>
-#include <mockdata/SimDeviceData.h>
 
 #include "HALSimGui.h"
 #include "IniSaver.h"

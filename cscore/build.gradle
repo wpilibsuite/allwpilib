@@ -15,15 +15,60 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
+model {
+    components {
+        cscoreJNICvStatic(JniNativeLibrarySpec) {
+            baseName = 'cscorejnicvstatic'
+
+            enableCheckTask true
+            javaCompileTasks << compileJava
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/jni/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        include '**/*.h'
+                    }
+
+                }
+            }
+            binaries.all {
+                if (it instanceof StaticLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+
+                if (it.targetPlatform.operatingSystem.linux) {
+                    it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
+                } else if (it.targetPlatform.operatingSystem.macOsX) {
+                    it.linker.args '-exported_symbols_list'
+                    it.linker.args file('src/main/native/MacSymbolScript.txt').toString()
+                }
+            }
+        }
+    }
+}
+
+
 ext {
     sharedCvConfigs = [cscore    : [],
                        cscoreBase: [],
                        cscoreDev : [],
                        cscoreTest: [],
                        cscoreJNIShared: []]
-    staticCvConfigs = [cscoreJNI: []]
+    staticCvConfigs = [cscoreJNI: [],
+                       cscoreJNICvStatic: []]
     useJava = true
     useCpp = true
+    cvStaticBuild = true
     splitSetup = {
         if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
@@ -105,6 +150,14 @@ nativeUtils.exportsConfigs {
                             '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
     }
     cscoreJNI {
+        x86SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
+        }
+        x64SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
+        }
+    }
+    cscoreJNICvStatic {
         x86SymbolFilter = { symbols ->
             symbols.removeIf({ !it.startsWith('CS_') })
         }

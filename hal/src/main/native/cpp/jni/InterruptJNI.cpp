@@ -18,7 +18,7 @@
 #include "edu_wpi_first_hal_InterruptJNI.h"
 #include "hal/Interrupts.h"
 
-using namespace frc;
+using namespace hal;
 
 // Thread where callbacks are actually performed.
 //

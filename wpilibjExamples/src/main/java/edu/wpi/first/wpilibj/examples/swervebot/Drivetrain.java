@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.examples.swervebot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
@@ -37,20 +36,11 @@ public class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
   );
 
-  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics, getAngle());
+  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
+      m_gyro.getRotation2d());
 
   public Drivetrain() {
     m_gyro.reset();
-  }
-
-  /**
-   * Returns the angle of the robot as a Rotation2d.
-   *
-   * @return The angle of the robot.
-   */
-  public Rotation2d getAngle() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return Rotation2d.fromDegrees(-m_gyro.getAngle());
   }
 
   /**
@@ -65,7 +55,7 @@ public class Drivetrain {
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var swerveModuleStates = m_kinematics.toSwerveModuleStates(
         fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rot, getAngle())
+            xSpeed, ySpeed, rot, m_gyro.getRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rot)
     );
     SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
@@ -80,7 +70,7 @@ public class Drivetrain {
    */
   public void updateOdometry() {
     m_odometry.update(
-        getAngle(),
+        m_gyro.getRotation2d(),
         m_frontLeft.getState(),
         m_frontRight.getState(),
         m_backLeft.getState(),

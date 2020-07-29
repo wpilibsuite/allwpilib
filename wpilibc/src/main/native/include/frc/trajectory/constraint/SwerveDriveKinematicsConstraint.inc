@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <units/math.h>
+
 namespace frc {
 
 template <size_t NumModules>

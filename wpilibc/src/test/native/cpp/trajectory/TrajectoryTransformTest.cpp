@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,10 +24,8 @@ void TestSameShapedTrajectory(std::vector<frc::Trajectory::State> statesA,
     auto a = a2.RelativeTo(a1);
     auto b = b2.RelativeTo(b1);
 
-    EXPECT_NEAR(a.Translation().X().to<double>(),
-                b.Translation().X().to<double>(), 1E-9);
-    EXPECT_NEAR(a.Translation().Y().to<double>(),
-                b.Translation().Y().to<double>(), 1E-9);
+    EXPECT_NEAR(a.X().to<double>(), b.X().to<double>(), 1E-9);
+    EXPECT_NEAR(a.Y().to<double>(), b.Y().to<double>(), 1E-9);
     EXPECT_NEAR(a.Rotation().Radians().to<double>(),
                 b.Rotation().Radians().to<double>(), 1E-9);
   }
@@ -44,8 +42,8 @@ TEST(TrajectoryTransforms, TransformBy) {
 
   auto firstPose = transformedTrajectory.Sample(0_s).pose;
 
-  EXPECT_NEAR(firstPose.Translation().X().to<double>(), 1.0, 1E-9);
-  EXPECT_NEAR(firstPose.Translation().Y().to<double>(), 2.0, 1E-9);
+  EXPECT_NEAR(firstPose.X().to<double>(), 1.0, 1E-9);
+  EXPECT_NEAR(firstPose.Y().to<double>(), 2.0, 1E-9);
   EXPECT_NEAR(firstPose.Rotation().Degrees().to<double>(), 30.0, 1E-9);
 
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
@@ -62,8 +60,8 @@ TEST(TrajectoryTransforms, RelativeTo) {
 
   auto firstPose = transformedTrajectory.Sample(0_s).pose;
 
-  EXPECT_NEAR(firstPose.Translation().X().to<double>(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Translation().Y().to<double>(), 0, 1E-9);
+  EXPECT_NEAR(firstPose.X().to<double>(), 0, 1E-9);
+  EXPECT_NEAR(firstPose.Y().to<double>(), 0, 1E-9);
   EXPECT_NEAR(firstPose.Rotation().Degrees().to<double>(), 0, 1E-9);
 
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());

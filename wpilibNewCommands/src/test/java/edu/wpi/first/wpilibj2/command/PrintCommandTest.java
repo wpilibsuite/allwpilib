@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,20 +18,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class PrintCommandTest extends CommandTestBase {
   @Test
   void printCommandScheduleTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      final PrintStream originalOut = System.out;
+      ByteArrayOutputStream testOut = new ByteArrayOutputStream();
+      System.setOut(new PrintStream(testOut));
+      try {
+        PrintCommand command = new PrintCommand("Test!");
 
-    final PrintStream originalOut = System.out;
-    ByteArrayOutputStream testOut = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(testOut));
+        scheduler.schedule(command);
+        scheduler.run();
 
-    PrintCommand command = new PrintCommand("Test!");
-
-    scheduler.schedule(command);
-    scheduler.run();
-
-    assertFalse(scheduler.isScheduled(command));
-    assertEquals(testOut.toString(), "Test!" + System.lineSeparator());
-
-    System.setOut(originalOut);
+        assertFalse(scheduler.isScheduled(command));
+        assertEquals(testOut.toString(), "Test!" + System.lineSeparator());
+      } finally {
+        System.setOut(originalOut);
+      }
+    }
   }
 }

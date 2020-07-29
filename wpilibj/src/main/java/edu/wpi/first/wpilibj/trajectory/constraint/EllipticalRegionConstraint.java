@@ -72,9 +72,9 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
     // If the inequality is satisfied, then it is inside the ellipse; otherwise
     // it is outside the ellipse.
     // Both sides have been multiplied by Rx^2 * Ry^2 for efficiency reasons.
-    return Math.pow(robotPose.getTranslation().getX() - m_center.getX(), 2)
+    return Math.pow(robotPose.getX() - m_center.getX(), 2)
         * Math.pow(m_radii.getY(), 2)
-        + Math.pow(robotPose.getTranslation().getY() - m_center.getY(), 2)
+        + Math.pow(robotPose.getY() - m_center.getY(), 2)
         * Math.pow(m_radii.getX(), 2) <= Math.pow(m_radii.getX(), 2) * Math.pow(m_radii.getY(), 2);
   }
 }

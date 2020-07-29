@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,8 +22,8 @@ class Twist2dTest {
     var straightPose = new Pose2d().exp(straight);
 
     assertAll(
-        () -> assertEquals(straightPose.getTranslation().getX(), 5.0, kEpsilon),
-        () -> assertEquals(straightPose.getTranslation().getY(), 0.0, kEpsilon),
+        () -> assertEquals(straightPose.getX(), 5.0, kEpsilon),
+        () -> assertEquals(straightPose.getY(), 0.0, kEpsilon),
         () -> assertEquals(straightPose.getRotation().getRadians(), 0.0, kEpsilon)
     );
   }
@@ -34,8 +34,8 @@ class Twist2dTest {
     var quarterCirclePose = new Pose2d().exp(quarterCircle);
 
     assertAll(
-        () -> assertEquals(quarterCirclePose.getTranslation().getX(), 5.0, kEpsilon),
-        () -> assertEquals(quarterCirclePose.getTranslation().getY(), 5.0, kEpsilon),
+        () -> assertEquals(quarterCirclePose.getX(), 5.0, kEpsilon),
+        () -> assertEquals(quarterCirclePose.getY(), 5.0, kEpsilon),
         () -> assertEquals(quarterCirclePose.getRotation().getDegrees(), 90.0, kEpsilon)
     );
   }
@@ -46,8 +46,8 @@ class Twist2dTest {
     var diagonalPose = new Pose2d().exp(diagonal);
 
     assertAll(
-        () -> assertEquals(diagonalPose.getTranslation().getX(), 2.0, kEpsilon),
-        () -> assertEquals(diagonalPose.getTranslation().getY(), 2.0, kEpsilon),
+        () -> assertEquals(diagonalPose.getX(), 2.0, kEpsilon),
+        () -> assertEquals(diagonalPose.getY(), 2.0, kEpsilon),
         () -> assertEquals(diagonalPose.getRotation().getDegrees(), 0.0, kEpsilon)
     );
   }

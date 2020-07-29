@@ -5,7 +5,7 @@ include(GenResources)
 include(CompileWarnings)
 include(AddTest)
 
-file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
+file(GLOB wpiutil_jni_src src/main/native/cpp/jni/DrakeJNI.cpp src/main/native/cpp/jni/WPIUtilJNI.cpp)
 
 # Java bindings
 if (NOT WITHOUT_JAVA)
@@ -64,7 +64,11 @@ if (NOT WITHOUT_JAVA)
 
   execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil RESULT_VARIABLE generateResult)
   if(NOT (generateResult EQUAL "0"))
-    message(FATAL_ERROR "python3 generate_numbers.py failed")
+    # Try python
+    execute_process(COMMAND python ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil RESULT_VARIABLE generateResult)
+    if(NOT (generateResult EQUAL "0"))
+      message(FATAL_ERROR "python and python3 generate_numbers.py failed")
+    endif()
   endif()
 
   set(CMAKE_JNI_TARGET true)
@@ -171,7 +175,7 @@ set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
 target_compile_features(wpiutil PUBLIC cxx_std_17)
 if (MSVC)
-    target_compile_options(wpiutil PUBLIC /permissive- /Zc:throwingNew)
+    target_compile_options(wpiutil PUBLIC /permissive- /Zc:throwingNew /MP /bigobj)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
@@ -273,5 +277,6 @@ set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
 if (WITH_TESTS)
     wpilib_add_test(wpiutil src/test/native/cpp)
+    target_include_directories(wpiutil_test PRIVATE src/test/native/include)
     target_link_libraries(wpiutil_test wpiutil ${LIBUTIL} gmock_main)
 endif()

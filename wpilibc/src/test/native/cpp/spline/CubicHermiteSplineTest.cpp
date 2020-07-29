@@ -9,7 +9,7 @@
 #include <iostream>
 #include <vector>
 
-#include <units/units.h>
+#include <units/length.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -66,10 +66,8 @@ class CubicHermiteSplineTest : public ::testing::Test {
     }
 
     // Check first point.
-    EXPECT_NEAR(poses.front().first.Translation().X().to<double>(),
-                a.Translation().X().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.front().first.Translation().Y().to<double>(),
-                a.Translation().Y().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.front().first.X().to<double>(), a.X().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.front().first.Y().to<double>(), a.Y().to<double>(), 1E-9);
     EXPECT_NEAR(poses.front().first.Rotation().Radians().to<double>(),
                 a.Rotation().Radians().to<double>(), 1E-9);
 
@@ -90,10 +88,8 @@ class CubicHermiteSplineTest : public ::testing::Test {
     EXPECT_TRUE(interiorsGood);
 
     // Check last point.
-    EXPECT_NEAR(poses.back().first.Translation().X().to<double>(),
-                b.Translation().X().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.back().first.Translation().Y().to<double>(),
-                b.Translation().Y().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.back().first.X().to<double>(), b.X().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.back().first.Y().to<double>(), b.Y().to<double>(), 1E-9);
     EXPECT_NEAR(poses.back().first.Rotation().Radians().to<double>(),
                 b.Rotation().Radians().to<double>(), 1E-9);
 

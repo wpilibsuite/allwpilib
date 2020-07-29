@@ -283,10 +283,10 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              const wpi::Twine& path)
     : SourceImpl{name, logger, notifier, telemetry},
-      m_path{path.str()},
       m_fd{-1},
       m_command_fd{eventfd(0, 0)},
-      m_active{true} {
+      m_active{true},
+      m_path{path.str()} {
   SetDescription(GetDescriptionImpl(m_path.c_str()));
   SetQuirks();
 
@@ -784,6 +784,22 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   return CS_OK;
 }
 
+CS_StatusValue UsbCameraImpl::DeviceCmdSetPath(
+    std::unique_lock<wpi::mutex>& lock, const Message& msg) {
+  m_path = msg.dataStr;
+  lock.unlock();
+  // disconnect and reconnect
+  bool wasStreaming = m_streaming;
+  if (wasStreaming) DeviceStreamOff();
+  if (m_fd >= 0) {
+    DeviceDisconnect();
+    DeviceConnect();
+  }
+  if (wasStreaming) DeviceStreamOn();
+  lock.lock();
+  return CS_OK;
+}
+
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
     std::unique_lock<wpi::mutex>& lock, const Message& msg) {
   if (msg.kind == Message::kCmdSetMode ||
@@ -797,6 +813,8 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
   } else if (msg.kind == Message::kNumSinksChanged ||
              msg.kind == Message::kNumSinksEnabledChanged) {
     return CS_OK;
+  } else if (msg.kind == Message::kCmdSetPath) {
+    return DeviceCmdSetPath(lock, msg);
   } else {
     return CS_OK;
   }
@@ -1377,6 +1395,17 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
   Send(Message{Message::kNumSinksEnabledChanged});
 }
 
+void UsbCameraImpl::SetPath(const wpi::Twine& path, CS_Status* status) {
+  Message msg{Message::kCmdSetPath};
+  msg.dataStr = path.str();
+  *status = SendAndWait(std::move(msg));
+}
+
+std::string UsbCameraImpl::GetPath() const {
+  std::scoped_lock lock(m_mutex);
+  return m_path;
+}
+
 namespace cs {
 
 CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
@@ -1393,6 +1422,16 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
   return inst.CreateSource(CS_SOURCE_USB, std::make_shared<UsbCameraImpl>(
                                               name, inst.logger, inst.notifier,
                                               inst.telemetry, path));
+}
+
+void SetUsbCameraPath(CS_Source source, const wpi::Twine& path,
+                      CS_Status* status) {
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data || data->kind != CS_SOURCE_USB) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  static_cast<UsbCameraImpl&>(*data->source).SetPath(path, status);
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {

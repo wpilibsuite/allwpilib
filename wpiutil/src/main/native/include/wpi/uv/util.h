@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -55,6 +55,24 @@ int AddrToName(const sockaddr_in6& addr, T* ip, unsigned int* port) {
     ip->assign(name, name);
   }
   return err;
+}
+
+/**
+ * Convert a binary structure containing an IPv4 or IPv6 address to a string.
+ * @param addr Binary structure
+ * @param ip Output string (any type that has `assign(char*, char*)`)
+ * @param port Output port number
+ * @return Error (same as `uv_ip6_name()`).
+ */
+template <typename T>
+int AddrToName(const sockaddr_storage& addr, T* ip, unsigned int* port) {
+  if (addr.ss_family == AF_INET)
+    return AddrToName(reinterpret_cast<const sockaddr_in&>(addr), ip, port);
+  if (addr.ss_family == AF_INET6)
+    return AddrToName(reinterpret_cast<const sockaddr_in6&>(addr), ip, port);
+  char name[1];
+  ip->assign(name, name);
+  return -1;
 }
 
 /**

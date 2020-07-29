@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/angular_velocity.h>
+#include <units/velocity.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"

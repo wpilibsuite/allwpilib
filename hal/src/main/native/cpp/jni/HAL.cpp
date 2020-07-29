@@ -19,7 +19,7 @@
 #include "hal/DriverStation.h"
 #include "hal/Main.h"
 
-using namespace frc;
+using namespace hal;
 using namespace wpi::java;
 
 extern "C" {

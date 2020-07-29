@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -81,18 +81,14 @@ class SplineHelper {
  private:
   static Spline<3>::ControlVector CubicControlVector(double scalar,
                                                      const Pose2d& point) {
-    return {
-        {point.Translation().X().to<double>(), scalar * point.Rotation().Cos()},
-        {point.Translation().Y().to<double>(),
-         scalar * point.Rotation().Sin()}};
+    return {{point.X().to<double>(), scalar * point.Rotation().Cos()},
+            {point.Y().to<double>(), scalar * point.Rotation().Sin()}};
   }
 
   static Spline<5>::ControlVector QuinticControlVector(double scalar,
                                                        const Pose2d& point) {
-    return {{point.Translation().X().to<double>(),
-             scalar * point.Rotation().Cos(), 0.0},
-            {point.Translation().Y().to<double>(),
-             scalar * point.Rotation().Sin(), 0.0}};
+    return {{point.X().to<double>(), scalar * point.Rotation().Cos(), 0.0},
+            {point.Y().to<double>(), scalar * point.Rotation().Sin(), 0.0}};
   }
 
   /**

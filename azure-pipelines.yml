@@ -23,6 +23,8 @@ trigger:
 stages:
 - stage: Build
   jobs:
+  - template: azure-templates/job-build-vcpkg.yml
+
   - template: azure-templates/job-build.yml
     parameters:
       jobName: Linux_Arm

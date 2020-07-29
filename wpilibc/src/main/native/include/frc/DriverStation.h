@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -313,12 +313,18 @@ class DriverStation : public ErrorBase {
    *
    * This is a good way to delay processing until there is new driver station
    * data to act on.
+   *
+   * Checks if new control data has arrived since the last waitForData call
+   * on the current thread. If new data has not arrived, returns immediately.
    */
   void WaitForData();
 
   /**
    * Wait until a new packet comes from the driver station, or wait for a
    * timeout.
+   *
+   * Checks if new control data has arrived since the last waitForData call
+   * on the current thread. If new data has not arrived, returns immediately.
    *
    * If the timeout is less then or equal to 0, wait indefinitely.
    *
@@ -446,7 +452,7 @@ class DriverStation : public ErrorBase {
   std::thread m_dsThread;
   std::atomic<bool> m_isRunning{false};
 
-  wpi::mutex m_waitForDataMutex;
+  mutable wpi::mutex m_waitForDataMutex;
   wpi::condition_variable m_waitForDataCond;
   int m_waitForDataCounter;
 

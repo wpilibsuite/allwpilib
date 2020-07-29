@@ -8,8 +8,8 @@
 #include "AnalogOutGui.h"
 
 #include <hal/Ports.h>
+#include <hal/simulation/AnalogOutData.h>
 #include <imgui.h>
-#include <mockdata/AnalogOutData.h>
 
 #include "IniSaver.h"
 #include "IniSaverInfo.h"

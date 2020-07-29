@@ -11,7 +11,7 @@
 
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
-#include <units/units.h>
+#include <units/angle.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"

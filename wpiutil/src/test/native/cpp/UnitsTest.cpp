@@ -11,44 +11,82 @@
 #include <type_traits>
 
 #include "gtest/gtest.h"
-#include "units/units.h"
+#include "units/acceleration.h"
+#include "units/angle.h"
+#include "units/angular_acceleration.h"
+#include "units/angular_velocity.h"
+#include "units/area.h"
+#include "units/capacitance.h"
+#include "units/charge.h"
+#include "units/concentration.h"
+#include "units/conductance.h"
+#include "units/constants.h"
+#include "units/current.h"
+#include "units/data.h"
+#include "units/data_transfer_rate.h"
+#include "units/density.h"
+#include "units/dimensionless.h"
+#include "units/energy.h"
+#include "units/force.h"
+#include "units/frequency.h"
+#include "units/illuminance.h"
+#include "units/impedance.h"
+#include "units/inductance.h"
+#include "units/length.h"
+#include "units/luminous_flux.h"
+#include "units/luminous_intensity.h"
+#include "units/magnetic_field_strength.h"
+#include "units/magnetic_flux.h"
+#include "units/mass.h"
+#include "units/math.h"
+#include "units/power.h"
+#include "units/pressure.h"
+#include "units/radiation.h"
+#include "units/solid_angle.h"
+#include "units/substance.h"
+#include "units/temperature.h"
+#include "units/time.h"
+#include "units/torque.h"
+#include "units/velocity.h"
+#include "units/voltage.h"
+#include "units/volume.h"
 
-using namespace units;
-using namespace units::dimensionless;
-using namespace units::length;
-using namespace units::mass;
-using namespace units::angle;
-using namespace units::time;
-using namespace units::frequency;
-using namespace units::area;
-using namespace units::velocity;
-using namespace units::angular_velocity;
-using namespace units::temperature;
-using namespace units::luminous_intensity;
-using namespace units::solid_angle;
-using namespace units::frequency;
 using namespace units::acceleration;
-using namespace units::pressure;
-using namespace units::charge;
-using namespace units::energy;
-using namespace units::power;
-using namespace units::voltage;
+using namespace units::angle;
+using namespace units::angular_acceleration;
+using namespace units::angular_velocity;
+using namespace units::area;
 using namespace units::capacitance;
-using namespace units::impedance;
-using namespace units::conductance;
-using namespace units::magnetic_flux;
-using namespace units::magnetic_field_strength;
-using namespace units::inductance;
-using namespace units::luminous_flux;
-using namespace units::illuminance;
-using namespace units::radiation;
-using namespace units::torque;
-using namespace units::volume;
-using namespace units::density;
+using namespace units::charge;
 using namespace units::concentration;
+using namespace units::conductance;
 using namespace units::data;
 using namespace units::data_transfer_rate;
+using namespace units::density;
+using namespace units::dimensionless;
+using namespace units::energy;
+using namespace units::frequency;
+using namespace units::illuminance;
+using namespace units::impedance;
+using namespace units::inductance;
+using namespace units::length;
+using namespace units::luminous_flux;
+using namespace units::luminous_intensity;
+using namespace units::magnetic_field_strength;
+using namespace units::magnetic_flux;
+using namespace units::mass;
 using namespace units::math;
+using namespace units::power;
+using namespace units::pressure;
+using namespace units::radiation;
+using namespace units::solid_angle;
+using namespace units::temperature;
+using namespace units::time;
+using namespace units::torque;
+using namespace units::velocity;
+using namespace units::voltage;
+using namespace units::volume;
+using namespace units;
 
 #if !defined(_MSC_VER) || _MSC_VER > 1800
 using namespace units::literals;
@@ -1890,6 +1928,7 @@ TEST_F(UnitConversion, acceleration) {
   test = convert<standard_gravity, meters_per_second_squared>(1.0);
   EXPECT_NEAR(9.80665, test, 5.0e-10);
 }
+
 TEST_F(UnitConversion, force) {
   double test;
 

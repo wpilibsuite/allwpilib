@@ -18,7 +18,10 @@
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
 #include <frc/trajectory/Trajectory.h>
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/length.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 #include <wpi/ArrayRef.h>
 
 #include "CommandBase.h"

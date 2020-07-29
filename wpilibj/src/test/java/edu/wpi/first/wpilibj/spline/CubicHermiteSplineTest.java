@@ -32,7 +32,7 @@ class CubicHermiteSplineTest {
   @SuppressWarnings({"ParameterName", "PMD.UnusedLocalVariable"})
   private void run(Pose2d a, List<Translation2d> waypoints, Pose2d b) {
     // Start the timer.
-    var start = System.nanoTime();
+    //var start = System.nanoTime();
 
     // Generate and parameterize the spline.
     var controlVectors =
@@ -51,10 +51,10 @@ class CubicHermiteSplineTest {
     }
 
     // End the timer.
-    var end = System.nanoTime();
+    //var end = System.nanoTime();
 
     // Calculate the duration (used when benchmarking)
-    var durationMicroseconds = (end - start) / 1000.0;
+    //var durationMicroseconds = (end - start) / 1000.0;
 
     for (int i = 0; i < poses.size() - 1; i++) {
       var p0 = poses.get(i);
@@ -71,10 +71,10 @@ class CubicHermiteSplineTest {
 
     // Check first point
     assertAll(
-        () -> assertEquals(a.getTranslation().getX(),
-            poses.get(0).poseMeters.getTranslation().getX(), 1E-9),
-        () -> assertEquals(a.getTranslation().getY(),
-            poses.get(0).poseMeters.getTranslation().getY(), 1E-9),
+        () -> assertEquals(a.getX(),
+            poses.get(0).poseMeters.getX(), 1E-9),
+        () -> assertEquals(a.getY(),
+            poses.get(0).poseMeters.getY(), 1E-9),
         () -> assertEquals(a.getRotation().getRadians(),
             poses.get(0).poseMeters.getRotation().getRadians(), 1E-9)
     );
@@ -95,10 +95,10 @@ class CubicHermiteSplineTest {
 
     // Check last point
     assertAll(
-        () -> assertEquals(b.getTranslation().getX(),
-            poses.get(poses.size() - 1).poseMeters.getTranslation().getX(), 1E-9),
-        () -> assertEquals(b.getTranslation().getY(),
-            poses.get(poses.size() - 1).poseMeters.getTranslation().getY(), 1E-9),
+        () -> assertEquals(b.getX(),
+            poses.get(poses.size() - 1).poseMeters.getX(), 1E-9),
+        () -> assertEquals(b.getY(),
+            poses.get(poses.size() - 1).poseMeters.getY(), 1E-9),
         () -> assertEquals(b.getRotation().getRadians(),
             poses.get(poses.size() - 1).poseMeters.getRotation().getRadians(), 1E-9)
     );

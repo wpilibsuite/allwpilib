@@ -551,5 +551,16 @@
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "RamseteController",
+    "description": "An example robot demonstrating the use of RamseteController.",
+    "tags": [
+      "RamseteController"
+    ],
+    "foldername": "ramsetecontroller",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]

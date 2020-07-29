@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -120,6 +120,7 @@ public class CameraServerJNI {
   //
   // UsbCamera Source Functions
   //
+  public static native void setUsbCameraPath(int source, String path);
   public static native String getUsbCameraPath(int source);
   public static native UsbCameraInfo getUsbCameraInfo(int source);
 

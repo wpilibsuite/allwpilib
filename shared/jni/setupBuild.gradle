@@ -43,7 +43,7 @@ model {
                     source {
                         srcDirs 'src/main/native/cpp'
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
+                        exclude '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -99,7 +99,7 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
@@ -108,7 +108,7 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -141,7 +141,7 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
@@ -150,7 +150,7 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'

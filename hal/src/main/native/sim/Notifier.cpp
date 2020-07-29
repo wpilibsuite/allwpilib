@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,7 +22,7 @@
 #include "hal/HAL.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/UnlimitedHandleResource.h"
-#include "mockdata/NotifierData.h"
+#include "hal/simulation/NotifierData.h"
 
 namespace {
 struct Notifier {
@@ -157,9 +157,15 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
   std::unique_lock lock(notifier->mutex);
   while (notifier->active) {
+    uint64_t curTime = HAL_GetFPGATime(status);
+    if (notifier->running && curTime >= notifier->waitTime) {
+      notifier->running = false;
+      return curTime;
+    }
+
     double waitTime;
     if (!notifier->running || notifiersPaused) {
-      waitTime = (HAL_GetFPGATime(status) * 1e-6) + 1000.0;
+      waitTime = (curTime * 1e-6) + 1000.0;
       // If not running, wait 1000 seconds
     } else {
       waitTime = notifier->waitTime * 1e-6;
@@ -168,12 +174,6 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
     auto timeoutTime =
         hal::fpga_clock::epoch() + std::chrono::duration<double>(waitTime);
     notifier->cond.wait_until(lock, timeoutTime);
-    if (!notifier->running) continue;
-    if (!notifier->active) break;
-    uint64_t curTime = HAL_GetFPGATime(status);
-    if (curTime < notifier->waitTime) continue;
-    notifier->running = false;
-    return curTime;
   }
   return 0;
 }

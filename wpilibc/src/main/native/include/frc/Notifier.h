@@ -16,7 +16,7 @@
 #include <utility>
 
 #include <hal/Types.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/Twine.h>
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>

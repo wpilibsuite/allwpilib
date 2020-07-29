@@ -22,6 +22,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -253,6 +254,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     //Run the periodic method of all registered subsystems.
     for (Subsystem subsystem : m_subsystems.keySet()) {
       subsystem.periodic();
+      if (RobotBase.isSimulation()) {
+        subsystem.simulationPeriodic();
+      }
       m_watchdog.addEpoch(subsystem.getClass().getSimpleName() + ".periodic()");
     }
 

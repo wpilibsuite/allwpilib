@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,14 +9,13 @@
 #include <frc2/command/MecanumControllerCommand.h>
 #include <frc2/command/Subsystem.h>
 
-#include <iostream>
-
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
+#include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <wpi/math>
 
@@ -60,6 +59,10 @@ class MecanumControllerCommandTest : public ::testing::Test {
   frc::MecanumDriveOdometry m_odometry{m_kinematics, 0_rad,
                                        frc::Pose2d{0_m, 0_m, 0_rad}};
 
+  void SetUp() override { frc::sim::PauseTiming(); }
+
+  void TearDown() override { frc::sim::ResumeTiming(); }
+
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
     return frc::MecanumDriveWheelSpeeds{m_frontLeftSpeed, m_frontRightSpeed,
                                         m_rearLeftSpeed, m_rearRightSpeed};
@@ -72,7 +75,7 @@ class MecanumControllerCommandTest : public ::testing::Test {
 };
 
 TEST_F(MecanumControllerCommandTest, ReachesReference) {
-  frc2::Subsystem subsystem{};
+  frc2::Subsystem subsystem;
 
   auto waypoints =
       std::vector{frc::Pose2d{0_m, 0_m, 0_rad}, frc::Pose2d{1_m, 5_m, 3_rad}};
@@ -99,18 +102,18 @@ TEST_F(MecanumControllerCommandTest, ReachesReference) {
 
   m_timer.Reset();
   m_timer.Start();
+
   command.Initialize();
   while (!command.IsFinished()) {
     command.Execute();
     m_angle = trajectory.Sample(m_timer.Get()).pose.Rotation();
+    frc::sim::StepTiming(5_ms);
   }
   m_timer.Stop();
   command.End(false);
 
-  EXPECT_NEAR_UNITS(endState.pose.Translation().X(),
-                    getRobotPose().Translation().X(), kxTolerance);
-  EXPECT_NEAR_UNITS(endState.pose.Translation().Y(),
-                    getRobotPose().Translation().Y(), kyTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.X(), getRobotPose().X(), kxTolerance);
+  EXPECT_NEAR_UNITS(endState.pose.Y(), getRobotPose().Y(), kyTolerance);
   EXPECT_NEAR_UNITS(endState.pose.Rotation().Radians(),
                     getRobotPose().Rotation().Radians(), kAngularTolerance);
 }

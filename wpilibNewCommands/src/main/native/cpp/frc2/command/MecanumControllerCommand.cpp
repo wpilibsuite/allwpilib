@@ -169,12 +169,10 @@ void MecanumControllerCommand::Execute() {
 
   auto m_poseError = m_desiredPose.RelativeTo(m_pose());
 
-  auto targetXVel = meters_per_second_t(
-      m_xController->Calculate((m_pose().Translation().X().to<double>()),
-                               (m_desiredPose.Translation().X().to<double>())));
-  auto targetYVel = meters_per_second_t(
-      m_yController->Calculate((m_pose().Translation().Y().to<double>()),
-                               (m_desiredPose.Translation().Y().to<double>())));
+  auto targetXVel = meters_per_second_t(m_xController->Calculate(
+      (m_pose().X().to<double>()), (m_desiredPose.X().to<double>())));
+  auto targetYVel = meters_per_second_t(m_yController->Calculate(
+      (m_pose().Y().to<double>()), (m_desiredPose.Y().to<double>())));
 
   // Profiled PID Controller only takes meters as setpoint and measurement
   // The robot will go to the desired rotation of the final pose in the

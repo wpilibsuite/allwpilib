@@ -9,6 +9,8 @@
 
 #include <cmath>
 
+#include <units/math.h>
+
 using namespace frc;
 
 /**
@@ -52,8 +54,8 @@ ChassisSpeeds RamseteController::Calculate(
   m_poseError = poseRef.RelativeTo(currentPose);
 
   // Aliases for equation readability
-  double eX = m_poseError.Translation().X().to<double>();
-  double eY = m_poseError.Translation().Y().to<double>();
+  double eX = m_poseError.X().to<double>();
+  double eY = m_poseError.Y().to<double>();
   double eTheta = m_poseError.Rotation().Radians().to<double>();
   double vRef = linearVelocityRef.to<double>();
   double omegaRef = angularVelocityRef.to<double>();

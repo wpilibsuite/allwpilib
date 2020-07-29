@@ -48,12 +48,12 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::radians_per_second_t rot, bool fieldRelative) {
   auto wheelSpeeds = m_kinematics.ToWheelSpeeds(
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, GetAngle())
+                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
   wheelSpeeds.Normalize(kMaxSpeed);
   SetSpeeds(wheelSpeeds);
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(GetAngle(), GetCurrentState());
+  m_odometry.Update(m_gyro.GetRotation2d(), GetCurrentState());
 }

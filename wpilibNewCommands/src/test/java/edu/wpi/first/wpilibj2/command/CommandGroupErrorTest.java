@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,18 +29,18 @@ class CommandGroupErrorTest extends CommandTestBase {
 
   @Test
   void commandInGroupExternallyScheduledTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      MockCommandHolder command1Holder = new MockCommandHolder(true);
+      Command command1 = command1Holder.getMock();
+      MockCommandHolder command2Holder = new MockCommandHolder(true);
+      Command command2 = command2Holder.getMock();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
-    MockCommandHolder command2Holder = new MockCommandHolder(true);
-    Command command2 = command2Holder.getMock();
+      @SuppressWarnings("PMD.UnusedLocalVariable")
+      Command group = new ParallelCommandGroup(command1, command2);
 
-    @SuppressWarnings("PMD.UnusedLocalVariable")
-    Command group = new ParallelCommandGroup(command1, command2);
-
-    assertThrows(IllegalArgumentException.class,
-        () -> scheduler.schedule(command1));
+      assertThrows(IllegalArgumentException.class,
+          () -> scheduler.schedule(command1));
+    }
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,7 +16,7 @@
 struct HAL_MatchInfo;
 struct HAL_Value;
 
-namespace frc {
+namespace hal {
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow = true);
 
@@ -72,6 +72,6 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
 
 JavaVM* GetJVM();
 
-}  // namespace frc
+}  // namespace hal
 
 #endif  // HAL_HAL_SRC_MAIN_NATIVE_CPP_JNI_HALUTIL_H_

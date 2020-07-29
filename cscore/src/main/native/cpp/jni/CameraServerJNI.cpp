@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -1023,6 +1023,20 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureManual
 {
   CS_Status status = 0;
   cs::SetCameraExposureManual(source, value, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setUsbCameraPath
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_setUsbCameraPath
+  (JNIEnv* env, jclass, jint source, jstring path)
+{
+  CS_Status status = 0;
+  cs::SetUsbCameraPath(source, JStringRef{env, path}.str(), &status);
   CheckStatus(env, status);
 }
 

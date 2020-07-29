@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,4 +13,8 @@ ExampleSubsystem::ExampleSubsystem() {
 
 void ExampleSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
+}
+
+void ExampleSubsystem::SimulationPeriodic() {
+  // Implementation of subsystem simulation periodic method goes here.
 }

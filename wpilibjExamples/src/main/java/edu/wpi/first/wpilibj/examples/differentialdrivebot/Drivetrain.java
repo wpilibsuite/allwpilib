@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -31,18 +30,18 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final SpeedController m_leftMaster = new PWMVictorSPX(1);
+  private final SpeedController m_leftLeader = new PWMVictorSPX(1);
   private final SpeedController m_leftFollower = new PWMVictorSPX(2);
-  private final SpeedController m_rightMaster = new PWMVictorSPX(3);
+  private final SpeedController m_rightLeader = new PWMVictorSPX(3);
   private final SpeedController m_rightFollower = new PWMVictorSPX(4);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 
   private final SpeedControllerGroup m_leftGroup
-      = new SpeedControllerGroup(m_leftMaster, m_leftFollower);
+      = new SpeedControllerGroup(m_leftLeader, m_leftFollower);
   private final SpeedControllerGroup m_rightGroup
-      = new SpeedControllerGroup(m_rightMaster, m_rightFollower);
+      = new SpeedControllerGroup(m_rightLeader, m_rightFollower);
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
@@ -73,17 +72,7 @@ public class Drivetrain {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
 
-    m_odometry = new DifferentialDriveOdometry(getAngle());
-  }
-
-  /**
-   * Returns the angle of the robot as a Rotation2d.
-   *
-   * @return The angle of the robot.
-   */
-  public Rotation2d getAngle() {
-    // Negating the angle because WPILib gyros are CW positive.
-    return Rotation2d.fromDegrees(-m_gyro.getAngle());
+    m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
   }
 
   /**
@@ -119,6 +108,7 @@ public class Drivetrain {
    * Updates the field-relative position.
    */
   public void updateOdometry() {
-    m_odometry.update(getAngle(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+    m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(),
+        m_rightEncoder.getDistance());
   }
 }

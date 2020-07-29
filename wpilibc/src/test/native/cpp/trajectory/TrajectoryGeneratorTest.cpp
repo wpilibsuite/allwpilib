@@ -7,6 +7,8 @@
 
 #include <vector>
 
+#include <units/math.h>
+
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"

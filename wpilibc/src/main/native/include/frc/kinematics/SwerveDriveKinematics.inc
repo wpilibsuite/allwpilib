@@ -9,11 +9,13 @@
 
 #include <algorithm>
 
+#include <units/math.h>
+
 namespace frc {
 
 template <class... Wheels>
 SwerveDriveKinematics(Translation2d, Wheels...)
-    ->SwerveDriveKinematics<1 + sizeof...(Wheels)>;
+    -> SwerveDriveKinematics<1 + sizeof...(Wheels)>;
 
 template <size_t NumModules>
 std::array<SwerveModuleState, NumModules>

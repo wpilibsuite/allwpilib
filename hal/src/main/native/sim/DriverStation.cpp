@@ -21,8 +21,8 @@
 #include <wpi/raw_ostream.h>
 
 #include "HALInitializer.h"
+#include "hal/simulation/MockHooks.h"
 #include "mockdata/DriverStationDataInternal.h"
-#include "mockdata/MockHooks.h"
 
 static wpi::mutex msgMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
@@ -218,42 +218,29 @@ void HAL_ObserveUserProgramTest(void) {
   // TODO
 }
 
-#ifdef __APPLE__
-static pthread_key_t lastCountKey;
-static pthread_once_t lastCountKeyOnce = PTHREAD_ONCE_INIT;
-
-static void InitLastCountKey(void) {
-  pthread_key_create(&lastCountKey, std::free);
-}
-#endif
-
 static int& GetThreadLocalLastCount() {
   // There is a rollover error condition here. At Packet# = n * (uintmax), this
   // will return false when instead it should return true. However, this at a
   // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
   // worth the cycles to check.
-#ifdef __APPLE__
-  pthread_once(&lastCountKeyOnce, InitLastCountKey);
-  int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
-  if (!lastCountPtr) {
-    lastCountPtr = static_cast<int*>(std::malloc(sizeof(int)));
-    *lastCountPtr = -1;
-    pthread_setspecific(lastCountKey, lastCountPtr);
-  }
-  int& lastCount = *lastCountPtr;
-#else
-  thread_local int lastCount{-1};
-#endif
+  thread_local int lastCount{0};
   return lastCount;
 }
 
-void HAL_WaitForCachedControlData(void) {
-  HAL_WaitForCachedControlDataTimeout(0);
+HAL_Bool HAL_IsNewControlData(void) {
+  std::scoped_lock lock(newDSDataAvailableMutex);
+  int& lastCount = GetThreadLocalLastCount();
+  int currentCount = newDSDataAvailableCounter;
+  if (lastCount == currentCount) return false;
+  lastCount = currentCount;
+  return true;
 }
 
-HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
-  int& lastCount = GetThreadLocalLastCount();
+void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
+
+HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock lock(newDSDataAvailableMutex);
+  int& lastCount = GetThreadLocalLastCount();
   int currentCount = newDSDataAvailableCounter;
   if (lastCount != currentCount) {
     lastCount = currentCount;
@@ -263,7 +250,6 @@ HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
   if (isFinalized.load()) {
     return false;
   }
-
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
@@ -277,42 +263,7 @@ HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
       newDSDataAvailableCond->wait(lock);
     }
   }
-  return true;
-}
-
-HAL_Bool HAL_IsNewControlData(void) {
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = 0;
-  {
-    std::scoped_lock lock(newDSDataAvailableMutex);
-    currentCount = newDSDataAvailableCounter;
-  }
-  if (lastCount == currentCount) return false;
-  lastCount = currentCount;
-  return true;
-}
-
-void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
-
-HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
-  if (isFinalized.load()) {
-    return false;
-  }
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-
-  std::unique_lock lock(newDSDataAvailableMutex);
-  int currentCount = newDSDataAvailableCounter;
-  while (newDSDataAvailableCounter == currentCount) {
-    if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      newDSDataAvailableCond->wait(lock);
-    }
-  }
+  lastCount = newDSDataAvailableCounter;
   return true;
 }
 

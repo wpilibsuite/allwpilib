@@ -37,7 +37,7 @@ set_target_properties(hal PROPERTIES DEBUG_POSTFIX "d")
 if(USE_EXTERNAL_HAL)
     include(${EXTERNAL_HAL_FILE})
 else()
-    target_sources(hal PRIVATE ${hal_sim_native_src} ${hal_sim_jni_src})
+    target_sources(hal PRIVATE ${hal_sim_native_src})
 endif()
 
 configure_file(src/generate/FRCUsageReporting.h.in gen/hal/FRCUsageReporting.h)
@@ -78,9 +78,7 @@ if (NOT WITHOUT_JAVA)
 
     configure_file(src/generate/FRCNetComm.java.in FRCNetComm.java)
 
-    file(GLOB
-        hal_shared_jni_src src/main/native/cpp/jni/*.cpp
-        hal_sim_jni_src src/main/native/sim/jni/*.cpp)
+    file(GLOB_RECURSE hal_shared_jni_src src/main/native/cpp/jni/*.cpp)
 
     file(GLOB_RECURSE JAVA_SOURCES
         ${CMAKE_CURRENT_BINARY_DIR}/FRCNetComm.java
@@ -103,8 +101,6 @@ if (NOT WITHOUT_JAVA)
 
     if(USE_EXTERNAL_HAL)
         include(${EXTERNAL_HAL_FILE})
-    else()
-        target_sources(haljni PRIVATE ${hal_sim_jni_src})
     endif()
 
     set_target_properties(haljni PROPERTIES OUTPUT_NAME "wpiHaljni")

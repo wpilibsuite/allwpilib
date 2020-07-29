@@ -8,12 +8,12 @@
 #include "DIOGui.h"
 
 #include <hal/Ports.h>
+#include <hal/simulation/DIOData.h>
+#include <hal/simulation/DigitalPWMData.h>
+#include <hal/simulation/DutyCycleData.h>
+#include <hal/simulation/EncoderData.h>
+#include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
-#include <mockdata/DIOData.h>
-#include <mockdata/DigitalPWMData.h>
-#include <mockdata/DutyCycleData.h>
-#include <mockdata/EncoderData.h>
-#include <mockdata/SimDeviceData.h>
 
 #include "HALSimGui.h"
 #include "IniSaver.h"

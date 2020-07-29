@@ -62,6 +62,7 @@ public final class SplineParameterizer {
     }
   }
 
+  @SuppressWarnings("serial")
   public static class MalformedSplineException extends RuntimeException {
     /**
      * Create a new exception with the given message.

@@ -9,7 +9,7 @@
 
 #include <cmath>
 
-#include <units/units.h>
+#include <units/velocity.h>
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"

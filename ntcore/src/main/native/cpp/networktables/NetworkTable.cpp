@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -233,13 +233,13 @@ NT_EntryListener NetworkTable::AddEntryListener(const Twine& key,
                                                 unsigned int flags) const {
   size_t prefix_len = m_path.size() + 1;
   auto entry = GetEntry(key);
-  return nt::AddEntryListener(entry.GetHandle(),
-                              [=](const EntryNotification& event) {
-                                listener(const_cast<NetworkTable*>(this),
-                                         event.name.substr(prefix_len), entry,
-                                         event.value, event.flags);
-                              },
-                              flags);
+  return nt::AddEntryListener(
+      entry.GetHandle(),
+      [=](const EntryNotification& event) {
+        listener(const_cast<NetworkTable*>(this), event.name.substr(prefix_len),
+                 entry, event.value, event.flags);
+      },
+      flags);
 }
 
 void NetworkTable::RemoveEntryListener(NT_EntryListener listener) const {

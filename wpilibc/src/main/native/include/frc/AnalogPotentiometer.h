@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -42,11 +42,12 @@ class AnalogPotentiometer : public ErrorBase,
    * This will calculate the result from the fullRange times the fraction of the
    * supply voltage, plus the offset.
    *
-   * @param channel   The channel number on the roboRIO to represent. 0-3 are
-   *                  on-board 4-7 are on the MXP port.
-   * @param fullRange The angular value (in desired units) representing the full
+   * @param channel   The Analog Input channel number on the roboRIO the
+   *                  potentiometer is plugged into. 0-3 are on-board and 4-7
+   *                  are on the MXP port.
+   * @param fullRange The value (in desired units) representing the full
    *                  0-5V range of the input.
-   * @param offset    The angular value (in desired units) representing the
+   * @param offset    The value (in desired units) representing the
    *                  angular output at 0V.
    */
   explicit AnalogPotentiometer(int channel, double fullRange = 1.0,
@@ -66,9 +67,9 @@ class AnalogPotentiometer : public ErrorBase,
    * supply voltage, plus the offset.
    *
    * @param channel   The existing Analog Input pointer
-   * @param fullRange The angular value (in desired units) representing the full
+   * @param fullRange The value (in desired units) representing the full
    *                  0-5V range of the input.
-   * @param offset    The angular value (in desired units) representing the
+   * @param offset    The value (in desired units) representing the
    *                  angular output at 0V.
    */
   explicit AnalogPotentiometer(AnalogInput* input, double fullRange = 1.0,
@@ -88,9 +89,9 @@ class AnalogPotentiometer : public ErrorBase,
    * supply voltage, plus the offset.
    *
    * @param channel   The existing Analog Input pointer
-   * @param fullRange The angular value (in desired units) representing the full
+   * @param fullRange The value (in desired units) representing the full
    *                  0-5V range of the input.
-   * @param offset    The angular value (in desired units) representing the
+   * @param offset    The value (in desired units) representing the
    *                  angular output at 0V.
    */
   explicit AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
@@ -102,7 +103,7 @@ class AnalogPotentiometer : public ErrorBase,
   AnalogPotentiometer& operator=(AnalogPotentiometer&&) = default;
 
   /**
-   * Get the current reading of the potentiomer.
+   * Get the current reading of the potentiometer.
    *
    * @return The current position of the potentiometer (in the units used for
    *         fullRange and offset).

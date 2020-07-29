@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -251,14 +251,15 @@ void Command::InitSendable(SendableBuilder& builder) {
   builder.AddStringProperty(
       ".name", [=]() { return SendableRegistry::GetInstance().GetName(this); },
       nullptr);
-  builder.AddBooleanProperty("running", [=]() { return IsRunning(); },
-                             [=](bool value) {
-                               if (value) {
-                                 if (!IsRunning()) Start();
-                               } else {
-                                 if (IsRunning()) Cancel();
-                               }
-                             });
-  builder.AddBooleanProperty(".isParented", [=]() { return IsParented(); },
-                             nullptr);
+  builder.AddBooleanProperty(
+      "running", [=]() { return IsRunning(); },
+      [=](bool value) {
+        if (value) {
+          if (!IsRunning()) Start();
+        } else {
+          if (IsRunning()) Cancel();
+        }
+      });
+  builder.AddBooleanProperty(
+      ".isParented", [=]() { return IsParented(); }, nullptr);
 }

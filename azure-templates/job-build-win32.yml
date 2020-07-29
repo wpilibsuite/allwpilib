@@ -12,7 +12,6 @@ jobs:
     pool: ${{ parameters.pool }}
     container: ''
     gradleOptions: '-Xmx1024m'
-    jdkVersionOption: '1.11'
     buildOptions: '-PskipPMD'
     artifactName: 'Win32'
     preBuild:

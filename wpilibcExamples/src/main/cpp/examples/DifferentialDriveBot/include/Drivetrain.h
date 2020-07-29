@@ -15,7 +15,10 @@
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/velocity.h>
 #include <wpi/math>
 
 /**
@@ -37,14 +40,6 @@ class Drivetrain {
     m_rightEncoder.Reset();
   }
 
-  /**
-   * Get the robot angle as a Rotation2d.
-   */
-  frc::Rotation2d GetAngle() const {
-    // Negating the angle because WPILib Gyros are CW positive.
-    return frc::Rotation2d(units::degree_t(-m_gyro.GetAngle()));
-  }
-
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
@@ -60,13 +55,13 @@ class Drivetrain {
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  frc::PWMVictorSPX m_leftMaster{1};
+  frc::PWMVictorSPX m_leftLeader{1};
   frc::PWMVictorSPX m_leftFollower{2};
-  frc::PWMVictorSPX m_rightMaster{3};
+  frc::PWMVictorSPX m_rightLeader{3};
   frc::PWMVictorSPX m_rightFollower{4};
 
-  frc::SpeedControllerGroup m_leftGroup{m_leftMaster, m_leftFollower};
-  frc::SpeedControllerGroup m_rightGroup{m_rightMaster, m_rightFollower};
+  frc::SpeedControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
+  frc::SpeedControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
 
   frc::Encoder m_leftEncoder{0, 1};
   frc::Encoder m_rightEncoder{2, 3};
@@ -77,7 +72,7 @@ class Drivetrain {
   frc::AnalogGyro m_gyro{0};
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
-  frc::DifferentialDriveOdometry m_odometry{GetAngle()};
+  frc::DifferentialDriveOdometry m_odometry{m_gyro.GetRotation2d()};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

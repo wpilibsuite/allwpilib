@@ -25,14 +25,6 @@ class Drivetrain {
  public:
   Drivetrain() { m_gyro.Reset(); }
 
-  /**
-   * Get the robot angle as a Rotation2d
-   */
-  frc::Rotation2d GetAngle() const {
-    // Negating the angle because WPILib Gyros are CW positive.
-    return frc::Rotation2d(units::degree_t(-m_gyro.GetAngle()));
-  }
-
   frc::MecanumDriveWheelSpeeds GetCurrentState() const;
   void SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds);
   void Drive(units::meters_per_second_t xSpeed,
@@ -72,7 +64,7 @@ class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
-  frc::MecanumDriveOdometry m_odometry{m_kinematics, GetAngle()};
+  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_gyro.GetRotation2d()};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

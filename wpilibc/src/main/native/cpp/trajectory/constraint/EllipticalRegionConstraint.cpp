@@ -9,6 +9,8 @@
 
 #include <limits>
 
+#include <units/math.h>
+
 using namespace frc;
 
 EllipticalRegionConstraint::EllipticalRegionConstraint(
@@ -46,9 +48,9 @@ bool EllipticalRegionConstraint::IsPoseInRegion(const Pose2d& pose) const {
   // If the inequality is satisfied, then it is inside the ellipse; otherwise
   // it is outside the ellipse.
   // Both sides have been multiplied by Rx^2 * Ry^2 for efficiency reasons.
-  return units::math::pow<2>(pose.Translation().X() - m_center.X()) *
+  return units::math::pow<2>(pose.X() - m_center.X()) *
                  units::math::pow<2>(m_radii.Y()) +
-             units::math::pow<2>(pose.Translation().Y() - m_center.Y()) *
+             units::math::pow<2>(pose.Y() - m_center.Y()) *
                  units::math::pow<2>(m_radii.X()) <=
          units::math::pow<2>(m_radii.X()) * units::math::pow<2>(m_radii.Y());
 }

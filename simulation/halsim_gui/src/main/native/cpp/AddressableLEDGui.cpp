@@ -8,9 +8,9 @@
 #include "AddressableLEDGui.h"
 
 #include <hal/Ports.h>
+#include <hal/simulation/AddressableLEDData.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <mockdata/AddressableLEDData.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringRef.h>
 

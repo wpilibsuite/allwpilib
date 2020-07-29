@@ -24,10 +24,10 @@ TEST(Transform2dTest, Inverse) {
   auto transformed = initial + transform;
   auto untransformed = transformed + transform.Inverse();
 
-  EXPECT_NEAR(initial.Translation().X().to<double>(),
-              untransformed.Translation().X().to<double>(), kEpsilon);
-  EXPECT_NEAR(initial.Translation().Y().to<double>(),
-              untransformed.Translation().Y().to<double>(), kEpsilon);
+  EXPECT_NEAR(initial.X().to<double>(), untransformed.X().to<double>(),
+              kEpsilon);
+  EXPECT_NEAR(initial.Y().to<double>(), untransformed.Y().to<double>(),
+              kEpsilon);
   EXPECT_NEAR(initial.Rotation().Degrees().to<double>(),
               untransformed.Rotation().Degrees().to<double>(), kEpsilon);
 }

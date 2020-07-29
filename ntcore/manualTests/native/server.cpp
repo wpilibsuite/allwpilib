@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,12 +14,13 @@
 
 int main() {
   auto inst = nt::GetDefaultInstance();
-  nt::AddLogger(inst,
-                [](const nt::LogMessage& msg) {
-                  std::fputs(msg.message.c_str(), stderr);
-                  std::fputc('\n', stderr);
-                },
-                0, UINT_MAX);
+  nt::AddLogger(
+      inst,
+      [](const nt::LogMessage& msg) {
+        std::fputs(msg.message.c_str(), stderr);
+        std::fputc('\n', stderr);
+      },
+      0, UINT_MAX);
   nt::StartServer(inst, "persistent.ini", "", 10000);
   std::this_thread::sleep_for(std::chrono::seconds(1));
 

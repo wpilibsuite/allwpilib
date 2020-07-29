@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,6 +49,16 @@ int32_t AddressableLEDData::GetData(HAL_AddressableLEDData* d) {
 }
 
 extern "C" {
+
+int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel) {
+  for (int i = 0; i < kNumAddressableLEDs; ++i) {
+    if (SimAddressableLEDData[i].initialized &&
+        SimAddressableLEDData[i].outputPort == channel)
+      return i;
+  }
+  return -1;
+}
+
 void HALSIM_ResetAddressableLEDData(int32_t index) {
   SimAddressableLEDData[index].ResetData();
 }
