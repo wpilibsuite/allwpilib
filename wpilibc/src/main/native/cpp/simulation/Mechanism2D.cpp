@@ -8,29 +8,33 @@
 #include "frc/simulation/Mechanism2D.h"
 
 #include <wpi/raw_ostream.h>
+#include <wpi/SmallString.h>
+#include <wpi/Twine.h>
 
 using namespace frc;
 
 Mechanism2D::Mechanism2D() : m_device{"Mechanism2D"} {}
 
-void Mechanism2D::SetLigamentAngle(std::string ligamentPath, float angle) {
+void Mechanism2D::SetLigamentAngle(const wpi::Twine& ligamentPath, float angle) {
   if (m_device) {
-    ligamentPath = ligamentPath + "angle/";
-    if (!createdItems.count(ligamentPath)) {
-      createdItems[ligamentPath] =
-          m_device.CreateDouble(ligamentPath.c_str(), false, angle);
+    wpi::SmallString<64> fullPathBuf;
+    wpi::StringRef fullPath = (ligamentPath + "angle/").toStringRef(fullPathBuf);
+    if (!createdItems.count(fullPath)) {
+      createdItems[fullPath] =
+          m_device.CreateDouble(fullPath, false, angle);
     }
+    createdItems[fullPath].Set(angle);
   }
-  createdItems[ligamentPath].Set(angle);
 }
 
-void Mechanism2D::SetLigamentALength(std::string ligamentPath, float length) {
+void Mechanism2D::SetLigamentLength(const wpi::Twine& ligamentPath, float length) {
   if (m_device) {
-    ligamentPath = ligamentPath + "length/";
-    if (!createdItems.count(ligamentPath)) {
-      createdItems[ligamentPath] =
-          m_device.CreateDouble(ligamentPath.c_str(), false, length);
+    wpi::SmallString<64> fullPathBuf;
+    wpi::StringRef fullPath = (ligamentPath + "length/").toStringRef(fullPathBuf);
+    if (!createdItems.count(fullPath)) {
+      createdItems[fullPath] =
+          m_device.CreateDouble(fullPath, false, length);
     }
+    createdItems[fullPath].Set(length);
   }
-  createdItems[ligamentPath].Set(length);
 }

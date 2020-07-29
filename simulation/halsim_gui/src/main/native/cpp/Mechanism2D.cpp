@@ -21,8 +21,6 @@
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include "HALSimGui.h"
-#include <map>
-#include <list>
 #include <string>
 #include <wpi/math>
 #include "portable-file-dialogs.h"
@@ -33,9 +31,9 @@ int windowWidth = 100;
 int windowHeight = 100;
 
 static HAL_SimDeviceHandle devHandle = 0;
-wpi::StringMap<ImColor> colorLookUpTable;
-std::unique_ptr<pfd::open_file> m_fileOpener;
-std::string previousJsonLocation = "Not empty";
+static wpi::StringMap<ImColor> colorLookUpTable;
+static std::unique_ptr<pfd::open_file> m_fileOpener;
+static std::string previousJsonLocation = "Not empty";
 
 struct BodyConfig {
   std::string name;
@@ -84,7 +82,7 @@ static void buildColorTable() {
 
 class Mechanism2DInfo {
  public:
-  std::string jsonLocation = "";
+  std::string jsonLocation;
 };
 
 static Mechanism2DInfo mechanism2DInfo;
@@ -261,7 +259,7 @@ BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   return c;
 }
 
-void readJson(std::string jFile) {
+static void readJson(std::string jFile) {
   std::error_code ec;
   std::string name;
   wpi::raw_fd_istream is(jFile, ec);

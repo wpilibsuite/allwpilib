@@ -28,7 +28,7 @@ class Mechanism2D {
    * @param ligamentPath json path to the ligament
    * @param angle to set the ligament
    */
-  void SetLigamentAngle(std::string ligamentPath, float angle);
+  void SetLigamentAngle(const wpi::Twine& ligamentPath, float angle);
 
   /**
    * Set/Create the length of a ligament
@@ -36,7 +36,7 @@ class Mechanism2D {
    * @param ligamentPath json path to the ligament
    * @param length to set the ligament
    */
-  void SetLigamentALength(std::string ligamentPath, float length);
+  void SetLigamentLength(const wpi::Twine& ligamentPath, float length);
 
  private:
   wpi::StringMap<hal::SimDouble> createdItems;

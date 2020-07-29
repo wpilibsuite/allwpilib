@@ -31,9 +31,7 @@ public class Mechanism2D {
         if(!createdItems.containsKey(ligamentPath)){
             createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
         }
-//        else{
             createdItems.get(ligamentPath).set(angle);
-//        }
     }
   }
 
