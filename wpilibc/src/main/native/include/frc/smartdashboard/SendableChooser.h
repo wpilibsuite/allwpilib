@@ -46,6 +46,7 @@ class SendableChooser : public SendableChooserBase {
 
  public:
   ~SendableChooser() override = default;
+  SendableChooser() = default;
   SendableChooser(SendableChooser&& rhs) = default;
   SendableChooser& operator=(SendableChooser&& rhs) = default;
 
