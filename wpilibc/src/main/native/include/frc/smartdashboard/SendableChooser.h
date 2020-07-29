@@ -46,6 +46,8 @@ class SendableChooser : public SendableChooserBase {
 
  public:
   ~SendableChooser() override = default;
+  SendableChooser(SendableChooser&& rhs) = default;
+  SendableChooser& operator=(SendableChooser&& rhs) = default;
 
   void AddOption(wpi::StringRef name, T object);
   void SetDefaultOption(wpi::StringRef name, T object);
