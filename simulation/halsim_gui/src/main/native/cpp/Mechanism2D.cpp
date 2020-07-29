@@ -99,7 +99,7 @@ bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
 }
 
 void WriteIni(ImGuiTextBuffer* out) {
-  out->appendf("[Mechanism2D][Mechanism]\njsonLocation=%s\n\n",
+  out->appendf("[Mechanism2D][Mechanism2D]\njsonLocation=%s\n\n",
                mechanism2DInfo.jsonLocation.c_str());
 }
 
@@ -328,7 +328,7 @@ static void DisplayAssembly2D() {
 void Mechanism2D::Initialize() {
   // hook ini handler to save settings
   ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "Simulator2D";
+  iniHandler.TypeName = "Mechanism2D";
   iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
   iniHandler.ReadOpenFn = Mechanism2DReadOpen;
   iniHandler.ReadLineFn = Mechanism2DReadLine;
