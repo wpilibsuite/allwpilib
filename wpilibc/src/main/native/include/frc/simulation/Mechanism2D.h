@@ -11,7 +11,6 @@
 #include <string>
 
 #include <hal/SimDevice.h>
-#include <units/units.h>
 #include <wpi/StringMap.h>
 
 #include "frc/geometry/Pose2d.h"

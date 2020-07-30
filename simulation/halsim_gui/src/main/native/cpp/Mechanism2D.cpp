@@ -15,13 +15,13 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 #include <imgui_internal.h>
-#include <mockdata/SimDeviceData.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include "HALSimGui.h"
 #include <string>
 #include <wpi/math>
+#include <hal/simulation/SimDeviceData.h>
 #include "portable-file-dialogs.h"
 
 using namespace halsimgui;
