@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
-
+import java.util.HashMap;
 
 public class Mechanism2D {
   SimDevice m_device = SimDevice.create("Mechanism2D");
