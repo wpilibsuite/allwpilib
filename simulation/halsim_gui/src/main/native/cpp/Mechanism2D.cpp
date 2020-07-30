@@ -269,7 +269,6 @@ static void readJson(std::string jFile) {
     for (wpi::json const& body : j.at("body")) {
       bodyConfigVector.push_back(readSubJson("/" + name + "/", body));
     }
-
   } catch (const wpi::json::exception& e) {
     wpi::errs() << "could not read body: " << e.what() << '\n';
   }
