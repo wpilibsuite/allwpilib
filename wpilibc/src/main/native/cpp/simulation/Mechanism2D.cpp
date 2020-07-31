@@ -20,7 +20,7 @@ void Mechanism2D::SetLigamentAngle(const wpi::Twine& ligamentPath,
   if (m_device) {
     wpi::SmallString<64> fullPathBuf;
     wpi::StringRef fullPath =
-        (ligamentPath + "angle/").toNullTerminatedStringRef(fullPathBuf);
+        (ligamentPath + "/angle").toNullTerminatedStringRef(fullPathBuf);
     if (!createdItems.count(fullPath)) {
       createdItems[fullPath] =
           m_device.CreateDouble(fullPath.data(), false, angle);
@@ -34,7 +34,7 @@ void Mechanism2D::SetLigamentLength(const wpi::Twine& ligamentPath,
   if (m_device) {
     wpi::SmallString<64> fullPathBuf;
     wpi::StringRef fullPath =
-        (ligamentPath + "length/").toNullTerminatedStringRef(fullPathBuf);
+        (ligamentPath + "/length").toNullTerminatedStringRef(fullPathBuf);
     if (!createdItems.count(fullPath)) {
       createdItems[fullPath] =
           m_device.CreateDouble(fullPath.data(), false, length);

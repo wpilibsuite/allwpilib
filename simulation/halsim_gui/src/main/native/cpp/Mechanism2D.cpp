@@ -8,20 +8,19 @@
 #include "Mechanism2D.h"
 
 #include <cmath>
+#include <string>
 
 #include <hal/SimDevice.h>
+#include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
-
 #define IMGUI_DEFINE_MATH_OPERATORS
-
 #include <imgui_internal.h>
 #include <wpi/json.h>
+#include <wpi/math>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
+
 #include "HALSimGui.h"
-#include <string>
-#include <wpi/math>
-#include <hal/simulation/SimDeviceData.h>
 #include "portable-file-dialogs.h"
 
 using namespace halsimgui;
@@ -30,7 +29,7 @@ static HAL_SimDeviceHandle devHandle = 0;
 static wpi::StringMap<ImColor> colorLookUpTable;
 static std::unique_ptr<pfd::open_file> m_fileOpener;
 static std::string previousJsonLocation = "Not empty";
-
+namespace {
 struct BodyConfig {
   std::string name;
   std::string type = "line";
@@ -40,14 +39,15 @@ struct BodyConfig {
   std::vector<BodyConfig> children;
   int lineWidth = 1;
 };
-std::vector<BodyConfig> bodyConfigVector;
-
+}
+static std::vector<BodyConfig> bodyConfigVector;
+namespace {
 struct DrawLineStruct {
   float xEnd;
   float yEnd;
   float angle;
 };
-
+}
 static struct NamedColor {
   const char* name;
   ImColor value;
@@ -119,7 +119,7 @@ static void Mechanism2DWriteAll(ImGuiContext* ctx,
   WriteIni(out_buf);
 }
 
-void GetJsonFileLocation() {
+static void GetJsonFileLocation() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
     if (!result.empty()) {
@@ -171,7 +171,7 @@ static void buildDrawList(float startXLocation, float startYLocation,
     // Get the length
     if (!lengthHandle)
       lengthHandle = HALSIM_GetSimValueHandle(
-          devHandle, (bodyConfig.name + "length/").c_str());
+          devHandle, (bodyConfig.name + "/length").c_str());
     if (lengthHandle) length = lengthHandle.Get();
     if (length <= 0) {
       length = bodyConfig.length;
@@ -179,7 +179,7 @@ static void buildDrawList(float startXLocation, float startYLocation,
     // Get the angle
     if (!angleHandle)
       angleHandle = HALSIM_GetSimValueHandle(
-          devHandle, (bodyConfig.name + "angle/").c_str());
+          devHandle, (bodyConfig.name + "/angle").c_str());
     if (angleHandle) angle = angleHandle.Get();
     // Calculate the next angle to go to
     float angleToGoTo = angle + bodyConfig.angle + previousAngle;
@@ -199,10 +199,10 @@ static void buildDrawList(float startXLocation, float startYLocation,
   }
 }
 
-BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
+static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   BodyConfig c;
   try {
-    c.name = name + body.at("name").get<std::string>() + "/";
+    c.name = name + "/" + body.at("name").get<std::string>();
   } catch (const wpi::json::exception& e) {
     wpi::errs() << "could not read body name: " << e.what() << '\n';
   }
@@ -267,7 +267,7 @@ static void readJson(std::string jFile) {
   }
   try {
     for (wpi::json const& body : j.at("body")) {
-      bodyConfigVector.push_back(readSubJson("/" + name + "/", body));
+      bodyConfigVector.push_back(readSubJson(name, body));
     }
   } catch (const wpi::json::exception& e) {
     wpi::errs() << "could not read body: " << e.what() << '\n';
