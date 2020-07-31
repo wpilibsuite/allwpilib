@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class Mechanism2D {
   SimDevice m_device = SimDevice.create("Mechanism2D");
-  HashMap<String, SimDouble> CreatedItems = new HashMap<String, SimDouble>();
+  HashMap<String, SimDouble> m_createdItems = new HashMap<String, SimDouble>();
 
   /**
      * Set/Create the angle of a ligament.
@@ -24,10 +24,10 @@ public class Mechanism2D {
   public void setLigamentAngle(String ligamentPath, float angle) {
     ligamentPath = ligamentPath + "angle/";
     if (m_device != null) {
-      if (!CreatedItems.containsKey(ligamentPath)) {
-        CreatedItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
+      if (!m_createdItems.containsKey(ligamentPath)) {
+        m_createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
       }
-      CreatedItems.get(ligamentPath).set(angle);
+      m_createdItems.get(ligamentPath).set(angle);
     }
   }
 
@@ -40,10 +40,10 @@ public class Mechanism2D {
   public void setLigamentLength(String ligamentPath, float length) {
     ligamentPath = ligamentPath + "length/";
     if (m_device != null) {
-      if (!CreatedItems.containsKey(ligamentPath)) {
-         CreatedItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));
+      if (!m_createdItems.containsKey(ligamentPath)) {
+        m_createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));
       }
-      CreatedItems.get(ligamentPath).set(length);
+      m_createdItems.get(ligamentPath).set(length);
     }
   }
 }
