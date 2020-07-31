@@ -22,30 +22,28 @@ public class Mechanism2D {
      * @param angle        to set the ligament
      */
   public void setLigamentAngle(String ligamentPath, float angle) {
-      ligamentPath = ligamentPath + "angle/";
+    ligamentPath = ligamentPath + "angle/";
     if (m_device != null) {
-        if(!CreatedItems.containsKey(ligamentPath)){
-            CreatedItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
-        }
-
-        CreatedItems.get(ligamentPath).set(angle);
+      if (!CreatedItems.containsKey(ligamentPath)) {
+        CreatedItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
+      }
+      CreatedItems.get(ligamentPath).set(angle);
     }
-
   }
 
-    /**
-     * Set/Create the length of a ligament.
-     *
-     * @param ligamentPath json path to the ligament
-     * @param length       to set the ligament
-     */
+  /**
+   * Set/Create the length of a ligament.
+   *
+   * @param ligamentPath json path to the ligament
+   * @param length       to set the ligament
+   */
   public void setLigamentLength(String ligamentPath, float length) {
-      ligamentPath = ligamentPath + "length/";
+    ligamentPath = ligamentPath + "length/";
     if (m_device != null) {
-        if(!CreatedItems.containsKey(ligamentPath)){
-            CreatedItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));
-        }
-        CreatedItems.get(ligamentPath).set(length);
+      if (!CreatedItems.containsKey(ligamentPath)) {
+         CreatedItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));
+      }
+      CreatedItems.get(ligamentPath).set(length);
     }
   }
 }
