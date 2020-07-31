@@ -10,10 +10,11 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Mechanism2D {
   SimDevice m_device = SimDevice.create("Mechanism2D");
-  HashMap<String, SimDouble> m_createdItems = new HashMap<String, SimDouble>();
+  Map<String, SimDouble> m_createdItems = new HashMap<String, SimDouble>();
 
   /**
      * Set/Create the angle of a ligament.
