@@ -17,7 +17,7 @@ target_include_directories(wpilibc PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpilibc>)
 wpilib_target_warnings(wpilibc)
-target_link_libraries(wpilibc PUBLIC cameraserver hal ntcore cscore wpiutil ${OpenCV_LIBS})
+target_link_libraries(wpilibc PUBLIC cameraserver hal ntcore cscore wpiutil wpimath ${OpenCV_LIBS})
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 

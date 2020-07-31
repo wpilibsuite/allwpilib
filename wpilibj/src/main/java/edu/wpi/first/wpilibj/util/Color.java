@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.util;
 
 import java.util.Objects;
 
-import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.math.MathUtil;
 
 /**
  * Represents colors.

@@ -1,0 +1,34 @@
+def wpimathVersion = '2020.1'
+
+if (project.hasProperty('useCpp') && project.useCpp) {
+    model {
+        binaries {
+            withType(NativeBinarySpec).all {
+                def binary = it
+                project.sharedMathConfigs.each {
+                    if (binary.component.name == it.key) {
+                        nativeUtils.useRequiredLibrary(binary, 'wpimath_shared')
+                    }
+                }
+                project.staticMathConfigs.each {
+                    if (binary.component.name == it.key) {
+                        nativeUtils.useRequiredLibrary(binary, 'wpimath_static')
+                    }
+                }
+            }
+        }
+    }
+}
+
+if (project.hasProperty('useJava') && project.useJava) {
+    dependencies {
+        implementation "org.ejml:ejml-simple:0.38"
+        implementation "edu.wpi.first.math:wpimath-java:${wpimathVersion}"
+        if (!project.hasProperty('skipDev') || !project.skipDev) {
+            devImplementation "edu.wpi.first.math:wpimath-java:${wpimathVersion}"
+        }
+        if (project.hasProperty('useDocumentation') && project.useDocumentation) {
+            javaSource "edu.wpi.first.math:wpimath-java:${wpimathVersion}:sources"
+        }
+    }
+}

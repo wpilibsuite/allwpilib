@@ -85,11 +85,14 @@ project(':').libraryBuild.dependsOn build
 ext {
     sharedCvConfigs = [wpilibjDev: []]
     staticCvConfigs = [:]
+    sharedMathConfigs = [wpilibj: [], wpilibjDev: []]
+    staticMathConfigs = [:]
     useJava = true
     useCpp = true
 }
 
 apply from: "${rootDir}/shared/opencv.gradle"
+apply from: "${rootDir}/shared/wpimath.gradle"
 
 model {
     components {
