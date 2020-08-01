@@ -79,7 +79,7 @@ class Mechanism2DInfo {
  public:
   std::string jsonLocation;
 };
-}
+}  // namespace
 
 static Mechanism2DInfo mechanism2DInfo;
 
