@@ -74,11 +74,12 @@ static void buildColorTable() {
     colorLookUpTable.try_emplace(namedColor.name, namedColor.value);
   }
 }
-
+namespace {
 class Mechanism2DInfo {
  public:
   std::string jsonLocation;
 };
+}
 
 static Mechanism2DInfo mechanism2DInfo;
 
