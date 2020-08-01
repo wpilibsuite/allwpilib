@@ -13,6 +13,7 @@
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
 #include <wpi/json.h>
@@ -39,7 +40,7 @@ struct BodyConfig {
   std::vector<BodyConfig> children;
   int lineWidth = 1;
 };
-}
+}  // namespace
 static std::vector<BodyConfig> bodyConfigVector;
 namespace {
 struct DrawLineStruct {
@@ -47,7 +48,7 @@ struct DrawLineStruct {
   float yEnd;
   float angle;
 };
-}
+}  // namespace
 static struct NamedColor {
   const char* name;
   ImColor value;
