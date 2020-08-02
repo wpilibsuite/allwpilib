@@ -37,9 +37,9 @@ class SlewRateLimiter {
    * @param initialValue The initial value of the input.
    */
   explicit SlewRateLimiter(Rate_t rateLimit, Unit_t initialValue = Unit_t{0})
-      : m_rateLimit{rateLimit}, m_prevVal{initialValue} {
-    m_timer.Start();
-  }
+      : m_rateLimit{rateLimit},
+        m_prevVal{initialValue},
+        m_prevTime{frc2::Timer::GetFPGATimestamp()} {}
 
   /**
    * Filters the input to limit its slew rate.
@@ -49,9 +49,11 @@ class SlewRateLimiter {
    * rate.
    */
   Unit_t Calculate(Unit_t input) {
-    m_prevVal += std::clamp(input - m_prevVal, -m_rateLimit * m_timer.Get(),
-                            m_rateLimit * m_timer.Get());
-    m_timer.Reset();
+    units::second_t currentTime = frc2::Timer::GetFPGATimestamp();
+    units::second_t elapsedTime = currentTime - m_prevTime;
+    m_prevVal += std::clamp(input - m_prevVal, -m_rateLimit * elapsedTime,
+                            m_rateLimit * elapsedTime);
+    m_prevTime = currentTime;
     return m_prevVal;
   }
 
@@ -62,13 +64,13 @@ class SlewRateLimiter {
    * @param value The value to reset to.
    */
   void Reset(Unit_t value) {
-    m_timer.Reset();
     m_prevVal = value;
+    m_prevTime = frc2::Timer::GetFPGATimestamp();
   }
 
  private:
-  frc2::Timer m_timer;
   Rate_t m_rateLimit;
   Unit_t m_prevVal;
+  units::second_t m_prevTime;
 };
 }  // namespace frc
