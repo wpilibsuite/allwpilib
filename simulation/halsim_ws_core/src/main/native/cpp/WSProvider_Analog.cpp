@@ -15,80 +15,96 @@ namespace wpilibws {
 
 void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderAnalogIn>("AI", HAL_GetNumAnalogInputs(),
-                                            HALSIM_RegisterAnalogInAllCallbacks,
                                             webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderAnalogIn::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderAnalogIn::RegisterCallbacks() {
+  m_initCbKey = HALSIM_RegisterAnalogInInitializedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{"<init", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_avgbitsCbKey = HALSIM_RegisterAnalogInAverageBitsCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{"<avg_bits", value->data.v_int}});
+      },
+      this, true);
 
-  if (cbType == "Initialized" || !sendDiffOnly) {
-    result["<init"] =
-        static_cast<bool>(HALSIM_GetAnalogInInitialized(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_oversampleCbKey = HALSIM_RegisterAnalogInOversampleBitsCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{"<oversample_bits", value->data.v_int}});
+      },
+      this, true);
 
-  if (cbType == "AverageBits" || !sendDiffOnly) {
-    result["<avg_bit"] = HALSIM_GetAnalogInAverageBits(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_voltageCbKey = HALSIM_RegisterAnalogInVoltageCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{">voltage", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "OversampleBits" || !sendDiffOnly) {
-    result["<oversample_bits"] = HALSIM_GetAnalogInOversampleBits(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_accumInitCbKey = HALSIM_RegisterAnalogInAccumulatorInitializedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{"accum", {{"<init", static_cast<bool>(value->data.v_boolean)}}}});
+      },
+      this, true);
 
-  if (cbType == "Voltage" || !sendDiffOnly) {
-    result[">voltage"] = HALSIM_GetAnalogInVoltage(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_accumValueCbKey = HALSIM_RegisterAnalogInAccumulatorValueCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{"accum", {{">value", value->data.v_long}}}});
+      },
+      this, true);
 
-  if (cbType == "AccumulatorInitialized" || !sendDiffOnly) {
-    if (result.find("accum") == result.end()) {
-      result["accum"] = wpi::json({});
-    }
-    result["accum"]["<init"] =
-        static_cast<bool>(HALSIM_GetAnalogInAccumulatorInitialized(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_accumCountCbKey = HALSIM_RegisterAnalogInAccumulatorCountCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{"accum", {{">count", value->data.v_long}}}});
+      },
+      this, true);
 
-  if (cbType == "AccumulatorValue" || !sendDiffOnly) {
-    if (result.find("accum") == result.end()) {
-      result["accum"] = wpi::json({});
-    }
-    result["accum"][">value"] = HALSIM_GetAnalogInAccumulatorValue(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_accumCenterCbKey = HALSIM_RegisterAnalogInAccumulatorCenterCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{"accum", {{"<center", value->data.v_int}}}});
+      },
+      this, true);
 
-  if (cbType == "AccumulatorCount" || !sendDiffOnly) {
-    if (result.find("accum") == result.end()) {
-      result["accum"] = wpi::json({});
-    }
-    result["accum"][">count"] = HALSIM_GetAnalogInAccumulatorCount(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_accumDeadbandCbKey = HALSIM_RegisterAnalogInAccumulatorDeadbandCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
+            {{"accum", {{"<deadband", value->data.v_int}}}});
+      },
+      this, true);
+}
 
-  if (cbType == "AccumulatorCenter" || !sendDiffOnly) {
-    if (result.find("accum") == result.end()) {
-      result["accum"] = wpi::json({});
-    }
-    result["accum"]["<center"] = HALSIM_GetAnalogInAccumulatorCenter(m_channel);
-    if (sendDiffOnly) return result;
-  }
-
-  if (cbType == "AccumulatorDeadband" || !sendDiffOnly) {
-    if (result.find("accum") == result.end()) {
-      result["accum"] = wpi::json({});
-    }
-    result["accum"]["<deadband"] =
-        HALSIM_GetAnalogInAccumulatorDeadband(m_channel);
-    if (sendDiffOnly) return result;
-  }
-
-  return result;
+void HALSimWSProviderAnalogIn::CancelCallbacks() {
+  // Cancel callbacks
+  HALSIM_CancelAnalogInInitializedCallback(m_channel, m_initCbKey);
+  HALSIM_CancelAnalogInAverageBitsCallback(m_channel, m_avgbitsCbKey);
+  HALSIM_CancelAnalogInOversampleBitsCallback(m_channel, m_oversampleCbKey);
+  HALSIM_CancelAnalogInVoltageCallback(m_channel, m_voltageCbKey);
+  HALSIM_CancelAnalogInAccumulatorInitializedCallback(m_channel,
+                                                      m_accumInitCbKey);
+  HALSIM_CancelAnalogInAccumulatorValueCallback(m_channel, m_accumValueCbKey);
+  HALSIM_CancelAnalogInAccumulatorCountCallback(m_channel, m_accumCountCbKey);
+  HALSIM_CancelAnalogInAccumulatorCenterCallback(m_channel, m_accumCenterCbKey);
+  HALSIM_CancelAnalogInAccumulatorDeadbandCallback(m_channel,
+                                                   m_accumDeadbandCbKey);
 }
 
 void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::json& json) {
@@ -108,29 +124,31 @@ void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::json& json) {
 }
 
 void HALSimWSProviderAnalogOut::Initialize(WSRegisterFunc webRegisterFunc) {
-  CreateProviders<HALSimWSProviderAnalogOut>(
-      "AO", HAL_GetNumAnalogOutputs(), HALSIM_RegisterAnalogOutAllCallbacks,
-      webRegisterFunc);
+  CreateProviders<HALSimWSProviderAnalogOut>("AO", HAL_GetNumAnalogOutputs(),
+                                             webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderAnalogOut::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderAnalogOut::RegisterCallbacks() {
+  m_initCbKey = HALSIM_RegisterAnalogOutInitializedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogOut*>(param)->ProcessHalCallback(
+            {{"<init", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_voltageCbKey = HALSIM_RegisterAnalogOutVoltageCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderAnalogOut*>(param)->ProcessHalCallback(
+            {{"<voltage", value->data.v_double}});
+      },
+      this, true);
+}
 
-  if (cbType == "Initialized" || !sendDiffOnly) {
-    result["<init"] =
-        static_cast<bool>(HALSIM_GetAnalogOutInitialized(m_channel));
-    if (sendDiffOnly) return result;
-  }
-
-  if (cbType == "Voltage" || !sendDiffOnly) {
-    result["<voltage"] = HALSIM_GetAnalogOutVoltage(m_channel);
-    if (sendDiffOnly) return result;
-  }
-
-  return result;
+void HALSimWSProviderAnalogOut::CancelCallbacks() {
+  HALSIM_CancelAnalogOutInitializedCallback(m_channel, m_initCbKey);
+  HALSIM_CancelAnalogOutVoltageCallback(m_channel, m_voltageCbKey);
 }
 
 }  // namespace wpilibws

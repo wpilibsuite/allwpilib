@@ -33,6 +33,10 @@ void HALSimWSProviderSimDevice::OnNetworkConnected(
   }
 }
 
+void HALSimWSProviderSimDevice::OnNetworkDisconnected() {
+  // no-op for now
+}
+
 void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
   auto it = json.cbegin();
   auto end = json.cend();

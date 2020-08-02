@@ -14,48 +14,66 @@ namespace wpilibws {
 
 void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderPWM>("PWM", HAL_GetNumPWMChannels(),
-                                       HALSIM_RegisterPWMAllCallbacks,
                                        webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderPWM::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderPWM::RegisterCallbacks() {
+  m_initCbKey = HALSIM_RegisterPWMInitializedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
+            {{"<init", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_speedCbKey = HALSIM_RegisterPWMSpeedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
+            {{"<speed", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "Initialized" || !sendDiffOnly) {
-    result["<init"] = static_cast<bool>(HALSIM_GetPWMInitialized(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_positionCbKey = HALSIM_RegisterPWMPositionCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
+            {{"<position", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "Speed" || !sendDiffOnly) {
-    result["<speed"] = HALSIM_GetPWMSpeed(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_rawCbKey = HALSIM_RegisterPWMRawValueCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
+            {{"<raw", value->data.v_int}});
+      },
+      this, true);
 
-  if (cbType == "Position" || !sendDiffOnly) {
-    result["<position"] = HALSIM_GetPWMPosition(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_periodScaleCbKey = HALSIM_RegisterPWMPeriodScaleCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
+            {{"<period_scale", value->data.v_int}});
+      },
+      this, true);
 
-  if (cbType == "RawValue" || !sendDiffOnly) {
-    result["<raw"] = HALSIM_GetPWMRawValue(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_zeroLatchCbKey = HALSIM_RegisterPWMZeroLatchCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
+            {{"<zero_latch", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
+}
 
-  if (cbType == "PeriodScale" || !sendDiffOnly) {
-    result["<period_scale"] = HALSIM_GetPWMPeriodScale(m_channel);
-    if (sendDiffOnly) return result;
-  }
-
-  if (cbType == "ZeroLatch" || !sendDiffOnly) {
-    result["<zero_latch"] =
-        static_cast<bool>(HALSIM_GetPWMZeroLatch(m_channel));
-    if (sendDiffOnly) return result;
-  }
-
-  return result;
+void HALSimWSProviderPWM::CancelCallbacks() {
+  HALSIM_CancelPWMInitializedCallback(m_channel, m_initCbKey);
+  HALSIM_CancelPWMSpeedCallback(m_channel, m_speedCbKey);
+  HALSIM_CancelPWMPositionCallback(m_channel, m_positionCbKey);
+  HALSIM_CancelPWMRawValueCallback(m_channel, m_rawCbKey);
+  HALSIM_CancelPWMPeriodScaleCallback(m_channel, m_periodScaleCbKey);
+  HALSIM_CancelPWMZeroLatchCallback(m_channel, m_zeroLatchCbKey);
 }
 
 }  // namespace wpilibws

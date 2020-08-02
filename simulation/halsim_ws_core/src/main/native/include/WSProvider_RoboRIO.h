@@ -19,8 +19,28 @@ class HALSimWSProviderRoboRIO : public HALSimWSHalProvider {
 
   using HALSimWSHalProvider::HALSimWSHalProvider;
 
-  wpi::json OnSimValueChanged(const char* cbName) override;
   void OnNetValueChanged(const wpi::json& json) override;
+
+ protected:
+  void RegisterCallbacks() override;
+  void CancelCallbacks() override;
+
+ private:
+  int32_t m_fpgaCbKey;
+  int32_t m_vinVoltageCbKey;
+  int32_t m_vinCurrentCbKey;
+  int32_t m_6vVoltageCbKey;
+  int32_t m_6vCurrentCbKey;
+  int32_t m_6vActiveCbKey;
+  int32_t m_6vFaultsCbKey;
+  int32_t m_5vVoltageCbKey;
+  int32_t m_5vCurrentCbKey;
+  int32_t m_5vActiveCbKey;
+  int32_t m_5vFaultsCbKey;
+  int32_t m_3v3VoltageCbKey;
+  int32_t m_3v3CurrentCbKey;
+  int32_t m_3v3ActiveCbKey;
+  int32_t m_3v3FaultsCbKey;
 };
 
 }  // namespace wpilibws

@@ -13,39 +13,48 @@
 namespace wpilibws {
 void HALSimWSProviderRelay::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderRelay>("Relay", HAL_GetNumRelayHeaders(),
-                                         HALSIM_RegisterRelayAllCallbacks,
                                          webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderRelay::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderRelay::RegisterCallbacks() {
+  m_initFwdCbKey = HALSIM_RegisterRelayInitializedForwardCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(
+            {{"<init_fwd", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_initRevCbKey = HALSIM_RegisterRelayInitializedReverseCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(
+            {{"<init_rev", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "InitializedForward" || !sendDiffOnly) {
-    result["<init_fwd"] =
-        static_cast<bool>(HALSIM_GetRelayInitializedForward(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_fwdCbKey = HALSIM_RegisterRelayForwardCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(
+            {{"<fwd", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "InitializedReverse" || !sendDiffOnly) {
-    result["<init_rev"] =
-        static_cast<bool>(HALSIM_GetRelayInitializedReverse(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_revCbKey = HALSIM_RegisterRelayReverseCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(
+            {{"<rev", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
+}
 
-  if (cbType == "Forward" || !sendDiffOnly) {
-    result["<fwd"] = static_cast<bool>(HALSIM_GetRelayForward(m_channel));
-    if (sendDiffOnly) return result;
-  }
-
-  if (cbType == "Reverse" || !sendDiffOnly) {
-    result["<rev"] = static_cast<bool>(HALSIM_GetRelayReverse(m_channel));
-    if (sendDiffOnly) return result;
-  }
-
-  return result;
+void HALSimWSProviderRelay::CancelCallbacks() {
+  HALSIM_CancelRelayInitializedForwardCallback(m_channel, m_initFwdCbKey);
+  HALSIM_CancelRelayInitializedReverseCallback(m_channel, m_initRevCbKey);
+  HALSIM_CancelRelayForwardCallback(m_channel, m_fwdCbKey);
+  HALSIM_CancelRelayReverseCallback(m_channel, m_revCbKey);
 }
 
 }  // namespace wpilibws

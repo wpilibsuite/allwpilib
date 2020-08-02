@@ -19,8 +19,19 @@ class HALSimWSProviderEncoder : public HALSimWSHalChanProvider {
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
 
-  wpi::json OnSimValueChanged(const char* cbName) override;
   void OnNetValueChanged(const wpi::json& json) override;
+
+ protected:
+  void RegisterCallbacks() override;
+  void CancelCallbacks() override;
+
+ private:
+  int32_t m_initCbKey;
+  int32_t m_countCbKey;
+  int32_t m_periodCbKey;
+  int32_t m_resetCbKey;
+  int32_t m_reverseDirectionCbKey;
+  int32_t m_samplesCbKey;
 };
 
 }  // namespace wpilibws

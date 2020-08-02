@@ -19,8 +19,22 @@ class HALSimWSProviderAnalogIn : public HALSimWSHalChanProvider {
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
 
-  wpi::json OnSimValueChanged(const char* cbName) override;
   void OnNetValueChanged(const wpi::json& json) override;
+
+ protected:
+  void RegisterCallbacks() override;
+  void CancelCallbacks() override;
+
+ private:
+  int32_t m_initCbKey;
+  int32_t m_avgbitsCbKey;
+  int32_t m_oversampleCbKey;
+  int32_t m_voltageCbKey;
+  int32_t m_accumInitCbKey;
+  int32_t m_accumValueCbKey;
+  int32_t m_accumCountCbKey;
+  int32_t m_accumCenterCbKey;
+  int32_t m_accumDeadbandCbKey;
 };
 
 class HALSimWSProviderAnalogOut : public HALSimWSHalChanProvider {
@@ -29,7 +43,13 @@ class HALSimWSProviderAnalogOut : public HALSimWSHalChanProvider {
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
 
-  wpi::json OnSimValueChanged(const char* cbName) override;
+ protected:
+  void RegisterCallbacks() override;
+  void CancelCallbacks() override;
+
+ private:
+  int32_t m_initCbKey;
+  int32_t m_voltageCbKey;
 };
 
 }  // namespace wpilibws

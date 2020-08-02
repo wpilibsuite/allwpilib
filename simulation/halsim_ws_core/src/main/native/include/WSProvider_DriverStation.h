@@ -19,8 +19,21 @@ class HALSimWSProviderDriverStation : public HALSimWSHalProvider {
 
   using HALSimWSHalProvider::HALSimWSHalProvider;
 
-  wpi::json OnSimValueChanged(const char* cbName) override;
   void OnNetValueChanged(const wpi::json& json) override;
+
+ protected:
+  void RegisterCallbacks() override;
+  void CancelCallbacks() override;
+
+ private:
+  int32_t m_enabledCbKey;
+  int32_t m_autonomousCbKey;
+  int32_t m_testCbKey;
+  int32_t m_estopCbKey;
+  int32_t m_fmsCbKey;
+  int32_t m_dsCbKey;
+  int32_t m_allianceCbKey;
+  int32_t m_matchTimeCbKey;
 };
 
 }  // namespace wpilibws

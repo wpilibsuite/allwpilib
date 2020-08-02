@@ -19,7 +19,14 @@ class HALSimWSProviderDigitalPWM : public HALSimWSHalChanProvider {
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
 
-  wpi::json OnSimValueChanged(const char* cbName) override;
+ protected:
+  void RegisterCallbacks() override;
+  void CancelCallbacks() override;
+
+ private:
+  int32_t m_initCbKey;
+  int32_t m_dutyCycleCbKey;
+  int32_t m_pinCbKey;
 };
 
 }  // namespace wpilibws

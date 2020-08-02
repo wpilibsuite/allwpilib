@@ -14,49 +14,67 @@ namespace wpilibws {
 
 void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderEncoder>("Encoder", HAL_GetNumEncoders(),
-                                           HALSIM_RegisterEncoderAllCallbacks,
                                            webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderEncoder::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderEncoder::RegisterCallbacks() {
+  m_initCbKey = HALSIM_RegisterEncoderInitializedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
+            {{"<init", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_countCbKey = HALSIM_RegisterEncoderCountCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
+            {{">count", value->data.v_int}});
+      },
+      this, true);
 
-  if (cbType == "Initialized" || !sendDiffOnly) {
-    result["<init"] =
-        static_cast<bool>(HALSIM_GetEncoderInitialized(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_periodCbKey = HALSIM_RegisterEncoderPeriodCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
+            {{">period", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "Count" || !sendDiffOnly) {
-    result[">count"] = HALSIM_GetEncoderCount(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_resetCbKey = HALSIM_RegisterEncoderResetCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
+            {{"<reset", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "Period" || !sendDiffOnly) {
-    result[">period"] = HALSIM_GetEncoderPeriod(m_channel);
-    if (sendDiffOnly) return result;
-  }
+  m_reverseDirectionCbKey = HALSIM_RegisterEncoderReverseDirectionCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
+            {{"<reverse_direction", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "Reset" || !sendDiffOnly) {
-    result["<reset"] = static_cast<bool>(HALSIM_GetEncoderReset(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_samplesCbKey = HALSIM_RegisterEncoderSamplesToAverageCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
+            {{"<samples_to_avg", value->data.v_int}});
+      },
+      this, true);
+}
 
-  if (cbType == "ReverseDirection" || !sendDiffOnly) {
-    result["<reverse_direction"] =
-        static_cast<bool>(HALSIM_GetEncoderReverseDirection(m_channel));
-    if (sendDiffOnly) return result;
-  }
-
-  if (cbType == "SamplesToAverage" || !sendDiffOnly) {
-    result["<samples_to_avg"] = HALSIM_GetEncoderSamplesToAverage(m_channel);
-    if (sendDiffOnly) return result;
-  }
-
-  return result;
+void HALSimWSProviderEncoder::CancelCallbacks() {
+  HALSIM_CancelEncoderInitializedCallback(m_channel, m_initCbKey);
+  HALSIM_CancelEncoderCountCallback(m_channel, m_countCbKey);
+  HALSIM_CancelEncoderPeriodCallback(m_channel, m_periodCbKey);
+  HALSIM_CancelEncoderResetCallback(m_channel, m_resetCbKey);
+  HALSIM_CancelEncoderReverseDirectionCallback(m_channel,
+                                               m_reverseDirectionCbKey);
+  HALSIM_CancelEncoderSamplesToAverageCallback(m_channel, m_samplesCbKey);
 }
 
 void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::json& json) {

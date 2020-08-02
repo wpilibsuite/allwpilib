@@ -40,6 +40,9 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
   void OnNetworkConnected(
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;
+
+  void OnNetworkDisconnected() override;
+
   void OnNetValueChanged(const wpi::json& json) override;
 
  private:

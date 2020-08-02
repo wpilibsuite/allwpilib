@@ -20,81 +20,98 @@ void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
   // TODO: if this isn't called, our callbacks get erased. Fixed in 2021
   HAL_InitializeDriverStation();
 
-  CreateSingleProvider<HALSimWSProviderDriverStation>(
-      "DriverStation", HALSIM_RegisterDriverStationAllCallbacks,
-      webRegisterFunc);
+  CreateSingleProvider<HALSimWSProviderDriverStation>("DriverStation",
+                                                      webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderDriverStation::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderDriverStation::RegisterCallbacks() {
+  m_enabledCbKey = HALSIM_RegisterDriverStationEnabledCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{">enabled", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_autonomousCbKey = HALSIM_RegisterDriverStationAutonomousCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{">autonomous", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "Enabled" || !sendDiffOnly) {
-    result[">enabled"] = static_cast<bool>(HALSIM_GetDriverStationEnabled());
-    if (sendDiffOnly) return result;
-  }
+  m_testCbKey = HALSIM_RegisterDriverStationTestCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{">test", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "Autonomous" || !sendDiffOnly) {
-    result[">autonomous"] =
-        static_cast<bool>(HALSIM_GetDriverStationAutonomous());
-    if (sendDiffOnly) return result;
-  }
+  m_estopCbKey = HALSIM_RegisterDriverStationEStopCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{">estop", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "Test" || !sendDiffOnly) {
-    result[">test"] = static_cast<bool>(HALSIM_GetDriverStationTest());
-    if (sendDiffOnly) return result;
-  }
+  m_fmsCbKey = HALSIM_RegisterDriverStationFmsAttachedCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{">fms", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "EStop" || !sendDiffOnly) {
-    result[">estop"] = static_cast<bool>(HALSIM_GetDriverStationEStop());
-    if (sendDiffOnly) return result;
-  }
+  m_dsCbKey = HALSIM_RegisterDriverStationDsAttachedCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{">ds", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "FmsAttached" || !sendDiffOnly) {
-    result[">fms"] = static_cast<bool>(HALSIM_GetDriverStationFmsAttached());
-    if (sendDiffOnly) return result;
-  }
+  m_allianceCbKey = HALSIM_RegisterDriverStationAllianceStationIdCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        std::string station;
+        switch (static_cast<HAL_AllianceStationID>(value->data.v_enum)) {
+          case HAL_AllianceStationID_kRed1:
+            station = "red1";
+            break;
+          case HAL_AllianceStationID_kBlue1:
+            station = "blue1";
+            break;
+          case HAL_AllianceStationID_kRed2:
+            station = "red2";
+            break;
+          case HAL_AllianceStationID_kBlue2:
+            station = "blue2";
+            break;
+          case HAL_AllianceStationID_kRed3:
+            station = "red3";
+            break;
+          case HAL_AllianceStationID_kBlue3:
+            station = "blue3";
+            break;
+        }
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{">station", station}});
+      },
+      this, true);
 
-  if (cbType == "DsAttached" || !sendDiffOnly) {
-    result[">ds"] = static_cast<bool>(HALSIM_GetDriverStationDsAttached());
-    if (sendDiffOnly) return result;
-  }
+  m_matchTimeCbKey = HALSIM_RegisterDriverStationMatchTimeCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{"<match_time", value->data.v_double}});
+      },
+      this, true);
+}
 
-  if (cbType == "AllianceStationId" || !sendDiffOnly) {
-    std::string station;
-    switch (HALSIM_GetDriverStationAllianceStationId()) {
-      case HAL_AllianceStationID_kRed1:
-        station = "red1";
-        break;
-      case HAL_AllianceStationID_kBlue1:
-        station = "blue1";
-        break;
-      case HAL_AllianceStationID_kRed2:
-        station = "red2";
-        break;
-      case HAL_AllianceStationID_kBlue2:
-        station = "blue2";
-        break;
-      case HAL_AllianceStationID_kRed3:
-        station = "red3";
-        break;
-      case HAL_AllianceStationID_kBlue3:
-        station = "blue3";
-        break;
-    }
-
-    result[">station"] = station;
-    if (sendDiffOnly) return result;
-  }
-
-  if (cbType == "MatchTime" || !sendDiffOnly) {
-    result["<match_time"] = HALSIM_GetDriverStationMatchTime();
-    if (sendDiffOnly) return result;
-  }
-
-  return result;
+void HALSimWSProviderDriverStation::CancelCallbacks() {
+  HALSIM_CancelDriverStationEnabledCallback(m_enabledCbKey);
+  HALSIM_CancelDriverStationAutonomousCallback(m_autonomousCbKey);
+  HALSIM_CancelDriverStationTestCallback(m_testCbKey);
+  HALSIM_CancelDriverStationEStopCallback(m_estopCbKey);
+  HALSIM_CancelDriverStationFmsAttachedCallback(m_fmsCbKey);
+  HALSIM_CancelDriverStationDsAttachedCallback(m_dsCbKey);
+  HALSIM_CancelDriverStationAllianceStationIdCallback(m_allianceCbKey);
+  HALSIM_CancelDriverStationMatchTimeCallback(m_matchTimeCbKey);
 }
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {

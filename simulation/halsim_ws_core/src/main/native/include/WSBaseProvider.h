@@ -32,6 +32,8 @@ class HALSimWSBaseProvider {
   virtual void OnNetworkConnected(
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) = 0;
 
+  virtual void OnNetworkDisconnected() = 0;
+
   // network -> sim
   virtual void OnNetValueChanged(const wpi::json& json);
 

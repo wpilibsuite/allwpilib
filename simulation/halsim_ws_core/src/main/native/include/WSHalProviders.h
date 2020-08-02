@@ -31,15 +31,14 @@ class HALSimWSHalProvider : public HALSimWSBaseProvider {
   using HALSimWSBaseProvider::HALSimWSBaseProvider;
 
   void OnNetworkConnected(std::shared_ptr<HALSimBaseWebSocketConnection> ws);
+  void OnNetworkDisconnected();
 
-  static void OnStaticSimCallback(const char* name, void* param,
-                                  const struct HAL_Value* value);
-  void OnSimCallback(const char* cbName);
-
-  // should return json structure representing sim value
-  virtual wpi::json OnSimValueChanged(const char* name) = 0;
+  void ProcessHalCallback(const wpi::json& payload);
 
  protected:
+  virtual void RegisterCallbacks() = 0;
+  virtual void CancelCallbacks() = 0;
+
   // mutex protects last
   wpi::mutex mutex;
 };
@@ -59,12 +58,10 @@ using WSRegisterFunc = std::function<void(
 
 template <typename T>
 void CreateProviders(const std::string& prefix, int32_t numChannels,
-                     HALCbRegisterIndexedFunc halRegisterFunc,
                      WSRegisterFunc webRegisterFunc);
 
 template <typename T>
 void CreateSingleProvider(const std::string& key,
-                          HALCbRegisterSingleFunc halRegisterFunc,
                           WSRegisterFunc webRegisterFunc);
 
 #include "WSHalProviders.inl"

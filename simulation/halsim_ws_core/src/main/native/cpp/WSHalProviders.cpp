@@ -18,30 +18,18 @@ void HALSimWSHalProvider::OnNetworkConnected(
     m_ws = ws;
   }
 
-  // trigger a send of the current state
-  OnSimCallback("");
+  RegisterCallbacks();
 }
 
-void HALSimWSHalProvider::OnStaticSimCallback(const char* name, void* param,
-                                              const struct HAL_Value* value) {
-  static_cast<HALSimWSHalProvider*>(param)->OnSimCallback(name);
-}
+void HALSimWSHalProvider::OnNetworkDisconnected() { CancelCallbacks(); }
 
-void HALSimWSHalProvider::OnSimCallback(const char* cbName) {
-  // Ensures all operations are performed in-order
-  // -> this includes the network send
+void HALSimWSHalProvider::ProcessHalCallback(const wpi::json& payload) {
   std::lock_guard lock(mutex);
-
-  // OnSimValueChanged will only return the values of interest
-  // so we won't need to diff
-  auto result = OnSimValueChanged(cbName);
-  if (!result.empty()) {
-    auto ws = m_ws.lock();
-    if (ws) {
-      wpi::json netValue = {
-          {"type", m_type}, {"device", m_deviceId}, {"data", result}};
-      ws->OnSimValueChanged(netValue);
-    }
+  auto ws = m_ws.lock();
+  if (ws) {
+    wpi::json netValue = {
+        {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
+    ws->OnSimValueChanged(netValue);
   }
 }
 

@@ -13,92 +13,135 @@
 namespace wpilibws {
 
 void HALSimWSProviderRoboRIO::Initialize(WSRegisterFunc webRegisterFunc) {
-  CreateSingleProvider<HALSimWSProviderRoboRIO>(
-      "RoboRIO", HALSIM_RegisterRoboRioAllCallbacks, webRegisterFunc);
+  CreateSingleProvider<HALSimWSProviderRoboRIO>("RoboRIO", webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderRoboRIO::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderRoboRIO::RegisterCallbacks() {
+  m_fpgaCbKey = HALSIM_RegisterRoboRioFPGAButtonCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">fpga_button", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_vinVoltageCbKey = HALSIM_RegisterRoboRioVInVoltageCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">vin_voltage", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "FPGAButton" || !sendDiffOnly) {
-    result[">fpga_button"] = static_cast<bool>(HALSIM_GetRoboRioFPGAButton());
-    if (sendDiffOnly) return result;
-  }
+  m_vinCurrentCbKey = HALSIM_RegisterRoboRioVInCurrentCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">vin_current", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "VInVoltage" || !sendDiffOnly) {
-    result[">vin_voltage"] = HALSIM_GetRoboRioVInVoltage();
-    if (sendDiffOnly) return result;
-  }
+  m_6vVoltageCbKey = HALSIM_RegisterRoboRioUserVoltage6VCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">6v_voltage", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "VInCurrent" || !sendDiffOnly) {
-    result[">vin_current"] = HALSIM_GetRoboRioVInCurrent();
-    if (sendDiffOnly) return result;
-  }
+  m_6vCurrentCbKey = HALSIM_RegisterRoboRioUserCurrent6VCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">6v_current", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "UserVoltage6V" || !sendDiffOnly) {
-    result[">6v_voltage"] = HALSIM_GetRoboRioUserVoltage6V();
-    if (sendDiffOnly) return result;
-  }
+  m_6vActiveCbKey = HALSIM_RegisterRoboRioUserActive6VCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">6v_active", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "UserCurrent6V" || !sendDiffOnly) {
-    result[">6v_current"] = HALSIM_GetRoboRioUserCurrent6V();
-    if (sendDiffOnly) return result;
-  }
+  m_6vFaultsCbKey = HALSIM_RegisterRoboRioUserFaults6VCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">6v_faults", value->data.v_int}});
+      },
+      this, true);
 
-  if (cbType == "UserActive6V" || !sendDiffOnly) {
-    result[">6v_active"] = static_cast<bool>(HALSIM_GetRoboRioUserActive6V());
-    if (sendDiffOnly) return result;
-  }
+  m_5vVoltageCbKey = HALSIM_RegisterRoboRioUserVoltage5VCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">5v_voltage", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "UserFaults6V" || !sendDiffOnly) {
-    result[">6v_faults"] = HALSIM_GetRoboRioUserFaults6V();
-    if (sendDiffOnly) return result;
-  }
+  m_5vCurrentCbKey = HALSIM_RegisterRoboRioUserCurrent5VCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">5v_current", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "UserVoltage5V" || !sendDiffOnly) {
-    result[">5v_voltage"] = HALSIM_GetRoboRioUserVoltage5V();
-    if (sendDiffOnly) return result;
-  }
+  m_5vActiveCbKey = HALSIM_RegisterRoboRioUserActive5VCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">5v_active", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "UserCurrent5V" || !sendDiffOnly) {
-    result[">5v_current"] = HALSIM_GetRoboRioUserCurrent5V();
-    if (sendDiffOnly) return result;
-  }
+  m_5vFaultsCbKey = HALSIM_RegisterRoboRioUserFaults5VCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">5v_faults", value->data.v_int}});
+      },
+      this, true);
 
-  if (cbType == "UserActive5V" || !sendDiffOnly) {
-    result[">5v_active"] = static_cast<bool>(HALSIM_GetRoboRioUserActive5V());
-    if (sendDiffOnly) return result;
-  }
+  m_3v3VoltageCbKey = HALSIM_RegisterRoboRioUserVoltage3V3Callback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">3v3_voltage", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "UserFaults5V" || !sendDiffOnly) {
-    result[">5v_faults"] = HALSIM_GetRoboRioUserFaults5V();
-    if (sendDiffOnly) return result;
-  }
+  m_3v3CurrentCbKey = HALSIM_RegisterRoboRioUserCurrent3V3Callback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">3v3_current", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "UserVoltage3V3" || !sendDiffOnly) {
-    result[">3v3_voltage"] = HALSIM_GetRoboRioUserVoltage3V3();
-    if (sendDiffOnly) return result;
-  }
+  m_3v3ActiveCbKey = HALSIM_RegisterRoboRioUserActive3V3Callback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">3v3_active", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "UserCurrent3V3" || !sendDiffOnly) {
-    result[">3v3_current"] = HALSIM_GetRoboRioUserCurrent3V3();
-    if (sendDiffOnly) return result;
-  }
+  m_3v3FaultsCbKey = HALSIM_RegisterRoboRioUserFaults3V3Callback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
+            {{">3v3_faults", value->data.v_int}});
+      },
+      this, true);
+}
 
-  if (cbType == "UserActive3V3" || !sendDiffOnly) {
-    result[">3v3_active"] = static_cast<bool>(HALSIM_GetRoboRioUserActive3V3());
-    if (sendDiffOnly) return result;
-  }
+void HALSimWSProviderRoboRIO::CancelCallbacks() {
+  HALSIM_CancelRoboRioFPGAButtonCallback(m_fpgaCbKey);
+  HALSIM_CancelRoboRioVInVoltageCallback(m_vinVoltageCbKey);
+  HALSIM_CancelRoboRioVInCurrentCallback(m_vinCurrentCbKey);
 
-  if (cbType == "UserFaults3V3" || !sendDiffOnly) {
-    result[">3v3_faults"] = HALSIM_GetRoboRioUserFaults3V3();
-    if (sendDiffOnly) return result;
-  }
+  HALSIM_CancelRoboRioUserVoltage6VCallback(m_6vVoltageCbKey);
+  HALSIM_CancelRoboRioUserCurrent6VCallback(m_6vCurrentCbKey);
+  HALSIM_CancelRoboRioUserActive6VCallback(m_6vActiveCbKey);
+  HALSIM_CancelRoboRioUserFaults6VCallback(m_6vFaultsCbKey);
 
-  return result;
+  HALSIM_CancelRoboRioUserVoltage5VCallback(m_5vVoltageCbKey);
+  HALSIM_CancelRoboRioUserCurrent5VCallback(m_5vCurrentCbKey);
+  HALSIM_CancelRoboRioUserActive5VCallback(m_5vActiveCbKey);
+  HALSIM_CancelRoboRioUserFaults5VCallback(m_5vFaultsCbKey);
+
+  HALSIM_CancelRoboRioUserVoltage3V3Callback(m_3v3VoltageCbKey);
+  HALSIM_CancelRoboRioUserCurrent3V3Callback(m_3v3CurrentCbKey);
+  HALSIM_CancelRoboRioUserActive3V3Callback(m_3v3ActiveCbKey);
+  HALSIM_CancelRoboRioUserFaults3V3Callback(m_3v3FaultsCbKey);
 }
 
 void HALSimWSProviderRoboRIO::OnNetValueChanged(const wpi::json& json) {

@@ -14,37 +14,48 @@ namespace wpilibws {
 
 void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderDIO>("DIO", HAL_GetNumDigitalChannels(),
-                                       HALSIM_RegisterDIOAllCallbacks,
                                        webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderDIO::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderDIO::RegisterCallbacks() {
+  m_initCbKey = HALSIM_RegisterDIOInitializedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(
+            {{"<init", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_valueCbKey = HALSIM_RegisterDIOValueCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(
+            {{"<>value", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  if (cbType == "Initialized" || !sendDiffOnly) {
-    result["<init"] = static_cast<bool>(HALSIM_GetDIOInitialized(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_pulseLengthCbKey = HALSIM_RegisterDIOPulseLengthCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(
+            {{"<pulse_length", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "Value" || !sendDiffOnly) {
-    result["<>value"] = static_cast<bool>(HALSIM_GetDIOValue(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_inputCbKey = HALSIM_RegisterDIOIsInputCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(
+            {{"<input", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
+}
 
-  if (cbType == "PulseLength" || !sendDiffOnly) {
-    result["<pulse_length"] = HALSIM_GetDIOPulseLength(m_channel);
-    if (sendDiffOnly) return result;
-  }
-
-  if (cbType == "IsInput" || !sendDiffOnly) {
-    result["<input"] = static_cast<bool>(HALSIM_GetDIOIsInput(m_channel));
-    if (sendDiffOnly) return result;
-  }
-
-  return result;
+void HALSimWSProviderDIO::CancelCallbacks() {
+  HALSIM_CancelDIOInitializedCallback(m_channel, m_initCbKey);
+  HALSIM_CancelDIOValueCallback(m_channel, m_valueCbKey);
+  HALSIM_CancelDIOPulseLengthCallback(m_channel, m_pulseLengthCbKey);
+  HALSIM_CancelDIOIsInputCallback(m_channel, m_inputCbKey);
 }
 
 void HALSimWSProviderDIO::OnNetValueChanged(const wpi::json& json) {

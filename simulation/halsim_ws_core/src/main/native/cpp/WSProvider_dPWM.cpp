@@ -14,33 +14,39 @@ namespace wpilibws {
 
 void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderDigitalPWM>(
-      "dPWM", HAL_GetNumDigitalPWMOutputs(),
-      HALSIM_RegisterDigitalPWMAllCallbacks, webRegisterFunc);
+      "dPWM", HAL_GetNumDigitalPWMOutputs(), webRegisterFunc);
 }
 
-wpi::json HALSimWSProviderDigitalPWM::OnSimValueChanged(const char* cbName) {
-  std::string cbType(cbName);
-  bool sendDiffOnly = (cbType != "");
+void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
+  m_initCbKey = HALSIM_RegisterDigitalPWMInitializedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDigitalPWM*>(param)->ProcessHalCallback(
+            {{"<init", static_cast<bool>(value->data.v_boolean)}});
+      },
+      this, true);
 
-  wpi::json result;
+  m_dutyCycleCbKey = HALSIM_RegisterDigitalPWMDutyCycleCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDigitalPWM*>(param)->ProcessHalCallback(
+            {{"<duty_cycle", value->data.v_double}});
+      },
+      this, true);
 
-  if (cbType == "Initialized" || !sendDiffOnly) {
-    result["<init"] =
-        static_cast<bool>(HALSIM_GetDigitalPWMInitialized(m_channel));
-    if (sendDiffOnly) return result;
-  }
+  m_pinCbKey = HALSIM_RegisterDigitalPWMPinCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDigitalPWM*>(param)->ProcessHalCallback(
+            {{"<dio_pin", value->data.v_int}});
+      },
+      this, true);
+}
 
-  if (cbType == "DutyCycle" || !sendDiffOnly) {
-    result["<duty_cycle"] = HALSIM_GetDigitalPWMDutyCycle(m_channel);
-    if (sendDiffOnly) return result;
-  }
-
-  if (cbType == "Pin" || !sendDiffOnly) {
-    result["<dio_pin"] = HALSIM_GetDigitalPWMPin(m_channel);
-    if (sendDiffOnly) return result;
-  }
-
-  return result;
+void HALSimWSProviderDigitalPWM::CancelCallbacks() {
+  HALSIM_CancelDigitalPWMInitializedCallback(m_channel, m_initCbKey);
+  HALSIM_CancelDigitalPWMDutyCycleCallback(m_channel, m_dutyCycleCbKey);
+  HALSIM_CancelDigitalPWMPinCallback(m_channel, m_pinCbKey);
 }
 
 }  // namespace wpilibws
