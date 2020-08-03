@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Mechanism2D {
-  SimDevice m_device = SimDevice.create("Mechanism2D");
-  Map<String, SimDouble> m_createdItems = new HashMap<String, SimDouble>();
+  private SimDevice m_device = SimDevice.create("Mechanism2D");
+  private Map<String, SimDouble> m_createdItems = new HashMap<String, SimDouble>();
 
   /**
      * Set/Create the angle of a ligament.
