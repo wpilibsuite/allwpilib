@@ -14,6 +14,7 @@
 #include <wpi/Path.h>
 #include <wpi/SmallVector.h>
 #include <wpi/UrlParser.h>
+#include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Request.h>
@@ -217,20 +218,26 @@ void HALSimHttpConnection::SendFileResponse(int code,
 
   Log(code);
 
-  // close after write completes if we aren't keeping alive
-  // since we're using sendfile, set socket to blocking
-  m_stream.SetBlocking(true);
-  Sendfile(m_stream.GetLoopRef(), uv_open_osfhandle(outfd), infd, 0,
-           status.getSize(),
-           [infd, closeAfter = !m_keepAlive, stream = &m_stream] {
-             wpi::sys::fs::file_t file = uv_get_osfhandle(infd);
-             wpi::sys::fs::closeFile(file);
+  // Read the file byte by byte
+  wpi::SmallVector<uv::Buffer, 4> bodyData;
+  wpi::raw_uv_ostream bodyOs{bodyData, 4096};
 
-             if (closeAfter)
-               stream->Close();
-             else
-               stream->SetBlocking(false);
-           });
+  wpi::raw_fd_istream is{infd, true};
+  std::string fileBuf;
+  size_t oldSize = 0;
+
+  while (fileBuf.size() < status.getSize()) {
+    oldSize = fileBuf.size();
+    fileBuf.resize(oldSize + 1);
+    is.read(&(*fileBuf.begin()) + oldSize, 1);
+  }
+
+  bodyOs << fileBuf;
+
+  SendData(bodyOs.bufs(), false);
+  if (!m_keepAlive) {
+    m_stream.Close();
+  }
 }
 
 void HALSimHttpConnection::ProcessRequest() {
@@ -269,7 +276,7 @@ void HALSimHttpConnection::ProcessRequest() {
         wpi::sys::fs::is_directory(nativePath)) {
       MySendError(404, "Resource '" + path + "' not found");
     } else {
-      auto contentType = wpi::MimeTypeFromPath(path);
+      auto contentType = wpi::MimeTypeFromPath(wpi::Twine(nativePath).str());
       SendFileResponse(200, "OK", contentType, nativePath);
     }
   } else {
