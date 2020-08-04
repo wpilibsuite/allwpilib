@@ -19,7 +19,7 @@ public final class DrakeJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader = new RuntimeLoader<>("wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(),
+        loader = new RuntimeLoader<>("wpimathjni", RuntimeLoader.getDefaultExtractionRoot(),
                 DrakeJNI.class);
         loader.loadLibrary();
       } catch (IOException ex) {
@@ -39,7 +39,7 @@ public final class DrakeJNI {
     if (libraryLoaded) {
       return;
     }
-    loader = new RuntimeLoader<>("wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(),
+    loader = new RuntimeLoader<>("wpimathjni", RuntimeLoader.getDefaultExtractionRoot(),
             DrakeJNI.class);
     loader.loadLibrary();
     libraryLoaded = true;
