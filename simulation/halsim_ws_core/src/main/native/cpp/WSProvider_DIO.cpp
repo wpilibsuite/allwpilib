@@ -10,6 +10,15 @@
 #include <hal/Ports.h>
 #include <hal/simulation/DIOData.h>
 
+#define REGISTER(halsim, jsonid, ctype, haltype)                         \
+  HALSIM_RegisterDIO##halsim##Callback(                                  \
+      m_channel,                                                         \
+      [](const char* name, void* param, const struct HAL_Value* value) { \
+        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(    \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});    \
+      },                                                                 \
+      this, true)
+
 namespace wpilibws {
 
 void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
@@ -18,37 +27,10 @@ void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderDIO::RegisterCallbacks() {
-  m_initCbKey = HALSIM_RegisterDIOInitializedCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(
-            {{"<init", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_valueCbKey = HALSIM_RegisterDIOValueCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(
-            {{"<>value", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_pulseLengthCbKey = HALSIM_RegisterDIOPulseLengthCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(
-            {{"<pulse_length", value->data.v_double}});
-      },
-      this, true);
-
-  m_inputCbKey = HALSIM_RegisterDIOIsInputCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(
-            {{"<input", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
+  m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
+  m_valueCbKey = REGISTER(Value, "<>value", bool, boolean);
+  m_pulseLengthCbKey = REGISTER(PulseLength, "<pulse_length", double, double);
+  m_inputCbKey = REGISTER(IsInput, "<input", bool, boolean);
 }
 
 void HALSimWSProviderDIO::CancelCallbacks() {

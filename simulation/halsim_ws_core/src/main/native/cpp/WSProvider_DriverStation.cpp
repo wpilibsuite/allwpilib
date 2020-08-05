@@ -14,6 +14,15 @@
 #include <hal/simulation/DriverStationData.h>
 #include <wpi/raw_ostream.h>
 
+#define REGISTER(halsim, jsonid, ctype, haltype)                          \
+  HALSIM_RegisterDriverStation##halsim##Callback(                         \
+      [](const char* name, void* param, const struct HAL_Value* value) {  \
+        static_cast<HALSimWSProviderDriverStation*>(param)                \
+            ->ProcessHalCallback(                                         \
+                {{jsonid, static_cast<ctype>(value->data.v_##haltype)}}); \
+      },                                                                  \
+      this, true)
+
 namespace wpilibws {
 
 void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
@@ -25,47 +34,12 @@ void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderDriverStation::RegisterCallbacks() {
-  m_enabledCbKey = HALSIM_RegisterDriverStationEnabledCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{">enabled", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_autonomousCbKey = HALSIM_RegisterDriverStationAutonomousCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{">autonomous", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_testCbKey = HALSIM_RegisterDriverStationTestCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{">test", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_estopCbKey = HALSIM_RegisterDriverStationEStopCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{">estop", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_fmsCbKey = HALSIM_RegisterDriverStationFmsAttachedCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{">fms", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_dsCbKey = HALSIM_RegisterDriverStationDsAttachedCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{">ds", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
+  m_enabledCbKey = REGISTER(Enabled, ">enabled", bool, boolean);
+  m_autonomousCbKey = REGISTER(Autonomous, ">autonomous", bool, boolean);
+  m_testCbKey = REGISTER(Test, ">test", bool, boolean);
+  m_estopCbKey = REGISTER(EStop, ">estop", bool, boolean);
+  m_fmsCbKey = REGISTER(FmsAttached, ">fms", bool, boolean);
+  m_dsCbKey = REGISTER(DsAttached, ">ds", bool, boolean);
 
   m_allianceCbKey = HALSIM_RegisterDriverStationAllianceStationIdCallback(
       [](const char* name, void* param, const struct HAL_Value* value) {
@@ -95,12 +69,7 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
       },
       this, true);
 
-  m_matchTimeCbKey = HALSIM_RegisterDriverStationMatchTimeCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
-            {{"<match_time", value->data.v_double}});
-      },
-      this, true);
+  m_matchTimeCbKey = REGISTER(MatchTime, "<match_time", double, double);
 }
 
 void HALSimWSProviderDriverStation::CancelCallbacks() {

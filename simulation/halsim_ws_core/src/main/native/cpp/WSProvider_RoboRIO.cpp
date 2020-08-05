@@ -10,6 +10,14 @@
 #include <hal/Ports.h>
 #include <hal/simulation/RoboRioData.h>
 
+#define REGISTER(halsim, jsonid, ctype, haltype)                          \
+  HALSIM_RegisterRoboRio##halsim##Callback(                               \
+      [](const char* name, void* param, const struct HAL_Value* value) {  \
+        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback( \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});     \
+      },                                                                  \
+      this, true)
+
 namespace wpilibws {
 
 void HALSimWSProviderRoboRIO::Initialize(WSRegisterFunc webRegisterFunc) {
@@ -17,110 +25,24 @@ void HALSimWSProviderRoboRIO::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderRoboRIO::RegisterCallbacks() {
-  m_fpgaCbKey = HALSIM_RegisterRoboRioFPGAButtonCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">fpga_button", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
+  m_fpgaCbKey = REGISTER(FPGAButton, ">fpga_button", bool, boolean);
+  m_vinVoltageCbKey = REGISTER(VInVoltage, ">vin_voltage", double, double);
+  m_vinCurrentCbKey = REGISTER(VInCurrent, ">vin_current", double, double);
 
-  m_vinVoltageCbKey = HALSIM_RegisterRoboRioVInVoltageCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">vin_voltage", value->data.v_double}});
-      },
-      this, true);
+  m_6vVoltageCbKey = REGISTER(UserVoltage6V, ">6v_voltage", double, double);
+  m_6vCurrentCbKey = REGISTER(UserCurrent6V, ">6v_current", double, double);
+  m_6vActiveCbKey = REGISTER(UserActive6V, ">6v_active", bool, boolean);
+  m_6vFaultsCbKey = REGISTER(UserFaults6V, ">6v_faults", int32_t, int);
 
-  m_vinCurrentCbKey = HALSIM_RegisterRoboRioVInCurrentCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">vin_current", value->data.v_double}});
-      },
-      this, true);
+  m_5vVoltageCbKey = REGISTER(UserVoltage5V, ">5v_voltage", double, double);
+  m_5vCurrentCbKey = REGISTER(UserCurrent5V, ">5v_current", double, double);
+  m_5vActiveCbKey = REGISTER(UserActive5V, ">5v_active", bool, boolean);
+  m_5vFaultsCbKey = REGISTER(UserFaults5V, ">5v_faults", int32_t, int);
 
-  m_6vVoltageCbKey = HALSIM_RegisterRoboRioUserVoltage6VCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">6v_voltage", value->data.v_double}});
-      },
-      this, true);
-
-  m_6vCurrentCbKey = HALSIM_RegisterRoboRioUserCurrent6VCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">6v_current", value->data.v_double}});
-      },
-      this, true);
-
-  m_6vActiveCbKey = HALSIM_RegisterRoboRioUserActive6VCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">6v_active", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_6vFaultsCbKey = HALSIM_RegisterRoboRioUserFaults6VCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">6v_faults", value->data.v_int}});
-      },
-      this, true);
-
-  m_5vVoltageCbKey = HALSIM_RegisterRoboRioUserVoltage5VCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">5v_voltage", value->data.v_double}});
-      },
-      this, true);
-
-  m_5vCurrentCbKey = HALSIM_RegisterRoboRioUserCurrent5VCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">5v_current", value->data.v_double}});
-      },
-      this, true);
-
-  m_5vActiveCbKey = HALSIM_RegisterRoboRioUserActive5VCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">5v_active", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_5vFaultsCbKey = HALSIM_RegisterRoboRioUserFaults5VCallback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">5v_faults", value->data.v_int}});
-      },
-      this, true);
-
-  m_3v3VoltageCbKey = HALSIM_RegisterRoboRioUserVoltage3V3Callback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">3v3_voltage", value->data.v_double}});
-      },
-      this, true);
-
-  m_3v3CurrentCbKey = HALSIM_RegisterRoboRioUserCurrent3V3Callback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">3v3_current", value->data.v_double}});
-      },
-      this, true);
-
-  m_3v3ActiveCbKey = HALSIM_RegisterRoboRioUserActive3V3Callback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">3v3_active", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_3v3FaultsCbKey = HALSIM_RegisterRoboRioUserFaults3V3Callback(
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback(
-            {{">3v3_faults", value->data.v_int}});
-      },
-      this, true);
+  m_3v3VoltageCbKey = REGISTER(UserVoltage3V3, ">3v3_voltage", double, double);
+  m_3v3CurrentCbKey = REGISTER(UserCurrent3V3, ">3v3_current", double, double);
+  m_3v3ActiveCbKey = REGISTER(UserActive3V3, ">3v3_active", bool, boolean);
+  m_3v3FaultsCbKey = REGISTER(UserFaults3V3, ">3v3_faults", int32_t, int);
 }
 
 void HALSimWSProviderRoboRIO::CancelCallbacks() {

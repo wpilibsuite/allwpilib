@@ -10,6 +10,15 @@
 #include <hal/Ports.h>
 #include <hal/simulation/EncoderData.h>
 
+#define REGISTER(halsim, jsonid, ctype, haltype)                          \
+  HALSIM_RegisterEncoder##halsim##Callback(                               \
+      m_channel,                                                          \
+      [](const char* name, void* param, const struct HAL_Value* value) {  \
+        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback( \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});     \
+      },                                                                  \
+      this, true)
+
 namespace wpilibws {
 
 void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
@@ -18,53 +27,13 @@ void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderEncoder::RegisterCallbacks() {
-  m_initCbKey = HALSIM_RegisterEncoderInitializedCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
-            {{"<init", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_countCbKey = HALSIM_RegisterEncoderCountCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
-            {{">count", value->data.v_int}});
-      },
-      this, true);
-
-  m_periodCbKey = HALSIM_RegisterEncoderPeriodCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
-            {{">period", value->data.v_double}});
-      },
-      this, true);
-
-  m_resetCbKey = HALSIM_RegisterEncoderResetCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
-            {{"<reset", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_reverseDirectionCbKey = HALSIM_RegisterEncoderReverseDirectionCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
-            {{"<reverse_direction", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_samplesCbKey = HALSIM_RegisterEncoderSamplesToAverageCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderEncoder*>(param)->ProcessHalCallback(
-            {{"<samples_to_avg", value->data.v_int}});
-      },
-      this, true);
+  m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
+  m_countCbKey = REGISTER(Count, ">count", int32_t, int);
+  m_periodCbKey = REGISTER(Period, ">period", double, double);
+  m_resetCbKey = REGISTER(Reset, "<reset", bool, boolean);
+  m_reverseDirectionCbKey =
+      REGISTER(ReverseDirection, "<reverse_direction", bool, boolean);
+  m_samplesCbKey = REGISTER(SamplesToAverage, "<samples_to_avg", int32_t, int);
 }
 
 void HALSimWSProviderEncoder::CancelCallbacks() {

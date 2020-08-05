@@ -10,6 +10,15 @@
 #include <hal/Ports.h>
 #include <hal/simulation/RelayData.h>
 
+#define REGISTER(halsim, jsonid, ctype, haltype)                         \
+  HALSIM_RegisterRelay##halsim##Callback(                                \
+      m_channel,                                                         \
+      [](const char* name, void* param, const struct HAL_Value* value) { \
+        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(  \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});    \
+      },                                                                 \
+      this, true)
+
 namespace wpilibws {
 void HALSimWSProviderRelay::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderRelay>("Relay", HAL_GetNumRelayHeaders(),
@@ -17,37 +26,10 @@ void HALSimWSProviderRelay::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderRelay::RegisterCallbacks() {
-  m_initFwdCbKey = HALSIM_RegisterRelayInitializedForwardCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(
-            {{"<init_fwd", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_initRevCbKey = HALSIM_RegisterRelayInitializedReverseCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(
-            {{"<init_rev", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_fwdCbKey = HALSIM_RegisterRelayForwardCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(
-            {{"<fwd", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_revCbKey = HALSIM_RegisterRelayReverseCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderRelay*>(param)->ProcessHalCallback(
-            {{"<rev", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
+  m_initFwdCbKey = REGISTER(InitializedForward, "<init_fwd", bool, boolean);
+  m_initRevCbKey = REGISTER(InitializedReverse, "<init_rev", bool, boolean);
+  m_fwdCbKey = REGISTER(Forward, "<fwd", bool, boolean);
+  m_revCbKey = REGISTER(Reverse, "<rev", bool, boolean);
 }
 
 void HALSimWSProviderRelay::CancelCallbacks() {

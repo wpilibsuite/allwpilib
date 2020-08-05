@@ -10,6 +10,15 @@
 #include <hal/Ports.h>
 #include <hal/simulation/DigitalPWMData.h>
 
+#define REGISTER(halsim, jsonid, ctype, haltype)                             \
+  HALSIM_RegisterDigitalPWM##halsim##Callback(                               \
+      m_channel,                                                             \
+      [](const char* name, void* param, const struct HAL_Value* value) {     \
+        static_cast<HALSimWSProviderDigitalPWM*>(param)->ProcessHalCallback( \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});        \
+      },                                                                     \
+      this, true)
+
 namespace wpilibws {
 
 void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
@@ -18,29 +27,9 @@ void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
-  m_initCbKey = HALSIM_RegisterDigitalPWMInitializedCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDigitalPWM*>(param)->ProcessHalCallback(
-            {{"<init", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_dutyCycleCbKey = HALSIM_RegisterDigitalPWMDutyCycleCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDigitalPWM*>(param)->ProcessHalCallback(
-            {{"<duty_cycle", value->data.v_double}});
-      },
-      this, true);
-
-  m_pinCbKey = HALSIM_RegisterDigitalPWMPinCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderDigitalPWM*>(param)->ProcessHalCallback(
-            {{"<dio_pin", value->data.v_int}});
-      },
-      this, true);
+  m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
+  m_dutyCycleCbKey = REGISTER(DutyCycle, "<duty_cycle", double, double);
+  m_pinCbKey = REGISTER(Pin, "<dio_pin", int32_t, int);
 }
 
 void HALSimWSProviderDigitalPWM::CancelCallbacks() {

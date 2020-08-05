@@ -11,6 +11,34 @@
 #include <hal/simulation/AnalogInData.h>
 #include <hal/simulation/AnalogOutData.h>
 
+#define REGISTER_AIN(halsim, jsonid, ctype, haltype)                       \
+  HALSIM_RegisterAnalogIn##halsim##Callback(                               \
+      m_channel,                                                           \
+      [](const char* name, void* param, const struct HAL_Value* value) {   \
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback( \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});      \
+      },                                                                   \
+      this, true)
+
+#define REGISTER_AIN_ACCUM(halsim, jsonid, ctype, haltype)                 \
+  HALSIM_RegisterAnalogInAccumulator##halsim##Callback(                    \
+      m_channel,                                                           \
+      [](const char* name, void* param, const struct HAL_Value* value) {   \
+        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback( \
+            {{"accum",                                                     \
+              {{jsonid, static_cast<ctype>(value->data.v_##haltype)}}}});  \
+      },                                                                   \
+      this, true)
+
+#define REGISTER_AOUT(halsim, jsonid, ctype, haltype)                       \
+  HALSIM_RegisterAnalogOut##halsim##Callback(                               \
+      m_channel,                                                            \
+      [](const char* name, void* param, const struct HAL_Value* value) {    \
+        static_cast<HALSimWSProviderAnalogOut*>(param)->ProcessHalCallback( \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});       \
+      },                                                                    \
+      this, true)
+
 namespace wpilibws {
 
 void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
@@ -19,77 +47,20 @@ void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderAnalogIn::RegisterCallbacks() {
-  m_initCbKey = HALSIM_RegisterAnalogInInitializedCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{"<init", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
+  m_initCbKey = REGISTER_AIN(Initialized, "<init", bool, boolean);
+  m_avgbitsCbKey = REGISTER_AIN(AverageBits, "<avg_bits", int32_t, int);
+  m_oversampleCbKey =
+      REGISTER_AIN(OversampleBits, "<oversample_bits", int32_t, int);
+  m_voltageCbKey = REGISTER_AIN(Voltage, ">voltage", double, double);
 
-  m_avgbitsCbKey = HALSIM_RegisterAnalogInAverageBitsCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{"<avg_bits", value->data.v_int}});
-      },
-      this, true);
-
-  m_oversampleCbKey = HALSIM_RegisterAnalogInOversampleBitsCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{"<oversample_bits", value->data.v_int}});
-      },
-      this, true);
-
-  m_voltageCbKey = HALSIM_RegisterAnalogInVoltageCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{">voltage", value->data.v_double}});
-      },
-      this, true);
-
-  m_accumInitCbKey = HALSIM_RegisterAnalogInAccumulatorInitializedCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{"accum", {{"<init", static_cast<bool>(value->data.v_boolean)}}}});
-      },
-      this, true);
-
-  m_accumValueCbKey = HALSIM_RegisterAnalogInAccumulatorValueCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{"accum", {{">value", value->data.v_long}}}});
-      },
-      this, true);
-
-  m_accumCountCbKey = HALSIM_RegisterAnalogInAccumulatorCountCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{"accum", {{">count", value->data.v_long}}}});
-      },
-      this, true);
-
-  m_accumCenterCbKey = HALSIM_RegisterAnalogInAccumulatorCenterCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{"accum", {{"<center", value->data.v_int}}}});
-      },
-      this, true);
-
-  m_accumDeadbandCbKey = HALSIM_RegisterAnalogInAccumulatorDeadbandCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback(
-            {{"accum", {{"<deadband", value->data.v_int}}}});
-      },
-      this, true);
+  m_accumInitCbKey = REGISTER_AIN_ACCUM(Initialized, "<init", bool, boolean);
+  m_accumValueCbKey = REGISTER_AIN_ACCUM(Value, ">value", int64_t,
+                                         long);  // NOLINT(runtime/int)
+  m_accumCountCbKey = REGISTER_AIN_ACCUM(Count, ">count", int64_t,
+                                         long);  // NOLINT(runtime/int)
+  m_accumCenterCbKey = REGISTER_AIN_ACCUM(Center, "<center", int32_t, int);
+  m_accumDeadbandCbKey =
+      REGISTER_AIN_ACCUM(Deadband, "<deadband", int32_t, int);
 }
 
 void HALSimWSProviderAnalogIn::CancelCallbacks() {
@@ -129,21 +100,8 @@ void HALSimWSProviderAnalogOut::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderAnalogOut::RegisterCallbacks() {
-  m_initCbKey = HALSIM_RegisterAnalogOutInitializedCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogOut*>(param)->ProcessHalCallback(
-            {{"<init", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_voltageCbKey = HALSIM_RegisterAnalogOutVoltageCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderAnalogOut*>(param)->ProcessHalCallback(
-            {{"<voltage", value->data.v_double}});
-      },
-      this, true);
+  m_initCbKey = REGISTER_AOUT(Initialized, "<init", bool, boolean);
+  m_voltageCbKey = REGISTER_AOUT(Voltage, "<voltage", double, double);
 }
 
 void HALSimWSProviderAnalogOut::CancelCallbacks() {

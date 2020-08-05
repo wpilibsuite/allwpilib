@@ -10,6 +10,14 @@
 #include <hal/Ports.h>
 #include <hal/simulation/PWMData.h>
 
+#define REGISTER(halsim, jsonid, ctype, haltype)                         \
+  HALSIM_RegisterPWM##halsim##Callback(                                  \
+      m_channel,                                                         \
+      [](const char* name, void* param, const struct HAL_Value* value) { \
+        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(    \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});    \
+      },                                                                 \
+      this, true)
 namespace wpilibws {
 
 void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
@@ -18,53 +26,12 @@ void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderPWM::RegisterCallbacks() {
-  m_initCbKey = HALSIM_RegisterPWMInitializedCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
-            {{"<init", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
-
-  m_speedCbKey = HALSIM_RegisterPWMSpeedCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
-            {{"<speed", value->data.v_double}});
-      },
-      this, true);
-
-  m_positionCbKey = HALSIM_RegisterPWMPositionCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
-            {{"<position", value->data.v_double}});
-      },
-      this, true);
-
-  m_rawCbKey = HALSIM_RegisterPWMRawValueCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
-            {{"<raw", value->data.v_int}});
-      },
-      this, true);
-
-  m_periodScaleCbKey = HALSIM_RegisterPWMPeriodScaleCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
-            {{"<period_scale", value->data.v_int}});
-      },
-      this, true);
-
-  m_zeroLatchCbKey = HALSIM_RegisterPWMZeroLatchCallback(
-      m_channel,
-      [](const char* name, void* param, const struct HAL_Value* value) {
-        static_cast<HALSimWSProviderPWM*>(param)->ProcessHalCallback(
-            {{"<zero_latch", static_cast<bool>(value->data.v_boolean)}});
-      },
-      this, true);
+  m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
+  m_speedCbKey = REGISTER(Speed, "<speed", double, double);
+  m_positionCbKey = REGISTER(Position, "<position", double, double);
+  m_rawCbKey = REGISTER(RawValue, "<raw", int32_t, int);
+  m_periodScaleCbKey = REGISTER(PeriodScale, "<period_scale", int32_t, int);
+  m_zeroLatchCbKey = REGISTER(ZeroLatch, "<zero_latch", bool, boolean);
 }
 
 void HALSimWSProviderPWM::CancelCallbacks() {
