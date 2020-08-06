@@ -16,6 +16,7 @@
 #include <cameraserver/CameraServerShared.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <math/MathShared.h>
 #include <networktables/NetworkTableInstance.h>
 
 #include "WPILibVersion.h"
@@ -25,7 +26,6 @@
 #include "frc/WPIErrors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
 
 typedef void (*SetCameraServerSharedFP)(frc::CameraServerShared* shared);
 
@@ -69,6 +69,47 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
     return std::make_pair(RobotBase::GetThreadId(), true);
   }
 };
+class WPILibMathShared : public wpi::math::MathShared {
+ public:
+  void ReportError(const wpi::Twine& error) override {
+    DriverStation::ReportError(error);
+  }
+
+  void ReportUsage(wpi::math::MathUsageId id, int count) override {
+    switch (id) {
+      case wpi::math::MathUsageId::kKinematics_DifferentialDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+                   HALUsageReporting::kKinematics_DifferentialDrive);
+        break;
+      case wpi::math::MathUsageId::kKinematics_MecanumDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+                   HALUsageReporting::kKinematics_MecanumDrive);
+        break;
+      case wpi::math::MathUsageId::kKinematics_SwerveDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+                   HALUsageReporting::kKinematics_SwerveDrive);
+        break;
+      case wpi::math::MathUsageId::kTrajectory_TrapezoidProfile:
+        HAL_Report(HALUsageReporting::kResourceType_TrapezoidProfile, count);
+        break;
+      case wpi::math::MathUsageId::kFilter_Linear:
+        HAL_Report(HALUsageReporting::kResourceType_LinearFilter, count);
+        break;
+      case wpi::math::MathUsageId::kOdometry_DifferentialDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Odometry,
+                   HALUsageReporting::kOdometry_DifferentialDrive);
+        break;
+      case wpi::math::MathUsageId::kOdometry_SwerveDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Odometry,
+                   HALUsageReporting::kOdometry_SwerveDrive);
+        break;
+      case wpi::math::MathUsageId::kOdometry_MecanumDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Odometry,
+                   HALUsageReporting::kOdometry_MecanumDrive);
+        break;
+    }
+  }
+};
 }  // namespace
 
 static void SetupCameraServerShared() {
@@ -102,6 +143,11 @@ static void SetupCameraServerShared() {
 #endif
 }
 
+static void SetupMathShared() {
+  wpi::math::MathSharedStore::SetMathShared(
+      std::make_unique<WPILibMathShared>());
+}
+
 bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
 
 bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
@@ -120,8 +166,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   m_threadId = std::this_thread::get_id();
 
   SetupCameraServerShared();
-  TrajectoryGenerator::SetErrorHandler(
-      [](const char* error) { DriverStation::ReportError(error); });
+  SetupMathShared();
 
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");

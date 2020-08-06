@@ -38,8 +38,9 @@ if (NOT WITHOUT_JAVA)
   endif()
 
   file(GLOB EJML_JARS "${CMAKE_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
+  file(GLOB JACKSON_JARS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
 
-  set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS})
+  set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS})
 
   execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpimath/generate_numbers.py ${CMAKE_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
   if(NOT (generateResult EQUAL "0"))
