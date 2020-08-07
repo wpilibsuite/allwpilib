@@ -57,6 +57,7 @@ model {
                 lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
@@ -84,6 +85,7 @@ model {
                     lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')
@@ -126,6 +128,7 @@ model {
                     lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     project(':hal').addHalDependency(binary, 'shared')

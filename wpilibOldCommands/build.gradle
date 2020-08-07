@@ -6,6 +6,7 @@ ext {
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
+evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':wpilibj')
@@ -17,11 +18,13 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':hal')
+    implementation project(':wpimath')
     implementation project(':wpilibj')
     devImplementation project(':wpiutil')
     devImplementation project(':ntcore')
     devImplementation project(':cscore')
     devImplementation project(':hal')
+    devImplementation project(':wpimath')
     devImplementation project(':wpilibj')
 }
 
@@ -51,6 +54,7 @@ model {
             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
             if (it.component.name == "${nativeName}Dev") {
               lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
