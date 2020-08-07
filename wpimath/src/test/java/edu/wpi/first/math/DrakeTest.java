@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpiutil.math;
+package edu.wpi.first.math;
 
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;

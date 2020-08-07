@@ -5,22 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpiutil.math;
+package edu.wpi.first.math;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wpi.first.wpiutil.RuntimeLoader;
 
-public final class DrakeJNI {
+public final class WPIMathJNI {
   static boolean libraryLoaded = false;
-  static RuntimeLoader<DrakeJNI> loader = null;
+  static RuntimeLoader<WPIMathJNI> loader = null;
 
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
         loader = new RuntimeLoader<>("wpimathjni", RuntimeLoader.getDefaultExtractionRoot(),
-                DrakeJNI.class);
+                WPIMathJNI.class);
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
@@ -40,7 +40,7 @@ public final class DrakeJNI {
       return;
     }
     loader = new RuntimeLoader<>("wpimathjni", RuntimeLoader.getDefaultExtractionRoot(),
-            DrakeJNI.class);
+            WPIMathJNI.class);
     loader.loadLibrary();
     libraryLoaded = true;
   }
