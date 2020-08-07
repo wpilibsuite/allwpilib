@@ -30,6 +30,8 @@ static HAL_SimDeviceHandle devHandle = 0;
 static wpi::StringMap<ImColor> colorLookUpTable;
 static std::unique_ptr<pfd::open_file> m_fileOpener;
 static std::string previousJsonLocation = "Not empty";
+//static std::vector<Mechanism2DView> Mechanism2DViewVector;
+
 namespace {
 struct BodyConfig {
   std::string name;
@@ -83,7 +85,7 @@ class Mechanism2DInfo {
 
 static Mechanism2DInfo mechanism2DInfo;
 
-bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
+static bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
   if (name == "jsonLocation") {
     mechanism2DInfo.jsonLocation = value;
   } else {
@@ -92,7 +94,7 @@ bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
   return true;
 }
 
-void WriteIni(ImGuiTextBuffer* out) {
+static void WriteIni(ImGuiTextBuffer* out) {
   out->appendf("[Mechanism2D][Mechanism2D]\njsonLocation=%s\n\n",
                mechanism2DInfo.jsonLocation.c_str());
 }
@@ -132,7 +134,7 @@ static void GetJsonFileLocation() {
   }
 }
 
-DrawLineStruct DrawLine(float startXLocation, float startYLocation, int length,
+static DrawLineStruct DrawLine(float startXLocation, float startYLocation, int length,
                         float angle, ImDrawList* drawList, ImVec2 windowPos,
                         ImColor color, const BodyConfig& bodyConfig,
                         const std::string& previousPath) {
