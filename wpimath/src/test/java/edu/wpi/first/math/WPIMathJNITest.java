@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpiutil.math;
+package edu.wpi.first.math;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-public class DrakeJNITest {
+public class WPIMathJNITest {
   @Test
   public void testLink() {
-    assertDoesNotThrow(DrakeJNI::forceLoad);
+    assertDoesNotThrow(WPIMathJNI::forceLoad);
   }
 }

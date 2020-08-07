@@ -5,9 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpiutil.math;
+package edu.wpi.first.math;
 
 import org.ejml.simple.SimpleMatrix;
+
+import edu.wpi.first.wpiutil.math.Matrix;
 
 public final class Drake {
   private Drake() {
@@ -29,7 +31,7 @@ public final class Drake {
           SimpleMatrix Q,
           SimpleMatrix R) {
     var S = new SimpleMatrix(A.numRows(), A.numCols());
-    DrakeJNI.discreteAlgebraicRiccatiEquation(A.getDDRM().getData(), B.getDDRM().getData(),
+    WPIMathJNI.discreteAlgebraicRiccatiEquation(A.getDDRM().getData(), B.getDDRM().getData(),
             Q.getDDRM().getData(), R.getDDRM().getData(), A.numCols(), B.numCols(),
             S.getDDRM().getData());
     return S;

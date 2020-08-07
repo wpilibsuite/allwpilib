@@ -12,19 +12,19 @@
 #include <wpi/jni_util.h>
 
 #include "drake/math/discrete_algebraic_riccati_equation.h"
-#include "edu_wpi_first_wpiutil_math_DrakeJNI.h"
+#include "edu_wpi_first_math_WPIMathJNI.h"
 
 using namespace wpi::java;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_wpiutil_math_DrakeJNI
+ * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    discreteAlgebraicRiccatiEquation
  * Signature: ([D[D[D[DII[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpiutil_math_DrakeJNI_discreteAlgebraicRiccatiEquation
+Java_edu_wpi_first_math_WPIMathJNI_discreteAlgebraicRiccatiEquation
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {

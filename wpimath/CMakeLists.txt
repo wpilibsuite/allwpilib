@@ -4,7 +4,7 @@ include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
 
-file(GLOB wpimath_jni_src src/main/native/cpp/jni/DrakeJNI.cpp)
+file(GLOB wpimath_jni_src src/main/native/cpp/jni/WPIMathJNI.cpp)
 
 # Java bindings
 if (NOT WITHOUT_JAVA)
