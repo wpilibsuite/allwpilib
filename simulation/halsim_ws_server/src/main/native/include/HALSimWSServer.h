@@ -48,6 +48,7 @@ class HALSimWeb {
 
   std::string GetServerUri() const { return m_uri; }
   int GetServerPort() { return m_port; }
+  std::shared_ptr<wpi::uv::Loop> GetLoop() { return m_loop; }
 
  private:
   static std::shared_ptr<HALSimWeb> g_instance;
