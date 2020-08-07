@@ -9,9 +9,9 @@
 
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
-#include "math/MathShared.h"
 #include "units/angle.h"
 #include "units/length.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 /**

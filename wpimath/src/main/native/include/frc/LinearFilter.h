@@ -15,8 +15,8 @@
 #include <wpi/ArrayRef.h>
 #include <wpi/circular_buffer.h>
 
-#include "math/MathShared.h"
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 

@@ -17,8 +17,8 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/SwerveModuleState.h"
-#include "math/MathShared.h"
 #include "units/velocity.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 /**
