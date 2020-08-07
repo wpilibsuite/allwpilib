@@ -6,8 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/TimedRobot.h>
+#include "frc/simulation/Mechanism2D.h"
 
 class MyRobot : public frc::TimedRobot {
+  frc::Mechanism2D mechanism2D;
+  int counter = 0;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -42,7 +45,14 @@ class MyRobot : public frc::TimedRobot {
   /**
    * This function is called periodically during all modes
    */
-  void RobotPeriodic() override {}
+  void RobotPeriodic() override {
+    mechanism2D.SetLigamentAngle("JasonOne/one", counter++);
+    if (counter > 90) {
+      counter = -90;
+    }
+    mechanism2D.SetLigamentAngle("JasonOne/one/two", counter / 4);
+    mechanism2D.SetLigamentLength("JasonOne/one/two", counter);
+  }
 };
 
 int main() { return frc::StartRobot<MyRobot>(); }
