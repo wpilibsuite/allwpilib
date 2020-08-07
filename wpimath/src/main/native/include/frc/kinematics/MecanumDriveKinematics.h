@@ -13,7 +13,7 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
-#include "math/MathShared.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 

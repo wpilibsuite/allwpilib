@@ -16,8 +16,8 @@
 #include <cameraserver/CameraServerShared.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
-#include <math/MathShared.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpimath/MathShared.h>
 
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"

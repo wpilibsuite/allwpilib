@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "math/MathShared.h"
+#include "wpimath/MathShared.h"
 
 #include <wpi/mutex.h>
 

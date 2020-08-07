@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "math/MathShared.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 template <size_t NumModules>

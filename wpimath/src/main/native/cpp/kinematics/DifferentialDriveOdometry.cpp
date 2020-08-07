@@ -7,7 +7,7 @@
 
 #include "frc/kinematics/DifferentialDriveOdometry.h"
 
-#include "math/MathShared.h"
+#include "wpimath/MathShared.h"
 
 using namespace frc;
 

@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "math/MathShared.h"
 #include "units/time.h"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 
