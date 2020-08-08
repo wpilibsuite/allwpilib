@@ -1,3 +1,0 @@
---triplet
-x64-windows
-opencv
