@@ -9,8 +9,7 @@
 
 #include <array>
 
-#include <Eigen/Core>
-
+#include "Eigen/Core"
 #include "frc/spline/Spline.h"
 
 namespace frc {

@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <Eigen/Core>
-#include <Eigen/QR>
-
+#include "Eigen/Core"
+#include "Eigen/QR"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"

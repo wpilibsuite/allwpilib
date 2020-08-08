@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <units/length.h>
-
 #include "Rotation2d.h"
+#include "units/length.h"
 
 namespace wpi {
 class json;

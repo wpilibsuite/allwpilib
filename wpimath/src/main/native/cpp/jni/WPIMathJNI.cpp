@@ -7,12 +7,12 @@
 
 #include <jni.h>
 
-#include <Eigen/Core>
-#include <unsupported/Eigen/MatrixFunctions>
 #include <wpi/jni_util.h>
 
+#include "Eigen/Core"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
+#include "unsupported/Eigen/MatrixFunctions"
 
 using namespace wpi::java;
 

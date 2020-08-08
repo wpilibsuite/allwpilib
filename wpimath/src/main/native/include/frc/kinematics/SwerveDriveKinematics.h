@@ -10,9 +10,8 @@
 #include <array>
 #include <cstddef>
 
-#include <Eigen/Core>
-#include <Eigen/QR>
-
+#include "Eigen/Core"
+#include "Eigen/QR"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
