@@ -26,9 +26,6 @@
 namespace wpilibws {
 
 void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
-  // TODO: if this isn't called, our callbacks get erased. Fixed in 2021
-  HAL_InitializeDriverStation();
-
   CreateSingleProvider<HALSimWSProviderDriverStation>("DriverStation",
                                                       webRegisterFunc);
 }
@@ -105,7 +102,7 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
   }
 
   if ((it = json.find(">station")) != json.end()) {
-    std::string station = it.value();
+    auto& station = it.value().get_ref<const std::string&>();
     if (station == "red1") {
       HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kRed1);
     } else if (station == "red2") {

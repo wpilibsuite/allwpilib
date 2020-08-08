@@ -5,8 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <iostream>
-
 #include <WSProviderContainer.h>
 #include <WSProvider_Analog.h>
 #include <WSProvider_DIO.h>
@@ -18,6 +16,7 @@
 #include <WSProvider_SimDevice.h>
 #include <WSProvider_dPWM.h>
 #include <hal/Main.h>
+#include <wpi/raw_ostream.h>
 
 #include "HALSimWSClient.h"
 
@@ -32,7 +31,7 @@ __declspec(dllexport)
 #endif
 
     int HALSIM_InitExtension(void) {
-  std::cout << "HALSim WS Client Extension Initializing" << std::endl;
+  wpi::outs() << "HALSim WS Client Extension Initializing\n";
 
   auto hws = std::make_shared<HALSimWS>(providers);
   HALSimWS::SetInstance(hws);
@@ -59,7 +58,7 @@ __declspec(dllexport)
 
   HAL_SetMain(nullptr, HALSimWS::Main, HALSimWS::Exit);
 
-  std::cout << "HALSim WS Client Extension Initialized" << std::endl;
+  wpi::outs() << "HALSim WS Client Extension Initialized\n";
   return 0;
 }
 
