@@ -31,7 +31,12 @@ includeGuardRoots {
 }
 
 includeOtherLibs {
-  ^Eigen/
-  ^unsupported/
   ^wpi/
+}
+
+includeProject {
+  ^drake/
+  ^Eigen/
+  ^units/
+  ^unsupported/
 }
