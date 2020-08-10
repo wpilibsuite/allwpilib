@@ -46,11 +46,15 @@ class WebServerClientTest {
 
   void SendMessage(const wpi::json& msg);
   const wpi::json& GetLastMessage();
+  bool IsConnectedWS() {return m_ws_connected;};
+  void SetTerminateFlag(bool flag) {m_terminateFlag = flag;}
+
 
  private:
   void InitializeWebSocket(const std::string& host, int port,
                            const std::string& uri);
 
+  bool m_terminateFlag = false;
   static std::shared_ptr<WebServerClientTest> g_instance;
   bool m_tcp_connected = false;
   std::shared_ptr<wpi::uv::Timer> m_connect_timer;

@@ -17,27 +17,30 @@
 
 using namespace wpilibws;
 
-extern "C" int HALSIM_InitExtension(
-    void);  // from simulation/halsim_ws_server/src/main/native/cpp/main.cpp
+extern "C" int HALSIM_InitExtension(void);  // from simulation/halsim_ws_server/src/main/native/cpp/main.cpp
+
+const int POLLING_SPEED = 10; // 10 ms polling
 
 class WebServerIntegrationTest : public ::testing::Test {
  public:
+
   WebServerIntegrationTest() {
+    const int MAX_TEST_TIME = 1000; // 1 second
+ 
     // Initialize HAL layer including webserver
     HALSIM_InitExtension();
 
     // Create and initialize client
-    m_webserver_client =
-        std::shared_ptr<WebServerClientTest>((new WebServerClientTest()));
+    m_webserver_client = std::shared_ptr<WebServerClientTest>((new WebServerClientTest()));
     WebServerClientTest::SetInstance(m_webserver_client);
     auto webserver = HALSimWeb::GetInstance();
     auto loop = webserver->GetLoop();
     m_webserver_client->Initialize(loop);
 
-    // Create timer for loop run
-    m_testTimer = wpi::uv::Timer::Create(loop);
-    m_testTimer->timeout.connect([loop] { loop->Stop(); });
-    m_testTimer->Start(uv::Timer::Time{4000});  // End test after 4 seconds
+    // Create failover timer to prevent running forever
+    m_failoverTimer = wpi::uv::Timer::Create(loop);
+    m_failoverTimer->timeout.connect([loop] { loop->Stop(); });
+    m_failoverTimer->Start(uv::Timer::Time(MAX_TEST_TIME));
   }
 
   ~WebServerIntegrationTest() {
@@ -49,13 +52,19 @@ class WebServerIntegrationTest : public ::testing::Test {
     m_webserver_client->Exit();
     WebServerClientTest::SetInstance(nullptr);
 
-    // Unreference test timer from loop
-    m_testTimer->Unreference();
+    // Unreference timers from loop
+    m_failoverTimer->Unreference();
   }
+
+  bool IsConnectedClientWS() { return m_webserver_client->IsConnectedWS(); }
+  void TerminateOnNextMessage(bool flag) {
+    m_webserver_client->SetTerminateFlag(flag);
+  }
+
 
  private:
   std::shared_ptr<WebServerClientTest> m_webserver_client;
-  std::shared_ptr<wpi::uv::Timer> m_testTimer;
+  std::shared_ptr<wpi::uv::Timer> m_failoverTimer;
 };
 
 TEST_F(WebServerIntegrationTest, DigitalOutput) {
@@ -63,16 +72,23 @@ TEST_F(WebServerIntegrationTest, DigitalOutput) {
   const bool EXPECTED_VALUE = false;
   const int PIN = 0;
 
-  // Get loop, attach timer, run loop
+  // Attach timer to loop for test function
   auto ws = HALSimWeb::GetInstance();
   auto loop = ws->GetLoop();
   auto timer = wpi::uv::Timer::Create(loop);
   timer->timeout.connect([&] {
-    wpi::outs() << "***** Setting DIO value for pin " << PIN << " to "
-                << (EXPECTED_VALUE ? "true" : "false") << "\n";
-    HALSIM_SetDIOValue(PIN, EXPECTED_VALUE);
+    if( IsConnectedClientWS() ) {
+      wpi::outs() << "***** Setting DIO value for pin " << PIN << " to "
+                  << (EXPECTED_VALUE ? "true" : "false") << "\n";
+      HALSIM_SetDIOValue(PIN, EXPECTED_VALUE);
+      TerminateOnNextMessage(true);
+    } else {
+      // Recheck in POLLING_SPEED ms
+      timer->Start(uv::Timer::Time(POLLING_SPEED));
+    }
   });
-  timer->Start(uv::Timer::Time(3000));  // Wait 3 second before sending message
+  timer->Start(uv::Timer::Time(POLLING_SPEED));
+
   HAL_RunMain();
   timer->Unreference();
 
@@ -103,19 +119,26 @@ TEST_F(WebServerIntegrationTest, DigitalInput) {
   // Create expected results
   const bool EXPECTED_VALUE = false;
   const int PIN = 0;
-
-  // Get loop, attach timer, run loop
+  
+  // Attach timer to loop for test function
   auto ws = HALSimWeb::GetInstance();
   auto loop = ws->GetLoop();
   auto timer = wpi::uv::Timer::Create(loop);
   timer->timeout.connect([&] {
+    if( IsConnectedClientWS() ) {
     wpi::json msg = {{"type", "DIO"},
                      {"device", std::to_string(PIN)},
                      {"data", {{"<>value", EXPECTED_VALUE}}}};
     wpi::outs() << "***** Input JSON: " << msg.dump() << "\n";
     WebServerClientTest::GetInstance()->SendMessage(msg);
+    loop->Stop();
+    } else {
+      // Recheck in POLLING_SPEED ms
+      timer->Start(uv::Timer::Time(POLLING_SPEED));
+    }
   });
-  timer->Start(uv::Timer::Time(3000));  // Wait 3 second before checking message
+  timer->Start(uv::Timer::Time(POLLING_SPEED));
+  
   HAL_RunMain();
   timer->Unreference();
 
