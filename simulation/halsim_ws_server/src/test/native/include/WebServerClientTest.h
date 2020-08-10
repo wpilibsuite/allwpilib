@@ -46,7 +46,7 @@ class WebServerClientTest {
 
   void SendMessage(const wpi::json& msg);
   const wpi::json& GetLastMessage();
-  bool IsConnectedWS() {return m_ws_connected;};
+  bool IsConnectedWS() {return m_ws_connected;}
   void SetTerminateFlag(bool flag) {m_terminateFlag = flag;}
 
 
