@@ -46,9 +46,8 @@ class WebServerClientTest {
 
   void SendMessage(const wpi::json& msg);
   const wpi::json& GetLastMessage();
-  bool IsConnectedWS() {return m_ws_connected;}
-  void SetTerminateFlag(bool flag) {m_terminateFlag = flag;}
-
+  bool IsConnectedWS() { return m_ws_connected; }
+  void SetTerminateFlag(bool flag) { m_terminateFlag = flag; }
 
  private:
   void InitializeWebSocket(const std::string& host, int port,

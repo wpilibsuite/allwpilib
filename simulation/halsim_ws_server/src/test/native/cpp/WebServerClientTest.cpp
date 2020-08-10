@@ -60,9 +60,8 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
     // Save last message received
     m_json = j;
 
-
     // If terminate flag set, end loop after message recieved
-    if(m_terminateFlag) {
+    if (m_terminateFlag) {
       m_loop->Stop();
     }
   });
