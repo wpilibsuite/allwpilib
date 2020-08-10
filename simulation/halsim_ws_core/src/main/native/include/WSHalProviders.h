@@ -38,9 +38,6 @@ class HALSimWSHalProvider : public HALSimWSBaseProvider {
  protected:
   virtual void RegisterCallbacks() = 0;
   virtual void CancelCallbacks() = 0;
-
-  // mutex protects last
-  wpi::mutex mutex;
 };
 
 // provider generates per-channel diffs

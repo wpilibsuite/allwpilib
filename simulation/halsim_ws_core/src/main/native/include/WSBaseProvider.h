@@ -26,12 +26,13 @@ class HALSimWSBaseProvider {
   HALSimWSBaseProvider(const HALSimWSBaseProvider&) = delete;
   HALSimWSBaseProvider& operator=(const HALSimWSBaseProvider&) = delete;
 
-  // Called when the websocket connects. The provider should send
-  // initial data to the websocket and store the SendFunc to
-  // use for later sends
+  // Called when the websocket connects. This will cause providers
+  // to register their HAL callbacks
   virtual void OnNetworkConnected(
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) = 0;
 
+  // Called when the websocket disconnects. This will cause provider
+  // to cancel their HAL callbacks
   virtual void OnNetworkDisconnected() = 0;
 
   // network -> sim

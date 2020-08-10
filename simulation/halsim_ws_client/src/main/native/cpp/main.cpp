@@ -10,6 +10,7 @@
 #include <WSProvider_DIO.h>
 #include <WSProvider_DriverStation.h>
 #include <WSProvider_Encoder.h>
+#include <WSProvider_Joystick.h>
 #include <WSProvider_PWM.h>
 #include <WSProvider_Relay.h>
 #include <WSProvider_RoboRIO.h>
@@ -50,6 +51,7 @@ __declspec(dllexport)
   HALSimWSProviderDigitalPWM::Initialize(registerFunc);
   HALSimWSProviderDriverStation::Initialize(registerFunc);
   HALSimWSProviderEncoder::Initialize(registerFunc);
+  HALSimWSProviderJoystick::Initialize(registerFunc);
   HALSimWSProviderPWM::Initialize(registerFunc);
   HALSimWSProviderRelay::Initialize(registerFunc);
   // HALSimWSProviderRoboRIO::Initialize(registerFunc);

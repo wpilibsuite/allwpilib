@@ -118,53 +118,6 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
     }
   }
 
-  if ((it = json.find("joysticks")) != json.end()) {
-    auto joysticks = it.value();
-    for (auto jit = joysticks.cbegin(); jit != joysticks.cend(); ++jit) {
-      auto stick = jit.value();
-
-      int num;
-      try {
-        num = std::stoi(jit.key());
-      } catch (const std::invalid_argument& err) {
-        wpi::errs() << "Error converting Joystick number. Skipping. "
-                    << err.what() << "\n";
-        continue;
-      }
-
-      if ((it = stick.find(">axes")) != stick.end()) {
-        HAL_JoystickAxes axes{};
-        axes.count = std::min(it.value().size(),
-                              (wpi::json::size_type)HAL_kMaxJoystickAxes);
-        for (int i = 0; i < axes.count; ++i) {
-          axes.axes[i] = it.value()[i];
-        }
-        HALSIM_SetJoystickAxes(num, &axes);
-      }
-
-      if ((it = stick.find(">buttons")) != stick.end()) {
-        HAL_JoystickButtons buttons{};
-        buttons.count = std::min(it.value().size(), (wpi::json::size_type)32);
-        for (int i = 0; i < buttons.count; ++i) {
-          if (it.value()[i]) {
-            buttons.buttons |= 1 << (i - 1);
-          }
-        }
-        HALSIM_SetJoystickButtons(num, &buttons);
-      }
-
-      if ((it = stick.find(">povs")) != stick.end()) {
-        HAL_JoystickPOVs povs{};
-        povs.count = std::min(it.value().size(),
-                              (wpi::json::size_type)HAL_kMaxJoystickPOVs);
-        for (int i = 0; i < povs.count; ++i) {
-          povs.povs[i] = it.value()[i];
-        }
-        HALSIM_SetJoystickPOVs(num, &povs);
-      }
-    }
-  }
-
   HALSIM_NotifyDriverStationNewData();
 }
 

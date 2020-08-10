@@ -12,8 +12,6 @@ namespace wpilibws {
 void HALSimWSHalProvider::OnNetworkConnected(
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
   {
-    std::lock_guard lock(mutex);
-
     // store a weak reference to the websocket object
     m_ws = ws;
   }
@@ -24,7 +22,6 @@ void HALSimWSHalProvider::OnNetworkConnected(
 void HALSimWSHalProvider::OnNetworkDisconnected() { CancelCallbacks(); }
 
 void HALSimWSHalProvider::ProcessHalCallback(const wpi::json& payload) {
-  std::lock_guard lock(mutex);
   auto ws = m_ws.lock();
   if (ws) {
     wpi::json netValue = {
