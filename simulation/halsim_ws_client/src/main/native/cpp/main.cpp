@@ -54,7 +54,7 @@ __declspec(dllexport)
   HALSimWSProviderJoystick::Initialize(registerFunc);
   HALSimWSProviderPWM::Initialize(registerFunc);
   HALSimWSProviderRelay::Initialize(registerFunc);
-  // HALSimWSProviderRoboRIO::Initialize(registerFunc);
+  HALSimWSProviderRoboRIO::Initialize(registerFunc);
 
   simDevices.Initialize();
 

@@ -27,7 +27,12 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
           axesValues.push_back(axes->axes[i]);
         }
 
-        static_cast<HALSimWSProviderJoystick*>(param)->ProcessHalCallback(
+        auto provider = static_cast<HALSimWSProviderJoystick*>(param);
+        if (provider->GetChannel() != joystickNum) {
+          return;
+        }
+
+        provider->ProcessHalCallback(
             {{">axes", axesValues}});
       },
       this, true);
@@ -40,8 +45,12 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
         for (int i = 0; i < povs->count; i++) {
           povsValues.push_back(povs->povs[i]);
         }
+        auto provider = static_cast<HALSimWSProviderJoystick*>(param);
+        if (provider->GetChannel() != joystickNum) {
+          return;
+        }
 
-        static_cast<HALSimWSProviderJoystick*>(param)->ProcessHalCallback(
+        provider->ProcessHalCallback(
             {{">povs", povsValues}});
       },
       this, true);
@@ -51,11 +60,17 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
       [](const char* name, void* param, int32_t joystickNum,
          const HAL_JoystickButtons* buttons) {
         std::vector<bool> buttonsValues;
-        for (int i = buttons->count; i >= 0; i--) {
+
+        for (int i = 0; i < buttons->count; i++) {
           buttonsValues.push_back(((buttons->buttons >> i) & 0x1) == 1);
         }
 
-        static_cast<HALSimWSProviderJoystick*>(param)->ProcessHalCallback(
+        auto provider = static_cast<HALSimWSProviderJoystick*>(param);
+        if (provider->GetChannel() != joystickNum) {
+          return;
+        }
+
+        provider->ProcessHalCallback(
             {{">buttons", buttonsValues}});
       },
       this, true);
