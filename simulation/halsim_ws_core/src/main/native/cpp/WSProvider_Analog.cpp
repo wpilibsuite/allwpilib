@@ -25,8 +25,7 @@
       m_channel,                                                           \
       [](const char* name, void* param, const struct HAL_Value* value) {   \
         static_cast<HALSimWSProviderAnalogIn*>(param)->ProcessHalCallback( \
-            {{"accum",                                                     \
-              {{jsonid, static_cast<ctype>(value->data.v_##haltype)}}}});  \
+            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});      \
       },                                                                   \
       this, true)
 
@@ -53,14 +52,16 @@ void HALSimWSProviderAnalogIn::RegisterCallbacks() {
       REGISTER_AIN(OversampleBits, "<oversample_bits", int32_t, int);
   m_voltageCbKey = REGISTER_AIN(Voltage, ">voltage", double, double);
 
-  m_accumInitCbKey = REGISTER_AIN_ACCUM(Initialized, "<init", bool, boolean);
-  m_accumValueCbKey = REGISTER_AIN_ACCUM(Value, ">value", int64_t,
+  m_accumInitCbKey =
+      REGISTER_AIN_ACCUM(Initialized, "<accum_init", bool, boolean);
+  m_accumValueCbKey = REGISTER_AIN_ACCUM(Value, ">accum_value", int64_t,
                                          long);  // NOLINT(runtime/int)
-  m_accumCountCbKey = REGISTER_AIN_ACCUM(Count, ">count", int64_t,
+  m_accumCountCbKey = REGISTER_AIN_ACCUM(Count, ">accum_count", int64_t,
                                          long);  // NOLINT(runtime/int)
-  m_accumCenterCbKey = REGISTER_AIN_ACCUM(Center, "<center", int32_t, int);
+  m_accumCenterCbKey =
+      REGISTER_AIN_ACCUM(Center, "<accum_center", int32_t, int);
   m_accumDeadbandCbKey =
-      REGISTER_AIN_ACCUM(Deadband, "<deadband", int32_t, int);
+      REGISTER_AIN_ACCUM(Deadband, "<accum_deadband", int32_t, int);
 }
 
 void HALSimWSProviderAnalogIn::CancelCallbacks() {
