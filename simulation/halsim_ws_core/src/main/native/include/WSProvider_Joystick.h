@@ -21,8 +21,6 @@ class HALSimWSProviderJoystick : public HALSimWSHalChanProvider {
 
   void OnNetValueChanged(const wpi::json& json) override;
 
-  int32_t GetChannel() { return m_channel; };
-
  protected:
   void RegisterCallbacks() override;
   void CancelCallbacks() override;

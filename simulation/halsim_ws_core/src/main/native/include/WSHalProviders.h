@@ -46,6 +46,8 @@ class HALSimWSHalChanProvider : public HALSimWSHalProvider {
   explicit HALSimWSHalChanProvider(int32_t channel, const std::string& key,
                                    const std::string& type);
 
+  int32_t GetChannel() { return m_channel; }
+
  protected:
   int32_t m_channel;
 };

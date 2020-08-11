@@ -27,7 +27,24 @@ void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 void HALSimWSProviderEncoder::RegisterCallbacks() {
-  m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
+  // Special case for initialization since we will need to send
+  // the digital channels down the line as well
+  m_initCbKey = HALSIM_RegisterEncoderInitializedCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        auto provider = static_cast<HALSimWSProviderEncoder*>(param);
+        bool init = static_cast<bool>(value->data.v_boolean);
+
+        wpi::json payload = {{"<init", init}};
+
+        if (init) {
+          payload["<channel_a"] = HALSIM_GetEncoderDigitalChannelA(provider->GetChannel());
+          payload["<channel_b"] = HALSIM_GetEncoderDigitalChannelB(provider->GetChannel());
+        }
+
+        provider->ProcessHalCallback(payload);
+      },
+      this, true);
   m_countCbKey = REGISTER(Count, ">count", int32_t, int);
   m_periodCbKey = REGISTER(Period, ">period", double, double);
   m_resetCbKey = REGISTER(Reset, "<reset", bool, boolean);
