@@ -32,8 +32,7 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
           return;
         }
 
-        provider->ProcessHalCallback(
-            {{">axes", axesValues}});
+        provider->ProcessHalCallback({{">axes", axesValues}});
       },
       this, true);
 
@@ -50,8 +49,7 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
           return;
         }
 
-        provider->ProcessHalCallback(
-            {{">povs", povsValues}});
+        provider->ProcessHalCallback({{">povs", povsValues}});
       },
       this, true);
 
@@ -70,8 +68,7 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
           return;
         }
 
-        provider->ProcessHalCallback(
-            {{">buttons", buttonsValues}});
+        provider->ProcessHalCallback({{">buttons", buttonsValues}});
       },
       this, true);
 }

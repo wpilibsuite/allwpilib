@@ -38,8 +38,10 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
         wpi::json payload = {{"<init", init}};
 
         if (init) {
-          payload["<channel_a"] = HALSIM_GetEncoderDigitalChannelA(provider->GetChannel());
-          payload["<channel_b"] = HALSIM_GetEncoderDigitalChannelB(provider->GetChannel());
+          payload["<channel_a"] =
+              HALSIM_GetEncoderDigitalChannelA(provider->GetChannel());
+          payload["<channel_b"] =
+              HALSIM_GetEncoderDigitalChannelB(provider->GetChannel());
         }
 
         provider->ProcessHalCallback(payload);
