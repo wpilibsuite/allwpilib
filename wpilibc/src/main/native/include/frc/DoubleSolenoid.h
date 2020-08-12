@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -67,6 +67,15 @@ class DoubleSolenoid : public SolenoidBase,
    * @return The current value of the solenoid.
    */
   virtual Value Get() const;
+
+  /**
+   * Toggle the value of the solenoid.
+   *
+   * If the solenoid is set to forward, it'll be set to reverse. If the solenoid
+   * is set to reverse, it'll be set to forward. If the solenoid is set to off,
+   * nothing happens.
+   */
+  void Toggle();
 
   /**
    * Check if the forward solenoid is blacklisted.

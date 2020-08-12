@@ -69,6 +69,8 @@ bool Solenoid::Get() const {
   return value;
 }
 
+void Solenoid::Toggle() { Set(!Get()); }
+
 bool Solenoid::IsBlackListed() const {
   int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
   return (value != 0);
