@@ -108,6 +108,7 @@ class DoubleSolenoid : public SolenoidBase,
   int m_reverseMask;     // The mask for the reverse channel.
   hal::Handle<HAL_SolenoidHandle> m_forwardHandle;
   hal::Handle<HAL_SolenoidHandle> m_reverseHandle;
+  mutable Value m_value = kOff;
 };
 
 }  // namespace frc

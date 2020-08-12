@@ -106,6 +106,7 @@ class Solenoid : public SolenoidBase,
  private:
   hal::Handle<HAL_SolenoidHandle> m_solenoidHandle;
   int m_channel;  // The channel on the module to control
+  mutable bool m_value = false;
 };
 
 }  // namespace frc

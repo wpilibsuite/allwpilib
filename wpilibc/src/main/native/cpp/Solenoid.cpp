@@ -56,20 +56,25 @@ Solenoid::~Solenoid() { HAL_FreeSolenoidPort(m_solenoidHandle); }
 
 void Solenoid::Set(bool on) {
   if (StatusIsFatal()) return;
+
+  m_value = on;
+
   int32_t status = 0;
-  HAL_SetSolenoid(m_solenoidHandle, on, &status);
+  HAL_SetSolenoid(m_solenoidHandle, m_value, &status);
   wpi_setHALError(status);
 }
 
 bool Solenoid::Get() const {
   if (StatusIsFatal()) return false;
+
   int32_t status = 0;
-  bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
+  m_value = HAL_GetSolenoid(m_solenoidHandle, &status);
   wpi_setHALError(status);
-  return value;
+
+  return m_value;
 }
 
-void Solenoid::Toggle() { Set(!Get()); }
+void Solenoid::Toggle() { Set(!m_value); }
 
 bool Solenoid::IsBlackListed() const {
   int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);

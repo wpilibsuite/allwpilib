@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
   private final int m_channel; // The channel to control.
   private int m_solenoidHandle;
+  private boolean m_value;
 
   /**
    * Constructor using the default PCM ID (defaults to 0).
@@ -65,7 +66,8 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
    * @param on True will turn the solenoid output on. False will turn the solenoid output off.
    */
   public void set(boolean on) {
-    SolenoidJNI.setSolenoid(m_solenoidHandle, on);
+    m_value = on;
+    SolenoidJNI.setSolenoid(m_solenoidHandle, m_value);
   }
 
   /**
@@ -74,7 +76,8 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
    * @return True if the solenoid output is on or false if the solenoid output is off.
    */
   public boolean get() {
-    return SolenoidJNI.getSolenoid(m_solenoidHandle);
+    m_value = SolenoidJNI.getSolenoid(m_solenoidHandle);
+    return m_value;
   }
 
   /**
@@ -84,7 +87,7 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
    * turned on.
    */
   public void toggle() {
-    set(!get());
+    set(!m_value);
   }
 
   /**
