@@ -34,7 +34,6 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
   private byte m_reverseMask; // The mask for the reverse channel.
   private int m_forwardHandle;
   private int m_reverseHandle;
-  private Value m_value = Value.kOff;
 
   /**
    * Constructor. Uses the default PCM ID (defaults to 0).
@@ -98,8 +97,6 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
    * @param value The value to set (Off, Forward, Reverse)
    */
   public void set(final Value value) {
-    m_value = value;
-
     boolean forward = false;
     boolean reverse = false;
 
@@ -135,14 +132,12 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
     boolean valueReverse = SolenoidJNI.getSolenoid(m_reverseHandle);
 
     if (valueForward) {
-      m_value = Value.kForward;
+      return Value.kForward;
     } else if (valueReverse) {
-      m_value = Value.kReverse;
+      return Value.kReverse;
     } else {
-      m_value = Value.kOff;
+      return Value.kOff;
     }
-
-    return m_value;
   }
 
   /**
@@ -152,9 +147,11 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
    * reverse, it'll be set to forward. If the solenoid is set to off, nothing happens.
    */
   public void toggle() {
-    if (m_value == Value.kForward) {
+    Value value = get();
+
+    if (value == Value.kForward) {
       set(Value.kReverse);
-    } else if (m_value == Value.kReverse) {
+    } else if (value == Value.kReverse) {
       set(Value.kForward);
     }
   }

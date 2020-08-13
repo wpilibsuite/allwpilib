@@ -90,8 +90,6 @@ DoubleSolenoid::~DoubleSolenoid() {
 void DoubleSolenoid::Set(Value value) {
   if (StatusIsFatal()) return;
 
-  m_value = value;
-
   bool forward = false;
   bool reverse = false;
 
@@ -131,20 +129,20 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
   wpi_setHALError(rstatus);
 
   if (valueForward) {
-    m_value = kForward;
+    return kForward;
   } else if (valueReverse) {
-    m_value = kReverse;
+    return kReverse;
   } else {
-    m_value = kOff;
+    return kOff;
   }
-
-  return m_value;
 }
 
 void DoubleSolenoid::Toggle() {
-  if (m_value == kForward) {
+  Value value = Get();
+
+  if (value == kForward) {
     Set(kReverse);
-  } else if (m_value == kReverse) {
+  } else if (value == kReverse) {
     Set(kForward);
   }
 }
