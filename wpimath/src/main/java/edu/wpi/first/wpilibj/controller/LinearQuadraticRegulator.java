@@ -116,18 +116,31 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
                                   Matrix<S, N1> qelms, double rho, Matrix<I, N1> relms,
                                   double dtSeconds
   ) {
-    var Q = StateSpaceUtil.makeCostMatrix(qelms).times(rho);
-    var R = StateSpaceUtil.makeCostMatrix(relms);
+    this(dtSeconds, A, B, StateSpaceUtil.makeCostMatrix(qelms).times(rho), 
+        StateSpaceUtil.makeCostMatrix(relms));
+  }
 
+  /**
+   * Constructs a controller with the given coefficients and plant.
+   *  @param dtSeconds Discretization timestep.
+   * @param A         Continuous system matrix of the plant being controlled.
+   * @param B         Continuous input matrix of the plant being controlled.
+   * @param Q         The Q matrix.
+   * @param R         The R matrix.
+   */
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
+  public LinearQuadraticRegulator(double dtSeconds, Matrix<S, S> A, Matrix<S, I> B,
+                                  Matrix<S, S> Q, Matrix<I, I> R
+  ) {
     var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R);
 
-    var temp = discB.transpose().times(new Matrix<S, S>(S)).times(discB).plus(R);
+    var temp = discB.transpose().times(S).times(discB).plus(R);
 
-    m_K = temp.solve(discB.transpose().times(new Matrix<S, S>(S)).times(discA));
+    m_K = temp.solve(discB.transpose().times(S).times(discA));
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));

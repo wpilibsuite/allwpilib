@@ -22,6 +22,13 @@ LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(
     : detail::LinearQuadraticRegulatorImpl<1, 1>{A,   B,      Qelems,
                                                  rho, Relems, dt} {}
 
+LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
+                           const Eigen::Matrix<double, 1, 1>& B,
+                           const Eigen::Matrix<double, 1, 1>& Q,
+                           const Eigen::Matrix<double, 1, 1>& R,
+                           units::second_t dt)
+    : detail::LinearQuadraticRegulatorImpl<1, 1>(A, B, Q, R, dt) {}
+
 LinearQuadraticRegulator<2, 1>::LinearQuadraticRegulator(
     const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 1>& B,
     const std::array<double, 2>& Qelems, const std::array<double, 1>& Relems,
@@ -34,5 +41,11 @@ LinearQuadraticRegulator<2, 1>::LinearQuadraticRegulator(
     const std::array<double, 1>& Relems, units::second_t dt)
     : detail::LinearQuadraticRegulatorImpl<2, 1>{A,   B,      Qelems,
                                                  rho, Relems, dt} {}
+
+LinearQuadraticRegulator<2, 1>::LinearQuadraticRegulator(
+    const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 1>& B,
+    const Eigen::Matrix<double, 2, 2>& Q, const Eigen::Matrix<double, 1, 1>& R,
+    units::second_t dt)
+    : detail::LinearQuadraticRegulatorImpl<2, 1>(A, B, Q, R, dt) {}
 
 }  // namespace frc

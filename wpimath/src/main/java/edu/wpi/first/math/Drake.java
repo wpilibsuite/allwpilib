@@ -10,6 +10,7 @@ package edu.wpi.first.math;
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.Num;
 
 public final class Drake {
   private Drake() {
@@ -47,12 +48,12 @@ public final class Drake {
    * @return Solution of DARE.
    */
   @SuppressWarnings("ParameterName")
-  public static SimpleMatrix discreteAlgebraicRiccatiEquation(
-          Matrix A,
-          Matrix B,
-          Matrix Q,
-          Matrix R) {
-    return discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(), Q.getStorage(),
-            R.getStorage());
+  public static <S extends Num, I extends Num> Matrix<S, S> discreteAlgebraicRiccatiEquation(
+          Matrix<S, S> A,
+          Matrix<S, I> B,
+          Matrix<S, S> Q,
+          Matrix<I, I> R) {
+    return new Matrix<>(discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(), 
+    Q.getStorage(), R.getStorage()));
   }
 }

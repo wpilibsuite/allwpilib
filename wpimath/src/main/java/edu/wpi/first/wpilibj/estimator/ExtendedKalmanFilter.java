@@ -96,8 +96,8 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
     // IsStabilizable(A^T, C^T) will tell us if the system is observable.
     boolean isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
     if (isObservable && outputs.getNum() <= states.getNum()) {
-      m_initP = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(
-            discA.transpose(), C.transpose(), discQ, m_discR));
+      m_initP = Drake.discreteAlgebraicRiccatiEquation(
+            discA.transpose(), C.transpose(), discQ, m_discR) ;
     } else {
       m_initP = new Matrix<>(states, states);
     }

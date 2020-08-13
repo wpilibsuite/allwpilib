@@ -34,7 +34,7 @@ class LinearQuadraticRegulatorImpl {
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param system The plant being controlled.
+   * @param plant  The plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
@@ -50,7 +50,7 @@ class LinearQuadraticRegulatorImpl {
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param system The plant being controlled.
+   * @param plant  The plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
    * @param rho    A weighting factor that balances control effort and state
    * excursion. Greater values penalize state excursion more heavily. 1 is a
@@ -102,13 +102,27 @@ class LinearQuadraticRegulatorImpl {
                                const std::array<double, States>& Qelems,
                                const double rho,
                                const std::array<double, Inputs>& Relems,
+                               units::second_t dt)
+      : LinearQuadraticRegulatorImpl(A, B, MakeCostMatrix(Qelems) * rho,
+                                     MakeCostMatrix(Relems), dt) {}
+
+  /**
+   * Constructs a controller with the given coefficients and plant.
+   *
+   * @param A      Continuous system matrix of the plant being controlled.
+   * @param B      Continuous input matrix of the plant being controlled.
+   * @param Q      The Q matrix.
+   * @param R      The R matrix.
+   * @param dt     Discretization timestep.
+   */
+  LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
+                               const Eigen::Matrix<double, States, Inputs>& B,
+                               const Eigen::Matrix<double, States, States>& Q,
+                               const Eigen::Matrix<double, Inputs, Inputs>& R,
                                units::second_t dt) {
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
-
-    Eigen::Matrix<double, States, States> Q = MakeCostMatrix(Qelems) * rho;
-    Eigen::Matrix<double, Inputs, Inputs> R = MakeCostMatrix(Relems);
 
     Eigen::Matrix<double, States, States> S =
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R);
@@ -293,6 +307,22 @@ class LinearQuadraticRegulator
       : detail::LinearQuadraticRegulatorImpl<States, Inputs>{
             A, B, Qelems, rho, Relems, dt} {}
 
+  /**
+   * Constructs a controller with the given coefficients and plant.
+   *
+   * @param A      Continuous system matrix of the plant being controlled.
+   * @param B      Continuous input matrix of the plant being controlled.
+   * @param Q      The Q matrix.
+   * @param R      The R matrix.
+   * @param dt     Discretization timestep.
+   */
+  LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
+                           const Eigen::Matrix<double, States, Inputs>& B,
+                           const Eigen::Matrix<double, States, States>& Q,
+                           const Eigen::Matrix<double, Inputs, Inputs>& R,
+                           units::second_t dt)
+      : detail::LinearQuadraticRegulatorImpl<States, Inputs>{A, B, Q, R, dt} {}
+
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
   LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
 };
@@ -333,6 +363,12 @@ class LinearQuadraticRegulator<1, 1>
                            const std::array<double, 1>& Relems,
                            units::second_t dt);
 
+  LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
+                           const Eigen::Matrix<double, 1, 1>& B,
+                           const Eigen::Matrix<double, 1, 1>& Q,
+                           const Eigen::Matrix<double, 1, 1>& R,
+                           units::second_t dt);
+
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
   LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
 };
@@ -371,6 +407,12 @@ class LinearQuadraticRegulator<2, 1>
                            const std::array<double, 2>& Qelems,
                            const double rho,
                            const std::array<double, 1>& Relems,
+                           units::second_t dt);
+
+  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
+                           const Eigen::Matrix<double, 2, 1>& B,
+                           const Eigen::Matrix<double, 2, 2>& Q,
+                           const Eigen::Matrix<double, 1, 1>& R,
                            units::second_t dt);
 
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;

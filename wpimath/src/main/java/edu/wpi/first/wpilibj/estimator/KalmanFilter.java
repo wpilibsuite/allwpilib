@@ -107,8 +107,8 @@ public class KalmanFilter<S extends Num, I extends Num,
     var isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), plant.getC().transpose());
     if (isObservable) {
       if (outputs.getNum() <= states.getNum()) {
-        m_P = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(
-            discA.transpose(), plant.getC().transpose(), discQ, m_discR));
+        m_P = Drake.discreteAlgebraicRiccatiEquation(
+            discA.transpose(), plant.getC().transpose(), discQ, m_discR);
       } else {
         m_P = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
       }
