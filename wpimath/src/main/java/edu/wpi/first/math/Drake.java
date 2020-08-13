@@ -53,7 +53,7 @@ public final class Drake {
           Matrix<S, I> B,
           Matrix<S, S> Q,
           Matrix<I, I> R) {
-    return new Matrix<>(discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(), 
+    return new Matrix<>(discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(),
     Q.getStorage(), R.getStorage()));
   }
 }

@@ -22,11 +22,10 @@ LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(
     : detail::LinearQuadraticRegulatorImpl<1, 1>{A,   B,      Qelems,
                                                  rho, Relems, dt} {}
 
-LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
-                           const Eigen::Matrix<double, 1, 1>& B,
-                           const Eigen::Matrix<double, 1, 1>& Q,
-                           const Eigen::Matrix<double, 1, 1>& R,
-                           units::second_t dt)
+LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(
+    const Eigen::Matrix<double, 1, 1>& A, const Eigen::Matrix<double, 1, 1>& B,
+    const Eigen::Matrix<double, 1, 1>& Q, const Eigen::Matrix<double, 1, 1>& R,
+    units::second_t dt)
     : detail::LinearQuadraticRegulatorImpl<1, 1>(A, B, Q, R, dt) {}
 
 LinearQuadraticRegulator<2, 1>::LinearQuadraticRegulator(

@@ -36,8 +36,7 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
 @SuppressWarnings({"ParameterName", "LocalVariableName", "MemberName"})
-public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num,
-        O extends Num> {
+public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num> {
   /**
    * The current reference state.
    */

@@ -116,7 +116,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
                                   Matrix<S, N1> qelms, double rho, Matrix<I, N1> relms,
                                   double dtSeconds
   ) {
-    this(dtSeconds, A, B, StateSpaceUtil.makeCostMatrix(qelms).times(rho), 
+    this(dtSeconds, A, B, StateSpaceUtil.makeCostMatrix(qelms).times(rho),
         StateSpaceUtil.makeCostMatrix(relms));
   }
 

@@ -21,8 +21,8 @@ class ControlAffinePlantInversionFeedforwardTest {
   @SuppressWarnings("LocalVariableName")
   @Test
   void testCalculate() {
-    ControlAffinePlantInversionFeedforward<N2, N1, N1> feedforward =
-            new ControlAffinePlantInversionFeedforward<N2, N1, N1>(
+    ControlAffinePlantInversionFeedforward<N2, N1> feedforward =
+            new ControlAffinePlantInversionFeedforward<N2, N1>(
                     Nat.N2(),
                     Nat.N1(),
                     this::getDynamics,
@@ -39,8 +39,8 @@ class ControlAffinePlantInversionFeedforwardTest {
   void testCalculateState() {
     Matrix<N2, N1> B = VecBuilder.fill(0, 1);
 
-    ControlAffinePlantInversionFeedforward<N2, N1, N1> feedforward =
-            new ControlAffinePlantInversionFeedforward<N2, N1, N1>(
+    ControlAffinePlantInversionFeedforward<N2, N1> feedforward =
+            new ControlAffinePlantInversionFeedforward<N2, N1>(
                     Nat.N2(),
                     Nat.N1(),
                     this::getStateDynamics,
