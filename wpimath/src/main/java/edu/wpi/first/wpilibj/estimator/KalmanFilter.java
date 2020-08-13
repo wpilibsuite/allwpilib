@@ -33,42 +33,43 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9.
  */
-public class KalmanFilter<S extends Num, I extends Num,
-      O extends Num> implements KalmanTypeFilter<S, I, O> {
+@SuppressWarnings("ClassTypeParameterName")
+public class KalmanFilter<States extends Num, Inputs extends Num,
+      Outputs extends Num> implements KalmanTypeFilter<States, Inputs, Outputs> {
 
-  private final Nat<S> m_states;
+  private final Nat<States> m_states;
 
-  private final LinearSystem<S, I, O> m_plant;
+  private final LinearSystem<States, Inputs, Outputs> m_plant;
 
-  private final Matrix<S, N1> m_stateStdDevs;
-  private final Matrix<O, N1> m_measurementStdDevs;
+  private final Matrix<States, N1> m_stateStdDevs;
+  private final Matrix<Outputs, N1> m_measurementStdDevs;
 
   /**
    * Error covariance matrix.
    */
   @SuppressWarnings("MemberName")
-  private Matrix<S, S> m_P;
+  private Matrix<States, States> m_P;
 
   /**
    * Continuous process noise covariance matrix.
    */
-  private final Matrix<S, S> m_contQ;
+  private final Matrix<States, States> m_contQ;
 
   /**
    * Continuous measurement noise covariance matrix.
    */
-  private final Matrix<O, O> m_contR;
+  private final Matrix<Outputs, Outputs> m_contR;
 
   /**
    * Discrete measurement noise covariance matrix.
    */
-  private Matrix<O, O> m_discR;
+  private Matrix<Outputs, Outputs> m_discR;
 
   /**
    * The current state estimate x-hat.
    */
   @SuppressWarnings("MemberName")
-  private Matrix<S, N1> m_xHat;
+  private Matrix<States, N1> m_xHat;
 
   /**
    * Constructs a state-space observer with the given plant.
@@ -81,11 +82,11 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @param dtSeconds          Nominal discretization timestep.
    */
   public KalmanFilter(
-        Nat<S> states, Nat<O> outputs,
-        LinearSystem<S, I, O> plant,
-        Matrix<S, N1> stateStdDevs,
-        Matrix<O, N1> measurementStdDevs,
-        double dtSeconds
+      Nat<States> states, Nat<Outputs> outputs,
+      LinearSystem<States, Inputs, Outputs> plant,
+      Matrix<States, N1> stateStdDevs,
+      Matrix<Outputs, N1> measurementStdDevs,
+      double dtSeconds
   ) {
     this.m_states = states;
 
@@ -133,7 +134,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @return the error covariance matrix P.
    */
   @Override
-  public Matrix<S, S> getP() {
+  public Matrix<States, States> getP() {
     return m_P;
   }
 
@@ -155,7 +156,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @param newP The new value of P to use.
    */
   @Override
-  public void setP(Matrix<S, S> newP) {
+  public void setP(Matrix<States, States> newP) {
     m_P = newP;
   }
 
@@ -165,7 +166,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @param xhat The state estimate x-hat.
    */
   @Override
-  public void setXhat(Matrix<S, N1> xhat) {
+  public void setXhat(Matrix<States, N1> xhat) {
     this.m_xHat = xhat;
   }
 
@@ -186,7 +187,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    * @return The state estimate x-hat.
    */
   @Override
-  public Matrix<S, N1> getXhat() {
+  public Matrix<States, N1> getXhat() {
     return m_xHat;
   }
 
@@ -204,14 +205,14 @@ public class KalmanFilter<S extends Num, I extends Num,
   /**
    * Returns the state standard deviations used to make Q.
    */
-  public Matrix<S, N1> getStateStdDevs() {
+  public Matrix<States, N1> getStateStdDevs() {
     return m_stateStdDevs;
   }
 
   /**
    * Returns the measurement standard deviations used to make R.
    */
-  public Matrix<O, N1> getMeasurementStdDevs() {
+  public Matrix<Outputs, N1> getMeasurementStdDevs() {
     return m_measurementStdDevs;
   }
 
@@ -223,7 +224,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    */
   @SuppressWarnings("ParameterName")
   @Override
-  public void predict(Matrix<I, N1> u, double dtSeconds) {
+  public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
 
     var pair = Discretization.discretizeAQTaylor(m_plant.getA(), m_contQ, dtSeconds);
@@ -242,7 +243,7 @@ public class KalmanFilter<S extends Num, I extends Num,
    */
   @SuppressWarnings("ParameterName")
   @Override
-  public void correct(Matrix<I, N1> u, Matrix<O, N1> y) {
+  public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     correct(u, y, m_plant.getC(), m_plant.getD(), m_discR);
   }
 
@@ -261,10 +262,10 @@ public class KalmanFilter<S extends Num, I extends Num,
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
-        Matrix<I, N1> u,
+        Matrix<Inputs, N1> u,
         Matrix<R, N1> y,
-        Matrix<R, S> C,
-        Matrix<R, I> D,
+        Matrix<R, States> C,
+        Matrix<R, Inputs> D,
         Matrix<R, R> r) {
     var S = C.times(m_P).times(C.transpose()).plus(r);
 
@@ -280,7 +281,7 @@ public class KalmanFilter<S extends Num, I extends Num,
     //
     // K^T = S^T.solve(CP^T)
     // K = (S^T.solve(CP^T))^T
-    Matrix<S, R> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
+    Matrix<States, R> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
 
     m_xHat = m_xHat.plus(K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
     m_P = Matrix.eye(m_states).minus(K.times(C)).times(m_P);

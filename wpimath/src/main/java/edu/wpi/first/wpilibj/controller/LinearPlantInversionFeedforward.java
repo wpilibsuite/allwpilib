@@ -24,25 +24,25 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
-@SuppressWarnings({"ParameterName", "LocalVariableName", "MemberName"})
-public class LinearPlantInversionFeedforward<S extends Num, I extends Num,
-        O extends Num> {
+@SuppressWarnings({"ParameterName", "LocalVariableName", "MemberName", "ClassTypeParameterName"})
+public class LinearPlantInversionFeedforward<States extends Num, Inputs extends Num,
+        Outputs extends Num> {
   /**
    * The current reference state.
    */
   @SuppressWarnings("MemberName")
-  private Matrix<S, N1> m_r;
+  private Matrix<States, N1> m_r;
 
   /**
    * The computed feedforward.
    */
-  private Matrix<I, N1> m_uff;
+  private Matrix<Inputs, N1> m_uff;
 
   @SuppressWarnings("MemberName")
-  private Matrix<S, I> m_B;
+  private Matrix<States, Inputs> m_B;
 
   @SuppressWarnings("MemberName")
-  private Matrix<S, S> m_A;
+  private Matrix<States, States> m_A;
 
   /**
    * Constructs a feedforward with the given plant.
@@ -51,7 +51,7 @@ public class LinearPlantInversionFeedforward<S extends Num, I extends Num,
    * @param dtSeconds Discretization timestep.
    */
   public LinearPlantInversionFeedforward(
-          LinearSystem<S, I, O> plant,
+          LinearSystem<States, Inputs, Outputs> plant,
           double dtSeconds
   ) {
     this(plant.getA(), plant.getB(), dtSeconds);
@@ -65,14 +65,14 @@ public class LinearPlantInversionFeedforward<S extends Num, I extends Num,
    * @param dtSeconds Discretization timestep.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public LinearPlantInversionFeedforward(Matrix<S, S> A, Matrix<S, I> B,
-                                   double dtSeconds) {
+  public LinearPlantInversionFeedforward(Matrix<States, States> A, Matrix<States, Inputs> B,
+                                         double dtSeconds) {
     var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
     this.m_A = discABPair.getFirst();
     this.m_B = discABPair.getSecond();
 
-    m_r = new Matrix<S, N1>(new SimpleMatrix(B.getNumRows(), 1));
-    m_uff = new Matrix<I, N1>(new SimpleMatrix(B.getNumCols(), 1));
+    m_r = new Matrix<States, N1>(new SimpleMatrix(B.getNumRows(), 1));
+    m_uff = new Matrix<Inputs, N1>(new SimpleMatrix(B.getNumCols(), 1));
 
     reset(m_r);
   }
@@ -82,7 +82,7 @@ public class LinearPlantInversionFeedforward<S extends Num, I extends Num,
    *
    * @return The calculated feedforward.
    */
-  public Matrix<I, N1> getUff() {
+  public Matrix<Inputs, N1> getUff() {
     return m_uff;
   }
 
@@ -102,7 +102,7 @@ public class LinearPlantInversionFeedforward<S extends Num, I extends Num,
    *
    * @return The current reference vector.
    */
-  public Matrix<S, N1> getR() {
+  public Matrix<States, N1> getR() {
     return m_r;
   }
 
@@ -122,7 +122,7 @@ public class LinearPlantInversionFeedforward<S extends Num, I extends Num,
    *
    * @param initialState The initial state vector.
    */
-  public void reset(Matrix<S, N1> initialState) {
+  public void reset(Matrix<States, N1> initialState) {
     m_r = initialState;
     m_uff.fill(0.0);
   }
@@ -148,7 +148,7 @@ public class LinearPlantInversionFeedforward<S extends Num, I extends Num,
    *
    * @return The calculated feedforward.
    */
-  public Matrix<I, N1> calculate(Matrix<S, N1> nextR) {
+  public Matrix<Inputs, N1> calculate(Matrix<States, N1> nextR) {
     return calculate(m_r, nextR);
   }
 
@@ -161,7 +161,7 @@ public class LinearPlantInversionFeedforward<S extends Num, I extends Num,
    * @return The calculated feedforward.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public Matrix<I, N1> calculate(Matrix<S, N1> r, Matrix<S, N1> nextR) {
+  public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
     m_uff = new Matrix<>(m_B.solve(nextR.minus(m_A.times(r))));
 
     m_r = nextR;

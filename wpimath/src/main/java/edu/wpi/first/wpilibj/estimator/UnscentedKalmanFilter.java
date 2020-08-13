@@ -31,24 +31,24 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * an estimate of the true covariance (as opposed to a linearized version of it). This means that
  * the UKF works with nonlinear systems.
  */
-@SuppressWarnings("MemberName")
-public class UnscentedKalmanFilter<S extends Num, I extends Num,
-      O extends Num> implements KalmanTypeFilter<S, I, O> {
+@SuppressWarnings({"MemberName", "ClassTypeParameterName"})
+public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
+      Outputs extends Num> implements KalmanTypeFilter<States, Inputs, Outputs> {
 
-  private final Nat<S> m_states;
-  private final Nat<O> m_outputs;
+  private final Nat<States> m_states;
+  private final Nat<Outputs> m_outputs;
 
-  private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> m_f;
-  private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> m_h;
+  private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> m_f;
+  private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> m_h;
 
-  private Matrix<S, N1> m_xHat;
-  private Matrix<S, S> m_P;
-  private final Matrix<S, S> m_contQ;
-  private final Matrix<O, O> m_contR;
-  private Matrix<O, O> m_discR;
-  private Matrix<S, ?> m_sigmasF;
+  private Matrix<States, N1> m_xHat;
+  private Matrix<States, States> m_P;
+  private final Matrix<States, States> m_contQ;
+  private final Matrix<Outputs, Outputs> m_contR;
+  private Matrix<Outputs, Outputs> m_discR;
+  private Matrix<States, ?> m_sigmasF;
 
-  private final MerweScaledSigmaPoints<S> m_pts;
+  private final MerweScaledSigmaPoints<States> m_pts;
 
   /**
    * Constructs an Unscented Kalman Filter.
@@ -64,11 +64,13 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    * @param nominalDtSeconds   Nominal discretization timestep.
    */
   @SuppressWarnings("ParameterName")
-  public UnscentedKalmanFilter(Nat<S> states, Nat<O> outputs,
-                               BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> f,
-                               BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> h,
-                               Matrix<S, N1> stateStdDevs,
-                               Matrix<O, N1> measurementStdDevs,
+  public UnscentedKalmanFilter(Nat<States> states, Nat<Outputs> outputs,
+                               BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>,
+                                   Matrix<States, N1>> f,
+                               BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>,
+                                   Matrix<Outputs, N1>> h,
+                               Matrix<States, N1> stateStdDevs,
+                               Matrix<Outputs, N1> measurementStdDevs,
                                double nominalDtSeconds) {
     this.m_states = states;
     this.m_outputs = outputs;
@@ -128,7 +130,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    * @return the error covariance matrix P.
    */
   @Override
-  public Matrix<S, S> getP() {
+  public Matrix<States, States> getP() {
     return m_P;
   }
 
@@ -150,7 +152,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    * @param newP The new value of P to use.
    */
   @Override
-  public void setP(Matrix<S, S> newP) {
+  public void setP(Matrix<States, States> newP) {
     m_P = newP;
   }
 
@@ -160,7 +162,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    * @return the state estimate x-hat.
    */
   @Override
-  public Matrix<S, N1> getXhat() {
+  public Matrix<States, N1> getXhat() {
     return m_xHat;
   }
 
@@ -183,7 +185,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    */
   @SuppressWarnings("ParameterName")
   @Override
-  public void setXhat(Matrix<S, N1> xHat) {
+  public void setXhat(Matrix<States, N1> xHat) {
     m_xHat = xHat;
   }
 
@@ -216,15 +218,17 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    */
   @SuppressWarnings({"LocalVariableName", "ParameterName"})
   @Override
-  public void predict(Matrix<I, N1> u, double dtSeconds) {
+  public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     // Discretize Q before projecting mean and covariance forward
-    Matrix<S, S> contA = NumericalJacobian.numericalJacobianX(m_states, m_states, m_f, m_xHat, u);
-    var discQ = Discretization.discretizeAQTaylor(contA, m_contQ, dtSeconds).getSecond();
+    Matrix<States, States> contA =
+        NumericalJacobian.numericalJacobianX(m_states, m_states, m_f, m_xHat, u);
+    var discQ =
+        Discretization.discretizeAQTaylor(contA, m_contQ, dtSeconds).getSecond();
 
     var sigmas = m_pts.sigmaPoints(m_xHat, m_P);
 
     for (int i = 0; i < m_pts.getNumSigmas(); ++i) {
-      Matrix<S, N1> x = sigmas.extractColumnVector(i);
+      Matrix<States, N1> x = sigmas.extractColumnVector(i);
 
       m_sigmasF.setColumn(i, RungeKutta.rungeKutta(m_f, x, u, dtSeconds));
     }
@@ -245,7 +249,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    */
   @SuppressWarnings("ParameterName")
   @Override
-  public void correct(Matrix<I, N1> u, Matrix<O, N1> y) {
+  public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     correct(m_outputs, u, y, m_h, m_discR);
   }
 
@@ -264,9 +268,9 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
-        Nat<R> rows, Matrix<I, N1> u,
+        Nat<R> rows, Matrix<Inputs, N1> u,
         Matrix<R, N1> y,
-        BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<R, N1>> h,
+        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<R, N1>> h,
         Matrix<R, R> R) {
     // Transform sigma points into measurement space
     Matrix<R, ?> sigmasH = new Matrix<>(new SimpleMatrix(
@@ -286,7 +290,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
     var Py = transRet.getSecond().plus(R);
 
     // Compute cross covariance of the state and the measurements
-    Matrix<S, R> Pxy = new Matrix<>(m_states, rows);
+    Matrix<States, R> Pxy = new Matrix<>(m_states, rows);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
       var temp =
             m_sigmasF.extractColumnVector(i).minus(m_xHat)
@@ -300,7 +304,7 @@ public class UnscentedKalmanFilter<S extends Num, I extends Num,
     // P_y^T K^T = P_{xy}^T
     // K^T = P_y^T.solve(P_{xy}^T)
     // K = (P_y^T.solve(P_{xy}^T)^T
-    Matrix<S, R> K = new Matrix<>(
+    Matrix<States, R> K = new Matrix<>(
           Py.transpose().solve(Pxy.transpose()).transpose()
     );
 

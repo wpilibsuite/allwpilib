@@ -12,33 +12,33 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
-@SuppressWarnings("PMD.TooManyMethods")
-public class LinearSystem<S extends Num, I extends Num,
-        O extends Num> {
+@SuppressWarnings({"PMD.TooManyMethods", "ClassTypeParameterName"})
+public class LinearSystem<States extends Num, Inputs extends Num,
+        Outputs extends Num> {
 
   /**
    * Continuous system matrix.
    */
   @SuppressWarnings("MemberName")
-  private final Matrix<S, S> m_A;
+  private final Matrix<States, States> m_A;
 
   /**
    * Continuous input matrix.
    */
   @SuppressWarnings("MemberName")
-  private final Matrix<S, I> m_B;
+  private final Matrix<States, Inputs> m_B;
 
   /**
    * Output matrix.
    */
   @SuppressWarnings("MemberName")
-  private final Matrix<O, S> m_C;
+  private final Matrix<Outputs, States> m_C;
 
   /**
    * Feedthrough matrix.
    */
   @SuppressWarnings("MemberName")
-  private final Matrix<O, I> m_D;
+  private final Matrix<Outputs, Inputs> m_D;
 
   /**
    * Construct a new LinearSystem from the four system matrices.
@@ -49,8 +49,8 @@ public class LinearSystem<S extends Num, I extends Num,
    * @param d             The feedthrough matrix D.
    */
   @SuppressWarnings("ParameterName")
-  public LinearSystem(Matrix<S, S> a, Matrix<S, I> b,
-                      Matrix<O, S> c, Matrix<O, I> d) {
+  public LinearSystem(Matrix<States, States> a, Matrix<States, Inputs> b,
+                      Matrix<Outputs, States> c, Matrix<Outputs, Inputs> d) {
 
     this.m_A = a;
     this.m_B = b;
@@ -63,7 +63,7 @@ public class LinearSystem<S extends Num, I extends Num,
    *
    * @return the system matrix A.
    */
-  public Matrix<S, S> getA() {
+  public Matrix<States, States> getA() {
     return m_A;
   }
 
@@ -83,7 +83,7 @@ public class LinearSystem<S extends Num, I extends Num,
    *
    * @return the input matrix B.
    */
-  public Matrix<S, I> getB() {
+  public Matrix<States, Inputs> getB() {
     return m_B;
   }
 
@@ -103,7 +103,7 @@ public class LinearSystem<S extends Num, I extends Num,
    *
    * @return Output matrix C.
    */
-  public Matrix<O, S> getC() {
+  public Matrix<Outputs, States> getC() {
     return m_C;
   }
 
@@ -123,7 +123,7 @@ public class LinearSystem<S extends Num, I extends Num,
    *
    * @return the feedthrough matrix D.
    */
-  public Matrix<O, I> getD() {
+  public Matrix<Outputs, Inputs> getD() {
     return m_D;
   }
 
@@ -150,7 +150,8 @@ public class LinearSystem<S extends Num, I extends Num,
    * @return the updated x.
    */
   @SuppressWarnings("ParameterName")
-  public Matrix<S, N1> calculateX(Matrix<S, N1> x, Matrix<I, N1> clampedU, double dtSeconds) {
+  public Matrix<States, N1> calculateX(Matrix<States, N1> x, Matrix<Inputs, N1> clampedU,
+                                       double dtSeconds) {
     var discABpair = Discretization.discretizeAB(m_A, m_B, dtSeconds);
 
     return (discABpair.getFirst().times(x)).plus(discABpair.getSecond().times(clampedU));
@@ -167,9 +168,9 @@ public class LinearSystem<S extends Num, I extends Num,
    * @return the updated output matrix Y.
    */
   @SuppressWarnings("ParameterName")
-  public Matrix<O, N1> calculateY(
-          Matrix<S, N1> x,
-          Matrix<I, N1> clampedU) {
+  public Matrix<Outputs, N1> calculateY(
+          Matrix<States, N1> x,
+          Matrix<Inputs, N1> clampedU) {
     return m_C.times(x).plus(m_D.times(clampedU));
   }
 

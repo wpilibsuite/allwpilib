@@ -67,46 +67,46 @@ public final class RungeKutta {
   /**
    * Performs 4th order Runge-Kutta integration of dx/dt = f(x, u) for dt.
    *
-   * @param <S>  A Num representing the states of the system to integrate.
-   * @param <I>  A Num representing the inputs of the system to integrate.
+   * @param <States>  A Num representing the states of the system to integrate.
+   * @param <Inputs>  A Num representing the inputs of the system to integrate.
    * @param f         The function to integrate. It must take two arguments x and u.
    * @param x         The initial value of x.
    * @param u         The value u held constant over the integration period.
    * @param dtSeconds The time over which to integrate.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
-  @SuppressWarnings("ParameterName")
-  public static <S extends Num, I extends Num> Matrix<S, N1> rungeKutta(
-          BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> f,
-          Matrix<S, N1> x, Matrix<I, N1> u, double dtSeconds) {
+  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
+  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKutta(
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      Matrix<States, N1> x, Matrix<Inputs, N1> u, double dtSeconds) {
 
     final var halfDt = 0.5 * dtSeconds;
-    Matrix<S, N1> k1 = f.apply(x, u);
-    Matrix<S, N1> k2 = f.apply(x.plus(k1.times(halfDt)), u);
-    Matrix<S, N1> k3 = f.apply(x.plus(k2.times(halfDt)), u);
-    Matrix<S, N1> k4 = f.apply(x.plus(k3.times(dtSeconds)), u);
+    Matrix<States, N1> k1 = f.apply(x, u);
+    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(halfDt)), u);
+    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(halfDt)), u);
+    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(dtSeconds)), u);
     return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(dtSeconds).div(6.0));
   }
 
   /**
    * Performs 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
    *
-   * @param <S>  A Num prepresenting the states of the system.
+   * @param <States>  A Num prepresenting the states of the system.
    * @param f         The function to integrate. It must take one argument x.
    * @param x         The initial value of x.
    * @param dtSeconds The time over which to integrate.
    * @return 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
    */
-  @SuppressWarnings("ParameterName")
-  public static <S extends Num> Matrix<S, N1> rungeKutta(
-          Function<Matrix<S, N1>, Matrix<S, N1>> f,
-          Matrix<S, N1> x, double dtSeconds) {
+  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
+  public static <States extends Num> Matrix<States, N1> rungeKutta(
+      Function<Matrix<States, N1>, Matrix<States, N1>> f,
+      Matrix<States, N1> x, double dtSeconds) {
 
     final var halfDt = 0.5 * dtSeconds;
-    Matrix<S, N1> k1 = f.apply(x);
-    Matrix<S, N1> k2 = f.apply(x.plus(k1.times(halfDt)));
-    Matrix<S, N1> k3 = f.apply(x.plus(k2.times(halfDt)));
-    Matrix<S, N1> k4 = f.apply(x.plus(k3.times(dtSeconds)));
+    Matrix<States, N1> k1 = f.apply(x);
+    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(halfDt)));
+    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(halfDt)));
+    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(dtSeconds)));
     return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(dtSeconds).div(6.0));
   }
 

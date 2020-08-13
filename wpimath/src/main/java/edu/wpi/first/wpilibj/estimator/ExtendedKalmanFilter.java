@@ -28,23 +28,24 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * linear approximation of nonlinear dynamics and/or nonlinear measurement models. This means that
  * the EKF works with nonlinear systems.
  */
-public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
-      implements KalmanTypeFilter<S, I, O> {
-  private final Nat<S> m_states;
-  private final Nat<O> m_outputs;
+@SuppressWarnings("ClassTypeParameterName")
+public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
+      implements KalmanTypeFilter<States, Inputs, Outputs> {
+  private final Nat<States> m_states;
+  private final Nat<Outputs> m_outputs;
 
   @SuppressWarnings("MemberName")
-  private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> m_f;
+  private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> m_f;
   @SuppressWarnings("MemberName")
-  private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> m_h;
-  private final Matrix<S, S> m_contQ;
-  private Matrix<O, O> m_discR;
-  private final Matrix<S, S> m_initP;
-  private final Matrix<O, O> m_contR;
+  private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> m_h;
+  private final Matrix<States, States> m_contQ;
+  private Matrix<Outputs, Outputs> m_discR;
+  private final Matrix<States, States> m_initP;
+  private final Matrix<Outputs, Outputs> m_contR;
   @SuppressWarnings("MemberName")
-  private Matrix<S, N1> m_xHat;
+  private Matrix<States, N1> m_xHat;
   @SuppressWarnings("MemberName")
-  private Matrix<S, S> m_P;
+  private Matrix<States, States> m_P;
 
   /**
    * Constructs an extended Kalman filter.
@@ -62,13 +63,13 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    */
   @SuppressWarnings("ParameterName")
   public ExtendedKalmanFilter(
-        Nat<S> states,
-        Nat<I> inputs,
-        Nat<O> outputs,
-        BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> f,
-        BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<O, N1>> h,
-        Matrix<S, N1> stateStdDevs,
-        Matrix<O, N1> measurementStdDevs,
+        Nat<States> states,
+        Nat<Inputs> inputs,
+        Nat<Outputs> outputs,
+        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
+        Matrix<States, N1> stateStdDevs,
+        Matrix<Outputs, N1> measurementStdDevs,
         double dtSeconds
   ) {
     m_states = states;
@@ -111,7 +112,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    * @return the error covariance matrix P.
    */
   @Override
-  public Matrix<S, S> getP() {
+  public Matrix<States, States> getP() {
     return m_P;
   }
 
@@ -133,7 +134,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    * @param newP The new value of P to use.
    */
   @Override
-  public void setP(Matrix<S, S> newP) {
+  public void setP(Matrix<States, States> newP) {
     m_P = newP;
   }
 
@@ -143,7 +144,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    * @return the state estimate x-hat.
    */
   @Override
-  public Matrix<S, N1> getXhat() {
+  public Matrix<States, N1> getXhat() {
     return m_xHat;
   }
 
@@ -165,7 +166,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    */
   @SuppressWarnings("ParameterName")
   @Override
-  public void setXhat(Matrix<S, N1> xHat) {
+  public void setXhat(Matrix<States, N1> xHat) {
     m_xHat = xHat;
   }
 
@@ -195,7 +196,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    */
   @SuppressWarnings("ParameterName")
   @Override
-  public void predict(Matrix<I, N1> u, double dtSeconds) {
+  public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     predict(u, m_f, dtSeconds);
   }
 
@@ -208,9 +209,9 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    */
   @SuppressWarnings("ParameterName")
   public void predict(
-        Matrix<I, N1> u, BiFunction<Matrix<S, N1>,
-        Matrix<I, N1>, Matrix<S, N1>> f,
-        double dtSeconds
+      Matrix<Inputs, N1> u, BiFunction<Matrix<States, N1>,
+        Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      double dtSeconds
   ) {
     // Find continuous A
     final var contA = NumericalJacobian.numericalJacobianX(m_states, m_states, f, m_xHat, u);
@@ -233,7 +234,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    */
   @SuppressWarnings("ParameterName")
   @Override
-  public void correct(Matrix<I, N1> u, Matrix<O, N1> y) {
+  public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     correct(m_outputs, u, y, m_h, m_discR);
   }
 
@@ -254,9 +255,9 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
    */
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public <Rows extends Num> void correct(
-        Nat<Rows> rows, Matrix<I, N1> u,
+        Nat<Rows> rows, Matrix<Inputs, N1> u,
         Matrix<Rows, N1> y,
-        BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<Rows, N1>> h,
+        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Rows, N1>> h,
         Matrix<Rows, Rows> R
   ) {
     final var C = NumericalJacobian.numericalJacobianX(rows, m_states, h, m_xHat, u);
@@ -277,7 +278,7 @@ public class ExtendedKalmanFilter<S extends Num, I extends Num, O extends Num>
     // K = (S^T.solve(CP^T))^T
     //
     // Now we have the Kalman gain
-    final Matrix<S, Rows> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
+    final Matrix<States, Rows> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
 
     m_xHat = m_xHat.plus(K.times(y.minus(h.apply(m_xHat, u))));
     m_P = Matrix.eye(m_states).minus(K.times(C)).times(m_P);

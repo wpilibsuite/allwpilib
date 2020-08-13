@@ -35,30 +35,30 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
-@SuppressWarnings({"ParameterName", "LocalVariableName", "MemberName"})
-public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num> {
+@SuppressWarnings({"ParameterName", "LocalVariableName", "MemberName", "ClassTypeParameterName"})
+public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs extends Num> {
   /**
    * The current reference state.
    */
   @SuppressWarnings("MemberName")
-  private Matrix<S, N1> m_r;
+  private Matrix<States, N1> m_r;
 
   /**
    * The computed feedforward.
    */
-  private Matrix<I, N1> m_uff;
+  private Matrix<Inputs, N1> m_uff;
 
   @SuppressWarnings("MemberName")
-  private final Matrix<S, I> m_B;
+  private final Matrix<States, Inputs> m_B;
 
-  private final Nat<I> m_inputs;
+  private final Nat<Inputs> m_inputs;
 
   private final double m_dt;
 
   /**
    * The model dynamics.
    */
-  private final BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> m_f;
+  private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> m_f;
 
   /**
    * Constructs a feedforward with given model dynamics as a function
@@ -73,9 +73,9 @@ public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num
    * @param dtSeconds The timestep between calls of calculate().
    */
   public ControlAffinePlantInversionFeedforward(
-        Nat<S> states,
-        Nat<I> inputs,
-        BiFunction<Matrix<S, N1>, Matrix<I, N1>, Matrix<S, N1>> f,
+        Nat<States> states,
+        Nat<Inputs> inputs,
+        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
         double dtSeconds) {
     this.m_dt = dtSeconds;
     this.m_f = f;
@@ -102,10 +102,10 @@ public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num
    * @param dtSeconds The timestep between calls of calculate().
    */
   public ControlAffinePlantInversionFeedforward(
-        Nat<S> states,
-        Nat<I> inputs,
-        Function<Matrix<S, N1>, Matrix<S, N1>> f,
-        Matrix<S, I> B,
+        Nat<States> states,
+        Nat<Inputs> inputs,
+        Function<Matrix<States, N1>, Matrix<States, N1>> f,
+        Matrix<States, Inputs> B,
         double dtSeconds) {
     this.m_dt = dtSeconds;
     this.m_inputs = inputs;
@@ -125,7 +125,7 @@ public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num
    *
    * @return The calculated feedforward.
    */
-  public Matrix<I, N1> getUff() {
+  public Matrix<Inputs, N1> getUff() {
     return m_uff;
   }
 
@@ -145,7 +145,7 @@ public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num
    *
    * @return The current reference vector.
    */
-  public Matrix<S, N1> getR() {
+  public Matrix<States, N1> getR() {
     return m_r;
   }
 
@@ -165,7 +165,7 @@ public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num
    *
    * @param initialState The initial state vector.
    */
-  public void reset(Matrix<S, N1> initialState) {
+  public void reset(Matrix<States, N1> initialState) {
     m_r = initialState;
     m_uff.fill(0.0);
   }
@@ -191,7 +191,7 @@ public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num
    *
    * @return The calculated feedforward.
    */
-  public Matrix<I, N1> calculate(Matrix<S, N1> nextR) {
+  public Matrix<Inputs, N1> calculate(Matrix<States, N1> nextR) {
     return calculate(m_r, nextR);
   }
 
@@ -204,7 +204,7 @@ public class ControlAffinePlantInversionFeedforward<S extends Num, I extends Num
    * @return The calculated feedforward.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public Matrix<I, N1> calculate(Matrix<S, N1> r, Matrix<S, N1> nextR) {
+  public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
     var rDot = (nextR.minus(r)).div(m_dt);
 
     m_uff = m_B.solve(rDot.minus(m_f.apply(r, new Matrix<>(m_inputs, Nat.N1()))));

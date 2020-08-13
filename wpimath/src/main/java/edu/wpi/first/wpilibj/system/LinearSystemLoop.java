@@ -34,15 +34,16 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/state-space-guide.pdf.
  */
-public class LinearSystemLoop<S extends Num, I extends Num,
-        O extends Num> {
+@SuppressWarnings("ClassTypeParameterName")
+public class LinearSystemLoop<States extends Num, Inputs extends Num,
+        Outputs extends Num> {
 
-  private final LinearSystem<S, I, O> m_plant;
-  private final LinearQuadraticRegulator<S, I, O> m_controller;
-  private final LinearPlantInversionFeedforward<S, I, O> m_feedforward;
-  private final KalmanFilter<S, I, O> m_observer;
-  private Matrix<S, N1> m_nextR;
-  private Function<Matrix<I, N1>, Matrix<I, N1>> m_clampFunction;
+  private final LinearSystem<States, Inputs, Outputs> m_plant;
+  private final LinearQuadraticRegulator<States, Inputs, Outputs> m_controller;
+  private final LinearPlantInversionFeedforward<States, Inputs, Outputs> m_feedforward;
+  private final KalmanFilter<States, Inputs, Outputs> m_observer;
+  private Matrix<States, N1> m_nextR;
+  private Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> m_clampFunction;
 
   /**
    * Constructs a state-space loop with the given plant, controller, and
@@ -56,9 +57,9 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * @param maxVoltageVolts The maximum voltage that can be applied. Commonly 12.
    * @param dtSeconds The nominal timestep.
    */
-  public LinearSystemLoop(LinearSystem<S, I, O> plant,
-                          LinearQuadraticRegulator<S, I, O> controller,
-                          KalmanFilter<S, I, O> observer,
+  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
+                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+                          KalmanFilter<States, Inputs, Outputs> observer,
                           double maxVoltageVolts,
                           double dtSeconds) {
     this(plant, controller,
@@ -77,10 +78,10 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * @param clampFunction The function used to clamp the input U.
    * @param dtSeconds The nominal timestep.
    */
-  public LinearSystemLoop(LinearSystem<S, I, O> plant,
-                          LinearQuadraticRegulator<S, I, O> controller,
-                          KalmanFilter<S, I, O> observer,
-                          Function<Matrix<I, N1>, Matrix<I, N1>> clampFunction,
+  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
+                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+                          KalmanFilter<States, Inputs, Outputs> observer,
+                          Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction,
                           double dtSeconds) {
     this(plant, controller, new LinearPlantInversionFeedforward<>(plant, dtSeconds),
           observer, clampFunction);
@@ -98,10 +99,10 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * @param maxVoltageVolts The maximum voltage that can be applied. Assumes that the
    *                        inputs are voltages.
    */
-  public LinearSystemLoop(LinearSystem<S, I, O> plant,
-                          LinearQuadraticRegulator<S, I, O> controller,
-                          LinearPlantInversionFeedforward<S, I, O> feedforward,
-                          KalmanFilter<S, I, O> observer,
+  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
+                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+                          LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
+                          KalmanFilter<States, Inputs, Outputs> observer,
                           double maxVoltageVolts
   ) {
     this(plant, controller, feedforward,
@@ -119,11 +120,11 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * @param observer   State-space observer.
    * @param clampFunction The function used to clamp the input U.
    */
-  public LinearSystemLoop(LinearSystem<S, I, O> plant,
-                          LinearQuadraticRegulator<S, I, O> controller,
-                          LinearPlantInversionFeedforward<S, I, O> feedforward,
-                          KalmanFilter<S, I, O> observer,
-                          Function<Matrix<I, N1>, Matrix<I, N1>> clampFunction) {
+  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
+                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+                          LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
+                          KalmanFilter<States, Inputs, Outputs> observer,
+                          Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction) {
     this.m_plant = plant;
     this.m_controller = controller;
     this.m_feedforward = feedforward;
@@ -139,7 +140,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @return the observer's state estimate x-hat.
    */
-  public Matrix<S, N1> getXHat() {
+  public Matrix<States, N1> getXHat() {
     return getObserver().getXhat();
   }
 
@@ -158,7 +159,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @param xhat The initial state estimate x-hat.
    */
-  public void setXHat(Matrix<S, N1> xhat) {
+  public void setXHat(Matrix<States, N1> xhat) {
     getObserver().setXhat(xhat);
   }
 
@@ -187,7 +188,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @return the controller's next reference r.
    */
-  public Matrix<S, N1> getNextR() {
+  public Matrix<States, N1> getNextR() {
     return m_nextR;
   }
 
@@ -196,7 +197,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @param nextR Next reference.
    */
-  public void setNextR(Matrix<S, N1> nextR) {
+  public void setNextR(Matrix<States, N1> nextR) {
     m_nextR = nextR;
   }
 
@@ -220,7 +221,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @return the calculated control input u.
    */
-  public Matrix<I, N1> getU() {
+  public Matrix<Inputs, N1> getU() {
     return clampInput(m_controller.getU().plus(m_feedforward.getUff()));
   }
 
@@ -239,7 +240,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @return the plant used internally.
    */
-  public LinearSystem<S, I, O> getPlant() {
+  public LinearSystem<States, Inputs, Outputs> getPlant() {
     return m_plant;
   }
 
@@ -248,7 +249,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @return the controller used internally.
    */
-  public LinearQuadraticRegulator<S, I, O> getController() {
+  public LinearQuadraticRegulator<States, Inputs, Outputs> getController() {
     return m_controller;
   }
 
@@ -257,7 +258,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @return the feedforward used internally.
    */
-  public LinearPlantInversionFeedforward<S, I, O> getFeedforward() {
+  public LinearPlantInversionFeedforward<States, Inputs, Outputs> getFeedforward() {
     return m_feedforward;
   }
 
@@ -266,7 +267,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @return the observer used internally.
    */
-  public KalmanFilter<S, I, O> getObserver() {
+  public KalmanFilter<States, Inputs, Outputs> getObserver() {
     return m_observer;
   }
 
@@ -276,7 +277,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * initial reference.
    * @param initialReference The initial reference.
    */
-  public void reset(Matrix<S, N1> initialReference) {
+  public void reset(Matrix<States, N1> initialReference) {
     m_controller.reset();
     m_feedforward.reset(initialReference);
     m_observer.reset();
@@ -288,7 +289,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    *
    * @return the
    */
-  public Matrix<S, N1> getError() {
+  public Matrix<States, N1> getError() {
     return getController().getR().minus(m_observer.getXhat());
   }
 
@@ -306,14 +307,14 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * Get the function used to clamp the input u.
    * @return The clamping function.
    */
-  public Function<Matrix<I, N1>, Matrix<I, N1>> getClampFunction() {
+  public Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> getClampFunction() {
     return m_clampFunction;
   }
 
   /**
    * Set the clamping function used to clamp inputs.
    */
-  public void setClampFunction(Function<Matrix<I, N1>, Matrix<I, N1>> clampFunction) {
+  public void setClampFunction(Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction) {
     this.m_clampFunction = clampFunction;
   }
 
@@ -323,7 +324,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * @param y Measurement vector.
    */
   @SuppressWarnings("ParameterName")
-  public void correct(Matrix<O, N1> y) {
+  public void correct(Matrix<Outputs, N1> y) {
     getObserver().correct(getU(), y);
   }
 
@@ -349,7 +350,7 @@ public class LinearSystemLoop<S extends Num, I extends Num,
    * @param unclampedU The input to clamp.
    * @return           The clamped input.
    */
-  public Matrix<I, N1> clampInput(Matrix<I, N1> unclampedU) {
+  public Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> unclampedU) {
     return m_clampFunction.apply(unclampedU);
   }
 

@@ -111,8 +111,8 @@ class LinearQuadraticRegulatorImpl {
    *
    * @param A      Continuous system matrix of the plant being controlled.
    * @param B      Continuous input matrix of the plant being controlled.
-   * @param Q      The Q matrix.
-   * @param R      The R matrix.
+   * @param Q      The state cost matrix.
+   * @param R      The input cost matrix.
    * @param dt     Discretization timestep.
    */
   LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
@@ -312,8 +312,8 @@ class LinearQuadraticRegulator
    *
    * @param A      Continuous system matrix of the plant being controlled.
    * @param B      Continuous input matrix of the plant being controlled.
-   * @param Q      The Q matrix.
-   * @param R      The R matrix.
+   * @param Q      The state cost matrix.
+   * @param R      The input cost matrix.
    * @param dt     Discretization timestep.
    */
   LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,

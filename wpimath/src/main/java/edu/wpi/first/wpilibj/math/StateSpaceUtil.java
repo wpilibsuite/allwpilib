@@ -33,7 +33,7 @@ public final class StateSpaceUtil {
    *
    * <p>Each element is squared and placed on the covariance matrix diagonal.
    *
-   * @param <S>     Num representing the states of the system.
+   * @param <States>     Num representing the states of the system.
    * @param states  A Nat representing the states of the system.
    * @param stdDevs For a Q matrix, its elements are the standard deviations of
    *                each state from how the model behaves. For an R matrix, its
@@ -41,10 +41,11 @@ public final class StateSpaceUtil {
    *                measurement.
    * @return Process noise or measurement noise covariance matrix.
    */
-  public static <S extends Num> Matrix<S, S> makeCovarianceMatrix(
-          Nat<S> states, Matrix<S, N1> stdDevs
+  @SuppressWarnings("MethodTypeParameterName")
+  public static <States extends Num> Matrix<States, States> makeCovarianceMatrix(
+      Nat<States> states, Matrix<States, N1> stdDevs
   ) {
-    var result = new Matrix<S, S>(states, states);
+    var result = new Matrix<>(states, states);
     for (int i = 0; i < states.getNum(); i++) {
       result.set(i, i, Math.pow(stdDevs.get(i, 0), 2));
     }
@@ -78,15 +79,18 @@ public final class StateSpaceUtil {
    * <p>The cost matrix is constructed using Bryson's rule. The inverse square of
    * each element in the input is taken and placed on the cost matrix diagonal.
    *
-   * @param <S>   Nat representing the states of the system.
+   * @param <States>   Nat representing the states of the system.
    * @param costs An array. For a Q matrix, its elements are the maximum allowed
    *              excursions of the states from the reference. For an R matrix,
    *              its elements are the maximum allowed excursions of the control
    *              inputs from no actuation.
    * @return State excursion or control effort cost matrix.
    */
-  public static <S extends Num> Matrix<S, S> makeCostMatrix(Matrix<S, N1> costs) {
-    Matrix<S, S> result = new Matrix<>(new SimpleMatrix(costs.getNumRows(), costs.getNumRows()));
+  @SuppressWarnings("MethodTypeParameterName")
+  public static <States extends Num> Matrix<States, States>
+      makeCostMatrix(Matrix<States, N1> costs) {
+    Matrix<States, States> result =
+        new Matrix<>(new SimpleMatrix(costs.getNumRows(), costs.getNumRows()));
     result.fill(0.0);
 
     for (int i = 0; i < costs.getNumRows(); i++) {
@@ -103,14 +107,15 @@ public final class StateSpaceUtil {
    * any, have absolute values less than one, where an eigenvalue is
    * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.
    *
-   * @param <S> Num representing the size of A.
-   * @param <I> Num representing the columns of B.
+   * @param <States> Num representing the size of A.
+   * @param <Inputs> Num representing the columns of B.
    * @param A   System matrix.
    * @param B   Input matrix.
    * @return If the system is stabilizable.
    */
-  public static <S extends Num, I extends Num> boolean isStabilizable(
-          Matrix<S, S> A, Matrix<S, I> B
+  @SuppressWarnings("MethodTypeParameterName")
+  public static <States extends Num, Inputs extends Num> boolean isStabilizable(
+      Matrix<States, States> A, Matrix<States, Inputs> B
   ) {
     return WPIMathJNI.isStabilizable(A.getNumRows(), B.getNumCols(),
             A.getData(), B.getData());

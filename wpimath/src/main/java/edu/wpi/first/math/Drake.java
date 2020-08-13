@@ -47,12 +47,12 @@ public final class Drake {
    * @param R Input cost matrix.
    * @return Solution of DARE.
    */
-  @SuppressWarnings("ParameterName")
-  public static <S extends Num, I extends Num> Matrix<S, S> discreteAlgebraicRiccatiEquation(
-          Matrix<S, S> A,
-          Matrix<S, I> B,
-          Matrix<S, S> Q,
-          Matrix<I, I> R) {
+  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
+  public static <States extends Num, Inputs extends Num> Matrix<States, States>
+      discreteAlgebraicRiccatiEquation(Matrix<States, States> A,
+                                   Matrix<States, Inputs> B,
+                                   Matrix<States, States> Q,
+                                   Matrix<Inputs, Inputs> R) {
     return new Matrix<>(discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(),
     Q.getStorage(), R.getStorage()));
   }

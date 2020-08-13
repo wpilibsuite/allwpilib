@@ -26,23 +26,24 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
-public class LinearQuadraticRegulator<S extends Num, I extends Num,
-      O extends Num> {
+@SuppressWarnings("ClassTypeParameterName")
+public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
+      Outputs extends Num> {
   /**
    * The current reference state.
    */
   @SuppressWarnings("MemberName")
-  private Matrix<S, N1> m_r;
+  private Matrix<States, N1> m_r;
 
   /**
    * The computed and capped controller output.
    */
   @SuppressWarnings("MemberName")
-  private Matrix<I, N1> m_u;
+  private Matrix<Inputs, N1> m_u;
 
   // Controller gain.
   @SuppressWarnings("MemberName")
-  private Matrix<I, S> m_K;
+  private Matrix<Inputs, States> m_K;
 
   /**
    * Constructs a controller with the given coefficients and plant. Rho is defaulted to 1.
@@ -53,9 +54,9 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    * @param dtSeconds Discretization timestep.
    */
   public LinearQuadraticRegulator(
-        LinearSystem<S, I, O> plant,
-        Matrix<S, N1> qelms,
-        Matrix<I, N1> relms,
+        LinearSystem<States, Inputs, Outputs> plant,
+        Matrix<States, N1> qelms,
+        Matrix<Inputs, N1> relms,
         double dtSeconds
   ) {
     this(plant.getA(), plant.getB(), qelms, 1.0, relms, dtSeconds);
@@ -73,10 +74,10 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    * @param dtSeconds Discretization timestep.
    */
   public LinearQuadraticRegulator(
-        LinearSystem<S, I, O> plant,
-        Matrix<S, N1> qelms,
+        LinearSystem<States, Inputs, Outputs> plant,
+        Matrix<States, N1> qelms,
         double rho,
-        Matrix<I, N1> relms,
+        Matrix<Inputs, N1> relms,
         double dtSeconds
   ) {
     this(plant.getA(), plant.getB(), qelms, rho, relms, dtSeconds);
@@ -92,8 +93,8 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    * @param dtSeconds Discretization timestep.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public LinearQuadraticRegulator(Matrix<S, S> A, Matrix<S, I> B,
-                                  Matrix<S, N1> qelms, Matrix<I, N1> relms,
+  public LinearQuadraticRegulator(Matrix<States, States> A, Matrix<States, Inputs> B,
+                                  Matrix<States, N1> qelms, Matrix<Inputs, N1> relms,
                                   double dtSeconds
   ) {
     this(A, B, qelms, 1.0, relms, dtSeconds);
@@ -112,8 +113,8 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    * @param dtSeconds Discretization timestep.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public LinearQuadraticRegulator(Matrix<S, S> A, Matrix<S, I> B,
-                                  Matrix<S, N1> qelms, double rho, Matrix<I, N1> relms,
+  public LinearQuadraticRegulator(Matrix<States, States> A, Matrix<States, Inputs> B,
+                                  Matrix<States, N1> qelms, double rho, Matrix<Inputs, N1> relms,
                                   double dtSeconds
   ) {
     this(dtSeconds, A, B, StateSpaceUtil.makeCostMatrix(qelms).times(rho),
@@ -125,12 +126,14 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    *  @param dtSeconds Discretization timestep.
    * @param A         Continuous system matrix of the plant being controlled.
    * @param B         Continuous input matrix of the plant being controlled.
-   * @param Q         The Q matrix.
-   * @param R         The R matrix.
+   * @param Q         The state cost matrix.
+   * @param R         The input cost matrix.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public LinearQuadraticRegulator(double dtSeconds, Matrix<S, S> A, Matrix<S, I> B,
-                                  Matrix<S, S> Q, Matrix<I, I> R
+  public LinearQuadraticRegulator(double dtSeconds, Matrix<States, States> A,
+                                  Matrix<States, Inputs> B,
+                                  Matrix<States, States> Q,
+                                  Matrix<Inputs, Inputs> R
   ) {
     var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
     var discA = discABPair.getFirst();
@@ -157,8 +160,8 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    */
   @SuppressWarnings("ParameterName")
   public LinearQuadraticRegulator(
-        Nat<S> states, Nat<I> inputs,
-        Matrix<I, S> k
+      Nat<States> states, Nat<Inputs> inputs,
+      Matrix<Inputs, States> k
   ) {
     m_K = k;
 
@@ -173,7 +176,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    *
    * @return The control input.
    */
-  public Matrix<I, N1> getU() {
+  public Matrix<Inputs, N1> getU() {
     return m_u;
   }
 
@@ -193,7 +196,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    *
    * @return The reference vector.
    */
-  public Matrix<S, N1> getR() {
+  public Matrix<States, N1> getR() {
     return m_r;
   }
 
@@ -213,7 +216,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    *
    * @return the controller matrix K.
    */
-  public Matrix<I, S> getK() {
+  public Matrix<Inputs, States> getK() {
     return m_K;
   }
 
@@ -231,7 +234,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    * @param x The current state x.
    */
   @SuppressWarnings("ParameterName")
-  public Matrix<I, N1> calculate(Matrix<S, N1> x) {
+  public Matrix<Inputs, N1> calculate(Matrix<States, N1> x) {
     m_u = m_K.times(m_r.minus(x));
     return m_u;
   }
@@ -243,7 +246,7 @@ public class LinearQuadraticRegulator<S extends Num, I extends Num,
    * @param nextR the next reference vector r.
    */
   @SuppressWarnings("ParameterName")
-  public Matrix<I, N1> calculate(Matrix<S, N1> x, Matrix<S, N1> nextR) {
+  public Matrix<Inputs, N1> calculate(Matrix<States, N1> x, Matrix<States, N1> nextR) {
     m_r = nextR;
     return calculate(x);
   }
