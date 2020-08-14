@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
+import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+
 
 /**
  * Contains the controller coefficients and logic for a linear-quadratic
@@ -55,8 +57,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
    */
   public LinearQuadraticRegulator(
         LinearSystem<States, Inputs, Outputs> plant,
-        Matrix<States, N1> qelms,
-        Matrix<Inputs, N1> relms,
+        Vector<States> qelms,
+        Vector<Inputs> relms,
         double dtSeconds
   ) {
     this(plant.getA(), plant.getB(), qelms, 1.0, relms, dtSeconds);
@@ -75,9 +77,9 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
    */
   public LinearQuadraticRegulator(
         LinearSystem<States, Inputs, Outputs> plant,
-        Matrix<States, N1> qelms,
+        Vector<States> qelms,
         double rho,
-        Matrix<Inputs, N1> relms,
+        Vector<Inputs> relms,
         double dtSeconds
   ) {
     this(plant.getA(), plant.getB(), qelms, rho, relms, dtSeconds);
@@ -94,7 +96,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearQuadraticRegulator(Matrix<States, States> A, Matrix<States, Inputs> B,
-                                  Matrix<States, N1> qelms, Matrix<Inputs, N1> relms,
+                                  Vector<States> qelms, Vector<Inputs> relms,
                                   double dtSeconds
   ) {
     this(A, B, qelms, 1.0, relms, dtSeconds);
@@ -114,26 +116,25 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearQuadraticRegulator(Matrix<States, States> A, Matrix<States, Inputs> B,
-                                  Matrix<States, N1> qelms, double rho, Matrix<Inputs, N1> relms,
+                                  Vector<States> qelms, double rho, Vector<Inputs> relms,
                                   double dtSeconds
   ) {
-    this(dtSeconds, A, B, StateSpaceUtil.makeCostMatrix(qelms).times(rho),
-        StateSpaceUtil.makeCostMatrix(relms));
+    this(A, B, StateSpaceUtil.makeCostMatrix(qelms).times(rho),
+      StateSpaceUtil.makeCostMatrix(relms), dtSeconds);
   }
 
   /**
    * Constructs a controller with the given coefficients and plant.
-   *  @param dtSeconds Discretization timestep.
    * @param A         Continuous system matrix of the plant being controlled.
    * @param B         Continuous input matrix of the plant being controlled.
    * @param Q         The state cost matrix.
    * @param R         The input cost matrix.
+   * @param dtSeconds Discretization timestep.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public LinearQuadraticRegulator(double dtSeconds, Matrix<States, States> A,
-                                  Matrix<States, Inputs> B,
-                                  Matrix<States, States> Q,
-                                  Matrix<Inputs, Inputs> R
+  public LinearQuadraticRegulator(Matrix<States, States> A, Matrix<States, Inputs> B,
+                                  Matrix<States, States> Q, Matrix<Inputs, Inputs> R,
+                                  double dtSeconds
   ) {
     var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
     var discA = discABPair.getFirst();

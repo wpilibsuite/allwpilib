@@ -56,10 +56,8 @@ public class LinearQuadraticRegulatorTest {
   @SuppressWarnings("LocalVariableName")
   public void testLQROnElevator() {
 
-    var qElms = new Matrix<>(Nat.N2(), Nat.N1());
-    qElms.setColumn(0, VecBuilder.fill(0.02, 0.4));
-    var rElms = new Matrix<>(Nat.N1(), Nat.N1());
-    rElms.setColumn(0, VecBuilder.fill(12.0));
+    var qElms = VecBuilder.fill(0.02, 0.);
+    var rElms = VecBuilder.fill(12.0);
     var dt = 0.00505;
 
     var controller = new LinearQuadraticRegulator<>(

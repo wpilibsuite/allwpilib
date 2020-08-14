@@ -66,7 +66,7 @@ public class Matrix<R extends Num, C extends Num> {
    * @param other The {@link Matrix} to copy the storage of.
    */
   public Matrix(Matrix<R, C> other) {
-    this.m_storage = Objects.requireNonNull(other).m_storage.copy();
+    this.m_storage = Objects.requireNonNull(other).getStorage().copy();
   }
 
   /**

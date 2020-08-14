@@ -302,14 +302,14 @@ public class UnscentedKalmanFilterTest {
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
-    var ref = VecBuilder.fill(100);
-    var u = VecBuilder.fill(0);
+    Matrix<N1, N1> ref = VecBuilder.fill(100);
+    Matrix<N1, N1> u = VecBuilder.fill(0);
 
     Matrix<N1, N1> xdot;
     for (int i = 0; i < (2.0 / dt); i++) {
       observer.predict(u, dt);
 
-      u = new Matrix<>(discB.solve(ref.minus(discA.times(ref))));
+      u = discB.solve(ref.minus(discA.times(ref)));
 
       xdot = plant.getA().times(observer.getXhat()).plus(plant.getB().times(u));
 

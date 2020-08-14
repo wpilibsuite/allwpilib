@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpiutil.math;
 
+import java.util.Objects;
+
+import org.ejml.simple.SimpleMatrix;
+
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N10;
 import edu.wpi.first.wpiutil.math.numbers.N2;
@@ -18,6 +22,8 @@ import edu.wpi.first.wpiutil.math.numbers.N7;
 import edu.wpi.first.wpiutil.math.numbers.N8;
 import edu.wpi.first.wpiutil.math.numbers.N9;
 
+
+
 /**
  * A specialization of {@link MatBuilder} for constructing vectors (Nx1 matrices).
  *
@@ -28,13 +34,23 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
     super(rows, Nat.N1());
   }
 
+  private Vector<N> fillVec(double... data) {
+    if (Objects.requireNonNull(data).length != this.m_rows.getNum() * this.m_cols.getNum()) {
+      throw new IllegalArgumentException("Invalid matrix data provided. Wanted "
+        + this.m_rows.getNum()
+        + " x " + this.m_cols.getNum() + " matrix, but got " + data.length + " elements");
+    } else {
+      return new Vector<>(new SimpleMatrix(this.m_rows.getNum(), this.m_cols.getNum(), true, data));
+    }
+  }
+
   /**
    * Returns a 1x1 vector containing the given elements.
    *
    * @param n1 the first element.
    */
-  public static Matrix<N1, N1> fill(double n1) {
-    return new MatBuilder<>(Nat.N1(), Nat.N1()).fill(n1);
+  public static Vector<N1> fill(double n1) {
+    return new VecBuilder<>(Nat.N1()).fillVec(n1);
   }
 
   /**
@@ -43,8 +59,8 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n1 the first element.
    * @param n2 the second element.
    */
-  public static Matrix<N2, N1> fill(double n1, double n2) {
-    return new MatBuilder<>(Nat.N2(), Nat.N1()).fill(n1, n2);
+  public static Vector<N2> fill(double n1, double n2) {
+    return new VecBuilder<>(Nat.N2()).fillVec(n1, n2);
   }
 
   /**
@@ -54,8 +70,8 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n2 the second element.
    * @param n3 the third element.
    */
-  public static Matrix<N3, N1> fill(double n1, double n2, double n3) {
-    return new MatBuilder<>(Nat.N3(), Nat.N1()).fill(n1, n2, n3);
+  public static Vector<N3> fill(double n1, double n2, double n3) {
+    return new VecBuilder<>(Nat.N3()).fillVec(n1, n2, n3);
   }
 
   /**
@@ -66,8 +82,8 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n3 the third element.
    * @param n4 the fourth element.
    */
-  public static Matrix<N4, N1> fill(double n1, double n2, double n3, double n4) {
-    return new MatBuilder<>(Nat.N4(), Nat.N1()).fill(n1, n2, n3, n4);
+  public static Vector<N4> fill(double n1, double n2, double n3, double n4) {
+    return new VecBuilder<>(Nat.N4()).fillVec(n1, n2, n3, n4);
   }
 
   /**
@@ -79,8 +95,8 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n4 the fourth element.
    * @param n5 the fifth element.
    */
-  public static Matrix<N5, N1> fill(double n1, double n2, double n3, double n4, double n5) {
-    return new MatBuilder<>(Nat.N5(), Nat.N1()).fill(n1, n2, n3, n4, n5);
+  public static Vector<N5> fill(double n1, double n2, double n3, double n4, double n5) {
+    return new VecBuilder<>(Nat.N5()).fillVec(n1, n2, n3, n4, n5);
   }
 
   /**
@@ -93,9 +109,9 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n5 the fifth element.
    * @param n6 the sixth element.
    */
-  public static Matrix<N6, N1> fill(double n1, double n2, double n3, double n4, double n5,
+  public static Vector<N6> fill(double n1, double n2, double n3, double n4, double n5,
                                     double n6) {
-    return new MatBuilder<>(Nat.N6(), Nat.N1()).fill(n1, n2, n3, n4, n5, n6);
+    return new VecBuilder<>(Nat.N6()).fillVec(n1, n2, n3, n4, n5, n6);
   }
 
   /**
@@ -109,9 +125,9 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n6 the sixth element.
    * @param n7 the seventh element.
    */
-  public static Matrix<N7, N1> fill(double n1, double n2, double n3, double n4, double n5,
+  public static Vector<N7> fill(double n1, double n2, double n3, double n4, double n5,
                                     double n6, double n7) {
-    return new MatBuilder<>(Nat.N7(), Nat.N1()).fill(n1, n2, n3, n4, n5, n6, n7);
+    return new VecBuilder<>(Nat.N7()).fillVec(n1, n2, n3, n4, n5, n6, n7);
   }
 
   /**
@@ -126,9 +142,9 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n7 the seventh element.
    * @param n8 the eighth element.
    */
-  public static Matrix<N8, N1> fill(double n1, double n2, double n3, double n4, double n5,
+  public static Vector<N8> fill(double n1, double n2, double n3, double n4, double n5,
                                     double n6, double n7, double n8) {
-    return new MatBuilder<>(Nat.N8(), Nat.N1()).fill(n1, n2, n3, n4, n5, n6, n7, n8);
+    return new VecBuilder<>(Nat.N8()).fillVec(n1, n2, n3, n4, n5, n6, n7, n8);
   }
 
   /**
@@ -144,9 +160,9 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n8 the eighth element.
    * @param n9 the ninth element.
    */
-  public static Matrix<N9, N1> fill(double n1, double n2, double n3, double n4, double n5,
+  public static Vector<N9> fill(double n1, double n2, double n3, double n4, double n5,
                                     double n6, double n7, double n8, double n9) {
-    return new MatBuilder<>(Nat.N9(), Nat.N1()).fill(n1, n2, n3, n4, n5, n6, n7, n8, n9);
+    return new VecBuilder<>(Nat.N9()).fillVec(n1, n2, n3, n4, n5, n6, n7, n8, n9);
   }
 
   /**
@@ -164,8 +180,8 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n10 the tenth element.
    */
   @SuppressWarnings("PMD.ExcessiveParameterList")
-  public static Matrix<N10, N1> fill(double n1, double n2, double n3, double n4, double n5,
+  public static Vector<N10> fill(double n1, double n2, double n3, double n4, double n5,
                                     double n6, double n7, double n8, double n9, double n10) {
-    return new MatBuilder<>(Nat.N10(), Nat.N1()).fill(n1, n2, n3, n4, n5, n6, n7, n8, n9, n10);
+    return new VecBuilder<>(Nat.N10()).fillVec(n1, n2, n3, n4, n5, n6, n7, n8, n9, n10);
   }
 }
