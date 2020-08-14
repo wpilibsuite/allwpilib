@@ -129,8 +129,8 @@ public final class StateSpaceUtil {
    */
   public static Matrix<N3, N1> poseToVector(Pose2d pose) {
     return VecBuilder.fill(
-            pose.getTranslation().getX(),
-            pose.getTranslation().getY(),
+            pose.getX(),
+            pose.getY(),
             pose.getRotation().getRadians()
     );
   }

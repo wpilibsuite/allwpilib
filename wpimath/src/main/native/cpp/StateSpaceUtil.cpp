@@ -22,8 +22,7 @@ bool IsStabilizable<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
 }
 
 Eigen::Matrix<double, 3, 1> PoseToVector(const Pose2d& pose) {
-  return frc::MakeMatrix<3, 1>(pose.Translation().X().to<double>(),
-                               pose.Translation().Y().to<double>(),
+  return frc::MakeMatrix<3, 1>(pose.X().to<double>(), pose.Y().to<double>(),
                                pose.Rotation().Radians().to<double>());
 }
 
