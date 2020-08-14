@@ -115,8 +115,7 @@ public final class StateSpaceUtil {
    */
   @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num, Inputs extends Num> boolean isStabilizable(
-      Matrix<States, States> A, Matrix<States, Inputs> B
-  ) {
+      Matrix<States, States> A, Matrix<States, Inputs> B) {
     return WPIMathJNI.isStabilizable(A.getNumRows(), B.getNumCols(),
             A.getData(), B.getData());
   }
@@ -168,7 +167,7 @@ public final class StateSpaceUtil {
    * @return The normalizedInput
    */
   public static <I extends Num> Matrix<I, N1> normalizeInputVector(Matrix<I, N1> u,
-                                                                      double maxMagnitude) {
+                                                                   double maxMagnitude) {
     double maxValue = u.maxAbs();
     boolean isCapped = maxValue > maxMagnitude;
 

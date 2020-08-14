@@ -50,9 +50,9 @@ public final class Drake {
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public static <States extends Num, Inputs extends Num> Matrix<States, States>
       discreteAlgebraicRiccatiEquation(Matrix<States, States> A,
-                                   Matrix<States, Inputs> B,
-                                   Matrix<States, States> Q,
-                                   Matrix<Inputs, Inputs> R) {
+                                       Matrix<States, Inputs> B,
+                                       Matrix<States, States> Q,
+                                       Matrix<Inputs, Inputs> R) {
     return new Matrix<>(discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(),
     Q.getStorage(), R.getStorage()));
   }
