@@ -120,7 +120,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
                                   double dtSeconds
   ) {
     this(A, B, StateSpaceUtil.makeCostMatrix(qelms).times(rho),
-      StateSpaceUtil.makeCostMatrix(relms), dtSeconds);
+        StateSpaceUtil.makeCostMatrix(relms), dtSeconds);
   }
 
   /**

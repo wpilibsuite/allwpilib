@@ -12,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
@@ -56,7 +54,7 @@ public class LinearQuadraticRegulatorTest {
   @SuppressWarnings("LocalVariableName")
   public void testLQROnElevator() {
 
-    var qElms = VecBuilder.fill(0.02, 0.);
+    var qElms = VecBuilder.fill(0.02, 0.4);
     var rElms = VecBuilder.fill(12.0);
     var dt = 0.00505;
 

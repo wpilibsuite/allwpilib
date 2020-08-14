@@ -7,10 +7,6 @@
 
 package edu.wpi.first.wpiutil.math;
 
-import java.util.Objects;
-
-import org.ejml.simple.SimpleMatrix;
-
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N10;
 import edu.wpi.first.wpiutil.math.numbers.N2;
@@ -29,19 +25,14 @@ import edu.wpi.first.wpiutil.math.numbers.N9;
  *
  * @param <N> The dimension of the vector to be constructed.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
   public VecBuilder(Nat<N> rows) {
     super(rows, Nat.N1());
   }
 
   private Vector<N> fillVec(double... data) {
-    if (Objects.requireNonNull(data).length != this.m_rows.getNum() * this.m_cols.getNum()) {
-      throw new IllegalArgumentException("Invalid matrix data provided. Wanted "
-        + this.m_rows.getNum()
-        + " x " + this.m_cols.getNum() + " matrix, but got " + data.length + " elements");
-    } else {
-      return new Vector<>(new SimpleMatrix(this.m_rows.getNum(), this.m_cols.getNum(), true, data));
-    }
+    return new Vector<>(fill(data));
   }
 
   /**

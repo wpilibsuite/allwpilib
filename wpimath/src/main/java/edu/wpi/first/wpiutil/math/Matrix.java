@@ -659,7 +659,7 @@ public class Matrix<R extends Num, C extends Num> {
     if (this == other) {
       return true;
     }
-    if (other == null || getClass() != other.getClass()) {
+    if (!(other instanceof Matrix)) {
       return false;
     }
 

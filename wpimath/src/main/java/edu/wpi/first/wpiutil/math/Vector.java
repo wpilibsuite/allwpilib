@@ -34,7 +34,7 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
    * Caller should make sure that the provided generic bounds match
    * the shape of the provided {@link Vector}.
    *
-   * <p>NOTE:It is not recommend to use this constructor unless the
+   * <p>NOTE:It is not recommended to use this constructor unless the
    * {@link SimpleMatrix} API is absolutely necessary due to the desired
    * function not being accessible through the {@link Vector} wrapper.
    *
@@ -52,6 +52,4 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
   public Vector(Matrix<R, N1> other) {
     super(other);
   }
-
-
 }
