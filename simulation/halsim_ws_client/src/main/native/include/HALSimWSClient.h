@@ -11,6 +11,7 @@
 #include <string>
 
 #include <WSProviderContainer.h>
+#include <WSProvider_SimDevice.h>
 #include <wpi/json.h>
 #include <wpi/uv/AsyncFunction.h>
 #include <wpi/uv/Loop.h>
@@ -26,7 +27,9 @@ class HALSimWS {
   static std::shared_ptr<HALSimWS> GetInstance() { return g_instance; }
   static void SetInstance(std::shared_ptr<HALSimWS> inst) { g_instance = inst; }
 
-  explicit HALSimWS(ProviderContainer& providers) : m_providers(providers) {}
+  explicit HALSimWS(ProviderContainer& providers,
+                    HALSimWSProviderSimDevices& simDevicesProvider)
+      : m_providers(providers), m_simDevicesProvider(simDevicesProvider) {}
   HALSimWS(const HALSimWS&) = delete;
   HALSimWS& operator=(const HALSimWS&) = delete;
 
@@ -42,6 +45,7 @@ class HALSimWS {
   std::string GetTargetHost() const { return m_host; }
   std::string GetTargetUri() const { return m_uri; }
   int GetTargetPort() { return m_port; }
+  std::shared_ptr<wpi::uv::Loop> GetLoop() { return m_loop; }
 
  private:
   static std::shared_ptr<HALSimWS> g_instance;
@@ -57,6 +61,7 @@ class HALSimWS {
   std::weak_ptr<HALSimBaseWebSocketConnection> m_hws;
 
   ProviderContainer& m_providers;
+  HALSimWSProviderSimDevices& m_simDevicesProvider;
 
   std::shared_ptr<wpi::uv::Loop> m_loop;
   std::shared_ptr<wpi::uv::Tcp> m_tcp_client;

@@ -35,7 +35,7 @@ __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
   wpi::outs() << "Websocket Simulator Initializing.\n";
-  auto hsw = std::make_shared<HALSimWeb>(providers);
+  auto hsw = std::make_shared<HALSimWeb>(providers, simDevices);
   HALSimWeb::SetInstance(hsw);
 
   if (!hsw->Initialize()) {
@@ -57,7 +57,7 @@ __declspec(dllexport)
   HALSimWSProviderRelay::Initialize(registerFunc);
   HALSimWSProviderRoboRIO::Initialize(registerFunc);
 
-  simDevices.Initialize();
+  simDevices.Initialize(hsw->GetLoop());
 
   HAL_SetMain(nullptr, HALSimWeb::Main, HALSimWeb::Exit);
 

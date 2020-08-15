@@ -13,6 +13,7 @@
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 #include <wpi/StringMap.h>
+#include <wpi/uv/AsyncFunction.h>
 
 #include "WSBaseProvider.h"
 #include "WSProviderContainer.h"
@@ -20,6 +21,7 @@
 namespace wpilibws {
 
 class HALSimWSProviderSimDevice;
+class HALSimWSProviderSimDevices;
 
 struct SimDeviceValueData {
   HALSimWSProviderSimDevice* device;
@@ -36,14 +38,14 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
     m_deviceId = deviceId;
   }
 
-  void Initialize();
-
   void OnNetworkConnected(
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;
 
   void OnNetworkDisconnected() override;
 
   void OnNetValueChanged(const wpi::json& json) override;
+
+  void ProcessHalCallback(const wpi::json& payload);
 
  private:
   static void OnValueCreatedStatic(const char* name, void* param,
@@ -68,13 +70,28 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
   std::shared_mutex m_vhLock;
 
   HAL_SimDeviceHandle m_handle;
+
+  std::shared_ptr<HALSimWSProviderSimDevices> m_simDevicesBase;
+
+  int32_t m_simValueCreatedCbKey;
+  wpi::StringMap<int32_t> m_simValueChangedCbKeys;
 };
 
 class HALSimWSProviderSimDevices {
  public:
+  using LoopFn = std::function<void(void)>;
+  using UvExecFn = wpi::uv::AsyncFunction<void(LoopFn)>;
+
   explicit HALSimWSProviderSimDevices(ProviderContainer& providers)
       : m_providers(providers) {}
-  void Initialize();
+  void Initialize(std::shared_ptr<wpi::uv::Loop> loop);
+
+  void OnNetworkConnected(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
+  void OnNetworkDisconnected();
+
+  std::shared_ptr<HALSimBaseWebSocketConnection> GetWSConnection() {
+    return m_ws;
+  }
 
  private:
   static void DeviceCreatedCallbackStatic(const char* name, void* param,
@@ -92,6 +109,9 @@ class HALSimWSProviderSimDevices {
   void DeviceFreedCallback(const char* name, HAL_SimDeviceHandle handle);
 
   ProviderContainer& m_providers;
+
+  std::shared_ptr<HALSimBaseWebSocketConnection> m_ws;
+  std::shared_ptr<UvExecFn> m_exec;
 };
 
 }  // namespace wpilibws

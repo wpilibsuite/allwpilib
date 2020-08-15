@@ -34,7 +34,7 @@ __declspec(dllexport)
     int HALSIM_InitExtension(void) {
   wpi::outs() << "HALSim WS Client Extension Initializing\n";
 
-  auto hws = std::make_shared<HALSimWS>(providers);
+  auto hws = std::make_shared<HALSimWS>(providers, simDevices);
   HALSimWS::SetInstance(hws);
 
   if (!hws->Initialize()) {
@@ -56,7 +56,7 @@ __declspec(dllexport)
   HALSimWSProviderRelay::Initialize(registerFunc);
   HALSimWSProviderRoboRIO::Initialize(registerFunc);
 
-  simDevices.Initialize();
+  simDevices.Initialize(hws->GetLoop());
 
   HAL_SetMain(nullptr, HALSimWS::Main, HALSimWS::Exit);
 

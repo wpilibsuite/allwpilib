@@ -11,14 +11,25 @@
 
 namespace wpilibws {
 
-void HALSimWSProviderSimDevice::Initialize() {
-  HALSIM_RegisterSimValueCreatedCallback(
-      m_handle, this, HALSimWSProviderSimDevice::OnValueCreatedStatic, 1);
-}
-
 void HALSimWSProviderSimDevice::OnNetworkConnected(
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
+  auto storedWS = m_ws.lock();
+
+  if (ws == storedWS) {
+    return;
+  }
+
+  // Otherwise, run the disconnection code first so we get
+  // back to a clean slate (only if the stored websocket is
+  // not null)
+  if (storedWS) {
+    OnNetworkDisconnected();
+  }
+
   m_ws = ws;
+
+  m_simValueCreatedCbKey = HALSIM_RegisterSimValueCreatedCallback(
+      m_handle, this, HALSimWSProviderSimDevice::OnValueCreatedStatic, 1);
 
   {
     auto it = m_valueHandles.begin();
@@ -34,7 +45,14 @@ void HALSimWSProviderSimDevice::OnNetworkConnected(
 }
 
 void HALSimWSProviderSimDevice::OnNetworkDisconnected() {
-  // no-op for now
+  // Cancel all callbacks
+  HALSIM_CancelSimValueCreatedCallback(m_simValueCreatedCbKey);
+
+  for (auto& kv : m_simValueChangedCbKeys) {
+    HALSIM_CancelSimValueChangedCallback(kv.getValue());
+  }
+
+  m_ws.reset();
 }
 
 void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
@@ -90,8 +108,10 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
     m_valueHandles[data->key] = std::move(data);
   }
 
-  HALSIM_RegisterSimValueChangedCallback(
+  int32_t cbKey = HALSIM_RegisterSimValueChangedCallback(
       handle, param, HALSimWSProviderSimDevice::OnValueChangedStatic, true);
+
+  m_simValueChangedCbKeys[key.str()] = cbKey;
 }
 
 void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
@@ -100,27 +120,32 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
   if (ws) {
     switch (value->type) {
       case HAL_BOOLEAN:
-        ws->OnSimValueChanged(
-            {{m_key, {{valueData->key, value->data.v_boolean}}}});
+        ProcessHalCallback({{valueData->key, value->data.v_boolean}});
         break;
       case HAL_DOUBLE:
-        ws->OnSimValueChanged(
-            {{m_key, {{valueData->key, value->data.v_double}}}});
+        ProcessHalCallback({{valueData->key, value->data.v_double}});
         break;
       case HAL_ENUM:
-        ws->OnSimValueChanged(
-            {{m_key, {{valueData->key, value->data.v_enum}}}});
+        ProcessHalCallback({{valueData->key, value->data.v_enum}});
         break;
       case HAL_INT:
-        ws->OnSimValueChanged({{m_key, {{valueData->key, value->data.v_int}}}});
+        ProcessHalCallback({{valueData->key, value->data.v_int}});
         break;
       case HAL_LONG:
-        ws->OnSimValueChanged(
-            {{m_key, {{valueData->key, value->data.v_long}}}});
+        ProcessHalCallback({{valueData->key, value->data.v_long}});
         break;
       default:
         break;
     }
+  }
+}
+
+void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
+  auto ws = m_ws.lock();
+  if (ws) {
+    wpi::json netValue = {
+        {"type", "SimDevices"}, {"device", m_deviceId}, {"data", payload}};
+    ws->OnSimValueChanged(netValue);
   }
 }
 
@@ -130,7 +155,10 @@ void HALSimWSProviderSimDevices::DeviceCreatedCallback(
   auto dev = std::make_shared<HALSimWSProviderSimDevice>(
       handle, key, wpi::Twine(name).str());
   m_providers.Add(key, dev);
-  dev->Initialize();
+
+  if (m_ws) {
+    m_exec->Call([this, dev]() { dev->OnNetworkConnected(GetWSConnection()); });
+  }
 }
 
 void HALSimWSProviderSimDevices::DeviceFreedCallback(
@@ -138,11 +166,24 @@ void HALSimWSProviderSimDevices::DeviceFreedCallback(
   m_providers.Delete(name);
 }
 
-void HALSimWSProviderSimDevices::Initialize() {
+void HALSimWSProviderSimDevices::Initialize(
+    std::shared_ptr<wpi::uv::Loop> loop) {
   HALSIM_RegisterSimDeviceCreatedCallback(
       "", this, HALSimWSProviderSimDevices::DeviceCreatedCallbackStatic, 1);
   HALSIM_RegisterSimDeviceFreedCallback(
       "", this, HALSimWSProviderSimDevices::DeviceFreedCallbackStatic);
+
+  m_exec = UvExecFn::Create(loop, [](auto out, LoopFn func) {
+    func();
+    out.set_value();
+  });
 }
+
+void HALSimWSProviderSimDevices::OnNetworkConnected(
+    std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
+  m_ws = hws;
+}
+
+void HALSimWSProviderSimDevices::OnNetworkDisconnected() { m_ws = nullptr; }
 
 }  // namespace wpilibws

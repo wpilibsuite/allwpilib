@@ -135,6 +135,8 @@ bool HALSimWeb::RegisterWebsocket(
 
   m_hws = hws;
 
+  m_simDevicesProvider.OnNetworkConnected(hws);
+
   // notify all providers that they should use this new websocket instead
   m_providers.ForEach([hws](std::shared_ptr<HALSimWSBaseProvider> provider) {
     provider->OnNetworkConnected(hws);
@@ -146,6 +148,8 @@ bool HALSimWeb::RegisterWebsocket(
 void HALSimWeb::CloseWebsocket(
     std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
   // Inform the providers that they need to cancel callbacks
+  m_simDevicesProvider.OnNetworkDisconnected();
+
   m_providers.ForEach([](std::shared_ptr<HALSimWSBaseProvider> provider) {
     provider->OnNetworkDisconnected();
   });
