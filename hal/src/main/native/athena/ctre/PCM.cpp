@@ -12,7 +12,7 @@ static const INT32 kCANPeriod = 20;
 #define STATUS_DEBUG  		0x9041480
 
 #define EXPECTED_RESPONSE_TIMEOUT_MS	(50)
-#define GET_PCM_STATUS()			CtreCanNode::recMsg<PcmStatus_t> 		rx = GetRx<PcmStatus_t>			(STATUS_1|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
+#define GET_PCM_STATUS()			CtreCanNode::recMsg<PcmStatus_t> 		rx = GetRx<PcmStatus_t> (STATUS_1|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS); if (rx.err == CTR_OKAY) m_cachedSolenoidBits = rx->SolenoidBits
 #define GET_PCM_SOL_FAULTS()		CtreCanNode::recMsg<PcmStatusFault_t> 	rx = GetRx<PcmStatusFault_t>	(STATUS_SOL_FAULTS|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
 #define GET_PCM_DEBUG()				CtreCanNode::recMsg<PcmDebug_t> 		rx = GetRx<PcmDebug_t>			(STATUS_DEBUG|GetDeviceNumber(),EXPECTED_RESPONSE_TIMEOUT_MS)
 
@@ -136,6 +136,7 @@ CTR_Code PCM::SetSolenoid(unsigned char idx, bool en)
 		toFill->solenoidBits |= (1ul << (idx));
 	else
 		toFill->solenoidBits &= ~(1ul << (idx));
+	m_cachedSolenoidBits = toFill->solenoidBits;
 	FlushTx(toFill);
 	return CTR_OKAY;
 }
@@ -149,6 +150,7 @@ CTR_Code PCM::SetAllSolenoids(UINT8 state) {
 	CtreCanNode::txTask<PcmControl_t> toFill = GetTx<PcmControl_t>(CONTROL_1 | GetDeviceNumber());
 	if(toFill.IsEmpty())return CTR_UnexpectedArbId;
 	toFill->solenoidBits = state;
+	m_cachedSolenoidBits = toFill->solenoidBits;
 	FlushTx(toFill);
 	return CTR_OKAY;
 }
@@ -247,8 +249,7 @@ CTR_Code PCM::SetOneShotDurationMs(UINT8 idx,uint32_t durMs)
  */
 CTR_Code PCM::GetSolenoid(UINT8 idx, bool &status)
 {
-	GET_PCM_STATUS();
-	status = (rx->SolenoidBits & (1ul<<(idx)) ) ? 1 : 0;
+	status = (m_cachedSolenoidBits & (1ul<<(idx)) ) ? 1 : 0;
 	return rx.err;
 }
 
@@ -258,8 +259,7 @@ CTR_Code PCM::GetSolenoid(UINT8 idx, bool &status)
  */
 CTR_Code PCM::GetAllSolenoids(UINT8 &status)
 {
-	GET_PCM_STATUS();
-	status = rx->SolenoidBits;
+	status = m_cachedSolenoidBits;
 	return rx.err;
 }
 

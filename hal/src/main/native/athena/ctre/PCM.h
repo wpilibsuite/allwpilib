@@ -194,6 +194,8 @@ public:
      */
     CTR_Code SetOneShotDurationMs(UINT8 idx,uint32_t durMs);
 
+  private:
+    unsigned m_cachedSolenoidBits = 0;
 };
 //------------------ C interface --------------------------------------------//
 extern "C" {
