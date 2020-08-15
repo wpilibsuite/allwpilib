@@ -9,29 +9,63 @@
 
 #include <cstdio>
 #include <cstring>
+#include <memory>
+#include <vector>
 
 #include <hal/Ports.h>
 #include <hal/simulation/RelayData.h>
 #include <imgui.h>
 
 #include "ExtraGuiWidgets.h"
+#include "GuiDataSource.h"
 #include "HALSimGui.h"
 #include "IniSaver.h"
 #include "IniSaverInfo.h"
 
 using namespace halsimgui;
 
+namespace {
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(RelayForward, "RelayFwd");
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(RelayReverse, "RelayRev");
+}  // namespace
+
 static IniSaver<NameInfo> gRelays{"Relay"};
+static std::vector<std::unique_ptr<RelayForwardSource>> gRelayForwardSources;
+static std::vector<std::unique_ptr<RelayReverseSource>> gRelayReverseSources;
+
+static void UpdateRelaySources() {
+  for (int i = 0, iend = gRelayForwardSources.size(); i < iend; ++i) {
+    auto& source = gRelayForwardSources[i];
+    if (HALSIM_GetRelayInitializedForward(i)) {
+      if (!source) {
+        source = std::make_unique<RelayForwardSource>(i);
+        source->SetName(gRelays[i].GetName());
+      }
+    } else {
+      source.reset();
+    }
+  }
+  for (int i = 0, iend = gRelayReverseSources.size(); i < iend; ++i) {
+    auto& source = gRelayReverseSources[i];
+    if (HALSIM_GetRelayInitializedReverse(i)) {
+      if (!source) {
+        source = std::make_unique<RelayReverseSource>(i);
+        source->SetName(gRelays[i].GetName());
+      }
+    } else {
+      source.reset();
+    }
+  }
+}
 
 static void DisplayRelays() {
   bool hasOutputs = false;
   bool first = true;
-  static const int numRelay = HAL_GetNumRelayHeaders();
-  for (int i = 0; i < numRelay; ++i) {
-    bool forwardInit = HALSIM_GetRelayInitializedForward(i);
-    bool reverseInit = HALSIM_GetRelayInitializedReverse(i);
+  for (int i = 0, iend = gRelayForwardSources.size(); i < iend; ++i) {
+    auto forwardSource = gRelayForwardSources[i].get();
+    auto reverseSource = gRelayReverseSources[i].get();
 
-    if (forwardInit || reverseInit) {
+    if (forwardSource || reverseSource) {
       hasOutputs = true;
 
       if (!first)
@@ -42,8 +76,8 @@ static void DisplayRelays() {
       bool forward = false;
       bool reverse = false;
       if (!HALSimGui::AreOutputsDisabled()) {
-        reverse = HALSIM_GetRelayReverse(i);
-        forward = HALSIM_GetRelayForward(i);
+        if (forwardSource) forward = forwardSource->GetValue();
+        if (reverseSource) reverse = reverseSource->GetValue();
       }
 
       auto& info = gRelays[i];
@@ -53,16 +87,22 @@ static void DisplayRelays() {
       else
         ImGui::Text("Relay[%d]", i);
       ImGui::PopID();
-      info.PopupEditName(i);
+      if (info.PopupEditName(i)) {
+        if (forwardSource) forwardSource->SetName(info.GetName());
+        if (reverseSource) reverseSource->SetName(info.GetName());
+      }
       ImGui::SameLine();
 
       // show forward and reverse as LED indicators
       static const ImU32 colors[] = {IM_COL32(255, 255, 102, 255),
                                      IM_COL32(255, 0, 0, 255),
                                      IM_COL32(128, 128, 128, 255)};
-      int values[2] = {reverseInit ? (reverse ? 2 : -2) : -3,
-                       forwardInit ? (forward ? 1 : -1) : -3};
-      DrawLEDs(values, 2, 2, colors);
+      int values[2] = {reverseSource ? (reverse ? 2 : -2) : -3,
+                       forwardSource ? (forward ? 1 : -1) : -3};
+      GuiDataSource* sources[2] = {reverseSource, forwardSource};
+      ImGui::PushID(i);
+      DrawLEDSources(values, sources, 2, 2, colors);
+      ImGui::PopID();
     }
   }
   if (!hasOutputs) ImGui::Text("No relays");
@@ -70,6 +110,10 @@ static void DisplayRelays() {
 
 void RelayGui::Initialize() {
   gRelays.Initialize();
+  int numRelays = HAL_GetNumRelayHeaders();
+  gRelayForwardSources.resize(numRelays);
+  gRelayReverseSources.resize(numRelays);
+  HALSimGui::AddExecute(UpdateRelaySources);
   HALSimGui::AddWindow("Relays", DisplayRelays,
                        ImGuiWindowFlags_AlwaysAutoResize);
   HALSimGui::SetDefaultWindowPos("Relays", 180, 20);

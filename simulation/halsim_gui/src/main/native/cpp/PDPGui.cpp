@@ -11,26 +11,56 @@
 #include <cstdio>
 #include <cstring>
 #include <memory>
+#include <vector>
 
 #include <hal/Ports.h>
 #include <hal/simulation/PDPData.h>
 #include <imgui.h>
 
+#include "GuiDataSource.h"
 #include "HALSimGui.h"
 #include "IniSaver.h"
 #include "IniSaverInfo.h"
 
 using namespace halsimgui;
 
+namespace {
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PDPTemperature, "PDP Temp");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PDPVoltage, "PDP Voltage");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED2(PDPCurrent, "PDP Current");
+struct PDPSource {
+  explicit PDPSource(int32_t index) : temp{index}, voltage{index} {
+    const int numChannels = HAL_GetNumPDPChannels();
+    currents.reserve(numChannels);
+    for (int i = 0; i < numChannels; ++i)
+      currents.emplace_back(std::make_unique<PDPCurrentSource>(index, i));
+  }
+  PDPTemperatureSource temp;
+  PDPVoltageSource voltage;
+  std::vector<std::unique_ptr<PDPCurrentSource>> currents;
+};
+}  // namespace
+
 static IniSaver<NameInfo> gChannels{"PDP"};
+static std::vector<std::unique_ptr<PDPSource>> gPDPSources;
+
+static void UpdatePDPSources() {
+  for (int i = 0, iend = gPDPSources.size(); i < iend; ++i) {
+    auto& source = gPDPSources[i];
+    if (HALSIM_GetPDPInitialized(i)) {
+      if (!source) {
+        source = std::make_unique<PDPSource>(i);
+      }
+    } else {
+      source.reset();
+    }
+  }
+}
 
 static void DisplayPDP() {
   bool hasAny = false;
-  static int numPDP = HAL_GetNumPDPModules();
-  static int numChannels = HAL_GetNumPDPChannels();
-  static auto channelCurrents = std::make_unique<double[]>(numChannels);
-  for (int i = 0; i < numPDP; ++i) {
-    if (HALSIM_GetPDPInitialized(i)) {
+  for (int i = 0, iend = gPDPSources.size(); i < iend; ++i) {
+    if (auto source = gPDPSources[i].get()) {
       hasAny = true;
 
       char name[128];
@@ -39,19 +69,19 @@ static void DisplayPDP() {
         ImGui::PushID(i);
 
         // temperature
-        double temp = HALSIM_GetPDPTemperature(i);
+        double temp = source->temp.GetValue();
         ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-        if (ImGui::InputDouble("Temp", &temp, 0, 0, "%.3f"))
+        if (source->temp.InputDouble("Temp", &temp, 0, 0, "%.3f"))
           HALSIM_SetPDPTemperature(i, temp);
 
         // voltage
-        double volts = HALSIM_GetPDPVoltage(i);
+        double volts = source->voltage.GetValue();
         ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-        if (ImGui::InputDouble("Voltage", &volts, 0, 0, "%.3f"))
+        if (source->voltage.InputDouble("Voltage", &volts, 0, 0, "%.3f"))
           HALSIM_SetPDPVoltage(i, volts);
 
         // channel currents; show as two columns laid out like PDP
-        HALSIM_GetPDPAllCurrents(i, channelCurrents.get());
+        const int numChannels = source->currents.size();
         ImGui::Text("Channel Current (A)");
         ImGui::Columns(2, "channels", false);
         float maxWidth = ImGui::GetFontSize() * 13;
@@ -59,27 +89,36 @@ static void DisplayPDP() {
              ++left, --right) {
           double val;
 
+          ImGui::PushID(left);
           auto& leftInfo = gChannels[i * numChannels + left];
-          leftInfo.GetName(name, sizeof(name), "", left);
-          val = channelCurrents[left];
+          leftInfo.GetLabel(name, sizeof(name), "", left);
+          val = source->currents[left]->GetValue();
           ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-          if (ImGui::InputDouble(name, &val, 0, 0, "%.3f"))
+          if (source->currents[left]->InputDouble(name, &val, 0, 0, "%.3f"))
             HALSIM_SetPDPCurrent(i, left, val);
           float leftWidth = ImGui::GetItemRectSize().x;
-          leftInfo.PopupEditName(left);
+          if (leftInfo.PopupEditName(left)) {
+            source->currents[left]->SetName(leftInfo.GetName());
+          }
+          ImGui::PopID();
           ImGui::NextColumn();
 
+          ImGui::PushID(right);
           auto& rightInfo = gChannels[i * numChannels + right];
-          rightInfo.GetName(name, sizeof(name), "", right);
-          val = channelCurrents[right];
+          rightInfo.GetLabel(name, sizeof(name), "", right);
+          val = source->currents[right]->GetValue();
           ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-          if (ImGui::InputDouble(name, &val, 0, 0, "%.3f"))
+          if (source->currents[right]->InputDouble(name, &val, 0, 0, "%.3f"))
             HALSIM_SetPDPCurrent(i, right, val);
           float rightWidth = ImGui::GetItemRectSize().x;
-          rightInfo.PopupEditName(right);
+          if (rightInfo.PopupEditName(right)) {
+            source->currents[right]->SetName(rightInfo.GetName());
+          }
+          ImGui::PopID();
           ImGui::NextColumn();
 
-          float width = (std::max)(leftWidth, rightWidth) * 2;
+          float width =
+              (std::max)(leftWidth, rightWidth) * 2 + ImGui::GetFontSize() * 4;
           if (width > maxWidth) maxWidth = width;
         }
         ImGui::Columns(1);
@@ -93,7 +132,9 @@ static void DisplayPDP() {
 
 void PDPGui::Initialize() {
   gChannels.Initialize();
-  HALSimGui::AddWindow("PDP", DisplayPDP, ImGuiWindowFlags_AlwaysAutoResize);
+  gPDPSources.resize(HAL_GetNumPDPModules());
+  HALSimGui::AddExecute(UpdatePDPSources);
+  HALSimGui::AddWindow("PDP", DisplayPDP);
   // hide it by default
   HALSimGui::SetWindowVisibility("PDP", HALSimGui::kHide);
   HALSimGui::SetDefaultWindowPos("PDP", 245, 155);

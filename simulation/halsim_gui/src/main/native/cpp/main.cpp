@@ -23,6 +23,7 @@
 #include "NetworkTablesGui.h"
 #include "PDPGui.h"
 #include "PWMGui.h"
+#include "PlotGui.h"
 #include "RelayGui.h"
 #include "RoboRioGui.h"
 #include "SimDeviceGui.h"
@@ -50,6 +51,7 @@ __declspec(dllexport)
   HALSimGui::Add(Mechanism2D::Initialize);
   HALSimGui::Add(NetworkTablesGui::Initialize);
   HALSimGui::Add(PDPGui::Initialize);
+  HALSimGui::Add(PlotGui::Initialize);
   HALSimGui::Add(PWMGui::Initialize);
   HALSimGui::Add(RelayGui::Initialize);
   HALSimGui::Add(RoboRioGui::Initialize);

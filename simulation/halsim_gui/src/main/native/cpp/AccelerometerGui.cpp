@@ -8,14 +8,34 @@
 #include "AccelerometerGui.h"
 
 #include <cstdio>
+#include <memory>
 
 #include <hal/Value.h>
 #include <hal/simulation/AccelerometerData.h>
 #include <imgui.h>
 
+#include "GuiDataSource.h"
+#include "HALSimGui.h"
 #include "SimDeviceGui.h"
 
 using namespace halsimgui;
+
+namespace {
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(AccelerometerX, "X Accel");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(AccelerometerY, "Y Accel");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(AccelerometerZ, "Z Accel");
+}  // namespace
+
+static std::unique_ptr<AccelerometerXSource> gAccelXSource;
+static std::unique_ptr<AccelerometerYSource> gAccelYSource;
+static std::unique_ptr<AccelerometerZSource> gAccelZSource;
+
+static void UpdateAccelSources() {
+  if (!HALSIM_GetAccelerometerActive(0)) return;
+  if (!gAccelXSource) gAccelXSource = std::make_unique<AccelerometerXSource>(0);
+  if (!gAccelYSource) gAccelYSource = std::make_unique<AccelerometerYSource>(0);
+  if (!gAccelZSource) gAccelZSource = std::make_unique<AccelerometerZSource>(0);
+}
 
 static void DisplayAccelerometers() {
   if (!HALSIM_GetAccelerometerActive(0)) return;
@@ -28,18 +48,21 @@ static void DisplayAccelerometers() {
     SimDeviceGui::DisplayValue("Range", true, &value, rangeOptions, 3);
 
     // X Accel
-    value = HAL_MakeDouble(HALSIM_GetAccelerometerX(0));
-    if (SimDeviceGui::DisplayValue("X Accel", false, &value))
+    value = HAL_MakeDouble(gAccelXSource->GetValue());
+    if (SimDeviceGui::DisplayValueSource("X Accel", false, &value,
+                                         gAccelXSource.get()))
       HALSIM_SetAccelerometerX(0, value.data.v_double);
 
     // Y Accel
-    value = HAL_MakeDouble(HALSIM_GetAccelerometerY(0));
-    if (SimDeviceGui::DisplayValue("Y Accel", false, &value))
+    value = HAL_MakeDouble(gAccelYSource->GetValue());
+    if (SimDeviceGui::DisplayValueSource("Y Accel", false, &value,
+                                         gAccelYSource.get()))
       HALSIM_SetAccelerometerY(0, value.data.v_double);
 
     // Z Accel
-    value = HAL_MakeDouble(HALSIM_GetAccelerometerZ(0));
-    if (SimDeviceGui::DisplayValue("Z Accel", false, &value))
+    value = HAL_MakeDouble(gAccelZSource->GetValue());
+    if (SimDeviceGui::DisplayValueSource("Z Accel", false, &value,
+                                         gAccelZSource.get()))
       HALSIM_SetAccelerometerZ(0, value.data.v_double);
 
     SimDeviceGui::FinishDevice();
@@ -47,5 +70,6 @@ static void DisplayAccelerometers() {
 }
 
 void AccelerometerGui::Initialize() {
+  HALSimGui::AddExecute(UpdateAccelSources);
   SimDeviceGui::Add(DisplayAccelerometers);
 }
