@@ -58,6 +58,7 @@ void DriverStationData::ResetData() {
     m_matchInfoCallbacks.Reset();
     m_matchInfo = HAL_MatchInfo{};
   }
+  m_newDataCallbacks.Reset();
 }
 
 #define DEFINE_CPPAPI_CALLBACKS(name, data, data2)                             \
@@ -184,6 +185,28 @@ void DriverStationData::SetMatchInfo(const HAL_MatchInfo* info) {
   m_matchInfo = *info;
   *(std::end(m_matchInfo.eventName) - 1) = '\0';
   m_matchInfoCallbacks(info);
+}
+
+int32_t DriverStationData::RegisterNewDataCallback(HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify) {
+  int32_t uid = m_newDataCallbacks.Register(callback, param);
+  if (initialNotify) {
+    HAL_Value empty;
+    empty.type = HAL_UNASSIGNED;
+    callback(GetNewDataName(), param, &empty);
+  }
+  return uid;
+}
+
+void DriverStationData::CancelNewDataCallback(int32_t uid) {
+  m_newDataCallbacks.Cancel(uid);
+}
+
+void DriverStationData::CallNewDataCallbacks() {
+  HAL_Value empty;
+  empty.type = HAL_UNASSIGNED;
+  m_newDataCallbacks(&empty);
 }
 
 void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
@@ -399,6 +422,17 @@ void HALSIM_GetMatchInfo(HAL_MatchInfo* info) {
 
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {
   SimDriverStationData->SetMatchInfo(info);
+}
+
+int32_t HALSIM_RegisterDriverStationNewDataCallback(HAL_NotifyCallback callback,
+                                                    void* param,
+                                                    HAL_Bool initialNotify) {
+  return SimDriverStationData->RegisterNewDataCallback(callback, param,
+                                                       initialNotify);
+}
+
+void HALSIM_CancelDriverStationNewDataCallback(int32_t uid) {
+  SimDriverStationData->CancelNewDataCallback(uid);
 }
 
 void HALSIM_NotifyDriverStationNewData(void) {

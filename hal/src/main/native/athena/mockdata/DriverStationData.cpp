@@ -71,6 +71,14 @@ void HALSIM_GetMatchInfo(HAL_MatchInfo* info) {}
 
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {}
 
+int32_t HALSIM_RegisterDriverStationNewDataCallback(HAL_NotifyCallback callback,
+                                                    void* param,
+                                                    HAL_Bool initialNotify) {
+  return 0;
+}
+
+void HALSIM_CancelDriverStationNewDataCallback(int32_t uid) {}
+
 void HALSIM_NotifyDriverStationNewData(void) {}
 
 void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state) {}
