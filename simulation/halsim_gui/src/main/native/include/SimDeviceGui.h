@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,6 +35,8 @@ void HALSIMGUI_DeviceTreeFinishDevice(void);
 
 namespace halsimgui {
 
+class GuiDataSource;
+
 class SimDeviceGui {
  public:
   static void Initialize();
@@ -68,6 +70,22 @@ class SimDeviceGui {
   static bool DisplayValue(const char* name, bool readonly, HAL_Value* value,
                            const char** options = nullptr,
                            int32_t numOptions = 0);
+
+  /**
+   * Displays device value formatted the same way as SimDevice device values.
+   *
+   * @param name value name
+   * @param readonly prevent value from being modified by the user
+   * @param value value contents (modified in place)
+   * @param source data source (may be nullptr)
+   * @param options options array for enum values
+   * @param numOptions size of options array for enum values
+   * @return True if value was modified by the user
+   */
+  static bool DisplayValueSource(const char* name, bool readonly,
+                                 HAL_Value* value, const GuiDataSource* source,
+                                 const char** options = nullptr,
+                                 int32_t numOptions = 0);
 
   /**
    * Wraps ImGui::CollapsingHeader() to provide consistency and open

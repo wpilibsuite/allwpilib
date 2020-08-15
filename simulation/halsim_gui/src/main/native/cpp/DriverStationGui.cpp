@@ -8,7 +8,9 @@
 #include "DriverStationGui.h"
 
 #include <cstring>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include <GLFW/glfw3.h>
 #include <hal/simulation/DriverStationData.h>
@@ -21,6 +23,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "ExtraGuiWidgets.h"
+#include "GuiDataSource.h"
 #include "HALSimGui.h"
 #include "IniSaverInfo.h"
 
@@ -63,6 +66,31 @@ struct RobotJoystick {
   bool IsButtonPressed(int i) { return (buttons.buttons & (1u << i)) != 0; }
 };
 
+class JoystickSource {
+ public:
+  explicit JoystickSource(int index);
+  ~JoystickSource() {
+    HALSIM_CancelDriverStationNewDataCallback(m_callback);
+    for (int i = 0; i < buttonCount; ++i) delete buttons[i];
+  }
+  JoystickSource(const JoystickSource&) = delete;
+  JoystickSource& operator=(const JoystickSource&) = delete;
+
+  int axisCount;
+  int buttonCount;
+  int povCount;
+  std::unique_ptr<GuiDataSource> axes[HAL_kMaxJoystickAxes];
+  // use pointer instead of unique_ptr to allow it to be passed directly
+  // to DrawLEDSources()
+  GuiDataSource* buttons[32];
+  std::unique_ptr<GuiDataSource> povs[HAL_kMaxJoystickPOVs];
+
+ private:
+  static void CallbackFunc(const char*, void* param, const HAL_Value*);
+
+  int m_index;
+  int32_t m_callback;
+};
 }  // namespace
 
 // system joysticks
@@ -71,8 +99,66 @@ static int gNumSystemJoysticks = 0;
 
 // robot joysticks
 static RobotJoystick gRobotJoysticks[HAL_kMaxJoysticks];
+static std::unique_ptr<JoystickSource> gJoystickSources[HAL_kMaxJoysticks];
 
 static bool gDisableDS = false;
+
+JoystickSource::JoystickSource(int index) : m_index{index} {
+  HAL_JoystickAxes halAxes;
+  HALSIM_GetJoystickAxes(index, &halAxes);
+  axisCount = halAxes.count;
+  for (int i = 0; i < axisCount; ++i) {
+    axes[i] = std::make_unique<GuiDataSource>("Joystick[" + wpi::Twine{index} +
+                                              "] Axis[" + wpi::Twine{i} +
+                                              wpi::Twine{']'});
+  }
+
+  HAL_JoystickButtons halButtons;
+  HALSIM_GetJoystickButtons(index, &halButtons);
+  buttonCount = halButtons.count;
+  for (int i = 0; i < buttonCount; ++i) {
+    buttons[i] =
+        new GuiDataSource("Joystick[" + wpi::Twine{index} + "] Button[" +
+                          wpi::Twine{i + 1} + wpi::Twine{']'});
+    buttons[i]->SetDigital(true);
+  }
+  for (int i = buttonCount; i < 32; ++i) buttons[i] = nullptr;
+
+  HAL_JoystickPOVs halPOVs;
+  HALSIM_GetJoystickPOVs(index, &halPOVs);
+  povCount = halPOVs.count;
+  for (int i = 0; i < povCount; ++i) {
+    povs[i] = std::make_unique<GuiDataSource>("Joystick[" + wpi::Twine{index} +
+                                              "] POV[" + wpi::Twine{i} +
+                                              wpi::Twine{']'});
+  }
+
+  m_callback =
+      HALSIM_RegisterDriverStationNewDataCallback(CallbackFunc, this, true);
+}
+
+void JoystickSource::CallbackFunc(const char*, void* param, const HAL_Value*) {
+  auto self = static_cast<JoystickSource*>(param);
+
+  HAL_JoystickAxes halAxes;
+  HALSIM_GetJoystickAxes(self->m_index, &halAxes);
+  for (int i = 0; i < halAxes.count; ++i) {
+    if (auto axis = self->axes[i].get()) axis->SetValue(halAxes.axes[i]);
+  }
+
+  HAL_JoystickButtons halButtons;
+  HALSIM_GetJoystickButtons(self->m_index, &halButtons);
+  for (int i = 0; i < halButtons.count; ++i) {
+    if (auto button = self->buttons[i])
+      button->SetValue((halButtons.buttons & (1u << i)) != 0 ? 1 : 0);
+  }
+
+  HAL_JoystickPOVs halPOVs;
+  HALSIM_GetJoystickPOVs(self->m_index, &halPOVs);
+  for (int i = 0; i < halPOVs.count; ++i) {
+    if (auto pov = self->povs[i].get()) pov->SetValue(halPOVs.povs[i]);
+  }
+}
 
 // read/write joystick mapping to ini file
 static void* JoystickReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
@@ -293,6 +379,22 @@ void RobotJoystick::GetHAL(int i) {
 }
 
 static void DriverStationExecute() {
+  // update sources
+  for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
+    auto& source = gJoystickSources[i];
+    int32_t axisCount, buttonCount, povCount;
+    HALSIM_GetJoystickCounts(i, &axisCount, &buttonCount, &povCount);
+    if (axisCount != 0 || buttonCount != 0 || povCount != 0) {
+      if (!source || source->axisCount != axisCount ||
+          source->buttonCount != buttonCount || source->povCount != povCount) {
+        source.reset();
+        source = std::make_unique<JoystickSource>(i);
+      }
+    } else {
+      source.reset();
+    }
+  }
+
   static bool prevDisableDS = false;
   if (gDisableDS && !prevDisableDS) {
     HALSimGui::SetWindowVisibility("System Joysticks", HALSimGui::kDisabled);
@@ -464,7 +566,7 @@ static void DisplayJoysticks() {
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
     auto& joy = gRobotJoysticks[i];
     char label[128];
-    joy.name.GetName(label, sizeof(label), "Joystick", i);
+    joy.name.GetLabel(label, sizeof(label), "Joystick", i);
     if (!gDisableDS && joy.sys) {
       ImGui::Selectable(label, false);
       if (ImGui::BeginDragDropSource()) {
@@ -499,6 +601,7 @@ static void DisplayJoysticks() {
 
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
     auto& joy = gRobotJoysticks[i];
+    auto source = gJoystickSources[i].get();
 
     if (gDisableDS) joy.GetHAL(i);
 
@@ -515,11 +618,31 @@ static void DisplayJoysticks() {
         if (joy.sys->isGamepad) ImGui::Checkbox("Map gamepad", &joy.useGamepad);
       }
 
-      for (int j = 0; j < joy.axes.count; ++j)
-        ImGui::Text("Axis[%d]: %.3f", j, joy.axes.axes[j]);
+      for (int j = 0; j < joy.axes.count; ++j) {
+        if (source && source->axes[j]) {
+          char label[64];
+          std::snprintf(label, sizeof(label), "Axis[%d]", j);
+          ImGui::Selectable(label);
+          source->axes[j]->EmitDrag();
+          ImGui::SameLine();
+          ImGui::Text(": %.3f", joy.axes.axes[j]);
+        } else {
+          ImGui::Text("Axis[%d]: %.3f", j, joy.axes.axes[j]);
+        }
+      }
 
-      for (int j = 0; j < joy.povs.count; ++j)
-        ImGui::Text("POVs[%d]: %d", j, joy.povs.povs[j]);
+      for (int j = 0; j < joy.povs.count; ++j) {
+        if (source && source->povs[j]) {
+          char label[64];
+          std::snprintf(label, sizeof(label), "POVs[%d]", j);
+          ImGui::Selectable(label);
+          source->povs[j]->EmitDrag();
+          ImGui::SameLine();
+          ImGui::Text(": %d", joy.povs.povs[j]);
+        } else {
+          ImGui::Text("POVs[%d]: %d", j, joy.povs.povs[j]);
+        }
+      }
 
       // show buttons as multiple lines of LED indicators, 8 per line
       static const ImU32 color = IM_COL32(255, 255, 102, 255);
@@ -527,7 +650,8 @@ static void DisplayJoysticks() {
       buttons.resize(joy.buttons.count);
       for (int j = 0; j < joy.buttons.count; ++j)
         buttons[j] = joy.IsButtonPressed(j) ? 1 : -1;
-      DrawLEDs(buttons.data(), buttons.size(), 8, &color);
+      DrawLEDSources(buttons.data(), source ? source->buttons : nullptr,
+                     buttons.size(), 8, &color);
       ImGui::PopID();
     } else {
       ImGui::Text("Unassigned");

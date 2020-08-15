@@ -33,7 +33,7 @@ ExternalProject_Add(imgui
 )
 ExternalProject_Add(implot
   GIT_REPOSITORY    https://github.com/epezent/implot.git
-  GIT_TAG           db16011e7398e6d9ef062fbd59338ddb689e99c6
+  GIT_TAG           90693cca1bd0ca5f0d49bc9cb8187d56b0b8f289
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/implot-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/implot-build"
   CONFIGURE_COMMAND ""

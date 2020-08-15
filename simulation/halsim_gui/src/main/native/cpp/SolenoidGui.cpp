@@ -9,6 +9,8 @@
 
 #include <cstdio>
 #include <cstring>
+#include <memory>
+#include <vector>
 
 #include <hal/Ports.h>
 #include <hal/simulation/PCMData.h>
@@ -16,37 +18,66 @@
 #include <wpi/SmallVector.h>
 
 #include "ExtraGuiWidgets.h"
+#include "GuiDataSource.h"
 #include "HALSimGui.h"
 #include "IniSaver.h"
 #include "IniSaverInfo.h"
 
 using namespace halsimgui;
 
+namespace {
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED2(PCMSolenoidOutput, "Solenoid");
+struct PCMSource {
+  explicit PCMSource(int numChannels) : solenoids(numChannels) {}
+  std::vector<std::unique_ptr<PCMSolenoidOutputSource>> solenoids;
+  int initCount = 0;
+};
+}  // namespace
+
 static IniSaver<OpenInfo> gPCMs{"PCM"};
 static IniSaver<NameInfo> gSolenoids{"Solenoid"};
+static std::vector<PCMSource> gPCMSources;
+
+static void UpdateSolenoidSources() {
+  for (int i = 0, iend = gPCMSources.size(); i < iend; ++i) {
+    auto& pcmSource = gPCMSources[i];
+    int numChannels = pcmSource.solenoids.size();
+    pcmSource.initCount = 0;
+    for (int j = 0; j < numChannels; ++j) {
+      auto& source = pcmSource.solenoids[j];
+      if (HALSIM_GetPCMSolenoidInitialized(i, j)) {
+        if (!source) {
+          source = std::make_unique<PCMSolenoidOutputSource>(i, j);
+          source->SetName(gSolenoids[i * numChannels + j].GetName());
+        }
+        ++pcmSource.initCount;
+      } else {
+        source.reset();
+      }
+    }
+  }
+}
 
 static void DisplaySolenoids() {
   bool hasOutputs = false;
-  static const int numPCM = HAL_GetNumPCMModules();
-  static const int numChannels = HAL_GetNumSolenoidChannels();
-  for (int i = 0; i < numPCM; ++i) {
-    bool anyInit = false;
+  for (int i = 0, iend = gPCMSources.size(); i < iend; ++i) {
+    auto& pcmSource = gPCMSources[i];
+    if (pcmSource.initCount == 0) continue;
+    hasOutputs = true;
+
+    int numChannels = pcmSource.solenoids.size();
     wpi::SmallVector<int, 16> channels;
     channels.resize(numChannels);
     for (int j = 0; j < numChannels; ++j) {
-      if (HALSIM_GetPCMSolenoidInitialized(i, j)) {
-        anyInit = true;
+      if (pcmSource.solenoids[j]) {
         channels[j] = (!HALSimGui::AreOutputsDisabled() &&
-                       HALSIM_GetPCMSolenoidOutput(i, j))
+                       pcmSource.solenoids[j]->GetValue())
                           ? 1
                           : -1;
       } else {
         channels[j] = -2;
       }
     }
-
-    if (!anyInit) continue;
-    hasOutputs = true;
 
     char name[128];
     std::snprintf(name, sizeof(name), "PCM[%d]", i);
@@ -66,11 +97,16 @@ static void DisplaySolenoids() {
       ImGui::PushID(i);
       ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
       for (int j = 0; j < numChannels; ++j) {
-        if (channels[j] == -2) continue;
+        if (!pcmSource.solenoids[j]) continue;
         auto& info = gSolenoids[i * numChannels + j];
-        info.GetName(name, sizeof(name), "Solenoid", j);
-        ImGui::LabelText(name, "%s", channels[j] == 1 ? "On" : "Off");
-        info.PopupEditName(j);
+        info.GetLabel(name, sizeof(name), "Solenoid", j);
+        ImGui::PushID(j);
+        pcmSource.solenoids[j]->LabelText(name, "%s",
+                                          channels[j] == 1 ? "On" : "Off");
+        if (info.PopupEditName(j)) {
+          pcmSource.solenoids[j]->SetName(info.GetName());
+        }
+        ImGui::PopID();
       }
       ImGui::PopItemWidth();
       ImGui::PopID();
@@ -82,6 +118,12 @@ static void DisplaySolenoids() {
 void SolenoidGui::Initialize() {
   gPCMs.Initialize();
   gSolenoids.Initialize();
+  const int numModules = HAL_GetNumPCMModules();
+  const int numChannels = HAL_GetNumSolenoidChannels();
+  gPCMSources.reserve(numModules);
+  for (int i = 0; i < numModules; ++i) gPCMSources.emplace_back(numChannels);
+
+  HALSimGui::AddExecute(UpdateSolenoidSources);
   HALSimGui::AddWindow("Solenoids", DisplaySolenoids,
                        ImGuiWindowFlags_AlwaysAutoResize);
   HALSimGui::SetDefaultWindowPos("Solenoids", 290, 20);
