@@ -9,12 +9,17 @@ package edu.wpi.first.wpiutil.math;
 
 import java.util.function.BiFunction;
 
+import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.NormOps_DDRM;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleBase;
 import org.ejml.simple.SimpleMatrix;
 
-public class SimpleMatrixUtils {
-  private SimpleMatrixUtils() {}
+@SuppressWarnings("PMD.TooManyMethods")
+public final class SimpleMatrixUtils {
+  private SimpleMatrixUtils() {
+  }
 
   /**
    * Compute the matrix exponential, e^M of the given matrix.
@@ -98,8 +103,10 @@ public class SimpleMatrixUtils {
     SimpleMatrix A4 = A2.mult(A2);
     SimpleMatrix A6 = A4.mult(A2);
 
-    SimpleMatrix U = A.mult(A6.scale(b[7]).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
-    SimpleMatrix V = A6.scale(b[6]).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0]));
+    SimpleMatrix U =
+            A.mult(A6.scale(b[7]).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
+    SimpleMatrix V =
+            A6.scale(b[6]).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0]));
 
     return new Pair<>(U, V);
   }
@@ -114,8 +121,10 @@ public class SimpleMatrixUtils {
     SimpleMatrix A6 = A4.mult(A2);
     SimpleMatrix A8 = A6.mult(A2);
 
-    SimpleMatrix U = A.mult(A8.scale(b[9]).plus(A6.scale(b[7])).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
-    SimpleMatrix V = A8.scale(b[8]).plus(A6.scale(b[6])).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0]));
+    SimpleMatrix U =
+            A.mult(A8.scale(b[9]).plus(A6.scale(b[7])).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
+    SimpleMatrix V =
+            A8.scale(b[8]).plus(A6.scale(b[6])).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0]));
 
     return new Pair<>(U, V);
   }
@@ -131,8 +140,10 @@ public class SimpleMatrixUtils {
     SimpleMatrix A4 = A2.mult(A2);
     SimpleMatrix A6 = A4.mult(A2);
 
-    SimpleMatrix U = A.mult(A6.scale(b[13]).plus(A4.scale(b[11])).plus(A2.scale(b[9])).plus(A6.scale(b[7])).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
-    SimpleMatrix V = A6.mult(A6.scale(b[12]).plus(A4.scale(b[10])).plus(A2.scale(b[8]))).plus(A6.scale(b[6]).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0])));
+    SimpleMatrix U =
+            A.mult(A6.scale(b[13]).plus(A4.scale(b[11])).plus(A2.scale(b[9])).plus(A6.scale(b[7])).plus(A4.scale(b[5])).plus(A2.scale(b[3])).plus(ident.scale(b[1])));
+    SimpleMatrix V =
+            A6.mult(A6.scale(b[12]).plus(A4.scale(b[10])).plus(A2.scale(b[8]))).plus(A6.scale(b[6]).plus(A4.scale(b[4])).plus(A2.scale(b[2])).plus(ident.scale(b[0])));
 
     return new Pair<>(U, V);
   }
@@ -141,21 +152,76 @@ public class SimpleMatrixUtils {
     return SimpleMatrix.identity(Math.min(rows, cols));
   }
 
-  private static class Pair<A, B> {
-    private final A m_first;
-    private final B m_second;
-
-    Pair(A first, B second) {
-      m_first = first;
-      m_second = second;
-    }
-
-    public A getFirst() {
-      return m_first;
-    }
-
-    public B getSecond() {
-      return m_second;
-    }
+  /**
+   * The identy of a square matrix.
+   *
+   * @param rows the number of rows (and columns)
+   * @return the identiy matrix, rows x rows.
+   */
+  public static SimpleMatrix eye(int rows) {
+    return SimpleMatrix.identity(rows);
   }
+
+  /**
+   * Decompose the given matrix using Cholesky Decomposition and return a view of the upper
+   * triangular matrix (if you want lower triangular see the other overload of this method.) If the
+   * input matrix is zeros, this will return the zero matrix.
+   *
+   * @param src The matrix to decompose.
+   * @return The decomposed matrix.
+   * @throws RuntimeException if the matrix could not be decomposed (ie. is not positive
+   *                          semidefinite).
+   */
+  public static SimpleMatrix lltDecompose(SimpleMatrix src) {
+    return lltDecompose(src, false);
+  }
+
+  /**
+   * Decompose the given matrix using Cholesky Decomposition. If the input matrix is zeros, this
+   * will return the zero matrix.
+   *
+   * @param src The matrix to decompose.
+   * @param lowerTriangular if we want to decompose to the lower triangular Cholesky matrix.
+   * @return The decomposed matrix.
+   * @throws RuntimeException if the matrix could not be decomposed (ie. is not positive
+   *                          semidefinite).
+   */
+  @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
+  public static SimpleMatrix lltDecompose(SimpleMatrix src, boolean lowerTriangular) {
+    SimpleMatrix temp = src.copy();
+
+    CholeskyDecomposition_F64<DMatrixRMaj> chol =
+            DecompositionFactory_DDRM.chol(temp.numRows(), lowerTriangular);
+    if (!chol.decompose(temp.getMatrix())) {
+      // check that the input is not all zeros -- if they are, we special case and return all
+      // zeros.
+      var matData = temp.getDDRM().data;
+      var isZeros = true;
+      for (double matDatum : matData) {
+        isZeros &= Math.abs(matDatum) < 1e-6;
+      }
+      if (isZeros) {
+        return new SimpleMatrix(temp.numRows(), temp.numCols());
+      }
+
+      throw new RuntimeException("Cholesky decomposition failed! Input matrix:\n" + src.toString());
+    }
+
+    return SimpleMatrix.wrap(chol.getT(null));
+  }
+
+  /**
+   * Computes the matrix exponential using Eigen's solver.
+   *
+   * @param A the matrix to exponentiate.
+   * @return the exponential of A.
+   */
+  @SuppressWarnings("ParameterName")
+  public static SimpleMatrix exp(
+          SimpleMatrix A) {
+    SimpleMatrix toReturn = new SimpleMatrix(A.numRows(), A.numRows());
+    WPIMathJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
+    return toReturn;
+  }
+
 }

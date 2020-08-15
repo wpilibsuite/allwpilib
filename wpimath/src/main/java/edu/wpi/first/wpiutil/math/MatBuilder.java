@@ -18,8 +18,8 @@ import org.ejml.simple.SimpleMatrix;
  * @param <C> The number of columns of the desired matrix.
  */
 public class MatBuilder<R extends Num, C extends Num> {
-  private final Nat<R> m_rows;
-  private final Nat<C> m_cols;
+  final Nat<R> m_rows;
+  final Nat<C> m_cols;
 
   /**
    * Fills the matrix with the given data, encoded in row major form.

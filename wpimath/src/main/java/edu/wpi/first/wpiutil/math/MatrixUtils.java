@@ -13,6 +13,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
+@Deprecated
 public final class MatrixUtils {
   private MatrixUtils() {
     throw new AssertionError("utility class");
