@@ -114,8 +114,8 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
 
     HALSIM_SetJoystickPOVs(m_channel, &povs);
   }
-
-  HALSIM_NotifyDriverStationNewData();
+  // We won't send any updates to user code until the new data message
+  // is received by the driver station provider
 }
 
 }  // namespace wpilibws

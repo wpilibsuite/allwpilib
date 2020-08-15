@@ -34,6 +34,7 @@ class HALSimWSProviderDriverStation : public HALSimWSHalProvider {
   int32_t m_dsCbKey;
   int32_t m_allianceCbKey;
   int32_t m_matchTimeCbKey;
+  int32_t m_newDataCbKey;
 };
 
 }  // namespace wpilibws

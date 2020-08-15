@@ -38,6 +38,14 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
   m_fmsCbKey = REGISTER(FmsAttached, ">fms", bool, boolean);
   m_dsCbKey = REGISTER(DsAttached, ">ds", bool, boolean);
 
+  // Special case for new data, since the HAL_Value is empty
+  m_newDataCbKey = HALSIM_RegisterDriverStationNewDataCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            {{">new_data", true}});
+      },
+      this, true);
+
   m_allianceCbKey = HALSIM_RegisterDriverStationAllianceStationIdCallback(
       [](const char* name, void* param, const struct HAL_Value* value) {
         std::string station;
@@ -76,6 +84,7 @@ void HALSimWSProviderDriverStation::CancelCallbacks() {
   HALSIM_CancelDriverStationEStopCallback(m_estopCbKey);
   HALSIM_CancelDriverStationFmsAttachedCallback(m_fmsCbKey);
   HALSIM_CancelDriverStationDsAttachedCallback(m_dsCbKey);
+  HALSIM_CancelDriverStationNewDataCallback(m_newDataCbKey);
   HALSIM_CancelDriverStationAllianceStationIdCallback(m_allianceCbKey);
   HALSIM_CancelDriverStationMatchTimeCallback(m_matchTimeCbKey);
 }
@@ -118,7 +127,10 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
     }
   }
 
-  HALSIM_NotifyDriverStationNewData();
+  // Only notify usercode if we get the new data message
+  if ((it = json.find(">new_data")) != json.end()) {
+    HALSIM_NotifyDriverStationNewData();
+  }
 }
 
 }  // namespace wpilibws
