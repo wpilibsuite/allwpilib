@@ -159,6 +159,10 @@ void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify);
 
+int32_t HALSIM_RegisterDriverStationNewDataCallback(HAL_NotifyCallback callback,
+                                                    void* param,
+                                                    HAL_Bool initialNotify);
+void HALSIM_CancelDriverStationNewDataCallback(int32_t uid);
 void HALSIM_NotifyDriverStationNewData(void);
 
 #ifdef __cplusplus

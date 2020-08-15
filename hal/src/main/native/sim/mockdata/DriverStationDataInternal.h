@@ -32,6 +32,7 @@ class DriverStationData {
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickDescriptor)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(JoystickOutputs)
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(MatchInfo)
+  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(NewData)
 
   static LLVM_ATTRIBUTE_ALWAYS_INLINE HAL_Value
   MakeAllianceStationIdValue(HAL_AllianceStationID value) {
@@ -90,6 +91,11 @@ class DriverStationData {
 
   void FreeMatchInfo(const HAL_MatchInfo* info);
 
+  int32_t RegisterNewDataCallback(HAL_NotifyCallback callback, void* param,
+                                  HAL_Bool initialNotify);
+  void CancelNewDataCallback(int32_t uid);
+  void CallNewDataCallbacks();
+
   void NotifyNewData();
 
   void SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
@@ -136,6 +142,7 @@ class DriverStationData {
       m_joystickDescriptorCallbacks;
   SimCallbackRegistry<HAL_MatchInfoCallback, GetMatchInfoName>
       m_matchInfoCallbacks;
+  SimCallbackRegistry<HAL_NotifyCallback, GetNewDataName> m_newDataCallbacks;
 
   struct JoystickOutputStore {
     int64_t outputs = 0;
