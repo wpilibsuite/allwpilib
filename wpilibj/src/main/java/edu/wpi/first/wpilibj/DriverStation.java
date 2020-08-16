@@ -349,25 +349,24 @@ public class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
+
     m_cacheDataMutex.lock();
     try {
-      if (button > m_joystickButtons[stick].m_count) {
-        // Unlock early so error printing isn't locked.
-        m_cacheDataMutex.unlock();
-        reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-            + " not available, check if controller is plugged in");
-      }
-
-      // If button was pressed, clear flag and return true
-      if ((m_joystickButtonsPressed[stick] & 1 << (button - 1)) != 0) {
-        m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
-        return true;
+      if (button <= m_joystickButtons[stick].m_count) {
+        // If button was pressed, clear flag and return true
+        if ((m_joystickButtonsPressed[stick] & 1 << (button - 1)) != 0) {
+          m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
+          return true;
+        } else {
+          return false;
+        }
       }
     } finally {
-      if (m_cacheDataMutex.isHeldByCurrentThread()) {
-        m_cacheDataMutex.unlock();
-      }
+      m_cacheDataMutex.unlock();
     }
+
+    reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+        + " not available, check if controller is plugged in");
     return false;
   }
 
@@ -387,25 +386,24 @@ public class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
+
     m_cacheDataMutex.lock();
     try {
-      if (button > m_joystickButtons[stick].m_count) {
-        // Unlock early so error printing isn't locked.
-        m_cacheDataMutex.unlock();
-        reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-            + " not available, check if controller is plugged in");
-      }
-
-      // If button was released, clear flag and return true
-      if ((m_joystickButtonsReleased[stick] & 1 << (button - 1)) != 0) {
-        m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
-        return true;
+      if (button <= m_joystickButtons[stick].m_count) {
+        // If button was released, clear flag and return true
+        if ((m_joystickButtonsReleased[stick] & 1 << (button - 1)) != 0) {
+          m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
+          return true;
+        } else {
+          return false;
+        }
       }
     } finally {
-      if (m_cacheDataMutex.isHeldByCurrentThread()) {
-        m_cacheDataMutex.unlock();
-      }
+      m_cacheDataMutex.unlock();
     }
+
+    reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+        + " not available, check if controller is plugged in");
     return false;
   }
 
