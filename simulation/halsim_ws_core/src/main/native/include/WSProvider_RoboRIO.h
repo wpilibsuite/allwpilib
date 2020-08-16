@@ -18,6 +18,7 @@ class HALSimWSProviderRoboRIO : public HALSimWSHalProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalProvider::HALSimWSHalProvider;
+  ~HALSimWSProviderRoboRIO();
 
   void OnNetValueChanged(const wpi::json& json) override;
 
@@ -26,21 +27,21 @@ class HALSimWSProviderRoboRIO : public HALSimWSHalProvider {
   void CancelCallbacks() override;
 
  private:
-  int32_t m_fpgaCbKey;
-  int32_t m_vinVoltageCbKey;
-  int32_t m_vinCurrentCbKey;
-  int32_t m_6vVoltageCbKey;
-  int32_t m_6vCurrentCbKey;
-  int32_t m_6vActiveCbKey;
-  int32_t m_6vFaultsCbKey;
-  int32_t m_5vVoltageCbKey;
-  int32_t m_5vCurrentCbKey;
-  int32_t m_5vActiveCbKey;
-  int32_t m_5vFaultsCbKey;
-  int32_t m_3v3VoltageCbKey;
-  int32_t m_3v3CurrentCbKey;
-  int32_t m_3v3ActiveCbKey;
-  int32_t m_3v3FaultsCbKey;
+  int32_t m_fpgaCbKey = 0;
+  int32_t m_vinVoltageCbKey = 0;
+  int32_t m_vinCurrentCbKey = 0;
+  int32_t m_6vVoltageCbKey = 0;
+  int32_t m_6vCurrentCbKey = 0;
+  int32_t m_6vActiveCbKey = 0;
+  int32_t m_6vFaultsCbKey = 0;
+  int32_t m_5vVoltageCbKey = 0;
+  int32_t m_5vCurrentCbKey = 0;
+  int32_t m_5vActiveCbKey = 0;
+  int32_t m_5vFaultsCbKey = 0;
+  int32_t m_3v3VoltageCbKey = 0;
+  int32_t m_3v3CurrentCbKey = 0;
+  int32_t m_3v3ActiveCbKey = 0;
+  int32_t m_3v3FaultsCbKey = 0;
 };
 
 }  // namespace wpilibws

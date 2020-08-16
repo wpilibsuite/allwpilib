@@ -25,6 +25,8 @@ void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
                                        webRegisterFunc);
 }
 
+HALSimWSProviderPWM::~HALSimWSProviderPWM() { CancelCallbacks(); }
+
 void HALSimWSProviderPWM::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
   m_speedCbKey = REGISTER(Speed, "<speed", double, double);

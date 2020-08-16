@@ -18,6 +18,7 @@ class HALSimWSProviderAnalogIn : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
+  ~HALSimWSProviderAnalogIn();
 
   void OnNetValueChanged(const wpi::json& json) override;
 
@@ -26,15 +27,15 @@ class HALSimWSProviderAnalogIn : public HALSimWSHalChanProvider {
   void CancelCallbacks() override;
 
  private:
-  int32_t m_initCbKey;
-  int32_t m_avgbitsCbKey;
-  int32_t m_oversampleCbKey;
-  int32_t m_voltageCbKey;
-  int32_t m_accumInitCbKey;
-  int32_t m_accumValueCbKey;
-  int32_t m_accumCountCbKey;
-  int32_t m_accumCenterCbKey;
-  int32_t m_accumDeadbandCbKey;
+  int32_t m_initCbKey = 0;
+  int32_t m_avgbitsCbKey = 0;
+  int32_t m_oversampleCbKey = 0;
+  int32_t m_voltageCbKey = 0;
+  int32_t m_accumInitCbKey = 0;
+  int32_t m_accumValueCbKey = 0;
+  int32_t m_accumCountCbKey = 0;
+  int32_t m_accumCenterCbKey = 0;
+  int32_t m_accumDeadbandCbKey = 0;
 };
 
 class HALSimWSProviderAnalogOut : public HALSimWSHalChanProvider {
@@ -42,14 +43,15 @@ class HALSimWSProviderAnalogOut : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
+  ~HALSimWSProviderAnalogOut();
 
  protected:
   void RegisterCallbacks() override;
   void CancelCallbacks() override;
 
  private:
-  int32_t m_initCbKey;
-  int32_t m_voltageCbKey;
+  int32_t m_initCbKey = 0;
+  int32_t m_voltageCbKey = 0;
 };
 
 }  // namespace wpilibws

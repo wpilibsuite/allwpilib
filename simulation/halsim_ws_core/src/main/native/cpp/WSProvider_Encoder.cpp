@@ -26,6 +26,8 @@ void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
                                            webRegisterFunc);
 }
 
+HALSimWSProviderEncoder::~HALSimWSProviderEncoder() { CancelCallbacks(); }
+
 void HALSimWSProviderEncoder::RegisterCallbacks() {
   // Special case for initialization since we will need to send
   // the digital channels down the line as well

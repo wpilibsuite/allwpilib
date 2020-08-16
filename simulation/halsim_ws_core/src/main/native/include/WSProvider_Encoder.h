@@ -18,6 +18,7 @@ class HALSimWSProviderEncoder : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
+  ~HALSimWSProviderEncoder();
 
   void OnNetValueChanged(const wpi::json& json) override;
 
@@ -26,12 +27,12 @@ class HALSimWSProviderEncoder : public HALSimWSHalChanProvider {
   void CancelCallbacks() override;
 
  private:
-  int32_t m_initCbKey;
-  int32_t m_countCbKey;
-  int32_t m_periodCbKey;
-  int32_t m_resetCbKey;
-  int32_t m_reverseDirectionCbKey;
-  int32_t m_samplesCbKey;
+  int32_t m_initCbKey = 0;
+  int32_t m_countCbKey = 0;
+  int32_t m_periodCbKey = 0;
+  int32_t m_resetCbKey = 0;
+  int32_t m_reverseDirectionCbKey = 0;
+  int32_t m_samplesCbKey = 0;
 };
 
 }  // namespace wpilibws

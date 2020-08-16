@@ -18,16 +18,17 @@ class HALSimWSProviderRelay : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
+  ~HALSimWSProviderRelay();
 
  protected:
   void RegisterCallbacks() override;
   void CancelCallbacks() override;
 
  private:
-  int32_t m_initFwdCbKey;
-  int32_t m_initRevCbKey;
-  int32_t m_fwdCbKey;
-  int32_t m_revCbKey;
+  int32_t m_initFwdCbKey = 0;
+  int32_t m_initRevCbKey = 0;
+  int32_t m_fwdCbKey = 0;
+  int32_t m_revCbKey = 0;
 };
 
 }  // namespace wpilibws

@@ -26,6 +26,8 @@ void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
       "dPWM", HAL_GetNumDigitalPWMOutputs(), webRegisterFunc);
 }
 
+HALSimWSProviderDigitalPWM::~HALSimWSProviderDigitalPWM() { CancelCallbacks(); }
+
 void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
   m_dutyCycleCbKey = REGISTER(DutyCycle, "<duty_cycle", double, double);

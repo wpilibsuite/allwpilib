@@ -11,6 +11,8 @@
 
 namespace wpilibws {
 
+HALSimWSProviderSimDevice::~HALSimWSProviderSimDevice() { CancelCallbacks(); }
+
 void HALSimWSProviderSimDevice::OnNetworkConnected(
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
   auto storedWS = m_ws.lock();
@@ -46,13 +48,19 @@ void HALSimWSProviderSimDevice::OnNetworkConnected(
 
 void HALSimWSProviderSimDevice::OnNetworkDisconnected() {
   // Cancel all callbacks
+  CancelCallbacks();
+
+  m_ws.reset();
+}
+
+void HALSimWSProviderSimDevice::CancelCallbacks() {
   HALSIM_CancelSimValueCreatedCallback(m_simValueCreatedCbKey);
 
   for (auto& kv : m_simValueChangedCbKeys) {
     HALSIM_CancelSimValueChangedCallback(kv.getValue());
   }
 
-  m_ws.reset();
+  m_simValueChangedCbKeys.clear();
 }
 
 void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
@@ -149,6 +157,8 @@ void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
   }
 }
 
+HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() { CancelCallbacks(); }
+
 void HALSimWSProviderSimDevices::DeviceCreatedCallback(
     const char* name, HAL_SimDeviceHandle handle) {
   auto key = (wpi::Twine("SimDevices/") + name).str();
@@ -168,15 +178,20 @@ void HALSimWSProviderSimDevices::DeviceFreedCallback(
 
 void HALSimWSProviderSimDevices::Initialize(
     std::shared_ptr<wpi::uv::Loop> loop) {
-  HALSIM_RegisterSimDeviceCreatedCallback(
+  m_deviceCreatedCbKey = HALSIM_RegisterSimDeviceCreatedCallback(
       "", this, HALSimWSProviderSimDevices::DeviceCreatedCallbackStatic, 1);
-  HALSIM_RegisterSimDeviceFreedCallback(
+  m_deviceFreedCbKey = HALSIM_RegisterSimDeviceFreedCallback(
       "", this, HALSimWSProviderSimDevices::DeviceFreedCallbackStatic);
 
   m_exec = UvExecFn::Create(loop, [](auto out, LoopFn func) {
     func();
     out.set_value();
   });
+}
+
+void HALSimWSProviderSimDevices::CancelCallbacks() {
+  HALSIM_CancelSimDeviceCreatedCallback(m_deviceCreatedCbKey);
+  HALSIM_CancelSimDeviceFreedCallback(m_deviceFreedCbKey);
 }
 
 void HALSimWSProviderSimDevices::OnNetworkConnected(

@@ -38,6 +38,8 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
     m_deviceId = deviceId;
   }
 
+  ~HALSimWSProviderSimDevice();
+
   void OnNetworkConnected(
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;
 
@@ -66,6 +68,8 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
   void OnValueChanged(SimDeviceValueData* valueData,
                       const struct HAL_Value* value);
 
+  void CancelCallbacks();
+
   wpi::StringMap<std::unique_ptr<SimDeviceValueData>> m_valueHandles;
   std::shared_mutex m_vhLock;
 
@@ -73,7 +77,7 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
   std::shared_ptr<HALSimWSProviderSimDevices> m_simDevicesBase;
 
-  int32_t m_simValueCreatedCbKey;
+  int32_t m_simValueCreatedCbKey = 0;
   wpi::StringMap<int32_t> m_simValueChangedCbKeys;
 };
 
@@ -84,6 +88,8 @@ class HALSimWSProviderSimDevices {
 
   explicit HALSimWSProviderSimDevices(ProviderContainer& providers)
       : m_providers(providers) {}
+  ~HALSimWSProviderSimDevices();
+
   void Initialize(std::shared_ptr<wpi::uv::Loop> loop);
 
   void OnNetworkConnected(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
@@ -108,10 +114,15 @@ class HALSimWSProviderSimDevices {
   }
   void DeviceFreedCallback(const char* name, HAL_SimDeviceHandle handle);
 
+  void CancelCallbacks();
+
   ProviderContainer& m_providers;
 
   std::shared_ptr<HALSimBaseWebSocketConnection> m_ws;
   std::shared_ptr<UvExecFn> m_exec;
+
+  int32_t m_deviceCreatedCbKey = 0;
+  int32_t m_deviceFreedCbKey = 0;
 };
 
 }  // namespace wpilibws

@@ -17,6 +17,8 @@ void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
                                             webregisterFunc);
 }
 
+HALSimWSProviderJoystick::~HALSimWSProviderJoystick() { CancelCallbacks(); }
+
 void HALSimWSProviderJoystick::RegisterCallbacks() {
   m_dsNewDataCbKey = HALSIM_RegisterDriverStationNewDataCallback(
       [](const char* name, void* param, const struct HAL_Value* value) {

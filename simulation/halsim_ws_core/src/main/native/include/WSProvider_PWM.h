@@ -18,18 +18,19 @@ class HALSimWSProviderPWM : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
+  ~HALSimWSProviderPWM();
 
  protected:
   void RegisterCallbacks() override;
   void CancelCallbacks() override;
 
  private:
-  int32_t m_initCbKey;
-  int32_t m_speedCbKey;
-  int32_t m_positionCbKey;
-  int32_t m_rawCbKey;
-  int32_t m_periodScaleCbKey;
-  int32_t m_zeroLatchCbKey;
+  int32_t m_initCbKey = 0;
+  int32_t m_speedCbKey = 0;
+  int32_t m_positionCbKey = 0;
+  int32_t m_rawCbKey = 0;
+  int32_t m_periodScaleCbKey = 0;
+  int32_t m_zeroLatchCbKey = 0;
 };
 
 }  // namespace wpilibws

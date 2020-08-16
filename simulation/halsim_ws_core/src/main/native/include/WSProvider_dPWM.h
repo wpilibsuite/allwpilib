@@ -18,15 +18,16 @@ class HALSimWSProviderDigitalPWM : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
+  ~HALSimWSProviderDigitalPWM();
 
  protected:
   void RegisterCallbacks() override;
   void CancelCallbacks() override;
 
  private:
-  int32_t m_initCbKey;
-  int32_t m_dutyCycleCbKey;
-  int32_t m_pinCbKey;
+  int32_t m_initCbKey = 0;
+  int32_t m_dutyCycleCbKey = 0;
+  int32_t m_pinCbKey = 0;
 };
 
 }  // namespace wpilibws

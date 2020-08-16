@@ -45,6 +45,8 @@ void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
                                             webRegisterFunc);
 }
 
+HALSimWSProviderAnalogIn::~HALSimWSProviderAnalogIn() { CancelCallbacks(); }
+
 void HALSimWSProviderAnalogIn::RegisterCallbacks() {
   m_initCbKey = REGISTER_AIN(Initialized, "<init", bool, boolean);
   m_avgbitsCbKey = REGISTER_AIN(AverageBits, "<avg_bits", int32_t, int);
@@ -99,6 +101,8 @@ void HALSimWSProviderAnalogOut::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderAnalogOut>("AO", HAL_GetNumAnalogOutputs(),
                                              webRegisterFunc);
 }
+
+HALSimWSProviderAnalogOut::~HALSimWSProviderAnalogOut() { CancelCallbacks(); }
 
 void HALSimWSProviderAnalogOut::RegisterCallbacks() {
   m_initCbKey = REGISTER_AOUT(Initialized, "<init", bool, boolean);

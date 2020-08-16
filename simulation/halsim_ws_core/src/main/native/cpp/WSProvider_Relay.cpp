@@ -25,6 +25,8 @@ void HALSimWSProviderRelay::Initialize(WSRegisterFunc webRegisterFunc) {
                                          webRegisterFunc);
 }
 
+HALSimWSProviderRelay::~HALSimWSProviderRelay() { CancelCallbacks(); }
+
 void HALSimWSProviderRelay::RegisterCallbacks() {
   m_initFwdCbKey = REGISTER(InitializedForward, "<init_fwd", bool, boolean);
   m_initRevCbKey = REGISTER(InitializedReverse, "<init_rev", bool, boolean);

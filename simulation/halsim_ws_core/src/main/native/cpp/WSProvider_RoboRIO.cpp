@@ -24,6 +24,8 @@ void HALSimWSProviderRoboRIO::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateSingleProvider<HALSimWSProviderRoboRIO>("RoboRIO", webRegisterFunc);
 }
 
+HALSimWSProviderRoboRIO::~HALSimWSProviderRoboRIO() { CancelCallbacks(); }
+
 void HALSimWSProviderRoboRIO::RegisterCallbacks() {
   m_fpgaCbKey = REGISTER(FPGAButton, ">fpga_button", bool, boolean);
   m_vinVoltageCbKey = REGISTER(VInVoltage, ">vin_voltage", double, double);

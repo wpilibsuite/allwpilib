@@ -30,6 +30,10 @@ void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
                                                       webRegisterFunc);
 }
 
+HALSimWSProviderDriverStation::~HALSimWSProviderDriverStation() {
+  CancelCallbacks();
+}
+
 void HALSimWSProviderDriverStation::RegisterCallbacks() {
   m_enabledCbKey = REGISTER(Enabled, ">enabled", bool, boolean);
   m_autonomousCbKey = REGISTER(Autonomous, ">autonomous", bool, boolean);

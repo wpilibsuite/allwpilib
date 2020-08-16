@@ -26,6 +26,8 @@ void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
                                        webRegisterFunc);
 }
 
+HALSimWSProviderDIO::~HALSimWSProviderDIO() { CancelCallbacks(); }
+
 void HALSimWSProviderDIO::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
   m_valueCbKey = REGISTER(Value, "<>value", bool, boolean);
