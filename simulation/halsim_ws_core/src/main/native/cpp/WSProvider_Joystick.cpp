@@ -18,65 +18,51 @@ void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
 }
 
 void HALSimWSProviderJoystick::RegisterCallbacks() {
-  m_axesCbKey = HALSIM_RegisterJoystickAxesCallback(
-      m_channel,
-      [](const char* name, void* param, int32_t joystickNum,
-         const HAL_JoystickAxes* axes) {
+  m_dsNewDataCbKey = HALSIM_RegisterDriverStationNewDataCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        auto provider = static_cast<HALSimWSProviderJoystick*>(param);
+
+        // Grab all joystick data and send it at once
+        wpi::json payload;
+
+        // Axes data
+        HAL_JoystickAxes axes{};
         std::vector<double> axesValues;
-        for (int i = 0; i < axes->count; i++) {
-          axesValues.push_back(axes->axes[i]);
+        HALSIM_GetJoystickAxes(provider->GetChannel(), &axes);
+
+        for (int i = 0; i < axes.count; i++) {
+          axesValues.push_back(axes.axes[i]);
         }
 
-        auto provider = static_cast<HALSimWSProviderJoystick*>(param);
-        if (provider->GetChannel() != joystickNum) {
-          return;
-        }
-
-        provider->ProcessHalCallback({{">axes", axesValues}});
-      },
-      this, true);
-
-  m_povsCbKey = HALSIM_RegisterJoystickPOVsCallback(
-      m_channel,
-      [](const char* name, void* param, int32_t joystickNum,
-         const HAL_JoystickPOVs* povs) {
+        // POVs data
+        HAL_JoystickPOVs povs{};
         std::vector<int16_t> povsValues;
-        for (int i = 0; i < povs->count; i++) {
-          povsValues.push_back(povs->povs[i]);
-        }
-        auto provider = static_cast<HALSimWSProviderJoystick*>(param);
-        if (provider->GetChannel() != joystickNum) {
-          return;
+        HALSIM_GetJoystickPOVs(provider->GetChannel(), &povs);
+
+        for (int i = 0; i < povs.count; i++) {
+          povsValues.push_back(povs.povs[i]);
         }
 
-        provider->ProcessHalCallback({{">povs", povsValues}});
-      },
-      this, true);
-
-  m_buttonsCbKey = HALSIM_RegisterJoystickButtonsCallback(
-      m_channel,
-      [](const char* name, void* param, int32_t joystickNum,
-         const HAL_JoystickButtons* buttons) {
+        // Button data
+        HAL_JoystickButtons buttons{};
         std::vector<bool> buttonsValues;
 
-        for (int i = 0; i < buttons->count; i++) {
-          buttonsValues.push_back(((buttons->buttons >> i) & 0x1) == 1);
+        for (int i = 0; i < buttons.count; i++) {
+          buttonsValues.push_back(((buttons.buttons >> i) & 0x1) == 1);
         }
 
-        auto provider = static_cast<HALSimWSProviderJoystick*>(param);
-        if (provider->GetChannel() != joystickNum) {
-          return;
-        }
+        payload[">axes"] = axesValues;
+        payload[">povs"] = povsValues;
+        payload[">buttons"] = buttonsValues;
 
-        provider->ProcessHalCallback({{">buttons", buttonsValues}});
+        provider->ProcessHalCallback(payload);
       },
       this, true);
 }
 
 void HALSimWSProviderJoystick::CancelCallbacks() {
-  HALSIM_CancelJoystickAxesCallback(m_axesCbKey);
-  HALSIM_CancelJoystickPOVsCallback(m_povsCbKey);
-  HALSIM_CancelJoystickButtonsCallback(m_buttonsCbKey);
+  HALSIM_CancelDriverStationNewDataCallback(m_dsNewDataCbKey);
+  m_dsNewDataCbKey = 0;
 }
 
 void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {

@@ -26,9 +26,7 @@ class HALSimWSProviderJoystick : public HALSimWSHalChanProvider {
   void CancelCallbacks() override;
 
  private:
-  int32_t m_axesCbKey;
-  int32_t m_povsCbKey;
-  int32_t m_buttonsCbKey;
+  int32_t m_dsNewDataCbKey = 0;
 };
 
 }  // namespace wpilibws
