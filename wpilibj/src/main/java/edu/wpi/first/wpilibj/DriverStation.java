@@ -317,21 +317,19 @@ public class DriverStation {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
     }
+
     m_cacheDataMutex.lock();
     try {
-      if (button > m_joystickButtons[stick].m_count) {
-        // Unlock early so error printing isn't locked.
-        m_cacheDataMutex.unlock();
-        reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-            + " not available, check if controller is plugged in");
+      if (button <= m_joystickButtons[stick].m_count) {
+        return (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
       }
-
-      return (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
     } finally {
-      if (m_cacheDataMutex.isHeldByCurrentThread()) {
-        m_cacheDataMutex.unlock();
-      }
+      m_cacheDataMutex.unlock();
     }
+
+    reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+        + " not available, check if controller is plugged in");
+    return false;
   }
 
   /**
@@ -425,20 +423,16 @@ public class DriverStation {
 
     m_cacheDataMutex.lock();
     try {
-      if (axis >= m_joystickAxes[stick].m_count) {
-        // Unlock early so error printing isn't locked.
-        m_cacheDataMutex.unlock();
-        reportJoystickUnpluggedWarning("Joystick axis " + axis + " on port " + stick
-            + " not available, check if controller is plugged in");
-        return 0.0;
+      if (axis < m_joystickAxes[stick].m_count) {
+        return m_joystickAxes[stick].m_axes[axis];
       }
-
-      return m_joystickAxes[stick].m_axes[axis];
     } finally {
-      if (m_cacheDataMutex.isHeldByCurrentThread()) {
-        m_cacheDataMutex.unlock();
-      }
+      m_cacheDataMutex.unlock();
     }
+
+    reportJoystickUnpluggedWarning("Joystick axis " + axis + " on port " + stick
+        + " not available, check if controller is plugged in");
+    return 0.0;
   }
 
   /**
@@ -456,20 +450,16 @@ public class DriverStation {
 
     m_cacheDataMutex.lock();
     try {
-      if (pov >= m_joystickPOVs[stick].m_count) {
-        // Unlock early so error printing isn't locked.
-        m_cacheDataMutex.unlock();
-        reportJoystickUnpluggedWarning("Joystick POV " + pov + " on port " + stick
-            + " not available, check if controller is plugged in");
-        return -1;
+      if (pov < m_joystickPOVs[stick].m_count) {
+        return m_joystickPOVs[stick].m_povs[pov];
       }
     } finally {
-      if (m_cacheDataMutex.isHeldByCurrentThread()) {
-        m_cacheDataMutex.unlock();
-      }
+      m_cacheDataMutex.unlock();
     }
 
-    return m_joystickPOVs[stick].m_povs[pov];
+    reportJoystickUnpluggedWarning("Joystick POV " + pov + " on port " + stick
+        + " not available, check if controller is plugged in");
+    return -1;
   }
 
   /**
