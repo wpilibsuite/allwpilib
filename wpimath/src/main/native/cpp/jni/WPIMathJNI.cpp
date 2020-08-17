@@ -85,12 +85,12 @@ Java_edu_wpi_first_math_WPIMathJNI_discreteAlgebraicRiccatiEquation
 }
 
 /*
- * Class:     edu_wpi_first_wpiutil_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    exp
  * Signature: ([DI[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpiutil_math_WPIMathJNI_exp
+Java_edu_wpi_first_math_WPIMathJNI_exp
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
 {
   jdouble* arrayBody = env->GetDoubleArrayElements(src, nullptr);
@@ -106,12 +106,12 @@ Java_edu_wpi_first_wpiutil_math_WPIMathJNI_exp
 }
 
 /*
- * Class:     edu_wpi_first_wpiutil_math_WPIMathJNI
+ * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    isStabilizable
  * Signature: (II[D[D)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpiutil_math_WPIMathJNI_isStabilizable
+Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
   (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc,
    jdoubleArray bSrc)
 {

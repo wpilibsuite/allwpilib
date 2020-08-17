@@ -11,13 +11,13 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.VecBuilder;
-import edu.wpi.first.wpiutil.math.WPIMathJNI;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 

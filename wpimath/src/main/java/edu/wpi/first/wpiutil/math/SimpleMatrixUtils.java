@@ -16,6 +16,8 @@ import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleBase;
 import org.ejml.simple.SimpleMatrix;
 
+import edu.wpi.first.math.WPIMathJNI;
+
 @SuppressWarnings("PMD.TooManyMethods")
 public final class SimpleMatrixUtils {
   private SimpleMatrixUtils() {
