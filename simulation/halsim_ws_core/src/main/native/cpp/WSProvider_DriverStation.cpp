@@ -91,6 +91,16 @@ void HALSimWSProviderDriverStation::CancelCallbacks() {
   HALSIM_CancelDriverStationNewDataCallback(m_newDataCbKey);
   HALSIM_CancelDriverStationAllianceStationIdCallback(m_allianceCbKey);
   HALSIM_CancelDriverStationMatchTimeCallback(m_matchTimeCbKey);
+
+  m_enabledCbKey = 0;
+  m_autonomousCbKey = 0;
+  m_testCbKey = 0;
+  m_estopCbKey = 0;
+  m_fmsCbKey = 0;
+  m_dsCbKey = 0;
+  m_newDataCbKey = 0;
+  m_allianceCbKey = 0;
+  m_matchTimeCbKey = 0;
 }
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {

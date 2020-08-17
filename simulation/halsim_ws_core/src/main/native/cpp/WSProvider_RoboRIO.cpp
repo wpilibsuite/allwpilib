@@ -66,6 +66,22 @@ void HALSimWSProviderRoboRIO::CancelCallbacks() {
   HALSIM_CancelRoboRioUserCurrent3V3Callback(m_3v3CurrentCbKey);
   HALSIM_CancelRoboRioUserActive3V3Callback(m_3v3ActiveCbKey);
   HALSIM_CancelRoboRioUserFaults3V3Callback(m_3v3FaultsCbKey);
+
+  m_fpgaCbKey = 0;
+  m_vinVoltageCbKey = 0;
+  m_vinCurrentCbKey = 0;
+  m_6vActiveCbKey = 0;
+  m_6vCurrentCbKey = 0;
+  m_6vFaultsCbKey = 0;
+  m_6vVoltageCbKey = 0;
+  m_5vActiveCbKey = 0;
+  m_5vCurrentCbKey = 0;
+  m_5vFaultsCbKey = 0;
+  m_5vVoltageCbKey = 0;
+  m_3v3ActiveCbKey = 0;
+  m_3v3CurrentCbKey = 0;
+  m_3v3FaultsCbKey = 0;
+  m_3v3VoltageCbKey = 0;
 }
 
 void HALSimWSProviderRoboRIO::OnNetValueChanged(const wpi::json& json) {

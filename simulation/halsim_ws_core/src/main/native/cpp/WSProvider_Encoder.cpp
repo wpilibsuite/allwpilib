@@ -65,6 +65,13 @@ void HALSimWSProviderEncoder::CancelCallbacks() {
   HALSIM_CancelEncoderReverseDirectionCallback(m_channel,
                                                m_reverseDirectionCbKey);
   HALSIM_CancelEncoderSamplesToAverageCallback(m_channel, m_samplesCbKey);
+
+  m_initCbKey = 0;
+  m_countCbKey = 0;
+  m_periodCbKey = 0;
+  m_resetCbKey = 0;
+  m_reverseDirectionCbKey = 0;
+  m_samplesCbKey = 0;
 }
 
 void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::json& json) {

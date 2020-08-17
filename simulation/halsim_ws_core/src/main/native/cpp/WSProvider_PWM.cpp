@@ -43,6 +43,13 @@ void HALSimWSProviderPWM::CancelCallbacks() {
   HALSIM_CancelPWMRawValueCallback(m_channel, m_rawCbKey);
   HALSIM_CancelPWMPeriodScaleCallback(m_channel, m_periodScaleCbKey);
   HALSIM_CancelPWMZeroLatchCallback(m_channel, m_zeroLatchCbKey);
+
+  m_initCbKey = 0;
+  m_speedCbKey = 0;
+  m_positionCbKey = 0;
+  m_rawCbKey = 0;
+  m_periodScaleCbKey = 0;
+  m_zeroLatchCbKey = 0;
 }
 
 }  // namespace wpilibws

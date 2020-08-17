@@ -79,6 +79,17 @@ void HALSimWSProviderAnalogIn::CancelCallbacks() {
   HALSIM_CancelAnalogInAccumulatorCenterCallback(m_channel, m_accumCenterCbKey);
   HALSIM_CancelAnalogInAccumulatorDeadbandCallback(m_channel,
                                                    m_accumDeadbandCbKey);
+
+  // Reset callback IDs
+  m_initCbKey = 0;
+  m_avgbitsCbKey = 0;
+  m_oversampleCbKey = 0;
+  m_voltageCbKey = 0;
+  m_accumInitCbKey = 0;
+  m_accumValueCbKey = 0;
+  m_accumCountCbKey = 0;
+  m_accumCenterCbKey = 0;
+  m_accumDeadbandCbKey = 0;
 }
 
 void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::json& json) {
@@ -112,6 +123,9 @@ void HALSimWSProviderAnalogOut::RegisterCallbacks() {
 void HALSimWSProviderAnalogOut::CancelCallbacks() {
   HALSIM_CancelAnalogOutInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelAnalogOutVoltageCallback(m_channel, m_voltageCbKey);
+
+  m_initCbKey = 0;
+  m_voltageCbKey = 0;
 }
 
 }  // namespace wpilibws

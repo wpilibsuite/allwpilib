@@ -56,6 +56,8 @@ void HALSimWSProviderSimDevice::OnNetworkDisconnected() {
 void HALSimWSProviderSimDevice::CancelCallbacks() {
   HALSIM_CancelSimValueCreatedCallback(m_simValueCreatedCbKey);
 
+  m_simValueCreatedCbKey = 0;
+
   for (auto& kv : m_simValueChangedCbKeys) {
     HALSIM_CancelSimValueChangedCallback(kv.getValue());
   }
@@ -192,6 +194,9 @@ void HALSimWSProviderSimDevices::Initialize(
 void HALSimWSProviderSimDevices::CancelCallbacks() {
   HALSIM_CancelSimDeviceCreatedCallback(m_deviceCreatedCbKey);
   HALSIM_CancelSimDeviceFreedCallback(m_deviceFreedCbKey);
+
+  m_deviceCreatedCbKey = 0;
+  m_deviceFreedCbKey = 0;
 }
 
 void HALSimWSProviderSimDevices::OnNetworkConnected(

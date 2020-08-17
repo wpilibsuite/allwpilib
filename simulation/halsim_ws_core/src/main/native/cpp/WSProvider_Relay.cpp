@@ -39,6 +39,11 @@ void HALSimWSProviderRelay::CancelCallbacks() {
   HALSIM_CancelRelayInitializedReverseCallback(m_channel, m_initRevCbKey);
   HALSIM_CancelRelayForwardCallback(m_channel, m_fwdCbKey);
   HALSIM_CancelRelayReverseCallback(m_channel, m_revCbKey);
+
+  m_initFwdCbKey = 0;
+  m_initRevCbKey = 0;
+  m_fwdCbKey = 0;
+  m_revCbKey = 0;
 }
 
 }  // namespace wpilibws

@@ -64,6 +64,7 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
 
 void HALSimWSProviderJoystick::CancelCallbacks() {
   HALSIM_CancelDriverStationNewDataCallback(m_dsNewDataCbKey);
+  
   m_dsNewDataCbKey = 0;
 }
 

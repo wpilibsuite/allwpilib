@@ -40,6 +40,11 @@ void HALSimWSProviderDIO::CancelCallbacks() {
   HALSIM_CancelDIOValueCallback(m_channel, m_valueCbKey);
   HALSIM_CancelDIOPulseLengthCallback(m_channel, m_pulseLengthCbKey);
   HALSIM_CancelDIOIsInputCallback(m_channel, m_inputCbKey);
+
+  m_initCbKey = 0;
+  m_valueCbKey = 0;
+  m_pulseLengthCbKey = 0;
+  m_inputCbKey = 0;
 }
 
 void HALSimWSProviderDIO::OnNetValueChanged(const wpi::json& json) {

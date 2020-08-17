@@ -38,6 +38,10 @@ void HALSimWSProviderDigitalPWM::CancelCallbacks() {
   HALSIM_CancelDigitalPWMInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelDigitalPWMDutyCycleCallback(m_channel, m_dutyCycleCbKey);
   HALSIM_CancelDigitalPWMPinCallback(m_channel, m_pinCbKey);
+
+  m_initCbKey = 0;
+  m_dutyCycleCbKey = 0;
+  m_pinCbKey = 0;
 }
 
 }  // namespace wpilibws
