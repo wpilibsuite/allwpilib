@@ -30,7 +30,7 @@ class SimCallbackRegistryBase {
  public:
   void Cancel(int32_t uid) {
     std::scoped_lock lock(m_mutex);
-    if (m_callbacks) m_callbacks->erase(uid - 1);
+    if (m_callbacks && uid > 0) m_callbacks->erase(uid - 1);
   }
 
   void Reset() {
