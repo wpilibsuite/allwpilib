@@ -162,7 +162,9 @@ jobs:
           RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: Create Maven archive
+        run: tar -czvf maven.tar.gz ~/releases
       - uses: actions/upload-artifact@v2
         with:
           name: Maven
-          path: ~/releases
+          path: maven.tar.gz
