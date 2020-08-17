@@ -27,12 +27,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {}
 
 /*
- * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Class:     edu_wpi_first_wpiutil_WPIUtilJNI
  * Method:    now
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_networktables_NetworkTablesJNI_now
+Java_edu_wpi_first_wpiutil_WPIUtilJNI_now
   (JNIEnv*, jclass)
 {
   return wpi::Now();
