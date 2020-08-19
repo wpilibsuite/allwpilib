@@ -18,6 +18,9 @@ class ControllerUtilTest {
     assertEquals(-20.0, ControllerUtil.getModulusError(170.0, -170.0, -180.0, 180.0));
     assertEquals(-20.0, ControllerUtil.getModulusError(170.0 + 360.0, -170.0, -180.0, 180.0));
     assertEquals(-20.0, ControllerUtil.getModulusError(170.0, -170.0 + 360.0, -180.0, 180.0));
+    assertEquals(20.0, ControllerUtil.getModulusError(-170.0, 170.0, -180.0, 180.0));
+    assertEquals(20.0, ControllerUtil.getModulusError(-170.0 + 360.0, 170.0, -180.0, 180.0));
+    assertEquals(20.0, ControllerUtil.getModulusError(-170.0, 170.0 + 360.0, -180.0, 180.0));
 
     // Test range start at zero
     assertEquals(-20.0, ControllerUtil.getModulusError(170.0, 190.0, 0.0, 360.0));
