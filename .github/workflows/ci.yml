@@ -75,6 +75,8 @@ jobs:
         run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF ..
       - name: build
         run: cd build && make -j3
+      - name: test
+        run: cd build && make test
 
   build-cmake-windows:
     name: "Build - CMake Windows"
