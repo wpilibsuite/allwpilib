@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: configure
-        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF ..
+        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF -DWITH_TESTS=ON ..
       - name: build
         run: cd build && make -j3
       - name: test
