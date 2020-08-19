@@ -19,7 +19,7 @@ template <size_t NumModules>
  * commanded velocities of the wheels stay below a certain limit.
  */
 SwerveDriveKinematicsConstraint<NumModules>::SwerveDriveKinematicsConstraint(
-    frc::SwerveDriveKinematics<NumModules> kinematics,
+    const frc::SwerveDriveKinematics<NumModules>& kinematics,
     units::meters_per_second_t maxSpeed)
     : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 

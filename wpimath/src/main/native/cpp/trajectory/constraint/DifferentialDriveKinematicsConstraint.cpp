@@ -10,7 +10,8 @@
 using namespace frc;
 
 DifferentialDriveKinematicsConstraint::DifferentialDriveKinematicsConstraint(
-    DifferentialDriveKinematics kinematics, units::meters_per_second_t maxSpeed)
+    const DifferentialDriveKinematics& kinematics,
+    units::meters_per_second_t maxSpeed)
     : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 
 units::meters_per_second_t DifferentialDriveKinematicsConstraint::MaxVelocity(

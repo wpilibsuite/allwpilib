@@ -22,7 +22,7 @@ namespace frc {
  */
 class MecanumDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
-  MecanumDriveKinematicsConstraint(MecanumDriveKinematics kinematics,
+  MecanumDriveKinematicsConstraint(const MecanumDriveKinematics& kinematics,
                                    units::meters_per_second_t maxSpeed);
 
   units::meters_per_second_t MaxVelocity(
@@ -33,7 +33,7 @@ class MecanumDriveKinematicsConstraint : public TrajectoryConstraint {
                             units::meters_per_second_t speed) const override;
 
  private:
-  MecanumDriveKinematics m_kinematics;
+  const MecanumDriveKinematics& m_kinematics;
   units::meters_per_second_t m_maxSpeed;
 };
 }  // namespace frc
