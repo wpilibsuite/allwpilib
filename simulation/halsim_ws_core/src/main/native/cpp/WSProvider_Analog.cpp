@@ -97,14 +97,11 @@ void HALSimWSProviderAnalogIn::OnNetValueChanged(const wpi::json& json) {
   if ((it = json.find(">voltage")) != json.end()) {
     HALSIM_SetAnalogInVoltage(m_channel, it.value());
   }
-  if ((it = json.find("accum")) != json.end()) {
-    auto accum = it.value();
-    if ((it = accum.find(">value")) != accum.end()) {
-      HALSIM_SetAnalogInAccumulatorValue(m_channel, it.value());
-    }
-    if ((it = json.find(">count")) != json.end()) {
-      HALSIM_SetAnalogInAccumulatorCount(m_channel, it.value());
-    }
+  if ((it = json.find(">accum_value")) != json.end()) {
+    HALSIM_SetAnalogInAccumulatorValue(m_channel, it.value());
+  }
+  if ((it = json.find(">accum_count")) != json.end()) {
+    HALSIM_SetAnalogInAccumulatorCount(m_channel, it.value());
   }
 }
 

@@ -32,18 +32,6 @@ void HALSimWSProviderSimDevice::OnNetworkConnected(
 
   m_simValueCreatedCbKey = HALSIM_RegisterSimValueCreatedCallback(
       m_handle, this, HALSimWSProviderSimDevice::OnValueCreatedStatic, 1);
-
-  {
-    auto it = m_valueHandles.begin();
-    auto end = m_valueHandles.end();
-
-    std::shared_lock lock(m_vhLock);
-    HAL_Value value;
-    for (; it != end; ++it) {
-      HAL_GetSimValue(it->second->handle, &value);
-      OnValueChanged(it->second.get(), &value);
-    }
-  }
 }
 
 void HALSimWSProviderSimDevice::OnNetworkDisconnected() {
