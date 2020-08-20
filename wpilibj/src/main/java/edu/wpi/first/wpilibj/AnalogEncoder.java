@@ -133,6 +133,15 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   }
 
   /**
+   * Get the channel number.
+   *
+   * @return The channel number.
+   */
+  public int getChannel() {
+    return m_analogInput.getChannel();
+  }
+
+  /**
    * Reset the Encoder distance to zero.
    */
   public void reset() {

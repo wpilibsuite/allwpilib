@@ -61,6 +61,7 @@ void InitializeHAL() {
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeAnalogOutput();
+  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCompressor();
   InitializeConstants();
