@@ -8,8 +8,6 @@
 #pragma once
 
 #include <units/angle.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/AnalogEncoder.h"
 #include "frc/geometry/Rotation2d.h"
@@ -29,38 +27,29 @@ class AnalogEncoderSim {
    *
    * @param analogInput AnalogEncoder to simulate
    */
-  explicit AnalogEncoderSim(const frc::AnalogEncoder& analogEncoder) {
-    wpi::SmallString<128> fullname;
-    wpi::raw_svector_ostream os(fullname);
-    os << "AnalogEncoder" << '[' << analogEncoder.GetChannel() << ']';
-    frc::sim::SimDeviceSim deviceSim{fullname.c_str()};
-    m_positionSim = deviceSim.GetDouble("Position");
-  }
+  explicit AnalogEncoderSim(const frc::AnalogEncoder& analogEncoder);
 
   /**
    * Set the position using an {@link Rotation2d}.
    */
-  void SetPosition(frc::Rotation2d angle) { SetTurns(angle.Degrees()); }
+  void SetPosition(frc::Rotation2d angle);
 
   /**
    * Set the position of the encoder.
    *
    * @param turns The position.
    */
-  void SetTurns(units::turn_t turns) { m_positionSim.Set(turns.to<double>()); }
+  void SetTurns(units::turn_t turns);
 
   /**
    * Get the simulated position.
    */
-  units::turn_t GetTurns() { return units::turn_t{m_positionSim.Get()}; }
+  units::turn_t GetTurns();
 
   /**
    * Get the position as a {@link Rotation2d}.
    */
-  frc::Rotation2d GetPosition() {
-    units::radian_t rads = GetTurns();
-    return frc::Rotation2d{rads};
-  }
+  frc::Rotation2d GetPosition();
 
  private:
   hal::SimDouble m_positionSim;
