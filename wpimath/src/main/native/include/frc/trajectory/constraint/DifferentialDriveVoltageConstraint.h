@@ -33,8 +33,8 @@ class DifferentialDriveVoltageConstraint : public TrajectoryConstraint {
    * voltage (12V) to account for "voltage sag" due to current draw.
    */
   DifferentialDriveVoltageConstraint(
-      SimpleMotorFeedforward<units::meter> feedforward,
-      DifferentialDriveKinematics kinematics, units::volt_t maxVoltage);
+      const SimpleMotorFeedforward<units::meter>& feedforward,
+      const DifferentialDriveKinematics& kinematics, units::volt_t maxVoltage);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
@@ -44,8 +44,8 @@ class DifferentialDriveVoltageConstraint : public TrajectoryConstraint {
                             units::meters_per_second_t speed) const override;
 
  private:
-  SimpleMotorFeedforward<units::meter> m_feedforward;
-  DifferentialDriveKinematics m_kinematics;
+  const SimpleMotorFeedforward<units::meter>& m_feedforward;
+  const DifferentialDriveKinematics& m_kinematics;
   units::volt_t m_maxVoltage;
 };
 }  // namespace frc

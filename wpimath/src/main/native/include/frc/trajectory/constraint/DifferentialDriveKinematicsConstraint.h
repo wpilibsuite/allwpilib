@@ -20,8 +20,9 @@ namespace frc {
  */
 class DifferentialDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
-  DifferentialDriveKinematicsConstraint(DifferentialDriveKinematics kinematics,
-                                        units::meters_per_second_t maxSpeed);
+  DifferentialDriveKinematicsConstraint(
+      const DifferentialDriveKinematics& kinematics,
+      units::meters_per_second_t maxSpeed);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
@@ -31,7 +32,7 @@ class DifferentialDriveKinematicsConstraint : public TrajectoryConstraint {
                             units::meters_per_second_t speed) const override;
 
  private:
-  DifferentialDriveKinematics m_kinematics;
+  const DifferentialDriveKinematics& m_kinematics;
   units::meters_per_second_t m_maxSpeed;
 };
 }  // namespace frc

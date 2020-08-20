@@ -25,7 +25,7 @@ template <size_t NumModules>
 class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
   SwerveDriveKinematicsConstraint(
-      frc::SwerveDriveKinematics<NumModules> kinematics,
+      const frc::SwerveDriveKinematics<NumModules>& kinematics,
       units::meters_per_second_t maxSpeed);
 
   units::meters_per_second_t MaxVelocity(
@@ -36,7 +36,7 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
                             units::meters_per_second_t speed) const override;
 
  private:
-  frc::SwerveDriveKinematics<NumModules> m_kinematics;
+  const frc::SwerveDriveKinematics<NumModules>& m_kinematics;
   units::meters_per_second_t m_maxSpeed;
 };
 }  // namespace frc
