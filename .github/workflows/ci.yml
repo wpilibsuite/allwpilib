@@ -94,9 +94,11 @@ jobs:
         uses: lukka/run-cmake@v2
         with:
           buildDirectory: ${{ runner.workspace }}/build/
-          cmakeAppendedArgs: -DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF
+          cmakeAppendedArgs: -DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF -DWITH_TESTS=ON
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           useVcpkgToolchainFile: true
+      - name: Run Tests
+        run: cd build && ctest
 
   wpiformat:
     name: "wpiformat"
