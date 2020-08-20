@@ -15,8 +15,7 @@
 
 using namespace frc::sim;
 
-AnalogEncoderSim::AnalogEncoderSim(
-    const frc::AnalogEncoder& analogEncoder) {
+AnalogEncoderSim::AnalogEncoderSim(const frc::AnalogEncoder& analogEncoder) {
   wpi::SmallString<128> fullname;
   wpi::raw_svector_ostream os(fullname);
   os << "AnalogEncoder" << '[' << analogEncoder.GetChannel() << ']';
