@@ -30,7 +30,6 @@ static HAL_SimDeviceHandle devHandle = 0;
 static wpi::StringMap<ImColor> colorLookUpTable;
 static std::unique_ptr<pfd::open_file> m_fileOpener;
 static std::string previousJsonLocation = "Not empty";
-//static std::vector<Mechanism2DView> Mechanism2DViewVector;
 
 namespace {
 struct BodyConfig {
@@ -43,7 +42,8 @@ struct BodyConfig {
   int lineWidth = 1;
 };
 }  // namespace
-static std::vector<BodyConfig> bodyConfigVector;
+//static std::vector<BodyConfig> bodyConfigVector;
+static std::vector<std::vector<BodyConfig>> mechanism2DViewVector;
 namespace {
 struct DrawLineStruct {
   float xEnd;
@@ -203,7 +203,7 @@ static void buildDrawList(float startXLocation, float startYLocation,
   }
 }
 
-static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
+static BodyConfig readSubJson(const std::string& name, wpi::json const& body, std::vector<BodyConfig> bodyConfigVector) {
   BodyConfig c;
   try {
     c.name = name + "/" + body.at("name").get<std::string>();
@@ -236,7 +236,7 @@ static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   }
   try {
     for (wpi::json const& child : body.at("children")) {
-      c.children.push_back(readSubJson(c.name, child));
+      c.children.push_back(readSubJson(c.name, child, bodyConfigVector));
       wpi::outs() << "Reading Child with name " << c.name << '\n';
     }
   } catch (const wpi::json::exception& e) {
@@ -245,7 +245,7 @@ static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   return c;
 }
 
-static void readJson(std::string jFile) {
+static void readJson(std::string jFile, std::vector<BodyConfig> bodyConfigVector) {
   std::error_code ec;
   std::string name;
   wpi::raw_fd_istream is(jFile, ec);
@@ -271,7 +271,7 @@ static void readJson(std::string jFile) {
   }
   try {
     for (wpi::json const& body : j.at("body")) {
-      bodyConfigVector.push_back(readSubJson(name, body));
+      bodyConfigVector.push_back(readSubJson(name, body, bodyConfigVector));
     }
   } catch (const wpi::json::exception& e) {
     wpi::errs() << "could not read body: " << e.what() << '\n';
@@ -288,13 +288,14 @@ static void OptionMenuLocateJson() {
   }
 }
 
-static void DisplayAssembly2D() {
+static void DisplayAssembly2D(std::vector<BodyConfig> bodyConfigVector) {
   GetJsonFileLocation();
   if (!mechanism2DInfo.jsonLocation.empty()) {
-    // Only read the json file if it changed
+//     Only read the json file if it changed
+//     TODO: Fix me
     if (mechanism2DInfo.jsonLocation != previousJsonLocation) {
       bodyConfigVector.clear();
-      readJson(mechanism2DInfo.jsonLocation);
+      readJson(mechanism2DInfo.jsonLocation, bodyConfigVector);
     }
     previousJsonLocation = mechanism2DInfo.jsonLocation;
     ImVec2 windowPos = ImGui::GetWindowPos();
@@ -315,7 +316,7 @@ void Mechanism2D::Initialize() {
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
   buildColorTable();
-  HALSimGui::AddWindow("Mechanism 2D", DisplayAssembly2D);
+  HALSimGui::AddWindow("Mechanism 2D", [=] { DisplayAssembly2D(new std::vector<BodyConfig>); });
   HALSimGui::AddOptionMenu(OptionMenuLocateJson);
   HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
   HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
