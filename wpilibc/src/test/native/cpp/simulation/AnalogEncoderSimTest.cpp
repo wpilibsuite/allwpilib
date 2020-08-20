@@ -11,6 +11,7 @@
 
 #include "frc/AnalogInput.h"
 #include "frc/simulation/AnalogEncoderSim.h"
+#include "frc/AnalogEncoder.h"
 #include "gtest/gtest.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \

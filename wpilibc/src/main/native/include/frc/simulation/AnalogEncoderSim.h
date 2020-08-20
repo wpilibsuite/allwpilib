@@ -9,11 +9,12 @@
 
 #include <units/angle.h>
 
-#include "frc/AnalogEncoder.h"
 #include "frc/geometry/Rotation2d.h"
-#include "frc/simulation/SimDeviceSim.h"
+#include "hal/SimDevice.h"
 
 namespace frc {
+
+class AnalogEncoder;
 
 namespace sim {
 
@@ -27,7 +28,7 @@ class AnalogEncoderSim {
    *
    * @param analogInput AnalogEncoder to simulate
    */
-  explicit AnalogEncoderSim(const frc::AnalogEncoder& analogEncoder);
+  AnalogEncoderSim(const frc::AnalogEncoder& analogEncoder);
 
   /**
    * Set the position using an {@link Rotation2d}.
