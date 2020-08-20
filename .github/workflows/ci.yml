@@ -72,9 +72,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: configure
-        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF ..
+        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF -DWITH_TESTS=ON ..
       - name: build
         run: cd build && make -j3
+      - name: test
+        run: cd build && make test
 
   build-cmake-windows:
     name: "Build - CMake Windows"
@@ -92,9 +94,12 @@ jobs:
         uses: lukka/run-cmake@v2
         with:
           buildDirectory: ${{ runner.workspace }}/build/
-          cmakeAppendedArgs: -DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF
+          cmakeAppendedArgs: -DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF -DWITH_TESTS=ON
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           useVcpkgToolchainFile: true
+      - name: Run Tests
+        run: ctest -C "Debug"
+        working-directory: ${{ runner.workspace }}/build/
 
   wpiformat:
     name: "wpiformat"
