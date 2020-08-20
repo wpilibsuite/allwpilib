@@ -98,7 +98,7 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           useVcpkgToolchainFile: true
       - name: Run Tests
-        run: ctest
+        run: ctest -C "Debug"
         working-directory: ${{ runner.workspace }}/build/
 
   wpiformat:
