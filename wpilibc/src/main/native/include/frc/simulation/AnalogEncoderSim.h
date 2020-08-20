@@ -17,8 +17,6 @@
 
 namespace frc {
 
-class AnalogEncoderSim;
-
 namespace sim {
 
 /**
