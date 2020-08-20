@@ -28,12 +28,12 @@ class AnalogEncoderSim {
    *
    * @param analogInput AnalogEncoder to simulate
    */
-  AnalogEncoderSim(const frc::AnalogEncoder& analogEncoder);
+  AnalogEncoderSim(const AnalogEncoder& analogEncoder);
 
   /**
    * Set the position using an {@link Rotation2d}.
    */
-  void SetPosition(frc::Rotation2d angle);
+  void SetPosition(Rotation2d angle);
 
   /**
    * Set the position of the encoder.
@@ -50,7 +50,7 @@ class AnalogEncoderSim {
   /**
    * Get the position as a {@link Rotation2d}.
    */
-  frc::Rotation2d GetPosition();
+  Rotation2d GetPosition();
 
  private:
   hal::SimDouble m_positionSim;
