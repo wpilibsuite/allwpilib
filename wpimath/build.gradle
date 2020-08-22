@@ -28,7 +28,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/eigeninclude'
                 }
             }
         }
