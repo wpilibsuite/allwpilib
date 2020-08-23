@@ -56,8 +56,10 @@ struct RobotJoystick {
   HAL_JoystickButtons buttons;
   HAL_JoystickPOVs povs;
 
+  void Clear();
   void Update();
   void SetHAL(int i);
+  void GetHAL(int i);
   bool IsButtonPressed(int i) { return (buttons.buttons & (1u << i)) != 0; }
 };
 
@@ -206,12 +208,16 @@ static int HatToAngle(unsigned char hat) {
   }
 }
 
-void RobotJoystick::Update() {
+void RobotJoystick::Clear() {
   std::memset(&desc, 0, sizeof(desc));
   desc.type = -1;
   std::memset(&axes, 0, sizeof(axes));
   std::memset(&buttons, 0, sizeof(buttons));
   std::memset(&povs, 0, sizeof(povs));
+}
+
+void RobotJoystick::Update() {
+  Clear();
 
   if (!sys || !sys->present) return;
 
@@ -279,16 +285,19 @@ void RobotJoystick::SetHAL(int i) {
   HALSIM_SetJoystickPOVs(i, &povs);
 }
 
+void RobotJoystick::GetHAL(int i) {
+  HALSIM_GetJoystickDescriptor(i, &desc);
+  HALSIM_GetJoystickAxes(i, &axes);
+  HALSIM_GetJoystickButtons(i, &buttons);
+  HALSIM_GetJoystickPOVs(i, &povs);
+}
+
 static void DriverStationExecute() {
   static bool prevDisableDS = false;
   if (gDisableDS && !prevDisableDS) {
-    HALSimGui::SetWindowVisibility("FMS", HALSimGui::kDisabled);
     HALSimGui::SetWindowVisibility("System Joysticks", HALSimGui::kDisabled);
-    HALSimGui::SetWindowVisibility("Joysticks", HALSimGui::kDisabled);
   } else if (!gDisableDS && prevDisableDS) {
-    HALSimGui::SetWindowVisibility("FMS", HALSimGui::kShow);
     HALSimGui::SetWindowVisibility("System Joysticks", HALSimGui::kShow);
-    HALSimGui::SetWindowVisibility("Joysticks", HALSimGui::kShow);
   }
   prevDisableDS = gDisableDS;
   if (gDisableDS) return;
@@ -344,22 +353,44 @@ static void DriverStationExecute() {
 }
 
 static void DisplayFMS() {
+  bool fmsAttached = HALSIM_GetDriverStationFmsAttached();
+  bool dsAttached = HALSIM_GetDriverStationDsAttached();
+  static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
+                                   "Blue 1", "Blue 2", "Blue 3"};
+  int allianceStationId = HALSIM_GetDriverStationAllianceStationId();
+  double matchTime = HALSIM_GetDriverStationMatchTime();
+  HAL_MatchInfo matchInfo;
+  HALSIM_GetMatchInfo(&matchInfo);
+
+  if (gDisableDS) {
+    if (!HALSIM_GetDriverStationEnabled())
+      ImGui::Text("Robot State: Disabled");
+    else if (HALSIM_GetDriverStationTest())
+      ImGui::Text("Robot State: Test");
+    else if (HALSIM_GetDriverStationAutonomous())
+      ImGui::Text("Robot State: Autonomous");
+    else
+      ImGui::Text("Robot State: Teleoperated");
+
+    ImGui::Text("FMS Attached: %s", fmsAttached ? "Yes" : "No");
+    ImGui::Text("DS Attached: %s", dsAttached ? "Yes" : "No");
+    ImGui::Text("Alliance Station: %s", stations[allianceStationId]);
+    ImGui::Text("Match Time: %.1f", matchTime);
+    ImGui::Text("Game Specific: %s", matchInfo.gameSpecificMessage);
+    return;
+  }
+
   double curTime = glfwGetTime();
 
   // FMS Attached
-  bool fmsAttached = HALSIM_GetDriverStationFmsAttached();
   if (ImGui::Checkbox("FMS Attached", &fmsAttached))
     HALSIM_SetDriverStationFmsAttached(fmsAttached);
 
   // DS Attached
-  bool dsAttached = HALSIM_GetDriverStationDsAttached();
   if (ImGui::Checkbox("DS Attached", &dsAttached))
     HALSIM_SetDriverStationDsAttached(dsAttached);
 
   // Alliance Station
-  static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
-                                   "Blue 1", "Blue 2", "Blue 3"};
-  int allianceStationId = HALSIM_GetDriverStationAllianceStationId();
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::Combo("Alliance Station", &allianceStationId, stations, 6))
     HALSIM_SetDriverStationAllianceStationId(
@@ -370,7 +401,6 @@ static void DisplayFMS() {
   ImGui::Checkbox("Match Time Enabled", &matchTimeEnabled);
 
   static double startMatchTime = 0.0;
-  double matchTime = HALSIM_GetDriverStationMatchTime();
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::InputDouble("Match Time", &matchTime, 0, 0, "%.1f",
                          ImGuiInputTextFlags_EnterReturnsTrue)) {
@@ -388,7 +418,6 @@ static void DisplayFMS() {
   }
 
   // Game Specific Message
-  static HAL_MatchInfo matchInfo;
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   if (ImGui::InputText("Game Specific",
                        reinterpret_cast<char*>(matchInfo.gameSpecificMessage),
@@ -436,7 +465,7 @@ static void DisplayJoysticks() {
     auto& joy = gRobotJoysticks[i];
     char label[128];
     joy.name.GetName(label, sizeof(label), "Joystick", i);
-    if (joy.sys) {
+    if (!gDisableDS && joy.sys) {
       ImGui::Selectable(label, false);
       if (ImGui::BeginDragDropSource()) {
         ImGui::SetDragDropPayload("Joystick", &joy.sys, sizeof(joy.sys));
@@ -447,7 +476,7 @@ static void DisplayJoysticks() {
     } else {
       ImGui::Selectable(label, false, ImGuiSelectableFlags_Disabled);
     }
-    if (ImGui::BeginDragDropTarget()) {
+    if (!gDisableDS && ImGui::BeginDragDropTarget()) {
       if (const ImGuiPayload* payload =
               ImGui::AcceptDragDropPayload("Joystick")) {
         IM_ASSERT(payload->DataSize == sizeof(SystemJoystick*));
@@ -471,13 +500,20 @@ static void DisplayJoysticks() {
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
     auto& joy = gRobotJoysticks[i];
 
-    if (joy.sys && joy.sys->present) {
+    if (gDisableDS) joy.GetHAL(i);
+
+    if ((gDisableDS && joy.desc.type != 0) || (joy.sys && joy.sys->present)) {
       // update GUI display
       ImGui::PushID(i);
-      ImGui::Text("%d: %s", static_cast<int>(joy.sys - gSystemJoysticks),
-                  joy.sys->name);
+      if (gDisableDS) {
+        ImGui::Text("%s", joy.desc.name);
+        ImGui::Text("Gamepad: %s", joy.desc.isXbox ? "Yes" : "No");
+      } else {
+        ImGui::Text("%d: %s", static_cast<int>(joy.sys - gSystemJoysticks),
+                    joy.sys->name);
 
-      if (joy.sys->isGamepad) ImGui::Checkbox("Map gamepad", &joy.useGamepad);
+        if (joy.sys->isGamepad) ImGui::Checkbox("Map gamepad", &joy.useGamepad);
+      }
 
       for (int j = 0; j < joy.axes.count; ++j)
         ImGui::Text("Axis[%d]: %.3f", j, joy.axes.axes[j]);
