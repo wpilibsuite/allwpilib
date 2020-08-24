@@ -274,6 +274,21 @@ void DriverStationData::SetJoystickButtonCount(int32_t stick, int32_t count) {
   m_joystickDescriptorCallbacks(stick, &m_joystickData[stick].descriptor);
 }
 
+void DriverStationData::GetJoystickCounts(int32_t stick, int32_t* axisCount,
+                                          int32_t* buttonCount,
+                                          int32_t* povCount) {
+  if (stick < 0 || stick >= kNumJoysticks) {
+    *axisCount = 0;
+    *buttonCount = 0;
+    *povCount = 0;
+    return;
+  }
+  std::scoped_lock lock(m_joystickDataMutex);
+  *axisCount = m_joystickData[stick].axes.count;
+  *buttonCount = m_joystickData[stick].buttons.count;
+  *povCount = m_joystickData[stick].povs.count;
+}
+
 void DriverStationData::SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {
   if (stick < 0 || stick >= kNumJoysticks) return;
   std::scoped_lock lock(m_joystickDataMutex);
@@ -465,6 +480,12 @@ void HALSIM_SetJoystickPOVCount(int32_t stick, int32_t count) {
 
 void HALSIM_SetJoystickButtonCount(int32_t stick, int32_t count) {
   SimDriverStationData->SetJoystickButtonCount(stick, count);
+}
+
+void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
+                              int32_t* buttonCount, int32_t* povCount) {
+  SimDriverStationData->GetJoystickCounts(stick, axisCount, buttonCount,
+                                          povCount);
 }
 
 void HALSIM_SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {

@@ -105,6 +105,8 @@ class DriverStationData {
   void SetJoystickAxisCount(int32_t stick, int32_t count);
   void SetJoystickPOVCount(int32_t stick, int32_t count);
   void SetJoystickButtonCount(int32_t stick, int32_t count);
+  void GetJoystickCounts(int32_t stick, int32_t* axisCount,
+                         int32_t* buttonCount, int32_t* povCount);
 
   void SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox);
   void SetJoystickType(int32_t stick, int32_t type);
