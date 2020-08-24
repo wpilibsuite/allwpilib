@@ -11,6 +11,8 @@
 # There is one file (delploy-and-run-test-on-robot.sh) that is designed to
 # deploy this file allong with the compiled tests for you.
 
+set -e
+
 # Configurable variables
 source config.sh
 
@@ -114,7 +116,7 @@ fi
 /usr/local/natinst/etc/init.d/systemWebServer stop
 
 # Kill all running robot programs
-killall java FRCUserProgram
+killall java FRCUserProgram || true
 
 # If we are running with the -d argument move the test to the DEFAULT_TEST_DIR
 if [[ ! -e "${TEST_DIR}/${TEST_FILE}" ]]; then
