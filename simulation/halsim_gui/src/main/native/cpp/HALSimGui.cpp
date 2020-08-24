@@ -205,6 +205,13 @@ void HALSimGui::AddWindow(const char* name, std::function<void()> display,
   }
 }
 
+void HALSimGui::RemoveWindow(const char* name) {
+  wpi::outs() << "Removing window " << name << "\n";
+  int index = gWindowMap[name];
+  gWindowMap.erase(name);
+  gWindows[index].display = nullptr;
+}
+
 void HALSimGui::AddMainMenu(std::function<void()> menu) {
   if (menu) gMenus.emplace_back(std::move(menu));
 }

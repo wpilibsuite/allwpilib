@@ -30,7 +30,7 @@ static HAL_SimDeviceHandle devHandle = 0;
 static wpi::StringMap<ImColor> colorLookUpTable;
 static std::unique_ptr<pfd::open_file> m_fileOpener;
 static std::string previousJsonLocation = "Not empty";
-//static std::vector<Mechanism2DView> Mechanism2DViewVector;
+// static std::vector<Mechanism2DView> Mechanism2DViewVector;
 
 namespace {
 struct BodyConfig {
@@ -83,8 +83,19 @@ class Mechanism2DInfo {
 };
 }  // namespace
 
+//namespace {
+//struct WindowStruct {
+//  const char* name;
+//  std::function<void()> display;
+//  int flags;
+//};
+//}  // namespace
+//
+//static std::vector<WindowStruct> windowVector;
+
 static Mechanism2DInfo mechanism2DInfo;
 
+// Get ready to read settings
 static bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
   if (name == "jsonLocation") {
     mechanism2DInfo.jsonLocation = value;
@@ -94,6 +105,7 @@ static bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
   return true;
 }
 
+// Get ready to write settings
 static void WriteIni(ImGuiTextBuffer* out) {
   out->appendf("[Mechanism2D][Mechanism2D]\njsonLocation=%s\n\n",
                mechanism2DInfo.jsonLocation.c_str());
@@ -106,7 +118,7 @@ static void* Mechanism2DReadOpen(ImGuiContext* ctx,
   if (name == wpi::StringRef{"Mechanism2D"}) return &mechanism2DInfo;
   return nullptr;
 }
-
+// Read line form settings
 static void Mechanism2DReadLine(ImGuiContext* ctx,
                                 ImGuiSettingsHandler* handler, void* entry,
                                 const char* lineStr) {
@@ -117,12 +129,14 @@ static void Mechanism2DReadLine(ImGuiContext* ctx,
   if (entry == &mechanism2DInfo) ReadIni(name, value);
 }
 
+// Write to settings
 static void Mechanism2DWriteAll(ImGuiContext* ctx,
                                 ImGuiSettingsHandler* handler,
                                 ImGuiTextBuffer* out_buf) {
   WriteIni(out_buf);
 }
 
+// Read in the json file
 static void GetJsonFileLocation() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
@@ -134,10 +148,12 @@ static void GetJsonFileLocation() {
   }
 }
 
-static DrawLineStruct DrawLine(float startXLocation, float startYLocation, int length,
-                        float angle, ImDrawList* drawList, ImVec2 windowPos,
-                        ImColor color, const BodyConfig& bodyConfig,
-                        const std::string& previousPath) {
+// Draw a line in the correct location
+static DrawLineStruct DrawLine(float startXLocation, float startYLocation,
+                               int length, float angle, ImDrawList* drawList,
+                               ImVec2 windowPos, ImColor color,
+                               const BodyConfig& bodyConfig,
+                               const std::string& previousPath) {
   DrawLineStruct drawLineStruct;
   drawLineStruct.angle = angle;
   // Find the current path do the ligament
@@ -156,6 +172,7 @@ static DrawLineStruct DrawLine(float startXLocation, float startYLocation, int l
   return drawLineStruct;
 }
 
+// Build the drawList from a body config
 static void buildDrawList(float startXLocation, float startYLocation,
                           ImDrawList* drawList, float previousAngle,
                           const std::vector<BodyConfig>& subBodyConfigs,
@@ -203,6 +220,7 @@ static void buildDrawList(float startXLocation, float startYLocation,
   }
 }
 
+// Read subjson
 static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   BodyConfig c;
   try {
@@ -245,6 +263,7 @@ static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   return c;
 }
 
+// Read json
 static void readJson(std::string jFile) {
   std::error_code ec;
   std::string name;
@@ -278,6 +297,7 @@ static void readJson(std::string jFile) {
   }
 }
 
+// Menu for loading json
 static void OptionMenuLocateJson() {
   if (ImGui::BeginMenu("Mechanism2D")) {
     if (ImGui::MenuItem("Load Json")) {
@@ -288,7 +308,8 @@ static void OptionMenuLocateJson() {
   }
 }
 
-static void DisplayAssembly2D() {
+//static int counter = 0;
+static void DisplayMechanism2D() {
   GetJsonFileLocation();
   if (!mechanism2DInfo.jsonLocation.empty()) {
     // Only read the json file if it changed
@@ -302,6 +323,20 @@ static void DisplayAssembly2D() {
     buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(),
                   drawList, 0, bodyConfigVector, windowPos);
   }
+//  wpi::outs() << counter << "\n";
+//  if (counter == 250) {
+//    wpi::outs() << "Removing windows \n";
+//    HALSimGui::RemoveWindow("Mechanism 2D");
+//  }
+//  counter++;
+}
+
+static void WindowManager() {
+//  ImDrawList* drawList = ImGui::GetWindowDrawList();
+//  if(ImGui::Button("Click me")) {
+//    wpi::outs() << "I was clicked";
+//  }
+  //  HALSimGui::AddWindow("Mechanism 2D", DisplayMechanism2D);
 }
 
 void Mechanism2D::Initialize() {
@@ -315,7 +350,9 @@ void Mechanism2D::Initialize() {
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
   buildColorTable();
-  HALSimGui::AddWindow("Mechanism 2D", DisplayAssembly2D);
+  HALSimGui::AddWindow("Mechanism 2D", WindowManager);
+  HALSimGui::AddWindow("Fix me!!!", DisplayMechanism2D);
+  WindowManager();
   HALSimGui::AddOptionMenu(OptionMenuLocateJson);
   HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
   HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);

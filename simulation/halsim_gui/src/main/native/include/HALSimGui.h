@@ -75,6 +75,13 @@ class HALSimGui {
                         int flags = 0);
 
   /**
+   * Removes window form the GUI.
+   *
+   * @param name name of the window (title bar)
+   */
+  static void RemoveWindow(const char* name);
+
+  /**
    * Adds to GUI's main menu bar.  The menu function is called from within a
    * ImGui::BeginMainMenuBar()/EndMainMenuBar() block.  Usually it's only
    * appropriate to create a menu with ImGui::BeginMenu()/EndMenu() inside of
