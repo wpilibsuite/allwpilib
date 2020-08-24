@@ -30,6 +30,8 @@ static HAL_SimDeviceHandle devHandle = 0;
 static wpi::StringMap<ImColor> colorLookUpTable;
 static std::unique_ptr<pfd::open_file> m_fileOpener;
 static std::string previousJsonLocation = "Not empty";
+static bool showMechanism2D = true;
+static bool initMechanism2D = true;
 // static std::vector<Mechanism2DView> Mechanism2DViewVector;
 
 namespace {
@@ -332,11 +334,22 @@ static void DisplayMechanism2D() {
 }
 
 static void WindowManager() {
-//  ImDrawList* drawList = ImGui::GetWindowDrawList();
-//  if(ImGui::Button("Click me")) {
-//    wpi::outs() << "I was clicked";
-//  }
-  //  HALSimGui::AddWindow("Mechanism 2D", DisplayMechanism2D);
+
+  ImGui::Checkbox("Mechanism 2D", &showMechanism2D);
+
+
+  if (initMechanism2D && showMechanism2D) {
+    HALSimGui::AddWindow("Mechanism 2D", DisplayMechanism2D);
+    HALSimGui::AddOptionMenu(OptionMenuLocateJson);
+    HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
+    HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
+    HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
+    initMechanism2D = false;
+  }
+  if(!initMechanism2D && !showMechanism2D){
+    HALSimGui::RemoveWindow("Mechanism 2D");
+    initMechanism2D = true;
+  }
 }
 
 void Mechanism2D::Initialize() {
@@ -350,11 +363,8 @@ void Mechanism2D::Initialize() {
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
   buildColorTable();
-  HALSimGui::AddWindow("Mechanism 2D", WindowManager);
-  HALSimGui::AddWindow("Fix me!!!", DisplayMechanism2D);
-  WindowManager();
-  HALSimGui::AddOptionMenu(OptionMenuLocateJson);
-  HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
-  HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
-  HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
+  HALSimGui::AddWindow("Mechanism 2D Settings", WindowManager);
+  HALSimGui::SetDefaultWindowPos("Mechanism 2D Settings", 100, 100);
+  HALSimGui::SetDefaultWindowSize("Mechanism 2D Settings", 200, 200);
+  HALSimGui::SetWindowPadding("Mechanism 2D Settings", 0, 0);
 }
