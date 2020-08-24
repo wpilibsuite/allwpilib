@@ -95,6 +95,13 @@ void HALSIM_SetJoystickPOVCount(int32_t stick, int32_t count) {}
 
 void HALSIM_SetJoystickButtonCount(int32_t stick, int32_t count) {}
 
+void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
+                              int32_t* buttonCount, int32_t* povCount) {
+  *axisCount = 0;
+  *buttonCount = 0;
+  *povCount = 0;
+}
+
 void HALSIM_SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {}
 
 void HALSIM_SetJoystickType(int32_t stick, int32_t type) {}
