@@ -64,9 +64,9 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
-  auto thetaController = frc::ProfiledPIDController<units::radians>(
+  frc::ProfiledPIDController<units::radians> thetaController{
       AutoConstants::kPThetaController, 0, 0,
-      AutoConstants::kThetaControllerConstraints);
+      AutoConstants::kThetaControllerConstraints};
 
   thetaController.EnableContinuousInput(units::radian_t(-wpi::math::pi),
                                         units::radian_t(wpi::math::pi));
