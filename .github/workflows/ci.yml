@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Fetch all history and metadata
         run: git fetch --prune --unshallow --tags
-      - uses: austinshalit/setup-java@bugfix/architecture
+      - uses: actions/setup-java@v1
         with:
           java-version: 11
           architecture: ${{ matrix.architecture }}
@@ -141,7 +141,7 @@ jobs:
         run: |
           cat combiner/products/build/allOutputs/version.txt
           test -s combiner/products/build/allOutputs/version.txt
-      - uses: austinshalit/setup-java@bugfix/architecture
+      - uses: actions/setup-java@v1
         with:
           java-version: 11
       - name: Combine
