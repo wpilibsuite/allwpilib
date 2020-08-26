@@ -36,5 +36,6 @@ includeOtherLibs {
   ^unsupported/
   ^vision/
   ^wpi/
+  ^wpigui
   ^wpimath/
 }

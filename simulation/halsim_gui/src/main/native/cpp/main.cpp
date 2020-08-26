@@ -36,6 +36,7 @@ extern "C" {
 __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
+  HALSimGui::GlobalInit();
   HALSimGui::Add(AccelerometerGui::Initialize);
   HALSimGui::Add(AddressableLEDGui::Initialize);
   HALSimGui::Add(AnalogGyroGui::Initialize);
