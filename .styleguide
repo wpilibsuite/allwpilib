@@ -26,6 +26,7 @@ includeOtherLibs {
   ^drake/
   ^hal/
   ^imgui
+  ^implot
   ^mockdata/
   ^networktables/
   ^ntcore

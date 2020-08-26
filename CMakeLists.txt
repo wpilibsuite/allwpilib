@@ -138,6 +138,7 @@ endif()
 
 if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
     add_subdirectory(imgui)
+    add_subdirectory(wpigui)
     add_subdirectory(simulation)
 endif()
 
