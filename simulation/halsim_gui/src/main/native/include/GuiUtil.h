@@ -7,14 +7,9 @@
 
 #pragma once
 
-#include <GL/gl3w.h>
 #include <imgui.h>
-#include <wpi/Twine.h>
 
 namespace halsimgui {
-
-bool LoadTextureFromFile(const wpi::Twine& filename, GLuint* out_texture,
-                         int* out_width, int* out_height);
 
 // get distance^2 between two ImVec's
 inline float GetDistSquared(const ImVec2& a, const ImVec2& b) {

@@ -34,6 +34,7 @@ namespace halsimgui {
 
 class HALSimGui {
  public:
+  static void GlobalInit();
   static bool Initialize();
   static void Main(void*);
   static void Exit(void*);
