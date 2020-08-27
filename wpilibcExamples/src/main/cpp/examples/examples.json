@@ -627,6 +627,22 @@
     "gradlebase": "cpp",
     "mainclass": "Main",
     "commandversion": 2
+  }, 
+  {
+    "name": "DifferentialDrivePoseEstimator",
+    "description": "Demonstrates the use of the DifferentialDrivePoseEstimator as a replacement for differential drive odometry.",
+    "tags": [
+      "Drivetrain",
+      "State space",
+      "Vision",
+      "Filter",
+      "Odometry",
+      "Pose"
+    ],
+    "foldername": "DifferentialDrivePoseEstimator",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
   },
   {
     "name": "ArmSimulation",
@@ -639,7 +655,6 @@
       "Simulation",
       "Physics"
     ],
-    "foldername": "ArmSimulation",
     "gradlebase": "cpp",
     "mainclass": "Main",
     "commandversion": 2
@@ -657,7 +672,23 @@
       "Drivetrain",
       "Field2d"
     ],
-    "foldername": "DifferentialDriveSimulation",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveDrivePoseEstimator",
+    "description": "Demonstrates the use of the SwerveDrivePoseEstimator as a replacement for mecanum drive odometry.",
+    "tags": [
+      "Drivetrain",
+      "State space",
+      "Vision",
+      "Filter",
+      "Odometry",
+      "State",
+      "Swerve"
+    ],
+    "foldername": "SwerveDrivePoseEstimator",
     "gradlebase": "cpp",
     "mainclass": "Main",
     "commandversion": 2

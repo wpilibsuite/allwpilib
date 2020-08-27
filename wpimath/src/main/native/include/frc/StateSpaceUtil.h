@@ -233,6 +233,24 @@ Eigen::Matrix<double, N, 1> MakeWhiteNoiseVector(
 }
 
 /**
+ * Converts a Pose2d into a vector of [x, y, theta].
+ *
+ * @param pose The pose that is being represented.
+ *
+ * @return The vector.
+ */
+Eigen::Matrix<double, 3, 1> PoseTo3dVector(const Pose2d& pose);
+
+/**
+ * Converts a Pose2d into a vector of [x, y, std::cos(theta), std::sin(theta)].
+ *
+ * @param pose The pose that is being represented.
+ *
+ * @return The vector.
+ */
+Eigen::Matrix<double, 4, 1> PoseTo4dVector(const Pose2d& pose);
+
+/**
  * Returns true if (A, B) is a stabilizable pair.
  *
  * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if

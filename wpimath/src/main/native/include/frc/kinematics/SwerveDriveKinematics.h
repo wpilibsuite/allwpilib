@@ -76,6 +76,23 @@ class SwerveDriveKinematics {
         wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
   }
 
+  explicit SwerveDriveKinematics(
+      const std::array<Translation2d, NumModules>& wheels)
+      : m_modules{wheels} {
+    for (size_t i = 0; i < NumModules; i++) {
+      // clang-format off
+      m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
+        1, 0, (-m_modules[i].Y()).template to<double>(),
+        0, 1, (+m_modules[i].X()).template to<double>();
+      // clang-format on
+    }
+
+    m_forwardKinematics = m_inverseKinematics.householderQr();
+
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
+  }
+
   SwerveDriveKinematics(const SwerveDriveKinematics&) = default;
 
   /**
