@@ -643,12 +643,39 @@ public class DriverStation {
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * autonomous mode and enabled.
+   *
+   * @return True if autonomous should be set and the robot should be enabled.
+   */
+  public boolean isAutonomousEnabled() {
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getAutonomous() && m_controlWordCache.getEnabled();
+    }
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
    * operator-controlled mode.
    *
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public boolean isOperatorControl() {
     return !(isAutonomous() || isTest());
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * operator-controller mode and enabled.
+   *
+   * @return True if operator-controlled mode should be set and the robot should be enabled.
+   */
+  public boolean isOperatorControlEnabled() {
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return !m_controlWordCache.getAutonomous() && !m_controlWordCache.getTest()
+          && m_controlWordCache.getEnabled();
+    }
   }
 
   /**

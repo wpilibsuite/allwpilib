@@ -212,6 +212,16 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
+   * Determine if the robot is current in Autonomous mode and enabled as determined by
+   * the field controls.
+   *
+   * @return True if the robot is currently operating autonomously while enabled.
+   */
+  public boolean isAutonomousEnabled() {
+    return m_ds.isAutonomousEnabled();
+  }
+
+  /**
    * Determine if the robot is currently in Test mode as determined by the driver
    * station.
    *
@@ -229,6 +239,16 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public boolean isOperatorControl() {
     return m_ds.isOperatorControl();
+  }
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled as determined by
+   * the field controls.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while enabled.
+   */
+  public boolean isOperatorControlEnabled() {
+    return m_ds.isOperatorControlEnabled();
   }
 
   /**

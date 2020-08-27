@@ -358,10 +358,22 @@ bool DriverStation::IsAutonomous() const {
   return controlWord.autonomous;
 }
 
+bool DriverStation::IsAutonomousEnabled() const {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return controlWord.autonomous && controlWord.enabled;
+}
+
 bool DriverStation::IsOperatorControl() const {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
+}
+
+bool DriverStation::IsOperatorControlEnabled() const {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return !controlWord.autonomous && !controlWord.test && controlWord.enabled;
 }
 
 bool DriverStation::IsTest() const {

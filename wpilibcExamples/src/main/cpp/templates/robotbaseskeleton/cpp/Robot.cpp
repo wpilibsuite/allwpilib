@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,7 +41,7 @@ void Robot::StartCompetition() {
       m_ds.InAutonomous(true);
       Autonomous();
       m_ds.InAutonomous(false);
-      while (IsAutonomous() && IsEnabled()) m_ds.WaitForData();
+      while (IsAutonomousEnabled()) m_ds.WaitForData();
     } else if (IsTest()) {
       lw.SetEnabled(true);
       frc::Shuffleboard::EnableActuatorWidgets();
@@ -55,7 +55,7 @@ void Robot::StartCompetition() {
       m_ds.InOperatorControl(true);
       Teleop();
       m_ds.InOperatorControl(false);
-      while (IsOperatorControl() && IsEnabled()) m_ds.WaitForData();
+      while (IsOperatorControlEnabled()) m_ds.WaitForData();
     }
   }
 }
