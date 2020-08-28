@@ -210,6 +210,8 @@ bool HALSimGui::Initialize() {
       if ((window.posCond & ImGuiCond_FirstUseEver) != 0) {
         window.pos.x *= windowScale;
         window.pos.y *= windowScale;
+        window.size.x *= windowScale;
+        window.size.y *= windowScale;
       }
     }
   });

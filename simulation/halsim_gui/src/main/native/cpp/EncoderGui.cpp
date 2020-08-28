@@ -117,5 +117,5 @@ void EncoderGui::Initialize() {
   gEncoders.Initialize();
   HALSimGui::AddWindow("Encoders", DisplayEncoders,
                        ImGuiWindowFlags_AlwaysAutoResize);
-  HALSimGui::SetDefaultWindowPos("Encoders", 640, 215);
+  HALSimGui::SetDefaultWindowPos("Encoders", 5, 250);
 }
