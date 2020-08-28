@@ -12,6 +12,7 @@ nativeUtils {
       opencvVersion = "3.4.7-3"
       googleTestVersion = "1.9.0-5-437e100-1"
       imguiVersion = "1.76-6"
+      wpimathVersion = "-1"
     }
   }
 }
