@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
 
 #include "frc/shuffleboard/Shuffleboard.h"
@@ -43,7 +44,7 @@ frc::ShuffleboardTab& ShuffleboardInstance::GetTab(wpi::StringRef title) {
 
 void ShuffleboardInstance::Update() {
   if (m_impl->tabsChanged) {
-    std::vector<std::string> tabTitles;
+    wpi::SmallVector<std::string, 16> tabTitles;
     for (auto& entry : m_impl->tabs) {
       tabTitles.emplace_back(entry.second.GetTitle());
     }
