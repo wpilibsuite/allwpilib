@@ -32,6 +32,7 @@ static std::unique_ptr<pfd::open_file> m_fileOpener;
 static std::string previousJsonLocation = "Not empty";
 static bool showMechanism2D = true;
 static bool initMechanism2D = true;
+static bool debugMode = false;
 // static std::vector<Mechanism2DView> Mechanism2DViewVector;
 
 namespace {
@@ -219,6 +220,9 @@ static void buildDrawList(float startXLocation, float startYLocation,
       buildDrawList(drawLine.xEnd, drawLine.yEnd, drawList, drawLine.angle,
                     bodyConfig.children, windowPos);
     }
+    if (debugMode) {
+      wpi::outs() << bodyConfig.name << " Angle: " << angle << " Length: " << length << "\n";
+    }
   }
 }
 
@@ -336,7 +340,7 @@ static void DisplayMechanism2D() {
 static void WindowManager() {
 
   ImGui::Checkbox("Mechanism 2D", &showMechanism2D);
-
+  ImGui::Checkbox("Debug mode", &debugMode);
 
   if (initMechanism2D && showMechanism2D) {
     HALSimGui::AddWindow("Mechanism 2D", DisplayMechanism2D);
