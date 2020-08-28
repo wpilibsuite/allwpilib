@@ -21,8 +21,7 @@ import org.ejml.simple.SimpleMatrix;
 import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
-/**
- * A shape-safe wrapper over Efficient Java Matrix Library (EJML) matrices.
+/*
  *
  * <p>This class is intended to be used alongside the state space library.
  *

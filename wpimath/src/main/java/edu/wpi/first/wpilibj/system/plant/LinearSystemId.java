@@ -65,7 +65,9 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a differential drive drivetrain.
+   * Create a state-space model of a differential drive drivetrain. In this model, the
+   * states are [v_left, v_right]^T, inputs are [V_left, V_right]^T and outputs are
+   * [v_left, v_right]^T.
    *
    * @param motor            the gearbox representing the motors driving the drivetrain.
    * @param massKg           the mass of the robot.
