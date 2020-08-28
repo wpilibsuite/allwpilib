@@ -30,6 +30,10 @@ static HAL_SimDeviceHandle devHandle = 0;
 static wpi::StringMap<ImColor> colorLookUpTable;
 static std::unique_ptr<pfd::open_file> m_fileOpener;
 static std::string previousJsonLocation = "Not empty";
+static bool showMechanism2D = true;
+static bool initMechanism2D = true;
+static bool debugMode = false;
+// static std::vector<Mechanism2DView> Mechanism2DViewVector;
 
 namespace {
 struct BodyConfig {
@@ -83,8 +87,19 @@ class Mechanism2DInfo {
 };
 }  // namespace
 
+//namespace {
+//struct WindowStruct {
+//  const char* name;
+//  std::function<void()> display;
+//  int flags;
+//};
+//}  // namespace
+//
+//static std::vector<WindowStruct> windowVector;
+
 static Mechanism2DInfo mechanism2DInfo;
 
+// Get ready to read settings
 static bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
   if (name == "jsonLocation") {
     mechanism2DInfo.jsonLocation = value;
@@ -94,6 +109,7 @@ static bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
   return true;
 }
 
+// Get ready to write settings
 static void WriteIni(ImGuiTextBuffer* out) {
   out->appendf("[Mechanism2D][Mechanism2D]\njsonLocation=%s\n\n",
                mechanism2DInfo.jsonLocation.c_str());
@@ -106,7 +122,7 @@ static void* Mechanism2DReadOpen(ImGuiContext* ctx,
   if (name == wpi::StringRef{"Mechanism2D"}) return &mechanism2DInfo;
   return nullptr;
 }
-
+// Read line form settings
 static void Mechanism2DReadLine(ImGuiContext* ctx,
                                 ImGuiSettingsHandler* handler, void* entry,
                                 const char* lineStr) {
@@ -117,12 +133,14 @@ static void Mechanism2DReadLine(ImGuiContext* ctx,
   if (entry == &mechanism2DInfo) ReadIni(name, value);
 }
 
+// Write to settings
 static void Mechanism2DWriteAll(ImGuiContext* ctx,
                                 ImGuiSettingsHandler* handler,
                                 ImGuiTextBuffer* out_buf) {
   WriteIni(out_buf);
 }
 
+// Read in the json file
 static void GetJsonFileLocation() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
@@ -134,10 +152,12 @@ static void GetJsonFileLocation() {
   }
 }
 
-static DrawLineStruct DrawLine(float startXLocation, float startYLocation, int length,
-                        float angle, ImDrawList* drawList, ImVec2 windowPos,
-                        ImColor color, const BodyConfig& bodyConfig,
-                        const std::string& previousPath) {
+// Draw a line in the correct location
+static DrawLineStruct DrawLine(float startXLocation, float startYLocation,
+                               int length, float angle, ImDrawList* drawList,
+                               ImVec2 windowPos, ImColor color,
+                               const BodyConfig& bodyConfig,
+                               const std::string& previousPath) {
   DrawLineStruct drawLineStruct;
   drawLineStruct.angle = angle;
   // Find the current path do the ligament
@@ -156,6 +176,7 @@ static DrawLineStruct DrawLine(float startXLocation, float startYLocation, int l
   return drawLineStruct;
 }
 
+// Build the drawList from a body config
 static void buildDrawList(float startXLocation, float startYLocation,
                           ImDrawList* drawList, float previousAngle,
                           const std::vector<BodyConfig>& subBodyConfigs,
@@ -200,10 +221,13 @@ static void buildDrawList(float startXLocation, float startYLocation,
       buildDrawList(drawLine.xEnd, drawLine.yEnd, drawList, drawLine.angle,
                     bodyConfig.children, windowPos);
     }
+    if (debugMode) {
+      wpi::outs() << bodyConfig.name << " Angle: " << angle << " Length: " << length << "\n";
+    }
   }
 }
 
-static BodyConfig readSubJson(const std::string& name, wpi::json const& body, std::vector<BodyConfig> bodyConfigVector) {
+static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   BodyConfig c;
   try {
     c.name = name + "/" + body.at("name").get<std::string>();
@@ -245,7 +269,8 @@ static BodyConfig readSubJson(const std::string& name, wpi::json const& body, st
   return c;
 }
 
-static void readJson(std::string jFile, std::vector<BodyConfig> bodyConfigVector) {
+
+static void readJson(std::string jFile) {
   std::error_code ec;
   std::string name;
   wpi::raw_fd_istream is(jFile, ec);
@@ -278,6 +303,7 @@ static void readJson(std::string jFile, std::vector<BodyConfig> bodyConfigVector
   }
 }
 
+// Menu for loading json
 static void OptionMenuLocateJson() {
   if (ImGui::BeginMenu("Mechanism2D")) {
     if (ImGui::MenuItem("Load Json")) {
@@ -288,7 +314,8 @@ static void OptionMenuLocateJson() {
   }
 }
 
-static void DisplayAssembly2D(std::vector<BodyConfig> bodyConfigVector) {
+
+static void DisplayMechanism2D() {
   GetJsonFileLocation();
   if (!mechanism2DInfo.jsonLocation.empty()) {
 //     Only read the json file if it changed
@@ -305,6 +332,25 @@ static void DisplayAssembly2D(std::vector<BodyConfig> bodyConfigVector) {
   }
 }
 
+static void WindowManager() {
+
+  ImGui::Checkbox("Mechanism 2D", &showMechanism2D);
+  ImGui::Checkbox("Debug mode", &debugMode);
+
+  if (initMechanism2D && showMechanism2D) {
+    HALSimGui::AddWindow("Mechanism 2D", DisplayMechanism2D);
+    HALSimGui::AddOptionMenu(OptionMenuLocateJson);
+    HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
+    HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
+    HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
+    initMechanism2D = false;
+  }
+  if(!initMechanism2D && !showMechanism2D){
+    HALSimGui::RemoveWindow("Mechanism 2D");
+    initMechanism2D = true;
+  }
+}
+
 void Mechanism2D::Initialize() {
   // hook ini handler to save settings
   ImGuiSettingsHandler iniHandler;
@@ -316,9 +362,8 @@ void Mechanism2D::Initialize() {
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
   buildColorTable();
-  HALSimGui::AddWindow("Mechanism 2D", [=] { DisplayAssembly2D(new std::vector<BodyConfig>); });
-  HALSimGui::AddOptionMenu(OptionMenuLocateJson);
-  HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
-  HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
-  HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
+  HALSimGui::AddWindow("Mechanism 2D Settings", WindowManager);
+  HALSimGui::SetDefaultWindowPos("Mechanism 2D Settings", 100, 100);
+  HALSimGui::SetDefaultWindowSize("Mechanism 2D Settings", 200, 200);
+  HALSimGui::SetWindowPadding("Mechanism 2D Settings", 0, 0);
 }
