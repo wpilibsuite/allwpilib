@@ -11,6 +11,25 @@
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
 
+typedef void (*HAL_JoystickAxesCallback)(const char* name, void* param,
+                                         int32_t joystickNum,
+                                         const HAL_JoystickAxes* axes);
+typedef void (*HAL_JoystickPOVsCallback)(const char* name, void* param,
+                                         int32_t joystickNum,
+                                         const HAL_JoystickPOVs* povs);
+typedef void (*HAL_JoystickButtonsCallback)(const char* name, void* param,
+                                            int32_t joystickNum,
+                                            const HAL_JoystickButtons* buttons);
+typedef void (*HAL_JoystickDescriptorCallback)(
+    const char* name, void* param, int32_t joystickNum,
+    const HAL_JoystickDescriptor* descriptor);
+typedef void (*HAL_JoystickOutputsCallback)(const char* name, void* param,
+                                            int32_t joystickNum,
+                                            int64_t outputs, int32_t leftRumble,
+                                            int32_t rightRumble);
+typedef void (*HAL_MatchInfoCallback)(const char* name, void* param,
+                                      const HAL_MatchInfo* info);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,16 +87,53 @@ void HALSIM_CancelDriverStationMatchTimeCallback(int32_t uid);
 double HALSIM_GetDriverStationMatchTime(void);
 void HALSIM_SetDriverStationMatchTime(double matchTime);
 
+int32_t HALSIM_RegisterJoystickAxesCallback(int32_t joystickNum,
+                                            HAL_JoystickAxesCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify);
+void HALSIM_CancelJoystickAxesCallback(int32_t uid);
+void HALSIM_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes);
 void HALSIM_SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes* axes);
+
+int32_t HALSIM_RegisterJoystickPOVsCallback(int32_t joystickNum,
+                                            HAL_JoystickPOVsCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify);
+void HALSIM_CancelJoystickPOVsCallback(int32_t uid);
+void HALSIM_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
 void HALSIM_SetJoystickPOVs(int32_t joystickNum, const HAL_JoystickPOVs* povs);
+
+int32_t HALSIM_RegisterJoystickButtonsCallback(
+    int32_t joystickNum, HAL_JoystickButtonsCallback callback, void* param,
+    HAL_Bool initialNotify);
+void HALSIM_CancelJoystickButtonsCallback(int32_t uid);
+void HALSIM_GetJoystickButtons(int32_t joystickNum,
+                               HAL_JoystickButtons* buttons);
 void HALSIM_SetJoystickButtons(int32_t joystickNum,
                                const HAL_JoystickButtons* buttons);
+
+int32_t HALSIM_RegisterJoystickDescriptorCallback(
+    int32_t joystickNum, HAL_JoystickDescriptorCallback callback, void* param,
+    HAL_Bool initialNotify);
+void HALSIM_CancelJoystickDescriptorCallback(int32_t uid);
+void HALSIM_GetJoystickDescriptor(int32_t joystickNum,
+                                  HAL_JoystickDescriptor* descriptor);
 void HALSIM_SetJoystickDescriptor(int32_t joystickNum,
                                   const HAL_JoystickDescriptor* descriptor);
 
+int32_t HALSIM_RegisterJoystickOutputsCallback(
+    int32_t joystickNum, HAL_JoystickOutputsCallback callback, void* param,
+    HAL_Bool initialNotify);
+void HALSIM_CancelJoystickOutputsCallback(int32_t uid);
 void HALSIM_GetJoystickOutputs(int32_t joystickNum, int64_t* outputs,
                                int32_t* leftRumble, int32_t* rightRumble);
+void HALSIM_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
+                               int32_t leftRumble, int32_t rightRumble);
 
+int32_t HALSIM_RegisterMatchInfoCallback(HAL_MatchInfoCallback callback,
+                                         void* param, HAL_Bool initialNotify);
+void HALSIM_CancelMatchInfoCallback(int32_t uid);
+void HALSIM_GetMatchInfo(HAL_MatchInfo* info);
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info);
 
 void HALSIM_SetJoystickButton(int32_t stick, int32_t button, HAL_Bool state);
@@ -103,6 +159,10 @@ void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify);
 
+int32_t HALSIM_RegisterDriverStationNewDataCallback(HAL_NotifyCallback callback,
+                                                    void* param,
+                                                    HAL_Bool initialNotify);
+void HALSIM_CancelDriverStationNewDataCallback(int32_t uid);
 void HALSIM_NotifyDriverStationNewData(void);
 
 #ifdef __cplusplus

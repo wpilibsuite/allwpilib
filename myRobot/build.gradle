@@ -119,6 +119,7 @@ repositories {
 
 dependencies {
     implementation project(':wpilibj')
+    implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
     implementation project(':ntcore')
@@ -148,6 +149,7 @@ model {
                     lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
@@ -180,6 +182,7 @@ model {
                     lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'static'
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
+                    lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'static'
                     lib project: ':cscore', library: 'cscore', linkage: 'static'
                     project(':hal').addHalDependency(binary, 'static')

@@ -64,16 +64,20 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
+  frc::ProfiledPIDController<units::radians> thetaController{
+      AutoConstants::kPThetaController, 0, 0,
+      AutoConstants::kThetaControllerConstraints};
+
+  thetaController.EnableContinuousInput(units::radian_t(-wpi::math::pi),
+                                        units::radian_t(wpi::math::pi));
+
   frc2::SwerveControllerCommand<4> swerveControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
 
       frc2::PIDController(AutoConstants::kPXController, 0, 0),
-      frc2::PIDController(AutoConstants::kPYController, 0, 0),
-      frc::ProfiledPIDController<units::radians>(
-          AutoConstants::kPThetaController, 0, 0,
-          AutoConstants::kThetaControllerConstraints),
+      frc2::PIDController(AutoConstants::kPYController, 0, 0), thetaController,
 
       [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 

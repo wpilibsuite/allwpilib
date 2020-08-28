@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,16 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class InstantCommandTest extends CommandTestBase {
   @Test
   void instantCommandScheduleTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder cond = new ConditionHolder();
 
-    ConditionHolder cond = new ConditionHolder();
+      InstantCommand command = new InstantCommand(() -> cond.setCondition(true));
 
-    InstantCommand command = new InstantCommand(() -> cond.setCondition(true));
+      scheduler.schedule(command);
+      scheduler.run();
 
-    scheduler.schedule(command);
-    scheduler.run();
-
-    assertTrue(cond.getCondition());
-    assertFalse(scheduler.isScheduled(command));
+      assertTrue(cond.getCondition());
+      assertFalse(scheduler.isScheduled(command));
+    }
   }
 }

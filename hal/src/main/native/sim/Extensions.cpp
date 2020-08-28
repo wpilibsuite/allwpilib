@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -64,7 +64,7 @@ int HAL_LoadOneExtension(const char* library) {
     libraryName += ".so";
 #endif
     wpi::outs() << "HAL Extensions: Trying modified name: "
-                << wpi::sys::path::stem(libraryName);
+                << wpi::sys::path::stem(libraryName) << "\n";
     wpi::outs().flush();
     handle = DLOPEN(libraryName.c_str());
   }

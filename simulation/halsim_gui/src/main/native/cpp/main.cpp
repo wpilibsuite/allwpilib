@@ -19,6 +19,7 @@
 #include "EncoderGui.h"
 #include "Field2D.h"
 #include "HALSimGui.h"
+#include "Mechanism2D.h"
 #include "NetworkTablesGui.h"
 #include "PDPGui.h"
 #include "PWMGui.h"
@@ -35,6 +36,7 @@ extern "C" {
 __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
+  HALSimGui::GlobalInit();
   HALSimGui::Add(AccelerometerGui::Initialize);
   HALSimGui::Add(AddressableLEDGui::Initialize);
   HALSimGui::Add(AnalogGyroGui::Initialize);
@@ -45,6 +47,7 @@ __declspec(dllexport)
   HALSimGui::Add(DIOGui::Initialize);
   HALSimGui::Add(EncoderGui::Initialize);
   HALSimGui::Add(Field2D::Initialize);
+  HALSimGui::Add(Mechanism2D::Initialize);
   HALSimGui::Add(NetworkTablesGui::Initialize);
   HALSimGui::Add(PDPGui::Initialize);
   HALSimGui::Add(PWMGui::Initialize);

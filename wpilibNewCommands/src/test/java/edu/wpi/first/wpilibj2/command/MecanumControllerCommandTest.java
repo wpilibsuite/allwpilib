@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj2.command;
 
 import java.util.ArrayList;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -28,6 +31,16 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MecanumControllerCommandTest {
+  @BeforeAll
+  static void setupAll() {
+    SimHooks.pauseTiming();
+  }
+
+  @AfterAll
+  static void cleanupAll() {
+    SimHooks.resumeTiming();
+  }
+
   private final Timer m_timer = new Timer();
   private Rotation2d m_angle = new Rotation2d(0);
 
@@ -102,6 +115,7 @@ class MecanumControllerCommandTest {
     while (!command.isFinished()) {
       command.execute();
       m_angle = trajectory.sample(m_timer.get()).poseMeters.getRotation();
+      SimHooks.stepTiming(0.005);
     }
     m_timer.stop();
     command.end(true);

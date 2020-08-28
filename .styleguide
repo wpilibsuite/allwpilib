@@ -20,16 +20,22 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^Eigen/
   ^cameraserver/
   ^cscore
+  ^drake/
   ^hal/
   ^imgui
+  ^implot
   ^mockdata/
   ^networktables/
   ^ntcore
   ^opencv2/
   ^support/
   ^units/
+  ^unsupported/
   ^vision/
   ^wpi/
+  ^wpigui
+  ^wpimath/
 }

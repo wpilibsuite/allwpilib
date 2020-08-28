@@ -22,7 +22,7 @@ bool IsTimingPaused();
 
 void StepTiming(uint64_t delta);
 
-int64_t GetFPGATime();
+uint64_t GetFPGATime();
 
 double GetFPGATimestamp();
 

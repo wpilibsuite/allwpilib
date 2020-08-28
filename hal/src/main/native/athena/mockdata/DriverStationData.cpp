@@ -26,22 +26,58 @@ DEFINE_CAPI(HAL_AllianceStationID, AllianceStationId,
             HAL_AllianceStationID_kRed1)
 DEFINE_CAPI(double, MatchTime, 0)
 
-void HALSIM_SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes* axes) {
+#undef DEFINE_CAPI
+#define DEFINE_CAPI(name, data)                                                \
+  int32_t HALSIM_RegisterJoystick##name##Callback(                             \
+      int32_t joystickNum, HAL_Joystick##name##Callback callback, void* param, \
+      HAL_Bool initialNotify) {                                                \
+    return 0;                                                                  \
+  }                                                                            \
+                                                                               \
+  void HALSIM_CancelJoystick##name##Callback(int32_t uid) {}                   \
+                                                                               \
+  void HALSIM_GetJoystick##name(int32_t joystickNum, HAL_Joystick##name* d) {} \
+                                                                               \
+  void HALSIM_SetJoystick##name(int32_t joystickNum,                           \
+                                const HAL_Joystick##name* d) {}
+
+DEFINE_CAPI(Axes, axes)
+DEFINE_CAPI(POVs, povs)
+DEFINE_CAPI(Buttons, buttons)
+DEFINE_CAPI(Descriptor, descriptor)
+
+int32_t HALSIM_RegisterJoystickOutputsCallback(
+    int32_t joystickNum, HAL_JoystickOutputsCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return 0;
 }
 
-void HALSIM_SetJoystickPOVs(int32_t joystickNum, const HAL_JoystickPOVs* povs) {
-}
-
-void HALSIM_SetJoystickButtons(int32_t joystickNum,
-                               const HAL_JoystickButtons* buttons) {}
-
-void HALSIM_SetJoystickDescriptor(int32_t joystickNum,
-                                  const HAL_JoystickDescriptor* descriptor) {}
+void HALSIM_CancelJoystickOutputsCallback(int32_t uid) {}
 
 void HALSIM_GetJoystickOutputs(int32_t joystickNum, int64_t* outputs,
                                int32_t* leftRumble, int32_t* rightRumble) {}
 
+void HALSIM_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
+                               int32_t leftRumble, int32_t rightRumble) {}
+
+int32_t HALSIM_RegisterMatchInfoCallback(HAL_MatchInfoCallback callback,
+                                         void* param, HAL_Bool initialNotify) {
+  return 0;
+}
+
+void HALSIM_CancelMatchInfoCallback(int32_t uid) {}
+
+void HALSIM_GetMatchInfo(HAL_MatchInfo* info) {}
+
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {}
+
+int32_t HALSIM_RegisterDriverStationNewDataCallback(HAL_NotifyCallback callback,
+                                                    void* param,
+                                                    HAL_Bool initialNotify) {
+  return 0;
+}
+
+void HALSIM_CancelDriverStationNewDataCallback(int32_t uid) {}
 
 void HALSIM_NotifyDriverStationNewData(void) {}
 

@@ -108,6 +108,13 @@ class AnalogEncoder : public ErrorBase,
    */
   double GetDistance() const;
 
+  /**
+   * Get the channel number.
+   *
+   * @return The channel number.
+   */
+  int GetChannel() const;
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:

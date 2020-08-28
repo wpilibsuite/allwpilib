@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -133,11 +133,27 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
 
     if (valueForward) {
       return Value.kForward;
-    }
-    if (valueReverse) {
+    } else if (valueReverse) {
       return Value.kReverse;
+    } else {
+      return Value.kOff;
     }
-    return Value.kOff;
+  }
+
+  /**
+   * Toggle the value of the solenoid.
+   *
+   * <p>If the solenoid is set to forward, it'll be set to reverse. If the solenoid is set to
+   * reverse, it'll be set to forward. If the solenoid is set to off, nothing happens.
+   */
+  public void toggle() {
+    Value value = get();
+
+    if (value == Value.kForward) {
+      set(Value.kReverse);
+    } else if (value == Value.kReverse) {
+      set(Value.kForward);
+    }
   }
 
   /**
