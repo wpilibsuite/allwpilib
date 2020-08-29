@@ -357,6 +357,6 @@ static void DisplayNetworkTables() {
 
 void NetworkTablesGui::Initialize() {
   HALSimGui::AddWindow("NetworkTables", DisplayNetworkTables);
-  HALSimGui::SetDefaultWindowPos("NetworkTables", 250, 260);
-  HALSimGui::SetDefaultWindowSize("NetworkTables", 1500, 375);
+  HALSimGui::SetDefaultWindowPos("NetworkTables", 250, 277);
+  HALSimGui::SetDefaultWindowSize("NetworkTables", 750, 185);
 }

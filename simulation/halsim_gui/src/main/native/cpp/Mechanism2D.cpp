@@ -314,6 +314,7 @@ void Mechanism2D::Initialize() {
 
   buildColorTable();
   HALSimGui::AddWindow("Mechanism 2D", DisplayAssembly2D);
+  HALSimGui::SetWindowVisibility("Mechanism 2D", HALSimGui::kHide);
   HALSimGui::AddOptionMenu(OptionMenuLocateJson);
   HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
   HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
