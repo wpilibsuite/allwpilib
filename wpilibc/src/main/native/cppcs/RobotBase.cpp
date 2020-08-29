@@ -154,7 +154,15 @@ bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
 
 bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
 
+bool RobotBase::IsAutonomousEnabled() const {
+  return m_ds.IsAutonomousEnabled();
+}
+
 bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
+
+bool RobotBase::IsOperatorControlEnabled() const {
+  return m_ds.IsOperatorControlEnabled();
+}
 
 bool RobotBase::IsTest() const { return m_ds.IsTest(); }
 
