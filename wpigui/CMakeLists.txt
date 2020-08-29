@@ -31,6 +31,9 @@ else()
     endif()
 endif()
 
+add_executable(wpiguidev src/dev/native/cpp/main.cpp)
+target_link_libraries(wpiguidev wpigui)
+
 install(TARGETS wpigui EXPORT wpigui DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")
 
