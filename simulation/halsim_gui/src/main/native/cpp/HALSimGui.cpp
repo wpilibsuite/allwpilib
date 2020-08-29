@@ -277,7 +277,10 @@ bool HALSimGui::Initialize() {
   return true;
 }
 
-void HALSimGui::Main(void*) { gui::Main(); }
+void HALSimGui::Main(void*) {
+  gui::Main();
+  gui::DestroyContext();
+}
 
 void HALSimGui::Exit(void*) { gui::Exit(); }
 

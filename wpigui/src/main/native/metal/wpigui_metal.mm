@@ -16,7 +16,6 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_metal.h>
-#include <stb_image.h>
 
 #include "wpigui.h"
 #include "wpigui_internal.h"
@@ -32,6 +31,7 @@ struct PlatformContext {
 }  // namespace
 
 static PlatformContext* gPlatformContext;
+static bool gPlatformValid = false;
 
 namespace wpi {
 
@@ -66,6 +66,7 @@ bool gui::PlatformInitRenderer() {
 
   gPlatformContext->renderPassDescriptor = [MTLRenderPassDescriptor new];
 
+  gPlatformValid = true;
   return true;
 }
 
@@ -103,17 +104,26 @@ void gui::PlatformRenderFrame() {
 
 void gui::PlatformShutdown() {
   ImGui_ImplMetal_Shutdown();
+  gPlatformValid = false;
 }
 
-bool gui::LoadTextureFromFile(const char* filename, ImTextureID* out_texture,
-                              int* out_width, int* out_height) {
-  // Load from file
-  int width = 0;
-  int height = 0;
-  unsigned char* data = stbi_load(filename, &width, &height, nullptr, 4);
-  if (!data) return false;
+static inline MTLPixelFormat MetalPixelFormat(PixelFormat format) {
+  switch (format) {
+    case kPixelRGBA:
+      return MTLPixelFormatRGBA8Unorm;
+    case kPixelBGRA:
+      return MTLPixelFormatBGRA8Unorm;
+    default:
+      return MTLPixelFormatRGBA8Unorm;
+  }
+}
 
-  MTLTextureDescriptor *textureDescriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm width:width height:height mipmapped:NO];
+ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
+                               const unsigned char* data) {
+  if (!gPlatformValid) return nullptr;
+
+  MTLPixelFormat fmt = MetalPixelFormat(format);
+  MTLTextureDescriptor *textureDescriptor = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:fmt width:width height:height mipmapped:NO];
   textureDescriptor.usage = MTLTextureUsageShaderRead;
 #if TARGET_OS_OSX
   textureDescriptor.storageMode = MTLStorageModeManaged;
@@ -123,16 +133,18 @@ bool gui::LoadTextureFromFile(const char* filename, ImTextureID* out_texture,
   id <MTLTexture> texture = [gPlatformContext->layer.device newTextureWithDescriptor:textureDescriptor];
   [texture replaceRegion:MTLRegionMake2D(0, 0, width, height) mipmapLevel:0 withBytes:data bytesPerRow:width * 4];
 
-  *out_texture = (__bridge_retained void *)texture;
-  *out_width = width;
-  *out_height = height;
-  stbi_image_free(data);
+  return (__bridge_retained void *)texture;
+}
 
-  return true;
+void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width,
+                        int height, const unsigned char* data) {
+  if (!texture) return;
+  id <MTLTexture> mtlTexture = (__bridge id <MTLTexture>)texture;
+  [mtlTexture replaceRegion:MTLRegionMake2D(0, 0, width, height) mipmapLevel:0 withBytes:data bytesPerRow:width * 4];
 }
 
 void gui::DeleteTexture(ImTextureID texture) {
-  if (!texture) return;
+  if (!gPlatformValid || !texture) return;
   id <MTLTexture> mtlTexture = (__bridge_transfer id <MTLTexture>)texture;
   (void)mtlTexture;
 }

@@ -15,7 +15,6 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_dx11.h>
-#include <stb_image.h>
 
 #include "wpigui.h"
 #include "wpigui_internal.h"
@@ -32,6 +31,7 @@ struct PlatformContext {
 }  // namespace
 
 static PlatformContext* gPlatformContext;
+static bool gPlatformValid = false;
 
 static void CreateRenderTarget() {
   ID3D11Texture2D* pBackBuffer;
@@ -127,6 +127,7 @@ bool gui::PlatformInitRenderer() {
   ImGui_ImplDX11_Init(gPlatformContext->pd3dDevice,
                       gPlatformContext->pd3dDeviceContext);
 
+  gPlatformValid = true;
   return true;
 }
 
@@ -146,15 +147,25 @@ void gui::PlatformRenderFrame() {
   // gPlatformContext->pSwapChain->Present(0, 0);  // Present without vsync
 }
 
-void gui::PlatformShutdown() { ImGui_ImplDX11_Shutdown(); }
+void gui::PlatformShutdown() {
+  gPlatformValid = false;
+  ImGui_ImplDX11_Shutdown();
+}
 
-bool gui::LoadTextureFromFile(const char* filename, ImTextureID* out_texture,
-                              int* out_width, int* out_height) {
-  // Load from disk into a raw RGBA buffer
-  int width = 0;
-  int height = 0;
-  unsigned char* data = stbi_load(filename, &width, &height, nullptr, 4);
-  if (!data) return false;
+static inline DXGI_FORMAT DXPixelFormat(PixelFormat format) {
+  switch (format) {
+    case kPixelRGBA:
+      return DXGI_FORMAT_R8G8B8A8_UNORM;
+    case kPixelBGRA:
+      return DXGI_FORMAT_B8G8R8A8_UNORM;
+    default:
+      return DXGI_FORMAT_R8G8B8A8_UNORM;
+  }
+}
+
+ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
+                               const unsigned char* data) {
+  if (!gPlatformValid) return nullptr;
 
   // Create texture
   D3D11_TEXTURE2D_DESC desc;
@@ -188,15 +199,34 @@ bool gui::LoadTextureFromFile(const char* filename, ImTextureID* out_texture,
                                                          &srv);
   pTexture->Release();
 
-  *out_texture = srv;
-  *out_width = width;
-  *out_height = height;
-  stbi_image_free(data);
+  return srv;
+}
 
-  return true;
+void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
+                        const unsigned char* data) {
+  if (!texture) return;
+
+  D3D11_BOX box;
+  box.front = 0;
+  box.back = 1;
+  box.left = 0;
+  box.right = width;
+  box.top = 0;
+  box.bottom = height;
+
+  ID3D11Resource* resource = nullptr;
+  static_cast<ID3D11ShaderResourceView*>(texture)->GetResource(&resource);
+
+  if (resource) {
+    gPlatformContext->pd3dDeviceContext->UpdateSubresource(
+        resource, 0, &box, data, width * 4, width * height * 4);
+
+    resource->Release();
+  }
 }
 
 void gui::DeleteTexture(ImTextureID texture) {
+  if (!gPlatformValid) return;
   if (texture) static_cast<ID3D11ShaderResourceView*>(texture)->Release();
 }
 

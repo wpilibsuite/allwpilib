@@ -12,12 +12,13 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <stb_image.h>
 
 #include "wpigui.h"
 #include "wpigui_internal.h"
 
 using namespace wpi::gui;
+
+static bool gPlatformValid = false;
 
 namespace wpi {
 
@@ -73,6 +74,7 @@ bool gui::PlatformInitRenderer() {
 #endif
   ImGui_ImplOpenGL3_Init(glsl_version);
 
+  gPlatformValid = true;
   return true;
 }
 
@@ -92,15 +94,25 @@ void gui::PlatformRenderFrame() {
   glfwSwapBuffers(gContext->window);
 }
 
-void gui::PlatformShutdown() { ImGui_ImplOpenGL3_Shutdown(); }
+void gui::PlatformShutdown() {
+  gPlatformValid = false;
+  ImGui_ImplOpenGL3_Shutdown();
+}
 
-bool gui::LoadTextureFromFile(const char* filename, ImTextureID* out_texture,
-                              int* out_width, int* out_height) {
-  // Load from file
-  int width = 0;
-  int height = 0;
-  unsigned char* data = stbi_load(filename, &width, &height, nullptr, 4);
-  if (!data) return false;
+static inline GLenum GLPixelFormat(PixelFormat format) {
+  switch (format) {
+    case kPixelRGBA:
+      return GL_RGBA;
+    case kPixelBGRA:
+      return GL_BGRA;
+    default:
+      return GL_RGBA;
+  }
+}
+
+ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
+                               const unsigned char* data) {
+  if (!gPlatformValid) return nullptr;
 
   // Create a OpenGL texture identifier
   GLuint texture;
@@ -113,18 +125,23 @@ bool gui::LoadTextureFromFile(const char* filename, ImTextureID* out_texture,
 
   // Upload pixels into texture
   glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, data);
-  stbi_image_free(data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+               GLPixelFormat(format), GL_UNSIGNED_BYTE, data);
 
-  *out_texture = reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(texture));
-  if (out_width) *out_width = width;
-  if (out_height) *out_height = height;
+  return reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(texture));
+}
 
-  return true;
+void gui::UpdateTexture(ImTextureID texture, PixelFormat format, int width,
+                        int height, const unsigned char* data) {
+  GLuint glTexture = static_cast<GLuint>(reinterpret_cast<uintptr_t>(texture));
+  if (glTexture == 0) return;
+  glBindTexture(GL_TEXTURE_2D, glTexture);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GLPixelFormat(format),
+                  GL_UNSIGNED_BYTE, data);
 }
 
 void gui::DeleteTexture(ImTextureID texture) {
+  if (!gPlatformValid) return;
   GLuint glTexture = static_cast<GLuint>(reinterpret_cast<uintptr_t>(texture));
   if (glTexture != 0) glDeleteTextures(1, &glTexture);
 }
