@@ -47,7 +47,8 @@ struct BodyConfig {
   int lineWidth = 1;
 };
 }  // namespace
-static std::vector<BodyConfig> bodyConfigVector;
+//static std::vector<BodyConfig> bodyConfigVector;
+static std::vector<std::vector<BodyConfig>> mechanism2DViewVector;
 namespace {
 struct DrawLineStruct {
   float xEnd;
@@ -227,7 +228,6 @@ static void buildDrawList(float startXLocation, float startYLocation,
   }
 }
 
-// Read subjson
 static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   BodyConfig c;
   try {
@@ -261,7 +261,7 @@ static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   }
   try {
     for (wpi::json const& child : body.at("children")) {
-      c.children.push_back(readSubJson(c.name, child));
+      c.children.push_back(readSubJson(c.name, child, bodyConfigVector));
       wpi::outs() << "Reading Child with name " << c.name << '\n';
     }
   } catch (const wpi::json::exception& e) {
@@ -270,7 +270,7 @@ static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
   return c;
 }
 
-// Read json
+
 static void readJson(std::string jFile) {
   std::error_code ec;
   std::string name;
@@ -297,7 +297,7 @@ static void readJson(std::string jFile) {
   }
   try {
     for (wpi::json const& body : j.at("body")) {
-      bodyConfigVector.push_back(readSubJson(name, body));
+      bodyConfigVector.push_back(readSubJson(name, body, bodyConfigVector));
     }
   } catch (const wpi::json::exception& e) {
     wpi::errs() << "could not read body: " << e.what() << '\n';
@@ -315,14 +315,15 @@ static void OptionMenuLocateJson() {
   }
 }
 
-//static int counter = 0;
+
 static void DisplayMechanism2D() {
   GetJsonFileLocation();
   if (!mechanism2DInfo.jsonLocation.empty()) {
-    // Only read the json file if it changed
+//     Only read the json file if it changed
+//     TODO: Fix me
     if (mechanism2DInfo.jsonLocation != previousJsonLocation) {
       bodyConfigVector.clear();
-      readJson(mechanism2DInfo.jsonLocation);
+      readJson(mechanism2DInfo.jsonLocation, bodyConfigVector);
     }
     previousJsonLocation = mechanism2DInfo.jsonLocation;
     ImVec2 windowPos = ImGui::GetWindowPos();
@@ -330,12 +331,6 @@ static void DisplayMechanism2D() {
     buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(),
                   drawList, 0, bodyConfigVector, windowPos);
   }
-//  wpi::outs() << counter << "\n";
-//  if (counter == 250) {
-//    wpi::outs() << "Removing windows \n";
-//    HALSimGui::RemoveWindow("Mechanism 2D");
-//  }
-//  counter++;
 }
 
 static void WindowManager() {
