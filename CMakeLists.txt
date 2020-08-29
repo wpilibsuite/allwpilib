@@ -120,6 +120,11 @@ endif()
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)
 
+if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
+    add_subdirectory(imgui)
+    add_subdirectory(wpigui)
+endif()
+
 if (NOT WITHOUT_CSCORE)
     set(CSCORE_DEP_REPLACE ${CSCORE_DEP_REPLACE_IMPL})
     set(CAMERASERVER_DEP_REPLACE ${CAMERASERVER_DEP_REPLACE_IMPL})
@@ -137,8 +142,6 @@ if (NOT WITHOUT_CSCORE)
 endif()
 
 if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
-    add_subdirectory(imgui)
-    add_subdirectory(wpigui)
     add_subdirectory(simulation)
 endif()
 
