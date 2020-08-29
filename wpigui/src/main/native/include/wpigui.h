@@ -351,4 +351,29 @@ class Texture {
   int m_height = 0;
 };
 
+/**
+ * Get square of distance between two ImVec2's.
+ *
+ * @param a first ImVec
+ * @param b second ImVec
+ *
+ * @return Distance^2 between a and b.
+ */
+inline float GetDistSquared(const ImVec2& a, const ImVec2& b) {
+  float deltaX = b.x - a.x;
+  float deltaY = b.y - a.y;
+  return deltaX * deltaX + deltaY * deltaY;
+}
+
+/**
+ * Maximize fit in "window" while preserving aspect ratio.  Min and max
+ * passed-in values are modified such that the object maximally fits.
+ *
+ * @param min upper left corner of window (modified to fit)
+ * @param max lower right corner of window (modified to fit)
+ * @param width width of object to fit
+ * @param height height of object to fit
+ */
+void MaxFit(ImVec2* min, ImVec2* max, float width, float height);
+
 }  // namespace wpi::gui

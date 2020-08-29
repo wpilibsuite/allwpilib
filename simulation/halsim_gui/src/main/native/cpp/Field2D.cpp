@@ -24,7 +24,6 @@
 #include <wpi/raw_ostream.h>
 #include <wpigui.h>
 
-#include "GuiUtil.h"
 #include "HALSimGui.h"
 #include "SimDeviceGui.h"
 #include "portable-file-dialogs.h"
@@ -310,7 +309,7 @@ FieldFrameData FieldInfo::GetFrameData() const {
 
   // fit the image into the window
   if (m_texture && m_imageHeight != 0 && m_imageWidth != 0)
-    MaxFit(&ffd.imageMin, &ffd.imageMax, m_imageWidth, m_imageHeight);
+    gui::MaxFit(&ffd.imageMin, &ffd.imageMax, m_imageWidth, m_imageHeight);
 
   ImVec2 min = ffd.imageMin;
   ImVec2 max = ffd.imageMax;
@@ -324,7 +323,7 @@ FieldFrameData FieldInfo::GetFrameData() const {
   }
 
   // draw the field "active area" as a yellow boundary box
-  MaxFit(&min, &max, m_width, m_height);
+  gui::MaxFit(&min, &max, m_width, m_height);
 
   ffd.min = min;
   ffd.max = max;
@@ -579,15 +578,15 @@ static void DisplayField2D() {
   if (ImGui::IsItemHovered()) {
     float hitRadiusSquared = hitRadius * hitRadius;
     // it's within the hit radius of the center?
-    if (GetDistSquared(cursor, rfd.center) < hitRadiusSquared)
+    if (gui::GetDistSquared(cursor, rfd.center) < hitRadiusSquared)
       hit = 1;
-    else if (GetDistSquared(cursor, rfd.corners[0]) < hitRadiusSquared)
+    else if (gui::GetDistSquared(cursor, rfd.corners[0]) < hitRadiusSquared)
       hit = 2;
-    else if (GetDistSquared(cursor, rfd.corners[1]) < hitRadiusSquared)
+    else if (gui::GetDistSquared(cursor, rfd.corners[1]) < hitRadiusSquared)
       hit = 3;
-    else if (GetDistSquared(cursor, rfd.corners[2]) < hitRadiusSquared)
+    else if (gui::GetDistSquared(cursor, rfd.corners[2]) < hitRadiusSquared)
       hit = 4;
-    else if (GetDistSquared(cursor, rfd.corners[3]) < hitRadiusSquared)
+    else if (gui::GetDistSquared(cursor, rfd.corners[3]) < hitRadiusSquared)
       hit = 5;
     if (hit > 0 && ImGui::IsMouseClicked(0)) {
       if (hit == 1) {
