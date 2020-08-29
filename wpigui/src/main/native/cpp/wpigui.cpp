@@ -413,4 +413,19 @@ bool gui::CreateTextureFromImage(const unsigned char* data, int len,
   return true;
 }
 
+void gui::MaxFit(ImVec2* min, ImVec2* max, float width, float height) {
+  float destWidth = max->x - min->x;
+  float destHeight = max->y - min->y;
+  if (width == 0 || height == 0) return;
+  if (destWidth * height > destHeight * width) {
+    float outputWidth = width * destHeight / height;
+    min->x += (destWidth - outputWidth) / 2;
+    max->x -= (destWidth - outputWidth) / 2;
+  } else {
+    float outputHeight = height * destWidth / width;
+    min->y += (destHeight - outputHeight) / 2;
+    max->y -= (destHeight - outputHeight) / 2;
+  }
+}
+
 }  // namespace wpi
