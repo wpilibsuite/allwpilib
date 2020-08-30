@@ -168,7 +168,6 @@ model {
                     simProjects.each {
                         lib project: ":simulation:$it", library: it, linkage: 'shared'
                     }
-
                 }
             }
         }
@@ -225,8 +224,6 @@ model {
                                 run.environment 'LD_LIBRARY_PATH', filePath
 
                                 def installTask = it.tasks.install
-
-
 
                                 runTask.doFirst {
                                     def extensions = '';
