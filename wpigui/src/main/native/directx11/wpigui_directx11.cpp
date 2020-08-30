@@ -152,6 +152,15 @@ void gui::PlatformShutdown() {
   ImGui_ImplDX11_Shutdown();
 }
 
+void gui::PlatformFramebufferSizeChanged(int width, int height) {
+  if (gPlatformContext && gPlatformContext->pd3dDevice) {
+    CleanupRenderTarget();
+    gPlatformContext->pSwapChain->ResizeBuffers(0, width, height,
+                                                DXGI_FORMAT_UNKNOWN, 0);
+    CreateRenderTarget();
+  }
+}
+
 static inline DXGI_FORMAT DXPixelFormat(PixelFormat format) {
   switch (format) {
     case kPixelRGBA:

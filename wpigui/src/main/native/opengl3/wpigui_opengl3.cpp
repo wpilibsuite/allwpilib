@@ -99,6 +99,8 @@ void gui::PlatformShutdown() {
   ImGui_ImplOpenGL3_Shutdown();
 }
 
+void gui::PlatformFramebufferSizeChanged(int width, int height) {}
+
 static inline GLenum GLPixelFormat(PixelFormat format) {
   switch (format) {
     case kPixelRGBA:
