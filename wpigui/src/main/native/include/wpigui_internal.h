@@ -67,6 +67,7 @@ void PlatformGlfwWindowHints();
 bool PlatformInitRenderer();
 void PlatformRenderFrame();
 void PlatformShutdown();
+void PlatformFramebufferSizeChanged(int width, int height);
 
 void CommonRenderFrame();
 

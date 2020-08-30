@@ -107,6 +107,8 @@ void gui::PlatformShutdown() {
   gPlatformValid = false;
 }
 
+void gui::PlatformFramebufferSizeChanged(int, int) {}
+
 static inline MTLPixelFormat MetalPixelFormat(PixelFormat format) {
   switch (format) {
     case kPixelRGBA:

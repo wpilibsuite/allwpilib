@@ -38,6 +38,10 @@ static void WindowSizeCallback(GLFWwindow* window, int width, int height) {
   }
 }
 
+static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+  PlatformFramebufferSizeChanged(width, height);
+}
+
 static void WindowMaximizeCallback(GLFWwindow* window, int maximized) {
   gContext->maximized = maximized;
 }
@@ -197,6 +201,7 @@ bool gui::Initialize(const char* title, int width, int height) {
   // Set window callbacks
   glfwGetWindowSize(gContext->window, &gContext->width, &gContext->height);
   glfwSetWindowSizeCallback(gContext->window, WindowSizeCallback);
+  glfwSetFramebufferSizeCallback(gContext->window, FramebufferSizeCallback);
   glfwSetWindowMaximizeCallback(gContext->window, WindowMaximizeCallback);
   glfwSetWindowPosCallback(gContext->window, WindowPosCallback);
 
