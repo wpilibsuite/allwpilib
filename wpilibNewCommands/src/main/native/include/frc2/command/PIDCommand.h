@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -44,6 +44,22 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
 
   /**
    * Creates a new PIDCommand, which controls the given output with a
+   * PIDController.
+   *
+   * @param controller        the controller that controls the output.
+   * @param measurementSource the measurement of the process variable
+   * @param setpointSource   the controller's reference (aka setpoint)
+   * @param useOutput         the controller's output
+   * @param requirements      the subsystems required by this command
+   */
+  PIDCommand(PIDController controller,
+             std::function<double()> measurementSource,
+             std::function<double()> setpointSource,
+             std::function<void(double)> useOutput,
+             wpi::ArrayRef<Subsystem*> requirements = {});
+
+  /**
+   * Creates a new PIDCommand, which controls the given output with a
    * PIDController with a constant setpoint.
    *
    * @param controller        the controller that controls the output.
@@ -56,6 +72,21 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
              std::function<double()> measurementSource, double setpoint,
              std::function<void(double)> useOutput,
              std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Creates a new PIDCommand, which controls the given output with a
+   * PIDController with a constant setpoint.
+   *
+   * @param controller        the controller that controls the output.
+   * @param measurementSource the measurement of the process variable
+   * @param setpoint         the controller's setpoint (aka setpoint)
+   * @param useOutput         the controller's output
+   * @param requirements      the subsystems required by this command
+   */
+  PIDCommand(PIDController controller,
+             std::function<double()> measurementSource, double setpoint,
+             std::function<void(double)> useOutput,
+             wpi::ArrayRef<Subsystem*> requirements = {});
 
   PIDCommand(PIDCommand&& other) = default;
 
@@ -72,7 +103,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
    *
    * @return The PIDController
    */
-  PIDController& getController();
+  PIDController& GetController();
 
  protected:
   PIDController m_controller;

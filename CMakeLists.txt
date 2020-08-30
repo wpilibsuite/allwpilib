@@ -16,10 +16,6 @@ INCLUDE(CPack)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND MSVC)
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Default install dir on windows" FORCE)
-endif()
-
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -55,6 +51,7 @@ option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
 option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
 option(FLAT_INSTALL_WPILIB "Use a flat install directory" OFF)
 option(WITH_SIMULATION_MODULES "build simulation modules" OFF)
+set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
 
 if (NOT WITHOUT_JAVA AND NOT BUILD_SHARED_LIBS)
     message(FATAL_ERROR "
@@ -62,6 +59,15 @@ FATAL: Cannot build static libs with Java enabled.
        Static libs requires both BUILD_SHARED_LIBS=OFF and
        WITHOUT_JAVA=ON
 ")
+endif()
+
+if (WITHOUT_JAVA OR WITHOUT_CSCORE)
+    if(NOT "${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
+        message(WARNING "
+WARNING: OpenCV Java dir set but java is not enabled!
+It will be ignored.
+")
+    endif()
 endif()
 
 set( wpilib_dest wpilib)
@@ -90,6 +96,7 @@ set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
 set(CSCORE_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cscore-config.cmake)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cameraserver-config.cmake)")
 set(HAL_DEP_REPLACE_IMPL "include(\${SELF_DIR}/hal-config.cmake)")
+set(WPIMATH_DEP_REPLACE "include($\{SELF_DIR\}/wpimath-config.cmake)")
 set(WPILIBC_DEP_REPLACE_IMPL "include(\${SELF_DIR}/wpilibc-config.cmake)")
 else()
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
@@ -97,6 +104,7 @@ set(NTCORE_DEP_REPLACE "find_dependency(ntcore)")
 set(CSCORE_DEP_REPLACE_IMPL "find_dependency(cscore)")
 set(CAMERASERVER_DEP_REPLACE_IMPL "find_dependency(cameraserver)")
 set(HAL_DEP_REPLACE_IMPL "find_dependency(hal)")
+set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
 set(WPILIBC_DEP_REPLACE_IMPL "find_dependency(wpilibc)")
 endif()
 
@@ -121,6 +129,7 @@ if (NOT WITHOUT_CSCORE)
         set(HAL_DEP_REPLACE ${HAL_DEP_REPLACE_IMPL})
         set(WPILIBC_DEP_REPLACE ${WPILIBC_DEP_REPLACE_IMPL})
         add_subdirectory(hal)
+        add_subdirectory(wpimath)
         add_subdirectory(wpilibj)
         add_subdirectory(wpilibc)
         add_subdirectory(myRobot)
@@ -129,6 +138,7 @@ endif()
 
 if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
     add_subdirectory(imgui)
+    add_subdirectory(wpigui)
     add_subdirectory(simulation)
 endif()
 

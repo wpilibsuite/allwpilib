@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,7 @@
 #include "frc/Compressor.h"
 
 #include <hal/Compressor.h>
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
 
@@ -22,8 +22,7 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
   int32_t status = 0;
   m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumPCMModules(), pcmID,
-                                 HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumPCMModules(), pcmID);
     return;
   }
   SetClosedLoopControl(true);
@@ -205,15 +204,18 @@ void Compressor::ClearAllPCMStickyFaults() {
   }
 }
 
+int Compressor::GetModule() const { return m_module; }
+
 void Compressor::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Compressor");
-  builder.AddBooleanProperty("Enabled", [=]() { return Enabled(); },
-                             [=](bool value) {
-                               if (value)
-                                 Start();
-                               else
-                                 Stop();
-                             });
+  builder.AddBooleanProperty(
+      "Enabled", [=]() { return Enabled(); },
+      [=](bool value) {
+        if (value)
+          Start();
+        else
+          Stop();
+      });
   builder.AddBooleanProperty(
       "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);
 }

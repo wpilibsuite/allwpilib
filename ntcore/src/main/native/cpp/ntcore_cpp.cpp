@@ -742,6 +742,20 @@ unsigned int GetNetworkMode(NT_Inst inst) {
   return ii->dispatcher.GetNetworkMode();
 }
 
+void StartLocal(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.StartLocal();
+}
+
+void StopLocal(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.Stop();
+}
+
 void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port) {
   auto ii = InstanceImpl::GetDefault();

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -260,27 +260,29 @@ NT_EntryListener NT_AddEntryListener(NT_Inst inst, const char* prefix,
                                      size_t prefix_len, void* data,
                                      NT_EntryListenerCallback callback,
                                      unsigned int flags) {
-  return nt::AddEntryListener(inst, StringRef(prefix, prefix_len),
-                              [=](const EntryNotification& event) {
-                                NT_EntryNotification c_event;
-                                ConvertToC(event, &c_event);
-                                callback(data, &c_event);
-                                DisposeEntryNotification(&c_event);
-                              },
-                              flags);
+  return nt::AddEntryListener(
+      inst, StringRef(prefix, prefix_len),
+      [=](const EntryNotification& event) {
+        NT_EntryNotification c_event;
+        ConvertToC(event, &c_event);
+        callback(data, &c_event);
+        DisposeEntryNotification(&c_event);
+      },
+      flags);
 }
 
 NT_EntryListener NT_AddEntryListenerSingle(NT_Entry entry, void* data,
                                            NT_EntryListenerCallback callback,
                                            unsigned int flags) {
-  return nt::AddEntryListener(entry,
-                              [=](const EntryNotification& event) {
-                                NT_EntryNotification c_event;
-                                ConvertToC(event, &c_event);
-                                callback(data, &c_event);
-                                DisposeEntryNotification(&c_event);
-                              },
-                              flags);
+  return nt::AddEntryListener(
+      entry,
+      [=](const EntryNotification& event) {
+        NT_EntryNotification c_event;
+        ConvertToC(event, &c_event);
+        callback(data, &c_event);
+        DisposeEntryNotification(&c_event);
+      },
+      flags);
 }
 
 NT_EntryListenerPoller NT_CreateEntryListenerPoller(NT_Inst inst) {
@@ -335,14 +337,15 @@ NT_Bool NT_WaitForEntryListenerQueue(NT_Inst inst, double timeout) {
 NT_ConnectionListener NT_AddConnectionListener(
     NT_Inst inst, void* data, NT_ConnectionListenerCallback callback,
     NT_Bool immediate_notify) {
-  return nt::AddConnectionListener(inst,
-                                   [=](const ConnectionNotification& event) {
-                                     NT_ConnectionNotification event_c;
-                                     ConvertToC(event, &event_c);
-                                     callback(data, &event_c);
-                                     DisposeConnectionNotification(&event_c);
-                                   },
-                                   immediate_notify != 0);
+  return nt::AddConnectionListener(
+      inst,
+      [=](const ConnectionNotification& event) {
+        NT_ConnectionNotification event_c;
+        ConvertToC(event, &event_c);
+        callback(data, &event_c);
+        DisposeConnectionNotification(&event_c);
+      },
+      immediate_notify != 0);
 }
 
 NT_ConnectionListenerPoller NT_CreateConnectionListenerPoller(NT_Inst inst) {
@@ -539,6 +542,10 @@ unsigned int NT_GetNetworkMode(NT_Inst inst) {
   return nt::GetNetworkMode(inst);
 }
 
+void NT_StartLocal(NT_Inst inst) { nt::StartLocal(inst); }
+
+void NT_StopLocal(NT_Inst inst) { nt::StopLocal(inst); }
+
 void NT_StartServer(NT_Inst inst, const char* persist_filename,
                     const char* listen_address, unsigned int port) {
   nt::StartServer(inst, persist_filename, listen_address, port);
@@ -635,14 +642,15 @@ uint64_t NT_Now(void) { return wpi::Now(); }
 
 NT_Logger NT_AddLogger(NT_Inst inst, void* data, NT_LogFunc func,
                        unsigned int min_level, unsigned int max_level) {
-  return nt::AddLogger(inst,
-                       [=](const LogMessage& msg) {
-                         NT_LogMessage msg_c;
-                         ConvertToC(msg, &msg_c);
-                         func(data, &msg_c);
-                         NT_DisposeLogMessage(&msg_c);
-                       },
-                       min_level, max_level);
+  return nt::AddLogger(
+      inst,
+      [=](const LogMessage& msg) {
+        NT_LogMessage msg_c;
+        ConvertToC(msg, &msg_c);
+        func(data, &msg_c);
+        NT_DisposeLogMessage(&msg_c);
+      },
+      min_level, max_level);
 }
 
 NT_LoggerPoller NT_CreateLoggerPoller(NT_Inst inst) {

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,6 +30,15 @@ extern "C" {
  * @return the created notifier
  */
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status);
+
+/**
+ * Sets the name of a notifier.
+ *
+ * @param notifierHandle the notifier handle
+ * @param name name
+ */
+void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
+                         int32_t* status);
 
 /**
  * Stops a notifier from running.

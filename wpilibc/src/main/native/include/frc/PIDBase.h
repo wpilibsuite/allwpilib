@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -35,6 +35,8 @@ class SendableBuilder;
  * This feedback controller runs in discrete time, so time deltas are not used
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
+ *
+ * @deprecated All APIs which use this have been deprecated.
  */
 class PIDBase : public PIDInterface,
                 public PIDOutput,
@@ -402,7 +404,7 @@ class PIDBase : public PIDInterface,
   double m_error = 0;
   double m_result = 0;
 
-  LinearFilter m_filter{{}, {}};
+  LinearFilter<double> m_filter{{}, {}};
 };
 
 }  // namespace frc

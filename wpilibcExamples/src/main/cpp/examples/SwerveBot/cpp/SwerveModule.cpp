@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,7 +26,8 @@ SwerveModule::SwerveModule(const int driveMotorChannel,
 
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
-  m_turningPIDController.EnableContinuousInput(-wpi::math::pi, wpi::math::pi);
+  m_turningPIDController.EnableContinuousInput(-units::radian_t(wpi::math::pi),
+                                               units::radian_t(wpi::math::pi));
 }
 
 frc::SwerveModuleState SwerveModule::GetState() const {
@@ -39,14 +40,16 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& state) {
   const auto driveOutput = m_drivePIDController.Calculate(
       m_driveEncoder.GetRate(), state.speed.to<double>());
 
+  const auto driveFeedforward = m_driveFeedforward.Calculate(state.speed);
+
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
-      units::meter_t(m_turningEncoder.Get()),
-      // We have to convert to the meters type here because that's what
-      // ProfiledPIDController wants.
-      units::meter_t(state.angle.Radians().to<double>()));
+      units::radian_t(m_turningEncoder.Get()), state.angle.Radians());
+
+  const auto turnFeedforward = m_turnFeedforward.Calculate(
+      m_turningPIDController.GetSetpoint().velocity);
 
   // Set the motor outputs.
-  m_driveMotor.Set(driveOutput);
-  m_turningMotor.Set(turnOutput);
+  m_driveMotor.SetVoltage(units::volt_t{driveOutput} + driveFeedforward);
+  m_turningMotor.SetVoltage(units::volt_t{turnOutput} + turnFeedforward);
 }

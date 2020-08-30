@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,7 +19,7 @@
 #include "hal/DriverStation.h"
 #include "hal/Main.h"
 
-using namespace frc;
+using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
@@ -445,6 +445,21 @@ Java_edu_wpi_first_hal_HAL_sendError
   jint returnValue =
       HAL_SendError(isError, errorCode, isLVCode, detailsStr.c_str(),
                     locationStr.c_str(), callStackStr.c_str(), printMsg);
+  return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    sendConsoleLine
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_HAL_sendConsoleLine
+  (JNIEnv* env, jclass, jstring line)
+{
+  JStringRef lineStr{env, line};
+
+  jint returnValue = HAL_SendConsoleLine(lineStr.c_str());
   return returnValue;
 }
 

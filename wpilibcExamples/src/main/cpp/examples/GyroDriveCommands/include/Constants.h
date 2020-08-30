@@ -1,11 +1,15 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <wpi/math>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -31,26 +35,29 @@ constexpr int kEncoderCPR = 1024;
 constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * 3.142) / static_cast<double>(kEncoderCPR);
+    (kWheelDiameterInches * wpi::math::pi) / static_cast<double>(kEncoderCPR);
 
 constexpr bool kGyroReversed = true;
 
 constexpr double kStabilizationP = 1;
-constexpr double kStabilizationI = .5;
+constexpr double kStabilizationI = 0.5;
 constexpr double kStabilizationD = 0;
 
 constexpr double kTurnP = 1;
 constexpr double kTurnI = 0;
 constexpr double kTurnD = 0;
 
-constexpr double kTurnToleranceDeg = 5;
-constexpr double kTurnRateToleranceDegPerS = 10;  // degrees per second
+constexpr auto kTurnTolerance = 5_deg;
+constexpr auto kTurnRateTolerance = 10_deg_per_s;
+
+constexpr auto kMaxTurnRate = 100_deg_per_s;
+constexpr auto kMaxTurnAcceleration = 300_deg_per_s / 1_s;
 }  // namespace DriveConstants
 
 namespace AutoConstants {
 constexpr double kAutoDriveDistanceInches = 60;
 constexpr double kAutoBackupDistanceInches = 20;
-constexpr double kAutoDriveSpeed = .5;
+constexpr double kAutoDriveSpeed = 0.5;
 }  // namespace AutoConstants
 
 namespace OIConstants {

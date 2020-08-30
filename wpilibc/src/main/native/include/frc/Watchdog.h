@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,16 +7,14 @@
 
 #pragma once
 
-#include <chrono>
 #include <functional>
 #include <utility>
 
-#include <hal/cpp/fpga_clock.h>
-#include <units/units.h>
-#include <wpi/SafeThread.h>
-#include <wpi/StringMap.h>
+#include <units/time.h>
 #include <wpi/StringRef.h>
 #include <wpi/deprecated.h>
+
+#include "frc/Tracer.h"
 
 namespace frc {
 
@@ -33,6 +31,9 @@ class Watchdog {
  public:
   /**
    * Watchdog constructor.
+   *
+   * @deprecated use unit-safe version instead.
+   * Watchdog(units::second_t timeout, std::function<void()> callback)
    *
    * @param timeout  The watchdog's timeout in seconds with microsecond
    *                 resolution.
@@ -63,8 +64,8 @@ class Watchdog {
 
   ~Watchdog();
 
-  Watchdog(Watchdog&&) = default;
-  Watchdog& operator=(Watchdog&&) = default;
+  Watchdog(Watchdog&& rhs);
+  Watchdog& operator=(Watchdog&& rhs);
 
   /**
    * Returns the time in seconds since the watchdog was last fed.
@@ -73,6 +74,9 @@ class Watchdog {
 
   /**
    * Sets the watchdog's timeout.
+   *
+   * @deprecated use the unit safe version instead.
+   * SetTimeout(units::second_t timeout)
    *
    * @param timeout The watchdog's timeout in seconds with microsecond
    *                resolution.
@@ -142,26 +146,25 @@ class Watchdog {
 
  private:
   // Used for timeout print rate-limiting
-  static constexpr std::chrono::milliseconds kMinPrintPeriod{1000};
+  static constexpr units::second_t kMinPrintPeriod = 1_s;
 
-  hal::fpga_clock::time_point m_startTime;
-  std::chrono::nanoseconds m_timeout;
-  hal::fpga_clock::time_point m_expirationTime;
+  units::second_t m_startTime = 0_s;
+  units::second_t m_timeout;
+  units::second_t m_expirationTime = 0_s;
   std::function<void()> m_callback;
-  hal::fpga_clock::time_point m_lastTimeoutPrintTime = hal::fpga_clock::epoch();
-  hal::fpga_clock::time_point m_lastEpochsPrintTime = hal::fpga_clock::epoch();
+  units::second_t m_lastTimeoutPrintTime = 0_s;
 
-  wpi::StringMap<std::chrono::nanoseconds> m_epochs;
+  Tracer m_tracer;
   bool m_isExpired = false;
 
   bool m_suppressTimeoutMessage = false;
 
-  class Thread;
-  wpi::SafeThreadOwner<Thread>* m_owner;
+  class Impl;
+  Impl* m_impl;
 
   bool operator>(const Watchdog& rhs);
 
-  static wpi::SafeThreadOwner<Thread>& GetThreadOwner();
+  static Impl* GetImpl();
 };
 
 }  // namespace frc

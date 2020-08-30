@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,6 +13,7 @@
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/angle.h>
 
 #include "Constants.h"
 
@@ -74,7 +75,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @return the robot's heading in degrees, from 180 to 180
    */
-  double GetHeading();
+  units::degree_t GetHeading();
 
   /**
    * Returns the turn rate of the robot.

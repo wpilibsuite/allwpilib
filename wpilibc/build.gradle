@@ -60,16 +60,6 @@ staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
-ext {
-    chipObjectComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
-                            "${nativeName}Test".toString()]
-    netCommComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
-                            "${nativeName}Test".toString()]
-    useNiJava = false
-}
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
 apply plugin: DisableBuildingGTest
 
 nativeUtils.exportsConfigs {
@@ -108,6 +98,7 @@ model {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             }
         }
         "${nativeName}"(NativeLibrarySpec) {
@@ -126,6 +117,7 @@ model {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
                 if (it instanceof SharedLibraryBinarySpec) {
                     cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
@@ -162,8 +154,12 @@ model {
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                }
             }
         }
     }
@@ -208,9 +204,13 @@ model {
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             lib library: nativeName, linkage: 'shared'
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+            }
         }
     }
     tasks {
@@ -234,6 +234,8 @@ model {
         }
     }
 }
+
+apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
 
 tasks.withType(RunTestExecutable) {
     args "--gtest_output=xml:test_detail.xml"

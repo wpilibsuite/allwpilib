@@ -1,14 +1,20 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_HTTPUTIL_INL_
-#define WPIUTIL_SUPPORT_HTTPUTIL_INL_
+#ifndef WPIUTIL_WPI_HTTPUTIL_INL_
+#define WPIUTIL_WPI_HTTPUTIL_INL_
+
+#include <utility>
 
 namespace wpi {
+
+inline HttpPathRef HttpPath::drop_front(size_t n) const {
+  return HttpPathRef(*this, n);
+}
 
 template <typename T>
 HttpRequest::HttpRequest(const HttpLocation& loc, const T& extraParams)
@@ -45,4 +51,4 @@ void HttpRequest::SetPath(StringRef path_, const T& params) {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_HTTPUTIL_INL_
+#endif  // WPIUTIL_WPI_HTTPUTIL_INL_

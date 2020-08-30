@@ -6,70 +6,208 @@
       "class"
     ],
     "foldername": "emptyclass",
-    "replacename": "ReplaceMeEmptyClass"
+    "replacename": "ReplaceMeEmptyClass",
+    "commandversion": 0
   },
   {
-    "name": "Command",
+    "name": "Command (Old)",
     "description": "Create a base command",
     "tags": [
       "command"
     ],
     "foldername": "command",
-    "replacename": "ReplaceMeCommand"
+    "replacename": "ReplaceMeCommand",
+    "commandversion": 1
   },
   {
-    "name": "Command Group",
+    "name": "Command Group (Old)",
     "description": "Create a command group",
     "tags": [
       "commandgroup"
     ],
     "foldername": "commandgroup",
-    "replacename": "ReplaceMeCommandGroup"
+    "replacename": "ReplaceMeCommandGroup",
+    "commandversion": 1
   },
   {
-    "name": "Instant Command",
+    "name": "Instant Command (Old)",
     "description": "A command that runs immediately",
     "tags": [
       "instantcommand"
     ],
     "foldername": "instant",
-    "replacename": "ReplaceMeInstantCommand"
+    "replacename": "ReplaceMeInstantCommand",
+    "commandversion": 1
   },
   {
-    "name": "Subsystem",
+    "name": "Subsystem (Old)",
     "description": "A subsystem",
     "tags": [
       "subsystem"
     ],
     "foldername": "subsystem",
-    "replacename": "ReplaceMeSubsystem"
+    "replacename": "ReplaceMeSubsystem",
+    "commandversion": 1
   },
   {
-    "name": "PID Subsystem",
+    "name": "PID Subsystem (Old)",
     "description": "A subsystem that runs a PID loop",
     "tags": [
       "pidsubsystem",
       "pid"
     ],
     "foldername": "pidsubsystem",
-    "replacename": "ReplaceMePIDSubsystem"
+    "replacename": "ReplaceMePIDSubsystem",
+    "commandversion": 1
   },
   {
-    "name": "Timed Command",
+    "name": "Timed Command (Old)",
     "description": "A command that runs for a specified time",
     "tags": [
       "timedcommand"
     ],
     "foldername": "timed",
-    "replacename": "ReplaceMeTimedCommand"
+    "replacename": "ReplaceMeTimedCommand",
+    "commandversion": 1
   },
   {
-    "name": "Trigger",
+    "name": "Trigger (Old)",
     "description": "A command that runs off of a trigger",
     "tags": [
       "trigger"
     ],
     "foldername": "trigger",
-    "replacename": "ReplaceMeTrigger"
+    "replacename": "ReplaceMeTrigger",
+    "commandversion": 1
+  },
+  {
+    "name": "Command (New)",
+    "description": "A command.",
+    "tags": [
+      "command"
+    ],
+    "foldername": "command2",
+    "replacename": "ReplaceMeCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "InstantCommand (New)",
+    "description": "A command that finishes instantly.",
+    "tags": [
+      "instantcommand"
+    ],
+    "foldername": "instantcommand",
+    "replacename": "ReplaceMeInstantCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "ParallelCommandGroup (New)",
+    "description": "A command group that runs commands in parallel, ending when all commands have finished.",
+    "tags": [
+      "parallelcommandgroup"
+    ],
+    "foldername": "parallelcommandgroup",
+    "replacename": "ReplaceMeParallelCommandGroup",
+    "commandversion": 2
+  },
+  {
+    "name": "ParallelDeadlineGroup (New)",
+    "description": "A command group that runs commands in parallel, ending when a specific command has finished.",
+    "tags": [
+      "paralleldeadlinegroup"
+    ],
+    "foldername": "paralleldeadlinegroup",
+    "replacename": "ReplaceMeParallelDeadlineGroup",
+    "commandversion": 2
+  },
+  {
+    "name": "ParallelRaceGroup (New)",
+    "description": "A command that runs commands in parallel, ending as soon as any command has finished.",
+    "tags": [
+      "parallelracegroup"
+    ],
+    "foldername": "parallelracegroup",
+    "replacename": "ReplaceMeParallelRaceGroup",
+    "commandversion": 2
+  },
+  {
+    "name": "PIDCommand (New)",
+    "description": "A command that runs a PIDController.",
+    "tags": [
+      "pidcommand"
+    ],
+    "foldername": "pidcommand",
+    "replacename": "ReplaceMePIDCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "PIDSubsystem (New)",
+    "description": "A subsystem that runs a PIDController.",
+    "tags": [
+      "pidsubsystem"
+    ],
+    "foldername": "pidsubsystem2",
+    "replacename": "ReplaceMePIDSubsystem",
+    "commandversion": 2
+  },
+  {
+    "name": "ProfiledPIDCommand (New)",
+    "description": "A command that runs a ProfiledPIDController.",
+    "tags": [
+      "profiledpidcommand"
+    ],
+    "foldername": "profiledpidcommand",
+    "replacename": "ReplaceMeProfiledPIDCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "ProfiledPIDSubsystem (New)",
+    "description": "A subsystem that runs a ProfiledPIDController.",
+    "tags": [
+      "profiledpidsubsystem"
+    ],
+    "foldername": "profiledpidsubsystem",
+    "replacename": "ReplaceMeProfiledPIDSubsystem",
+    "commandversion": 2
+  },
+  {
+    "name": "SequentialCommandGroup (New)",
+    "description": "A command group that runs commands in sequence.",
+    "tags": [
+      "sequentialcommandgroup"
+    ],
+    "foldername": "sequentialcommandgroup",
+    "replacename": "ReplaceMeSequentialCommandGroup",
+    "commandversion": 2
+  },
+  {
+    "name": "Subsystem (New)",
+    "description": "A robot subsystem.",
+    "tags": [
+      "subsystem"
+    ],
+    "foldername": "subsystem2",
+    "replacename": "ReplaceMeSubsystem",
+    "commandversion": 2
+  },
+  {
+    "name": "TrapezoidProfileCommand (New)",
+    "description": "A command that executes a trapezoidal motion profile.",
+    "tags": [
+      "trapezoidprofilecommand"
+    ],
+    "foldername": "trapezoidprofilecommand",
+    "replacename": "ReplaceMeTrapezoidProfileCommand",
+    "commandversion": 2
+  },
+  {
+    "name": "TrapezoidProfileSubsystem (New)",
+    "description": "A command that executes a trapezoidal motion profile.",
+    "tags": [
+      "trapezoidprofilesubsystem"
+    ],
+    "foldername": "trapezoidprofilesubsystem",
+    "replacename": "ReplaceMeTrapezoidProfileSubsystem",
+    "commandversion": 2
   }
 ]

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,7 +15,7 @@
 #include "edu_wpi_first_hal_SPIJNI.h"
 #include "hal/SPI.h"
 
-using namespace frc;
+using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
@@ -392,6 +392,22 @@ Java_edu_wpi_first_hal_SPIJNI_spiGetAutoDroppedCount
       HAL_GetSPIAutoDroppedCount(static_cast<HAL_SPIPort>(port), &status);
   CheckStatus(env, status);
   return retval;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_SPIJNI
+ * Method:    spiConfigureAutoStall
+ * Signature: (IIII)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_SPIJNI_spiConfigureAutoStall
+  (JNIEnv* env, jclass, jint port, jint csToSclkTicks, jint stallTicks,
+   jint pow2BytesPerRead)
+{
+  int32_t status = 0;
+  HAL_ConfigureSPIAutoStall(static_cast<HAL_SPIPort>(port), csToSclkTicks,
+                            stallTicks, pow2BytesPerRead, &status);
+  CheckStatus(env, status);
 }
 
 }  // extern "C"

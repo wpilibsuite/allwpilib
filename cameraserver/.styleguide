@@ -7,16 +7,12 @@ cppSrcFileInclude {
   \.cpp$
 }
 
-modifiableFileExclude {
-  \.so$
-}
-
 repoRootNameOverride {
   cameraserver
 }
 
 includeOtherLibs {
-  ^HAL/
+  ^hal/
   ^networktables/
   ^opencv2/
   ^support/

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,17 +19,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class NotifierCommandTest extends CommandTestBase {
   @Test
   void notifierCommandScheduleTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Counter counter = new Counter();
 
-    Counter counter = new Counter();
+      NotifierCommand command = new NotifierCommand(counter::increment, 0.01);
 
-    NotifierCommand command = new NotifierCommand(counter::increment, .01);
+      scheduler.schedule(command);
+      Timer.delay(0.25);
+      scheduler.cancel(command);
 
-    scheduler.schedule(command);
-    Timer.delay(.25);
-    scheduler.cancel(command);
-
-    assertTrue(counter.m_counter > 10, "Should have hit at least 10 triggers");
-    assertTrue(counter.m_counter < 100, "Shouldn't hit more then 100 triggers");
+      assertTrue(counter.m_counter > 10, "Should have hit at least 10 triggers");
+      assertTrue(counter.m_counter < 100, "Shouldn't hit more then 100 triggers");
+    }
   }
 }

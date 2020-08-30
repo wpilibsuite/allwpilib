@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2014-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -85,10 +85,16 @@ class PowerDistributionPanel : public ErrorBase,
    */
   void ClearStickyFaults();
 
+  /**
+   * Gets module number (CAN ID).
+   */
+  int GetModule() const;
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:
   hal::Handle<HAL_PDPHandle> m_handle;
+  int m_module;
 };
 
 }  // namespace frc

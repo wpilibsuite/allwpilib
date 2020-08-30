@@ -23,7 +23,7 @@ class TurnToAngle : public frc2::CommandHelper<frc2::PIDCommand, TurnToAngle> {
    * @param targetAngleDegrees The angle to turn to
    * @param drive              The drive subsystem to use
    */
-  TurnToAngle(double targetAngleDegrees, DriveSubsystem* drive);
+  TurnToAngle(units::degree_t target, DriveSubsystem* drive);
 
   bool IsFinished() override;
 };

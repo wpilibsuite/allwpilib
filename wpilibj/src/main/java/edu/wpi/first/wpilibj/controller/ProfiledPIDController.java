@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,17 +7,24 @@
 
 package edu.wpi.first.wpilibj.controller;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid
- * profile.
+ * profile. Users should call reset() when they first start running the controller
+ * to avoid unwanted behavior.
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public class ProfiledPIDController implements Sendable {
+  private static int instances;
+
   private PIDController m_controller;
+  private double m_minimumInput;
+  private double m_maximumInput;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private TrapezoidProfile.Constraints m_constraints;
@@ -54,6 +61,8 @@ public class ProfiledPIDController implements Sendable {
                         double period) {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
+    instances++;
+    HAL.report(tResourceType.kResourceType_ProfiledPIDController, instances);
   }
 
   /**
@@ -272,6 +281,18 @@ public class ProfiledPIDController implements Sendable {
    * @param measurement The current measurement of the process variable.
    */
   public double calculate(double measurement) {
+    if (m_controller.isContinuousInputEnabled()) {
+      // Get error which is smallest distance between goal and measurement
+      double error = ControllerUtil.getModulusError(m_goal.position, measurement, m_minimumInput,
+          m_maximumInput);
+
+      // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
+      // may be outside the input range after this operation, but that's OK because the controller
+      // will still go there and report an error of zero. In other words, the setpoint only needs to
+      // be offset from the measurement by the input range modulus; they don't need to be equal.
+      m_goal.position = error + measurement;
+    }
+
     var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
     m_setpoint = profile.calculate(getPeriod());
     return m_controller.calculate(measurement, m_setpoint.position);
@@ -313,10 +334,33 @@ public class ProfiledPIDController implements Sendable {
   }
 
   /**
-   * Reset the previous error, the integral term, and disable the controller.
+   * Reset the previous error and the integral term.
+   *
+   * @param measurement The current measured State of the system.
    */
-  public void reset() {
+  public void reset(TrapezoidProfile.State measurement) {
     m_controller.reset();
+    m_setpoint = measurement;
+  }
+
+  /**
+   * Reset the previous error and the integral term.
+   *
+   * @param measuredPosition The current measured position of the system.
+   * @param measuredVelocity The current measured velocity of the system.
+   */
+  public void reset(double measuredPosition, double measuredVelocity) {
+    reset(new TrapezoidProfile.State(measuredPosition, measuredVelocity));
+  }
+
+  /**
+   * Reset the previous error and the integral term.
+   *
+   * @param measuredPosition The current measured position of the system. The velocity is
+   *     assumed to be zero.
+   */
+  public void reset(double measuredPosition) {
+    reset(measuredPosition, 0.0);
   }
 
   @Override

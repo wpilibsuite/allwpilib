@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.examples.ramsetecommand;
 
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -30,29 +29,27 @@ public final class Constants {
     public static final boolean kLeftEncoderReversed = false;
     public static final boolean kRightEncoderReversed = true;
 
-    public static final double kTrackwidthMeters = .6;
+    public static final double kTrackwidthMeters = 0.69;
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackwidthMeters);
 
     public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = .15;
+    public static final double kWheelDiameterMeters = 0.15;
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
 
-    public static final boolean kGyroReversed = true;
-
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
-    // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
+    // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
     // values for your robot.
-    public static final double ksVolts = 1;
-    public static final double kvVoltSecondsPerMeter = .8;
-    public static final double kaVoltSecondsSquaredPerMeter = .15;
+    public static final double ksVolts = 0.22;
+    public static final double kvVoltSecondsPerMeter = 1.98;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.2;
 
     // Example value only - as above, this must be tuned for your drive!
-    public static final double kPDriveVel = .5;
+    public static final double kPDriveVel = 8.5;
   }
 
   public static final class OIConstants {
@@ -63,12 +60,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
 
-    public static final DifferentialDriveKinematicsConstraint kAutoPathConstraints =
-        new DifferentialDriveKinematicsConstraint(DriveConstants.kDriveKinematics,
-                                                  kMaxSpeedMetersPerSecond);
-
     // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
     public static final double kRamseteB = 2;
-    public static final double kRamseteZeta = .7;
+    public static final double kRamseteZeta = 0.7;
   }
 }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/PIDOutput.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -35,7 +35,7 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   m_F = Kf;
 
   m_pidInput = &source;
-  m_filter = LinearFilter::MovingAverage(1);
+  m_filter = LinearFilter<double>::MovingAverage(1);
 
   m_pidOutput = &output;
 
@@ -196,7 +196,7 @@ void PIDBase::SetPercentTolerance(double percent) {
 
 void PIDBase::SetToleranceBuffer(int bufLength) {
   std::scoped_lock lock(m_thisMutex);
-  m_filter = LinearFilter::MovingAverage(bufLength);
+  m_filter = LinearFilter<double>::MovingAverage(bufLength);
 }
 
 bool PIDBase::OnTarget() const {
@@ -229,16 +229,17 @@ void PIDBase::PIDWrite(double output) { SetSetpoint(output); }
 void PIDBase::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
   builder.SetSafeState([=]() { Reset(); });
-  builder.AddDoubleProperty("p", [=]() { return GetP(); },
-                            [=](double value) { SetP(value); });
-  builder.AddDoubleProperty("i", [=]() { return GetI(); },
-                            [=](double value) { SetI(value); });
-  builder.AddDoubleProperty("d", [=]() { return GetD(); },
-                            [=](double value) { SetD(value); });
-  builder.AddDoubleProperty("f", [=]() { return GetF(); },
-                            [=](double value) { SetF(value); });
-  builder.AddDoubleProperty("setpoint", [=]() { return GetSetpoint(); },
-                            [=](double value) { SetSetpoint(value); });
+  builder.AddDoubleProperty(
+      "p", [=]() { return GetP(); }, [=](double value) { SetP(value); });
+  builder.AddDoubleProperty(
+      "i", [=]() { return GetI(); }, [=](double value) { SetI(value); });
+  builder.AddDoubleProperty(
+      "d", [=]() { return GetD(); }, [=](double value) { SetD(value); });
+  builder.AddDoubleProperty(
+      "f", [=]() { return GetF(); }, [=](double value) { SetF(value); });
+  builder.AddDoubleProperty(
+      "setpoint", [=]() { return GetSetpoint(); },
+      [=](double value) { SetSetpoint(value); });
 }
 
 void PIDBase::Calculate() {

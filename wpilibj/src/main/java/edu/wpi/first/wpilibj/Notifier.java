@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -139,6 +139,16 @@ public class Notifier implements AutoCloseable {
   }
 
   /**
+   * Sets the name of the notifier.  Used for debugging purposes only.
+   *
+   * @param name Name
+   */
+  public void setName(String name) {
+    m_thread.setName(name);
+    NotifierJNI.setNotifierName(m_notifier.get(), name);
+  }
+
+  /**
    * Change the handler function.
    *
    * @param handler Handler
@@ -197,6 +207,12 @@ public class Notifier implements AutoCloseable {
    * function will block until the handler call is complete.
    */
   public void stop() {
-    NotifierJNI.cancelNotifierAlarm(m_notifier.get());
+    m_processLock.lock();
+    try {
+      m_periodic = false;
+      NotifierJNI.cancelNotifierAlarm(m_notifier.get());
+    } finally {
+      m_processLock.unlock();
+    }
   }
 }

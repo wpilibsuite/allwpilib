@@ -1,0 +1,58 @@
+apply plugin: 'cpp'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: ExtraTasks
+
+if (!project.hasProperty('onlylinuxathena')) {
+
+    description = "Core library for WebSocket extensions"
+
+    ext {
+        includeWpiutil = true
+        includeNtCore = true
+        pluginName = 'halsim_ws_core'
+    }
+
+    apply plugin: 'google-test-test-suite'
+
+
+    ext {
+        staticGtestConfigs = [:]
+    }
+
+    staticGtestConfigs["${pluginName}Test"] = []
+    apply from: "${rootDir}/shared/googletest.gradle"
+
+    apply from: "${rootDir}/shared/config.gradle"
+
+    model {
+        components {
+            halsim_ws_core(NativeLibrarySpec) {
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ['src/main/native/cpp']
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/main/native/include"]
+                        }
+                    }
+                }
+                binaries.all {
+                    project(':hal').addHalDependency(it, 'shared')
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+
+                }
+                appendDebugPathToBinaries(binaries)
+            }
+        }
+        binaries {
+            all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    it.buildable = false
+                    return
+                }
+            }
+        }
+    }
+}

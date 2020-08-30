@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -18,10 +18,11 @@
 
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 #include "HALInitializer.h"
+#include "hal/simulation/MockHooks.h"
 #include "mockdata/DriverStationDataInternal.h"
-#include "mockdata/MockHooks.h"
 
 static wpi::mutex msgMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
@@ -29,6 +30,8 @@ static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 static std::atomic_bool isFinalized{false};
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
+static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
+    nullptr};
 
 namespace hal {
 namespace init {
@@ -45,6 +48,10 @@ extern "C" {
 
 void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
   sendErrorHandler.store(handler);
+}
+
+void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {
+  sendConsoleLineHandler.store(handler);
 }
 
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
@@ -103,6 +110,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     prevMsgTime[i] = curTime;
   }
   return retval;
+}
+
+int32_t HAL_SendConsoleLine(const char* line) {
+  auto handler = sendConsoleLineHandler.load();
+  if (handler) {
+    return handler(line);
+  }
+  wpi::outs() << line << "\n";
+  wpi::outs().flush();
+  return 0;
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
@@ -201,38 +218,29 @@ void HAL_ObserveUserProgramTest(void) {
   // TODO
 }
 
-#ifdef __APPLE__
-static pthread_key_t lastCountKey;
-static pthread_once_t lastCountKeyOnce = PTHREAD_ONCE_INIT;
-
-static void InitLastCountKey(void) {
-  pthread_key_create(&lastCountKey, std::free);
-}
-#endif
-
 static int& GetThreadLocalLastCount() {
   // There is a rollover error condition here. At Packet# = n * (uintmax), this
   // will return false when instead it should return true. However, this at a
   // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
   // worth the cycles to check.
-#ifdef __APPLE__
-  pthread_once(&lastCountKeyOnce, InitLastCountKey);
-  int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
-  if (!lastCountPtr) {
-    lastCountPtr = static_cast<int*>(std::malloc(sizeof(int)));
-    *lastCountPtr = -1;
-    pthread_setspecific(lastCountKey, lastCountPtr);
-  }
-  int& lastCount = *lastCountPtr;
-#else
-  thread_local int lastCount{-1};
-#endif
+  thread_local int lastCount{0};
   return lastCount;
 }
 
-HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
+HAL_Bool HAL_IsNewControlData(void) {
+  std::scoped_lock lock(newDSDataAvailableMutex);
   int& lastCount = GetThreadLocalLastCount();
+  int currentCount = newDSDataAvailableCounter;
+  if (lastCount == currentCount) return false;
+  lastCount = currentCount;
+  return true;
+}
+
+void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
+
+HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock lock(newDSDataAvailableMutex);
+  int& lastCount = GetThreadLocalLastCount();
   int currentCount = newDSDataAvailableCounter;
   if (lastCount != currentCount) {
     lastCount = currentCount;
@@ -242,7 +250,6 @@ HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
   if (isFinalized.load()) {
     return false;
   }
-
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
@@ -256,42 +263,7 @@ HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
       newDSDataAvailableCond->wait(lock);
     }
   }
-  return true;
-}
-
-HAL_Bool HAL_IsNewControlData(void) {
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = 0;
-  {
-    std::scoped_lock lock(newDSDataAvailableMutex);
-    currentCount = newDSDataAvailableCounter;
-  }
-  if (lastCount == currentCount) return false;
-  lastCount = currentCount;
-  return true;
-}
-
-void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
-
-HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
-  if (isFinalized.load()) {
-    return false;
-  }
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-
-  std::unique_lock lock(newDSDataAvailableMutex);
-  int currentCount = newDSDataAvailableCounter;
-  while (newDSDataAvailableCounter == currentCount) {
-    if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      newDSDataAvailableCond->wait(lock);
-    }
-  }
+  lastCount = newDSDataAvailableCounter;
   return true;
 }
 
@@ -302,6 +274,7 @@ static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return 0;
+  SimDriverStationData->CallNewDataCallbacks();
   std::scoped_lock lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;

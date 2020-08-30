@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,8 @@
 #include <utility>
 
 #include <hal/DIO.h>
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Ports.h>
 
 #include "frc/SensorUtil.h"
@@ -33,8 +34,7 @@ DigitalInput::DigitalInput(int channel) {
   int32_t status = 0;
   m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), true, &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumDigitalChannels(),
-                                 channel, HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumDigitalChannels(), channel);
     m_handle = HAL_kInvalidHandle;
     m_channel = std::numeric_limits<int>::max();
     return;
@@ -53,7 +53,7 @@ bool DigitalInput::Get() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value = HAL_GetDIO(m_handle, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return value;
 }
 
@@ -73,5 +73,6 @@ int DigitalInput::GetChannel() const { return m_channel; }
 
 void DigitalInput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");
-  builder.AddBooleanProperty("Value", [=]() { return Get(); }, nullptr);
+  builder.AddBooleanProperty(
+      "Value", [=]() { return Get(); }, nullptr);
 }

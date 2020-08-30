@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.ComplexAuto;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.DefaultDrive;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.commands.DriveDistance;
@@ -24,9 +26,6 @@ import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsys
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.HatchSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants.kAutoDriveDistanceInches;
-import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants.kAutoDriveSpeed;
-import static edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -43,7 +42,8 @@ public class RobotContainer {
 
   // A simple auto routine that drives forward a specified distance, and then stops.
   private final Command m_simpleAuto =
-      new DriveDistance(kAutoDriveDistanceInches, kAutoDriveSpeed, m_robotDrive);
+      new DriveDistance(AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed,
+                        m_robotDrive);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_complexAuto = new ComplexAuto(m_robotDrive, m_hatchSubsystem);
@@ -52,7 +52,7 @@ public class RobotContainer {
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -69,11 +69,10 @@ public class RobotContainer {
         new DefaultDrive(
             m_robotDrive,
             () -> m_driverController.getY(GenericHID.Hand.kLeft),
-            () -> m_driverController.getX(GenericHID.Hand.kRight))
-    );
+            () -> m_driverController.getX(GenericHID.Hand.kRight)));
 
     // Add commands to the autonomous command chooser
-    m_chooser.addOption("Simple Auto", m_simpleAuto);
+    m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
     m_chooser.addOption("Complex Auto", m_complexAuto);
 
     // Put the chooser on the dashboard

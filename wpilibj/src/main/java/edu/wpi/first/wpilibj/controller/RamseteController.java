@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -48,6 +48,7 @@ public class RamseteController {
 
   private Pose2d m_poseError = new Pose2d();
   private Pose2d m_poseTolerance = new Pose2d();
+  private boolean m_enabled = true;
 
   /**
    * Construct a Ramsete unicycle controller.
@@ -61,6 +62,15 @@ public class RamseteController {
   public RamseteController(double b, double zeta) {
     m_b = b;
     m_zeta = zeta;
+  }
+
+  /**
+   * Construct a Ramsete unicycle controller. The default arguments for
+   * b and zeta of 2.0 and 0.7 have been well-tested to produce desireable
+   * results.
+   */
+  public RamseteController() {
+    this(2.0, 0.7);
   }
 
   /**
@@ -94,19 +104,23 @@ public class RamseteController {
    *
    * @param currentPose                        The current pose.
    * @param poseRef                            The desired pose.
-   * @param linearVelocityRefMeters            The desired linear velocity in meters.
-   * @param angularVelocityRefRadiansPerSecond The desired angular velocity in meters.
+   * @param linearVelocityRefMeters            The desired linear velocity in meters per second.
+   * @param angularVelocityRefRadiansPerSecond The desired angular velocity in radians per second.
    */
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(Pose2d currentPose,
                                  Pose2d poseRef,
                                  double linearVelocityRefMeters,
                                  double angularVelocityRefRadiansPerSecond) {
+    if (!m_enabled) {
+      return new ChassisSpeeds(linearVelocityRefMeters, 0.0, angularVelocityRefRadiansPerSecond);
+    }
+
     m_poseError = poseRef.relativeTo(currentPose);
 
     // Aliases for equation readability
-    final double eX = m_poseError.getTranslation().getX();
-    final double eY = m_poseError.getTranslation().getY();
+    final double eX = m_poseError.getX();
+    final double eY = m_poseError.getY();
     final double eTheta = m_poseError.getRotation().getRadians();
     final double vRef = linearVelocityRefMeters;
     final double omegaRef = angularVelocityRefRadiansPerSecond;
@@ -132,6 +146,15 @@ public class RamseteController {
   public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState) {
     return calculate(currentPose, desiredState.poseMeters, desiredState.velocityMetersPerSecond,
         desiredState.velocityMetersPerSecond * desiredState.curvatureRadPerMeter);
+  }
+
+  /**
+   * Enables and disables the controller for troubleshooting purposes.
+   *
+   * @param enabled If the controller is enabled or not.
+   */
+  public void setEnabled(boolean enabled) {
+    m_enabled = enabled;
   }
 
   /**

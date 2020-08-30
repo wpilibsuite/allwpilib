@@ -1,0 +1,42 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  src/main/native/cpp/drake/
+  src/main/native/eigeninclude/
+  src/main/native/include/drake/
+  src/main/native/include/units/base\.h$
+  src/main/native/include/units/units\.h$
+  src/main/native/include/unsupported/
+  src/test/native/cpp/UnitsTest\.cpp$
+  src/test/native/cpp/drake/
+  src/test/native/include/drake/
+}
+
+repoRootNameOverride {
+  wpimath
+}
+
+includeGuardRoots {
+  wpimath/src/main/native/cpp/
+  wpimath/src/main/native/include/
+  wpimath/src/test/native/cpp/
+}
+
+includeOtherLibs {
+  ^wpi/
+}
+
+includeProject {
+  ^drake/
+  ^Eigen/
+  ^units/
+  ^unsupported/
+}

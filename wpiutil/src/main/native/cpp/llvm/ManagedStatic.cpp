@@ -30,6 +30,22 @@ static wpi::mutex* getManagedStaticMutex() {
   return ManagedStaticMutex;
 }
 
+void ManagedStaticBase::RegisterManagedStatic(void* created,
+                                              void (*Deleter)(void*)) const {
+  std::scoped_lock Lock(*getManagedStaticMutex());
+
+  if (!Ptr.load(std::memory_order_relaxed)) {
+    void *Tmp = created;
+
+    Ptr.store(Tmp, std::memory_order_release);
+    DeleterFn = Deleter;
+
+    // Add to list of managed statics.
+    Next = StaticList;
+    StaticList = this;
+  }
+}
+
 void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
                                               void (*Deleter)(void*)) const {
   assert(Creator);

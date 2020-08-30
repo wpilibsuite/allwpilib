@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -33,6 +33,9 @@ public class LiveWindow {
   private static boolean liveWindowEnabled;
   private static boolean telemetryEnabled = true;
 
+  private static Runnable enabledListener;
+  private static Runnable disabledListener;
+
   private static Component getOrAdd(Sendable sendable) {
     Component data = (Component) SendableRegistry.getData(sendable, dataHandle);
     if (data == null) {
@@ -44,6 +47,14 @@ public class LiveWindow {
 
   private LiveWindow() {
     throw new UnsupportedOperationException("This is a utility class!");
+  }
+
+  public static synchronized void setEnabledListener(Runnable runnable) {
+    enabledListener = runnable;
+  }
+
+  public static synchronized void setDisabledListener(Runnable runnable) {
+    disabledListener = runnable;
   }
 
   public static synchronized boolean isEnabled() {
@@ -65,11 +76,17 @@ public class LiveWindow {
       updateValues(); // Force table generation now to make sure everything is defined
       if (enabled) {
         System.out.println("Starting live window mode.");
+        if (enabledListener != null) {
+          enabledListener.run();
+        }
       } else {
         System.out.println("stopping live window mode.");
         SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
           cbdata.builder.stopLiveWindowMode();
         });
+        if (disabledListener != null) {
+          disabledListener.run();
+        }
       }
       enabledEntry.setBoolean(enabled);
     }

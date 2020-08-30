@@ -1,12 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
+#include <functional>
+#include <initializer_list>
 #include <utility>
+
+#include <wpi/ArrayRef.h>
 
 #include "Trigger.h"
 
@@ -65,8 +70,19 @@ class Button : public Trigger {
    * Binds a runnable to execute when the button is pressed.
    *
    * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
    */
-  Button WhenPressed(std::function<void()> toRun);
+  Button WhenPressed(std::function<void()> toRun,
+                     std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Binds a runnable to execute when the button is pressed.
+   *
+   * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
+   */
+  Button WhenPressed(std::function<void()> toRun,
+                     wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started repeatedly while the button is pressed, and
@@ -100,8 +116,19 @@ class Button : public Trigger {
    * Binds a runnable to execute repeatedly while the button is pressed.
    *
    * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
    */
-  Button WhileHeld(std::function<void()> toRun);
+  Button WhileHeld(std::function<void()> toRun,
+                   std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Binds a runnable to execute repeatedly while the button is pressed.
+   *
+   * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
+   */
+  Button WhileHeld(std::function<void()> toRun,
+                   wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
    * Binds a command to be started when the button is pressed, and cancelled
@@ -163,8 +190,19 @@ class Button : public Trigger {
    * Binds a runnable to execute when the button is released.
    *
    * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
    */
-  Button WhenReleased(std::function<void()> toRun);
+  Button WhenReleased(std::function<void()> toRun,
+                      std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Binds a runnable to execute when the button is released.
+   *
+   * @param toRun the runnable to execute.
+   * @param requirements the required subsystems.
+   */
+  Button WhenReleased(std::function<void()> toRun,
+                      wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
    * Binds a command to start when the button is pressed, and be cancelled when

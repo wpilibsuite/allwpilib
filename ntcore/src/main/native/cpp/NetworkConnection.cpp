@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -135,18 +135,18 @@ void NetworkConnection::ReadThreadMain() {
   WireDecoder decoder(is, m_proto_rev, m_logger);
 
   set_state(kHandshake);
-  if (!m_handshake(*this,
-                   [&] {
-                     decoder.set_proto_rev(m_proto_rev);
-                     auto msg = Message::Read(decoder, m_get_entry_type);
-                     if (!msg && decoder.error())
-                       DEBUG0(
-                           "error reading in handshake: " << decoder.error());
-                     return msg;
-                   },
-                   [&](wpi::ArrayRef<std::shared_ptr<Message>> msgs) {
-                     m_outgoing.emplace(msgs);
-                   })) {
+  if (!m_handshake(
+          *this,
+          [&] {
+            decoder.set_proto_rev(m_proto_rev);
+            auto msg = Message::Read(decoder, m_get_entry_type);
+            if (!msg && decoder.error())
+              DEBUG0("error reading in handshake: " << decoder.error());
+            return msg;
+          },
+          [&](wpi::ArrayRef<std::shared_ptr<Message>> msgs) {
+            m_outgoing.emplace(msgs);
+          })) {
     set_state(kDead);
     m_active = false;
     goto done;

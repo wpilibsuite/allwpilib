@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -61,7 +61,8 @@ class NetworkTableInstance final {
     kNetModeServer = NT_NET_MODE_SERVER,
     kNetModeClient = NT_NET_MODE_CLIENT,
     kNetModeStarting = NT_NET_MODE_STARTING,
-    kNetModeFailure = NT_NET_MODE_FAILURE
+    kNetModeFailure = NT_NET_MODE_FAILURE,
+    kNetModeLocal = NT_NET_MODE_LOCAL
   };
 
   /**
@@ -297,6 +298,19 @@ class NetworkTableInstance final {
    * @return Bitmask of NetworkMode.
    */
   unsigned int GetNetworkMode() const;
+
+  /**
+   * Starts local-only operation.  Prevents calls to StartServer or StartClient
+   * from taking effect.  Has no effect if StartServer or StartClient
+   * has already been called.
+   */
+  void StartLocal();
+
+  /**
+   * Stops local-only operation.  StartServer or StartClient can be called after
+   * this call to start a server or client.
+   */
+  void StopLocal();
 
   /**
    * Starts a server using the specified filename, listening address, and port.

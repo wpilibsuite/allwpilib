@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,6 +9,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "AccelerometerGui.h"
+#include "AddressableLEDGui.h"
 #include "AnalogGyroGui.h"
 #include "AnalogInputGui.h"
 #include "AnalogOutGui.h"
@@ -16,13 +17,17 @@
 #include "DIOGui.h"
 #include "DriverStationGui.h"
 #include "EncoderGui.h"
+#include "Field2D.h"
 #include "HALSimGui.h"
+#include "Mechanism2D.h"
+#include "NetworkTablesGui.h"
 #include "PDPGui.h"
 #include "PWMGui.h"
 #include "RelayGui.h"
 #include "RoboRioGui.h"
 #include "SimDeviceGui.h"
 #include "SolenoidGui.h"
+#include "TimingGui.h"
 
 using namespace halsimgui;
 
@@ -31,7 +36,9 @@ extern "C" {
 __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
+  HALSimGui::GlobalInit();
   HALSimGui::Add(AccelerometerGui::Initialize);
+  HALSimGui::Add(AddressableLEDGui::Initialize);
   HALSimGui::Add(AnalogGyroGui::Initialize);
   HALSimGui::Add(AnalogInputGui::Initialize);
   HALSimGui::Add(AnalogOutGui::Initialize);
@@ -39,12 +46,16 @@ __declspec(dllexport)
   HALSimGui::Add(DriverStationGui::Initialize);
   HALSimGui::Add(DIOGui::Initialize);
   HALSimGui::Add(EncoderGui::Initialize);
+  HALSimGui::Add(Field2D::Initialize);
+  HALSimGui::Add(Mechanism2D::Initialize);
+  HALSimGui::Add(NetworkTablesGui::Initialize);
   HALSimGui::Add(PDPGui::Initialize);
   HALSimGui::Add(PWMGui::Initialize);
   HALSimGui::Add(RelayGui::Initialize);
   HALSimGui::Add(RoboRioGui::Initialize);
   HALSimGui::Add(SimDeviceGui::Initialize);
   HALSimGui::Add(SolenoidGui::Initialize);
+  HALSimGui::Add(TimingGui::Initialize);
 
   wpi::outs() << "Simulator GUI Initializing.\n";
   if (!HALSimGui::Initialize()) return 0;

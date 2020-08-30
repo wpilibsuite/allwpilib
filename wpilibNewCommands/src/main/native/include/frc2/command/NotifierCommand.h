@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,7 +11,8 @@
 #include <initializer_list>
 
 #include <frc/Notifier.h>
-#include <units/units.h>
+#include <units/time.h>
+#include <wpi/ArrayRef.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -38,6 +39,16 @@ class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
    */
   NotifierCommand(std::function<void()> toRun, units::second_t period,
                   std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Creates a new NotifierCommand.
+   *
+   * @param toRun        the runnable for the notifier to run
+   * @param period       the period at which the notifier should run
+   * @param requirements the subsystems required by this command
+   */
+  NotifierCommand(std::function<void()> toRun, units::second_t period,
+                  wpi::ArrayRef<Subsystem*> requirements = {});
 
   NotifierCommand(NotifierCommand&& other);
 

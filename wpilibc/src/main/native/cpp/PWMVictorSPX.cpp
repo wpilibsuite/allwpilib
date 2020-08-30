@@ -7,26 +7,14 @@
 
 #include "frc/PWMVictorSPX.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 PWMVictorSPX::PWMVictorSPX(int channel) : PWMSpeedController(channel) {
-  /* Note that the PWMVictorSPX uses the following bounds for PWM values. These
-   * values should work reasonably well for most controllers, but if users
-   * experience issues such as asymmetric behavior around the deadband or
-   * inability to saturate the controller in either direction, calibration is
-   * recommended. The calibration procedure can be found in the VictorSPX User
-   * Manual available from Cross The Road Electronics.
-   *   2.004ms = full "forward"
-   *   1.52ms = the "high end" of the deadband range
-   *   1.50ms = center of the deadband range (off)
-   *   1.48ms = the "low end" of the deadband range
-   *   0.997ms = full "reverse"
-   */
-  SetBounds(2.004, 1.52, 1.50, 1.48, .997);
+  SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);
   SetZeroLatch();

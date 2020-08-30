@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,9 @@
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
@@ -336,10 +338,10 @@ public class SendableRegistry {
       return null;
     }
     Object rv = null;
-    if (handle < comp.m_data.length) {
-      rv = comp.m_data[handle];
-    } else if (comp.m_data == null) {
+    if (comp.m_data == null) {
       comp.m_data = new Object[handle + 1];
+    } else if (handle < comp.m_data.length) {
+      rv = comp.m_data[handle];
     } else {
       comp.m_data = Arrays.copyOf(comp.m_data, handle + 1);
     }
@@ -454,6 +456,10 @@ public class SendableRegistry {
     public SendableBuilderImpl builder;
   }
 
+  // As foreachLiveWindow is single threaded, cache the components it
+  // iterates over to avoid risk of ConcurrentModificationException
+  private static List<Component> foreachComponents = new ArrayList<>();
+
   /**
    * Iterates over LiveWindow-enabled objects in the registry.
    * It is *not* safe to call other SendableRegistry functions from the
@@ -467,7 +473,9 @@ public class SendableRegistry {
   public static synchronized void foreachLiveWindow(int dataHandle,
       Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();
-    for (Component comp : components.values()) {
+    foreachComponents.clear();
+    foreachComponents.addAll(components.values());
+    for (Component comp : foreachComponents) {
       if (comp.m_sendable == null) {
         continue;
       }
@@ -508,5 +516,6 @@ public class SendableRegistry {
         }
       }
     }
+    foreachComponents.clear();
   }
 }

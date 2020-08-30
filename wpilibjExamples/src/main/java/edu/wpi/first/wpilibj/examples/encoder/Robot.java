@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
      * attached to a 3 inch diameter (1.5inch radius) wheel,
      * and that we want to measure distance in inches.
      */
-    m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5);
+    m_encoder.setDistancePerPulse(1.0 / 360.0 * 2.0 * Math.PI * 1.5);
 
     /*
      * Defines the lowest rate at which the encoder will

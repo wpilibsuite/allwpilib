@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.MedianFilter;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -37,6 +38,9 @@ public class Robot extends TimedRobot {
   private static final int kRightMotorPort = 1;
   private static final int kUltrasonicPort = 0;
 
+  // median filter to discard outliers; filters over 5 samples
+  private final MedianFilter m_filter = new MedianFilter(5);
+
   private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
   private final DifferentialDrive m_robotDrive
       = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
@@ -51,8 +55,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    // returned value is filtered with a rolling median filter, since ultrasonics
+    // tend to be quite noisy and susceptible to sudden outliers
     double pidOutput
-        = m_pidController.calculate(m_ultrasonic.getAverageVoltage());
+        = m_pidController.calculate(m_filter.calculate(m_ultrasonic.getVoltage()));
 
     m_robotDrive.arcadeDrive(pidOutput, 0);
   }

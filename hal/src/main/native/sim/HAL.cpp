@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,11 @@
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
+#ifdef _WIN32
+#include <Windows.h>
+#pragma comment(lib, "Winmm.lib")
+#endif  // _WIN32
+
 #include "ErrorsInternal.h"
 #include "HALInitializer.h"
 #include "MockHooksInternal.h"
@@ -17,14 +22,18 @@
 #include "hal/Errors.h"
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/simulation/DriverStationData.h"
 #include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
+
+static HAL_RuntimeType runtimeType{HAL_Mock};
 
 namespace hal {
 namespace init {
 void InitializeHAL() {
   InitializeAccelerometerData();
+  InitializeAddressableLEDData();
   InitializeAnalogGyroData();
   InitializeAnalogInData();
   InitializeAnalogOutData();
@@ -46,11 +55,13 @@ void InitializeHAL() {
   InitializeSPIAccelerometerData();
   InitializeSPIData();
   InitializeAccelerometer();
+  InitializeAddressableLED();
   InitializeAnalogAccumulator();
   InitializeAnalogGyro();
   InitializeAnalogInput();
   InitializeAnalogInternal();
   InitializeAnalogOutput();
+  InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCompressor();
   InitializeConstants();
@@ -203,12 +214,18 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_CAN_TIMEOUT_MESSAGE;
     case HAL_SIM_NOT_SUPPORTED:
       return HAL_SIM_NOT_SUPPORTED_MESSAGE;
+    case HAL_CAN_BUFFER_OVERRUN:
+      return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
+    case HAL_LED_CHANNEL_ERROR:
+      return HAL_LED_CHANNEL_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
 }
 
-HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Mock; }
+HAL_RuntimeType HAL_GetRuntimeType(void) { return runtimeType; }
+
+void HALSIM_SetRuntimeType(HAL_RuntimeType type) { runtimeType = type; }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
   return 2018;  // Automatically script this at some point
@@ -220,12 +237,34 @@ int64_t HAL_GetFPGARevision(int32_t* status) {
 
 uint64_t HAL_GetFPGATime(int32_t* status) { return hal::GetFPGATime(); }
 
+uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
+  // Capture the current FPGA time.  This will give us the upper half of the
+  // clock.
+  uint64_t fpga_time = HAL_GetFPGATime(status);
+  if (*status != 0) return 0;
+
+  // Now, we need to detect the case where the lower bits rolled over after we
+  // sampled.  In that case, the upper bits will be 1 bigger than they should
+  // be.
+
+  // Break it into lower and upper portions.
+  uint32_t lower = fpga_time & 0xffffffffull;
+  uint64_t upper = (fpga_time >> 32) & 0xffffffff;
+
+  // The time was sampled *before* the current time, so roll it back.
+  if (lower < unexpanded_lower) {
+    --upper;
+  }
+
+  return (upper << 32) + static_cast<uint64_t>(unexpanded_lower);
+}
+
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   return SimRoboRioData[0].fpgaButton;
 }
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
-  return true;  // Figure out if we need to handle this
+  return HALSIM_GetDriverStationEnabled();
 }
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
@@ -246,12 +285,30 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   hal::init::HAL_IsInitialized.store(true);
 
-  wpi::outs().SetUnbuffered();
-  if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
 
   initialized = true;
+
+// Set Timer Precision to 1ms on Windows
+#ifdef _WIN32
+  TIMECAPS tc;
+  if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+    UINT target = min(1, tc.wPeriodMin);
+    timeBeginPeriod(target);
+    std::atexit([]() {
+      TIMECAPS tc;
+      if (timeGetDevCaps(&tc, sizeof(tc)) == TIMERR_NOERROR) {
+        UINT target = min(1, tc.wPeriodMin);
+        timeEndPeriod(target);
+      }
+    });
+  }
+#endif  // _WIN32
+
+  wpi::outs().SetUnbuffered();
+  if (HAL_LoadExtensions() < 0) return false;
+
   return true;  // Add initialization if we need to at a later point
 }
 

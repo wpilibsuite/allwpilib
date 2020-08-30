@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,11 +10,13 @@
 #include <cassert>
 #include <cstdio>
 
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_NotifierJNI.h"
 #include "hal/Notifier.h"
 
-using namespace frc;
+using namespace hal;
 
 extern "C" {
 
@@ -35,6 +37,21 @@ Java_edu_wpi_first_hal_NotifierJNI_initializeNotifier
   }
 
   return (jint)notifierHandle;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_NotifierJNI
+ * Method:    setNotifierName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_NotifierJNI_setNotifierName
+  (JNIEnv* env, jclass cls, jint notifierHandle, jstring name)
+{
+  int32_t status = 0;
+  HAL_SetNotifierName((HAL_NotifierHandle)notifierHandle,
+                      wpi::java::JStringRef{env, name}.c_str(), &status);
+  CheckStatus(env, status);
 }
 
 /*

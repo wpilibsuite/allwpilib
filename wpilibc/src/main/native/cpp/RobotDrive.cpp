@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/GenericHID.h"
 #include "frc/Joystick.h"
@@ -128,13 +128,13 @@ void RobotDrive::Drive(double outputMagnitude, double curve) {
   if (curve < 0) {
     double value = std::log(-curve);
     double ratio = (value - m_sensitivity) / (value + m_sensitivity);
-    if (ratio == 0) ratio = .0000000001;
+    if (ratio == 0) ratio = 0.0000000001;
     leftOutput = outputMagnitude / ratio;
     rightOutput = outputMagnitude;
   } else if (curve > 0) {
     double value = std::log(curve);
     double ratio = (value - m_sensitivity) / (value + m_sensitivity);
-    if (ratio == 0) ratio = .0000000001;
+    if (ratio == 0) ratio = 0.0000000001;
     leftOutput = outputMagnitude;
     rightOutput = outputMagnitude / ratio;
   } else {

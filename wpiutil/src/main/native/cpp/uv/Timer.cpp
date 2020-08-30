@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -34,12 +34,13 @@ void Timer::SingleShot(Loop& loop, Time timeout, std::function<void()> func) {
 }
 
 void Timer::Start(Time timeout, Time repeat) {
-  Invoke(&uv_timer_start, GetRaw(),
-         [](uv_timer_t* handle) {
-           Timer& h = *static_cast<Timer*>(handle->data);
-           h.timeout();
-         },
-         timeout.count(), repeat.count());
+  Invoke(
+      &uv_timer_start, GetRaw(),
+      [](uv_timer_t* handle) {
+        Timer& h = *static_cast<Timer*>(handle->data);
+        h.timeout();
+      },
+      timeout.count(), repeat.count());
 }
 
 }  // namespace uv

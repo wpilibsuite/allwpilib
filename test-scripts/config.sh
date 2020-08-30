@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #*----------------------------------------------------------------------------*#
-#* Copyright (c) FIRST 2014. All Rights Reserved.							  *#
+#* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        *#
 #* Open Source Software - may be modified and shared by FRC teams. The code   *#
 #* must be accompanied by the FIRST BSD license file in the root directory of *#
-#* the project.															      *#
+#* the project.                                                               *#
 #*----------------------------------------------------------------------------*#
 
 # If this is changed, update the .gitignore
@@ -31,7 +31,7 @@ DEFAULT_DESTINATION_CPP_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/${C
 DEFAULT_JAVA_TEST_NAME=FRCUserProgram.jar
 DEFAULT_JAVA_TEST_ARGS=""
 
-DEFAULT_LOCAL_JAVA_TEST_FILE=../build/integrationTestFiles/java/wpilibjIntegrationTests.jar
+DEFAULT_LOCAL_JAVA_TEST_FILE=../build/integrationTestFiles/java/wpilibjIntegrationTests-all.jar
 
 JAVA_REPORT=javareport.xml
 DEFAULT_LIBRARY_NATIVE_FILES=../build/integrationTestFiles/libs

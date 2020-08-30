@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <frc/AnalogInput.h>
+#include <frc/MedianFilter.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
@@ -27,7 +28,8 @@ class Robot : public frc::TimedRobot {
   }
 
   void TeleopPeriodic() override {
-    double output = m_pidController.Calculate(m_ultrasonic.GetAverageVoltage());
+    double output =
+        m_pidController.Calculate(m_filter.Calculate(m_ultrasonic.GetValue()));
     m_robotDrive.ArcadeDrive(output, 0);
   }
 
@@ -50,6 +52,9 @@ class Robot : public frc::TimedRobot {
   static constexpr int kLeftMotorPort = 0;
   static constexpr int kRightMotorPort = 1;
   static constexpr int kUltrasonicPort = 0;
+
+  // median filter to discard outliers; filters over 5 samples
+  frc::MedianFilter<double> m_filter{5};
 
   frc::AnalogInput m_ultrasonic{kUltrasonicPort};
 

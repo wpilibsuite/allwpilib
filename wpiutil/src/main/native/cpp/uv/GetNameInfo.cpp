@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,17 +19,18 @@ GetNameInfoReq::GetNameInfoReq() {
 
 void GetNameInfo(Loop& loop, const std::shared_ptr<GetNameInfoReq>& req,
                  const sockaddr& addr, int flags) {
-  int err = uv_getnameinfo(loop.GetRaw(), req->GetRaw(),
-                           [](uv_getnameinfo_t* req, int status,
-                              const char* hostname, const char* service) {
-                             auto& h = *static_cast<GetNameInfoReq*>(req->data);
-                             if (status < 0)
-                               h.ReportError(status);
-                             else
-                               h.resolved(hostname, service);
-                             h.Release();  // this is always a one-shot
-                           },
-                           &addr, flags);
+  int err = uv_getnameinfo(
+      loop.GetRaw(), req->GetRaw(),
+      [](uv_getnameinfo_t* req, int status, const char* hostname,
+         const char* service) {
+        auto& h = *static_cast<GetNameInfoReq*>(req->data);
+        if (status < 0)
+          h.ReportError(status);
+        else
+          h.resolved(hostname, service);
+        h.Release();  // this is always a one-shot
+      },
+      &addr, flags);
   if (err < 0)
     loop.ReportError(err);
   else

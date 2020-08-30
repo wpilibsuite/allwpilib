@@ -13,6 +13,7 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/DenseMap.h>
+#include <wpi/ManagedStatic.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
@@ -47,8 +48,14 @@ struct CameraServer::Impl {
 };
 
 CameraServer* CameraServer::GetInstance() {
-  static CameraServer instance;
-  return &instance;
+  struct Creator {
+    static void* call() { return new CameraServer{}; }
+  };
+  struct Deleter {
+    static void call(void* ptr) { delete static_cast<CameraServer*>(ptr); }
+  };
+  static wpi::ManagedStatic<CameraServer, Creator, Deleter> instance;
+  return &(*instance);
 }
 
 static wpi::StringRef MakeSourceValue(CS_Source source,

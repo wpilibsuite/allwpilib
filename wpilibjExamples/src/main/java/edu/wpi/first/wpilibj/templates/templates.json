@@ -42,5 +42,16 @@
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "Old Command Robot",
+    "description": "Old-command style (deprecated)",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "oldcommandbased",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 1
   }
 ]

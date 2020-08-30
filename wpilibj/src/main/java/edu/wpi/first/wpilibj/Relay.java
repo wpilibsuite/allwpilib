@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -33,6 +33,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.
    */
+  @SuppressWarnings("serial")
   public static class InvalidValueException extends RuntimeException {
     /**
      * Create a new exception with the given message.

@@ -34,6 +34,8 @@ The following build options are available:
   * TODO
 * EXTERNAL_HAL_FILE
   * TODO
+* OPENCV_JAVA_INSTALL_DIR
+  * Set this option to the location of the archive of the OpenCV Java bindings (it should be called opencv-xxx.jar, with the x'es being version numbers). NOTE: set it to the LOCATION of the file, not the file itself!
 
 ## Build Setup
 

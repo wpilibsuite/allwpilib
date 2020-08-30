@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,6 +41,11 @@ void InitializeExtensions() {}
 }  // namespace init
 }  // namespace hal
 
+static bool& GetShowNotFoundMessage() {
+  static bool showMsg = true;
+  return showMsg;
+}
+
 extern "C" {
 
 int HAL_LoadOneExtension(const char* library) {
@@ -59,7 +64,7 @@ int HAL_LoadOneExtension(const char* library) {
     libraryName += ".so";
 #endif
     wpi::outs() << "HAL Extensions: Trying modified name: "
-                << wpi::sys::path::stem(libraryName);
+                << wpi::sys::path::stem(libraryName) << "\n";
     wpi::outs().flush();
     handle = DLOPEN(libraryName.c_str());
   }
@@ -91,8 +96,10 @@ int HAL_LoadExtensions(void) {
   wpi::SmallVector<wpi::StringRef, 2> libraries;
   const char* e = std::getenv("HALSIM_EXTENSIONS");
   if (!e) {
-    wpi::outs() << "HAL Extensions: No extensions found\n";
-    wpi::outs().flush();
+    if (GetShowNotFoundMessage()) {
+      wpi::outs() << "HAL Extensions: No extensions found\n";
+      wpi::outs().flush();
+    }
     return rc;
   }
   wpi::StringRef env{e};
@@ -103,6 +110,10 @@ int HAL_LoadExtensions(void) {
     if (rc < 0) break;
   }
   return rc;
+}
+
+void HAL_SetShowExtensionsNotFoundMessages(HAL_Bool showMessage) {
+  GetShowNotFoundMessage() = showMessage;
 }
 
 }  // extern "C"

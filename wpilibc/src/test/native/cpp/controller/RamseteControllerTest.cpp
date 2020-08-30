@@ -1,11 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <wpi/math>
+#include <units/math.h>
 
 #include "frc/controller/RamseteController.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
@@ -16,16 +16,6 @@
 
 static constexpr units::meter_t kTolerance{1 / 12.0};
 static constexpr units::radian_t kAngularTolerance{2.0 * wpi::math::pi / 180.0};
-
-units::radian_t boundRadians(units::radian_t value) {
-  while (value > units::radian_t{wpi::math::pi}) {
-    value -= units::radian_t{wpi::math::pi * 2};
-  }
-  while (value <= units::radian_t{-wpi::math::pi}) {
-    value += units::radian_t{wpi::math::pi * 2};
-  }
-  return value;
-}
 
 TEST(RamseteControllerTest, ReachesReference) {
   frc::RamseteController controller{2.0, 0.7};
@@ -47,11 +37,9 @@ TEST(RamseteControllerTest, ReachesReference) {
   }
 
   auto& endPose = trajectory.States().back().pose;
-  EXPECT_NEAR_UNITS(endPose.Translation().X(), robotPose.Translation().X(),
-                    kTolerance);
-  EXPECT_NEAR_UNITS(endPose.Translation().Y(), robotPose.Translation().Y(),
-                    kTolerance);
-  EXPECT_NEAR_UNITS(boundRadians(endPose.Rotation().Radians() -
-                                 robotPose.Rotation().Radians()),
+  EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
+  EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
+  EXPECT_NEAR_UNITS(units::math::NormalizeAngle(endPose.Rotation().Radians() -
+                                                robotPose.Rotation().Radians()),
                     0_rad, kAngularTolerance);
 }

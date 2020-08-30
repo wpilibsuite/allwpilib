@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -124,7 +124,7 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
 
 static wpi::mutex* newDSDataAvailableMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
-static std::atomic_int newDSDataAvailableCounter{0};
+static int newDSDataAvailableCounter{0};
 
 namespace hal {
 namespace init {
@@ -176,27 +176,27 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 
     if (baseLength + detailsRef.size() + locationRef.size() +
             callStackRef.size() <=
-        65536) {
+        65535) {
       // Pass through
       retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
                                                   details, location, callStack);
-    } else if (baseLength + detailsRef.size() > 65536) {
+    } else if (baseLength + detailsRef.size() > 65535) {
       // Details too long, cut both location and stack
-      auto newLen = 65536 - baseLength;
+      auto newLen = 65535 - baseLength;
       std::string newDetails{details, newLen};
       char empty = '\0';
       retval = FRC_NetworkCommunication_sendError(
           isError, errorCode, isLVCode, newDetails.c_str(), &empty, &empty);
-    } else if (baseLength + detailsRef.size() + locationRef.size() > 65536) {
+    } else if (baseLength + detailsRef.size() + locationRef.size() > 65535) {
       // Location too long, cut stack
-      auto newLen = 65536 - baseLength - detailsRef.size();
+      auto newLen = 65535 - baseLength - detailsRef.size();
       std::string newLocation{location, newLen};
       char empty = '\0';
       retval = FRC_NetworkCommunication_sendError(
           isError, errorCode, isLVCode, details, newLocation.c_str(), &empty);
     } else {
       // Stack too long
-      auto newLen = 65536 - baseLength - detailsRef.size() - locationRef.size();
+      auto newLen = 65535 - baseLength - detailsRef.size() - locationRef.size();
       std::string newCallStack{callStack, newLen};
       retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
                                                   details, location,
@@ -227,6 +227,18 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     prevMsgTime[i] = curTime;
   }
   return retval;
+}
+
+int32_t HAL_SendConsoleLine(const char* line) {
+  wpi::StringRef lineRef{line};
+  if (lineRef.size() <= 65535) {
+    // Send directly
+    return FRC_NetworkCommunication_sendConsoleLine(line);
+  } else {
+    // Need to truncate
+    std::string newLine{line, 65535};
+    return FRC_NetworkCommunication_sendConsoleLine(newLine.c_str());
+  }
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
@@ -343,41 +355,14 @@ static int& GetThreadLocalLastCount() {
   // will return false when instead it should return true. However, this at a
   // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
   // worth the cycles to check.
-  thread_local int lastCount{-1};
+  thread_local int lastCount{0};
   return lastCount;
 }
 
-void HAL_WaitForCachedControlData(void) {
-  HAL_WaitForCachedControlDataTimeout(0);
-}
-
-HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout) {
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter.load();
-  if (lastCount != currentCount) {
-    lastCount = currentCount;
-    return true;
-  }
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-
-  std::unique_lock lock{*newDSDataAvailableMutex};
-  while (newDSDataAvailableCounter.load() == currentCount) {
-    if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      newDSDataAvailableCond->wait(lock);
-    }
-  }
-  return true;
-}
-
 HAL_Bool HAL_IsNewControlData(void) {
+  std::scoped_lock lock{*newDSDataAvailableMutex};
   int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter.load();
+  int currentCount = newDSDataAvailableCounter;
   if (lastCount == currentCount) return false;
   lastCount = currentCount;
   return true;
@@ -394,12 +379,17 @@ void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
  * time has passed. Returns true on new data, false on timeout.
  */
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
+  std::unique_lock lock{*newDSDataAvailableMutex};
+  int& lastCount = GetThreadLocalLastCount();
+  int currentCount = newDSDataAvailableCounter;
+  if (lastCount != currentCount) {
+    lastCount = currentCount;
+    return true;
+  }
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  int currentCount = newDSDataAvailableCounter.load();
-  std::unique_lock lock{*newDSDataAvailableMutex};
-  while (newDSDataAvailableCounter.load() == currentCount) {
+  while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
       auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
       if (timedOut == std::cv_status::timeout) {
@@ -409,6 +399,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
       newDSDataAvailableCond->wait(lock);
     }
   }
+  lastCount = newDSDataAvailableCounter;
   return true;
 }
 
@@ -419,8 +410,9 @@ static void newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return;
+  std::scoped_lock lock{*newDSDataAvailableMutex};
   // Notify all threads
-  newDSDataAvailableCounter.fetch_add(1);
+  ++newDSDataAvailableCounter;
   newDSDataAvailableCond->notify_all();
 }
 

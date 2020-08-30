@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,6 +27,7 @@ namespace frc {
  * determine the heading.
  *
  * This class is for the digital ADXRS450 gyro sensor that connects via SPI.
+ * Only one instance of an ADXRS Gyro is supported.
  */
 class ADXRS450_Gyro : public GyroBase {
  public:
@@ -50,21 +51,19 @@ class ADXRS450_Gyro : public GyroBase {
   /**
    * Return the actual angle in degrees that the robot is currently facing.
    *
-   * The angle is based on the current accumulator value corrected by the
-   * oversampling rate, the gyro type and the A/D calibration values.
+   * The angle is based on integration of the returned rate from the gyro.
    * The angle is continuous, that is it will continue from 360->361 degrees.
    * This allows algorithms that wouldn't want to see a discontinuity in the
    * gyro output as it sweeps from 360 to 0 on the second time around.
    *
-   * @return the current heading of the robot in degrees. This heading is based
-   *         on integration of the returned rate from the gyro.
+   * @return the current heading of the robot in degrees.
    */
   double GetAngle() const override;
 
   /**
    * Return the rate of rotation of the gyro
    *
-   * The rate is based on the most recent reading of the gyro analog value
+   * The rate is based on the most recent reading of the gyro.
    *
    * @return the current rate in degrees per second
    */

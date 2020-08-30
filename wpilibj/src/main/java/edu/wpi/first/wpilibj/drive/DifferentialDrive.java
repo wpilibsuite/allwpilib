@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpiutil.math.MathUtils;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -31,12 +31,12 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * <p>Four motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Spark m_frontLeft = new Spark(1);
- *   Spark m_rearLeft = new Spark(2);
+ *   SpeedController m_frontLeft = new PWMVictorSPX(1);
+ *   SpeedController m_rearLeft = new PWMVictorSPX(2);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
  *
- *   Spark m_frontRight = new Spark(3);
- *   Spark m_rearRight = new Spark(4);
+ *   SpeedController m_frontRight = new PWMVictorSPX(3);
+ *   SpeedController m_rearRight = new PWMVictorSPX(4);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
@@ -46,14 +46,14 @@ import edu.wpi.first.wpiutil.math.MathUtils;
  * <p>Six motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Spark m_frontLeft = new Spark(1);
- *   Spark m_midLeft = new Spark(2);
- *   Spark m_rearLeft = new Spark(3);
+ *   SpeedController m_frontLeft = new PWMVictorSPX(1);
+ *   SpeedController m_midLeft = new PWMVictorSPX(2);
+ *   SpeedController m_rearLeft = new PWMVictorSPX(3);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_midLeft, m_rearLeft);
  *
- *   Spark m_frontRight = new Spark(4);
- *   Spark m_midRight = new Spark(5);
- *   Spark m_rearRight = new Spark(6);
+ *   SpeedController m_frontRight = new PWMVictorSPX(4);
+ *   SpeedController m_midRight = new PWMVictorSPX(5);
+ *   SpeedController m_rearRight = new PWMVictorSPX(6);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_midRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
@@ -184,10 +184,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
       m_reported = true;
     }
 
-    xSpeed = MathUtils.clamp(xSpeed, -1.0, 1.0);
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    zRotation = MathUtils.clamp(zRotation, -1.0, 1.0);
+    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
     zRotation = applyDeadband(zRotation, m_deadband);
 
     // Square the inputs (while preserving the sign) to increase fine control
@@ -222,9 +222,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
       }
     }
 
-    m_leftMotor.set(MathUtils.clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
+    m_leftMotor.set(MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
     double maxOutput = m_maxOutput * m_rightSideInvertMultiplier;
-    m_rightMotor.set(MathUtils.clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
+    m_rightMotor.set(MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
 
     feed();
   }
@@ -251,10 +251,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
       m_reported = true;
     }
 
-    xSpeed = MathUtils.clamp(xSpeed, -1.0, 1.0);
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    zRotation = MathUtils.clamp(zRotation, -1.0, 1.0);
+    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
     zRotation = applyDeadband(zRotation, m_deadband);
 
     double angularPower;
@@ -263,7 +263,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     if (isQuickTurn) {
       if (Math.abs(xSpeed) < m_quickStopThreshold) {
         m_quickStopAccumulator = (1 - m_quickStopAlpha) * m_quickStopAccumulator
-            + m_quickStopAlpha * MathUtils.clamp(zRotation, -1.0, 1.0) * 2;
+            + m_quickStopAlpha * MathUtil.clamp(zRotation, -1.0, 1.0) * 2;
       }
       overPower = true;
       angularPower = zRotation;
@@ -342,10 +342,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
       m_reported = true;
     }
 
-    leftSpeed = MathUtils.clamp(leftSpeed, -1.0, 1.0);
+    leftSpeed = MathUtil.clamp(leftSpeed, -1.0, 1.0);
     leftSpeed = applyDeadband(leftSpeed, m_deadband);
 
-    rightSpeed = MathUtils.clamp(rightSpeed, -1.0, 1.0);
+    rightSpeed = MathUtil.clamp(rightSpeed, -1.0, 1.0);
     rightSpeed = applyDeadband(rightSpeed, m_deadband);
 
     // Square the inputs (while preserving the sign) to increase fine control

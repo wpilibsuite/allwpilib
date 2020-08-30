@@ -1,22 +1,31 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/Encoder.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
-#include <frc/controller/PIDController.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/trajectory/TrapezoidProfile.h>
+#include <units/acceleration.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
+#include <wpi/math>
+
+#include "ExampleSmartMotorController.h"
 
 class Robot : public frc::TimedRobot {
  public:
   static constexpr units::second_t kDt = 20_ms;
 
-  Robot() { m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5); }
+  Robot() {
+    // Note: These gains are fake, and will have to be tuned for your robot.
+    m_motor.SetPID(1.3, 0.0, 0.7);
+  }
 
   void TeleopPeriodic() override {
     if (m_joystick.GetRawButtonPressed(2)) {
@@ -28,27 +37,30 @@ class Robot : public frc::TimedRobot {
     // Create a motion profile with the given maximum velocity and maximum
     // acceleration constraints for the next setpoint, the desired goal, and the
     // current setpoint.
-    frc::TrapezoidProfile profile{m_constraints, m_goal, m_setpoint};
+    frc::TrapezoidProfile<units::meters> profile{m_constraints, m_goal,
+                                                 m_setpoint};
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
     m_setpoint = profile.Calculate(kDt);
 
-    // Run controller with profiled setpoint and update motor output
-    double output = m_controller.Calculate(m_encoder.GetDistance(),
-                                           m_setpoint.position.to<double>());
-    m_motor.Set(output);
+    // Send setpoint to offboard controller PID
+    m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
+                        m_setpoint.position.to<double>(),
+                        m_feedforward.Calculate(m_setpoint.velocity) / 12_V);
   }
 
  private:
   frc::Joystick m_joystick{1};
-  frc::Encoder m_encoder{1, 2};
-  frc::PWMVictorSPX m_motor{1};
-  frc2::PIDController m_controller{1.3, 0.0, 0.7, kDt};
+  ExampleSmartMotorController m_motor{1};
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward{
+      // Note: These gains are fake, and will have to be tuned for your robot.
+      1_V, 1.5_V * 1_s / 1_m};
 
-  frc::TrapezoidProfile::Constraints m_constraints{1.75_mps, 0.75_mps_sq};
-  frc::TrapezoidProfile::State m_goal;
-  frc::TrapezoidProfile::State m_setpoint;
+  frc::TrapezoidProfile<units::meters>::Constraints m_constraints{1.75_mps,
+                                                                  0.75_mps_sq};
+  frc::TrapezoidProfile<units::meters>::State m_goal;
+  frc::TrapezoidProfile<units::meters>::State m_setpoint;
 };
 
 #ifndef RUNNING_FRC_TESTS

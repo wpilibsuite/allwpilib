@@ -1,13 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-
-#include <units/units.h>
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
@@ -17,6 +15,7 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc2/command/SubsystemBase.h>
+#include <units/voltage.h>
 
 #include "Constants.h"
 
@@ -84,9 +83,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from 180 to 180
+   * @return the robot's heading in degrees, from -180 to 180
    */
-  double GetHeading();
+  units::degree_t GetHeading() const;
 
   /**
    * Returns the turn rate of the robot.
@@ -101,6 +100,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @return The pose.
    */
   frc::Pose2d GetPose();
+
+  /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  frc::DifferentialDriveWheelSpeeds GetWheelSpeeds();
 
   /**
    * Resets the odometry to the specified pose.

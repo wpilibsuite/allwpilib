@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <wpi/math>
+
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
  * numerical or bool constants.  This should not be used for any other purpose.
@@ -31,7 +33,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * 3.142) / static_cast<double>(kEncoderCPR);
+    (kWheelDiameterInches * wpi::math::pi) / static_cast<double>(kEncoderCPR);
 }  // namespace DriveConstants
 
 namespace HatchConstants {
@@ -42,7 +44,7 @@ constexpr int kHatchSolenoidPorts[]{0, 1};
 namespace AutoConstants {
 constexpr double kAutoDriveDistanceInches = 60;
 constexpr double kAutoBackupDistanceInches = 20;
-constexpr double kAutoDriveSpeed = .5;
+constexpr double kAutoDriveSpeed = 0.5;
 }  // namespace AutoConstants
 
 namespace OIConstants {

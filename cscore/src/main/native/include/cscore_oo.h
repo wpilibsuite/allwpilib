@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -443,6 +443,11 @@ class UsbCamera : public VideoCamera {
    * @return Vector of USB camera information (one for each camera)
    */
   static std::vector<UsbCameraInfo> EnumerateUsbCameras();
+
+  /**
+   * Change the path to the device.
+   */
+  void SetPath(const wpi::Twine& path);
 
   /**
    * Get the path to the device.

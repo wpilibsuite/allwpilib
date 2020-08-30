@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,6 +22,9 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.math.MathShared;
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -78,6 +81,53 @@ public abstract class RobotBase implements AutoCloseable {
     CameraServerSharedStore.setCameraServerShared(shared);
   }
 
+  private static void setupMathShared() {
+    MathSharedStore.setMathShared(new MathShared() {
+      @Override
+      public void reportError(String error, StackTraceElement[] stackTrace) {
+        DriverStation.reportError(error, stackTrace);
+      }
+
+      @Override
+      public void reportUsage(MathUsageId id, int count) {
+        switch (id) {
+          case kKinematics_DifferentialDrive:
+            HAL.report(tResourceType.kResourceType_Kinematics,
+                tInstances.kKinematics_DifferentialDrive);
+            break;
+          case kKinematics_MecanumDrive:
+            HAL.report(tResourceType.kResourceType_Kinematics,
+                tInstances.kKinematics_MecanumDrive);
+            break;
+          case kKinematics_SwerveDrive:
+            HAL.report(tResourceType.kResourceType_Kinematics,
+                tInstances.kKinematics_SwerveDrive);
+            break;
+          case kTrajectory_TrapezoidProfile:
+            HAL.report(tResourceType.kResourceType_TrapezoidProfile, count);
+            break;
+          case kFilter_Linear:
+            HAL.report(tResourceType.kResourceType_LinearFilter, count);
+            break;
+          case kOdometry_DifferentialDrive:
+            HAL.report(tResourceType.kResourceType_Odometry,
+                tInstances.kOdometry_DifferentialDrive);
+            break;
+          case kOdometry_SwerveDrive:
+            HAL.report(tResourceType.kResourceType_Odometry,
+                tInstances.kOdometry_SwerveDrive);
+            break;
+          case kOdometry_MecanumDrive:
+            HAL.report(tResourceType.kResourceType_Odometry,
+                tInstances.kOdometry_MecanumDrive);
+            break;
+          default:
+            break;
+        }
+      }
+    });
+  }
+
   protected final DriverStation m_ds;
 
   /**
@@ -90,11 +140,16 @@ public abstract class RobotBase implements AutoCloseable {
    * to put this code into it's own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
+    setupMathShared();
     inst.setNetworkIdentity("Robot");
-    inst.startServer("/home/lvuser/networktables.ini");
+    if (isReal()) {
+      inst.startServer("/home/lvuser/networktables.ini");
+    } else {
+      inst.startServer();
+    }
     m_ds = DriverStation.getInstance();
     inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
@@ -157,6 +212,16 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
+   * Determine if the robot is current in Autonomous mode and enabled as determined by
+   * the field controls.
+   *
+   * @return True if the robot is currently operating autonomously while enabled.
+   */
+  public boolean isAutonomousEnabled() {
+    return m_ds.isAutonomousEnabled();
+  }
+
+  /**
    * Determine if the robot is currently in Test mode as determined by the driver
    * station.
    *
@@ -174,6 +239,16 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public boolean isOperatorControl() {
     return m_ds.isOperatorControl();
+  }
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled as determined by
+   * the field controls.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while enabled.
+   */
+  public boolean isOperatorControlEnabled() {
+    return m_ds.isOperatorControlEnabled();
   }
 
   /**
@@ -317,7 +392,8 @@ public abstract class RobotBase implements AutoCloseable {
     // Needed because all the OpenCV JNI functions don't have built in loading
     CameraServerJNI.enumerateSinks();
 
-    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0,
+        WPILibVersion.Version);
 
     if (HAL.hasMain()) {
       Thread thread = new Thread(() -> {

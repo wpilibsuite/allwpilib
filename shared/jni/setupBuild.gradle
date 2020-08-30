@@ -17,8 +17,8 @@ apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 dependencies {
     if (!project.hasProperty('noWpiutil')) {
-        compile project(':wpiutil')
-        devCompile project(':wpiutil')
+        implementation project(':wpiutil')
+        devImplementation project(':wpiutil')
     }
 }
 
@@ -32,18 +32,6 @@ staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
-if (project.hasProperty('niLibraries')) {
-    ext {
-        chipObjectComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
-                                "${nativeName}JNI".toString(), "${nativeName}JNIShared".toString(), "${nativeName}Test".toString()]
-        netCommComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
-                             "${nativeName}JNI".toString(), "${nativeName}JNIShared".toString(), "${nativeName}Test".toString()]
-        useNiJava = true
-    }
-
-    apply from: "${rootDir}/shared/nilibraries.gradle"
-}
-
 model {
     components {
         "${nativeName}Base"(NativeLibrarySpec) {
@@ -55,7 +43,7 @@ model {
                     source {
                         srcDirs 'src/main/native/cpp'
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
+                        exclude '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -111,7 +99,7 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
@@ -120,7 +108,7 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -153,7 +141,7 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
@@ -162,7 +150,7 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -211,6 +199,9 @@ model {
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
+                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                }
             }
         }
     }
@@ -243,6 +234,9 @@ model {
             lib library: nativeName, linkage: 'shared'
             if (!project.hasProperty('noWpiutil')) {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                }
             }
         }
     }
@@ -280,6 +274,9 @@ model {
         }
     }
 }
+
+apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
+apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"
 
 ext.getJniSpecClass = {
     return JniNativeLibrarySpec

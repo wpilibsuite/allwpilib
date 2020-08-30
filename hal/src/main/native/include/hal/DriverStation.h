@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2013-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2013-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -37,6 +37,12 @@ extern "C" {
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg);
+/**
+ * Sends a line to the driver station console.
+ *
+ * @param line the line to send (null terminated)
+ */
+int32_t HAL_SendConsoleLine(const char* line);
 
 /**
  * Gets the current control word of the driver station.
@@ -194,24 +200,6 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 void HAL_ReleaseDSMutex(void);
 
 /**
- * Checks if new control data has arrived since the last
- * HAL_WaitForCachedControlData or HAL_IsNewControlData call. If new data has
- * not arrived, waits for new data to arrive. Otherwise, returns immediately.
- */
-void HAL_WaitForCachedControlData(void);
-
-/**
- * Checks if new control data has arrived since the last
- * HAL_WaitForCachedControlData or HAL_IsNewControlData call. If new data has
- * not arrived, waits for new data to arrive, or a timeout. Otherwise, returns
- * immediately.
- *
- * @param timeout timeout in seconds
- * @return        true for new data, false for timeout
- */
-HAL_Bool HAL_WaitForCachedControlDataTimeout(double timeout);
-
-/**
  * Has a new control packet from the driver station arrived since the last
  * time this function was called?
  *
@@ -221,6 +209,9 @@ HAL_Bool HAL_IsNewControlData(void);
 
 /**
  * Waits for the newest DS packet to arrive. Note that this is a blocking call.
+ * Checks if new control data has arrived since the last HAL_WaitForDSData or
+ * HAL_IsNewControlData call. If new data has not arrived, waits for new data
+ * to arrive. Otherwise, returns immediately.
  */
 void HAL_WaitForDSData(void);
 

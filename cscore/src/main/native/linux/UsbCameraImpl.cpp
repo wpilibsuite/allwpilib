@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -102,7 +102,7 @@ static bool IsPercentageProperty(wpi::StringRef name) {
   if (name.startswith("raw_")) name = name.substr(4);
   return name == "brightness" || name == "contrast" || name == "saturation" ||
          name == "hue" || name == "sharpness" || name == "gain" ||
-         name == "exposure_absolute";
+         name == "exposure_absolute" || name == "exposure_time_absolute";
 }
 
 static constexpr const int quirkLifeCamHd3000[] = {
@@ -112,6 +112,11 @@ static constexpr char const* quirkPS3EyePropExAuto = "auto_exposure";
 static constexpr char const* quirkPS3EyePropExValue = "exposure";
 static constexpr const int quirkPS3EyePropExAutoOn = 0;
 static constexpr const int quirkPS3EyePropExAutoOff = 1;
+static constexpr char const* quirkPiCameraPropExAuto = "auto_exposure";
+static constexpr char const* quirkPiCameraPropExValue =
+    "exposure_time_absolute";
+static constexpr const int quirkPiCameraPropExAutoOn = 0;
+static constexpr const int quirkPiCameraPropExAutoOff = 1;
 
 int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
                                    int rawValue) {
@@ -218,6 +223,25 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
   return true;
 }
 
+static bool IsVideoCaptureDevice(const char* cpath) {
+  int fd = open(cpath, O_RDWR);
+  if (fd < 0) return false;
+
+  struct v4l2_capability vcap;
+  std::memset(&vcap, 0, sizeof(vcap));
+  if (DoIoctl(fd, VIDIOC_QUERYCAP, &vcap) < 0) {
+    close(fd);
+    return false;
+  }
+  close(fd);
+
+  return (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE) != 0 &&
+         (vcap.capabilities & V4L2_CAP_STREAMING) != 0 &&
+         ((vcap.capabilities & V4L2_CAP_DEVICE_CAPS) == 0 ||
+          ((vcap.device_caps & V4L2_CAP_VIDEO_CAPTURE) != 0 &&
+           (vcap.device_caps & V4L2_CAP_STREAMING) != 0));
+}
+
 static int GetDeviceNum(const char* cpath) {
   wpi::StringRef path{cpath};
   std::string pathBuf;
@@ -259,10 +283,10 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              const wpi::Twine& path)
     : SourceImpl{name, logger, notifier, telemetry},
-      m_path{path.str()},
       m_fd{-1},
       m_command_fd{eventfd(0, 0)},
-      m_active{true} {
+      m_active{true},
+      m_path{path.str()} {
   SetDescription(GetDescriptionImpl(m_path.c_str()));
   SetQuirks();
 
@@ -760,6 +784,22 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   return CS_OK;
 }
 
+CS_StatusValue UsbCameraImpl::DeviceCmdSetPath(
+    std::unique_lock<wpi::mutex>& lock, const Message& msg) {
+  m_path = msg.dataStr;
+  lock.unlock();
+  // disconnect and reconnect
+  bool wasStreaming = m_streaming;
+  if (wasStreaming) DeviceStreamOff();
+  if (m_fd >= 0) {
+    DeviceDisconnect();
+    DeviceConnect();
+  }
+  if (wasStreaming) DeviceStreamOn();
+  lock.lock();
+  return CS_OK;
+}
+
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
     std::unique_lock<wpi::mutex>& lock, const Message& msg) {
   if (msg.kind == Message::kCmdSetMode ||
@@ -773,6 +813,8 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
   } else if (msg.kind == Message::kNumSinksChanged ||
              msg.kind == Message::kNumSinksEnabledChanged) {
     return CS_OK;
+  } else if (msg.kind == Message::kCmdSetPath) {
+    return DeviceCmdSetPath(lock, msg);
   } else {
     return CS_OK;
   }
@@ -1112,6 +1154,25 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     }
   }
 
+  // The Pi camera reports mode ranges, which we don't currently handle, so only
+  // provide a set of discrete modes; list based on
+  // https://picamera.readthedocs.io/en/release-1.10/fov.html
+  if (modes.empty() && m_picamera) {
+    for (VideoMode::PixelFormat pixelFormat :
+         {VideoMode::kYUYV, VideoMode::kMJPEG, VideoMode::kBGR}) {
+      modes.emplace_back(pixelFormat, 1920, 1080, 30);
+      modes.emplace_back(pixelFormat, 2592, 1944, 15);
+      modes.emplace_back(pixelFormat, 1296, 972, 42);
+      modes.emplace_back(pixelFormat, 1296, 730, 49);
+      modes.emplace_back(pixelFormat, 640, 480, 90);
+      modes.emplace_back(pixelFormat, 320, 240, 90);
+      modes.emplace_back(pixelFormat, 160, 120, 90);
+      modes.emplace_back(pixelFormat, 640, 480, 60);
+      modes.emplace_back(pixelFormat, 320, 240, 60);
+      modes.emplace_back(pixelFormat, 160, 120, 60);
+    }
+  }
+
   {
     std::scoped_lock lock(m_mutex);
     m_videoModes.swap(modes);
@@ -1192,12 +1253,13 @@ void UsbCameraImpl::SetQuirks() {
   wpi::StringRef desc = GetDescription(descbuf);
   m_lifecam_exposure =
       desc.endswith("LifeCam HD-3000") || desc.endswith("LifeCam Cinema (TM)");
+  m_picamera = desc.startswith("mmal service");
 
   int deviceNum = GetDeviceNum(m_path.c_str());
   if (deviceNum >= 0) {
     int vendorId, productId;
     if (GetVendorProduct(deviceNum, &vendorId, &productId)) {
-      m_ps3eyecam_exposure = vendorId == 0x2000 && productId == 0x0145;
+      m_ps3eyecam_exposure = vendorId == 0x1415 && productId == 0x2000;
     }
   }
 }
@@ -1248,7 +1310,9 @@ void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOn, status);
-
+  } else if (m_picamera) {
+    SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
+                quirkPiCameraPropExAutoOn, status);
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 3, status);
   }
@@ -1258,6 +1322,9 @@ void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOff, status);  // manual
+  } else if (m_picamera) {
+    SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
+                quirkPiCameraPropExAutoOff, status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
@@ -1267,6 +1334,9 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExAuto),
                 quirkPS3EyePropExAutoOff, status);  // manual
+  } else if (m_picamera) {
+    SetProperty(GetPropertyIndex(quirkPiCameraPropExAuto),
+                quirkPiCameraPropExAutoOff, status);  // manual
   } else {
     SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
   }
@@ -1277,6 +1347,8 @@ void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
   }
   if (m_ps3eyecam_exposure) {
     SetProperty(GetPropertyIndex(quirkPS3EyePropExValue), value, status);
+  } else if (m_picamera) {
+    SetProperty(GetPropertyIndex(quirkPiCameraPropExValue), value, status);
   } else {
     SetProperty(GetPropertyIndex(kPropExValue), value, status);
   }
@@ -1323,6 +1395,17 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
   Send(Message{Message::kNumSinksEnabledChanged});
 }
 
+void UsbCameraImpl::SetPath(const wpi::Twine& path, CS_Status* status) {
+  Message msg{Message::kCmdSetPath};
+  msg.dataStr = path.str();
+  *status = SendAndWait(std::move(msg));
+}
+
+std::string UsbCameraImpl::GetPath() const {
+  std::scoped_lock lock(m_mutex);
+  return m_path;
+}
+
 namespace cs {
 
 CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
@@ -1339,6 +1422,16 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
   return inst.CreateSource(CS_SOURCE_USB, std::make_shared<UsbCameraImpl>(
                                               name, inst.logger, inst.notifier,
                                               inst.telemetry, path));
+}
+
+void SetUsbCameraPath(CS_Source source, const wpi::Twine& path,
+                      CS_Status* status) {
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data || data->kind != CS_SOURCE_USB) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  static_cast<UsbCameraImpl&>(*data->source).SetPath(path, status);
 }
 
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
@@ -1417,6 +1510,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
       wpi::SmallString<32> path{"/dev/"};
       path += fname;
       info.path = path.str();
+
+      if (!IsVideoCaptureDevice(path.c_str())) continue;
 
       info.name = GetDescriptionImpl(path.c_str());
       if (info.name.empty()) continue;

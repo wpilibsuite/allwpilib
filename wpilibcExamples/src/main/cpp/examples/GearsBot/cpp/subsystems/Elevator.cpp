@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,8 +28,8 @@ void Elevator::Log() { frc::SmartDashboard::PutData("Wrist Pot", &m_pot); }
 
 double Elevator::GetMeasurement() { return m_pot.Get(); }
 
-void Elevator::UseOutput(double d) { m_motor.Set(d); }
+void Elevator::UseOutput(double output, double setpoint) {
+  m_motor.Set(output);
+}
 
-double Elevator::GetSetpoint() { return m_setpoint; }
-
-void Elevator::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
+void Elevator::Periodic() { Log(); }

@@ -46,7 +46,9 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
   }
 
   private final int m_channel;
-  private int m_handle;
+
+  // Package private to use from AddressableLED
+  int m_handle;
 
   /**
    * Allocate a PWM given a channel.

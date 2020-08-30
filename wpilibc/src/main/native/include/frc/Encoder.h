@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -23,6 +23,8 @@ namespace frc {
 class DigitalSource;
 class DigitalGlitchFilter;
 class SendableBuilder;
+class DMA;
+class DMASample;
 
 /**
  * Class to read quad encoders.
@@ -44,6 +46,9 @@ class Encoder : public ErrorBase,
                 public PIDSource,
                 public Sendable,
                 public SendableHelper<Encoder> {
+  friend class DMA;
+  friend class DMASample;
+
  public:
   enum IndexingType {
     kResetWhileHigh,
@@ -187,6 +192,9 @@ class Encoder : public ErrorBase,
    *                  the FPGA will report the device stopped. This is expressed
    *                  in seconds.
    */
+  WPI_DEPRECATED(
+      "Use SetMinRate() in favor of this method.  This takes unscaled periods "
+      "and SetMinRate() scales using value from SetDistancePerPulse().")
   void SetMaxPeriod(double maxPeriod) override;
 
   /**

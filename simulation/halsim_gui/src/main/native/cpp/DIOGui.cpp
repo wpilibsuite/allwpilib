@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,21 +7,21 @@
 
 #include "DIOGui.h"
 
-#include <cstdio>
-#include <cstring>
-#include <memory>
-
 #include <hal/Ports.h>
+#include <hal/simulation/DIOData.h>
+#include <hal/simulation/DigitalPWMData.h>
+#include <hal/simulation/DutyCycleData.h>
+#include <hal/simulation/EncoderData.h>
+#include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
-#include <mockdata/DIOData.h>
-#include <mockdata/DigitalPWMData.h>
-#include <mockdata/DutyCycleData.h>
-#include <mockdata/EncoderData.h>
-#include <mockdata/SimDeviceData.h>
 
 #include "HALSimGui.h"
+#include "IniSaver.h"
+#include "IniSaverInfo.h"
 
 using namespace halsimgui;
+
+static IniSaver<NameInfo> gDIO{"DIO"};
 
 static void LabelSimDevice(const char* name, HAL_SimDeviceHandle simDevice) {
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
@@ -71,9 +71,10 @@ static void DisplayDIO() {
   for (int i = 0; i < numDIO; ++i) {
     if (HALSIM_GetDIOInitialized(i)) {
       hasAny = true;
-      char name[32];
+      auto& info = gDIO[i];
+      char name[128];
       if (pwmMap[i] > 0) {
-        std::snprintf(name, sizeof(name), "PWM[%d]", i);
+        info.GetName(name, sizeof(name), "PWM", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
           LabelSimDevice(name, simDevice);
         } else {
@@ -81,7 +82,7 @@ static void DisplayDIO() {
                            HALSIM_GetDigitalPWMDutyCycle(pwmMap[i] - 1));
         }
       } else if (encoderMap[i] > 0) {
-        std::snprintf(name, sizeof(name), " In[%d]", i);
+        info.GetName(name, sizeof(name), " In", i);
         if (auto simDevice = HALSIM_GetEncoderSimDevice(encoderMap[i] - 1)) {
           LabelSimDevice(name, simDevice);
         } else {
@@ -92,7 +93,7 @@ static void DisplayDIO() {
           ImGui::PopStyleColor();
         }
       } else if (dutyCycleMap[i] > 0) {
-        std::snprintf(name, sizeof(name), "PWM[%d]", i);
+        info.GetName(name, sizeof(name), "Dty", i);
         if (auto simDevice =
                 HALSIM_GetDutyCycleSimDevice(dutyCycleMap[i] - 1)) {
           LabelSimDevice(name, simDevice);
@@ -102,7 +103,7 @@ static void DisplayDIO() {
             HALSIM_SetDutyCycleOutput(dutyCycleMap[i] - 1, val);
         }
       } else if (!HALSIM_GetDIOIsInput(i)) {
-        std::snprintf(name, sizeof(name), "Out[%d]", i);
+        info.GetName(name, sizeof(name), "Out", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
           LabelSimDevice(name, simDevice);
         } else {
@@ -110,7 +111,7 @@ static void DisplayDIO() {
                            HALSIM_GetDIOValue(i) ? "1 (high)" : "0 (low)");
         }
       } else {
-        std::snprintf(name, sizeof(name), " In[%d]", i);
+        info.GetName(name, sizeof(name), " In", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
           LabelSimDevice(name, simDevice);
         } else {
@@ -119,6 +120,7 @@ static void DisplayDIO() {
           if (ImGui::Combo(name, &val, options, 2)) HALSIM_SetDIOValue(i, val);
         }
       }
+      info.PopupEditName(i);
     }
   }
   ImGui::PopItemWidth();
@@ -126,6 +128,7 @@ static void DisplayDIO() {
 }
 
 void DIOGui::Initialize() {
+  gDIO.Initialize();
   HALSimGui::AddWindow("DIO", DisplayDIO, ImGuiWindowFlags_AlwaysAutoResize);
   HALSimGui::SetDefaultWindowPos("DIO", 470, 20);
 }

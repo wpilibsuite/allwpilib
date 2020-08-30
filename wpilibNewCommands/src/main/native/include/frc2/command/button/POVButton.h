@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,15 +27,8 @@ class POVButton : public Button {
    * @param povNumber The number of the POV on the joystick.
    */
   POVButton(frc::GenericHID* joystick, int angle, int povNumber = 0)
-      : m_joystick{joystick}, m_angle{angle}, m_povNumber{povNumber} {}
-
-  bool Get() const override {
-    return m_joystick->GetPOV(m_povNumber) == m_angle;
-  }
-
- private:
-  frc::GenericHID* m_joystick;
-  int m_angle;
-  int m_povNumber;
+      : Button([joystick, angle, povNumber] {
+          return joystick->GetPOV(povNumber) == angle;
+        }) {}
 };
 }  // namespace frc2

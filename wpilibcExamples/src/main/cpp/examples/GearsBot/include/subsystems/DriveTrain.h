@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -59,6 +59,12 @@ class DriveTrain : public frc2::SubsystemBase {
    * @return The distance to the obstacle detected by the rangefinder.
    */
   double GetDistanceToObstacle();
+
+  /**
+   * Log the data periodically. This method is automatically called
+   * by the subsystem.
+   */
+  void Periodic() override;
 
  private:
   frc::PWMVictorSPX m_frontLeft{1};

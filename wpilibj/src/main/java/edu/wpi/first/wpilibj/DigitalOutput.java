@@ -44,6 +44,7 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
 
   @Override
   public void close() {
+    super.close();
     SendableRegistry.remove(this);
     // Disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {

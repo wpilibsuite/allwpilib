@@ -16,14 +16,13 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngle;
+import edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands.TurnToAngleProfiled;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kStabilizationD;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kStabilizationI;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants.kStabilizationP;
-import static edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.OIConstants.kDriverControllerPort;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -36,7 +35,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -52,7 +51,7 @@ public class RobotContainer {
         // hand, and turning controlled by the right.
         new RunCommand(() -> m_robotDrive
             .arcadeDrive(m_driverController.getY(GenericHID.Hand.kLeft),
-                m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
+                         m_driverController.getX(GenericHID.Hand.kRight)), m_robotDrive));
 
   }
 
@@ -65,26 +64,29 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Drive at half speed when the right bumper is held
     new JoystickButton(m_driverController, Button.kBumperRight.value)
-        .whenPressed(() -> m_robotDrive.setMaxOutput(.5))
+        .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
 
     // Stabilize robot to drive straight with gyro when left bumper is held
-    new JoystickButton(m_driverController, Button.kBumperLeft.value).whenHeld(
-        new PIDCommand(
-            new PIDController(kStabilizationP, kStabilizationI, kStabilizationD),
-            // Close the loop on the turn rate
-            m_robotDrive::getTurnRate,
-            // Setpoint is 0
-            0,
-            // Pipe the output to the turning controls
-            output -> m_robotDrive
-                .arcadeDrive(m_driverController.getY(GenericHID.Hand.kLeft), output),
-            // Require the robot drive
-            m_robotDrive));
+    new JoystickButton(m_driverController, Button.kBumperLeft.value).whenHeld(new PIDCommand(
+        new PIDController(DriveConstants.kStabilizationP, DriveConstants.kStabilizationI,
+                          DriveConstants.kStabilizationD),
+        // Close the loop on the turn rate
+        m_robotDrive::getTurnRate,
+        // Setpoint is 0
+        0,
+        // Pipe the output to the turning controls
+        output -> m_robotDrive.arcadeDrive(m_driverController.getY(GenericHID.Hand.kLeft), output),
+        // Require the robot drive
+        m_robotDrive));
 
     // Turn to 90 degrees when the 'X' button is pressed, with a 5 second timeout
     new JoystickButton(m_driverController, Button.kX.value)
         .whenPressed(new TurnToAngle(90, m_robotDrive).withTimeout(5));
+
+    // Turn to -90 degrees with a profile when the 'A' button is pressed, with a 5 second timeout
+    new JoystickButton(m_driverController, Button.kA.value)
+        .whenPressed(new TurnToAngleProfiled(-90, m_robotDrive).withTimeout(5));
   }
 
 

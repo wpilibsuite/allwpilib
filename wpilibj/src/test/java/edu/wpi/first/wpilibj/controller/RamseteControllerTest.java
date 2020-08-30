@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,16 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RamseteControllerTest {
   private static final double kTolerance = 1 / 12.0;
   private static final double kAngularTolerance = Math.toRadians(2);
-
-  private static double boundRadians(double value) {
-    while (value > Math.PI) {
-      value -= Math.PI * 2;
-    }
-    while (value <= -Math.PI) {
-      value += Math.PI * 2;
-    }
-    return value;
-  }
 
   @Test
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -63,12 +54,12 @@ class RamseteControllerTest {
     // must be final or effectively final.
     final var finalRobotPose = robotPose;
     assertAll(
-        () -> assertEquals(endPose.getTranslation().getX(), finalRobotPose.getTranslation().getX(),
+        () -> assertEquals(endPose.getX(), finalRobotPose.getX(),
             kTolerance),
-        () -> assertEquals(endPose.getTranslation().getY(), finalRobotPose.getTranslation().getY(),
+        () -> assertEquals(endPose.getY(), finalRobotPose.getY(),
             kTolerance),
         () -> assertEquals(0.0,
-            boundRadians(endPose.getRotation().getRadians()
+            MathUtil.normalizeAngle(endPose.getRotation().getRadians()
                 - finalRobotPose.getRotation().getRadians()),
             kAngularTolerance)
     );

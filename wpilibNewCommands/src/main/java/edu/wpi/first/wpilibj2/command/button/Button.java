@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj2.command.button;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * This class provides an easy way to link commands to OI inputs.
@@ -22,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * wrapper around Trigger with the method names renamed to fit the Button object use.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class Button extends Trigger {
+public class Button extends Trigger {
   /**
    * Default constructor; creates a button that is never pressed (unless {@link Button#get()} is
    * overridden).
@@ -66,11 +67,12 @@ public abstract class Button extends Trigger {
   /**
    * Runs the given runnable whenever the button is newly pressed.
    *
-   * @param toRun the runnable to run
+   * @param toRun        the runnable to run
+   * @param requirements the required subsystems
    * @return this button, so calls can be chained
    */
-  public Button whenPressed(final Runnable toRun) {
-    whenActive(toRun);
+  public Button whenPressed(final Runnable toRun, Subsystem... requirements) {
+    whenActive(toRun, requirements);
     return this;
   }
 
@@ -106,11 +108,12 @@ public abstract class Button extends Trigger {
   /**
    * Constantly runs the given runnable while the button is held.
    *
-   * @param toRun the runnable to run
+   * @param toRun        the runnable to run
+   * @param requirements the required subsystems
    * @return this button, so calls can be chained
    */
-  public Button whileHeld(final Runnable toRun) {
-    whileActiveContinuous(toRun);
+  public Button whileHeld(final Runnable toRun, Subsystem... requirements) {
+    whileActiveContinuous(toRun, requirements);
     return this;
   }
 
@@ -167,11 +170,12 @@ public abstract class Button extends Trigger {
   /**
    * Runs the given runnable when the button is released.
    *
-   * @param toRun the runnable to run
+   * @param toRun        the runnable to run
+   * @param requirements the required subsystems
    * @return this button, so calls can be chained
    */
-  public Button whenReleased(final Runnable toRun) {
-    whenInactive(toRun);
+  public Button whenReleased(final Runnable toRun, Subsystem... requirements) {
+    whenInactive(toRun, requirements);
     return this;
   }
 

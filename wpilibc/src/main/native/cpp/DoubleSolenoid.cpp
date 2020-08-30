@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,8 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
 
@@ -50,8 +51,8 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   m_forwardHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_forwardChannel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
-                                 forwardChannel, HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(),
+                             forwardChannel);
     m_forwardHandle = HAL_kInvalidHandle;
     m_reverseHandle = HAL_kInvalidHandle;
     return;
@@ -60,8 +61,8 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   m_reverseHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_reverseChannel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
-                                 reverseChannel, HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(),
+                             reverseChannel);
     // free forward solenoid
     HAL_FreeSolenoidPort(m_forwardHandle);
     m_forwardHandle = HAL_kInvalidHandle;
@@ -91,6 +92,7 @@ void DoubleSolenoid::Set(Value value) {
 
   bool forward = false;
   bool reverse = false;
+
   switch (value) {
     case kOff:
       forward = false;
@@ -105,28 +107,44 @@ void DoubleSolenoid::Set(Value value) {
       reverse = true;
       break;
   }
+
   int fstatus = 0;
   HAL_SetSolenoid(m_forwardHandle, forward, &fstatus);
   int rstatus = 0;
   HAL_SetSolenoid(m_reverseHandle, reverse, &rstatus);
 
-  wpi_setErrorWithContext(fstatus, HAL_GetErrorMessage(fstatus));
-  wpi_setErrorWithContext(rstatus, HAL_GetErrorMessage(rstatus));
+  wpi_setHALError(fstatus);
+  wpi_setHALError(rstatus);
 }
 
 DoubleSolenoid::Value DoubleSolenoid::Get() const {
   if (StatusIsFatal()) return kOff;
+
   int fstatus = 0;
   int rstatus = 0;
   bool valueForward = HAL_GetSolenoid(m_forwardHandle, &fstatus);
   bool valueReverse = HAL_GetSolenoid(m_reverseHandle, &rstatus);
 
-  wpi_setErrorWithContext(fstatus, HAL_GetErrorMessage(fstatus));
-  wpi_setErrorWithContext(rstatus, HAL_GetErrorMessage(rstatus));
+  wpi_setHALError(fstatus);
+  wpi_setHALError(rstatus);
 
-  if (valueForward) return kForward;
-  if (valueReverse) return kReverse;
-  return kOff;
+  if (valueForward) {
+    return kForward;
+  } else if (valueReverse) {
+    return kReverse;
+  } else {
+    return kOff;
+  }
+}
+
+void DoubleSolenoid::Toggle() {
+  Value value = Get();
+
+  if (value == kForward) {
+    Set(kReverse);
+  } else if (value == kReverse) {
+    Set(kForward);
+  }
 }
 
 bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {

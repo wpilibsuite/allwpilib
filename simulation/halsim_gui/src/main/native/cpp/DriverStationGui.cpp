@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,9 +11,10 @@
 #include <string>
 
 #include <GLFW/glfw3.h>
+#include <hal/simulation/DriverStationData.h>
+#include <hal/simulation/MockHooks.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <mockdata/DriverStationData.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
@@ -21,6 +22,7 @@
 
 #include "ExtraGuiWidgets.h"
 #include "HALSimGui.h"
+#include "IniSaverInfo.h"
 
 using namespace halsimgui;
 
@@ -44,6 +46,7 @@ struct SystemJoystick {
 };
 
 struct RobotJoystick {
+  NameInfo name;
   std::string guid;
   const SystemJoystick* sys = nullptr;
   bool useGamepad = false;
@@ -92,6 +95,8 @@ static void JoystickReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
     int num;
     if (value.getAsInteger(10, num)) return;
     joy->useGamepad = num;
+  } else {
+    joy->name.ReadIni(name, value);
   }
 }
 
@@ -99,11 +104,15 @@ static void JoystickWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                              ImGuiTextBuffer* out_buf) {
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
     auto& joy = gRobotJoysticks[i];
-    if (!joy.sys) continue;
-    const char* guid = glfwGetJoystickGUID(joy.sys - gSystemJoysticks);
-    if (!guid) continue;
-    out_buf->appendf("[Joystick][%d]\nguid=%s\nuseGamepad=%d\n\n", i, guid,
+    if (!joy.name.HasName() && !joy.sys) continue;
+    out_buf->appendf("[Joystick][%d]\nuseGamepad=%d\n", i,
                      joy.useGamepad ? 1 : 0);
+    if (joy.name.HasName()) joy.name.WriteIni(out_buf);
+    if (joy.sys) {
+      const char* guid = glfwGetJoystickGUID(joy.sys - gSystemJoysticks);
+      if (guid) out_buf->appendf("guid=%s\n", guid);
+    }
+    out_buf->append("\n");
   }
 }
 
@@ -328,7 +337,7 @@ static void DriverStationExecute() {
 
   // Send new data every 20 ms (may be slower depending on GUI refresh rate)
   static double lastNewDataTime = 0.0;
-  if ((curTime - lastNewDataTime) > 0.02) {
+  if ((curTime - lastNewDataTime) > 0.02 && !HALSIM_IsTimingPaused()) {
     lastNewDataTime = curTime;
     HALSIM_NotifyDriverStationNewData();
   }
@@ -367,7 +376,7 @@ static void DisplayFMS() {
                          ImGuiInputTextFlags_EnterReturnsTrue)) {
     HALSIM_SetDriverStationMatchTime(matchTime);
     startMatchTime = curTime - matchTime;
-  } else if (!HALSIM_GetDriverStationEnabled()) {
+  } else if (!HALSIM_GetDriverStationEnabled() || HALSIM_IsTimingPaused()) {
     startMatchTime = curTime - matchTime;
   } else if (matchTimeEnabled) {
     HALSIM_SetDriverStationMatchTime(curTime - startMatchTime);
@@ -425,8 +434,8 @@ static void DisplayJoysticks() {
   ImGui::Columns(HAL_kMaxJoysticks, "Joysticks", false);
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
     auto& joy = gRobotJoysticks[i];
-    char label[30];
-    std::snprintf(label, sizeof(label), "Joystick %d", i);
+    char label[128];
+    joy.name.GetName(label, sizeof(label), "Joystick", i);
     if (joy.sys) {
       ImGui::Selectable(label, false);
       if (ImGui::BeginDragDropSource()) {
@@ -454,6 +463,7 @@ static void DisplayJoysticks() {
       }
       ImGui::EndDragDropTarget();
     }
+    joy.name.PopupEditName(i);
     ImGui::NextColumn();
   }
   ImGui::Separator();

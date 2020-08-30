@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -196,6 +196,20 @@ void UsbCameraImpl::NumSinksChanged() {
 void UsbCameraImpl::NumSinksEnabledChanged() {
   m_messagePump->PostWindowMessage<Message::Kind, Message*>(
       SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
+}
+
+void UsbCameraImpl::SetPath(const wpi::Twine& path, CS_Status* status) {
+  Message msg{Message::kCmdSetPath};
+  msg.dataStr = path.str();
+  auto result =
+      m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
+          SetCameraMessage, msg.kind, &msg);
+  *status = result;
+}
+
+std::string UsbCameraImpl::GetPath() const {
+  std::scoped_lock lock(m_mutex);
+  return m_path;
 }
 
 void UsbCameraImpl::StartMessagePump() {
@@ -705,6 +719,16 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
       DeviceStreamOn();
     }
     return CS_OK;
+  } else if (msgKind == Message::kCmdSetPath) {
+    {
+      std::scoped_lock lock(m_mutex);
+      m_path = msg->dataStr;
+      std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+      m_widePath = utf8_conv.from_bytes(m_path.c_str());
+    }
+    DeviceDisconnect();
+    DeviceConnect();
+    return CS_OK;
   } else {
     return CS_OK;
   }
@@ -966,6 +990,27 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
+static void ParseVidAndPid(wpi::StringRef path, int* pid, int* vid) {
+  auto vidIndex = path.find_lower("vid_");
+  auto pidIndex = path.find_lower("pid_");
+
+  if (vidIndex != wpi::StringRef::npos) {
+    auto vidSlice = path.slice(vidIndex + 4, vidIndex + 8);
+    uint16_t val = 0;
+    if (!vidSlice.getAsInteger(16, val)) {
+      *vid = val;
+    }
+  }
+
+  if (pidIndex != wpi::StringRef::npos) {
+    auto pidSlice = path.slice(pidIndex + 4, pidIndex + 8);
+    uint16_t val = 0;
+    if (!pidSlice.getAsInteger(16, val)) {
+      *pid = val;
+    }
+  }
+}
+
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   std::vector<UsbCameraInfo> retval;
 
@@ -1012,6 +1057,10 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
         sizeof(buf) / sizeof(WCHAR), NULL);
     info.path = utf8_conv.to_bytes(buf);
+
+    // Try to parse path from symbolic link
+    ParseVidAndPid(info.path, &info.productId, &info.vendorId);
+
     retval.emplace_back(std::move(info));
   }
 
@@ -1052,6 +1101,16 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
+void SetUsbCameraPath(CS_Source source, const wpi::Twine& path,
+                      CS_Status* status) {
+  auto data = Instance::GetInstance().GetSource(source);
+  if (!data || data->kind != CS_SOURCE_USB) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  static_cast<UsbCameraImpl&>(*data->source).SetPath(path, status);
+}
+
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data || data->kind != CS_SOURCE_USB) {
@@ -1070,7 +1129,10 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   }
 
   info.path = static_cast<UsbCameraImpl&>(*data->source).GetPath();
-  // TODO: dev and name
+  wpi::SmallVector<char, 64> buf;
+  info.name = static_cast<UsbCameraImpl&>(*data->source).GetDescription(buf);
+  ParseVidAndPid(info.path, &info.productId, &info.vendorId);
+  info.dev = -1;  // We have lost dev information by this point in time.
   return info;
 }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -55,7 +55,7 @@ public final class RuntimeDetector {
         filePath = "/linux/athena/";
       } else if (isRaspbian()) {
         filePath = "/linux/raspbian/";
-      } else if (isAarch64Bionic()) {
+      } else if (isAarch64()) {
         filePath = "/linux/aarch64bionic/";
       } else {
         filePath = "/linux/nativearm/";
@@ -128,28 +128,12 @@ public final class RuntimeDetector {
     }
   }
 
-  /** check if os is bionic aarch64.
+  /** check if architecture is aarch64.
    *
-   * @return if os is bionic aarch64
+   * @return if architecture is aarch64
    */
-  public static boolean isAarch64Bionic() {
-    if (!System.getProperty("os.arch").equals("aarch64")) {
-      return false;
-    }
-    try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {
-      String value = reader.readLine();
-      String version = "";
-      while (value != null) {
-        if (value.contains("VERSION=")) {
-          version = value;
-          break;
-        }
-        value = reader.readLine();
-      }
-      return version.contains("Bionic");
-    } catch (IOException ex) {
-      return false;
-    }
+  public static boolean isAarch64() {
+    return System.getProperty("os.arch").equals("aarch64");
   }
 
   public static boolean isLinux() {

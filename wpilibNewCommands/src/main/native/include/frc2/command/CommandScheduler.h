@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,8 +13,10 @@
 
 #include <frc/ErrorBase.h>
 #include <frc/WPIErrors.h>
+#include <frc/Watchdog.h>
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
+#include <units/time.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/FunctionExtras.h>
 
@@ -45,6 +47,12 @@ class CommandScheduler final : public frc::Sendable,
   CommandScheduler& operator=(const CommandScheduler&) = delete;
 
   using Action = std::function<void(const Command&)>;
+
+  /**
+   * Changes the period of the loop overrun watchdog. This should be kept in
+   * sync with the TimedRobot period.
+   */
+  void SetPeriod(units::second_t period);
 
   /**
    * Adds a button binding to the scheduler, which will be polled to schedule
@@ -157,8 +165,10 @@ class CommandScheduler final : public frc::Sendable,
   void UnregisterSubsystem(Subsystem* subsystem);
 
   void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
+  void RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems);
 
   void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
+  void UnregisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems);
 
   /**
    * Sets the default command for a subsystem.  Registers that subsystem if it
@@ -199,30 +209,36 @@ class CommandScheduler final : public frc::Sendable,
   Command* GetDefaultCommand(const Subsystem* subsystem) const;
 
   /**
-   * Cancels a command.  The scheduler will only call the interrupted method of
-   * a canceled command, not the end method (though the interrupted method may
-   * itself call the end method).  Commands will be canceled even if they are
-   * not scheduled as interruptible.
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
+   * canceled (as opposed to finishing normally).
    *
-   * @param command the command to cancel
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
+   *
+   * @param commands the commands to cancel
    */
   void Cancel(Command* command);
 
   /**
-   * Cancels commands.  The scheduler will only call the interrupted method of a
-   * canceled command, not the end method (though the interrupted method may
-   * itself call the end method).  Commands will be canceled even if they are
-   * not scheduled as interruptible.
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
+   * canceled (as opposed to finishing normally).
+   *
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
    *
    * @param commands the commands to cancel
    */
   void Cancel(wpi::ArrayRef<Command*> commands);
 
   /**
-   * Cancels commands.  The scheduler will only call the interrupted method of a
-   * canceled command, not the end method (though the interrupted method may
-   * itself call the end method).  Commands will be canceled even if they are
-   * not scheduled as interruptible.
+   * Cancels commands. The scheduler will only call Command::End()
+   * method of the canceled command with true, indicating they were
+   * canceled (as opposed to finishing normally).
+   *
+   * <p>Commands will be canceled even if they are not scheduled as
+   * interruptible.
    *
    * @param commands the commands to cancel
    */
@@ -334,6 +350,8 @@ class CommandScheduler final : public frc::Sendable,
 
   class Impl;
   std::unique_ptr<Impl> m_impl;
+
+  frc::Watchdog m_watchdog;
 
   friend class CommandTestBase;
 };

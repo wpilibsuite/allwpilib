@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -110,6 +110,20 @@ HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 uint64_t HAL_GetFPGATime(int32_t* status);
 
 /**
+ * Given an 32 bit FPGA time, expand it to the nearest likely 64 bit FPGA time.
+ *
+ * Note: This is making the assumption that the timestamp being converted is
+ * always in the past.  If you call this with a future timestamp, it probably
+ * will make it in the past.  If you wait over 70 minutes between capturing the
+ * bottom 32 bits of the timestamp and expanding it, you will be off by
+ * multiples of 1<<32 microseconds.
+ *
+ * @return The current time in microseconds according to the FPGA (since FPGA
+ * reset) as a 64 bit number.
+ */
+uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status);
+
+/**
  * Call this to start up HAL. This is required for robot programs.
  *
  * This must be called before any other HAL functions. Failure to do so will
@@ -134,34 +148,6 @@ uint64_t HAL_GetFPGATime(int32_t* status);
  * @return        true if initialization was successful, otherwise false.
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
-
-// ifdef's definition is to allow for default parameters in C++.
-#ifdef __cplusplus
-/**
- * Reports a hardware usage to the HAL.
- *
- * @param resource       the used resource
- * @param instanceNumber the instance of the resource
- * @param context        a user specified context index
- * @param feature        a user specified feature string
- * @return               the index of the added value in NetComm
- */
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
-                   int32_t context = 0, const char* feature = nullptr);
-#else
-
-/**
- * Reports a hardware usage to the HAL.
- *
- * @param resource       the used resource
- * @param instanceNumber the instance of the resource
- * @param context        a user specified context index
- * @param feature        a user specified feature string
- * @return               the index of the added value in NetComm
- */
-int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
-                   const char* feature);
-#endif
 
 #ifdef __cplusplus
 }  // extern "C"

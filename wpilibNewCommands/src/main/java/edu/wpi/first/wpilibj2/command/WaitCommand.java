@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -41,7 +41,7 @@ public class WaitCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasPeriodPassed(m_duration);
+    return m_timer.hasElapsed(m_duration);
   }
 
   @Override

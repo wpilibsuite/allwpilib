@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,8 +11,9 @@
 #include <initializer_list>
 
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <frc2/Timer.h>
+#include <wpi/ArrayRef.h>
 
+#include "frc2/Timer.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -23,8 +24,15 @@ namespace frc2 {
  *
  * @see TrapezoidProfile
  */
+template <class Distance>
 class TrapezoidProfileCommand
-    : public CommandHelper<CommandBase, TrapezoidProfileCommand> {
+    : public CommandHelper<CommandBase, TrapezoidProfileCommand<Distance>> {
+  using Distance_t = units::unit_t<Distance>;
+  using Velocity =
+      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  using Velocity_t = units::unit_t<Velocity>;
+  using State = typename frc::TrapezoidProfile<Distance>::State;
+
  public:
   /**
    * Creates a new TrapezoidProfileCommand that will execute the given
@@ -33,22 +41,43 @@ class TrapezoidProfileCommand
    * @param profile The motion profile to execute.
    * @param output  The consumer for the profile output.
    */
-  TrapezoidProfileCommand(
-      frc::TrapezoidProfile profile,
-      std::function<void(frc::TrapezoidProfile::State)> output,
-      std::initializer_list<Subsystem*> requirements);
+  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
+                          std::function<void(State)> output,
+                          std::initializer_list<Subsystem*> requirements)
+      : m_profile(profile), m_output(output) {
+    this->AddRequirements(requirements);
+  }
 
-  void Initialize() override;
+  /**
+   * Creates a new TrapezoidProfileCommand that will execute the given
+   * TrapezoidalProfile. Output will be piped to the provided consumer function.
+   *
+   * @param profile The motion profile to execute.
+   * @param output  The consumer for the profile output.
+   */
+  TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
+                          std::function<void(State)> output,
+                          wpi::ArrayRef<Subsystem*> requirements = {})
+      : m_profile(profile), m_output(output) {
+    this->AddRequirements(requirements);
+  }
 
-  void Execute() override;
+  void Initialize() override {
+    m_timer.Reset();
+    m_timer.Start();
+  }
 
-  void End(bool interrupted) override;
+  void Execute() override { m_output(m_profile.Calculate(m_timer.Get())); }
 
-  bool IsFinished() override;
+  void End(bool interrupted) override { m_timer.Stop(); }
+
+  bool IsFinished() override {
+    return m_timer.HasElapsed(m_profile.TotalTime());
+  }
 
  private:
-  frc::TrapezoidProfile m_profile;
-  std::function<void(frc::TrapezoidProfile::State)> m_output;
+  frc::TrapezoidProfile<Distance> m_profile;
+  std::function<void(State)> m_output;
 
   Timer m_timer;
 };

@@ -9,7 +9,8 @@
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <hal/Relay.h>
 #include <wpi/raw_ostream.h>
@@ -35,8 +36,7 @@ Relay::Relay(int channel, Relay::Direction direction)
     int32_t status = 0;
     m_forwardHandle = HAL_InitializeRelayPort(portHandle, true, &status);
     if (status != 0) {
-      wpi_setErrorWithContextRange(status, 0, HAL_GetNumRelayChannels(),
-                                   channel, HAL_GetErrorMessage(status));
+      wpi_setHALErrorWithRange(status, 0, HAL_GetNumRelayChannels(), channel);
       m_forwardHandle = HAL_kInvalidHandle;
       m_reverseHandle = HAL_kInvalidHandle;
       return;
@@ -47,8 +47,7 @@ Relay::Relay(int channel, Relay::Direction direction)
     int32_t status = 0;
     m_reverseHandle = HAL_InitializeRelayPort(portHandle, false, &status);
     if (status != 0) {
-      wpi_setErrorWithContextRange(status, 0, HAL_GetNumRelayChannels(),
-                                   channel, HAL_GetErrorMessage(status));
+      wpi_setHALErrorWithRange(status, 0, HAL_GetNumRelayChannels(), channel);
       m_forwardHandle = HAL_kInvalidHandle;
       m_reverseHandle = HAL_kInvalidHandle;
       return;
@@ -61,7 +60,7 @@ Relay::Relay(int channel, Relay::Direction direction)
   if (m_forwardHandle != HAL_kInvalidHandle) {
     HAL_SetRelay(m_forwardHandle, false, &status);
     if (status != 0) {
-      wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+      wpi_setHALError(status);
       m_forwardHandle = HAL_kInvalidHandle;
       m_reverseHandle = HAL_kInvalidHandle;
       return;
@@ -70,7 +69,7 @@ Relay::Relay(int channel, Relay::Direction direction)
   if (m_reverseHandle != HAL_kInvalidHandle) {
     HAL_SetRelay(m_reverseHandle, false, &status);
     if (status != 0) {
-      wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+      wpi_setHALError(status);
       m_forwardHandle = HAL_kInvalidHandle;
       m_reverseHandle = HAL_kInvalidHandle;
       return;
@@ -137,7 +136,7 @@ void Relay::Set(Relay::Value value) {
       break;
   }
 
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 Relay::Value Relay::Get() const {
@@ -171,7 +170,7 @@ Relay::Value Relay::Get() const {
     }
   }
 
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 int Relay::GetChannel() const { return m_channel; }

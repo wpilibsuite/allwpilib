@@ -3,6 +3,7 @@
 dependency-reduced-pom.xml
 doxygen.log
 build*/
+!buildSrc/
 
 # Created by the jenkins test script
 test-reports

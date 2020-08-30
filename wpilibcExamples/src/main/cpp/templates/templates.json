@@ -38,5 +38,15 @@
     "foldername": "commandbased",
     "gradlebase": "cpp",
     "commandversion": 2
+  },
+  {
+    "name": "Old Command Robot",
+    "description": "Old-Command style (deprecated)",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "oldcommandbased",
+    "gradlebase": "cpp",
+    "commandversion": 1
   }
 ]

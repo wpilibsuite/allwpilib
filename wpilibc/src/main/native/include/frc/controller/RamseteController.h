@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <units/units.h>
+#include <units/angular_velocity.h>
+#include <units/velocity.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -55,6 +56,13 @@ class RamseteController {
   RamseteController(double b, double zeta);
 
   /**
+   * Construct a Ramsete unicycle controller. The default arguments for
+   * b and zeta of 2.0 and 0.7 have been well-tested to produce desireable
+   * results.
+   */
+  RamseteController() : RamseteController(2.0, 0.7) {}
+
+  /**
    * Returns true if the pose error is within tolerance of the reference.
    */
   bool AtReference() const;
@@ -95,12 +103,20 @@ class RamseteController {
   ChassisSpeeds Calculate(const Pose2d& currentPose,
                           const Trajectory::State& desiredState);
 
+  /**
+   * Enables and disables the controller for troubleshooting purposes.
+   *
+   * @param enabled If the controller is enabled or not.
+   */
+  void SetEnabled(bool enabled);
+
  private:
   double m_b;
   double m_zeta;
 
   Pose2d m_poseError;
   Pose2d m_poseTolerance;
+  bool m_enabled = true;
 };
 
 }  // namespace frc

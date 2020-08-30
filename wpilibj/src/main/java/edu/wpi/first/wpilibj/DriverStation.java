@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -164,6 +164,7 @@ public class DriverStation {
   private final Lock m_waitForDataMutex;
   private final Condition m_waitForDataCond;
   private int m_waitForDataCount;
+  private final ThreadLocal<Integer> m_lastCount = ThreadLocal.withInitial(() -> 0);
 
   // Robot state status variables
   private boolean m_userInDisabled;
@@ -316,21 +317,19 @@ public class DriverStation {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
     }
+
     m_cacheDataMutex.lock();
     try {
-      if (button > m_joystickButtons[stick].m_count) {
-        // Unlock early so error printing isn't locked.
-        m_cacheDataMutex.unlock();
-        reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-            + " not available, check if controller is plugged in");
+      if (button <= m_joystickButtons[stick].m_count) {
+        return (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
       }
-
-      return (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
     } finally {
-      if (m_cacheDataMutex.isHeldByCurrentThread()) {
-        m_cacheDataMutex.unlock();
-      }
+      m_cacheDataMutex.unlock();
     }
+
+    reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+        + " not available, check if controller is plugged in");
+    return false;
   }
 
   /**
@@ -340,7 +339,7 @@ public class DriverStation {
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was pressed since the last check.
    */
-  boolean getStickButtonPressed(final int stick, final int button) {
+  public boolean getStickButtonPressed(final int stick, final int button) {
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
@@ -348,27 +347,25 @@ public class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
-    boolean error = false;
-    boolean retVal = false;
-    synchronized (m_cacheDataMutex) {
-      if (button > m_joystickButtons[stick].m_count) {
-        error = true;
-        retVal = false;
-      } else {
+
+    m_cacheDataMutex.lock();
+    try {
+      if (button <= m_joystickButtons[stick].m_count) {
         // If button was pressed, clear flag and return true
         if ((m_joystickButtonsPressed[stick] & 1 << (button - 1)) != 0) {
           m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
-          retVal = true;
+          return true;
         } else {
-          retVal = false;
+          return false;
         }
       }
+    } finally {
+      m_cacheDataMutex.unlock();
     }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
+
+    reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+        + " not available, check if controller is plugged in");
+    return false;
   }
 
   /**
@@ -379,7 +376,7 @@ public class DriverStation {
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was released since the last check.
    */
-  boolean getStickButtonReleased(final int stick, final int button) {
+  public boolean getStickButtonReleased(final int stick, final int button) {
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
@@ -387,27 +384,25 @@ public class DriverStation {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
     }
-    boolean error = false;
-    boolean retVal = false;
-    synchronized (m_cacheDataMutex) {
-      if (button > m_joystickButtons[stick].m_count) {
-        error = true;
-        retVal = false;
-      } else {
+
+    m_cacheDataMutex.lock();
+    try {
+      if (button <= m_joystickButtons[stick].m_count) {
         // If button was released, clear flag and return true
         if ((m_joystickButtonsReleased[stick] & 1 << (button - 1)) != 0) {
           m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
-          retVal = true;
+          return true;
         } else {
-          retVal = false;
+          return false;
         }
       }
+    } finally {
+      m_cacheDataMutex.unlock();
     }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
+
+    reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+        + " not available, check if controller is plugged in");
+    return false;
   }
 
   /**
@@ -428,20 +423,16 @@ public class DriverStation {
 
     m_cacheDataMutex.lock();
     try {
-      if (axis >= m_joystickAxes[stick].m_count) {
-        // Unlock early so error printing isn't locked.
-        m_cacheDataMutex.unlock();
-        reportJoystickUnpluggedWarning("Joystick axis " + axis + " on port " + stick
-            + " not available, check if controller is plugged in");
-        return 0.0;
+      if (axis < m_joystickAxes[stick].m_count) {
+        return m_joystickAxes[stick].m_axes[axis];
       }
-
-      return m_joystickAxes[stick].m_axes[axis];
     } finally {
-      if (m_cacheDataMutex.isHeldByCurrentThread()) {
-        m_cacheDataMutex.unlock();
-      }
+      m_cacheDataMutex.unlock();
     }
+
+    reportJoystickUnpluggedWarning("Joystick axis " + axis + " on port " + stick
+        + " not available, check if controller is plugged in");
+    return 0.0;
   }
 
   /**
@@ -459,20 +450,16 @@ public class DriverStation {
 
     m_cacheDataMutex.lock();
     try {
-      if (pov >= m_joystickPOVs[stick].m_count) {
-        // Unlock early so error printing isn't locked.
-        m_cacheDataMutex.unlock();
-        reportJoystickUnpluggedWarning("Joystick POV " + pov + " on port " + stick
-            + " not available, check if controller is plugged in");
-        return -1;
+      if (pov < m_joystickPOVs[stick].m_count) {
+        return m_joystickPOVs[stick].m_povs[pov];
       }
     } finally {
-      if (m_cacheDataMutex.isHeldByCurrentThread()) {
-        m_cacheDataMutex.unlock();
-      }
+      m_cacheDataMutex.unlock();
     }
 
-    return m_joystickPOVs[stick].m_povs[pov];
+    reportJoystickUnpluggedWarning("Joystick POV " + pov + " on port " + stick
+        + " not available, check if controller is plugged in");
+    return -1;
   }
 
   /**
@@ -656,12 +643,39 @@ public class DriverStation {
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * autonomous mode and enabled.
+   *
+   * @return True if autonomous should be set and the robot should be enabled.
+   */
+  public boolean isAutonomousEnabled() {
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getAutonomous() && m_controlWordCache.getEnabled();
+    }
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
    * operator-controlled mode.
    *
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public boolean isOperatorControl() {
     return !(isAutonomous() || isTest());
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * operator-controller mode and enabled.
+   *
+   * @return True if operator-controlled mode should be set and the robot should be enabled.
+   */
+  public boolean isOperatorControlEnabled() {
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return !m_controlWordCache.getAutonomous() && !m_controlWordCache.getTest()
+          && m_controlWordCache.getEnabled();
+    }
   }
 
   /**
@@ -696,7 +710,17 @@ public class DriverStation {
    * @return True if the control data has been updated since the last call.
    */
   public boolean isNewControlData() {
-    return HAL.isNewControlData();
+    m_waitForDataMutex.lock();
+    try {
+      int currentCount = m_waitForDataCount;
+      if (m_lastCount.get() != currentCount) {
+        m_lastCount.set(currentCount);
+        return true;
+      }
+    } finally {
+      m_waitForDataMutex.unlock();
+    }
+    return false;
   }
 
   /**
@@ -849,6 +873,9 @@ public class DriverStation {
 
   /**
    * Wait for new data from the driver station.
+   *
+   * <p>Checks if new control data has arrived since the last waitForData call
+   * on the current thread. If new data has not arrived, returns immediately.
    */
   public void waitForData() {
     waitForData(0);
@@ -857,6 +884,9 @@ public class DriverStation {
   /**
    * Wait for new data or for timeout, which ever comes first. If timeout is 0, wait for new data
    * only.
+   *
+   * <p>Checks if new control data has arrived since the last waitForData call
+   * on the current thread. If new data has not arrived, returns immediately.
    *
    * @param timeout The maximum time in seconds to wait.
    * @return true if there is new data, otherwise false
@@ -867,6 +897,10 @@ public class DriverStation {
     m_waitForDataMutex.lock();
     try {
       int currentCount = m_waitForDataCount;
+      if (m_lastCount.get() != currentCount) {
+        m_lastCount.set(currentCount);
+        return true;
+      }
       while (m_waitForDataCount == currentCount) {
         if (timeout > 0) {
           long now = RobotController.getFPGATime();
@@ -886,6 +920,7 @@ public class DriverStation {
           m_waitForDataCond.await();
         }
       }
+      m_lastCount.set(m_waitForDataCount);
       // Return true if we have received a proper signal
       return true;
     } catch (InterruptedException ex) {

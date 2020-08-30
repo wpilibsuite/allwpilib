@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -53,4 +53,22 @@ TEST_F(SchedulerTest, UnregisterSubsystemTest) {
   scheduler.RegisterSubsystem(&system);
 
   EXPECT_NO_FATAL_FAILURE(scheduler.UnregisterSubsystem(&system));
+}
+
+TEST_F(SchedulerTest, SchedulerCancelAllTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  RunCommand command([] {}, {});
+  RunCommand command2([] {}, {});
+
+  int counter = 0;
+
+  scheduler.OnCommandInterrupt([&counter](const Command&) { counter++; });
+
+  scheduler.Schedule(&command);
+  scheduler.Schedule(&command2);
+  scheduler.Run();
+  scheduler.CancelAll();
+
+  EXPECT_EQ(counter, 2);
 }

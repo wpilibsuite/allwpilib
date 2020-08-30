@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,7 +9,8 @@
 
 #include <cstdio>
 
-#include <hal/HAL.h>
+#include <hal/DriverStation.h>
+#include <hal/FRCUsageReporting.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
@@ -33,6 +34,10 @@ void IterativeRobotBase::RobotInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
 
+void IterativeRobotBase::SimulationInit() {
+  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+}
+
 void IterativeRobotBase::DisabledInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
 }
@@ -50,6 +55,14 @@ void IterativeRobotBase::TestInit() {
 }
 
 void IterativeRobotBase::RobotPeriodic() {
+  static bool firstRun = true;
+  if (firstRun) {
+    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    firstRun = false;
+  }
+}
+
+void IterativeRobotBase::SimulationPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
@@ -160,6 +173,12 @@ void IterativeRobotBase::LoopFunc() {
   m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
   Shuffleboard::Update();
   m_watchdog.AddEpoch("Shuffleboard::Update()");
+
+  if (IsSimulation()) {
+    SimulationPeriodic();
+    m_watchdog.AddEpoch("SimulationPeriodic()");
+  }
+
   m_watchdog.Disable();
 
   // Warn on loop time overruns

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,7 +12,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpiutil.math.MathUtils;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * Implements a PID control loop.
@@ -40,14 +40,9 @@ public class PIDController implements Sendable, AutoCloseable {
 
   private double m_minimumIntegral = -1.0;
 
-  // Maximum input - limit setpoint to this
   private double m_maximumInput;
 
-  // Minimum input - limit setpoint to this
   private double m_minimumInput;
-
-  // Input range - difference between maximum and minimum
-  private double m_inputRange;
 
   // Do the endpoints wrap around? eg. Absolute encoder
   private boolean m_continuous;
@@ -62,7 +57,7 @@ public class PIDController implements Sendable, AutoCloseable {
   // The sum of the errors for use in the integral calc
   private double m_totalError;
 
-  // The percentage or absolute error that is considered at setpoint.
+  // The error that is considered at setpoint.
   private double m_positionTolerance = 0.05;
   private double m_velocityTolerance = Double.POSITIVE_INFINITY;
 
@@ -100,7 +95,7 @@ public class PIDController implements Sendable, AutoCloseable {
     instances++;
     SendableRegistry.addLW(this, "PIDController", instances);
 
-    HAL.report(tResourceType.kResourceType_PIDController, instances);
+    HAL.report(tResourceType.kResourceType_PIDController2, instances);
   }
 
   @Override
@@ -196,11 +191,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param setpoint The desired setpoint.
    */
   public void setSetpoint(double setpoint) {
-    if (m_maximumInput > m_minimumInput) {
-      m_setpoint = MathUtils.clamp(setpoint, m_minimumInput, m_maximumInput);
-    } else {
-      m_setpoint = setpoint;
-    }
+    m_setpoint = setpoint;
   }
 
   /**
@@ -213,8 +204,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns true if the error is within the percentage of the total input range, determined by
-   * SetTolerance. This asssumes that the maximum and minimum input were set using SetInput.
+   * Returns true if the error is within the tolerance of the setpoint.
    *
    * <p>This will return false until at least one input value has been computed.
    *
@@ -237,7 +227,8 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public void enableContinuousInput(double minimumInput, double maximumInput) {
     m_continuous = true;
-    setInputRange(minimumInput, maximumInput);
+    m_minimumInput = minimumInput;
+    m_maximumInput = maximumInput;
   }
 
   /**
@@ -245,6 +236,13 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public void disableContinuousInput() {
     m_continuous = false;
+  }
+
+  /**
+   * Returns true if continuous input is enabled.
+   */
+  public boolean isContinuousInputEnabled() {
+    return m_continuous;
   }
 
   /**
@@ -287,7 +285,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return The error.
    */
   public double getPositionError() {
-    return getContinuousError(m_positionError);
+    return m_positionError;
   }
 
   /**
@@ -316,11 +314,18 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public double calculate(double measurement) {
     m_prevError = m_positionError;
-    m_positionError = getContinuousError(m_setpoint - measurement);
+
+    if (m_continuous) {
+      m_positionError = ControllerUtil.getModulusError(m_setpoint, measurement, m_minimumInput,
+          m_maximumInput);
+    } else {
+      m_positionError = m_setpoint - measurement;
+    }
+
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
     if (m_Ki != 0) {
-      m_totalError = MathUtils.clamp(m_totalError + m_positionError * m_period,
+      m_totalError = MathUtil.clamp(m_totalError + m_positionError * m_period,
           m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
     }
 
@@ -328,7 +333,7 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
-   * Resets the previous error and the integral term. Also disables the controller.
+   * Resets the previous error and the integral term.
    */
   public void reset() {
     m_prevError = 0;
@@ -342,43 +347,5 @@ public class PIDController implements Sendable, AutoCloseable {
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-  }
-
-  /**
-   * Wraps error around for continuous inputs. The original error is returned if continuous mode is
-   * disabled.
-   *
-   * @param error The current error of the PID controller.
-   * @return Error for continuous inputs.
-   */
-  protected double getContinuousError(double error) {
-    if (m_continuous && m_inputRange > 0) {
-      error %= m_inputRange;
-      if (Math.abs(error) > m_inputRange / 2) {
-        if (error > 0) {
-          return error - m_inputRange;
-        } else {
-          return error + m_inputRange;
-        }
-      }
-    }
-    return error;
-  }
-
-  /**
-   * Sets the minimum and maximum values expected from the input.
-   *
-   * @param minimumInput The minimum value expected from the input.
-   * @param maximumInput The maximum value expected from the input.
-   */
-  private void setInputRange(double minimumInput, double maximumInput) {
-    m_minimumInput = minimumInput;
-    m_maximumInput = maximumInput;
-    m_inputRange = maximumInput - minimumInput;
-
-    // Clamp setpoint to new input
-    if (m_maximumInput > m_minimumInput) {
-      m_setpoint = MathUtils.clamp(m_setpoint, m_minimumInput, m_maximumInput);
-    }
   }
 }

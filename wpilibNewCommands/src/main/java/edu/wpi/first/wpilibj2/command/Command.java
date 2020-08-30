@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -36,6 +36,9 @@ public interface Command {
   /**
    * The action to take when the command ends.  Called when either the command finishes normally,
    * or when it interrupted/canceled.
+   *
+   * <p>Do not schedule commands here that share requirements with this command.
+   * Use {@link #andThen(Command...)} instead.
    *
    * @param interrupted whether the command was interrupted/canceled
    */
@@ -112,11 +115,12 @@ public interface Command {
    * {@link CommandGroupBase#clearGroupedCommand(Command)}.  The decorated command can, however, be
    * further decorated without issue.
    *
-   * @param toRun the Runnable to run
+   * @param toRun        the Runnable to run
+   * @param requirements the required subsystems
    * @return the decorated command
    */
-  default SequentialCommandGroup beforeStarting(Runnable toRun) {
-    return new SequentialCommandGroup(new InstantCommand(toRun), this);
+  default SequentialCommandGroup beforeStarting(Runnable toRun, Subsystem... requirements) {
+    return new SequentialCommandGroup(new InstantCommand(toRun, requirements), this);
   }
 
   /**
@@ -128,11 +132,12 @@ public interface Command {
    * {@link CommandGroupBase#clearGroupedCommand(Command)}.  The decorated command can, however, be
    * further decorated without issue.
    *
-   * @param toRun the Runnable to run
+   * @param toRun        the Runnable to run
+   * @param requirements the required subsystems
    * @return the decorated command
    */
-  default SequentialCommandGroup andThen(Runnable toRun) {
-    return new SequentialCommandGroup(this, new InstantCommand(toRun));
+  default SequentialCommandGroup andThen(Runnable toRun, Subsystem... requirements) {
+    return new SequentialCommandGroup(this, new InstantCommand(toRun, requirements));
   }
 
   /**
@@ -279,7 +284,7 @@ public interface Command {
    * Whether the command requires a given subsystem.  Named "hasRequirement" rather than "requires"
    * to avoid confusion with
    * {@link edu.wpi.first.wpilibj.command.Command#requires(edu.wpi.first.wpilibj.command.Subsystem)}
-   *  - this may be able to be changed in a few years.
+   * - this may be able to be changed in a few years.
    *
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required

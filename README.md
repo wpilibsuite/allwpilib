@@ -1,6 +1,6 @@
 # WPILib Project
 
-[![Build Status](https://dev.azure.com/wpilib/wpilib/_apis/build/status/wpilibsuite.allwpilib)](https://dev.azure.com/wpilib/wpilib/_build/latest?definitionId=1)
+![CI](https://github.com/wpilibsuite/allwpilib/workflows/CI/badge.svg)
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 
@@ -15,7 +15,7 @@ Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WP
 
 ## WPILib Mission
 
-The WPILib Mission is to enable FIRST Robotics teams to focus on writing game-specific software rather than focusing on hardware details - "raise the floor, don't lower the ceiling". We work to enable teams with limited programming knowledge and/or mentor experience to be as successful as possible, while not hampering the abilities of teams with more advanced programming capabilities. We support Kit of Parts control system components directly in the library. We also strive to keep parity between major features of each language (Java, C++, and NI's LabVIEW), so that teams aren't at a disadvantage for choosing a specific programming language. WPILib is an open source project, licensed under the BSD 3-clause license. You can find a copy of the license [here](LICENSE.txt).
+The WPILib Mission is to enable FIRST Robotics teams to focus on writing game-specific software rather than focusing on hardware details - "raise the floor, don't lower the ceiling". We work to enable teams with limited programming knowledge and/or mentor experience to be as successful as possible, while not hampering the abilities of teams with more advanced programming capabilities. We support Kit of Parts control system components directly in the library. We also strive to keep parity between major features of each language (Java, C++, and NI's LabVIEW), so that teams aren't at a disadvantage for choosing a specific programming language. WPILib is an open source project, licensed under the BSD 3-clause license. You can find a copy of the license [here](LICENSE.md).
 
 # Building WPILib
 
@@ -27,7 +27,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - On Linux, GCC works fine
     - On Windows, you need Visual Studio 2019 (the free community edition works fine).
       Make sure to select the C++ Programming Language for installation
-- [ARM Compiler Toolchain](https://github.com/wpilibsuite/toolchain-builder/releases)
+- [ARM Compiler Toolchain](https://github.com/wpilibsuite/roborio-toolchain/releases)
   * Note that for 2020 and beyond, you should use version 7 or greater of GCC
 - Doxygen (Only required if you want to build the C++ documentation)
 

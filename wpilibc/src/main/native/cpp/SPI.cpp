@@ -10,7 +10,7 @@
 #include <cstring>
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/SPI.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
@@ -155,7 +155,7 @@ void SPI::Accumulator::Update() {
 SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
   int32_t status = 0;
   HAL_InitializeSPI(m_port, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 
   HAL_Report(HALUsageReporting::kResourceType_SPI,
              static_cast<uint8_t>(port) + 1);
@@ -208,13 +208,13 @@ void SPI::SetClockActiveHigh() {
 void SPI::SetChipSelectActiveHigh() {
   int32_t status = 0;
   HAL_SetSPIChipSelectActiveHigh(m_port, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void SPI::SetChipSelectActiveLow() {
   int32_t status = 0;
   HAL_SetSPIChipSelectActiveLow(m_port, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 int SPI::Write(uint8_t* data, int size) {
@@ -244,26 +244,26 @@ int SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size) {
 void SPI::InitAuto(int bufferSize) {
   int32_t status = 0;
   HAL_InitSPIAuto(m_port, bufferSize, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void SPI::FreeAuto() {
   int32_t status = 0;
   HAL_FreeSPIAuto(m_port, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void SPI::SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend, int zeroSize) {
   int32_t status = 0;
   HAL_SetSPIAutoTransmitData(m_port, dataToSend.data(), dataToSend.size(),
                              zeroSize, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void SPI::StartAutoRate(units::second_t period) {
   int32_t status = 0;
   HAL_StartSPIAutoRate(m_port, period.to<double>(), &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void SPI::StartAutoRate(double period) {
@@ -276,19 +276,19 @@ void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
       m_port, source.GetPortHandleForRouting(),
       (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(), rising,
       falling, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void SPI::StopAuto() {
   int32_t status = 0;
   HAL_StopSPIAuto(m_port, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 void SPI::ForceAutoRead() {
   int32_t status = 0;
   HAL_ForceSPIAutoRead(m_port, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
 }
 
 int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead,
@@ -296,7 +296,7 @@ int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead,
   int32_t status = 0;
   int32_t val = HAL_ReadSPIAutoReceivedData(m_port, buffer, numToRead,
                                             timeout.to<double>(), &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return val;
 }
 
@@ -307,8 +307,16 @@ int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout) {
 int SPI::GetAutoDroppedCount() {
   int32_t status = 0;
   int32_t val = HAL_GetSPIAutoDroppedCount(m_port, &status);
-  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setHALError(status);
   return val;
+}
+
+void SPI::ConfigureAutoStall(HAL_SPIPort port, int csToSclkTicks,
+                             int stallTicks, int pow2BytesPerRead) {
+  int32_t status = 0;
+  HAL_ConfigureSPIAutoStall(m_port, csToSclkTicks, stallTicks, pow2BytesPerRead,
+                            &status);
+  wpi_setHALError(status);
 }
 
 void SPI::InitAccumulator(units::second_t period, int cmd, int xferSize,
