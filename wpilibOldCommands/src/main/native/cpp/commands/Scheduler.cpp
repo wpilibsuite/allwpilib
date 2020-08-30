@@ -232,7 +232,7 @@ void Scheduler::Impl::ProcessCommandAddition(Command* command) {
   if (found == commands.end()) {
     // Check that the requirements can be had
     const auto& requirements = command->GetRequirements();
-    for (const auto& requirement : requirements) {
+    for (const auto requirement : requirements) {
       if (requirement->GetCurrentCommand() != nullptr &&
           !requirement->GetCurrentCommand()->IsInterruptible())
         return;
