@@ -12,7 +12,6 @@ set_target_properties(wpigui PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpigui PROPERTY FOLDER "libraries")
 
-target_compile_features(wpigui PUBLIC cxx_std_17)
 wpilib_target_warnings(wpigui)
 target_link_libraries(wpigui imgui)
 
@@ -24,6 +23,8 @@ if (MSVC)
     target_sources(wpigui PRIVATE ${wpigui_windows_src})
 else()
     if (APPLE)
+        target_compile_options(wpigui PRIVATE -fobjc-arc)
+        set_target_properties(wpigui PROPERTIES LINK_FLAGS "-framework Metal -framework QuartzCore")
         target_sources(wpigui PRIVATE ${wpigui_mac_src})
     else()
         target_sources(wpigui PRIVATE ${wpigui_unix_src})
