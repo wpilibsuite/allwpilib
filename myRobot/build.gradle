@@ -225,7 +225,7 @@ model {
 
                                 def installTask = it.tasks.install
 
-                                runTask.doFirst {
+                                def doFirstTask = {
                                     def extensions = '';
                                     installTask.installDirectory.get().getAsFile().eachFileRecurse {
                                         def name = it.name
@@ -244,6 +244,9 @@ model {
                                         runTask.environment 'HALSIM_EXTENSIONS', extensions
                                     }
                                 }
+
+                                runTask.doFirst doFirstTask
+                                run.doFirst doFirstTask
 
                                 run.workingDir filePath
 
