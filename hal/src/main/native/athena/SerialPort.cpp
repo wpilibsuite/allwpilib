@@ -41,14 +41,14 @@ struct SerialPort {
 
 namespace hal {
 IndexedHandleResource<HAL_SerialPortHandle, SerialPort, 4,
-                      HAL_HandleEnum::SerialPort>* serialPortHandles;
+                      HAL_HandleEnum::SerialPort, 1>* serialPortHandles;
 }  // namespace hal
 
 namespace hal {
 namespace init {
 void InitializeSerialPort() {
   static IndexedHandleResource<HAL_SerialPortHandle, SerialPort, 4,
-                               HAL_HandleEnum::SerialPort>
+                               HAL_HandleEnum::SerialPort, 1>
       spH;
   serialPortHandles = &spH;
 }
@@ -75,57 +75,54 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
 HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
                                                     const char* portName,
                                                     int32_t* status) {
-  auto handle = serialPortHandles->Allocate(static_cast<int16_t>(port), status);
+  HAL_SerialPortHandle handle = HAL_kInvalidHandle;
 
-  if (*status != 0) {
-    return HAL_kInvalidHandle;
-  }
+  int32_t initStatus = 0;
 
-  auto serialPort = serialPortHandles->Get(handle);
+  *status = serialPortHandles->Allocate(static_cast<int16_t>(port), &handle, nullptr, [portName, &initStatus](SerialPort* serialPort){
+    serialPort->portId = open(portName, O_RDWR | O_NOCTTY);
+    if (serialPort->portId < 0) {
+      initStatus = errno;
+      return;
+    }
 
-  if (serialPort == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
-  }
+    std::memset(&serialPort->tty, 0, sizeof(serialPort->tty));
 
-  serialPort->portId = open(portName, O_RDWR | O_NOCTTY);
-  if (serialPort->portId < 0) {
-    *status = errno;
+    serialPort->baudRate = B9600;
+    cfsetospeed(&serialPort->tty, static_cast<speed_t>(serialPort->baudRate));
+    cfsetispeed(&serialPort->tty, static_cast<speed_t>(serialPort->baudRate));
+
+    serialPort->tty.c_cflag &= ~PARENB;
+    serialPort->tty.c_cflag &= ~CSTOPB;
+    serialPort->tty.c_cflag &= ~CSIZE;
+    serialPort->tty.c_cflag |= CS8;
+
+    serialPort->tty.c_cc[VMIN] = 0;
+    serialPort->tty.c_cc[VTIME] = 10;
+
+    serialPort->tty.c_cflag |= CREAD | CLOCAL;
+
+    serialPort->tty.c_lflag &= ~(ICANON | ECHO | ISIG);
+    serialPort->tty.c_iflag &= ~(IXON | IXOFF | IXANY);
+    /* Raw output mode, sends the raw and unprocessed data  (send as it is).
+    * If it is in canonical mode and sending new line char then CR
+    * will be added as prefix and send as CR LF
+    */
+    serialPort->tty.c_oflag = ~OPOST;
+
+    tcflush(serialPort->portId, TCIOFLUSH);
+    if (tcsetattr(serialPort->portId, TCSANOW, &serialPort->tty) != 0) {
+      initStatus = errno;
+      close(serialPort->portId);
+    }
+  });
+
+  if (initStatus != 0) {
     serialPortHandles->Free(handle);
-    return HAL_kInvalidHandle;
+    *status = initStatus;
+    handle = HAL_kInvalidHandle;
   }
 
-  std::memset(&serialPort->tty, 0, sizeof(serialPort->tty));
-
-  serialPort->baudRate = B9600;
-  cfsetospeed(&serialPort->tty, static_cast<speed_t>(serialPort->baudRate));
-  cfsetispeed(&serialPort->tty, static_cast<speed_t>(serialPort->baudRate));
-
-  serialPort->tty.c_cflag &= ~PARENB;
-  serialPort->tty.c_cflag &= ~CSTOPB;
-  serialPort->tty.c_cflag &= ~CSIZE;
-  serialPort->tty.c_cflag |= CS8;
-
-  serialPort->tty.c_cc[VMIN] = 0;
-  serialPort->tty.c_cc[VTIME] = 10;
-
-  serialPort->tty.c_cflag |= CREAD | CLOCAL;
-
-  serialPort->tty.c_lflag &= ~(ICANON | ECHO | ISIG);
-  serialPort->tty.c_iflag &= ~(IXON | IXOFF | IXANY);
-  /* Raw output mode, sends the raw and unprocessed data  (send as it is).
-   * If it is in canonical mode and sending new line char then CR
-   * will be added as prefix and send as CR LF
-   */
-  serialPort->tty.c_oflag = ~OPOST;
-
-  tcflush(serialPort->portId, TCIOFLUSH);
-  if (tcsetattr(serialPort->portId, TCSANOW, &serialPort->tty) != 0) {
-    *status = errno;
-    close(serialPort->portId);
-    serialPortHandles->Free(handle);
-    return HAL_kInvalidHandle;
-  }
   return handle;
 }
 

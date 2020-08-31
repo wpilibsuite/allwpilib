@@ -37,7 +37,7 @@ struct AnalogPort {
 };
 
 extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
-                             kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
+                             kNumAnalogInputs, HAL_HandleEnum::AnalogInput, 1>*
     analogInputHandles;
 
 /**

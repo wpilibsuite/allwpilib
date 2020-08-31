@@ -25,14 +25,14 @@ struct AnalogOutput {
 }  // namespace
 
 static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
-                             kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>*
+                             kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput, 1>*
     analogOutputHandles;
 
 namespace hal {
 namespace init {
 void InitializeAnalogOutput() {
   static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
-                               kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>
+                               kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput, 1>
       aoH;
   analogOutputHandles = &aoH;
 }
@@ -54,19 +54,12 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
     return HAL_kInvalidHandle;
   }
 
-  HAL_AnalogOutputHandle handle =
-      analogOutputHandles->Allocate(channel, status);
+  HAL_AnalogOutputHandle handle = HAL_kInvalidHandle;
 
-  if (*status != 0)
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  *status = analogOutputHandles->Allocate(channel, &handle, nullptr, [channel](AnalogOutput* ao){
+    ao->channel = static_cast<uint8_t>(channel);
+  });
 
-  auto port = analogOutputHandles->Get(handle);
-  if (port == nullptr) {  // would only error on thread issue
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
-  }
-
-  port->channel = static_cast<uint8_t>(channel);
   return handle;
 }
 

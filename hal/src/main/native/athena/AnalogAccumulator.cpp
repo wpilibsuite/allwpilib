@@ -13,6 +13,13 @@
 using namespace hal;
 
 namespace hal {
+bool IsAccumulatorChannelDirect(uint8_t channel) {
+  for (int32_t i = 0; i < kNumAccumulators; i++) {
+    if (channel == kAccumulatorChannels[i]) return true;
+  }
+  return false;
+}
+
 namespace init {
 void InitializeAnalogAccumulator() {}
 }  // namespace init
@@ -27,10 +34,7 @@ HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analogPortHandle,
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  for (int32_t i = 0; i < kNumAccumulators; i++) {
-    if (port->channel == kAccumulatorChannels[i]) return true;
-  }
-  return false;
+  return IsAccumulatorChannelDirect(port->channel);
 }
 
 void HAL_InitAccumulator(HAL_AnalogInputHandle analogPortHandle,

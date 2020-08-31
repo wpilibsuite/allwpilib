@@ -33,8 +33,9 @@ namespace hal {
  *
  */
 template <typename THandle, typename TStruct, int16_t size,
-          HAL_HandleEnum enumValue>
+          HAL_HandleEnum enumValue, uint16_t maxRefCount>
 class IndexedHandleResource : public HandleBase {
+  static_assert(maxRefCount > 0, "Must have a max ref count of at least 1");
   friend class IndexedHandleResourceTest;
 
  public:
@@ -42,42 +43,54 @@ class IndexedHandleResource : public HandleBase {
   IndexedHandleResource(const IndexedHandleResource&) = delete;
   IndexedHandleResource& operator=(const IndexedHandleResource&) = delete;
 
-  THandle Allocate(int16_t index, int32_t* status);
+  template<typename TInitializer>
+  int32_t Allocate(int16_t index, THandle* handle, std::shared_ptr<TStruct>* resource, TInitializer initialConstructor);
+
   int16_t GetIndex(THandle handle) {
     return getHandleTypedIndex(handle, enumValue, m_version);
   }
   std::shared_ptr<TStruct> Get(THandle handle);
-  void Free(THandle handle);
+  std::shared_ptr<TStruct> Free(THandle handle);
   void ResetHandles() override;
 
  private:
-  std::array<std::shared_ptr<TStruct>, size> m_structures;
+  std::array<std::pair<std::shared_ptr<TStruct>, uint16_t>, size> m_structures;
   std::array<wpi::mutex, size> m_handleMutexes;
 };
 
 template <typename THandle, typename TStruct, int16_t size,
-          HAL_HandleEnum enumValue>
-THandle IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
-    int16_t index, int32_t* status) {
+          HAL_HandleEnum enumValue, uint16_t maxRefCount>
+template <typename TInitializer>
+int32_t IndexedHandleResource<THandle, TStruct, size, enumValue, maxRefCount>::Allocate(
+    int16_t index, THandle* handle, std::shared_ptr<TStruct>* resource, TInitializer initialConstructor) {
   // don't aquire the lock if we can fail early.
   if (index < 0 || index >= size) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    return RESOURCE_OUT_OF_RANGE;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
-  if (m_structures[index] != nullptr) {
-    *status = RESOURCE_IS_ALLOCATED;
-    return HAL_kInvalidHandle;
+  if (m_structures[index].first != nullptr) {
+    if (m_structures[index].second >= maxRefCount) {
+      return RESOURCE_IS_ALLOCATED;
+    }
+    m_structures[index].second++;
+  } else {
+    m_structures[index].first = std::make_shared<TStruct>();
+    m_structures[index].second = 1;
+    initialConstructor(m_structures[index].first.get());
   }
-  m_structures[index] = std::make_shared<TStruct>();
-  return static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+
+  *handle = static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+  if (resource) {
+    *resource = m_structures[index].first;
+  }
+  return 0;
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HAL_HandleEnum enumValue>
+          HAL_HandleEnum enumValue, uint16_t maxRefCount>
 std::shared_ptr<TStruct>
-IndexedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
+IndexedHandleResource<THandle, TStruct, size, enumValue, maxRefCount>::Get(THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = GetIndex(handle);
   if (index < 0 || index >= size) {
@@ -86,27 +99,35 @@ IndexedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
   std::scoped_lock lock(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
-  return m_structures[index];
+  return m_structures[index].first;
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HAL_HandleEnum enumValue>
-void IndexedHandleResource<THandle, TStruct, size, enumValue>::Free(
+          HAL_HandleEnum enumValue, uint16_t maxRefCount>
+std::shared_ptr<TStruct> IndexedHandleResource<THandle, TStruct, size, enumValue, maxRefCount>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = GetIndex(handle);
-  if (index < 0 || index >= size) return;
+  if (index < 0 || index >= size) return nullptr;
   // lock and deallocated handle
   std::scoped_lock lock(m_handleMutexes[index]);
-  m_structures[index].reset();
+  if (m_structures[index].first == nullptr) {
+    return nullptr;
+  }
+  std::shared_ptr<TStruct> toReturn = nullptr;
+  auto oldRefCount = m_structures[index].second--;
+  if (oldRefCount == 1) {
+    toReturn = std::move(m_structures[index].first);
+  }
+  return toReturn;
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HAL_HandleEnum enumValue>
-void IndexedHandleResource<THandle, TStruct, size, enumValue>::ResetHandles() {
+          HAL_HandleEnum enumValue, uint16_t maxRefCount>
+void IndexedHandleResource<THandle, TStruct, size, enumValue, maxRefCount>::ResetHandles() {
   for (int i = 0; i < size; i++) {
     std::scoped_lock lock(m_handleMutexes[i]);
-    m_structures[i].reset();
+    m_structures[i].first.reset();
   }
   HandleBase::ResetHandles();
 }

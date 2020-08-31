@@ -17,12 +17,27 @@
 #include "hal/handles/HandlesInternal.h"
 
 namespace hal {
+extern bool IsAccumulatorChannelDirect(uint8_t channel);
 namespace init {
 void InitializeAnalogInput() {}
 }  // namespace init
 }  // namespace hal
 
 using namespace hal;
+
+static int32_t SetAnalogAverageBits(AnalogPort* port, int32_t bits) {
+  int32_t status = 0;
+  analogInputSystem->writeAverageBits(port->channel, static_cast<uint8_t>(bits),
+                                      &status);
+  return status;
+}
+
+static int32_t SetAnalogOversampleBits(AnalogPort* port, int32_t bits) {
+  int32_t status = 0;
+  analogInputSystem->writeOversampleBits(port->channel,
+                                         static_cast<uint8_t>(bits), &status);
+  return status;
+}
 
 extern "C" {
 
@@ -39,28 +54,39 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
     return HAL_kInvalidHandle;
   }
 
-  HAL_AnalogInputHandle handle = analogInputHandles->Allocate(channel, status);
+  HAL_AnalogInputHandle handle = HAL_kInvalidHandle;
+  int32_t localStatus = 0;
 
-  if (*status != 0)
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  *status = analogInputHandles->Allocate(channel, &handle, nullptr, [channel, &localStatus](AnalogPort* analog_port) {
+    analog_port->channel = static_cast<uint8_t>(channel);
+    if (IsAccumulatorChannelDirect(analog_port->channel)) {
+      analog_port->accumulator.reset(tAccumulator::create(channel, &localStatus));
+    } else {
+      analog_port->accumulator = nullptr;
+    }
 
-  // Initialize port structure
-  auto analog_port = analogInputHandles->Get(handle);
-  if (analog_port == nullptr) {  // would only error on thread issue
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
+    if (localStatus != 0) {
+      return;
+    }
+
+    // Set default configuration
+    analogInputSystem->writeScanList(channel, channel, &localStatus);
+    if (localStatus != 0) {
+      return;
+    }
+    localStatus = SetAnalogAverageBits(analog_port, kDefaultAverageBits);
+    if (localStatus != 0) {
+      return;
+    }
+    localStatus = SetAnalogAverageBits(analog_port, kDefaultOversampleBits);
+  });
+
+  if (localStatus != 0) {
+    *status = localStatus;
+    analogInputHandles->Free(handle);
+    handle = HAL_kInvalidHandle;
   }
-  analog_port->channel = static_cast<uint8_t>(channel);
-  if (HAL_IsAccumulatorChannel(handle, status)) {
-    analog_port->accumulator.reset(tAccumulator::create(channel, status));
-  } else {
-    analog_port->accumulator = nullptr;
-  }
 
-  // Set default configuration
-  analogInputSystem->writeScanList(channel, channel, status);
-  HAL_SetAnalogAverageBits(handle, kDefaultAverageBits, status);
-  HAL_SetAnalogOversampleBits(handle, kDefaultOversampleBits, status);
   return handle;
 }
 
@@ -103,8 +129,7 @@ void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  analogInputSystem->writeAverageBits(port->channel, static_cast<uint8_t>(bits),
-                                      status);
+  *status = SetAnalogAverageBits(port.get(), bits);
 }
 
 int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
@@ -125,8 +150,7 @@ void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  analogInputSystem->writeOversampleBits(port->channel,
-                                         static_cast<uint8_t>(bits), status);
+  *status = SetAnalogOversampleBits(port.get(), bits);
 }
 
 int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,

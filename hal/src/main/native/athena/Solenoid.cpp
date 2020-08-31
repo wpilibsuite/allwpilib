@@ -7,8 +7,6 @@
 
 #include "hal/Solenoid.h"
 
-#include <FRC_NetworkCommunication/LoadOut.h>
-
 #include "HALInitializer.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
@@ -32,14 +30,14 @@ using namespace hal;
 
 static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
                              kNumPCMModules * kNumSolenoidChannels,
-                             HAL_HandleEnum::Solenoid>* solenoidHandles;
+                             HAL_HandleEnum::Solenoid, 1>* solenoidHandles;
 
 namespace hal {
 namespace init {
 void InitializeSolenoid() {
   static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
                                kNumPCMModules * kNumSolenoidChannels,
-                               HAL_HandleEnum::Solenoid>
+                               HAL_HandleEnum::Solenoid, 1>
       sH;
   solenoidHandles = &sH;
 }
@@ -69,18 +67,12 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
     return HAL_kInvalidHandle;
   }
 
-  auto handle = solenoidHandles->Allocate(
-      module * kNumSolenoidChannels + channel, status);
-  if (*status != 0) {
-    return HAL_kInvalidHandle;
-  }
-  auto solenoidPort = solenoidHandles->Get(handle);
-  if (solenoidPort == nullptr) {  // would only occur on thread issues
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
-  }
-  solenoidPort->module = static_cast<uint8_t>(module);
+  HAL_SolenoidHandle handle = HAL_kInvalidHandle;
+
+  *status = solenoidHandles->Allocate(module * kNumSolenoidChannels + channel, &handle, nullptr, [module, channel](Solenoid* solenoidPort){
+    solenoidPort->module = static_cast<uint8_t>(module);
   solenoidPort->channel = static_cast<uint8_t>(channel);
+  });
 
   return handle;
 }

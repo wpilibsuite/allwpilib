@@ -37,13 +37,13 @@ static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
 using namespace hal;
 
 static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
-                             HAL_HandleEnum::AnalogGyro>* analogGyroHandles;
+                             HAL_HandleEnum::AnalogGyro, 1>* analogGyroHandles;
 
 namespace hal {
 namespace init {
 void InitializeAnalogGyro() {
   static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
-                               HAL_HandleEnum::AnalogGyro>
+                               HAL_HandleEnum::AnalogGyro, 1>
       agHandles;
   analogGyroHandles = &agHandles;
 }
@@ -69,23 +69,14 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
 
   // handle known to be correct, so no need to type check
   int16_t channel = getHandleIndex(analogHandle);
+  HAL_GyroHandle handle = HAL_kInvalidHandle;
 
-  auto handle = analogGyroHandles->Allocate(channel, status);
-
-  if (*status != 0)
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-
-  // Initialize port structure
-  auto gyro = analogGyroHandles->Get(handle);
-  if (gyro == nullptr) {  // would only error on thread issue
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
-  }
-
-  gyro->handle = analogHandle;
-  gyro->voltsPerDegreePerSecond = 0;
-  gyro->offset = 0;
-  gyro->center = 0;
+  *status = analogGyroHandles->Allocate(channel, &handle, nullptr, [analogHandle](AnalogGyro* gyro){
+    gyro->handle = analogHandle;
+    gyro->voltsPerDegreePerSecond = 0;
+    gyro->offset = 0;
+    gyro->center = 0;
+  });
 
   return handle;
 }

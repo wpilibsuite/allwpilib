@@ -16,7 +16,6 @@
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
 #include "hal/Ports.h"
-#include "hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 

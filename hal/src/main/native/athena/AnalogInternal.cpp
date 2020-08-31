@@ -23,7 +23,7 @@ std::unique_ptr<tAI> analogInputSystem;
 std::unique_ptr<tAO> analogOutputSystem;
 
 IndexedHandleResource<HAL_AnalogInputHandle, ::hal::AnalogPort,
-                      kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
+                      kNumAnalogInputs, HAL_HandleEnum::AnalogInput, 1>*
     analogInputHandles;
 
 static int32_t analogNumChannelsToActivate = 0;
@@ -35,7 +35,7 @@ bool analogSampleRateSet = false;
 namespace init {
 void InitializeAnalogInternal() {
   static IndexedHandleResource<HAL_AnalogInputHandle, ::hal::AnalogPort,
-                               kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
+                               kNumAnalogInputs, HAL_HandleEnum::AnalogInput, 1>
       alH;
   analogInputHandles = &alH;
 }

@@ -24,7 +24,7 @@ struct Relay {
 }  // namespace
 
 static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
-                             HAL_HandleEnum::Relay>* relayHandles;
+                             HAL_HandleEnum::Relay, 1>* relayHandles;
 
 // Create a mutex to protect changes to the relay values
 static wpi::mutex digitalRelayMutex;
@@ -33,7 +33,7 @@ namespace hal {
 namespace init {
 void InitializeRelay() {
   static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
-                               HAL_HandleEnum::Relay>
+                               HAL_HandleEnum::Relay, 1>
       rH;
   relayHandles = &rH;
 }
@@ -57,27 +57,21 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 
   if (!fwd) channel += kNumRelayHeaders;  // add 4 to reverse channels
 
-  auto handle = relayHandles->Allocate(channel, status);
+  HAL_RelayHandle handle = HAL_kInvalidHandle;
 
-  if (*status != 0)
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  *status = relayHandles->Allocate(channel, &handle, nullptr, [fwd, &channel](Relay* port) {
+    if (!fwd) {
+      // Subtract number of headers to put channel in range
+      channel -= kNumRelayHeaders;
 
-  auto port = relayHandles->Get(handle);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
-  }
+      port->fwd = false;  // set to reverse
+    } else {
+      port->fwd = true;  // set to forward
+    }
 
-  if (!fwd) {
-    // Subtract number of headers to put channel in range
-    channel -= kNumRelayHeaders;
+    port->channel = static_cast<uint8_t>(channel);
+  });
 
-    port->fwd = false;  // set to reverse
-  } else {
-    port->fwd = true;  // set to forward
-  }
-
-  port->channel = static_cast<uint8_t>(channel);
   return handle;
 }
 
