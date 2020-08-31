@@ -127,7 +127,8 @@ class MecanumDrive : public RobotDriveBase,
    * Sets if the power sent to the right side of the drivetrain should be
    * multiplied by -1.
    *
-   * @param rightSideInverted true if right side power should be multiplied by -1
+   * @param rightSideInverted true if right side power should be multiplied by
+   * -1
    */
   void SetRightSideInverted(bool rightSideInverted);
 
