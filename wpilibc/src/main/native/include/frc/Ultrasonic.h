@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -132,7 +132,7 @@ class Ultrasonic : public ErrorBase,
    *                 the ultrasonic sensors. This scheduling method assures that
    *                 the sensors are non-interfering because no two sensors fire
    *                 at the same time. If another scheduling algorithm is
-   *                 prefered, it can be implemented by pinging the sensors
+   *                 preferred, it can be implemented by pinging the sensors
    *                 manually and waiting for the results to come back.
    */
   static void SetAutomaticMode(bool enabling);

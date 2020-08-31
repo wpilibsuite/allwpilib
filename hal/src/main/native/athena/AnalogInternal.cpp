@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -93,7 +93,7 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   config.ConvertRate = ticksPerConversion;
   analogInputSystem->writeConfig(config, status);
 
-  // Indicate that the scan size has been commited to hardware.
+  // Indicate that the scan size has been committed to hardware.
   setAnalogNumChannelsToActivate(0);
 }
 

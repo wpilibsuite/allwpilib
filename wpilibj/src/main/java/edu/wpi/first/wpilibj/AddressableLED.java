@@ -98,7 +98,7 @@ public class AddressableLED implements AutoCloseable {
   /**
    * Starts the output.
    *
-   * <p>The output writes continously.
+   * <p>The output writes continuously.
    */
   public void start() {
     AddressableLEDJNI.start(m_handle);

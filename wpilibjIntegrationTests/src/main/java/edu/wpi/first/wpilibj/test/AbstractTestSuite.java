@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -116,7 +116,7 @@ public abstract class AbstractTestSuite {
             | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
-          logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
+          logger.log(Level.SEVERE, "Test suites can not take parameters in their constructors.",
               ex);
         }
       } else if (c.getAnnotation(SuiteClasses.class) != null) {
@@ -212,7 +212,7 @@ public abstract class AbstractTestSuite {
             | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
-          logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
+          logger.log(Level.SEVERE, "Test suites can not take parameters in their constructors.",
               ex);
         }
       }

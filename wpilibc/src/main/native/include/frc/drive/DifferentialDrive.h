@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -191,7 +191,7 @@ class DifferentialDrive : public RobotDriveBase,
   void SetQuickStopAlpha(double alpha);
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multipled by
+   * Gets if the power sent to the right side of the drivetrain is multiplied by
    * -1.
    *
    * @return true if the right side is inverted
@@ -200,9 +200,10 @@ class DifferentialDrive : public RobotDriveBase,
 
   /**
    * Sets if the power sent to the right side of the drivetrain should be
-   * multipled by -1.
+   * multiplied by -1.
    *
-   * @param rightSideInverted true if right side power should be multipled by -1
+   * @param rightSideInverted true if right side power should be multiplied by
+   * -1
    */
   void SetRightSideInverted(bool rightSideInverted);
 

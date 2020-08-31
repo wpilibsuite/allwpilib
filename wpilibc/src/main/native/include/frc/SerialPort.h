@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -106,7 +106,7 @@ class SerialPort : public ErrorBase {
    * Enable termination and specify the termination character.
    *
    * Termination is currently only implemented for receive.
-   * When the the terminator is recieved, the Read() or Scanf() will return
+   * When the the terminator is received, the Read() or Scanf() will return
    * fewer bytes than requested, stopping after the terminator.
    *
    * @param terminator The character to use for termination.
@@ -169,7 +169,7 @@ class SerialPort : public ErrorBase {
    *
    * Specify the amount of data that can be stored before data
    * from the device is returned to Read or Scanf.  If you want
-   * data that is recieved to be returned immediately, set this to 1.
+   * data that is received to be returned immediately, set this to 1.
    *
    * It the buffer is not filled before the read timeout expires, all
    * data that has been received so far will be returned.

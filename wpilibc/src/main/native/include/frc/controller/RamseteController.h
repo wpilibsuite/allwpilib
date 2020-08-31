@@ -57,7 +57,7 @@ class RamseteController {
 
   /**
    * Construct a Ramsete unicycle controller. The default arguments for
-   * b and zeta of 2.0 and 0.7 have been well-tested to produce desireable
+   * b and zeta of 2.0 and 0.7 have been well-tested to produce desirable
    * results.
    */
   RamseteController() : RamseteController(2.0, 0.7) {}

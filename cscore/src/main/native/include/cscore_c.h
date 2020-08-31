@@ -228,7 +228,7 @@ struct CS_Event {
 };
 
 /**
- * USB camera infomation
+ * USB camera information
  */
 typedef struct CS_UsbCameraInfo {
   int dev;

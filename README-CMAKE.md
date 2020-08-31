@@ -81,7 +81,7 @@ project(vision_app) # Project Name Here
 
 find_package(wpilib REQUIRED)
 
-add_executable(my_vision_app main.cpp) # exectuable name as first parameter
+add_executable(my_vision_app main.cpp) # executable name as first parameter
 target_link_libraries(my_vision_app cameraserver ntcore cscore wpiutil)
 ```
 

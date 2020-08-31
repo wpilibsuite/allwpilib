@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -88,8 +88,8 @@ void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle) {
 
 HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
   // roboRIO only has 4 headers, and the FPGA has
-  // seperate functions for forward and reverse,
-  // instead of seperate channel IDs
+  // separate functions for forward and reverse,
+  // instead of separate channel IDs
   return channel < kNumRelayHeaders && channel >= 0;
 }
 
