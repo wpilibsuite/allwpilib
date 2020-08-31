@@ -116,7 +116,7 @@ public abstract class AbstractTestSuite {
             | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
-          logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
+          logger.log(Level.SEVERE, "Test suites can not take parameters in their constructors.",
               ex);
         }
       } else if (c.getAnnotation(SuiteClasses.class) != null) {
@@ -212,7 +212,7 @@ public abstract class AbstractTestSuite {
             | IllegalAccessException ex) {
           // This shouldn't happen unless the constructor is changed in some
           // way.
-          logger.log(Level.SEVERE, "Test suites can not take paramaters in their constructors.",
+          logger.log(Level.SEVERE, "Test suites can not take parameters in their constructors.",
               ex);
         }
       }

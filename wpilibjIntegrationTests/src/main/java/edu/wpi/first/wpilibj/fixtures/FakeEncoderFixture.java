@@ -100,7 +100,7 @@ public class FakeEncoderFixture implements ITestFixture {
    */
   @Override
   public boolean teardown() {
-    logger.fine("Begining teardown");
+    logger.fine("Beginning teardown");
     m_source.close();
     logger.finer("Source freed " + m_sourcePort[0] + ",  " + m_sourcePort[1]);
     m_encoder.close();

@@ -36,7 +36,7 @@ abstract class ShuffleboardWidget<W extends ShuffleboardWidget<W>>
   /**
    * Sets the type of widget used to display the data. If not set, the default widget type will be
    * used. This method should only be used to use a widget that does not come built into
-   * Shuffleboard (i.e. one that comes with a custom or thrid-party plugin). To use a widget that
+   * Shuffleboard (i.e. one that comes with a custom or third-party plugin). To use a widget that
    * is built into Shuffleboard, use {@link #withWidget(WidgetType)} and {@link BuiltInWidgets}.
    *
    * @param widgetType the type of the widget used to display the data

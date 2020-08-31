@@ -13,7 +13,7 @@
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to
- * maintian rotation vectorsin relation to the starting orientation of the robot
+ * maintain rotation vectorsin relation to the starting orientation of the robot
  * (field-oriented controls).
  */
 class Robot : public frc::TimedRobot {

@@ -69,7 +69,7 @@ class Encoder : public gazebo::ModelPlugin {
   /// \brief Whether or not this encoder measures radians or degrees.
   bool radians;
 
-  /// \brief A factor to mulitply this output by.
+  /// \brief A factor to multiply this output by.
   double multiplier;
 
   /// \brief Whether or not the encoder has been stopped.

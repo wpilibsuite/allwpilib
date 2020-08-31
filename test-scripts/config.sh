@@ -7,7 +7,7 @@
 #*----------------------------------------------------------------------------*#
 
 # If this is changed, update the .gitignore
-# so that test results are not commited to the repo
+# so that test results are not committed to the repo
 DEFAULT_LOCAL_TEST_RESULTS_DIR=../test-reports
 
 ROBOT_ADDRESS=admin@roboRIO-190-FRC.local

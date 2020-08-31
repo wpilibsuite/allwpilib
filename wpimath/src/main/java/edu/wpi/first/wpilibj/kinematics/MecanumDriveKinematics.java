@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
  * individual wheel speeds) uses the relative locations of the wheels with
  * respect to the center of rotation. The center of rotation for inverse
  * kinematics is also variable. This means that you can set your set your center
- * of rotation in a corner of the robot to perform special evasion manuevers.
+ * of rotation in a corner of the robot to perform special evasion maneuvers.
  *
  * <p>Forward kinematics (converting an array of wheel speeds into the overall
  * chassis motion) is performs the exact opposite of what inverse kinematics
@@ -84,7 +84,7 @@ public class MecanumDriveKinematics {
    * operations, the center of rotation is usually the same as the physical
    * center of the robot; therefore, the argument is defaulted to that use case.
    * However, if you wish to change the center of rotation for evasive
-   * manuevers, vision alignment, or for any other use case, you can do so.
+   * maneuvers, vision alignment, or for any other use case, you can do so.
    *
    * @param chassisSpeeds    The desired chassis speed.
    * @param centerOfRotationMeters The center of rotation. For example, if you set the

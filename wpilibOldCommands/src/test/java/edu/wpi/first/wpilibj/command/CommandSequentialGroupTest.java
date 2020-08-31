@@ -23,7 +23,7 @@ class CommandSequentialGroupTest extends AbstractCommandTest {
    */
   @Test
   public void testThreeCommandOnSubSystem() {
-    logger.fine("Begining Test");
+    logger.fine("Beginning Test");
     final ASubsystem subsystem = new ASubsystem();
 
     logger.finest("Creating Mock Command1");

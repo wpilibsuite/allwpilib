@@ -116,7 +116,7 @@ class MecanumDrive : public RobotDriveBase,
   void DrivePolar(double magnitude, double angle, double zRotation);
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multipled by
+   * Gets if the power sent to the right side of the drivetrain is multiplied by
    * -1.
    *
    * @return true if the right side is inverted
@@ -125,9 +125,9 @@ class MecanumDrive : public RobotDriveBase,
 
   /**
    * Sets if the power sent to the right side of the drivetrain should be
-   * multipled by -1.
+   * multiplied by -1.
    *
-   * @param rightSideInverted true if right side power should be multipled by -1
+   * @param rightSideInverted true if right side power should be multiplied by -1
    */
   void SetRightSideInverted(bool rightSideInverted);
 

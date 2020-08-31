@@ -78,7 +78,7 @@ public class DIOCrossConnectFixture implements ITestFixture {
 
   @Override
   public boolean teardown() {
-    logger.log(Level.FINE, "Begining teardown");
+    logger.log(Level.FINE, "Beginning teardown");
     if (m_allocated) {
       m_input.close();
       m_output.close();

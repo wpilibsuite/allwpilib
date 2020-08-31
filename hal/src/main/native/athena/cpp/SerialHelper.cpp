@@ -199,7 +199,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
 
     *status = viGetAttribute(vSession, VI_ATTR_INTF_INST_NAME, &osName);
     // Ignore an error here, as we want to close the session on an error
-    // Use a seperate close variable so we can check
+    // Use a separate close variable so we can check
     ViStatus closeStatus = viClose(vSession);
     if (*status < 0) goto done;
     if (closeStatus < 0) goto done;

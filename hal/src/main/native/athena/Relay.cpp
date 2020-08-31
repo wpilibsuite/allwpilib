@@ -88,8 +88,8 @@ void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle) {
 
 HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
   // roboRIO only has 4 headers, and the FPGA has
-  // seperate functions for forward and reverse,
-  // instead of seperate channel IDs
+  // separate functions for forward and reverse,
+  // instead of separate channel IDs
   return channel < kNumRelayHeaders && channel >= 0;
 }
 

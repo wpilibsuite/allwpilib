@@ -52,7 +52,7 @@ T RungeKutta(F&& f, T x, U u, units::second_t dt) {
  *
  * @param f  The function to integrate. It must take two arguments x and t.
  * @param x  The initial value of x.
- * @param t  The intial value of t.
+ * @param t  The initial value of t.
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T>

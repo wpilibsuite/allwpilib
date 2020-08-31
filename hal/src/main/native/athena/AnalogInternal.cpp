@@ -93,7 +93,7 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   config.ConvertRate = ticksPerConversion;
   analogInputSystem->writeConfig(config, status);
 
-  // Indicate that the scan size has been commited to hardware.
+  // Indicate that the scan size has been committed to hardware.
   setAnalogNumChannelsToActivate(0);
 }
 

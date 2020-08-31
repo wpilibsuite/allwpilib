@@ -282,7 +282,7 @@ void RobotDrive::MecanumDrive_Cartesian(double x, double y, double rotation,
   double yIn = y;
   // Negate y for the joystick.
   yIn = -yIn;
-  // Compenstate for gyro angle.
+  // Compensate for gyro angle.
   RotateVector(xIn, yIn, gyroAngle);
 
   double wheelSpeeds[kMaxNumberOfMotors];

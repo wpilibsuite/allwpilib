@@ -150,7 +150,7 @@
       "Complete List",
       "Sensors",
       "Analog",
-      "Joysitck"
+      "Joystick"
     ],
     "foldername": "GyroMecanum",
     "gradlebase": "cpp",

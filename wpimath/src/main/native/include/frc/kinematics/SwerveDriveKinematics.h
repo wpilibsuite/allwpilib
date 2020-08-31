@@ -28,7 +28,7 @@ namespace frc {
  * individual module states) uses the relative locations of the modules with
  * respect to the center of rotation. The center of rotation for inverse
  * kinematics is also variable. This means that you can set your set your center
- * of rotation in a corner of the robot to perform special evasion manuevers.
+ * of rotation in a corner of the robot to perform special evasion maneuvers.
  *
  * Forward kinematics (converting an array of module states into the overall
  * chassis motion) is performs the exact opposite of what inverse kinematics
@@ -48,7 +48,7 @@ class SwerveDriveKinematics {
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable
    * number of wheel locations as Translation2ds. The order in which you pass in
-   * the wheel locations is the same order that you will recieve the module
+   * the wheel locations is the same order that you will receive the module
    * states when performing inverse kinematics. It is also expected that you
    * pass in the module states in the same order when calling the forward
    * kinematics methods.
@@ -87,7 +87,7 @@ class SwerveDriveKinematics {
    * operations, the center of rotation is usually the same as the physical
    * center of the robot; therefore, the argument is defaulted to that use case.
    * However, if you wish to change the center of rotation for evasive
-   * manuevers, vision alignment, or for any other use case, you can do so.
+   * maneuvers, vision alignment, or for any other use case, you can do so.
    *
    * @param chassisSpeeds The desired chassis speed.
    * @param centerOfRotation The center of rotation. For example, if you set the

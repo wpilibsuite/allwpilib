@@ -48,7 +48,7 @@ class PIDController : public PIDBase, public Controller {
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
    *               particularly affects calculations of the integral and
-   *               differental terms. The default is 0.05 (50ms).
+   *               differential terms. The default is 0.05 (50ms).
    */
   WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, PIDSource* source,
@@ -64,7 +64,7 @@ class PIDController : public PIDBase, public Controller {
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
    *               particularly affects calculations of the integral and
-   *               differental terms. The default is 0.05 (50ms).
+   *               differential terms. The default is 0.05 (50ms).
    */
   WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, double f, PIDSource* source,
@@ -80,7 +80,7 @@ class PIDController : public PIDBase, public Controller {
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
    *               particularly affects calculations of the integral and
-   *               differental terms. The default is 0.05 (50ms).
+   *               differential terms. The default is 0.05 (50ms).
    */
   WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, PIDSource& source,
@@ -96,7 +96,7 @@ class PIDController : public PIDBase, public Controller {
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
    *               particularly affects calculations of the integral and
-   *               differental terms. The default is 0.05 (50ms).
+   *               differential terms. The default is 0.05 (50ms).
    */
   WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, double f, PIDSource& source,
