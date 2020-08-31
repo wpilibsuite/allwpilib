@@ -64,7 +64,7 @@ void InitializeHAL() {
   InitializeFPGAEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
-  InitialzeInterrupts();
+  InitializeInterrupts();
   InitializeMain();
   InitializeNotifier();
   InitializePCMInternal();
