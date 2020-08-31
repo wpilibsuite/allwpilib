@@ -419,6 +419,6 @@ public abstract class RobotBase implements AutoCloseable {
       runRobot(robotSupplier);
     }
 
-    System.exit(1);
+    System.exit(0);
   }
 }

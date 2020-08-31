@@ -23,7 +23,7 @@
 #if defined(WIN32) || defined(_WIN32)
 #define DELIM ';'
 #define HTYPE HMODULE
-#define DLOPEN(a) LoadLibrary(a)
+#define DLOPEN(a) LoadLibraryA(a)
 #define DLSYM GetProcAddress
 #define DLCLOSE FreeLibrary
 #else
