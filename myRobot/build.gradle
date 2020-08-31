@@ -1,5 +1,6 @@
 import jaci.gradle.toolchains.*
 import jaci.gradle.nativedeps.*
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'java'
@@ -12,6 +13,12 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: 'jaci.gradle.EmbeddedTools'
 
 apply from: '../shared/config.gradle'
+
+application {
+    if (OperatingSystem.current().isMacOsX()) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+    }
+}
 
 ext {
     sharedCvConfigs = [myRobotCpp: []]
