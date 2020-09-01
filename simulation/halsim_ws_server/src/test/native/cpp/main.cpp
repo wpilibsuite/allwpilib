@@ -5,6 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <hal/simulation/DIOData.h>
@@ -144,6 +145,44 @@ TEST_F(WebServerIntegrationTest, DigitalInput) {
 
   // Compare results
   bool test_value = HALSIM_GetDIOValue(PIN);
+  EXPECT_EQ(EXPECTED_VALUE, test_value);
+}
+
+TEST_F(WebServerIntegrationTest, DriverStation) {
+  // Create expected results
+  const bool EXPECTED_VALUE = true;
+
+  // Attach timer to loop for test function
+  auto ws = HALSimWeb::GetInstance();
+  auto loop = ws->GetLoop();
+  auto timer = wpi::uv::Timer::Create(loop);
+  bool done = false;
+  timer->timeout.connect([&] {
+    if (done) {
+      loop->Stop();
+    } else {
+      // Recheck in POLLING_SPEED ms
+      timer->Start(uv::Timer::Time(POLLING_SPEED));
+    }
+    if (IsConnectedClientWS()) {
+      wpi::json msg = {
+          {"type", "DriverStation"},
+          {"device", ""},
+          {"data", {{">enabled", EXPECTED_VALUE}, {">new_data", true}}}};
+      wpi::outs() << "***** Input JSON: " << msg.dump() << "\n";
+      WebServerClientTest::GetInstance()->SendMessage(msg);
+      done = true;
+    }
+  });
+  timer->Start(uv::Timer::Time(POLLING_SPEED));
+
+  HAL_RunMain();
+  timer->Unreference();
+
+  // Compare results
+  HAL_ControlWord cw;
+  HAL_GetControlWord(&cw);
+  bool test_value = cw.enabled;
   EXPECT_EQ(EXPECTED_VALUE, test_value);
 }
 
