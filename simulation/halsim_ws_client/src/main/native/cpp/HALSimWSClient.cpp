@@ -179,8 +179,10 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
 
     wpi::SmallString<64> key;
     key.append(type);
-    key.append("/");
-    key.append(device);
+    if (!device.empty()) {
+      key.append("/");
+      key.append(device);
+    }
 
     auto provider = m_providers.Get(key.str());
     if (provider) {

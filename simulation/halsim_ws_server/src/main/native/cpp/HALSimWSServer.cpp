@@ -164,14 +164,19 @@ void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
   // generate the key
 
   try {
-    std::string type = msg.at("type").get<std::string>();
-    std::string device = msg.at("device").get<std::string>();
-    auto data = msg.at("data");
+    auto& type = msg.at("type").get_ref<const std::string&>();
+    auto& device = msg.at("device").get_ref<const std::string&>();
 
-    auto key = type + "/" + device;
-    auto provider = m_providers.Get(key);
+    wpi::SmallString<64> key;
+    key.append(type);
+    if (!device.empty()) {
+      key.append("/");
+      key.append(device);
+    }
+
+    auto provider = m_providers.Get(key.str());
     if (provider) {
-      provider->OnNetValueChanged(data);
+      provider->OnNetValueChanged(msg.at("data"));
     }
   } catch (wpi::json::exception& e) {
     wpi::errs() << "Error with incoming message: " << e.what() << "\n";
