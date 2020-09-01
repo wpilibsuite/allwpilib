@@ -45,7 +45,7 @@ void HALSimWSProviderAnalogIn::Initialize(WSRegisterFunc webRegisterFunc) {
                                             webRegisterFunc);
 }
 
-HALSimWSProviderAnalogIn::~HALSimWSProviderAnalogIn() { CancelCallbacks(); }
+HALSimWSProviderAnalogIn::~HALSimWSProviderAnalogIn() { DoCancelCallbacks(); }
 
 void HALSimWSProviderAnalogIn::RegisterCallbacks() {
   m_initCbKey = REGISTER_AIN(Initialized, "<init", bool, boolean);
@@ -66,7 +66,9 @@ void HALSimWSProviderAnalogIn::RegisterCallbacks() {
       REGISTER_AIN_ACCUM(Deadband, "<accum_deadband", int32_t, int);
 }
 
-void HALSimWSProviderAnalogIn::CancelCallbacks() {
+void HALSimWSProviderAnalogIn::CancelCallbacks() { DoCancelCallbacks(); }
+
+void HALSimWSProviderAnalogIn::DoCancelCallbacks() {
   // Cancel callbacks
   HALSIM_CancelAnalogInInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelAnalogInAverageBitsCallback(m_channel, m_avgbitsCbKey);

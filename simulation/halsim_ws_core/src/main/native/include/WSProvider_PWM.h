@@ -23,6 +23,7 @@ class HALSimWSProviderPWM : public HALSimWSHalChanProvider {
  protected:
   void RegisterCallbacks() override;
   void CancelCallbacks() override;
+  void DoCancelCallbacks();
 
  private:
   int32_t m_initCbKey = 0;

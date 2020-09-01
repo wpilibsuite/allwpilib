@@ -31,7 +31,7 @@ void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
 }
 
 HALSimWSProviderDriverStation::~HALSimWSProviderDriverStation() {
-  CancelCallbacks();
+  DoCancelCallbacks();
 }
 
 void HALSimWSProviderDriverStation::RegisterCallbacks() {
@@ -81,7 +81,9 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
   m_matchTimeCbKey = REGISTER(MatchTime, "<match_time", double, double);
 }
 
-void HALSimWSProviderDriverStation::CancelCallbacks() {
+void HALSimWSProviderDriverStation::CancelCallbacks() { DoCancelCallbacks(); }
+
+void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   HALSIM_CancelDriverStationEnabledCallback(m_enabledCbKey);
   HALSIM_CancelDriverStationAutonomousCallback(m_autonomousCbKey);
   HALSIM_CancelDriverStationTestCallback(m_testCbKey);

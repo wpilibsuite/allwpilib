@@ -25,6 +25,7 @@ class HALSimWSProviderDriverStation : public HALSimWSHalProvider {
  protected:
   void RegisterCallbacks() override;
   void CancelCallbacks() override;
+  void DoCancelCallbacks();
 
  private:
   int32_t m_enabledCbKey = 0;

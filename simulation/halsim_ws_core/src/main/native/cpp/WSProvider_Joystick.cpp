@@ -17,7 +17,7 @@ void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
                                             webregisterFunc);
 }
 
-HALSimWSProviderJoystick::~HALSimWSProviderJoystick() { CancelCallbacks(); }
+HALSimWSProviderJoystick::~HALSimWSProviderJoystick() { DoCancelCallbacks(); }
 
 void HALSimWSProviderJoystick::RegisterCallbacks() {
   m_dsNewDataCbKey = HALSIM_RegisterDriverStationNewDataCallback(
@@ -62,7 +62,9 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
       this, true);
 }
 
-void HALSimWSProviderJoystick::CancelCallbacks() {
+void HALSimWSProviderJoystick::CancelCallbacks() { DoCancelCallbacks(); }
+
+void HALSimWSProviderJoystick::DoCancelCallbacks() {
   HALSIM_CancelDriverStationNewDataCallback(m_dsNewDataCbKey);
 
   m_dsNewDataCbKey = 0;
