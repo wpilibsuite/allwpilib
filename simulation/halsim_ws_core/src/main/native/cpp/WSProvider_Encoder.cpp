@@ -26,7 +26,7 @@ void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
                                            webRegisterFunc);
 }
 
-HALSimWSProviderEncoder::~HALSimWSProviderEncoder() { CancelCallbacks(); }
+HALSimWSProviderEncoder::~HALSimWSProviderEncoder() { DoCancelCallbacks(); }
 
 void HALSimWSProviderEncoder::RegisterCallbacks() {
   // Special case for initialization since we will need to send
@@ -57,7 +57,9 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
   m_samplesCbKey = REGISTER(SamplesToAverage, "<samples_to_avg", int32_t, int);
 }
 
-void HALSimWSProviderEncoder::CancelCallbacks() {
+void HALSimWSProviderEncoder::CancelCallbacks() { DoCancelCallbacks(); }
+
+void HALSimWSProviderEncoder::DoCancelCallbacks() {
   HALSIM_CancelEncoderInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelEncoderCountCallback(m_channel, m_countCbKey);
   HALSIM_CancelEncoderPeriodCallback(m_channel, m_periodCbKey);

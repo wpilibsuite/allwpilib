@@ -25,6 +25,7 @@ class HALSimWSProviderRoboRIO : public HALSimWSHalProvider {
  protected:
   void RegisterCallbacks() override;
   void CancelCallbacks() override;
+  void DoCancelCallbacks();
 
  private:
   int32_t m_fpgaCbKey = 0;

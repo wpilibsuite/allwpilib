@@ -26,7 +26,9 @@ void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
       "dPWM", HAL_GetNumDigitalPWMOutputs(), webRegisterFunc);
 }
 
-HALSimWSProviderDigitalPWM::~HALSimWSProviderDigitalPWM() { CancelCallbacks(); }
+HALSimWSProviderDigitalPWM::~HALSimWSProviderDigitalPWM() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
@@ -34,7 +36,9 @@ void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
   m_pinCbKey = REGISTER(Pin, "<dio_pin", int32_t, int);
 }
 
-void HALSimWSProviderDigitalPWM::CancelCallbacks() {
+void HALSimWSProviderDigitalPWM::CancelCallbacks() { DoCancelCallbacks(); }
+
+void HALSimWSProviderDigitalPWM::DoCancelCallbacks() {
   HALSIM_CancelDigitalPWMInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelDigitalPWMDutyCycleCallback(m_channel, m_dutyCycleCbKey);
   HALSIM_CancelDigitalPWMPinCallback(m_channel, m_pinCbKey);
