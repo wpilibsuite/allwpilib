@@ -31,8 +31,8 @@ struct HalCallbackListener {
 
   explicit operator bool() const { return callback != nullptr; }
 
-  CallbackFunction callback;
-  void* param;
+  CallbackFunction callback = nullptr;
+  void* param = nullptr;
 };
 
 }  // namespace hal
