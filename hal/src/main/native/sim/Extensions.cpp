@@ -26,6 +26,7 @@
 #define DLOPEN(a) LoadLibraryA(a)
 #define DLSYM GetProcAddress
 #define DLCLOSE FreeLibrary
+#define DLERROR "error #" << GetLastError()
 #else
 #define DELIM ':'
 #define HTYPE void*
@@ -33,6 +34,7 @@
 #define DLOPEN(a) dlopen(a, RTLD_LAZY)
 #define DLSYM dlsym
 #define DLCLOSE dlclose
+#define DLERROR dlerror()
 #endif
 
 namespace hal {
@@ -63,14 +65,16 @@ int HAL_LoadOneExtension(const char* library) {
 #else
     libraryName += ".so";
 #endif
-    wpi::outs() << "HAL Extensions: Trying modified name: "
+    wpi::outs() << "HAL Extensions: Load failed: " << DLERROR
+                << "\nTrying modified name: "
                 << wpi::sys::path::stem(libraryName) << "\n";
     wpi::outs().flush();
     handle = DLOPEN(libraryName.c_str());
   }
 #endif
   if (!handle) {
-    wpi::outs() << "HAL Extensions: Failed to load library\n";
+    wpi::outs() << "HAL Extensions: Failed to load library: " << DLERROR
+                << '\n';
     wpi::outs().flush();
     return rc;
   }
