@@ -86,7 +86,7 @@ class Button : public Trigger {
 
   /**
    * Binds a command to be started repeatedly while the button is pressed, and
-   * cancelled when it is released.  Takes a raw pointer, and so is non-owning;
+   * canceled when it is released.  Takes a raw pointer, and so is non-owning;
    * users are responsible for the lifespan of the command.
    *
    * @param command The command to bind.
@@ -97,7 +97,7 @@ class Button : public Trigger {
 
   /**
    * Binds a command to be started repeatedly while the button is pressed, and
-   * cancelled when it is released.  Transfers command ownership to the button
+   * canceled when it is released.  Transfers command ownership to the button
    * scheduler, so the user does not have to worry about lifespan - rvalue refs
    * will be *moved*, lvalue refs will be *copied.*
    *
@@ -131,7 +131,7 @@ class Button : public Trigger {
                    wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
-   * Binds a command to be started when the button is pressed, and cancelled
+   * Binds a command to be started when the button is pressed, and canceled
    * when it is released.  Takes a raw pointer, and so is non-owning; users are
    * responsible for the lifespan of the command.
    *
@@ -142,7 +142,7 @@ class Button : public Trigger {
   Button WhenHeld(Command* command, bool interruptible = true);
 
   /**
-   * Binds a command to be started when the button is pressed, and cancelled
+   * Binds a command to be started when the button is pressed, and canceled
    * when it is released.  Transfers command ownership to the button scheduler,
    * so the user does not have to worry about lifespan - rvalue refs will be
    * *moved*, lvalue refs will be *copied.*
@@ -205,7 +205,7 @@ class Button : public Trigger {
                       wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
-   * Binds a command to start when the button is pressed, and be cancelled when
+   * Binds a command to start when the button is pressed, and be canceled when
    * it is pressed again.  Takes a raw pointer, and so is non-owning; users are
    * responsible for the lifespan of the command.
    *
@@ -216,7 +216,7 @@ class Button : public Trigger {
   Button ToggleWhenPressed(Command* command, bool interruptible = true);
 
   /**
-   * Binds a command to start when the button is pressed, and be cancelled when
+   * Binds a command to start when the button is pressed, and be canceled when
    * it is pessed again.  Transfers command ownership to the button scheduler,
    * so the user does not have to worry about lifespan - rvalue refs will be
    * *moved*, lvalue refs will be *copied.*
@@ -233,7 +233,7 @@ class Button : public Trigger {
   }
 
   /**
-   * Binds a command to be cancelled when the button is pressed.  Takes a
+   * Binds a command to be canceled when the button is pressed.  Takes a
    * raw pointer, and so is non-owning; users are responsible for the lifespan
    *  and scheduling of the command.
    *

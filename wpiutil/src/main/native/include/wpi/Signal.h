@@ -815,7 +815,7 @@ using Signal = SignalBase<detail::NullMutex, T...>;
  *
  * Beware of accidentally using recursive signal emission or cycles between
  * two or more signals in your code. Locking std::mutex more than once is
- * undefined behaviour, even if it "seems to work somehow". Use signal_r
+ * undefined behavior, even if it "seems to work somehow". Use signal_r
  * instead for that use case.
  */
 template <typename... T>

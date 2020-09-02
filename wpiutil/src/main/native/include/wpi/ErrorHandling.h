@@ -46,7 +46,7 @@ class StringRef;
   void install_fatal_error_handler(fatal_error_handler_t handler,
                                    void *user_data = nullptr);
 
-  /// Restores default error handling behaviour.
+  /// Restores default error handling behavior.
   void remove_fatal_error_handler();
 
   /// ScopedFatalErrorHandler - This is a simple helper class which just
