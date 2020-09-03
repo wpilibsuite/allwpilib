@@ -31,57 +31,31 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
    * the simulation and write simulated outputs to sensors.
    *
-   * @param armSystem          The arm system being controlled.
-   * @param motor              DCMotor representing the motor driving the arm.
-   * @param G                  The gear ratio of the arm (numbers greater than 1
-   *                           represent reductions).
-   * @param armMassKg          The mass of the arm.
-   * @param armLengthMeters    The distance from the pivot of the arm to its center of mass.
-   *                           This number is not the same as the overall length of the arm.
-   * @param minAngleRads       The min angle the arm can reach, with 0 being measured from
-   *                           horizontal. The simulation will not allow motion past this.
-   * @param maxAngleRads       The max angle the arm can reach, with 0 being measured from
-   *                           horizontal. The simulation will not allow motion past this.
-   * @param measurementStdDevs Standard deviations of measurements. Can be null.
+   * @param armSystem            The arm system being controlled.
+   * @param motor                DCMotor representing the motor driving the arm.
+   * @param G                    The gear ratio of the arm (numbers greater than 1
+   *                             represent reductions).
+   * @param armMassKg            The mass of the arm.
+   * @param armLengthMeters      The distance from the pivot of the arm to its center of mass.
+   *                             This number is not the same as the overall length of the arm.
+   * @param minAngleRads         The min angle the arm can reach, with 0 being measured from
+   *                             horizontal. The simulation will not allow motion past this.
+   * @param maxAngleRads         The max angle the arm can reach, with 0 being measured from
+   *                             horizontal. The simulation will not allow motion past this.
+   * @param posMeasurementStdDev Standard deviations of noise in the arm's position measurement.
    */
   public SingleJointedArmSim(LinearSystem<N2, N1, N1> armSystem,
                              DCMotor motor, double G,
                              double armMassKg,
                              double armLengthMeters, double minAngleRads, double maxAngleRads,
-                             Matrix<N1, N1> measurementStdDevs) {
-    super(armSystem, measurementStdDevs);
+                             double posMeasurementStdDev) {
+    super(armSystem, VecBuilder.fill(posMeasurementStdDev));
     this.m_armMass = armMassKg;
     this.m_r = armLengthMeters;
     this.m_minAngleRads = minAngleRads;
     this.m_maxAngleRads = maxAngleRads;
     this.m_motor = motor;
     this.m_gearing = G;
-  }
-
-  /**
-   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
-   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
-   * the simulation and write simulated outputs to sensors.
-   *
-   * @param motor              DCMotor representing the motor driving the arm.
-   * @param G                  The gear ratio of the arm (numbers greater than 1
-   *                           represent reductions).
-   * @param armMassKg          The mass of the arm.
-   * @param armLengthMeters    The distance from the pivot of the arm to its center of mass.
-   * @param minAngleRads       The min angle the arm can reach, with 0 being measured from
-   *                           horizontal. The simulation will not allow motion past this.
-   * @param maxAngleRads       The max angle the arm can reach, with 0 being measured from
-   *                           horizontal. The simulation will not allow motion past this.
-   * @param measurementStdDevs Standard deviations of measurements. Can be null.
-   */
-  public SingleJointedArmSim(DCMotor motor, double jKgSquaredMeters,
-                             double G, double armMassKg, double armLengthMeters,
-                             double minAngleRads, double maxAngleRads,
-                             Matrix<N1, N1> measurementStdDevs) {
-    this(LinearSystemId.createSingleJointedArmSystem(motor, jKgSquaredMeters, G),
-        motor, G,
-        armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
-        measurementStdDevs);
   }
 
   /**
@@ -98,17 +72,43 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    *                             horizontal. The simulation will not allow motion past this.
    * @param maxAngleRads         The max angle the arm can reach, with 0 being measured from
    *                             horizontal. The simulation will not allow motion past this.
-   * @param m_measurementStdDevs Standard deviations of measurements. Can be null.
+   * @param posMeasurementStdDev Standard deviations of noise in the arm's position measurement.
+   */
+  public SingleJointedArmSim(DCMotor motor, double jKgSquaredMeters,
+                             double G, double armMassKg, double armLengthMeters,
+                             double minAngleRads, double maxAngleRads,
+                             double posMeasurementStdDev) {
+    this(LinearSystemId.createSingleJointedArmSystem(motor, jKgSquaredMeters, G),
+        motor, G,
+        armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
+        posMeasurementStdDev);
+  }
+
+  /**
+   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
+   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
+   * the simulation and write simulated outputs to sensors.
+   *
+   * @param motor                      DCMotor representing the motor driving the arm.
+   * @param G                          The gear ratio of the arm (numbers greater than 1
+   *                                   represent reductions).
+   * @param armMassKg                  The mass of the arm.
+   * @param armLengthMeters            The distance from the pivot of the arm to its center of mass.
+   * @param minAngleRads               The min angle the arm can reach, with 0 being measured from
+   *                                   horizontal. The simulation will not allow motion past this.
+   * @param maxAngleRads               The max angle the arm can reach, with 0 being measured from
+   *                                   horizontal. The simulation will not allow motion past this.
+   * @param positionMeasurementStdDevs Standard deviations of noise in the arm's position measurement.
    */
   public SingleJointedArmSim(DCMotor motor,
                              double G, double armMassKg, double armLengthMeters,
                              double minAngleRads, double maxAngleRads,
-                             Matrix<N1, N1> m_measurementStdDevs) {
+                             double positionMeasurementStdDevs) {
     this(LinearSystemId.createSingleJointedArmSystem(motor,
         1.0 / 3.0 * armMassKg * armLengthMeters * armLengthMeters, G),
         motor, G,
         armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
-        m_measurementStdDevs);
+        positionMeasurementStdDevs);
   }
 
   public boolean hasHitLowerLimit(Matrix<N2, N1> x) {

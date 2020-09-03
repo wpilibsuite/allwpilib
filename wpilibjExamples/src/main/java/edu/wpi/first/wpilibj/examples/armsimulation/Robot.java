@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.VecBuilder;
 
 /**
  * This is a sample program to demonstrate the use of elevator simulation with existing code.
@@ -47,13 +46,18 @@ public class Robot extends TimedRobot {
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
+  private static final double m_armReduction = 100;
+  private static final double m_armMass = 5.0; // Kilograms
+  private static final double m_armLength = Units.inchesToMeters(30);
+  // This arm sim represents an arm that can travel from -180 degrees (rotated straight backwards)
+  // to 0 degrees (rotated straight forwards).
   private final SingleJointedArmSim m_armSim = new SingleJointedArmSim(m_armGearbox,
-      100.0,
-      5,
+      m_armReduction,
+      m_armMass,
+      m_armLength,
       Units.degreesToRadians(-180),
       Units.degreesToRadians(0),
-      Units.inchesToMeters(30),
-      VecBuilder.fill(Units.degreesToRadians(0.5))
+      Units.degreesToRadians(0.5) // Add noise with a standard deviation of 0.5 degrees
       );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 

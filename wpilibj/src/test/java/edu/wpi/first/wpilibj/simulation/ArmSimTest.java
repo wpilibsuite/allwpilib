@@ -21,8 +21,7 @@ public class ArmSimTest {
       10 / 2.2,
       Units.inchesToMeters(19.0 / 2.0),
       -Math.PI,
-      0.0, VecBuilder.fill(0.0)
-  );
+      0.0, 0.0);
 
   @Test
   public void testArmDisabled() {

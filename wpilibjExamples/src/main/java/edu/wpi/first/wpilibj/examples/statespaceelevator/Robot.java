@@ -50,11 +50,14 @@ public class Robot extends TimedRobot {
         Units.feetToMeters(3.0), Units.feetToMeters(6.0)); // Max elevator speed and acceleration.
   private TrapezoidProfile.State m_lastProfiledReference = new TrapezoidProfile.State();
 
-  // The plant holds a state-space model of our elevator. This system has the following properties:
-  //
-  // States: [position, velocity], in meters and meters per second.
-  // Inputs (what we can "put in"): [voltage], in volts.
-  // Outputs (what we can measure): [position], in meters.
+  /* The plant holds a state-space model of our elevator. This system has the following properties:
+
+  States: [position, velocity], in meters and meters per second.
+  Inputs (what we can "put in"): [voltage], in volts.
+  Outputs (what we can measure): [position], in meters.
+
+  This elevator is driven by two NEO motors.
+   */
   private final LinearSystem<N2, N1, N1> m_elevatorPlant = LinearSystemId.createElevatorSystem(
         DCMotor.getNEO(2),
         kCarriageMass,
