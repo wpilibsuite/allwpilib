@@ -61,28 +61,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
         Vector<Inputs> relms,
         double dtSeconds
   ) {
-    this(plant.getA(), plant.getB(), qelms, 1.0, relms, dtSeconds);
-  }
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param plant     The plant being controlled.
-   * @param qelms     The maximum desired error tolerance for each state.
-   * @param rho       A weighting factor that balances control effort and state excursion.
-   *                  Greater values penalize state excursion more heavily. 1 is a good starting
-   *                  value.
-   * @param relms     The maximum desired control effort for each input.
-   * @param dtSeconds Discretization timestep.
-   */
-  public LinearQuadraticRegulator(
-        LinearSystem<States, Inputs, Outputs> plant,
-        Vector<States> qelms,
-        double rho,
-        Vector<Inputs> relms,
-        double dtSeconds
-  ) {
-    this(plant.getA(), plant.getB(), qelms, rho, relms, dtSeconds);
+    this(plant.getA(), plant.getB(), qelms, relms, dtSeconds);
   }
 
   /**
@@ -99,27 +78,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
                                   Vector<States> qelms, Vector<Inputs> relms,
                                   double dtSeconds
   ) {
-    this(A, B, qelms, 1.0, relms, dtSeconds);
-  }
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param A         Continuous system matrix of the plant being controlled.
-   * @param B         Continuous input matrix of the plant being controlled.
-   * @param qelms     The maximum desired error tolerance for each state.
-   * @param rho       A weighting factor that balances control effort and state excursion.
-   *                  Greater
-   *                  values penalize state excursion more heavily. 1 is a good starting value.
-   * @param relms     The maximum desired control effort for each input.
-   * @param dtSeconds Discretization timestep.
-   */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public LinearQuadraticRegulator(Matrix<States, States> A, Matrix<States, Inputs> B,
-                                  Vector<States> qelms, double rho, Vector<Inputs> relms,
-                                  double dtSeconds
-  ) {
-    this(A, B, StateSpaceUtil.makeCostMatrix(qelms).times(rho),
+    this(A, B, StateSpaceUtil.makeCostMatrix(qelms),
         StateSpaceUtil.makeCostMatrix(relms), dtSeconds);
   }
 

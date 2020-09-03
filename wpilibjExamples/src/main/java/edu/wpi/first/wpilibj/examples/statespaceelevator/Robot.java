@@ -80,10 +80,6 @@ public class Robot extends TimedRobot {
         // heavily penalize state excursion, or make the controller behave more aggressively. In
         // this example we weight position much more highly than velocity, but this can be
         // tuned to balance the two.
-        1.0, // rho balances Q and R, or velocity and voltage weights. Increasing this
-        // will penalize state excursion more heavily, while decreasing this will penalize control
-        // effort more heavily. Useful for balancing weights for systems with more states such
-        // as drivetrains.
         VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
         // heavily penalize control effort, or make the controller less aggressive. 12 is a good
         // starting point because that is the (approximate) maximum voltage of a battery.
