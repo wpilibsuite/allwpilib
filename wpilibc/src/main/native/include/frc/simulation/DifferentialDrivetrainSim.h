@@ -73,6 +73,9 @@ class DifferentialDrivetrainSim {
    */
   double GetState(int state) const;
 
+  /**
+   * Get the current gearing reduction of the drivetrain, as output over input.
+   */
   double GetGearing() const;
 
   /**

@@ -152,6 +152,9 @@ public class DifferentialDrivetrainSim {
     return loadIleft + loadIright;
   }
 
+  /**
+   * Get the current gearing reduction of the drivetrain, as output over input.
+   */
   public double getGearing() {
     return m_currentGearing;
   }
