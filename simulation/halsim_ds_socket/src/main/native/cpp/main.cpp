@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,6 @@
 #include <sys/types.h>
 
 #include <cstring>
-#include <iostream>
 
 #include <DSCommPacket.h>
 #include <wpi/EventLoopRunner.h>
@@ -172,13 +171,12 @@ __declspec(dllexport)
   static bool once = false;
 
   if (once) {
-    std::cerr << "Error: cannot invoke HALSIM_InitExtension twice."
-              << std::endl;
+    wpi::errs() << "Error: cannot invoke HALSIM_InitExtension twice.\n";
     return -1;
   }
   once = true;
 
-  std::cout << "DriverStationSocket Initializing." << std::endl;
+  wpi::outs() << "DriverStationSocket Initializing.\n";
 
   singleByte = std::make_unique<Buffer>("0");
 
@@ -186,7 +184,7 @@ __declspec(dllexport)
 
   eventLoopRunner->ExecAsync(SetupEventLoop);
 
-  std::cout << "DriverStationSocket Initialized!" << std::endl;
+  wpi::outs() << "DriverStationSocket Initialized!\n";
   return 0;
 }
 }  // extern "C"
