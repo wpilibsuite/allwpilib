@@ -7,6 +7,7 @@
 
 #include "DriverStationGui.h"
 
+#include <atomic>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -102,6 +103,11 @@ static RobotJoystick gRobotJoysticks[HAL_kMaxJoysticks];
 static std::unique_ptr<JoystickSource> gJoystickSources[HAL_kMaxJoysticks];
 
 static bool gDisableDS = false;
+static std::atomic<bool>* gDSSocketConnected = nullptr;
+
+static inline bool IsDSDisabled() {
+  return gDisableDS || (gDSSocketConnected && *gDSSocketConnected);
+}
 
 JoystickSource::JoystickSource(int index) : m_index{index} {
   HAL_JoystickAxes halAxes;
@@ -396,13 +402,15 @@ static void DriverStationExecute() {
   }
 
   static bool prevDisableDS = false;
-  if (gDisableDS && !prevDisableDS) {
+
+  bool disableDS = IsDSDisabled();
+  if (disableDS && !prevDisableDS) {
     HALSimGui::SetWindowVisibility("System Joysticks", HALSimGui::kDisabled);
-  } else if (!gDisableDS && prevDisableDS) {
+  } else if (!disableDS && prevDisableDS) {
     HALSimGui::SetWindowVisibility("System Joysticks", HALSimGui::kShow);
   }
-  prevDisableDS = gDisableDS;
-  if (gDisableDS) return;
+  prevDisableDS = disableDS;
+  if (disableDS) return;
 
   double curTime = glfwGetTime();
 
@@ -464,7 +472,7 @@ static void DisplayFMS() {
   HAL_MatchInfo matchInfo;
   HALSIM_GetMatchInfo(&matchInfo);
 
-  if (gDisableDS) {
+  if (IsDSDisabled()) {
     if (!HALSIM_GetDriverStationEnabled())
       ImGui::Text("Robot State: Disabled");
     else if (HALSIM_GetDriverStationTest())
@@ -559,6 +567,7 @@ static void DisplaySystemJoysticks() {
 }
 
 static void DisplayJoysticks() {
+  bool disableDS = IsDSDisabled();
   // imgui doesn't size columns properly with autoresize, so force it
   ImGui::Dummy(ImVec2(ImGui::GetFontSize() * 10 * HAL_kMaxJoysticks, 0));
 
@@ -567,7 +576,7 @@ static void DisplayJoysticks() {
     auto& joy = gRobotJoysticks[i];
     char label[128];
     joy.name.GetLabel(label, sizeof(label), "Joystick", i);
-    if (!gDisableDS && joy.sys) {
+    if (!disableDS && joy.sys) {
       ImGui::Selectable(label, false);
       if (ImGui::BeginDragDropSource()) {
         ImGui::SetDragDropPayload("Joystick", &joy.sys, sizeof(joy.sys));
@@ -578,7 +587,7 @@ static void DisplayJoysticks() {
     } else {
       ImGui::Selectable(label, false, ImGuiSelectableFlags_Disabled);
     }
-    if (!gDisableDS && ImGui::BeginDragDropTarget()) {
+    if (!disableDS && ImGui::BeginDragDropTarget()) {
       if (const ImGuiPayload* payload =
               ImGui::AcceptDragDropPayload("Joystick")) {
         IM_ASSERT(payload->DataSize == sizeof(SystemJoystick*));
@@ -603,12 +612,12 @@ static void DisplayJoysticks() {
     auto& joy = gRobotJoysticks[i];
     auto source = gJoystickSources[i].get();
 
-    if (gDisableDS) joy.GetHAL(i);
+    if (disableDS) joy.GetHAL(i);
 
-    if ((gDisableDS && joy.desc.type != 0) || (joy.sys && joy.sys->present)) {
+    if ((disableDS && joy.desc.type != 0) || (joy.sys && joy.sys->present)) {
       // update GUI display
       ImGui::PushID(i);
-      if (gDisableDS) {
+      if (disableDS) {
         ImGui::Text("%s", joy.desc.name);
         ImGui::Text("Gamepad: %s", joy.desc.isXbox ? "Yes" : "No");
       } else {
@@ -662,7 +671,11 @@ static void DisplayJoysticks() {
 }
 
 static void DriverStationOptionMenu() {
-  ImGui::MenuItem("Turn off DS", nullptr, &gDisableDS);
+  if (gDSSocketConnected && *gDSSocketConnected) {
+    ImGui::MenuItem("Turn off DS (real DS connected)", nullptr, true, false);
+  } else {
+    ImGui::MenuItem("Turn off DS", nullptr, &gDisableDS);
+  }
 }
 
 void DriverStationGui::Initialize() {
@@ -694,4 +707,8 @@ void DriverStationGui::Initialize() {
   HALSimGui::SetDefaultWindowPos("FMS", 5, 540);
   HALSimGui::SetDefaultWindowPos("System Joysticks", 5, 385);
   HALSimGui::SetDefaultWindowPos("Joysticks", 250, 465);
+}
+
+void DriverStationGui::SetDSSocketExtension(void* data) {
+  gDSSocketConnected = static_cast<std::atomic<bool>*>(data);
 }
