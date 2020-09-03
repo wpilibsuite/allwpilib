@@ -67,10 +67,6 @@ public class LinearPlantInversionFeedforward<States extends Num, Inputs extends 
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public LinearPlantInversionFeedforward(Matrix<States, States> A, Matrix<States, Inputs> B,
                                          double dtSeconds) {
-    var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
-    this.m_A = discABPair.getFirst();
-    this.m_B = discABPair.getSecond();
-
     m_r = new Matrix<States, N1>(new SimpleMatrix(B.getNumRows(), 1));
     m_uff = new Matrix<Inputs, N1>(new SimpleMatrix(B.getNumCols(), 1));
 
