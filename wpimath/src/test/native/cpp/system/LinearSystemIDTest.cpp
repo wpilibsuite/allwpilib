@@ -70,8 +70,6 @@ TEST(LinearSystemIDTest, IdentifyVelocitySystem) {
   double ka = 0.5;
   auto model = frc::LinearSystemId::IdentifyVelocitySystem(kv, ka);
 
-  std::cout << model.A() << std::endl << model.B() << std::endl;
-
   ASSERT_TRUE(model.A().isApprox(frc::MakeMatrix<1, 1>(-kv / ka), 0.001));
   ASSERT_TRUE(model.B().isApprox(frc::MakeMatrix<1, 1>(1.0 / ka), 0.001));
 }
