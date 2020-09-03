@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -83,7 +83,7 @@ class CallbackThread : public wpi::SafeThread {
     wpi::mutex poll_mutex;
     wpi::condition_variable poll_cond;
     bool terminating = false;
-    bool cancelling = false;
+    bool canceling = false;
   };
   wpi::UidVector<std::shared_ptr<Poller>, 64> m_pollers;
 
@@ -247,10 +247,10 @@ class CallbackManager {
     *timed_out = false;
     while (poller->poll_queue.empty()) {
       if (poller->terminating) return infos;
-      if (poller->cancelling) {
+      if (poller->canceling) {
         // Note: this only works if there's a single thread calling this
         // function for any particular poller, but that's the intended use.
-        poller->cancelling = false;
+        poller->canceling = false;
         return infos;
       }
       if (timeout == 0) {
@@ -287,7 +287,7 @@ class CallbackManager {
 
     {
       std::scoped_lock lock(poller->poll_mutex);
-      poller->cancelling = true;
+      poller->canceling = true;
     }
     poller->poll_cond.notify_one();
   }

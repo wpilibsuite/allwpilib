@@ -171,8 +171,8 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
     // Cancel commands whose cancel buttons were pressed on the SmartDashboard
     if (!toCancel.empty()) {
       for (auto& command : m_impl->commands) {
-        for (const auto& cancelled : toCancel) {
-          if (command->GetID() == cancelled) {
+        for (const auto& canceled : toCancel) {
+          if (command->GetID() == canceled) {
             command->Cancel();
           }
         }

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -330,7 +330,7 @@ public abstract class Command implements Sendable, AutoCloseable {
    * method for time-sensitive commands.
    *
    * <p>Returning false will result in the command never ending automatically. It may still be
-   * cancelled manually or interrupted by another command. Returning true will result in the
+   * canceled manually or interrupted by another command. Returning true will result in the
    * command executing once and finishing immediately. We recommend using {@link InstantCommand}
    * for this.
    *
@@ -447,7 +447,7 @@ public abstract class Command implements Sendable, AutoCloseable {
 
   /**
    * Clears list of subsystem requirements. This is only used by
-   * {@link ConditionalCommand} so cancelling the chosen command works properly
+   * {@link ConditionalCommand} so canceling the chosen command works properly
    * in {@link CommandGroup}.
    */
   protected void clearRequirements() {
