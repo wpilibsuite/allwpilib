@@ -42,8 +42,9 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class DifferentialDrivetrainSim {
   private final DCMotor m_motor;
-  private final double m_gearing;
-  private double m_wheelRadiusMeters;
+  private final double m_originalGearing;
+  private double m_currentGearing;
+  private final double m_wheelRadiusMeters;
   @SuppressWarnings("MemberName")
   private Matrix<N2, N1> m_u;
   @SuppressWarnings("MemberName")
@@ -62,6 +63,8 @@ public class DifferentialDrivetrainSim {
    *                          differential drivetrain's kinematics.
    * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
    * @param gearingRatio      The gearingRatio ratio of the left side, as output over input.
+   *                          This must be the same ratio as the ratio used to identify or create
+   *                          the drivetrainPlant.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
    */
   public DifferentialDrivetrainSim(LinearSystem<N2, N2, N2> drivetrainPlant,
@@ -71,9 +74,10 @@ public class DifferentialDrivetrainSim {
     this.m_plant = drivetrainPlant;
     this.m_rb = kinematics.trackWidthMeters / 2.0;
     this.m_motor = driveMotor;
-    this.m_gearing = gearingRatio;
+    this.m_originalGearing = gearingRatio;
     m_wheelRadiusMeters = wheelRadiusMeters;
 
+    m_currentGearing = this.m_originalGearing;
     m_x = new Matrix<>(new SimpleMatrix(10, 1));
   }
 
@@ -138,23 +142,43 @@ public class DifferentialDrivetrainSim {
 
   public double getCurrentDrawAmps() {
     var loadIleft = m_motor.getCurrent(
-        getState(State.kLeftVelocity) * m_gearing / m_wheelRadiusMeters,
+        getState(State.kLeftVelocity) * m_originalGearing / m_wheelRadiusMeters,
         m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
 
     var loadIright = m_motor.getCurrent(
-        getState(State.kRightVelocity) * m_gearing / m_wheelRadiusMeters,
+        getState(State.kRightVelocity) * m_originalGearing / m_wheelRadiusMeters,
         m_u.get(1, 0)) * Math.signum(m_u.get(1, 0));
 
     return loadIleft + loadIright;
   }
 
+  public double getCurrentGearing() {
+    return m_currentGearing;
+  }
+
+  /**
+   * Set the gearing reduction on the drivetrain. This is commonly used for
+   * shifting drivetrains.
+   *
+   * @param newGearRatio The new gear ratio, as output over input.
+   */
+  public void setCurrentGearing(double newGearRatio) {
+    this.m_currentGearing = newGearRatio;
+  }
+
   @SuppressWarnings({"DuplicatedCode", "LocalVariableName"})
   protected Matrix<N10, N1> getDynamics(Matrix<N10, N1> x, Matrix<N2, N1> u) {
-    var B = new Matrix<>(Nat.N4(), Nat.N2());
-    B.assignBlock(0, 0, m_plant.getB());
 
+    // Because G can be factored out of B, we can divide by the old ratio and multiply
+    // by the new ratio to get a new drivetrain model.
+    var B = new Matrix<>(Nat.N4(), Nat.N2());
+    B.assignBlock(0, 0, m_plant.getB().times(this.m_currentGearing / this.m_originalGearing));
+
+    // Because G^2 can be factored out of A, we can divide by the old ratio squared and multiply
+    // by the new ratio squared to get a new drivetrain model.
     var A = new Matrix<>(Nat.N4(), Nat.N7());
-    A.assignBlock(0, 0, m_plant.getA());
+    A.assignBlock(0, 0, m_plant.getA().times((this.m_currentGearing * this.m_currentGearing)
+        / (this.m_originalGearing * this.m_originalGearing)));
 
     A.assignBlock(2, 0, Matrix.eye(Nat.N2()));
     A.assignBlock(0, 4, B);

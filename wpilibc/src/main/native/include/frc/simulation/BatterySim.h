@@ -52,5 +52,4 @@ class BatterySim {
   }
 };
 
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

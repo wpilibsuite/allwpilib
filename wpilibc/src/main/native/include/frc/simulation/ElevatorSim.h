@@ -62,21 +62,21 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
 
   /**
    * Returns the position of the elevator.
-   * 
+   *
    * @return The position of the elevator.
    */
   units::meter_t GetElevatorPosition() const;
 
   /**
    * Returns the velocity of the elevator.
-   * 
+   *
    * @return The velocity of the elevator.
    */
   units::meters_per_second_t GetElevatorVelocity() const;
 
   /**
    * Returns the elevator current draw.
-   * 
+   *
    * @return The elevator current draw.
    */
   units::ampere_t GetCurrentDraw() const override;
@@ -100,5 +100,4 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
   units::meter_t m_maxHeight;
   double m_gearing;
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

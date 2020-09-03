@@ -93,11 +93,5 @@ class Drivetrain {
   frc::LinearSystem<2, 2, 2> m_drivetrainSystem =
       frc::LinearSystemId::IdentifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      m_drivetrainSystem,
-      m_kinematics,
-      frc::DCMotor::CIM(2),
-      8,
-      frc::DCMotor::CIM(2),
-      8,
-      2_in};
+      m_drivetrainSystem, m_kinematics, frc::DCMotor::CIM(2), 8, 2_in};
 };

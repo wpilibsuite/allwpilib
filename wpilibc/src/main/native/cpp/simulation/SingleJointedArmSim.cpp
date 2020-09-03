@@ -79,7 +79,8 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
   // alpha = m * g * r / I
   // Finally, multiply RHS by cos(theta) to account for the arm angle
   // This acceleration is added to the linear system dynamics x-dot = Ax + Bu
-  // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I * cos(theta)]]
+  // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
+  // std::cos(theta)]]
 
   auto updatedXhat = RungeKutta(
       [&](const auto& x, const auto& u) -> Eigen::Matrix<double, 2, 1> {

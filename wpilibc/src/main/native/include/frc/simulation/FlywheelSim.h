@@ -54,14 +54,14 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
 
   /**
    * Returns the flywheel velocity.
-   * 
+   *
    * @return The flywheel velocity.
    */
   units::radians_per_second_t GetAngularVelocity() const;
 
   /**
    * Returns the flywheel current draw.
-   * 
+   *
    * @return The flywheel current draw.
    */
   units::ampere_t GetCurrentDraw() const override;
@@ -70,5 +70,4 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   DCMotor m_motor;
   double m_gearing;
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim
