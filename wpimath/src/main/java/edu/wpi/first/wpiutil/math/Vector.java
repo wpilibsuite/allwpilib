@@ -52,4 +52,19 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
   public Vector(Matrix<R, N1> other) {
     super(other);
   }
+
+  @Override
+  public Vector<R> times(double value) {
+    return new Vector<>(this.m_storage.scale(value));
+  }
+
+  @Override
+  public Vector<R> div(int value) {
+    return new Vector<>(this.m_storage.divide(value));
+  }
+
+  @Override
+  public Vector<R> div(double value) {
+    return new Vector<>(this.m_storage.divide(value));
+  }
 }
