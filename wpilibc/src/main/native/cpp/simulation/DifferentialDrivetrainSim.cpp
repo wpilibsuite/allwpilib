@@ -47,7 +47,7 @@ double DifferentialDrivetrainSim::GetGearing() const {
   return m_currentGearing;
 }
 
-Eigen::Matrix<double, 10, 1> DifferentialDrivetrainSim::GetState() const {
+Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::GetState() const {
   return m_x;
 }
 
@@ -78,8 +78,8 @@ units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
   return loadIleft + loadIRight;
 }
 
-Eigen::Matrix<double, 10, 1> DifferentialDrivetrainSim::Dynamics(
-    const Eigen::Matrix<double, 10, 1>& x,
+Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::Dynamics(
+    const Eigen::Matrix<double, 7, 1>& x,
     const Eigen::Matrix<double, 2, 1>& u) {
   // Because G^2 can be factored out of A, we can divide by the old ratio
   // squared and multiply by the new ratio squared to get a new drivetrain
@@ -101,13 +101,12 @@ Eigen::Matrix<double, 10, 1> DifferentialDrivetrainSim::Dynamics(
 
   double v = (x(State::kLeftVelocity) + x(State::kRightVelocity)) / 2.0;
 
-  Eigen::Matrix<double, 10, 1> result;
-  result(0) = v * std::cos(x(State::kHeading));
-  result(1) = v * std::sin(x(State::kHeading));
-  result(2) =
+  Eigen::Matrix<double, 7, 1> xdot;
+  xdot(0) = v * std::cos(x(State::kHeading));
+  xdot(1) = v * std::sin(x(State::kHeading));
+  xdot(2) =
       ((x(State::kRightVelocity) - x(State::kLeftVelocity)) / (2.0 * m_rb))
           .to<double>();
-  result.block<4, 1>(3, 0) = A * x.block<7, 1>(3, 0) + B * u;
-  result.block<3, 1>(7, 0).setZero();
-  return result;
+  xdot.block<4, 1>(3, 0) = A * x.block<7, 1>(3, 0) + B * u;
+  return xdot;
 }

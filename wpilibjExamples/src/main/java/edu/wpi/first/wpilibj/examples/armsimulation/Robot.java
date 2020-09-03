@@ -30,12 +30,14 @@ public class Robot extends TimedRobot {
   private static final int kEncoderBChannel = 1;
   private static final int kJoystickPort = 0;
 
+  // The P gain for the PID controller that drives this arm.
   private static final double kArmKp = 5.0;
 
   // distance per pulse = (angle per revolution) / (pulses per revolution)
   //  = (2 * PI rads) / (4096 pulses)
   private static final double kArmEncoderDistPerPulse = 2.0 * Math.PI / 4096;
 
+  // The arm gearbox represents a gerbox containing two Vex 775pro motors.
   private final DCMotor m_armGearbox = DCMotor.getVex775Pro(2);
 
   // Standard classes for controlling our elevator

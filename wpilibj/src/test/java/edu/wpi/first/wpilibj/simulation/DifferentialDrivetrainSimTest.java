@@ -24,7 +24,8 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N10;
+import edu.wpi.first.wpiutil.math.numbers.N7;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -53,7 +54,7 @@ class DifferentialDrivetrainSimTest {
     feedforward.reset(VecBuilder.fill(0, 0));
 
     // ground truth
-    Matrix<N10, N1> groundTruthX = new Vector<>(Nat.N10());
+    Matrix<N7, N1> groundTruthX = new Vector<>(Nat.N7());
 
     var traj = TrajectoryGenerator.generateTrajectory(
         new Pose2d(),

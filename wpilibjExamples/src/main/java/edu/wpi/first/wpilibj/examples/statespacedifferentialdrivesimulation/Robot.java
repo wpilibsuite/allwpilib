@@ -37,8 +37,8 @@ public class Robot extends TimedRobot {
     // As our robot draws more power from the battery its voltage drops.
     // The estimated voltage is highly dependent on the battery's internal
     // resistance.
-    var drawCurrent = m_robotContainer.getRobotDrive().getDrawnCurrentAmps();
-    var loadedVoltage = BatterySim.calculateLoadedBatteryVoltage(drawCurrent);
+    double drawCurrent = m_robotContainer.getRobotDrive().getDrawnCurrentAmps();
+    double loadedVoltage = BatterySim.calculateLoadedBatteryVoltage(drawCurrent);
     RoboRioSim.setVInVoltage(loadedVoltage);
   }
 

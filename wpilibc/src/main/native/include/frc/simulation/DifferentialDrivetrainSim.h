@@ -81,7 +81,7 @@ class DifferentialDrivetrainSim {
   /**
    * Returns the current state vector x.
    */
-  Eigen::Matrix<double, 10, 1> GetState() const;
+  Eigen::Matrix<double, 7, 1> GetState() const;
 
   /**
    * Get the estimated direction the robot is pointing. Note that this angle is
@@ -99,8 +99,8 @@ class DifferentialDrivetrainSim {
    */
   units::ampere_t GetCurrentDraw() const;
 
-  Eigen::Matrix<double, 10, 1> Dynamics(const Eigen::Matrix<double, 10, 1>& x,
-                                        const Eigen::Matrix<double, 2, 1>& u);
+  Eigen::Matrix<double, 7, 1> Dynamics(const Eigen::Matrix<double, 7, 1>& x,
+                                       const Eigen::Matrix<double, 2, 1>& u);
 
   class State {
    public:
@@ -111,9 +111,6 @@ class DifferentialDrivetrainSim {
     static constexpr int kRightVelocity = 4;
     static constexpr int kLeftPosition = 5;
     static constexpr int kRightPosition = 6;
-    static constexpr int kLeftVoltageError = 7;
-    static constexpr int kRightVoltageError = 8;
-    static constexpr int kAngularVelocityError = 9;
   };
 
  private:
@@ -126,7 +123,7 @@ class DifferentialDrivetrainSim {
   double m_originalGearing;
   double m_currentGearing;
 
-  Eigen::Matrix<double, 10, 1> m_x;
+  Eigen::Matrix<double, 7, 1> m_x;
   Eigen::Matrix<double, 2, 1> m_u;
 };
 }  // namespace frc::sim

@@ -32,7 +32,8 @@ class Robot : public frc::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
   static constexpr int kJoystickPort = 0;
 
-  static constexpr double kElevatorKp = 5.0;
+  // The P gain for the PID controller that drives this arm.
+  static constexpr double kArmKp = 5.0;
 
   static constexpr units::meter_t kMinElevatorHeight = 0_in;
   static constexpr units::meter_t kMaxElevatorHeight = 50_in;
@@ -42,10 +43,11 @@ class Robot : public frc::TimedRobot {
   static constexpr double kArmEncoderDistPerPulse =
       2.0 * wpi::math::pi / 4096.0;
 
-  frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
+  // The arm gearbox represents a gerbox containing two Vex 775pro motors.
+  frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(2);
 
   // Standard classes for controlling our elevator
-  frc2::PIDController m_controller{kElevatorKp, 0, 0};
+  frc2::PIDController m_controller{kArmKp, 0, 0};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMVictorSPX m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};

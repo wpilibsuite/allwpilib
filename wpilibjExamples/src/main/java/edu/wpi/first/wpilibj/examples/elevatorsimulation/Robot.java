@@ -84,7 +84,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     if (m_joystick.getTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
-      var pidOutput = m_controller.calculate(m_encoder.getDistance(), Units.inchesToMeters(30));
+      double pidOutput = m_controller.calculate(m_encoder.getDistance(), Units.inchesToMeters(30));
       m_motor.setVoltage(pidOutput);
     } else {
       // Otherwise, we disable the motor.
