@@ -41,7 +41,7 @@ TEST(ElevatorSim, StateSpaceSim) {
     sim.Update(20_ms);
 
     const auto& y = sim.Y();
-    encoderSim.SetDistance(y(0, 0));
+    encoderSim.SetDistance(y(0));
   }
 
   EXPECT_NEAR(controller.GetSetpoint(), sim.GetPosition().to<double>(),
