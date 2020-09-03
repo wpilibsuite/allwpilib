@@ -5,7 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <hal/Extensions.h>
 #include <hal/Main.h>
+#include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
 
 #include "AccelerometerGui.h"
@@ -61,6 +63,12 @@ __declspec(dllexport)
 
   wpi::outs() << "Simulator GUI Initializing.\n";
   if (!HALSimGui::Initialize()) return 0;
+  HAL_RegisterExtensionListener(
+      nullptr, [](void*, const char* name, void* data) {
+        if (wpi::StringRef{name} == "ds_socket") {
+          DriverStationGui::SetDSSocketExtension(data);
+        }
+      });
   HAL_SetMain(nullptr, HALSimGui::Main, HALSimGui::Exit);
   wpi::outs() << "Simulator GUI Initialized!\n";
 

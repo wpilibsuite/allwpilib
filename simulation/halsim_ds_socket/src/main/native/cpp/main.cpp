@@ -16,9 +16,11 @@
 
 #include <sys/types.h>
 
+#include <atomic>
 #include <cstring>
 
 #include <DSCommPacket.h>
+#include <hal/Extensions.h>
 #include <wpi/EventLoopRunner.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
@@ -35,6 +37,7 @@
 using namespace wpi::uv;
 
 static std::unique_ptr<Buffer> singleByte;
+static std::atomic<bool> gDSConnected = false;
 
 namespace {
 struct DataStore {
@@ -91,12 +94,16 @@ static void SetupTcp(wpi::uv::Loop& loop) {
 
   tcp->Listen([t = tcp.get()] {
     auto client = t->Accept();
+    gDSConnected = true;
 
     client->data.connect([t](Buffer& buf, size_t len) {
       HandleTcpDataStream(buf, len, *t->GetData<DataStore>());
     });
     client->StartRead();
-    client->end.connect([c = client.get()] { c->Close(); });
+    client->end.connect([c = client.get()] {
+      c->Close();
+      gDSConnected = false;
+    });
   });
 }
 
@@ -177,6 +184,8 @@ __declspec(dllexport)
   once = true;
 
   wpi::outs() << "DriverStationSocket Initializing.\n";
+
+  HAL_RegisterExtension("ds_socket", &gDSConnected);
 
   singleByte = std::make_unique<Buffer>("0");
 
