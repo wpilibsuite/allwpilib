@@ -16,8 +16,7 @@
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/LinearSystem.h"
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 /**
  * Represents a simulated generic linear system.
  */
@@ -45,24 +44,28 @@ class LinearSystemSim {
 
   /**
    * Returns whether the sim should add noise to the measurements.
+   * 
    * @return Whether the sim should add noise to the measurements.
    */
   bool ShouldAddNoise() const { return m_shouldAddNoise; }
 
   /**
    * Returns the current output of the plant.
+   * 
    * @return The current output of the plant.
    */
   const Eigen::Matrix<double, Outputs, 1>& Y() const { return m_y; }
 
   /**
    * Returns an element of the current output of the plant.
+   * 
    * @param row The row to return.
    */
   double Y(int i) const { return m_y(i); }
 
   /**
    * Sets whether the sim should add noise to measurements.
+   * 
    * @param shouldAddNoise Whether the sim should add noise to measurements.
    */
   void SetShouldAddNoise(bool shouldAddNoise) {
@@ -71,6 +74,7 @@ class LinearSystemSim {
 
   /**
    * Updates the linear system sim.
+   * 
    * @param dt The time between updates.
    */
   void Update(units::second_t dt) {
@@ -89,12 +93,14 @@ class LinearSystemSim {
 
   /**
    * Sets the system inputs (usually voltages).
+   * 
    * @param u The system inputs.
    */
   void SetInput(const Eigen::Matrix<double, Inputs, 1>& u) { m_u = u; }
 
   /**
    * Resets the system state.
+   * 
    * @param state The state to reset to.
    */
   void ResetState(const Eigen::Matrix<double, States, 1>& state) {

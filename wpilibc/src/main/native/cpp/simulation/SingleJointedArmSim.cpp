@@ -53,20 +53,20 @@ SingleJointedArmSim::SingleJointedArmSim(
 
 bool SingleJointedArmSim::HasHitLowerLimit(
     const Eigen::Matrix<double, 2, 1>& x) const {
-  return x(0, 0) < m_minAngle.to<double>();
+  return x(0) < m_minAngle.to<double>();
 }
 
 bool SingleJointedArmSim::HasHitUpperLimit(
     const Eigen::Matrix<double, 2, 1>& x) const {
-  return x(0, 0) > m_maxAngle.to<double>();
+  return x(0) > m_maxAngle.to<double>();
 }
 
 units::radian_t SingleJointedArmSim::GetAngle() const {
-  return units::radian_t(m_x(0, 0));
+  return units::radian_t{m_x(0)};
 }
 
 units::radians_per_second_t SingleJointedArmSim::GetVelocity() const {
-  return units::radians_per_second_t(m_x(1, 0));
+  return units::radians_per_second_t{m_x(1)};
 }
 
 Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
@@ -77,6 +77,9 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
   // alpha = F * r / I
   // Since F = mg,
   // alpha = m * g * r / I
+  // Finally, multiply RHS by cos(theta) to account for the arm angle
+  // This acceleration is added to the linear system dynamics x-dot = Ax + Bu
+  // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I * cos(theta)]]
 
   auto updatedXhat = RungeKutta(
       [&](const auto& x, const auto& u) -> Eigen::Matrix<double, 2, 1> {

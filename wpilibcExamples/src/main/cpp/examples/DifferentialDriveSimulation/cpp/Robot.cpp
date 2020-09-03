@@ -29,7 +29,7 @@ class Robot : public frc::TimedRobot {
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    const auto rot = -m_rotLimiter.Calculate(
+    double rot = -m_rotLimiter.Calculate(
                          m_controller.GetX(frc::GenericHID::kRightHand)) *
                      Drivetrain::kMaxAngularSpeed;
 

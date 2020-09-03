@@ -66,10 +66,8 @@ public final class Constants {
                 kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
 
     // Example values only -- use what's on your physical robot!
-    public static final DCMotor kLeftGearbox = DCMotor.getCIM(2);
-    public static final DCMotor kRightGearbox = DCMotor.getCIM(2);
-    public static final double kLeftGearing = 8;
-    public static final double kRightGearing = 8;
+    public static final DCMotor kDriveGearbox = DCMotor.getCIM(2);
+    public static final double kDriveGearing = 8;
 
     // Example value only - as above, this must be tuned for your drive!
     public static final double kPDriveVel = 0.1;

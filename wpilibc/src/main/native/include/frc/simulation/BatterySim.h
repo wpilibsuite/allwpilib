@@ -13,9 +13,7 @@
 #include <units/impedance.h>
 #include <units/voltage.h>
 
-namespace frc {
-
-namespace sim {
+namespace frc::sim {
 
 class BatterySim {
  public:
@@ -26,8 +24,8 @@ class BatterySim {
    * RobotController#getBatteryVoltage()} method.
    *
    * @param nominalVoltage The nominal battery voltage. Usually 12v.
-   * @param resistance The forward resistance of the battery. Most batteries
-   * are at or below 20 milliohms.
+   * @param resistance     The forward resistance of the battery. Most batteries
+   *                       are at or below 20 milliohms.
    * @param currents       The currents drawn from the battery.
    * @return The battery's voltage under load.
    */

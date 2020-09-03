@@ -64,6 +64,11 @@ public class LinearSystemSim<States extends Num, Inputs extends Num,
     return m_plant.calculateX(currentXhat, u, dtSeconds);
   }
 
+  /**
+   * Updates the simulation.
+   *
+   * @param dtSeconds The time that's passed since the last {@link #update(double)} call.
+   */
   @SuppressWarnings("LocalVariableName")
   public void update(double dtSeconds) {
     // Update X. By default, this is the linear system dynamics X = Ax + Bu

@@ -85,10 +85,8 @@ public class DriveSubsystem extends SubsystemBase {
       m_drivetrainSimulator = new DifferentialDrivetrainSim(
             Constants.DriveConstants.kDrivetrainPlant,
             Constants.DriveConstants.kDriveKinematics,
-            Constants.DriveConstants.kLeftGearbox,
-            Constants.DriveConstants.kLeftGearing,
-            Constants.DriveConstants.kRightGearbox,
-            Constants.DriveConstants.kRightGearing,
+            Constants.DriveConstants.kDriveGearbox,
+            Constants.DriveConstants.kDriveGearing,
             Constants.DriveConstants.kWheelDiameterMeters / 2.0);
 
       // The encoder and gyro angle sims let us set simulated sensor readings

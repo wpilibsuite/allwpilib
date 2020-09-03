@@ -31,7 +31,7 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, units::kilogram_t carriageMass,
       m_gearing(gearing) {}
 
 bool ElevatorSim::HasHitLowerLimit(const Eigen::Matrix<double, 2, 1>& x) const {
-  return x(0, 0) < m_minHeight.to<double>();
+  return x(0) < m_minHeight.to<double>();
 }
 
 bool ElevatorSim::HasHitUpperLimit(const Eigen::Matrix<double, 2, 1>& x) const {
@@ -52,12 +52,12 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
   // is spinning 10x faster than the output.
 
   // v = r w, so w = v / r
-  units::meters_per_second_t velocity = m_x(1, 0) * 1_mps;
+  units::meters_per_second_t velocity{m_x(1)};
   units::radians_per_second_t motorVelocity =
       velocity / m_drumRadius * m_gearing * 1_rad;
 
   // Perform calculation and return.
-  return m_motor.Current(motorVelocity, units::volt_t(m_u(0))) *
+  return m_motor.Current(motorVelocity, units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }
 

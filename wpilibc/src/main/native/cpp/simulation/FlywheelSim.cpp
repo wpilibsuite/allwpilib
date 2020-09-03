@@ -28,7 +28,7 @@ FlywheelSim::FlywheelSim(const DCMotor& gearbox, double gearing,
                   gearbox, gearing, addNoise, measurementStdDevs) {}
 
 units::radians_per_second_t FlywheelSim::GetAngularVelocity() const {
-  return units::radians_per_second_t(Y()(0, 0));
+  return units::radians_per_second_t{Y(0)};
 }
 
 units::ampere_t FlywheelSim::GetCurrentDraw() const {
@@ -36,6 +36,6 @@ units::ampere_t FlywheelSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
   return m_motor.Current(GetAngularVelocity() * m_gearing,
-                         units::volt_t(m_u(0))) *
+                         units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
 }

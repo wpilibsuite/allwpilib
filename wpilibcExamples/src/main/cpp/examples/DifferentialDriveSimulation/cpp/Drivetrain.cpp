@@ -10,11 +10,11 @@
 #include <frc/RobotController.h>
 
 void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
-  const auto leftFeedforward = m_feedforward.Calculate(speeds.left);
-  const auto rightFeedforward = m_feedforward.Calculate(speeds.right);
-  const double leftOutput = m_leftPIDController.Calculate(
+  auto leftFeedforward = m_feedforward.Calculate(speeds.left);
+  auto rightFeedforward = m_feedforward.Calculate(speeds.right);
+  double leftOutput = m_leftPIDController.Calculate(
       m_leftEncoder.GetRate(), speeds.left.to<double>());
-  const double rightOutput = m_rightPIDController.Calculate(
+  double rightOutput = m_rightPIDController.Calculate(
       m_rightEncoder.GetRate(), speeds.right.to<double>());
 
   m_leftGroup.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);

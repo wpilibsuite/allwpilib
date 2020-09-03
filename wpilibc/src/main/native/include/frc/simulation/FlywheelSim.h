@@ -14,8 +14,7 @@
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 /**
  * Represents a simulated flywheel mechanism.
  */
@@ -55,12 +54,14 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
 
   /**
    * Returns the flywheel velocity.
+   * 
    * @return The flywheel velocity.
    */
   units::radians_per_second_t GetAngularVelocity() const;
 
   /**
    * Returns the flywheel current draw.
+   * 
    * @return The flywheel current draw.
    */
   units::ampere_t GetCurrentDraw() const override;

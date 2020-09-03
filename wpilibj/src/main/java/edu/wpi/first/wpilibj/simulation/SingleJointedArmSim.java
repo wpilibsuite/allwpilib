@@ -129,6 +129,9 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     alpha = m g r / I
 
     Multiply RHS by cos(theta) to account for the arm angle
+
+    This acceleration is added to the linear system dynamics x-dot = Ax + Bu
+    We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I]]
      */
     Matrix<N2, N1> updatedXhat = RungeKutta.rungeKutta(
         (x, u_) -> (m_plant.getA().times(x))

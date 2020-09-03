@@ -17,8 +17,7 @@
 #include "frc/simulation/LinearSystemSim.h"
 #include "frc/system/plant/DCMotor.h"
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 /**
  * Represents a simulated arm mechanism.
  */
@@ -104,12 +103,14 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
 
   /**
    * Returns the current arm angle.
+   * 
    * @return The current arm angle.
    */
   units::radian_t GetAngle() const;
 
   /**
    * Returns the current arm velocity.
+   * 
    * @return The current arm velocity.
    */
   units::radians_per_second_t GetVelocity() const;

@@ -42,7 +42,7 @@ Eigen::Matrix<double, 10, 1> DifferentialDrivetrainSim::GetState() const {
   return m_x;
 }
 
-Rotation2d DifferentialDrivetrainSim::GetHeading() {
+Rotation2d DifferentialDrivetrainSim::GetHeading() const {
   return Rotation2d(units::radian_t(m_x(State::kHeading)));
 }
 
@@ -51,7 +51,7 @@ Pose2d DifferentialDrivetrainSim::GetEstimatedPosition() const {
                 Rotation2d(units::radian_t(m_x(State::kHeading))));
 }
 
-units::ampere_t DifferentialDrivetrainSim::GetCurrentDrawAmps() {
+units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
   auto loadIleft = m_leftMotor.Current(
                        units::radians_per_second_t(m_x(State::kLeftVelocity) *
                                                    m_leftGearing /

@@ -15,30 +15,71 @@
 #include <units/time.h>
 #include <units/voltage.h>
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 
 class DifferentialDrivetrainSim {
  public:
+
+  /**
+   * Create a SimDrivetrain.
+   *
+   * @param drivetrainPlant   The LinearSystem representing the robot's drivetrain. This
+   *                          system can be created with LinearSystemId#createDrivetrainVelocitySystem
+   *                          or LinearSystemId#identifyDrivetrainSystem.
+   * @param kinematics        A {@link DifferentialDriveKinematics} object representing the
+   *                          differential drivetrain's kinematics.
+   * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
+   * @param gearingRatio      The gearingRatio ratio of the left side, as output over input.
+   * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
+   */
   DifferentialDrivetrainSim(LinearSystem<2, 2, 2>& plant,
                             DifferentialDriveKinematics& kinematics,
-                            DCMotor leftGearbox, double leftGearing,
-                            DCMotor rightGearbox, double rightGearing,
+                            DCMotor driveMotor, double gearingRatio,
                             units::meter_t wheelRadius);
 
+  /**
+   * Set the applied voltage to the drivetrain. Note that positive voltage must make that
+   * side of the drivetrain travel forward (+X).
+   *
+   * @param leftVoltage  The left voltage.
+   * @param rightVoltage The right voltage.
+   */
   void SetInputs(units::volt_t leftVoltage, units::volt_t rightVoltage);
 
+  /**
+   * Updates the simulation.
+   * 
+   * @param dt The time that's passed since the last {@link #update(double)} call.
+   */
   void Update(units::second_t dt);
 
+  /**
+   * Returns an element of the state vector.
+   * 
+   * @param state The row of the state vector.
+   */
   double GetState(int state) const;
 
+  /**
+   * Returns the current state vector x.
+   */
   Eigen::Matrix<double, 10, 1> GetState() const;
 
-  Rotation2d GetHeading();
+  /**
+   * Get the estimated direction the robot is pointing. Note that this angle is
+   * counterclockwise-positive, while most gyros are clockwise positive.
+   */
+  Rotation2d GetHeading() const;
 
+  /**
+   * Returns the current estimated position.
+   */
   Pose2d GetEstimatedPosition() const;
 
-  units::ampere_t GetCurrentDrawAmps();
+  /**
+   * Returns the currently drawn current.
+   */
+  units::ampere_t GetCurrentDraw() const;
 
   Eigen::Matrix<double, 10, 1> Dynamics(const Eigen::Matrix<double, 10, 1>& x,
                                         const Eigen::Matrix<double, 2, 1>& u);

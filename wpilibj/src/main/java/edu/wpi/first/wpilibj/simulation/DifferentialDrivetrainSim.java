@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.RungeKutta;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
@@ -40,10 +41,8 @@ import org.ejml.simple.SimpleMatrix;
  *
  */
 public class DifferentialDrivetrainSim {
-  private final DCMotor m_leftMotor;
-  private final DCMotor m_rightMotor;
-  private final double m_leftGearing;
-  private final double m_rightGearing;
+  private final DCMotor m_motor;
+  private final double m_gearing;
   private double m_wheelRadiusMeters;
   @SuppressWarnings("MemberName")
   private Matrix<N2, N1> m_u;
@@ -56,26 +55,45 @@ public class DifferentialDrivetrainSim {
   /**
    * Create a SimDrivetrain.
    *
-   * @param drivetrainPlant The {@link LinearSystem} representing the robot's drivetrain. This
-   *                        system can be created with {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor, double, double, double, double, double)}
-   *                        or {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
-   * @param kinematics      A {@link DifferentialDriveKinematics} object representing the
-   *                        differential drivetrain's kinematics.
+   * @param drivetrainPlant   The {@link LinearSystem} representing the robot's drivetrain. This
+   *                          system can be created with {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor, double, double, double, double, double)}
+   *                          or {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
+   * @param kinematics        A {@link DifferentialDriveKinematics} object representing the
+   *                          differential drivetrain's kinematics.
+   * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
+   * @param gearingRatio      The gearingRatio ratio of the left side, as output over input.
+   * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
    */
   public DifferentialDrivetrainSim(LinearSystem<N2, N2, N2> drivetrainPlant,
                                    DifferentialDriveKinematics kinematics,
-                                   DCMotor leftGearbox, double leftGearing,
-                                   DCMotor rightGearbox, double rightGearing,
+                                   DCMotor driveMotor, double gearingRatio,
                                    double wheelRadiusMeters) {
     this.m_plant = drivetrainPlant;
     this.m_rb = kinematics.trackWidthMeters / 2.0;
-    this.m_leftMotor = leftGearbox;
-    this.m_rightMotor = rightGearbox;
-    this.m_leftGearing = leftGearing;
-    this.m_rightGearing = rightGearing;
+    this.m_motor = driveMotor;
+    this.m_gearing = gearingRatio;
     m_wheelRadiusMeters = wheelRadiusMeters;
 
     m_x = new Matrix<>(new SimpleMatrix(10, 1));
+  }
+
+  /**
+   * Create a SimDrivetrain.
+   *
+   * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
+   * @param massKg            The mass of the drivebase.
+   * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
+   * @param jKgMetersSquared  The moment of inertia of the drivetrain about its center.
+   * @param gearing           The gearing on the drive between motor and wheel, as output over input.
+   * @param trackWidthMeters  The robot's track width, or distance between left and right wheels.
+   */
+  public DifferentialDrivetrainSim(DCMotor driveMotor, double massKg,
+                                   double wheelRadiusMeters, double jKgMetersSquared, double gearing,
+                                   double trackWidthMeters) {
+    this(LinearSystemId.createDrivetrainVelocitySystem(driveMotor, massKg, wheelRadiusMeters,
+        trackWidthMeters / 2, jKgMetersSquared, gearing),
+        new DifferentialDriveKinematics(trackWidthMeters),
+        driveMotor, gearing, wheelRadiusMeters);
   }
 
   /**
@@ -119,12 +137,12 @@ public class DifferentialDrivetrainSim {
   }
 
   public double getCurrentDrawAmps() {
-    var loadIleft = m_leftMotor.getCurrent(
-        getState(State.kLeftVelocity) * m_leftGearing / m_wheelRadiusMeters,
+    var loadIleft = m_motor.getCurrent(
+        getState(State.kLeftVelocity) * m_gearing / m_wheelRadiusMeters,
         m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
 
-    var loadIright = m_rightMotor.getCurrent(
-        getState(State.kRightVelocity) * m_rightGearing / m_wheelRadiusMeters,
+    var loadIright = m_motor.getCurrent(
+        getState(State.kRightVelocity) * m_gearing / m_wheelRadiusMeters,
         m_u.get(1, 0)) * Math.signum(m_u.get(1, 0));
 
     return loadIleft + loadIright;
