@@ -38,11 +38,11 @@ bool ElevatorSim::HasHitUpperLimit(const Eigen::Matrix<double, 2, 1>& x) const {
   return x(0) > m_maxHeight.to<double>();
 }
 
-units::meter_t ElevatorSim::GetElevatorPosition() const {
+units::meter_t ElevatorSim::GetPosition() const {
   return units::meter_t{Y(0)};
 }
 
-units::meters_per_second_t ElevatorSim::GetElevatorVelocity() const {
+units::meters_per_second_t ElevatorSim::GetVelocity() const {
   return units::meters_per_second_t{m_x(1)};
 }
 

@@ -75,7 +75,7 @@ public class Robot extends TimedRobot {
     m_elevatorSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_encoderSim.setDistance(m_elevatorSim.getElevatorPositionMeters());
+    m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateLoadedBatteryVoltage(m_elevatorSim.getCurrentDrawAmps()));
   }

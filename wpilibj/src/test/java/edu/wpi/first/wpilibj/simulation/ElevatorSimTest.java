@@ -50,7 +50,7 @@ public class ElevatorSimTest {
       encoderSim.setDistance(y.get(0, 0));
     }
 
-    assertEquals(controller.getSetpoint(), sim.getElevatorPositionMeters(), 0.2);
+    assertEquals(controller.getSetpoint(), sim.getPositionMeters(), 0.2);
   }
 
   @Test
@@ -68,14 +68,14 @@ public class ElevatorSimTest {
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));
       sim.update(0.020);
-      var height = sim.getElevatorPositionMeters();
+      var height = sim.getPositionMeters();
       assertTrue(height >= -0.05);
     }
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(12.0));
       sim.update(0.020);
-      var height = sim.getElevatorPositionMeters();
+      var height = sim.getPositionMeters();
       assertTrue(height <= 1.05);
     }
   }

@@ -78,7 +78,7 @@ class Robot : public frc::TimedRobot {
 
     // Finally, we set our simulated encoder's readings and simulated battery
     // voltage
-    m_encoderSim.SetDistance(m_elevatorSim.GetElevatorPosition().to<double>());
+    m_encoderSim.SetDistance(m_elevatorSim.GetPosition().to<double>());
     // SimBattery estimates loaded battery voltages
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({m_elevatorSim.GetCurrentDraw()})

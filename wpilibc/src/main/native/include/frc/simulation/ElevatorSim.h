@@ -65,14 +65,14 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *
    * @return The position of the elevator.
    */
-  units::meter_t GetElevatorPosition() const;
+  units::meter_t GetPosition() const;
 
   /**
    * Returns the velocity of the elevator.
    *
    * @return The velocity of the elevator.
    */
-  units::meters_per_second_t GetElevatorVelocity() const;
+  units::meters_per_second_t GetVelocity() const;
 
   /**
    * Returns the elevator current draw.

@@ -150,11 +150,11 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     return updatedXhat;
   }
 
-  public double getArmAngleRads() {
+  public double getAngleRads() {
     return m_x.get(0, 0);
   }
 
-  public double getArmVelocityRadPerSec() {
+  public double getVelocityRadPerSec() {
     return m_x.get(1, 0);
   }
 

@@ -44,7 +44,7 @@ TEST(ElevatorSim, StateSpaceSim) {
     encoderSim.SetDistance(y(0, 0));
   }
 
-  EXPECT_NEAR(controller.GetSetpoint(), sim.GetElevatorPosition().to<double>(),
+  EXPECT_NEAR(controller.GetSetpoint(), sim.GetPosition().to<double>(),
               0.2);
 }
 
@@ -56,7 +56,7 @@ TEST(ElevatorSim, MinMax) {
     sim.SetInput(frc::MakeMatrix<1, 1>(0.0));
     sim.Update(20_ms);
 
-    auto height = sim.GetElevatorPosition();
+    auto height = sim.GetPosition();
     EXPECT_TRUE(height > -0.05_m);
   }
 
@@ -64,7 +64,7 @@ TEST(ElevatorSim, MinMax) {
     sim.SetInput(frc::MakeMatrix<1, 1>(12.0));
     sim.Update(20_ms);
 
-    auto height = sim.GetElevatorPosition();
+    auto height = sim.GetPosition();
     EXPECT_TRUE(height < 1.05_m);
   }
 }

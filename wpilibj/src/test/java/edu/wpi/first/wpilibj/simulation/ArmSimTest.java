@@ -34,6 +34,6 @@ public class ArmSimTest {
     }
 
     // the arm should swing down
-    assertEquals(-Math.PI / 2.0, m_sim.getArmAngleRads(), 0.1);
+    assertEquals(-Math.PI / 2.0, m_sim.getAngleRads(), 0.1);
   }
 }

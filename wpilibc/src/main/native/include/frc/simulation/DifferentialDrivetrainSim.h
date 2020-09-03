@@ -56,7 +56,7 @@ class DifferentialDrivetrainSim {
    *
    * @param newGearing The new gear ratio, as output over input.
    */
-  void SetCurrentGearing(double newGearing);
+  void SetGearing(double newGearing);
 
   /**
    * Updates the simulation.
@@ -73,7 +73,7 @@ class DifferentialDrivetrainSim {
    */
   double GetState(int state) const;
 
-  double GetCurrentGearing() const;
+  double GetGearing() const;
 
   /**
    * Returns the current state vector x.

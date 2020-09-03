@@ -30,7 +30,7 @@ void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,
   m_u << leftVoltage.to<double>(), rightVoltage.to<double>();
 }
 
-void DifferentialDrivetrainSim::SetCurrentGearing(double newGearing) {
+void DifferentialDrivetrainSim::SetGearing(double newGearing) {
   m_currentGearing = newGearing;
 }
 
@@ -43,7 +43,7 @@ double DifferentialDrivetrainSim::GetState(int state) const {
   return m_x(state);
 }
 
-double DifferentialDrivetrainSim::GetCurrentGearing() const {
+double DifferentialDrivetrainSim::GetGearing() const {
   return m_currentGearing;
 }
 

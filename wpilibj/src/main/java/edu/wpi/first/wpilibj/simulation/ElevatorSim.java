@@ -100,11 +100,11 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     setInput(volts);
   }
 
-  public double getElevatorPositionMeters() {
+  public double getPositionMeters() {
     return getOutput(0);
   }
 
-  public double getElevatorVelocityMetersPerSecond() {
+  public double getVelocityMetersPerSecond() {
     return m_x.get(0, 1);
   }
 
@@ -114,7 +114,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
     // spinning 10x faster than the output
     // v = r w, so w = v/r
-    double motorVelocityRadPerSec = getElevatorVelocityMetersPerSecond() / m_drumRadiusMeters * m_gearing;
+    double motorVelocityRadPerSec = getVelocityMetersPerSecond() / m_drumRadiusMeters * m_gearing;
     var appliedVoltage = getInput(0);
     return m_motor.getCurrent(motorVelocityRadPerSec, appliedVoltage) * Math.signum(appliedVoltage);
   }

@@ -152,7 +152,7 @@ public class DifferentialDrivetrainSim {
     return loadIleft + loadIright;
   }
 
-  public double getCurrentGearing() {
+  public double getGearing() {
     return m_currentGearing;
   }
 
@@ -162,7 +162,7 @@ public class DifferentialDrivetrainSim {
    *
    * @param newGearRatio The new gear ratio, as output over input.
    */
-  public void setCurrentGearing(double newGearRatio) {
+  public void setGearing(double newGearRatio) {
     this.m_currentGearing = newGearRatio;
   }
 
