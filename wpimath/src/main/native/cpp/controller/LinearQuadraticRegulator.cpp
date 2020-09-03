@@ -13,14 +13,8 @@ LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(
     const Eigen::Matrix<double, 1, 1>& A, const Eigen::Matrix<double, 1, 1>& B,
     const std::array<double, 1>& Qelems, const std::array<double, 1>& Relems,
     units::second_t dt)
-    : LinearQuadraticRegulator(A, B, Qelems, 1.0, Relems, dt) {}
-
-LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(
-    const Eigen::Matrix<double, 1, 1>& A, const Eigen::Matrix<double, 1, 1>& B,
-    const std::array<double, 1>& Qelems, const double rho,
-    const std::array<double, 1>& Relems, units::second_t dt)
-    : detail::LinearQuadraticRegulatorImpl<1, 1>{A,   B,      Qelems,
-                                                 rho, Relems, dt} {}
+    : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
+                               MakeCostMatrix(Relems), dt) {}
 
 LinearQuadraticRegulator<1, 1>::LinearQuadraticRegulator(
     const Eigen::Matrix<double, 1, 1>& A, const Eigen::Matrix<double, 1, 1>& B,
@@ -32,14 +26,8 @@ LinearQuadraticRegulator<2, 1>::LinearQuadraticRegulator(
     const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 1>& B,
     const std::array<double, 2>& Qelems, const std::array<double, 1>& Relems,
     units::second_t dt)
-    : LinearQuadraticRegulator(A, B, Qelems, 1.0, Relems, dt) {}
-
-LinearQuadraticRegulator<2, 1>::LinearQuadraticRegulator(
-    const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 1>& B,
-    const std::array<double, 2>& Qelems, const double rho,
-    const std::array<double, 1>& Relems, units::second_t dt)
-    : detail::LinearQuadraticRegulatorImpl<2, 1>{A,   B,      Qelems,
-                                                 rho, Relems, dt} {}
+    : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
+                               MakeCostMatrix(Relems), dt) {}
 
 LinearQuadraticRegulator<2, 1>::LinearQuadraticRegulator(
     const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 1>& B,

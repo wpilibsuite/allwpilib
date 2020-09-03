@@ -70,10 +70,6 @@ class Robot : public frc::TimedRobot {
       // Decrease this to more heavily penalize state excursion, or make the
       // controller behave more aggressively.
       {1.0 * 2.0 * wpi::math::pi / 360.0, 10.0 * 2.0 * wpi::math::pi / 360.0},
-      // rho balances Q and R. Increasing this will penalize state excursion
-      // more heavily, while decreasing this will penalize control effort more
-      // heavily.
-      1.0,
       // relms. Control effort (voltage) tolerance. Decrease this to more
       // heavily penalize control effort, or make the controller less
       // aggressive. 12 is a good starting point because that is the
