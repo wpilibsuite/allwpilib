@@ -7,6 +7,8 @@
 
 #include "hal/Extensions.h"
 
+#include <vector>
+
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
@@ -36,6 +38,10 @@
 #define DLCLOSE dlclose
 #define DLERROR dlerror()
 #endif
+
+static std::vector<std::pair<const char*, void*>> gExtensionRegistry;
+static std::vector<std::pair<void*, void (*)(void*, const char*, void*)>>
+    gExtensionListeners;
 
 namespace hal {
 namespace init {
@@ -114,6 +120,20 @@ int HAL_LoadExtensions(void) {
     if (rc < 0) break;
   }
   return rc;
+}
+
+void HAL_RegisterExtension(const char* name, void* data) {
+  gExtensionRegistry.emplace_back(name, data);
+  for (auto&& listener : gExtensionListeners)
+    listener.second(listener.first, name, data);
+}
+
+void HAL_RegisterExtensionListener(void* param,
+                                   void (*func)(void*, const char* name,
+                                                void* data)) {
+  gExtensionListeners.emplace_back(param, func);
+  for (auto&& extension : gExtensionRegistry)
+    func(param, extension.first, extension.second);
 }
 
 void HAL_SetShowExtensionsNotFoundMessages(HAL_Bool showMessage) {

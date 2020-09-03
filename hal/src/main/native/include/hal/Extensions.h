@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -43,6 +43,31 @@ int HAL_LoadOneExtension(const char* library);
  * @return        the succes state of the initialization
  */
 int HAL_LoadExtensions(void);
+
+/**
+ * Registers an extension such that other extensions can discover it.
+ *
+ * The passed data pointer is retained and the extension must keep this
+ * pointer valid.
+ *
+ * @param name extension name (may embed version number)
+ * @param data data pointer
+ */
+void HAL_RegisterExtension(const char* name, void* data);
+
+/**
+ * Registers an extension registration listener function. The function will
+ * be called immediately with any currently registered extensions, and will
+ * be called later when any additional extensions are registered.
+ *
+ * @param param parameter data to pass to callback function
+ * @param func callback function to be called for each registered extension;
+ *             parameters are the parameter data, extension name, and extension
+ *             data pointer passed to HAL_RegisterExtension()
+ */
+void HAL_RegisterExtensionListener(void* param,
+                                   void (*func)(void*, const char* name,
+                                                void* data));
 
 /**
  * Enables or disables the message saying no HAL extensions were found.
