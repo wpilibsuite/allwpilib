@@ -86,7 +86,7 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
       [&](const auto& x, const auto& u) -> Eigen::Matrix<double, 2, 1> {
         return m_plant.A() * x + m_plant.B() * u +
                MakeMatrix<2, 1>(0.0, (m_mass * m_r * -9.8 * 3.0 /
-                                      (m_mass * m_r * m_r) * std::cos(x(0, 0)))
+                                      (m_mass * m_r * m_r) * std::cos(x(0)))
                                          .template to<double>());
       },
       currentXhat, u, dt);
