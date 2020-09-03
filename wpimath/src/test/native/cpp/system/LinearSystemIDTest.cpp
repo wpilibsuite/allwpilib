@@ -10,8 +10,6 @@
 #include <frc/system/plant/LinearSystemId.h>
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "units/length.h"
