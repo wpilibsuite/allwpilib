@@ -7,10 +7,14 @@
 
 #include "WSProvider_Joystick.h"
 
+#include <atomic>
+
 #include <hal/Ports.h>
 #include <hal/simulation/DriverStationData.h>
 
 namespace wpilibws {
+
+extern std::atomic<bool>* gDSSocketConnected;
 
 void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
   CreateProviders<HALSimWSProviderJoystick>("Joystick", HAL_kMaxJoysticks,
@@ -71,6 +75,9 @@ void HALSimWSProviderJoystick::DoCancelCallbacks() {
 }
 
 void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
+  // ignore if DS connected
+  if (gDSSocketConnected && *gDSSocketConnected) return;
+
   wpi::json::const_iterator it;
   if ((it = json.find(">axes")) != json.end()) {
     HAL_JoystickAxes axes{};
