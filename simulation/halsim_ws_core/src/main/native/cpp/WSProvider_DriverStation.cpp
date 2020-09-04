@@ -8,8 +8,10 @@
 #include "WSProvider_DriverStation.h"
 
 #include <algorithm>
+#include <atomic>
 
 #include <hal/DriverStation.h>
+#include <hal/Extensions.h>
 #include <hal/Ports.h>
 #include <hal/simulation/DriverStationData.h>
 #include <wpi/raw_ostream.h>
@@ -25,7 +27,19 @@
 
 namespace wpilibws {
 
+std::atomic<bool>* gDSSocketConnected{nullptr};
+
 void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
+  static bool registered = false;
+  if (!registered) {
+    registered = true;
+    HAL_RegisterExtensionListener(
+        nullptr, [](void*, const char* name, void* data) {
+          if (wpi::StringRef{name} == "ds_socket") {
+            gDSSocketConnected = static_cast<std::atomic<bool>*>(data);
+          }
+        });
+  }
   CreateSingleProvider<HALSimWSProviderDriverStation>("DriverStation",
                                                       webRegisterFunc);
 }
@@ -106,6 +120,9 @@ void HALSimWSProviderDriverStation::DoCancelCallbacks() {
 }
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
+  // ignore if DS connected
+  if (gDSSocketConnected && *gDSSocketConnected) return;
+
   wpi::json::const_iterator it;
   if ((it = json.find(">enabled")) != json.end()) {
     HALSIM_SetDriverStationEnabled(it.value());
