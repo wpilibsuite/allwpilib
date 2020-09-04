@@ -8,8 +8,9 @@
 #pragma once
 
 #include "Eigen/Core"
+#include "Eigen/src/LU/PartialPivLU.h"
 #include "units/time.h"
-#include "unsupported/Eigen/MatrixFunctions"
+#include "unsupported/Eigen/src/MatrixFunctions/MatrixExponential.h"
 
 namespace frc {
 

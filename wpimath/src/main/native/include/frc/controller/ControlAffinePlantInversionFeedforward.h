@@ -11,6 +11,7 @@
 #include <functional>
 
 #include "Eigen/Core"
+#include "Eigen/QR"
 #include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
 
