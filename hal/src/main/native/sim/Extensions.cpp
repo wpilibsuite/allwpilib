@@ -12,7 +12,9 @@
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
+#include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/spinlock.h>
 
 #include "hal/HAL.h"
 
@@ -39,6 +41,7 @@
 #define DLERROR dlerror()
 #endif
 
+static wpi::recursive_spinlock gExtensionRegistryMutex;
 static std::vector<std::pair<const char*, void*>> gExtensionRegistry;
 static std::vector<std::pair<void*, void (*)(void*, const char*, void*)>>
     gExtensionListeners;
@@ -123,6 +126,7 @@ int HAL_LoadExtensions(void) {
 }
 
 void HAL_RegisterExtension(const char* name, void* data) {
+  std::scoped_lock lock(gExtensionRegistryMutex);
   gExtensionRegistry.emplace_back(name, data);
   for (auto&& listener : gExtensionListeners)
     listener.second(listener.first, name, data);
@@ -131,6 +135,7 @@ void HAL_RegisterExtension(const char* name, void* data) {
 void HAL_RegisterExtensionListener(void* param,
                                    void (*func)(void*, const char* name,
                                                 void* data)) {
+  std::scoped_lock lock(gExtensionRegistryMutex);
   gExtensionListeners.emplace_back(param, func);
   for (auto&& extension : gExtensionRegistry)
     func(param, extension.first, extension.second);
