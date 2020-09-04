@@ -166,8 +166,7 @@ void HALSimWSProviderSimDevices::DeviceFreedCallback(
   m_providers.Delete(name);
 }
 
-void HALSimWSProviderSimDevices::Initialize(
-    std::shared_ptr<wpi::uv::Loop> loop) {
+void HALSimWSProviderSimDevices::Initialize(wpi::uv::Loop& loop) {
   m_deviceCreatedCbKey = HALSIM_RegisterSimDeviceCreatedCallback(
       "", this, HALSimWSProviderSimDevices::DeviceCreatedCallbackStatic, 1);
   m_deviceFreedCbKey = HALSIM_RegisterSimDeviceFreedCallback(

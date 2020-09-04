@@ -20,8 +20,6 @@ namespace uv = wpi::uv;
 
 namespace wpilibws {
 
-std::shared_ptr<WebServerClientTest> WebServerClientTest::g_instance;
-
 // Create Web Socket and specify event callbacks
 void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
                                               const std::string& uri) {
@@ -59,11 +57,6 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
     }
     // Save last message received
     m_json = j;
-
-    // If terminate flag set, end loop after message received
-    if (m_terminateFlag) {
-      m_loop->Stop();
-    }
   });
 
   m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
@@ -75,9 +68,8 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
 }
 
 // Create tcp client, specify callbacks, and create timers for loop
-bool WebServerClientTest::Initialize(std::shared_ptr<uv::Loop>& loop) {
-  m_loop = loop;
-  m_loop->error.connect(
+bool WebServerClientTest::Initialize() {
+  m_loop.error.connect(
       [](uv::Error err) { wpi::errs() << "uv Error: " << err.str() << "\n"; });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
@@ -92,7 +84,7 @@ bool WebServerClientTest::Initialize(std::shared_ptr<uv::Loop>& loop) {
         if (m_tcp_connected) {
           m_tcp_connected = false;
           m_connect_attempts = 0;
-          m_loop->Stop();
+          m_loop.Stop();
           return;
         }
 
@@ -124,7 +116,7 @@ void WebServerClientTest::AttemptConnect() {
 
   if (m_connect_attempts >= 5) {
     wpi::errs() << "Test Client Timeout. Unable to connect\n";
-    Exit();
+    m_loop.Stop();
     return;
   }
 
@@ -133,13 +125,6 @@ void WebServerClientTest::AttemptConnect() {
   m_tcp_client->Connect(dest, [this]() {
     m_tcp_connected = true;
     InitializeWebSocket("localhost", 8080, "/wpilibws");
-  });
-}
-
-void WebServerClientTest::Exit() {
-  m_loop->Walk([](uv::Handle& h) {
-    h.SetLoopClosing(true);
-    h.Close();
   });
 }
 
