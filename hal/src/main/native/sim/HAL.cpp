@@ -7,8 +7,11 @@
 
 #include "hal/HAL.h"
 
+#include <vector>
+
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/spinlock.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -28,6 +31,8 @@
 using namespace hal;
 
 static HAL_RuntimeType runtimeType{HAL_Mock};
+static wpi::spinlock gOnShutdownMutex;
+static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 
 namespace hal {
 namespace init {
@@ -310,6 +315,22 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   if (HAL_LoadExtensions() < 0) return false;
 
   return true;  // Add initialization if we need to at a later point
+}
+
+void HAL_Shutdown(void) {
+  std::vector<std::pair<void*, void (*)(void*)>> funcs;
+  {
+    std::scoped_lock lock(gOnShutdownMutex);
+    funcs.swap(gOnShutdown);
+  }
+  for (auto&& func : funcs) {
+    func.second(func.first);
+  }
+}
+
+void HAL_OnShutdown(void* param, void (*func)(void*)) {
+  std::scoped_lock lock(gOnShutdownMutex);
+  gOnShutdown.emplace_back(param, func);
 }
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,

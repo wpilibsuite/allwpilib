@@ -25,7 +25,10 @@
  */
 typedef int halsim_extension_init_func_t(void);
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 /**
  * Loads a single extension from a direct path.
  *
@@ -82,5 +85,17 @@ void HAL_RegisterExtensionListener(void* param,
  * @param showMessage true to show message, false to not.
  */
 void HAL_SetShowExtensionsNotFoundMessages(HAL_Bool showMessage);
+
+/**
+ * Registers a function to be called from HAL_Shutdown(). This is intended
+ * for use only by simulation extensions.
+ *
+ * @param param parameter data to pass to callback function
+ * @param func callback function
+ */
+void HAL_OnShutdown(void* param, void (*func)(void*));
+
+#ifdef __cplusplus
 }  // extern "C"
+#endif
 /** @} */

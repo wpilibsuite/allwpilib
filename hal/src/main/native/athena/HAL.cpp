@@ -420,6 +420,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   return true;
 }
 
+void HAL_Shutdown(void) {}
+
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
                    const char* feature) {
   if (feature == nullptr) {
