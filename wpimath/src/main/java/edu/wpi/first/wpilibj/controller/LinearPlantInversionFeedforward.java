@@ -39,10 +39,10 @@ public class LinearPlantInversionFeedforward<States extends Num, Inputs extends 
   private Matrix<Inputs, N1> m_uff;
 
   @SuppressWarnings("MemberName")
-  private Matrix<States, Inputs> m_B;
+  private final Matrix<States, Inputs> m_B;
 
   @SuppressWarnings("MemberName")
-  private Matrix<States, States> m_A;
+  private final Matrix<States, States> m_A;
 
   /**
    * Constructs a feedforward with the given plant.
@@ -71,8 +71,8 @@ public class LinearPlantInversionFeedforward<States extends Num, Inputs extends 
     this.m_A = discABPair.getFirst();
     this.m_B = discABPair.getSecond();
 
-    m_r = new Matrix<States, N1>(new SimpleMatrix(B.getNumRows(), 1));
-    m_uff = new Matrix<Inputs, N1>(new SimpleMatrix(B.getNumCols(), 1));
+    m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
+    m_uff = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
 
     reset(m_r);
   }
