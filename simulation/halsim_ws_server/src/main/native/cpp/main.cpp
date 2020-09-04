@@ -5,18 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <WSProviderContainer.h>
-#include <WSProvider_Analog.h>
-#include <WSProvider_DIO.h>
-#include <WSProvider_DriverStation.h>
-#include <WSProvider_Encoder.h>
-#include <WSProvider_Joystick.h>
-#include <WSProvider_PWM.h>
-#include <WSProvider_Relay.h>
-#include <WSProvider_RoboRIO.h>
-#include <WSProvider_SimDevice.h>
-#include <WSProvider_dPWM.h>
-#include <hal/Main.h>
+#include <memory>
+
+#include <hal/Extensions.h>
 #include <wpi/raw_ostream.h>
 
 #include "HALSimWSServer.h"
@@ -24,44 +15,23 @@
 using namespace std::placeholders;
 using namespace wpilibws;
 
-// Currently, robots never terminate, so we keep static objects that are
-// never properly released or cleaned up.
-static ProviderContainer providers;
-static HALSimWSProviderSimDevices simDevices(providers);
+static std::unique_ptr<HALSimWSServer> gServer;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
-  wpi::outs() << "Websocket Simulator Initializing.\n";
-  auto hsw = std::make_shared<HALSimWeb>(providers, simDevices);
-  HALSimWeb::SetInstance(hsw);
+  wpi::outs() << "Websocket WS Server Initializing.\n";
 
-  if (!hsw->Initialize()) {
+  HAL_OnShutdown(nullptr, [](void*) { gServer.reset(); });
+
+  gServer = std::make_unique<HALSimWSServer>();
+  if (!gServer->Initialize()) {
     return -1;
   }
 
-  WSRegisterFunc registerFunc = [&](auto key, auto provider) {
-    providers.Add(key, provider);
-  };
-
-  HALSimWSProviderAnalogIn::Initialize(registerFunc);
-  HALSimWSProviderAnalogOut::Initialize(registerFunc);
-  HALSimWSProviderDIO::Initialize(registerFunc);
-  HALSimWSProviderDigitalPWM::Initialize(registerFunc);
-  HALSimWSProviderDriverStation::Initialize(registerFunc);
-  HALSimWSProviderEncoder::Initialize(registerFunc);
-  HALSimWSProviderJoystick::Initialize(registerFunc);
-  HALSimWSProviderPWM::Initialize(registerFunc);
-  HALSimWSProviderRelay::Initialize(registerFunc);
-  HALSimWSProviderRoboRIO::Initialize(registerFunc);
-
-  simDevices.Initialize(hsw->GetLoop());
-
-  HAL_SetMain(nullptr, HALSimWeb::Main, HALSimWeb::Exit);
-
-  wpi::outs() << "Websocket Simulator Initialized!\n";
+  wpi::outs() << "Websocket WS Server Initialized!\n";
   return 0;
 }
 }  // extern "C"

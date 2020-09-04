@@ -90,7 +90,7 @@ class HALSimWSProviderSimDevices {
       : m_providers(providers) {}
   ~HALSimWSProviderSimDevices();
 
-  void Initialize(std::shared_ptr<wpi::uv::Loop> loop);
+  void Initialize(wpi::uv::Loop& loop);
 
   void OnNetworkConnected(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
   void OnNetworkDisconnected();
