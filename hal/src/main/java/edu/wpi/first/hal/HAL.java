@@ -18,6 +18,8 @@ public final class HAL extends JNIWrapper {
 
   public static native boolean initialize(int timeout, int mode);
 
+  public static native void shutdown();
+
   public static native boolean hasMain();
 
   public static native void runMain();

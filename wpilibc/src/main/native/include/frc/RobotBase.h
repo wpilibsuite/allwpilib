@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 
+#include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -88,6 +89,8 @@ int StartRobot() {
   } else {
     impl::RunRobot<Robot>(m, &robot);
   }
+
+  HAL_Shutdown();
 
   return 0;
 }

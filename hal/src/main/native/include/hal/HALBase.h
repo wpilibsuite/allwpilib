@@ -149,6 +149,14 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status);
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
 
+/**
+ * Call this to shut down HAL.
+ *
+ * This must be called at termination of the robot program to avoid potential
+ * segmentation faults with simulation extensions at exit.
+ */
+void HAL_Shutdown(void);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
