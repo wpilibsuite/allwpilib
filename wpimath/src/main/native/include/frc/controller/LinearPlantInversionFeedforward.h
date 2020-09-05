@@ -11,6 +11,7 @@
 #include <functional>
 
 #include "Eigen/Core"
+#include "Eigen/QR"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"

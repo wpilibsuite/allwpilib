@@ -10,6 +10,7 @@
 #include <functional>
 
 #include "Eigen/Core"
+#include "Eigen/Eigenvalues"
 #include "frc/system/Discretization.h"
 #include "frc/system/RungeKutta.h"
 

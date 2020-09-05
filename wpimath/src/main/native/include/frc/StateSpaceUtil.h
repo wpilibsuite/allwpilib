@@ -13,8 +13,8 @@
 #include <type_traits>
 
 #include "Eigen/Core"
-#include "Eigen/Eigenvalues"
 #include "Eigen/QR"
+#include "Eigen/src/Eigenvalues/EigenSolver.h"
 #include "frc/geometry/Pose2d.h"
 
 namespace frc {

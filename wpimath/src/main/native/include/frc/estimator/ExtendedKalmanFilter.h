@@ -10,8 +10,8 @@
 #include <array>
 #include <functional>
 
-#include "Eigen/Cholesky"
 #include "Eigen/Core"
+#include "Eigen/src/Cholesky/LDLT.h"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
