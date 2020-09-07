@@ -23,6 +23,12 @@ nativeUtils.exportsConfigs {
     }
 }
 
+cppHeadersZip {
+    from('src/main/native/eigeninclude') {
+        into '/'
+    }
+}
+
 model {
     components {
         all {
