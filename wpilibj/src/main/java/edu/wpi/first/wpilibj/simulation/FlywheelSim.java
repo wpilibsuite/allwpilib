@@ -47,14 +47,14 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @param flywheelGearbox    The DCMotor representing the motor driving the flywheel.
    * @param gearing            The reduction between motor and drum, as output over input.
    *                           In most cases this is greater than one.
-   * @param moiKgMetersSquared The moment of inertia J of the flywheel. This can be
+   * @param jKgMetersSquared   The moment of inertia J of the flywheel. This can be
    *                           calculated with CAD. If J is unknown, {@link #FlywheelSim(LinearSystem, DCMotor, double, Matrix)}
    *                           using FRC-Characterization's kV and kA may be better.
    * @param measurementStdDevs Standard deviations of measurements. Can be null if addNoise is false.
    */
   public FlywheelSim(DCMotor flywheelGearbox, double gearing,
-                     double moiKgMetersSquared, Matrix<N1, N1> measurementStdDevs) {
-    super(LinearSystemId.createFlywheelSystem(flywheelGearbox, moiKgMetersSquared, gearing),
+                     double jKgMetersSquared, Matrix<N1, N1> measurementStdDevs) {
+    super(LinearSystemId.createFlywheelSystem(flywheelGearbox, jKgMetersSquared, gearing),
         measurementStdDevs);
     this.m_motor = flywheelGearbox;
     this.m_gearing = gearing;

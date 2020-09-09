@@ -45,7 +45,7 @@ class Robot : public frc::TimedRobot {
   static constexpr double kArmEncoderDistPerPulse =
       2.0 * wpi::math::pi * kElevatorDrumRadius.to<double>() / 4096.0;
 
-  // This gearbox represnts the four Vex 775pros driving the elevator.
+  // This gearbox represents a gearbox containing 4 Vex 775pro motors.
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator

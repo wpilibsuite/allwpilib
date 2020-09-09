@@ -35,34 +35,34 @@ class Robot : public frc::TimedRobot {
   // The P gain for the PID controller that drives this arm.
   static constexpr double kArmKp = 5.0;
 
-  static constexpr units::meter_t kMinElevatorHeight = 0_in;
-  static constexpr units::meter_t kMaxElevatorHeight = 50_in;
-
   // distance per pulse = (angle per revolution) / (pulses per revolution)
   //  = (2 * PI rads) / (4096 pulses)
   static constexpr double kArmEncoderDistPerPulse =
       2.0 * wpi::math::pi / 4096.0;
 
   // The arm gearbox represents a gerbox containing two Vex 775pro motors.
-  frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(2);
+  frc::DCMotor m_armGearbox = frc::DCMotor::Vex775Pro(2);
 
-  // Standard classes for controlling our elevator
+  // Standard classes for controlling our arm
   frc2::PIDController m_controller{kArmKp, 0, 0};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::PWMVictorSPX m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
 
   // Simulation classes help us simulate what's going on, including gravity.
+  // This sim represents an arm with 2 775s, a 100:1 reduction, a mass of 5kg,
+  // 30in overall arm length, range of motion nin [-180, 0] degrees, and noise with a standard
+  // deviation of 0.5 degrees.
   frc::sim::SingleJointedArmSim m_armSim{
-      m_elevatorGearbox, 100.0, 5_kg, 30_in,
-      -180_deg,          0_deg, true, {(0.5_deg).to<double>()}};
+      m_armGearbox, 100.0, 5_kg, 30_in,
+      -180_deg, 0_deg, true, {(0.5_deg).to<double>()}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
  public:
   void RobotInit() { m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse); }
 
   void SimulationPeriodic() {
-    // In this method, we update our simulation of what our elevator is doing
+    // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
     m_armSim.SetInput(frc::MakeMatrix<1, 1>(
         m_motor.Get() * frc::RobotController::GetInputVoltage()));

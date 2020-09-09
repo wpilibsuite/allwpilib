@@ -632,7 +632,7 @@
     "name": "ArmSimulation",
     "description": "Demonstrates the use of physics simulation with a simple single-jointed arm.",
     "tags": [
-      "ARm",
+      "Arm",
       "State space",
       "Digital",
       "Sensors",
