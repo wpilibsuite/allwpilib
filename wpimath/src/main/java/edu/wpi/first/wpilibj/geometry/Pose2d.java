@@ -155,9 +155,9 @@ public class Pose2d {
   /**
    * Obtain a new Pose2d from a (constant curvature) velocity.
    *
-   * <p>See <a href="https://file.tavsys.net/control/state-space-guide.pdf">
-   * Controls Engineering in the FIRST Robotics Competition</a>
-   * section on nonlinear pose estimation for derivation.
+   * <p>See <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">
+   * Controls Engineering in the FIRST Robotics Competition</a> section 10.2 "Pose exponential" for
+   * a derivation.
    *
    * <p>The twist is a change in pose in the robot's coordinate frame since the
    * previous pose update. When the user runs exp() on the previous known

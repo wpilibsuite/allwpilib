@@ -32,7 +32,7 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * input because that's what comes back from the sensors).
  *
  * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/state-space-guide.pdf.
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
 @SuppressWarnings("ClassTypeParameterName")
 public class LinearSystemLoop<States extends Num, Inputs extends Num,
