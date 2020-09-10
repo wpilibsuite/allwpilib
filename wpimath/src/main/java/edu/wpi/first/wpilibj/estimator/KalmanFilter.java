@@ -29,7 +29,8 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * the model.
  *
  * <p>For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9.
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
+ * theory".
  */
 @SuppressWarnings("ClassTypeParameterName")
 public class KalmanFilter<States extends Num, Inputs extends Num,
