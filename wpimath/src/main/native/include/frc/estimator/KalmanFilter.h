@@ -23,22 +23,20 @@ namespace frc {
 namespace detail {
 
 /**
- * Luenberger observers combine predictions from a model and measurements to
- * give an estimate of the true system state.
+ * A Kalman filter combines predictions from a model and measurements to give an
+ * estimate of the true system state. This is useful because many states cannot
+ * be measured directly as a result of sensor noise, or because the state is
+ * "hidden".
  *
- * Luenberger observers use an L gain matrix to determine whether to trust the
- * model or measurements more. Kalman filter theory uses statistics to compute
- * an optimal L gain (alternatively called the Kalman gain, K) which minimizes
- * the sum of squares error in the state estimate.
- *
- * Luenberger observers run the prediction and correction steps simultaneously
- * while Kalman filters run them sequentially. To implement a discrete-time
- * Kalman filter as a Luenberger observer, use the following mapping:
- * <pre>C = H, L = A * K</pre>
- * (H is the measurement matrix).
+ * Kalman filters use a K gain matrix to determine whether to trust the model or
+ * measurements more. Kalman filter theory uses statistics to compute an optimal
+ * K gain which minimizes the sum of squares error in the state estimate. This K
+ * gain is used to correct the state estimate by some amount of the difference
+ * between the actual measurements and the measurements predicted by the model.
  *
  * For more on the underlying math, read
- * https://file.tavsys.net/control/state-space-guide.pdf.
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
+ * "Stochastic control theory".
  */
 template <int States, int Inputs, int Outputs>
 class KalmanFilterImpl {
