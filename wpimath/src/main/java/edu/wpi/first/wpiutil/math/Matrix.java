@@ -23,7 +23,7 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 
 /**
  * A shape-safe wrapper over Efficient Java Matrix Library (EJML) matrices.
- * 
+ *
  * <p>This class is intended to be used alongside the state space library.
  *
  * @param <R> The number of rows in this matrix.

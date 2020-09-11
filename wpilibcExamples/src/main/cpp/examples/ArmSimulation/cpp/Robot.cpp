@@ -51,11 +51,11 @@ class Robot : public frc::TimedRobot {
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This sim represents an arm with 2 775s, a 100:1 reduction, a mass of 5kg,
-  // 30in overall arm length, range of motion nin [-180, 0] degrees, and noise with a standard
-  // deviation of 0.5 degrees.
+  // 30in overall arm length, range of motion nin [-180, 0] degrees, and noise
+  // with a standard deviation of 0.5 degrees.
   frc::sim::SingleJointedArmSim m_armSim{
       m_armGearbox, 100.0, 5_kg, 30_in,
-      -180_deg, 0_deg, true, {(0.5_deg).to<double>()}};
+      -180_deg,     0_deg, true, {(0.5_deg).to<double>()}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
  public:
