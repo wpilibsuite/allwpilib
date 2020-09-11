@@ -24,6 +24,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import edu.wpi.first.wpiutil.math.numbers.N12;
 import edu.wpi.first.wpiutil.math.numbers.N7;
 
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ class DifferentialDrivetrainSimTest {
     feedforward.reset(VecBuilder.fill(0, 0));
 
     // ground truth
-    Matrix<N7, N1> groundTruthX = new Vector<>(Nat.N7());
+    Matrix<N12, N1> groundTruthX = new Vector<>(Nat.N12());
 
     var traj = TrajectoryGenerator.generateTrajectory(
         new Pose2d(),
@@ -84,8 +85,8 @@ class DifferentialDrivetrainSimTest {
         sim.getState(DifferentialDrivetrainSim.State.kX));
     assertEquals(groundTruthX.get(DifferentialDrivetrainSim.State.kY.value, 0),
         sim.getState(DifferentialDrivetrainSim.State.kY));
-    assertEquals(groundTruthX.get(DifferentialDrivetrainSim.State.kHeading.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kHeading));
+    assertEquals(groundTruthX.get(DifferentialDrivetrainSim.State.kCos.value, 0),
+        sim.getState(DifferentialDrivetrainSim.State.kCos));
   }
 
   @Test
@@ -119,5 +120,30 @@ class DifferentialDrivetrainSimTest {
       sim.update(0.020);
     }
     assertTrue(sim.getCurrentDrawAmps() > 0);
+  }
+
+  @Test
+  public void testWHeee() {
+    var motor = DCMotor.getNEO(2);
+    var plant = LinearSystemId.createDrivetrainVelocitySystem(
+        motor,
+        50,
+        Units.inchesToMeters(2),
+        Units.inchesToMeters(12),
+        2.0,
+        5.0);
+
+    var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
+    var sim = new DifferentialDrivetrainSim(plant,
+        kinematics, motor, 1, Units.inchesToMeters(2));
+
+    sim.setInputs(2, 4);
+
+    for(int i = 0; i < 10000; i++) {
+      sim.update(0.020);
+    }
+
+    System.out.println(sim.getEstimatedPosition());
+    assertTrue(Double.isFinite(sim.getEstimatedPosition().getX()));
   }
 }
