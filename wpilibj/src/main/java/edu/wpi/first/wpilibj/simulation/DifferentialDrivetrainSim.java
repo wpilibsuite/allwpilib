@@ -95,6 +95,7 @@ public class DifferentialDrivetrainSim {
     this.m_motor = driveMotor;
     this.m_originalGearing = gearing;
     m_wheelRadiusMeters = wheelRadiusMeters;
+    m_currentGearing = m_originalGearing;
 
     m_x = new Matrix<>(Nat.N7(), Nat.N1());
   }
@@ -175,29 +176,24 @@ public class DifferentialDrivetrainSim {
 
     // Because G^2 can be factored out of A, we can divide by the old ratio squared and multiply
     // by the new ratio squared to get a new drivetrain model.
-    var A = new Matrix<>(Nat.N4(), Nat.N7());
+    var A = new Matrix<>(Nat.N4(), Nat.N4());
     A.assignBlock(0, 0, m_plant.getA().times((this.m_currentGearing * this.m_currentGearing)
         / (this.m_originalGearing * this.m_originalGearing)));
 
     A.assignBlock(2, 0, Matrix.eye(Nat.N2()));
-    A.assignBlock(0, 4, B);
-    A.setColumn(6, VecBuilder.fill(0, 0, 1, -1));
 
     var v = (x.get(State.kLeftVelocity.value, 0) + x.get(State.kRightVelocity.value, 0)) / 2.0;
 
-    var xdot = new Matrix<>(Nat.N10(), Nat.N1());
+    var xdot = new Matrix<>(Nat.N7(), Nat.N1());
     xdot.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
     xdot.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
     xdot.set(2, 0, (x.get(State.kRightVelocity.value, 0)
         - x.get(State.kLeftVelocity.value, 0)) / (2.0 * m_rb));
-
-    var xAug = new Matrix<>(Nat.N10(), Nat.N1());
-    xAug.assignBlock(0, 0, x);
     xdot.assignBlock(3, 0,
-        A.times(xAug.block(Nat.N7(), Nat.N1(), 3, 0))
+        A.times(x.block(Nat.N4(), Nat.N1(), 3, 0))
         .plus(B.times(u)));
 
-    return xdot.block(Nat.N7(), Nat.N1(), 0, 0);
+    return xdot;
   }
 
   public enum State {
