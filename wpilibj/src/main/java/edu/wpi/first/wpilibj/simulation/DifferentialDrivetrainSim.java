@@ -19,6 +19,7 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N10;
 import edu.wpi.first.wpiutil.math.numbers.N2;
+import edu.wpi.first.wpiutil.math.numbers.N7;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -48,7 +49,7 @@ public class DifferentialDrivetrainSim {
   @SuppressWarnings("MemberName")
   private Matrix<N2, N1> m_u;
   @SuppressWarnings("MemberName")
-  private Matrix<N10, N1> m_x;
+  private Matrix<N7, N1> m_x;
 
   private final double m_rb;
   private final LinearSystem<N2, N2, N2> m_plant;
@@ -66,7 +67,7 @@ public class DifferentialDrivetrainSim {
     this.m_rightGearing = gearing;
     m_wheelRadiusMeters = wheelRadiusMeters;
 
-    m_x = new Matrix<>(new SimpleMatrix(10, 1));
+    m_x = new Matrix<>(Nat.N7(), Nat.N1());
   }
 
   /**
@@ -116,7 +117,7 @@ public class DifferentialDrivetrainSim {
     return m_x.get(state.value, 0);
   }
 
-  public Matrix<N10, N1> getState() {
+  public Matrix<N7, N1> getState() {
     return m_x;
   }
 
@@ -147,7 +148,7 @@ public class DifferentialDrivetrainSim {
   }
 
   @SuppressWarnings({"DuplicatedCode", "LocalVariableName"})
-  protected Matrix<N10, N1> getDynamics(Matrix<N10, N1> x, Matrix<N2, N1> u) {
+  protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
     var B = new Matrix<>(Nat.N4(), Nat.N2());
     B.assignBlock(0, 0, m_plant.getB());
 
@@ -160,17 +161,19 @@ public class DifferentialDrivetrainSim {
 
     var v = (x.get(State.kLeftVelocity.value, 0) + x.get(State.kRightVelocity.value, 0)) / 2.0;
 
-    var result = new Matrix<>(Nat.N10(), Nat.N1());
-    result.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
-    result.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
-    result.set(2, 0, (x.get(State.kRightVelocity.value, 0)
+    var xdot = new Matrix<>(Nat.N10(), Nat.N1());
+    xdot.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
+    xdot.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
+    xdot.set(2, 0, (x.get(State.kRightVelocity.value, 0)
         - x.get(State.kLeftVelocity.value, 0)) / (2.0 * m_rb));
 
-    result.assignBlock(3, 0,
-        A.times(x.block(Nat.N7(), Nat.N1(), 3, 0))
+    var xAug = new Matrix<>(Nat.N10(), Nat.N1());
+    xAug.assignBlock(0, 0, x);
+    xdot.assignBlock(3, 0,
+        A.times(xAug.block(Nat.N7(), Nat.N1(), 3, 0))
         .plus(B.times(u)));
 
-    return result;
+    return xdot.block(Nat.N7(), Nat.N1(), 0, 0);
   }
 
   public enum State {
@@ -180,10 +183,10 @@ public class DifferentialDrivetrainSim {
     kLeftVelocity(3),
     kRightVelocity(4),
     kLeftPosition(5),
-    kRightPosition(6),
-    kLeftVoltageError(7),
-    kRightVoltageError(8),
-    kHeadingError(9);
+    kRightPosition(6);
+//    kLeftVoltageError(7),
+//    kRightVoltageError(8),
+//    kHeadingError(9);
 
     @SuppressWarnings("MemberName")
     public final int value;

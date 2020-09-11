@@ -56,7 +56,7 @@ class DifferentialDrivetrainSimTest {
     feedforward.reset(VecBuilder.fill(0, 0));
 
     // ground truth
-    Matrix<N10, N1> groundTruthX = new Vector<>(Nat.N10());
+    Matrix<N7, N1> groundTruthX = new Vector<>(Nat.N7());
 
     var traj = TrajectoryGenerator.generateTrajectory(
         new Pose2d(),
