@@ -91,13 +91,11 @@ Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::Dynamics(
 
   // Because G can be factored out of B, we can divide by the old ratio and
   // multiply by the new ratio to get a new drivetrain model.
-  Eigen::Matrix<double, 4, 7> A;
+  Eigen::Matrix<double, 4, 4> A;
   A.block<2, 2>(0, 0) = m_plant.A() * m_currentGearing / m_originalGearing;
 
   A.block<2, 2>(2, 0).setIdentity();
   A.block<4, 2>(0, 2).setZero();
-  A.block<4, 2>(0, 4) = B;
-  A.block<4, 1>(0, 6) << 0, 0, 1, -1;
 
   double v = (x(State::kLeftVelocity) + x(State::kRightVelocity)) / 2.0;
 
@@ -107,6 +105,6 @@ Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::Dynamics(
   xdot(2) =
       ((x(State::kRightVelocity) - x(State::kLeftVelocity)) / (2.0 * m_rb))
           .to<double>();
-  xdot.block<4, 1>(3, 0) = A * x.block<7, 1>(3, 0) + B * u;
+  xdot.block<4, 1>(3, 0) = A * x.block<4, 1>(3, 0) + B * u;
   return xdot;
 }
