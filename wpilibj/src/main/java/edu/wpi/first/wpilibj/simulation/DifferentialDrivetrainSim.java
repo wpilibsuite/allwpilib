@@ -13,14 +13,13 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.RungeKutta;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N7;
+import edu.wpi.first.wpiutil.math.numbers.N10;
 import edu.wpi.first.wpiutil.math.numbers.N2;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * This class simulates the state of the drivetrain. In simulationPeriodic, users should first set inputs from motors with
@@ -41,63 +40,58 @@ import edu.wpi.first.wpiutil.math.numbers.N2;
  *
  */
 public class DifferentialDrivetrainSim {
-  private final DCMotor m_motor;
-  private final double m_originalGearing;
-  private double m_currentGearing;
-  private final double m_wheelRadiusMeters;
+  private final DCMotor m_leftMotor;
+  private final DCMotor m_rightMotor;
+  private final double m_leftGearing;
+  private final double m_rightGearing;
+  private double m_wheelRadiusMeters;
   @SuppressWarnings("MemberName")
   private Matrix<N2, N1> m_u;
   @SuppressWarnings("MemberName")
-  private Matrix<N7, N1> m_x;
+  private Matrix<N10, N1> m_x;
 
   private final double m_rb;
   private final LinearSystem<N2, N2, N2> m_plant;
 
-  /**
-   * Create a SimDrivetrain.
-   *
-   * @param drivetrainPlant   The {@link LinearSystem} representing the robot's drivetrain. This
-   *                          system can be created with {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor, double, double, double, double, double)}
-   *                          or {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
-   * @param kinematics        A {@link DifferentialDriveKinematics} object representing the
-   *                          differential drivetrain's kinematics.
-   * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
-   * @param gearingRatio      The gearingRatio ratio of the left side, as output over input.
-   *                          This must be the same ratio as the ratio used to identify or create
-   *                          the drivetrainPlant.
-   * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
-   */
+
   public DifferentialDrivetrainSim(LinearSystem<N2, N2, N2> drivetrainPlant,
                                    DifferentialDriveKinematics kinematics,
-                                   DCMotor driveMotor, double gearingRatio,
+                                   DCMotor driveMotor, double gearing,
                                    double wheelRadiusMeters) {
     this.m_plant = drivetrainPlant;
     this.m_rb = kinematics.trackWidthMeters / 2.0;
-    this.m_motor = driveMotor;
-    this.m_originalGearing = gearingRatio;
+    this.m_leftMotor = driveMotor;
+    this.m_rightMotor = driveMotor;
+    this.m_leftGearing = gearing;
+    this.m_rightGearing = gearing;
     m_wheelRadiusMeters = wheelRadiusMeters;
 
-    m_currentGearing = this.m_originalGearing;
-    m_x = new Matrix<>(Nat.N7(), Nat.N1());
+    m_x = new Matrix<>(new SimpleMatrix(10, 1));
   }
 
   /**
    * Create a SimDrivetrain.
    *
-   * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
-   * @param massKg            The mass of the drivebase.
-   * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
-   * @param jKgMetersSquared  The moment of inertia of the drivetrain about its center.
-   * @param gearing           The gearing on the drive between motor and wheel, as output over input.
-   * @param trackWidthMeters  The robot's track width, or distance between left and right wheels.
+   * @param drivetrainPlant The {@link LinearSystem} representing the robot's drivetrain. This
+   *                        system can be created with {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor, double, double, double, double, double)}
+   *                        or {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
+   * @param kinematics      A {@link DifferentialDriveKinematics} object representing the
+   *                        differential drivetrain's kinematics.
    */
-  public DifferentialDrivetrainSim(DCMotor driveMotor, double massKg,
-                                   double wheelRadiusMeters, double jKgMetersSquared, double gearing,
-                                   double trackWidthMeters) {
-    this(LinearSystemId.createDrivetrainVelocitySystem(driveMotor, massKg, wheelRadiusMeters,
-        trackWidthMeters / 2, jKgMetersSquared, gearing),
-        new DifferentialDriveKinematics(trackWidthMeters),
-        driveMotor, gearing, wheelRadiusMeters);
+  public DifferentialDrivetrainSim(LinearSystem<N2, N2, N2> drivetrainPlant,
+                                   DifferentialDriveKinematics kinematics,
+                                   DCMotor leftGearbox, double leftGearing,
+                                   DCMotor rightGearbox, double rightGearing,
+                                   double wheelRadiusMeters) {
+    this.m_plant = drivetrainPlant;
+    this.m_rb = kinematics.trackWidthMeters / 2.0;
+    this.m_leftMotor = leftGearbox;
+    this.m_rightMotor = rightGearbox;
+    this.m_leftGearing = leftGearing;
+    this.m_rightGearing = rightGearing;
+    m_wheelRadiusMeters = wheelRadiusMeters;
+
+    m_x = new Matrix<>(new SimpleMatrix(10, 1));
   }
 
   /**
@@ -122,7 +116,7 @@ public class DifferentialDrivetrainSim {
     return m_x.get(state.value, 0);
   }
 
-  public Matrix<N7, N1> getState() {
+  public Matrix<N10, N1> getState() {
     return m_x;
   }
 
@@ -141,47 +135,24 @@ public class DifferentialDrivetrainSim {
   }
 
   public double getCurrentDrawAmps() {
-    var loadIleft = m_motor.getCurrent(
-        getState(State.kLeftVelocity) * m_originalGearing / m_wheelRadiusMeters,
+    var loadIleft = m_leftMotor.getCurrent(
+        getState(State.kLeftVelocity) * m_leftGearing / m_wheelRadiusMeters,
         m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
 
-    var loadIright = m_motor.getCurrent(
-        getState(State.kRightVelocity) * m_originalGearing / m_wheelRadiusMeters,
+    var loadIright = m_rightMotor.getCurrent(
+        getState(State.kRightVelocity) * m_rightGearing / m_wheelRadiusMeters,
         m_u.get(1, 0)) * Math.signum(m_u.get(1, 0));
 
     return loadIleft + loadIright;
   }
 
-  /**
-   * Get the current gearing reduction of the drivetrain, as output over input.
-   */
-  public double getGearing() {
-    return m_currentGearing;
-  }
-
-  /**
-   * Set the gearing reduction on the drivetrain. This is commonly used for
-   * shifting drivetrains.
-   *
-   * @param newGearRatio The new gear ratio, as output over input.
-   */
-  public void setGearing(double newGearRatio) {
-    this.m_currentGearing = newGearRatio;
-  }
-
   @SuppressWarnings({"DuplicatedCode", "LocalVariableName"})
-  protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
-
-    // Because G can be factored out of B, we can divide by the old ratio and multiply
-    // by the new ratio to get a new drivetrain model.
+  protected Matrix<N10, N1> getDynamics(Matrix<N10, N1> x, Matrix<N2, N1> u) {
     var B = new Matrix<>(Nat.N4(), Nat.N2());
-    B.assignBlock(0, 0, m_plant.getB().times(this.m_currentGearing / this.m_originalGearing));
+    B.assignBlock(0, 0, m_plant.getB());
 
-    // Because G^2 can be factored out of A, we can divide by the old ratio squared and multiply
-    // by the new ratio squared to get a new drivetrain model.
     var A = new Matrix<>(Nat.N4(), Nat.N7());
-    A.assignBlock(0, 0, m_plant.getA().times((this.m_currentGearing * this.m_currentGearing)
-        / (this.m_originalGearing * this.m_originalGearing)));
+    A.assignBlock(0, 0, m_plant.getA());
 
     A.assignBlock(2, 0, Matrix.eye(Nat.N2()));
     A.assignBlock(0, 4, B);
@@ -189,17 +160,17 @@ public class DifferentialDrivetrainSim {
 
     var v = (x.get(State.kLeftVelocity.value, 0) + x.get(State.kRightVelocity.value, 0)) / 2.0;
 
-    Matrix<N7, N1> xdot = new Matrix<>(Nat.N7(), Nat.N1());
-    xdot.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
-    xdot.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
-    xdot.set(2, 0, (x.get(State.kRightVelocity.value, 0)
+    var result = new Matrix<>(Nat.N10(), Nat.N1());
+    result.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
+    result.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
+    result.set(2, 0, (x.get(State.kRightVelocity.value, 0)
         - x.get(State.kLeftVelocity.value, 0)) / (2.0 * m_rb));
 
-    xdot.assignBlock(3, 0,
-        A.times(x.block(Nat.N7(), Nat.N1(), 0, 0))
+    result.assignBlock(3, 0,
+        A.times(x.block(Nat.N7(), Nat.N1(), 3, 0))
         .plus(B.times(u)));
 
-    return xdot;
+    return result;
   }
 
   public enum State {
@@ -209,7 +180,10 @@ public class DifferentialDrivetrainSim {
     kLeftVelocity(3),
     kRightVelocity(4),
     kLeftPosition(5),
-    kRightPosition(6);
+    kRightPosition(6),
+    kLeftVoltageError(7),
+    kRightVoltageError(8),
+    kHeadingError(9);
 
     @SuppressWarnings("MemberName")
     public final int value;
@@ -217,78 +191,5 @@ public class DifferentialDrivetrainSim {
     State(int i) {
       this.value = i;
     }
-  }
-
-  public enum KitbotGearing {
-    Gearing10_71(10.71),
-    Gearing8_45(8.45),
-    Gearing5_95(5.95);
-
-    @SuppressWarnings("MemberName")
-    public final double value;
-
-    KitbotGearing(double i) {
-      this.value = i;
-    }
-  }
-
-  public enum KitbotMotor {
-    SingleCIMPerSide(DCMotor.getCIM(1)),
-    DualCIMPerSide(DCMotor.getCIM(2)),
-    SingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
-    DualMiniCIMPerSide(DCMotor.getMiniCIM(2));
-
-    @SuppressWarnings("MemberName")
-    public final DCMotor value;
-
-    KitbotMotor(DCMotor i) {
-      this.value = i;
-    }
-  }
-
-  public enum KitbotWheelSize {
-    SixInch(Units.inchesToMeters(6)),
-    EightInch(Units.inchesToMeters(8)),
-    TenInch(Units.inchesToMeters(10));
-
-    @SuppressWarnings("MemberName")
-    public final double value;
-
-    KitbotWheelSize(double i) {
-      this.value = i;
-    }
-  }
-
-  /**
-   * Create a sim for the standard FRC kitbot.
-   * 
-   * @param motor     The motors installed in the bot.
-   * @param gearing   The gearing reduction used.
-   * @param wheelSize The wheel size.
-   */
-  public static DifferentialDrivetrainSim createKitbotSim(KitbotMotor motor, KitbotGearing gearing,
-                                                          KitbotWheelSize wheelSize) {
-    // MOI estimation -- note that I = m r^2 for point masses
-    var batteryMoi = 12.5 / 2.2 * Math.pow(Units.inchesToMeters(10), 2);
-    var gearboxMoi = (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)
-        * Math.pow(Units.inchesToMeters(26.0 / 2.0), 2);
-
-    return new DifferentialDrivetrainSim(motor.value, 25 / 2.2, wheelSize.value / 2.0,
-        batteryMoi + gearboxMoi, gearing.value, Units.inchesToMeters(26));
-  }
-
-  /**
-   * Create a sim for the standard FRC kitbot.
-   *
-   * @param motor            The motors installed in the bot.
-   * @param gearing          The gearing reduction used.
-   * @param wheelSize        The wheel size.
-   * @param jKgMetersSquared The moment of inertia of the drivebase. This can be calculated using
-   *                         frc-characterization.
-   */
-  public static DifferentialDrivetrainSim createKitbotSim(KitbotMotor motor, KitbotGearing gearing,
-                                                          KitbotWheelSize wheelSize, double jKgMetersSquared) {
-    return new DifferentialDrivetrainSim(motor.value, 25 / 2.2, wheelSize.value / 2.0,
-        jKgMetersSquared, gearing.value, Units.inchesToMeters(26));
   }
 }

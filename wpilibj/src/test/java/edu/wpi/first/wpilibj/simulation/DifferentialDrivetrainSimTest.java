@@ -24,6 +24,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import edu.wpi.first.wpiutil.math.numbers.N10;
 import edu.wpi.first.wpiutil.math.numbers.N12;
 import edu.wpi.first.wpiutil.math.numbers.N7;
 
@@ -55,7 +56,7 @@ class DifferentialDrivetrainSimTest {
     feedforward.reset(VecBuilder.fill(0, 0));
 
     // ground truth
-    Matrix<N12, N1> groundTruthX = new Vector<>(Nat.N12());
+    Matrix<N10, N1> groundTruthX = new Vector<>(Nat.N10());
 
     var traj = TrajectoryGenerator.generateTrajectory(
         new Pose2d(),
@@ -85,8 +86,8 @@ class DifferentialDrivetrainSimTest {
         sim.getState(DifferentialDrivetrainSim.State.kX));
     assertEquals(groundTruthX.get(DifferentialDrivetrainSim.State.kY.value, 0),
         sim.getState(DifferentialDrivetrainSim.State.kY));
-    assertEquals(groundTruthX.get(DifferentialDrivetrainSim.State.kCos.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kCos));
+    assertEquals(groundTruthX.get(DifferentialDrivetrainSim.State.kHeading.value, 0),
+        sim.getState(DifferentialDrivetrainSim.State.kHeading));
   }
 
   @Test
@@ -135,7 +136,7 @@ class DifferentialDrivetrainSimTest {
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim = new DifferentialDrivetrainSim(plant,
-        kinematics, motor, 1, Units.inchesToMeters(2));
+        kinematics, motor, 5, Units.inchesToMeters(2));
 
     sim.setInputs(2, 4);
 
@@ -144,6 +145,6 @@ class DifferentialDrivetrainSimTest {
     }
 
     System.out.println(sim.getEstimatedPosition());
-    assertTrue(Double.isFinite(sim.getEstimatedPosition().getX()));
+    assertTrue(Math.abs(sim.getEstimatedPosition().getX()) < 10000);
   }
 }
