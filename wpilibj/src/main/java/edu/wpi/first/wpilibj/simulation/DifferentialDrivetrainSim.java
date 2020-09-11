@@ -9,15 +9,14 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.RungeKutta;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N10;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpiutil.math.numbers.N7;
 import org.ejml.simple.SimpleMatrix;
@@ -41,11 +40,10 @@ import org.ejml.simple.SimpleMatrix;
  *
  */
 public class DifferentialDrivetrainSim {
-  private final DCMotor m_leftMotor;
-  private final DCMotor m_rightMotor;
-  private final double m_leftGearing;
-  private final double m_rightGearing;
-  private double m_wheelRadiusMeters;
+  private final DCMotor m_motor;
+  private final double m_originalGearing;
+  private double m_currentGearing;
+  private final double m_wheelRadiusMeters;
   @SuppressWarnings("MemberName")
   private Matrix<N2, N1> m_u;
   @SuppressWarnings("MemberName")
@@ -54,45 +52,51 @@ public class DifferentialDrivetrainSim {
   private final double m_rb;
   private final LinearSystem<N2, N2, N2> m_plant;
 
-
-  public DifferentialDrivetrainSim(LinearSystem<N2, N2, N2> drivetrainPlant,
-                                   DifferentialDriveKinematics kinematics,
-                                   DCMotor driveMotor, double gearing,
-                                   double wheelRadiusMeters) {
-    this.m_plant = drivetrainPlant;
-    this.m_rb = kinematics.trackWidthMeters / 2.0;
-    this.m_leftMotor = driveMotor;
-    this.m_rightMotor = driveMotor;
-    this.m_leftGearing = gearing;
-    this.m_rightGearing = gearing;
-    m_wheelRadiusMeters = wheelRadiusMeters;
-
-    m_x = new Matrix<>(Nat.N7(), Nat.N1());
-  }
-
   /**
    * Create a SimDrivetrain.
    *
-   * @param drivetrainPlant The {@link LinearSystem} representing the robot's drivetrain. This
-   *                        system can be created with {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor, double, double, double, double, double)}
-   *                        or {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
-   * @param kinematics      A {@link DifferentialDriveKinematics} object representing the
-   *                        differential drivetrain's kinematics.
+   * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
+   * @param massKg            The mass of the drivebase.
+   * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
+   * @param jKgMetersSquared  The moment of inertia of the drivetrain about its center.
+   * @param gearing           The gearing on the drive between motor and wheel, as output over input.
+   *                          This must be the same ratio as the ratio used to identify or
+   *                          create the drivetrainPlant.
+   * @param trackWidthMeters  The robot's track width, or distance between left and right wheels.
+   */
+  public DifferentialDrivetrainSim(DCMotor driveMotor, double gearing,
+                                   double jKgMetersSquared, double massKg,
+                                   double wheelRadiusMeters, double trackWidthMeters) {
+    this(LinearSystemId.createDrivetrainVelocitySystem(driveMotor, massKg, wheelRadiusMeters,
+        trackWidthMeters / 2.0, jKgMetersSquared, gearing),
+        driveMotor, gearing, trackWidthMeters, wheelRadiusMeters);
+  }
+
+  /**
+   * Create a SimDrivetrain
+   * .
+   * @param drivetrainPlant   The {@link LinearSystem} representing the robot's drivetrain. This
+   *                          system can be created with {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor, double, double, double, double, double)}
+   *                          or {@link edu.wpi.first.wpilibj.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double, double, double)}.
+   * @param driveMotor        A {@link DCMotor} representing the drivetrain.
+   * @param gearing           The gearingRatio ratio of the robot, as output over input.
+   *                          This must be the same ratio as the ratio used to identify or
+   *                          create the drivetrainPlant.
+   * @param trackWidthMeters  The distance between the two sides of the drivetrian. Can be
+   *                          found with frc-characterization.
+   * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
    */
   public DifferentialDrivetrainSim(LinearSystem<N2, N2, N2> drivetrainPlant,
-                                   DifferentialDriveKinematics kinematics,
-                                   DCMotor leftGearbox, double leftGearing,
-                                   DCMotor rightGearbox, double rightGearing,
+                                   DCMotor driveMotor, double gearing,
+                                   double trackWidthMeters,
                                    double wheelRadiusMeters) {
     this.m_plant = drivetrainPlant;
-    this.m_rb = kinematics.trackWidthMeters / 2.0;
-    this.m_leftMotor = leftGearbox;
-    this.m_rightMotor = rightGearbox;
-    this.m_leftGearing = leftGearing;
-    this.m_rightGearing = rightGearing;
+    this.m_rb = trackWidthMeters / 2.0;
+    this.m_motor = driveMotor;
+    this.m_originalGearing = gearing;
     m_wheelRadiusMeters = wheelRadiusMeters;
 
-    m_x = new Matrix<>(new SimpleMatrix(10, 1));
+    m_x = new Matrix<>(Nat.N7(), Nat.N1());
   }
 
   /**
@@ -136,24 +140,44 @@ public class DifferentialDrivetrainSim {
   }
 
   public double getCurrentDrawAmps() {
-    var loadIleft = m_leftMotor.getCurrent(
-        getState(State.kLeftVelocity) * m_leftGearing / m_wheelRadiusMeters,
+    var loadIleft = m_motor.getCurrent(
+        getState(State.kLeftVelocity) * m_originalGearing / m_wheelRadiusMeters,
         m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
 
-    var loadIright = m_rightMotor.getCurrent(
-        getState(State.kRightVelocity) * m_rightGearing / m_wheelRadiusMeters,
+    var loadIright = m_motor.getCurrent(
+        getState(State.kRightVelocity) * m_originalGearing / m_wheelRadiusMeters,
         m_u.get(1, 0)) * Math.signum(m_u.get(1, 0));
 
     return loadIleft + loadIright;
   }
 
+  public double getCurrentGearing() {
+    return m_currentGearing;
+  }
+
+  /**
+   * Set the gearing reduction on the drivetrain. This is commonly used for
+   * shifting drivetrains.
+   *
+   * @param newGearRatio The new gear ratio, as output over input.
+   */
+  public void setCurrentGearing(double newGearRatio) {
+    this.m_currentGearing = newGearRatio;
+  }
+
   @SuppressWarnings({"DuplicatedCode", "LocalVariableName"})
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
-    var B = new Matrix<>(Nat.N4(), Nat.N2());
-    B.assignBlock(0, 0, m_plant.getB());
 
+    // Because G can be factored out of B, we can divide by the old ratio and multiply
+    // by the new ratio to get a new drivetrain model.
+    var B = new Matrix<>(Nat.N4(), Nat.N2());
+    B.assignBlock(0, 0, m_plant.getB().times(this.m_currentGearing / this.m_originalGearing));
+
+    // Because G^2 can be factored out of A, we can divide by the old ratio squared and multiply
+    // by the new ratio squared to get a new drivetrain model.
     var A = new Matrix<>(Nat.N4(), Nat.N7());
-    A.assignBlock(0, 0, m_plant.getA());
+    A.assignBlock(0, 0, m_plant.getA().times((this.m_currentGearing * this.m_currentGearing)
+        / (this.m_originalGearing * this.m_originalGearing)));
 
     A.assignBlock(2, 0, Matrix.eye(Nat.N2()));
     A.assignBlock(0, 4, B);
@@ -184,9 +208,6 @@ public class DifferentialDrivetrainSim {
     kRightVelocity(4),
     kLeftPosition(5),
     kRightPosition(6);
-//    kLeftVoltageError(7),
-//    kRightVoltageError(8),
-//    kHeadingError(9);
 
     @SuppressWarnings("MemberName")
     public final int value;

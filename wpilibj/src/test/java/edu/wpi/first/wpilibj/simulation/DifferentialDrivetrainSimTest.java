@@ -24,8 +24,6 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N10;
-import edu.wpi.first.wpiutil.math.numbers.N12;
 import edu.wpi.first.wpiutil.math.numbers.N7;
 
 import org.junit.jupiter.api.Test;
@@ -49,7 +47,7 @@ class DifferentialDrivetrainSimTest {
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim = new DifferentialDrivetrainSim(plant,
-        kinematics, motor, 1, Units.inchesToMeters(2));
+        motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2));
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
     var ramsete = new RamseteController();
@@ -101,8 +99,7 @@ class DifferentialDrivetrainSimTest {
         0.5,
         1.0);
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim = new DifferentialDrivetrainSim(plant,
-        kinematics, motor, 1, Units.inchesToMeters(2));
+    var sim = new DifferentialDrivetrainSim(plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2));
 
     sim.setInputs(-12, -12);
     for (int i = 0; i < 10; i++) {
@@ -135,12 +132,11 @@ class DifferentialDrivetrainSimTest {
         5.0);
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim = new DifferentialDrivetrainSim(plant,
-        kinematics, motor, 5, Units.inchesToMeters(2));
+    var sim = new DifferentialDrivetrainSim(plant, motor, 5, kinematics.trackWidthMeters, Units.inchesToMeters(2));
 
     sim.setInputs(2, 4);
 
-    for(int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 10000; i++) {
       sim.update(0.020);
     }
 
