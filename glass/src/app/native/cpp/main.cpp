@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 #include <imgui.h>
+#include <cscore_cpp.h>
 #include <ntcore_cpp.h>
 #include <wpi/StringExtras.h>
 #include <wpigui.h>
@@ -17,6 +18,8 @@
 #include "glass/Model.h"
 #include "glass/Storage.h"
 #include "glass/View.h"
+#include "glass/camera/NTCameraProvider.h"
+#include "glass/camera/UsbCameraProvider.h"
 #include "glass/networktables/NetworkTables.h"
 #include "glass/networktables/NetworkTablesProvider.h"
 #include "glass/networktables/NetworkTablesSettings.h"
@@ -39,6 +42,8 @@ std::string_view GetResource_glass_512_png();
 
 static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 static std::unique_ptr<glass::NetworkTablesProvider> gNtProvider;
+static std::unique_ptr<glass::NTCameraProvider> gNtCameraProvider;
+static std::unique_ptr<glass::UsbCameraProvider> gUsbCameraProvider;
 
 static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
 static std::unique_ptr<glass::NetworkTablesSettings> gNetworkTablesSettings;
@@ -225,6 +230,10 @@ int main(int argc, char** argv) {
       glass::GetStorageRoot().GetChild("Plots"));
   gNtProvider = std::make_unique<glass::NetworkTablesProvider>(
       glass::GetStorageRoot().GetChild("NetworkTables"));
+  gNtCameraProvider =
+      std::make_unique<glass::NTCameraProvider>("NTCameraProvider");
+  gUsbCameraProvider =
+      std::make_unique<glass::UsbCameraProvider>("UsbCameraProvider");
 
   glass::SetStorageName("glass");
   glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
@@ -233,6 +242,12 @@ int main(int argc, char** argv) {
   gui::AddInit([] { glass::ResetTime(); });
   gNtProvider->GlobalInit();
   NtInitialize();
+  gNtCameraProvider->GlobalInit();
+  gUsbCameraProvider->GlobalInit();
+  cs::SetTelemetryPeriod(1.0);
+  cs::SetLogger([](unsigned int level, const char* file, unsigned int line,
+                   const char* msg) { fmt::print("CS: {}\n", msg); },
+                0);
 
   glass::AddStandardNetworkTablesViews(*gNtProvider);
 
@@ -265,6 +280,17 @@ int main(int argc, char** argv) {
                       &gNetworkTablesDebugLog);
       ImGui::Separator();
       gNtProvider->DisplayMenu();
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Camera")) {
+      if (ImGui::BeginMenu("Network")) {
+        gNtCameraProvider->DisplayMenu();
+        ImGui::EndMenu();
+      }
+      if (ImGui::BeginMenu("USB")) {
+        gUsbCameraProvider->DisplayMenu();
+        ImGui::EndMenu();
+      }
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Plot")) {
@@ -359,6 +385,9 @@ int main(int argc, char** argv) {
   }
   gui::Main();
 
+  // cs::Shutdown();
+  gUsbCameraProvider.reset();
+  gNtCameraProvider.reset();
   gNetworkTablesSettingsWindow.reset();
   gNetworkTablesLogWindow.reset();
   gNetworkTablesWindow.reset();
