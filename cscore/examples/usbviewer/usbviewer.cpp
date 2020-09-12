@@ -24,7 +24,7 @@
 namespace gui = wpi::gui;
 
 int main() {
-  std::atomic<cv::Mat*> latestFrame;
+  std::atomic<cv::Mat*> latestFrame{nullptr};
   std::vector<cv::Mat*> sharedFreeList;
   wpi::spinlock sharedFreeListMutex;
   std::vector<cv::Mat*> sourceFreeList;
