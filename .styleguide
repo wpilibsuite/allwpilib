@@ -12,7 +12,6 @@ cppSrcFileInclude {
 generatedFileExclude {
   FRCNetComm\.java$
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
-  simulation/halsim_gui/src/main/native/include/portable-file-dialogs\.h$
 }
 
 repoRootNameOverride {
