@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.RungeKutta;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
@@ -216,5 +217,78 @@ public class DifferentialDrivetrainSim {
     State(int i) {
       this.value = i;
     }
+  }
+
+  public enum KitbotGearing {
+    Gearing10_71(10.71),
+    Gearing8_45(8.45),
+    Gearing5_95(5.95);
+
+    @SuppressWarnings("MemberName")
+    public final double value;
+
+    KitbotGearing(double i) {
+      this.value = i;
+    }
+  }
+
+  public enum KitbotMotor {
+    SingleCIMPerSide(DCMotor.getCIM(1)),
+    DualCIMPerSide(DCMotor.getCIM(2)),
+    SingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
+    DualMiniCIMPerSide(DCMotor.getMiniCIM(2));
+
+    @SuppressWarnings("MemberName")
+    public final DCMotor value;
+
+    KitbotMotor(DCMotor i) {
+      this.value = i;
+    }
+  }
+
+  public enum KitbotWheelSize {
+    SixInch(Units.inchesToMeters(6)),
+    EightInch(Units.inchesToMeters(8)),
+    TenInch(Units.inchesToMeters(10));
+
+    @SuppressWarnings("MemberName")
+    public final double value;
+
+    KitbotWheelSize(double i) {
+      this.value = i;
+    }
+  }
+
+  /**
+   * Create a sim for the standard FRC kitbot.
+   * 
+   * @param motor     The motors installed in the bot.
+   * @param gearing   The gearing reduction used.
+   * @param wheelSize The wheel size.
+   */
+  public static DifferentialDrivetrainSim createKitbotSim(KitbotMotor motor, KitbotGearing gearing,
+                                                          KitbotWheelSize wheelSize) {
+    // MOI estimation -- note that I = m r^2 for point masses
+    var batteryMoi = 12.5 / 2.2 * Math.pow(Units.inchesToMeters(10), 2);
+    var gearboxMoi = (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)
+        * Math.pow(Units.inchesToMeters(26.0 / 2.0), 2);
+
+    return new DifferentialDrivetrainSim(motor.value, 25 / 2.2, wheelSize.value / 2.0,
+        batteryMoi + gearboxMoi, gearing.value, Units.inchesToMeters(26));
+  }
+
+  /**
+   * Create a sim for the standard FRC kitbot.
+   *
+   * @param motor            The motors installed in the bot.
+   * @param gearing          The gearing reduction used.
+   * @param wheelSize        The wheel size.
+   * @param jKgMetersSquared The moment of inertia of the drivebase. This can be calculated using
+   *                         frc-characterization.
+   */
+  public static DifferentialDrivetrainSim createKitbotSim(KitbotMotor motor, KitbotGearing gearing,
+                                                          KitbotWheelSize wheelSize, double jKgMetersSquared) {
+    return new DifferentialDrivetrainSim(motor.value, 25 / 2.2, wheelSize.value / 2.0,
+        jKgMetersSquared, gearing.value, Units.inchesToMeters(26));
   }
 }
