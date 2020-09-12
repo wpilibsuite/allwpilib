@@ -1,0 +1,10 @@
+### Remove me before merge ###
+
+TODO:
+    Add Json to AddWindow so it isn't static window
+    Dynamically create windows so we can n number of them
+
+
+
+What I did:
+    Added AddWindow

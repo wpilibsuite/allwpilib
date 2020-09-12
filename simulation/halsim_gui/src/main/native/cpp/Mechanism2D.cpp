@@ -28,7 +28,7 @@ using namespace halsimgui;
 
 static HAL_SimDeviceHandle devHandle = 0;
 static wpi::StringMap<ImColor> colorLookUpTable;
-static std::unique_ptr<pfd::open_file> m_fileOpener;
+static std::vector<std::unique_ptr<pfd::open_file>> m_fileOpenerVector;
 static std::string previousJsonLocation = "Not empty";
 static bool showMechanism2D = true;
 static bool initMechanism2D = true;
@@ -87,63 +87,75 @@ class Mechanism2DInfo {
 };
 }  // namespace
 
-//namespace {
-//struct WindowStruct {
+// namespace {
+// struct WindowStruct {
 //  const char* name;
 //  std::function<void()> display;
 //  int flags;
 //};
 //}  // namespace
 //
-//static std::vector<WindowStruct> windowVector;
+// static std::vector<WindowStruct> windowVector;
 
 static Mechanism2DInfo mechanism2DInfo;
 
-// Get ready to read settings
-static bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
-  if (name == "jsonLocation") {
-    mechanism2DInfo.jsonLocation = value;
-  } else {
-    return false;
-  }
-  return true;
-}
-
-// Get ready to write settings
-static void WriteIni(ImGuiTextBuffer* out) {
-  out->appendf("[Mechanism2D][Mechanism2D]\njsonLocation=%s\n\n",
-               mechanism2DInfo.jsonLocation.c_str());
-}
-
-// read/write settings to ini file
-static void* Mechanism2DReadOpen(ImGuiContext* ctx,
-                                 ImGuiSettingsHandler* handler,
-                                 const char* name) {
-  if (name == wpi::StringRef{"Mechanism2D"}) return &mechanism2DInfo;
-  return nullptr;
-}
-// Read line form settings
-static void Mechanism2DReadLine(ImGuiContext* ctx,
-                                ImGuiSettingsHandler* handler, void* entry,
-                                const char* lineStr) {
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
-  if (entry == &mechanism2DInfo) ReadIni(name, value);
-}
-
-// Write to settings
-static void Mechanism2DWriteAll(ImGuiContext* ctx,
-                                ImGuiSettingsHandler* handler,
-                                ImGuiTextBuffer* out_buf) {
-  WriteIni(out_buf);
-}
-
+// TODO: Readd me with m_fileOpenerVector
+//
+//// Get ready to read settings
+// static bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
+//  if (name == "jsonLocation") {
+//    mechanism2DInfo.jsonLocation = value;
+//  } else {
+//    return false;
+//  }
+//  return true;
+//}
+//
+//// Get ready to write settings
+// static void WriteIni(ImGuiTextBuffer* out) {
+//  out->appendf("[Mechanism2D][Mechanism2D]\njsonLocation=%s\n\n",
+//               mechanism2DInfo.jsonLocation.c_str());
+//}
+//
+//// read/write settings to ini file
+// static void* Mechanism2DReadOpen(ImGuiContext* ctx,
+//                                 ImGuiSettingsHandler* handler,
+//                                 const char* name) {
+//  if (name == wpi::StringRef{"Mechanism2D"}) return &mechanism2DInfo;
+//  return nullptr;
+//}
+//// Read line form settings
+// static void Mechanism2DReadLine(ImGuiContext* ctx,
+//                                ImGuiSettingsHandler* handler, void* entry,
+//                                const char* lineStr) {
+//  wpi::StringRef line{lineStr};
+//  auto [name, value] = line.split('=');//// Read in the json file
+// static void GetJsonFileLocation() {
+//  if (m_fileOpener && m_fileOpener->ready(0)) {
+//    auto result = m_fileOpener->result();
+//    if (!result.empty()) {
+//      mechanism2DInfo.jsonLocation = result[0];
+//    } else {
+//      wpi::errs() << "Can not find json file!!!";
+//    }
+//  }
+//}
+//  name = name.trim();
+//  value = value.trim();
+//  if (entry == &mechanism2DInfo) ReadIni(name, value);
+//}
+//
+//// Write to settings
+// static void Mechanism2DWriteAll(ImGuiContext* ctx,
+//                                ImGuiSettingsHandler* handler,
+//                                ImGuiTextBuffer* out_buf) {
+//  WriteIni(out_buf);
+//}
+//
 // Read in the json file
-static void GetJsonFileLocation() {
-  if (m_fileOpener && m_fileOpener->ready(0)) {
-    auto result = m_fileOpener->result();
+static void GetJsonFileLocaton(std::make_unique<pfd::open_file> file) {
+  if (file && file->ready(0)) {
+    auto result = file->result();
     if (!result.empty()) {
       mechanism2DInfo.jsonLocation = result[0];
     } else {
@@ -222,7 +234,8 @@ static void buildDrawList(float startXLocation, float startYLocation,
                     bodyConfig.children, windowPos);
     }
     if (debugMode && loopCount % 30) {
-      wpi::outs() << bodyConfig.name << " Angle: " << angle << " Length: " << length << "\n";
+      wpi::outs() << bodyConfig.name << " Angle: " << angle
+                  << " Length: " << length << "\n";
     }
   }
 }
@@ -304,20 +317,35 @@ static void readJson(std::string jFile) {
   }
 }
 
+// TODO: Fix m_fileOpener
 // Menu for loading json
 static void OptionMenuLocateJson() {
   if (ImGui::BeginMenu("Mechanism2D")) {
     if (ImGui::MenuItem("Load Json")) {
-      m_fileOpener = std::make_unique<pfd::open_file>(
-          "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"});
+      m_fileOpenerVector.push_back(std::make_unique<pfd::open_file>(
+          "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"}));
+      for (auto& file : m_fileOpenerVector) {
+      }
     }
     ImGui::EndMenu();
   }
 }
 
-//static int counter = 0;
-static void DisplayMechanism2D() {
-  GetJsonFileLocation();
+static void AddWindow(std::string WindowName){
+  HALSimGui::AddWindow(WindowName, []() -> void {
+    wpi::outs() << TestString << '\n';
+    DisplayMechanism2D();
+  });
+  //    TODO re add me
+  HALSimGui::AddOptionMenu(OptionMenuLocateJson);
+  HALSimGui::SetDefaultWindowPos(WindowName, 200, 200);
+  HALSimGui::SetDefaultWindowSize(WindowName, 600, 600);
+  HALSimGui::SetWindowPadding(WindowName, 0, 0);
+}
+
+static void DisplayMechanism2D(std::string WindowName) {
+  //  TODO: Fix OptionMenuLocateJson
+  //    GetJsonFileLocation();
   if (!mechanism2DInfo.jsonLocation.empty()) {
     // Only read the json file if it changed
     if (mechanism2DInfo.jsonLocation != previousJsonLocation) {
@@ -330,12 +358,6 @@ static void DisplayMechanism2D() {
     buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(),
                   drawList, 0, bodyConfigVector, windowPos);
   }
-//  wpi::outs() << counter << "\n";
-//  if (counter == 250) {
-//    wpi::outs() << "Removing windows \n";
-//    HALSimGui::RemoveWindow("Mechanism 2D");
-//  }
-//  counter++;
 }
 
 static void WindowManager() {
@@ -343,14 +365,10 @@ static void WindowManager() {
   ImGui::Checkbox("Debug mode", &debugMode);
 
   if (initMechanism2D && showMechanism2D) {
-    HALSimGui::AddWindow("Mechanism 2D", DisplayMechanism2D);
-    HALSimGui::AddOptionMenu(OptionMenuLocateJson);
-    HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
-    HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
-    HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
-    initMechanism2D = false;
+
+    initMechanism2D = false;    //    TODO re add me
   }
-  if(!initMechanism2D && !showMechanism2D){
+  if (!initMechanism2D && !showMechanism2D) {
     HALSimGui::RemoveWindow("Mechanism 2D");
     initMechanism2D = true;
   }
@@ -358,14 +376,15 @@ static void WindowManager() {
 }
 
 void Mechanism2D::Initialize() {
-  // hook ini handler to save settings
-  ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "Mechanism2D";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = Mechanism2DReadOpen;
-  iniHandler.ReadLineFn = Mechanism2DReadLine;
-  iniHandler.WriteAllFn = Mechanism2DWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+  //  TODO: Fix me
+  //  // hook ini handler to save settings
+    ImGuiSettingsHandler iniHandler;
+    iniHandler.TypeName = "Mechanism2D";
+    iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
+    iniHandler.ReadOpenFn = Mechanism2DReadOpen;
+    iniHandler.ReadLineFn = Mechanism2DReadLine;
+    iniHandler.WriteAllFn = Mechanism2DWriteAll;
+    ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
   buildColorTable();
   HALSimGui::AddWindow("Mechanism 2D Settings", WindowManager);
