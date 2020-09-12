@@ -5,9 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <cstdlib>
 #include <cstring>
-#include <string>
 
 #include "DriverStationDataInternal.h"
 #include "hal/DriverStation.h"

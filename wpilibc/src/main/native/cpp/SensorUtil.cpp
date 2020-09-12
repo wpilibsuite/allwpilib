@@ -10,7 +10,6 @@
 #include <hal/AnalogInput.h>
 #include <hal/AnalogOutput.h>
 #include <hal/DIO.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/PDP.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>

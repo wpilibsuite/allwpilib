@@ -12,7 +12,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/Path.h"
-#include "wpi/ArrayRef.h"
 #include "wpi/Endian.h"
 #include "wpi/Errc.h"
 #include "wpi/ErrorHandling.h"
@@ -22,7 +21,6 @@
 #include <cstring>
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
-#include <unistd.h>
 #else
 #include <io.h>
 #endif

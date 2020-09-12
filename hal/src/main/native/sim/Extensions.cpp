@@ -12,11 +12,8 @@
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
-#include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/spinlock.h>
-
-#include "hal/HAL.h"
 
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>

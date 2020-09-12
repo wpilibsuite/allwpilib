@@ -14,7 +14,6 @@
 #ifndef WPIUTIL_WPI_ERROR_H
 #define WPIUTIL_WPI_ERROR_H
 
-#include "wpi/STLExtras.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/Twine.h"

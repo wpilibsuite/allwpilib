@@ -16,11 +16,9 @@
 #include <hal/DriverStationTypes.h>
 #include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/RobotState.h"
 
 namespace frc {
 

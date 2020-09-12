@@ -18,7 +18,6 @@
 
 #include "wpi/Twine.h"
 #include "wpi/iterator.h"
-#include <cstdint>
 #include <iterator>
 #include <system_error>
 

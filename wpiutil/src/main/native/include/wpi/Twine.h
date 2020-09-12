@@ -12,7 +12,6 @@
 
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
-#include "wpi/ErrorHandling.h"
 #include <cassert>
 #include <cstdint>
 #include <string>

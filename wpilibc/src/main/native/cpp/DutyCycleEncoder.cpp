@@ -7,6 +7,7 @@
 
 #include "frc/DutyCycleEncoder.h"
 
+#include "frc/Base.h"
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalSource.h"

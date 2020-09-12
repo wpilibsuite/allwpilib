@@ -28,10 +28,8 @@
 #include "wpi/NativeFormatting.h"
 #include "wpi/WindowsError.h"
 #include <algorithm>
-#include <cctype>
 #include <cerrno>
 #include <cstdio>
-#include <iterator>
 #include <sys/stat.h>
 #include <system_error>
 
@@ -40,7 +38,6 @@
 
 #ifndef _WIN32
 #include <unistd.h>
-#include <sys/uio.h>
 #endif
 
 #if defined(__CYGWIN__)

@@ -10,7 +10,6 @@
 #include <chrono>
 
 #include <hal/DriverStation.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Power.h>
 #include <networktables/NetworkTable.h>
@@ -19,10 +18,8 @@
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 
-#include "frc/AnalogInput.h"
 #include "frc/MotorSafety.h"
 #include "frc/Timer.h"
-#include "frc/Utility.h"
 #include "frc/WPIErrors.h"
 
 namespace frc {

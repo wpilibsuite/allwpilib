@@ -7,16 +7,12 @@
 
 #include "hal/PDP.h"
 
-#include <memory>
-
 #include <wpi/mutex.h>
 
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
-#include "hal/Ports.h"
-#include "hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 

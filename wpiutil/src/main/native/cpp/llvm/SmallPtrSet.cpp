@@ -15,7 +15,6 @@
 #include "wpi/SmallPtrSet.h"
 #include "wpi/DenseMapInfo.h"
 #include "wpi/MathExtras.h"
-#include "wpi/ErrorHandling.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>

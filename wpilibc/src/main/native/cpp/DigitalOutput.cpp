@@ -8,7 +8,6 @@
 #include "frc/DigitalOutput.h"
 
 #include <limits>
-#include <utility>
 
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>

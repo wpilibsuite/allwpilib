@@ -9,6 +9,7 @@
 
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/Base.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"

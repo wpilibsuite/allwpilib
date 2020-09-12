@@ -14,8 +14,6 @@
 #include "wpi/StringExtras.h"
 #include "wpi/Format.h"
 
-#include <float.h>
-
 using namespace wpi;
 
 template<typename T, std::size_t N>

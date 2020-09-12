@@ -7,6 +7,7 @@
 
 #include "frc/AnalogPotentiometer.h"
 
+#include "frc/Base.h"
 #include "frc/RobotController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"

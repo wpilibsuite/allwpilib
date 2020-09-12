@@ -20,8 +20,6 @@
 #include "wpi/iterator_range.h"
 #include "wpi/MemAlloc.h"
 #include "wpi/PointerLikeTypeTraits.h"
-#include "wpi/ErrorHandling.h"
-#include "wpi/deprecated.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -36,7 +34,6 @@ namespace wpi {
 template<typename ValueTy> class StringMapConstIterator;
 template<typename ValueTy> class StringMapIterator;
 template<typename ValueTy> class StringMapKeyIterator;
-template<typename ValueTy> class StringMapEntry;
 
 /// StringMapEntryBase - Shared base class of StringMapEntry instances.
 class StringMapEntryBase {

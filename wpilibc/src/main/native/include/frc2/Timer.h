@@ -8,10 +8,7 @@
 #pragma once
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
-
-#include "frc/Base.h"
 
 namespace frc2 {
 
