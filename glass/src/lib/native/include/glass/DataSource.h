@@ -1,0 +1,86 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
+
+#include <stdint.h>
+
+#include <atomic>
+#include <string>
+
+#include <imgui.h>
+#include <wpi/Signal.h>
+#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
+#include <wpi/spinlock.h>
+
+namespace glass {
+
+class NameInfo;
+
+/**
+ * A data source for numeric/boolean data.
+ */
+class DataSource {
+ public:
+  explicit DataSource(const wpi::Twine& id);
+  DataSource(const wpi::Twine& id, int index);
+  DataSource(const wpi::Twine& id, int index, int index2);
+  virtual ~DataSource();
+
+  DataSource(const DataSource&) = delete;
+  DataSource& operator=(const DataSource&) = delete;
+
+  const char* GetId() const { return m_id.c_str(); }
+
+  void SetName(const wpi::Twine& name);
+  const char* GetName() const;
+  NameInfo& GetNameInfo() { return *m_name; }
+
+  void PushEditNameId(int index);
+  void PushEditNameId(const char* name);
+  bool PopupEditName(int index);
+  bool PopupEditName(const char* name);
+  bool InputTextName(const char* label_id, ImGuiInputTextFlags flags = 0);
+
+  void SetDigital(bool digital) { m_digital = digital; }
+  bool IsDigital() const { return m_digital; }
+
+  void SetValue(double value, uint64_t time = 0) {
+    m_value = value;
+    valueChanged(value, time);
+  }
+  double GetValue() const { return m_value; }
+
+  // drag source helpers
+  void LabelText(const char* label, const char* fmt, ...) const;
+  void LabelTextV(const char* label, const char* fmt, va_list args) const;
+  bool Combo(const char* label, int* current_item, const char* const items[],
+             int items_count, int popup_max_height_in_items = -1) const;
+  bool SliderFloat(const char* label, float* v, float v_min, float v_max,
+                   const char* format = "%.3f", float power = 1.0f) const;
+  bool InputDouble(const char* label, double* v, double step = 0.0,
+                   double step_fast = 0.0, const char* format = "%.6f",
+                   ImGuiInputTextFlags flags = 0) const;
+  bool InputInt(const char* label, int* v, int step = 1, int step_fast = 100,
+                ImGuiInputTextFlags flags = 0) const;
+  void EmitDrag(ImGuiDragDropFlags flags = 0) const;
+
+  wpi::sig::SignalBase<wpi::spinlock, double, uint64_t> valueChanged;
+
+  static DataSource* Find(wpi::StringRef id);
+
+  static wpi::sig::Signal<const char*, DataSource*> sourceCreated;
+
+ private:
+  std::string m_id;
+  NameInfo* m_name;
+  bool m_digital = false;
+  std::atomic<double> m_value = 0;
+};
+
+}  // namespace glass

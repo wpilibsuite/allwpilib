@@ -24,6 +24,8 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
         binaries {
             all {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':glass', library: 'glassnt', linkage: 'static'
+                lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'imgui_static')
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
