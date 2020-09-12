@@ -46,7 +46,7 @@ public final class BatterySim {
    * @param currents The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  public static double calculateLoadedBatteryVoltage(double... currents) {
+  public static double calculateDefaultBatteryLoadedVoltage(double... currents) {
     return calculateLoadedBatteryVoltage(12, 0.02, currents);
   }
 }

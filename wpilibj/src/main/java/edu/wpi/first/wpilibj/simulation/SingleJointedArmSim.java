@@ -25,6 +25,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   private final double m_armMass;
   private final DCMotor m_motor;
   private final double m_gearing;
+  private final boolean m_simulateGravity;
 
   /**
    * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
@@ -43,12 +44,13 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param maxAngleRads         The max angle the arm can reach, with 0 being measured from
    *                             horizontal. The simulation will not allow motion past this.
    * @param posMeasurementStdDev Standard deviations of noise in the arm's position measurement.
+   * @param simulateGravity      If the affects of gravity should be simulated.
    */
   public SingleJointedArmSim(LinearSystem<N2, N1, N1> armSystem,
                              DCMotor motor, double G,
                              double armMassKg,
                              double armLengthMeters, double minAngleRads, double maxAngleRads,
-                             double posMeasurementStdDev) {
+                             double posMeasurementStdDev, boolean simulateGravity) {
     super(armSystem, VecBuilder.fill(posMeasurementStdDev));
     this.m_armMass = armMassKg;
     this.m_r = armLengthMeters;
@@ -56,6 +58,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     this.m_maxAngleRads = maxAngleRads;
     this.m_motor = motor;
     this.m_gearing = G;
+    this.m_simulateGravity = simulateGravity;
   }
 
   /**
@@ -73,16 +76,46 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param maxAngleRads         The max angle the arm can reach, with 0 being measured from
    *                             horizontal. The simulation will not allow motion past this.
    * @param posMeasurementStdDev Standard deviations of noise in the arm's position measurement.
+   * @param simulateGravity      If the affects of gravity should be simulated.
    */
   public SingleJointedArmSim(DCMotor motor, double jKgSquaredMeters,
                              double G, double armMassKg, double armLengthMeters,
                              double minAngleRads, double maxAngleRads,
-                             double posMeasurementStdDev) {
+                             double posMeasurementStdDev, boolean simulateGravity) {
     this(LinearSystemId.createSingleJointedArmSystem(motor, jKgSquaredMeters, G),
         motor, G,
         armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
-        posMeasurementStdDev);
+        posMeasurementStdDev, simulateGravity);
   }
+
+  /**
+   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
+   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
+   * the simulation and write simulated outputs to sensors.
+   *
+   * @param motor                      DCMotor representing the motor driving the arm.
+   * @param G                          The gear ratio of the arm (numbers greater than 1
+   *                                   represent reductions).
+   * @param armMassKg                  The mass of the arm.
+   * @param armLengthMeters            The distance from the pivot of the arm to its center of mass.
+   * @param minAngleRads               The min angle the arm can reach, with 0 being measured from
+   *                                   horizontal. The simulation will not allow motion past this.
+   * @param maxAngleRads               The max angle the arm can reach, with 0 being measured from
+   *                                   horizontal. The simulation will not allow motion past this.
+   * @param positionMeasurementStdDevs Standard deviations of noise in the arm's position measurement.
+   * @param simulateGravity      If the affects of gravity should be simulated.
+   */
+  public SingleJointedArmSim(DCMotor motor,
+                             double G, double armMassKg, double armLengthMeters,
+                             double minAngleRads, double maxAngleRads,
+                             double positionMeasurementStdDevs, boolean simulateGravity) {
+    this(LinearSystemId.createSingleJointedArmSystem(motor,
+        1.0 / 3.0 * armMassKg * armLengthMeters * armLengthMeters, G),
+        motor, G,
+        armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
+        positionMeasurementStdDevs, simulateGravity);
+  }
+
 
   /**
    * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
@@ -108,7 +141,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
         1.0 / 3.0 * armMassKg * armLengthMeters * armLengthMeters, G),
         motor, G,
         armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
-        positionMeasurementStdDevs);
+        positionMeasurementStdDevs, true);
   }
 
   public boolean hasHitLowerLimit(Matrix<N2, N1> x) {
@@ -134,10 +167,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I]]
      */
     Matrix<N2, N1> updatedXhat = RungeKutta.rungeKutta(
-        (x, u_) -> (m_plant.getA().times(x))
-            .plus(m_plant.getB().times(u_))
-            .plus(VecBuilder.fill(0,
-                m_armMass * m_r * -9.8 * 3.0 / (m_armMass * m_r * m_r) * Math.cos(x.get(0, 0)))),
+        this::dynamics,
         currentXhat, u, dtSeconds);
 
     // We check for collision after updating xhat
@@ -168,5 +198,16 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     // spinning 10x faster than the output
     var motorVelocity = m_x.get(1, 0) * m_gearing;
     return m_motor.getCurrent(motorVelocity, m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
+  }
+
+  private Matrix<N2, N1> dynamics(Matrix<N2, N1> x, Matrix<N1, N1> u_) {
+    Matrix<N2, N1> xdot = (m_plant.getA().times(x))
+        .plus(m_plant.getB().times(u_));
+
+    if (m_simulateGravity) {
+      xdot = xdot.plus(VecBuilder.fill(0,
+              m_armMass * m_r * -9.8 * 3.0 / (m_armMass * m_r * m_r) * Math.cos(x.get(0, 0))));
+    }
+    return xdot;
   }
 }

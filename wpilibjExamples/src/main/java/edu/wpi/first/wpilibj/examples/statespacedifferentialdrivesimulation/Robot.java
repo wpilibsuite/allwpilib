@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     // The estimated voltage is highly dependent on the battery's internal
     // resistance.
     double drawCurrent = m_robotContainer.getRobotDrive().getDrawnCurrentAmps();
-    double loadedVoltage = BatterySim.calculateLoadedBatteryVoltage(drawCurrent);
+    double loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(drawCurrent);
     RoboRioSim.setVInVoltage(loadedVoltage);
   }
 

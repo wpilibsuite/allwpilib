@@ -19,7 +19,6 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpiutil.math.numbers.N7;
-import org.ejml.simple.SimpleMatrix;
 
 /**
  * This class simulates the state of the drivetrain. In simulationPeriodic, users should first set inputs from motors with
@@ -56,12 +55,12 @@ public class DifferentialDrivetrainSim {
    * Create a SimDrivetrain.
    *
    * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
-   * @param massKg            The mass of the drivebase.
-   * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
-   * @param jKgMetersSquared  The moment of inertia of the drivetrain about its center.
    * @param gearing           The gearing on the drive between motor and wheel, as output over input.
    *                          This must be the same ratio as the ratio used to identify or
    *                          create the drivetrainPlant.
+   * @param jKgMetersSquared  The moment of inertia of the drivetrain about its center.
+   * @param massKg            The mass of the drivebase.
+   * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
    * @param trackWidthMeters  The robot's track width, or distance between left and right wheels.
    */
   public DifferentialDrivetrainSim(DCMotor driveMotor, double gearing,
@@ -122,6 +121,9 @@ public class DifferentialDrivetrainSim {
     return m_x.get(state.value, 0);
   }
 
+  /**
+   * Get the full simulated state of the drivetrain.
+   */
   public Matrix<N7, N1> getState() {
     return m_x;
   }
@@ -134,6 +136,9 @@ public class DifferentialDrivetrainSim {
     return new Rotation2d(getState(State.kHeading));
   }
 
+  /**
+   * Get the estimated position of the drivetrain.
+   */
   public Pose2d getEstimatedPosition() {
     return new Pose2d(m_x.get(0, 0),
       m_x.get(1, 0),
