@@ -92,7 +92,6 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                         source {
                             srcDirs 'src/dev/native/cpp'
                             include '**/*.cpp'
-                            lib library: 'wpigui'
                         }
                         exportedHeaders {
                             srcDirs 'src/dev/native/include'
@@ -100,6 +99,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     }
                 }
                 binaries.all {
+                    lib library: 'wpigui'
                     nativeUtils.useRequiredLibrary(it, 'imgui_static')
                 }
             }
@@ -117,6 +117,9 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                 } else {
                     it.linker.args << '-lX11'
                 }
+            }
+            withType(SharedLibraryBinarySpec) {
+                buildable = false
             }
         }
     }
