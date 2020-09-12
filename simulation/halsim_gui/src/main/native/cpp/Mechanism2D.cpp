@@ -16,13 +16,13 @@
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
+#include <portable-file-dialogs.h>
 #include <wpi/json.h>
 #include <wpi/math>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
 #include "HALSimGui.h"
-#include "portable-file-dialogs.h"
 
 using namespace halsimgui;
 
@@ -276,17 +276,15 @@ static void readJson(std::string jFile) {
   }
 }
 
-static void OptionMenuLocateJson() {
-  if (ImGui::BeginMenu("Mechanism2D")) {
+static void DisplayAssembly2D() {
+  if (ImGui::BeginPopupContextItem()) {
     if (ImGui::MenuItem("Load Json")) {
       m_fileOpener = std::make_unique<pfd::open_file>(
           "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"});
     }
-    ImGui::EndMenu();
+    ImGui::EndPopup();
   }
-}
 
-static void DisplayAssembly2D() {
   GetJsonFileLocation();
   if (!mechanism2DInfo.jsonLocation.empty()) {
     // Only read the json file if it changed
@@ -313,10 +311,11 @@ void Mechanism2D::Initialize() {
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
   buildColorTable();
-  HALSimGui::AddWindow("Mechanism 2D", DisplayAssembly2D);
-  HALSimGui::SetWindowVisibility("Mechanism 2D", HALSimGui::kHide);
-  HALSimGui::AddOptionMenu(OptionMenuLocateJson);
-  HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
-  HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
-  HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
+  if (auto win =
+          HALSimGui::manager.AddWindow("Mechanism 2D", DisplayAssembly2D)) {
+    win->SetVisibility(glass::Window::kHide);
+    win->SetDefaultPos(200, 200);
+    win->SetDefaultSize(600, 600);
+    win->SetPadding(0, 0);
+  }
 }

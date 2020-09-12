@@ -186,6 +186,7 @@ endif()
 if (WITH_GUI)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
+    add_subdirectory(glass)
 endif()
 
 if (WITH_CSCORE)

@@ -1,0 +1,56 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
+
+#include <wpi/StringRef.h>
+
+#include "glass/Model.h"
+
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
+
+namespace glass {
+
+class DataSource;
+
+class FMSModel : public Model {
+ public:
+  virtual DataSource* GetFmsAttachedData() = 0;
+  virtual DataSource* GetDsAttachedData() = 0;
+  virtual DataSource* GetAllianceStationIdData() = 0;
+  virtual DataSource* GetMatchTimeData() = 0;
+  virtual DataSource* GetEStopData() = 0;
+  virtual DataSource* GetEnabledData() = 0;
+  virtual DataSource* GetTestData() = 0;
+  virtual DataSource* GetAutonomousData() = 0;
+  virtual wpi::StringRef GetGameSpecificMessage(
+      wpi::SmallVectorImpl<char>& buf) = 0;
+
+  virtual void SetFmsAttached(bool val) = 0;
+  virtual void SetDsAttached(bool val) = 0;
+  virtual void SetAllianceStationId(int val) = 0;
+  virtual void SetMatchTime(double val) = 0;
+  virtual void SetEStop(bool val) = 0;
+  virtual void SetEnabled(bool val) = 0;
+  virtual void SetTest(bool val) = 0;
+  virtual void SetAutonomous(bool val) = 0;
+  virtual void SetGameSpecificMessage(const char* val) = 0;
+};
+
+/**
+ * Displays FMS view.
+ *
+ * @param matchTimeEnabled If not null, a checkbox is displayed for
+ *                         "enable match time" linked to this value
+ */
+void DisplayFMS(FMSModel* model, bool* matchTimeEnabled = nullptr);
+void DisplayFMSReadOnly(FMSModel* model);
+
+}  // namespace glass

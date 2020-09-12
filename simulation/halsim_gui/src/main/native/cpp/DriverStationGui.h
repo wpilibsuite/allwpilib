@@ -7,12 +7,23 @@
 
 #pragma once
 
+#include <glass/WindowManager.h>
+
 namespace halsimgui {
+
+class DSManager : public glass::WindowManager {
+ public:
+  explicit DSManager(const wpi::Twine& iniName) : WindowManager{iniName} {}
+
+  void DisplayMenu() override;
+};
 
 class DriverStationGui {
  public:
-  static void Initialize();
+  static void GlobalInit();
   static void SetDSSocketExtension(void* data);
+
+  static DSManager dsManager;
 };
 
 }  // namespace halsimgui

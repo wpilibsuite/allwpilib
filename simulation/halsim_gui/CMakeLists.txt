@@ -10,7 +10,7 @@ wpilib_target_warnings(halsim_gui)
 set_target_properties(halsim_gui PROPERTIES DEBUG_POSTFIX "d")
 
 wpilib_link_macos_gui(halsim_gui)
-target_link_libraries(halsim_gui PUBLIC hal ntcore wpimath PRIVATE wpigui)
+target_link_libraries(halsim_gui PUBLIC hal wpimath PRIVATE libglassnt libglass)
 
 target_include_directories(halsim_gui PRIVATE src/main/native/include)
 

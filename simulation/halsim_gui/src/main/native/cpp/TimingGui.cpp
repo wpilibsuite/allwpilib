@@ -7,6 +7,9 @@
 
 #include "TimingGui.h"
 
+#include <glass/Model.h>
+#include <glass/View.h>
+
 #include <cstdio>
 #include <cstring>
 #include <vector>
@@ -19,6 +22,14 @@
 #include "HALSimGui.h"
 
 using namespace halsimgui;
+
+namespace {
+class TimingModel : public glass::Model {
+ public:
+  void Update() override {}
+  bool Exists() override { return true; }
+};
+}  // namespace
 
 static void DisplayTiming() {
   int32_t status = 0;
@@ -55,7 +66,14 @@ static void DisplayTiming() {
 }
 
 void TimingGui::Initialize() {
-  HALSimGui::AddWindow("Timing", DisplayTiming,
-                       ImGuiWindowFlags_AlwaysAutoResize);
-  HALSimGui::SetDefaultWindowPos("Timing", 5, 150);
+  HALSimGui::halProvider.Register(
+      "Timing", [] { return true; },
+      [] { return std::make_unique<TimingModel>(); },
+      [](glass::Window* win, glass::Model* model) {
+        win->DisableRenamePopup();
+        win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
+        win->SetDefaultPos(5, 150);
+        return glass::MakeFunctionView(DisplayTiming);
+      });
+  HALSimGui::halProvider.ShowDefault("Timing");
 }
