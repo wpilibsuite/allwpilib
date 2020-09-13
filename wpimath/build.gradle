@@ -1,0 +1,109 @@
+ext {
+    useJava = true
+    useCpp = true
+    baseId = 'wpimath'
+    groupId = 'edu.wpi.first.wpimath'
+
+    nativeName = 'wpimath'
+    devMain = 'edu.wpi.first.wpiutil.math.DevMain'
+}
+
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+
+nativeUtils.exportsConfigs {
+    wpimath {
+        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
+                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+    }
+}
+
+cppHeadersZip {
+    from('src/main/native/eigeninclude') {
+        into '/'
+    }
+}
+
+model {
+    components {
+        all {
+            it.sources.each {
+                it.exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/eigeninclude'
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    api "org.ejml:ejml-simple:0.38"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
+    api "com.fasterxml.jackson.core:jackson-core:2.10.0"
+    api "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+}
+
+def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")
+def natFileInput = file("src/generate/Nat.java.in")
+def natGetterInput = file("src/generate/NatGetter.java.in")
+def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/numbers")
+def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/Nat.java")
+def maxNum = 20
+
+task generateNumbers() {
+    description = "Generates generic number classes from template"
+    group = "WPILib"
+
+    inputs.file wpilibNumberFileInput
+    outputs.dir wpilibNumberFileOutputDir
+
+    doLast {
+        if(wpilibNumberFileOutputDir.exists()) {
+            wpilibNumberFileOutputDir.delete()
+        }
+        wpilibNumberFileOutputDir.mkdirs()
+
+        for(i in 0..maxNum) {
+            def outputFile = new File(wpilibNumberFileOutputDir, "N${i}.java")
+            def read = wpilibNumberFileInput.text.replace('${num}', i.toString())
+            outputFile.write(read)
+        }
+    }
+}
+
+task generateNat() {
+    description = "Generates Nat.java"
+    group = "WPILib"
+    inputs.files([natFileInput, natGetterInput])
+    outputs.file wpilibNatFileOutput
+    dependsOn generateNumbers
+
+    doLast {
+        if(wpilibNatFileOutput.exists()) {
+            wpilibNatFileOutput.delete()
+        }
+
+        def template = natFileInput.text + "\n"
+
+        def importsString = "";
+
+        for(i in 0..maxNum) {
+            importsString += "import edu.wpi.first.wpiutil.math.numbers.N${i};\n"
+            template += natGetterInput.text.replace('${num}', i.toString()) + "\n"
+        }
+        template += "}\n" // Close the class body
+
+        template = template.replace('{{REPLACEWITHIMPORTS}}', importsString)
+
+        wpilibNatFileOutput.write(template)
+    }
+}
+
+sourceSets.main.java.srcDir "${buildDir}/generated/java"
+compileJava.dependsOn generateNumbers
+compileJava.dependsOn generateNat

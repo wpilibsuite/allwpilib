@@ -16,14 +16,49 @@
 #include <imgui.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableValue.h>
+#include <ntcore_cpp.h>
+#include <wpi/DenseMap.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
 
+#include "GuiDataSource.h"
 #include "HALSimGui.h"
 
 using namespace halsimgui;
+
+static NT_EntryListenerPoller gNetworkTablesPoller;
+static wpi::DenseMap<NT_Entry, std::unique_ptr<GuiDataSource>>
+    gNetworkTableSources;
+
+static void UpdateNetworkTableSources() {
+  bool timedOut = false;
+  for (auto&& event :
+       nt::PollEntryListener(gNetworkTablesPoller, 0, &timedOut)) {
+    if (!event.value->IsBoolean() && !event.value->IsDouble()) continue;
+    if (event.flags & NT_NOTIFY_NEW) {
+      auto& source = gNetworkTableSources[event.entry];
+      if (!source)
+        source =
+            std::make_unique<GuiDataSource>(wpi::Twine{"NT:"} + event.name);
+    }
+    if (event.flags & NT_NOTIFY_DELETE) {
+      if (auto& source = gNetworkTableSources[event.entry]) source.reset();
+    }
+    if (event.flags & (NT_NOTIFY_NEW | NT_NOTIFY_UPDATE)) {
+      if (auto& source = gNetworkTableSources[event.entry]) {
+        if (event.value->IsBoolean()) {
+          source->SetValue(event.value->GetBoolean() ? 1 : 0);
+          source->SetDigital(true);
+        } else if (event.value->IsDouble()) {
+          source->SetValue(event.value->GetDouble());
+          source->SetDigital(false);
+        }
+      }
+    }
+  }
+}
 
 static void BooleanArrayToString(wpi::SmallVectorImpl<char>& out,
                                  wpi::ArrayRef<int> in) {
@@ -265,7 +300,12 @@ static void DisplayNetworkTables() {
               [](const auto& a, const auto& b) { return a.name < b.name; });
 
     for (auto&& i : info) {
-      ImGui::Text("%s", i.name.c_str());
+      if (auto source = gNetworkTableSources[i.entry].get()) {
+        ImGui::Selectable(i.name.c_str());
+        source->EmitDrag();
+      } else {
+        ImGui::Text("%s", i.name.c_str());
+      }
       ImGui::NextColumn();
 
       if (auto val = nt::GetEntryValue(i.entry)) {
@@ -356,7 +396,14 @@ static void DisplayNetworkTables() {
 }
 
 void NetworkTablesGui::Initialize() {
+  gNetworkTablesPoller =
+      nt::CreateEntryListenerPoller(nt::GetDefaultInstance());
+  nt::AddPolledEntryListener(gNetworkTablesPoller, "",
+                             NT_NOTIFY_LOCAL | NT_NOTIFY_NEW |
+                                 NT_NOTIFY_UPDATE | NT_NOTIFY_DELETE |
+                                 NT_NOTIFY_IMMEDIATE);
+  HALSimGui::AddExecute(UpdateNetworkTableSources);
   HALSimGui::AddWindow("NetworkTables", DisplayNetworkTables);
-  HALSimGui::SetDefaultWindowPos("NetworkTables", 250, 260);
-  HALSimGui::SetDefaultWindowSize("NetworkTables", 1500, 375);
+  HALSimGui::SetDefaultWindowPos("NetworkTables", 250, 277);
+  HALSimGui::SetDefaultWindowSize("NetworkTables", 750, 185);
 }

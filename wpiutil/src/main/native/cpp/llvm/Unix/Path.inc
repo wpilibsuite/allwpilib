@@ -410,7 +410,7 @@ std::error_code openFileForRead(const Twine &Name, int &ResultFD,
     return std::error_code();
   RealPath->clear();
 #if defined(F_GETPATH)
-  // When F_GETPATH is availble, it is the quickest way to get
+  // When F_GETPATH is available, it is the quickest way to get
   // the real path name.
   char Buffer[MAXPATHLEN];
   if (::fcntl(ResultFD, F_GETPATH, Buffer) != -1)

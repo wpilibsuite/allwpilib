@@ -177,7 +177,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
  * Warning: This is not an official time (so it cannot be used to dispute ref
  * calls or guarantee that a function will trigger before the match ends).
  *
- * The Practice Match function of the DS approximates the behaviour seen on
+ * The Practice Match function of the DS approximates the behavior seen on
  * the field.
  *
  * @param status the error code, or 0 for success

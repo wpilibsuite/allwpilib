@@ -9,12 +9,11 @@
 
 #include <cmath>
 
-#include <GL/gl3w.h>
 #include <hal/SimDevice.h>
-#include <imgui.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <hal/simulation/SimDeviceData.h>
+#include <imgui.h>
 #include <imgui_internal.h>
 #include <units/angle.h>
 #include <units/length.h>
@@ -23,13 +22,15 @@
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
+#include <wpigui.h>
 
-#include "GuiUtil.h"
 #include "HALSimGui.h"
 #include "SimDeviceGui.h"
 #include "portable-file-dialogs.h"
 
 using namespace halsimgui;
+
+namespace gui = wpi::gui;
 
 namespace {
 
@@ -64,10 +65,10 @@ class FieldInfo {
   void WriteIni(ImGuiTextBuffer* out) const;
 
  private:
-  bool LoadImageImpl(const wpi::Twine& fn);
+  bool LoadImageImpl(const char* fn);
 
   std::string m_filename;
-  GLuint m_texture = 0;
+  gui::Texture m_texture;
   int m_imageWidth = 0;
   int m_imageHeight = 0;
   int m_top = 0;
@@ -114,10 +115,10 @@ class RobotInfo {
   void WriteIni(ImGuiTextBuffer* out) const;
 
  private:
-  bool LoadImageImpl(const wpi::Twine& fn);
+  bool LoadImageImpl(const char* fn);
 
   std::string m_filename;
-  GLuint m_texture = 0;
+  gui::Texture m_texture;
 
   HAL_SimDeviceHandle m_devHandle = 0;
   hal::SimDouble m_xHandle;
@@ -164,8 +165,7 @@ static void Field2DWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
 }
 
 void FieldInfo::Reset() {
-  if (m_texture != 0) glDeleteTextures(1, &m_texture);
-  m_texture = 0;
+  m_texture = gui::Texture{};
   m_filename.clear();
   m_imageWidth = 0;
   m_imageHeight = 0;
@@ -182,7 +182,7 @@ void FieldInfo::LoadImage() {
       if (wpi::StringRef(result[0]).endswith(".json")) {
         LoadJson(result[0]);
       } else {
-        LoadImageImpl(result[0]);
+        LoadImageImpl(result[0].c_str());
         m_top = 0;
         m_left = 0;
         m_bottom = -1;
@@ -191,8 +191,8 @@ void FieldInfo::LoadImage() {
     }
     m_fileOpener.reset();
   }
-  if (m_texture == 0 && !m_filename.empty()) {
-    if (!LoadImageImpl(m_filename)) m_filename.clear();
+  if (!m_texture && !m_filename.empty()) {
+    if (!LoadImageImpl(m_filename.c_str())) m_filename.clear();
   }
 }
 
@@ -274,7 +274,7 @@ void FieldInfo::LoadJson(const wpi::Twine& jsonfile) {
   wpi::sys::path::append(pathname, image);
 
   // load field image
-  if (!LoadImageImpl(pathname)) return;
+  if (!LoadImageImpl(pathname.c_str())) return;
 
   // save to field info
   m_filename = pathname.str();
@@ -286,15 +286,17 @@ void FieldInfo::LoadJson(const wpi::Twine& jsonfile) {
   m_height = height;
 }
 
-bool FieldInfo::LoadImageImpl(const wpi::Twine& fn) {
+bool FieldInfo::LoadImageImpl(const char* fn) {
   wpi::outs() << "GUI: loading field image '" << fn << "'\n";
-  GLuint oldTexture = m_texture;
-  if (!LoadTextureFromFile(fn, &m_texture, &m_imageWidth, &m_imageHeight)) {
+  auto texture = gui::Texture::CreateFromFile(fn);
+  if (!texture) {
     wpi::errs() << "GUI: could not read field image\n";
     return false;
   }
-  if (oldTexture != 0) glDeleteTextures(1, &oldTexture);
-  m_filename = fn.str();
+  m_texture = std::move(texture);
+  m_imageWidth = m_texture.GetWidth();
+  m_imageHeight = m_texture.GetHeight();
+  m_filename = fn;
   return true;
 }
 
@@ -306,8 +308,8 @@ FieldFrameData FieldInfo::GetFrameData() const {
   ffd.imageMax = ImGui::GetWindowContentRegionMax();
 
   // fit the image into the window
-  if (m_texture != 0 && m_imageHeight != 0 && m_imageWidth != 0)
-    MaxFit(&ffd.imageMin, &ffd.imageMax, m_imageWidth, m_imageHeight);
+  if (m_texture && m_imageHeight != 0 && m_imageWidth != 0)
+    gui::MaxFit(&ffd.imageMin, &ffd.imageMax, m_imageWidth, m_imageHeight);
 
   ImVec2 min = ffd.imageMin;
   ImVec2 max = ffd.imageMax;
@@ -321,7 +323,7 @@ FieldFrameData FieldInfo::GetFrameData() const {
   }
 
   // draw the field "active area" as a yellow boundary box
-  MaxFit(&min, &max, m_width, m_height);
+  gui::MaxFit(&min, &max, m_width, m_height);
 
   ffd.min = min;
   ffd.max = max;
@@ -331,10 +333,9 @@ FieldFrameData FieldInfo::GetFrameData() const {
 
 void FieldInfo::Draw(ImDrawList* drawList, const ImVec2& windowPos,
                      const FieldFrameData& ffd) const {
-  if (m_texture != 0 && m_imageHeight != 0 && m_imageWidth != 0) {
-    drawList->AddImage(
-        reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(m_texture)),
-        windowPos + ffd.imageMin, windowPos + ffd.imageMax);
+  if (m_texture && m_imageHeight != 0 && m_imageWidth != 0) {
+    drawList->AddImage(m_texture, windowPos + ffd.imageMin,
+                       windowPos + ffd.imageMax);
   }
 
   // draw the field "active area" as a yellow boundary box
@@ -379,31 +380,30 @@ void FieldInfo::WriteIni(ImGuiTextBuffer* out) const {
 }
 
 void RobotInfo::Reset() {
-  if (m_texture != 0) glDeleteTextures(1, &m_texture);
-  m_texture = 0;
+  m_texture = gui::Texture{};
   m_filename.clear();
 }
 
 void RobotInfo::LoadImage() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
-    if (!result.empty()) LoadImageImpl(result[0]);
+    if (!result.empty()) LoadImageImpl(result[0].c_str());
     m_fileOpener.reset();
   }
-  if (m_texture == 0 && !m_filename.empty()) {
-    if (!LoadImageImpl(m_filename)) m_filename.clear();
+  if (!m_texture && !m_filename.empty()) {
+    if (!LoadImageImpl(m_filename.c_str())) m_filename.clear();
   }
 }
 
-bool RobotInfo::LoadImageImpl(const wpi::Twine& fn) {
+bool RobotInfo::LoadImageImpl(const char* fn) {
   wpi::outs() << "GUI: loading robot image '" << fn << "'\n";
-  GLuint oldTexture = m_texture;
-  if (!LoadTextureFromFile(fn, &m_texture, nullptr, nullptr)) {
+  auto texture = gui::Texture::CreateFromFile(fn);
+  if (!texture) {
     wpi::errs() << "GUI: could not read robot image\n";
     return false;
   }
-  if (oldTexture != 0) glDeleteTextures(1, &oldTexture);
-  m_filename = fn.str();
+  m_texture = std::move(texture);
+  m_filename = fn;
   return true;
 }
 
@@ -468,10 +468,9 @@ RobotFrameData RobotInfo::GetFrameData(const FieldFrameData& ffd) const {
 void RobotInfo::Draw(ImDrawList* drawList, const ImVec2& windowPos,
                      const RobotFrameData& rfd, int hit,
                      float hitRadius) const {
-  if (m_texture != 0) {
+  if (m_texture) {
     drawList->AddImageQuad(
-        reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(m_texture)),
-        windowPos + rfd.corners[0], windowPos + rfd.corners[1],
+        m_texture, windowPos + rfd.corners[0], windowPos + rfd.corners[1],
         windowPos + rfd.corners[2], windowPos + rfd.corners[3]);
   } else {
     drawList->AddQuad(windowPos + rfd.corners[0], windowPos + rfd.corners[1],
@@ -579,15 +578,15 @@ static void DisplayField2D() {
   if (ImGui::IsItemHovered()) {
     float hitRadiusSquared = hitRadius * hitRadius;
     // it's within the hit radius of the center?
-    if (GetDistSquared(cursor, rfd.center) < hitRadiusSquared)
+    if (gui::GetDistSquared(cursor, rfd.center) < hitRadiusSquared)
       hit = 1;
-    else if (GetDistSquared(cursor, rfd.corners[0]) < hitRadiusSquared)
+    else if (gui::GetDistSquared(cursor, rfd.corners[0]) < hitRadiusSquared)
       hit = 2;
-    else if (GetDistSquared(cursor, rfd.corners[1]) < hitRadiusSquared)
+    else if (gui::GetDistSquared(cursor, rfd.corners[1]) < hitRadiusSquared)
       hit = 3;
-    else if (GetDistSquared(cursor, rfd.corners[2]) < hitRadiusSquared)
+    else if (gui::GetDistSquared(cursor, rfd.corners[2]) < hitRadiusSquared)
       hit = 4;
-    else if (GetDistSquared(cursor, rfd.corners[3]) < hitRadiusSquared)
+    else if (gui::GetDistSquared(cursor, rfd.corners[3]) < hitRadiusSquared)
       hit = 5;
     if (hit > 0 && ImGui::IsMouseClicked(0)) {
       if (hit == 1) {

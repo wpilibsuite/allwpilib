@@ -7,6 +7,9 @@
 
 #include "DIOGui.h"
 
+#include <memory>
+#include <vector>
+
 #include <hal/Ports.h>
 #include <hal/simulation/DIOData.h>
 #include <hal/simulation/DigitalPWMData.h>
@@ -15,13 +18,23 @@
 #include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
 
+#include "GuiDataSource.h"
 #include "HALSimGui.h"
 #include "IniSaver.h"
 #include "IniSaverInfo.h"
 
 using namespace halsimgui;
 
+namespace {
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(DIOValue, "DIO");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DigitalPWMDutyCycle, "DPWM");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DutyCycleOutput, "DutyCycle");
+}  // namespace
+
 static IniSaver<NameInfo> gDIO{"DIO"};
+static std::vector<std::unique_ptr<DIOValueSource>> gDIOSources;
+static std::vector<std::unique_ptr<DigitalPWMDutyCycleSource>> gDPWMSources;
+static std::vector<std::unique_ptr<DutyCycleOutputSource>> gDutyCycleSources;
 
 static void LabelSimDevice(const char* name, HAL_SimDeviceHandle simDevice) {
   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
@@ -29,12 +42,62 @@ static void LabelSimDevice(const char* name, HAL_SimDeviceHandle simDevice) {
   ImGui::PopStyleColor();
 }
 
+static void UpdateDIOSources() {
+  for (int i = 0, iend = gDIOSources.size(); i < iend; ++i) {
+    auto& source = gDIOSources[i];
+    if (HALSIM_GetDIOInitialized(i)) {
+      if (!source) {
+        source = std::make_unique<DIOValueSource>(i);
+        source->SetName(gDIO[i].GetName());
+      }
+    } else {
+      source.reset();
+    }
+  }
+}
+
+static void UpdateDPWMSources() {
+  const int numDIO = gDIOSources.size();
+  for (int i = 0, iend = gDPWMSources.size(); i < iend; ++i) {
+    auto& source = gDPWMSources[i];
+    if (HALSIM_GetDigitalPWMInitialized(i)) {
+      if (!source) {
+        int channel = HALSIM_GetDigitalPWMPin(i);
+        if (channel >= 0 && channel < numDIO) {
+          source = std::make_unique<DigitalPWMDutyCycleSource>(i, channel);
+          source->SetName(gDIO[channel].GetName());
+        }
+      }
+    } else {
+      source.reset();
+    }
+  }
+}
+
+static void UpdateDutyCycleSources() {
+  const int numDIO = gDIOSources.size();
+  for (int i = 0, iend = gDutyCycleSources.size(); i < iend; ++i) {
+    auto& source = gDutyCycleSources[i];
+    if (HALSIM_GetDutyCycleInitialized(i)) {
+      if (!source) {
+        int channel = HALSIM_GetDutyCycleDigitalChannel(i);
+        if (channel >= 0 && channel < numDIO) {
+          source = std::make_unique<DutyCycleOutputSource>(i, channel);
+          source->SetName(gDIO[channel].GetName());
+        }
+      }
+    } else {
+      source.reset();
+    }
+  }
+}
+
 static void DisplayDIO() {
   bool hasAny = false;
-  static int numDIO = HAL_GetNumDigitalChannels();
-  static int numPWM = HAL_GetNumDigitalPWMOutputs();
-  static int numEncoder = HAL_GetNumEncoders();
-  static int numDutyCycle = HAL_GetNumDutyCycles();
+  const int numDIO = gDIOSources.size();
+  const int numPWM = gDPWMSources.size();
+  static const int numEncoder = HAL_GetNumEncoders();
+  const int numDutyCycle = gDutyCycleSources.size();
   static auto pwmMap = std::make_unique<int[]>(numDIO);
   static auto encoderMap = std::make_unique<int[]>(numDIO);
   static auto dutyCycleMap = std::make_unique<int[]>(numDIO);
@@ -44,8 +107,8 @@ static void DisplayDIO() {
   std::memset(dutyCycleMap.get(), 0, numDIO * sizeof(dutyCycleMap[0]));
 
   for (int i = 0; i < numPWM; ++i) {
-    if (HALSIM_GetDigitalPWMInitialized(i)) {
-      int channel = HALSIM_GetDigitalPWMPin(i);
+    if (auto source = gDPWMSources[i].get()) {
+      int channel = source->GetChannel();
       if (channel >= 0 && channel < numDIO) pwmMap[channel] = i + 1;
     }
   }
@@ -61,66 +124,76 @@ static void DisplayDIO() {
   }
 
   for (int i = 0; i < numDutyCycle; ++i) {
-    if (HALSIM_GetDutyCycleInitialized(i)) {
-      int channel = HALSIM_GetDutyCycleDigitalChannel(i);
+    if (auto source = gDutyCycleSources[i].get()) {
+      int channel = source->GetChannel();
       if (channel >= 0 && channel < numDIO) dutyCycleMap[channel] = i + 1;
     }
   }
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
   for (int i = 0; i < numDIO; ++i) {
-    if (HALSIM_GetDIOInitialized(i)) {
+    if (auto dioSource = gDIOSources[i].get()) {
+      ImGui::PushID(i);
       hasAny = true;
+      DigitalPWMDutyCycleSource* dpwmSource = nullptr;
+      DutyCycleOutputSource* dutyCycleSource = nullptr;
       auto& info = gDIO[i];
-      char name[128];
+      char label[128];
       if (pwmMap[i] > 0) {
-        info.GetName(name, sizeof(name), "PWM", i);
+        dpwmSource = gDPWMSources[pwmMap[i] - 1].get();
+        info.GetLabel(label, sizeof(label), "PWM", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
-          LabelSimDevice(name, simDevice);
+          LabelSimDevice(label, simDevice);
         } else {
-          ImGui::LabelText(name, "%0.3f",
-                           HALSIM_GetDigitalPWMDutyCycle(pwmMap[i] - 1));
+          dpwmSource->LabelText(label, "%0.3f", dpwmSource->GetValue());
         }
       } else if (encoderMap[i] > 0) {
-        info.GetName(name, sizeof(name), " In", i);
+        info.GetLabel(label, sizeof(label), " In", i);
         if (auto simDevice = HALSIM_GetEncoderSimDevice(encoderMap[i] - 1)) {
-          LabelSimDevice(name, simDevice);
+          LabelSimDevice(label, simDevice);
         } else {
           ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
-          ImGui::LabelText(name, "Encoder[%d,%d]",
+          ImGui::LabelText(label, "Encoder[%d,%d]",
                            HALSIM_GetEncoderDigitalChannelA(encoderMap[i] - 1),
                            HALSIM_GetEncoderDigitalChannelB(encoderMap[i] - 1));
           ImGui::PopStyleColor();
         }
       } else if (dutyCycleMap[i] > 0) {
-        info.GetName(name, sizeof(name), "Dty", i);
+        dutyCycleSource = gDutyCycleSources[dutyCycleMap[i] - 1].get();
+        info.GetLabel(label, sizeof(label), "Dty", i);
         if (auto simDevice =
                 HALSIM_GetDutyCycleSimDevice(dutyCycleMap[i] - 1)) {
-          LabelSimDevice(name, simDevice);
+          LabelSimDevice(label, simDevice);
         } else {
-          double val = HALSIM_GetDutyCycleOutput(dutyCycleMap[i] - 1);
-          if (ImGui::InputDouble(name, &val))
+          double val = dutyCycleSource->GetValue();
+          if (dutyCycleSource->InputDouble(label, &val))
             HALSIM_SetDutyCycleOutput(dutyCycleMap[i] - 1, val);
         }
       } else if (!HALSIM_GetDIOIsInput(i)) {
-        info.GetName(name, sizeof(name), "Out", i);
+        info.GetLabel(label, sizeof(label), "Out", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
-          LabelSimDevice(name, simDevice);
+          LabelSimDevice(label, simDevice);
         } else {
-          ImGui::LabelText(name, "%s",
-                           HALSIM_GetDIOValue(i) ? "1 (high)" : "0 (low)");
+          dioSource->LabelText(
+              label, "%s", dioSource->GetValue() != 0 ? "1 (high)" : "0 (low)");
         }
       } else {
-        info.GetName(name, sizeof(name), " In", i);
+        info.GetLabel(label, sizeof(label), " In", i);
         if (auto simDevice = HALSIM_GetDIOSimDevice(i)) {
-          LabelSimDevice(name, simDevice);
+          LabelSimDevice(label, simDevice);
         } else {
           static const char* options[] = {"0 (low)", "1 (high)"};
-          int val = HALSIM_GetDIOValue(i) ? 1 : 0;
-          if (ImGui::Combo(name, &val, options, 2)) HALSIM_SetDIOValue(i, val);
+          int val = dioSource->GetValue() != 0 ? 1 : 0;
+          if (dioSource->Combo(label, &val, options, 2))
+            HALSIM_SetDIOValue(i, val);
         }
       }
-      info.PopupEditName(i);
+      if (info.PopupEditName(i)) {
+        dioSource->SetName(info.GetName());
+        if (dpwmSource) dpwmSource->SetName(info.GetName());
+        if (dutyCycleSource) dutyCycleSource->SetName(info.GetName());
+      }
+      ImGui::PopID();
     }
   }
   ImGui::PopItemWidth();
@@ -129,6 +202,13 @@ static void DisplayDIO() {
 
 void DIOGui::Initialize() {
   gDIO.Initialize();
+  gDIOSources.resize(HAL_GetNumDigitalChannels());
+  gDPWMSources.resize(HAL_GetNumDigitalPWMOutputs());
+  gDutyCycleSources.resize(HAL_GetNumDutyCycles());
+
+  HALSimGui::AddExecute(UpdateDIOSources);
+  HALSimGui::AddExecute(UpdateDPWMSources);
+  HALSimGui::AddExecute(UpdateDutyCycleSources);
   HALSimGui::AddWindow("DIO", DisplayDIO, ImGuiWindowFlags_AlwaysAutoResize);
   HALSimGui::SetDefaultWindowPos("DIO", 470, 20);
 }

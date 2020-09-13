@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,16 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RamseteControllerTest {
   private static final double kTolerance = 1 / 12.0;
   private static final double kAngularTolerance = Math.toRadians(2);
-
-  private static double boundRadians(double value) {
-    while (value > Math.PI) {
-      value -= Math.PI * 2;
-    }
-    while (value <= -Math.PI) {
-      value += Math.PI * 2;
-    }
-    return value;
-  }
 
   @Test
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -68,7 +59,7 @@ class RamseteControllerTest {
         () -> assertEquals(endPose.getY(), finalRobotPose.getY(),
             kTolerance),
         () -> assertEquals(0.0,
-            boundRadians(endPose.getRotation().getRadians()
+            MathUtil.normalizeAngle(endPose.getRotation().getRadians()
                 - finalRobotPose.getRotation().getRadians()),
             kAngularTolerance)
     );

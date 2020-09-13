@@ -53,7 +53,7 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
       lock.unlock();
       callback(name, param, &value);
     }
-    return newUid + 1;
+    return newUid;
   }
 
   void DoSet(T value, const char* name) {

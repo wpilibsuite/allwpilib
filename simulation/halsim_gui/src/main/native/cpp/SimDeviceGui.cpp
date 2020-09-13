@@ -9,12 +9,16 @@
 
 #include <stdint.h>
 
+#include <functional>
+#include <memory>
 #include <vector>
 
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 #include <imgui.h>
+#include <wpi/DenseMap.h>
 
+#include "GuiDataSource.h"
 #include "HALSimGui.h"
 #include "IniSaverInfo.h"
 #include "IniSaverString.h"
@@ -22,6 +26,7 @@
 using namespace halsimgui;
 
 namespace {
+
 struct ElementInfo : public NameInfo, public OpenInfo {
   bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
     if (NameInfo::ReadIni(name, value)) return true;
@@ -34,10 +39,56 @@ struct ElementInfo : public NameInfo, public OpenInfo {
   }
   bool visible = true;  // not saved
 };
+
+class SimValueSource : public GuiDataSource {
+ public:
+  explicit SimValueSource(HAL_SimValueHandle handle, const char* device,
+                          const char* name)
+      : GuiDataSource(wpi::Twine{device} + wpi::Twine{'-'} + name),
+        m_callback{HALSIM_RegisterSimValueChangedCallback(
+            handle, this, CallbackFunc, true)} {}
+  ~SimValueSource() {
+    if (m_callback != 0) HALSIM_CancelSimValueChangedCallback(m_callback);
+  }
+
+ private:
+  static void CallbackFunc(const char*, void* param, HAL_SimValueHandle,
+                           HAL_Bool, const HAL_Value* value) {
+    auto source = static_cast<SimValueSource*>(param);
+    if (value->type == HAL_BOOLEAN) {
+      source->SetValue(value->data.v_boolean);
+      source->SetDigital(true);
+    } else if (value->type == HAL_DOUBLE) {
+      source->SetValue(value->data.v_double);
+      source->SetDigital(false);
+    }
+  }
+
+  int32_t m_callback;
+};
+
 }  // namespace
 
 static std::vector<std::function<void()>> gDeviceExecutors;
 static IniSaverString<ElementInfo> gElements{"Device"};
+static wpi::DenseMap<HAL_SimValueHandle, std::unique_ptr<SimValueSource>>
+    gSimValueSources;
+
+static void UpdateSimValueSources() {
+  HALSIM_EnumerateSimDevices(
+      "", nullptr, [](const char* name, void*, HAL_SimDeviceHandle handle) {
+        HALSIM_EnumerateSimValues(
+            handle, const_cast<char*>(name),
+            [](const char* name, void* deviceV, HAL_SimValueHandle handle,
+               HAL_Bool readonly, const HAL_Value* value) {
+              auto device = static_cast<const char*>(deviceV);
+              auto& source = gSimValueSources[handle];
+              if (!source) {
+                source = std::make_unique<SimValueSource>(handle, device, name);
+              }
+            });
+      });
+}
 
 void SimDeviceGui::Hide(const char* name) { gElements[name].visible = false; }
 
@@ -50,7 +101,7 @@ bool SimDeviceGui::StartDevice(const char* label, ImGuiTreeNodeFlags flags) {
   if (!element.visible) return false;
 
   char name[128];
-  element.GetName(name, sizeof(name), label);
+  element.GetLabel(name, sizeof(name), label);
 
   bool open = ImGui::CollapsingHeader(
       name, flags | (element.IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0));
@@ -63,8 +114,8 @@ bool SimDeviceGui::StartDevice(const char* label, ImGuiTreeNodeFlags flags) {
 
 void SimDeviceGui::FinishDevice() { ImGui::PopID(); }
 
-bool DisplayValueImpl(const char* name, bool readonly, HAL_Value* value,
-                      const char** options, int32_t numOptions) {
+static bool DisplayValueImpl(const char* name, bool readonly, HAL_Value* value,
+                             const char** options, int32_t numOptions) {
   // read-only
   if (readonly) {
     switch (value->type) {
@@ -141,11 +192,36 @@ bool DisplayValueImpl(const char* name, bool readonly, HAL_Value* value,
   return false;
 }
 
+static bool DisplayValueSourceImpl(const char* name, bool readonly,
+                                   HAL_Value* value,
+                                   const GuiDataSource* source,
+                                   const char** options, int32_t numOptions) {
+  if (!source)
+    return DisplayValueImpl(name, readonly, value, options, numOptions);
+  ImGui::PushID(name);
+  bool rv = DisplayValueImpl("", readonly, value, options, numOptions);
+  ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
+  ImGui::Selectable(name);
+  source->EmitDrag();
+  ImGui::PopID();
+  return rv;
+}
+
 bool SimDeviceGui::DisplayValue(const char* name, bool readonly,
                                 HAL_Value* value, const char** options,
                                 int32_t numOptions) {
+  return DisplayValueSource(name, readonly, value, nullptr, options,
+                            numOptions);
+}
+
+bool SimDeviceGui::DisplayValueSource(const char* name, bool readonly,
+                                      HAL_Value* value,
+                                      const GuiDataSource* source,
+                                      const char** options,
+                                      int32_t numOptions) {
   ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.5f);
-  return DisplayValueImpl(name, readonly, value, options, numOptions);
+  return DisplayValueSourceImpl(name, readonly, value, source, options,
+                                numOptions);
 }
 
 static void SimDeviceDisplayValue(const char* name, void*,
@@ -158,7 +234,9 @@ static void SimDeviceDisplayValue(const char* name, void*,
     options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
 
   HAL_Value valueCopy = *value;
-  if (DisplayValueImpl(name, readonly, &valueCopy, options, numOptions))
+  if (DisplayValueSourceImpl(name, readonly, &valueCopy,
+                             gSimValueSources[handle].get(), options,
+                             numOptions))
     HAL_SetSimValue(handle, valueCopy);
 }
 
@@ -184,6 +262,7 @@ static void DisplayDeviceTree() {
 
 void SimDeviceGui::Initialize() {
   gElements.Initialize();
+  HALSimGui::AddExecute(UpdateSimValueSources);
   HALSimGui::AddWindow("Other Devices", DisplayDeviceTree);
   HALSimGui::SetDefaultWindowPos("Other Devices", 1025, 20);
   HALSimGui::SetDefaultWindowSize("Other Devices", 250, 695);

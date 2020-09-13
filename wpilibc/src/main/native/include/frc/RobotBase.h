@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 
+#include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -89,6 +90,8 @@ int StartRobot() {
     impl::RunRobot<Robot>(m, &robot);
   }
 
+  HAL_Shutdown();
+
   return 0;
 }
 
@@ -134,12 +137,28 @@ class RobotBase {
   bool IsAutonomous() const;
 
   /**
+   * Determine if the robot is currently in Autonomous mode and enabled.
+   *
+   * @return True if the robot us currently operating Autonomously while enabled
+   * as determined by the field controls.
+   */
+  bool IsAutonomousEnabled() const;
+
+  /**
    * Determine if the robot is currently in Operator Control mode.
    *
    * @return True if the robot is currently operating in Tele-Op mode as
    *         determined by the field controls.
    */
   bool IsOperatorControl() const;
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while
+   * wnabled as determined by the field-controls.
+   */
+  bool IsOperatorControlEnabled() const;
 
   /**
    * Determine if the robot is currently in Test mode.

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -78,7 +78,7 @@ public class DIOCrossConnectFixture implements ITestFixture {
 
   @Override
   public boolean teardown() {
-    logger.log(Level.FINE, "Begining teardown");
+    logger.log(Level.FINE, "Beginning teardown");
     if (m_allocated) {
       m_input.close();
       m_output.close();

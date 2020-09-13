@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -98,6 +98,10 @@ public class RobotContainer {
         config
     );
 
+    var thetaController = new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0,
+        AutoConstants.kThetaControllerConstraints);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
     SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
         exampleTrajectory,
         m_robotDrive::getPose, //Functional interface to feed supplier
@@ -105,9 +109,7 @@ public class RobotContainer {
 
         //Position controllers
         new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0,
-                                  AutoConstants.kThetaControllerConstraints),
+        new PIDController(AutoConstants.kPYController, 0, 0), thetaController,
 
         m_robotDrive::setModuleStates,
 

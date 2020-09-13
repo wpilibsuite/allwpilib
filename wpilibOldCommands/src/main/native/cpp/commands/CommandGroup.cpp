@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -137,7 +137,7 @@ void CommandGroup::_Execute() {
       // If command timed out, cancel it so it's removed from the Scheduler
       if (entry->IsTimedOut()) cmd->_Cancel();
 
-      // If command finished or was cancelled, remove it from Scheduler
+      // If command finished or was canceled, remove it from Scheduler
       if (cmd->Run()) {
         break;
       } else {
@@ -192,7 +192,7 @@ void CommandGroup::_Execute() {
       child->_Cancel();
     }
 
-    // If child finished or was cancelled, set it to nullptr. nullptr entries
+    // If child finished or was canceled, set it to nullptr. nullptr entries
     // are removed later.
     if (!child->Run()) {
       child->Removed();

@@ -64,7 +64,7 @@ void InitializeHAL() {
   InitializeFPGAEncoder();
   InitializeFRCDriverStation();
   InitializeI2C();
-  InitialzeInterrupts();
+  InitializeInterrupts();
   InitializeMain();
   InitializeNotifier();
   InitializePCMInternal();
@@ -334,7 +334,7 @@ static bool killExistingProgram(int timeout, int mode) {
       kill(pid, SIGTERM);  // try to kill it
       std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
       if (kill(pid, 0) == 0) {
-        // still not successfull
+        // still not successful
         wpi::outs() << "FRC pid " << pid << " did not die within " << timeout
                     << "ms. Force killing with kill -9\n";
         // Force kill -9
@@ -419,6 +419,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   initialized = true;
   return true;
 }
+
+void HAL_Shutdown(void) {}
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
                    const char* feature) {

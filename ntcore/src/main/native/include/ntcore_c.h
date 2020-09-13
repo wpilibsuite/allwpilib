@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -1747,7 +1747,7 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeStringArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
- * freed seperately. Note that the individual NT_Strings should not be freed,
+ * freed separately. Note that the individual NT_Strings should not be freed,
  * but the entire array should be freed at once. The NT_FreeStringArray()
  * function will free all the NT_Strings.
  */

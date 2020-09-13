@@ -151,7 +151,7 @@ class AddressableLED : public ErrorBase {
   /**
    * Starts the output.
    *
-   * <p>The output writes continously.
+   * <p>The output writes continuously.
    */
   void Start();
 

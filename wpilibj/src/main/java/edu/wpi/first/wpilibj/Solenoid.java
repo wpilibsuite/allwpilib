@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -75,6 +75,16 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
    */
   public boolean get() {
     return SolenoidJNI.getSolenoid(m_solenoidHandle);
+  }
+
+  /**
+   * Toggle the value of the solenoid.
+   *
+   * <p>If the solenoid is set to on, it'll be turned off. If the solenoid is set to off, it'll be
+   * turned on.
+   */
+  public void toggle() {
+    set(!get());
   }
 
   /**

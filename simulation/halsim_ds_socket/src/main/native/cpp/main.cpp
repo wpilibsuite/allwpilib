@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -16,10 +16,11 @@
 
 #include <sys/types.h>
 
+#include <atomic>
 #include <cstring>
-#include <iostream>
 
 #include <DSCommPacket.h>
+#include <hal/Extensions.h>
 #include <wpi/EventLoopRunner.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
@@ -36,6 +37,7 @@
 using namespace wpi::uv;
 
 static std::unique_ptr<Buffer> singleByte;
+static std::atomic<bool> gDSConnected = false;
 
 namespace {
 struct DataStore {
@@ -92,12 +94,16 @@ static void SetupTcp(wpi::uv::Loop& loop) {
 
   tcp->Listen([t = tcp.get()] {
     auto client = t->Accept();
+    gDSConnected = true;
 
     client->data.connect([t](Buffer& buf, size_t len) {
       HandleTcpDataStream(buf, len, *t->GetData<DataStore>());
     });
     client->StartRead();
-    client->end.connect([c = client.get()] { c->Close(); });
+    client->end.connect([c = client.get()] {
+      c->Close();
+      gDSConnected = false;
+    });
   });
 }
 
@@ -172,13 +178,14 @@ __declspec(dllexport)
   static bool once = false;
 
   if (once) {
-    std::cerr << "Error: cannot invoke HALSIM_InitExtension twice."
-              << std::endl;
+    wpi::errs() << "Error: cannot invoke HALSIM_InitExtension twice.\n";
     return -1;
   }
   once = true;
 
-  std::cout << "DriverStationSocket Initializing." << std::endl;
+  wpi::outs() << "DriverStationSocket Initializing.\n";
+
+  HAL_RegisterExtension("ds_socket", &gDSConnected);
 
   singleByte = std::make_unique<Buffer>("0");
 
@@ -186,7 +193,7 @@ __declspec(dllexport)
 
   eventLoopRunner->ExecAsync(SetupEventLoop);
 
-  std::cout << "DriverStationSocket Initialized!" << std::endl;
+  wpi::outs() << "DriverStationSocket Initialized!\n";
   return 0;
 }
 }  // extern "C"

@@ -1,6 +1,6 @@
 # WPILib Project
 
-[![Build Status](https://dev.azure.com/wpilib/wpilib/_apis/build/status/wpilibsuite.allwpilib)](https://dev.azure.com/wpilib/wpilib/_build/latest?definitionId=1)
+![CI](https://github.com/wpilibsuite/allwpilib/workflows/CI/badge.svg)
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 

@@ -212,11 +212,28 @@ class DriverStation : public ErrorBase {
   bool IsAutonomous() const;
 
   /**
+   * Check if the DS is commanding autonomous mode and if it has enabled the
+   * robot.
+   *
+   * @return True if the robot is being commanded to be in autonomous mode and
+   * enabled.
+   */
+  bool IsAutonomousEnabled() const;
+
+  /**
    * Check if the DS is commanding teleop mode.
    *
    * @return True if the robot is being commanded to be in teleop mode
    */
   bool IsOperatorControl() const;
+
+  /**
+   * Check if the DS is commanding teleop mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in teleop mode and
+   * enabled.
+   */
+  bool IsOperatorControlEnabled() const;
 
   /**
    * Check if the DS is commanding test mode.
@@ -351,7 +368,7 @@ class DriverStation : public ErrorBase {
    * Warning: This is not an official time (so it cannot be used to dispute ref
    * calls or guarantee that a function will trigger before the match ends).
    *
-   * The Practice Match function of the DS approximates the behaviour seen on
+   * The Practice Match function of the DS approximates the behavior seen on
    * the field.
    *
    * @return Time remaining in current match period (auto or teleop)

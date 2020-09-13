@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -176,7 +176,7 @@ static uint8_t readRegister(Register reg) {
  * 1 g-force, taking into account the accelerometer range.
  */
 static double unpackAxis(int16_t raw) {
-  // The raw value is actually 12 bits, not 16, so we need to propogate the
+  // The raw value is actually 12 bits, not 16, so we need to propagate the
   // 2's complement sign bit to the unused 4 bits for this to work with
   // negative numbers.
   raw <<= 4;

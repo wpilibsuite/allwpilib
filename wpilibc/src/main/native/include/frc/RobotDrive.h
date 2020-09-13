@@ -349,7 +349,7 @@ class RobotDrive : public MotorSafety {
   /**
    * Holonomic Drive method for Mecanum wheeled robots.
    *
-   * This is an alias to MecanumDrive_Polar() for backward compatability
+   * This is an alias to MecanumDrive_Polar() for backward compatibility
    *
    * @param magnitude The speed that the robot should drive in a given
    *                  direction. [-1.0..1.0]

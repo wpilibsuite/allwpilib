@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -92,6 +92,38 @@ class CAN : public ErrorBase {
    * @param apiId The API ID to write.
    */
   void WriteRTRFrame(int length, int apiId);
+
+  /**
+   * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
+   *
+   * @param data The data to write (8 bytes max)
+   * @param length The data length to write
+   * @param apiId The API ID to write.
+   */
+  int WritePacketNoError(const uint8_t* data, int length, int apiId);
+
+  /**
+   * Write a repeating packet to the CAN device with a specific ID. This ID is
+   * 10 bits. The RoboRIO will automatically repeat the packet at the specified
+   * interval
+   *
+   * @param data The data to write (8 bytes max)
+   * @param length The data length to write
+   * @param apiId The API ID to write.
+   * @param repeatMs The period to repeat the packet at.
+   */
+  int WritePacketRepeatingNoError(const uint8_t* data, int length, int apiId,
+                                  int repeatMs);
+
+  /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10
+   * bits. The length by spec must match what is returned by the responding
+   * device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  int WriteRTRFrameNoError(int length, int apiId);
 
   /**
    * Stop a repeating packet with a specific ID. This ID is 10 bits.

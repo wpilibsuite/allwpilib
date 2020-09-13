@@ -33,11 +33,10 @@ public abstract class CommandTestBase {
   }
 
   public void setDSEnabled(boolean enabled) {
-    DriverStationSim sim = new DriverStationSim();
-    sim.setDsAttached(true);
+    DriverStationSim.setDsAttached(true);
 
-    sim.setEnabled(enabled);
-    sim.notifyNewData();
+    DriverStationSim.setEnabled(enabled);
+    DriverStationSim.notifyNewData();
     DriverStation.getInstance().isNewControlData();
     while (DriverStation.getInstance().isEnabled() != enabled) {
       try {

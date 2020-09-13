@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -215,7 +215,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   }
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+   * Gets if the power sent to the right side of the drivetrain is multiplied by -1.
    *
    * @return true if the right side is inverted
    */
@@ -224,9 +224,9 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   }
 
   /**
-   * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+   * Sets if the power sent to the right side of the drivetrain should be multiplied by -1.
    *
-   * @param rightSideInverted true if right side power should be multipled by -1
+   * @param rightSideInverted true if right side power should be multiplied by -1
    */
   public void setRightSideInverted(boolean rightSideInverted) {
     m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;

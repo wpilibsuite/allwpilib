@@ -23,7 +23,7 @@ namespace hal {
 /**
  * The DigitalHandleResource class is a way to track handles. This version
  * allows a limited number of handles that are allocated by index.
- * The enum value is seperate, as 2 enum values are allowed per handle
+ * The enum value is separate, as 2 enum values are allowed per handle
  * Because they are allocated by index, each individual index holds its own
  * mutex, which reduces contention heavily.]
  *
@@ -57,7 +57,7 @@ class DigitalHandleResource : public HandleBase {
 template <typename THandle, typename TStruct, int16_t size>
 THandle DigitalHandleResource<THandle, TStruct, size>::Allocate(
     int16_t index, HAL_HandleEnum enumValue, int32_t* status) {
-  // don't aquire the lock if we can fail early.
+  // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
@@ -81,7 +81,7 @@ std::shared_ptr<TStruct> DigitalHandleResource<THandle, TStruct, size>::Get(
     return nullptr;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
-  // return structure. Null will propogate correctly, so no need to manually
+  // return structure. Null will propagate correctly, so no need to manually
   // check.
   return m_structures[index];
 }

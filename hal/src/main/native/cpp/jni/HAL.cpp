@@ -38,6 +38,18 @@ Java_edu_wpi_first_hal_HAL_initialize
 
 /*
  * Class:     edu_wpi_first_hal_HAL
+ * Method:    shutdown
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_shutdown
+  (JNIEnv*, jclass)
+{
+  return HAL_Shutdown();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
  * Method:    hasMain
  * Signature: ()Z
  */

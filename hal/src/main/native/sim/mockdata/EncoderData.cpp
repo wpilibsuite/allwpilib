@@ -67,7 +67,6 @@ HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) {
                                SimEncoderData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
-DEFINE_CAPI(int32_t, Count, count)
 DEFINE_CAPI(double, Period, period)
 DEFINE_CAPI(HAL_Bool, Reset, reset)
 DEFINE_CAPI(double, MaxPeriod, maxPeriod)
@@ -76,9 +75,31 @@ DEFINE_CAPI(HAL_Bool, ReverseDirection, reverseDirection)
 DEFINE_CAPI(int32_t, SamplesToAverage, samplesToAverage)
 DEFINE_CAPI(double, DistancePerPulse, distancePerPulse)
 
+int32_t HALSIM_RegisterEncoderCountCallback(int32_t index,
+                                            HAL_NotifyCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify) {
+  return SimEncoderData[index].count.RegisterCallback(callback, param,
+                                                      initialNotify);
+}
+
+void HALSIM_CancelEncoderCountCallback(int32_t index, int32_t uid) {
+  SimEncoderData[index].count.CancelCallback(uid);
+}
+
+int32_t HALSIM_GetEncoderCount(int32_t index) {
+  return SimEncoderData[index].count;
+}
+
+void HALSIM_SetEncoderCount(int32_t index, int32_t count) {
+  SimEncoderData[index].count = count;
+  SimEncoderData[index].reset = false;
+}
+
 void HALSIM_SetEncoderDistance(int32_t index, double distance) {
   auto& simData = SimEncoderData[index];
   simData.count = distance / simData.distancePerPulse;
+  simData.reset = false;
 }
 
 double HALSIM_GetEncoderDistance(int32_t index) {

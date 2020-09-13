@@ -36,7 +36,7 @@ class IterativeRobot : public IterativeRobotBase {
   /**
    * Provide an alternate "main loop" via StartCompetition().
    *
-   * This specific StartCompetition() implements "main loop" behaviour synced
+   * This specific StartCompetition() implements "main loop" behavior synced
    * with the DS packets.
    */
   void StartCompetition() override;

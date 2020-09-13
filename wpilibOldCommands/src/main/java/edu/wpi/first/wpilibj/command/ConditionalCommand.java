@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -141,7 +141,7 @@ public abstract class ConditionalCommand extends Command {
 
     if (m_chosenCommand != null) {
       /*
-       * This is a hack to make cancelling the chosen command inside a
+       * This is a hack to make canceling the chosen command inside a
        * CommandGroup work properly
        */
       m_chosenCommand.clearRequirements();

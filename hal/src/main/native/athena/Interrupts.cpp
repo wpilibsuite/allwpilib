@@ -84,7 +84,7 @@ static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
 
 namespace hal {
 namespace init {
-void InitialzeInterrupts() {
+void InitializeInterrupts() {
   static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                                HAL_HandleEnum::Interrupt>
       iH;

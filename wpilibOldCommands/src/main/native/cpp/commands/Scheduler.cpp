@@ -171,8 +171,8 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
     // Cancel commands whose cancel buttons were pressed on the SmartDashboard
     if (!toCancel.empty()) {
       for (auto& command : m_impl->commands) {
-        for (const auto& cancelled : toCancel) {
-          if (command->GetID() == cancelled) {
+        for (const auto& canceled : toCancel) {
+          if (command->GetID() == canceled) {
             command->Cancel();
           }
         }
@@ -232,7 +232,7 @@ void Scheduler::Impl::ProcessCommandAddition(Command* command) {
   if (found == commands.end()) {
     // Check that the requirements can be had
     const auto& requirements = command->GetRequirements();
-    for (const auto& requirement : requirements) {
+    for (const auto requirement : requirements) {
       if (requirement->GetCurrentCommand() != nullptr &&
           !requirement->GetCurrentCommand()->IsInterruptible())
         return;

@@ -1,7 +1,7 @@
 /*
    TCPStream.h
 
-   TCPStream class definition. TCPStream provides methods to trasnfer
+   TCPStream class definition. TCPStream provides methods to transfer
    data between peers over a TCP/IP connection.
 
    ------------------------------------------

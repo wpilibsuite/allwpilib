@@ -85,7 +85,7 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
     return nullptr;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
-  // return structure. Null will propogate correctly, so no need to manually
+  // return structure. Null will propagate correctly, so no need to manually
   // check.
   return m_structures[index];
 }

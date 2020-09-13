@@ -5,7 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <hal/Extensions.h>
 #include <hal/Main.h>
+#include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
 
 #include "AccelerometerGui.h"
@@ -19,9 +21,11 @@
 #include "EncoderGui.h"
 #include "Field2D.h"
 #include "HALSimGui.h"
+#include "Mechanism2D.h"
 #include "NetworkTablesGui.h"
 #include "PDPGui.h"
 #include "PWMGui.h"
+#include "PlotGui.h"
 #include "RelayGui.h"
 #include "RoboRioGui.h"
 #include "SimDeviceGui.h"
@@ -35,6 +39,7 @@ extern "C" {
 __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
+  HALSimGui::GlobalInit();
   HALSimGui::Add(AccelerometerGui::Initialize);
   HALSimGui::Add(AddressableLEDGui::Initialize);
   HALSimGui::Add(AnalogGyroGui::Initialize);
@@ -45,8 +50,10 @@ __declspec(dllexport)
   HALSimGui::Add(DIOGui::Initialize);
   HALSimGui::Add(EncoderGui::Initialize);
   HALSimGui::Add(Field2D::Initialize);
+  HALSimGui::Add(Mechanism2D::Initialize);
   HALSimGui::Add(NetworkTablesGui::Initialize);
   HALSimGui::Add(PDPGui::Initialize);
+  HALSimGui::Add(PlotGui::Initialize);
   HALSimGui::Add(PWMGui::Initialize);
   HALSimGui::Add(RelayGui::Initialize);
   HALSimGui::Add(RoboRioGui::Initialize);
@@ -56,6 +63,12 @@ __declspec(dllexport)
 
   wpi::outs() << "Simulator GUI Initializing.\n";
   if (!HALSimGui::Initialize()) return 0;
+  HAL_RegisterExtensionListener(
+      nullptr, [](void*, const char* name, void* data) {
+        if (wpi::StringRef{name} == "ds_socket") {
+          DriverStationGui::SetDSSocketExtension(data);
+        }
+      });
   HAL_SetMain(nullptr, HALSimGui::Main, HALSimGui::Exit);
   wpi::outs() << "Simulator GUI Initialized!\n";
 

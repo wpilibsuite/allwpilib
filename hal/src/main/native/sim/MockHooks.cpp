@@ -23,24 +23,24 @@ static std::atomic<uint64_t> programStepTime{0};
 
 namespace hal {
 namespace init {
-void InitializeMockHooks() {}
+void InitializeMockHooks() { wpi::SetNowImpl(GetFPGATime); }
 }  // namespace init
 }  // namespace hal
 
 namespace hal {
 void RestartTiming() {
-  programStartTime = wpi::Now();
+  programStartTime = wpi::NowDefault();
   programStepTime = 0;
   if (programPauseTime != 0) programPauseTime = programStartTime.load();
 }
 
 void PauseTiming() {
-  if (programPauseTime == 0) programPauseTime = wpi::Now();
+  if (programPauseTime == 0) programPauseTime = wpi::NowDefault();
 }
 
 void ResumeTiming() {
   if (programPauseTime != 0) {
-    programStartTime += wpi::Now() - programPauseTime;
+    programStartTime += wpi::NowDefault() - programPauseTime;
     programPauseTime = 0;
   }
 }
@@ -49,9 +49,9 @@ bool IsTimingPaused() { return programPauseTime != 0; }
 
 void StepTiming(uint64_t delta) { programStepTime += delta; }
 
-int64_t GetFPGATime() {
+uint64_t GetFPGATime() {
   uint64_t curTime = programPauseTime;
-  if (curTime == 0) curTime = wpi::Now();
+  if (curTime == 0) curTime = wpi::NowDefault();
   return curTime + programStepTime - programStartTime;
 }
 

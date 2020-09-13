@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -107,6 +107,7 @@ class SimpleBufferPool {
    * @param size Size of each buffer to allocate.
    */
   explicit SimpleBufferPool(size_t size = 4096) : m_size{size} {}
+  ~SimpleBufferPool() { Clear(); }
 
   SimpleBufferPool(const SimpleBufferPool& other) = delete;
   SimpleBufferPool& operator=(const SimpleBufferPool& other) = delete;

@@ -94,6 +94,8 @@ void AnalogEncoder::Reset() {
   m_positionOffset = m_analogInput->GetVoltage();
 }
 
+int AnalogEncoder::GetChannel() const { return m_analogInput->GetChannel(); }
+
 void AnalogEncoder::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(

@@ -64,7 +64,7 @@ template <typename THandle, typename TStruct, int16_t size,
 THandle
 IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     int16_t index, std::shared_ptr<TStruct> toSet, int32_t* status) {
-  // don't aquire the lock if we can fail early.
+  // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
@@ -90,7 +90,7 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
     return nullptr;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
-  // return structure. Null will propogate correctly, so no need to manually
+  // return structure. Null will propagate correctly, so no need to manually
   // check.
   return m_structures[index];
 }

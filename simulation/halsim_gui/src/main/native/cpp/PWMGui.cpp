@@ -10,19 +10,44 @@
 #include <cstdio>
 #include <cstring>
 #include <memory>
+#include <vector>
 
 #include <hal/Ports.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <hal/simulation/PWMData.h>
 #include <imgui.h>
 
+#include "GuiDataSource.h"
 #include "HALSimGui.h"
 #include "IniSaver.h"
 #include "IniSaverInfo.h"
 
 using namespace halsimgui;
 
+namespace {
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMSpeed, "PWM");
+}  // namespace
+
 static IniSaver<NameInfo> gPWM{"PWM"};
+static std::vector<std::unique_ptr<PWMSpeedSource>> gPWMSources;
+
+static void UpdatePWMSources() {
+  static const int numPWM = HAL_GetNumPWMChannels();
+  if (static_cast<size_t>(numPWM) != gPWMSources.size())
+    gPWMSources.resize(numPWM);
+
+  for (int i = 0; i < numPWM; ++i) {
+    auto& source = gPWMSources[i];
+    if (HALSIM_GetPWMInitialized(i)) {
+      if (!source) {
+        source = std::make_unique<PWMSpeedSource>(i);
+        source->SetName(gPWM[i].GetName());
+      }
+    } else {
+      source.reset();
+    }
+  }
+}
 
 static void DisplayPWMs() {
   bool hasOutputs = false;
@@ -39,19 +64,11 @@ static void DisplayPWMs() {
     }
   }
 
-  // struct History {
-  //  History() { std::memset(data, 0, 90 * sizeof(float)); }
-  //  History(const History&) = delete;
-  //  History& operator=(const History&) = delete;
-  //  float data[90];
-  //  int display_offset = 0;
-  //  int save_offset = 0;
-  //};
-  // static std::vector<std::unique_ptr<History>> history;
   bool first = true;
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
   for (int i = 0; i < numPWM; ++i) {
-    if (HALSIM_GetPWMInitialized(i)) {
+    if (auto source = gPWMSources[i].get()) {
+      ImGui::PushID(i);
       hasOutputs = true;
 
       if (!first)
@@ -59,26 +76,19 @@ static void DisplayPWMs() {
       else
         first = false;
 
-      char name[128];
       auto& info = gPWM[i];
-      info.GetName(name, sizeof(name), "PWM", i);
+      char label[128];
+      info.GetLabel(label, sizeof(label), "PWM", i);
       if (ledMap[i] > 0) {
-        ImGui::LabelText(name, "LED[%d]", ledMap[i] - 1);
+        ImGui::LabelText(label, "LED[%d]", ledMap[i] - 1);
       } else {
         float val = HALSimGui::AreOutputsDisabled() ? 0 : HALSIM_GetPWMSpeed(i);
-        ImGui::LabelText(name, "%0.3f", val);
+        source->LabelText(label, "%0.3f", val);
       }
-      info.PopupEditName(i);
-
-      // lazily build history storage
-      // if (static_cast<unsigned int>(i) > history.size())
-      //  history.resize(i + 1);
-      // if (!history[i]) history[i] = std::make_unique<History>();
-
-      // save history
-
-      // ImGui::PlotLines(labels[i].c_str(), values.data(), values.size(),
-      // );
+      if (info.PopupEditName(i)) {
+        source->SetName(info.GetName());
+      }
+      ImGui::PopID();
     }
   }
   ImGui::PopItemWidth();
@@ -87,6 +97,7 @@ static void DisplayPWMs() {
 
 void PWMGui::Initialize() {
   gPWM.Initialize();
+  HALSimGui::AddExecute(UpdatePWMSources);
   HALSimGui::AddWindow("PWM Outputs", DisplayPWMs,
                        ImGuiWindowFlags_AlwaysAutoResize);
   HALSimGui::SetDefaultWindowPos("PWM Outputs", 910, 20);
