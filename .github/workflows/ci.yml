@@ -84,12 +84,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Dependencies
+        shell: bash
         run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get update && sudo apt-get install -y libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
+          elif [ "$RUNNER_OS" == "macOS" ]; then
             brew install opencv
           fi
       - name: configure
-        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF -DWITH_TESTS=ON ${{ matrix.flags }} ..
+        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF -DWITH_SIMULATION_MODULES=ON -DWITH_TESTS=ON ${{ matrix.flags }} ..
       - name: build
         working-directory: build
         run: make -j3
@@ -105,7 +108,7 @@ jobs:
       - name: Prepare vcpkg
         uses: lukka/run-vcpkg@v2
         with:
-          vcpkgArguments: opencv
+          vcpkgArguments: opencv glfw3
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg/
           vcpkgGitCommitId: 544f8e4593764f78faa94bac2adb81cca5232943
           vcpkgTriplet: x64-windows
@@ -113,7 +116,7 @@ jobs:
         uses: lukka/run-cmake@v2
         with:
           buildDirectory: ${{ runner.workspace }}/build/
-          cmakeAppendedArgs: -DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF -DWITH_TESTS=ON
+          cmakeAppendedArgs: -DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF -DWITH_SIMULATION_MODULES=ON -DWITH_TESTS=ON
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           useVcpkgToolchainFile: true
       - name: Run Tests
