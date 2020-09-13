@@ -12,6 +12,7 @@ generatedFileExclude {
   src/main/native/cpp/drake/
   src/main/native/eigeninclude/
   src/main/native/include/drake/
+  src/main/native/include/gcem/
   src/main/native/include/units/base\.h$
   src/main/native/include/units/units\.h$
   src/main/native/include/unsupported/

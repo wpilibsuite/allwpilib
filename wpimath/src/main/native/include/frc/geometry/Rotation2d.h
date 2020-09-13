@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <wpi/math>
+
+#include "gcem/gcem.h"
 #include "units/angle.h"
 
 namespace wpi {
@@ -31,14 +34,21 @@ class Rotation2d {
    *
    * @param value The value of the angle in radians.
    */
-  Rotation2d(units::radian_t value);  // NOLINT(runtime/explicit)
+  constexpr Rotation2d(units::radian_t value)
+      : m_value(value),
+        m_cos(gcem::cos(value.to<double>())),
+        m_sin(gcem::sin(value.to<double>())) {}  // NOLINT(runtime/explicit)
 
   /**
    * Constructs a Rotation2d with the given degree value.
    *
    * @param value The value of the angle in degrees.
    */
-  Rotation2d(units::degree_t value);  // NOLINT(runtime/explicit)
+  constexpr Rotation2d(units::degree_t value)
+      : m_value(value),
+        m_cos(gcem::cos(value.to<double>() * wpi::math::pi / 180.0)),
+        m_sin(gcem::sin(value.to<double>() * wpi::math::pi / 180.0)) {
+  }  // NOLINT(runtime/explicit)
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
@@ -47,7 +57,17 @@ class Rotation2d {
    * @param x The x component or cosine of the rotation.
    * @param y The y component or sine of the rotation.
    */
-  Rotation2d(double x, double y);
+  constexpr Rotation2d(double x, double y) {
+    double magnitude = gcem::sqrt(gcem::pow(x, 2) + gcem::pow(y, 2));
+    if (magnitude > 1e-6) {
+      m_sin = y / magnitude;
+      m_cos = x / magnitude;
+    } else {
+      m_sin = 0.0;
+      m_cos = 1.0;
+    }
+    m_value = units::radian_t(gcem::atan2(m_sin, m_cos));
+  }
 
   /**
    * Adds two rotations together, with the result being bounded between -pi and
