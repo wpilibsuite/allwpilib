@@ -56,10 +56,12 @@ class SynchronousInterrupt : public ErrorBase {
   /**
    * Wait for an interrupt to occur.
    *
-   * <p> Both rising and falling edge can be returned if both a rising and falling happened between calls, and ignorePrevious is false.
+   * <p> Both rising and falling edge can be returned if both a rising and
+   * falling happened between calls, and ignorePrevious is false.
    *
    * @param timeout The timeout to wait for. 0s or less will return immediately.
-   * @param ignorePrevious True to ignore any previous interrupts, false to return interrupt value if an interrupt has occured since last call.
+   * @param ignorePrevious True to ignore any previous interrupts, false to
+   * return interrupt value if an interrupt has occured since last call.
    * @return The edge(s) that were triggered, or timeout.
    */
   WaitResult WaitForInterrupt(units::second_t timeout,

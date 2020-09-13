@@ -18,9 +18,11 @@ namespace frc {
 /**
  * Class for handling asynchronous interrupts.
  *
- * <p> By default, interrupts will occur on rising edge. Callbacks are disabled by default, and Enable() must be called before they will occur.
+ * <p> By default, interrupts will occur on rising edge. Callbacks are disabled
+ * by default, and Enable() must be called before they will occur.
  *
- * <p> Both rising and falling edge can be indiciated if both a rising and falling happen between callbacks.
+ * <p> Both rising and falling edge can be indiciated if both a rising and
+ * falling happen between callbacks.
  *
  * <p>Synchronous interrupts are handled by the SynchronousInterrupt class.
  */
@@ -33,7 +35,7 @@ class AsynchronousInterrupt {
    * <p> The first bool in the callback is rising, the 2nd is falling.
    */
   AsynchronousInterrupt(DigitalSource& source,
-                                 std::function<void(bool, bool)> callback);
+                        std::function<void(bool, bool)> callback);
 
   /**
    * Construct an Asynchronous Interrupt from a Digital Source.
@@ -43,7 +45,7 @@ class AsynchronousInterrupt {
    * <p> The first bool in the callback is rising, the 2nd is falling.
    */
   AsynchronousInterrupt(DigitalSource* source,
-                                 std::function<void(bool, bool)> callback);
+                        std::function<void(bool, bool)> callback);
 
   /**
    * Construct an Asynchronous Interrupt from a Digital Source.
@@ -53,7 +55,7 @@ class AsynchronousInterrupt {
    * <p> The first bool in the callback is rising, the 2nd is falling.
    */
   AsynchronousInterrupt(std::shared_ptr<DigitalSource> source,
-                                 std::function<void(bool, bool)> callback);
+                        std::function<void(bool, bool)> callback);
 
   /**
    * Construct an Asynchronous Interrupt from a Digital Source.
@@ -103,7 +105,8 @@ class AsynchronousInterrupt {
   AsynchronousInterrupt& operator=(AsynchronousInterrupt&&) = default;
 
   /**
-   * Enables interrupt callbacks. Before this, callbacks will not occur. Does nothing if already enabled.
+   * Enables interrupt callbacks. Before this, callbacks will not occur. Does
+   * nothing if already enabled.
    */
   void Enable();
 
