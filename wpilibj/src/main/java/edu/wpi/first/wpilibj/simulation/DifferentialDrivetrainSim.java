@@ -261,7 +261,7 @@ public class DifferentialDrivetrainSim {
 
   /**
    * Create a sim for the standard FRC kitbot.
-   * 
+   *
    * @param motor     The motors installed in the bot.
    * @param gearing   The gearing reduction used.
    * @param wheelSize The wheel size.

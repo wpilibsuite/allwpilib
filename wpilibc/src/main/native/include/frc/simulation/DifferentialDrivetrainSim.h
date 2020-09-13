@@ -12,6 +12,8 @@
 #include <frc/system/plant/DCMotor.h>
 
 #include <Eigen/Core>
+#include <units/length.h>
+#include <units/moment_of_inertia.h>
 #include <units/time.h>
 #include <units/voltage.h>
 
@@ -40,6 +42,26 @@ class DifferentialDrivetrainSim {
                             DifferentialDriveKinematics& kinematics,
                             DCMotor driveMotor, double gearingRatio,
                             units::meter_t wheelRadius);
+
+  /**
+   * Create a SimDrivetrain.
+   *
+   * @param driveMotor  A {@link DCMotor} representing the left side of the
+   * drivetrain.
+   * @param gearing     The gearing on the drive between motor and wheel, as
+   * output over input. This must be the same ratio as the ratio used to
+   * identify or create the drivetrainPlant.
+   * @param J           The moment of inertia of the drivetrain about its
+   * center.
+   * @param mass        The mass of the drivebase.
+   * @param wheelRadius The radius of the wheels on the drivetrain.
+   * @param trackWidth  The robot's track width, or distance between left and
+   * right wheels.
+   */
+  DifferentialDrivetrainSim(frc::DCMotor driveMotor, double gearing,
+                            units::kilogram_square_meter_t J,
+                            units::kilogram_t mass, units::meter_t wheelRadius,
+                            units::meter_t trackWidth);
 
   /**
    * Set the applied voltage to the drivetrain. Note that positive voltage must
@@ -112,6 +134,66 @@ class DifferentialDrivetrainSim {
     static constexpr int kLeftPosition = 5;
     static constexpr int kRightPosition = 6;
   };
+
+  class KitbotGearing {
+   public:
+    static constexpr double Gearing10_71 = 10.71;
+    static constexpr double Gearing8_45 = 8.45;
+    static constexpr double Gearing5_95 = 5.95;
+  };
+
+  class KitbotMotor {
+   public:
+    static inline const frc::DCMotor SingleCIMPerSide = frc::DCMotor::CIM(1);
+    static inline const frc::DCMotor DualCIMPerSide = frc::DCMotor::CIM(2);
+    static inline const frc::DCMotor SingleMiniCIMPerSide =
+        frc::DCMotor::MiniCIM(1);
+    static inline const frc::DCMotor DualMiniCIMPerSide =
+        frc::DCMotor::MiniCIM(2);
+  };
+
+  class KitbotWheelSize {
+   public:
+    static inline const units::meter_t SixInch = 6_in;
+    static inline const units::meter_t EightInch = 8_in;
+    static inline const units::meter_t TenInch = 10_in;
+  };
+
+  /**
+   * Create a sim for the standard FRC kitbot.
+   *
+   * @param motor     The motors installed in the bot.
+   * @param gearing   The gearing reduction used.
+   * @param wheelSize The wheel size.
+   */
+  static DifferentialDrivetrainSim createKitbotSim(frc::DCMotor motor,
+                                                   double gearing,
+                                                   units::meter_t wheelSize) {
+    // MOI estimation -- note that I = m r^2 for point masses
+    units::kilogram_square_meter_t batteryMoi = 12.5_lb * 10_in * 10_in;
+    units::kilogram_square_meter_t gearboxMoi = (2.8_lb + 2.0_lb) *
+                                                2  // CIM plus toughbox per side
+                                                * (26_in / 2) * (26_in / 2);
+
+    return DifferentialDrivetrainSim{
+        motor, gearing, batteryMoi + gearboxMoi, 25_kg, wheelSize / 2.0, 26_in};
+  }
+
+  /**
+   * Create a sim for the standard FRC kitbot.
+   *
+   * @param motor     The motors installed in the bot.
+   * @param gearing   The gearing reduction used.
+   * @param wheelSize The wheel size.
+   * @param J         The moment of inertia of the drivebase. This can be
+   * calculated using frc-characterization.
+   */
+  static DifferentialDrivetrainSim createKitbotSim(
+      frc::DCMotor motor, double gearing, units::meter_t wheelSize,
+      units::kilogram_square_meter_t J) {
+    return DifferentialDrivetrainSim{motor, gearing,         J,
+                                     25_kg, wheelSize / 2.0, 26_in};
+  }
 
  private:
   LinearSystem<2, 2, 2> m_plant;

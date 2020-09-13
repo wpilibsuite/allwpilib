@@ -7,16 +7,18 @@
 
 #include "frc/simulation/DifferentialDrivetrainSim.h"
 
+#include <frc/system/plant/LinearSystemId.h>
+
 #include "frc/system/RungeKutta.h"
 
 using namespace frc;
 using namespace frc::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    LinearSystem<2, 2, 2>& plant, DifferentialDriveKinematics& kinematics,
-    DCMotor driveMotor, double gearRatio, units::meter_t wheelRadius)
+    LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth, DCMotor driveMotor,
+    double gearRatio, units::meter_t wheelRadius)
     : m_plant(plant),
-      m_rb(kinematics.trackWidth / 2.0),
+      m_rb(trackWidth / 2.0),
       m_wheelRadius(wheelRadius),
       m_motor(driveMotor),
       m_originalGearing(gearRatio),
@@ -24,6 +26,14 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
   m_x.setZero();
   m_u.setZero();
 }
+
+DifferentialDrivetrainSim(frc::DCMotor driveMotor, double gearing,
+                          units::kilogram_square_meter_t J, units::kg_t mass,
+                          units::meter_t wheelRadius, units::meter_t trackWidth)
+    : DifferentialDrivetrainSim(
+          frc::LinearSystemId::DrivetrainVelocitySystem(
+              driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
+          trackWidth, driveMotor, gearing, wheelRadius) {}
 
 void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,
                                           units::volt_t rightVoltage) {
