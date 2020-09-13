@@ -7,13 +7,14 @@ file(GLOB wpigui_windows_src src/main/native/directx11/*.cpp)
 file(GLOB wpigui_mac_src src/main/native/metal/*.mm)
 file(GLOB wpigui_unix_src src/main/native/opengl3/*.cpp)
 
-add_library(wpigui ${wpigui_src})
+add_library(wpigui STATIC ${wpigui_src})
 set_target_properties(wpigui PROPERTIES DEBUG_POSTFIX "d")
+set_property(TARGET wpigui PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 set_property(TARGET wpigui PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(wpigui)
-target_link_libraries(wpigui imgui)
+target_link_libraries(wpigui PUBLIC imgui)
 
 target_include_directories(wpigui PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
