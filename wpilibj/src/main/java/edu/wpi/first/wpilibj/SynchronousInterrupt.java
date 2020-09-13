@@ -14,6 +14,8 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 /**
  * Class for handling sychronous interrupts.
  *
+ * <p> By default, interrupts will occur on rising edge.
+ *
  * <p>Asynchronous interrupts are handled by the AsynchronousInterrupt class.
  */
 public class SynchronousInterrupt implements AutoCloseable {

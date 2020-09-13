@@ -15,6 +15,10 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 /**
  * Class for handling asynchrounous interrupts.
  *
+ * <p> By default, interrupts will occur on rising edge. Callbacks are disabled by default, and Enable() must be called before they will occur.
+ *
+ * <p> Both rising and falling edge can be indiciated if both a rising and falling happen between callbacks.
+ *
  * <p>Synchronous interrupts are handled by the SynchronousInterrupt class.
  */
 public class AsynchronousInterrupt implements AutoCloseable {
@@ -53,7 +57,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
   }
 
   /**
-   * Enable interrupts to trigger.
+   * Enables interrupt callbacks. Before this, callbacks will not occur. Does nothing if already enabled.
    */
   public void enable() {
     if (m_keepRunning.get()) {
@@ -65,7 +69,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
   }
 
   /**
-   * Disable interrupts from triggering.
+   * Disables interrupt callbacks. Does nothing if already disabled.
    */
   public void disable() {
     m_keepRunning.set(false);

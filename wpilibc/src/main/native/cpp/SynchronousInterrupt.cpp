@@ -50,6 +50,11 @@ void SynchronousInterrupt::InitSynchronousInterrupt() {
                             m_source->GetAnalogTriggerTypeForRouting()),
                         &status);
   wpi_setHALError(status);
+  if (status != 0) {
+    return;
+  }
+  HAL_SetInterruptUpSourceEdge(m_handle, true, false, &status);
+  wpi_setHALError(status);
 }
 
 SynchronousInterrupt::~SynchronousInterrupt() {
