@@ -27,8 +27,8 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
   m_u.setZero();
 }
 
-DifferentialDrivetrainSim(frc::DCMotor driveMotor, double gearing,
-                          units::kilogram_square_meter_t J, units::kg_t mass,
+DifferentialDrivetrainSim::DifferentialDrivetrainSim(frc::DCMotor driveMotor, double gearing,
+                          units::kilogram_square_meter_t J, units::kilogram_t mass,
                           units::meter_t wheelRadius, units::meter_t trackWidth)
     : DifferentialDrivetrainSim(
           frc::LinearSystemId::DrivetrainVelocitySystem(
