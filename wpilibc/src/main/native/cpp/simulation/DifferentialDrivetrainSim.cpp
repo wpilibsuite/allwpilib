@@ -15,7 +15,7 @@ using namespace frc;
 using namespace frc::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth, DCMotor driveMotor,
+    const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth, DCMotor driveMotor,
     double gearRatio, units::meter_t wheelRadius)
     : m_plant(plant),
       m_rb(trackWidth / 2.0),

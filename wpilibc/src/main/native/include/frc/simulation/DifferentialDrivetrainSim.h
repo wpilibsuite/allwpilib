@@ -37,7 +37,7 @@ class DifferentialDrivetrainSim {
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in
    * meters.
    */
-  DifferentialDrivetrainSim(LinearSystem<2, 2, 2>& plant,
+  DifferentialDrivetrainSim(const LinearSystem<2, 2, 2>& plant,
                             units::meter_t trackWidth,
                             DCMotor driveMotor, double gearingRatio,
                             units::meter_t wheelRadius);
@@ -195,7 +195,7 @@ class DifferentialDrivetrainSim {
   }
 
  private:
-  LinearSystem<2, 2, 2> m_plant;
+  const LinearSystem<2, 2, 2>& m_plant;
   units::meter_t m_rb;
   units::meter_t m_wheelRadius;
 
