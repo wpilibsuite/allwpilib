@@ -273,8 +273,7 @@ public class DifferentialDrivetrainSim {
     var gearboxMoi = (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)
         * Math.pow(Units.inchesToMeters(26.0 / 2.0), 2);
 
-    return new DifferentialDrivetrainSim(motor.value, 25 / 2.2, wheelSize.value / 2.0,
-        batteryMoi + gearboxMoi, gearing.value, Units.inchesToMeters(26));
+    return createKitbotSim(motor, gearing, wheelSize, batteryMoi + gearboxMoi);
   }
 
   /**
@@ -288,7 +287,7 @@ public class DifferentialDrivetrainSim {
    */
   public static DifferentialDrivetrainSim createKitbotSim(KitbotMotor motor, KitbotGearing gearing,
                                                           KitbotWheelSize wheelSize, double jKgMetersSquared) {
-    return new DifferentialDrivetrainSim(motor.value, 25 / 2.2, wheelSize.value / 2.0,
-        jKgMetersSquared, gearing.value, Units.inchesToMeters(26));
+    return new DifferentialDrivetrainSim(motor.value, gearing.value, jKgMetersSquared, 25 / 2.2,
+        wheelSize.value / 2.0, Units.inchesToMeters(26));
   }
 }
