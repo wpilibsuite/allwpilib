@@ -187,8 +187,8 @@ class LinearSystemId {
    * @param J Moment of inertia.
    */
   static LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
-      const DCMotor& motor, units::kilogram_t m, units::meter_t r, units::meter_t rb,
-      units::kilogram_square_meter_t J, double G) {
+      const DCMotor& motor, units::kilogram_t m, units::meter_t r,
+      units::meter_t rb, units::kilogram_square_meter_t J, double G) {
     auto C1 = -std::pow(G, 2) * motor.Kt /
               (motor.Kv * motor.R * units::math::pow<2>(r));
     auto C2 = G * motor.Kt / (motor.R * r);
