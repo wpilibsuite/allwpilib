@@ -15,8 +15,8 @@ using namespace frc;
 using namespace frc::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth, DCMotor driveMotor,
-    double gearRatio, units::meter_t wheelRadius)
+    const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
+    DCMotor driveMotor, double gearRatio, units::meter_t wheelRadius)
     : m_plant(plant),
       m_rb(trackWidth / 2.0),
       m_wheelRadius(wheelRadius),
@@ -27,9 +27,10 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
   m_u.setZero();
 }
 
-DifferentialDrivetrainSim::DifferentialDrivetrainSim(frc::DCMotor driveMotor, double gearing,
-                          units::kilogram_square_meter_t J, units::kilogram_t mass,
-                          units::meter_t wheelRadius, units::meter_t trackWidth)
+DifferentialDrivetrainSim::DifferentialDrivetrainSim(
+    frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
+    units::kilogram_t mass, units::meter_t wheelRadius,
+    units::meter_t trackWidth)
     : DifferentialDrivetrainSim(
           frc::LinearSystemId::DrivetrainVelocitySystem(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),

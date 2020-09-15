@@ -38,9 +38,8 @@ class DifferentialDrivetrainSim {
    * meters.
    */
   DifferentialDrivetrainSim(const LinearSystem<2, 2, 2>& plant,
-                            units::meter_t trackWidth,
-                            DCMotor driveMotor, double gearingRatio,
-                            units::meter_t wheelRadius);
+                            units::meter_t trackWidth, DCMotor driveMotor,
+                            double gearingRatio, units::meter_t wheelRadius);
 
   /**
    * Create a SimDrivetrain.
