@@ -28,8 +28,7 @@ class DifferentialDrivetrainSim {
    * drivetrain. This system can be created with
    * LinearSystemId#createDrivetrainVelocitySystem or
    * LinearSystemId#identifyDrivetrainSystem.
-   * @param kinematics        A {@link DifferentialDriveKinematics} object
-   * representing the differential drivetrain's kinematics.
+   * @param trackWidth        The robot's track width.
    * @param driveMotor        A {@link DCMotor} representing the left side of
    * the drivetrain.
    * @param gearingRatio      The gearingRatio ratio of the left side, as output
@@ -39,7 +38,7 @@ class DifferentialDrivetrainSim {
    * meters.
    */
   DifferentialDrivetrainSim(LinearSystem<2, 2, 2>& plant,
-                            DifferentialDriveKinematics& kinematics,
+                            units::meter_t trackWidth,
                             DCMotor driveMotor, double gearingRatio,
                             units::meter_t wheelRadius);
 
