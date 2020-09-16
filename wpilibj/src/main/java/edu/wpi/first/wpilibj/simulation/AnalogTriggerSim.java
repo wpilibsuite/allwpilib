@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import java.util.NoSuchElementException;
 import edu.wpi.first.hal.simulation.AnalogTriggerDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AnalogTrigger;
-import java.util.NoSuchElementException;
 
 /** Class to control a simulated analog trigger. */
 public class AnalogTriggerSim {
