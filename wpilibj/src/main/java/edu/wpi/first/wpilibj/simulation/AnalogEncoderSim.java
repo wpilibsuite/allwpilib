@@ -19,7 +19,7 @@ public class AnalogEncoderSim {
    */
   public AnalogEncoderSim(AnalogEncoder encoder) {
     SimDeviceSim wrappedSimDevice =
-        new SimDeviceSim("AnalogEncoder" + "[" + encoder.getChannel() + "]");
+            new SimDeviceSim("AnalogEncoder" + "[" + encoder.getChannel() + "]");
     m_simPosition = wrappedSimDevice.getDouble("Position");
   }
 

@@ -68,6 +68,7 @@ public class CallbackStore implements AutoCloseable {
     m_cancelType = -1;
   }
 
+  @SuppressWarnings("NoFinalizer")
   @Override
   protected void finalize() throws Throwable {
     try {

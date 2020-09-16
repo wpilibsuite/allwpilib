@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import java.util.NoSuchElementException;
 import edu.wpi.first.hal.simulation.DutyCycleDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DutyCycle;
-import java.util.NoSuchElementException;
 
 /** Class to control a simulated duty cycle digital input. */
 public class DutyCycleSim {

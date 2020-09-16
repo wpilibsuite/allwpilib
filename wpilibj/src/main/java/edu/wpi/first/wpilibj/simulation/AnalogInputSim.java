@@ -43,7 +43,8 @@ public class AnalogInputSim {
     AnalogInDataJNI.setInitialized(m_index, initialized);
   }
 
-  public CallbackStore registerAverageBitsCallback(NotifyCallback callback, boolean initialNotify) {
+  public CallbackStore registerAverageBitsCallback(NotifyCallback callback,
+                                                   boolean initialNotify) {
     int uid = AnalogInDataJNI.registerAverageBitsCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogInDataJNI::cancelAverageBitsCallback);
   }

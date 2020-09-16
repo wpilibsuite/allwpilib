@@ -63,6 +63,7 @@ public class DriverStationSim {
     return DriverStationDataJNI.getEStop();
   }
 
+  @SuppressWarnings("ParameterName")
   public static void setEStop(boolean eStop) {
     DriverStationDataJNI.setEStop(eStop);
   }

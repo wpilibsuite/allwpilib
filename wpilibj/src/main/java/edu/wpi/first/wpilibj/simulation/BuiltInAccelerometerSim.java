@@ -62,6 +62,7 @@ public class BuiltInAccelerometerSim {
     return AccelerometerDataJNI.getX(m_index);
   }
 
+  @SuppressWarnings("ParameterName")
   public void setX(double x) {
     AccelerometerDataJNI.setX(m_index, x);
   }
@@ -75,6 +76,7 @@ public class BuiltInAccelerometerSim {
     return AccelerometerDataJNI.getY(m_index);
   }
 
+  @SuppressWarnings("ParameterName")
   public void setY(double y) {
     AccelerometerDataJNI.setY(m_index, y);
   }
@@ -88,6 +90,7 @@ public class BuiltInAccelerometerSim {
     return AccelerometerDataJNI.getZ(m_index);
   }
 
+  @SuppressWarnings("ParameterName")
   public void setZ(double z) {
     AccelerometerDataJNI.setZ(m_index, z);
   }
