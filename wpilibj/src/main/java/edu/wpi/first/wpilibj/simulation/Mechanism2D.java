@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 

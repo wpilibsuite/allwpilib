@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import java.util.NoSuchElementException;
+
 import edu.wpi.first.hal.simulation.EncoderDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.Encoder;
