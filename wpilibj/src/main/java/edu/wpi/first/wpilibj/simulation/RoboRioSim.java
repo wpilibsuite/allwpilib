@@ -10,16 +10,19 @@ import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 /** Class to control a simulated RoboRIO. */
 @SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.UseUtilityClass"})
 public class RoboRioSim {
-  public static CallbackStore registerFPGAButtonCallback(
-      NotifyCallback callback, boolean initialNotify) {
+  @SuppressWarnings("AbbreviationAsWordInName")
+  public static CallbackStore registerFPGAButtonCallback(NotifyCallback callback,
+                                                         boolean initialNotify) {
     int uid = RoboRioDataJNI.registerFPGAButtonCallback(callback, initialNotify);
     return new CallbackStore(uid, RoboRioDataJNI::cancelFPGAButtonCallback);
   }
 
+  @SuppressWarnings("AbbreviationAsWordInName")
   public static boolean getFPGAButton() {
     return RoboRioDataJNI.getFPGAButton();
   }
 
+  @SuppressWarnings({"AbbreviationAsWordInName", "ParameterName"})
   public static void setFPGAButton(boolean fPGAButton) {
     RoboRioDataJNI.setFPGAButton(fPGAButton);
   }
@@ -34,6 +37,7 @@ public class RoboRioSim {
     return RoboRioDataJNI.getVInVoltage();
   }
 
+  @SuppressWarnings("ParameterName")
   public static void setVInVoltage(double vInVoltage) {
     RoboRioDataJNI.setVInVoltage(vInVoltage);
   }
@@ -48,6 +52,7 @@ public class RoboRioSim {
     return RoboRioDataJNI.getVInCurrent();
   }
 
+  @SuppressWarnings("ParameterName")
   public static void setVInCurrent(double vInCurrent) {
     RoboRioDataJNI.setVInCurrent(vInCurrent);
   }

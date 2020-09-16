@@ -4,10 +4,11 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimDouble;
 import java.util.HashMap;
 import java.util.Map;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
+
 
 public class Mechanism2D {
   private static final SimDevice m_device = SimDevice.create("Mechanism2D");

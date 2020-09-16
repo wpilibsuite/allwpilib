@@ -49,6 +49,7 @@ public class SPIAccelerometerSim {
     return SPIAccelerometerDataJNI.getX(m_index);
   }
 
+  @SuppressWarnings("ParameterName")
   public void setX(double x) {
     SPIAccelerometerDataJNI.setX(m_index, x);
   }
@@ -62,6 +63,7 @@ public class SPIAccelerometerSim {
     return SPIAccelerometerDataJNI.getY(m_index);
   }
 
+  @SuppressWarnings("ParameterName")
   public void setY(double y) {
     SPIAccelerometerDataJNI.setY(m_index, y);
   }
@@ -75,6 +77,7 @@ public class SPIAccelerometerSim {
     return SPIAccelerometerDataJNI.getZ(m_index);
   }
 
+  @SuppressWarnings("ParameterName")
   public void setZ(double z) {
     SPIAccelerometerDataJNI.setZ(m_index, z);
   }
