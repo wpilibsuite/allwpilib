@@ -191,7 +191,7 @@ void Watchdog::AddEpoch(wpi::StringRef epochName) {
 
 void Watchdog::PrintEpochs() { m_tracer.PrintEpochs(); }
 
-void Watchdog::PrintEpochs(wpi::raw_ostream& os) { m_tracer.PrintEpochs(os)}
+void Watchdog::PrintEpochs(wpi::raw_ostream& os) { m_tracer.PrintEpochs(os); }
 
 void Watchdog::Reset() { Enable(); }
 
