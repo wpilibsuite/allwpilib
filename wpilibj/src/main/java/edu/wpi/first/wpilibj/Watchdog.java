@@ -149,7 +149,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   /**
    * Prints list of epochs added so far and their times.
-   * @see Tracer#printEpochs(Consumer<String>)
+   * @see Tracer#printEpochs(Consumer)
    */
   public void printEpochs(Consumer<String> output) {
     m_tracer.printEpochs(output);
