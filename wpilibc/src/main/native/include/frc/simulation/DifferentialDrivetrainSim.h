@@ -152,9 +152,9 @@ class DifferentialDrivetrainSim {
 
   class KitbotWheelSize {
    public:
-    static inline const units::meter_t SixInch = 6_in;
-    static inline const units::meter_t EightInch = 8_in;
-    static inline const units::meter_t TenInch = 10_in;
+    static constexpr units::meter_t kSixInch = 6_in;
+    static constexpr units::meter_t kEightInch = 8_in;
+    static constexpr units::meter_t kTenInch = 10_in;
   };
 
   /**
