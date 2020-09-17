@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 import edu.wpi.first.hal.NotifierJNI;
 
@@ -144,6 +145,14 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    */
   public void printEpochs() {
     m_tracer.printEpochs();
+  }
+
+  /**
+   * Prints list of epochs added so far and their times.
+   * @see Tracer#printEpochs(Consumer<String>)
+   */
+  public void printEpochs(Consumer<String> output) {
+    m_tracer.printEpochs(output);
   }
 
   /**
