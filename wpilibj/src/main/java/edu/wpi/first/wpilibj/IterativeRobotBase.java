@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -86,7 +87,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * never indicate that the code is ready, causing the robot to be bypassed in a match.
    */
   public void robotInit() {
-    System.out.println("Default robotInit() method... Override me!");
+    DriverStation.reportWarning("Default robotInit() method... Override me!", false);
   }
 
   /**
@@ -98,7 +99,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * only when the robot is in simulation.
    */
   public void simulationInit() {
-    System.out.println("Default simulationInit() method... Override me!");
+    DriverStation.reportWarning("Default simulationInit() method... Override me!", false);
   }
 
   /**
@@ -108,7 +109,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * robot enters disabled mode.
    */
   public void disabledInit() {
-    System.out.println("Default disabledInit() method... Override me!");
+    DriverStation.reportWarning("Default disabledInit() method... Override me!", false);
   }
 
   /**
@@ -118,7 +119,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * robot enters autonomous mode.
    */
   public void autonomousInit() {
-    System.out.println("Default autonomousInit() method... Override me!");
+    DriverStation.reportWarning("Default autonomousInit() method... Override me!", false);
   }
 
   /**
@@ -128,7 +129,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * robot enters teleop mode.
    */
   public void teleopInit() {
-    System.out.println("Default teleopInit() method... Override me!");
+    DriverStation.reportWarning("Default teleopInit() method... Override me!", false);
   }
 
   /**
@@ -139,7 +140,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testInit() {
-    System.out.println("Default testInit() method... Override me!");
+    DriverStation.reportWarning("Default testInit() method... Override me!", false);
   }
 
   /* ----------- Overridable periodic code ----------------- */
@@ -151,7 +152,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
-      System.out.println("Default robotPeriodic() method... Override me!");
+      DriverStation.reportWarning("Default robotPeriodic() method... Override me!", false);
       m_rpFirstRun = false;
     }
   }
@@ -165,7 +166,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void simulationPeriodic() {
     if (m_spFirstRun) {
-      System.out.println("Default simulationPeriodic() method... Override me!");
+      DriverStation.reportWarning("Default simulationPeriodic() method... Override me!", false);
       m_spFirstRun = false;
     }
   }
@@ -177,7 +178,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
-      System.out.println("Default disabledPeriodic() method... Override me!");
+      DriverStation.reportWarning("Default disabledPeriodic() method... Override me!", false);
       m_dpFirstRun = false;
     }
   }
@@ -189,7 +190,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
-      System.out.println("Default autonomousPeriodic() method... Override me!");
+      DriverStation.reportWarning("Default autonomousPeriodic() method... Override me!", false);
       m_apFirstRun = false;
     }
   }
@@ -201,7 +202,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
-      System.out.println("Default teleopPeriodic() method... Override me!");
+      DriverStation.reportWarning("Default teleopPeriodic() method... Override me!", false);
       m_tpFirstRun = false;
     }
   }
@@ -214,7 +215,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testPeriodic() {
     if (m_tmpFirstRun) {
-      System.out.println("Default testPeriodic() method... Override me!");
+      DriverStation.reportWarning("Default testPeriodic() method... Override me!", false);
       m_tmpFirstRun = false;
     }
   }
