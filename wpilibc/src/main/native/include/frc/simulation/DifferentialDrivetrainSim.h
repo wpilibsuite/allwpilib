@@ -156,8 +156,7 @@ class DifferentialDrivetrainSim {
     static constexpr frc::DCMotor DualCIMPerSide = frc::DCMotor::CIM(2);
     static constexpr frc::DCMotor SingleMiniCIMPerSide =
         frc::DCMotor::MiniCIM(1);
-    static constexpr frc::DCMotor DualMiniCIMPerSide =
-        frc::DCMotor::MiniCIM(2);
+    static constexpr frc::DCMotor DualMiniCIMPerSide = frc::DCMotor::MiniCIM(2);
   };
 
   class KitbotWheelSize {
