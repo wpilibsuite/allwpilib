@@ -220,9 +220,9 @@ public class DifferentialDrivetrainSim {
   }
 
   public enum KitbotGearing {
-    Gearing10_71(10.71),
-    Gearing8_45(8.45),
-    Gearing5_95(5.95);
+    k10p71(10.71),
+    k8p45(8.45),
+    k5p95(5.95);
 
     @SuppressWarnings("MemberName")
     public final double value;
@@ -233,10 +233,10 @@ public class DifferentialDrivetrainSim {
   }
 
   public enum KitbotMotor {
-    SingleCIMPerSide(DCMotor.getCIM(1)),
-    DualCIMPerSide(DCMotor.getCIM(2)),
-    SingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
-    DualMiniCIMPerSide(DCMotor.getMiniCIM(2));
+    kSingleCIMPerSide(DCMotor.getCIM(1)),
+    kDualCIMPerSide(DCMotor.getCIM(2)),
+    kSingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
+    kDualMiniCIMPerSide(DCMotor.getMiniCIM(2));
 
     @SuppressWarnings("MemberName")
     public final DCMotor value;
