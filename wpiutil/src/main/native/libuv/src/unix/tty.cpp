@@ -38,7 +38,7 @@ static int orig_termios_fd = -1;
 static struct termios orig_termios;
 static uv_spinlock_t termios_spinlock = UV_SPINLOCK_INITIALIZER;
 
-static int uv__tty_is_slave(const int fd) {
+static int uv__tty_is_peripheral(const int fd) {
   int result;
 #if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
   int dummy;
@@ -50,15 +50,16 @@ static int uv__tty_is_slave(const int fd) {
   result = ioctl(fd, TIOCPTYGNAME, &dummy) != 0;
 #elif defined(__NetBSD__)
   /*
-   * NetBSD as an extension returns with ptsname(3) and ptsname_r(3) the slave
-   * device name for both descriptors, the master one and slave one.
+   * NetBSD as an extension returns with ptsname(3) and ptsname_r(3) the
+   * peripheral device name for both descriptors, the controller one and
+   * peripheral one.
    *
    * Implement function to compare major device number with pts devices.
    *
    * The major numbers are machine-dependent, on NetBSD/amd64 they are
    * respectively:
-   *  - master tty: ptc - major 6
-   *  - slave tty:  pts - major 5
+   *  - controller tty: ptc - major 6
+   *  - peripheral tty:  pts - major 5
    */
 
   struct stat sb;
@@ -133,12 +134,12 @@ int uv_tty_init(uv_loop_t* loop, uv_tty_t* tty, int fd, int unused) {
    * other processes.
    */
   if (type == UV_TTY) {
-    /* Reopening a pty in master mode won't work either because the reopened
-     * pty will be in slave mode (*BSD) or reopening will allocate a new
-     * master/slave pair (Linux). Therefore check if the fd points to a
-     * slave device.
+    /* Reopening a pty in controller mode won't work either because the reopened
+     * pty will be in peripheral mode (*BSD) or reopening will allocate a new
+     * controller/peripheral pair (Linux). Therefore check if the fd points to a
+     * peripheral device.
      */
-    if (uv__tty_is_slave(fd) && ttyname_r(fd, path, sizeof(path)) == 0)
+    if (uv__tty_is_peripheral(fd) && ttyname_r(fd, path, sizeof(path)) == 0)
       r = uv__open_cloexec(path, mode);
     else
       r = -1;
