@@ -136,10 +136,10 @@ class DifferentialDrivetrainSim {
   /**
    * Represents a gearing option of the Toughbox mini.
    * 12.75:1 -- 14:50 and 14:50
-   * 10.71 -- 14:50 and 16:48
+   * 10.71:1 -- 14:50 and 16:48
    * 8.45:1 -- 14:50 and 19:45
-   * 7.31 -- 14:50 and 21:43
-   * 5.95: 14:50 and 24:40
+   * 7.31:1 -- 14:50 and 21:43
+   * 5.95:1 -- 14:50 and 24:40
    */
   class KitbotGearing {
    public:
