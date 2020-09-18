@@ -142,19 +142,19 @@ class DifferentialDrivetrainSim {
 
   class KitbotMotor {
    public:
-    static inline const frc::DCMotor SingleCIMPerSide = frc::DCMotor::CIM(1);
-    static inline const frc::DCMotor DualCIMPerSide = frc::DCMotor::CIM(2);
-    static inline const frc::DCMotor SingleMiniCIMPerSide =
+    static constexpr frc::DCMotor SingleCIMPerSide = frc::DCMotor::CIM(1);
+    static constexpr frc::DCMotor DualCIMPerSide = frc::DCMotor::CIM(2);
+    static constexpr frc::DCMotor SingleMiniCIMPerSide =
         frc::DCMotor::MiniCIM(1);
-    static inline const frc::DCMotor DualMiniCIMPerSide =
+    static constexpr frc::DCMotor DualMiniCIMPerSide =
         frc::DCMotor::MiniCIM(2);
   };
 
   class KitbotWheelSize {
    public:
-    static inline const units::meter_t SixInch = 6_in;
-    static inline const units::meter_t EightInch = 8_in;
-    static inline const units::meter_t TenInch = 10_in;
+    static constexpr units::meter_t kSixInch = 6_in;
+    static constexpr units::meter_t kEightInch = 8_in;
+    static constexpr units::meter_t kTenInch = 10_in;
   };
 
   /**
