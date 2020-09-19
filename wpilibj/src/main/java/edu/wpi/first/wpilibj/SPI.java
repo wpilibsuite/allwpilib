@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -162,9 +162,9 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Write data to the slave device. Blocks until there is space in the output FIFO.
+   * Write data to the peripheral device. Blocks until there is space in the output FIFO.
    *
-   * <p>If not running in output only mode, also saves the data received on the MISO input during
+   * <p>If not running in output only mode, also saves the data received on the CIPO input during
    * the transfer into the receive FIFO.
    */
   public int write(byte[] dataToSend, int size) {
@@ -175,9 +175,9 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Write data to the slave device. Blocks until there is space in the output FIFO.
+   * Write data to the peripheral device. Blocks until there is space in the output FIFO.
    *
-   * <p>If not running in output only mode, also saves the data received on the MISO input during
+   * <p>If not running in output only mode, also saves the data received on the CIPO input during
    * the transfer into the receive FIFO.
    *
    * @param dataToSend The buffer containing the data to send.

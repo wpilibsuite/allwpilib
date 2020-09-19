@@ -122,11 +122,11 @@ class SPI : public ErrorBase {
   void SetChipSelectActiveLow();
 
   /**
-   * Write data to the slave device.  Blocks until there is space in the
+   * Write data to the peripheral device.  Blocks until there is space in the
    * output FIFO.
    *
    * If not running in output only mode, also saves the data received
-   * on the MISO input during the transfer into the receive FIFO.
+   * on the CIPO input during the transfer into the receive FIFO.
    */
   virtual int Write(uint8_t* data, int size);
 
