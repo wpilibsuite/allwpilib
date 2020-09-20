@@ -631,5 +631,54 @@
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "StateSpaceSimulation",
+    "description": "An example of drivetrain simulation in combination with a RAMSETE path following controller.",
+    "tags": [
+      "Drivetrain",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick",
+      "Simulation"
+    ],
+    "foldername": "statespacedifferentialdrivesimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorSimulation",
+    "description": "Demonstrates the use of physics simulation with a simple elevator.",
+    "tags": [
+      "Elevator",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Simulation",
+      "Physics"
+    ],
+    "foldername": "elevatorsimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "ArmSimulation",
+    "description": "Demonstrates the use of physics simulation with a simple single-jointedarm.",
+    "tags": [
+      "Arm",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Simulation",
+      "Physics"
+    ],
+    "foldername": "armsimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]
