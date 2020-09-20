@@ -1,6 +1,7 @@
 project(wpigui)
 
 include(CompileWarnings)
+include(LinkMacOSGUI)
 
 file(GLOB wpigui_src src/main/native/cpp/*.cpp)
 file(GLOB wpigui_windows_src src/main/native/directx11/*.cpp)
@@ -33,6 +34,7 @@ else()
 endif()
 
 add_executable(wpiguidev src/dev/native/cpp/main.cpp)
+wpilib_link_macos_gui(wpiguidev)
 target_link_libraries(wpiguidev wpigui)
 
 install(TARGETS wpigui EXPORT wpigui DESTINATION "${main_lib_dest}")
