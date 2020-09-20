@@ -3,6 +3,7 @@ project(cscore)
 include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
+include(LinkMacOSGUI)
 
 find_package( OpenCV REQUIRED )
 
@@ -63,6 +64,11 @@ foreach(example ${cscore_examples})
     if(cscore_example_src)
         add_executable(cscore_${example} ${cscore_example_src})
         wpilib_target_warnings(cscore_${example})
+
+        if (${example} STREQUAL "usbviewer")
+            wpilib_link_macos_gui(cscore_${example})
+        endif()
+
         target_link_libraries(cscore_${example} cscore ${add_libs})
         set_property(TARGET cscore_${example} PROPERTY FOLDER "examples")
     endif()
