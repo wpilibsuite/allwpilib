@@ -66,19 +66,38 @@ jobs:
           path: build/allOutputs
 
   build-cmake:
-    name: "Build - CMake"
-    runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2020-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: Linux
+            container: wpilib/roborio-cross-ubuntu:2020-18.04
+            flags: ""
+          - os: macos-latest
+            name: macOS
+            container: ""
+            flags: "-DWITHOUT_JAVA=ON"
+    name: "Build - CMake ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: |
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            brew install opencv
+          fi
       - name: configure
-        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF -DWITH_TESTS=ON ..
+        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF -DWITH_TESTS=ON ${{ matrix.flags }} ..
       - name: build
-        run: cd build && make -j3
+        working-directory: build
+        run: make -j3
       - name: test
-        run: cd build && make test
+        working-directory: build
+        run: make test
 
-  build-cmake-windows:
+  build-cmake-vcpkg:
     name: "Build - CMake Windows"
     runs-on: windows-latest
     steps:
