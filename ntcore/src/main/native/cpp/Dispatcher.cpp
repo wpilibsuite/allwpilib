@@ -404,11 +404,11 @@ void DispatcherBase::ServerThreadMain() {
              << ". Attempted to connect over websockets.");
       // Reject websocket connection with non 101 HTTP Response.
       constexpr auto kResponse =
-          "HTTP/1.1 400 Bad Request\r\n\
-      Connection:close\r\n\
-      Content-Type: text/plain\r\n\
-      \r\n\
-      Server is unable to serve websocket clients. NT4 server may be available on port 5810.";
+          "HTTP/1.1 400 Bad Request\r\n" +
+      "Connection:close\r\n" +
+      "Content-Type: text/plain\r\n" +
+      "\r\n" +
+      "Server is unable to serve websocket clients. NT4 server may be available on port 5810.";
       stream->send(kResponse, std::strlen(kResponse), &err);
       continue;
     }
