@@ -111,6 +111,35 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   return static_cast<size_t>(rv);
 }
 
+size_t TCPStream::peek(char* buffer, size_t len, Error* err, int timeout) {
+#ifdef _WIN32
+  int rv;
+#else
+  ssize_t rv;
+#endif
+
+  if (timeout <= 0) {
+    rv = recv(m_sd, buffer, len, MSG_PEEK);
+  } else if (WaitForReadEvent(timeout)) {
+    rv = recv(m_sd, buffer, len, MSG_PEEK);
+  }
+
+  if (rv < 0) {
+#ifdef _WIN32
+    if (!m_blocking && WSAGetLastError() == WSAEWOULDBLOCK) {
+#else
+    if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+#endif
+      *err = kWouldBlock;
+    } else {
+      *err = kConnectionReset;
+      return 0;
+    }
+  }
+
+  return static_cast<size_t>(rv);
+}
+
 size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
   if (m_sd < 0) {
     *err = kConnectionClosed;

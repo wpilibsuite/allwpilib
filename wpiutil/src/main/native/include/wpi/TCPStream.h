@@ -48,6 +48,7 @@ class TCPStream : public NetworkStream {
   size_t send(const char* buffer, size_t len, Error* err) override;
   size_t receive(char* buffer, size_t len, Error* err,
                  int timeout = 0) override;
+  size_t peek(char* buffer, size_t len, Error* err, int timeout = 0) override;
   void close() override;
 
   StringRef getPeerIP() const override;
