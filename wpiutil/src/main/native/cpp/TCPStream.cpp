@@ -112,6 +112,10 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
 }
 
 size_t TCPStream::peek(char* buffer, size_t len, Error* err, int timeout) {
+  if (m_sd < 0) {
+    *err = kConnectionClosed;
+    return 0;
+  }
 #ifdef _WIN32
   int rv;
 #else
@@ -122,6 +126,9 @@ size_t TCPStream::peek(char* buffer, size_t len, Error* err, int timeout) {
     rv = recv(m_sd, buffer, len, MSG_PEEK);
   } else if (WaitForReadEvent(timeout)) {
     rv = recv(m_sd, buffer, len, MSG_PEEK);
+  } else {
+    *err = kConnectionTimedOut;
+    return 0;
   }
 
   if (rv < 0) {
