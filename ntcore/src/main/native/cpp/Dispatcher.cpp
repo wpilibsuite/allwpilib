@@ -398,7 +398,7 @@ void DispatcherBase::ServerThreadMain() {
     wpi::NetworkStream::Error err;
     size_t read = stream->peek(peekBuffer, 3, &err);
 
-    if (read == 3 && memcmp(peekBuffer, "GET", 3) == 0) {
+    if (read == 3 && std::memcmp(peekBuffer, "GET", 3) == 0) {
       DEBUG0("server: rejecting client from "
              << stream->getPeerIP() << " port " << stream->getPeerPort()
              << ". Attempted to connect over websockets.");
