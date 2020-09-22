@@ -64,7 +64,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
     } catch (const wpi::json::parse_error& e) {
       std::string err("JSON parse failed: ");
       err += e.what();
-      m_websocket->Fail(400, err);
+      m_websocket->Fail(1002, err);
       return;
     }
     m_server->OnNetValueChanged(j);
