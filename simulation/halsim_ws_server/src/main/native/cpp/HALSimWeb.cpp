@@ -117,31 +117,24 @@ void HALSimWeb::Start() {
 bool HALSimWeb::AcceptableWebsocket(wpi::StringRef requestUrl) {
   auto clientIdent = requestUrl.substr(GetServerUri().size() + 1);
 
-  return m_conns.find(clientIdent) == m_conns.end();
+  return m_conns.find(clientIdent) == m_conns.end() ||
+         !m_conns.lookup(clientIdent).expired();
 }
 
 bool HALSimWeb::RegisterWebsocket(
     wpi::StringRef requestUrl,
     std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
-  // if (m_hws.lock()) {
-  //  return false;
-  //}
-
   auto clientIdent = requestUrl.substr(GetServerUri().size() + 1);
 
-  if (m_conns.find(clientIdent) != m_conns.end()) {
-    wpi::errs() << "Client attempting to connect with same identifier as an "
-                   "existing client.\n"
-                << "Identifier: " << clientIdent << ".\n";
+  if (m_conns.find(clientIdent) != m_conns.end() &&
+      !m_conns.lookup(clientIdent).expired()) {
     return false;
   }
 
-  auto entry =
-      wpi::StringMapEntry<std::weak_ptr<HALSimBaseWebSocketConnection>>::Create(
-          clientIdent, hws);
-  m_conns.insert(entry);
-
-  // m_hws = hws;
+  auto& entry = m_conns[clientIdent];
+  if (entry.expired()) {
+    entry = std::weak_ptr<HALSimBaseWebSocketConnection>(hws);
+  }
 
   m_simDevicesProvider.OnNetworkConnected(hws);
 
@@ -153,8 +146,7 @@ bool HALSimWeb::RegisterWebsocket(
   return true;
 }
 
-void HALSimWeb::CloseWebsocket(
-    std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
+void HALSimWeb::CloseWebsocket(wpi::StringRef requestUrl) {
   // Inform the providers that they need to cancel callbacks
   m_simDevicesProvider.OnNetworkDisconnected();
 
@@ -162,9 +154,7 @@ void HALSimWeb::CloseWebsocket(
     provider->OnNetworkDisconnected();
   });
 
-  if (hws == m_hws.lock()) {
-    m_hws.reset();
-  }
+  m_conns.erase(requestUrl.substr(GetServerUri().size() + 1));
 }
 
 void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {

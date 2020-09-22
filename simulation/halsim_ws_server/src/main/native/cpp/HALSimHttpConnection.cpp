@@ -31,6 +31,7 @@ bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
   }
 
   if (!m_server->AcceptableWebsocket(m_request.GetUrl())) {
+    Log(409);
     MySendError(409, "Identifier already in use.");
     return false;
   }
@@ -42,11 +43,9 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
   m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
     conn.disconnect();  // one-shot
 
-    if (!m_server->RegisterWebsocket(m_request.GetUrl(), shared_from_this())) {
-      Log(409);
-      m_websocket->Fail(409, "Only a single simulation websocket is allowed");
-      return;
-    }
+    // Can ignore the return result because IsValidWsUpgrade validates this
+    // already
+    m_server->RegisterWebsocket(m_request.GetUrl(), shared_from_this());
 
     Log(200);
     m_isWsConnected = true;
@@ -77,7 +76,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
       wpi::errs() << "HALWebSim: websocket disconnected\n";
       m_isWsConnected = false;
 
-      m_server->CloseWebsocket(shared_from_this());
+      m_server->CloseWebsocket(m_request.GetUrl());
     }
   });
 }
