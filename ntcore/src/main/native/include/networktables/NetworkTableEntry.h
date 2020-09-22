@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -30,6 +30,7 @@ using wpi::ArrayRef;
 using wpi::StringRef;
 using wpi::Twine;
 
+class NetworkTable;
 class NetworkTableInstance;
 
 /**
@@ -47,6 +48,36 @@ class NetworkTableEntry final {
    * Construct invalid instance.
    */
   NetworkTableEntry();
+
+  /**
+   * Construct an entry instance from a table name and an entry name.
+   *
+   * The default NetworkTables instance is used when creating the table.
+   *
+   * @param tableName The table name.
+   * @param entryName The entry name.
+   */
+  NetworkTableEntry(wpi::StringRef tableName, wpi::StringRef entryName);
+
+  /**
+   * Construct an entry instance from a NetworkTables instance, a table name,
+   * and an entry name.
+   *
+   * @param inst      The NetworkTables instance.
+   * @param tableName The table name.
+   * @param entryName The entry name.
+   */
+  NetworkTableEntry(NetworkTableInstance inst, wpi::StringRef tableName,
+                    wpi::StringRef entryName);
+
+  /**
+   * Construct an entry instance from a table and an entry name.
+   *
+   * @param table     The table containing the entry.
+   * @param entryName The entry name.
+   */
+  NetworkTableEntry(std::shared_ptr<NetworkTable> table,
+                    wpi::StringRef entryName);
 
   /**
    * Construct from native handle.

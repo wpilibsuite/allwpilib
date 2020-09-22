@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,6 +28,40 @@ public final class NetworkTableEntry {
   public NetworkTableEntry(NetworkTableInstance inst, int handle) {
     m_inst = inst;
     m_handle = handle;
+  }
+
+  /**
+   * Construct an entry instance from a table name and an entry name.
+   *
+   * <p>The default NetworkTables instance is used when creating the table.
+   *
+   * @param tableName The table name.
+   * @param entryName The entry name.
+   */
+  public NetworkTableEntry(String tableName, String entryName) {
+    this(NetworkTableInstance.getDefault(), tableName, entryName);
+  }
+
+  /**
+   * Construct an entry instance from a NetworkTables instance, a table name,
+   * and an entry name.
+   *
+   * @param inst      The NetworkTables instance.
+   * @param tableName The table name.
+   * @param entryName The entry name.
+   */
+  public NetworkTableEntry(NetworkTableInstance inst, String tableName, String entryName) {
+    this(inst.getTable(tableName), entryName);
+  }
+
+  /**
+   * Construct an entry instance from a table and an entry name.
+   *
+   * @param table     The table containing the entry.
+   * @param entryName The entry name.
+   */
+  public NetworkTableEntry(NetworkTable table, String entryName) {
+    m_handle = table.getEntry(entryName).getHandle();
   }
 
   /**
