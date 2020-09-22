@@ -24,8 +24,14 @@ namespace uv = wpi::uv;
 using namespace wpilibws;
 
 bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
-  if (m_request.GetUrl() != m_server->GetServerUri()) {
+  wpi::errs() << "Request URL " << m_request.GetUrl() << "\n";
+  if (!m_request.GetUrl().startswith(m_server->GetServerUri())) {
     MySendError(404, "invalid websocket address");
+    return false;
+  }
+
+  if (!m_server->AcceptableWebsocket(m_request.GetUrl())) {
+    MySendError(409, "Identifier already in use.");
     return false;
   }
 
@@ -36,7 +42,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
   m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
     conn.disconnect();  // one-shot
 
-    if (!m_server->RegisterWebsocket(shared_from_this())) {
+    if (!m_server->RegisterWebsocket(m_request.GetUrl(), shared_from_this())) {
       Log(409);
       m_websocket->Fail(409, "Only a single simulation websocket is allowed");
       return;

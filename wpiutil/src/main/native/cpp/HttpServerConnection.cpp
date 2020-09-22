@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -133,13 +133,17 @@ void HttpServerConnection::SendError(int code, const Twine& message) {
       codeText = "Not Found";
       baseMessage = "404: Not Found!";
       break;
+    case 409:
+      codeText = "Conflict";
+      baseMessage = "409: Conflict!";
+      break;
     case 500:
       codeText = "Internal Server Error";
       baseMessage = "500: Internal Server Error!";
       break;
     case 400:
       codeText = "Bad Request";
-      baseMessage = "400: Not Found!";
+      baseMessage = "400: Bad Request!";
       break;
     case 403:
       codeText = "Forbidden";

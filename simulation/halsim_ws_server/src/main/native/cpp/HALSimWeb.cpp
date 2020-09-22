@@ -25,7 +25,8 @@ using namespace wpilibws;
 
 HALSimWeb::HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,
                      HALSimWSProviderSimDevices& simDevicesProvider)
-    : m_loop(loop),
+    : m_conns{1},
+      m_loop(loop),
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
@@ -113,13 +114,34 @@ void HALSimWeb::Start() {
   wpi::outs() << "WebSocket URI: " << m_uri << "\n";
 }
 
+bool HALSimWeb::AcceptableWebsocket(wpi::StringRef requestUrl) {
+  auto clientIdent = requestUrl.substr(GetServerUri().size() + 1);
+
+  return m_conns.find(clientIdent) == m_conns.end();
+}
+
 bool HALSimWeb::RegisterWebsocket(
+    wpi::StringRef requestUrl,
     std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
-  if (m_hws.lock()) {
+  // if (m_hws.lock()) {
+  //  return false;
+  //}
+
+  auto clientIdent = requestUrl.substr(GetServerUri().size() + 1);
+
+  if (m_conns.find(clientIdent) != m_conns.end()) {
+    wpi::errs() << "Client attempting to connect with same identifier as an "
+                   "existing client.\n"
+                << "Identifier: " << clientIdent << ".\n";
     return false;
   }
 
-  m_hws = hws;
+  auto entry =
+      wpi::StringMapEntry<std::weak_ptr<HALSimBaseWebSocketConnection>>::Create(
+          clientIdent, hws);
+  m_conns.insert(entry);
+
+  // m_hws = hws;
 
   m_simDevicesProvider.OnNetworkConnected(hws);
 
