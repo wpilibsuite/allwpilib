@@ -14,6 +14,7 @@
 #include <hal/simulation/SimDeviceData.h>
 #include <wpi/StringMap.h>
 #include <wpi/uv/AsyncFunction.h>
+#include <wpi/spinlock.h>
 
 #include "WSBaseProvider.h"
 #include "WSProviderContainer.h"
@@ -40,10 +41,10 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
   ~HALSimWSProviderSimDevice();
 
-  void OnNetworkConnected(
+  void OnNetworkConnected(wpi::StringRef clientId,
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;
 
-  void OnNetworkDisconnected() override;
+  void OnNetworkDisconnected(wpi::StringRef clientId) override;
 
   void OnNetValueChanged(const wpi::json& json) override;
 
@@ -92,11 +93,11 @@ class HALSimWSProviderSimDevices {
 
   void Initialize(wpi::uv::Loop& loop);
 
-  void OnNetworkConnected(std::shared_ptr<HALSimBaseWebSocketConnection> hws);
-  void OnNetworkDisconnected();
+  void OnNetworkConnected(wpi::StringRef clientId, std::shared_ptr<HALSimBaseWebSocketConnection> hws);
+  void OnNetworkDisconnected(wpi::StringRef clientId);
 
-  std::shared_ptr<HALSimBaseWebSocketConnection> GetWSConnection() {
-    return m_ws;
+  std::shared_ptr<HALSimBaseWebSocketConnection> GetWSConnection(wpi::StringRef clientId) {
+    return m_conns.lookup(clientId);
   }
 
  private:
@@ -118,7 +119,9 @@ class HALSimWSProviderSimDevices {
 
   ProviderContainer& m_providers;
 
-  std::shared_ptr<HALSimBaseWebSocketConnection> m_ws;
+  wpi::StringMap<std::shared_ptr<HALSimBaseWebSocketConnection>> m_conns;
+  wpi::spinlock m_connsLock;
+  // std::shared_ptr<HALSimBaseWebSocketConnection> m_ws;
   std::shared_ptr<UvExecFn> m_exec;
 
   int32_t m_deviceCreatedCbKey = 0;

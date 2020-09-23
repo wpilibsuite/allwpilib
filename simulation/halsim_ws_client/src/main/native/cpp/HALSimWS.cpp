@@ -64,8 +64,11 @@ bool HALSimWS::Initialize() {
   if (uri != NULL) {
     m_uri = uri;
   } else {
-    m_uri = "/wpilibws";
+    m_uri = "/wpilibws/halsimws";
   }
+
+  constexpr auto baseSize = 10;
+  m_clientId = wpi::StringRef(m_uri.substr(baseSize));
 
   return true;
 }
@@ -127,10 +130,10 @@ bool HALSimWS::RegisterWebsocket(
 
   m_hws = hws;
 
-  m_simDevicesProvider.OnNetworkConnected(hws);
+  m_simDevicesProvider.OnNetworkConnected(m_clientId, hws);
 
-  m_providers.ForEach([hws](std::shared_ptr<HALSimWSBaseProvider> provider) {
-    provider->OnNetworkConnected(hws);
+  m_providers.ForEach([this, hws](std::shared_ptr<HALSimWSBaseProvider> provider) {
+    provider->OnNetworkConnected(m_clientId, hws);
   });
 
   return true;
@@ -139,10 +142,10 @@ bool HALSimWS::RegisterWebsocket(
 void HALSimWS::CloseWebsocket(
     std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
   // Inform the providers that they need to cancel callbacks
-  m_simDevicesProvider.OnNetworkDisconnected();
+  m_simDevicesProvider.OnNetworkDisconnected(m_clientId);
 
-  m_providers.ForEach([](std::shared_ptr<HALSimWSBaseProvider> provider) {
-    provider->OnNetworkDisconnected();
+  m_providers.ForEach([this](std::shared_ptr<HALSimWSBaseProvider> provider) {
+    provider->OnNetworkDisconnected(m_clientId);
   });
 
   if (hws == m_hws.lock()) {

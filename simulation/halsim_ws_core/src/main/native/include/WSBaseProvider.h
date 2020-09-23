@@ -12,6 +12,7 @@
 #include <string>
 
 #include <wpi/json.h>
+#include <wpi/spinlock.h>
 
 #include "HALSimBaseWebSocketConnection.h"
 
@@ -28,12 +29,12 @@ class HALSimWSBaseProvider {
 
   // Called when the websocket connects. This will cause providers
   // to register their HAL callbacks
-  virtual void OnNetworkConnected(
+  virtual void OnNetworkConnected(wpi::StringRef clientId,
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) = 0;
 
   // Called when the websocket disconnects. This will cause provider
   // to cancel their HAL callbacks
-  virtual void OnNetworkDisconnected() = 0;
+  virtual void OnNetworkDisconnected(wpi::StringRef clientId) = 0;
 
   // network -> sim
   virtual void OnNetValueChanged(const wpi::json& json);
@@ -43,7 +44,8 @@ class HALSimWSBaseProvider {
 
  protected:
   // sim -> network
-  std::weak_ptr<HALSimBaseWebSocketConnection> m_ws;
+  wpi::StringMap<std::weak_ptr<HALSimBaseWebSocketConnection>> m_conns;
+  wpi::spinlock m_connsLock;
   std::string m_key;
 
   std::string m_type;

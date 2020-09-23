@@ -136,25 +136,26 @@ bool HALSimWeb::RegisterWebsocket(
     entry = std::weak_ptr<HALSimBaseWebSocketConnection>(hws);
   }
 
-  m_simDevicesProvider.OnNetworkConnected(hws);
+  m_simDevicesProvider.OnNetworkConnected(clientIdent, hws);
 
   // notify all providers that they should use this new websocket instead
-  m_providers.ForEach([hws](std::shared_ptr<HALSimWSBaseProvider> provider) {
-    provider->OnNetworkConnected(hws);
+  m_providers.ForEach([hws, clientIdent](std::shared_ptr<HALSimWSBaseProvider> provider) {
+    provider->OnNetworkConnected(clientIdent, hws);
   });
 
   return true;
 }
 
 void HALSimWeb::CloseWebsocket(wpi::StringRef requestUrl) {
+  auto clientIdent = requestUrl.substr(GetServerUri().size() + 1);
   // Inform the providers that they need to cancel callbacks
-  m_simDevicesProvider.OnNetworkDisconnected();
+  m_simDevicesProvider.OnNetworkDisconnected(clientIdent);
+  m_conns.erase(clientIdent);
 
-  m_providers.ForEach([](std::shared_ptr<HALSimWSBaseProvider> provider) {
-    provider->OnNetworkDisconnected();
+  m_providers.ForEach([clientIdent](std::shared_ptr<HALSimWSBaseProvider> provider) {
+    provider->OnNetworkDisconnected(clientIdent);
   });
 
-  m_conns.erase(requestUrl.substr(GetServerUri().size() + 1));
 }
 
 void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {

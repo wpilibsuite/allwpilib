@@ -25,13 +25,12 @@ using namespace wpilibws;
 
 bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
   wpi::errs() << "Request URL " << m_request.GetUrl() << "\n";
-  if (!m_request.GetUrl().startswith(m_server->GetServerUri())) {
+  if (!m_request.GetUrl().startswith(m_server->GetServerUri()) && m_request.GetUrl().count("/") > 1) {
     MySendError(404, "invalid websocket address");
     return false;
   }
 
   if (!m_server->AcceptableWebsocket(m_request.GetUrl())) {
-    Log(409);
     MySendError(409, "Identifier already in use.");
     return false;
   }

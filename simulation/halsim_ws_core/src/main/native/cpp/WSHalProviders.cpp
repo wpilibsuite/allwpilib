@@ -6,27 +6,40 @@
 /*----------------------------------------------------------------------------*/
 
 #include "WSHalProviders.h"
+#include <mutex>
 
 namespace wpilibws {
 
-void HALSimWSHalProvider::OnNetworkConnected(
+void HALSimWSHalProvider::OnNetworkConnected(wpi::StringRef clientId,
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
-  {
-    // store a weak reference to the websocket object
-    m_ws = ws;
-  }
+  std::scoped_lock lock(m_connsLock);
+  
+  bool shouldRegisterCallbacks = m_conns.empty();
+  m_conns.insert(std::make_pair(clientId, ws));
 
-  RegisterCallbacks();
+  if(shouldRegisterCallbacks) {
+    RegisterCallbacks();
+  }
 }
 
-void HALSimWSHalProvider::OnNetworkDisconnected() { CancelCallbacks(); }
+void HALSimWSHalProvider::OnNetworkDisconnected(wpi::StringRef clientId) {
+  std::scoped_lock lock(m_connsLock);
+
+  m_conns.erase(clientId);
+  if(m_conns.empty()) {
+    CancelCallbacks();
+  }
+}
 
 void HALSimWSHalProvider::ProcessHalCallback(const wpi::json& payload) {
-  auto ws = m_ws.lock();
-  if (ws) {
-    wpi::json netValue = {
-        {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
-    ws->OnSimValueChanged(netValue);
+  std::scoped_lock lock(m_connsLock);
+  for(auto it = m_conns.begin(); it != m_conns.end(); it++) {
+    auto ws = it->getValue().lock();
+    if(ws) {
+      wpi::json netValue = {
+          {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
+      ws->OnSimValueChanged(netValue);
+    }
   }
 }
 

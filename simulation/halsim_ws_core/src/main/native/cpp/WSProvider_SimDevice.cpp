@@ -8,37 +8,34 @@
 #include "WSProvider_SimDevice.h"
 
 #include <hal/Ports.h>
+#include <mutex>
+#include <wpi/spinlock.h>
 
 namespace wpilibws {
 
 HALSimWSProviderSimDevice::~HALSimWSProviderSimDevice() { CancelCallbacks(); }
 
-void HALSimWSProviderSimDevice::OnNetworkConnected(
+void HALSimWSProviderSimDevice::OnNetworkConnected(wpi::StringRef clientId,
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
-  auto storedWS = m_ws.lock();
 
-  if (ws == storedWS) {
-    return;
+  std::scoped_lock lock(m_connsLock);
+  bool shouldRegisterCallbacks = m_conns.empty();
+  m_conns.insert(std::make_pair(clientId, ws));
+
+  if(shouldRegisterCallbacks) {
+    m_simValueCreatedCbKey = HALSIM_RegisterSimValueCreatedCallback(
+        m_handle, this, HALSimWSProviderSimDevice::OnValueCreatedStatic, 1);
   }
-
-  // Otherwise, run the disconnection code first so we get
-  // back to a clean slate (only if the stored websocket is
-  // not null)
-  if (storedWS) {
-    OnNetworkDisconnected();
-  }
-
-  m_ws = ws;
-
-  m_simValueCreatedCbKey = HALSIM_RegisterSimValueCreatedCallback(
-      m_handle, this, HALSimWSProviderSimDevice::OnValueCreatedStatic, 1);
 }
 
-void HALSimWSProviderSimDevice::OnNetworkDisconnected() {
-  // Cancel all callbacks
-  CancelCallbacks();
+void HALSimWSProviderSimDevice::OnNetworkDisconnected(wpi::StringRef clientId) {
+  std::scoped_lock lock(m_connsLock);
 
-  m_ws.reset();
+  m_conns.erase(clientId);
+  if(m_conns.empty()) {
+    // Cancel all callbacks
+    CancelCallbacks();
+  }
 }
 
 void HALSimWSProviderSimDevice::CancelCallbacks() {
@@ -114,36 +111,36 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
 
 void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
                                                const struct HAL_Value* value) {
-  auto ws = m_ws.lock();
-  if (ws) {
-    switch (value->type) {
-      case HAL_BOOLEAN:
-        ProcessHalCallback({{valueData->key, value->data.v_boolean}});
-        break;
-      case HAL_DOUBLE:
-        ProcessHalCallback({{valueData->key, value->data.v_double}});
-        break;
-      case HAL_ENUM:
-        ProcessHalCallback({{valueData->key, value->data.v_enum}});
-        break;
-      case HAL_INT:
-        ProcessHalCallback({{valueData->key, value->data.v_int}});
-        break;
-      case HAL_LONG:
-        ProcessHalCallback({{valueData->key, value->data.v_long}});
-        break;
-      default:
-        break;
-    }
+  switch (value->type) {
+    case HAL_BOOLEAN:
+      ProcessHalCallback({{valueData->key, value->data.v_boolean}});
+      break;
+    case HAL_DOUBLE:
+      ProcessHalCallback({{valueData->key, value->data.v_double}});
+      break;
+    case HAL_ENUM:
+      ProcessHalCallback({{valueData->key, value->data.v_enum}});
+      break;
+    case HAL_INT:
+      ProcessHalCallback({{valueData->key, value->data.v_int}});
+      break;
+    case HAL_LONG:
+      ProcessHalCallback({{valueData->key, value->data.v_long}});
+      break;
+    default:
+      break;
   }
 }
 
 void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
-  auto ws = m_ws.lock();
-  if (ws) {
-    wpi::json netValue = {
-        {"type", "SimDevices"}, {"device", m_deviceId}, {"data", payload}};
-    ws->OnSimValueChanged(netValue);
+  std::scoped_lock lock(m_connsLock);
+
+  for(auto it = m_conns.begin(); it != m_conns.end(); it++) {
+    auto ws = it->getValue().lock();
+    if(ws) {
+      wpi::json netValue = {{"type", "SimDevices"}, {"device", m_deviceId}, {"data", payload}};
+      ws->OnSimValueChanged(netValue);
+    }
   }
 }
 
@@ -156,9 +153,12 @@ void HALSimWSProviderSimDevices::DeviceCreatedCallback(
       handle, key, wpi::Twine(name).str());
   m_providers.Add(key, dev);
 
-  if (m_ws) {
-    m_exec->Call([this, dev]() { dev->OnNetworkConnected(GetWSConnection()); });
-  }
+  m_exec->Call([this, dev]() {
+    std::scoped_lock lock(m_connsLock);
+    for(auto it = m_conns.begin(); it != m_conns.end(); it++) {
+      dev->OnNetworkConnected(it->getKey(), it->getValue());
+    }
+  });
 }
 
 void HALSimWSProviderSimDevices::DeviceFreedCallback(
@@ -186,11 +186,15 @@ void HALSimWSProviderSimDevices::CancelCallbacks() {
   m_deviceFreedCbKey = 0;
 }
 
-void HALSimWSProviderSimDevices::OnNetworkConnected(
+void HALSimWSProviderSimDevices::OnNetworkConnected(wpi::StringRef clientId,
     std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
-  m_ws = hws;
+  std::scoped_lock lock(m_connsLock);
+  m_conns.insert(std::make_pair(clientId, hws));
 }
 
-void HALSimWSProviderSimDevices::OnNetworkDisconnected() { m_ws = nullptr; }
+void HALSimWSProviderSimDevices::OnNetworkDisconnected(wpi::StringRef clientId) { 
+  std::scoped_lock lock(m_connsLock);
+  m_conns.erase(clientId);
+}
 
 }  // namespace wpilibws

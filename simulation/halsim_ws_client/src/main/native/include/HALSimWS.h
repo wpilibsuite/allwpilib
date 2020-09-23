@@ -69,6 +69,7 @@ class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
 
   std::string m_host;
   std::string m_uri;
+  wpi::StringRef m_clientId;
   int m_port;
 };
 
