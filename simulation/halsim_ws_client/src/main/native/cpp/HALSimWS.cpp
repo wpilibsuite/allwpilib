@@ -67,7 +67,7 @@ bool HALSimWS::Initialize() {
     m_uri = "/wpilibws/halsimws";
   }
 
-  m_clientId = "halsim_ws_client";
+  m_clientId = "halsimws";
 
   return true;
 }
