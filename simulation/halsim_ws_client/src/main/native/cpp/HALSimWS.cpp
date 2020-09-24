@@ -67,8 +67,7 @@ bool HALSimWS::Initialize() {
     m_uri = "/wpilibws/halsimws";
   }
 
-  constexpr auto baseSize = 10;
-  m_clientId = wpi::StringRef(m_uri.substr(baseSize));
+  m_clientId = "halsim_ws_client";
 
   return true;
 }
