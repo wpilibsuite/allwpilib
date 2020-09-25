@@ -185,6 +185,11 @@ class RobotBase {
 
   virtual void EndCompetition() = 0;
 
+  /**
+   * Get if the robot is real.
+   *
+   * @return If the robot is running in the real world.
+   */
   static constexpr bool IsReal() {
 #ifdef __FRC_ROBORIO__
     return true;
@@ -193,6 +198,11 @@ class RobotBase {
 #endif
   }
 
+  /**
+   * Get if the robot is a simulation.
+   *
+   * @return If the robot is running in simulation.
+   */
   static constexpr bool IsSimulation() { return !IsReal(); }
 
   /**
