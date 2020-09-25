@@ -50,11 +50,29 @@ To build a specific subproject, such as WPILibC, you must access the subproject 
 ./gradlew :wpilibc:build
 ```
 
+The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change in the HAL and then run `./gradlew :wpilibc:build`, the HAL will be rebuilt, then WPILibC.
+
+There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
+
+### Faster builds
+
+`./gradlew build` builds _everything_, which includes debug and release builds for desktop and all installed cross compilers. Many developers don't need or want to build all of this. Therefore, common tasks have shortcuts to only build necessary components for common development and testing tasks.
+
+`./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibc` and `wpilibj` respectively. They will only build the minimum components required to run the tests.
+
+`testDesktopCpp` and `testDesktopJava` tasks also exist for the projects `wpiutil`, `ntcore`, `cscore`, `hal` `wpilibOldCommands`, `wpilibNewCommands` and `cameraserver`. These can be ran with `./gradlew :projectName:task`.
+
+`./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
+
+### Custom toolchain location
+
 If you have installed the FRC Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
 
 ```bash
 ./gradlew build -PtoolChainPath=some/path/to/frc/toolchain/bin
 ```
+
+### Gazebo simulation
 
 If you also want simulation to be built, add -PmakeSim. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
 
@@ -72,11 +90,13 @@ cmake ..
 make
 ```
 
-The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change in the HAL and then run `./gradlew :wpilibc:build`, the HAL will be rebuilt, then WPILibC.
 
-There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
+### Formatting/linting with wpiformat
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
+
+
+### CMake
 
 CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
 
