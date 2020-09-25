@@ -121,7 +121,7 @@ class DifferentialDrivetrainSimTest {
   }
 
   @Test
-  public void testWHeee() {
+  public void testModelStability() {
     var motor = DCMotor.getNEO(2);
     var plant = LinearSystemId.createDrivetrainVelocitySystem(
         motor,
@@ -140,7 +140,6 @@ class DifferentialDrivetrainSimTest {
       sim.update(0.020);
     }
 
-    System.out.println(sim.getEstimatedPosition());
     assertTrue(Math.abs(sim.getEstimatedPosition().getX()) < 10000);
   }
 }
