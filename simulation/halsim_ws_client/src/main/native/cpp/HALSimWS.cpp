@@ -131,9 +131,10 @@ bool HALSimWS::RegisterWebsocket(
 
   m_simDevicesProvider.OnNetworkConnected(m_clientId, hws);
 
-  m_providers.ForEach([this, hws](std::shared_ptr<HALSimWSBaseProvider> provider) {
-    provider->OnNetworkConnected(m_clientId, hws);
-  });
+  m_providers.ForEach(
+      [this, hws](std::shared_ptr<HALSimWSBaseProvider> provider) {
+        provider->OnNetworkConnected(m_clientId, hws);
+      });
 
   return true;
 }

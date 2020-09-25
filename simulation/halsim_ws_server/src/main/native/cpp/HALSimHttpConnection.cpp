@@ -25,7 +25,8 @@ using namespace wpilibws;
 
 bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
   wpi::errs() << "Request URL " << m_request.GetUrl() << "\n";
-  if (!m_request.GetUrl().startswith(m_server->GetServerUri()) && m_request.GetUrl().count("/") > 1) {
+  if (!m_request.GetUrl().startswith(m_server->GetServerUri()) &&
+      m_request.GetUrl().count("/") > 1) {
     MySendError(404, "invalid websocket address");
     return false;
   }

@@ -6,18 +6,20 @@
 /*----------------------------------------------------------------------------*/
 
 #include "WSHalProviders.h"
+
 #include <mutex>
 
 namespace wpilibws {
 
-void HALSimWSHalProvider::OnNetworkConnected(wpi::StringRef clientId,
+void HALSimWSHalProvider::OnNetworkConnected(
+    wpi::StringRef clientId,
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
   std::scoped_lock lock(m_connsLock);
-  
+
   bool shouldRegisterCallbacks = m_conns.empty();
   m_conns.insert(std::make_pair(clientId, ws));
 
-  if(shouldRegisterCallbacks) {
+  if (shouldRegisterCallbacks) {
     RegisterCallbacks();
   }
 }
@@ -26,16 +28,16 @@ void HALSimWSHalProvider::OnNetworkDisconnected(wpi::StringRef clientId) {
   std::scoped_lock lock(m_connsLock);
 
   m_conns.erase(clientId);
-  if(m_conns.empty()) {
+  if (m_conns.empty()) {
     CancelCallbacks();
   }
 }
 
 void HALSimWSHalProvider::ProcessHalCallback(const wpi::json& payload) {
   std::scoped_lock lock(m_connsLock);
-  for(auto it = m_conns.begin(); it != m_conns.end(); it++) {
+  for (auto it = m_conns.begin(); it != m_conns.end(); it++) {
     auto ws = it->getValue().lock();
-    if(ws) {
+    if (ws) {
       wpi::json netValue = {
           {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
       ws->OnSimValueChanged(netValue);

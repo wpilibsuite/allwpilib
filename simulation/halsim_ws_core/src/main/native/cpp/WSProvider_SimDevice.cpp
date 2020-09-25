@@ -7,22 +7,23 @@
 
 #include "WSProvider_SimDevice.h"
 
-#include <hal/Ports.h>
 #include <mutex>
+
+#include <hal/Ports.h>
 #include <wpi/spinlock.h>
 
 namespace wpilibws {
 
 HALSimWSProviderSimDevice::~HALSimWSProviderSimDevice() { CancelCallbacks(); }
 
-void HALSimWSProviderSimDevice::OnNetworkConnected(wpi::StringRef clientId,
+void HALSimWSProviderSimDevice::OnNetworkConnected(
+    wpi::StringRef clientId,
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
-
   std::scoped_lock lock(m_connsLock);
   bool shouldRegisterCallbacks = m_conns.empty();
   m_conns.insert(std::make_pair(clientId, ws));
 
-  if(shouldRegisterCallbacks) {
+  if (shouldRegisterCallbacks) {
     m_simValueCreatedCbKey = HALSIM_RegisterSimValueCreatedCallback(
         m_handle, this, HALSimWSProviderSimDevice::OnValueCreatedStatic, 1);
   }
@@ -32,7 +33,7 @@ void HALSimWSProviderSimDevice::OnNetworkDisconnected(wpi::StringRef clientId) {
   std::scoped_lock lock(m_connsLock);
 
   m_conns.erase(clientId);
-  if(m_conns.empty()) {
+  if (m_conns.empty()) {
     // Cancel all callbacks
     CancelCallbacks();
   }
@@ -135,10 +136,11 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
 void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
   std::scoped_lock lock(m_connsLock);
 
-  for(auto it = m_conns.begin(); it != m_conns.end(); it++) {
+  for (auto it = m_conns.begin(); it != m_conns.end(); it++) {
     auto ws = it->getValue().lock();
-    if(ws) {
-      wpi::json netValue = {{"type", "SimDevices"}, {"device", m_deviceId}, {"data", payload}};
+    if (ws) {
+      wpi::json netValue = {
+          {"type", "SimDevices"}, {"device", m_deviceId}, {"data", payload}};
       ws->OnSimValueChanged(netValue);
     }
   }
@@ -155,7 +157,7 @@ void HALSimWSProviderSimDevices::DeviceCreatedCallback(
 
   m_exec->Call([this, dev]() {
     std::scoped_lock lock(m_connsLock);
-    for(auto it = m_conns.begin(); it != m_conns.end(); it++) {
+    for (auto it = m_conns.begin(); it != m_conns.end(); it++) {
       dev->OnNetworkConnected(it->getKey(), it->getValue());
     }
   });
@@ -186,13 +188,15 @@ void HALSimWSProviderSimDevices::CancelCallbacks() {
   m_deviceFreedCbKey = 0;
 }
 
-void HALSimWSProviderSimDevices::OnNetworkConnected(wpi::StringRef clientId,
+void HALSimWSProviderSimDevices::OnNetworkConnected(
+    wpi::StringRef clientId,
     std::shared_ptr<HALSimBaseWebSocketConnection> hws) {
   std::scoped_lock lock(m_connsLock);
   m_conns.insert(std::make_pair(clientId, hws));
 }
 
-void HALSimWSProviderSimDevices::OnNetworkDisconnected(wpi::StringRef clientId) { 
+void HALSimWSProviderSimDevices::OnNetworkDisconnected(
+    wpi::StringRef clientId) {
   std::scoped_lock lock(m_connsLock);
   m_conns.erase(clientId);
 }

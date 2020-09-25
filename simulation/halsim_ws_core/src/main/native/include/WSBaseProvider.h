@@ -29,7 +29,8 @@ class HALSimWSBaseProvider {
 
   // Called when the websocket connects. This will cause providers
   // to register their HAL callbacks
-  virtual void OnNetworkConnected(wpi::StringRef clientId,
+  virtual void OnNetworkConnected(
+      wpi::StringRef clientId,
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) = 0;
 
   // Called when the websocket disconnects. This will cause provider
