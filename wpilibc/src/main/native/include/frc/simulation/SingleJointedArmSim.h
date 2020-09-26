@@ -37,17 +37,19 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param addNoise           Whether the sim should automatically add some
    *                           encoder noise.
    * @param measurementStdDevs The standard deviation of the measurement noise.
+   * @param simulateGravity    If the affects of gravity should be simulated.
    */
   SingleJointedArmSim(const LinearSystem<2, 1, 1>& system, const DCMotor motor,
                       double G, units::kilogram_t mass,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool addNoise,
-                      const std::array<double, 1>& measurementStdDevs);
+                      const std::array<double, 1>& measurementStdDevs,
+                      bool simulateGravity);
   /**
    * Creates a simulated arm mechanism.
    *
    * @param motor              The type and number of motors on the arm gearbox.
-   * @param j                  The moment of inertia of the arm.
+   * @param J                  The moment of inertia of the arm.
    * @param G                  The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
    * @param mass               The mass of the arm.
@@ -57,12 +59,14 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param addNoise           Whether the sim should automatically add some
    *                           encoder noise.
    * @param measurementStdDevs The standard deviation of the measurement noise.
+   * @param simulateGravity    If the affects of gravity should be simulated.
    */
   SingleJointedArmSim(const DCMotor& motor, units::kilogram_square_meter_t J,
                       double G, units::kilogram_t mass,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool addNoise,
-                      const std::array<double, 1>& measurementStdDevs);
+                      const std::array<double, 1>& measurementStdDevs,
+                      bool simulateGravity);
 
   /**
    * Creates a simulated arm mechanism.
@@ -79,11 +83,13 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param addNoise           Whether the sim should automatically add some
    *                           encoder noise.
    * @param measurementStdDevs The standard deviation of the measurement noise.
+   * @param simulateGravity    If the affects of gravity should be simulated.
    */
   SingleJointedArmSim(const DCMotor& motor, double G, units::kilogram_t mass,
                       units::meter_t armLength, units::radian_t minAngle,
                       units::radian_t maxAngle, bool addNoise,
-                      const std::array<double, 1>& measurementStdDevs);
+                      const std::array<double, 1>& measurementStdDevs,
+                      bool simulateGravity);
 
   /**
    * Returns whether the arm has hit the lower limit.
@@ -115,6 +121,9 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    */
   units::radians_per_second_t GetVelocity() const;
 
+  units::ampere_t GetCurrentDraw() const override;
+
+ protected:
   /**
    * Updates the state estimate of the arm.
    *
@@ -126,8 +135,6 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
       const Eigen::Matrix<double, 2, 1>& currentXhat,
       const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) override;
 
-  units::ampere_t GetCurrentDraw() const override;
-
  private:
   units::meter_t m_r;
   units::radian_t m_minAngle;
@@ -135,5 +142,6 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
   units::kilogram_t m_mass;
   const DCMotor m_motor;
   double m_gearing;
+  bool m_simulateGravity;
 };
 }  // namespace frc::sim

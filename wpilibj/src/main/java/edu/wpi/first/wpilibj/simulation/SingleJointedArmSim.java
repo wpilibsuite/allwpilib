@@ -67,6 +67,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * the simulation and write simulated outputs to sensors.
    *
    * @param motor                DCMotor representing the motor driving the arm.
+   * @param jKgSquaredMeters     The moment of inertia of the arm.
    * @param G                    The gear ratio of the arm (numbers greater than 1
    *                             represent reductions).
    * @param armMassKg            The mass of the arm.
@@ -186,10 +187,6 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
 
   public double getVelocityRadPerSec() {
     return m_x.get(1, 0);
-  }
-
-  public double getInputVoltageVolts() {
-    return m_u.get(0, 0);
   }
 
   @Override
