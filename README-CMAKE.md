@@ -19,7 +19,7 @@ By default, all libraries except for the HAL and WPILib get built with a default
 
 The most common prerequisite is going to be OpenCV. OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
 
-In addition, if you want JNI and Java, you will need a JDK of at least version 8 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the JDK directory.
+In addition, if you want JNI and Java, you will need a JDK of at least version 11 installed. In addition, you need a `JAVA_HOME` environment variable set properly and set to the JDK directory.
 
 If you are building with unit tests or simulation modules, you will also need an Internet connection for the initial setup process, as CMake will clone google-test and imgui from GitHub.
 
