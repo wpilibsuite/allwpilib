@@ -122,6 +122,20 @@ class DifferentialDrivetrainSim {
    */
   units::ampere_t GetCurrentDraw() const;
 
+  /**
+   * Sets the system state.
+   *
+   * @param state The state.
+   */
+  void SetState(const Eigen::Matrix<double, 7, 1>& state);
+
+  /**
+   * Sets the system pose.
+   *
+   * @param pose The pose.
+   */
+  void SetPose(const frc::Pose2d& pose);
+
   Eigen::Matrix<double, 7, 1> Dynamics(const Eigen::Matrix<double, 7, 1>& x,
                                        const Eigen::Matrix<double, 2, 1>& u);
 

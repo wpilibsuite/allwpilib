@@ -174,6 +174,26 @@ public class DifferentialDrivetrainSim {
     this.m_currentGearing = newGearRatio;
   }
 
+  /**
+   * Sets the system state.
+   *
+   * @param state The state.
+   */
+  public void setState(Matrix<N7, N1> state) {
+    m_x = state;
+  }
+
+  /**
+   * Sets the system pose.
+   *
+   * @param pose The pose.
+   */
+  public void setPose(Pose2d pose) {
+    m_x.set(State.kX.value, 0, pose.getX());
+    m_x.set(State.kY.value, 0, pose.getY());
+    m_x.set(State.kHeading.value, 0, pose.getRotation().getRadians());
+  }
+
   @SuppressWarnings({"DuplicatedCode", "LocalVariableName"})
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
 

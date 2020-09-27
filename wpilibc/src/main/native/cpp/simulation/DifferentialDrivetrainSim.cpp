@@ -89,6 +89,17 @@ units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
   return loadIleft + loadIRight;
 }
 
+void DifferentialDrivetrainSim::SetState(
+    const Eigen::Matrix<double, 7, 1>& state) {
+  m_x = state;
+}
+
+void DifferentialDrivetrainSim::SetPose(const frc::Pose2d& pose) {
+  m_x(State::kX) = pose.X().to<double>();
+  m_x(State::kY) = pose.Y().to<double>();
+  m_x(State::kHeading) = pose.Rotation().Radians().to<double>();
+}
+
 Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::Dynamics(
     const Eigen::Matrix<double, 7, 1>& x,
     const Eigen::Matrix<double, 2, 1>& u) {
