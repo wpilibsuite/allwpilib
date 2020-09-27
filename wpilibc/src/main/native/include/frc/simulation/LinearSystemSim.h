@@ -99,13 +99,11 @@ class LinearSystemSim {
   void SetInput(const Eigen::Matrix<double, Inputs, 1>& u) { m_u = u; }
 
   /**
-   * Resets the system state.
+   * Sets the system state.
    *
-   * @param state The state to reset to.
+   * @param state The state.
    */
-  void ResetState(const Eigen::Matrix<double, States, 1>& state) {
-    m_x = state;
-  }
+  void SetState(const Eigen::Matrix<double, States, 1>& state) { m_x = state; }
 
  protected:
   /**
