@@ -48,4 +48,8 @@ public final class SimHooks {
   public static void stepTiming(double deltaSeconds) {
     SimulatorJNI.stepTiming((long) (deltaSeconds * 1e6));
   }
+
+  public static void stepTimingAsync(double deltaSeconds) {
+    SimulatorJNI.stepTimingAsync((long) (deltaSeconds * 1e6));
+  }
 }

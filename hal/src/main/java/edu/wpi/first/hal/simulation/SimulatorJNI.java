@@ -19,5 +19,6 @@ public class SimulatorJNI extends JNIWrapper {
   public static native void resumeTiming();
   public static native boolean isTimingPaused();
   public static native void stepTiming(long delta);
+  public static native void stepTimingAsync(long delta);
   public static native void resetHandles();
 }

@@ -13,6 +13,7 @@
 #include <cstring>
 #include <string>
 
+#include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
@@ -30,12 +31,16 @@ struct Notifier {
   uint64_t waitTime;
   bool active = true;
   bool running = false;
+  uint64_t count = 0;
   wpi::mutex mutex;
   wpi::condition_variable cond;
 };
 }  // namespace
 
 using namespace hal;
+
+static wpi::mutex notifiersWaiterMutex;
+static wpi::condition_variable notifiersWaiterCond;
 
 class NotifierHandleContainer
     : public UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
@@ -50,6 +55,7 @@ class NotifierHandleContainer
       }
       notifier->cond.notify_all();  // wake up any waiting threads
     });
+    notifiersWaiterCond.notify_all();
   }
 };
 
@@ -75,6 +81,42 @@ void WakeupNotifiers() {
   notifierHandles->ForEach([](HAL_NotifierHandle handle, Notifier* notifier) {
     notifier->cond.notify_all();
   });
+}
+
+void WakeupWaitNotifiers() {
+  std::unique_lock ulock(notifiersWaiterMutex);
+  int32_t status = 0;
+  uint64_t curTime = HAL_GetFPGATime(&status);
+  wpi::SmallVector<std::pair<HAL_NotifierHandle, uint64_t>, 8> waiters;
+  notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
+    std::scoped_lock lock(notifier->mutex);
+    // only wait for it if it's going to wake up (either because
+    // the timeout has expired or the alarm hasn't been waited on yet)
+    if (notifier->running &&
+        (notifier->count == 0 || curTime >= notifier->waitTime)) {
+      waiters.emplace_back(handle, notifier->count);
+      notifier->cond.notify_all();
+    }
+  });
+  for (;;) {
+    int count = 0;
+    int end = waiters.size();
+    while (count < end) {
+      auto& it = waiters[count];
+      if (auto notifier = notifierHandles->Get(it.first)) {
+        std::scoped_lock lock(notifier->mutex);
+        if (notifier->active && notifier->count == it.second) {
+          ++count;
+          continue;
+        }
+      }
+      // no longer need to wait for it, put at end so it can be erased
+      it.swap(waiters[--end]);
+    }
+    if (count == 0) break;
+    waiters.resize(count);
+    notifiersWaiterCond.wait_for(ulock, std::chrono::duration<double>(1));
+  }
 }
 }  // namespace hal
 
@@ -132,7 +174,7 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
   {
     std::scoped_lock lock(notifier->mutex);
     notifier->waitTime = triggerTime;
-    notifier->running = true;
+    notifier->running = (triggerTime != UINT64_MAX);
   }
 
   // We wake up any waiters to change how long they're sleeping for
@@ -155,7 +197,11 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
   auto notifier = notifierHandles->Get(notifierHandle);
   if (!notifier) return 0;
 
+  std::unique_lock ulock(notifiersWaiterMutex);
   std::unique_lock lock(notifier->mutex);
+  ++notifier->count;
+  ulock.unlock();
+  notifiersWaiterCond.notify_all();
   while (notifier->active) {
     uint64_t curTime = HAL_GetFPGATime(status);
     if (notifier->running && curTime >= notifier->waitTime) {
@@ -165,15 +211,13 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
     double waitTime;
     if (!notifier->running || notifiersPaused) {
-      waitTime = (curTime * 1e-6) + 1000.0;
       // If not running, wait 1000 seconds
+      waitTime = 1000.0;
     } else {
-      waitTime = notifier->waitTime * 1e-6;
+      waitTime = (notifier->waitTime - curTime) * 1e-6;
     }
 
-    auto timeoutTime =
-        hal::fpga_clock::epoch() + std::chrono::duration<double>(waitTime);
-    notifier->cond.wait_until(lock, timeoutTime);
+    notifier->cond.wait_for(lock, std::chrono::duration<double>(waitTime));
   }
   return 0;
 }

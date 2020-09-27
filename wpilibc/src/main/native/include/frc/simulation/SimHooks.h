@@ -33,5 +33,7 @@ bool IsTimingPaused();
 
 void StepTiming(units::second_t delta);
 
+void StepTimingAsync(units::second_t delta);
+
 }  // namespace sim
 }  // namespace frc

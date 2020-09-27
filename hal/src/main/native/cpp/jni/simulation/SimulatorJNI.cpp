@@ -220,6 +220,18 @@ Java_edu_wpi_first_hal_simulation_SimulatorJNI_stepTiming
 
 /*
  * Class:     edu_wpi_first_hal_simulation_SimulatorJNI
+ * Method:    stepTimingAsync
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_SimulatorJNI_stepTimingAsync
+  (JNIEnv*, jclass, jlong delta)
+{
+  HALSIM_StepTimingAsync(delta);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimulatorJNI
  * Method:    resetHandles
  * Signature: ()V
  */

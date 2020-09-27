@@ -20,6 +20,7 @@ void HALSIM_PauseTiming(void);
 void HALSIM_ResumeTiming(void);
 HAL_Bool HALSIM_IsTimingPaused(void);
 void HALSIM_StepTiming(uint64_t delta);
+void HALSIM_StepTimingAsync(uint64_t delta);
 
 typedef int32_t (*HALSIM_SendErrorHandler)(
     HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode, const char* details,
