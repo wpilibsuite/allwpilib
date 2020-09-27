@@ -66,7 +66,7 @@ Rotation2d DifferentialDrivetrainSim::GetHeading() const {
   return Rotation2d(units::radian_t(m_x(State::kHeading)));
 }
 
-Pose2d DifferentialDrivetrainSim::GetEstimatedPosition() const {
+Pose2d DifferentialDrivetrainSim::GetPose() const {
   return Pose2d(units::meter_t(m_x(State::kX)), units::meter_t(m_x(State::kY)),
                 Rotation2d(units::radian_t(m_x(State::kHeading))));
 }

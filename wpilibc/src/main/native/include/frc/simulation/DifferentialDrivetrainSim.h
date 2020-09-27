@@ -62,7 +62,7 @@ class DifferentialDrivetrainSim {
                             units::meter_t trackWidth);
 
   /**
-   * Set the applied voltage to the drivetrain. Note that positive voltage must
+   * Sets the applied voltage to the drivetrain. Note that positive voltage must
    * make that side of the drivetrain travel forward (+X).
    *
    * @param leftVoltage  The left voltage.
@@ -71,7 +71,7 @@ class DifferentialDrivetrainSim {
   void SetInputs(units::volt_t leftVoltage, units::volt_t rightVoltage);
 
   /**
-   * Set the gearing reduction on the drivetrain. This is commonly used for
+   * Sets the gearing reduction on the drivetrain. This is commonly used for
    * shifting drivetrains.
    *
    * @param newGearing The new gear ratio, as output over input.
@@ -94,7 +94,8 @@ class DifferentialDrivetrainSim {
   double GetState(int state) const;
 
   /**
-   * Get the current gearing reduction of the drivetrain, as output over input.
+   * Returns the current gearing reduction of the drivetrain, as output over
+   * input.
    */
   double GetGearing() const;
 
@@ -104,15 +105,17 @@ class DifferentialDrivetrainSim {
   Eigen::Matrix<double, 7, 1> GetState() const;
 
   /**
-   * Get the estimated direction the robot is pointing. Note that this angle is
-   * counterclockwise-positive, while most gyros are clockwise positive.
+   * Returns the direction the robot is pointing.
+   *
+   * Note that this angle is counterclockwise-positive, while most gyros are
+   * clockwise positive.
    */
   Rotation2d GetHeading() const;
 
   /**
-   * Returns the current estimated position.
+   * Returns the current pose.
    */
-  Pose2d GetEstimatedPosition() const;
+  Pose2d GetPose() const;
 
   /**
    * Returns the currently drawn current.
@@ -173,7 +176,7 @@ class DifferentialDrivetrainSim {
    * @param gearing   The gearing reduction used.
    * @param wheelSize The wheel size.
    */
-  static DifferentialDrivetrainSim createKitbotSim(frc::DCMotor motor,
+  static DifferentialDrivetrainSim CreateKitbotSim(frc::DCMotor motor,
                                                    double gearing,
                                                    units::meter_t wheelSize) {
     // MOI estimation -- note that I = m r^2 for point masses
@@ -195,7 +198,7 @@ class DifferentialDrivetrainSim {
    * @param J         The moment of inertia of the drivebase. This can be
    * calculated using frc-characterization.
    */
-  static DifferentialDrivetrainSim createKitbotSim(
+  static DifferentialDrivetrainSim CreateKitbotSim(
       frc::DCMotor motor, double gearing, units::meter_t wheelSize,
       units::kilogram_square_meter_t J) {
     return DifferentialDrivetrainSim{motor, gearing,         J,
