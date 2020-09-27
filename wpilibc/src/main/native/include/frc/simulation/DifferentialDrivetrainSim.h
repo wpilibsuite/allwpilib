@@ -203,7 +203,7 @@ class DifferentialDrivetrainSim {
   }
 
  private:
-  const LinearSystem<2, 2, 2>& m_plant;
+  LinearSystem<2, 2, 2> m_plant;
   units::meter_t m_rb;
   units::meter_t m_wheelRadius;
 
