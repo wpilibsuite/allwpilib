@@ -101,7 +101,7 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Set the applied voltage to the drivetrain. Note that positive voltage must make that
+   * Sets the applied voltage to the drivetrain. Note that positive voltage must make that
    * side of the drivetrain travel forward (+X).
    *
    * @param leftVoltageVolts  The left voltage.
@@ -123,24 +123,26 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Get the full simulated state of the drivetrain.
+   * Returns the full simulated state of the drivetrain.
    */
   public Matrix<N7, N1> getState() {
     return m_x;
   }
 
   /**
-   * Get the estimated direction the robot is pointing. Note that this angle is
-   * counterclockwise-positive, while most gyros are clockwise positive.
+   * Returns the direction the robot is pointing.
+   *
+   * <p>Note that this angle is counterclockwise-positive, while most gyros are
+   * clockwise positive.
    */
   public Rotation2d getHeading() {
     return new Rotation2d(getState(State.kHeading));
   }
 
   /**
-   * Get the estimated position of the drivetrain.
+   * Returns the current pose.
    */
-  public Pose2d getEstimatedPosition() {
+  public Pose2d getPose() {
     return new Pose2d(m_x.get(0, 0),
       m_x.get(1, 0),
       new Rotation2d(m_x.get(2, 0)));
@@ -163,7 +165,7 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Set the gearing reduction on the drivetrain. This is commonly used for
+   * Sets the gearing reduction on the drivetrain. This is commonly used for
    * shifting drivetrains.
    *
    * @param newGearRatio The new gear ratio, as output over input.

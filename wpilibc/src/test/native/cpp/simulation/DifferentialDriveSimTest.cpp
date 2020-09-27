@@ -46,7 +46,7 @@ TEST(DifferentialDriveSim, Convergence) {
 
   for (double t = 0; t < trajectory.TotalTime().to<double>(); t += 0.02) {
     auto state = trajectory.Sample(20_ms);
-    auto ramseteOut = ramsete.Calculate(sim.GetEstimatedPosition(), state);
+    auto ramseteOut = ramsete.Calculate(sim.GetPose(), state);
 
     auto [l, r] = kinematics.ToWheelSpeeds(ramseteOut);
     auto voltages = feedforward.Calculate(
@@ -111,6 +111,5 @@ TEST(DifferentialDriveSim, ModelStability) {
     sim.Update(20_ms);
   }
 
-  EXPECT_LT(units::math::abs(sim.GetEstimatedPosition().Translation().Norm()),
-            100_m);
+  EXPECT_LT(units::math::abs(sim.GetPose().Translation().Norm()), 100_m);
 }

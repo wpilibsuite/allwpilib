@@ -65,7 +65,7 @@ class DifferentialDrivetrainSimTest {
 
     for (double t = 0; t < traj.getTotalTimeSeconds(); t += 0.020) {
       var state = traj.sample(0.020);
-      var ramseteOut = ramsete.calculate(sim.getEstimatedPosition(), state);
+      var ramseteOut = ramsete.calculate(sim.getPose(), state);
 
       var wheelSpeeds = kinematics.toWheelSpeeds(ramseteOut);
 
@@ -141,6 +141,6 @@ class DifferentialDrivetrainSimTest {
       sim.update(0.020);
     }
 
-    assertTrue(Math.abs(sim.getEstimatedPosition().getTranslation().getNorm()) < 100);
+    assertTrue(Math.abs(sim.getPose().getTranslation().getNorm()) < 100);
   }
 }
