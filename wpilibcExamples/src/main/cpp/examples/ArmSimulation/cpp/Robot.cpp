@@ -55,7 +55,8 @@ class Robot : public frc::TimedRobot {
   // with a standard deviation of 0.5 degrees.
   frc::sim::SingleJointedArmSim m_armSim{
       m_armGearbox, 100.0, 5_kg, 30_in,
-      -180_deg,     0_deg, true, {(0.5_deg).to<double>()}};
+      -180_deg,     0_deg, true, {(0.5_deg).to<double>()},
+      true};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
  public:
