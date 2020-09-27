@@ -83,7 +83,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   @Override
   public int hashCode() {
-    return Double.valueOf(m_expirationTime).hashCode();
+    return Double.hashCode(m_expirationTime);
   }
 
   /**
