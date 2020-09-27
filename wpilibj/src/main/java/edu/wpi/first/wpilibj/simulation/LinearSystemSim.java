@@ -121,7 +121,12 @@ public class LinearSystemSim<States extends Num, Inputs extends Num,
     return m_y.get(row, 0);
   }
 
-  public void resetState(Matrix<States, N1> state) {
+  /**
+   * Sets the system state.
+   *
+   * @param state The state.
+   */
+  public void setState(Matrix<States, N1> state) {
     m_x = state;
   }
 

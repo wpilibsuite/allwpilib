@@ -25,7 +25,7 @@ public class ArmSimTest {
 
   @Test
   public void testArmDisabled() {
-    m_sim.resetState(VecBuilder.fill(0.0, 0.0));
+    m_sim.setState(VecBuilder.fill(0.0, 0.0));
 
     for (int i = 0; i < 12 / 0.02; i++) {
       m_sim.setInput(0.0);
