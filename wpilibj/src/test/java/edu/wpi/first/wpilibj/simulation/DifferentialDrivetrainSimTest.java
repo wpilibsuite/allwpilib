@@ -136,10 +136,11 @@ class DifferentialDrivetrainSimTest {
 
     sim.setInputs(2, 4);
 
-    for (int i = 0; i < 10000; i++) {
+    // 10 seconds should be enough time to verify stability
+    for (int i = 0; i < 500; i++) {
       sim.update(0.020);
     }
 
-    assertTrue(Math.abs(sim.getEstimatedPosition().getX()) < 10000);
+    assertTrue(Math.abs(sim.getEstimatedPosition().getTranslation().getNorm()) < 100);
   }
 }

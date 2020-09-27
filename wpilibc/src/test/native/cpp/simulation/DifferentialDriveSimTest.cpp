@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include <units/current.h>
+#include <units/math.h>
 #include <units/moment_of_inertia.h>
 
 #include "frc/controller/LinearPlantInversionFeedforward.h"
@@ -105,9 +106,11 @@ TEST(DifferentialDriveSim, ModelStability) {
 
   sim.SetInputs(2_V, 4_V);
 
-  for (int i = 0; i < 10000; ++i) {
+  // 10 seconds should be enough time to verify stability
+  for (int i = 0; i < 500; ++i) {
     sim.Update(20_ms);
   }
 
-  EXPECT_TRUE(std::abs(sim.GetEstimatedPosition().X().to<double>()) < 10000);
+  EXPECT_LT(units::math::abs(sim.GetEstimatedPosition().Translation().Norm()),
+            100_m);
 }
