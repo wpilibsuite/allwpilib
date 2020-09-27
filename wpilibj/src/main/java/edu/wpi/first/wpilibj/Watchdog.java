@@ -72,6 +72,20 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     return Double.compare(m_expirationTime, rhs.m_expirationTime);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Watchdog)) {
+      return false;
+    }
+    Watchdog oth = (Watchdog) obj;
+    return oth.m_expirationTime == m_expirationTime;
+  }
+
+  @Override
+  public int hashCode() {
+    return Double.hashCode(m_expirationTime);
+  }
+
   /**
    * Returns the time in seconds since the watchdog was last fed.
    */
