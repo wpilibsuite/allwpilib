@@ -15,6 +15,7 @@
 #include <imgui.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
+
 #include <imgui_internal.h>
 #include <wpi/json.h>
 #include <wpi/math>
@@ -33,58 +34,59 @@ static std::string previousJsonLocation = "Not empty";
 static bool showMechanism2D = true;
 static bool initMechanism2D = true;
 static bool debugMode = false;
-static int loopCount = 0;
+//static int loopCount = 0;
 // static std::vector<Mechanism2DView> Mechanism2DViewVector;
 
 namespace {
-struct BodyConfig {
-  std::string name;
-  std::string type = "line";
-  int length = 100;
-  std::string color = "green";
-  int angle = 0;
-  std::vector<BodyConfig> children;
-  int lineWidth = 1;
-};
+    struct BodyConfig {
+        std::string name;
+        std::string type = "line";
+        int length = 100;
+        std::string color = "green";
+        int angle = 0;
+        std::vector<BodyConfig> children;
+        int lineWidth = 1;
+    };
 }  // namespace
 static std::vector<BodyConfig> bodyConfigVector;
 namespace {
-struct DrawLineStruct {
-  float xEnd;
-  float yEnd;
-  float angle;
-};
+    struct DrawLineStruct {
+        float xEnd;
+        float yEnd;
+        float angle;
+    };
 }  // namespace
 static struct NamedColor {
-  const char* name;
-  ImColor value;
-} staticColors[] = {{"white", IM_COL32(255, 255, 255, 255)},
-                    {"silver", IM_COL32(192, 192, 192, 255)},
-                    {"gray", IM_COL32(128, 128, 128, 255)},
-                    {"black", IM_COL32(0, 0, 0, 255)},
-                    {"red", IM_COL32(255, 0, 0, 255)},
-                    {"maroon", IM_COL32(128, 0, 0, 255)},
-                    {"yellow", IM_COL32(255, 255, 0, 255)},
-                    {"olive", IM_COL32(128, 128, 0, 255)},
-                    {"lime", IM_COL32(0, 255, 0, 255)},
-                    {"green", IM_COL32(0, 128, 0, 255)},
-                    {"aqua", IM_COL32(0, 255, 255, 255)},
-                    {"teal", IM_COL32(0, 128, 128, 255)},
-                    {"blue", IM_COL32(0, 0, 255, 255)},
-                    {"navy", IM_COL32(0, 0, 128, 255)},
+    const char *name;
+    ImColor value;
+} staticColors[] = {{"white",   IM_COL32(255, 255, 255, 255)},
+                    {"silver",  IM_COL32(192, 192, 192, 255)},
+                    {"gray",    IM_COL32(128, 128, 128, 255)},
+                    {"black",   IM_COL32(0, 0, 0, 255)},
+                    {"red",     IM_COL32(255, 0, 0, 255)},
+                    {"maroon",  IM_COL32(128, 0, 0, 255)},
+                    {"yellow",  IM_COL32(255, 255, 0, 255)},
+                    {"olive",   IM_COL32(128, 128, 0, 255)},
+                    {"lime",    IM_COL32(0, 255, 0, 255)},
+                    {"green",   IM_COL32(0, 128, 0, 255)},
+                    {"aqua",    IM_COL32(0, 255, 255, 255)},
+                    {"teal",    IM_COL32(0, 128, 128, 255)},
+                    {"blue",    IM_COL32(0, 0, 255, 255)},
+                    {"navy",    IM_COL32(0, 0, 128, 255)},
                     {"fuchsia", IM_COL32(255, 0, 255, 255)},
-                    {"purple", IM_COL32(128, 0, 128, 255)}};
+                    {"purple",  IM_COL32(128, 0, 128, 255)}};
 
 static void buildColorTable() {
-  for (auto&& namedColor : staticColors) {
-    colorLookUpTable.try_emplace(namedColor.name, namedColor.value);
-  }
+    for (auto &&namedColor : staticColors) {
+        colorLookUpTable.try_emplace(namedColor.name, namedColor.value);
+    }
 }
+
 namespace {
-class Mechanism2DInfo {
- public:
-  std::string jsonLocation;
-};
+    class Mechanism2DInfo {
+    public:
+        std::string jsonLocation;
+    };
 }  // namespace
 
 // namespace {
@@ -153,7 +155,7 @@ static Mechanism2DInfo mechanism2DInfo;
 //}
 //
 // Read in the json file
-static void GetJsonFileLocaton(std::make_unique<pfd::open_file> file) {
+static void GetJsonFileLocation(std::unique_ptr<pfd::open_file> file) {
   if (file && file->ready(0)) {
     auto result = file->result();
     if (!result.empty()) {
@@ -166,181 +168,181 @@ static void GetJsonFileLocaton(std::make_unique<pfd::open_file> file) {
 
 // Draw a line in the correct location
 static DrawLineStruct DrawLine(float startXLocation, float startYLocation,
-                               int length, float angle, ImDrawList* drawList,
+                               int length, float angle, ImDrawList *drawList,
                                ImVec2 windowPos, ImColor color,
-                               const BodyConfig& bodyConfig,
-                               const std::string& previousPath) {
-  DrawLineStruct drawLineStruct;
-  drawLineStruct.angle = angle;
-  // Find the current path do the ligament
-  std::string currentPath = previousPath + bodyConfig.name;
-  // Find the angle in radians
-  double radAngle = (drawLineStruct.angle - 90) * wpi::math::pi / 180;
-  // Get the start X and Y location
-  drawLineStruct.xEnd = startXLocation + length * std::cos(radAngle);
-  drawLineStruct.yEnd = startYLocation + length * std::sin(radAngle);
-  // Add the line to the drawList
-  drawList->AddLine(
-      windowPos + ImVec2(startXLocation, startYLocation),
-      windowPos + ImVec2(drawLineStruct.xEnd, drawLineStruct.yEnd), color,
-      bodyConfig.lineWidth);
-  // Return the end X, Y, and angle
-  return drawLineStruct;
+                               const BodyConfig &bodyConfig,
+                               const std::string &previousPath) {
+    DrawLineStruct drawLineStruct;
+    drawLineStruct.angle = angle;
+    // Find the current path do the ligament
+    std::string currentPath = previousPath + bodyConfig.name;
+    // Find the angle in radians
+    double radAngle = (drawLineStruct.angle - 90) * wpi::math::pi / 180;
+    // Get the start X and Y location
+    drawLineStruct.xEnd = startXLocation + length * std::cos(radAngle);
+    drawLineStruct.yEnd = startYLocation + length * std::sin(radAngle);
+    // Add the line to the drawList
+    drawList->AddLine(
+            windowPos + ImVec2(startXLocation, startYLocation),
+            windowPos + ImVec2(drawLineStruct.xEnd, drawLineStruct.yEnd), color,
+            bodyConfig.lineWidth);
+    // Return the end X, Y, and angle
+    return drawLineStruct;
 }
 
 // Build the drawList from a body config
 static void buildDrawList(float startXLocation, float startYLocation,
-                          ImDrawList* drawList, float previousAngle,
-                          const std::vector<BodyConfig>& subBodyConfigs,
+                          ImDrawList *drawList, float previousAngle,
+                          const std::vector<BodyConfig> &subBodyConfigs,
                           ImVec2 windowPos) {
-  for (BodyConfig const& bodyConfig : subBodyConfigs) {
-    hal::SimDouble angleHandle;
-    hal::SimDouble lengthHandle;
-    float angle = 0;
-    float length = 0;
-    // Get the smallest of width or height
-    double minSize;
-    // Find the min size of the window
-    minSize = ImGui::GetWindowHeight() > ImGui::GetWindowWidth()
+    for (BodyConfig const &bodyConfig : subBodyConfigs) {
+        hal::SimDouble angleHandle;
+        hal::SimDouble lengthHandle;
+        float angle = 0;
+        float length = 0;
+        // Get the smallest of width or height
+        double minSize;
+        // Find the min size of the window
+        minSize = ImGui::GetWindowHeight() > ImGui::GetWindowWidth()
                   ? ImGui::GetWindowWidth()
                   : ImGui::GetWindowHeight();
-    if (devHandle == 0) devHandle = HALSIM_GetSimDeviceHandle("Mechanism2D");
-    // Get the length
-    if (!lengthHandle)
-      lengthHandle = HALSIM_GetSimValueHandle(
-          devHandle, (bodyConfig.name + "/length").c_str());
-    if (lengthHandle) length = lengthHandle.Get();
-    if (length <= 0) {
-      length = bodyConfig.length;
-    }
-    // Get the angle
-    if (!angleHandle)
-      angleHandle = HALSIM_GetSimValueHandle(
-          devHandle, (bodyConfig.name + "/angle").c_str());
-    if (angleHandle) angle = angleHandle.Get();
-    // Calculate the next angle to go to
-    float angleToGoTo = angle + bodyConfig.angle + previousAngle;
-    // Draw the first line and get the ending coordinates
+        if (devHandle == 0) devHandle = HALSIM_GetSimDeviceHandle("Mechanism2D");
+        // Get the length
+        if (!lengthHandle)
+            lengthHandle = HALSIM_GetSimValueHandle(
+                    devHandle, (bodyConfig.name + "/length").c_str());
+        if (lengthHandle) length = lengthHandle.Get();
+        if (length <= 0) {
+            length = bodyConfig.length;
+        }
+        // Get the angle
+        if (!angleHandle)
+            angleHandle = HALSIM_GetSimValueHandle(
+                    devHandle, (bodyConfig.name + "/angle").c_str());
+        if (angleHandle) angle = angleHandle.Get();
+        // Calculate the next angle to go to
+        float angleToGoTo = angle + bodyConfig.angle + previousAngle;
+        // Draw the first line and get the ending coordinates
 
-    DrawLineStruct drawLine =
-        DrawLine(startXLocation, startYLocation, minSize / 100 * length,
-                 angleToGoTo, drawList, windowPos,
-                 colorLookUpTable[bodyConfig.color], bodyConfig, "");
+        DrawLineStruct drawLine =
+                DrawLine(startXLocation, startYLocation, minSize / 100 * length,
+                         angleToGoTo, drawList, windowPos,
+                         colorLookUpTable[bodyConfig.color], bodyConfig, "");
 
-    // If the line has children then draw them with the stating points being the
-    // end of the parent
-    if (!bodyConfig.children.empty()) {
-      buildDrawList(drawLine.xEnd, drawLine.yEnd, drawList, drawLine.angle,
-                    bodyConfig.children, windowPos);
+        // If the line has children then draw them with the stating points being the
+        // end of the parent
+        if (!bodyConfig.children.empty()) {
+            buildDrawList(drawLine.xEnd, drawLine.yEnd, drawList, drawLine.angle,
+                          bodyConfig.children, windowPos);
+        }
+        if (debugMode && loopCount % 30) {
+            wpi::outs() << bodyConfig.name << " Angle: " << angle
+                        << " Length: " << length << "\n";
+        }
     }
-    if (debugMode && loopCount % 30) {
-      wpi::outs() << bodyConfig.name << " Angle: " << angle
-                  << " Length: " << length << "\n";
-    }
-  }
 }
 
 // Read subjson
-static BodyConfig readSubJson(const std::string& name, wpi::json const& body) {
-  BodyConfig c;
-  try {
-    c.name = name + "/" + body.at("name").get<std::string>();
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "could not read body name: " << e.what() << '\n';
-  }
-  try {
-    c.length = body.at("length").get<int>();
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "length '" << c.name
-                << "': could not find length path: " << e.what() << '\n';
-  }
-  try {
-    c.color = body.at("color").get<std::string>();
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "color '" << c.name
-                << "': could not find color path: " << e.what() << '\n';
-  }
-  try {
-    c.angle = body.at("angle").get<int>();
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "angle '" << c.name
-                << "': could not find angle path: " << e.what() << '\n';
-  }
-  try {
-    c.lineWidth = body.at("lineWidth").get<int>();
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "lineWidth '" << c.name
-                << "': could not find lineWidth path: " << e.what() << '\n';
-  }
-  try {
-    for (wpi::json const& child : body.at("children")) {
-      c.children.push_back(readSubJson(c.name, child));
-      wpi::outs() << "Reading Child with name " << c.name << '\n';
+static BodyConfig readSubJson(const std::string &name, wpi::json const &body) {
+    BodyConfig c;
+    try {
+        c.name = name + "/" + body.at("name").get<std::string>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "could not read body name: " << e.what() << '\n';
     }
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "could not read body: " << e.what() << '\n';
-  }
-  return c;
+    try {
+        c.length = body.at("length").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "length '" << c.name
+                    << "': could not find length path: " << e.what() << '\n';
+    }
+    try {
+        c.color = body.at("color").get<std::string>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "color '" << c.name
+                    << "': could not find color path: " << e.what() << '\n';
+    }
+    try {
+        c.angle = body.at("angle").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "angle '" << c.name
+                    << "': could not find angle path: " << e.what() << '\n';
+    }
+    try {
+        c.lineWidth = body.at("lineWidth").get<int>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "lineWidth '" << c.name
+                    << "': could not find lineWidth path: " << e.what() << '\n';
+    }
+    try {
+        for (wpi::json const &child : body.at("children")) {
+            c.children.push_back(readSubJson(c.name, child));
+            wpi::outs() << "Reading Child with name " << c.name << '\n';
+        }
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "could not read body: " << e.what() << '\n';
+    }
+    return c;
 }
 
 // Read json
 static void readJson(std::string jFile) {
-  std::error_code ec;
-  std::string name;
-  wpi::raw_fd_istream is(jFile, ec);
-  if (ec) {
-    wpi::errs() << "could not open '" << jFile << "': " << ec.message() << '\n';
-  }
-  // parse file
-  wpi::json j;
-  try {
-    j = wpi::json::parse(is);
-  } catch (const wpi::json::parse_error& e) {
-    wpi::errs() << "byte " << e.byte << ": " << e.what() << '\n';
-  }
-  // top level must be an object
-  if (!j.is_object()) {
-    wpi::errs() << "must be JSON object\n";
-  }
-  try {
-    name = j.at("name").get<std::string>();
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "name '" << name
-                << "': could not find name path: " << e.what() << '\n';
-  }
-  try {
-    for (wpi::json const& body : j.at("body")) {
-      bodyConfigVector.push_back(readSubJson(name, body));
+    std::error_code ec;
+    std::string name;
+    wpi::raw_fd_istream is(jFile, ec);
+    if (ec) {
+        wpi::errs() << "could not open '" << jFile << "': " << ec.message() << '\n';
     }
-  } catch (const wpi::json::exception& e) {
-    wpi::errs() << "could not read body: " << e.what() << '\n';
-  }
+    // parse file
+    wpi::json j;
+    try {
+        j = wpi::json::parse(is);
+    } catch (const wpi::json::parse_error &e) {
+        wpi::errs() << "byte " << e.byte << ": " << e.what() << '\n';
+    }
+    // top level must be an object
+    if (!j.is_object()) {
+        wpi::errs() << "must be JSON object\n";
+    }
+    try {
+        name = j.at("name").get<std::string>();
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "name '" << name
+                    << "': could not find name path: " << e.what() << '\n';
+    }
+    try {
+        for (wpi::json const &body : j.at("body")) {
+            bodyConfigVector.push_back(readSubJson(name, body));
+        }
+    } catch (const wpi::json::exception &e) {
+        wpi::errs() << "could not read body: " << e.what() << '\n';
+    }
 }
 
 // TODO: Fix m_fileOpener
 // Menu for loading json
 static void OptionMenuLocateJson() {
-  if (ImGui::BeginMenu("Mechanism2D")) {
-    if (ImGui::MenuItem("Load Json")) {
-      m_fileOpenerVector.push_back(std::make_unique<pfd::open_file>(
-          "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"}));
-      for (auto& file : m_fileOpenerVector) {
-      }
+    if (ImGui::BeginMenu("Mechanism2D")) {
+        if (ImGui::MenuItem("Load Json")) {
+            m_fileOpenerVector.push_back(std::make_unique<pfd::open_file>(
+                    "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"}));
+            for (auto &file : m_fileOpenerVector) {
+            }
+        }
+        ImGui::EndMenu();
     }
-    ImGui::EndMenu();
-  }
 }
 
-static void AddWindow(std::string WindowName){
-  HALSimGui::AddWindow(WindowName, []() -> void {
-    wpi::outs() << TestString << '\n';
-    DisplayMechanism2D();
-  });
-  //    TODO re add me
-  HALSimGui::AddOptionMenu(OptionMenuLocateJson);
-  HALSimGui::SetDefaultWindowPos(WindowName, 200, 200);
-  HALSimGui::SetDefaultWindowSize(WindowName, 600, 600);
-  HALSimGui::SetWindowPadding(WindowName, 0, 0);
+static void AddWindow(std::string WindowName) {
+    HALSimGui::AddWindow(WindowName, []() -> void {
+        wpi::outs() << TestString << '\n';
+        DisplayMechanism2D();
+    });
+    //    TODO re add me
+    HALSimGui::AddOptionMenu(OptionMenuLocateJson);
+    HALSimGui::SetDefaultWindowPos(WindowName, 200, 200);
+    HALSimGui::SetDefaultWindowSize(WindowName, 600, 600);
+    HALSimGui::SetWindowPadding(WindowName, 0, 0);
 }
 
 static void DisplayMechanism2D(std::string WindowName) {
@@ -361,23 +363,24 @@ static void DisplayMechanism2D(std::string WindowName) {
 }
 
 static void WindowManager() {
-  ImGui::Checkbox("Mechanism 2D", &showMechanism2D);
-  ImGui::Checkbox("Debug mode", &debugMode);
+    // TODO make me not static
+    ImGui::Checkbox("Mechanism 2D", &showMechanism2D);
+    ImGui::Checkbox("Debug mode", &debugMode);
 
-  if (initMechanism2D && showMechanism2D) {
+    if (initMechanism2D && showMechanism2D) {
 
-    initMechanism2D = false;    //    TODO re add me
-  }
-  if (!initMechanism2D && !showMechanism2D) {
-    HALSimGui::RemoveWindow("Mechanism 2D");
-    initMechanism2D = true;
-  }
-  loopCount++;
+        initMechanism2D = false;    //    TODO re add me
+    }
+    if (!initMechanism2D && !showMechanism2D) {
+        HALSimGui::RemoveWindow("Mechanism 2D");
+        initMechanism2D = true;
+    }
+    loopCount++;
 }
 
-void Mechanism2D::Initialize() {
-  //  TODO: Fix me
-  //  // hook ini handler to save settings
+static void InitSettings() {
+    //  TODO: Fix me
+    //  // hook ini handler to save settings
     ImGuiSettingsHandler iniHandler;
     iniHandler.TypeName = "Mechanism2D";
     iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
@@ -385,10 +388,16 @@ void Mechanism2D::Initialize() {
     iniHandler.ReadLineFn = Mechanism2DReadLine;
     iniHandler.WriteAllFn = Mechanism2DWriteAll;
     ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+}
 
-  buildColorTable();
-  HALSimGui::AddWindow("Mechanism 2D Settings", WindowManager);
-  HALSimGui::SetDefaultWindowPos("Mechanism 2D Settings", 100, 100);
-  HALSimGui::SetDefaultWindowSize("Mechanism 2D Settings", 200, 200);
-  HALSimGui::SetWindowPadding("Mechanism 2D Settings", 0, 0);
+static void addMainSettingsWindow(){
+    HALSimGui::AddWindow("Mechanism 2D Settings", WindowManager);
+    HALSimGui::SetDefaultWindowPos("Mechanism 2D Settings", 100, 100);
+    HALSimGui::SetDefaultWindowSize("Mechanism 2D Settings", 200, 200);
+    HALSimGui::SetWindowPadding("Mechanism 2D Settings", 0, 0);
+}
+void Mechanism2D::Initialize() {
+    InitSettings();
+    buildColorTable();
+    addMainSettingsWindow();
 }

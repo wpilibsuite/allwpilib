@@ -3,6 +3,7 @@
 TODO:
     Add Json to AddWindow so it isn't static window
     Dynamically create windows so we can n number of them
+    Change sim device to be the same as the json name
 
 
 
