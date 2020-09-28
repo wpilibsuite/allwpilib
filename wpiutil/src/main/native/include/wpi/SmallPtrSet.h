@@ -20,6 +20,7 @@
 #include "wpi/type_traits.h"
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <initializer_list>
