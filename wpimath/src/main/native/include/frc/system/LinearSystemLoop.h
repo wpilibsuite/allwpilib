@@ -52,11 +52,10 @@ class LinearSystemLoop {
                    units::volt_t maxVoltage, units::second_t dt)
       : LinearSystemLoop(
             plant, controller,
-            LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
             observer, [=](Eigen::Matrix<double, Inputs, 1> u) {
               return frc::NormalizeInputVector<Inputs>(
                   u, maxVoltage.template to<double>());
-            }) {}
+            }, dt) {}
 
   /**
    * Constructs a state-space loop with the given plant, controller, and
@@ -96,7 +95,7 @@ class LinearSystemLoop {
    */
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
                    LinearQuadraticRegulator<States, Inputs>& controller,
-                   LinearPlantInversionFeedforward<States, Inputs>& feedforward,
+                   LinearPlantInversionFeedforward<States, Inputs> feedforward,
                    KalmanFilter<States, Inputs, Outputs>& observer,
                    units::volt_t maxVoltage)
       : LinearSystemLoop(plant, controller, feedforward, observer,
@@ -117,7 +116,7 @@ class LinearSystemLoop {
    */
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
                    LinearQuadraticRegulator<States, Inputs>& controller,
-                   LinearPlantInversionFeedforward<States, Inputs>& feedforward,
+                   LinearPlantInversionFeedforward<States, Inputs> feedforward,
                    KalmanFilter<States, Inputs, Outputs>& observer,
                    std::function<Eigen::Matrix<double, Inputs, 1>(
                        const Eigen::Matrix<double, Inputs, 1>&)>
@@ -289,7 +288,7 @@ class LinearSystemLoop {
  protected:
   LinearSystem<States, Inputs, Outputs>& m_plant;
   LinearQuadraticRegulator<States, Inputs>& m_controller;
-  LinearPlantInversionFeedforward<States, Inputs>& m_feedforward;
+  LinearPlantInversionFeedforward<States, Inputs> m_feedforward;
   KalmanFilter<States, Inputs, Outputs>& m_observer;
 
   /**

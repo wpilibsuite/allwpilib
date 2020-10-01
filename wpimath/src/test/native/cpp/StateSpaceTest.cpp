@@ -43,9 +43,8 @@ class StateSpace : public testing::Test {
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, kDt};
   KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, kDt};
-  LinearPlantInversionFeedforward<2, 1> feedforward{plant, kDt};
-  LinearSystemLoop<2, 1, 1> loop{plant, controller, feedforward, observer,
-                                 12_V};
+  LinearSystemLoop<2, 1, 1> loop{plant, controller, observer,
+                                 12_V, kDt};
 };
 
 void Update(LinearSystemLoop<2, 1, 1>& loop, double noise) {

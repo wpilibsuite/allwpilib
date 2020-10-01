@@ -75,7 +75,7 @@ class Robot : public frc::TimedRobot {
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
   frc::LinearSystemLoop<1, 1, 1> m_loop{
-      m_flywheelPlant, m_controller, m_feedforward, m_observer, 12_V, 20_ms};
+      m_flywheelPlant, m_controller, m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure flywheel velocity in radians per second.
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};

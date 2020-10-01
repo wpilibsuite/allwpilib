@@ -59,6 +59,7 @@ class LinearPlantInversionFeedforward {
     Reset(m_r);
   }
 
+  LinearPlantInversionFeedforward(const LinearPlantInversionFeedforward&) = default;
   LinearPlantInversionFeedforward(LinearPlantInversionFeedforward&&) = default;
   LinearPlantInversionFeedforward& operator=(
       LinearPlantInversionFeedforward&&) = default;
