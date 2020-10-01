@@ -78,8 +78,8 @@ class Robot : public frc::TimedRobot {
 
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
-  frc::LinearSystemLoop<2, 1, 1> m_loop{
-      m_elevatorPlant, m_controller, m_observer, 12_V, 20_ms};
+  frc::LinearSystemLoop<2, 1, 1> m_loop{m_elevatorPlant, m_controller,
+                                        m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure elevator height in meters.
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};

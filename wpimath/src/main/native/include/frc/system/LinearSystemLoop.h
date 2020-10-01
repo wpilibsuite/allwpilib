@@ -51,11 +51,12 @@ class LinearSystemLoop {
                    KalmanFilter<States, Inputs, Outputs>& observer,
                    units::volt_t maxVoltage, units::second_t dt)
       : LinearSystemLoop(
-            plant, controller,
-            observer, [=](Eigen::Matrix<double, Inputs, 1> u) {
+            plant, controller, observer,
+            [=](Eigen::Matrix<double, Inputs, 1> u) {
               return frc::NormalizeInputVector<Inputs>(
                   u, maxVoltage.template to<double>());
-            }, dt) {}
+            },
+            dt) {}
 
   /**
    * Constructs a state-space loop with the given plant, controller, and
