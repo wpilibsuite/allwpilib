@@ -45,8 +45,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   private Matrix<States, States> m_P;
   private final Matrix<States, States> m_contQ;
   private final Matrix<Outputs, Outputs> m_contR;
-  private Matrix<Outputs, Outputs> m_discR;
   private Matrix<States, ?> m_sigmasF;
+  private double m_dtSeconds;
 
   private final MerweScaledSigmaPoints<States> m_pts;
 
@@ -61,7 +61,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
    *                           the measurement vector.
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param nominalDtSeconds   Nominal discretization timestep.
+   * @param dtSeconds          Nominal discretization timestep.
    */
   @SuppressWarnings("ParameterName")
   public UnscentedKalmanFilter(Nat<States> states, Nat<Outputs> outputs,
@@ -71,7 +71,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
                                    Matrix<Outputs, N1>> h,
                                Matrix<States, N1> stateStdDevs,
                                Matrix<Outputs, N1> measurementStdDevs,
-                               double nominalDtSeconds) {
+                               double dtSeconds) {
     this.m_states = states;
     this.m_outputs = outputs;
 
@@ -81,7 +81,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
 
-    m_discR = Discretization.discretizeR(m_contR, nominalDtSeconds);
+    m_dtSeconds = dtSeconds;
 
     m_pts = new MerweScaledSigmaPoints<>(states);
 
@@ -238,7 +238,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
 
     m_xHat = ret.getFirst();
     m_P = ret.getSecond().plus(discQ);
-    m_discR = Discretization.discretizeR(m_contR, dtSeconds);
+    m_dtSeconds = dtSeconds;
   }
 
   /**
@@ -250,7 +250,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   @SuppressWarnings("ParameterName")
   @Override
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
-    correct(m_outputs, u, y, m_h, m_discR);
+    correct(m_outputs, u, y, m_h, m_contR);
   }
 
   /**
@@ -272,6 +272,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
         Matrix<R, N1> y,
         BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<R, N1>> h,
         Matrix<R, R> R) {
+    final var discR = Discretization.discretizeR(R, m_dtSeconds);
+
     // Transform sigma points into measurement space
     Matrix<R, ?> sigmasH = new Matrix<>(new SimpleMatrix(
           rows.getNum(), 2 * m_states.getNum() + 1));
@@ -287,7 +289,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
     // Mean and covariance of prediction passed through unscented transform
     var transRet = unscentedTransform(m_states, rows, sigmasH, m_pts.getWm(), m_pts.getWc());
     var yHat = transRet.getFirst();
-    var Py = transRet.getSecond().plus(R);
+    var Py = transRet.getSecond().plus(discR);
 
     // Compute cross covariance of the state and the measurements
     Matrix<States, R> Pxy = new Matrix<>(m_states, rows);
