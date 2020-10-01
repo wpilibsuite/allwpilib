@@ -1,4 +1,5 @@
-# WPILib Project
+# WPILib Project - an amazing project
+
 
 ![CI](https://github.com/wpilibsuite/allwpilib/workflows/CI/badge.svg)
 
