@@ -37,13 +37,61 @@ class LinearSystemLoop {
   /**
    * Constructs a state-space loop with the given plant, controller, and
    * observer. By default, the initial reference is all zeros. Users should
-   * call reset with the initial system state before enabling the loop.
+   * call reset with the initial system state before enabling the loop. This
+   * constructor assumes that the input(s) to this system are voltage.
    *
    * @param plant      State-space plant.
    * @param controller State-space controller.
-   * @param feedforward Plant inversion feedforward.
    * @param observer   State-space observer.
-   * @param maxVoltageVolts The maximum voltage that can be applied. Assumes
+   * @param maxVoltage The maximum voltage that can be applied. Commonly 12.
+   * @param dt         The nominal timestep.
+   */
+  LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
+                   LinearQuadraticRegulator<States, Inputs>& controller,
+                   KalmanFilter<States, Inputs, Outputs>& observer,
+                   units::volt_t maxVoltage, units::second_t dt)
+      : LinearSystemLoop(
+            plant, controller,
+            LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
+            observer, [=](Eigen::Matrix<double, Inputs, 1> u) {
+              return frc::NormalizeInputVector<Inputs>(
+                  u, maxVoltage.template to<double>());
+            }) {}
+
+  /**
+   * Constructs a state-space loop with the given plant, controller, and
+   * observer. By default, the initial reference is all zeros. Users should
+   * call reset with the initial system state before enabling the loop. This
+   * constructor assumes that the input(s) to this system are voltage.
+   *
+   * @param plant      State-space plant.
+   * @param controller State-space controller.
+   * @param observer   State-space observer.
+   * @param clampFunction The maximum voltage that can be applied. Commonly 12.
+   * @param dt         The nominal timestep.
+   */
+  LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
+                   LinearQuadraticRegulator<States, Inputs>& controller,
+                   KalmanFilter<States, Inputs, Outputs>& observer,
+                   std::function<Eigen::Matrix<double, Inputs, 1>(
+                       const Eigen::Matrix<double, Inputs, 1>&)>
+                       clampFunction,
+                   units::second_t dt)
+      : LinearSystemLoop(
+            plant, controller,
+            LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
+            observer, clampFunction) {}
+
+  /**
+   * Constructs a state-space loop with the given plant, controller, and
+   * observer. By default, the initial reference is all zeros. Users should
+   * call reset with the initial system state before enabling the loop.
+   *
+   * @param plant       State-space plant.
+   * @param controller  State-space controller.
+   * @param feedforward Plant inversion feedforward.
+   * @param observer    State-space observer.
+   * @param maxVoltage  The maximum voltage that can be applied. Assumes
    * that the inputs are voltages.
    */
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
@@ -61,10 +109,11 @@ class LinearSystemLoop {
    * Constructs a state-space loop with the given plant, controller, and
    * observer.
    *
-   * @param plant      State-space plant.
-   * @param controller State-space controller.
-   * @param feedforward Plant-inversion feedforward.
-   * @param observer   State-space observer.
+   * @param plant         State-space plant.
+   * @param controller    State-space controller.
+   * @param feedforward   Plant-inversion feedforward.
+   * @param observer      State-space observer.
+   * @param clampFunction The function used to clamp the input vector.
    */
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
                    LinearQuadraticRegulator<States, Inputs>& controller,
