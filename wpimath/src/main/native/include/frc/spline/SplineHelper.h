@@ -36,13 +36,13 @@ class SplineHelper {
       const Pose2d& end);
 
   /**
-   * Returns quintic control vectors from a set of waypoints.
+   * Returns quintic splines from a set of waypoints.
    *
    * @param waypoints The waypoints
-   * @return List of control vectors
+   * @return List of quintic splines.
    */
-  static std::vector<Spline<5>::ControlVector>
-  QuinticControlVectorsFromWaypoints(const std::vector<Pose2d>& waypoints);
+  static std::vector<QuinticHermiteSpline> QuinticSplinesFromWaypoints(
+      const std::vector<Pose2d>& waypoints);
 
   /**
    * Returns a set of cubic splines corresponding to the provided control

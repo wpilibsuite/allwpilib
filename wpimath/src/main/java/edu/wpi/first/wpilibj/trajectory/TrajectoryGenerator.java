@@ -196,9 +196,38 @@ public final class TrajectoryGenerator {
    */
   @SuppressWarnings("LocalVariableName")
   public static Trajectory generateTrajectory(List<Pose2d> waypoints, TrajectoryConfig config) {
-    var originalList = SplineHelper.getQuinticControlVectorsFromWaypoints(waypoints);
-    var newList = new ControlVectorList(originalList);
-    return generateTrajectory(newList, config);
+    final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
+
+    List<Pose2d> newWaypoints = new ArrayList<>();
+    if (config.isReversed()) {
+      for (Pose2d originalWaypoint : waypoints) {
+        newWaypoints.add(originalWaypoint.plus(flip));
+      }
+    } else {
+      newWaypoints.addAll(waypoints);
+    }
+
+    // Get the spline points
+    List<PoseWithCurvature> points;
+    try {
+      points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromWaypoints(newWaypoints));
+    } catch (MalformedSplineException ex) {
+      reportError(ex.getMessage(), ex.getStackTrace());
+      return kDoNothingTrajectory;
+    }
+
+    // Change the points back to their original orientation.
+    if (config.isReversed()) {
+      for (var point : points) {
+        point.poseMeters = point.poseMeters.plus(flip);
+        point.curvatureRadPerMeter *= -1;
+      }
+    }
+
+    // Generate and return trajectory.
+    return TrajectoryParameterizer.timeParameterizeTrajectory(points, config.getConstraints(),
+        config.getStartVelocity(), config.getEndVelocity(), config.getMaxVelocity(),
+        config.getMaxAcceleration(), config.isReversed());
   }
 
   /**
