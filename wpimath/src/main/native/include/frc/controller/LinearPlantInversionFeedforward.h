@@ -61,6 +61,8 @@ class LinearPlantInversionFeedforward {
 
   LinearPlantInversionFeedforward(const LinearPlantInversionFeedforward&) =
       default;
+  LinearPlantInversionFeedforward& operator=(
+      const LinearPlantInversionFeedforward&) = default;
   LinearPlantInversionFeedforward(LinearPlantInversionFeedforward&&) = default;
   LinearPlantInversionFeedforward& operator=(
       LinearPlantInversionFeedforward&&) = default;

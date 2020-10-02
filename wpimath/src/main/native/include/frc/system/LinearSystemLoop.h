@@ -94,11 +94,11 @@ class LinearSystemLoop {
    * @param maxVoltage  The maximum voltage that can be applied. Assumes
    * that the inputs are voltages.
    */
-  LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
-                   LinearQuadraticRegulator<States, Inputs>& controller,
-                   LinearPlantInversionFeedforward<States, Inputs> feedforward,
-                   KalmanFilter<States, Inputs, Outputs>& observer,
-                   units::volt_t maxVoltage)
+  LinearSystemLoop(
+      LinearSystem<States, Inputs, Outputs>& plant,
+      LinearQuadraticRegulator<States, Inputs>& controller,
+      const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
+      KalmanFilter<States, Inputs, Outputs>& observer, units::volt_t maxVoltage)
       : LinearSystemLoop(plant, controller, feedforward, observer,
                          [=](Eigen::Matrix<double, Inputs, 1> u) {
                            return frc::NormalizeInputVector<Inputs>(
@@ -115,13 +115,14 @@ class LinearSystemLoop {
    * @param observer      State-space observer.
    * @param clampFunction The function used to clamp the input vector.
    */
-  LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
-                   LinearQuadraticRegulator<States, Inputs>& controller,
-                   LinearPlantInversionFeedforward<States, Inputs> feedforward,
-                   KalmanFilter<States, Inputs, Outputs>& observer,
-                   std::function<Eigen::Matrix<double, Inputs, 1>(
-                       const Eigen::Matrix<double, Inputs, 1>&)>
-                       clampFunction)
+  LinearSystemLoop(
+      LinearSystem<States, Inputs, Outputs>& plant,
+      LinearQuadraticRegulator<States, Inputs>& controller,
+      const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
+      KalmanFilter<States, Inputs, Outputs>& observer,
+      std::function<Eigen::Matrix<double, Inputs, 1>(
+          const Eigen::Matrix<double, Inputs, 1>&)>
+          clampFunction)
       : m_plant(plant),
         m_controller(controller),
         m_feedforward(feedforward),
