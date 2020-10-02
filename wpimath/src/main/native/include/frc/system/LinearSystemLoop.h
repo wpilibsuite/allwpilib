@@ -67,7 +67,7 @@ class LinearSystemLoop {
    * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param observer   State-space observer.
-   * @param clampFunction The maximum voltage that can be applied. Commonly 12.
+   * @param clampFunction The function used to clamp the input vector.
    * @param dt         The nominal timestep.
    */
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
