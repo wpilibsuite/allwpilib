@@ -59,14 +59,6 @@ class LinearPlantInversionFeedforward {
     Reset(m_r);
   }
 
-  LinearPlantInversionFeedforward(const LinearPlantInversionFeedforward&) =
-      default;
-  LinearPlantInversionFeedforward& operator=(
-      const LinearPlantInversionFeedforward&) = default;
-  LinearPlantInversionFeedforward(LinearPlantInversionFeedforward&&) = default;
-  LinearPlantInversionFeedforward& operator=(
-      LinearPlantInversionFeedforward&&) = default;
-
   /**
    * Returns the previously calculated feedforward as an input vector.
    *

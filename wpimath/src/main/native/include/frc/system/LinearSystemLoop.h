@@ -132,11 +132,6 @@ class LinearSystemLoop {
     Reset(m_nextR);
   }
 
-  virtual ~LinearSystemLoop() = default;
-
-  LinearSystemLoop(LinearSystemLoop&&) = default;
-  LinearSystemLoop& operator=(LinearSystemLoop&&) = default;
-
   /**
    * Returns the observer's state estimate x-hat.
    */
