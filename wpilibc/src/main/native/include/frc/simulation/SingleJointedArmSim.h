@@ -27,69 +27,43 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * Creates a simulated arm mechanism.
    *
    * @param system             The system representing this arm.
-   * @param motor              The type and number of motors on the arm gearbox.
-   * @param G                  The gear ratio of the arm (numbers greater than 1
+   * @param gearbox            The type and number of motors on the arm gearbox.
+   * @param gearing            The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
-   * @param mass               The mass of the arm.
    * @param armLength          The length of the arm.
-   * @param minAngle           The minimum allowed angle for the arm.
-   * @param maxAngle           The maximum allowed angle for the arm.
-   * @param addNoise           Whether the sim should automatically add some
-   *                           encoder noise.
-   * @param measurementStdDevs The standard deviation of the measurement noise.
-   * @param simulateGravity    If the affects of gravity should be simulated.
+   * @param minAngle           The minimum angle that the arm is capable of.
+   * @param maxAngle           The maximum angle that the arm is capable of.
+   * @param mass               The mass of the arm.
+   * @param measurementStdDevs The standard deviations of the measurements.
+   * @param simulateGravity    Whether gravity should be simulated or not.
    */
-  SingleJointedArmSim(const LinearSystem<2, 1, 1>& system, const DCMotor motor,
-                      double G, units::kilogram_t mass,
+  SingleJointedArmSim(const LinearSystem<2, 1, 1>& system,
+                      const DCMotor& gearbox, double gearing,
                       units::meter_t armLength, units::radian_t minAngle,
-                      units::radian_t maxAngle, bool addNoise,
-                      const std::array<double, 1>& measurementStdDevs,
-                      bool simulateGravity);
+                      units::radian_t maxAngle, units::kilogram_t mass,
+                      bool simulateGravity,
+                      const std::array<double, 1>& measurementStdDevs = {0.0});
   /**
    * Creates a simulated arm mechanism.
    *
-   * @param motor              The type and number of motors on the arm gearbox.
-   * @param J                  The moment of inertia of the arm.
-   * @param G                  The gear ratio of the arm (numbers greater than 1
+   * @param gearbox            The type and number of motors on the arm gearbox.
+   * @param gearing            The gear ratio of the arm (numbers greater than 1
    *                           represent reductions).
-   * @param mass               The mass of the arm.
+   * @param moi                The moment of inertia of the arm. This can be
+   *                           calculated from CAD software.
    * @param armLength          The length of the arm.
-   * @param minAngle           The minimum allowed angle for the arm.
-   * @param maxAngle           The maximum allowed angle for the arm.
-   * @param addNoise           Whether the sim should automatically add some
-   *                           encoder noise.
-   * @param measurementStdDevs The standard deviation of the measurement noise.
-   * @param simulateGravity    If the affects of gravity should be simulated.
-   */
-  SingleJointedArmSim(const DCMotor& motor, units::kilogram_square_meter_t J,
-                      double G, units::kilogram_t mass,
-                      units::meter_t armLength, units::radian_t minAngle,
-                      units::radian_t maxAngle, bool addNoise,
-                      const std::array<double, 1>& measurementStdDevs,
-                      bool simulateGravity);
-
-  /**
-   * Creates a simulated arm mechanism.
-   *
-   * @param motor              The type and number of motors on the arm gearbox.
-   * @param G                  The gear ratio of the arm (numbers greater than 1
-   *                           represent reductions).
+   * @param minAngle           The minimum angle that the arm is capable of.
+   * @param maxAngle           The maximum angle that the arm is capable of.
    * @param mass               The mass of the arm.
-   * @param armLength          The length of the arm.
-   * @param minAngle           The minimum allowed angle for the arm. This is
-   * measured from horizontal, with straight out being 0.
-   * @param maxAngle           The maximum allowed angle for the arm. This is
-   * measured from horizontal, with straight out being 0.
-   * @param addNoise           Whether the sim should automatically add some
-   *                           encoder noise.
    * @param measurementStdDevs The standard deviation of the measurement noise.
-   * @param simulateGravity    If the affects of gravity should be simulated.
+   * @param simulateGravity    Whether gravity should be simulated or not.
    */
-  SingleJointedArmSim(const DCMotor& motor, double G, units::kilogram_t mass,
+  SingleJointedArmSim(const DCMotor& gearbox, double gearing,
+                      units::kilogram_square_meter_t moi,
                       units::meter_t armLength, units::radian_t minAngle,
-                      units::radian_t maxAngle, bool addNoise,
-                      const std::array<double, 1>& measurementStdDevs,
-                      bool simulateGravity);
+                      units::radian_t maxAngle, units::kilogram_t mass,
+                      bool simulateGravity,
+                      const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
    * Returns whether the arm has hit the lower limit.
@@ -121,7 +95,33 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    */
   units::radians_per_second_t GetVelocity() const;
 
+  /**
+   * Returns the arm current draw.
+   *
+   * @return The arm current draw.
+   */
   units::ampere_t GetCurrentDraw() const override;
+
+  /**
+   * Sets the input voltage for the elevator.
+   *
+   * @param voltage The input voltage.
+   */
+  void SetInputVoltage(units::volt_t voltage);
+
+  /**
+   * Calculates a rough estimate of the moment of inertia of an arm given its
+   * length and mass.
+   *
+   * @param length The length of the arm.
+   * @param mass   The mass of the arm.
+   *
+   * @return The calculated moment of inertia.
+   */
+  static constexpr units::kilogram_square_meter_t EstimateMOI(
+      units::meter_t length, units::kilogram_t mass) {
+    return 1.0 / 3.0 * mass * length * length;
+  }
 
  protected:
   /**
@@ -140,7 +140,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
   units::radian_t m_minAngle;
   units::radian_t m_maxAngle;
   units::kilogram_t m_mass;
-  const DCMotor m_motor;
+  const DCMotor m_gearbox;
   double m_gearing;
   bool m_simulateGravity;
 };

@@ -16,15 +16,27 @@
 using namespace frc;
 using namespace frc::sim;
 
-ElevatorSim::ElevatorSim(const DCMotor& gearbox, units::kilogram_t carriageMass,
-                         double gearing, units::meter_t drumRadius,
-                         units::meter_t minHeight, units::meter_t maxHeight,
-                         bool addNoise,
-                         const std::array<double, 1>& m_measurementStdDevs)
+ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant,
+                         const DCMotor& gearbox, double gearing,
+                         units::meter_t drumRadius, units::meter_t minHeight,
+                         units::meter_t maxHeight,
+                         const std::array<double, 1>& measurementStdDevs)
+    : LinearSystemSim(plant, measurementStdDevs),
+      m_gearbox(gearbox),
+      m_drumRadius(drumRadius),
+      m_minHeight(minHeight),
+      m_maxHeight(maxHeight),
+      m_gearing(gearing) {}
+
+ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
+                         units::kilogram_t carriageMass,
+                         units::meter_t drumRadius, units::meter_t minHeight,
+                         units::meter_t maxHeight,
+                         const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
                                                      drumRadius, gearing),
-                      addNoise, m_measurementStdDevs),
-      m_motor(gearbox),
+                      measurementStdDevs),
+      m_gearbox(gearbox),
       m_drumRadius(drumRadius),
       m_minHeight(minHeight),
       m_maxHeight(maxHeight),
@@ -38,7 +50,9 @@ bool ElevatorSim::HasHitUpperLimit(const Eigen::Matrix<double, 2, 1>& x) const {
   return x(0) > m_maxHeight.to<double>();
 }
 
-units::meter_t ElevatorSim::GetPosition() const { return units::meter_t{Y(0)}; }
+units::meter_t ElevatorSim::GetPosition() const {
+  return units::meter_t{m_x(0)};
+}
 
 units::meters_per_second_t ElevatorSim::GetVelocity() const {
   return units::meters_per_second_t{m_x(1)};
@@ -55,8 +69,12 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
       velocity / m_drumRadius * m_gearing * 1_rad;
 
   // Perform calculation and return.
-  return m_motor.Current(motorVelocity, units::volt_t{m_u(0)}) *
+  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
+}
+
+void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
+  SetInput(frc::MakeMatrix<1, 1>(voltage.to<double>()));
 }
 
 Eigen::Matrix<double, 2, 1> ElevatorSim::UpdateX(
@@ -72,7 +90,8 @@ Eigen::Matrix<double, 2, 1> ElevatorSim::UpdateX(
   // Check for collision after updating x-hat.
   if (HasHitLowerLimit(updatedXhat)) {
     return MakeMatrix<2, 1>(m_minHeight.to<double>(), 0.0);
-  } else if (HasHitUpperLimit(updatedXhat)) {
+  }
+  if (HasHitUpperLimit(updatedXhat)) {
     return MakeMatrix<2, 1>(m_maxHeight.to<double>(), 0.0);
   }
   return updatedXhat;

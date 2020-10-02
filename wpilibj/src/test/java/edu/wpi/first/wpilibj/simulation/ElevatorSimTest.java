@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import org.junit.jupiter.api.Test;
+
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.RobotController;
@@ -14,7 +16,6 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.VecBuilder;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,7 +27,7 @@ public class ElevatorSimTest {
 
     var controller = new PIDController(10, 0, 0);
 
-    var sim = new ElevatorSim(DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67,
+    var sim = new ElevatorSim(DCMotor.getVex775Pro(4), 14.67, 8, 0.75 * 25.4 / 1000.0,
         0.0, 3.0, VecBuilder.fill(0.01));
 
     var motor = new PWMVictorSPX(0);
@@ -61,9 +62,9 @@ public class ElevatorSimTest {
         0.75 * 25.4 / 1000.0,
         14.67);
 
-    var sim = new ElevatorSim(plant, VecBuilder.fill(0.01),
+    var sim = new ElevatorSim(plant,
         DCMotor.getVex775Pro(4),
-        14.67, 0.75 * 25.4 / 1000.0, 0.0, 1.0);
+        14.67, 0.75 * 25.4 / 1000.0, 0.0, 1.0, VecBuilder.fill(0.01));
 
     for (int i = 0; i < 100; i++) {
       sim.setInput(VecBuilder.fill(0));

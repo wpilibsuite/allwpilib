@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 
 /**
  * This is a sample program to demonstrate the use of elevator simulation with existing code.
@@ -53,11 +54,13 @@ public class Robot extends TimedRobot {
   // to 0 degrees (rotated straight forwards).
   private final SingleJointedArmSim m_armSim = new SingleJointedArmSim(m_armGearbox,
       m_armReduction,
-      m_armMass,
+      SingleJointedArmSim.estimateMOI(m_armLength, m_armMass),
       m_armLength,
       Units.degreesToRadians(-180),
       Units.degreesToRadians(0),
-      Units.degreesToRadians(0.5) // Add noise with a standard deviation of 0.5 degrees
+      m_armMass,
+      true,
+      VecBuilder.fill(Units.degreesToRadians(0.5)) // Add noise with a std-dev of 0.5 degrees
       );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 

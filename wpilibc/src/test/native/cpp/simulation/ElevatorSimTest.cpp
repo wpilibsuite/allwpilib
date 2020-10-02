@@ -21,9 +21,9 @@
 #include "gtest/gtest.h"
 
 TEST(ElevatorSim, StateSpaceSim) {
-  frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 8_kg, 13.67,
+  frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg,
                             units::meter_t(0.75 * 25.4 / 1000.0), 0_m, 3_m,
-                            true, {0.01});
+                            {0.01});
   frc2::PIDController controller(10, 0.0, 0.0);
 
   frc::PWMVictorSPX motor(0);
@@ -40,7 +40,7 @@ TEST(ElevatorSim, StateSpaceSim) {
     sim.SetInput(u);
     sim.Update(20_ms);
 
-    const auto& y = sim.Y();
+    const auto& y = sim.GetOutput();
     encoderSim.SetDistance(y(0));
   }
 
@@ -48,9 +48,9 @@ TEST(ElevatorSim, StateSpaceSim) {
 }
 
 TEST(ElevatorSim, MinMax) {
-  frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 8_kg, 13.67,
+  frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg,
                             units::meter_t(0.75 * 25.4 / 1000.0), 0_m, 1_m,
-                            true, {0.01});
+                            {0.01});
   for (size_t i = 0; i < 100; ++i) {
     sim.SetInput(frc::MakeMatrix<1, 1>(0.0));
     sim.Update(20_ms);

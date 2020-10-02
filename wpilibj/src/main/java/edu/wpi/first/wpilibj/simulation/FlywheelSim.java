@@ -14,66 +14,121 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
+/**
+ * Represents a simulated flywheel mechanism.
+ */
 public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
+  // Gearbox for the flywheel.
+  private final DCMotor m_gearbox;
 
-  private final DCMotor m_motor;
+  // The gearing from the motors to the output.
   private final double m_gearing;
 
   /**
-   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
-   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
-   * the simulation and write simulated outputs to sensors.
+   * Creates a simulated flywheel mechanism.
    *
-   * @param flywheelPlant      The flywheel system being controlled. This system can be created
-   *                           using {@link LinearSystemId#createFlywheelSystem(DCMotor, double, double)}
-   *                           or {@link LinearSystemId#identifyVelocitySystem(double, double)}
-   * @param flywheelGearbox    The DCMotor representing the motor driving the flywheel.
-   * @param gearing            The reduction between motor and drum, as output over input.
-   *                           In most cases this is greater than one.
-   * @param measurementStdDevs Standard deviations of measurements. Can be null if addNoise is false.
+   * @param plant   The linear system that represents the flywheel.
+   * @param gearbox The type of and number of motors in the flywheel gearbox.
+   * @param gearing The gearing of the flywheel (numbers greater than 1
+   *                represent reductions).
    */
-  public FlywheelSim(LinearSystem<N1, N1, N1> flywheelPlant, DCMotor flywheelGearbox,
-                     double gearing, Matrix<N1, N1> measurementStdDevs) {
-    super(flywheelPlant, measurementStdDevs);
-    this.m_motor = flywheelGearbox;
-    this.m_gearing = gearing;
+  public FlywheelSim(LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double gearing) {
+    super(plant);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
   }
 
   /**
-   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
-   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
-   * the simulation and write simulated outputs to sensors.
+   * Creates a simulated flywheel mechanism.
    *
-   * @param flywheelGearbox    The DCMotor representing the motor driving the flywheel.
-   * @param gearing            The reduction between motor and drum, as output over input.
-   *                           In most cases this is greater than one.
-   * @param jKgMetersSquared   The moment of inertia J of the flywheel. This can be
-   *                           calculated with CAD. If J is unknown, {@link #FlywheelSim(LinearSystem, DCMotor, double, Matrix)}
-   *                           using FRC-Characterization's kV and kA may be better.
-   * @param measurementStdDevs Standard deviations of measurements. Can be null if addNoise is false.
+   * @param plant              The linear system that represents the flywheel.
+   * @param gearbox            The type of and number of motors in the flywheel
+   *                           gearbox.
+   * @param gearing            The gearing of the flywheel (numbers greater
+   *                           than 1 represent reductions).
+   * @param measurementStdDevs The standard deviations of the measurements.
    */
-  public FlywheelSim(DCMotor flywheelGearbox, double gearing,
-                     double jKgMetersSquared, Matrix<N1, N1> measurementStdDevs) {
-    super(LinearSystemId.createFlywheelSystem(flywheelGearbox, jKgMetersSquared, gearing),
-        measurementStdDevs);
-    this.m_motor = flywheelGearbox;
-    this.m_gearing = gearing;
+  public FlywheelSim(LinearSystem<N1, N1, N1> plant, DCMotor gearbox, double gearing,
+                     Matrix<N1, N1> measurementStdDevs) {
+    super(plant, measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
   }
 
+  /**
+   * Creates a simulated flywheel mechanism.
+   *
+   * @param gearbox          The type of and number of motors in the flywheel gearbox.
+   * @param gearing          The gearing of the flywheel (numbers greater than 1
+   *                         represent reductions).
+   * @param jKgMetersSquared The moment of inertia of the flywheel. If this is unknown,
+   *                         use the {@link #FlywheelSim(LinearSystem, DCMotor, double, Matrix)}
+   *                         constructor.
+   */
+  public FlywheelSim(DCMotor gearbox, double gearing, double jKgMetersSquared) {
+    super(LinearSystemId.createFlywheelSystem(gearbox, gearing, jKgMetersSquared));
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+  }
+
+  /**
+   * Creates a simulated flywheel mechanism.
+   *
+   * @param gearbox            The type of and number of motors in the flywheel
+   *                           gearbox.
+   * @param gearing            The gearing of the flywheel (numbers greater
+   *                           than 1 represent reductions).
+   * @param jKgMetersSquared   The moment of inertia of the flywheel. If this is unknown,
+   *                           use the {@link #FlywheelSim(LinearSystem, DCMotor, double, Matrix)}
+   *                           constructor.
+   * @param measurementStdDevs The standard deviations of the measurements.
+   */
+  public FlywheelSim(DCMotor gearbox, double gearing, double jKgMetersSquared,
+                     Matrix<N1, N1> measurementStdDevs) {
+    super(LinearSystemId.createFlywheelSystem(gearbox, gearing, jKgMetersSquared),
+        measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+  }
+
+  /**
+   * Returns the flywheel velocity.
+   *
+   * @return The flywheel velocity.
+   */
   public double getAngularVelocityRadPerSec() {
     return getOutput(0);
   }
 
+  /**
+   * Returns the flywheel velocity in RPM.
+   *
+   * @return The flywheel velocity in RPM.
+   */
   public double getAngularVelocityRPM() {
     return Units.radiansPerSecondToRotationsPerMinute(getOutput(0));
   }
 
+  /**
+   * Returns the flywheel current draw.
+   *
+   * @return The flywheel current draw.
+   */
   @Override
   public double getCurrentDrawAmps() {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
     // 2x faster than the flywheel
-    return m_motor.getCurrent(getAngularVelocityRadPerSec() * m_gearing, m_u.get(0, 0))
+    return m_gearbox.getCurrent(getAngularVelocityRadPerSec() * m_gearing, m_u.get(0, 0))
         * Math.signum(m_u.get(0, 0));
+  }
+
+  /**
+   * Sets the input voltage for the flywheel.
+   *
+   * @param volts The input voltage.
+   */
+  public void setInputVoltage(double volts) {
+    setInput(volts);
   }
 }

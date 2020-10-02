@@ -56,12 +56,11 @@ class Robot : public frc::TimedRobot {
 
   // Simulation classes help us simulate what's going on, including gravity.
   frc::sim::ElevatorSim m_elevatorSim{m_elevatorGearbox,
-                                      kCarriageMass,
                                       kElevatorGearing,
+                                      kCarriageMass,
                                       kElevatorDrumRadius,
                                       kMinElevatorHeight,
                                       kMaxElevatorHeight,
-                                      true,
                                       {0.01}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
