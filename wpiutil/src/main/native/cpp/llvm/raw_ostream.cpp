@@ -28,8 +28,10 @@
 #include "wpi/NativeFormatting.h"
 #include "wpi/WindowsError.h"
 #include <algorithm>
+#include <cctype>
 #include <cerrno>
 #include <cstdio>
+#include <iterator>
 #include <sys/stat.h>
 #include <system_error>
 

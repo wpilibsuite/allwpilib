@@ -12,6 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/Path.h"
+#include "wpi/ArrayRef.h"
 #include "wpi/Endian.h"
 #include "wpi/Errc.h"
 #include "wpi/ErrorHandling.h"
