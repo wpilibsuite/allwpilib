@@ -38,6 +38,7 @@
 
 #ifndef _WIN32
 #include <unistd.h>
+#include <sys/uio.h>
 #endif
 
 #if defined(__CYGWIN__)

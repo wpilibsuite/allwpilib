@@ -36,6 +36,7 @@ namespace wpi {
 template<typename ValueTy> class StringMapConstIterator;
 template<typename ValueTy> class StringMapIterator;
 template<typename ValueTy> class StringMapKeyIterator;
+template<typename ValueTy> class StringMapEntry;
 
 /// StringMapEntryBase - Shared base class of StringMapEntry instances.
 class StringMapEntryBase {
