@@ -10,8 +10,6 @@
 #include <chrono>
 #include <thread>
 
-#include <hal/FRCUsageReporting.h>
-
 #include "frc/DriverStation.h"
 #include "frc/RobotController.h"
 

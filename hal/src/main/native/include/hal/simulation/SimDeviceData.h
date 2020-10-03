@@ -9,7 +9,6 @@
 
 #include "hal/Types.h"
 #include "hal/Value.h"
-#include "hal/simulation/NotifyListener.h"
 
 typedef void (*HALSIM_SimDeviceCallback)(const char* name, void* param,
                                          HAL_SimDeviceHandle handle);

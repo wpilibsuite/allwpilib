@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,10 +9,8 @@
 
 #include <stdint.h>
 
-#include <memory>
-
 #include "PortsInternal.h"
-#include "hal/Ports.h"
+#include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 
 namespace hal {

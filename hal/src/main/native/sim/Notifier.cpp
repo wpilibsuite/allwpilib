@@ -16,11 +16,11 @@
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
 #include "NotifierInternal.h"
-#include "hal/HAL.h"
+#include "hal/Errors.h"
+#include "hal/HALBase.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "hal/simulation/NotifierData.h"

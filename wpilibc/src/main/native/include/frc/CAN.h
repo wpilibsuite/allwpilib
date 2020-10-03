@@ -10,7 +10,6 @@
 #include <stdint.h>
 
 #include <hal/CANAPITypes.h>
-#include <wpi/ArrayRef.h>
 
 #include "frc/ErrorBase.h"
 

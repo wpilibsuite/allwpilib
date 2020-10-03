@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,11 @@
 
 #include "hal/cpp/fpga_clock.h"
 
+#include <limits>
+
 #include <wpi/raw_ostream.h>
 
-#include "hal/HAL.h"
+#include "hal/HALBase.h"
 
 namespace hal {
 const fpga_clock::time_point fpga_clock::min_time =
