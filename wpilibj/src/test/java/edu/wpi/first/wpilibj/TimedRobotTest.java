@@ -392,4 +392,113 @@ class TimedRobotTest {
     }
     robot.close();
   }
+
+  @Test
+  @ResourceLock("timing")
+  void addPeriodicTest() {
+    MockRobot robot = new MockRobot();
+
+    final AtomicInteger callbackCount = new AtomicInteger(0);
+    robot.addPeriodic(() -> {
+      callbackCount.addAndGet(1);
+    }, 0.01);
+
+    Thread robotThread = new Thread(() -> {
+      robot.startCompetition();
+    });
+    robotThread.start();
+
+    DriverStationSim.setEnabled(false);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(0.0);  // Wait for Notifiers
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(0, callbackCount.get());
+
+    SimHooks.stepTiming(0.01);
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(1, callbackCount.get());
+
+    SimHooks.stepTiming(0.01);
+
+    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledPeriodicCount.get());
+    assertEquals(2, callbackCount.get());
+
+    robot.endCompetition();
+    try {
+      robotThread.interrupt();
+      robotThread.join();
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+    robot.close();
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void addPeriodicWithOffsetTest() {
+    MockRobot robot = new MockRobot();
+
+    final AtomicInteger callbackCount = new AtomicInteger(0);
+    robot.addPeriodic(() -> {
+      callbackCount.addAndGet(1);
+    }, 0.01, 0.005);
+
+    // Expirations in this test (ms)
+    //
+    // Robot | Callback
+    // ================
+    //    20 |      15
+    //    40 |      25
+
+    Thread robotThread = new Thread(() -> {
+      robot.startCompetition();
+    });
+    robotThread.start();
+
+    DriverStationSim.setEnabled(false);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(0.0);  // Wait for Notifiers
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(0, callbackCount.get());
+
+    SimHooks.stepTiming(0.0075);
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(0, callbackCount.get());
+
+    SimHooks.stepTiming(0.0075);
+
+    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledPeriodicCount.get());
+    assertEquals(1, callbackCount.get());
+
+    SimHooks.stepTiming(0.005);
+
+    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledPeriodicCount.get());
+    assertEquals(1, callbackCount.get());
+
+    SimHooks.stepTiming(0.005);
+
+    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledPeriodicCount.get());
+    assertEquals(2, callbackCount.get());
+
+    robot.endCompetition();
+    try {
+      robotThread.interrupt();
+      robotThread.join();
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+    robot.close();
+  }
 }
