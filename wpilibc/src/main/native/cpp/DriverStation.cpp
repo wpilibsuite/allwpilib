@@ -8,6 +8,8 @@
 #include "frc/DriverStation.h"
 
 #include <chrono>
+#include <string>
+#include <type_traits>
 
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
@@ -23,40 +25,78 @@
 #include "frc/WPIErrors.h"
 
 namespace frc {
+// A simple class which caches the previous value written to an NT entry
+// Used to prevent redundant, repeated writes of the same value
+template<class T>
+class MatchDataSenderEntry
+{
+	public:
+		MatchDataSenderEntry(std::shared_ptr<nt::NetworkTable> table, const std::string &key, const T& initialVal)
+		{
+			static_assert(std::is_convertible<decltype(initialVal), bool>() ||
+						  std::is_convertible<decltype(initialVal), double>() ||
+						  std::is_convertible<decltype(initialVal), std::string>(),
+					"Invalid type for MatchDataSenderEntry - must be convertable to bool, double or std::string");
+
+			ntEntry = table->GetEntry(key);
+			if constexpr (std::is_convertible<decltype(initialVal), bool>())
+			{
+				ntEntry.ForceSetBoolean(initialVal);
+			}
+			else if constexpr (std::is_convertible<decltype(initialVal), double>())
+			{
+				ntEntry.ForceSetDouble(initialVal);
+			}
+			else if constexpr (std::is_convertible<decltype(initialVal), std::string>())
+			{
+				ntEntry.ForceSetString(initialVal);
+			}
+			prevVal = initialVal;
+		}
+		void Set(const T& val)
+		{
+			if (val != prevVal)
+			{
+				SetValue(val);
+				prevVal = val;
+			}
+		}
+
+	private:
+		nt::NetworkTableEntry ntEntry;
+		T                     prevVal;
+
+		void SetValue(const bool        &val) {ntEntry.SetBoolean(val); }
+		void SetValue(const double      &val) {ntEntry.SetDouble(val); }
+		void SetValue(const std::string &val) {ntEntry.SetString(val); }
+
+};
 
 class MatchDataSender {
  public:
   std::shared_ptr<nt::NetworkTable> table;
-  nt::NetworkTableEntry typeMetadata;
-  nt::NetworkTableEntry gameSpecificMessage;
-  nt::NetworkTableEntry eventName;
-  nt::NetworkTableEntry matchNumber;
-  nt::NetworkTableEntry replayNumber;
-  nt::NetworkTableEntry matchType;
-  nt::NetworkTableEntry alliance;
-  nt::NetworkTableEntry station;
-  nt::NetworkTableEntry controlWord;
+  MatchDataSenderEntry<std::string> typeMetaData;
+  MatchDataSenderEntry<std::string> gameSpecificMessage;
+  MatchDataSenderEntry<std::string> eventName;
+  MatchDataSenderEntry<double> matchNumber;
+  MatchDataSenderEntry<double> replayNumber;
+  MatchDataSenderEntry<double> matchType;
+  MatchDataSenderEntry<bool> alliance;
+  MatchDataSenderEntry<double> station;
+  MatchDataSenderEntry<double> controlWord;
 
-  MatchDataSender() {
-    table = nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
-    typeMetadata = table->GetEntry(".type");
-    typeMetadata.ForceSetString("FMSInfo");
-    gameSpecificMessage = table->GetEntry("GameSpecificMessage");
-    gameSpecificMessage.ForceSetString("");
-    eventName = table->GetEntry("EventName");
-    eventName.ForceSetString("");
-    matchNumber = table->GetEntry("MatchNumber");
-    matchNumber.ForceSetDouble(0);
-    replayNumber = table->GetEntry("ReplayNumber");
-    replayNumber.ForceSetDouble(0);
-    matchType = table->GetEntry("MatchType");
-    matchType.ForceSetDouble(0);
-    alliance = table->GetEntry("IsRedAlliance");
-    alliance.ForceSetBoolean(true);
-    station = table->GetEntry("StationNumber");
-    station.ForceSetDouble(1);
-    controlWord = table->GetEntry("FMSControlData");
-    controlWord.ForceSetDouble(0);
+  MatchDataSender()
+	: table(nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo"))
+	, typeMetaData(table, ".type", "FMSInfo")
+	, gameSpecificMessage(table, "GameSpecificMessage", "")
+	, eventName(table, "EventName", "")
+	, matchNumber(table, "MatchNumber", 0.0)
+	, replayNumber(table, "ReplayNumber", 0.0)
+	, matchType(table, "MatchType", 0.0)
+	, alliance(table, "IsRedAlliance", true)
+	, station(table, "StationNumber", 1.0)
+	, controlWord(table, "FMSControlData", 0.0)
+  {
   }
 };
 }  // namespace frc
@@ -627,20 +667,20 @@ void DriverStation::SendMatchData() {
   HAL_MatchInfo tmpDataStore;
   HAL_GetMatchInfo(&tmpDataStore);
 
-  m_matchDataSender->alliance.SetBoolean(isRedAlliance);
-  m_matchDataSender->station.SetDouble(stationNumber);
-  m_matchDataSender->eventName.SetString(tmpDataStore.eventName);
-  m_matchDataSender->gameSpecificMessage.SetString(
+  m_matchDataSender->alliance.Set(isRedAlliance);
+  m_matchDataSender->station.Set(stationNumber);
+  m_matchDataSender->eventName.Set(tmpDataStore.eventName);
+  m_matchDataSender->gameSpecificMessage.Set(
       std::string(reinterpret_cast<char*>(tmpDataStore.gameSpecificMessage),
                   tmpDataStore.gameSpecificMessageSize));
-  m_matchDataSender->matchNumber.SetDouble(tmpDataStore.matchNumber);
-  m_matchDataSender->replayNumber.SetDouble(tmpDataStore.replayNumber);
-  m_matchDataSender->matchType.SetDouble(
+  m_matchDataSender->matchNumber.Set(tmpDataStore.matchNumber);
+  m_matchDataSender->replayNumber.Set(tmpDataStore.replayNumber);
+  m_matchDataSender->matchType.Set(
       static_cast<int>(tmpDataStore.matchType));
 
   HAL_ControlWord ctlWord;
   HAL_GetControlWord(&ctlWord);
   int32_t wordInt = 0;
   std::memcpy(&wordInt, &ctlWord, sizeof(wordInt));
-  m_matchDataSender->controlWord.SetDouble(wordInt);
+  m_matchDataSender->controlWord.Set(wordInt);
 }
