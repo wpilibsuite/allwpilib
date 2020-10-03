@@ -220,7 +220,7 @@ void Watchdog::SuppressTimeoutMessage(bool suppress) {
   m_suppressTimeoutMessage = suppress;
 }
 
-bool Watchdog::operator>(const Watchdog& rhs) {
+bool Watchdog::operator>(const Watchdog& rhs) const {
   return m_expirationTime > rhs.m_expirationTime;
 }
 
