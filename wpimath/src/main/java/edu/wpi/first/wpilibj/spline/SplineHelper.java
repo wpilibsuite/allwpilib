@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.spline;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,26 +52,28 @@ public final class SplineHelper {
   }
 
   /**
-   * Returns quintic control vectors from a set of waypoints.
+   * Returns quintic splines from a set of waypoints.
    *
    * @param waypoints The waypoints
-   * @return List of control vectors
+   * @return List of splines.
    */
-  public static List<Spline.ControlVector> getQuinticControlVectorsFromWaypoints(
-      List<Pose2d> waypoints
-  ) {
-    List<Spline.ControlVector> vectors = new ArrayList<>();
-    for (int i = 0; i < waypoints.size() - 1; i++) {
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  public static QuinticHermiteSpline[] getQuinticSplinesFromWaypoints(List<Pose2d> waypoints) {
+    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[waypoints.size() - 1];
+    for (int i = 0; i < waypoints.size() - 1; ++i) {
       var p0 = waypoints.get(i);
       var p1 = waypoints.get(i + 1);
 
       // This just makes the splines look better.
       final var scalar = 1.2 * p0.getTranslation().getDistance(p1.getTranslation());
 
-      vectors.add(getQuinticControlVector(scalar, p0));
-      vectors.add(getQuinticControlVector(scalar, p1));
+      var controlVecA = getQuinticControlVector(scalar, p0);
+      var controlVecB = getQuinticControlVector(scalar, p1);
+
+      splines[i]
+          = new QuinticHermiteSpline(controlVecA.x, controlVecB.x, controlVecA.y, controlVecB.y);
     }
-    return vectors;
+    return splines;
   }
 
   /**
@@ -216,15 +217,14 @@ public final class SplineHelper {
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public static QuinticHermiteSpline[] getQuinticSplinesFromControlVectors(
       Spline.ControlVector[] controlVectors) {
-    // There are twice as many control vectors are there are splines.
-    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length / 2];
-    for (int i = 0; i < controlVectors.length - 1; i += 2) {
+    QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length - 1];
+    for (int i = 0; i < controlVectors.length - 1; i++) {
       var xInitial = controlVectors[i].x;
       var xFinal = controlVectors[i + 1].x;
       var yInitial = controlVectors[i].y;
       var yFinal = controlVectors[i + 1].y;
-      splines[i / 2] = new QuinticHermiteSpline(xInitial, xFinal,
-          yInitial, yFinal);
+      splines[i] = new QuinticHermiteSpline(xInitial, xFinal,
+                                            yInitial, yFinal);
     }
     return splines;
   }
