@@ -24,7 +24,7 @@ IterativeRobot::IterativeRobot() : IterativeRobotBase(kPacketPeriod) {
 void IterativeRobot::StartCompetition() {
   RobotInit();
 
-  if (IsSimulation()) {
+  if constexpr (IsSimulation()) {
     SimulationInit();
   }
 
