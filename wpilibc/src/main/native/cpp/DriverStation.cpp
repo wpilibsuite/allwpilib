@@ -27,49 +27,42 @@
 namespace frc {
 // A simple class which caches the previous value written to an NT entry
 // Used to prevent redundant, repeated writes of the same value
-template<class T>
-class MatchDataSenderEntry
-{
-	public:
-		MatchDataSenderEntry(std::shared_ptr<nt::NetworkTable> table, const std::string &key, const T& initialVal)
-		{
-			static_assert(std::is_convertible<decltype(initialVal), bool>() ||
-						  std::is_convertible<decltype(initialVal), double>() ||
-						  std::is_convertible<decltype(initialVal), std::string>(),
-					"Invalid type for MatchDataSenderEntry - must be convertable to bool, double or std::string");
+template <class T>
+class MatchDataSenderEntry {
+ public:
+  MatchDataSenderEntry(std::shared_ptr<nt::NetworkTable> table,
+                       const std::string& key, const T& initialVal) {
+    static_assert(std::is_convertible<decltype(initialVal), bool>() ||
+                      std::is_convertible<decltype(initialVal), double>() ||
+                      std::is_convertible<decltype(initialVal), std::string>(),
+                  "Invalid type for MatchDataSenderEntry - must be convertable "
+                  "to bool, double or std::string");
 
-			ntEntry = table->GetEntry(key);
-			if constexpr (std::is_convertible<decltype(initialVal), bool>())
-			{
-				ntEntry.ForceSetBoolean(initialVal);
-			}
-			else if constexpr (std::is_convertible<decltype(initialVal), double>())
-			{
-				ntEntry.ForceSetDouble(initialVal);
-			}
-			else if constexpr (std::is_convertible<decltype(initialVal), std::string>())
-			{
-				ntEntry.ForceSetString(initialVal);
-			}
-			prevVal = initialVal;
-		}
-		void Set(const T& val)
-		{
-			if (val != prevVal)
-			{
-				SetValue(val);
-				prevVal = val;
-			}
-		}
+    ntEntry = table->GetEntry(key);
+    if constexpr (std::is_convertible<decltype(initialVal), bool>()) {
+      ntEntry.ForceSetBoolean(initialVal);
+    } else if constexpr (std::is_convertible<decltype(initialVal), double>()) {
+      ntEntry.ForceSetDouble(initialVal);
+    } else if constexpr (std::is_convertible<decltype(initialVal),
+                                             std::string>()) {
+      ntEntry.ForceSetString(initialVal);
+    }
+    prevVal = initialVal;
+  }
+  void Set(const T& val) {
+    if (val != prevVal) {
+      SetValue(val);
+      prevVal = val;
+    }
+  }
 
-	private:
-		nt::NetworkTableEntry ntEntry;
-		T                     prevVal;
+ private:
+  nt::NetworkTableEntry ntEntry;
+  T prevVal;
 
-		void SetValue(const bool        &val) {ntEntry.SetBoolean(val); }
-		void SetValue(const double      &val) {ntEntry.SetDouble(val); }
-		void SetValue(const std::string &val) {ntEntry.SetString(val); }
-
+  void SetValue(const bool& val) { ntEntry.SetBoolean(val); }
+  void SetValue(const double& val) { ntEntry.SetDouble(val); }
+  void SetValue(const std::string& val) { ntEntry.SetString(val); }
 };
 
 class MatchDataSender {
@@ -86,16 +79,16 @@ class MatchDataSender {
   MatchDataSenderEntry<double> controlWord;
 
   MatchDataSender()
-	: table(nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo"))
-	, typeMetaData(table, ".type", "FMSInfo")
-	, gameSpecificMessage(table, "GameSpecificMessage", "")
-	, eventName(table, "EventName", "")
-	, matchNumber(table, "MatchNumber", 0.0)
-	, replayNumber(table, "ReplayNumber", 0.0)
-	, matchType(table, "MatchType", 0.0)
-	, alliance(table, "IsRedAlliance", true)
-	, station(table, "StationNumber", 1.0)
-	, controlWord(table, "FMSControlData", 0.0)
+      : table(nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo")),
+        typeMetaData(table, ".type", "FMSInfo"),
+        gameSpecificMessage(table, "GameSpecificMessage", ""),
+        eventName(table, "EventName", ""),
+        matchNumber(table, "MatchNumber", 0.0),
+        replayNumber(table, "ReplayNumber", 0.0),
+        matchType(table, "MatchType", 0.0),
+        alliance(table, "IsRedAlliance", true),
+        station(table, "StationNumber", 1.0),
+        controlWord(table, "FMSControlData", 0.0) {}
   {
   }
 };
@@ -675,8 +668,7 @@ void DriverStation::SendMatchData() {
                   tmpDataStore.gameSpecificMessageSize));
   m_matchDataSender->matchNumber.Set(tmpDataStore.matchNumber);
   m_matchDataSender->replayNumber.Set(tmpDataStore.replayNumber);
-  m_matchDataSender->matchType.Set(
-      static_cast<int>(tmpDataStore.matchType));
+  m_matchDataSender->matchType.Set(static_cast<int>(tmpDataStore.matchType));
 
   HAL_ControlWord ctlWord;
   HAL_GetControlWord(&ctlWord);
