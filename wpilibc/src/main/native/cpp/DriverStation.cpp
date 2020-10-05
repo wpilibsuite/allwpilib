@@ -89,8 +89,6 @@ class MatchDataSender {
         alliance(table, "IsRedAlliance", true),
         station(table, "StationNumber", 1.0),
         controlWord(table, "FMSControlData", 0.0) {}
-  {
-  }
 };
 }  // namespace frc
 
