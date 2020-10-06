@@ -11,5 +11,6 @@ namespace hal {
 void PauseNotifiers();
 void ResumeNotifiers();
 void WakeupNotifiers();
+void WaitNotifiers();
 void WakeupWaitNotifiers();
 }  // namespace hal
