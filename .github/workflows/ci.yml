@@ -65,6 +65,23 @@ jobs:
           name: ${{ matrix.artifact-name }}
           path: build/allOutputs
 
+  build-documentation:
+    name: "Build - Documentation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch all history and metadata
+        run: git fetch --prune --unshallow --tags
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      - name: Build with Gradle
+        run: ./gradlew docs:zipDocs
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Documentation
+          path: docs/outputs
+
   build-cmake:
     strategy:
       fail-fast: false

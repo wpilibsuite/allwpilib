@@ -148,11 +148,10 @@ tasks.register("zipJavaDocs", Zip) {
     into '/'
 }
 
-addTaskToCopyAllOutputs(zipCppDocs)
-addTaskToCopyAllOutputs(zipJavaDocs)
-
-build.dependsOn zipCppDocs
-build.dependsOn zipJavaDocs
+tasks.register("zipDocs") {
+    dependsOn zipCppDocs
+    dependsOn zipJavaDocs
+}
 
 apply plugin: 'maven-publish'
 
