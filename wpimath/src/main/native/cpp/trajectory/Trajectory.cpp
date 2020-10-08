@@ -78,7 +78,7 @@ Trajectory::State Trajectory::Sample(units::second_t t) const {
       std::lower_bound(m_states.cbegin() + 1, m_states.cend(), t,
                        [](const auto& a, const auto& b) { return a.t < b; });
 
-  const auto& prevSample = sample - 1;
+  auto prevSample = sample - 1;
 
   // The sample's timestamp is now greater than or equal to the requested
   // timestamp. If it is greater, we need to interpolate between the
