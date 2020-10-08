@@ -52,7 +52,7 @@ plugins {
 }
 
 wpi.maven.useFrcMavenLocalDevelopment = true
-wpi.wpilibVersion = '2020.424242.+'
+wpi.wpilibVersion = 'YEAR.424242.+'
 ```
 
 C++
@@ -63,5 +63,5 @@ plugins {
 }
 
 wpi.maven.useFrcMavenLocalDevelopment = true
-wpi.wpilibVersion = '2020.424242.+'
+wpi.wpilibVersion = 'YEAR.424242.+'
 ```
