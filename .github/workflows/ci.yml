@@ -80,7 +80,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: Documentation
-          path: docs/outputs
+          path: docs/build/outputs
 
   build-cmake:
     strategy:
