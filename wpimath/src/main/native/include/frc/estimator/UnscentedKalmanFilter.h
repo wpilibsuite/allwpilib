@@ -50,8 +50,7 @@ class UnscentedKalmanFilter {
       : m_f(f), m_h(h) {
     m_contQ = MakeCovMatrix(stateStdDevs);
     m_contR = MakeCovMatrix(measurementStdDevs);
-
-    m_discR = DiscretizeR<Outputs>(m_contR, dt);
+    m_dt = dt;
 
     Reset();
   }
@@ -119,6 +118,8 @@ class UnscentedKalmanFilter {
    * @param dt Timestep for prediction.
    */
   void Predict(const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
+    m_dt = dt;
+
     // Discretize Q before projecting mean and covariance forward
     Eigen::Matrix<double, States, States> contA =
         NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
@@ -141,7 +142,6 @@ class UnscentedKalmanFilter {
     m_P = std::get<1>(ret);
 
     m_P += discQ;
-    m_discR = DiscretizeR<Outputs>(m_contR, dt);
   }
 
   /**
@@ -152,7 +152,7 @@ class UnscentedKalmanFilter {
    */
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
                const Eigen::Matrix<double, Outputs, 1>& y) {
-    Correct<Outputs>(u, y, m_h, m_discR);
+    Correct<Outputs>(u, y, m_h, m_contR);
   }
 
   /**
@@ -176,6 +176,8 @@ class UnscentedKalmanFilter {
                    const Eigen::Matrix<double, Inputs, 1>&)>
                    h,
                const Eigen::Matrix<double, Rows, Rows>& R) {
+    const Eigen::Matrix<double, Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
+
     // Transform sigma points into measurement space
     Eigen::Matrix<double, Rows, 2 * States + 1> sigmasH;
     Eigen::Matrix<double, States, 2 * States + 1> sigmas =
@@ -188,7 +190,7 @@ class UnscentedKalmanFilter {
     // Mean and covariance of prediction passed through UT
     auto [yHat, Py] =
         UnscentedTransform<States, Rows>(sigmasH, m_pts.Wm(), m_pts.Wc());
-    Py += R;
+    Py += discR;
 
     // Compute cross covariance of the state and the measurements
     Eigen::Matrix<double, States, Rows> Pxy;
@@ -224,8 +226,8 @@ class UnscentedKalmanFilter {
   Eigen::Matrix<double, States, States> m_P;
   Eigen::Matrix<double, States, States> m_contQ;
   Eigen::Matrix<double, Outputs, Outputs> m_contR;
-  Eigen::Matrix<double, Outputs, Outputs> m_discR;
   Eigen::Matrix<double, States, 2 * States + 1> m_sigmasF;
+  units::second_t m_dt;
 
   MerweScaledSigmaPoints<States> m_pts;
 };

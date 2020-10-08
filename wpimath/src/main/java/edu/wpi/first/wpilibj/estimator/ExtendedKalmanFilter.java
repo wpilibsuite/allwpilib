@@ -39,13 +39,13 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
   @SuppressWarnings("MemberName")
   private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> m_h;
   private final Matrix<States, States> m_contQ;
-  private Matrix<Outputs, Outputs> m_discR;
   private final Matrix<States, States> m_initP;
   private final Matrix<Outputs, Outputs> m_contR;
   @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
   @SuppressWarnings("MemberName")
   private Matrix<States, States> m_P;
+  private double m_dtSeconds;
 
   /**
    * Constructs an extended Kalman filter.
@@ -78,10 +78,11 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     m_f = f;
     m_h = h;
 
-    reset();
-
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
     this.m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    m_dtSeconds = dtSeconds;
+
+    reset();
 
     final var contA = NumericalJacobian
           .numericalJacobianX(states, states, f, m_xHat, new Matrix<>(inputs, Nat.N1()));
@@ -92,13 +93,13 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     final var discA = discPair.getFirst();
     final var discQ = discPair.getSecond();
 
-    m_discR = Discretization.discretizeR(m_contR, dtSeconds);
+    final var discR = Discretization.discretizeR(m_contR, dtSeconds);
 
     // IsStabilizable(A^T, C^T) will tell us if the system is observable.
     boolean isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
     if (isObservable && outputs.getNum() <= states.getNum()) {
       m_initP = Drake.discreteAlgebraicRiccatiEquation(
-            discA.transpose(), C.transpose(), discQ, m_discR) ;
+            discA.transpose(), C.transpose(), discQ, discR) ;
     } else {
       m_initP = new Matrix<>(states, states);
     }
@@ -223,7 +224,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     m_xHat = RungeKutta.rungeKutta(f, m_xHat, u, dtSeconds);
     m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
-    m_discR = Discretization.discretizeR(m_contR, dtSeconds);
+    m_dtSeconds = dtSeconds;
   }
 
   /**
@@ -235,7 +236,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
   @SuppressWarnings("ParameterName")
   @Override
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
-    correct(m_outputs, u, y, m_h, m_discR);
+    correct(m_outputs, u, y, m_h, m_contR);
   }
 
   /**
@@ -261,8 +262,9 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         Matrix<Rows, Rows> R
   ) {
     final var C = NumericalJacobian.numericalJacobianX(rows, m_states, h, m_xHat, u);
+    final var discR = Discretization.discretizeR(R, m_dtSeconds);
 
-    final var S = C.times(m_P).times(C.transpose()).plus(R);
+    final var S = C.times(m_P).times(C.transpose()).plus(discR);
 
     // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
     // efficiently.
