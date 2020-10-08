@@ -74,7 +74,7 @@ Trajectory::State Trajectory::Sample(units::second_t t) const {
   // Use binary search to get the element with a timestamp no less than the
   // requested timestamp. This starts at 1 because we use the previous state
   // later on for interpolation.
-  const auto& sample =
+  auto sample =
       std::lower_bound(m_states.cbegin() + 1, m_states.cend(), t,
                        [](const auto& a, const auto& b) { return a.t < b; });
 
