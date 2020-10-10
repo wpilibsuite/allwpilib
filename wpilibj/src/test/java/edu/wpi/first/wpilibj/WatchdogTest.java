@@ -41,17 +41,17 @@ class WatchdogTest {
     try (Watchdog watchdog = new Watchdog(0.4, () -> {
       watchdogCounter.addAndGet(1);
     })) {
-      System.out.println("Run 1");
+      // Run 1
       watchdog.enable();
       SimHooks.stepTiming(0.2);
       watchdog.disable();
 
       assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
 
-      System.out.println("Run 2");
+      // Run 2
       watchdogCounter.set(0);
       watchdog.enable();
-      SimHooks.stepTiming(0.6);
+      SimHooks.stepTiming(0.4);
       watchdog.disable();
 
       assertEquals(1, watchdogCounter.get(),
@@ -60,7 +60,7 @@ class WatchdogTest {
       // Run 3
       watchdogCounter.set(0);
       watchdog.enable();
-      SimHooks.stepTiming(1);
+      SimHooks.stepTiming(1.0);
       watchdog.disable();
 
       assertEquals(1, watchdogCounter.get(),
@@ -137,7 +137,7 @@ class WatchdogTest {
     try (Watchdog watchdog = new Watchdog(0.4, () -> {
       watchdogCounter.addAndGet(1);
     })) {
-      System.out.println("Run 1");
+      // Run 1
       watchdog.enable();
       watchdog.addEpoch("Epoch 1");
       SimHooks.stepTiming(0.1);
@@ -148,7 +148,7 @@ class WatchdogTest {
 
       assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
 
-      System.out.println("Run 2");
+      // Run 2
       watchdog.enable();
       watchdog.addEpoch("Epoch 1");
       SimHooks.stepTiming(0.2);

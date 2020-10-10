@@ -9,8 +9,6 @@
 
 #include <stdint.h>
 
-#include <wpi/raw_ostream.h>
-
 #include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
 
@@ -31,23 +29,23 @@ TEST_F(WatchdogTest, EnableDisable) {
 
   Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
-  wpi::outs() << "Run 1\n";
+  // Run 1
   watchdog.Enable();
   frc::sim::StepTiming(0.2_s);
   watchdog.Disable();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 
-  wpi::outs() << "Run 2\n";
+  // Run 2
   watchdogCounter = 0;
   watchdog.Enable();
-  frc::sim::StepTiming(0.6_s);
+  frc::sim::StepTiming(0.4_s);
   watchdog.Disable();
 
   EXPECT_EQ(1u, watchdogCounter)
       << "Watchdog either didn't trigger or triggered more than once";
 
-  wpi::outs() << "Run 3\n";
+  // Run 3
   watchdogCounter = 0;
   watchdog.Enable();
   frc::sim::StepTiming(1_s);
@@ -74,7 +72,7 @@ TEST_F(WatchdogTest, Reset) {
 TEST_F(WatchdogTest, SetTimeout) {
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(1.0_s, [&] { watchdogCounter++; });
+  Watchdog watchdog(1_s, [&] { watchdogCounter++; });
 
   watchdog.Enable();
   frc::sim::StepTiming(0.2_s);
@@ -111,7 +109,7 @@ TEST_F(WatchdogTest, Epochs) {
 
   Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
-  wpi::outs() << "Run 1\n";
+  // Run 1
   watchdog.Enable();
   watchdog.AddEpoch("Epoch 1");
   frc::sim::StepTiming(0.1_s);
@@ -122,7 +120,7 @@ TEST_F(WatchdogTest, Epochs) {
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 
-  wpi::outs() << "Run 2\n";
+  // Run 2
   watchdog.Enable();
   watchdog.AddEpoch("Epoch 1");
   frc::sim::StepTiming(0.2_s);
