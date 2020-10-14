@@ -8,6 +8,7 @@
 #include "frc/AnalogEncoder.h"
 
 #include "frc/AnalogInput.h"
+#include "frc/Base.h"
 #include "frc/Counter.h"
 #include "frc/DriverStation.h"
 #include "frc/smartdashboard/SendableBuilder.h"

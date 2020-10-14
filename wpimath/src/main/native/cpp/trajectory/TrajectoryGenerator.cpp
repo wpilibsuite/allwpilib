@@ -113,6 +113,30 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
     const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config) {
-  return GenerateTrajectory(
-      SplineHelper::QuinticControlVectorsFromWaypoints(waypoints), config);
+  auto newWaypoints = waypoints;
+  const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
+  if (config.IsReversed())
+    for (auto& waypoint : newWaypoints) waypoint += flip;
+
+  std::vector<SplineParameterizer::PoseWithCurvature> points;
+  try {
+    points = SplinePointsFromSplines(
+        SplineHelper::QuinticSplinesFromWaypoints(newWaypoints));
+  } catch (SplineParameterizer::MalformedSplineException& e) {
+    ReportError(e.what());
+    return kDoNothingTrajectory;
+  }
+
+  // After trajectory generation, flip theta back so it's relative to the
+  // field. Also fix curvature.
+  if (config.IsReversed()) {
+    for (auto& point : points) {
+      point = {point.first + flip, -point.second};
+    }
+  }
+
+  return TrajectoryParameterizer::TimeParameterizeTrajectory(
+      points, config.Constraints(), config.StartVelocity(),
+      config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
+      config.IsReversed());
 }

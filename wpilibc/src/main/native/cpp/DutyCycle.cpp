@@ -10,6 +10,7 @@
 #include <hal/DutyCycle.h>
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/Base.h"
 #include "frc/DigitalSource.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"

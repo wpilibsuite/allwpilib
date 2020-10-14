@@ -4,13 +4,20 @@
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 
-- [WPILib Mission](#wpilib-mission)
+- [WPILib Project](#wpilib-project)
+  - [WPILib Mission](#wpilib-mission)
 - [Building WPILib](#building-wpilib)
-    - [Requirements](#requirements)
-    - [Setup](#setup)
-    - [Building](#building)
-    - [Publishing](#publishing)
-    - [Structure and Organization](#structure-and-organization)
+  - [Requirements](#requirements)
+  - [Setup](#setup)
+  - [Building](#building)
+    - [Faster builds](#faster-builds)
+    - [Using Development Builds](#using-development-builds)
+    - [Custom toolchain location](#custom-toolchain-location)
+    - [Gazebo simulation](#gazebo-simulation)
+    - [Formatting/linting with wpiformat](#formattinglinting-with-wpiformat)
+    - [CMake](#cmake)
+  - [Publishing](#publishing)
+  - [Structure and Organization](#structure-and-organization)
 - [Contributing to WPILib](#contributing-to-wpilib)
 
 ## WPILib Mission
@@ -63,6 +70,10 @@ There are a few tasks other than `build` available. To see them, run the meta-ta
 `testDesktopCpp` and `testDesktopJava` tasks also exist for the projects `wpiutil`, `ntcore`, `cscore`, `hal` `wpilibOldCommands`, `wpilibNewCommands` and `cameraserver`. These can be ran with `./gradlew :projectName:task`.
 
 `./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
+
+### Using Development Builds
+
+Please read the documentation available [here](OtherVersions.md)
 
 ### Custom toolchain location
 

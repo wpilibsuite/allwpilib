@@ -11,8 +11,8 @@
 
 #include <hal/Notifier.h>
 #include <wpi/Format.h>
-#include <wpi/PriorityQueue.h>
 #include <wpi/SmallString.h>
+#include <wpi/priority_queue.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
@@ -34,7 +34,8 @@ class Watchdog::Impl {
 
   wpi::mutex m_mutex;
   std::atomic<HAL_NotifierHandle> m_notifier;
-  wpi::PriorityQueue<Watchdog*, std::vector<Watchdog*>, DerefGreater<Watchdog*>>
+  wpi::priority_queue<Watchdog*, std::vector<Watchdog*>,
+                      DerefGreater<Watchdog*>>
       m_watchdogs;
 
   void UpdateAlarm();
@@ -97,8 +98,7 @@ void Watchdog::Impl::Main() {
 
     // If the condition variable timed out, that means a Watchdog timeout
     // has occurred, so call its timeout function.
-    auto watchdog = m_watchdogs.top();
-    m_watchdogs.pop();
+    auto watchdog = m_watchdogs.pop();
 
     units::second_t now{curTime * 1e-6};
     if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
@@ -220,7 +220,7 @@ void Watchdog::SuppressTimeoutMessage(bool suppress) {
   m_suppressTimeoutMessage = suppress;
 }
 
-bool Watchdog::operator>(const Watchdog& rhs) {
+bool Watchdog::operator>(const Watchdog& rhs) const {
   return m_expirationTime > rhs.m_expirationTime;
 }
 

@@ -79,14 +79,10 @@ class Robot : public frc::TimedRobot {
       // using notifiers.
       20_ms};
 
-  // Plant-inversion feedforward calculates the voltages necessary to reach our
-  // reference.
-  frc::LinearPlantInversionFeedforward<2, 1> m_feedforward{m_armPlant, 20_ms};
-
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
-  frc::LinearSystemLoop<2, 1, 1> m_loop{m_armPlant, m_controller, m_feedforward,
-                                        m_observer, 12_V};
+  frc::LinearSystemLoop<2, 1, 1> m_loop{m_armPlant, m_controller, m_observer,
+                                        12_V, 20_ms};
 
   // An encoder set up to measure arm position in radians per second.
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};

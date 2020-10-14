@@ -15,6 +15,7 @@
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/AnalogInput.h"
+#include "frc/Base.h"
 #include "frc/Timer.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableRegistry.h"

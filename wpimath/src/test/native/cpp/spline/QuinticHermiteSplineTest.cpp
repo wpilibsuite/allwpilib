@@ -27,8 +27,7 @@ class QuinticHermiteSplineTest : public ::testing::Test {
     const auto start = std::chrono::high_resolution_clock::now();
 
     // Generate and parameterize the spline.
-    const auto spline = SplineHelper::QuinticSplinesFromControlVectors(
-        SplineHelper::QuinticControlVectorsFromWaypoints({a, b}))[0];
+    const auto spline = SplineHelper::QuinticSplinesFromWaypoints({a, b})[0];
     const auto poses = SplineParameterizer::Parameterize(spline);
 
     // End timer.

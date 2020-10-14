@@ -162,7 +162,7 @@ class Watchdog {
   class Impl;
   Impl* m_impl;
 
-  bool operator>(const Watchdog& rhs);
+  bool operator>(const Watchdog& rhs) const;
 
   static Impl* GetImpl();
 };

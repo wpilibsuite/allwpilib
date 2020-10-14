@@ -220,8 +220,14 @@ Eigen::Matrix<double, N, 1> MakeWhiteNoiseVector(
 
   Eigen::Matrix<double, N, 1> result;
   for (int i = 0; i < N; ++i) {
-    std::normal_distribution<> distr{0.0, stdDevs[i]};
-    result(i) = distr(gen);
+    // Passing a standard deviation of 0.0 to std::normal_distribution is
+    // undefined behavior
+    if (stdDevs[i] == 0.0) {
+      result(i) = 0.0;
+    } else {
+      std::normal_distribution distr{0.0, stdDevs[i]};
+      result(i) = distr(gen);
+    }
   }
   return result;
 }

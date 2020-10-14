@@ -127,9 +127,7 @@ std::vector<QuinticHermiteSpline>
 SplineHelper::QuinticSplinesFromControlVectors(
     const std::vector<Spline<5>::ControlVector>& controlVectors) {
   std::vector<QuinticHermiteSpline> splines;
-  // There are twice as many control vectors are there are splines,
-  // so we increment the counter by 2.
-  for (size_t i = 0; i < controlVectors.size() - 1; i += 2) {
+  for (size_t i = 0; i < controlVectors.size() - 1; ++i) {
     auto& xInitial = controlVectors[i].x;
     auto& yInitial = controlVectors[i].y;
     auto& xFinal = controlVectors[i + 1].x;
@@ -160,10 +158,10 @@ SplineHelper::CubicControlVectorsFromWaypoints(
   return {initialCV, finalCV};
 }
 
-std::vector<Spline<5>::ControlVector>
-SplineHelper::QuinticControlVectorsFromWaypoints(
+std::vector<QuinticHermiteSpline> SplineHelper::QuinticSplinesFromWaypoints(
     const std::vector<Pose2d>& waypoints) {
-  std::vector<Spline<5>::ControlVector> vectors;
+  std::vector<QuinticHermiteSpline> splines;
+  splines.reserve(waypoints.size() - 1);
   for (size_t i = 0; i < waypoints.size() - 1; ++i) {
     auto& p0 = waypoints[i];
     auto& p1 = waypoints[i + 1];
@@ -172,10 +170,12 @@ SplineHelper::QuinticControlVectorsFromWaypoints(
     const auto scalar =
         1.2 * p0.Translation().Distance(p1.Translation()).to<double>();
 
-    vectors.push_back(QuinticControlVector(scalar, p0));
-    vectors.push_back(QuinticControlVector(scalar, p1));
+    auto controlVectorA = QuinticControlVector(scalar, p0);
+    auto controlVectorB = QuinticControlVector(scalar, p1);
+    splines.emplace_back(controlVectorA.x, controlVectorB.x, controlVectorA.y,
+                         controlVectorB.y);
   }
-  return vectors;
+  return splines;
 }
 
 void SplineHelper::ThomasAlgorithm(const std::vector<double>& a,

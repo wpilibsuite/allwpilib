@@ -12,6 +12,7 @@
 #include <hal/Encoder.h>
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/Base.h"
 #include "frc/DigitalInput.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"

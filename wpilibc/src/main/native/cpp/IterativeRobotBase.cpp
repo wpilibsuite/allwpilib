@@ -7,16 +7,12 @@
 
 #include "frc/IterativeRobotBase.h"
 
-#include <cstdio>
-
 #include <hal/DriverStation.h>
-#include <hal/FRCUsageReporting.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
-#include "frc/Timer.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
@@ -174,7 +170,7 @@ void IterativeRobotBase::LoopFunc() {
   Shuffleboard::Update();
   m_watchdog.AddEpoch("Shuffleboard::Update()");
 
-  if (IsSimulation()) {
+  if constexpr (IsSimulation()) {
     SimulationPeriodic();
     m_watchdog.AddEpoch("SimulationPeriodic()");
   }

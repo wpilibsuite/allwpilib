@@ -7,11 +7,6 @@
 
 #pragma once
 
-#include <units/time.h>
-#include <wpi/deprecated.h>
-#include <wpi/mutex.h>
-
-#include "frc/Base.h"
 #include "frc2/Timer.h"
 
 namespace frc {

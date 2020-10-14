@@ -120,14 +120,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Prepare vcpkg
-        uses: lukka/run-vcpkg@v2
+        uses: lukka/run-vcpkg@v4
         with:
           vcpkgArguments: opencv
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg/
           vcpkgGitCommitId: 544f8e4593764f78faa94bac2adb81cca5232943
           vcpkgTriplet: x64-windows
       - name: Configure & Build
-        uses: lukka/run-cmake@v2
+        uses: lukka/run-cmake@v3
         with:
           buildDirectory: ${{ runner.workspace }}/build/
           cmakeAppendedArgs: -DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF -DWITH_TESTS=ON
