@@ -25,6 +25,7 @@ void PCMData::ResetData() {
     solenoidInitialized[i].Reset(false);
     solenoidOutput[i].Reset(false);
   }
+  anySolenoidInitialized.Reset(false);
   compressorInitialized.Reset(false);
   compressorOn.Reset(false);
   closedLoopEnabled.Reset(true);
@@ -43,6 +44,7 @@ HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidInitialized,
                                      SimPCMData, solenoidInitialized)
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidOutput,
                                      SimPCMData, solenoidOutput)
+DEFINE_CAPI(HAL_Bool, AnySolenoidInitialized, anySolenoidInitialized)
 DEFINE_CAPI(HAL_Bool, CompressorInitialized, compressorInitialized)
 DEFINE_CAPI(HAL_Bool, CompressorOn, compressorOn)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)
