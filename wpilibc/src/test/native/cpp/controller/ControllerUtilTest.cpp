@@ -17,6 +17,11 @@ TEST(ControllerUtilTest, GetModulusError) {
                   frc::GetModulusError(170.0 + 360.0, -170.0, -180.0, 180.0));
   EXPECT_FLOAT_EQ(-20.0,
                   frc::GetModulusError(170.0, -170.0 + 360.0, -180.0, 180.0));
+  EXPECT_FLOAT_EQ(20.0, frc::GetModulusError(-170.0, 170.0, -180.0, 180.0));
+  EXPECT_FLOAT_EQ(20.0,
+                  frc::GetModulusError(-170.0 + 360.0, 170.0, -180.0, 180.0));
+  EXPECT_FLOAT_EQ(20.0,
+                  frc::GetModulusError(-170.0, 170.0 + 360.0, -180.0, 180.0));
 
   // Test range starting at zero
   EXPECT_FLOAT_EQ(-20.0, frc::GetModulusError(170.0, 190.0, 0.0, 360.0));

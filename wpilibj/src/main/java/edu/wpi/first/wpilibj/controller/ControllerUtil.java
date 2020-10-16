@@ -12,12 +12,6 @@ public final class ControllerUtil {
    * Returns modulus of error where error is the difference between the reference
    * and a measurement.
    *
-   * <p>This implements modular subtraction defined as:
-   *
-   * <p>e = (r mod m - x mod m) mod m
-   *
-   * <p>with an offset in the modulus range for minimum input.
-   *
    * @param reference Reference input of a controller.
    * @param measurement The current measurement.
    * @param minimumInput The minimum value expected from the input.
@@ -25,12 +19,18 @@ public final class ControllerUtil {
    */
   public static double getModulusError(double reference, double measurement, double minimumInput,
       double maximumInput) {
+    double error = reference - measurement;
     double modulus = maximumInput - minimumInput;
-    double error = reference % modulus - measurement % modulus;
 
-    // Moduli on the difference arguments establish a precondition for the
-    // following modulus.
-    return (error - minimumInput) % modulus + minimumInput;
+    // Wrap error above maximum input
+    int numMax = (int) ((error + maximumInput) / modulus);
+    error -= numMax * modulus;
+
+    // Wrap error below minimum input
+    int numMin = (int) ((error + minimumInput) / modulus);
+    error -= numMin * modulus;
+
+    return error;
   }
 
   private ControllerUtil() {

@@ -218,6 +218,8 @@ public class ProfiledPIDController implements Sendable {
    */
   public void enableContinuousInput(double minimumInput, double maximumInput) {
     m_controller.enableContinuousInput(minimumInput, maximumInput);
+    m_minimumInput = minimumInput;
+    m_maximumInput = maximumInput;
   }
 
   /**
@@ -283,14 +285,17 @@ public class ProfiledPIDController implements Sendable {
   public double calculate(double measurement) {
     if (m_controller.isContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
-      double error = ControllerUtil.getModulusError(m_goal.position, measurement, m_minimumInput,
-          m_maximumInput);
+      double goalMinDistance = ControllerUtil.getModulusError(m_goal.position, measurement,
+          m_minimumInput, m_maximumInput);
+      double setpointMinDistance = ControllerUtil.getModulusError(m_setpoint.position, measurement,
+          m_minimumInput, m_maximumInput);
 
       // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
       // may be outside the input range after this operation, but that's OK because the controller
       // will still go there and report an error of zero. In other words, the setpoint only needs to
       // be offset from the measurement by the input range modulus; they don't need to be equal.
-      m_goal.position = error + measurement;
+      m_goal.position = goalMinDistance + measurement;
+      m_setpoint.position = setpointMinDistance + measurement;
     }
 
     var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);

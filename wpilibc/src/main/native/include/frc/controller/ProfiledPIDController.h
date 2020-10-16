@@ -196,6 +196,8 @@ class ProfiledPIDController
   void EnableContinuousInput(Distance_t minimumInput, Distance_t maximumInput) {
     m_controller.EnableContinuousInput(minimumInput.template to<double>(),
                                        maximumInput.template to<double>());
+    m_minimumInput = minimumInput;
+    m_maximumInput = maximumInput;
   }
 
   /**
@@ -254,8 +256,10 @@ class ProfiledPIDController
   double Calculate(Distance_t measurement) {
     if (m_controller.IsContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
-      auto error = frc::GetModulusError<Distance_t>(
+      auto goalMinDistance = frc::GetModulusError<Distance_t>(
           m_goal.position, measurement, m_minimumInput, m_maximumInput);
+      auto setpointMinDistance = frc::GetModulusError<Distance_t>(
+          m_setpoint.position, measurement, m_minimumInput, m_maximumInput);
 
       // Recompute the profile goal with the smallest error, thus giving the
       // shortest path. The goal may be outside the input range after this
@@ -263,7 +267,8 @@ class ProfiledPIDController
       // report an error of zero. In other words, the setpoint only needs to be
       // offset from the measurement by the input range modulus; they don't need
       // to be equal.
-      m_goal.position = Distance_t{error} + measurement;
+      m_goal.position = goalMinDistance + measurement;
+      m_setpoint.position = setpointMinDistance + measurement;
     }
 
     frc::TrapezoidProfile<Distance> profile{m_constraints, m_goal, m_setpoint};
