@@ -1055,7 +1055,7 @@ public class DriverStation {
     if (m_matchDataSender.matchType.getDouble(0) != matchType) {
       m_matchDataSender.matchType.setDouble(matchType);
     }
-    if (m_matchDataSender.controlWord.getDouble(0) != controlWord)
+    if (m_matchDataSender.controlWord.getDouble(0) != controlWord) {
       m_matchDataSender.controlWord.setDouble(controlWord);
     }
   }
