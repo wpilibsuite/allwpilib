@@ -52,9 +52,9 @@ public class Robot extends TimedRobot {
 
   // Simulation classes help us simulate what's going on, including gravity.
   private final ElevatorSim m_elevatorSim = new ElevatorSim(m_elevatorGearbox,
+      kElevatorGearing,
       kCarriageMass,
       kElevatorDrumRadius,
-      kElevatorGearing,
       kMinElevatorHeight,
       kMaxElevatorHeight,
       VecBuilder.fill(0.01));

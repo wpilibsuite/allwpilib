@@ -16,195 +16,235 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 
+/**
+ * Represents a simulated single jointed arm mechanism.
+ */
 public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
+  // The gearbox for the arm.
+  private final DCMotor m_gearbox;
 
+  // The gearing between the motors and the output.
+  private final double m_gearing;
+
+  // The length of the arm.
   @SuppressWarnings("MemberName")
   private final double m_r;
-  private final double m_maxAngleRads;
-  private final double m_minAngleRads;
+
+  // The minimum angle that the arm is capable of.
+  private final double m_minAngle;
+
+  // The maximum angle that the arm is capable of.
+  private final double m_maxAngle;
+
+  // The mass of the arm.
   private final double m_armMass;
-  private final DCMotor m_motor;
-  private final double m_gearing;
+
+  // Whether the simulator should simulate gravity.
   private final boolean m_simulateGravity;
 
   /**
-   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
-   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
-   * the simulation and write simulated outputs to sensors.
+   * Creates a simulated arm mechanism.
    *
-   * @param armSystem            The arm system being controlled.
-   * @param motor                DCMotor representing the motor driving the arm.
-   * @param G                    The gear ratio of the arm (numbers greater than 1
-   *                             represent reductions).
-   * @param armMassKg            The mass of the arm.
-   * @param armLengthMeters      The distance from the pivot of the arm to its center of mass.
-   *                             This number is not the same as the overall length of the arm.
-   * @param minAngleRads         The min angle the arm can reach, with 0 being measured from
-   *                             horizontal. The simulation will not allow motion past this.
-   * @param maxAngleRads         The max angle the arm can reach, with 0 being measured from
-   *                             horizontal. The simulation will not allow motion past this.
-   * @param posMeasurementStdDev Standard deviations of noise in the arm's position measurement.
-   * @param simulateGravity      If the affects of gravity should be simulated.
+   * @param plant           The linear system that represents the arm.
+   * @param gearbox         The type of and number of motors in the arm gearbox.
+   * @param gearing         The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param armLengthMeters The length of the arm.
+   * @param minAngleRads    The minimum angle that the arm is capable of.
+   * @param maxAngleRads    The maximum angle that the arm is capable of.
+   * @param armMassKg       The mass of the arm.
+   * @param simulateGravity Whether gravity should be simulated or not.
    */
-  public SingleJointedArmSim(LinearSystem<N2, N1, N1> armSystem,
-                             DCMotor motor, double G,
-                             double armMassKg,
+  public SingleJointedArmSim(LinearSystem<N2, N1, N1> plant, DCMotor gearbox, double gearing,
                              double armLengthMeters, double minAngleRads, double maxAngleRads,
-                             double posMeasurementStdDev, boolean simulateGravity) {
-    super(armSystem, VecBuilder.fill(posMeasurementStdDev));
-    this.m_armMass = armMassKg;
-    this.m_r = armLengthMeters;
-    this.m_minAngleRads = minAngleRads;
-    this.m_maxAngleRads = maxAngleRads;
-    this.m_motor = motor;
-    this.m_gearing = G;
-    this.m_simulateGravity = simulateGravity;
+                             double armMassKg, boolean simulateGravity) {
+    this(plant, gearbox, gearing, armLengthMeters, minAngleRads, maxAngleRads, armMassKg,
+        simulateGravity, null);
   }
 
   /**
-   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
-   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
-   * the simulation and write simulated outputs to sensors.
+   * Creates a simulated arm mechanism.
    *
-   * @param motor                DCMotor representing the motor driving the arm.
-   * @param jKgSquaredMeters     The moment of inertia of the arm.
-   * @param G                    The gear ratio of the arm (numbers greater than 1
-   *                             represent reductions).
-   * @param armMassKg            The mass of the arm.
-   * @param armLengthMeters      The distance from the pivot of the arm to its center of mass.
-   * @param minAngleRads         The min angle the arm can reach, with 0 being measured from
-   *                             horizontal. The simulation will not allow motion past this.
-   * @param maxAngleRads         The max angle the arm can reach, with 0 being measured from
-   *                             horizontal. The simulation will not allow motion past this.
-   * @param posMeasurementStdDev Standard deviations of noise in the arm's position measurement.
-   * @param simulateGravity      If the affects of gravity should be simulated.
+   * @param plant              The linear system that represents the arm.
+   * @param gearbox            The type of and number of motors in the arm gearbox.
+   * @param gearing            The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param armLengthMeters    The length of the arm.
+   * @param minAngleRads       The minimum angle that the arm is capable of.
+   * @param maxAngleRads       The maximum angle that the arm is capable of.
+   * @param armMassKg          The mass of the arm.
+   * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param measurementStdDevs The standard deviations of the measurements.
    */
-  public SingleJointedArmSim(DCMotor motor, double jKgSquaredMeters,
-                             double G, double armMassKg, double armLengthMeters,
-                             double minAngleRads, double maxAngleRads,
-                             double posMeasurementStdDev, boolean simulateGravity) {
-    this(LinearSystemId.createSingleJointedArmSystem(motor, jKgSquaredMeters, G),
-        motor, G,
-        armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
-        posMeasurementStdDev, simulateGravity);
+  public SingleJointedArmSim(LinearSystem<N2, N1, N1> plant, DCMotor gearbox, double gearing,
+                             double armLengthMeters, double minAngleRads, double maxAngleRads,
+                             double armMassKg, boolean simulateGravity,
+                             Matrix<N1, N1> measurementStdDevs) {
+    super(plant, measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+    m_r = armLengthMeters;
+    m_minAngle = minAngleRads;
+    m_maxAngle = maxAngleRads;
+    m_armMass = armMassKg;
+    m_simulateGravity = simulateGravity;
   }
 
   /**
-   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
-   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
-   * the simulation and write simulated outputs to sensors.
+   * Creates a simulated arm mechanism.
    *
-   * @param motor                      DCMotor representing the motor driving the arm.
-   * @param G                          The gear ratio of the arm (numbers greater than 1
-   *                                   represent reductions).
-   * @param armMassKg                  The mass of the arm.
-   * @param armLengthMeters            The distance from the pivot of the arm to its center of mass.
-   * @param minAngleRads               The min angle the arm can reach, with 0 being measured from
-   *                                   horizontal. The simulation will not allow motion past this.
-   * @param maxAngleRads               The max angle the arm can reach, with 0 being measured from
-   *                                   horizontal. The simulation will not allow motion past this.
-   * @param positionMeasurementStdDevs Standard deviations of noise in the arm's position measurement.
-   * @param simulateGravity      If the affects of gravity should be simulated.
+   * @param gearbox          The type of and number of motors in the arm gearbox.
+   * @param gearing          The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param jKgMetersSquared The moment of inertia of the arm. This can be calculated from CAD software.
+   * @param armLengthMeters  The length of the arm.
+   * @param minAngleRads     The minimum angle that the arm is capable of.
+   * @param maxAngleRads     The maximum angle that the arm is capable of.
+   * @param armMassKg        The mass of the arm.
+   * @param simulateGravity  Whether gravity should be simulated or not.
    */
-  public SingleJointedArmSim(DCMotor motor,
-                             double G, double armMassKg, double armLengthMeters,
-                             double minAngleRads, double maxAngleRads,
-                             double positionMeasurementStdDevs, boolean simulateGravity) {
-    this(LinearSystemId.createSingleJointedArmSystem(motor,
-        1.0 / 3.0 * armMassKg * armLengthMeters * armLengthMeters, G),
-        motor, G,
-        armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
-        positionMeasurementStdDevs, simulateGravity);
+  public SingleJointedArmSim(DCMotor gearbox, double gearing, double jKgMetersSquared,
+                             double armLengthMeters, double minAngleRads, double maxAngleRads,
+                             double armMassKg, boolean simulateGravity) {
+    this(gearbox, gearing, jKgMetersSquared, armLengthMeters, minAngleRads, maxAngleRads,
+        armMassKg, simulateGravity, null);
   }
-
 
   /**
-   * Create a LinearSystemSimulator. This simulator uses an {@link LinearSystem} to simulate
-   * the state of the system. In simulationPeriodic, users should first set inputs from motors, update
-   * the simulation and write simulated outputs to sensors.
+   * Creates a simulated arm mechanism.
    *
-   * @param motor                      DCMotor representing the motor driving the arm.
-   * @param G                          The gear ratio of the arm (numbers greater than 1
-   *                                   represent reductions).
-   * @param armMassKg                  The mass of the arm.
-   * @param armLengthMeters            The distance from the pivot of the arm to its center of mass.
-   * @param minAngleRads               The min angle the arm can reach, with 0 being measured from
-   *                                   horizontal. The simulation will not allow motion past this.
-   * @param maxAngleRads               The max angle the arm can reach, with 0 being measured from
-   *                                   horizontal. The simulation will not allow motion past this.
-   * @param positionMeasurementStdDevs Standard deviations of noise in the arm's position measurement.
+   * @param gearbox            The type of and number of motors in the arm gearbox.
+   * @param gearing            The gearing of the arm (numbers greater than 1 represent reductions).
+   * @param jKgMetersSquared   The moment of inertia of the arm. This can be calculated from CAD software.
+   * @param armLengthMeters    The length of the arm.
+   * @param minAngleRads       The minimum angle that the arm is capable of.
+   * @param maxAngleRads       The maximum angle that the arm is capable of.
+   * @param armMassKg          The mass of the arm.
+   * @param simulateGravity    Whether gravity should be simulated or not.
+   * @param measurementStdDevs The standard deviations of the measurements.
    */
-  public SingleJointedArmSim(DCMotor motor,
-                             double G, double armMassKg, double armLengthMeters,
-                             double minAngleRads, double maxAngleRads,
-                             double positionMeasurementStdDevs) {
-    this(LinearSystemId.createSingleJointedArmSystem(motor,
-        1.0 / 3.0 * armMassKg * armLengthMeters * armLengthMeters, G),
-        motor, G,
-        armMassKg, armLengthMeters, minAngleRads, maxAngleRads,
-        positionMeasurementStdDevs, true);
+  public SingleJointedArmSim(DCMotor gearbox, double gearing, double jKgMetersSquared,
+                             double armLengthMeters, double minAngleRads, double maxAngleRads,
+                             double armMassKg, boolean simulateGravity,
+                             Matrix<N1, N1> measurementStdDevs) {
+    super(LinearSystemId.createSingleJointedArmSystem(gearbox, jKgMetersSquared, gearing),
+        measurementStdDevs);
+    m_gearbox = gearbox;
+    m_gearing = gearing;
+    m_r = armLengthMeters;
+    m_minAngle = minAngleRads;
+    m_maxAngle = maxAngleRads;
+    m_armMass = armMassKg;
+    m_simulateGravity = simulateGravity;
   }
 
+  /**
+   * Returns whether the arm has hit the lower limit.
+   *
+   * @param x The current arm state.
+   * @return Whether the arm has hit the lower limit.
+   */
   public boolean hasHitLowerLimit(Matrix<N2, N1> x) {
-    return x.get(0, 0) < this.m_minAngleRads;
+    return x.get(0, 0) < this.m_minAngle;
   }
 
+  /**
+   * Returns whether the arm has hit the upper limit.
+   *
+   * @param x The current arm state.
+   * @return Whether the arm has hit the upper limit.
+   */
   public boolean hasHitUpperLimit(Matrix<N2, N1> x) {
-    return x.get(0, 0) > this.m_maxAngleRads;
+    return x.get(0, 0) > this.m_maxAngle;
   }
 
-  @Override
-  protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
-    /*
-    Horizontal case:
-    Torque = f * r = I * alpha
-    alpha = f * r / I
-    since f=mg,
-    alpha = m g r / I
-
-    Multiply RHS by cos(theta) to account for the arm angle
-
-    This acceleration is added to the linear system dynamics x-dot = Ax + Bu
-    We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I]]
-     */
-    Matrix<N2, N1> updatedXhat = RungeKutta.rungeKutta(
-        this::dynamics,
-        currentXhat, u, dtSeconds);
-
-    // We check for collision after updating xhat
-    if (hasHitLowerLimit(updatedXhat)) {
-      return VecBuilder.fill(m_minAngleRads, 0);
-    } else if (hasHitUpperLimit(updatedXhat)) {
-      return VecBuilder.fill(m_maxAngleRads, 0);
-    }
-
-    return updatedXhat;
-  }
-
+  /**
+   * Returns the current arm angle.
+   *
+   * @return The current arm angle.
+   */
   public double getAngleRads() {
     return m_x.get(0, 0);
   }
 
+  /**
+   * Returns the current arm velocity.
+   *
+   * @return The current arm velocity.
+   */
   public double getVelocityRadPerSec() {
     return m_x.get(1, 0);
   }
 
+  /**
+   * Returns the arm current draw.
+   *
+   * @return The aram current draw.
+   */
   @Override
   public double getCurrentDrawAmps() {
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
     // spinning 10x faster than the output
     var motorVelocity = m_x.get(1, 0) * m_gearing;
-    return m_motor.getCurrent(motorVelocity, m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
+    return m_gearbox.getCurrent(motorVelocity, m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
   }
 
-  private Matrix<N2, N1> dynamics(Matrix<N2, N1> x, Matrix<N1, N1> u_) {
-    Matrix<N2, N1> xdot = (m_plant.getA().times(x))
-        .plus(m_plant.getB().times(u_));
+  /**
+   * Sets the input voltage for the elevator.
+   *
+   * @param volts The input voltage.
+   */
+  public void setInputVoltage(double volts) {
+    setInput(volts);
+  }
 
-    if (m_simulateGravity) {
-      xdot = xdot.plus(VecBuilder.fill(0,
-              m_armMass * m_r * -9.8 * 3.0 / (m_armMass * m_r * m_r) * Math.cos(x.get(0, 0))));
+  /**
+   * Calculates a rough estimate of the moment of inertia of an arm given its
+   * length and mass.
+   *
+   * @param lengthMeters The length of the arm.
+   * @param massKg       The mass of the arm.
+   *
+   * @return The calculated moment of inertia.
+   */
+  public static double estimateMOI(double lengthMeters, double massKg) {
+    return 1.0 / 3.0 * massKg * lengthMeters * lengthMeters;
+  }
+
+  /**
+   * Updates the state of the arm.
+   *
+   * @param currentXhat The current state estimate.
+   * @param u           The system inputs (voltage).
+   * @param dtSeconds   The time difference between controller updates.
+   */
+  @Override
+  protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat,
+                                   Matrix<N1, N1> u, double dtSeconds) {
+    // Horizontal case:
+    // Torque = F * r = I * alpha
+    // alpha = F * r / I
+    // Since F = mg,
+    // alpha = m * g * r / I
+    // Finally, multiply RHS by cos(theta) to account for the arm angle
+    // This acceleration is added to the linear system dynamics x-dot = Ax + Bu
+    // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
+    // cos(theta)]]
+    Matrix<N2, N1> updatedXhat = RungeKutta.rungeKutta(
+        (Matrix<N2, N1> x, Matrix<N1, N1> u_) -> {
+          Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(u_));
+          if (m_simulateGravity) {
+            xdot = xdot.plus(VecBuilder.fill(0,
+                m_armMass * m_r * -9.8 * 3.0 / (m_armMass * m_r * m_r) * Math.cos(x.get(0, 0))));
+          }
+          return xdot;
+        },
+        currentXhat, u, dtSeconds);
+
+    // We check for collision after updating xhat
+    if (hasHitLowerLimit(updatedXhat)) {
+      return VecBuilder.fill(m_minAngle, 0);
     }
-    return xdot;
+    if (hasHitUpperLimit(updatedXhat)) {
+      return VecBuilder.fill(m_maxAngle, 0);
+    }
+    return updatedXhat;
   }
 }

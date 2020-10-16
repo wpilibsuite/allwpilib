@@ -28,12 +28,10 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *                           gearbox.
    * @param gearing            The gearing of the flywheel (numbers greater than
    *                           1 represent reductions).
-   * @param addNoise           Whether the sim should automatically add some
-   *                           encoder noise.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   FlywheelSim(const LinearSystem<1, 1, 1>& plant, const DCMotor& gearbox,
-              double gearing, bool addNoise = false,
+              double gearing,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -44,12 +42,10 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    * @param gearing            The gearing of the flywheel (numbers greater than
    *                           1 represent reductions).
    * @param moi                The moment of inertia of the flywheel.
-   * @param addNoise           Whether the sim should automatically add some
-   *                           encoder noise.
    * @param measurementStdDevs The standard deviation of the measurement noise.
    */
   FlywheelSim(const DCMotor& gearbox, double gearing,
-              units::kilogram_square_meter_t moi, bool addNoise = false,
+              units::kilogram_square_meter_t moi,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -66,8 +62,15 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    */
   units::ampere_t GetCurrentDraw() const override;
 
+  /**
+   * Sets the input voltage for the flywheel.
+   *
+   * @param voltage The input voltage.
+   */
+  void SetInputVoltage(units::volt_t voltage);
+
  private:
-  DCMotor m_motor;
+  DCMotor m_gearbox;
   double m_gearing;
 };
 }  // namespace frc::sim

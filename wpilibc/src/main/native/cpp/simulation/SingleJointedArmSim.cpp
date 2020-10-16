@@ -19,38 +19,28 @@ using namespace frc;
 using namespace frc::sim;
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const LinearSystem<2, 1, 1>& system, const DCMotor motor, double G,
-    units::kilogram_t mass, units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, bool addNoise,
-    const std::array<double, 1>& measurementStdDevs, bool simulateGravity)
-    : LinearSystemSim<2, 1, 1>(system, addNoise, measurementStdDevs),
+    const LinearSystem<2, 1, 1>& system, const DCMotor& gearbox, double gearing,
+    units::meter_t armLength, units::radian_t minAngle,
+    units::radian_t maxAngle, units::kilogram_t mass, bool simulateGravity,
+    const std::array<double, 1>& measurementStdDevs)
+    : LinearSystemSim<2, 1, 1>(system, measurementStdDevs),
       m_r(armLength),
       m_minAngle(minAngle),
       m_maxAngle(maxAngle),
       m_mass(mass),
-      m_motor(motor),
-      m_gearing(G),
+      m_gearbox(gearbox),
+      m_gearing(gearing),
       m_simulateGravity(simulateGravity) {}
 
 SingleJointedArmSim::SingleJointedArmSim(
-    const DCMotor& motor, units::kilogram_square_meter_t J, double G,
-    units::kilogram_t mass, units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, bool addNoise,
-    const std::array<double, 1>& measurementStdDevs, bool simulateGravity)
-    : SingleJointedArmSim(LinearSystemId::SingleJointedArmSystem(motor, J, G),
-                          motor, G, mass, armLength, minAngle, maxAngle,
-                          addNoise, measurementStdDevs, simulateGravity) {}
-
-SingleJointedArmSim::SingleJointedArmSim(
-    const DCMotor& motor, double G, units::kilogram_t mass,
+    const DCMotor& gearbox, double gearing, units::kilogram_square_meter_t moi,
     units::meter_t armLength, units::radian_t minAngle,
-    units::radian_t maxAngle, bool addNoise,
-    const std::array<double, 1>& measurementStdDevs, bool simulateGravity)
+    units::radian_t maxAngle, units::kilogram_t mass, bool simulateGravity,
+    const std::array<double, 1>& measurementStdDevs)
     : SingleJointedArmSim(
-          LinearSystemId::SingleJointedArmSystem(
-              motor, 1.0 / 3.0 * mass * armLength * armLength, G),
-          motor, G, mass, armLength, minAngle, maxAngle, addNoise,
-          measurementStdDevs, simulateGravity) {}
+          LinearSystemId::SingleJointedArmSystem(gearbox, moi, gearing),
+          gearbox, gearing, armLength, minAngle, maxAngle, mass,
+          simulateGravity, measurementStdDevs) {}
 
 bool SingleJointedArmSim::HasHitLowerLimit(
     const Eigen::Matrix<double, 2, 1>& x) const {
@@ -74,8 +64,12 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output
   units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
-  return m_motor.Current(motorVelocity, units::volt_t{m_u(0)}) *
+  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
          wpi::sgn(m_u(0));
+}
+
+void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
+  SetInput(frc::MakeMatrix<1, 1>(voltage.to<double>()));
 }
 
 Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
@@ -100,7 +94,6 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
                                          (m_mass * m_r * m_r) * std::cos(x(0)))
                                             .template to<double>());
         }
-
         return xdot;
       },
       currentXhat, u, dt);

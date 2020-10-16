@@ -25,24 +25,40 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
   /**
    * Constructs a simulated elevator mechanism.
    *
-   * @param gearbox            The type of and number of motors in your elevator
-   *                           gearbox.
-   * @param carriageMass       The mass of the elevator carriage.
-   * @param gearing            The gearing of the elevator (numbers greater than
-   *                           1 represent reductions).
-   * @param drumRadius         The radius of the drum that your cable is wrapped
-   *                           around.
+   * @param plant              The linear system that represents the elevator.
+   * @param gearbox            The type of and number of motors in your
+   *                           elevator gearbox.
+   * @param gearing            The gearing of the elevator (numbers greater
+   *                           than 1 represent reductions).
+   * @param drumRadius         The radius of the drum that your cable is
+   *                           wrapped around.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
-   * @param addNoise           Whether the sim should automatically add some
-   *                           encoder noise.
-   * @param measurementStdDevs The standard deviation of the measurement noise.
+   * @param measurementStdDevs The standard deviation of the measurements.
    */
-  ElevatorSim(const DCMotor& gearbox, units::kilogram_t carriageMass,
+  ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               double gearing, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
-              bool addNoise = false,
-              const std::array<double, 1>& m_measurementStdDevs = {0.0});
+              const std::array<double, 1>& measurementStdDevs = {0.0});
+
+  /**
+   * Constructs a simulated elevator mechanism.
+   *
+   * @param gearbox            The type of and number of motors in your
+   *                           elevator gearbox.
+   * @param gearing            The gearing of the elevator (numbers greater
+   *                           than 1 represent reductions).
+   * @param carriageMass       The mass of the elevator carriage.
+   * @param drumRadius         The radius of the drum that your cable is
+   *                           wrapped around.
+   * @param minHeight          The minimum allowed height of the elevator.
+   * @param maxHeight          The maximum allowed height of the elevator.
+   * @param measurementStdDevs The standard deviation of the measurements.
+   */
+  ElevatorSim(const DCMotor& gearbox, double gearing,
+              units::kilogram_t carriageMass, units::meter_t drumRadius,
+              units::meter_t minHeight, units::meter_t maxHeight,
+              const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
    * Returns whether the elevator has hit the lower limit.
@@ -56,7 +72,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    * Returns whether the elevator has hit the upper limit.
    *
    * @param x The current elevator state.
-   * @return Whether the elevator has hit the uppwer limit.
+   * @return Whether the elevator has hit the upper limit.
    */
   bool HasHitUpperLimit(const Eigen::Matrix<double, 2, 1>& x) const;
 
@@ -81,6 +97,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    */
   units::ampere_t GetCurrentDraw() const override;
 
+  /**
+   * Sets the input voltage for the elevator.
+   *
+   * @param voltage The input voltage.
+   */
+  void SetInputVoltage(units::volt_t voltage);
+
  protected:
   /**
    * Updates the state estimate of the elevator.
@@ -94,7 +117,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
       const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) override;
 
  private:
-  DCMotor m_motor;
+  DCMotor m_gearbox;
   units::meter_t m_drumRadius;
   units::meter_t m_minHeight;
   units::meter_t m_maxHeight;
