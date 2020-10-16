@@ -1025,22 +1025,39 @@ public class DriverStation {
     int matchNumber;
     int replayNumber;
     int matchType;
+    int controlWord;
     synchronized (m_cacheDataMutex) {
       eventName = m_matchInfo.eventName;
       gameSpecificMessage = m_matchInfo.gameSpecificMessage;
       matchNumber = m_matchInfo.matchNumber;
       replayNumber = m_matchInfo.replayNumber;
       matchType = m_matchInfo.matchType;
+      controlWord = HAL.nativeGetControlWord();
     }
-
-    m_matchDataSender.alliance.setBoolean(isRedAlliance);
-    m_matchDataSender.station.setDouble(stationNumber);
-    m_matchDataSender.eventName.setString(eventName);
-    m_matchDataSender.gameSpecificMessage.setString(gameSpecificMessage);
-    m_matchDataSender.matchNumber.setDouble(matchNumber);
-    m_matchDataSender.replayNumber.setDouble(replayNumber);
-    m_matchDataSender.matchType.setDouble(matchType);
-    m_matchDataSender.controlWord.setDouble(HAL.nativeGetControlWord());
+    if (m_matchDataSender.alliance.getBoolean(true) != isRedAlliance) {
+      m_matchDataSender.alliance.setBoolean(isRedAlliance);
+    }
+    if (m_matchDataSender.station.getDouble(1) != stationNumber) {
+      m_matchDataSender.station.setDouble(stationNumber);
+    }
+    if (!m_matchDataSender.eventName.getString("").equals(eventName)) {
+      m_matchDataSender.eventName.setString(eventName);
+    }
+    if (!m_matchDataSender.gameSpecificMessage.getString("").equals(gameSpecificMessage)) {
+      m_matchDataSender.gameSpecificMessage.setString(gameSpecificMessage);
+    }
+    if(m_matchDataSender.matchNumber.getDouble(0) != matchNumber) {
+      m_matchDataSender.matchNumber.setDouble(matchNumber);
+    }
+    if (m_matchDataSender.replayNumber.getDouble(0) != replayNumber) {
+      m_matchDataSender.replayNumber.setDouble(replayNumber);
+    }
+    if (m_matchDataSender.matchType.getDouble(0) != matchType) {
+      m_matchDataSender.matchType.setDouble(matchType);
+    }
+    if (m_matchDataSender.controlWord.getDouble(0) != controlWord)
+      m_matchDataSender.controlWord.setDouble(controlWord);
+    }
   }
 
   /**
