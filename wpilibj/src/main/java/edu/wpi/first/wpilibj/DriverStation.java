@@ -1046,7 +1046,7 @@ public class DriverStation {
     if (!m_matchDataSender.gameSpecificMessage.getString("").equals(gameSpecificMessage)) {
       m_matchDataSender.gameSpecificMessage.setString(gameSpecificMessage);
     }
-    if(m_matchDataSender.matchNumber.getDouble(0) != matchNumber) {
+    if (m_matchDataSender.matchNumber.getDouble(0) != matchNumber) {
       m_matchDataSender.matchNumber.setDouble(matchNumber);
     }
     if (m_matchDataSender.replayNumber.getDouble(0) != replayNumber) {
