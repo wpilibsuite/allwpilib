@@ -28,10 +28,11 @@
 namespace {
 struct Notifier {
   std::string name;
-  uint64_t waitTime;
+  uint64_t waitTime = UINT64_MAX;
   bool active = true;
-  bool running = false;
-  uint64_t count = 0;
+  bool waitTimeValid = false;    // True if waitTime is set and in the future
+  bool waitingForAlarm = false;  // True if in HAL_WaitForNotifierAlarm()
+  uint64_t waitCount = 0;        // Counts calls to HAL_WaitForNotifierAlarm()
   wpi::mutex mutex;
   wpi::condition_variable cond;
 };
@@ -51,7 +52,7 @@ class NotifierHandleContainer
       {
         std::scoped_lock lock(notifier->mutex);
         notifier->active = false;
-        notifier->running = false;
+        notifier->waitTimeValid = false;
       }
       notifier->cond.notify_all();  // wake up any waiting threads
     });
@@ -83,18 +84,52 @@ void WakeupNotifiers() {
   });
 }
 
+void WaitNotifiers() {
+  std::unique_lock ulock(notifiersWaiterMutex);
+  wpi::SmallVector<HAL_NotifierHandle, 8> waiters;
+
+  // Wait for all Notifiers to hit HAL_WaitForNotifierAlarm()
+  notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
+    std::scoped_lock lock(notifier->mutex);
+    if (notifier->active && !notifier->waitingForAlarm) {
+      waiters.emplace_back(handle);
+    }
+  });
+  for (;;) {
+    int count = 0;
+    int end = waiters.size();
+    while (count < end) {
+      auto& it = waiters[count];
+      if (auto notifier = notifierHandles->Get(it)) {
+        std::scoped_lock lock(notifier->mutex);
+        if (notifier->active && !notifier->waitingForAlarm) {
+          ++count;
+          continue;
+        }
+      }
+      // No longer need to wait for it, put at end so it can be erased
+      std::swap(it, waiters[--end]);
+    }
+    if (count == 0) break;
+    waiters.resize(count);
+    notifiersWaiterCond.wait_for(ulock, std::chrono::duration<double>(1));
+  }
+}
+
 void WakeupWaitNotifiers() {
   std::unique_lock ulock(notifiersWaiterMutex);
   int32_t status = 0;
   uint64_t curTime = HAL_GetFPGATime(&status);
   wpi::SmallVector<std::pair<HAL_NotifierHandle, uint64_t>, 8> waiters;
+
+  // Wake up Notifiers that have expired timeouts
   notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
     std::scoped_lock lock(notifier->mutex);
-    // only wait for it if it's going to wake up (either because
-    // the timeout has expired or the alarm hasn't been waited on yet)
-    if (notifier->running &&
-        (notifier->count == 0 || curTime >= notifier->waitTime)) {
-      waiters.emplace_back(handle, notifier->count);
+
+    // Only wait for the Notifier if it has a valid timeout that's expired
+    if (notifier->active && notifier->waitTimeValid &&
+        curTime >= notifier->waitTime) {
+      waiters.emplace_back(handle, notifier->waitCount);
       notifier->cond.notify_all();
     }
   });
@@ -105,12 +140,15 @@ void WakeupWaitNotifiers() {
       auto& it = waiters[count];
       if (auto notifier = notifierHandles->Get(it.first)) {
         std::scoped_lock lock(notifier->mutex);
-        if (notifier->active && notifier->count == it.second) {
+
+        // waitCount is used here instead of waitingForAlarm because we want to
+        // wait until HAL_WaitForNotifierAlarm() is exited, then reentered
+        if (notifier->active && notifier->waitCount == it.second) {
           ++count;
           continue;
         }
       }
-      // no longer need to wait for it, put at end so it can be erased
+      // No longer need to wait for it, put at end so it can be erased
       it.swap(waiters[--end]);
     }
     if (count == 0) break;
@@ -148,7 +186,7 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   {
     std::scoped_lock lock(notifier->mutex);
     notifier->active = false;
-    notifier->running = false;
+    notifier->waitTimeValid = false;
   }
   notifier->cond.notify_all();
 }
@@ -161,7 +199,7 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   {
     std::scoped_lock lock(notifier->mutex);
     notifier->active = false;
-    notifier->running = false;
+    notifier->waitTimeValid = false;
   }
   notifier->cond.notify_all();
 }
@@ -174,7 +212,7 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
   {
     std::scoped_lock lock(notifier->mutex);
     notifier->waitTime = triggerTime;
-    notifier->running = (triggerTime != UINT64_MAX);
+    notifier->waitTimeValid = (triggerTime != UINT64_MAX);
   }
 
   // We wake up any waiters to change how long they're sleeping for
@@ -188,7 +226,7 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
   {
     std::scoped_lock lock(notifier->mutex);
-    notifier->running = false;
+    notifier->waitTimeValid = false;
   }
 }
 
@@ -199,26 +237,29 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
   std::unique_lock ulock(notifiersWaiterMutex);
   std::unique_lock lock(notifier->mutex);
-  ++notifier->count;
+  notifier->waitingForAlarm = true;
+  ++notifier->waitCount;
   ulock.unlock();
   notifiersWaiterCond.notify_all();
   while (notifier->active) {
     uint64_t curTime = HAL_GetFPGATime(status);
-    if (notifier->running && curTime >= notifier->waitTime) {
-      notifier->running = false;
+    if (notifier->waitTimeValid && curTime >= notifier->waitTime) {
+      notifier->waitTimeValid = false;
+      notifier->waitingForAlarm = false;
       return curTime;
     }
 
-    double waitTime;
-    if (!notifier->running || notifiersPaused) {
+    double waitDuration;
+    if (!notifier->waitTimeValid || notifiersPaused) {
       // If not running, wait 1000 seconds
-      waitTime = 1000.0;
+      waitDuration = 1000.0;
     } else {
-      waitTime = (notifier->waitTime - curTime) * 1e-6;
+      waitDuration = (notifier->waitTime - curTime) * 1e-6;
     }
 
-    notifier->cond.wait_for(lock, std::chrono::duration<double>(waitTime));
+    notifier->cond.wait_for(lock, std::chrono::duration<double>(waitDuration));
   }
+  notifier->waitingForAlarm = false;
   return 0;
 }
 
@@ -226,7 +267,8 @@ uint64_t HALSIM_GetNextNotifierTimeout(void) {
   uint64_t timeout = UINT64_MAX;
   notifierHandles->ForEach([&](HAL_NotifierHandle, Notifier* notifier) {
     std::scoped_lock lock(notifier->mutex);
-    if (notifier->active && notifier->running && timeout > notifier->waitTime)
+    if (notifier->active && notifier->waitTimeValid &&
+        timeout > notifier->waitTime)
       timeout = notifier->waitTime;
   });
   return timeout;
@@ -257,7 +299,7 @@ int32_t HALSIM_GetNotifierInfo(struct HALSIM_NotifierInfo* arr, int32_t size) {
         arr[num].name[sizeof(arr[num].name) - 1] = '\0';
       }
       arr[num].timeout = notifier->waitTime;
-      arr[num].running = notifier->running;
+      arr[num].waitTimeValid = notifier->waitTimeValid;
     }
     ++num;
   });

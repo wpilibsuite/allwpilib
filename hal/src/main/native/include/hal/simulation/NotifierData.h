@@ -17,7 +17,7 @@ struct HALSIM_NotifierInfo {
   HAL_NotifierHandle handle;
   char name[64];
   uint64_t timeout;
-  HAL_Bool running;
+  HAL_Bool waitTimeValid;
 };
 
 uint64_t HALSIM_GetNextNotifierTimeout(void);

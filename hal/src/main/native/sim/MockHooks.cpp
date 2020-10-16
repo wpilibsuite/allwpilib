@@ -92,6 +92,7 @@ void HALSIM_ResumeTiming(void) {
 HAL_Bool HALSIM_IsTimingPaused(void) { return IsTimingPaused(); }
 
 void HALSIM_StepTiming(uint64_t delta) {
+  WaitNotifiers();
   StepTiming(delta);
   WakeupWaitNotifiers();
 }
