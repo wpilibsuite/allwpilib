@@ -131,7 +131,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
     this.m_observer = observer;
     this.m_clampFunction = clampFunction;
 
-    m_nextR = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 0));
+    m_nextR = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 1));
     reset(m_nextR);
   }
 
