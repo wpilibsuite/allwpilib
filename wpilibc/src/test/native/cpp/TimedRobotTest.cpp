@@ -309,3 +309,86 @@ TEST_F(TimedRobotTest, Test) {
   robot.EndCompetition();
   robotThread.join();
 }
+
+TEST_F(TimedRobotTest, AddPeriodic) {
+  MockRobot robot;
+
+  std::atomic<uint32_t> callbackCount{0};
+  robot.AddPeriodic([&] { callbackCount++; }, 10_ms);
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+
+  frc::sim::DriverStationSim::SetEnabled(false);
+  frc::sim::DriverStationSim::NotifyNewData();
+  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
+
+  EXPECT_EQ(0u, robot.m_disabledInitCount);
+  EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(0u, callbackCount);
+
+  frc::sim::StepTiming(10_ms);
+
+  EXPECT_EQ(0u, robot.m_disabledInitCount);
+  EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(1u, callbackCount);
+
+  frc::sim::StepTiming(10_ms);
+
+  EXPECT_EQ(1u, robot.m_disabledInitCount);
+  EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(2u, callbackCount);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_F(TimedRobotTest, AddPeriodicWithOffset) {
+  MockRobot robot;
+
+  std::atomic<uint32_t> callbackCount{0};
+  robot.AddPeriodic([&] { callbackCount++; }, 10_ms, 5_ms);
+
+  // Expirations in this test (ms)
+  //
+  // Robot | Callback
+  // ================
+  //    20 |      15
+  //    40 |      25
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+
+  frc::sim::DriverStationSim::SetEnabled(false);
+  frc::sim::DriverStationSim::NotifyNewData();
+  frc::sim::StepTiming(0_ms);  // Wait for Notifiers
+
+  EXPECT_EQ(0u, robot.m_disabledInitCount);
+  EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(0u, callbackCount);
+
+  frc::sim::StepTiming(7.5_ms);
+
+  EXPECT_EQ(0u, robot.m_disabledInitCount);
+  EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(0u, callbackCount);
+
+  frc::sim::StepTiming(7.5_ms);
+
+  EXPECT_EQ(0u, robot.m_disabledInitCount);
+  EXPECT_EQ(0u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(1u, callbackCount);
+
+  frc::sim::StepTiming(5_ms);
+
+  EXPECT_EQ(1u, robot.m_disabledInitCount);
+  EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(1u, callbackCount);
+
+  frc::sim::StepTiming(5_ms);
+
+  EXPECT_EQ(1u, robot.m_disabledInitCount);
+  EXPECT_EQ(1u, robot.m_disabledPeriodicCount);
+  EXPECT_EQ(2u, callbackCount);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
