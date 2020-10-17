@@ -115,7 +115,8 @@ subprojects {
                     String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
                     exec {
                         workingDir rootDir
-                        def args = ['sh', 'codesign.sh', project.findProperty("developerID"), path]
+                        def args = ["sh", "-c", "codesign --force --strict --timestamp --options=runtime " +
+                                    "--verbose -s ${project.findProperty("developerID")} ${path}"]
                         commandLine args
                     }
                 }

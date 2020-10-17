@@ -48,8 +48,6 @@ jobs:
           - os: macos-latest
             artifact-name: macOS
             architecture: x64
-    env:
-      developer-id: ${{ secrets.DEVELOPER_ID }}
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -62,19 +60,25 @@ jobs:
           architecture: ${{ matrix.architecture }}
       - uses: devbotsxyz/xcode-import-certificate@v1
         name: Import Developer ID Certificate
-        if: ${{ matrix.artifact-name == 'macOS' && env.developer-id != 0 }}
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
         with:
           certificate-data: ${{ secrets.CERTIFICATE_DATA }}
           certificate-passphrase: ${{ secrets.CERTIFICATE_PASSWORD }}
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
       - name: Set Keychain Lock Timeout
         run: security set-keychain-settings -lut 2700
-        if: ${{ matrix.artifact-name == 'macOS' && env.developer-id != 0}}
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
       - name: Build with Gradle
         run: ./gradlew build -PbuildServer
       - name: Sign Libraries with Developer ID
         run: ./gradlew build -PbuildServer -PdeveloperID=${{ secrets.DEVELOPER_ID }}
-        if: ${{ matrix.artifact-name == 'macOS' && env.developer-id != 0 }}
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
