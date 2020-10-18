@@ -108,6 +108,23 @@ public class DriverStation {
     @SuppressWarnings("MemberName")
     NetworkTableEntry controlWord;
 
+    @SuppressWarnings("MemberName")
+    boolean oldIsRedAlliance = true;
+    @SuppressWarnings("MemberName")
+    int oldStationNumber = 1;
+    @SuppressWarnings("MemberName")
+    String oldEventName = "";
+    @SuppressWarnings("MemberName")
+    String oldGameSpecificMessage = "";
+    @SuppressWarnings("MemberName")
+    int oldMatchNumber;
+    @SuppressWarnings("MemberName")
+    int oldReplayNumber;
+    @SuppressWarnings("MemberName")
+    int oldMatchType;
+    @SuppressWarnings("MemberName")
+    int oldControlWord;
+
     MatchDataSender() {
       table = NetworkTableInstance.getDefault().getTable("FMSInfo");
       typeMetadata = table.getEntry(".type");
@@ -128,6 +145,87 @@ public class DriverStation {
       station.forceSetDouble(1);
       controlWord = table.getEntry("FMSControlData");
       controlWord.forceSetDouble(0);
+    }
+
+    @SuppressWarnings("PMD.NPathComplexity")
+    private void sendMatchData(DriverStation driverStation) {
+      AllianceStationID allianceID = HAL.getAllianceStation();
+      boolean isRedAlliance = false;
+      int stationNumber = 1;
+      switch (allianceID) {
+        case Blue1:
+          isRedAlliance = false;
+          stationNumber = 1;
+          break;
+        case Blue2:
+          isRedAlliance = false;
+          stationNumber = 2;
+          break;
+        case Blue3:
+          isRedAlliance = false;
+          stationNumber = 3;
+          break;
+        case Red1:
+          isRedAlliance = true;
+          stationNumber = 1;
+          break;
+        case Red2:
+          isRedAlliance = true;
+          stationNumber = 2;
+          break;
+        default:
+          isRedAlliance = true;
+          stationNumber = 3;
+          break;
+      }
+
+      String currentEventName;
+      String currentGameSpecificMessage;
+      int currentMatchNumber;
+      int currentReplayNumber;
+      int currentMatchType;
+      int currentControlWord;
+      synchronized (driverStation.m_cacheDataMutex) {
+        currentEventName = driverStation.m_matchInfo.eventName;
+        currentGameSpecificMessage = driverStation.m_matchInfo.gameSpecificMessage;
+        currentMatchNumber = driverStation.m_matchInfo.matchNumber;
+        currentReplayNumber = driverStation.m_matchInfo.replayNumber;
+        currentMatchType = driverStation.m_matchInfo.matchType;
+      }
+      currentControlWord = HAL.nativeGetControlWord();
+
+      if (oldIsRedAlliance != isRedAlliance) {
+        alliance.setBoolean(isRedAlliance);
+        oldIsRedAlliance = isRedAlliance;
+      }
+      if (oldStationNumber != stationNumber) {
+        station.setDouble(stationNumber);
+        oldStationNumber = stationNumber;
+      }
+      if (!oldEventName.equals(currentEventName)) {
+        eventName.setString(currentEventName);
+        oldEventName = currentEventName;
+      }
+      if (!oldGameSpecificMessage.equals(currentGameSpecificMessage)) {
+        gameSpecificMessage.setString(currentGameSpecificMessage);
+        oldGameSpecificMessage = currentGameSpecificMessage;
+      }
+      if (currentMatchNumber != oldMatchNumber) {
+        matchNumber.setDouble(currentMatchNumber);
+        oldMatchNumber = currentMatchNumber;
+      }
+      if (currentReplayNumber != oldReplayNumber) {
+        replayNumber.setDouble(currentReplayNumber);
+        oldReplayNumber = currentReplayNumber;
+      }
+      if (currentMatchType != oldMatchType) {
+        matchType.setDouble(currentMatchType);
+        oldMatchType = currentMatchType;
+      }
+      if (currentControlWord != oldControlWord) {
+        controlWord.setDouble(currentControlWord);
+        oldControlWord = currentControlWord;
+      }
     }
   }
 
@@ -988,78 +1086,6 @@ public class DriverStation {
     m_userInTest = entering;
   }
 
-  private void sendMatchData() {
-    AllianceStationID alliance = HAL.getAllianceStation();
-    boolean isRedAlliance = false;
-    int stationNumber = 1;
-    switch (alliance) {
-      case Blue1:
-        isRedAlliance = false;
-        stationNumber = 1;
-        break;
-      case Blue2:
-        isRedAlliance = false;
-        stationNumber = 2;
-        break;
-      case Blue3:
-        isRedAlliance = false;
-        stationNumber = 3;
-        break;
-      case Red1:
-        isRedAlliance = true;
-        stationNumber = 1;
-        break;
-      case Red2:
-        isRedAlliance = true;
-        stationNumber = 2;
-        break;
-      default:
-        isRedAlliance = true;
-        stationNumber = 3;
-        break;
-    }
-
-
-    String eventName;
-    String gameSpecificMessage;
-    int matchNumber;
-    int replayNumber;
-    int matchType;
-    int controlWord;
-    synchronized (m_cacheDataMutex) {
-      eventName = m_matchInfo.eventName;
-      gameSpecificMessage = m_matchInfo.gameSpecificMessage;
-      matchNumber = m_matchInfo.matchNumber;
-      replayNumber = m_matchInfo.replayNumber;
-      matchType = m_matchInfo.matchType;
-      controlWord = HAL.nativeGetControlWord();
-    }
-    if (m_matchDataSender.alliance.getBoolean(true) != isRedAlliance) {
-      m_matchDataSender.alliance.setBoolean(isRedAlliance);
-    }
-    if (m_matchDataSender.station.getDouble(1) != stationNumber) {
-      m_matchDataSender.station.setDouble(stationNumber);
-    }
-    if (!m_matchDataSender.eventName.getString("").equals(eventName)) {
-      m_matchDataSender.eventName.setString(eventName);
-    }
-    if (!m_matchDataSender.gameSpecificMessage.getString("").equals(gameSpecificMessage)) {
-      m_matchDataSender.gameSpecificMessage.setString(gameSpecificMessage);
-    }
-    if (m_matchDataSender.matchNumber.getDouble(0) != matchNumber) {
-      m_matchDataSender.matchNumber.setDouble(matchNumber);
-    }
-    if (m_matchDataSender.replayNumber.getDouble(0) != replayNumber) {
-      m_matchDataSender.replayNumber.setDouble(replayNumber);
-    }
-    if (m_matchDataSender.matchType.getDouble(0) != matchType) {
-      m_matchDataSender.matchType.setDouble(matchType);
-    }
-    if (m_matchDataSender.controlWord.getDouble(0) != controlWord) {
-      m_matchDataSender.controlWord.setDouble(controlWord);
-    }
-  }
-
   /**
    * Forces waitForData() to return immediately.
    */
@@ -1124,7 +1150,7 @@ public class DriverStation {
     }
 
     wakeupWaitForData();
-    sendMatchData();
+    m_matchDataSender.sendMatchData(this);
   }
 
   /**
