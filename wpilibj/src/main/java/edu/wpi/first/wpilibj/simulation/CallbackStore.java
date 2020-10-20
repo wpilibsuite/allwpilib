@@ -5,18 +5,31 @@
 package edu.wpi.first.wpilibj.simulation;
 
 public class CallbackStore implements AutoCloseable {
+
+  /**
+   * <b>Note: This interface is for simulation classes only and should not be used by teams!</b>
+   */
   interface CancelCallbackFunc {
     void cancel(int index, int uid);
   }
 
+  /**
+   * <b>Note: This interface is for simulation classes only and should not be used by teams!</b>
+   */
   interface CancelCallbackChannelFunc {
     void cancel(int index, int channel, int uid);
   }
 
+  /**
+   * <b>Note: This interface is for simulation classes only and should not be used by teams!</b>
+   */
   interface CancelCallbackNoIndexFunc {
     void cancel(int uid);
   }
 
+  /**
+   * <b>Note: This constructor is for simulation classes only and should not be called by teams!</b>
+   */
   public CallbackStore(int index, int uid, CancelCallbackFunc ccf) {
     this.m_cancelType = kNormalCancel;
     this.m_index = index;
@@ -24,6 +37,9 @@ public class CallbackStore implements AutoCloseable {
     this.m_cancelCallback = ccf;
   }
 
+  /**
+   * <b>Note: This constructor is for simulation classes only and should not be called by teams!</b>
+   */
   public CallbackStore(int index, int channel, int uid, CancelCallbackChannelFunc ccf) {
     this.m_cancelType = kChannelCancel;
     this.m_index = index;
@@ -32,6 +48,9 @@ public class CallbackStore implements AutoCloseable {
     this.m_cancelCallbackChannel = ccf;
   }
 
+  /**
+   * <b>Note: This constructor is for simulation classes only and should not be called by teams!</b>
+   */
   public CallbackStore(int uid, CancelCallbackNoIndexFunc ccf) {
     this.m_cancelType = kNoIndexCancel;
     this.m_uid = uid;
@@ -49,6 +68,9 @@ public class CallbackStore implements AutoCloseable {
   private static final int kNoIndexCancel = 2;
   private int m_cancelType;
 
+  /**
+   * Cancel the callback associated with this object
+   */
   @Override
   public void close() {
     switch (m_cancelType) {
