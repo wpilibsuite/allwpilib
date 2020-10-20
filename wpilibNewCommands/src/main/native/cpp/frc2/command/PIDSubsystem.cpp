@@ -12,6 +12,7 @@ using namespace frc2;
 PIDSubsystem::PIDSubsystem(PIDController controller, double initialPosition)
     : m_controller{controller} {
   SetSetpoint(initialPosition);
+  AddChild("PID Controller", &m_controller);
 }
 
 void PIDSubsystem::Periodic() {
