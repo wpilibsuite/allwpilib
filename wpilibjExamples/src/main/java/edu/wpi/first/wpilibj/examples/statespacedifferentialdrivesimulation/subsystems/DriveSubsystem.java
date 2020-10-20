@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.Constants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -24,18 +23,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 
+import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.Constants.DriveConstants;
+
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
   private final SpeedControllerGroup m_leftMotors =
       new SpeedControllerGroup(
-          new PWMVictorSPX(Constants.DriveConstants.kLeftMotor1Port),
-          new PWMVictorSPX(Constants.DriveConstants.kLeftMotor2Port));
+          new PWMVictorSPX(DriveConstants.kLeftMotor1Port),
+          new PWMVictorSPX(DriveConstants.kLeftMotor2Port));
 
   // The motors on the right side of the drive.
   private final SpeedControllerGroup m_rightMotors =
       new SpeedControllerGroup(
-          new PWMVictorSPX(Constants.DriveConstants.kRightMotor1Port),
-          new PWMVictorSPX(Constants.DriveConstants.kRightMotor2Port));
+          new PWMVictorSPX(DriveConstants.kRightMotor1Port),
+          new PWMVictorSPX(DriveConstants.kRightMotor2Port));
 
   // The robot's drive
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
@@ -43,16 +44,16 @@ public class DriveSubsystem extends SubsystemBase {
   // The left-side drive encoder
   private final Encoder m_leftEncoder =
       new Encoder(
-          Constants.DriveConstants.kLeftEncoderPorts[0],
-          Constants.DriveConstants.kLeftEncoderPorts[1],
-          Constants.DriveConstants.kLeftEncoderReversed);
+          DriveConstants.kLeftEncoderPorts[0],
+          DriveConstants.kLeftEncoderPorts[1],
+          DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
   private final Encoder m_rightEncoder =
       new Encoder(
-          Constants.DriveConstants.kRightEncoderPorts[0],
-          Constants.DriveConstants.kRightEncoderPorts[1],
-          Constants.DriveConstants.kRightEncoderReversed);
+          DriveConstants.kRightEncoderPorts[0],
+          DriveConstants.kRightEncoderPorts[1],
+          DriveConstants.kRightEncoderReversed);
 
   // The gyro sensor
   private final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro();
@@ -71,8 +72,8 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Sets the distance per pulse for the encoders
-    m_leftEncoder.setDistancePerPulse(Constants.DriveConstants.kEncoderDistancePerPulse);
-    m_rightEncoder.setDistancePerPulse(Constants.DriveConstants.kEncoderDistancePerPulse);
+    m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
 
     resetEncoders();
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
@@ -81,11 +82,11 @@ public class DriveSubsystem extends SubsystemBase {
       // This class simulates our drivetrain's motion around the field.
       m_drivetrainSimulator =
           new DifferentialDrivetrainSim(
-              Constants.DriveConstants.kDrivetrainPlant,
-              Constants.DriveConstants.kDriveGearbox,
-              Constants.DriveConstants.kDriveGearing,
-              Constants.DriveConstants.kTrackwidthMeters,
-              Constants.DriveConstants.kWheelDiameterMeters / 2.0,
+              DriveConstants.kDrivetrainPlant,
+              DriveConstants.kDriveGearbox,
+              DriveConstants.kDriveGearing,
+              DriveConstants.kTrackwidthMeters,
+              DriveConstants.kWheelDiameterMeters / 2.0,
               VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
       // The encoder and gyro angle sims let us set simulated sensor readings
@@ -247,6 +248,6 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getHeading() {
     return Math.IEEEremainder(m_gyro.getAngle(), 360)
-        * (Constants.DriveConstants.kGyroReversed ? -1.0 : 1.0);
+        * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }
