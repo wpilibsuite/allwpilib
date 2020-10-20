@@ -60,7 +60,7 @@ public class DifferentialDrivetrainSim {
    * Create a SimDrivetrain.
    *
    * @param driveMotor A {@link DCMotor} representing the left side of the drivetrain.
-   * @param gearing The gearing on the drive between motor and wheel, as output over input. This
+   * @param gearing The gearing ratio between motor and wheel, as output over input. This
    *     must be the same ratio as the ratio used to identify or create the drivetrainPlant.
    * @param jKgMetersSquared The moment of inertia of the drivetrain about its center.
    * @param massKg The mass of the drivebase.
@@ -148,6 +148,10 @@ public class DifferentialDrivetrainSim {
     m_u = clampInput(VecBuilder.fill(leftVoltageVolts, rightVoltageVolts));
   }
 
+  /**
+   * Update the drivetrain states with the current time difference.
+   * @param dtSeconds the time difference
+   */
   @SuppressWarnings("LocalVariableName")
   public void update(double dtSeconds) {
 
@@ -448,6 +452,7 @@ public class DifferentialDrivetrainSim {
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
    */
+  @SuppressWarnings("ParameterName")
   public static DifferentialDrivetrainSim createKitbotSim(
       KitbotMotor motor,
       KitbotGearing gearing,

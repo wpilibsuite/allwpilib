@@ -102,7 +102,7 @@ public class AnalogTriggerSim {
   }
 
   /**
-   * Change the lower bound
+   * Change the lower bound.
    * @param triggerLowerBound the new lower bound
    */
   public void setTriggerLowerBound(double triggerLowerBound) {
@@ -131,7 +131,7 @@ public class AnalogTriggerSim {
   }
 
   /**
-   * Change the upper bound
+   * Change the upper bound.
    * @param triggerUpperBound the new upper bound
    */
   public void setTriggerUpperBound(double triggerUpperBound) {

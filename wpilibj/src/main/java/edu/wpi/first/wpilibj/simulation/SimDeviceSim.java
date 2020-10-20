@@ -87,7 +87,7 @@ public class SimDeviceSim {
   }
 
   /**
-   * Get all data of this object
+   * Get all data of this object.
    * @return all data and fields of this object
    */
   public SimDeviceDataJNI.SimValueInfo[] enumerateValues() {
@@ -95,7 +95,7 @@ public class SimDeviceSim {
   }
 
   /**
-   * Get the native handle of this object
+   * Get the native handle of this object.
    * @return the handle used to refer to this object through JNI
    */
   public int getNativeHandle() {
@@ -129,7 +129,7 @@ public class SimDeviceSim {
   }
 
   /**
-   * Get all sim devices with the given prefix
+   * Get all sim devices with the given prefix.
    * @param prefix the prefix to filter sim devices
    * @return all sim devices
    */

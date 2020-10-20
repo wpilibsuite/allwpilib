@@ -36,6 +36,12 @@ public class PCMSim {
     m_index = compressor.getModule();
   }
 
+  /**
+   * Register a callback to be run every time a new solenoid is created.
+   * @param callback the callback
+   * @param initialNotify should the callback be run with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerSolenoidInitializedCallback(
       int channel, NotifyCallback callback, boolean initialNotify) {
     int uid =
@@ -43,6 +49,11 @@ public class PCMSim {
     return new CallbackStore(m_index, channel, uid, PCMDataJNI::cancelSolenoidInitializedCallback);
   }
 
+  /**
+   * Check if a solenoid has been initialized on a specific channel.
+   * @param channel the channel to check
+   * @return true if initialized
+   */
   public boolean getSolenoidInitialized(int channel) {
     return PCMDataJNI.getSolenoidInitialized(m_index, channel);
   }
@@ -57,10 +68,20 @@ public class PCMSim {
     return new CallbackStore(m_index, channel, uid, PCMDataJNI::cancelSolenoidOutputCallback);
   }
 
+  /**
+   * Check the solenoid output on a specific channel.
+   * @param channel the channel to check
+   * @return the solenoid output
+   */
   public boolean getSolenoidOutput(int channel) {
     return PCMDataJNI.getSolenoidOutput(m_index, channel);
   }
 
+  /**
+   * Change the solenoid output on a specific channel.
+   * @param channel the channel to check
+   * @param solenoidOutput  the new solenoid output
+   */
   public void setSolenoidOutput(int channel, boolean solenoidOutput) {
     PCMDataJNI.setSolenoidOutput(m_index, channel, solenoidOutput);
   }
@@ -85,10 +106,18 @@ public class PCMSim {
     return new CallbackStore(m_index, uid, PCMDataJNI::cancelCompressorOnCallback);
   }
 
+  /**
+   * Check if the compressor is on.
+   * @return true if the compressor is active
+   */
   public boolean getCompressorOn() {
     return PCMDataJNI.getCompressorOn(m_index);
   }
 
+  /**
+   * Set whether the compressor is active.
+   * @param compressorOn the new value
+   */
   public void setCompressorOn(boolean compressorOn) {
     PCMDataJNI.setCompressorOn(m_index, compressorOn);
   }
@@ -99,10 +128,18 @@ public class PCMSim {
     return new CallbackStore(m_index, uid, PCMDataJNI::cancelClosedLoopEnabledCallback);
   }
 
+  /**
+   * Check whether the closed loop compressor control is active.
+   * @return true if active
+   */
   public boolean getClosedLoopEnabled() {
     return PCMDataJNI.getClosedLoopEnabled(m_index);
   }
 
+  /**
+   * Turn on/off the closed loop control of the compressor.
+   * @param closedLoopEnabled whether the control loop is active
+   */
   public void setClosedLoopEnabled(boolean closedLoopEnabled) {
     PCMDataJNI.setClosedLoopEnabled(m_index, closedLoopEnabled);
   }
@@ -113,10 +150,18 @@ public class PCMSim {
     return new CallbackStore(m_index, uid, PCMDataJNI::cancelPressureSwitchCallback);
   }
 
+  /**
+   * Check the value of the pressure switch.
+   * @return the pressure switch value
+   */
   public boolean getPressureSwitch() {
     return PCMDataJNI.getPressureSwitch(m_index);
   }
 
+  /**
+   * Set the value of the pressure switch.
+   * @param pressureSwitch the new value
+   */
   public void setPressureSwitch(boolean pressureSwitch) {
     PCMDataJNI.setPressureSwitch(m_index, pressureSwitch);
   }
@@ -127,14 +172,25 @@ public class PCMSim {
     return new CallbackStore(m_index, uid, PCMDataJNI::cancelCompressorCurrentCallback);
   }
 
+  /**
+   * Read the compressor current.
+   * @return the current of the compressor connected to this module
+   */
   public double getCompressorCurrent() {
     return PCMDataJNI.getCompressorCurrent(m_index);
   }
 
+  /**
+   * Set the compressor current.
+   * @param compressorCurrent the new compressor current
+   */
   public void setCompressorCurrent(double compressorCurrent) {
     PCMDataJNI.setCompressorCurrent(m_index, compressorCurrent);
   }
 
+  /**
+   * Reset all simulation data for this object.
+   */
   public void resetData() {
     PCMDataJNI.resetData(m_index);
   }

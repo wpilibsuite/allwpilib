@@ -62,7 +62,7 @@ public class AddressableLEDSim {
   }
 
   /**
-   * Register a callback on the Initialized property
+   * Register a callback on the Initialized property.
    * @param callback the callback that will be called whenever the Initialized property is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object storing this callback
@@ -73,7 +73,7 @@ public class AddressableLEDSim {
   }
 
   /**
-   * Check if initialized
+   * Check if initialized.
    * @return true if initialized
    */
   public boolean getInitialized() {

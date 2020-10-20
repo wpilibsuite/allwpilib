@@ -42,7 +42,7 @@ public class DriverStationSim {
 
   /**
    * Register a callback on whether the DS is in autonomous mode.
-   * @param callback the callback that will be called whenever the autonomous mode is entered or left
+   * @param callback the callback that will be called on autonomous mode entrance/exit
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
    */
@@ -116,7 +116,7 @@ public class DriverStationSim {
   }
 
   /**
-   * Set whether eStop is active
+   * Set whether eStop is active.
    * @param eStop true to activate
    */
   @SuppressWarnings("ParameterName")

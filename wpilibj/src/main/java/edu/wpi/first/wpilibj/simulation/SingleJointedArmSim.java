@@ -116,6 +116,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param armMassKg The mass of the arm.
    * @param simulateGravity Whether gravity should be simulated or not.
    */
+  @SuppressWarnings("ParameterName")
   public SingleJointedArmSim(
       DCMotor gearbox,
       double gearing,
@@ -151,6 +152,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param simulateGravity Whether gravity should be simulated or not.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
+  @SuppressWarnings("ParameterName")
   public SingleJointedArmSim(
       DCMotor gearbox,
       double gearing,

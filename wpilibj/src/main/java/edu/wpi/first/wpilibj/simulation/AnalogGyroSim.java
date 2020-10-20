@@ -31,7 +31,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Register a callback on the angle
+   * Register a callback on the angle.
    * @param callback the callback that will be called whenever the angle changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -42,7 +42,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Get the current angle of the gyro
+   * Get the current angle of the gyro.
    * @return the angle measured by the gyro
    */
   public double getAngle() {
@@ -50,7 +50,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Change the angle measured by the gyro
+   * Change the angle measured by the gyro.
    * @param angle the new value
    */
   public void setAngle(double angle) {
@@ -58,7 +58,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Register a callback on the rate
+   * Register a callback on the rate.
    * @param callback the callback that will be called whenever the rate changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -69,7 +69,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Get the rate of angle change on this gyro
+   * Get the rate of angle change on this gyro.
    * @return the rate
    */
   public double getRate() {
@@ -77,7 +77,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Change the rate of the gyro
+   * Change the rate of the gyro.
    * @param rate the new rate
    */
   public void setRate(double rate) {
@@ -85,7 +85,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Register a callback on whether the gyro is initialized
+   * Register a callback on whether the gyro is initialized.
    * @param callback the callback that will be called whenever the gyro is initialized
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -96,7 +96,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Check if the gyro is initialized
+   * Check if the gyro is initialized.
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -104,7 +104,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Set whether this gyro is initialized
+   * Set whether this gyro is initialized.
    * @param initialized the new value
    */
   public void setInitialized(boolean initialized) {
@@ -112,7 +112,7 @@ public class AnalogGyroSim {
   }
 
   /**
-   * Reset all simulation data for this object
+   * Reset all simulation data for this object.
    */
   public void resetData() {
     AnalogGyroDataJNI.resetData(m_index);

@@ -42,7 +42,7 @@ public class AnalogInputSim {
   }
 
   /**
-   * Check if this analog input has been initialized
+   * Check if this analog input has been initialized.
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -50,7 +50,7 @@ public class AnalogInputSim {
   }
 
   /**
-   * Change whether this analog input has been initialized
+   * Change whether this analog input has been initialized.
    * @param initialized the new value
    */
   public void setInitialized(boolean initialized) {
@@ -58,7 +58,7 @@ public class AnalogInputSim {
   }
 
   /**
-   * Register a callback on the number of average bits
+   * Register a callback on the number of average bits.
    * @param callback the callback that will be called whenever the number of average bits is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -154,7 +154,7 @@ public class AnalogInputSim {
   }
 
   /**
-   * Check if the accumulator has been initialized
+   * Check if the accumulator has been initialized.
    * @return true if initialized
    */
   public boolean getAccumulatorInitialized() {
@@ -162,7 +162,7 @@ public class AnalogInputSim {
   }
 
   /**
-   * Change whether the accumulator has been initialized
+   * Change whether the accumulator has been initialized.
    * @param accumulatorInitialized the new value
    */
   public void setAccumulatorInitialized(boolean accumulatorInitialized) {

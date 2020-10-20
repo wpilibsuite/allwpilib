@@ -97,7 +97,7 @@ public class XboxControllerSim extends GenericHIDSim {
   }
 
   /**
-   * Change the value of the A button
+   * Change the value of the A button.
    * @param state the new value
    */
   public void setAButton(boolean state) {
@@ -105,7 +105,7 @@ public class XboxControllerSim extends GenericHIDSim {
   }
 
   /**
-   * Change the value of the B button
+   * Change the value of the B button.
    * @param state the new value
    */
   public void setBButton(boolean state) {
@@ -113,7 +113,7 @@ public class XboxControllerSim extends GenericHIDSim {
   }
 
   /**
-   * Change the value of the X button
+   * Change the value of the X button.
    * @param state the new value
    */
   public void setXButton(boolean state) {
@@ -121,7 +121,7 @@ public class XboxControllerSim extends GenericHIDSim {
   }
 
   /**
-   * Change the value of the Y button
+   * Change the value of the Y button.
    * @param state the new value
    */
   public void setYButton(boolean state) {
@@ -129,7 +129,7 @@ public class XboxControllerSim extends GenericHIDSim {
   }
 
   /**
-   * Change the value of the Back button
+   * Change the value of the Back button.
    * @param state the new value
    */
   public void setBackButton(boolean state) {
@@ -137,7 +137,7 @@ public class XboxControllerSim extends GenericHIDSim {
   }
 
   /**
-   * Change the value of the Start button
+   * Change the value of the Start button.
    * @param state the new value
    */
   public void setStartButton(boolean state) {

@@ -71,7 +71,7 @@ public class CallbackStore implements AutoCloseable {
   private int m_cancelType;
 
   /**
-   * Cancel the callback associated with this object
+   * Cancel the callback associated with this object.
    */
   @Override
   public void close() {
