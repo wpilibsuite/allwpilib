@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.simulation;
 
 public class CallbackStore implements AutoCloseable {
-
   /**
    * <b>Note: This interface is for simulation classes only and should not be used by teams!</b>
    */
