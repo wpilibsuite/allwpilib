@@ -25,6 +25,11 @@ public class SimDeviceSim {
     m_handle = SimDeviceDataJNI.getSimDeviceHandle(name);
   }
 
+  /**
+   * Get the property object with the given name.
+   * @param name the property name
+   * @return the value
+   */
   public SimValue getValue(String name) {
     int handle = SimDeviceDataJNI.getSimValueHandle(m_handle, name);
     if (handle <= 0) {
@@ -33,6 +38,11 @@ public class SimDeviceSim {
     return new SimValue(handle);
   }
 
+  /**
+   * Get the property object with the given name.
+   * @param name the property name
+   * @return the value
+   */
   public SimDouble getDouble(String name) {
     int handle = SimDeviceDataJNI.getSimValueHandle(m_handle, name);
     if (handle <= 0) {
@@ -41,6 +51,11 @@ public class SimDeviceSim {
     return new SimDouble(handle);
   }
 
+  /**
+   * Get the property object with the given name.
+   * @param name the property name
+   * @return the value
+   */
   public SimEnum getEnum(String name) {
     int handle = SimDeviceDataJNI.getSimValueHandle(m_handle, name);
     if (handle <= 0) {
@@ -49,6 +64,11 @@ public class SimDeviceSim {
     return new SimEnum(handle);
   }
 
+  /**
+   * Get the property object with the given name.
+   * @param name the property name
+   * @return the value
+   */
   public SimBoolean getBoolean(String name) {
     int handle = SimDeviceDataJNI.getSimValueHandle(m_handle, name);
     if (handle <= 0) {
@@ -57,24 +77,49 @@ public class SimDeviceSim {
     return new SimBoolean(handle);
   }
 
+  /**
+   * Get all options for the given enum.
+   * @param val the enum
+   * @return names of the different values for that enum
+   */
   public static String[] getEnumOptions(SimEnum val) {
     return SimDeviceDataJNI.getSimValueEnumOptions(val.getNativeHandle());
   }
 
+  /**
+   * Get all data of this object
+   * @return all data and fields of this object
+   */
   public SimDeviceDataJNI.SimValueInfo[] enumerateValues() {
     return SimDeviceDataJNI.enumerateSimValues(m_handle);
   }
 
+  /**
+   * Get the native handle of this object
+   * @return the handle used to refer to this object through JNI
+   */
   public int getNativeHandle() {
     return m_handle;
   }
 
+  /**
+   * Register a callback to be run every time a new value is added to this device.
+   * @param callback the callback
+   * @param initialNotify should the callback be run with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerValueCreatedCallback(
       SimValueCallback callback, boolean initialNotify) {
     int uid = SimDeviceDataJNI.registerSimValueCreatedCallback(m_handle, callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueCreatedCallback);
   }
 
+  /**
+   * Register a callback to be run every time a value is changed on this device.
+   * @param callback the callback
+   * @param initialNotify should the callback be run with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerValueChangedCallback(
       SimValue value, SimValueCallback callback, boolean initialNotify) {
     int uid =
@@ -83,22 +128,41 @@ public class SimDeviceSim {
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueChangedCallback);
   }
 
+  /**
+   * Get all sim devices with the given prefix
+   * @param prefix the prefix to filter sim devices
+   * @return all sim devices
+   */
   public static SimDeviceDataJNI.SimDeviceInfo[] enumerateDevices(String prefix) {
     return SimDeviceDataJNI.enumerateSimDevices(prefix);
   }
 
+  /**
+   * Register a callback to be run every time a new {@link SimDevice} is created.
+   * @param callback the callback
+   * @param initialNotify should the callback be run with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public static CallbackStore registerDeviceCreatedCallback(
       String prefix, SimDeviceCallback callback, boolean initialNotify) {
     int uid = SimDeviceDataJNI.registerSimDeviceCreatedCallback(prefix, callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceCreatedCallback);
   }
 
+  /**
+   * Register a callback to be run every time a {@link SimDevice} is freed/destroyed.
+   * @param callback the callback
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public static CallbackStore registerDeviceFreedCallback(
       String prefix, SimDeviceCallback callback, boolean initialNotify) {
     int uid = SimDeviceDataJNI.registerSimDeviceFreedCallback(prefix, callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceFreedCallback);
   }
 
+  /**
+   * Reset all SimDevice data.
+   */
   public static void resetData() {
     SimDeviceDataJNI.resetSimDeviceData();
   }

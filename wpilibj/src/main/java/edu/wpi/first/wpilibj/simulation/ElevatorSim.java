@@ -133,6 +133,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param x The current elevator state.
    * @return Whether the elevator has hit the lower limit.
    */
+  @SuppressWarnings("ParameterName")
   public boolean hasHitLowerLimit(Matrix<N2, N1> x) {
     return x.get(0, 0) < this.m_minHeight;
   }
@@ -143,6 +144,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param x The current elevator state.
    * @return Whether the elevator has hit the upper limit.
    */
+  @SuppressWarnings("ParameterName")
   public boolean hasHitUpperLimit(Matrix<N2, N1> x) {
     return x.get(0, 0) > this.m_maxHeight;
   }
@@ -198,6 +200,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param u The system inputs (voltage).
    * @param dtSeconds The time difference between controller updates.
    */
+  @SuppressWarnings("ParameterName")
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.

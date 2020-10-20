@@ -108,7 +108,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    *
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the arm. This can be calculated from CAD
+   * @param jKgMetersSquared The moment of inertia of the arm, can be calculated from CAD
    *     software.
    * @param armLengthMeters The length of the arm.
    * @param minAngleRads The minimum angle that the arm is capable of.
@@ -142,7 +142,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    *
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the arm. This can be calculated from CAD
+   * @param jKgMetersSquared The moment of inertia of the arm,can be calculated from CAD
    *     software.
    * @param armLengthMeters The length of the arm.
    * @param minAngleRads The minimum angle that the arm is capable of.
@@ -179,6 +179,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param x The current arm state.
    * @return Whether the arm has hit the lower limit.
    */
+  @SuppressWarnings("ParameterName")
   public boolean hasHitLowerLimit(Matrix<N2, N1> x) {
     return x.get(0, 0) < this.m_minAngle;
   }
@@ -189,6 +190,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param x The current arm state.
    * @return Whether the arm has hit the upper limit.
    */
+  @SuppressWarnings("ParameterName")
   public boolean hasHitUpperLimit(Matrix<N2, N1> x) {
     return x.get(0, 0) > this.m_maxAngle;
   }
@@ -252,6 +254,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param dtSeconds The time difference between controller updates.
    */
   @Override
+  @SuppressWarnings("ParameterName")
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Horizontal case:
     // Torque = F * r = I * alpha

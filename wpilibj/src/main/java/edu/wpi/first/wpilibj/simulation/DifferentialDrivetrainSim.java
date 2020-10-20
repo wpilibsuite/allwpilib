@@ -72,6 +72,7 @@ public class DifferentialDrivetrainSim {
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
    */
+  @SuppressWarnings("ParameterName")
   public DifferentialDrivetrainSim(
       DCMotor driveMotor,
       double gearing,
@@ -163,6 +164,11 @@ public class DifferentialDrivetrainSim {
     return m_x;
   }
 
+  /**
+   * Get one of the drivetrain states.
+   * @param state the state to get
+   * @return the state
+   */
   double getState(State state) {
     return m_x.get(state.value, 0);
   }
@@ -221,6 +227,10 @@ public class DifferentialDrivetrainSim {
     return getOutput(State.kLeftVelocity);
   }
 
+  /**
+   * Get the current draw of the drivetrain.
+   * @return the current draw, in amps
+   */
   public double getLeftCurrentDrawAmps() {
     var loadIleft =
         m_motor.getCurrent(
@@ -244,6 +254,10 @@ public class DifferentialDrivetrainSim {
     return getLeftCurrentDrawAmps() + getRightCurrentDrawAmps();
   }
 
+  /**
+   * Get the drivetrain gearing.
+   * @return the gearing ration
+   */
   public double getCurrentGearing() {
     return m_currentGearing;
   }
@@ -279,7 +293,7 @@ public class DifferentialDrivetrainSim {
     m_x.set(State.kRightPosition.value, 0, 0);
   }
 
-  @SuppressWarnings({"DuplicatedCode", "LocalVariableName"})
+  @SuppressWarnings({"DuplicatedCode", "LocalVariableName", "ParameterName"})
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
 
     // Because G can be factored out of B, we can divide by the old ratio and multiply
@@ -339,6 +353,7 @@ public class DifferentialDrivetrainSim {
     @SuppressWarnings("MemberName")
     public final int value;
 
+    @SuppressWarnings("ParameterName")
     State(int i) {
       this.value = i;
     }
@@ -358,6 +373,7 @@ public class DifferentialDrivetrainSim {
     @SuppressWarnings("MemberName")
     public final double value;
 
+    @SuppressWarnings("ParameterName")
     KitbotGearing(double i) {
       this.value = i;
     }
@@ -372,6 +388,7 @@ public class DifferentialDrivetrainSim {
     @SuppressWarnings("MemberName")
     public final DCMotor value;
 
+    @SuppressWarnings("ParameterName")
     KitbotMotor(DCMotor i) {
       this.value = i;
     }
@@ -385,6 +402,7 @@ public class DifferentialDrivetrainSim {
     @SuppressWarnings("MemberName")
     public final double value;
 
+    @SuppressWarnings("ParameterName")
     KitbotWheelSize(double i) {
       this.value = i;
     }
