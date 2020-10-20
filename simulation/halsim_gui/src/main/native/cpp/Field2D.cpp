@@ -565,7 +565,10 @@ static void DisplayField2D() {
 
   // for dragging to work, there needs to be a button (otherwise the window is
   // dragged)
-  ImGui::InvisibleButton("field", ImGui::GetContentRegionAvail());
+  ImVec2 contentSize =
+      ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
+  if (contentSize.x <= 0 || contentSize.y <= 0) return;
+  ImGui::InvisibleButton("field", contentSize);
 
   // allow dragging the robot around
   ImVec2 cursor = ImGui::GetIO().MousePos - windowPos;
