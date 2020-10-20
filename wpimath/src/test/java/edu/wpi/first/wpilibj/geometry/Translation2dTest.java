@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@SuppressWarnings("PMD.TooManyMethods")
 class Translation2dTest {
   private static final double kEpsilon = 1E-9;
 
@@ -111,5 +112,17 @@ class Translation2dTest {
     var one = new Translation2d(9, 5.5);
     var two = new Translation2d(9, 5.7);
     assertNotEquals(one, two);
+  }
+
+  @Test
+  void testPolarConstructor() {
+    var one = new Translation2d(Math.sqrt(2), Rotation2d.fromDegrees(45.0));
+    var two = new Translation2d(2, Rotation2d.fromDegrees(60.0));
+    assertAll(
+        () -> assertEquals(one.getX(), 1.0, kEpsilon),
+        () -> assertEquals(one.getY(), 1.0, kEpsilon),
+        () -> assertEquals(two.getX(), 1.0, kEpsilon),
+        () -> assertEquals(two.getY(), Math.sqrt(3), kEpsilon)
+    );
   }
 }
