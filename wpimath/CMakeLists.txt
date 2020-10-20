@@ -7,7 +7,7 @@ include(AddTest)
 file(GLOB wpimath_jni_src src/main/native/cpp/jni/WPIMathJNI.cpp)
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
   find_package(Java REQUIRED)
   find_package(JNI REQUIRED)
   include(UseJava)
@@ -121,7 +121,7 @@ target_include_directories(wpimath PUBLIC
 install(TARGETS wpimath EXPORT wpimath DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 
-if (NOT WITHOUT_JAVA AND MSVC)
+if (WITH_JAVA AND MSVC)
     install(TARGETS wpimath RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
 endif()
 

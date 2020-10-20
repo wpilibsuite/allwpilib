@@ -27,19 +27,19 @@ If you are building with unit tests or simulation modules, you will also need an
 
 The following build options are available:
 
-* `WITHOUT_JAVA` (OFF Default)
-  * Enabling this option will disable Java and JNI builds. If this is off, `BUILD_SHARED_LIBS` must be on. Otherwise CMake will error.
-* `BUILD_SHARED_LIBS` (ON Default)
-  * Disabling this option will cause cmake to build static libraries instead of shared libraries. If this is off, `WITHOUT_JAVA` must be on. Otherwise CMake will error.
-* `WITH_TESTS` (OFF Default)
-  * Enabling this option will build C++ unit tests. These can be run via `make test`.
-* `WITHOUT_CSCORE` (OFF Default)
-  * Enabling this option will cause cscore to not be built. This will also implicitly disable cameraserver, the hal and wpilib as well, irrespective of their specific options. If this is on, the OpenCV build requirement is removed.
-* `WITHOUT_ALLWPILIB` (ON Default)
-  * Disabling this option will build the hal and wpilib during the build. The HAL is the simulator hal, unless the external hal options are used. The cmake build has no capability to build for the RoboRIO.
-* `WITH_SIMULATION_MODULES` (OFF Default)
-  * Enabling this option will build simulation modules, including wpigui and the HALSim plugins.
-* `USE_EXTERNAL_HAL` (OFF Default)
+* `WITH_JAVA` (ON Default)
+  * This option will enable Java and JNI builds. If this is on, `WITH_SHARED_LIBS` must be on. Otherwise CMake will error.
+* `WITH_SHARED_LIBS` (ON Default)
+  * This option will cause cmake to build static libraries instead of shared libraries. If this is off, `WITH_JAVA` must be off. Otherwise CMake will error.
+* `WITH_TESTS` (ON Default)
+  * This option will build C++ unit tests. These can be run via `make test`.
+* `WITH_CSCORE` (ON Default)
+  * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver, the hal and wpilib as well, irrespective of their specific options. If this is off, the OpenCV build requirement is removed.
+* `WITH_ALLWPILIB` (ON Default)
+  * This option will build the hal and wpilib during the build. The HAL is the simulator hal, unless the external hal options are used. The cmake build has no capability to build for the RoboRIO.
+* `WITH_SIMULATION_MODULES` (ON Default)
+  * This option will build simulation modules, including wpigui and the HALSim plugins.
+* `WITH_EXTERNAL_HAL` (OFF Default)
   * TODO
 * `EXTERNAL_HAL_FILE`
   * TODO
@@ -146,4 +146,4 @@ CMake Error at /usr/share/cmake-3.5/Modules/FindPackageHandleStandardArgs.cmake:
 
 If this happens, make sure you have a JDK of at least version 8 installed, and that your JAVA_HOME variable is set properly to point to the JDK.
 
-In addition, if you do not need Java, you can disable it with `-DWITHOUT_JAVA=ON`.
+In addition, if you do not need Java, you can disable it with `-DWITH_JAVA=OFF`.

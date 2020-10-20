@@ -3,7 +3,7 @@ project (wpilibj)
 find_package( OpenCV REQUIRED )
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
     find_package(Java REQUIRED)
     include(UseJava)
     set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")

@@ -31,7 +31,7 @@ install(FILES ${CMAKE_BINARY_DIR}/ntcore-config.cmake DESTINATION ${ntcore_confi
 install(EXPORT ntcore DESTINATION ${ntcore_config_dir})
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)

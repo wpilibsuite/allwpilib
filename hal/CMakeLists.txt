@@ -70,7 +70,7 @@ install(FILES ${CMAKE_BINARY_DIR}/hal-config.cmake DESTINATION ${hal_config_dir}
 install(EXPORT hal DESTINATION ${hal_config_dir})
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)

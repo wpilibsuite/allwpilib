@@ -94,7 +94,7 @@ jobs:
           - os: macos-latest
             name: macOS
             container: ""
-            flags: "-DWITHOUT_JAVA=ON"
+            flags: "-DWITH_JAVA=OFF"
     name: "Build - CMake ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -106,7 +106,7 @@ jobs:
             brew install opencv
           fi
       - name: configure
-        run: mkdir build && cd build && cmake -DWITHOUT_ALLWPILIB=OFF -DWITH_TESTS=ON ${{ matrix.flags }} ..
+        run: mkdir build && cd build && cmake -DWITH_SIMULATION_MODULES=OFF ${{ matrix.flags }} ..
       - name: build
         working-directory: build
         run: make -j3
@@ -130,7 +130,7 @@ jobs:
         uses: lukka/run-cmake@v3
         with:
           buildDirectory: ${{ runner.workspace }}/build/
-          cmakeAppendedArgs: -DWITHOUT_JAVA=ON -DWITHOUT_ALLWPILIB=OFF -DWITHOUT_CSCORE=OFF -DWITH_TESTS=ON
+          cmakeAppendedArgs: -DWITH_JAVA=OFF -DWITH_SIMULATION_MODULES=OFF
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           useVcpkgToolchainFile: true
       - name: Run Tests

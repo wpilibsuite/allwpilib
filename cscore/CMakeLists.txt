@@ -75,7 +75,7 @@ foreach(example ${cscore_examples})
 endforeach()
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
