@@ -90,6 +90,12 @@ It will be ignored.
     endif()
 endif()
 
+if (NOT WITH_WPILIB AND WITH_SIMULATION_MODULES)
+    message(FATAL_ERROR "
+FATAL: Cannot build simulation modules with wpilib disabled.
+       Enable wpilib by setting WITH_WPILIB=ON
+")
+
 set( wpilib_dest wpilib)
 set( include_dest wpilib/include )
 set( main_lib_dest wpilib/lib )
