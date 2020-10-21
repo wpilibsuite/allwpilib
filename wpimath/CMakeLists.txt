@@ -125,7 +125,7 @@ if (WITH_JAVA AND MSVC)
     install(TARGETS wpimath RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
 endif()
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (wpimath_config_dir ${wpilib_dest})
 else()
     set (wpimath_config_dir share/wpimath)

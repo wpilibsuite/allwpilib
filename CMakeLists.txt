@@ -44,7 +44,7 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 option(WITH_JAVA "Include java and JNI in the build" ON)
 option(WITH_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
-option(WITH_ALLWPILIB "Build allwpilib (needs OpenCV)" ON)
+option(WITH_WPILIB "Build hal, wpilibc/j, wpimath, and myRobot (needs OpenCV)" ON)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 
@@ -57,7 +57,7 @@ option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
 option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
 
 # Options for installation.
-option(WITH_FLAT_INSTALL_WPILIB "Use a flat install directory" OFF)
+option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
 
 # Options for location of OpenCV Java.
 set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
@@ -68,11 +68,16 @@ if (NOT CMAKE_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
 endif()
 
+# We always want flat install with MSVC.
+if (MSVC)
+  set(WITH_FLAT_INSTALL ON)
+endif()
+
 if (WITH_JAVA AND NOT WITH_SHARED_LIBS)
     message(FATAL_ERROR "
 FATAL: Cannot build static libs with Java enabled.
-       Static libs requires both BUILD_SHARED_LIBS=OFF and
-       WITHOUT_JAVA=ON
+       Static libs requires both WITH_SHARED_LIBS=OFF and
+       WITH_JAVA=OFF
 ")
 endif()
 
@@ -91,7 +96,7 @@ set( main_lib_dest wpilib/lib )
 set( java_lib_dest wpilib/java )
 set( jni_lib_dest wpilib/jni )
 
-if (MSVC OR WITH_FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (wpilib_config_dir ${wpilib_dest})
 else()
     set (wpilib_config_dir share/wpilib)
@@ -105,7 +110,7 @@ if (USE_VCPKG_EIGEN)
 set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
-if (MSVC OR WITH_FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
 set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
 set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
 set(CSCORE_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cscore-config.cmake)")
@@ -145,7 +150,7 @@ if (WITH_CSCORE)
     set(CAMERASERVER_DEP_REPLACE ${CAMERASERVER_DEP_REPLACE_IMPL})
     add_subdirectory(cscore)
     add_subdirectory(cameraserver)
-    if (WITH_ALLWPILIB)
+    if (WITH_WPILIB)
         set(HAL_DEP_REPLACE ${HAL_DEP_REPLACE_IMPL})
         set(WPILIBC_DEP_REPLACE ${WPILIBC_DEP_REPLACE_IMPL})
         add_subdirectory(hal)
