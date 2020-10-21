@@ -95,6 +95,7 @@ if (NOT WITH_WPILIB AND WITH_SIMULATION_MODULES)
 FATAL: Cannot build simulation modules with wpilib disabled.
        Enable wpilib by setting WITH_WPILIB=ON
 ")
+endif()
 
 set( wpilib_dest wpilib)
 set( include_dest wpilib/include )
