@@ -51,6 +51,18 @@ public class Translation2d {
   }
 
   /**
+   * Constructs a Translation2d with the provided distance and angle. This is
+   * essentially converting from polar coordinates to Cartesian coordinates.
+   *
+   * @param distance The distance from the origin to the end of the translation.
+   * @param angle    The angle between the x-axis and the translation vector.
+   */
+  public Translation2d(double distance, Rotation2d angle) {
+    m_x = distance * angle.getCos();
+    m_y = distance * angle.getSin();
+  }
+
+  /**
    * Calculates the distance between two translations in 2d space.
    *
    * <p>This function uses the pythagorean theorem to calculate the distance.

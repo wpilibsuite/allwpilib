@@ -41,6 +41,15 @@ class Translation2d {
   Translation2d(units::meter_t x, units::meter_t y);
 
   /**
+   * Constructs a Translation2d with the provided distance and angle. This is
+   * essentially converting from polar coordinates to Cartesian coordinates.
+   *
+   * @param distance The distance from the origin to the end of the translation.
+   * @param angle The angle between the x-axis and the translation vector.
+   */
+  Translation2d(units::meter_t distance, const Rotation2d& angle);
+
+  /**
    * Calculates the distance between two translations in 2d space.
    *
    * This function uses the pythagorean theorem to calculate the distance.

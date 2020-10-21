@@ -16,6 +16,9 @@ using namespace frc;
 Translation2d::Translation2d(units::meter_t x, units::meter_t y)
     : m_x(x), m_y(y) {}
 
+Translation2d::Translation2d(units::meter_t distance, const Rotation2d& angle)
+    : m_x(distance * angle.Cos()), m_y(distance * angle.Sin()) {}
+
 units::meter_t Translation2d::Distance(const Translation2d& other) const {
   return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
 }
