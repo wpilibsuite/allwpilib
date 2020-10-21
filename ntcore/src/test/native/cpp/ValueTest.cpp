@@ -241,7 +241,11 @@ TEST_F(ValueTest, StringArray) {
   NT_DisposeValue(&cv);
 }
 
+#ifdef NDEBUG
+TEST_F(ValueDeathTest, DISABLED_GetAssertions) {
+#else
 TEST_F(ValueDeathTest, GetAssertions) {
+#endif
   Value v;
   ASSERT_DEATH((void)v.GetBoolean(), "type == NT_BOOLEAN");
   ASSERT_DEATH((void)v.GetDouble(), "type == NT_DOUBLE");
