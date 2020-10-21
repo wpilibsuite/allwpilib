@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
  * profile. Users should call reset() when they first start running the controller
  * to avoid unwanted behavior.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class ProfiledPIDController implements Sendable {
   private static int instances;
 

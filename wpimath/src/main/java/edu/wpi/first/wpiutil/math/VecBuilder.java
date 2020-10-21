@@ -25,7 +25,6 @@ import edu.wpi.first.wpiutil.math.numbers.N9;
  *
  * @param <N> The dimension of the vector to be constructed.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
   public VecBuilder(Nat<N> rows) {
     super(rows, Nat.N1());

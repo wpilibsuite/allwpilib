@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidInstantiatingObjectsInLoops"})
+@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
 class TrapezoidProfileTest {
   private static final double kDt = 0.01;
 

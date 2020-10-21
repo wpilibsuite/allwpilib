@@ -12,7 +12,7 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
-@SuppressWarnings({"PMD.TooManyMethods", "ClassTypeParameterName"})
+@SuppressWarnings("ClassTypeParameterName")
 public class LinearSystem<States extends Num, Inputs extends Num,
         Outputs extends Num> {
 

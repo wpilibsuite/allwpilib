@@ -14,7 +14,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.Pair;
 
-@SuppressWarnings({"PMD.TooManyMethods", "ParameterName", "MethodTypeParameterName"})
+@SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
 public final class Discretization {
   private Discretization() {
     // Utility class

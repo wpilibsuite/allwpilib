@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.AnalogInput;
 /**
  * Class to control a simulated analog input.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class AnalogInputSim {
   private final int m_index;
 

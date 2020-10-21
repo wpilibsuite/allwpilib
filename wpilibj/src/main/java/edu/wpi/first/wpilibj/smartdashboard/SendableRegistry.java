@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.Sendable;
  * The SendableRegistry class is the public interface for registering sensors
  * and actuators for use on dashboards and LiveWindow.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class SendableRegistry {
   private static class Component {
     Component() {}

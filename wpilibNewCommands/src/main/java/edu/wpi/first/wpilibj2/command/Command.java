@@ -18,7 +18,6 @@ import java.util.function.BooleanSupplier;
  * <p>Commands are run synchronously from the main robot loop; no multithreading is used, unless
  * specified explicitly from the command implementation.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public interface Command {
 
   /**

@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-@SuppressWarnings("PMD.TooManyMethods")
 class Translation2dTest {
   private static final double kEpsilon = 1E-9;
 

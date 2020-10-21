@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SuppressWarnings("PMD.TooManyMethods")
 class SwerveDriveKinematicsTest {
   private static final double kEpsilon = 1E-9;
 

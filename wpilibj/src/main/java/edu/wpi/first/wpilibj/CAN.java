@@ -25,7 +25,6 @@ import edu.wpi.first.hal.HAL;
  * read methods and the byte[] passed into the write methods need to not
  * be modified for the duration of their respective calls.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class CAN implements Closeable {
   public static final int kTeamManufacturer = 8;
   public static final int kTeamDeviceType = 10;
