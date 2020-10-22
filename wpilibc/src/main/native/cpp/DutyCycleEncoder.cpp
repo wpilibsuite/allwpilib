@@ -58,6 +58,8 @@ void DutyCycleEncoder::Init() {
 
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
+    m_simDistancePerRotation =
+        m_simDevice.CreateDouble("DistancePerRotation", false, 0.0);
     m_simIsConnected = m_simDevice.CreateBoolean("Connected", false, true);
   } else {
     m_analogTrigger = std::make_unique<AnalogTrigger>(m_dutyCycle.get());
@@ -98,6 +100,7 @@ units::turn_t DutyCycleEncoder::Get() const {
 
 void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
   m_distancePerRotation = distancePerRotation;
+  m_simDistancePerRotation.Set(distancePerRotation);
 }
 
 double DutyCycleEncoder::GetDistancePerRotation() const {
@@ -127,6 +130,10 @@ void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
     frequency = 0;
   }
   m_frequencyThreshold = frequency;
+}
+
+int DutyCycleEncoder::GetSourceChannel() const {
+  return m_dutyCycle->GetSourceChannel();
 }
 
 void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {

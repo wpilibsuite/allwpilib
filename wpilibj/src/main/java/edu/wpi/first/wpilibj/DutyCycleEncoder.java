@@ -230,6 +230,15 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     }
   }
 
+  /**
+   * Get the channel of the source.
+   *
+   * @return the source channel
+   */
+  public int getSourceChannel() {
+    return m_dutyCycle.getSourceChannel();
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("AbsoluteEncoder");
