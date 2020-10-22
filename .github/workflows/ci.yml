@@ -58,27 +58,25 @@ jobs:
         with:
           java-version: 11
           architecture: ${{ matrix.architecture }}
-      - uses: devbotsxyz/xcode-import-certificate@v1
-        name: Import Developer ID Certificate
+      - name: Import Developer ID Certificate
+        run: |
+          base64 -d <<< "${{ secrets.APPLE_CERTIFICATE_DATA }}" > /tmp/signing-certificate.p12
+          security create-keychain -p ${{ secrets.APPLE_KEYCHAIN_PASSWORD }} wpilibsuite-keychain
+          security default-keychain -s wpilibsuite-keychain
+          security unlock-keychain -p ${{ secrets.APPLE_KEYCHAIN_PASSWORD }} wpilibsuite-keychain
+          security import /tmp/signing-certificate.p12 -f pkcs12 -k wpilibsuite-keychain -P ${{ secrets.APPLE_CERTIFICATE_PASSWORD }} -T /usr/bin/codesign -x
+          security set-key-partition-list -S apple-tool:,apple: -s -k ${{ secrets.APPLE_KEYCHAIN_PASSWORD }} wpilibsuite-keychain > /tmp/output.txt
+          security set-keychain-settings -lut 2700
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
-        with:
-          certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
-          certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
-      - name: Set Keychain Lock Timeout
-        run: security set-keychain-settings -lut 2700
-        if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository_owner == 'prateekma' || (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
       - name: Build with Gradle
         run: ./gradlew build -PbuildServer
       - name: Sign Libraries with Developer ID
         run: ./gradlew build -PbuildServer -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }}
         if: |
-          github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+          github.repository_owner == 'prateekma' || (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
