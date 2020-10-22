@@ -45,6 +45,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
   private static final int kSNLowRegister = 0x10;
 
   private SPI m_spi;
+  private SPI.Port m_port;
 
   private SimDevice m_simDevice;
   private SimBoolean m_simConnected;
@@ -65,6 +66,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
    */
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
+    m_port = port;
 
     // simulation
     m_simDevice = SimDevice.create("ADXRS450_Gyro", port.value);
@@ -127,6 +129,15 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
     m_spi.setAccumulatorIntegratedCenter(m_spi.getAccumulatorIntegratedAverage());
     m_spi.resetAccumulator();
+  }
+
+  /**
+   * Get the SPI port number.
+   *
+   * @return The SPI port number.
+   */
+  public int getPort() {
+    return m_port.value;
   }
 
   private boolean calcParity(int value) {

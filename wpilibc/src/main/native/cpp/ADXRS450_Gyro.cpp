@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -32,7 +32,7 @@ static constexpr int kPIDRegister = 0x0C;
 ADXRS450_Gyro::ADXRS450_Gyro() : ADXRS450_Gyro(SPI::kOnboardCS0) {}
 
 ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
-    : m_spi(port), m_simDevice("ADXRS450_Gyro", port) {
+    : m_spi(port), m_port(port), m_simDevice("ADXRS450_Gyro", port) {
   if (m_simDevice) {
     m_simAngle = m_simDevice.CreateDouble("Angle", false, 0.0);
     m_simRate = m_simDevice.CreateDouble("Rate", false, 0.0);
@@ -123,3 +123,5 @@ void ADXRS450_Gyro::Calibrate() {
   m_spi.SetAccumulatorIntegratedCenter(m_spi.GetAccumulatorIntegratedAverage());
   m_spi.ResetAccumulator();
 }
+
+int ADXRS450_Gyro::GetPort() const { return m_port; }
