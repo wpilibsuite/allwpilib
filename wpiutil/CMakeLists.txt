@@ -8,7 +8,7 @@ include(AddTest)
 file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
   find_package(Java REQUIRED)
   find_package(JNI REQUIRED)
   include(UseJava)
@@ -185,11 +185,11 @@ target_include_directories(wpiutil PUBLIC
 install(TARGETS wpiutil EXPORT wpiutil DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpiutil")
 
-if (NOT WITHOUT_JAVA AND MSVC)
+if (WITH_JAVA AND MSVC)
     install(TARGETS wpiutil RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
 endif()
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (wpiutil_config_dir ${wpilib_dest})
 else()
     set (wpiutil_config_dir share/wpiutil)

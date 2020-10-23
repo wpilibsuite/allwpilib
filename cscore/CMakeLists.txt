@@ -40,7 +40,7 @@ set_property(TARGET cscore PROPERTY FOLDER "libraries")
 install(TARGETS cscore EXPORT cscore DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (cscore_config_dir ${wpilib_dest})
 else()
     set (cscore_config_dir share/cscore)
@@ -75,7 +75,7 @@ foreach(example ${cscore_examples})
 endforeach()
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)

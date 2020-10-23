@@ -40,7 +40,7 @@ target_link_libraries(wpiguidev wpigui)
 install(TARGETS wpigui EXPORT wpigui DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")
 
-#if (MSVC OR FLAT_INSTALL_WPILIB)
+#if (WITH_FLAT_INSTALL)
 #    set (wpigui_config_dir ${wpilib_dest})
 #else()
 #    set (wpigui_config_dir share/wpigui)

@@ -40,28 +40,48 @@ IF("${isSystemDir}" STREQUAL "-1")
    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/wpilib/lib")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
-option(WITHOUT_JAVA "don't include java and JNI in the build" OFF)
-option(BUILD_SHARED_LIBS "build with shared libs (needed for JNI)" ON)
-option(WITHOUT_CSCORE "Don't build cscore (removes OpenCV requirement)" OFF)
-option(WITHOUT_ALLWPILIB "Don't build allwpilib (removes OpenCV requirement)" ON)
-option(WITH_TESTS "build unit tests (requires internet connection)" OFF)
-option(USE_EXTERNAL_HAL "Use a separately built HAL" OFF)
+# Options for building certain parts of the repo. Everything is built by default.
+option(WITH_JAVA "Include java and JNI in the build" ON)
+option(WITH_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
+option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
+option(WITH_WPILIB "Build hal, wpilibc/j, wpimath, and myRobot (needs OpenCV)" ON)
+option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
+option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
+
+# Options for external HAL.
+option(WITH_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
+
+# Options for using a package manager (vcpkg) for certain dependencies.
 option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
 option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
-option(FLAT_INSTALL_WPILIB "Use a flat install directory" OFF)
-option(WITH_SIMULATION_MODULES "build simulation modules" OFF)
+
+# Options for installation.
+option(WITH_FLAT_INSTALL "Use a flat install directory" OFF)
+
+# Options for location of OpenCV Java.
 set(OPENCV_JAVA_INSTALL_DIR "" CACHE PATH "Location to search for the OpenCV jar file")
 
-if (NOT WITHOUT_JAVA AND NOT BUILD_SHARED_LIBS)
+# Set default build type to release with debug info (i.e. release mode optimizations
+# are performed, but debug info still exists).
+if (NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
+endif()
+
+# We always want flat install with MSVC.
+if (MSVC)
+  set(WITH_FLAT_INSTALL ON)
+endif()
+
+if (WITH_JAVA AND NOT WITH_SHARED_LIBS)
     message(FATAL_ERROR "
 FATAL: Cannot build static libs with Java enabled.
-       Static libs requires both BUILD_SHARED_LIBS=OFF and
-       WITHOUT_JAVA=ON
+       Static libs requires both WITH_SHARED_LIBS=OFF and
+       WITH_JAVA=OFF
 ")
 endif()
 
-if (WITHOUT_JAVA OR WITHOUT_CSCORE)
+if (NOT WITH_JAVA OR NOT WITH_CSCORE)
     if(NOT "${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
         message(WARNING "
 WARNING: OpenCV Java dir set but java is not enabled!
@@ -70,13 +90,20 @@ It will be ignored.
     endif()
 endif()
 
+if (NOT WITH_WPILIB AND WITH_SIMULATION_MODULES)
+    message(FATAL_ERROR "
+FATAL: Cannot build simulation modules with wpilib disabled.
+       Enable wpilib by setting WITH_WPILIB=ON
+")
+endif()
+
 set( wpilib_dest wpilib)
 set( include_dest wpilib/include )
 set( main_lib_dest wpilib/lib )
 set( java_lib_dest wpilib/java )
 set( jni_lib_dest wpilib/jni )
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (wpilib_config_dir ${wpilib_dest})
 else()
     set (wpilib_config_dir share/wpilib)
@@ -90,7 +117,7 @@ if (USE_VCPKG_EIGEN)
 set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
 set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
 set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
 set(CSCORE_DEP_REPLACE_IMPL "include(\${SELF_DIR}/cscore-config.cmake)")
@@ -120,17 +147,17 @@ endif()
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)
 
-if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
+if (WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
 endif()
 
-if (NOT WITHOUT_CSCORE)
+if (WITH_CSCORE)
     set(CSCORE_DEP_REPLACE ${CSCORE_DEP_REPLACE_IMPL})
     set(CAMERASERVER_DEP_REPLACE ${CAMERASERVER_DEP_REPLACE_IMPL})
     add_subdirectory(cscore)
     add_subdirectory(cameraserver)
-    if (NOT WITHOUT_ALLWPILIB)
+    if (WITH_WPILIB)
         set(HAL_DEP_REPLACE ${HAL_DEP_REPLACE_IMPL})
         set(WPILIBC_DEP_REPLACE ${WPILIBC_DEP_REPLACE_IMPL})
         add_subdirectory(hal)
@@ -141,7 +168,7 @@ if (NOT WITHOUT_CSCORE)
     endif()
 endif()
 
-if (WITH_SIMULATION_MODULES AND NOT USE_EXTERNAL_HAL)
+if (WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)
     add_subdirectory(simulation)
 endif()
 

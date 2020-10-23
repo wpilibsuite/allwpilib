@@ -20,7 +20,7 @@ set_property(TARGET ntcore PROPERTY FOLDER "libraries")
 install(TARGETS ntcore EXPORT ntcore DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/ntcore")
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (ntcore_config_dir ${wpilib_dest})
 else()
     set (ntcore_config_dir share/ntcore)
@@ -31,7 +31,7 @@ install(FILES ${CMAKE_BINARY_DIR}/ntcore-config.cmake DESTINATION ${ntcore_confi
 install(EXPORT ntcore DESTINATION ${ntcore_config_dir})
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
