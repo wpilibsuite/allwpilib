@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  * operator interface as a common use case of the more generalized Trigger objects. This is a simple
  * wrapper around Trigger with the method names renamed to fit the Button object use.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class Button extends Trigger {
   /**
    * Default constructor; creates a button that is never pressed (unless {@link Button#get()} is

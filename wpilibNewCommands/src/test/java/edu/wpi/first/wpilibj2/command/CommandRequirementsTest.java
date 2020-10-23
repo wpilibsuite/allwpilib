@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
-@SuppressWarnings("PMD.TooManyMethods")
 class CommandRequirementsTest extends CommandTestBase {
   @Test
   void requirementInterruptTest() {

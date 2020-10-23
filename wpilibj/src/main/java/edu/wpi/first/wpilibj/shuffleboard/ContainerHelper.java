@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 /**
  * A helper class for Shuffleboard containers to handle common child operations.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 final class ContainerHelper {
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();

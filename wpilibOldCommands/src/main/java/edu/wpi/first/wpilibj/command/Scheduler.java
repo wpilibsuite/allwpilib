@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  *
  * @see Command
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public final class Scheduler implements Sendable, AutoCloseable {
   /**
    * The Singleton Instance.

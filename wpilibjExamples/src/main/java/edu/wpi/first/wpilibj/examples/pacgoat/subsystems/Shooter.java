@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * <p>NOTE: Simulation currently approximates this as as single pneumatic
  * cylinder and ignores the latch.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class Shooter extends Subsystem {
   // Devices
   DoubleSolenoid m_piston1 = new DoubleSolenoid(1, 3, 4);

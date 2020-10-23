@@ -21,7 +21,6 @@ import edu.wpi.first.hal.NotifierJNI;
  *
  * <p>The watchdog is initialized disabled, so the user needs to call enable() before use.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
   private static final long kMinPrintPeriod = 1000000; // microseconds

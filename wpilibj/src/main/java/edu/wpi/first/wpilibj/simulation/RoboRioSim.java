@@ -13,7 +13,7 @@ import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 /**
  * Class to control a simulated RoboRIO.
  */
-@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyMethods", "PMD.UseUtilityClass"})
+@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.UseUtilityClass"})
 public class RoboRioSim {
   public static CallbackStore registerFPGAButtonCallback(NotifyCallback callback,
                                                          boolean initialNotify) {

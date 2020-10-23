@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 /**
  * JNI Wrapper for HAL<br>.
  */
-@SuppressWarnings({"AbbreviationAsWordInName", "MethodName", "PMD.TooManyMethods"})
+@SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
 public final class HAL extends JNIWrapper {
   public static native void waitForDSData();
 

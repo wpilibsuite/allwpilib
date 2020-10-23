@@ -31,7 +31,6 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * <p> This will also interact with {@link NetworkTable} by creating a table called "Preferences"
  * with all the key-value pairs. </p>
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public final class Preferences {
   /**
    * The Preferences table name.

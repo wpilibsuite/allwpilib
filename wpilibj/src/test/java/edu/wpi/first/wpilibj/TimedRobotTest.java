@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TimedRobotTest {
-  @SuppressWarnings("PMD.TooManyMethods")
   class MockRobot extends TimedRobot {
     public final AtomicInteger m_robotInitCount = new AtomicInteger(0);
     public final AtomicInteger m_simulationInitCount = new AtomicInteger(0);

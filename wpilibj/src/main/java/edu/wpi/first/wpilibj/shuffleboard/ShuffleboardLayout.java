@@ -21,7 +21,6 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 /**
  * A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout>
     implements ShuffleboardContainer {
   private final ContainerHelper m_helper = new ContainerHelper(this);

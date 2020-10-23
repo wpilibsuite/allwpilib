@@ -29,7 +29,7 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * @param <R> The number of rows in this matrix.
  * @param <C> The number of columns in this matrix.
  */
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
+@SuppressWarnings("PMD.ExcessivePublicCount")
 public class Matrix<R extends Num, C extends Num> {
   protected final SimpleMatrix m_storage;
 

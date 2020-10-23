@@ -25,8 +25,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * Provide access to the network communication data to / from the Driver Station.
  */
 @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength",
-                   "PMD.ExcessivePublicCount", "PMD.GodClass", "PMD.TooManyFields",
-                   "PMD.TooManyMethods"})
+                   "PMD.ExcessivePublicCount", "PMD.GodClass", "PMD.TooManyFields"})
 public class DriverStation {
   /**
    * Number of Joystick Ports.

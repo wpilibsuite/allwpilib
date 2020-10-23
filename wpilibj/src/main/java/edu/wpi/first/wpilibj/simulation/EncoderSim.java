@@ -15,7 +15,6 @@ import java.util.NoSuchElementException;
 /**
  * Class to control a simulated encoder.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class EncoderSim {
   private final int m_index;
 

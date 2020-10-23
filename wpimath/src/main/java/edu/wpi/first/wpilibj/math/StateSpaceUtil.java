@@ -21,7 +21,7 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 
-@SuppressWarnings({"PMD.TooManyMethods", "ParameterName"})
+@SuppressWarnings("ParameterName")
 public final class StateSpaceUtil {
   private StateSpaceUtil() {
     // Utility class

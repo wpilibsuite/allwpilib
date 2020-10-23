@@ -42,7 +42,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *   - teleopPeriodic()
  *   - testPeriodic()
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public abstract class IterativeRobotBase extends RobotBase {
   protected double m_period;
 
