@@ -92,8 +92,16 @@ class ADXRS450_Gyro : public GyroBase {
    */
   void Calibrate() override;
 
+  /**
+   * Get the SPI port number.
+   *
+   * @return The SPI port number.
+   */
+  int GetPort() const;
+
  private:
   SPI m_spi;
+  SPI::Port m_port;
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simAngle;
