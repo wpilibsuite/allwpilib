@@ -46,6 +46,7 @@ option(WITH_JAVA "Include java and JNI in the build" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, wpimath, and myRobot (needs OpenCV)" ON)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
+option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
 
 # Options for external HAL.
@@ -155,7 +156,7 @@ endif()
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)
 
-if (WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)
+if (WITH_GUI)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
 endif()
