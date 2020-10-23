@@ -41,8 +41,8 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 # Options for building certain parts of the repo. Everything is built by default.
+option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include java and JNI in the build" ON)
-option(WITH_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WITH_WPILIB "Build hal, wpilibc/j, wpimath, and myRobot (needs OpenCV)" ON)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
@@ -73,11 +73,19 @@ if (MSVC)
   set(WITH_FLAT_INSTALL ON)
 endif()
 
-if (WITH_JAVA AND NOT WITH_SHARED_LIBS)
+if (WITH_JAVA AND NOT BUILD_SHARED_LIBS)
     message(FATAL_ERROR "
 FATAL: Cannot build static libs with Java enabled.
-       Static libs requires both WITH_SHARED_LIBS=OFF and
+       Static libs requires both BUILD_SHARED_LIBS=OFF and
        WITH_JAVA=OFF
+")
+endif()
+
+if (WITH_SIMULATION_MODULES AND NOT BUILD_SHARED_LIBS)
+    message(FATAL_ERROR "
+FATAL: Cannot build static libs with simulation modules enabled.
+       Static libs requires both BUILD_SHARED_LIBS=OFF and
+       WITH_SIMULATION_MODULES=OFF
 ")
 endif()
 
