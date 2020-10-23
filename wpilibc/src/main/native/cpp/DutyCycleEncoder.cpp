@@ -59,7 +59,7 @@ void DutyCycleEncoder::Init() {
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
     m_simDistancePerRotation =
-        m_simDevice.CreateDouble("DistancePerRotation", false, 0.0);
+        m_simDevice.CreateDouble("DistancePerRotation", false, 1.0);
     m_simIsConnected = m_simDevice.CreateBoolean("Connected", false, true);
   } else {
     m_analogTrigger = std::make_unique<AnalogTrigger>(m_dutyCycle.get());

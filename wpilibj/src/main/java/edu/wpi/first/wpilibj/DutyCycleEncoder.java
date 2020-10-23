@@ -32,6 +32,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
+  protected SimDouble m_simDistancePerRotation;
   protected SimBoolean m_simIsConnected;
 
   /**
@@ -72,6 +73,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
     if (m_simDevice != null) {
       m_simPosition = m_simDevice.createDouble("Position", false, 0.0);
+      m_simDistancePerRotation = m_simDevice.createDouble("DistancePerRotation", false, 1.0);
       m_simIsConnected = m_simDevice.createBoolean("Connected", false, true);
     } else {
       m_counter = new Counter();
@@ -140,6 +142,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    */
   public void setDistancePerRotation(double distancePerRotation) {
     m_distancePerRotation = distancePerRotation;
+    m_simDistancePerRotation.set(distancePerRotation);
   }
 
   /**
