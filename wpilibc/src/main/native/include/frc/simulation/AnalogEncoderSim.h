@@ -26,12 +26,14 @@ class AnalogEncoderSim {
   /**
    * Constructs from an AnalogEncoder object.
    *
-   * @param analogInput AnalogEncoder to simulate
+   * @param encoder AnalogEncoder to simulate
    */
-  explicit AnalogEncoderSim(const AnalogEncoder& analogEncoder);
+  explicit AnalogEncoderSim(const AnalogEncoder& encoder);
 
   /**
    * Set the position using an {@link Rotation2d}.
+   *
+   * @param angle The angle.
    */
   void SetPosition(Rotation2d angle);
 

@@ -29,6 +29,8 @@ public class AnalogEncoderSim {
 
   /**
    * Set the position using an {@link Rotation2d}.
+   *
+   * @param angle The angle.
    */
   public void setPosition(Rotation2d angle) {
     setTurns(angle.getDegrees() / 360.0);

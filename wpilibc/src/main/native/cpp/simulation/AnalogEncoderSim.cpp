@@ -15,10 +15,10 @@
 
 using namespace frc::sim;
 
-AnalogEncoderSim::AnalogEncoderSim(const frc::AnalogEncoder& analogEncoder) {
+AnalogEncoderSim::AnalogEncoderSim(const frc::AnalogEncoder& encoder) {
   wpi::SmallString<128> fullname;
   wpi::raw_svector_ostream os(fullname);
-  os << "AnalogEncoder" << '[' << analogEncoder.GetChannel() << ']';
+  os << "AnalogEncoder" << '[' << encoder.GetChannel() << ']';
   frc::sim::SimDeviceSim deviceSim{fullname.c_str()};
   m_positionSim = deviceSim.GetDouble("Position");
 }
