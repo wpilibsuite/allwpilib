@@ -1,4 +1,6 @@
-add_subdirectory(halsim_gui)
+if (WITH_GUI)
+    add_subdirectory(halsim_gui)
+endif()
 #add_subdirectory(gz_msgs)
 #add_subdirectory(frc_gazebo_plugins)
 #add_subdirectory(halsim_gazebo)
