@@ -155,6 +155,13 @@ class DutyCycleEncoder : public ErrorBase,
   double GetDistance() const;
 
   /**
+   * Get the FPGA index for the DutyCycleEncoder.
+   *
+   * @return the FPGA index
+   */
+  int GetFPGAIndex() const;
+
+  /**
    * Get the channel of the source.
    *
    * @return the source channel
