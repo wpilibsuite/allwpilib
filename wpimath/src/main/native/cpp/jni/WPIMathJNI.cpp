@@ -107,6 +107,28 @@ Java_edu_wpi_first_math_WPIMathJNI_exp
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    llt
+ * Signature: ([DII[D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_llt
+  (JNIEnv* env, jclass, jdoubleArray src, jint rows, jint columns, jdoubleArray dst)
+{
+  jdouble* arrayBody = env->GetDoubleArrayElements(src, nullptr);
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      P{arrayBody, rows, columns};
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> U =
+      P.llt().matrixL();
+
+  env->ReleaseDoubleArrayElements(src, arrayBody, 0);
+  env->SetDoubleArrayRegion(dst, 0, rows * columns, U.data());
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    isStabilizable
  * Signature: (II[D[D)Z
  */

@@ -90,7 +90,7 @@ public class MerweScaledSigmaPoints<S extends Num> {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
 
     var intermediate = P.times(lambda + m_states.getNum());
-    var U = intermediate.lltDecompose(true); // Lower triangular
+    var U = intermediate.llt(); // Lower triangular
 
     // 2 * states + 1 by states
     Matrix<S, ?> sigmas = new Matrix<>(
