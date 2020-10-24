@@ -102,10 +102,15 @@ make
 ```
 
 
-### Formatting/linting with wpiformat
+### Formatting/linting
+
+#### wpiformat
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
 
+#### Java Code Quality Tools
+
+The Java code quality tools (checkstyle, pmd, etc.) can be run with the `./gradlew javaFormat` task.
 
 ### CMake
 
