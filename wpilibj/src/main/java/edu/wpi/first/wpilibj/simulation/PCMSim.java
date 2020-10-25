@@ -37,7 +37,8 @@ public class PCMSim {
   }
 
   /**
-   * Register a callback to be run every time a new solenoid is created.
+   * Register a callback to be run when a solenoid is initialized on a channel.
+   * @param channel the channel to monitor
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -58,10 +59,22 @@ public class PCMSim {
     return PCMDataJNI.getSolenoidInitialized(m_index, channel);
   }
 
+  /**
+   * Define whether a solenoid has been initialized on a specific channel
+   * @param channel the channel
+   * @param solenoidInitialized is there a solenoid initialized on that channel
+   */
   public void setSolenoidInitialized(int channel, boolean solenoidInitialized) {
     PCMDataJNI.setSolenoidInitialized(m_index, channel, solenoidInitialized);
   }
 
+  /**
+   * Register a callback to be run when the solenoid output on a channel changes.
+   * @param channel the channel to monitor
+   * @param callback the callback
+   * @param initialNotify should the callback be run with the initial value
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerSolenoidOutputCallback(
       int channel, NotifyCallback callback, boolean initialNotify) {
     int uid = PCMDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
@@ -86,20 +99,40 @@ public class PCMSim {
     PCMDataJNI.setSolenoidOutput(m_index, channel, solenoidOutput);
   }
 
+  /**
+   * Register a callback to be run when the compressor is initialized.
+   * @param callback the callback
+   * @param initialNotify whether to run the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerCompressorInitializedCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = PCMDataJNI.registerCompressorInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, PCMDataJNI::cancelCompressorInitializedCallback);
   }
 
+  /**
+   * Check whether the compressor has been initialized.
+   * @return true if initialized
+   */
   public boolean getCompressorInitialized() {
     return PCMDataJNI.getCompressorInitialized(m_index);
   }
 
+  /**
+   * Define whether the compressor has been initialized.
+   * @param compressorInitialized whether the compressor is initialized
+   */
   public void setCompressorInitialized(boolean compressorInitialized) {
     PCMDataJNI.setCompressorInitialized(m_index, compressorInitialized);
   }
 
+  /**
+   * Register a callback to be run when the compressor activates.
+   * @param callback the callback
+   * @param initialNotify whether to run the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerCompressorOnCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = PCMDataJNI.registerCompressorOnCallback(m_index, callback, initialNotify);
@@ -122,6 +155,12 @@ public class PCMSim {
     PCMDataJNI.setCompressorOn(m_index, compressorOn);
   }
 
+  /**
+   * Register a callback to be run whenever the closed loop state changes.
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the initial value
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerClosedLoopEnabledCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = PCMDataJNI.registerClosedLoopEnabledCallback(m_index, callback, initialNotify);
@@ -144,6 +183,12 @@ public class PCMSim {
     PCMDataJNI.setClosedLoopEnabled(m_index, closedLoopEnabled);
   }
 
+  /**
+   * Register a callback to be run whenever the pressure switch value changes.
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the initial value
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerPressureSwitchCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = PCMDataJNI.registerPressureSwitchCallback(m_index, callback, initialNotify);

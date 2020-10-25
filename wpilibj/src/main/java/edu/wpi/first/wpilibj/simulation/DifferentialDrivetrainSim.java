@@ -345,6 +345,10 @@ public class DifferentialDrivetrainSim {
     return StateSpaceUtil.normalizeInputVector(u, RobotController.getBatteryVoltage());
   }
 
+  /**
+   * Represents the different states of the drivetrain.
+   *
+   */
   enum State {
     kX(0),
     kY(1),
@@ -383,6 +387,9 @@ public class DifferentialDrivetrainSim {
     }
   }
 
+  /**
+   * Represents common motor layouts of the kit drivetrain.
+   */
   public enum KitbotMotor {
     kSingleCIMPerSide(DCMotor.getCIM(1)),
     kDualCIMPerSide(DCMotor.getCIM(2)),
@@ -398,6 +405,9 @@ public class DifferentialDrivetrainSim {
     }
   }
 
+  /**
+   * Represents common wheel sizes of the kit drivetrain.
+   */
   public enum KitbotWheelSize {
     SixInch(Units.inchesToMeters(6)),
     EightInch(Units.inchesToMeters(8)),
