@@ -10,6 +10,12 @@ import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 /** Class to control a simulated RoboRIO. */
 @SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.UseUtilityClass"})
 public class RoboRioSim {
+  /**
+   * Register a callback to be run when the FPGA button state changes.
+   * @param callback the callback
+   * @param initialNotify whether to run the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static CallbackStore registerFPGAButtonCallback(NotifyCallback callback,
                                                          boolean initialNotify) {
@@ -17,31 +23,59 @@ public class RoboRioSim {
     return new CallbackStore(uid, RoboRioDataJNI::cancelFPGAButtonCallback);
   }
 
+  /**
+   * Query the state of the FPGA button.
+   * @return the FPGA button state
+   */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static boolean getFPGAButton() {
     return RoboRioDataJNI.getFPGAButton();
   }
 
+  /**
+   * Define the state of the FPGA button.
+   * @param fpgaButton the new state
+   */
   @SuppressWarnings("AbbreviationAsWordInName")
   public static void setFPGAButton(boolean fpgaButton) {
     RoboRioDataJNI.setFPGAButton(fpgaButton);
   }
 
+  /**
+   * Register a callback to be run whenever the Vin voltage changes.
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public static CallbackStore registerVInVoltageCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = RoboRioDataJNI.registerVInVoltageCallback(callback, initialNotify);
     return new CallbackStore(uid, RoboRioDataJNI::cancelVInVoltageCallback);
   }
 
+  /**
+   * Measure the Vin voltage.
+   * @return the Vin voltage
+   */
   public static double getVInVoltage() {
     return RoboRioDataJNI.getVInVoltage();
   }
 
+  /**
+   * Define teh Vin voltage.
+   * @param vInVoltage the new voltage
+   */
   @SuppressWarnings("ParameterName")
   public static void setVInVoltage(double vInVoltage) {
     RoboRioDataJNI.setVInVoltage(vInVoltage);
   }
 
+  /**
+   * Register a callback to be run whenever the Vin current changes.
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the initial value
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public static CallbackStore registerVInCurrentCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = RoboRioDataJNI.registerVInCurrentCallback(callback, initialNotify);
@@ -225,6 +259,9 @@ public class RoboRioSim {
     RoboRioDataJNI.setUserFaults3V3(userFaults3V3);
   }
 
+  /**
+   * Reset all simulation data.
+   */
   public static void resetData() {
     RoboRioDataJNI.resetData();
   }

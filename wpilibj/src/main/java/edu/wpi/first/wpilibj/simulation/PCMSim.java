@@ -60,7 +60,7 @@ public class PCMSim {
   }
 
   /**
-   * Define whether a solenoid has been initialized on a specific channel
+   * Define whether a solenoid has been initialized on a specific channel.
    * @param channel the channel
    * @param solenoidInitialized is there a solenoid initialized on that channel
    */
@@ -211,6 +211,12 @@ public class PCMSim {
     PCMDataJNI.setPressureSwitch(m_index, pressureSwitch);
   }
 
+  /**
+   * Register a callback to be run whenever the compressor current changes.
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback
+   */
   public CallbackStore registerCompressorCurrentCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid = PCMDataJNI.registerCompressorCurrentCallback(m_index, callback, initialNotify);

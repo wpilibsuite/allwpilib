@@ -143,7 +143,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    *
    * @param gearbox The type of and number of motors in the arm gearbox.
    * @param gearing The gearing of the arm (numbers greater than 1 represent reductions).
-   * @param jKgMetersSquared The moment of inertia of the arm,can be calculated from CAD
+   * @param jKgMetersSquared The moment of inertia of the arm; can be calculated from CAD
    *     software.
    * @param armLengthMeters The length of the arm.
    * @param minAngleRads The minimum angle that the arm is capable of.

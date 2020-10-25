@@ -25,22 +25,39 @@ public final class SimHooks {
     return SimulatorJNI.getProgramStarted();
   }
 
+  /**
+   * Restart the simulator time.
+   */
   public static void restartTiming() {
     SimulatorJNI.restartTiming();
   }
 
+  /**
+   * Pause the simulator time.
+   */
   public static void pauseTiming() {
     SimulatorJNI.pauseTiming();
   }
 
+  /**
+   * Resume the simulator time.
+   */
   public static void resumeTiming() {
     SimulatorJNI.resumeTiming();
   }
 
+  /**
+   * Check if the simulator time is paused.
+   * @return true if paused
+   */
   public static boolean isTimingPaused() {
     return SimulatorJNI.isTimingPaused();
   }
 
+  /**
+   * Advance the simulator time.
+   * @param deltaSeconds the amount to advance (in seconds)
+   */
   public static void stepTiming(double deltaSeconds) {
     SimulatorJNI.stepTiming((long) (deltaSeconds * 1e6));
   }
