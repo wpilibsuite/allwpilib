@@ -132,6 +132,10 @@ void DutyCycleEncoder::SetConnectedFrequencyThreshold(int frequency) {
   m_frequencyThreshold = frequency;
 }
 
+int DutyCycleEncoder::GetFPGAIndex() const {
+  return m_dutyCycle->GetFPGAIndex();
+}
+
 int DutyCycleEncoder::GetSourceChannel() const {
   return m_dutyCycle->GetSourceChannel();
 }

@@ -18,7 +18,7 @@ using namespace frc::sim;
 DutyCycleEncoderSim::DutyCycleEncoderSim(const frc::DutyCycleEncoder& encoder) {
   wpi::SmallString<128> fullname;
   wpi::raw_svector_ostream os(fullname);
-  os << "DutyCycleEncoder" << '[' << encoder.GetSourceChannel() << ']';
+  os << "DutyCycleEncoder" << '[' << encoder.GetFPGAIndex() << ']';
   frc::sim::SimDeviceSim deviceSim{fullname.c_str()};
   m_simPosition = deviceSim.GetDouble("Position");
   m_simDistancePerRotation = deviceSim.GetDouble("DistancePerRotation");

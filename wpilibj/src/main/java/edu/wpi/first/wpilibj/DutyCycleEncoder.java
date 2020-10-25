@@ -237,6 +237,16 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
+   * Get the FPGA index for the DutyCycleEncoder.
+   *
+   * @return the FPGA index
+   */
+  @SuppressWarnings("AbbreviationAsWordInName")
+  public int getFPGAIndex() {
+    return m_dutyCycle.getFPGAIndex();
+  }
+
+  /**
    * Get the channel of the source.
    *
    * @return the source channel
