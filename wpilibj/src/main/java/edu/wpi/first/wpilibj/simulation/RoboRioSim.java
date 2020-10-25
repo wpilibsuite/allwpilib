@@ -22,9 +22,9 @@ public class RoboRioSim {
     return RoboRioDataJNI.getFPGAButton();
   }
 
-  @SuppressWarnings({"AbbreviationAsWordInName", "ParameterName"})
-  public static void setFPGAButton(boolean fPGAButton) {
-    RoboRioDataJNI.setFPGAButton(fPGAButton);
+  @SuppressWarnings("AbbreviationAsWordInName")
+  public static void setFPGAButton(boolean fpgaButton) {
+    RoboRioDataJNI.setFPGAButton(fpgaButton);
   }
 
   public static CallbackStore registerVInVoltageCallback(
