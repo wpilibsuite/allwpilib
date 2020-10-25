@@ -32,7 +32,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 - C++ compiler
     - On Linux, install GCC
-    - On Windows, install the [build tools for Visual Studio 2019](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), or install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation
+    - On Windows, install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio 2019)
     - On macOS, install the Xcode command-line build tools via `xcode-select --install`
 - [ARM compiler toolchain](https://github.com/wpilibsuite/roborio-toolchain/releases)
     - For 2020 and beyond, use GCC version 7 or greater
