@@ -18,3 +18,8 @@ if (!project.hasProperty('skipPMD')) {
         ruleSets = []
     }
 }
+
+task javaFormat {
+    dependsOn(tasks.withType(Checkstyle))
+    dependsOn(tasks.withType(Pmd))
+}
