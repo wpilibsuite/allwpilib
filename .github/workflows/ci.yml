@@ -67,6 +67,11 @@ jobs:
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
+      - name: Set Keychain Lock Timeout
+        run: security set-keychain-settings -lut 3600
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
       - name: Build with Gradle
         run: ./gradlew build -PbuildServer
       - name: Sign Libraries with Developer ID
