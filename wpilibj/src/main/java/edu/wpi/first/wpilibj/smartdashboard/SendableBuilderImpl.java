@@ -74,6 +74,7 @@ public class SendableBuilderImpl implements SendableBuilder {
    *
    * @return The network table
    */
+  @Override
   public NetworkTable getTable() {
     return m_table;
   }

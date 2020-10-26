@@ -43,7 +43,7 @@ class SendableBuilderImpl : public SendableBuilder {
    * Get the network table.
    * @return The network table
    */
-  std::shared_ptr<nt::NetworkTable> GetTable();
+  std::shared_ptr<nt::NetworkTable> GetTable() override;
 
   /**
    * Return whether this sendable has an associated table.
