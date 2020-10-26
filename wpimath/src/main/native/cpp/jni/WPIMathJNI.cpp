@@ -112,7 +112,8 @@ Java_edu_wpi_first_math_WPIMathJNI_exp
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_math_WPIMathJNI_llt
-  (JNIEnv* env, jclass, jdoubleArray src, jint rows, jint columns, jdoubleArray dst)
+  (JNIEnv* env, jclass, jdoubleArray src, jint rows, jint columns,
+   jdoubleArray dst)
 {
   jdouble* arrayBody = env->GetDoubleArrayElements(src, nullptr);
 
@@ -120,8 +121,7 @@ Java_edu_wpi_first_math_WPIMathJNI_llt
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
       P{arrayBody, rows, columns};
 
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> U =
-      P.llt().matrixL();
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> U = P.llt().matrixL();
 
   env->ReleaseDoubleArrayElements(src, arrayBody, 0);
   env->SetDoubleArrayRegion(dst, 0, rows * columns, U.data());
