@@ -2,7 +2,7 @@ import edu.wpi.first.toolchain.*
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.0.1'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.0.2'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'edu.wpi.first.NativeUtils' apply false
     id 'edu.wpi.first.GradleJni' version '0.10.1'
@@ -15,10 +15,12 @@ plugins {
 
 if (project.hasProperty('buildServer')) {
     wpilibVersioning.buildServerMode = true
+    wpilibVersioning.useAllTags = true
 }
 
 if (project.hasProperty('releaseMode')) {
     wpilibVersioning.releaseMode = true
+    wpilibVersioning.useAllTags = true
 }
 
 allprojects {
