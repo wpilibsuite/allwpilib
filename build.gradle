@@ -103,6 +103,26 @@ subprojects {
             }
         }
     }
+
+    // Sign outputs with Developer ID
+    if (project.hasProperty("developerID")) {
+        tasks.withType(AbstractLinkTask) { task ->
+            // Don't sign any executables because codesign complains
+            // about relative rpath.
+            if (!(task instanceof LinkExecutable)) {
+                doLast {
+                    // Get path to binary.
+                    String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
+                    exec {
+                        workingDir rootDir
+                        def args = ["sh", "-c", "codesign --force --strict --timestamp --options=runtime " +
+                                    "--verbose -s ${project.findProperty("developerID")} ${path}"]
+                        commandLine args
+                    }
+                }
+            }
+        }
+    }
 }
 
 ext.getCurrentArch = {
