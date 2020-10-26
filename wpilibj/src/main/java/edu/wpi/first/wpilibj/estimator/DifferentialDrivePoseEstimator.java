@@ -58,7 +58,7 @@ import edu.wpi.first.wpiutil.math.numbers.N5;
  * or <strong>y = [[dist_l, dist_r, theta]] </strong> from encoders and gyro.
  */
 public class DifferentialDrivePoseEstimator {
-  private final ExtendedKalmanFilter<N5, N3, N3> m_observer;
+  final UnscentedKalmanFilter<N5, N3, N3> m_observer; // Package-private to allow for unit testing
   private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
   private final KalmanFilterLatencyCompensator<N5, N3, N3> m_latencyCompensator;
 
@@ -113,11 +113,15 @@ public class DifferentialDrivePoseEstimator {
   ) {
     m_nominalDt = nominalDtSeconds;
 
-    m_observer = new ExtendedKalmanFilter<>(
-            Nat.N5(), Nat.N3(), Nat.N3(),
+    m_observer = new UnscentedKalmanFilter<>(
+            Nat.N5(), Nat.N3(),
             this::f,
             (x, u) -> VecBuilder.fill(x.get(3, 0), x.get(4, 0), x.get(2, 0)),
             stateStdDevs, localMeasurementStdDevs,
+            (sigmas, Wm) -> AngleStatistics.angleMean(sigmas, Wm, 2),
+            (sigmas, Wm) -> AngleStatistics.angleMean(sigmas, Wm, 2),
+            (a, b) -> AngleStatistics.angleResidual(a, b, 2),
+            (a, b) -> AngleStatistics.angleResidual(a, b, 2),
             m_nominalDt
     );
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
@@ -127,7 +131,9 @@ public class DifferentialDrivePoseEstimator {
     m_visionCorrect = (u, y) -> m_observer.correct(
             Nat.N3(), u, y,
             (x, u_) -> new Matrix<>(x.getStorage().extractMatrix(0, 3, 0, 1)),
-            visionDiscR
+            visionDiscR,
+            (sigmas, Wm) -> AngleStatistics.angleMean(sigmas, Wm, 2),
+            (a, b) -> AngleStatistics.angleResidual(a, b, 2)
     );
 
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);

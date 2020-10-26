@@ -32,6 +32,8 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Nat;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChartBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,7 +52,8 @@ public class DifferentialDrivePoseEstimatorTest {
                     new Pose2d(),
                     new Pose2d(20, 20, Rotation2d.fromDegrees(0)),
                     new Pose2d(23, 23, Rotation2d.fromDegrees(173)),
-                    new Pose2d(54, 54, new Rotation2d())
+                    new Pose2d(54, 54, new Rotation2d()),
+                    new Pose2d(30, 44, Rotation2d.fromDegrees(160))
             ),
             new TrajectoryConfig(0.5, 2));
 
@@ -142,22 +145,22 @@ public class DifferentialDrivePoseEstimatorTest {
             "Incorrect max error"
     );
 
-    //System.out.println("Mean error (meters): " + errorSum / (traj.getTotalTimeSeconds() / dt));
-    //System.out.println("Max error (meters):  " + maxError);
+    System.out.println("Mean error (meters): " + errorSum / (traj.getTotalTimeSeconds() / dt));
+    System.out.println("Max error (meters):  " + maxError);
 
-    //var chartBuilder = new XYChartBuilder();
-    //chartBuilder.title = "The Magic of Sensor Fusion";
-    //var chart = chartBuilder.build();
+    var chartBuilder = new XYChartBuilder();
+    chartBuilder.title = "The Magic of Sensor Fusion";
+    var chart = chartBuilder.build();
 
-    //chart.addSeries("Vision", visionXs, visionYs);
-    //chart.addSeries("Trajectory", trajXs, trajYs);
-    //chart.addSeries("xHat", observerXs, observerYs);
+    chart.addSeries("Vision", visionXs, visionYs);
+    chart.addSeries("Trajectory", trajXs, trajYs);
+    chart.addSeries("xHat", observerXs, observerYs);
 
-    //new SwingWrapper<>(chart).displayChart();
-    //try {
-    //  Thread.sleep(1000000000);
-    //} catch (InterruptedException e) {
-    //}
+    new SwingWrapper<>(chart).displayChart();
+    try {
+      Thread.sleep(1000000000);
+    } catch (InterruptedException e) {
+    }
   }
 
   @Test void test() {
@@ -166,9 +169,9 @@ public class DifferentialDrivePoseEstimatorTest {
         new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01),
         new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01));
 
-    System.out.println("x, y, cos(theta), sin(theta), dist_l, dist_r");
+    System.out.println("x, y, theta, dist_l, dist_r");
 
-    estimator.m_observer.setXhat(VecBuilder.fill(0, 0, Math.cos(0), Math.sin(0), 0, 0));
+    estimator.m_observer.setXhat(VecBuilder.fill(0, 0, 0, 0, 0));
     for(int i = 0; i < 50; i++) {
       estimator.m_observer.predict(VecBuilder.fill(1, 1, 0), 0.020);
     }
