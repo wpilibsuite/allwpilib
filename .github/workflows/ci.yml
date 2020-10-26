@@ -27,8 +27,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer ${{ matrix.build-options }}
+        run: ./gradlew build -PbuildServer ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
@@ -72,10 +75,13 @@ jobs:
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer
+        run: ./gradlew build -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
       - name: Sign Libraries with Developer ID
-        run: ./gradlew build -PbuildServer -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }}
+        run: ./gradlew build -PbuildServer -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
           (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
