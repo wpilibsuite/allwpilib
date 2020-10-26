@@ -137,13 +137,28 @@ inline bool NetworkTableEntry::SetDefaultBooleanArray(
   return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
 }
 
+inline bool NetworkTableEntry::SetDefaultBooleanArray(
+    std::initializer_list<int> defaultValue) {
+  return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
+}
+
 inline bool NetworkTableEntry::SetDefaultDoubleArray(
     ArrayRef<double> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(defaultValue));
 }
 
+inline bool NetworkTableEntry::SetDefaultDoubleArray(
+    std::initializer_list<double> value) {
+  return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(value));
+}
+
 inline bool NetworkTableEntry::SetDefaultStringArray(
     ArrayRef<std::string> defaultValue) {
+  return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
+}
+
+inline bool NetworkTableEntry::SetDefaultStringArray(
+    std::initializer_list<std::string> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
 }
 
