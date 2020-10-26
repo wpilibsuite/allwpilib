@@ -1,3 +1,4 @@
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -26,7 +27,7 @@ import edu.wpi.first.wpiutil.math.numbers.N3;
 import edu.wpi.first.wpiutil.math.numbers.N4;
 
 /**
- * This class wraps an {@link UnscentedKalmanFilter ExtendedKalmanFilter} to fuse
+ * This class wraps an {@link ExtendedKalmanFilter ExtendedKalmanFilter} to fuse
  * latency-compensated vision measurements with mecanum drive encoder velocity measurements.
  * It will correct for noisy measurements and encoder drift. It is intended to be an easy
  * but more accurate drop-in for {@link edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry}.
@@ -51,7 +52,7 @@ import edu.wpi.first.wpiutil.math.numbers.N4;
  * or <strong> y = [[cos(theta), sin(theta)]]^T </strong> from the gyro.
  */
 public class MecanumDrivePoseEstimator {
-  private final UnscentedKalmanFilter<N4, N3, N2> m_observer;
+  private final ExtendedKalmanFilter<N4, N3, N2> m_observer;
   private final MecanumDriveKinematics m_kinematics;
   private final BiConsumer<Matrix<N3, N1>, Matrix<N4, N1>> m_visionCorrect;
   private final KalmanFilterLatencyCompensator<N4, N3, N2> m_latencyCompensator;
@@ -106,15 +107,15 @@ public class MecanumDrivePoseEstimator {
   ) {
     m_nominalDt = nominalDtSeconds;
 
-    m_observer = new UnscentedKalmanFilter<>(
-        Nat.N4(), Nat.N2(),
-        this::f,
-        (x, u) -> x.block(Nat.N2(), Nat.N1(), 2, 0),
-        VecBuilder.fill(stateStdDevs.get(0, 0), stateStdDevs.get(1, 0),
-            Math.cos(stateStdDevs.get(2, 0)), Math.sin(stateStdDevs.get(2, 0))),
-        VecBuilder.fill(Math.cos(localMeasurementStdDevs.get(0, 0)),
-                Math.sin(localMeasurementStdDevs.get(0, 0))),
-        m_nominalDt
+    m_observer = new ExtendedKalmanFilter<>(
+            Nat.N4(), Nat.N3(), Nat.N2(),
+            this::f,
+            (x, u) -> x.block(Nat.N2(), Nat.N1(), 2, 0),
+            VecBuilder.fill(stateStdDevs.get(0, 0), stateStdDevs.get(1, 0),
+                    Math.cos(stateStdDevs.get(2, 0)), Math.sin(stateStdDevs.get(2, 0))),
+            VecBuilder.fill(Math.cos(localMeasurementStdDevs.get(0, 0)),
+                    Math.sin(localMeasurementStdDevs.get(0, 0))),
+            m_nominalDt
     );
     m_kinematics = kinematics;
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
@@ -129,9 +130,9 @@ public class MecanumDrivePoseEstimator {
     var visionDiscR = Discretization.discretizeR(visionContR, m_nominalDt);
 
     m_visionCorrect = (u, y) -> m_observer.correct(
-        Nat.N4(), u, y,
-        (x, u_) -> x,
-        visionDiscR
+            Nat.N4(), u, y,
+            (x, u_) -> x,
+            visionDiscR
     );
 
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);

@@ -1,3 +1,4 @@
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -9,12 +10,10 @@ package edu.wpi.first.wpilibj.estimator;
 
 import java.util.function.BiConsumer;
 
-import edu.wpi.first.wpiutil.math.numbers.N12;
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.math.Discretization;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
@@ -32,11 +31,12 @@ import edu.wpi.first.wpiutil.math.numbers.N7;
 
 /**
  * This class wraps an
- * {@link edu.wpi.first.wpilibj.estimator.UnscentedKalmanFilter Extended Kalman Filter}
+ * {@link edu.wpi.first.wpilibj.estimator.ExtendedKalmanFilter Extended Kalman Filter}
  * to fuse latency-compensated global measurements(ex. vision) with differential drive encoder
  * measurements. It will correct for noisy global measurements and encoder drift.
  *
- * <p>This class is indented to be paired with an LTVDiffDriveController as it provides a
+ * <p>This class is indented to be paired with
+ * {@link edu.wpi.first.wpilibj.controller.LTVDiffDriveController} as it provides a
  * 10-state estimate. This can then be trimmed into 5-state using {@link Matrix#block}
  * with the operation
  * <code>
@@ -54,19 +54,19 @@ import edu.wpi.first.wpiutil.math.numbers.N7;
  *
  * <p>Our state-space system is:
  *
- * <p>x = [[x, y, cos(theta), sin(theta), vel_l, vel_r, dist_l, dist_r, voltError_l, voltError_r, cos_error, sin_error]]^T
+ * <p>x = [[x, y, theta, vel_l, vel_r, dist_l, dist_r, voltError_l, voltError_r, headingError]]^T
  * in the field coordinate system (dist_* are wheel distances.)
  *
  * <p>u = [[voltage_l, voltage_r]]^T This is typically the control input of the last timestep
- * from a LTVDiffDriveController.
+ * from a {@link edu.wpi.first.wpilibj.controller.LTVDiffDriveController}.
  *
  * <p>y = [[x, y, theta]]^T from a global measurement source(ex. vision),
- * or y = [[dist_l, dist_r, cos(theta), sin(theta)]] from encoders and gyro.
+ * or y = [[dist_l, dist_r, theta]] from encoders and gyro.
  */
 @SuppressWarnings({"ParameterName", "LocalVariableName", "MemberName", "PMD.SingularField"})
 public class DifferentialDriveStateEstimator {
-  private final UnscentedKalmanFilter<N12, N2, N4> m_observer;
-  private final KalmanFilterLatencyCompensator<N12, N2, N4> m_latencyCompensator;
+  private final ExtendedKalmanFilter<N10, N2, N3> m_observer;
+  private final KalmanFilterLatencyCompensator<N10, N2, N3> m_latencyCompensator;
 
   private final BiConsumer<Matrix<N2, N1>, Matrix<N3, N1>> m_globalCorrect;
 
@@ -96,11 +96,11 @@ public class DifferentialDriveStateEstimator {
    *                                 differential drivetrain's kinematics.
    */
   public DifferentialDriveStateEstimator(LinearSystem<N2, N2, N2> plant,
-                                        Matrix<N10, N1> initialState,
-                                        Matrix<N10, N1> stateStdDevs,
-                                        Matrix<N3, N1> localMeasurementStdDevs,
-                                        Matrix<N3, N1> globalMeasurementStdDevs,
-                                        DifferentialDriveKinematics kinematics
+                                         Matrix<N10, N1> initialState,
+                                         Matrix<N10, N1> stateStdDevs,
+                                         Matrix<N3, N1> localMeasurementStdDevs,
+                                         Matrix<N3, N1> globalMeasurementStdDevs,
+                                         DifferentialDriveKinematics kinematics
   ) {
     this(plant, initialState, stateStdDevs,
             localMeasurementStdDevs, globalMeasurementStdDevs, kinematics, 0.02);
@@ -142,20 +142,20 @@ public class DifferentialDriveStateEstimator {
     var globalContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), globalMeasurementStdDevs);
     var globalDiscR = Discretization.discretizeR(globalContR, m_nominalDt);
 
-    m_observer = new UnscentedKalmanFilter<>(
-      Nat.N10(), Nat.N3(),
-      this::getDynamics,
-      this::getLocalMeasurementModel,
-      stateStdDevs,
-      localMeasurementStdDevs,
-      nominalDtSeconds
-   );
+    m_observer = new ExtendedKalmanFilter<>(
+            Nat.N10(), Nat.N2(), Nat.N3(),
+            this::getDynamics,
+            this::getLocalMeasurementModel,
+            stateStdDevs,
+            localMeasurementStdDevs,
+            nominalDtSeconds
+    );
 
     // Create correction mechanism for global measurements.
     m_globalCorrect = (u, y) -> m_observer.correct(
-      Nat.N3(), u, y,
-      this::getGlobalMeasurementModel,
-      globalDiscR
+            Nat.N3(), u, y,
+            this::getGlobalMeasurementModel,
+            globalDiscR
     );
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
 
@@ -163,7 +163,7 @@ public class DifferentialDriveStateEstimator {
   }
 
   @SuppressWarnings("JavadocMethod")
-  protected Matrix<N12, N1> getDynamics(Matrix<N12, N1> x, Matrix<N2, N1> u) {
+  protected Matrix<N10, N1> getDynamics(Matrix<N10, N1> x, Matrix<N2, N1> u) {
     Matrix<N4, N2> B = new Matrix<>(new SimpleMatrix(4, 2));
     B.getStorage().insertIntoThis(0, 0, m_plant.getB().getStorage());
     B.getStorage().insertIntoThis(2, 0, new SimpleMatrix(2, 2));
@@ -178,13 +178,13 @@ public class DifferentialDriveStateEstimator {
 
     var v = (x.get(State.kLeftVelocity.value, 0) + x.get(State.kRightVelocity.value, 0)) / 2.0;
 
-    var result = new Matrix<>(Nat.N12(), Nat.N1());
-    result.set(0, 0, v * x.get(State.kCos.value, 0));
-    result.set(1, 0, v * x.get(State.kSin.value, 0));
+    var result = new Matrix<N10, N1>(new SimpleMatrix(10, 1));
+    result.set(0, 0, v * Math.cos(x.get(State.kHeading.value, 0)));
+    result.set(1, 0, v * Math.sin(x.get(State.kHeading.value, 0)));
     result.set(2, 0, (x.get(State.kRightVelocity.value, 0)
             - x.get(State.kLeftVelocity.value, 0)) / (2.0 * m_rb));
 
-    result.getStorage().insertIntoThis(4, 0, A.times(new Matrix<N7, N1>(
+    result.getStorage().insertIntoThis(3, 0, A.times(new Matrix<N7, N1>(
             x.getStorage().extractMatrix(3, 10, 0, 1))).plus(B.times(u)).getStorage());
     result.getStorage().insertIntoThis(7, 0, new SimpleMatrix(3, 1));
     return result;
@@ -192,16 +192,16 @@ public class DifferentialDriveStateEstimator {
 
   @SuppressWarnings("JavadocMethod")
   public Matrix<N3, N1> getLocalMeasurementModel(Matrix<N10, N1> x, Matrix<N2, N1> u) {
-    return new MatBuilder<>(Nat.N3(), Nat.N1()).fill(x.get(State.kCos.value, 0),
+    return new MatBuilder<>(Nat.N3(), Nat.N1()).fill(x.get(State.kHeading.value, 0),
             x.get(State.kLeftPosition.value, 0), x.get(State.kRightPosition.value, 0));
   }
 
   @SuppressWarnings("JavadocMethod")
   public Matrix<N3, N1> getGlobalMeasurementModel(Matrix<N10, N1> x, Matrix<N2, N1> u) {
     return new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
-        x.get(State.kX.value, 0),
-        x.get(State.kY.value, 0),
-        x.get(State.kCos.value, 0)
+            x.get(State.kX.value, 0),
+            x.get(State.kY.value, 0),
+            x.get(State.kHeading.value, 0)
     );
   }
 
@@ -244,21 +244,9 @@ public class DifferentialDriveStateEstimator {
   }
 
   /**
-   * Gets the state of the robot at the current time as estimated by the Extended Kalman Filter.
-   *
-   * @return The robot state estimate.
-   */
-  public Pose2d getEstimatedPosition() {
-    var xHat = getEstimatedState();
-    return new Pose2d(
-        xHat.get(State.kX.value, 0),
-        xHat.get(State.kY.value, 0),
-        new Rotation2d(xHat.get(State.kCos.value, 0)));
-  }
-
-  /**
    * Updates the the Extended Kalman Filter using wheel encoder information, robot heading and the
-   * previous control input. The control input can be obtained from a LTVDiffDriveController.
+   * previous control input. The control input can be obtained from a
+   * {@link edu.wpi.first.wpilibj.controller.LTVDiffDriveController}.
    * Note that this should be called every loop.
    *
    * @param headingRadians The current heading of the robot in radians.
@@ -279,7 +267,8 @@ public class DifferentialDriveStateEstimator {
 
   /**
    * Updates the the Extended Kalman Filter using wheel encoder information, robot heading and the
-   * previous control input. The control input can be obtained from a LTVDiffDriveController.
+   * previous control input. The control input can be obtained from a
+   * {@link edu.wpi.first.wpilibj.controller.LTVDiffDriveController}.
    * Note that this should be called every loop.
    *
    * @param headingRadians     The current heading of the robot in radians.
@@ -330,16 +319,14 @@ public class DifferentialDriveStateEstimator {
   private enum State {
     kX(0),
     kY(1),
-    kCos(2),
-    kSin(3),
-    kLeftVelocity(4),
-    kRightVelocity(5),
-    kLeftPosition(6),
-    kRightPosition(7),
-    kLeftVoltageError(8),
-    kRightVoltageError(9),
-    kCosError(10),
-    kSinError(11);
+    kHeading(2),
+    kLeftVelocity(3),
+    kRightVelocity(4),
+    kLeftPosition(5),
+    kRightPosition(6),
+    kLeftVoltageError(7),
+    kRightVoltageError(8),
+    kAngularVelocityError(9);
 
     private final int value;
 
