@@ -282,7 +282,6 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
     m_nextR.fill(0.0);
     m_controller.reset();
     m_feedforward.reset(initialState);
-    m_observer.reset();
     m_observer.setXhat(initialState);
   }
 
