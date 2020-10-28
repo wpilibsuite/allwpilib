@@ -30,11 +30,11 @@ namespace frc {
 template <class T>
 class MatchDataSenderEntry {
  public:
-  MatchDataSenderEntry(std::shared_ptr<nt::NetworkTable> table,
-                       const std::string& key, const T& initialVal) {
+  MatchDataSenderEntry(const std::shared_ptr<nt::NetworkTable>& table,
+                       const wpi::Twine& key, const T& initialVal) {
     static_assert(std::is_convertible<decltype(initialVal), bool>() ||
-                      std::is_convertible<decltype(initialVal), double>() ||
-                      std::is_convertible<decltype(initialVal), std::string>(),
+                  std::is_convertible<decltype(initialVal), double>() ||
+                  std::is_convertible<decltype(initialVal), std::string>(),
                   "Invalid type for MatchDataSenderEntry - must be convertable "
                   "to bool, double or std::string");
 
@@ -49,6 +49,7 @@ class MatchDataSenderEntry {
     }
     prevVal = initialVal;
   }
+
   void Set(const T& val) {
     if (val != prevVal) {
       SetValue(val);
@@ -60,9 +61,9 @@ class MatchDataSenderEntry {
   nt::NetworkTableEntry ntEntry;
   T prevVal;
 
-  void SetValue(const bool& val) { ntEntry.SetBoolean(val); }
-  void SetValue(const double& val) { ntEntry.SetDouble(val); }
-  void SetValue(const std::string& val) { ntEntry.SetString(val); }
+  void SetValue(bool val) { ntEntry.SetBoolean(val); }
+  void SetValue(double val) { ntEntry.SetDouble(val); }
+  void SetValue(const wpi::Twine& val) { ntEntry.SetString(val); }
 };
 
 class MatchDataSender {
