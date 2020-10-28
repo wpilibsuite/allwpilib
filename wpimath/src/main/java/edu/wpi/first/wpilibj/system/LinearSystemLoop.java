@@ -275,7 +275,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
    * Zeroes reference r and controller output u. The previous reference
    * of the PlantInversionFeedforward and the initial state estimate of
    * the KalmanFilter are set to the initial state provided.
-   * 
+   *
    * @param initialState The initial state.
    */
   public void reset(Matrix<States, N1> initialState) {
