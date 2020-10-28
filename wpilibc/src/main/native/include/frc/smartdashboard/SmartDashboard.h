@@ -102,6 +102,34 @@ class SmartDashboard {
   static void PutData(wpi::Sendable* value);
 
   /**
+   * Maps the specified key to the specified value in this table.
+   *
+   * The value can be retrieved by calling the get method with a key that is
+   * equal to the original key.
+   *
+   * In order for the value to appear in the dashboard, it must be registered
+   * with SendableRegistry.  WPILib components do this automatically.
+   *
+   * @param key the key
+   * @param data the value
+   */
+  static void PutData(std::string_view key, wpi::Sendable& data);
+
+  /**
+   * Maps the specified key (where the key is the name of the Sendable)
+   * to the specified value in this table.
+   *
+   * The value can be retrieved by calling the get method with a key that is
+   * equal to the original key.
+   *
+   * In order for the value to appear in the dashboard, it must be registered
+   * with SendableRegistry.  WPILib components do this automatically.
+   *
+   * @param value the value
+   */
+  static void PutData(wpi::Sendable& value);
+
+  /**
    * Returns the value at the specified key.
    *
    * @param keyName the key
