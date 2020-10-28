@@ -33,8 +33,8 @@ class MatchDataSenderEntry {
   MatchDataSenderEntry(const std::shared_ptr<nt::NetworkTable>& table,
                        const wpi::Twine& key, const T& initialVal) {
     static_assert(std::is_convertible<decltype(initialVal), bool>() ||
-                  std::is_convertible<decltype(initialVal), double>() ||
-                  std::is_convertible<decltype(initialVal), wpi::Twine>(),
+                      std::is_convertible<decltype(initialVal), double>() ||
+                      std::is_convertible<decltype(initialVal), wpi::Twine>(),
                   "Invalid type for MatchDataSenderEntry - must be convertable "
                   "to bool, double or wpi::Twine");
 
