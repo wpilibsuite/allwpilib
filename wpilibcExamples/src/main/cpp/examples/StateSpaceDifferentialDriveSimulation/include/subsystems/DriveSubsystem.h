@@ -17,7 +17,7 @@
 #include <frc/simulation/AnalogGyroSim.h>
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>
-#include <frc/simulation/Field2d.h>
+#include <frc/smartdashboard/Field2d.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/voltage.h>
 
@@ -169,7 +169,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
   frc::sim::AnalogGyroSim m_gyroAngleSim{m_gyro};
 
-  // The Field2d class simulates the field in the sim GUI. Note that we can have
-  // only one instance!
+  // The Field2d class shows the field in the sim GUI.
   frc::Field2d m_fieldSim;
 };
