@@ -24,7 +24,7 @@ import edu.wpi.first.wpiutil.math.numbers.N7;
 /**
  * This class simulates the state of the drivetrain. In simulationPeriodic, users should first set inputs from motors with
  * {@link #setInputs(double, double)}, call {@link #update(double)} to update the simulation,
- * and set estimated encoder and gyro positions, as well as estimated odometry pose. Teams can use {@link edu.wpi.first.wpilibj.simulation.Field2d} to
+ * and set estimated encoder and gyro positions, as well as estimated odometry pose. Teams can use {@link edu.wpi.first.wpilibj.smartdashboard.Field2d} to
  * visualize their robot on the Sim GUI's field.
  *
  *  <p>Our state-space system is:

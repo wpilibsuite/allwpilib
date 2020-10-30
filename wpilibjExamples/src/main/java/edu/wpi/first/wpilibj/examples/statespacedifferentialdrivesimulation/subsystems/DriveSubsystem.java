@@ -25,7 +25,8 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.simulation.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -64,8 +65,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DifferentialDrivetrainSim m_drivetrainSimulator;
   private EncoderSim m_leftEncoderSim;
   private EncoderSim m_rightEncoderSim;
-  // The Field2d class simulates the field in the sim GUI. Note that we can have only one
-  // instance!
+  // The Field2d class shows the field in the sim GUI
   private Field2d m_fieldSim;
   private SimDouble m_gyroAngleSim;
 
@@ -125,6 +125,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_gyroAngleSim.set(-m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getPose());
+    SmartDashboard.putData("Field", m_fieldSim);
   }
 
   /**

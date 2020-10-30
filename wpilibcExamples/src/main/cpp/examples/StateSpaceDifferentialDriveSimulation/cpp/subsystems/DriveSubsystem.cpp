@@ -12,6 +12,7 @@
 #include <frc/geometry/Rotation2d.h>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 #include <frc/simulation/SimDeviceSim.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace DriveConstants;
 
@@ -53,6 +54,7 @@ void DriveSubsystem::SimulationPeriodic() {
       -m_drivetrainSimulator.GetHeading().Degrees().to<double>());
 
   m_fieldSim.SetRobotPose(m_odometry.GetPose());
+  frc::SmartDashboard::PutData("Field", &m_fieldSim);
 }
 
 units::ampere_t DriveSubsystem::GetCurrentDraw() const {
