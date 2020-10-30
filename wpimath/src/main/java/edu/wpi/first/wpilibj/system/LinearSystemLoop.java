@@ -272,29 +272,30 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
   }
 
   /**
-   * Zeroes reference r, controller output u and plant output y.
-   * The previous reference for PlantInversionFeedforward is set to the
-   * initial reference.
-   * @param initialReference The initial reference.
+   * Zeroes reference r and controller output u. The previous reference
+   * of the PlantInversionFeedforward and the initial state estimate of
+   * the KalmanFilter are set to the initial state provided.
+   *
+   * @param initialState The initial state.
    */
-  public void reset(Matrix<States, N1> initialReference) {
-    m_controller.reset();
-    m_feedforward.reset(initialReference);
-    m_observer.reset();
+  public void reset(Matrix<States, N1> initialState) {
     m_nextR.fill(0.0);
+    m_controller.reset();
+    m_feedforward.reset(initialState);
+    m_observer.setXhat(initialState);
   }
 
   /**
-   * Returns difference between reoid predict(double dtSference r and x-hat.
+   * Returns difference between reference r and current state x-hat.
    *
-   * @return the
+   * @return The state error matrix.
    */
   public Matrix<States, N1> getError() {
     return getController().getR().minus(m_observer.getXhat());
   }
 
   /**
-   * Returns difference between reference r and x-hat.
+   * Returns difference between reference r and current state x-hat.
    *
    * @param index The index of the error matrix to return.
    * @return The error at that index.

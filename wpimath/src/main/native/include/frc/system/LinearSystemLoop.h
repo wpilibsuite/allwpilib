@@ -227,20 +227,21 @@ class LinearSystemLoop {
   }
 
   /**
-   * Zeroes reference r, controller output u and plant output y.
-   * The previous reference for PlantInversionFeedforward is set to the
-   * initial reference.
-   * @param initialReference The initial reference.
+   * Zeroes reference r and controller output u. The previous reference
+   * of the PlantInversionFeedforward and the initial state estimate of
+   * the KalmanFilter are set to the initial state provided.
+   *
+   * @param initialState The initial state.
    */
   void Reset(Eigen::Matrix<double, States, 1> initialState) {
+    m_nextR.setZero();
     m_controller.Reset();
     m_feedforward.Reset(initialState);
-    m_observer.Reset();
-    m_nextR.setZero();
+    m_observer.SetXhat(initialState);
   }
 
   /**
-   * Returns difference between reference r and x-hat.
+   * Returns difference between reference r and current state x-hat.
    */
   const Eigen::Matrix<double, States, 1> Error() const {
     return m_controller.R() - m_observer.Xhat();
