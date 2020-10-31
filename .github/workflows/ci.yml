@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - container: wpilib/roborio-cross-ubuntu:2020-18.04
+          - container: wpilib/roborio-cross-ubuntu:2021-18.04
             artifact-name: Athena
             build-options: "-Ponlylinuxathena"
           - container: wpilib/raspbian-cross-ubuntu:10-18.04
