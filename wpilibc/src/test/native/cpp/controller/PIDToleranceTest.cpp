@@ -24,7 +24,7 @@ TEST(PIDToleranceTest, AbsoluteTolerance) {
   controller.EnableContinuousInput(-kRange / 2, kRange / 2);
 
   EXPECT_TRUE(controller.AtSetpoint())
-      << "Error was in tolerance when it should not have been. Error was "
+      << "Error was not in tolerance when it should have been. Error was "
       << controller.GetPositionError();
 
   controller.SetTolerance(kTolerance);
