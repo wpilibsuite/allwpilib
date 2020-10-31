@@ -32,7 +32,7 @@ class PIDToleranceTest {
       controller.enableContinuousInput(-kRange / 2, kRange / 2);
 
       assertTrue(controller.atSetpoint(),
-          "Error was in tolerance when it should not have been. Error was "
+          "Error was not in tolerance when it should have been. Error was "
           + controller.getPositionError());
 
       controller.setTolerance(kTolerance);
