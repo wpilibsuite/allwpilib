@@ -54,8 +54,18 @@ void PIDController::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
 double PIDController::GetSetpoint() const { return m_setpoint; }
 
 bool PIDController::AtSetpoint() const {
-  return std::abs(m_positionError) < m_positionTolerance &&
-         std::abs(m_velocityError) < m_velocityTolerance;
+  double positionError;
+  if (m_continuous) {
+    positionError = frc::GetModulusError<double>(
+        m_setpoint, m_measurement, m_minimumInput, m_maximumInput);
+  } else {
+    positionError = m_setpoint - m_measurement;
+  }
+
+  double velocityError = (positionError - m_prevError) / m_period.to<double>();
+
+  return std::abs(positionError) < m_positionTolerance &&
+         std::abs(velocityError) < m_velocityTolerance;
 }
 
 void PIDController::EnableContinuousInput(double minimumInput,
@@ -86,6 +96,7 @@ double PIDController::GetPositionError() const { return m_positionError; }
 double PIDController::GetVelocityError() const { return m_velocityError; }
 
 double PIDController::Calculate(double measurement) {
+  m_measurement = measurement;
   m_prevError = m_positionError;
 
   if (m_continuous) {
