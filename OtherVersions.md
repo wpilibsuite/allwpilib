@@ -58,7 +58,8 @@ wpi.wpilibVersion = 'YEAR.424242.+'
 C++
 ```groovy
 plugins {
-  id "java"
+  id "cpp"
+  id "google-test-test-suite"
   id "edu.wpi.first.GradleRIO" version "2020.3.2"
 }
 
