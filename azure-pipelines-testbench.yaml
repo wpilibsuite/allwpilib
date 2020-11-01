@@ -15,7 +15,7 @@ stages:
       vmImage: 'Ubuntu 16.04'
 
     container:
-      image:  wpilib/roborio-cross-ubuntu:2020-18.04
+      image:  wpilib/roborio-cross-ubuntu:2021-18.04
 
     timeoutInMinutes: 0
 
