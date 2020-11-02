@@ -159,6 +159,7 @@ public class AnalogPotentiometer implements Potentiometer, Sendable, AutoCloseab
   @Override
   public void initSendable(SendableBuilder builder) {
     if (m_analogInput != null) {
+      builder.setSmartDashboardType("Analog Input");
       builder.addDoubleProperty("Value", this::get, null);
     }
   }
