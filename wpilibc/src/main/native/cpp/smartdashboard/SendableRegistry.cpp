@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -296,9 +296,13 @@ SendableRegistry::UID SendableRegistry::GetUniqueId(Sendable* sendable) {
 }
 
 Sendable* SendableRegistry::GetSendable(UID uid) {
-  if (uid == 0) return nullptr;
+  if (uid == 0 || uid - 1 >= m_impl->components.size()) return nullptr;
   std::scoped_lock lock(m_impl->mutex);
-  return m_impl->components[uid - 1]->sendable;
+  if (m_impl->components[uid - 1] != nullptr) {
+    return m_impl->components[uid - 1]->sendable;
+  } else {
+    return nullptr;
+  }
 }
 
 void SendableRegistry::Publish(UID sendableUid,
