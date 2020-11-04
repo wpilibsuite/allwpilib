@@ -88,12 +88,12 @@ public class SimDeviceSim {
     return SimDeviceDataJNI.enumerateSimDevices(prefix);
   }
 
-  public CallbackStore registerDeviceCreatedCallback(String prefix, SimDeviceCallback callback, boolean initialNotify) {
+  public static CallbackStore registerDeviceCreatedCallback(String prefix, SimDeviceCallback callback, boolean initialNotify) {
     int uid = SimDeviceDataJNI.registerSimDeviceCreatedCallback(prefix, callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceCreatedCallback);
   }
 
-  public CallbackStore registerDeviceFreedCallback(String prefix, SimDeviceCallback callback) {
+  public static CallbackStore registerDeviceFreedCallback(String prefix, SimDeviceCallback callback) {
     int uid = SimDeviceDataJNI.registerSimDeviceFreedCallback(prefix, callback);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceFreedCallback);
   }
