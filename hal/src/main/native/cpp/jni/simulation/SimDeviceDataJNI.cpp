@@ -184,7 +184,7 @@ void CallbackThreadJNI::Main() {
 
   std::unique_lock lock(m_mutex);
   while (m_active) {
-    m_cond.wait(lock, [&] { return !m_active; });
+    m_cond.wait(lock, [&] { return m_active.load(); });
     if (!m_active) break;
 
     deviceCalls.swap(m_deviceCalls);
@@ -247,7 +247,7 @@ CallbackJNI::AllocateCallback(JNIEnv* env, jobject obj) {
   auto thr = m_owner.GetThread();
   if (!thr) return std::pair(0, nullptr);
   auto store = std::make_shared<CallbackStore>(env, obj);
-  return std::pair(thr->m_callbacks.emplace_back(store) + 1, store);
+  return std::pair(thr->m_callbacks.emplace_back(store), store);
 }
 
 void CallbackJNI::FreeCallback(JNIEnv* env, int32_t uid) {
