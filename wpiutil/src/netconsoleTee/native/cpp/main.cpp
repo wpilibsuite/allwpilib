@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -57,14 +57,14 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   return true;
 }
 
-static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out,
+static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out, int port,
                     bool broadcast) {
   sockaddr_in addr;
   if (broadcast) {
     out->SetBroadcast(true);
-    uv::NameToAddr("0.0.0.0", 6666, &addr);
+    uv::NameToAddr("0.0.0.0", port, &addr);
   } else {
-    uv::NameToAddr("127.0.0.1", 6666, &addr);
+    uv::NameToAddr("127.0.0.1", port, &addr);
   }
 
   in.data.connect(
@@ -119,6 +119,7 @@ int main(int argc, char* argv[]) {
   bool useUdp = false;
   bool broadcastUdp = false;
   bool err = false;
+  int port = -1;
 
   while (arg < argc && argv[arg][0] == '-') {
     if (wpi::StringRef(argv[arg]) == "-u") {
@@ -126,6 +127,13 @@ int main(int argc, char* argv[]) {
     } else if (wpi::StringRef(argv[arg]) == "-b") {
       useUdp = true;
       broadcastUdp = true;
+    } else if (wpi::StringRef(argv[arg]) == "-p") {
+      ++arg;
+      if (arg >= argc || argv[arg][0] == '-' ||
+          wpi::StringRef(argv[arg]).getAsInteger(10, port)) {
+        wpi::errs() << "-p must be followed by port number\n";
+        err = true;
+      }
     } else {
       wpi::errs() << "unrecognized command line option " << argv[arg] << '\n';
       err = true;
@@ -135,9 +143,10 @@ int main(int argc, char* argv[]) {
 
   if (err) {
     wpi::errs()
-        << argv[0] << " [-ub]\n"
-        << "  -u  send udp to localhost port 6666 instead of using tcp\n"
-        << "  -b  broadcast udp to port 6666 instead of using tcp\n";
+        << argv[0] << " [-ub] [-p PORT]\n"
+        << "  -u       send udp to localhost port 6666 instead of using tcp\n"
+        << "  -b       broadcast udp to port 6666 instead of using tcp\n"
+        << "  -p PORT  use port PORT instead of 6666 (udp) or 1740 (tcp)\n";
     return EXIT_FAILURE;
   }
 
@@ -161,12 +170,12 @@ int main(int argc, char* argv[]) {
   if (useUdp) {
     auto udp = uv::Udp::Create(loop);
     // tee
-    CopyUdp(*stdinTty, udp, broadcastUdp);
+    CopyUdp(*stdinTty, udp, port < 0 ? 6666 : port, broadcastUdp);
   } else {
     auto tcp = uv::Tcp::Create(loop);
 
     // bind to listen address and port
-    tcp->Bind("", 1740);
+    tcp->Bind("", port < 0 ? 1740 : port);
 
     // when we get a connection, accept it
     tcp->connection.connect([srv = tcp.get(), stdinTty] {
