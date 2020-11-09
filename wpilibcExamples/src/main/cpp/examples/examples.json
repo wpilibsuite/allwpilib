@@ -10,7 +10,7 @@
     ],
     "foldername": "MotorControl",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Motor Control With Encoder",
@@ -25,7 +25,7 @@
     ],
     "foldername": "MotorControlEncoder",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Relay",
@@ -37,7 +37,7 @@
     ],
     "foldername": "Relay",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "PDP CAN Monitoring",
@@ -49,7 +49,7 @@
     ],
     "foldername": "CANPDP",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Solenoids",
@@ -62,7 +62,7 @@
     ],
     "foldername": "Solenoid",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Encoder",
@@ -74,7 +74,7 @@
     ],
     "foldername": "Encoder",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Arcade Drive",
@@ -87,7 +87,7 @@
     ],
     "foldername": "ArcadeDrive",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Mecanum Drive",
@@ -100,7 +100,7 @@
     ],
     "foldername": "MecanumDrive",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Ultrasonic",
@@ -113,7 +113,7 @@
     ],
     "foldername": "Ultrasonic",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "UltrasonicPID",
@@ -126,7 +126,7 @@
     ],
     "foldername": "UltrasonicPID",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Gyro",
@@ -140,7 +140,7 @@
     ],
     "foldername": "Gyro",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Gyro Mecanum",
@@ -154,7 +154,7 @@
     ],
     "foldername": "GyroMecanum",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "HID Rumble",
@@ -164,7 +164,7 @@
     ],
     "foldername": "HidRumble",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "PotentiometerPID",
@@ -178,7 +178,7 @@
     ],
     "foldername": "PotentiometerPID",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Elevator with trapezoid profiled PID",
@@ -191,7 +191,7 @@
     ],
     "foldername": "ElevatorTrapezoidProfile",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Elevator with profiled PID controller",
@@ -204,7 +204,7 @@
     ],
     "foldername": "ElevatorProfiledPID",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Getting Started",
@@ -215,7 +215,7 @@
     ],
     "foldername": "GettingStarted",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Simple Vision",
@@ -226,7 +226,7 @@
     ],
     "foldername": "QuickVision",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Intermediate Vision",
@@ -237,7 +237,7 @@
     ],
     "foldername": "IntermediateVision",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Axis Camera Sample",
@@ -248,7 +248,7 @@
     ],
     "foldername": "AxisCameraSample",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "GearsBot",
@@ -280,7 +280,7 @@
     ],
     "foldername": "HAL",
     "gradlebase": "c",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "ShuffleBoard",
@@ -290,7 +290,7 @@
     ],
     "foldername": "ShuffleBoard",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "'Traditional' Hatchbot",
@@ -414,7 +414,7 @@
     ],
     "foldername": "ArcadeDriveXboxController",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Tank Drive Xbox Controller",
@@ -427,7 +427,7 @@
     ],
     "foldername": "TankDriveXboxController",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Duty Cycle Encoder",
