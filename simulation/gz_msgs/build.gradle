@@ -26,17 +26,14 @@ try {
 } catch(Exception ex) {
 }
 
-if (!protobuf_version?.trim()) {
-    println "Protobuf is not available. (pkg-config --modversion protobuf failed)"
-    protobuf_version = "+"
-    if (project.hasProperty("makeSim")) {
-        /* Force the build even though we did not find protobuf. */
+if (project.hasProperty("makeSim")) {
+    if (!protobuf_version?.trim()) {
+        println "Protobuf is not available. (pkg-config --modversion protobuf failed)"
         println "makeSim set. Forcing build - failure likely."
     }
-    else {
-        ext.skip_gz_msgs = true
-        println "Skipping gz_msgs."
-    }
+} else {
+    ext.skip_gz_msgs = true
+    println "Skipping gz msgs."
 }
 
 tasks.whenTaskAdded { task ->
@@ -88,6 +85,11 @@ model {
             binaries {
                 all {
                     cppCompiler.args "-fPIC"
+
+                    // Disable -Wzero-length-array on Clang
+                    if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                        it.cppCompiler.args.add('-Wno-error=zero-length-array')
+                    }
                 }
             }
         }
