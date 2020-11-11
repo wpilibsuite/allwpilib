@@ -21,6 +21,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "HALInitializer.h"
+#include "hal/cpp/fpga_clock.h"
 #include "hal/simulation/MockHooks.h"
 #include "mockdata/DriverStationDataInternal.h"
 
@@ -66,18 +67,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   static constexpr int KEEP_MSGS = 5;
   std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
-  static std::chrono::time_point<std::chrono::steady_clock>
-      prevMsgTime[KEEP_MSGS];
+  static fpga_clock::time_point prevMsgTime[KEEP_MSGS];
   static bool initialized = false;
   if (!initialized) {
     for (int i = 0; i < KEEP_MSGS; i++) {
-      prevMsgTime[i] =
-          std::chrono::steady_clock::now() - std::chrono::seconds(2);
+      prevMsgTime[i] = fpga_clock::now() - std::chrono::seconds(2);
     }
     initialized = true;
   }
 
-  auto curTime = std::chrono::steady_clock::now();
+  auto curTime = fpga_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prevMsg[i] == details) break;
