@@ -431,6 +431,23 @@ class DriverStation : public ErrorBase {
    */
   void WakeupWaitForData();
 
+  /**
+   * Allows the user to specify whether they want joystick connection warnings
+   * to be printed to the console. This setting is ignored when the FMS is
+   * connected -- warnings will always be on in that scenario.
+   *
+   * @param silence Whether warning messages should be silenced.
+   */
+  void SilenceJoystickConnectionWarning(bool silence);
+
+  /**
+   * Returns whether joystick connection warnings are silenced. This will
+   * always return false when connected to the FMS.
+   *
+   * @return Whether joystick connection warnings are silenced.
+   */
+  bool IsJoystickConnectionWarningSilenced() const;
+
  protected:
   /**
    * Copy data from the DS task for the user.
@@ -481,6 +498,8 @@ class DriverStation : public ErrorBase {
   mutable wpi::mutex m_waitForDataMutex;
   wpi::condition_variable m_waitForDataCond;
   int m_waitForDataCounter;
+
+  bool m_silenceJoystickWarning = false;
 
   // Robot state status variables
   bool m_userInDisabled = false;

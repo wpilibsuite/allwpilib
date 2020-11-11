@@ -41,4 +41,23 @@ class DriverStationTest {
       arguments(4, 10, 1, true)
     );
   }
+
+  @MethodSource("connectionWarningProvider")
+  void testConnectionWarnings(boolean fms, boolean silence, boolean expected) {
+    DriverStationSim.setFmsAttached(fms);
+    DriverStationSim.notifyNewData();
+
+    DriverStation.getInstance().silenceJoystickConnectionWarning(silence);
+    assertEquals(expected,
+        DriverStation.getInstance().isJoystickConnectionWarningSilenced());
+  }
+
+  static Stream<Arguments> connectionWarningProvider() {
+    return Stream.of(
+      arguments(false, true, true),
+      arguments(false, false, false),
+      arguments(true, true, false),
+      arguments(true, false, false)
+    );
+  }
 }
