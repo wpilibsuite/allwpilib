@@ -331,6 +331,11 @@ int DriverStation::GetJoystickAxisType(int stick, int axis) const {
   return static_cast<bool>(descriptor.axisTypes);
 }
 
+bool DriverStation::IsJoystickConnected(int stick) const {
+  return GetStickAxisCount(stick) > 0 || GetStickButtonCount(stick) > 0 ||
+         GetStickPOVCount(stick) > 0;
+}
+
 bool DriverStation::IsEnabled() const {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
