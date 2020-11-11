@@ -545,7 +545,7 @@
   },
   {
     "name": "StateSpaceFlywheel",
-    "description": "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.",
+    "description": "An example state-space controller for a flywheel.",
     "tags": [
       "StateSpaceFlywheel",
       "Flywheel",
@@ -582,7 +582,7 @@
   },
   {
     "name": "StateSpaceElevator",
-    "description": "An example state-space controller demonstrating the use of FRC Characterization's System Identification for controlling a flywheel.",
+    "description": "An example state-space controller for controlling an elevator.",
     "tags": [
       "Elevator",
       "State Space",
@@ -598,7 +598,7 @@
   },
   {
     "name": "StateSpaceArm",
-    "description": "An example state-space controller demonstrating the use of FRC Characterization's System Identification for controlling a flywheel.",
+    "description": "An example state-space controller for controlling an arm.",
     "tags": [
       "Arm",
       "State space",
@@ -645,7 +645,7 @@
     "commandversion": 2
   },
   {
-    "name": "DifferentialDriveSimulation",
+    "name": "StateSpaceDriveSimulation",
     "description": "Demonstrates the use of physics simulation with a differential drivetrain and the Field2d class.",
     "tags": [
       "Differential Drive",

@@ -618,7 +618,7 @@
   },
   {
     "name": "StateSpaceArm",
-    "description": "An example state-space controller demonstrating the use of FRC Characterization's System Identification for controlling a flywheel.",
+    "description": "An example state-space controller for controlling an arm.",
     "tags": [
       "Arm",
       "State space",
@@ -633,8 +633,8 @@
     "commandversion": 2
   },
   {
-    "name": "StateSpaceSimulation",
-    "description": "An example of drivetrain simulation in combination with a RAMSETE path following controller.",
+    "name": "StateSpaceDriveSimulation",
+    "description": "An example of drivetrain simulation in combination with a RAMSETE path following controller and the Field2d class.",
     "tags": [
       "Drivetrain",
       "State space",
