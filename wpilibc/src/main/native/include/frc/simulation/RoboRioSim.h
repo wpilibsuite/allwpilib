@@ -9,6 +9,9 @@
 
 #include <memory>
 
+#include <units/current.h>
+#include <units/voltage.h>
+
 #include "frc/simulation/CallbackStore.h"
 
 namespace frc {
@@ -29,30 +32,30 @@ class RoboRioSim {
   static std::unique_ptr<CallbackStore> RegisterVInVoltageCallback(
       NotifyCallback callback, bool initialNotify);
 
-  static double GetVInVoltage();
+  static units::volt_t GetVInVoltage();
 
-  static void SetVInVoltage(double vInVoltage);
+  static void SetVInVoltage(units::volt_t vInVoltage);
 
   static std::unique_ptr<CallbackStore> RegisterVInCurrentCallback(
       NotifyCallback callback, bool initialNotify);
 
-  static double GetVInCurrent();
+  static units::ampere_t GetVInCurrent();
 
-  static void SetVInCurrent(double vInCurrent);
+  static void SetVInCurrent(units::ampere_t vInCurrent);
 
   static std::unique_ptr<CallbackStore> RegisterUserVoltage6VCallback(
       NotifyCallback callback, bool initialNotify);
 
-  static double GetUserVoltage6V();
+  static units::volt_t GetUserVoltage6V();
 
-  static void SetUserVoltage6V(double userVoltage6V);
+  static void SetUserVoltage6V(units::volt_t userVoltage6V);
 
   static std::unique_ptr<CallbackStore> RegisterUserCurrent6VCallback(
       NotifyCallback callback, bool initialNotify);
 
-  static double GetUserCurrent6V();
+  static units::ampere_t GetUserCurrent6V();
 
-  static void SetUserCurrent6V(double userCurrent6V);
+  static void SetUserCurrent6V(units::ampere_t userCurrent6V);
 
   static std::unique_ptr<CallbackStore> RegisterUserActive6VCallback(
       NotifyCallback callback, bool initialNotify);
@@ -64,16 +67,16 @@ class RoboRioSim {
   static std::unique_ptr<CallbackStore> RegisterUserVoltage5VCallback(
       NotifyCallback callback, bool initialNotify);
 
-  static double GetUserVoltage5V();
+  static units::volt_t GetUserVoltage5V();
 
-  static void SetUserVoltage5V(double userVoltage5V);
+  static void SetUserVoltage5V(units::volt_t userVoltage5V);
 
   static std::unique_ptr<CallbackStore> RegisterUserCurrent5VCallback(
       NotifyCallback callback, bool initialNotify);
 
-  static double GetUserCurrent5V();
+  static units::ampere_t GetUserCurrent5V();
 
-  static void SetUserCurrent5V(double userCurrent5V);
+  static void SetUserCurrent5V(units::ampere_t userCurrent5V);
 
   static std::unique_ptr<CallbackStore> RegisterUserActive5VCallback(
       NotifyCallback callback, bool initialNotify);
@@ -85,16 +88,16 @@ class RoboRioSim {
   static std::unique_ptr<CallbackStore> RegisterUserVoltage3V3Callback(
       NotifyCallback callback, bool initialNotify);
 
-  static double GetUserVoltage3V3();
+  static units::volt_t GetUserVoltage3V3();
 
-  static void SetUserVoltage3V3(double userVoltage3V3);
+  static void SetUserVoltage3V3(units::volt_t userVoltage3V3);
 
   static std::unique_ptr<CallbackStore> RegisterUserCurrent3V3Callback(
       NotifyCallback callback, bool initialNotify);
 
-  static double GetUserCurrent3V3();
+  static units::ampere_t GetUserCurrent3V3();
 
-  static void SetUserCurrent3V3(double userCurrent3V3);
+  static void SetUserCurrent3V3(units::ampere_t userCurrent3V3);
 
   static std::unique_ptr<CallbackStore> RegisterUserActive3V3Callback(
       NotifyCallback callback, bool initialNotify);
