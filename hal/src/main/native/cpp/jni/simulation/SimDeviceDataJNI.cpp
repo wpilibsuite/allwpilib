@@ -253,8 +253,7 @@ CallbackJNI::AllocateCallback(JNIEnv* env, jobject obj) {
 void CallbackJNI::FreeCallback(JNIEnv* env, int32_t uid) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  if (uid <= 0 || static_cast<uint32_t>(uid) >= thr->m_callbacks.size()) return;
-  --uid;
+  if (uid < 0 || static_cast<uint32_t>(uid) >= thr->m_callbacks.size()) return;
   auto store = std::move(thr->m_callbacks[uid]);
   thr->m_callbacks.erase(uid);
   store->Free(env);
