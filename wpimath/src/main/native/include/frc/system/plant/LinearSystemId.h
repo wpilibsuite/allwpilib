@@ -10,12 +10,25 @@
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
+#include "units/acceleration.h"
+#include "units/angular_acceleration.h"
+#include "units/angular_velocity.h"
 #include "units/moment_of_inertia.h"
+#include "units/velocity.h"
+#include "units/voltage.h"
 
 namespace frc {
-
 class LinearSystemId {
  public:
+  template <typename Distance>
+  using Velocity_t = units::unit_t<
+      units::compound_unit<Distance, units::inverse<units::seconds>>>;
+
+  template <typename Distance>
+  using Acceleration_t = units::unit_t<units::compound_unit<
+      units::compound_unit<Distance, units::inverse<units::seconds>>,
+      units::inverse<units::seconds>>>;
+
   /**
    * Constructs the state-space model for an elevator.
    *
@@ -72,6 +85,11 @@ class LinearSystemId {
    * Constructs the state-space model for a 1 DOF velocity-only system from
    * system identification data.
    *
+   * You MUST use an SI unit (i.e. meters or radians) for the Distance template
+   * argument. You may still use non-SI units (such as feet or inches) for the
+   * actual method arguments; they will automatically be converted to SI
+   * internally.
+   *
    * States: [[velocity]]
    * Inputs: [[voltage]]
    * Outputs: [[velocity]]
@@ -83,9 +101,15 @@ class LinearSystemId {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    */
-  static LinearSystem<1, 1, 1> IdentifyVelocitySystem(double kV, double kA) {
-    auto A = frc::MakeMatrix<1, 1>(-kV / kA);
-    auto B = frc::MakeMatrix<1, 1>(1.0 / kA);
+  template <typename Distance, typename = std::enable_if_t<
+                                   std::is_same_v<units::meter, Distance> ||
+                                   std::is_same_v<units::radian, Distance>>>
+  static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
+      decltype(1_V / Velocity_t<Distance>(1)) kV,
+      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
+    auto A = frc::MakeMatrix<1, 1>(-kV.template to<double>() /
+                                   kA.template to<double>());
+    auto B = frc::MakeMatrix<1, 1>(1.0 / kA.template to<double>());
     auto C = frc::MakeMatrix<1, 1>(1.0);
     auto D = frc::MakeMatrix<1, 1>(0.0);
 
@@ -95,6 +119,11 @@ class LinearSystemId {
   /**
    * Constructs the state-space model for a 1 DOF position system from system
    * identification data.
+   *
+   * You MUST use an SI unit (i.e. meters or radians) for the Distance template
+   * argument. You may still use non-SI units (such as feet or inches) for the
+   * actual method arguments; they will automatically be converted to SI
+   * internally.
    *
    * States: [[position], [velocity]]
    * Inputs: [[voltage]]
@@ -107,9 +136,15 @@ class LinearSystemId {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    */
-  static LinearSystem<2, 1, 1> IdentifyPositionSystem(double kV, double kA) {
-    auto A = frc::MakeMatrix<2, 2>(0.0, 1.0, 0.0, -kV / kA);
-    auto B = frc::MakeMatrix<2, 1>(0.0, 1.0 / kA);
+  template <typename Distance, typename = std::enable_if_t<
+                                   std::is_same_v<units::meter, Distance> ||
+                                   std::is_same_v<units::radian, Distance>>>
+  static LinearSystem<2, 1, 1> IdentifyPositionSystem(
+      decltype(1_V / Velocity_t<Distance>(1)) kV,
+      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
+    auto A = frc::MakeMatrix<2, 2>(
+        0.0, 1.0, 0.0, -kV.template to<double>() / kA.template to<double>());
+    auto B = frc::MakeMatrix<2, 1>(0.0, 1.0 / kA.template to<double>());
     auto C = frc::MakeMatrix<1, 2>(1.0, 0.0);
     auto D = frc::MakeMatrix<1, 1>(0.0);
 
@@ -131,15 +166,17 @@ class LinearSystemId {
    * @param kAangular The angular acceleration gain, in volt seconds^2 per
    * angle.
    */
-  static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(double kVlinear,
-                                                        double kAlinear,
-                                                        double kVangular,
-                                                        double kAangular) {
-    double c = 0.5 / (kAlinear * kAangular);
-    double A1 = c * (-kAlinear * kVangular - kVlinear * kAangular);
-    double A2 = c * (kAlinear * kVangular - kVlinear * kAangular);
-    double B1 = c * (kAlinear + kAangular);
-    double B2 = c * (kAangular - kAlinear);
+  static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
+      decltype(1_V / 1_mps) kVlinear, decltype(1_V / 1_mps_sq) kAlinear,
+      decltype(1_V / 1_rad_per_s) kVangular,
+      decltype(1_V / 1_rad_per_s_sq) kAangular) {
+    double c = 0.5 / (kAlinear.to<double>() * kAangular.to<double>());
+    double A1 = c * (-kAlinear.to<double>() * kVangular.to<double>() -
+                     kVlinear.to<double>() * kAangular.to<double>());
+    double A2 = c * (kAlinear.to<double>() * kVangular.to<double>() -
+                     kVlinear.to<double>() * kAangular.to<double>());
+    double B1 = c * (kAlinear.to<double>() + kAangular.to<double>());
+    double B2 = c * (kAangular.to<double>() - kAlinear.to<double>());
 
     auto A = frc::MakeMatrix<2, 2>(A1, A2, A2, A1);
     auto B = frc::MakeMatrix<2, 2>(B1, B2, B2, B1);

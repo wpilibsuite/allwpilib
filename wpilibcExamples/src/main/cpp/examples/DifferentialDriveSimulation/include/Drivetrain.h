@@ -91,7 +91,9 @@ class Drivetrain {
   frc::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
   frc::Field2d m_fieldSim{};
   frc::LinearSystem<2, 2, 2> m_drivetrainSystem =
-      frc::LinearSystemId::IdentifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
+      frc::LinearSystemId::IdentifyDrivetrainSystem(
+          1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_rad_per_s,
+          0.3_V / 1_rad_per_s_sq);
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
       m_drivetrainSystem, kTrackWidth, frc::DCMotor::CIM(2), 8, 2_in};
 };

@@ -53,7 +53,8 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
   // x-dot = [0 1 | 0 -kv/ka] x = [0 | 1/ka] u
   double kv = 1.0;
   double ka = 0.5;
-  auto model = frc::LinearSystemId::IdentifyPositionSystem(kv, ka);
+  auto model = frc::LinearSystemId::IdentifyPositionSystem<units::meter>(
+      kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 
   ASSERT_TRUE(model.A().isApprox(frc::MakeMatrix<2, 2>(0.0, 1.0, 0.0, -kv / ka),
                                  0.001));
@@ -66,7 +67,8 @@ TEST(LinearSystemIDTest, IdentifyVelocitySystem) {
   // x-dot =  -kv/ka * v + 1/ka \cdot V
   double kv = 1.0;
   double ka = 0.5;
-  auto model = frc::LinearSystemId::IdentifyVelocitySystem(kv, ka);
+  auto model = frc::LinearSystemId::IdentifyVelocitySystem<units::meter>(
+      kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 
   ASSERT_TRUE(model.A().isApprox(frc::MakeMatrix<1, 1>(-kv / ka), 0.001));
   ASSERT_TRUE(model.B().isApprox(frc::MakeMatrix<1, 1>(1.0 / ka), 0.001));
