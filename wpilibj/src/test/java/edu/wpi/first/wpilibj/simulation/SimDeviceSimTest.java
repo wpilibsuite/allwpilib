@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,31 +40,27 @@ class SimDeviceSimTest {
     AtomicInteger callback1Counter = new AtomicInteger(0);
     AtomicInteger callback2Counter = new AtomicInteger(0);
 
-    SimDevice dev1 = SimDevice.create("testDC1");
-    
+    final SimDevice dev1 = SimDevice.create("testDC1");
+
     SimDeviceSim sim = new SimDeviceSim("testDC1");
-    CallbackStore callback1 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
+    final CallbackStore callback1 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
       callback1Counter.addAndGet(1);
-      synchronized(callback1Counter) {
-        callback1Counter.notify();
+      synchronized (callback1Counter) {
+        callback1Counter.notifyAll();
       }
     }, false);
-    CallbackStore callback2 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
+    final CallbackStore callback2 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
       callback2Counter.addAndGet(1);
-      synchronized(callback2Counter) {
-        callback2Counter.notify();
+      synchronized (callback2Counter) {
+        callback2Counter.notifyAll();
       }
     }, true);
 
-    synchronized(callback1Counter) {
-      try {
-        callback1Counter.wait(100);
-      } catch(InterruptedException e) {}
+    synchronized (callback1Counter) {
+      assertDoesNotThrow(() -> callback1Counter.wait(100));
     }
-    synchronized(callback2Counter) {
-      try {
-        callback2Counter.wait(100);
-      } catch(InterruptedException e) {}
+    synchronized (callback2Counter) {
+      assertDoesNotThrow(() -> callback2Counter.wait(100));
     }
 
     assertEquals(0, callback1Counter.get(), "Callback 1 called early");
@@ -72,15 +69,11 @@ class SimDeviceSimTest {
     SimDevice dev2 = SimDevice.create("testDC2");
     dev2.close();
 
-    synchronized(callback1Counter) {
-      try {
-        callback1Counter.wait(100);
-      } catch(InterruptedException e) {}
+    synchronized (callback1Counter) {
+      assertDoesNotThrow(() -> callback1Counter.wait(100));
     }
-    synchronized(callback2Counter) {
-      try {
-        callback2Counter.wait(100);
-      } catch(InterruptedException e) {}
+    synchronized (callback2Counter) {
+      assertDoesNotThrow(() -> callback2Counter.wait(100));
     }
 
     assertEquals(1, callback1Counter.get(), "Callback 1 called either more than once or not at all");
@@ -92,15 +85,12 @@ class SimDeviceSimTest {
     SimDevice dev3 = SimDevice.create("testDC3");
     dev3.close();
 
-    synchronized(callback1Counter) {
-      try {
-        callback1Counter.wait(100);
-      } catch(InterruptedException e) {}
+
+    synchronized (callback1Counter) {
+      assertDoesNotThrow(() -> callback1Counter.wait(100));
     }
-    synchronized(callback2Counter) {
-      try {
-        callback2Counter.wait(100);
-      } catch(InterruptedException e) {}
+    synchronized (callback2Counter) {
+      assertDoesNotThrow(() -> callback2Counter.wait(100));
     }
 
     assertEquals(1, callback1Counter.get(), "Callback 1 called after closure");
@@ -112,30 +102,27 @@ class SimDeviceSimTest {
   @Test
   void testDeviceFreedCallback() {
     AtomicInteger counter = new AtomicInteger(0);
-    
+
     SimDevice dev1 = SimDevice.create("testDF1");
     SimDeviceSim sim = new SimDeviceSim("testDF1");
-    CallbackStore callback = sim.registerDeviceFreedCallback("testDF", (name, handle) -> {
+    final CallbackStore callback = sim.registerDeviceFreedCallback("testDF", (name, handle) -> {
       counter.addAndGet(1);
-      synchronized(counter) {
-        counter.notify();
+      synchronized (counter) {
+        counter.notifyAll();
       }
     });
 
-    synchronized(counter) {
-      try {
-        counter.wait(100);
-      } catch(InterruptedException e) {}
+
+    synchronized (counter) {
+      assertDoesNotThrow(() -> counter.wait(100));
     }
 
     assertEquals(0, counter.get(), "Callback called early");
 
     dev1.close();
 
-    synchronized(counter) {
-      try {
-        counter.wait(100);
-      } catch(InterruptedException e) {}
+    synchronized (counter) {
+      assertDoesNotThrow(() -> counter.wait(100));
     }
 
     assertEquals(1, counter.get(), "Callback called either more than once or not at all");
@@ -145,10 +132,8 @@ class SimDeviceSimTest {
     SimDevice dev2 = SimDevice.create("testDF2");
     dev2.close();
 
-    synchronized(counter) {
-      try {
-        counter.wait(100);
-      } catch(InterruptedException e) {}
+    synchronized (counter) {
+      assertDoesNotThrow(() -> counter.wait(100));
     }
 
     assertEquals(1, counter.get(), "Callback called after closure");
