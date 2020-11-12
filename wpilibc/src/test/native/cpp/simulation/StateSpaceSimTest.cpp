@@ -47,7 +47,7 @@ TEST(StateSpaceSimTest, TestFlywheelSim) {
 
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
-        frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}).to<double>());
+        frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
     sim.SetInput(frc::MakeMatrix<1, 1>(
         motor.Get() * frc::RobotController::GetInputVoltage()));
     sim.Update(20_ms);

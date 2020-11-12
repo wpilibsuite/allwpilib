@@ -81,8 +81,7 @@ class Robot : public frc::TimedRobot {
     m_encoderSim.SetDistance(m_elevatorSim.GetPosition().to<double>());
     // SimBattery estimates loaded battery voltages
     frc::sim::RoboRioSim::SetVInVoltage(
-        frc::sim::BatterySim::Calculate({m_elevatorSim.GetCurrentDraw()})
-            .to<double>());
+        frc::sim::BatterySim::Calculate({m_elevatorSim.GetCurrentDraw()}));
   }
 
   void TeleopPeriodic() {
