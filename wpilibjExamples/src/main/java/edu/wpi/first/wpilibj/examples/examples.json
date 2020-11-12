@@ -8,7 +8,7 @@
     "foldername": "gettingstarted",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Tank Drive",
@@ -22,7 +22,7 @@
     "foldername": "tankdrive",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Arcade Drive",
@@ -33,7 +33,7 @@
     "foldername": "arcadedrive",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Mecanum Drive",
@@ -47,7 +47,7 @@
     "foldername": "mecanumdrive",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "PDP CAN Monitoring",
@@ -60,7 +60,7 @@
     "foldername": "canpdp",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Solenoids",
@@ -74,7 +74,7 @@
     "foldername": "solenoid",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Encoder",
@@ -87,7 +87,7 @@
     "foldername": "encoder",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Relay",
@@ -100,7 +100,7 @@
     "foldername": "relay",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Ultrasonic",
@@ -113,7 +113,7 @@
     "foldername": "ultrasonic",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Ultrasonic PID",
@@ -126,7 +126,7 @@
     "foldername": "ultrasonicpid",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Potentiometer PID",
@@ -140,7 +140,7 @@
     "foldername": "potentiometerpid",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Elevator with trapezoid profiled PID",
@@ -154,7 +154,7 @@
     "foldername": "elevatortrapezoidprofile",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Elevator with profiled PID controller",
@@ -168,7 +168,7 @@
     "foldername": "elevatorprofiledpid",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Gyro",
@@ -182,7 +182,7 @@
     "foldername": "gyro",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Gyro Mecanum",
@@ -196,7 +196,7 @@
     "foldername": "gyromecanum",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "HID Rumble",
@@ -207,7 +207,7 @@
     "foldername": "hidrumble",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Motor Controller",
@@ -220,7 +220,7 @@
     "foldername": "motorcontrol",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Motor Control With Encoder",
@@ -236,7 +236,7 @@
     "foldername": "motorcontrolencoder",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "GearsBot",
@@ -270,7 +270,7 @@
     "foldername": "quickvision",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Intermediate Vision",
@@ -282,7 +282,7 @@
     "foldername": "intermediatevision",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Axis Camera Sample",
@@ -293,7 +293,7 @@
     "foldername": "axiscamera",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Shuffleboard Sample",
@@ -305,7 +305,7 @@
     "foldername": "shuffleboard",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "'Traditional' Hatchbot",
@@ -437,7 +437,7 @@
     "foldername": "arcadedrivexboxcontroller",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Tank Drive Xbox Controller",
@@ -448,7 +448,7 @@
     "foldername": "tankdrivexboxcontroller",
     "gradlebase": "java",
     "mainclass": "Main",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Duty Cycle Encoder",
