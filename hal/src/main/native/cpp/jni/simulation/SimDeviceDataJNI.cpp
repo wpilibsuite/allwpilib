@@ -231,14 +231,14 @@ void CallbackThreadJNI::Main() {
 void CallbackJNI::SendDevice(int32_t callback, DeviceInfo info) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_deviceCalls.emplace_back(thr->m_callbacks[callback], std::move(info));
+  thr->m_deviceCalls.emplace_back(thr->m_callbacks[callback - 1], std::move(info));
   thr->m_cond.notify_one();
 }
 
 void CallbackJNI::SendValue(int32_t callback, ValueInfo info) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_valueCalls.emplace_back(thr->m_callbacks[callback], std::move(info));
+  thr->m_valueCalls.emplace_back(thr->m_callbacks[callback - 1], std::move(info));
   thr->m_cond.notify_one();
 }
 
@@ -247,13 +247,14 @@ CallbackJNI::AllocateCallback(JNIEnv* env, jobject obj) {
   auto thr = m_owner.GetThread();
   if (!thr) return std::pair(0, nullptr);
   auto store = std::make_shared<CallbackStore>(env, obj);
-  return std::pair(thr->m_callbacks.emplace_back(store), store);
+  return std::pair(thr->m_callbacks.emplace_back(store) + 1, store);
 }
 
 void CallbackJNI::FreeCallback(JNIEnv* env, int32_t uid) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  if (uid < 0 || static_cast<uint32_t>(uid) >= thr->m_callbacks.size()) return;
+  if (uid <= 0 || static_cast<uint32_t>(uid) > thr->m_callbacks.size()) return;
+  uid--;
   auto store = std::move(thr->m_callbacks[uid]);
   thr->m_callbacks.erase(uid);
   store->Free(env);
