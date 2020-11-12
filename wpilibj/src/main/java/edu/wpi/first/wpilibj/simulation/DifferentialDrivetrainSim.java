@@ -192,6 +192,8 @@ public class DifferentialDrivetrainSim {
     m_x.set(State.kX.value, 0, pose.getX());
     m_x.set(State.kY.value, 0, pose.getY());
     m_x.set(State.kHeading.value, 0, pose.getRotation().getRadians());
+    m_x.set(State.kLeftPosition.value, 0, 0);
+    m_x.set(State.kRightPosition.value, 0, 0);
   }
 
   @SuppressWarnings({"DuplicatedCode", "LocalVariableName"})

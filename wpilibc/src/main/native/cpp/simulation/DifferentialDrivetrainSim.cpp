@@ -98,6 +98,8 @@ void DifferentialDrivetrainSim::SetPose(const frc::Pose2d& pose) {
   m_x(State::kX) = pose.X().to<double>();
   m_x(State::kY) = pose.Y().to<double>();
   m_x(State::kHeading) = pose.Rotation().Radians().to<double>();
+  m_x(State::kLeftPosition) = 0;
+  m_x(State::kRightPosition) = 0;
 }
 
 Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::Dynamics(
