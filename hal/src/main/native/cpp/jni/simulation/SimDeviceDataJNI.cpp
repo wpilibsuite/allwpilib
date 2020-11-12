@@ -231,14 +231,16 @@ void CallbackThreadJNI::Main() {
 void CallbackJNI::SendDevice(int32_t callback, DeviceInfo info) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_deviceCalls.emplace_back(thr->m_callbacks[callback - 1], std::move(info));
+  thr->m_deviceCalls.emplace_back(thr->m_callbacks[callback - 1],
+                                  std::move(info));
   thr->m_cond.notify_one();
 }
 
 void CallbackJNI::SendValue(int32_t callback, ValueInfo info) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_valueCalls.emplace_back(thr->m_callbacks[callback - 1], std::move(info));
+  thr->m_valueCalls.emplace_back(thr->m_callbacks[callback - 1],
+                                 std::move(info));
   thr->m_cond.notify_one();
 }
 
