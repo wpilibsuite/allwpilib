@@ -98,6 +98,7 @@ public class DifferentialDrivetrainSim {
     m_currentGearing = m_originalGearing;
 
     m_x = new Matrix<>(Nat.N7(), Nat.N1());
+    m_u = VecBuilder.fill(0, 0);
   }
 
   /**
