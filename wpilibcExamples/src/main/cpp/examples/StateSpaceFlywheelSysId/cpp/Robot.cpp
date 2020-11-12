@@ -33,10 +33,10 @@ class Robot : public frc::TimedRobot {
   static constexpr units::radians_per_second_t kSpinup = 500_rpm;
 
   // Volts per (radian per second)
-  static constexpr double kFlywheelKv = 0.023;
+  static constexpr auto kFlywheelKv = 0.023_V / 1_rad_per_s;
 
   // Volts per (radian per second squared)
-  static constexpr double kFlywheelKa = 0.001;
+  static constexpr auto kFlywheelKa = 0.001_V / 1_rad_per_s_sq;
 
   // The plant holds a state-space model of our flywheel. This system has the
   // following properties:
@@ -47,7 +47,8 @@ class Robot : public frc::TimedRobot {
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
   frc::LinearSystem<1, 1, 1> m_flywheelPlant =
-      frc::LinearSystemId::IdentifyVelocitySystem(kFlywheelKv, kFlywheelKa);
+      frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(kFlywheelKv,
+                                                                 kFlywheelKa);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   frc::KalmanFilter<1, 1, 1> m_observer{

@@ -134,6 +134,9 @@ public final class LinearSystemId {
    * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
    * These constants cam be found using frc-characterization.
    *
+   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use
+   * the {@link edu.wpi.first.wpilibj.util.Units} class for converting between unit types.
+   *
    * @param kV         The velocity gain, in volts per (units per second)
    * @param kA         The acceleration gain, in volts per (units per second squared)
    * @return A LinearSystem representing the given characterized constants.
@@ -152,6 +155,9 @@ public final class LinearSystemId {
   /**
    * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
    * These constants cam be found using frc-characterization.
+   *
+   * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use
+   * the {@link edu.wpi.first.wpilibj.util.Units} class for converting between unit types.
    *
    * @param kV         The velocity gain, in volts per (units per second)
    * @param kA         The acceleration gain, in volts per (units per second squared)
