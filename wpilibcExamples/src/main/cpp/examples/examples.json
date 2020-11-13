@@ -657,7 +657,7 @@
       "Drivetrain",
       "Field2d"
     ],
-    "foldername": "DifferentialDriveSimulation",
+    "foldername": "StateSpaceDifferentialDriveSimulation",
     "gradlebase": "cpp",
     "mainclass": "Main",
     "commandversion": 2
