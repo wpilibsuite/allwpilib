@@ -47,6 +47,10 @@ int GenericHID::GetButtonCount() const {
   return m_ds->GetStickButtonCount(m_port);
 }
 
+bool GenericHID::IsConnected() const {
+  return m_ds->IsJoystickConnected(m_port);
+}
+
 GenericHID::HIDType GenericHID::GetType() const {
   return static_cast<HIDType>(m_ds->GetJoystickType(m_port));
 }

@@ -182,6 +182,17 @@ class DriverStation : public ErrorBase {
   int GetJoystickAxisType(int stick, int axis) const;
 
   /**
+   * Returns if a joystick is connected to the Driver Station.
+   *
+   * This makes a best effort guess by looking at the reported number of axis,
+   * buttons, and POVs attached.
+   *
+   * @param stick The joystick port number
+   * @return true if a joystick is connected
+   */
+  bool IsJoystickConnected(int stick) const;
+
+  /**
    * Check if the DS has enabled the robot.
    *
    * @return True if the robot is enabled and the DS is connected

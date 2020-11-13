@@ -218,6 +218,15 @@ public abstract class GenericHID {
   }
 
   /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  public boolean isConnected() {
+    return m_ds.isJoystickConnected(m_port);
+  }
+
+  /**
    * Get the type of the HID.
    *
    * @return the type of the HID.

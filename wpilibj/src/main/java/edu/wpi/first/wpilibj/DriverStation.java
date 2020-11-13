@@ -595,6 +595,21 @@ public class DriverStation {
   }
 
   /**
+   * Returns if a joystick is connected to the Driver Station.
+   *
+   * <p>This makes a best effort guess by looking at the reported number of axis,
+   * buttons, and POVs attached.
+   *
+   * @param stick The joystick port number
+   * @return true if a joystick is connected
+   */
+  public boolean isJoystickConnected(int stick) {
+    return getStickAxisCount(stick) > 0
+      || getStickButtonCount(stick) > 0
+      || getStickPOVCount(stick) > 0;
+  }
+
+  /**
    * Gets a value indicating whether the Driver Station requires the robot to be enabled.
    *
    * @return True if the robot is enabled, false otherwise.

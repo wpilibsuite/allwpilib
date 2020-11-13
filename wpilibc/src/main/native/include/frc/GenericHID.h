@@ -137,6 +137,13 @@ class GenericHID : public ErrorBase {
   int GetButtonCount() const;
 
   /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  bool IsConnected() const;
+
+  /**
    * Get the type of the HID.
    *
    * @return the type of the HID.
