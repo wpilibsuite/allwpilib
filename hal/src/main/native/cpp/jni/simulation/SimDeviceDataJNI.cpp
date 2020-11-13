@@ -184,7 +184,7 @@ void CallbackThreadJNI::Main() {
 
   std::unique_lock lock(m_mutex);
   while (m_active) {
-    m_cond.wait(lock, [&] { return m_active.load(); });
+    m_cond.wait(lock);
     if (!m_active) break;
 
     deviceCalls.swap(m_deviceCalls);
