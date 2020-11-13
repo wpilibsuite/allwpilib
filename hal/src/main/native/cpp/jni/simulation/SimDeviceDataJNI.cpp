@@ -162,7 +162,10 @@ class CallbackJNI {
   void FreeCallback(JNIEnv* env, int32_t uid);
 
  private:
-  CallbackJNI() { m_owner.Start(); }
+  CallbackJNI() {
+    m_owner.SetJoinAtExit(false); // To prevent hangs on linux/MacOS
+    m_owner.Start();
+  }
 
   wpi::SafeThreadOwner<CallbackThreadJNI> m_owner;
 };
@@ -184,7 +187,9 @@ void CallbackThreadJNI::Main() {
 
   std::unique_lock lock(m_mutex);
   while (m_active) {
-    m_cond.wait(lock, [&] { return m_active.load(); });
+    m_cond.wait(lock, [&] { 
+      return !m_active || !m_deviceCalls.empty() || !m_valueCalls.empty(); 
+      });
     if (!m_active) break;
 
     deviceCalls.swap(m_deviceCalls);
@@ -258,7 +263,7 @@ void CallbackJNI::FreeCallback(JNIEnv* env, int32_t uid) {
   if (uid <= 0 || static_cast<uint32_t>(uid) > thr->m_callbacks.size()) return;
   uid--;
   auto store = std::move(thr->m_callbacks[uid]);
-  thr->m_callbacks.erase(uid);
+  // thr->m_callbacks.erase(uid); // Erasing callbacks would change the uid->callback mapping
   store->Free(env);
 }
 
