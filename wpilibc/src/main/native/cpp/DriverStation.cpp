@@ -543,6 +543,14 @@ void DriverStation::GetData() {
   SendMatchData();
 }
 
+void DriverStation::SilenceJoystickConnectionWarning(bool silence) {
+  m_silenceJoystickWarning = silence;
+}
+
+bool DriverStation::IsJoystickConnectionWarningSilenced() const {
+  return !IsFMSAttached() && m_silenceJoystickWarning;
+}
+
 DriverStation::DriverStation() {
   HAL_Initialize(500, 0);
   m_waitForDataCounter = 0;
@@ -570,10 +578,12 @@ void DriverStation::ReportJoystickUnpluggedError(const wpi::Twine& message) {
 }
 
 void DriverStation::ReportJoystickUnpluggedWarning(const wpi::Twine& message) {
-  double currentTime = Timer::GetFPGATimestamp();
-  if (currentTime > m_nextMessageTime) {
-    ReportWarning(message);
-    m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+  if (IsFMSAttached() || !m_silenceJoystickWarning) {
+    double currentTime = Timer::GetFPGATimestamp();
+    if (currentTime > m_nextMessageTime) {
+      ReportWarning(message);
+      m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+    }
   }
 }
 

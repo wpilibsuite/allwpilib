@@ -5,10 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <string>
 #include <tuple>
 
 #include "frc/DriverStation.h"
+#include "frc/Joystick.h"
 #include "frc/simulation/DriverStationSim.h"
+#include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
 
 class IsJoystickConnectedParametersTests
@@ -32,3 +35,40 @@ INSTANTIATE_TEST_SUITE_P(IsConnectedTests, IsJoystickConnectedParametersTests,
                                            std::make_tuple(0, 0, 1, true),
                                            std::make_tuple(1, 1, 1, true),
                                            std::make_tuple(4, 10, 1, true)));
+class JoystickConnectionWarningTests
+    : public ::testing::TestWithParam<
+          std::tuple<bool, bool, bool, std::string>> {};
+
+TEST_P(JoystickConnectionWarningTests, JoystickConnectionWarnings) {
+  // Capture all output to stderr.
+  ::testing::internal::CaptureStderr();
+
+  // Set FMS and Silence settings
+  frc::sim::DriverStationSim::SetFmsAttached(std::get<0>(GetParam()));
+  frc::sim::DriverStationSim::NotifyNewData();
+  frc::DriverStation::GetInstance().SilenceJoystickConnectionWarning(
+      std::get<1>(GetParam()));
+
+  // Create joystick and attempt to retrieve button.
+  frc::Joystick joystick(0);
+  joystick.GetRawButton(1);
+
+  frc::sim::StepTiming(1_s);
+  EXPECT_EQ(
+      frc::DriverStation::GetInstance().IsJoystickConnectionWarningSilenced(),
+      std::get<2>(GetParam()));
+  EXPECT_EQ(::testing::internal::GetCapturedStderr(), std::get<3>(GetParam()));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    DriverStation, JoystickConnectionWarningTests,
+    ::testing::Values(std::make_tuple(false, true, true, ""),
+                      std::make_tuple(false, false, false,
+                                      "Joystick Button missing, check if all "
+                                      "controllers are plugged in\n"),
+                      std::make_tuple(true, true, false,
+                                      "Joystick Button missing, check if all "
+                                      "controllers are plugged in\n"),
+                      std::make_tuple(true, false, false,
+                                      "Joystick Button missing, check if all "
+                                      "controllers are plugged in\n")));

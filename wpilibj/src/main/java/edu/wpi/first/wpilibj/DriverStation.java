@@ -165,6 +165,8 @@ public class DriverStation {
   private int m_waitForDataCount;
   private final ThreadLocal<Integer> m_lastCount = ThreadLocal.withInitial(() -> 0);
 
+  private boolean m_silenceJoystickWarning;
+
   // Robot state status variables
   private boolean m_userInDisabled;
   private boolean m_userInAutonomous;
@@ -1068,6 +1070,27 @@ public class DriverStation {
   }
 
   /**
+   * Allows the user to specify whether they want joystick connection warnings
+   * to be printed to the console. This setting is ignored when the FMS is
+   * connected -- warnings will always be on in that scenario.
+   *
+   * @param silence Whether warning messages should be silenced.
+   */
+  public void silenceJoystickConnectionWarning(boolean silence) {
+    m_silenceJoystickWarning = silence;
+  }
+
+  /**
+   * Returns whether joystick connection warnings are silenced. This will
+   * always return false when connected to the FMS.
+   *
+   * @return Whether joystick connection warnings are silenced.
+   */
+  public boolean isJoystickConnectionWarningSilenced() {
+    return !isFMSAttached() && m_silenceJoystickWarning;
+  }
+
+  /**
    * Copy data from the DS task for the user. If no new data exists, it will just be returned,
    * otherwise the data will be copied from the DS polling loop.
    */
@@ -1141,10 +1164,12 @@ public class DriverStation {
    * the DS.
    */
   private void reportJoystickUnpluggedWarning(String message) {
-    double currentTime = Timer.getFPGATimestamp();
-    if (currentTime > m_nextMessageTime) {
-      reportWarning(message, false);
-      m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+    if (isFMSAttached() || !m_silenceJoystickWarning) {
+      double currentTime = Timer.getFPGATimestamp();
+      if (currentTime > m_nextMessageTime) {
+        reportWarning(message, false);
+        m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+      }
     }
   }
 
