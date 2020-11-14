@@ -145,8 +145,8 @@ void DeviceCallbackStore::performCallback(const char* name,
     wpi::outs().flush();
   }
 
-  env->CallVoidMethod(m_call, simDeviceCallbackCallback,
-                      MakeJString(env, name), (jint)handle);
+  env->CallVoidMethod(m_call, simDeviceCallbackCallback, MakeJString(env, name),
+                      (jint)handle);
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();
@@ -408,7 +408,8 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_cancelSimDeviceCreatedCallbac
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimDeviceFreedCallback
-  (JNIEnv* env, jclass, jstring prefix, jobject callback, jboolean initialNotify)
+  (JNIEnv* env, jclass, jstring prefix, jobject callback,
+   jboolean initialNotify)
 {
   return AllocateDeviceCallback(env, JStringRef{env, prefix}.c_str(), callback,
                                 initialNotify,
