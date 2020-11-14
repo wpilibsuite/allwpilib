@@ -45,6 +45,7 @@ class SimDeviceSimTest {
             callback1Counter.addAndGet(1);
           }, false);
           CallbackStore callback2 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
+            System.out.println("callback2: " + name);
             callback2Counter.addAndGet(1);
           }, true)) {
         assertEquals(0, callback1Counter.get(), "Callback 1 called early");
