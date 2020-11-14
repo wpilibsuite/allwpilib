@@ -93,8 +93,8 @@ public class SimDeviceSim {
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceCreatedCallback);
   }
 
-  public static CallbackStore registerDeviceFreedCallback(String prefix, SimDeviceCallback callback) {
-    int uid = SimDeviceDataJNI.registerSimDeviceFreedCallback(prefix, callback);
+  public static CallbackStore registerDeviceFreedCallback(String prefix, SimDeviceCallback callback, boolean initialNotify) {
+    int uid = SimDeviceDataJNI.registerSimDeviceFreedCallback(prefix, callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceFreedCallback);
   }
 

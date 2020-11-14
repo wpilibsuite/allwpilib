@@ -31,8 +31,9 @@ int32_t HALSIM_RegisterSimDeviceCreatedCallback(
 
 void HALSIM_CancelSimDeviceCreatedCallback(int32_t uid);
 
-int32_t HALSIM_RegisterSimDeviceFreedCallback(
-    const char* prefix, void* param, HALSIM_SimDeviceCallback callback);
+int32_t HALSIM_RegisterSimDeviceFreedCallback(const char* prefix, void* param,
+                                              HALSIM_SimDeviceCallback callback,
+                                              HAL_Bool initialNotify);
 
 void HALSIM_CancelSimDeviceFreedCallback(int32_t uid);
 

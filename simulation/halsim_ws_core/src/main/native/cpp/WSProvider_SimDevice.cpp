@@ -170,7 +170,7 @@ void HALSimWSProviderSimDevices::Initialize(wpi::uv::Loop& loop) {
   m_deviceCreatedCbKey = HALSIM_RegisterSimDeviceCreatedCallback(
       "", this, HALSimWSProviderSimDevices::DeviceCreatedCallbackStatic, 1);
   m_deviceFreedCbKey = HALSIM_RegisterSimDeviceFreedCallback(
-      "", this, HALSimWSProviderSimDevices::DeviceFreedCallbackStatic);
+      "", this, HALSimWSProviderSimDevices::DeviceFreedCallbackStatic, false);
 
   m_exec = UvExecFn::Create(loop, [](auto out, LoopFn func) {
     func();
