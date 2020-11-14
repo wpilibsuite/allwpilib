@@ -36,6 +36,7 @@ static void WindowSizeCallback(GLFWwindow* window, int width, int height) {
     gContext->width = width;
     gContext->height = height;
   }
+  PlatformRenderFrame();
 }
 
 static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
