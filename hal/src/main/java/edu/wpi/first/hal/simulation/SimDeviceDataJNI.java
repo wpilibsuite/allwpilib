@@ -17,7 +17,7 @@ public class SimDeviceDataJNI extends JNIWrapper {
   public static native int registerSimDeviceCreatedCallback(String prefix, SimDeviceCallback callback, boolean initialNotify);
   public static native void cancelSimDeviceCreatedCallback(int uid);
 
-  public static native int registerSimDeviceFreedCallback(String prefix, SimDeviceCallback callback);
+  public static native int registerSimDeviceFreedCallback(String prefix, SimDeviceCallback callback, boolean initialNotify);
   public static native void cancelSimDeviceFreedCallback(int uid);
 
   public static native int getSimDeviceHandle(String name);
