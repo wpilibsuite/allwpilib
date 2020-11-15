@@ -81,4 +81,16 @@ void HALSimWSProviderSolenoid::RegisterCallbacks() {
   m_initCbKey = REGISTER_SOLENOID(Initialized, "<initialized", bool, boolean);
   m_outputCbKey = REGISTER_SOLENOID(Output, "<>output", bool, boolean);
 }
+
+void HALSimWSProviderSolenoid::CancelCallbacks() {
+  DoCancelCallbacks();
+}
+
+void HALSimWSProviderSolenoid::DoCancelCallbacks() {
+  HALSIM_CancelPCMSolenoidInitializedCallback(m_pcmIndex, m_channel, m_initCbKey);
+  HALSIM_CancelPCMSolenoidOutputCallback(m_pcmIndex, m_channel, m_outputCbKey);
+
+  m_initCbKey = 0;
+  m_outputCbKey = 0;
+}
 }  // namespace wpilibws
