@@ -19,6 +19,8 @@
 #include "wpigui.h"
 #include "wpigui_internal.h"
 
+#pragma comment(lib, "d3d11.lib")
+
 using namespace wpi::gui;
 
 namespace {
