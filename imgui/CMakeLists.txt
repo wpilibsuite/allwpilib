@@ -40,6 +40,7 @@ file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/stb_image.cpp
 # Add imgui directly to our build.
 set(SAVE_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(BUILD_SHARED_LIBS OFF)
+set(GLFW_INSTALL OFF)
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/glfw-src
                  ${CMAKE_CURRENT_BINARY_DIR}/glfw-build
                  EXCLUDE_FROM_ALL)
