@@ -159,7 +159,7 @@ jobs:
         uses: lukka/run-cmake@v3
         with:
           buildDirectory: ${{ runner.workspace }}/build/
-          cmakeAppendedArgs: -DWITH_JAVA=OFF -DWITH_GUI=OFF
+          cmakeAppendedArgs: -DWITH_JAVA=OFF
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           useVcpkgToolchainFile: true
       - name: Run Tests
