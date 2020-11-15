@@ -204,8 +204,10 @@ int32_t SimDeviceData::RegisterDeviceCreatedCallback(
 
   // initial notifications
   if (initialNotify) {
-    for (auto&& device : m_devices)
-      callback(device->name.c_str(), param, device->handle);
+    for (auto&& device : m_devices) {
+      if (wpi::StringRef{device->name}.startswith(prefix))
+        callback(device->name.c_str(), param, device->handle);
+    }
   }
 
   return index;

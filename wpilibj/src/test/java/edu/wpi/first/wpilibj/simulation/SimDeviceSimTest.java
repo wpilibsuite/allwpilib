@@ -38,14 +38,14 @@ class SimDeviceSimTest {
     AtomicInteger callback1Counter = new AtomicInteger(0);
     AtomicInteger callback2Counter = new AtomicInteger(0);
 
-    try (SimDevice dev1 = SimDevice.create("testDC1")) {
+    try (SimDevice otherdev = SimDevice.create("testnotDC");
+        SimDevice dev1 = SimDevice.create("testDC1")) {
       SimDeviceSim sim = new SimDeviceSim("testDC1");
       try (
           CallbackStore callback1 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
             callback1Counter.addAndGet(1);
           }, false);
           CallbackStore callback2 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
-            System.out.println("callback2: " + name);
             callback2Counter.addAndGet(1);
           }, true)) {
         assertEquals(0, callback1Counter.get(), "Callback 1 called early");
