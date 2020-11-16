@@ -5,4 +5,5 @@ include(CMakeFindDependencyMacro)
 @CSCORE_DEP_REPLACE@
 find_dependency(OpenCV)
 
+@FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/cameraserver.cmake)
