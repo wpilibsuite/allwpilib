@@ -31,7 +31,7 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * an estimate of the true covariance (as opposed to a linearized version of it). This means that
  * the UKF works with nonlinear systems.
  */
-@SuppressWarnings({"MemberName", "ClassTypeParameterName"})
+@SuppressWarnings({"MemberName", "ClassTypeParameterName", "PMD.TooManyFields"})
 public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
       Outputs extends Num> implements KalmanTypeFilter<States, Inputs, Outputs> {
 
@@ -116,7 +116,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
    *                           use the default.
    * @param nominalDtSeconds   Nominal discretization timestep.
    */
-  @SuppressWarnings("ParameterName")
+  @SuppressWarnings({"ParameterName", "PMD.ExcessiveParameterList"})
   public UnscentedKalmanFilter(
           Nat<States> states, Nat<Outputs> outputs,
           BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,

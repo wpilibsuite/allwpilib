@@ -27,7 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MecanumDrivePoseEstimatorTest {
   @Test
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops",
+          "PMD.ExcessiveMethodLength"})
   public void testAccuracy() {
     var kinematics = new MecanumDriveKinematics(
             new Translation2d(1, 1), new Translation2d(1, -1),

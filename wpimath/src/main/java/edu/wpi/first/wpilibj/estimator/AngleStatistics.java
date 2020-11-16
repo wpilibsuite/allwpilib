@@ -16,7 +16,11 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
-public class AngleStatistics {
+public final class AngleStatistics {
+  private AngleStatistics() {
+    // Utility class
+  }
+
   /**
    * Subtracts a and b while normalizing the resulting value in the selected row as if it were an
    * angle.
