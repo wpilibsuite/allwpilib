@@ -4,7 +4,7 @@ include(CompileWarnings)
 
 file(GLOB halsim_ws_server_src src/main/native/cpp/*.cpp)
 
-add_library(halsim_ws_server MODULE ${halsim_ws_server_src})
+add_library(halsim_ws_server SHARED ${halsim_ws_server_src})
 wpilib_target_warnings(halsim_ws_server)
 set_target_properties(halsim_ws_server PROPERTIES DEBUG_POSTFIX "d")
 target_link_libraries(halsim_ws_server PUBLIC hal halsim_ws_core)

@@ -5,7 +5,7 @@ include(LinkMacOSGUI)
 
 file(GLOB halsim_gui_src src/main/native/cpp/*.cpp)
 
-add_library(halsim_gui MODULE ${halsim_gui_src})
+add_library(halsim_gui SHARED ${halsim_gui_src})
 wpilib_target_warnings(halsim_gui)
 set_target_properties(halsim_gui PROPERTIES DEBUG_POSTFIX "d")
 
