@@ -74,8 +74,8 @@ Pose2d DifferentialDrivePoseEstimator::Update(
     const Rotation2d& gyroAngle,
     const DifferentialDriveWheelSpeeds& wheelSpeeds,
     units::meter_t leftDistance, units::meter_t rightDistance) {
-  return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle, wheelSpeeds,
-                        leftDistance, rightDistance);
+  return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
+                        wheelSpeeds, leftDistance, rightDistance);
 }
 
 Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(

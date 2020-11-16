@@ -148,8 +148,7 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
 
     auto localY =
         LocalMeasurementModel(trueXhat, Eigen::Matrix<double, 2, 1>::Zero());
-    observer.Correct(u,
-                     localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+    observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
     Eigen::Matrix<double, 5, 1> rdot = (nextR - r) / dt.to<double>();
     u = B.householderQr().solve(

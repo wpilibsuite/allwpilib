@@ -11,11 +11,9 @@
 #include <iostream>
 #include <limits>
 
-#include <Eigen/Core>
-#include <units/time.h>
-
 #include <wpi/timestamp.h>
 
+#include "Eigen/Core"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
@@ -23,6 +21,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
+#include "units/time.h"
 
 namespace frc {
 
