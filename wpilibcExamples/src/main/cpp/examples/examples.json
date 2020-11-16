@@ -645,6 +645,22 @@
     "commandversion": 2
   },
   {
+    "name": "MecanumDrivePoseEstimator",
+    "description": "Demonstrates the use of the MecanumDrivePoseEstimator as a replacement for mecanum odometry.",
+    "tags": [
+      "Drivetrain",
+      "State space",
+      "Vision",
+      "Filter",
+      "Odometry",
+      "Pose"
+    ],
+    "foldername": "MecanumDrivePoseEstimator",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "ArmSimulation",
     "description": "Demonstrates the use of physics simulation with a simple single-jointed arm.",
     "tags": [
@@ -655,6 +671,7 @@
       "Simulation",
       "Physics"
     ],
+    "foldername": "ArmSimulation",
     "gradlebase": "cpp",
     "mainclass": "Main",
     "commandversion": 2
