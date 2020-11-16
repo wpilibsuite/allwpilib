@@ -20,16 +20,15 @@ public class AngleStatisticsTest {
   @Test
   public void testMean() {
     // 3 states, 2 sigmas
-    var sigmas = Matrix.mat(Nat.N3(), Nat.N3()).fill(
-            1, 1.2, 0,
-            Math.toRadians(359), Math.toRadians(3), 0,
-            1, 2, 0
+    var sigmas = Matrix.mat(Nat.N3(), Nat.N2()).fill(
+            1, 1.2,
+            Math.toRadians(359), Math.toRadians(3),
+            1, 2
     );
     // Weights need to produce the mean of the sigmas
-    var weights = new Matrix(Nat.N3(), Nat.N1());
+    var weights = new Matrix<>(Nat.N2(), Nat.N1());
     weights.fill(1.0 / sigmas.getNumCols());
 
-    System.out.println(AngleStatistics.angleMean(sigmas, weights, 1));
     assertTrue(AngleStatistics.angleMean(sigmas, weights, 1).isEqual(
             VecBuilder.fill(1.1, Math.toRadians(1), 1.5), 1e-6));
   }

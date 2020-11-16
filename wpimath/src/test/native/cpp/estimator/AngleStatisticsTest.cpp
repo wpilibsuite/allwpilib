@@ -33,7 +33,6 @@ TEST(AngleStatisticsTest, TestResidual) {
 TEST(AngleStatisticsTest, TestAdd) {
   Eigen::Vector3d a(1, 1 * wpi::math::pi / 180, 2);
   Eigen::Vector3d b(1, 359 * wpi::math::pi / 180, 1);
-  std::cout << frc::AngleAdd<3>(a, b, 1) << "\n";
 
   ASSERT_TRUE(frc::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d(2, 0, 3)));
 }

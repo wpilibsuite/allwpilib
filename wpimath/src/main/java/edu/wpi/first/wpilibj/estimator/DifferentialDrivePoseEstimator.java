@@ -9,12 +9,12 @@ package edu.wpi.first.wpilibj.estimator;
 
 import java.util.function.BiConsumer;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.math.Discretization;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
 import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
@@ -204,8 +204,7 @@ public class DifferentialDrivePoseEstimator {
    *                              {@link DifferentialDrivePoseEstimator#updateWithTime} then you
    *                              must use a timestamp with an epoch since FPGA startup
    *                              (i.e. the epoch of this timestamp is the same epoch as
-   *                              {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp
-   *                              Timer.getFPGATimestamp}.) This means that you should
+   *                              Timer.getFPGATimestamp.) This means that you should
    *                              use Timer.getFPGATimestamp as your time source in
    *                              this case.
    */
@@ -239,7 +238,7 @@ public class DifferentialDrivePoseEstimator {
           double distanceLeftMeters, double distanceRightMeters
   ) {
     return updateWithTime(
-            Timer.getFPGATimestamp(), gyroAngle, wheelVelocitiesMetersPerSecond,
+            WPIUtilJNI.now() * 1.0e-6, gyroAngle, wheelVelocitiesMetersPerSecond,
             distanceLeftMeters, distanceRightMeters
     );
   }

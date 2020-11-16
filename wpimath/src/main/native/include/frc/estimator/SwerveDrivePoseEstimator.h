@@ -14,6 +14,8 @@
 #include <Eigen/Core>
 #include <units/time.h>
 
+#include <wpi/timestamp.h>
+
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
@@ -21,7 +23,6 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
-#include "frc2/Timer.h"
 
 namespace frc {
 
@@ -184,7 +185,7 @@ class SwerveDrivePoseEstimator {
    */
   template <typename... ModuleState>
   Pose2d Update(const Rotation2d& gyroAngle, ModuleState&&... moduleStates) {
-    return UpdateWithTime(frc2::Timer::GetFPGATimestamp(), gyroAngle,
+    return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
                           moduleStates...);
   }
 

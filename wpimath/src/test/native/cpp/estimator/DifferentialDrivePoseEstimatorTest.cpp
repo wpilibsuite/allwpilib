@@ -50,8 +50,6 @@ TEST(DifferentialDrivePoseEstimatorTest, TestAccuracy) {
 
   units::second_t kVisionUpdateRate = 0.1_s;
   frc::Pose2d lastVisionPose;
-  units::second_t lastVisionUpdateRealTimestamp{
-      -std::numeric_limits<double>::max()};
   units::second_t lastVisionUpdateTime{-std::numeric_limits<double>::max()};
 
   double maxError = -std::numeric_limits<double>::max();

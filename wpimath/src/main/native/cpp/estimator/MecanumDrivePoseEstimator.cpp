@@ -7,7 +7,7 @@
 
 #include "frc/estimator/MecanumDrivePoseEstimator.h"
 
-#include <limits>
+#include <wpi/timestamp.h>
 
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
@@ -77,7 +77,7 @@ void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
 
 Pose2d frc::MecanumDrivePoseEstimator::Update(
     const Rotation2d& gyroAngle, const MecanumDriveWheelSpeeds& wheelSpeeds) {
-  return UpdateWithTime(frc2::Timer::GetFPGATimestamp(), gyroAngle,
+  return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
                         wheelSpeeds);
 }
 

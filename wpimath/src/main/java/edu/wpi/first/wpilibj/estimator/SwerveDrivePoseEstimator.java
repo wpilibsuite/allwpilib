@@ -9,14 +9,14 @@ package edu.wpi.first.wpilibj.estimator;
 
 import java.util.function.BiConsumer;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.math.Discretization;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
@@ -25,17 +25,17 @@ import edu.wpi.first.wpiutil.math.numbers.N3;
 
 /**
  * This class wraps an {@link ExtendedKalmanFilter ExtendedKalmanFilter} to fuse
- * latency-compensated vision measurements with mecanum drive encoder velocity measurements.
+ * latency-compensated vision measurements with swerve drive encoder velocity measurements.
  * It will correct for noisy measurements and encoder drift. It is intended to be an easy
- * but more accurate drop-in for {@link edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry}.
+ * but more accurate drop-in for {@link edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry}.
  *
- * <p>{@link MecanumDrivePoseEstimator#update} should be called every robot loop. If
+ * <p>{@link SwerveDrivePoseEstimator#update} should be called every robot loop. If
  * your loops are faster or slower than the default of 0.02s, then you should change
  * the nominal delta time using the secondary constructor:
- * {@link MecanumDrivePoseEstimator#MecanumDrivePoseEstimator(Rotation2d, Pose2d,
- * MecanumDriveKinematics, Matrix, Matrix, Matrix, double)}.
+ * {@link SwerveDrivePoseEstimator#SwerveDrivePoseEstimator(Rotation2d, Pose2d,
+ * SwerveDriveKinematics, Matrix, Matrix, Matrix, double)}.
  *
- * <p>{@link MecanumDrivePoseEstimator#addVisionMeasurement} can be called as
+ * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as
  * infrequently as you want; if you never call it, then this class will behave mostly like regular
  * encoder odometry.
  *
@@ -43,14 +43,14 @@ import edu.wpi.first.wpiutil.math.numbers.N3;
  *
  * <p><strong> x = [[x, y, theta]]^T </strong> in the field-coordinate system.
  *
- * <p><strong> u = [[vx, vy, theta]]^T </strong> in the field-coordinate system.
+ * <p><strong> u = [[vx, vy, omega]]^T </strong> in the field-coordinate system.
  *
  * <p><strong> y = [[x, y, theta]]^T </strong> in field coords from vision,
  * or <strong> y = [[theta]]^T </strong> from the gyro.
  */
-public class MecanumDrivePoseEstimator {
+public class SwerveDrivePoseEstimator {
   private final UnscentedKalmanFilter<N3, N3, N1> m_observer;
-  private final MecanumDriveKinematics m_kinematics;
+  private final SwerveDriveKinematics m_kinematics;
   private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
   private final KalmanFilterLatencyCompensator<N3, N3, N1> m_latencyCompensator;
 
@@ -61,7 +61,7 @@ public class MecanumDrivePoseEstimator {
   private Rotation2d m_previousAngle;
 
   /**
-   * Constructs a MecanumDrivePoseEstimator.
+   * Constructs a SwerveDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
    * @param initialPoseMeters        The starting pose estimate.
@@ -73,8 +73,8 @@ public class MecanumDrivePoseEstimator {
    * @param visionMeasurementStdDevs Standard deviations of the encoder measurements. Increase
    *                                 these numbers to trust vision less.
    */
-  public MecanumDrivePoseEstimator(
-          Rotation2d gyroAngle, Pose2d initialPoseMeters, MecanumDriveKinematics kinematics,
+  public SwerveDrivePoseEstimator(
+          Rotation2d gyroAngle, Pose2d initialPoseMeters, SwerveDriveKinematics kinematics,
           Matrix<N3, N1> stateStdDevs, Matrix<N1, N1> localMeasurementStdDevs,
           Matrix<N3, N1> visionMeasurementStdDevs
   ) {
@@ -83,7 +83,7 @@ public class MecanumDrivePoseEstimator {
   }
 
   /**
-   * Constructs a MecanumDrivePoseEstimator.
+   * Constructs a SwerveDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
    * @param initialPoseMeters        The starting pose estimate.
@@ -97,8 +97,8 @@ public class MecanumDrivePoseEstimator {
    * @param nominalDtSeconds         The time in seconds between each robot loop.
    */
   @SuppressWarnings("ParameterName")
-  public MecanumDrivePoseEstimator(
-          Rotation2d gyroAngle, Pose2d initialPoseMeters, MecanumDriveKinematics kinematics,
+  public SwerveDrivePoseEstimator(
+          Rotation2d gyroAngle, Pose2d initialPoseMeters, SwerveDriveKinematics kinematics,
           Matrix<N3, N1> stateStdDevs, Matrix<N1, N1> localMeasurementStdDevs,
           Matrix<N3, N1> visionMeasurementStdDevs, double nominalDtSeconds
   ) {
@@ -173,19 +173,18 @@ public class MecanumDrivePoseEstimator {
    * odometry pose estimate while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are
-   * calling {@link MecanumDrivePoseEstimator#update} every loop.
+   * calling {@link SwerveDrivePoseEstimator#update} every loop.
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision
    *                              camera.
    * @param timestampSeconds      The timestamp of the vision measurement in seconds. Note that if
    *                              you don't use your own time source by calling
-   *                              {@link MecanumDrivePoseEstimator#updateWithTime} then you
+   *                              {@link SwerveDrivePoseEstimator#updateWithTime} then you
    *                              must use a timestamp with an epoch since FPGA startup
    *                              (i.e. the epoch of this timestamp is the same epoch as
-   *                              {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp
-   *                              Timer.getFPGATimestamp}.) This means that you should
-   *                              use Timer.getFPGATimestamp as your time source
-   *                              or sync the epochs.
+   *                              Timer.getFPGATimestamp.) This means that you should
+   *                              use Timer.getFPGATimestamp as your time source or
+   *                              sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     m_latencyCompensator.applyPastGlobalMeasurement(
@@ -202,12 +201,15 @@ public class MecanumDrivePoseEstimator {
    * This should be called every loop, and the correct loop period must be passed
    * into the constructor of this class.
    *
-   * @param gyroAngle   The current gyro angle.
-   * @param wheelSpeeds The current speeds of the mecanum drive wheels.
+   * @param gyroAngle    The current gyro angle.
+   * @param moduleStates The current velocities and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelSpeeds wheelSpeeds) {
-    return updateWithTime(Timer.getFPGATimestamp(), gyroAngle, wheelSpeeds);
+  public Pose2d update(
+          Rotation2d gyroAngle,
+          SwerveModuleState... moduleStates
+  ) {
+    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, moduleStates);
   }
 
   /**
@@ -217,22 +219,24 @@ public class MecanumDrivePoseEstimator {
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle          The current gyroscope angle.
-   * @param wheelSpeeds        The current speeds of the mecanum drive wheels.
+   * @param moduleStates       The current velocities and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
   @SuppressWarnings("LocalVariableName")
-  public Pose2d updateWithTime(double currentTimeSeconds, Rotation2d gyroAngle,
-                               MecanumDriveWheelSpeeds wheelSpeeds) {
+  public Pose2d updateWithTime(
+          double currentTimeSeconds,
+          Rotation2d gyroAngle, SwerveModuleState... moduleStates
+  ) {
     double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;
     m_prevTimeSeconds = currentTimeSeconds;
 
     var angle = gyroAngle.plus(m_gyroOffset);
     var omega = angle.minus(m_previousAngle).getRadians() / dt;
 
-    var chassisSpeeds = m_kinematics.toChassisSpeeds(wheelSpeeds);
-    var fieldRelativeVelocities =
-            new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond)
-                    .rotateBy(angle);
+    var chassisSpeeds = m_kinematics.toChassisSpeeds(moduleStates);
+    var fieldRelativeVelocities = new Translation2d(
+            chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond
+    ).rotateBy(angle);
 
     var u = VecBuilder.fill(
             fieldRelativeVelocities.getX(),
