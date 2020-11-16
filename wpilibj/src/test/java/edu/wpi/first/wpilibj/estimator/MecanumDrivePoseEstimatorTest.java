@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MecanumDrivePoseEstimatorTest {
   @Test
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops",
-        "PMD.ExcessiveMethodLength"})
+  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public void testAccuracy() {
     var kinematics = new MecanumDriveKinematics(
             new Translation2d(1, 1), new Translation2d(1, -1),
@@ -36,7 +35,7 @@ public class MecanumDrivePoseEstimatorTest {
 
     var estimator = new MecanumDrivePoseEstimator(
             new Rotation2d(), new Pose2d(), kinematics,
-            VecBuilder.fill(0.01, 0.01, 0.01),
+            VecBuilder.fill(0.1, 0.1, 0.1),
             VecBuilder.fill(0.05),
             VecBuilder.fill(0.1, 0.1, 0.1)
     );
@@ -148,61 +147,57 @@ public class MecanumDrivePoseEstimatorTest {
     }
 
     assertEquals(
-           0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.25,
-           "Incorrect mean error"
+            0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.25,
+            "Incorrect mean error"
     );
     assertEquals(
-           0.0, maxError, 0.42,
-           "Incorrect max error"
+            0.0, maxError, 0.42,
+            "Incorrect max error"
     );
 
-    /*
-    List<XYChart> charts = new ArrayList<XYChart>();
+    // List<XYChart> charts = new ArrayList<>();
 
-    var chartBuilder = new XYChartBuilder();
-    chartBuilder.title = "The Magic of Sensor Fusion";
-    var chart = chartBuilder.build();
+    // var chartBuilder = new XYChartBuilder();
+    // chartBuilder.title = "The Magic of Sensor Fusion";
+    // var chart = chartBuilder.build();
 
-    chart.addSeries("Vision", visionXs, visionYs);
-    chart.addSeries("Trajectory", trajXs, trajYs);
-    chart.addSeries("xHat", observerXs, observerYs);
-    charts.add(chart);
+    // chart.addSeries("Vision", visionXs, visionYs);
+    // chart.addSeries("Trajectory", trajXs, trajYs);
+    // chart.addSeries("xHat", observerXs, observerYs);
+    // charts.add(chart);
 
-    var chartBuilder1 = new XYChartBuilder();
-    chartBuilder1.title = "Cosine";
-    var chart1 = chartBuilder1.build();
+    // var chartBuilder1 = new XYChartBuilder();
+    // chartBuilder1.title = "Cosine";
+    // var chart1 = chartBuilder1.build();
 
-    chart1.addSeries("Vision", visionTime, visionCosine);
-    chart1.addSeries("Trajectory", time, trajCosine);
-    chart1.addSeries("xHat", time, observerCosine);
-    charts.add(chart1);
+    // chart1.addSeries("Vision", visionTime, visionCosine);
+    // chart1.addSeries("Trajectory", time, trajCosine);
+    // chart1.addSeries("xHat", time, observerCosine);
+    // charts.add(chart1);
 
-    var chartBuilder2 = new XYChartBuilder();
-    chartBuilder2.title = "Sine";
-    var chart2 = chartBuilder2.build();
+    // var chartBuilder2 = new XYChartBuilder();
+    // chartBuilder2.title = "Sine";
+    // var chart2 = chartBuilder2.build();
 
-    chart2.addSeries("Vision", visionTime, visionSine);
-    chart2.addSeries("Trajectory", time, trajSine);
-    chart2.addSeries("xHat", time, observerSine);
+    // chart2.addSeries("Vision", visionTime, visionSine);
+    // chart2.addSeries("Trajectory", time, trajSine);
+    // chart2.addSeries("xHat", time, observerSine);
 
-    charts.add(chart2);
+    // charts.add(chart2);
 
-    var chartBuilder3 = new XYChartBuilder();
-    chartBuilder3.title = "Degrees";
-    var chart3 = chartBuilder3.build();
+    // var chartBuilder3 = new XYChartBuilder();
+    // chartBuilder3.title = "Degrees";
+    // var chart3 = chartBuilder3.build();
 
-    chart3.addSeries("Vision", visionTime, visionTheta);
-    chart3.addSeries("Trajectory", time, trajTheta);
-    chart3.addSeries("xHat", time, observerTheta);
-    charts.add(chart3);
+    // chart3.addSeries("Vision", visionTime, visionTheta);
+    // chart3.addSeries("Trajectory", time, trajTheta);
+    // chart3.addSeries("xHat", time, observerTheta);
+    // charts.add(chart3);
 
-
-
-    new SwingWrapper<>(charts).displayChartMatrix();
-    try {
-      Thread.sleep(1000000000);
-    } catch (InterruptedException e) {
-    }
-    */
+    // new SwingWrapper<>(charts).displayChartMatrix();
+    // try {
+    //   Thread.sleep(1000000000);
+    // } catch (InterruptedException e) {
+    // }
   }
 }

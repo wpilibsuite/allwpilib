@@ -8,11 +8,11 @@
 #pragma once
 
 #include <frc/AnalogGyro.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <wpi/math>
-#include <frc/estimator/SwerveDrivePoseEstimator.h>
 
 #include "SwerveModule.h"
 

@@ -8,17 +8,9 @@
 package edu.wpi.first.wpilibj.estimator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
-import edu.wpi.first.wpilibj.system.RungeKutta;
-import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.VecBuilder;
-import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N6;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -32,8 +24,6 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Nat;
-import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.XYChartBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -44,18 +34,19 @@ public class DifferentialDrivePoseEstimatorTest {
   public void testAccuracy() {
     var estimator = new DifferentialDrivePoseEstimator(new Rotation2d(), new Pose2d(),
             new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.02, 0.02, 0.01, 0.02, 0.02),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01),
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.01, 0.01, 0.001),
             new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01));
 
     var traj = TrajectoryGenerator.generateTrajectory(
             List.of(
-                    new Pose2d(),
-                    new Pose2d(20, 20, Rotation2d.fromDegrees(0)),
-                    new Pose2d(23, 23, Rotation2d.fromDegrees(173)),
-                    new Pose2d(54, 54, new Rotation2d()),
-                    new Pose2d(30, 44, Rotation2d.fromDegrees(160))
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                    new Pose2d(3, 0, Rotation2d.fromDegrees(-90)),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                    new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45))
             ),
-            new TrajectoryConfig(0.5, 2));
+            new TrajectoryConfig(10, 5));
+
 
     var kinematics = new DifferentialDriveKinematics(1);
     var rand = new Random(4915);
@@ -107,13 +98,13 @@ public class DifferentialDrivePoseEstimatorTest {
         visionYs.add(lastVisionPose.getTranslation().getY());
       }
 
-      input.leftMetersPerSecond += rand.nextGaussian() * 0.02;
-      input.rightMetersPerSecond += rand.nextGaussian() * 0.02;
+      input.leftMetersPerSecond += rand.nextGaussian() * 0.01;
+      input.rightMetersPerSecond += rand.nextGaussian() * 0.01;
 
       distanceLeft += input.leftMetersPerSecond * dt;
       distanceRight += input.rightMetersPerSecond * dt;
 
-      var rotNoise = new Rotation2d(rand.nextGaussian() * 0.01);
+      var rotNoise = new Rotation2d(rand.nextGaussian() * 0.001);
       var xHat = estimator.updateWithTime(
               t,
               groundtruthState.poseMeters.getRotation().plus(rotNoise),
@@ -137,53 +128,29 @@ public class DifferentialDrivePoseEstimatorTest {
     }
 
     assertEquals(
-            0.0, errorSum / (traj.getTotalTimeSeconds() / dt), 0.03,
+            0.0, errorSum / (traj.getTotalTimeSeconds() / dt), 0.035,
             "Incorrect mean error"
     );
     assertEquals(
-            0.0, maxError, 0.05,
+            0.0, maxError, 0.055,
             "Incorrect max error"
     );
 
-    System.out.println("Mean error (meters): " + errorSum / (traj.getTotalTimeSeconds() / dt));
-    System.out.println("Max error (meters):  " + maxError);
+    // System.out.println("Mean error (meters): " + errorSum / (traj.getTotalTimeSeconds() / dt));
+    // System.out.println("Max error (meters):  " + maxError);
 
-    var chartBuilder = new XYChartBuilder();
-    chartBuilder.title = "The Magic of Sensor Fusion";
-    var chart = chartBuilder.build();
+    // var chartBuilder = new XYChartBuilder();
+    // chartBuilder.title = "The Magic of Sensor Fusion";
+    // var chart = chartBuilder.build();
 
-    chart.addSeries("Vision", visionXs, visionYs);
-    chart.addSeries("Trajectory", trajXs, trajYs);
-    chart.addSeries("xHat", observerXs, observerYs);
+    // chart.addSeries("Vision", visionXs, visionYs);
+    // chart.addSeries("Trajectory", trajXs, trajYs);
+    // chart.addSeries("xHat", observerXs, observerYs);
 
-    new SwingWrapper<>(chart).displayChart();
-    try {
-      Thread.sleep(1000000000);
-    } catch (InterruptedException e) {
-    }
+    // new SwingWrapper<>(chart).displayChart();
+    // try {
+    //   Thread.sleep(1000000000);
+    // } catch (InterruptedException e) {
+    // }
   }
-
-  @Test void test() {
-    var estimator = new DifferentialDrivePoseEstimator(new Rotation2d(), new Pose2d(),
-        new MatBuilder<>(Nat.N5(), Nat.N1()).fill(0.02, 0.02, 0.01, 0.02, 0.02),
-        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01),
-        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.01));
-
-    System.out.println("x, y, theta, dist_l, dist_r");
-
-    estimator.m_observer.setXhat(VecBuilder.fill(0, 0, 0, 0, 0));
-    for(int i = 0; i < 50; i++) {
-      estimator.m_observer.predict(VecBuilder.fill(1, 1, 0), 0.020);
-    }
-
-    var x = estimator.m_observer.getXhat();
-    assertEquals(1, x.get(0, 0), 0.01);
-    assertEquals(0, x.get(1, 0), 0.01);
-    assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), 0.01);
-  }
-
-  //  String matToCSV(Matrix<?, ?> mat) {
-  //    return Arrays.stream(mat.getStorage().getDDRM().getData())
-  //        .mapToObj(String::valueOf).collect(Collectors.joining(","));
-  //  }
 }

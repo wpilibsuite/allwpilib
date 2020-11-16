@@ -1,4 +1,3 @@
-
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -22,9 +21,7 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpiutil.math.numbers.N3;
-import edu.wpi.first.wpiutil.math.numbers.N4;
 
 /**
  * This class wraps an {@link ExtendedKalmanFilter ExtendedKalmanFilter} to fuse
@@ -44,18 +41,18 @@ import edu.wpi.first.wpiutil.math.numbers.N4;
  *
  * <p>Our state-space system is:
  *
- * <p><strong> x = [[x, y, cos(theta), sin(theta)]]^T </strong> in the field-coordinate system.
+ * <p><strong> x = [[x, y, theta]]^T </strong> in the field-coordinate system.
  *
- * <p><strong> u = [[vx, vy, omega]]^T </strong> in the field-coordinate system.
+ * <p><strong> u = [[vx, vy, theta]]^T </strong> in the field-coordinate system.
  *
- * <p><strong> y = [[x, y, cos(theta), sin(theta)]]^T </strong> in field coords from vision,
- * or <strong> y = [[cos(theta), sin(theta)]]^T </strong> from the gyro.
+ * <p><strong> y = [[x, y, theta]]^T </strong> in field coords from vision,
+ * or <strong> y = [[theta]]^T </strong> from the gyro.
  */
 public class MecanumDrivePoseEstimator {
-  private final ExtendedKalmanFilter<N4, N3, N2> m_observer;
+  private final UnscentedKalmanFilter<N3, N3, N1> m_observer;
   private final MecanumDriveKinematics m_kinematics;
-  private final BiConsumer<Matrix<N3, N1>, Matrix<N4, N1>> m_visionCorrect;
-  private final KalmanFilterLatencyCompensator<N4, N3, N2> m_latencyCompensator;
+  private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
+  private final KalmanFilterLatencyCompensator<N3, N3, N1> m_latencyCompensator;
 
   private final double m_nominalDt; // Seconds
   private double m_prevTimeSeconds = -1.0;
@@ -107,44 +104,38 @@ public class MecanumDrivePoseEstimator {
   ) {
     m_nominalDt = nominalDtSeconds;
 
-    m_observer = new ExtendedKalmanFilter<>(
-            Nat.N4(), Nat.N3(), Nat.N2(),
-            this::f,
-            (x, u) -> x.block(Nat.N2(), Nat.N1(), 2, 0),
-            VecBuilder.fill(stateStdDevs.get(0, 0), stateStdDevs.get(1, 0),
-                    Math.cos(stateStdDevs.get(2, 0)), Math.sin(stateStdDevs.get(2, 0))),
-            VecBuilder.fill(Math.cos(localMeasurementStdDevs.get(0, 0)),
-                    Math.sin(localMeasurementStdDevs.get(0, 0))),
-            m_nominalDt
+    m_observer = new UnscentedKalmanFilter<>(
+        Nat.N3(), Nat.N1(),
+        (x_, u) -> u,
+        (x, u_) -> x.extractRowVector(2),
+        stateStdDevs,
+        localMeasurementStdDevs,
+        AngleStatistics.angleMean(2),
+        AngleStatistics.angleMean(0),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleResidual(0),
+        AngleStatistics.angleAdd(2),
+        m_nominalDt
     );
     m_kinematics = kinematics;
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
 
-    var fullVisionMeasurementStdDev = VecBuilder.fill(
-            visionMeasurementStdDevs.get(0, 0), visionMeasurementStdDevs.get(1, 0),
-            Math.cos(visionMeasurementStdDevs.get(2, 0)),
-            Math.sin(visionMeasurementStdDevs.get(2, 0))
-    );
-
-    var visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N4(), fullVisionMeasurementStdDev);
+    var visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
     var visionDiscR = Discretization.discretizeR(visionContR, m_nominalDt);
 
     m_visionCorrect = (u, y) -> m_observer.correct(
-            Nat.N4(), u, y,
-            (x, u_) -> x,
-            visionDiscR
+        Nat.N3(), u, y,
+        (x, u_) -> x,
+        visionDiscR,
+        AngleStatistics.angleMean(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleAdd(2)
     );
 
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
-    m_observer.setXhat(StateSpaceUtil.poseTo4dVector(initialPoseMeters));
-  }
-
-  @SuppressWarnings({"ParameterName", "MethodName"})
-  private Matrix<N4, N1> f(Matrix<N4, N1> x, Matrix<N3, N1> u) {
-    return VecBuilder.fill(
-            u.get(0, 0), u.get(1, 0), -x.get(3, 0) * u.get(2, 0), x.get(2, 0) * u.get(2, 0)
-    );
+    m_observer.setXhat(StateSpaceUtil.poseTo3dVector(initialPoseMeters));
   }
 
   /**
@@ -161,11 +152,11 @@ public class MecanumDrivePoseEstimator {
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     m_previousAngle = poseMeters.getRotation();
     m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
-    m_observer.setXhat(StateSpaceUtil.poseTo4dVector(poseMeters));
+    m_observer.setXhat(StateSpaceUtil.poseTo3dVector(poseMeters));
   }
 
   /**
-   * Gets the pose of the robot at the current time as estimated by the Extended Kalman Filter.
+   * Gets the pose of the robot at the current time as estimated by the Unscented Kalman Filter.
    *
    * @return The estimated robot pose in meters.
    */
@@ -173,12 +164,12 @@ public class MecanumDrivePoseEstimator {
     return new Pose2d(
             m_observer.getXhat(0),
             m_observer.getXhat(1),
-            new Rotation2d(m_observer.getXhat(2), m_observer.getXhat(3))
+            new Rotation2d(m_observer.getXhat(2))
     );
   }
 
   /**
-   * Add a vision measurement to the Extended Kalman Filter. This will correct the
+   * Add a vision measurement to the Unscented Kalman Filter. This will correct the
    * odometry pose estimate while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are
@@ -198,16 +189,16 @@ public class MecanumDrivePoseEstimator {
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     m_latencyCompensator.applyPastGlobalMeasurement(
-            Nat.N4(),
+            Nat.N3(),
             m_observer, m_nominalDt,
-            StateSpaceUtil.poseTo4dVector(visionRobotPoseMeters),
+            StateSpaceUtil.poseTo3dVector(visionRobotPoseMeters),
             m_visionCorrect,
             timestampSeconds
     );
   }
 
   /**
-   * Updates the the Extended Kalman Filter using only wheel encoder information.
+   * Updates the the Unscented Kalman Filter using only wheel encoder information.
    * This should be called every loop, and the correct loop period must be passed
    * into the constructor of this class.
    *
@@ -220,7 +211,7 @@ public class MecanumDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Extended Kalman Filter using only wheel encoder information.
+   * Updates the the Unscented Kalman Filter using only wheel encoder information.
    * This should be called every loop, and the correct loop period must be passed
    * into the constructor of this class.
    *
@@ -250,7 +241,7 @@ public class MecanumDrivePoseEstimator {
     );
     m_previousAngle = angle;
 
-    var localY = VecBuilder.fill(angle.getCos(), angle.getSin());
+    var localY = VecBuilder.fill(angle.getRadians());
     m_latencyCompensator.addObserverState(m_observer, u, localY, currentTimeSeconds);
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);

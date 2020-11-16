@@ -8,6 +8,7 @@
 #include "frc/estimator/DifferentialDrivePoseEstimator.h"
 
 #include "frc/StateSpaceUtil.h"
+#include "frc/estimator/AngleStatistics.h"
 #include "frc2/Timer.h"
 
 using namespace frc;
@@ -22,7 +23,10 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
             return frc::MakeMatrix<3, 1>(x(3, 0), x(4, 0), x(2, 0));
           },
           StdDevMatrixToArray<5>(stateStdDevs),
-          StdDevMatrixToArray<3>(localMeasurementStdDevs), nominalDt),
+          StdDevMatrixToArray<3>(localMeasurementStdDevs),
+          frc::AngleMean<5, 5>(2), frc::AngleMean<3, 5>(2),
+          frc::AngleResidual<5>(2), frc::AngleResidual<3>(2),
+          frc::AngleAdd<5>(2), nominalDt),
       m_nominalDt(nominalDt) {
   // Create R (covariances) for vision measurements.
   Eigen::Matrix<double, 3, 3> visionContR =
@@ -36,7 +40,8 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
         [](const Vector<5>& x, const Vector<3>&) {
           return x.block<3, 1>(0, 0);
         },
-        m_visionDiscR);
+        m_visionDiscR, frc::AngleMean<3, 5>(2), frc::AngleResidual<3>(2),
+        frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
   };
 
   m_gyroOffset = initialPose.Rotation() - gyroAngle;

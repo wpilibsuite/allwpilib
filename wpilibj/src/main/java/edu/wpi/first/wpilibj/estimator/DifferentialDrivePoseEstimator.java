@@ -25,7 +25,7 @@ import edu.wpi.first.wpiutil.math.numbers.N5;
 
 /**
  * This class wraps an
- * {@link edu.wpi.first.wpilibj.estimator.ExtendedKalmanFilter Extended Kalman Filter}
+ * {@link edu.wpi.first.wpilibj.estimator.UnscentedKalmanFilter Unscented Kalman Filter}
  * to fuse latency-compensated vision
  * measurements with differential drive encoder measurements. It will correct
  * for noisy vision measurements and encoder drift. It is intended to be an easy
@@ -114,26 +114,29 @@ public class DifferentialDrivePoseEstimator {
     m_nominalDt = nominalDtSeconds;
 
     m_observer = new UnscentedKalmanFilter<>(
-            Nat.N5(), Nat.N3(),
-            this::f,
-            (x, u) -> VecBuilder.fill(x.get(3, 0), x.get(4, 0), x.get(2, 0)),
-            stateStdDevs, localMeasurementStdDevs,
-            (sigmas, Wm) -> AngleStatistics.angleMean(sigmas, Wm, 2),
-            (sigmas, Wm) -> AngleStatistics.angleMean(sigmas, Wm, 2),
-            (a, b) -> AngleStatistics.angleResidual(a, b, 2),
-            (a, b) -> AngleStatistics.angleResidual(a, b, 2),
-            m_nominalDt
+        Nat.N5(), Nat.N3(),
+        this::f,
+        (x, u) -> VecBuilder.fill(x.get(3, 0), x.get(4, 0), x.get(2, 0)),
+        stateStdDevs, localMeasurementStdDevs,
+        AngleStatistics.angleMean(2),
+        AngleStatistics.angleMean(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleAdd(2),
+        m_nominalDt
     );
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
 
     var visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
     var visionDiscR = Discretization.discretizeR(visionContR, m_nominalDt);
     m_visionCorrect = (u, y) -> m_observer.correct(
-            Nat.N3(), u, y,
-            (x, u_) -> new Matrix<>(x.getStorage().extractMatrix(0, 3, 0, 1)),
-            visionDiscR,
-            (sigmas, Wm) -> AngleStatistics.angleMean(sigmas, Wm, 2),
-            (a, b) -> AngleStatistics.angleResidual(a, b, 2)
+        Nat.N3(), u, y,
+        (x, u_) -> new Matrix<>(x.getStorage().extractMatrix(0, 3, 0, 1)),
+        visionDiscR,
+        AngleStatistics.angleMean(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleResidual(2),
+        AngleStatistics.angleAdd(2)
     );
 
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
@@ -175,7 +178,7 @@ public class DifferentialDrivePoseEstimator {
   }
 
   /**
-   * Gets the pose of the robot at the current time as estimated by the Extended Kalman Filter.
+   * Gets the pose of the robot at the current time as estimated by the Unscented Kalman Filter.
    *
    * @return The estimated robot pose in meters.
    */
@@ -188,7 +191,7 @@ public class DifferentialDrivePoseEstimator {
   }
 
   /**
-   * Add a vision measurement to the Extended Kalman Filter. This will correct the
+   * Add a vision measurement to the Unscented Kalman Filter. This will correct the
    * odometry pose estimate while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are
@@ -217,7 +220,7 @@ public class DifferentialDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Extended Kalman Filter using only wheel encoder information.
+   * Updates the the Unscented Kalman Filter using only wheel encoder information.
    * Note that this should be called every loop.
    *
    * @param gyroAngle                      The current gyro angle.
@@ -242,7 +245,7 @@ public class DifferentialDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Extended Kalman Filter using only wheel encoder information.
+   * Updates the the Unscented Kalman Filter using only wheel encoder information.
    * Note that this should be called every loop.
    *
    * @param currentTimeSeconds             Time at which this method was called, in seconds.

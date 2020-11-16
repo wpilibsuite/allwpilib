@@ -15,8 +15,9 @@
 #include <units/time.h>
 
 #include "frc/StateSpaceUtil.h"
-#include "frc/estimator/ExtendedKalmanFilter.h"
+#include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
+#include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
@@ -43,13 +44,13 @@ using Vector = Eigen::Matrix<double, N, 1>;
  *
  * Our state-space system is:
  *
- * <strong> x = [[x, y, std::cos(theta), std::sin(theta)]]^T </strong> in the
+ * <strong> x = [[x, y, theta]]^T </strong> in the
  * field-coordinate system.
  *
  * <strong> u = [[vx, vy, omega]]^T </strong> in the field-coordinate system.
  *
- * <strong> y = [[x, y, std::cos(theta), std::sin(theta)]]^T </strong> in field
- * coords from vision, or <strong> y = [[cos(theta), std::sin(theta)]]^T
+ * <strong> y = [[x, y, std::theta]]^T </strong> in field
+ * coords from vision, or <strong> y = [[theta]]^T
  * </strong> from the gyro.
  */
 template <size_t NumModules>
@@ -81,39 +82,34 @@ class SwerveDrivePoseEstimator {
                            const Vector<1>& localMeasurementStdDevs,
                            const Vector<3>& visionMeasurementStdDevs,
                            units::second_t nominalDt = 0.02_s)
-      : m_observer(
-            &SwerveDrivePoseEstimator::F,
-            [](const Vector<4>& x, const Vector<3>& u) {
-              return x.block<2, 1>(2, 0);
-            },
-            StdDevMatrixToArray<4>(frc::MakeMatrix<4, 1>(
-                stateStdDevs(0), stateStdDevs(1), std::cos(stateStdDevs(2)),
-                std::sin(stateStdDevs(2)))),
-            StdDevMatrixToArray<2>(
-                frc::MakeMatrix<2, 1>(std::cos(localMeasurementStdDevs(0)),
-                                      std::sin(localMeasurementStdDevs(0)))),
-            nominalDt),
+      : m_observer([](const Vector<3>& x, const Vector<3>& u) { return u; },
+                   [](const Vector<3>& x, const Vector<3>& u) {
+                     return x.block<1, 1>(2, 0);
+                   },
+                   StdDevMatrixToArray<3>(stateStdDevs),
+                   StdDevMatrixToArray<1>(localMeasurementStdDevs),
+                   frc::AngleMean<3, 3>(2), frc::AngleMean<1, 3>(0),
+                   frc::AngleResidual<3>(2), frc::AngleResidual<1>(0),
+                   frc::AngleAdd<3>(2), nominalDt),
         m_kinematics(kinematics),
         m_nominalDt(nominalDt) {
     // Construct R (covariances) matrix for vision measurements.
-    Eigen::Matrix4d visionContR =
-        frc::MakeCovMatrix<4>(StdDevMatrixToArray<4>(frc::MakeMatrix<4, 1>(
-            visionMeasurementStdDevs(0), visionMeasurementStdDevs(1),
-            std::cos(visionMeasurementStdDevs(2)),
-            std::sin(visionMeasurementStdDevs(2)))));
+    Eigen::Matrix3d visionContR =
+        frc::MakeCovMatrix<3>(StdDevMatrixToArray<3>(visionMeasurementStdDevs));
 
     // Create and store discrete covariance matrix for vision measurements.
-    m_visionDiscR = frc::DiscretizeR<4>(visionContR, m_nominalDt);
+    m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
 
     // Create correction mechanism for vision measurements.
-    m_visionCorrect = [&](const Vector<3>& u, const Vector<4>& y) {
-      m_observer.Correct<4>(
-          u, y, [](const Vector<4>& x, const Vector<3>& u) { return x; },
-          m_visionDiscR);
+    m_visionCorrect = [&](const Vector<3>& u, const Vector<3>& y) {
+      m_observer.Correct<3>(
+          u, y, [](const Vector<3>& x, const Vector<3>& u) { return x; },
+          m_visionDiscR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
+          frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
     };
 
     // Set initial state.
-    m_observer.SetXhat(PoseTo4dVector(initialPose));
+    m_observer.SetXhat(PoseTo3dVector(initialPose));
 
     // Calculate offsets.
     m_gyroOffset = initialPose.Rotation() - gyroAngle;
@@ -133,7 +129,7 @@ class SwerveDrivePoseEstimator {
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
     // Set observer state.
-    m_observer.SetXhat(PoseTo4dVector(pose));
+    m_observer.SetXhat(PoseTo3dVector(pose));
 
     // Calculate offsets.
     m_gyroOffset = pose.Rotation() - gyroAngle;
@@ -148,11 +144,11 @@ class SwerveDrivePoseEstimator {
    */
   Pose2d GetEstimatedPosition() const {
     return Pose2d(m_observer.Xhat(0) * 1_m, m_observer.Xhat(1) * 1_m,
-                  Rotation2d(m_observer.Xhat(2), m_observer.Xhat(3)));
+                  Rotation2d(units::radian_t{m_observer.Xhat(2)}));
   }
 
   /**
-   * Add a vision measurement to the Extended Kalman Filter. This will correct
+   * Add a vision measurement to the Unscented Kalman Filter. This will correct
    * the odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are
@@ -171,13 +167,13 @@ class SwerveDrivePoseEstimator {
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
-    m_latencyCompensator.ApplyPastMeasurement<4>(
-        &m_observer, m_nominalDt, PoseTo4dVector(visionRobotPose),
+    m_latencyCompensator.ApplyPastMeasurement<3>(
+        &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
         m_visionCorrect, timestamp);
   }
 
   /**
-   * Updates the the Extended Kalman Filter using only wheel encoder
+   * Updates the the Unscented Kalman Filter using only wheel encoder
    * information. This should be called every loop, and the correct loop period
    * must be passed into the constructor of this class.
    *
@@ -193,7 +189,7 @@ class SwerveDrivePoseEstimator {
   }
 
   /**
-   * Updates the the Extended Kalman Filter using only wheel encoder
+   * Updates the the Unscented Kalman Filter using only wheel encoder
    * information. This should be called every loop, and the correct loop period
    * must be passed into the constructor of this class.
    *
@@ -223,9 +219,7 @@ class SwerveDrivePoseEstimator {
                               fieldRelativeSpeeds.Y().template to<double>(),
                               omega.template to<double>());
 
-    auto localY =
-        frc::MakeMatrix<2, 1>(std::cos(angle.Radians().template to<double>()),
-                              std::sin(angle.Radians().template to<double>()));
+    auto localY = frc::MakeMatrix<1, 1>(angle.Radians().template to<double>());
     m_previousAngle = angle;
 
     m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
@@ -237,23 +231,19 @@ class SwerveDrivePoseEstimator {
   }
 
  private:
-  ExtendedKalmanFilter<4, 3, 2> m_observer;
+  UnscentedKalmanFilter<3, 3, 1> m_observer;
   SwerveDriveKinematics<NumModules>& m_kinematics;
-  KalmanFilterLatencyCompensator<4, 3, 2, ExtendedKalmanFilter<4, 3, 2>>
+  KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
       m_latencyCompensator;
-  std::function<void(const Vector<3>& u, const Vector<4>& y)> m_visionCorrect;
+  std::function<void(const Vector<3>& u, const Vector<3>& y)> m_visionCorrect;
 
-  Eigen::Matrix4d m_visionDiscR;
+  Eigen::Matrix3d m_visionDiscR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;
 
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
-
-  static Vector<4> F(const Vector<4>& x, const Vector<3>& u) {
-    return frc::MakeMatrix<4, 1>(u(0), u(1), -x(3) * u(2), x(2) * u(2));
-  }
 
   template <int Dim>
   static std::array<double, Dim> StdDevMatrixToArray(

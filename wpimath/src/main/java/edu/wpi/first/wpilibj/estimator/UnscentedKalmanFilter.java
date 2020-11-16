@@ -45,6 +45,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   private BiFunction<Matrix<Outputs, ?>, Matrix<?, N1>, Matrix<Outputs, N1>> m_meanFuncY;
   private BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> m_residualFuncX;
   private BiFunction<Matrix<Outputs, N1>, Matrix<Outputs, N1>, Matrix<Outputs, N1>> m_residualFuncY;
+  private BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> m_addFuncX;
 
   private Matrix<States, N1> m_xHat;
   private Matrix<States, States> m_P;
@@ -77,20 +78,17 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
                                Matrix<States, N1> stateStdDevs,
                                Matrix<Outputs, N1> measurementStdDevs,
                                double nominalDtSeconds) {
-    this.m_states = states;
-    this.m_outputs = outputs;
-
-    m_f = f;
-    m_h = h;
-
-    m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
-
-    m_dtSeconds = nominalDtSeconds;
-
-    m_pts = new MerweScaledSigmaPoints<>(states);
-
-    reset();
+    this(
+        states, outputs,
+        f, h,
+        stateStdDevs, measurementStdDevs,
+        (sigmas, Wm) -> sigmas.times(Matrix.changeBoundsUnchecked(Wm)),
+        (sigmas, Wm) -> sigmas.times(Matrix.changeBoundsUnchecked(Wm)),
+        Matrix::minus,
+        Matrix::minus,
+        Matrix::plus,
+        nominalDtSeconds
+    );
   }
 
   /**
@@ -107,13 +105,15 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
    * @param meanFuncX           Function that computes the mean of the provided sigma points and
    *                           weights. Useful if you have values (like anglues) that cannot be
    *                           summed. Takes (sigma points, weights). Pass null to use the default.
-   * @param meanFuncZ           Function that computes the mean of the provided sigma points and
+   * @param meanFuncY           Function that computes the mean of the provided sigma points and
    *                           weights. Useful if you have values (like anglues) that cannot be
    *                           summed. Takes (sigma points, weights). Pass null to use the default.
    * @param residualFuncX       Function that computes the residual (difference) between two state
    *                           vectors. Pass null to use the default.
-   * @param residualFuncZ       Function that computes the residual (difference) between two state
+   * @param residualFuncY       Function that computes the residual (difference) between two state
    *                           vectors. Pass null to use the default.
+   * @param addFuncX           Function that computes the sum of two state vectors. Pass null to
+   *                           use the default.
    * @param nominalDtSeconds   Nominal discretization timestep.
    */
   @SuppressWarnings("ParameterName")
@@ -124,9 +124,10 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
           Matrix<States, N1> stateStdDevs,
           Matrix<Outputs, N1> measurementStdDevs,
           BiFunction<Matrix<States, ?>, Matrix<?, N1>, Matrix<States, N1>> meanFuncX,
-          BiFunction<Matrix<Outputs, ?>, Matrix<?, N1>, Matrix<Outputs, N1>> meanFuncZ,
+          BiFunction<Matrix<Outputs, ?>, Matrix<?, N1>, Matrix<Outputs, N1>> meanFuncY,
           BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX,
-          BiFunction<Matrix<Outputs, N1>, Matrix<Outputs, N1>, Matrix<Outputs, N1>> residualFuncZ,
+          BiFunction<Matrix<Outputs, N1>, Matrix<Outputs, N1>, Matrix<Outputs, N1>> residualFuncY,
+          BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX,
           double nominalDtSeconds
   ) {
     this.m_states = states;
@@ -136,9 +137,10 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
     m_h = h;
 
     m_meanFuncX = meanFuncX;
-    m_meanFuncY = meanFuncZ;
+    m_meanFuncY = meanFuncY;
     m_residualFuncX = residualFuncX;
-    m_residualFuncY = residualFuncZ;
+    m_residualFuncY = residualFuncY;
+    m_addFuncX = addFuncX;
 
     m_dtSeconds = nominalDtSeconds;
 
@@ -172,26 +174,16 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
             + Wc.getNumRows() + " by " + Wc.getNumCols());
     }
 
-
-    Matrix<C, N1> x;
-    if (meanFunc == null) {
-      // New mean is just the sum of the sigmas * weight
-      // dot = \Sigma^n_1 (W[k]*Xi[k])
-      x = sigmas.times(Matrix.changeBoundsUnchecked(Wm));
-    } else {
-      // Slower custom mean function
-      x = meanFunc.apply(sigmas, Wm);
-    }
+    // New mean is usually just the sum of the sigmas * weight:
+    // dot = \Sigma^n_1 (W[k]*Xi[k])
+    Matrix<C, N1> x = meanFunc.apply(sigmas, Wm);
 
     // New covariance is the sum of the outer product of the residuals times the
     // weights
     Matrix<C, ?> y = new Matrix<>(new SimpleMatrix(dim.getNum(), 2 * s.getNum() + 1));
     for (int i = 0; i < 2 * s.getNum() + 1; i++) {
-      if (residualFunc == null) {
-        y.setColumn(i, sigmas.extractColumnVector(i).minus(x));
-      } else {
-        y.setColumn(i, residualFunc.apply(sigmas.extractColumnVector(i), x));
-      }
+      // y[:, i] = sigmas[:, i] - x
+      y.setColumn(i, residualFunc.apply(sigmas.extractColumnVector(i), x));
     }
     Matrix<C, C> P = y.times(Matrix.changeBoundsUnchecked(Wc.diag()))
           .times(Matrix.changeBoundsUnchecked(y.transpose()));
@@ -325,7 +317,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   @SuppressWarnings("ParameterName")
   @Override
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
-    correct(m_outputs, u, y, m_h, m_contR, m_meanFuncY, m_residualFuncY);
+    correct(m_outputs, u, y, m_h, m_contR,
+            m_meanFuncY, m_residualFuncY, m_residualFuncX, m_addFuncX);
   }
 
   /**
@@ -347,8 +340,10 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
         Matrix<R, N1> y,
         BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<R, N1>> h,
         Matrix<R, R> R,
-        BiFunction<Matrix<R, ?>, Matrix<?, N1>, Matrix<R, N1>> meanFunc,
-        BiFunction<Matrix<R, N1>, Matrix<R, N1>, Matrix<R, N1>> residualFunc) {
+        BiFunction<Matrix<R, ?>, Matrix<?, N1>, Matrix<R, N1>> meanFuncY,
+        BiFunction<Matrix<R, N1>, Matrix<R, N1>, Matrix<R, N1>> residualFuncY,
+        BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX,
+        BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX) {
     final var discR = Discretization.discretizeR(R, m_dtSeconds);
 
     // Transform sigma points into measurement space
@@ -365,18 +360,18 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
 
     // Mean and covariance of prediction passed through unscented transform
     var transRet = unscentedTransform(m_states, rows,
-            sigmasH, m_pts.getWm(), m_pts.getWc(), meanFunc, residualFunc);
+            sigmasH, m_pts.getWm(), m_pts.getWc(), meanFuncY, residualFuncY);
     var yHat = transRet.getFirst();
     var Py = transRet.getSecond().plus(discR);
 
     // Compute cross covariance of the state and the measurements
     Matrix<States, R> Pxy = new Matrix<>(m_states, rows);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
-      var temp =
-            m_sigmasF.extractColumnVector(i).minus(m_xHat)
-                    .times(sigmasH.extractColumnVector(i).minus(yHat).transpose());
+      // Pxy += (sigmas_f[:, i] - xHat) * (sigmas_h[:, i] - yHat)^T * W_c[i]
+      var dx = residualFuncX.apply(m_sigmasF.extractColumnVector(i), m_xHat);
+      var dy = residualFuncY.apply(sigmasH.extractColumnVector(i), yHat).transpose();
 
-      Pxy = Pxy.plus(temp.times(m_pts.getWc(i)));
+      Pxy = Pxy.plus(dx.times(dy).times(m_pts.getWc(i)));
     }
 
     // K = P_{xy} Py^-1
@@ -388,7 +383,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
           Py.transpose().solve(Pxy.transpose()).transpose()
     );
 
-    m_xHat = m_xHat.plus(K.times(y.minus(yHat)));
+    // xHat + K * (y - yHat)
+    m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, yHat)));
     m_P = m_P.minus(K.times(Py).times(K.transpose()));
   }
 }

@@ -39,17 +39,18 @@ public class SwerveDrivePoseEstimatorTest {
     var estimator = new SwerveDrivePoseEstimator(
             new Rotation2d(), new Pose2d(), kinematics,
             VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.05),
+            VecBuilder.fill(0.005),
             VecBuilder.fill(0.1, 0.1, 0.1)
     );
 
     var trajectory = TrajectoryGenerator.generateTrajectory(
-            List.of(new Pose2d(),
-                    new Pose2d(20, 20, Rotation2d.fromDegrees(0)),
-                    new Pose2d(10, 10, Rotation2d.fromDegrees(180)),
-                    new Pose2d(30, 30, Rotation2d.fromDegrees(0)),
-                    new Pose2d(20, 20, Rotation2d.fromDegrees(180)),
-                    new Pose2d(10, 10, Rotation2d.fromDegrees(0))),
+            List.of(
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                    new Pose2d(3, 0, Rotation2d.fromDegrees(-90)),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                    new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45))
+            ),
             new TrajectoryConfig(0.5, 2)
     );
 
@@ -75,7 +76,6 @@ public class SwerveDrivePoseEstimatorTest {
 
     List<Double> time = new ArrayList<>();
     List<Double> visionTime = new ArrayList<>();
-
 
     final double dt = 0.02;
     double t = 0.0;
@@ -121,8 +121,8 @@ public class SwerveDrivePoseEstimatorTest {
               groundTruthState.velocityMetersPerSecond * groundTruthState.curvatureRadPerMeter)
       );
       for (var moduleState : moduleStates) {
-        moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.5));
-        moduleState.speedMetersPerSecond += rand.nextGaussian() * 1;
+        moduleState.angle = moduleState.angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
+        moduleState.speedMetersPerSecond += rand.nextGaussian() * 0.1;
       }
 
       var xHat = estimator.updateWithTime(
@@ -162,53 +162,49 @@ public class SwerveDrivePoseEstimatorTest {
             "Incorrect max error"
     );
 
-    /*
-    List<XYChart> charts = new ArrayList<XYChart>();
+    // List<XYChart> charts = new ArrayList<>();
 
-    var chartBuilder = new XYChartBuilder();
-    chartBuilder.title = "The Magic of Sensor Fusion";
-    var chart = chartBuilder.build();
+    // var chartBuilder = new XYChartBuilder();
+    // chartBuilder.title = "The Magic of Sensor Fusion";
+    // var chart = chartBuilder.build();
 
-    chart.addSeries("Vision", visionXs, visionYs);
-    chart.addSeries("Trajectory", trajXs, trajYs);
-    chart.addSeries("xHat", observerXs, observerYs);
-    charts.add(chart);
+    // chart.addSeries("Vision", visionXs, visionYs);
+    // chart.addSeries("Trajectory", trajXs, trajYs);
+    // chart.addSeries("xHat", observerXs, observerYs);
+    // charts.add(chart);
 
-    var chartBuilder1 = new XYChartBuilder();
-    chartBuilder1.title = "Cosine";
-    var chart1 = chartBuilder1.build();
+    // var chartBuilder1 = new XYChartBuilder();
+    // chartBuilder1.title = "Cosine";
+    // var chart1 = chartBuilder1.build();
 
-    chart1.addSeries("Vision", visionTime, visionCosine);
-    chart1.addSeries("Trajectory", time, trajCosine);
-    chart1.addSeries("xHat", time, observerCosine);
-    charts.add(chart1);
+    // chart1.addSeries("Vision", visionTime, visionCosine);
+    // chart1.addSeries("Trajectory", time, trajCosine);
+    // chart1.addSeries("xHat", time, observerCosine);
+    // charts.add(chart1);
 
-    var chartBuilder2 = new XYChartBuilder();
-    chartBuilder2.title = "Sine";
-    var chart2 = chartBuilder2.build();
+    // var chartBuilder2 = new XYChartBuilder();
+    // chartBuilder2.title = "Sine";
+    // var chart2 = chartBuilder2.build();
 
-    chart2.addSeries("Vision", visionTime, visionSine);
-    chart2.addSeries("Trajectory", time, trajSine);
-    chart2.addSeries("xHat", time, observerSine);
+    // chart2.addSeries("Vision", visionTime, visionSine);
+    // chart2.addSeries("Trajectory", time, trajSine);
+    // chart2.addSeries("xHat", time, observerSine);
 
-    charts.add(chart2);
+    // charts.add(chart2);
 
-    var chartBuilder3 = new XYChartBuilder();
-    chartBuilder3.title = "Degrees";
-    var chart3 = chartBuilder3.build();
+    // var chartBuilder3 = new XYChartBuilder();
+    // chartBuilder3.title = "Degrees";
+    // var chart3 = chartBuilder3.build();
 
-    chart3.addSeries("Vision", visionTime, visionTheta);
-    chart3.addSeries("Trajectory", time, trajTheta);
-    chart3.addSeries("xHat", time, observerTheta);
-    charts.add(chart3);
+    // chart3.addSeries("Vision", visionTime, visionTheta);
+    // chart3.addSeries("Trajectory", time, trajTheta);
+    // chart3.addSeries("xHat", time, observerTheta);
+    // charts.add(chart3);
 
-
-
-    new SwingWrapper<>(charts).displayChartMatrix();
-    try {
-      Thread.sleep(1000000000);
-    } catch (InterruptedException e) {
-    }
-    */
+    // new SwingWrapper<>(charts).displayChartMatrix();
+    // try {
+    //   Thread.sleep(1000000000);
+    // } catch (InterruptedException e) {
+    // }
   }
 }

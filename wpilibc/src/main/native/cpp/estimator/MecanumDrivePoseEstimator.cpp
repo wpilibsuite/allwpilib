@@ -10,6 +10,7 @@
 #include <limits>
 
 #include "frc/StateSpaceUtil.h"
+#include "frc/estimator/AngleStatistics.h"
 
 using namespace frc;
 
@@ -18,39 +19,34 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     MecanumDriveKinematics kinematics, const Vector<3>& stateStdDevs,
     const Vector<1>& localMeasurementStdDevs,
     const Vector<3>& visionMeasurementStdDevs, units::second_t nominalDt)
-    : m_observer(
-          &MecanumDrivePoseEstimator::F,
-          [](const Vector<4>& x, const Vector<3>& u) {
-            return x.block<2, 1>(2, 0);
-          },
-          StdDevMatrixToArray<4>(frc::MakeMatrix<4, 1>(
-              stateStdDevs(0), stateStdDevs(1), std::cos(stateStdDevs(2)),
-              std::sin(stateStdDevs(2)))),
-          StdDevMatrixToArray<2>(
-              frc::MakeMatrix<2, 1>(std::cos(localMeasurementStdDevs(0)),
-                                    std::sin(localMeasurementStdDevs(0)))),
-          nominalDt),
+    : m_observer([](const Vector<3>& x, const Vector<3>& u) { return u; },
+                 [](const Vector<3>& x, const Vector<3>& u) {
+                   return x.block<1, 1>(2, 0);
+                 },
+                 StdDevMatrixToArray<3>(stateStdDevs),
+                 StdDevMatrixToArray<1>(localMeasurementStdDevs),
+                 frc::AngleMean<3, 3>(2), frc::AngleMean<1, 3>(0),
+                 frc::AngleResidual<3>(2), frc::AngleResidual<1>(0),
+                 frc::AngleAdd<3>(2), nominalDt),
       m_kinematics(kinematics),
       m_nominalDt(nominalDt) {
   // Construct R (covariances) matrix for vision measurements.
-  Eigen::Matrix4d visionContR =
-      frc::MakeCovMatrix<4>(StdDevMatrixToArray<4>(frc::MakeMatrix<4, 1>(
-          visionMeasurementStdDevs(0), visionMeasurementStdDevs(1),
-          std::cos(visionMeasurementStdDevs(2)),
-          std::sin(visionMeasurementStdDevs(2)))));
+  Eigen::Matrix3d visionContR =
+      frc::MakeCovMatrix<3>(StdDevMatrixToArray<3>(visionMeasurementStdDevs));
 
   // Create and store discrete covariance matrix for vision measurements.
-  m_visionDiscR = frc::DiscretizeR<4>(visionContR, m_nominalDt);
+  m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
 
   // Create vision correction mechanism.
-  m_visionCorrect = [&](const Vector<3>& u, const Vector<4>& y) {
-    m_observer.Correct<4>(
-        u, y, [](const Vector<4>& x, const Vector<3>& u) { return x; },
-        m_visionDiscR);
+  m_visionCorrect = [&](const Vector<3>& u, const Vector<3>& y) {
+    m_observer.Correct<3>(
+        u, y, [](const Vector<3>& x, const Vector<3>&) { return x; },
+        m_visionDiscR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
+        frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
   };
 
   // Set initial state.
-  m_observer.SetXhat(PoseTo4dVector(initialPose));
+  m_observer.SetXhat(PoseTo3dVector(initialPose));
 
   // Calculate offsets.
   m_gyroOffset = initialPose.Rotation() - gyroAngle;
@@ -60,7 +56,7 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
 void frc::MecanumDrivePoseEstimator::ResetPosition(
     const Pose2d& pose, const Rotation2d& gyroAngle) {
   // Set observer state.
-  m_observer.SetXhat(PoseTo4dVector(pose));
+  m_observer.SetXhat(PoseTo3dVector(pose));
 
   // Calculate offsets.
   m_gyroOffset = pose.Rotation() - gyroAngle;
@@ -69,13 +65,13 @@ void frc::MecanumDrivePoseEstimator::ResetPosition(
 
 Pose2d frc::MecanumDrivePoseEstimator::GetEstimatedPosition() const {
   return Pose2d(m_observer.Xhat(0) * 1_m, m_observer.Xhat(1) * 1_m,
-                Rotation2d(m_observer.Xhat(2), m_observer.Xhat(3)));
+                Rotation2d(units::radian_t{m_observer.Xhat(2)}));
 }
 
 void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
-  m_latencyCompensator.ApplyPastMeasurement<4>(&m_observer, m_nominalDt,
-                                               PoseTo4dVector(visionRobotPose),
+  m_latencyCompensator.ApplyPastMeasurement<3>(&m_observer, m_nominalDt,
+                                               PoseTo3dVector(visionRobotPose),
                                                m_visionCorrect, timestamp);
 }
 
@@ -103,9 +99,7 @@ Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
                                  fieldRelativeVelocities.Y().to<double>(),
                                  omega.to<double>());
 
-  auto localY =
-      frc::MakeMatrix<2, 1>(std::cos(angle.Radians().template to<double>()),
-                            std::sin(angle.Radians().template to<double>()));
+  auto localY = frc::MakeMatrix<1, 1>(angle.Radians().template to<double>());
   m_previousAngle = angle;
 
   m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
@@ -114,9 +108,4 @@ Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
   m_observer.Correct(u, localY);
 
   return GetEstimatedPosition();
-}
-
-Vector<4> frc::MecanumDrivePoseEstimator::F(const Vector<4>& x,
-                                            const Vector<3>& u) {
-  return frc::MakeMatrix<4, 1>(u(0), u(1), -x(3) * u(2), x(2) * u(2));
 }

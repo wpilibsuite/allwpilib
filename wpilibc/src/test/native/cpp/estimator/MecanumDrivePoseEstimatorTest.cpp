@@ -31,11 +31,11 @@ TEST(MecanumDrivePoseEstimatorTest, TestAccuracy) {
   frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d()};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d(), frc::Pose2d(20_m, 20_m, frc::Rotation2d()),
-                  frc::Pose2d(10_m, 10_m, frc::Rotation2d(180_deg)),
-                  frc::Pose2d(30_m, 30_m, frc::Rotation2d()),
-                  frc::Pose2d(20_m, 20_m, frc::Rotation2d(180_deg)),
-                  frc::Pose2d(10_m, 10_m, frc::Rotation2d())},
+      std::vector{frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg)),
+                  frc::Pose2d(3_m, 0_m, frc::Rotation2d(-90_deg)),
+                  frc::Pose2d(0_m, 0_m, frc::Rotation2d(135_deg)),
+                  frc::Pose2d(-3_m, 0_m, frc::Rotation2d(-90_deg)),
+                  frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg))},
       frc::TrajectoryConfig(5.0_mps, 2.0_mps_sq));
 
   std::default_random_engine generator;

@@ -13,6 +13,7 @@
 #include "Eigen/Core"
 #include "Eigen/QR"
 #include "frc/StateSpaceUtil.h"
+#include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/system/NumericalJacobian.h"
 #include "frc/system/RungeKutta.h"
@@ -94,7 +95,9 @@ TEST(UnscentedKalmanFilterTest, Init) {
 
   auto globalY = GlobalMeasurementModel(observer.Xhat(), u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
-  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
+  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R,
+                      frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
+                      frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
 }
 
 TEST(UnscentedKalmanFilterTest, Convergence) {
@@ -145,7 +148,8 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
 
     auto localY =
         LocalMeasurementModel(trueXhat, Eigen::Matrix<double, 2, 1>::Zero());
-    observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
+    observer.Correct(u,
+                     localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
     Eigen::Matrix<double, 5, 1> rdot = (nextR - r) / dt.to<double>();
     u = B.householderQr().solve(
@@ -162,7 +166,11 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
 
   auto globalY = GlobalMeasurementModel(trueXhat, u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
-  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
+  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R,
+                      frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
+                      frc::AngleResidual<5>(2), frc::AngleAdd<5>(2)
+
+  );
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
   ASSERT_NEAR(finalPosition.pose.Translation().X().template to<double>(),

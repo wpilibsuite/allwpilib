@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import edu.wpi.first.wpiutil.math.*;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
@@ -28,13 +29,8 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import edu.wpi.first.wpiutil.math.MatBuilder;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.MatrixUtils;
-import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -59,17 +55,17 @@ public class DifferentialDriveStateEstimatorTest {
 
     var estimator = new DifferentialDriveStateEstimator(
             plant,
-            MatrixUtils.zeros(Nat.N10()),
-            new MatBuilder<>(Nat.N10(), Nat.N1()).fill(
+            new Matrix<>(Nat.N10(), Nat.N1()),
+            VecBuilder.fill(
                 0.002, 0.002, 0.0001, 1.5, 1.5, 0.5, 0.5, 10.0, 10.0, 2.0),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0001, 0.005, 0.005),
-            new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.5, 0.5, 0.5),
+            VecBuilder.fill(0.0001, 0.005, 0.005),
+            VecBuilder.fill(0.5, 0.5, 0.5),
             kinematics);
 
     var feedforward = new ControlAffinePlantInversionFeedforward<>(Nat.N10(), Nat.N2(),
         estimator::getDynamics, dt);
 
-    var config = new TrajectoryConfig(12 / 2.5, (12 / 0.642) - 17.5);
+    var config = new TrajectoryConfig(12 / 3.5, (12 / 0.642) - 17.5);
     config.addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 12.0 / 2.5));
     config.addConstraint(new DifferentialDriveVoltageConstraint(
         new SimpleMotorFeedforward(0, 3.02, 0.642),
@@ -77,10 +73,16 @@ public class DifferentialDriveStateEstimatorTest {
         12));
 
     var traj = TrajectoryGenerator.generateTrajectory(
-            new Pose2d(),
-            List.of(),
-            new Pose2d(4.8768, 2.7432, new Rotation2d()),
-            config);
+            List.of(
+                    new Pose2d(),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
+                    new Pose2d(3, 0, Rotation2d.fromDegrees(-90)),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
+                    new Pose2d(-3, 0, Rotation2d.fromDegrees(-90)),
+                    new Pose2d(0, 0, Rotation2d.fromDegrees(45))
+            ),
+            new TrajectoryConfig(0.5, 2));
+
 
     var rand = new Random(604);
 
@@ -132,7 +134,7 @@ public class DifferentialDriveStateEstimatorTest {
               wheelSpeeds.rightMetersPerSecond,
               0.0, 0.0, 0.0, 0.0, 0.0);
 
-      input = feedforward.calculate(x, feedforward.getR());
+      input = feedforward.calculate(x);
 
       scaleCappedU(input);
 
@@ -207,49 +209,22 @@ public class DifferentialDriveStateEstimatorTest {
            "Incorrect max error"
     );
 
-    /*
-    List<XYChart> charts = new ArrayList<XYChart>();
+    // List<XYChart> charts = new ArrayList<>();
 
-    var chartBuilder = new XYChartBuilder();
-    chartBuilder.title = "The Magic of Sensor Fusion";
-    var chart = chartBuilder.build();
+    // var chartBuilder = new XYChartBuilder();
+    // chartBuilder.title = "The Magic of Sensor Fusion";
+    // var chart = chartBuilder.build();
 
-    chart.addSeries("Vision", visionXs, visionYs);
-    chart.addSeries("Trajectory", trajXs, trajYs);
-    chart.addSeries("xHat", observerXs, observerYs);
-    charts.add(chart);
+    // chart.addSeries("Vision", visionXs, visionYs);
+    // chart.addSeries("Trajectory", trajXs, trajYs);
+    // chart.addSeries("xHat", observerXs, observerYs);
+    // charts.add(chart);
 
-    var chartBuilderError = new XYChartBuilder();
-    chartBuilderError.title = "Error versus Time";
-    var chartError = chartBuilderError.build();
 
-    chartError.addSeries("LeftVoltage", time, observerLeftVoltageError);
-    chartError.addSeries("RightVoltage", time, observerRightVoltageError);
-    chartError.addSeries("AngularVelocity", time, observerAngularVelocityError);
-    charts.add(chartError);
-
-    var chartBuilderLeftVelocity = new XYChartBuilder();
-    chartBuilderLeftVelocity.title = "Left Velocity versus Time";
-    var chartLeftVelocity = chartBuilderLeftVelocity.build();
-
-    chartLeftVelocity.addSeries("xHat", time, observerLeftVelocity);
-    chartLeftVelocity.addSeries("Trajectory", time, trajLeftVel);
-    charts.add(chartLeftVelocity);
-
-    var chartBuilderRightVelocity = new XYChartBuilder();
-    chartBuilderRightVelocity.title = "Right Velocity versus Time";
-    var chartRightVelocity = chartBuilderRightVelocity.build();
-
-    chartRightVelocity.addSeries("xHat", time, observerRightVelocity);
-    chartRightVelocity.addSeries("Trajectory", time, trajRightVel);
-
-    charts.add(chartRightVelocity);
-
-    new SwingWrapper<>(charts).displayChartMatrix();
-    try {
-      Thread.sleep(1000000000);
-    } catch (InterruptedException e) {
-    }
-    */
+    // new SwingWrapper<>(charts).displayChartMatrix();
+    // try {
+    //   Thread.sleep(1000000000);
+    // } catch (InterruptedException e) {
+    // }
   }
 }

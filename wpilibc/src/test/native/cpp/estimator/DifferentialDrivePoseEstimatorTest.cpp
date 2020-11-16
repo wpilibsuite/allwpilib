@@ -19,19 +19,21 @@
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/DifferentialDriveOdometry.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "frc2/Timer.h"
 #include "gtest/gtest.h"
 
 TEST(DifferentialDrivePoseEstimatorTest, TestAccuracy) {
   frc::DifferentialDrivePoseEstimator estimator{
       frc::Rotation2d(), frc::Pose2d(),
-      frc::MakeMatrix<5, 1>(0.01, 0.01, 0.01, 0.01, 0.01),
-      frc::MakeMatrix<3, 1>(0.1, 0.1, 0.1),
-      frc::MakeMatrix<3, 1>(0.1, 0.1, 0.1)};
+      frc::MakeMatrix<5, 1>(0.02, 0.02, 0.01, 0.02, 0.02),
+      frc::MakeMatrix<3, 1>(0.01, 0.01, 0.001),
+      frc::MakeMatrix<3, 1>(0.1, 0.1, 0.01)};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d(), frc::Pose2d(20_m, 20_m, frc::Rotation2d()),
-                  frc::Pose2d(54_m, 54_m, frc::Rotation2d())},
+      std::vector{frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg)),
+                  frc::Pose2d(3_m, 0_m, frc::Rotation2d(-90_deg)),
+                  frc::Pose2d(0_m, 0_m, frc::Rotation2d(135_deg)),
+                  frc::Pose2d(-3_m, 0_m, frc::Rotation2d(-90_deg)),
+                  frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg))},
       frc::TrajectoryConfig(10_mps, 5.0_mps_sq));
 
   frc::DifferentialDriveKinematics kinematics{1.0_m};
@@ -70,19 +72,18 @@ TEST(DifferentialDrivePoseEstimatorTest, TestAccuracy) {
           frc::Transform2d(
               frc::Translation2d(distribution(generator) * 0.1 * 1_m,
                                  distribution(generator) * 0.1 * 1_m),
-              frc::Rotation2d(distribution(generator) * 0.1 * 1_rad));
+              frc::Rotation2d(distribution(generator) * 0.01 * 1_rad));
 
-      lastVisionUpdateRealTimestamp = frc2::Timer::GetFPGATimestamp();
       lastVisionUpdateTime = t;
     }
 
-    leftDistance += input.left * distribution(generator) * 0.1 * dt;
-    rightDistance += input.right * distribution(generator) * 0.1 * dt;
+    leftDistance += input.left * distribution(generator) * 0.01 * dt;
+    rightDistance += input.right * distribution(generator) * 0.01 * dt;
 
     auto xhat = estimator.UpdateWithTime(
         t,
         groundTruthState.pose.Rotation() +
-            frc::Rotation2d(units::radian_t(distribution(generator) * 0.1)),
+            frc::Rotation2d(units::radian_t(distribution(generator) * 0.001)),
         input, leftDistance, rightDistance);
 
     double error = groundTruthState.pose.Translation()
@@ -97,14 +98,8 @@ TEST(DifferentialDrivePoseEstimatorTest, TestAccuracy) {
     t += dt;
   }
 
-  std::cout << "error sum "
-            << errorSum /
-                   (trajectory.TotalTime().to<double>() / dt.to<double>())
-            << std::endl;
-  std::cout << "max error " << maxError << std::endl;
-
-  //  EXPECT_NEAR(0.0, errorSum / (trajectory.TotalTime().to<double>() /
-  //  dt.to<double>()),
-  //            0.2);
-  //  EXPECT_NEAR(0.0, maxError, 0.4);
+  EXPECT_NEAR(
+      0.0, errorSum / (trajectory.TotalTime().to<double>() / dt.to<double>()),
+      0.2);
+  EXPECT_NEAR(0.0, maxError, 0.4);
 }

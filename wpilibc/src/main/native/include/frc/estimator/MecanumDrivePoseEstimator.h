@@ -12,8 +12,8 @@
 #include <Eigen/Core>
 #include <units/time.h>
 
-#include "frc/estimator/ExtendedKalmanFilter.h"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
+#include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
@@ -40,13 +40,13 @@ using Vector = Eigen::Matrix<double, N, 1>;
  *
  * Our state-space system is:
  *
- * <strong> x = [[x, y, std::cos(theta), std::sin(theta)]]^T </strong> in the
+ * <strong> x = [[x, y, theta]]^T </strong> in the
  * field-coordinate system.
  *
  * <strong> u = [[vx, vy, omega]]^T </strong> in the field-coordinate system.
  *
- * <strong> y = [[x, y, std::cos(theta), std::sin(theta)]]^T </strong> in field
- * coords from vision, or <strong> y = [[cos(theta), std::sin(theta)]]^T
+ * <strong> y = [[x, y, theta]]^T </strong> in field
+ * coords from vision, or <strong> y = [[theta]]^T
  * </strong> from the gyro.
  */
 class MecanumDrivePoseEstimator {
@@ -100,7 +100,7 @@ class MecanumDrivePoseEstimator {
   Pose2d GetEstimatedPosition() const;
 
   /**
-   * Add a vision measurement to the Extended Kalman Filter. This will correct
+   * Add a vision measurement to the Unscented Kalman Filter. This will correct
    * the odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are
@@ -121,7 +121,7 @@ class MecanumDrivePoseEstimator {
                             units::second_t timestamp);
 
   /**
-   * Updates the the Extended Kalman Filter using only wheel encoder
+   * Updates the the Unscented Kalman Filter using only wheel encoder
    * information. This should be called every loop, and the correct loop period
    * must be passed into the constructor of this class.
    *
@@ -133,7 +133,7 @@ class MecanumDrivePoseEstimator {
                 const MecanumDriveWheelSpeeds& wheelSpeeds);
 
   /**
-   * Updates the the Extended Kalman Filter using only wheel encoder
+   * Updates the the Unscented Kalman Filter using only wheel encoder
    * information. This should be called every loop, and the correct loop period
    * must be passed into the constructor of this class.
    *
@@ -147,21 +147,19 @@ class MecanumDrivePoseEstimator {
                         const MecanumDriveWheelSpeeds& wheelSpeeds);
 
  private:
-  ExtendedKalmanFilter<4, 3, 2> m_observer;
+  UnscentedKalmanFilter<3, 3, 1> m_observer;
   MecanumDriveKinematics m_kinematics;
-  KalmanFilterLatencyCompensator<4, 3, 2, ExtendedKalmanFilter<4, 3, 2>>
+  KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
       m_latencyCompensator;
-  std::function<void(const Vector<3>& u, const Vector<4>& y)> m_visionCorrect;
+  std::function<void(const Vector<3>& u, const Vector<3>& y)> m_visionCorrect;
 
-  Eigen::Matrix4d m_visionDiscR;
+  Eigen::Matrix3d m_visionDiscR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;
 
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
-
-  static Vector<4> F(const Vector<4>& x, const Vector<3>& u);
 
   template <int Dim>
   static std::array<double, Dim> StdDevMatrixToArray(

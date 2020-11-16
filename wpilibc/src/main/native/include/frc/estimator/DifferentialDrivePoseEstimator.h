@@ -12,8 +12,8 @@
 #include <Eigen/Core>
 #include <units/time.h>
 
-#include "frc/estimator/ExtendedKalmanFilter.h"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
+#include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
@@ -24,7 +24,7 @@ template <int N>
 using Vector = Eigen::Matrix<double, N, 1>;
 
 /**
- * This class wraps an Extended Kalman Filter to fuse latency-compensated
+ * This class wraps an Unscented Kalman Filter to fuse latency-compensated
  * vision measurements with differential drive encoder measurements. It will
  * correct for noisy vision measurements and encoder drift. It is intended to be
  * an easy drop-in for DifferentialDriveOdometry. In fact, if you never call
@@ -40,7 +40,8 @@ using Vector = Eigen::Matrix<double, N, 1>;
  *
  * Our state-space system is:
  *
- * <strong> x = [[x, y, theta]]^T </strong> in the field coordinate system.
+ * <strong> x = [[x, y, theta, dist_l, dist_r]]^T </strong> in the field
+ * coordinate system.
  *
  * <strong> u = [[d_l, d_r, dtheta]]^T </strong> (robot-relative velocities) --
  * NB: using velocities make things considerably easier, because it means that
@@ -48,7 +49,8 @@ using Vector = Eigen::Matrix<double, N, 1>;
  * suspect that it's easier for teams to get good encoder data than it is for
  * them to perform system identification well enough to get a good model
  *
- * <strong> y = [[x, y, theta]]^T </strong>
+ * <strong>y = [[x, y, theta]]^T </strong> from vision,
+ * or <strong>y = [[dist_l, dist_r, theta]] </strong> from encoders and gyro.
  */
 class DifferentialDrivePoseEstimator {
  public:
@@ -89,14 +91,14 @@ class DifferentialDrivePoseEstimator {
 
   /**
    * Returns the pose of the robot at the current time as estimated by the
-   * Extended Kalman Filter.
+   * Unscented Kalman Filter.
    *
    * @return The estimated robot pose.
    */
   Pose2d GetEstimatedPosition() const;
 
   /**
-   * Adds a vision measurement to the Extended Kalman Filter. This will correct
+   * Adds a vision measurement to the Unscented Kalman Filter. This will correct
    * the odometry pose estimate while still accounting for measurement noise.
    *
    * This method can be called as infrequently as you want, as long as you are
@@ -117,7 +119,7 @@ class DifferentialDrivePoseEstimator {
                             units::second_t timestamp);
 
   /**
-   * Updates the Extended Kalman Filter using only wheel encoder information.
+   * Updates the Unscented Kalman Filter using only wheel encoder information.
    * Note that this should be called every loop iteration.
    *
    * @param gyroAngle     The current gyro angle.
@@ -131,7 +133,7 @@ class DifferentialDrivePoseEstimator {
                 units::meter_t leftDistance, units::meter_t rightDistance);
 
   /**
-   * Updates the Extended Kalman Filter using only wheel encoder information.
+   * Updates the Unscented Kalman Filter using only wheel encoder information.
    * Note that this should be called every loop iteration.
    *
    * @param currentTime   The time at which this method was called.
@@ -148,8 +150,8 @@ class DifferentialDrivePoseEstimator {
                         units::meter_t rightDistance);
 
  private:
-  ExtendedKalmanFilter<5, 3, 3> m_observer;
-  KalmanFilterLatencyCompensator<5, 3, 3, ExtendedKalmanFilter<5, 3, 3>>
+  UnscentedKalmanFilter<5, 3, 3> m_observer;
+  KalmanFilterLatencyCompensator<5, 3, 3, UnscentedKalmanFilter<5, 3, 3>>
       m_latencyCompensator;
   std::function<void(const Vector<3>& u, const Vector<3>& y)> m_visionCorrect;
 

@@ -12,12 +12,12 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/estimator/MecanumDrivePoseEstimator.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
 #include <wpi/math>
-#include <frc/estimator/MecanumDrivePoseEstimator.h>
 
 /**
  * Represents a mecanum drive style drivetrain.

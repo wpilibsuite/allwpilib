@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Drivetrain.h"
+
 #include "ExampleGlobalMeasurementSensor.h"
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
