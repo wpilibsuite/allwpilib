@@ -46,7 +46,7 @@ class DCMotor {
    * Constructs a DC motor.
    *
    * @param nominalVoltage Voltage at which the motor constants were measured.
-   * @param stallTorque    Current draw when stalled.
+   * @param stallTorque    Torque when stalled.
    * @param stallCurrent   Current draw when stalled.
    * @param freeCurrent    Current draw under no load.
    * @param freeSpeed      Angular velocity under no load.
