@@ -138,7 +138,7 @@ public class RamseteCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    m_prevTime = 0;
+    m_prevTime = -1;
     var initialState = m_trajectory.sample(0);
     m_prevSpeeds = m_kinematics.toWheelSpeeds(
         new ChassisSpeeds(initialState.velocityMetersPerSecond,
@@ -157,6 +157,12 @@ public class RamseteCommand extends CommandBase {
   public void execute() {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;
+
+    if (m_prevTime < 0) {
+      m_output.accept(0.0, 0.0);
+      m_prevTime = curTime;
+      return;
+    }
 
     var targetWheelSpeeds = m_kinematics.toWheelSpeeds(
         m_follower.calculate(m_pose.get(), m_trajectory.sample(curTime)));
@@ -189,9 +195,8 @@ public class RamseteCommand extends CommandBase {
     }
 
     m_output.accept(leftOutput, rightOutput);
-
-    m_prevTime = curTime;
     m_prevSpeeds = targetWheelSpeeds;
+    m_prevTime = curTime;
   }
 
   @Override

@@ -87,7 +87,7 @@ RamseteCommand::RamseteCommand(
 }
 
 void RamseteCommand::Initialize() {
-  m_prevTime = 0_s;
+  m_prevTime = -1_s;
   auto initialState = m_trajectory.Sample(0_s);
   m_prevSpeeds = m_kinematics.ToWheelSpeeds(
       frc::ChassisSpeeds{initialState.velocity, 0_mps,
@@ -103,6 +103,16 @@ void RamseteCommand::Initialize() {
 void RamseteCommand::Execute() {
   auto curTime = m_timer.Get();
   auto dt = curTime - m_prevTime;
+
+  if (m_prevTime < 0_s) {
+    if (m_usePID)
+      m_outputVolts(0_V, 0_V);
+    else
+      m_outputVel(0_mps, 0_mps);
+
+    m_prevTime = curTime;
+    return;
+  }
 
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(
       m_controller.Calculate(m_pose(), m_trajectory.Sample(curTime)));
@@ -130,9 +140,8 @@ void RamseteCommand::Execute() {
   } else {
     m_outputVel(targetWheelSpeeds.left, targetWheelSpeeds.right);
   }
-
-  m_prevTime = curTime;
   m_prevSpeeds = targetWheelSpeeds;
+  m_prevTime = curTime;
 }
 
 void RamseteCommand::End(bool interrupted) { m_timer.Stop(); }
