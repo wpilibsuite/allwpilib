@@ -40,7 +40,17 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 ## Setup
 
-Clone the WPILib repository. If the toolchains are not installed, install them, and make sure they are available on the system PATH.
+Clone the WPILib repository. If the toolchains are not installed, install them, and make sure they are available on the system PATH. The roboRIO toolchain can be installed via
+
+```bash
+./gradlew installRoboRioToolchain
+```
+
+and the Raspberry Pi toolchain can be installed via
+
+```bash
+./gradlew installRaspbianToolchain
+```
 
 See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/master/README.md) for wpiformat setup instructions.
 
