@@ -370,6 +370,7 @@ void RobotJoystick::Update() {
 }
 
 void RobotJoystick::SetHAL(int i) {
+  if (!sys || !sys->present) return;
   // set at HAL level
   HALSIM_SetJoystickDescriptor(i, &desc);
   HALSIM_SetJoystickAxes(i, &axes);
