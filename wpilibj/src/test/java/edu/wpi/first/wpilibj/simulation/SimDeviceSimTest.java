@@ -40,12 +40,11 @@ class SimDeviceSimTest {
 
     try (SimDevice otherdev = SimDevice.create("testnotDC");
         SimDevice dev1 = SimDevice.create("testDC1")) {
-      SimDeviceSim sim = new SimDeviceSim("testDC1");
       try (
-          CallbackStore callback1 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
+          CallbackStore callback1 = SimDeviceSim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
             callback1Counter.addAndGet(1);
           }, false);
-          CallbackStore callback2 = sim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
+          CallbackStore callback2 = SimDeviceSim.registerDeviceCreatedCallback("testDC", (name, handle) -> {
             callback2Counter.addAndGet(1);
           }, true)) {
         assertEquals(0, callback1Counter.get(), "Callback 1 called early");
@@ -71,8 +70,7 @@ class SimDeviceSimTest {
     AtomicInteger counter = new AtomicInteger(0);
 
     SimDevice dev1 = SimDevice.create("testDF1");
-    SimDeviceSim sim = new SimDeviceSim("testDF1");
-    try (CallbackStore callback = sim.registerDeviceFreedCallback("testDF", (name, handle) -> {
+    try (CallbackStore callback = SimDeviceSim.registerDeviceFreedCallback("testDF", (name, handle) -> {
       counter.addAndGet(1);
     }, false)) {
       assertEquals(0, counter.get(), "Callback called early");
@@ -84,5 +82,64 @@ class SimDeviceSimTest {
     dev2.close();
 
     assertEquals(1, counter.get(), "Callback called after closure");
+  }
+
+  @Test
+  void testValueCreatedCallback() {
+    AtomicInteger callback1Counter = new AtomicInteger(0);
+    AtomicInteger callback2Counter = new AtomicInteger(0);
+
+    try (SimDevice dev1 = SimDevice.create("testVM1")) {
+      dev1.createBoolean("v1", false, false);
+      SimDeviceSim sim = new SimDeviceSim("testVM1");
+      try (
+          CallbackStore callback1 = sim.registerValueCreatedCallback((name, handle, readonly, value) -> {
+            callback1Counter.addAndGet(1);
+          }, false);
+          CallbackStore callback2 = sim.registerValueCreatedCallback((name, handle, readonly, value) -> {
+            callback2Counter.addAndGet(1);
+          }, true)) {
+        assertEquals(0, callback1Counter.get(), "Callback 1 called early");
+        assertEquals(1, callback2Counter.get(), "Callback 2 called early or not initalized with existing devices");
+
+        dev1.createDouble("v2", false, 0);
+
+        assertEquals(1, callback1Counter.get(), "Callback 1 called either more than once or not at all");
+        assertEquals(2, callback2Counter.get(), "Callback 2 called either more or less than twice");
+      }
+      dev1.createBoolean("v3", false, false);
+
+      assertEquals(1, callback1Counter.get(), "Callback 1 called after closure");
+      assertEquals(2, callback2Counter.get(), "Callback 2 called after closure");
+    }
+  }
+
+  @Test
+  void testValueChangedCallback() {
+    AtomicInteger callback1Counter = new AtomicInteger(0);
+    AtomicInteger callback2Counter = new AtomicInteger(0);
+
+    try (SimDevice dev1 = SimDevice.create("testVC1")) {
+      SimBoolean val = dev1.createBoolean("v1", false, false);
+      SimDeviceSim sim = new SimDeviceSim("testVM1");
+      try (
+          CallbackStore callback1 = sim.registerValueChangedCallback(val, (name, handle, readonly, value) -> {
+            callback1Counter.addAndGet(1);
+          }, false);
+          CallbackStore callback2 = sim.registerValueChangedCallback(val,(name, handle, readonly, value) -> {
+            callback2Counter.addAndGet(1);
+          }, true)) {
+        assertEquals(0, callback1Counter.get(), "Callback 1 called early");
+        assertEquals(1, callback2Counter.get(), "Callback 2 called early or not initalized with existing devices");
+
+        val.set(true);
+
+        assertEquals(1, callback1Counter.get(), "Callback 1 called either more than once or not at all");
+        assertEquals(2, callback2Counter.get(), "Callback 2 called either more or less than twice");
+      }
+      val.set(false);
+      assertEquals(1, callback1Counter.get(), "Callback 1 called after closure");
+      assertEquals(2, callback2Counter.get(), "Callback 2 called after closure");
+    }
   }
 }
