@@ -16,11 +16,15 @@ using namespace frc;
 
 frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     const Rotation2d& gyroAngle, const Pose2d& initialPose,
-    MecanumDriveKinematics kinematics, const Vector<3>& stateStdDevs,
-    const Vector<1>& localMeasurementStdDevs,
-    const Vector<3>& visionMeasurementStdDevs, units::second_t nominalDt)
-    : m_observer([](const Vector<3>& x, const Vector<3>& u) { return u; },
-                 [](const Vector<3>& x, const Vector<3>& u) {
+    MecanumDriveKinematics kinematics,
+    const Eigen::Matrix<double, 3, 1>& stateStdDevs,
+    const Eigen::Matrix<double, 1, 1>& localMeasurementStdDevs,
+    const Eigen::Matrix<double, 3, 1>& visionMeasurementStdDevs,
+    units::second_t nominalDt)
+    : m_observer([](const Eigen::Matrix<double, 3, 1>& x,
+                    const Eigen::Matrix<double, 3, 1>& u) { return u; },
+                 [](const Eigen::Matrix<double, 3, 1>& x,
+                    const Eigen::Matrix<double, 3, 1>& u) {
                    return x.block<1, 1>(2, 0);
                  },
                  StdDevMatrixToArray<3>(stateStdDevs),
@@ -38,9 +42,12 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
   m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
 
   // Create vision correction mechanism.
-  m_visionCorrect = [&](const Vector<3>& u, const Vector<3>& y) {
+  m_visionCorrect = [&](const Eigen::Matrix<double, 3, 1>& u,
+                        const Eigen::Matrix<double, 3, 1>& y) {
     m_observer.Correct<3>(
-        u, y, [](const Vector<3>& x, const Vector<3>&) { return x; },
+        u, y,
+        [](const Eigen::Matrix<double, 3, 1>& x,
+           const Eigen::Matrix<double, 3, 1>&) { return x; },
         m_visionDiscR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
         frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
   };

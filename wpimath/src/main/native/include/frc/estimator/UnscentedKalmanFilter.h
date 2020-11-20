@@ -60,6 +60,29 @@ class UnscentedKalmanFilter {
     Reset();
   }
 
+  /**
+   * Constructs an unscented Kalman filter with custom mean, residual, and
+   * addition functions. Using custom functions for arithmetic can be useful if
+   * you have angles in the state or measurements, because they allow you to
+   * correctly account for the modular nature of angle arithmetic.
+   *
+   * @param f                  A vector-valued function of x and u that returns
+   *                           the derivative of the state vector.
+   * @param h                  A vector-valued function of x and u that returns
+   *                           the measurement vector.
+   * @param stateStdDevs       Standard deviations of model states.
+   * @param measurementStdDevs Standard deviations of measurements.
+   * @param meanFuncX          A function that computes the mean of 2 * States +
+   * 1 state vectors using a given set of weights.
+   * @param meanFuncY          A function that computes the mean of 2 * States +
+   * 1 measurement vectors using a given set of weights.
+   * @param residualFuncX      A function that computes the residual of two
+   * state vectors (i.e. it subtracts them.)
+   * @param residualFuncY      A function that computes the residual of two
+   * measurement vectors (i.e. it subtracts them.)
+   * @param addFuncX           A function that adds two state vectors.
+   * @param dt                 Nominal discretization timestep.
+   */
   UnscentedKalmanFilter(
       std::function<Eigen::Matrix<double, States, 1>(
           const Eigen::Matrix<double, States, 1>&,

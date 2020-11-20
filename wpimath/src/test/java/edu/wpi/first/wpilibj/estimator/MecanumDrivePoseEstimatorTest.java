@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.estimator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -53,27 +52,6 @@ public class MecanumDrivePoseEstimatorTest {
 
     var rand = new Random(5190);
 
-    List<Double> trajXs = new ArrayList<>();
-    List<Double> trajYs = new ArrayList<>();
-    List<Double> trajCosine = new ArrayList<>();
-    List<Double> trajSine = new ArrayList<>();
-    List<Double> trajTheta = new ArrayList<>();
-
-    List<Double> observerXs = new ArrayList<>();
-    List<Double> observerYs = new ArrayList<>();
-    List<Double> observerCosine = new ArrayList<>();
-    List<Double> observerSine = new ArrayList<>();
-    List<Double> observerTheta = new ArrayList<>();
-
-    List<Double> visionXs = new ArrayList<>();
-    List<Double> visionYs = new ArrayList<>();
-    List<Double> visionCosine = new ArrayList<>();
-    List<Double> visionSine = new ArrayList<>();
-    List<Double> visionTheta = new ArrayList<>();
-
-    List<Double> time = new ArrayList<>();
-    List<Double> visionTime = new ArrayList<>();
-
     final double dt = 0.02;
     double t = 0.0;
 
@@ -103,13 +81,6 @@ public class MecanumDrivePoseEstimatorTest {
         );
 
         lastVisionUpdateTime = t;
-
-        visionXs.add(lastVisionPose.getTranslation().getX());
-        visionYs.add(lastVisionPose.getTranslation().getY());
-        visionTheta.add(lastVisionPose.getRotation().getDegrees());
-        visionCosine.add(lastVisionPose.getRotation().getCos());
-        visionSine.add(lastVisionPose.getRotation().getSin());
-        visionTime.add(t);
       }
 
       var wheelSpeeds = kinematics.toWheelSpeeds(new ChassisSpeeds(
@@ -132,18 +103,6 @@ public class MecanumDrivePoseEstimatorTest {
       }
       errorSum += error;
 
-      trajXs.add(groundTruthState.poseMeters.getTranslation().getX());
-      trajYs.add(groundTruthState.poseMeters.getTranslation().getY());
-      trajTheta.add(groundTruthState.poseMeters.getRotation().getDegrees());
-      trajCosine.add(groundTruthState.poseMeters.getRotation().getCos());
-      trajSine.add(groundTruthState.poseMeters.getRotation().getSin());
-      observerXs.add(xHat.getTranslation().getX());
-      observerYs.add(xHat.getTranslation().getY());
-      observerTheta.add(xHat.getRotation().getDegrees());
-      observerCosine.add(xHat.getRotation().getCos());
-      observerSine.add(xHat.getRotation().getSin());
-      time.add(t);
-
       t += dt;
     }
 
@@ -155,50 +114,5 @@ public class MecanumDrivePoseEstimatorTest {
             0.0, maxError, 0.42,
             "Incorrect max error"
     );
-
-    // List<XYChart> charts = new ArrayList<>();
-
-    // var chartBuilder = new XYChartBuilder();
-    // chartBuilder.title = "The Magic of Sensor Fusion";
-    // var chart = chartBuilder.build();
-
-    // chart.addSeries("Vision", visionXs, visionYs);
-    // chart.addSeries("Trajectory", trajXs, trajYs);
-    // chart.addSeries("xHat", observerXs, observerYs);
-    // charts.add(chart);
-
-    // var chartBuilder1 = new XYChartBuilder();
-    // chartBuilder1.title = "Cosine";
-    // var chart1 = chartBuilder1.build();
-
-    // chart1.addSeries("Vision", visionTime, visionCosine);
-    // chart1.addSeries("Trajectory", time, trajCosine);
-    // chart1.addSeries("xHat", time, observerCosine);
-    // charts.add(chart1);
-
-    // var chartBuilder2 = new XYChartBuilder();
-    // chartBuilder2.title = "Sine";
-    // var chart2 = chartBuilder2.build();
-
-    // chart2.addSeries("Vision", visionTime, visionSine);
-    // chart2.addSeries("Trajectory", time, trajSine);
-    // chart2.addSeries("xHat", time, observerSine);
-
-    // charts.add(chart2);
-
-    // var chartBuilder3 = new XYChartBuilder();
-    // chartBuilder3.title = "Degrees";
-    // var chart3 = chartBuilder3.build();
-
-    // chart3.addSeries("Vision", visionTime, visionTheta);
-    // chart3.addSeries("Trajectory", time, trajTheta);
-    // chart3.addSeries("xHat", time, observerTheta);
-    // charts.add(chart3);
-
-    // new SwingWrapper<>(charts).displayChartMatrix();
-    // try {
-    //   Thread.sleep(1000000000);
-    // } catch (InterruptedException e) {
-    // }
   }
 }

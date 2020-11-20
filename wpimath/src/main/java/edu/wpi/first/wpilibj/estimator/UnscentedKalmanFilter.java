@@ -92,7 +92,9 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   }
 
   /**
-   * Constructs an Unscented Kalman Filter.
+   * Constructs an unscented Kalman filter with custom mean, residual, and addition functions. Using
+   * custom functions for arithmetic can be useful if you have angles in the state or measurements,
+   * because they allow you to correctly account for the modular nature of angle arithmetic.
    *
    * @param states             A Nat representing the number of states.
    * @param outputs            A Nat representing the number of outputs.
@@ -102,18 +104,15 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
    *                           the measurement vector.
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param meanFuncX           Function that computes the mean of the provided sigma points and
-   *                           weights. Useful if you have values (like anglues) that cannot be
-   *                           summed. Takes (sigma points, weights). Pass null to use the default.
-   * @param meanFuncY           Function that computes the mean of the provided sigma points and
-   *                           weights. Useful if you have values (like anglues) that cannot be
-   *                           summed. Takes (sigma points, weights). Pass null to use the default.
-   * @param residualFuncX       Function that computes the residual (difference) between two state
-   *                           vectors. Pass null to use the default.
-   * @param residualFuncY       Function that computes the residual (difference) between two state
-   *                           vectors. Pass null to use the default.
-   * @param addFuncX           Function that computes the sum of two state vectors. Pass null to
-   *                           use the default.
+   * @param meanFuncX          A function that computes the mean of 2 * States + 1 state vectors
+   *                           using a given set of weights.
+   * @param meanFuncY          A function that computes the mean of 2 * States + 1 measurement
+   *                           vectors using a given set of weights.
+   * @param residualFuncX      A function that computes the residual of two state vectors (i.e. it
+   *                           subtracts them.)
+   * @param residualFuncY      A function that computes the residual of two measurement vectors
+   *                           (i.e. it subtracts them.)
+   * @param addFuncX           A function that adds two state vectors.
    * @param nominalDtSeconds   Nominal discretization timestep.
    */
   @SuppressWarnings({"ParameterName", "PMD.ExcessiveParameterList"})

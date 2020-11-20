@@ -8,7 +8,6 @@
 #pragma once
 
 #include <array>
-#include <iostream>
 #include <limits>
 
 #include <wpi/timestamp.h>
@@ -24,15 +23,11 @@
 #include "units/time.h"
 
 namespace frc {
-
-template <int N>
-using Vector = Eigen::Matrix<double, N, 1>;
-
 /**
- * This class wraps an ExtendedKalmanFilter to fuse latency-compensated vision
- * measurements with swerve drive encoder velocity measurements. It will correct
- * for noisy measurements and encoder drift. It is intended to be an easy but
- * more accurate drop-in for SwerveDriveOdometry.
+ * This class wraps an Unscented Kalman Filter to fuse latency-compensated
+ * vision measurements with swerve drive encoder velocity measurements. It will
+ * correct for noisy measurements and encoder drift. It is intended to be an
+ * easy but more accurate drop-in for SwerveDriveOdometry.
  *
  * Update() should be called every robot loop. If your loops are faster or
  * slower than the default of 0.02s, then you should change the nominal delta
@@ -75,15 +70,17 @@ class SwerveDrivePoseEstimator {
    * @param nominalDt                The time in seconds between each robot
    *                                 loop.
    */
-  SwerveDrivePoseEstimator(const Rotation2d& gyroAngle,
-                           const Pose2d& initialPose,
-                           SwerveDriveKinematics<NumModules>& kinematics,
-                           const Vector<3>& stateStdDevs,
-                           const Vector<1>& localMeasurementStdDevs,
-                           const Vector<3>& visionMeasurementStdDevs,
-                           units::second_t nominalDt = 0.02_s)
-      : m_observer([](const Vector<3>& x, const Vector<3>& u) { return u; },
-                   [](const Vector<3>& x, const Vector<3>& u) {
+  SwerveDrivePoseEstimator(
+      const Rotation2d& gyroAngle, const Pose2d& initialPose,
+      SwerveDriveKinematics<NumModules>& kinematics,
+      const Eigen::Matrix<double, 3, 1>& stateStdDevs,
+      const Eigen::Matrix<double, 1, 1>& localMeasurementStdDevs,
+      const Eigen::Matrix<double, 3, 1>& visionMeasurementStdDevs,
+      units::second_t nominalDt = 0.02_s)
+      : m_observer([](const Eigen::Matrix<double, 3, 1>& x,
+                      const Eigen::Matrix<double, 3, 1>& u) { return u; },
+                   [](const Eigen::Matrix<double, 3, 1>& x,
+                      const Eigen::Matrix<double, 3, 1>& u) {
                      return x.block<1, 1>(2, 0);
                    },
                    StdDevMatrixToArray<3>(stateStdDevs),
@@ -101,9 +98,12 @@ class SwerveDrivePoseEstimator {
     m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
 
     // Create correction mechanism for vision measurements.
-    m_visionCorrect = [&](const Vector<3>& u, const Vector<3>& y) {
+    m_visionCorrect = [&](const Eigen::Matrix<double, 3, 1>& u,
+                          const Eigen::Matrix<double, 3, 1>& y) {
       m_observer.Correct<3>(
-          u, y, [](const Vector<3>& x, const Vector<3>& u) { return x; },
+          u, y,
+          [](const Eigen::Matrix<double, 3, 1>& x,
+             const Eigen::Matrix<double, 3, 1>& u) { return x; },
           m_visionDiscR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
           frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
     };
@@ -235,7 +235,9 @@ class SwerveDrivePoseEstimator {
   SwerveDriveKinematics<NumModules>& m_kinematics;
   KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
       m_latencyCompensator;
-  std::function<void(const Vector<3>& u, const Vector<3>& y)> m_visionCorrect;
+  std::function<void(const Eigen::Matrix<double, 3, 1>& u,
+                     const Eigen::Matrix<double, 3, 1>& y)>
+      m_visionCorrect;
 
   Eigen::Matrix3d m_visionDiscR;
 
@@ -247,7 +249,7 @@ class SwerveDrivePoseEstimator {
 
   template <int Dim>
   static std::array<double, Dim> StdDevMatrixToArray(
-      const Vector<Dim>& vector) {
+      const Eigen::Matrix<double, Dim, 1>& vector) {
     std::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);

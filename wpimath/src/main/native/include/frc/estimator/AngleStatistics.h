@@ -14,7 +14,7 @@
 namespace frc {
 namespace {
 double NormalizeAngle(double angle) {
-  constexpr double tau = 2 * wpi::math::pi;
+  static constexpr double tau = 2 * wpi::math::pi;
 
   angle -= std::floor(angle / tau) * tau;
   if (angle > wpi::math::pi) angle -= tau;

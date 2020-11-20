@@ -18,13 +18,9 @@
 #include "units/time.h"
 
 namespace frc {
-
-template <int N>
-using Vector = Eigen::Matrix<double, N, 1>;
-
 /**
- * This class wraps an ExtendedKalmanFilter to fuse latency-compensated vision
- * measurements with mecanum drive encoder velocity measurements. It will
+ * This class wraps an Unscented Kalman Filter to fuse latency-compensated
+ * vision measurements with mecanum drive encoder velocity measurements. It will
  * correct for noisy measurements and encoder drift. It is intended to be an
  * easy but more accurate drop-in for MecanumDriveOdometry.
  *
@@ -68,13 +64,13 @@ class MecanumDrivePoseEstimator {
    * @param nominalDt                The time in seconds between each robot
    *                                 loop.
    */
-  MecanumDrivePoseEstimator(const Rotation2d& gyroAngle,
-                            const Pose2d& initialPose,
-                            MecanumDriveKinematics kinematics,
-                            const Vector<3>& stateStdDevs,
-                            const Vector<1>& localMeasurementStdDevs,
-                            const Vector<3>& visionMeasurementStdDevs,
-                            units::second_t nominalDt = 0.02_s);
+  MecanumDrivePoseEstimator(
+      const Rotation2d& gyroAngle, const Pose2d& initialPose,
+      MecanumDriveKinematics kinematics,
+      const Eigen::Matrix<double, 3, 1>& stateStdDevs,
+      const Eigen::Matrix<double, 1, 1>& localMeasurementStdDevs,
+      const Eigen::Matrix<double, 3, 1>& visionMeasurementStdDevs,
+      units::second_t nominalDt = 0.02_s);
 
   /**
    * Resets the robot's position on the field.
@@ -149,7 +145,9 @@ class MecanumDrivePoseEstimator {
   MecanumDriveKinematics m_kinematics;
   KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
       m_latencyCompensator;
-  std::function<void(const Vector<3>& u, const Vector<3>& y)> m_visionCorrect;
+  std::function<void(const Eigen::Matrix<double, 3, 1>& u,
+                     const Eigen::Matrix<double, 3, 1>& y)>
+      m_visionCorrect;
 
   Eigen::Matrix3d m_visionDiscR;
 
@@ -161,7 +159,7 @@ class MecanumDrivePoseEstimator {
 
   template <int Dim>
   static std::array<double, Dim> StdDevMatrixToArray(
-      const Vector<Dim>& vector) {
+      const Eigen::Matrix<double, Dim, 1>& vector) {
     std::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);

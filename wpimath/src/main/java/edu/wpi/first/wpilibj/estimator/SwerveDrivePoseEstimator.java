@@ -24,7 +24,7 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 
 /**
- * This class wraps an {@link ExtendedKalmanFilter ExtendedKalmanFilter} to fuse
+ * This class wraps an {@link UnscentedKalmanFilter Unscented Kalman Filter} to fuse
  * latency-compensated vision measurements with swerve drive encoder velocity measurements.
  * It will correct for noisy measurements and encoder drift. It is intended to be an easy
  * but more accurate drop-in for {@link edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry}.
@@ -70,7 +70,7 @@ public class SwerveDrivePoseEstimator {
    *                                 trust your wheel and gyro velocities less.
    * @param localMeasurementStdDevs  Standard deviations of the gyro measurement. Increase this
    *                                 number to trust gyro angle measurements less.
-   * @param visionMeasurementStdDevs Standard deviations of the encoder measurements. Increase
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
    *                                 these numbers to trust vision less.
    */
   public SwerveDrivePoseEstimator(
@@ -92,7 +92,7 @@ public class SwerveDrivePoseEstimator {
    *                                 trust your wheel and gyro velocities less.
    * @param localMeasurementStdDevs  Standard deviations of the gyro measurement. Increase this
    *                                 number to trust gyro angle measurements less.
-   * @param visionMeasurementStdDevs Standard deviations of the encoder measurements. Increase
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
    *                                 these numbers to trust vision less.
    * @param nominalDtSeconds         The time in seconds between each robot loop.
    */

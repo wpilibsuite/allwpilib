@@ -31,10 +31,10 @@ class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.SetDistancePerPulse(2 * wpi::math::pi * kWheelRadius /
-                                      kEncoderResolution);
-    m_rightEncoder.SetDistancePerPulse(2 * wpi::math::pi * kWheelRadius /
-                                       kEncoderResolution);
+    m_leftEncoder.SetDistancePerPulse(
+        2 * wpi::math::pi * kWheelRadius.to<double>() / kEncoderResolution);
+    m_rightEncoder.SetDistancePerPulse(
+        2 * wpi::math::pi * kWheelRadius.to<double>() / kEncoderResolution);
 
     m_leftEncoder.Reset();
     m_rightEncoder.Reset();
@@ -52,7 +52,7 @@ class Drivetrain {
 
  private:
   static constexpr units::meter_t kTrackWidth = 0.381_m * 2;
-  static constexpr double kWheelRadius = 0.0508;  // meters
+  static constexpr units::meter_t kWheelRadius = 0.0508_m;
   static constexpr int kEncoderResolution = 4096;
 
   frc::PWMVictorSPX m_leftLeader{1};

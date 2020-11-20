@@ -18,7 +18,7 @@ import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
 public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num> {
-  private static final int k_maxPastObserverStates = 300;
+  private static final int kMaxPastObserverStates = 300;
 
   private final List<Map.Entry<Double, ObserverSnapshot>> m_pastObserverSnapshots;
 
@@ -43,7 +43,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
             timestampSeconds, new ObserverSnapshot(observer, u, localY)
     ));
 
-    if (m_pastObserverSnapshots.size() > k_maxPastObserverStates) {
+    if (m_pastObserverSnapshots.size() > kMaxPastObserverStates) {
       m_pastObserverSnapshots.remove(0);
     }
   }

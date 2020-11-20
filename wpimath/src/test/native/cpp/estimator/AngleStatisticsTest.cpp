@@ -18,7 +18,7 @@ TEST(AngleStatisticsTest, TestMean) {
   Eigen::Vector3d weights{};
   weights.fill(1.0 / sigmas.cols());
 
-  ASSERT_TRUE(Eigen::Vector3d(0.7333333, 0.01163323, 1)
+  EXPECT_TRUE(Eigen::Vector3d(0.7333333, 0.01163323, 1)
                   .isApprox(frc::AngleMean<3, 1>(sigmas, weights, 1), 1e-3));
 }
 
@@ -26,7 +26,7 @@ TEST(AngleStatisticsTest, TestResidual) {
   Eigen::Vector3d a(1, 1 * wpi::math::pi / 180, 2);
   Eigen::Vector3d b(1, 359 * wpi::math::pi / 180, 1);
 
-  ASSERT_TRUE(frc::AngleResidual<3>(a, b, 1).isApprox(
+  EXPECT_TRUE(frc::AngleResidual<3>(a, b, 1).isApprox(
       Eigen::Vector3d(0, 2 * wpi::math::pi / 180, 1)));
 }
 
@@ -34,7 +34,7 @@ TEST(AngleStatisticsTest, TestAdd) {
   Eigen::Vector3d a(1, 1 * wpi::math::pi / 180, 2);
   Eigen::Vector3d b(1, 359 * wpi::math::pi / 180, 1);
 
-  ASSERT_TRUE(frc::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d(2, 0, 3)));
+  EXPECT_TRUE(frc::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d(2, 0, 3)));
 }
 
 TEST(AngleStatisticsTest, TestNormalize) {

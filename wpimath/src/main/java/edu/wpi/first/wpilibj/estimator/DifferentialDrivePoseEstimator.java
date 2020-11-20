@@ -78,7 +78,7 @@ public class DifferentialDrivePoseEstimator {
    * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro measurements.
    *                                 Increase these numbers to trust encoder distances and gyro
    *                                 angle less.
-   * @param visionMeasurementStdDevs Standard deviations of the encoder measurements. Increase
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
    *                                 these numbers to trust vision less.
    */
   public DifferentialDrivePoseEstimator(
@@ -100,7 +100,7 @@ public class DifferentialDrivePoseEstimator {
    * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro measurements.
    *                                 Increase these numbers to trust encoder distances and gyro
    *                                 angle less.
-   * @param visionMeasurementStdDevs Standard deviations of the encoder measurements. Increase
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
    *                                 these numbers to trust vision less.
    * @param nominalDtSeconds         The time in seconds between each robot loop.
    */

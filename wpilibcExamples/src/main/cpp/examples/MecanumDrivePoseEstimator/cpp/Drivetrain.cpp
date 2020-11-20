@@ -17,22 +17,18 @@ frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
 }
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
-  const auto frontLeftFeedforward =
-      m_feedforward.Calculate(wheelSpeeds.frontLeft);
-  const auto frontRightFeedforward =
-      m_feedforward.Calculate(wheelSpeeds.frontRight);
-  const auto backLeftFeedforward =
-      m_feedforward.Calculate(wheelSpeeds.rearLeft);
-  const auto backRightFeedforward =
-      m_feedforward.Calculate(wheelSpeeds.rearRight);
+  auto frontLeftFeedforward = m_feedforward.Calculate(wheelSpeeds.frontLeft);
+  auto frontRightFeedforward = m_feedforward.Calculate(wheelSpeeds.frontRight);
+  auto backLeftFeedforward = m_feedforward.Calculate(wheelSpeeds.rearLeft);
+  auto backRightFeedforward = m_feedforward.Calculate(wheelSpeeds.rearRight);
 
-  const double frontLeftOutput = m_frontLeftPIDController.Calculate(
+  double frontLeftOutput = m_frontLeftPIDController.Calculate(
       m_frontLeftEncoder.GetRate(), wheelSpeeds.frontLeft.to<double>());
-  const double frontRightOutput = m_frontRightPIDController.Calculate(
+  double frontRightOutput = m_frontRightPIDController.Calculate(
       m_frontRightEncoder.GetRate(), wheelSpeeds.frontRight.to<double>());
-  const double backLeftOutput = m_backLeftPIDController.Calculate(
+  double backLeftOutput = m_backLeftPIDController.Calculate(
       m_backLeftEncoder.GetRate(), wheelSpeeds.rearLeft.to<double>());
-  const double backRightOutput = m_backRightPIDController.Calculate(
+  double backRightOutput = m_backRightPIDController.Calculate(
       m_backRightEncoder.GetRate(), wheelSpeeds.rearRight.to<double>());
 
   m_frontLeftMotor.SetVoltage(units::volt_t{frontLeftOutput} +
@@ -65,5 +61,5 @@ void Drivetrain::UpdateOdometry() {
   m_poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
           m_poseEstimator.GetEstimatedPosition()),
-      units::second_t{frc::Timer::GetFPGATimestamp() - 0.3});
+      units::second_t{frc::Timer::GetFPGATimestamp()} - 0.3_s);
 }

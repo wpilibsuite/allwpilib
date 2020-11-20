@@ -18,10 +18,6 @@
 #include "units/time.h"
 
 namespace frc {
-
-template <int N>
-using Vector = Eigen::Matrix<double, N, 1>;
-
 /**
  * This class wraps an Unscented Kalman Filter to fuse latency-compensated
  * vision measurements with differential drive encoder measurements. It will
@@ -69,12 +65,12 @@ class DifferentialDrivePoseEstimator {
    *                                 vision less.
    * @param nominalDt                The period of the loop calling Update().
    */
-  DifferentialDrivePoseEstimator(const Rotation2d& gyroAngle,
-                                 const Pose2d& initialPose,
-                                 const Vector<5>& stateStdDevs,
-                                 const Vector<3>& localMeasurementStdDevs,
-                                 const Vector<3>& visionMeasurementStdDevs,
-                                 units::second_t nominalDt = 0.02_s);
+  DifferentialDrivePoseEstimator(
+      const Rotation2d& gyroAngle, const Pose2d& initialPose,
+      const Eigen::Matrix<double, 5, 1>& stateStdDevs,
+      const Eigen::Matrix<double, 3, 1>& localMeasurementStdDevs,
+      const Eigen::Matrix<double, 3, 1>& visionMeasurementStdDevs,
+      units::second_t nominalDt = 0.02_s);
 
   /**
    * Resets the robot's position on the field.
@@ -152,7 +148,9 @@ class DifferentialDrivePoseEstimator {
   UnscentedKalmanFilter<5, 3, 3> m_observer;
   KalmanFilterLatencyCompensator<5, 3, 3, UnscentedKalmanFilter<5, 3, 3>>
       m_latencyCompensator;
-  std::function<void(const Vector<3>& u, const Vector<3>& y)> m_visionCorrect;
+  std::function<void(const Eigen::Matrix<double, 3, 1>& u,
+                     const Eigen::Matrix<double, 3, 1>& y)>
+      m_visionCorrect;
 
   Eigen::Matrix<double, 3, 3> m_visionDiscR;
 
@@ -164,12 +162,13 @@ class DifferentialDrivePoseEstimator {
 
   template <int Dim>
   static std::array<double, Dim> StdDevMatrixToArray(
-      const Vector<Dim>& stdDevs);
+      const Eigen::Matrix<double, Dim, 1>& stdDevs);
 
-  static Vector<5> F(const Vector<5>& x, const Vector<3>& u);
-  static Vector<5> FillStateVector(const Pose2d& pose,
-                                   units::meter_t leftDistance,
-                                   units::meter_t rightDistance);
+  static Eigen::Matrix<double, 5, 1> F(const Eigen::Matrix<double, 5, 1>& x,
+                                       const Eigen::Matrix<double, 3, 1>& u);
+  static Eigen::Matrix<double, 5, 1> FillStateVector(
+      const Pose2d& pose, units::meter_t leftDistance,
+      units::meter_t rightDistance);
 };
 
 }  // namespace frc

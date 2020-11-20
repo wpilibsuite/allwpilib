@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.estimator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -51,13 +50,6 @@ public class DifferentialDrivePoseEstimatorTest {
     var kinematics = new DifferentialDriveKinematics(1);
     var rand = new Random(4915);
 
-    List<Double> trajXs = new ArrayList<>();
-    List<Double> trajYs = new ArrayList<>();
-    List<Double> observerXs = new ArrayList<>();
-    List<Double> observerYs = new ArrayList<>();
-    List<Double> visionXs = new ArrayList<>();
-    List<Double> visionYs = new ArrayList<>();
-
     final double dt = 0.02;
     double t = 0.0;
 
@@ -93,9 +85,6 @@ public class DifferentialDrivePoseEstimatorTest {
                 new Rotation2d(rand.nextGaussian() * 0.01).plus(groundPose.getRotation())
         );
         lastVisionUpdateTime = t;
-
-        visionXs.add(lastVisionPose.getTranslation().getX());
-        visionYs.add(lastVisionPose.getTranslation().getY());
       }
 
       input.leftMetersPerSecond += rand.nextGaussian() * 0.01;
@@ -119,11 +108,6 @@ public class DifferentialDrivePoseEstimatorTest {
       }
       errorSum += error;
 
-      trajXs.add(groundtruthState.poseMeters.getTranslation().getX());
-      trajYs.add(groundtruthState.poseMeters.getTranslation().getY());
-      observerXs.add(xHat.getTranslation().getX());
-      observerYs.add(xHat.getTranslation().getY());
-
       t += dt;
     }
 
@@ -135,22 +119,5 @@ public class DifferentialDrivePoseEstimatorTest {
             0.0, maxError, 0.055,
             "Incorrect max error"
     );
-
-    // System.out.println("Mean error (meters): " + errorSum / (traj.getTotalTimeSeconds() / dt));
-    // System.out.println("Max error (meters):  " + maxError);
-
-    // var chartBuilder = new XYChartBuilder();
-    // chartBuilder.title = "The Magic of Sensor Fusion";
-    // var chart = chartBuilder.build();
-
-    // chart.addSeries("Vision", visionXs, visionYs);
-    // chart.addSeries("Trajectory", trajXs, trajYs);
-    // chart.addSeries("xHat", observerXs, observerYs);
-
-    // new SwingWrapper<>(chart).displayChart();
-    // try {
-    //   Thread.sleep(1000000000);
-    // } catch (InterruptedException e) {
-    // }
   }
 }
