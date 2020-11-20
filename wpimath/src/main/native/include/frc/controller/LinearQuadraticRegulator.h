@@ -11,11 +11,16 @@
 
 #include "Eigen/Core"
 #include "Eigen/src/Cholesky/LLT.h"
+#include "Eigen/src/Eigenvalues/ComplexSchur.h"
+#include "Eigen/src/LU/Determinant.h"
+#include "Eigen/src/LU/InverseImpl.h"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
+#include "unsupported/Eigen/src/MatrixFunctions/MatrixPower.h"
+#include "unsupported/Eigen/src/MatrixFunctions/MatrixSquareRoot.h"
 
 namespace frc {
 namespace detail {
@@ -172,6 +177,31 @@ class LinearQuadraticRegulatorImpl {
     return Calculate(x);
   }
 
+  /**
+   * Adjusts LQR controller gain to compensate for a pure time delay in the
+   * input.
+   *
+   * Linear-Quadratic regulator controller gains tend to be aggressive. If
+   * sensor measurements are time-delayed too long, the LQR may be unstable.
+   * However, if we know the amount of delay, we can compute the control based
+   * on where the system will be after the time delay.
+   *
+   * See https://file.tavsys.net/control/controls-engineering-in-frc.pdf
+   * appendix C.4 for a derivation.
+   *
+   * @param plant      The plant being controlled.
+   * @param dt         Discretization timestep.
+   * @param inputDelay Input time delay.
+   */
+  template <int Outputs>
+  void LatencyCompensate(const LinearSystem<States, Inputs, Outputs>& plant,
+                         units::second_t dt, units::second_t inputDelay) {
+    Eigen::Matrix<double, States, States> discA;
+    Eigen::Matrix<double, States, Inputs> discB;
+    DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);
+    m_K = m_K * (discA - discB * m_K).pow(inputDelay / dt);
+  }
+
  private:
   // Current reference
   Eigen::Matrix<double, States, 1> m_r;
@@ -192,7 +222,7 @@ class LinearQuadraticRegulator
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param system The plant being controlled.
+   * @param plant  The plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.

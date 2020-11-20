@@ -113,4 +113,26 @@ public class LinearQuadraticRegulatorTest {
     assertEquals(19.16, k.get(0, 0), 0.1);
     assertEquals(3.32, k.get(0, 1), 0.1);
   }
+
+  @Test
+  public void testLatencyCompensate() {
+    var dt = 0.02;
+
+    var plant = LinearSystemId.createElevatorSystem(
+          DCMotor.getVex775Pro(4),
+          8.0,
+          0.75 * 25.4 / 1000.0,
+          14.67);
+
+    var regulator = new LinearQuadraticRegulator<>(
+          plant,
+          VecBuilder.fill(0.1, 0.2),
+          VecBuilder.fill(12.0),
+          dt);
+
+    regulator.latencyCompensate(plant, dt, 0.01);
+
+    assertEquals(8.97115941, regulator.getK().get(0, 0), 1e-3);
+    assertEquals(0.07904881, regulator.getK().get(0, 1), 1e-3);
+  }
 }
