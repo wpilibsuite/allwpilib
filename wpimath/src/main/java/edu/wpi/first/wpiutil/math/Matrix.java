@@ -369,6 +369,25 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
   /**
+   * Computes the matrix power using Eigen's solver.
+   * This method only works for square matrices, and will
+   * otherwise throw an {@link MatrixDimensionException}.
+   *
+   * @param exponent The exponent.
+   * @return The exponential of A.
+   */
+  public final Matrix<R, C> pow(double exponent) {
+    if (this.getNumRows() != this.getNumCols()) {
+      throw new MatrixDimensionException("Non-square matrices cannot be raised to a power! "
+            + "This matrix is " + this.getNumRows() + " x " + this.getNumCols());
+    }
+    Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
+    WPIMathJNI.pow(this.m_storage.getDDRM().getData(), this.getNumRows(), exponent,
+          toReturn.m_storage.getDDRM().getData());
+    return toReturn;
+  }
+
+  /**
    * Returns the determinant of this matrix.
    *
    * @return The determinant of this matrix.

@@ -85,4 +85,27 @@ TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
   EXPECT_NEAR(0.69, controller.K(0, 1), 1e-1);
 }
 
+TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
+  LinearSystem<2, 1, 1> plant = [] {
+    auto motors = DCMotor::Vex775Pro(4);
+
+    // Carriage mass
+    constexpr auto m = 8_kg;
+
+    // Radius of pulley
+    constexpr auto r = 0.75_in;
+
+    // Gear ratio
+    constexpr double G = 14.67;
+
+    return frc::LinearSystemId::ElevatorSystem(motors, m, r, G);
+  }();
+  LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 0.02_s};
+
+  controller.LatencyCompensate(plant, 0.02_s, 0.01_s);
+
+  EXPECT_NEAR(8.97115941, controller.K(0, 0), 1e-3);
+  EXPECT_NEAR(0.07904881, controller.K(0, 1), 1e-3);
+}
+
 }  // namespace frc

@@ -107,6 +107,28 @@ Java_edu_wpi_first_math_WPIMathJNI_exp
 
 /*
  * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    pow
+ * Signature: ([DID[D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_pow
+  (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdouble exponent,
+   jdoubleArray dst)
+{
+  jdouble* arrayBody = env->GetDoubleArrayElements(src, nullptr);
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      Amat{arrayBody, rows, rows};
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Apow =
+      Amat.pow(exponent);
+
+  env->ReleaseDoubleArrayElements(src, arrayBody, 0);
+  env->SetDoubleArrayRegion(dst, 0, rows * rows, Apow.data());
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
  * Method:    isStabilizable
  * Signature: (II[D[D)Z
  */
