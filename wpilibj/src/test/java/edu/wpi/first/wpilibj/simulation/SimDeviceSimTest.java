@@ -126,7 +126,7 @@ class SimDeviceSimTest {
           CallbackStore callback1 = sim.registerValueChangedCallback(val, (name, handle, readonly, value) -> {
             callback1Counter.addAndGet(1);
           }, false);
-          CallbackStore callback2 = sim.registerValueChangedCallback(val,(name, handle, readonly, value) -> {
+          CallbackStore callback2 = sim.registerValueChangedCallback(val, (name, handle, readonly, value) -> {
             callback2Counter.addAndGet(1);
           }, true)) {
         assertEquals(0, callback1Counter.get(), "Callback 1 called early");
