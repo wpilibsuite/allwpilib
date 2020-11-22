@@ -211,4 +211,30 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
     m_r = nextR;
     return calculate(x);
   }
+
+  /**
+   * Adjusts LQR controller gain to compensate for a pure time delay in the
+   * input.
+   *
+   * <p>Linear-Quadratic regulator controller gains tend to be aggressive. If
+   * sensor measurements are time-delayed too long, the LQR may be unstable.
+   * However, if we know the amount of delay, we can compute the control based
+   * on where the system will be after the time delay.
+   *
+   * <p>See https://file.tavsys.net/control/controls-engineering-in-frc.pdf
+   * appendix C.4 for a derivation.
+   *
+   * @param plant             The plant being controlled.
+   * @param dtSeconds         Discretization timestep in seconds.
+   * @param inputDelaySeconds Input time delay in seconds.
+   */
+  public void latencyCompensate(
+      LinearSystem<States, Inputs, Outputs> plant, double dtSeconds,
+      double inputDelaySeconds) {
+    var discABPair = Discretization.discretizeAB(plant.getA(), plant.getB(), dtSeconds);
+    var discA = discABPair.getFirst();
+    var discB = discABPair.getSecond();
+
+    m_K = m_K.times((discA.minus(discB.times(m_K))).pow(inputDelaySeconds / dtSeconds));
+  }
 }

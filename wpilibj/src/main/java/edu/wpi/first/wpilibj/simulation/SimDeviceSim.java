@@ -79,8 +79,8 @@ public class SimDeviceSim {
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueCreatedCallback);
   }
 
-  public CallbackStore registerValueChangedCallback(SimValueCallback callback, boolean initialNotify) {
-    int uid = SimDeviceDataJNI.registerSimValueChangedCallback(m_handle, callback, initialNotify);
+  public CallbackStore registerValueChangedCallback(SimValue value, SimValueCallback callback, boolean initialNotify) {
+    int uid = SimDeviceDataJNI.registerSimValueChangedCallback(value.getNativeHandle(), callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueChangedCallback);
   }
 

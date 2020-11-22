@@ -122,6 +122,7 @@ int32_t HAL_SendConsoleLine(const char* line) {
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
+  std::memset(controlWord, 0, sizeof(HAL_ControlWord));
   controlWord->enabled = SimDriverStationData->enabled;
   controlWord->autonomous = SimDriverStationData->autonomous;
   controlWord->test = SimDriverStationData->test;
