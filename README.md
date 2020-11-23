@@ -38,6 +38,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - ARM compiler toolchain
     - For 2020 and beyond, use GCC version 7 or greater
     - Run `./gradlew installRoboRioToolchain` after cloning this repository
+    - If the WPILib installer was used, this toolchain is already installed
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installRaspbianToolchain` after cloning this repository
 
