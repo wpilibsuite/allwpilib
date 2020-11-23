@@ -28,6 +28,6 @@ class HALSimWSProviderPDP : public HALSimWSHalProvider {
   int32_t m_initCbKey = 0;
   int32_t m_temperatureCbKey = 0;
   int32_t m_voltageCbKey = 0;
-  int32_t m_currentCbKey = 0;
+  // int32_t m_currentCbKey = 0;
 };
 }  // namespace wpilibws
