@@ -135,7 +135,7 @@ jobs:
             brew install opencv
           fi
       - name: configure
-        run: mkdir build && cd build && cmake -DWITH_GUI=OFF ${{ matrix.flags }} ..
+        run: mkdir build && cd build && cmake ${{ matrix.flags }} ..
       - name: build
         working-directory: build
         run: make -j3
