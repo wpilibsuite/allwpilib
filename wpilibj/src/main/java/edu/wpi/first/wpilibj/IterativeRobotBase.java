@@ -292,7 +292,9 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.addEpoch("Shuffleboard.update()");
 
     if (isSimulation()) {
+      HAL.simPeriodicBefore();
       simulationPeriodic();
+      HAL.simPeriodicAfter();
       m_watchdog.addEpoch("simulationPeriodic()");
     }
 

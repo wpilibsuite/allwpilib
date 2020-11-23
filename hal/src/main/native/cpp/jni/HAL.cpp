@@ -86,6 +86,30 @@ Java_edu_wpi_first_hal_HAL_exitMain
 
 /*
  * Class:     edu_wpi_first_hal_HAL
+ * Method:    simPeriodicBeforeNative
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_simPeriodicBeforeNative
+  (JNIEnv*, jclass)
+{
+  HAL_SimPeriodicBefore();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    simPeriodicAfterNative
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_simPeriodicAfterNative
+  (JNIEnv*, jclass)
+{
+  HAL_SimPeriodicAfter();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
  * Method:    observeUserProgramStarting
  * Signature: ()V
  */

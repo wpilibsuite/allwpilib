@@ -157,6 +157,18 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
  */
 void HAL_Shutdown(void);
 
+/**
+ * Calls registered SimPeriodic "before" callbacks (only in simulation mode).
+ * This should be called prior to user code periodic simulation functions.
+ */
+void HAL_SimPeriodicBefore(void);
+
+/**
+ * Calls registered SimPeriodic "after" callbacks (only in simulation mode).
+ * This should be called after user code periodic simulation functions.
+ */
+void HAL_SimPeriodicAfter(void);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

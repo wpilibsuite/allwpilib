@@ -30,4 +30,13 @@ void HALSIM_SetSendError(HALSIM_SendErrorHandler handler);
 typedef int32_t (*HALSIM_SendConsoleLineHandler)(const char* line);
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler);
 
+typedef void (*HALSIM_SimPeriodicCallback)(void* param);
+int32_t HALSIM_RegisterSimPeriodicBeforeCallback(
+    HALSIM_SimPeriodicCallback callback, void* param);
+void HALSIM_CancelSimPeriodicBeforeCallback(int32_t uid);
+
+int32_t HALSIM_RegisterSimPeriodicAfterCallback(
+    HALSIM_SimPeriodicCallback callback, void* param);
+void HALSIM_CancelSimPeriodicAfterCallback(int32_t uid);
+
 }  // extern "C"
