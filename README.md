@@ -33,6 +33,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - [JDK 11](https://adoptopenjdk.net/)
     - Note that the JRE is insufficient; the full JDK is required
     - On Ubuntu, run `sudo apt install openjdk-11-jdk`
+    - On Windows, install the JDK 11 .msi from the link above
     - On macOS, run `brew install openjdk@11`
 - C++ compiler
     - On Linux, install GCC
