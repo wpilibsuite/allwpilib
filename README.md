@@ -31,6 +31,10 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 ## Requirements
 
 - [JDK 11](https://adoptopenjdk.net/)
+    - Note that the JRE is insufficient; the full JDK is required
+    - On Ubuntu, run `sudo apt install openjdk-11-jdk`
+    - On Windows, install the JDK 11 .msi from the link above
+    - On macOS, install the JDK 11 .pkg from the link above
 - C++ compiler
     - On Linux, install GCC
     - On Windows, install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio 2019)
