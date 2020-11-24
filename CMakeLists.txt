@@ -44,7 +44,8 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 option(BUILD_SHARED_LIBS "Build with shared libs (needed for JNI)" ON)
 option(WITH_JAVA "Include java and JNI in the build" ON)
 option(WITH_CSCORE "Build cscore (needs OpenCV)" ON)
-option(WITH_WPILIB "Build hal, wpilibc/j, wpimath, and myRobot (needs OpenCV)" ON)
+option(WITH_WPIMATH "Build wpimath" ON)
+option(WITH_WPILIB "Build hal, wpilibc/j, and myRobot (needs OpenCV)" ON)
 option(WITH_TESTS "Build unit tests (requires internet connection)" ON)
 option(WITH_GUI "Build GUI items" ON)
 option(WITH_SIMULATION_MODULES "Build simulation modules" ON)
@@ -106,6 +107,13 @@ FATAL: Cannot build simulation modules with wpilib disabled.
 ")
 endif()
 
+if (NOT WITH_WPIMATH AND WITH_WPILIB)
+    message(FATAL_ERROR "
+FATAL: Cannot build wpilib without wpimath.
+       Enable wpimath by setting WITH_WPIMATH=ON
+")
+endif()
+
 set( wpilib_dest wpilib)
 set( include_dest wpilib/include )
 set( main_lib_dest wpilib/lib )
@@ -156,6 +164,10 @@ endif()
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)
 
+if (WITH_WPIMATH)
+    add_subdirectory(wpimath)
+endif()
+
 if (WITH_GUI)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
@@ -170,7 +182,6 @@ if (WITH_CSCORE)
         set(HAL_DEP_REPLACE ${HAL_DEP_REPLACE_IMPL})
         set(WPILIBC_DEP_REPLACE ${WPILIBC_DEP_REPLACE_IMPL})
         add_subdirectory(hal)
-        add_subdirectory(wpimath)
         add_subdirectory(wpilibj)
         add_subdirectory(wpilibc)
         add_subdirectory(myRobot)
