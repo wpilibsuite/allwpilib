@@ -103,6 +103,7 @@ static RobotJoystick gRobotJoysticks[HAL_kMaxJoysticks];
 static std::unique_ptr<JoystickSource> gJoystickSources[HAL_kMaxJoysticks];
 
 static bool gDisableDS = false;
+static bool gZeroDisconnectedJoysticks = true;
 static std::atomic<bool>* gDSSocketConnected = nullptr;
 
 static inline bool IsDSDisabled() {
@@ -229,13 +230,19 @@ static void DriverStationReadLine(ImGuiContext* ctx,
     int num;
     if (value.getAsInteger(10, num)) return;
     gDisableDS = num;
+  } else if (name == "zeroDisconnectedJoysticks") {
+    int num;
+    if (value.getAsInteger(10, num)) return;
+    gZeroDisconnectedJoysticks = num;
   }
 }
 
 static void DriverStationWriteAll(ImGuiContext* ctx,
                                   ImGuiSettingsHandler* handler,
                                   ImGuiTextBuffer* out_buf) {
-  out_buf->appendf("[DriverStation][Main]\ndisable=%d\n\n", gDisableDS ? 1 : 0);
+  out_buf->appendf(
+      "[DriverStation][Main]\ndisable=%d\nzeroDisconnectedJoysticks=%d\n\n",
+      gDisableDS ? 1 : 0, gZeroDisconnectedJoysticks ? 1 : 0);
 }
 
 void SystemJoystick::Update(int i) {
@@ -370,6 +377,7 @@ void RobotJoystick::Update() {
 }
 
 void RobotJoystick::SetHAL(int i) {
+  if (!gZeroDisconnectedJoysticks && (!sys || !sys->present)) return;
   // set at HAL level
   HALSIM_SetJoystickDescriptor(i, &desc);
   HALSIM_SetJoystickAxes(i, &axes);
@@ -675,6 +683,8 @@ static void DriverStationOptionMenu() {
     ImGui::MenuItem("Turn off DS (real DS connected)", nullptr, true, false);
   } else {
     ImGui::MenuItem("Turn off DS", nullptr, &gDisableDS);
+    ImGui::MenuItem("Zero disconnected joysticks", nullptr,
+                    &gZeroDisconnectedJoysticks, true);
   }
 }
 
