@@ -15,8 +15,8 @@ if (WITH_JAVA)
     configure_file(src/generate/WPILibVersion.java.in WPILibVersion.java)
 
     file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-    file(GLOB EJML_JARS "${CMAKE_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
-    file(GLOB JACKSON_JARS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
+    file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
+    file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
 
     add_jar(wpilibj_jar ${JAVA_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.java INCLUDE_JARS hal_jar ntcore_jar ${EJML_JARS} ${JACKSON_JARS} ${OPENCV_JAR_FILE} cscore_jar cameraserver_jar wpimath_jar wpiutil_jar OUTPUT_NAME wpilibj)
 
