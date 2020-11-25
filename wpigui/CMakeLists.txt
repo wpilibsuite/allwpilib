@@ -46,6 +46,6 @@ install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")
 #    set (wpigui_config_dir share/wpigui)
 #endif()
 
-#configure_file(wpigui-config.cmake.in ${CMAKE_BINARY_DIR}/wpigui-config.cmake )
-#install(FILES ${CMAKE_BINARY_DIR}/wpigui-config.cmake DESTINATION ${wpigui_config_dir})
+#configure_file(wpigui-config.cmake.in ${WPILIB_BINARY_DIR}/wpigui-config.cmake )
+#install(FILES ${WPILIB_BINARY_DIR}/wpigui-config.cmake DESTINATION ${wpigui_config_dir})
 #install(EXPORT wpigui DESTINATION ${wpigui_config_dir})

@@ -14,9 +14,9 @@ if (WITH_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
-        set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson")
+        set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
 
         message(STATUS "Downloading Jackson jarfiles...")
 
@@ -31,7 +31,7 @@ if (WITH_JAVA)
     endif()
 
   file(GLOB JACKSON_JARS
-        ${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
+        ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
 
   set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${JACKSON_JARS})
 
@@ -195,8 +195,8 @@ else()
     set (wpiutil_config_dir share/wpiutil)
 endif()
 
-configure_file(wpiutil-config.cmake.in ${CMAKE_BINARY_DIR}/wpiutil-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
+configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
 install(EXPORT wpiutil DESTINATION ${wpiutil_config_dir})
 
 SUBDIR_LIST(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")

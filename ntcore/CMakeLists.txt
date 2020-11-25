@@ -26,8 +26,8 @@ else()
     set (ntcore_config_dir share/ntcore)
 endif()
 
-configure_file(ntcore-config.cmake.in ${CMAKE_BINARY_DIR}/ntcore-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/ntcore-config.cmake DESTINATION ${ntcore_config_dir})
+configure_file(ntcore-config.cmake.in ${WPILIB_BINARY_DIR}/ntcore-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/ntcore-config.cmake DESTINATION ${ntcore_config_dir})
 install(EXPORT ntcore DESTINATION ${ntcore_config_dir})
 
 # Java bindings

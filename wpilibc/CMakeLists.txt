@@ -30,8 +30,8 @@ else()
     set (wpilibc_config_dir share/wpilibc)
 endif()
 
-configure_file(wpilibc-config.cmake.in ${CMAKE_BINARY_DIR}/wpilibc-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/wpilibc-config.cmake DESTINATION ${wpilibc_config_dir})
+configure_file(wpilibc-config.cmake.in ${WPILIB_BINARY_DIR}/wpilibc-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/wpilibc-config.cmake DESTINATION ${wpilibc_config_dir})
 install(EXPORT wpilibc DESTINATION ${wpilibc_config_dir})
 
 if (WITH_TESTS)

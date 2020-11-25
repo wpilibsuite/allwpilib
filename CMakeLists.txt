@@ -1,5 +1,5 @@
 # Disable in-source builds to prevent source tree corruption.
-if(" ${CMAKE_SOURCE_DIR}" STREQUAL " ${CMAKE_BINARY_DIR}")
+if(" ${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL " ${CMAKE_CURRENT_BINARY_DIR}")
   message(FATAL_ERROR "
 FATAL: In-source builds are not allowed.
        You should create a separate directory for build files.
@@ -9,17 +9,19 @@ endif()
 
 project(allwpilib)
 cmake_minimum_required(VERSION 3.3.0)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+
+set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 INCLUDE(CPack)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_JAVA_TARGET_OUTPUT_DIR ${CMAKE_BINARY_DIR}/jar)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/bin)
+set(CMAKE_JAVA_TARGET_OUTPUT_DIR ${WPILIB_BINARY_DIR}/jar)
 
 # use, i.e. don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -192,5 +194,5 @@ if (WITH_SIMULATION_MODULES AND NOT WITH_EXTERNAL_HAL)
     add_subdirectory(simulation)
 endif()
 
-configure_file(wpilib-config.cmake.in ${CMAKE_BINARY_DIR}/wpilib-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/wpilib-config.cmake DESTINATION ${wpilib_config_dir})
+configure_file(wpilib-config.cmake.in ${WPILIB_BINARY_DIR}/wpilib-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/wpilib-config.cmake DESTINATION ${wpilib_config_dir})

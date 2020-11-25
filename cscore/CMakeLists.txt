@@ -46,8 +46,8 @@ else()
     set (cscore_config_dir share/cscore)
 endif()
 
-configure_file(cscore-config.cmake.in ${CMAKE_BINARY_DIR}/cscore-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/cscore-config.cmake DESTINATION ${cscore_config_dir})
+configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION ${cscore_config_dir})
 install(EXPORT cscore DESTINATION ${cscore_config_dir})
 
 SUBDIR_LIST(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
