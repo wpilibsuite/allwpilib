@@ -7,6 +7,8 @@
 
 #include "Drivetrain.h"
 
+#include <frc2/Timer.h>
+
 #include "ExampleGlobalMeasurementSensor.h"
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
@@ -17,28 +19,16 @@ frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
 }
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
-  auto frontLeftFeedforward = m_feedforward.Calculate(wheelSpeeds.frontLeft);
-  auto frontRightFeedforward = m_feedforward.Calculate(wheelSpeeds.frontRight);
-  auto backLeftFeedforward = m_feedforward.Calculate(wheelSpeeds.rearLeft);
-  auto backRightFeedforward = m_feedforward.Calculate(wheelSpeeds.rearRight);
+  std::function<void(units::meters_per_second_t, const frc::Encoder&, frc2::PIDController&, frc::PWMVictorSPX&)> calcAndSetSpeeds = [&m_feedforward = m_feedforward](units::meters_per_second_t speed, const auto &encoder, auto &controller, auto &motor) {
+      auto feedforward = m_feedforward.Calculate(speed);
+      double output = controller.Calculate(encoder.GetRate(), speed.to<double>());
+      motor.SetVoltage(units::volt_t{output} + feedforward);
+  };
 
-  double frontLeftOutput = m_frontLeftPIDController.Calculate(
-      m_frontLeftEncoder.GetRate(), wheelSpeeds.frontLeft.to<double>());
-  double frontRightOutput = m_frontRightPIDController.Calculate(
-      m_frontRightEncoder.GetRate(), wheelSpeeds.frontRight.to<double>());
-  double backLeftOutput = m_backLeftPIDController.Calculate(
-      m_backLeftEncoder.GetRate(), wheelSpeeds.rearLeft.to<double>());
-  double backRightOutput = m_backRightPIDController.Calculate(
-      m_backRightEncoder.GetRate(), wheelSpeeds.rearRight.to<double>());
-
-  m_frontLeftMotor.SetVoltage(units::volt_t{frontLeftOutput} +
-                              frontLeftFeedforward);
-  m_frontRightMotor.SetVoltage(units::volt_t{frontRightOutput} +
-                               frontRightFeedforward);
-  m_backLeftMotor.SetVoltage(units::volt_t{backLeftOutput} +
-                             backLeftFeedforward);
-  m_backRightMotor.SetVoltage(units::volt_t{backRightOutput} +
-                              backRightFeedforward);
+  calcAndSetSpeeds(wheelSpeeds.frontLeft, m_frontLeftEncoder, m_frontLeftPIDController, m_frontLeftMotor);
+  calcAndSetSpeeds(wheelSpeeds.frontRight, m_frontRightEncoder, m_frontRightPIDController, m_frontRightMotor);
+  calcAndSetSpeeds(wheelSpeeds.rearLeft, m_backLeftEncoder, m_backLeftPIDController, m_backLeftMotor);
+  calcAndSetSpeeds(wheelSpeeds.rearRight, m_backRightEncoder, m_backRightPIDController, m_backRightMotor);
 }
 
 void Drivetrain::Drive(units::meters_per_second_t xSpeed,
@@ -61,5 +51,5 @@ void Drivetrain::UpdateOdometry() {
   m_poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
           m_poseEstimator.GetEstimatedPosition()),
-      units::second_t{frc::Timer::GetFPGATimestamp()} - 0.3_s);
+      frc2::Timer::GetFPGATimestamp() - 0.3_s);
 }
