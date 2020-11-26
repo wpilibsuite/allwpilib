@@ -272,7 +272,7 @@ bool HALSimGui::Initialize() {
     }
   });
 
-  if (!gui::Initialize("", 1280, 720)) return false;
+  if (!gui::Initialize("Simulation GUI", 1280, 720)) return false;
 
   return true;
 }
