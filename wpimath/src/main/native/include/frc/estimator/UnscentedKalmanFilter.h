@@ -50,11 +50,22 @@ class UnscentedKalmanFilter {
       : m_f(f), m_h(h) {
     m_contQ = MakeCovMatrix(stateStdDevs);
     m_contR = MakeCovMatrix(measurementStdDevs);
-    m_meanFuncX = [](auto sigmas, auto Wm) { return sigmas * Wm; };
-    m_meanFuncY = [](auto sigmas, auto Wc) { return sigmas * Wc; };
-    m_residualFuncX = [](auto a, auto b) { return a - b; };
-    m_residualFuncY = [](auto a, auto b) { return a - b; };
-    m_addFuncX = [](auto a, auto b) { return a + b; };
+    m_meanFuncX = [](auto sigmas, auto Wm) -> Eigen::Matrix<double, States, 1> {
+      return sigmas * Wm;
+    };
+    m_meanFuncY = [](auto sigmas,
+                     auto Wc) -> Eigen::Matrix<double, Outputs, 1> {
+      return sigmas * Wc;
+    };
+    m_residualFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
+      return a - b;
+    };
+    m_residualFuncY = [](auto a, auto b) -> Eigen::Matrix<double, Outputs, 1> {
+      return a - b;
+    };
+    m_addFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
+      return a + b;
+    };
     m_dt = dt;
 
     Reset();

@@ -32,17 +32,17 @@ namespace frc {
 template <int States, int CovDim>
 std::tuple<Eigen::Matrix<double, CovDim, 1>,
            Eigen::Matrix<double, CovDim, CovDim>>
-UnscentedTransform(
-    const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
-    const Eigen::Matrix<double, 2 * States + 1, 1>& Wm,
-    const Eigen::Matrix<double, 2 * States + 1, 1>& Wc,
-    std::function<Eigen::Matrix<double, CovDim, 1>(
-        Eigen::Matrix<double, CovDim, 2 * States + 1>,
-        Eigen::Matrix<double, 2 * States + 1, 1>)>
-        meanFunc,
-    std::function<Eigen::Matrix<double, CovDim, 1>(
-        Eigen::Matrix<double, CovDim, 1>, Eigen::Matrix<double, CovDim, 1>)>
-        residualFunc) {
+UnscentedTransform(const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
+                   const Eigen::Matrix<double, 2 * States + 1, 1>& Wm,
+                   const Eigen::Matrix<double, 2 * States + 1, 1>& Wc,
+                   std::function<Eigen::Matrix<double, CovDim, 1>(
+                       const Eigen::Matrix<double, CovDim, 2 * States + 1>&,
+                       const Eigen::Matrix<double, 2 * States + 1, 1>&)>
+                       meanFunc,
+                   std::function<Eigen::Matrix<double, CovDim, 1>(
+                       const Eigen::Matrix<double, CovDim, 1>&,
+                       const Eigen::Matrix<double, CovDim, 1>&)>
+                       residualFunc) {
   // New mean is usually just the sum of the sigmas * weight:
   // dot = \Sigma^n_1 (W[k]*Xi[k])
   Eigen::Matrix<double, CovDim, 1> x = meanFunc(sigmas, Wm);
