@@ -21,11 +21,11 @@
 #include "units/time.h"
 
 TEST(DifferentialDrivePoseEstimatorTest, TestAccuracy) {
-  frc::DifferentialDrivePoseEstimator estimator{
-      frc::Rotation2d(), frc::Pose2d(),
-      frc::MakeMatrix<5, 1>(0.02, 0.02, 0.01, 0.02, 0.02),
-      frc::MakeMatrix<3, 1>(0.01, 0.01, 0.001),
-      frc::MakeMatrix<3, 1>(0.1, 0.1, 0.01)};
+  frc::DifferentialDrivePoseEstimator estimator{frc::Rotation2d(),
+                                                frc::Pose2d(),
+                                                {0.02, 0.02, 0.01, 0.02, 0.02},
+                                                {0.01, 0.01, 0.001},
+                                                {0.1, 0.1, 0.01}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       std::vector{frc::Pose2d(0_m, 0_m, frc::Rotation2d(45_deg)),

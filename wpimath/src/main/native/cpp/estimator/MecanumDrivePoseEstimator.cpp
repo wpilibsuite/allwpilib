@@ -17,9 +17,9 @@ using namespace frc;
 frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     const Rotation2d& gyroAngle, const Pose2d& initialPose,
     MecanumDriveKinematics kinematics,
-    const Eigen::Matrix<double, 3, 1>& stateStdDevs,
-    const Eigen::Matrix<double, 1, 1>& localMeasurementStdDevs,
-    const Eigen::Matrix<double, 3, 1>& visionMeasurementStdDevs,
+    const std::array<double, 3>& stateStdDevs,
+    const std::array<double, 1>& localMeasurementStdDevs,
+    const std::array<double, 3>& visionMeasurementStdDevs,
     units::second_t nominalDt)
     : m_observer([](const Eigen::Matrix<double, 3, 1>& x,
                     const Eigen::Matrix<double, 3, 1>& u) { return u; },
@@ -27,16 +27,13 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
                     const Eigen::Matrix<double, 3, 1>& u) {
                    return x.block<1, 1>(2, 0);
                  },
-                 StdDevMatrixToArray<3>(stateStdDevs),
-                 StdDevMatrixToArray<1>(localMeasurementStdDevs),
-                 frc::AngleMean<3, 3>(2), frc::AngleMean<1, 3>(0),
-                 frc::AngleResidual<3>(2), frc::AngleResidual<1>(0),
-                 frc::AngleAdd<3>(2), nominalDt),
+                 stateStdDevs, localMeasurementStdDevs, frc::AngleMean<3, 3>(2),
+                 frc::AngleMean<1, 3>(0), frc::AngleResidual<3>(2),
+                 frc::AngleResidual<1>(0), frc::AngleAdd<3>(2), nominalDt),
       m_kinematics(kinematics),
       m_nominalDt(nominalDt) {
   // Construct R (covariances) matrix for vision measurements.
-  Eigen::Matrix3d visionContR =
-      frc::MakeCovMatrix<3>(StdDevMatrixToArray<3>(visionMeasurementStdDevs));
+  Eigen::Matrix3d visionContR = frc::MakeCovMatrix<3>(visionMeasurementStdDevs);
 
   // Create and store discrete covariance matrix for vision measurements.
   m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);

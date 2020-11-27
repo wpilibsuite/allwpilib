@@ -67,9 +67,9 @@ class MecanumDrivePoseEstimator {
   MecanumDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
       MecanumDriveKinematics kinematics,
-      const Eigen::Matrix<double, 3, 1>& stateStdDevs,
-      const Eigen::Matrix<double, 1, 1>& localMeasurementStdDevs,
-      const Eigen::Matrix<double, 3, 1>& visionMeasurementStdDevs,
+      const std::array<double, 3>& stateStdDevs,
+      const std::array<double, 1>& localMeasurementStdDevs,
+      const std::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s);
 
   /**

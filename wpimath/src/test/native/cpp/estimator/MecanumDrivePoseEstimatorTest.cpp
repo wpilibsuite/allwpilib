@@ -21,12 +21,8 @@ TEST(MecanumDrivePoseEstimatorTest, TestAccuracy) {
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
 
   frc::MecanumDrivePoseEstimator estimator{
-      frc::Rotation2d(),
-      frc::Pose2d(),
-      kinematics,
-      frc::MakeMatrix<3, 1>(0.1, 0.1, 0.1),
-      frc::MakeMatrix<1, 1>(0.05),
-      frc::MakeMatrix<3, 1>(0.1, 0.1, 0.1)};
+      frc::Rotation2d(), frc::Pose2d(), kinematics,
+      {0.1, 0.1, 0.1},   {0.05},        {0.1, 0.1, 0.1}};
 
   frc::MecanumDriveOdometry odometry{kinematics, frc::Rotation2d()};
 

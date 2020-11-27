@@ -76,10 +76,11 @@ class Drivetrain {
   // Gains are for example purposes only - must be determined for your own
   // robot!
   frc::DifferentialDrivePoseEstimator m_poseEstimator{
-      frc::Rotation2d(), frc::Pose2d(),
-      frc::MakeMatrix<5, 1>(0.01, 0.01, 0.01, 0.01, 0.01),
-      frc::MakeMatrix<3, 1>(0.1, 0.1, 0.1),
-      frc::MakeMatrix<3, 1>(0.1, 0.1, 0.1)};
+      frc::Rotation2d(),
+      frc::Pose2d(),
+      {0.01, 0.01, 0.01, 0.01, 0.01},
+      {0.1, 0.1, 0.1},
+      {0.1, 0.1, 0.1}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

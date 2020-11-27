@@ -16,9 +16,9 @@ using namespace frc;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     const Rotation2d& gyroAngle, const Pose2d& initialPose,
-    const Eigen::Matrix<double, 5, 1>& stateStdDevs,
-    const Eigen::Matrix<double, 3, 1>& localMeasurementStdDevs,
-    const Eigen::Matrix<double, 3, 1>& visionMeasurmentStdDevs,
+    const std::array<double, 5>& stateStdDevs,
+    const std::array<double, 3>& localMeasurementStdDevs,
+    const std::array<double, 3>& visionMeasurmentStdDevs,
     units::second_t nominalDt)
     : m_observer(
           &DifferentialDrivePoseEstimator::F,
@@ -26,15 +26,13 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
              const Eigen::Matrix<double, 3, 1>& u) {
             return frc::MakeMatrix<3, 1>(x(3, 0), x(4, 0), x(2, 0));
           },
-          StdDevMatrixToArray<5>(stateStdDevs),
-          StdDevMatrixToArray<3>(localMeasurementStdDevs),
-          frc::AngleMean<5, 5>(2), frc::AngleMean<3, 5>(2),
-          frc::AngleResidual<5>(2), frc::AngleResidual<3>(2),
-          frc::AngleAdd<5>(2), nominalDt),
+          stateStdDevs, localMeasurementStdDevs, frc::AngleMean<5, 5>(2),
+          frc::AngleMean<3, 5>(2), frc::AngleResidual<5>(2),
+          frc::AngleResidual<3>(2), frc::AngleAdd<5>(2), nominalDt),
       m_nominalDt(nominalDt) {
   // Create R (covariances) for vision measurements.
   Eigen::Matrix<double, 3, 3> visionContR =
-      frc::MakeCovMatrix(StdDevMatrixToArray<3>(visionMeasurmentStdDevs));
+      frc::MakeCovMatrix(visionMeasurmentStdDevs);
   m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
 
   // Create correction mechanism for vision measurements.
