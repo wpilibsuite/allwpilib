@@ -32,19 +32,17 @@ class MatchDataSenderEntry {
  public:
   MatchDataSenderEntry(const std::shared_ptr<nt::NetworkTable>& table,
                        const wpi::Twine& key, const T& initialVal) {
-    static_assert(std::is_convertible<decltype(initialVal), bool>() ||
-                      std::is_convertible<decltype(initialVal), double>() ||
-                      std::is_convertible<decltype(initialVal), wpi::Twine>(),
-                  "Invalid type for MatchDataSenderEntry - must be convertable "
-                  "to bool, double or wpi::Twine");
+    static_assert(std::is_same_v<T, bool> || std::is_same_v<T, double> ||
+                      std::is_same_v<T, std::string>,
+                  "Invalid type for MatchDataSenderEntry - must be "
+                  "to bool, double or std::string");
 
     ntEntry = table->GetEntry(key);
-    if constexpr (std::is_convertible<decltype(initialVal), bool>()) {
+    if constexpr (std::is_same_v<T, bool>) {
       ntEntry.ForceSetBoolean(initialVal);
-    } else if constexpr (std::is_convertible<decltype(initialVal), double>()) {
+    } else if constexpr (std::is_same_v<T, double>) {
       ntEntry.ForceSetDouble(initialVal);
-    } else if constexpr (std::is_convertible<decltype(initialVal),
-                                             wpi::Twine>()) {
+    } else if constexpr (std::is_same_v<T, std::string>) {
       ntEntry.ForceSetString(initialVal);
     }
     prevVal = initialVal;
