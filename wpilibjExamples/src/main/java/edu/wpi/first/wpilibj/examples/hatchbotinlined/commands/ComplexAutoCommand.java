@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -49,7 +49,7 @@ public class ComplexAutoCommand extends SequentialCommandGroup {
         new FunctionalCommand(
             // Reset encoders on command start
             driveSubsystem::resetEncoders,
-            // Drive forward while the command is executing
+            // Drive backward while the command is executing
             () -> driveSubsystem.arcadeDrive(-AutoConstants.kAutoDriveSpeed, 0),
             // Stop driving at the end of the command
             interrupt -> driveSubsystem.arcadeDrive(0, 0),

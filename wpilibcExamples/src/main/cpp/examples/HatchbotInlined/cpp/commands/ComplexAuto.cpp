@@ -38,7 +38,7 @@ ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
       frc2::FunctionalCommand(
           // Reset encoders on command start
           [&] { drive->ResetEncoders(); },
-          // Drive forward while the command is executing
+          // Drive backward while the command is executing
           [&] { drive->ArcadeDrive(-AutoConstants::kAutoDriveSpeed, 0); },
           // Stop driving at the end of the command
           [&](bool interrupted) { drive->ArcadeDrive(0, 0); },
