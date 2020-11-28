@@ -25,7 +25,7 @@ template <int States, int Inputs, int Outputs>
 class ExtendedKalmanFilter {
  public:
   /**
-   * Constructs an extended Kalman filter.
+   * Constructs an Extended Kalman filter.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.

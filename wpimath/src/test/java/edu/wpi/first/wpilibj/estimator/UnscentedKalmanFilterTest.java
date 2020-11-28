@@ -222,7 +222,9 @@ public class UnscentedKalmanFilterTest {
     var R = StateSpaceUtil.makeCostMatrix(
           VecBuilder.fill(0.01, 0.01, 0.0001, 0.0001, 0.5, 0.5));
     observer.correct(Nat.N6(), u, globalY,
-          UnscentedKalmanFilterTest::getGlobalMeasurementModel, R);
+        UnscentedKalmanFilterTest::getGlobalMeasurementModel, R,
+        (sigmas, weights) -> sigmas.times(Matrix.changeBoundsUnchecked(weights)),
+        Matrix::minus, Matrix::minus, Matrix::plus);
 
     final var finalPosition = trajectory.sample(trajectory.getTotalTimeSeconds());
 
@@ -371,7 +373,7 @@ public class UnscentedKalmanFilterTest {
               16.66666667,
               16.66666667,
               16.66666667
-          )
+          ), (sigmas, weights) -> sigmas.times(Matrix.changeBoundsUnchecked(weights)), Matrix::minus
     );
 
     assertTrue(
