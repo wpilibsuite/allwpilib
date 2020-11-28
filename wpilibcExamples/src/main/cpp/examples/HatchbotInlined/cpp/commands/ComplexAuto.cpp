@@ -20,14 +20,14 @@ ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
           // Reset encoders on command start
           [&] { drive->ResetEncoders(); },
           // Drive forward while the command is executing
-          [&] { drive->ArcadeDrive(AutoConstants::kAutoDriveSpeed, 0); },
+          [&] { drive->ArcadeDrive(kAutoDriveSpeed, 0); },
           // Stop driving at the end of the command
           [&](bool interrupted) { drive->ArcadeDrive(0, 0); },
           // End the command when the robot's driven distance exceeds the
           // desired value
           [&] {
             return drive->GetAverageEncoderDistance() >=
-                   AutoConstants::kAutoDriveDistanceInches;
+                   kAutoDriveDistanceInches;
           },
           // Requires the drive subsystem
           {drive}),
@@ -39,14 +39,14 @@ ComplexAuto::ComplexAuto(DriveSubsystem* drive, HatchSubsystem* hatch) {
           // Reset encoders on command start
           [&] { drive->ResetEncoders(); },
           // Drive backward while the command is executing
-          [&] { drive->ArcadeDrive(-AutoConstants::kAutoDriveSpeed, 0); },
+          [&] { drive->ArcadeDrive(-kAutoDriveSpeed, 0); },
           // Stop driving at the end of the command
           [&](bool interrupted) { drive->ArcadeDrive(0, 0); },
           // End the command when the robot's driven distance exceeds the
           // desired value
           [&] {
             return drive->GetAverageEncoderDistance() <=
-                   AutoConstants::kAutoBackupDistanceInches;
+                   kAutoBackupDistanceInches;
           },
           // Requires the drive subsystem
           {drive}));
