@@ -50,7 +50,7 @@ class RobotContainer {
   frc2::FunctionalCommand m_simpleAuto = frc2::FunctionalCommand(
       // Reset encoders on command start
       [this] { m_drive.ResetEncoders(); },
-      // Start driving forward at the start of the command
+      // Drive forward while the command is executing
       [this] { m_drive.ArcadeDrive(AutoConstants::kAutoDriveSpeed, 0); },
       // Stop driving at the end of the command
       [this](bool interrupted) { m_drive.ArcadeDrive(0, 0); },

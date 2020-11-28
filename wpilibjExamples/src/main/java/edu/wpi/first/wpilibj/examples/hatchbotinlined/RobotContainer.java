@@ -42,7 +42,7 @@ public class RobotContainer {
   private final Command m_simpleAuto = new FunctionalCommand(
       // Reset encoders on command start
       m_robotDrive::resetEncoders,
-      // Start driving forward at the start of the command
+      // Drive forward while the command is executing
       () -> m_robotDrive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
       // Stop driving at the end of the command
       interrupt -> m_robotDrive.arcadeDrive(0, 0),
