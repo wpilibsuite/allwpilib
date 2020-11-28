@@ -41,8 +41,6 @@ nativeUtils.exportsConfigs {
     }
 }
 
-apply plugin: DisableBuildingGTest
-
 model {
     components {}
     binaries {

@@ -43,8 +43,6 @@ def generateUsageReporting = tasks.register('generateUsageReporting') {
     }
 }
 
-apply plugin: DisableBuildingGTest
-
 ext {
     addHalDependency = { binary, shared->
         binary.tasks.withType(AbstractNativeSourceCompileTask) {
