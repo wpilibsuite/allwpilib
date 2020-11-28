@@ -10,6 +10,7 @@
 #include <frc/XboxController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
@@ -46,14 +47,21 @@ class RobotContainer {
   HatchSubsystem m_hatch;
 
   // The autonomous routines
-  frc2::ParallelRaceGroup m_simpleAuto =
-      frc2::RunCommand([this] { m_drive.ArcadeDrive(ac::kAutoDriveSpeed, 0); })
-          .BeforeStarting([this] { m_drive.ResetEncoders(); })
-          .AndThen([this] { m_drive.ArcadeDrive(0, 0); }, {&m_drive})
-          .WithInterrupt([this] {
-            return m_drive.GetAverageEncoderDistance() >=
-                   ac::kAutoDriveDistanceInches;
-          });
+  frc2::FunctionalCommand m_simpleAuto = frc2::FunctionalCommand(
+      // Reset encoders on command start
+      [this] { m_drive.ResetEncoders(); },
+      // Start driving forward at the start of the command
+      [this] { m_drive.ArcadeDrive(AutoConstants::kAutoDriveSpeed, 0); },
+      // Stop driving at the end of the command
+      [this](bool interrupted) { m_drive.ArcadeDrive(0, 0); },
+      // End the command when the robot's driven distance exceeds the desired
+      // value
+      [this] {
+        return m_drive.GetAverageEncoderDistance() >=
+               AutoConstants::kAutoDriveDistanceInches;
+      },
+      // Requires the drive subsystem
+      {&m_drive});
   ComplexAuto m_complexAuto{&m_drive, &m_hatch};
 
   // Assorted commands to be bound to buttons
