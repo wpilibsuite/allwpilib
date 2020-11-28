@@ -258,7 +258,7 @@ model {
                                 def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
                                 test.dependsOn it.tasks.install
 
-                                if (project.hasProperty('CIBuild')) {
+                                if (project.hasProperty('buildServer')) {
                                     def folderDir = it.tasks.install.installDirectory.get().toString()
                                     test.doLast {
                                         def folder = file(folderDir)
