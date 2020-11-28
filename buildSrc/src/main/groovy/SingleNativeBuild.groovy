@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gradle.api.tasks.Delete
+
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -87,6 +89,14 @@ class SingleNativeBuild implements Plugin<Project> {
                     subs << component
                 }
             }
+            Delete deleteObjects = null
+            if (project.hasProperty('buildServer')) {
+                deleteObjects = project.tasks.create('deleteObjects', Delete)
+                project.tasks.named('build').configure { Task t ->
+                    t.dependsOn deleteObjects
+                    return
+                }
+            }
             subs.each {
                 ((NativeLibrarySpec) it).binaries.each { oBinary ->
                     if (oBinary.buildable == false) {
@@ -136,6 +146,10 @@ class SingleNativeBuild implements Plugin<Project> {
                             tree.include '**/*.o'
                             tree.include '**/*.obj'
                             link.source tree
+                            if (project.hasProperty('buildServer')) {
+                                deleteObjects.dependsOn link
+                                deleteObjects.delete tree
+                            }
                         } else if (binary instanceof StaticLibraryBinarySpec) {
                             def sBinary = (StaticLibraryBinarySpec) binary
                             ObjectFilesToBinary assemble = (ObjectFilesToBinary) sBinary.tasks.createStaticLib
@@ -145,6 +159,10 @@ class SingleNativeBuild implements Plugin<Project> {
                             tree.include '**/*.o'
                             tree.include '**/*.obj'
                             assemble.source tree
+                            if (project.hasProperty('buildServer')) {
+                                deleteObjects.dependsOn assemble
+                                deleteObjects.delete tree
+                            }
                         }
                     }
                 }

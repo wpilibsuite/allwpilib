@@ -257,6 +257,15 @@ model {
                                 commandLine it.tasks.install.runScriptFile.get().asFile.toString()
                                 def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
                                 test.dependsOn it.tasks.install
+
+                                if (project.hasProperty('buildServer')) {
+                                    def folderDir = it.tasks.install.installDirectory.get().toString()
+                                    test.doLast {
+                                        def folder = file(folderDir)
+                                        folder.deleteDir()
+                                    }
+                                }
+
                                 test.systemProperty 'java.library.path', filePath
                                 test.environment 'LD_LIBRARY_PATH', filePath
                                 test.workingDir filePath

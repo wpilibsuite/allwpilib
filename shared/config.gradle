@@ -45,6 +45,19 @@ model {
     }
 }
 
+apply plugin: DisableBuildingGTest
+
+if (project.hasProperty('buildServer')) {
+    tasks.withType(org.gradle.nativeplatform.test.tasks.RunTestExecutable) {
+        def exeFile = file(it.executable)
+        def folder = exeFile.parentFile
+
+        it.doLast {
+            folder.deleteDir()
+        }
+    }
+}
+
 ext.appendDebugPathToBinaries = { binaries->
     binaries.withType(StaticLibraryBinarySpec) {
         if (it.buildType.name.contains('debug')) {
