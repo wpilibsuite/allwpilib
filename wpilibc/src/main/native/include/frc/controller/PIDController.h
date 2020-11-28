@@ -238,6 +238,7 @@ class PIDController : public frc::Sendable,
   double m_velocityTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
+  double m_measurement = 0;
 };
 
 }  // namespace frc2

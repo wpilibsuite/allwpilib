@@ -62,6 +62,7 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_velocityTolerance = Double.POSITIVE_INFINITY;
 
   private double m_setpoint;
+  private double m_measurement;
 
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd and a default period of
@@ -211,8 +212,18 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    return Math.abs(m_positionError) < m_positionTolerance
-        && Math.abs(m_velocityError) < m_velocityTolerance;
+    double positionError;
+    if (m_continuous) {
+      positionError = ControllerUtil.getModulusError(m_setpoint, m_measurement, m_minimumInput,
+          m_maximumInput);
+    } else {
+      positionError = m_setpoint - m_measurement;
+    }
+
+    double velocityError = (positionError - m_prevError) / m_period;
+
+    return Math.abs(positionError) < m_positionTolerance
+        && Math.abs(velocityError) < m_velocityTolerance;
   }
 
   /**
@@ -313,6 +324,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param measurement The current measurement of the process variable.
    */
   public double calculate(double measurement) {
+    m_measurement = measurement;
     m_prevError = m_positionError;
 
     if (m_continuous) {
