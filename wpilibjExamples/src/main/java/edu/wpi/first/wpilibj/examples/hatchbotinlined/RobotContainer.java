@@ -45,7 +45,7 @@ public class RobotContainer {
       // Start driving forward at the start of the command
       () -> m_robotDrive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
       // Stop driving at the end of the command
-      (interrupt) -> m_robotDrive.arcadeDrive(0, 0),
+      interrupt -> m_robotDrive.arcadeDrive(0, 0),
       // End the command when the robot's driven distance exceeds the desired value
       () -> m_robotDrive.getAverageEncoderDistance() >= AutoConstants.kAutoDriveDistanceInches,
       // Require the drive subsystem
