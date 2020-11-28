@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.AutoConstants;
@@ -39,15 +38,15 @@ public class RobotContainer {
   // The autonomous routines
 
   // A simple auto routine that drives forward a specified distance, and then stops.
-  private final Command m_simpleAuto = new StartEndCommand(
-      // Start driving forward at the start of the command
+  private final Command m_simpleAuto = new RunCommand(
+      // Drive forward
       () -> m_robotDrive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0),
-      // Stop driving at the end of the command
-      () -> m_robotDrive.arcadeDrive(0, 0),
       // Requires the drive subsystem
       m_robotDrive)
       // Reset the encoders before starting
       .beforeStarting(m_robotDrive::resetEncoders)
+      // Stop driving at the end of the command
+      .andThen(() -> m_robotDrive.arcadeDrive(0, 0))
       // End the command when the robot's driven distance exceeds the desired value
       .withInterrupt(
           () -> m_robotDrive.getAverageEncoderDistance() >= AutoConstants.kAutoDriveDistanceInches);
