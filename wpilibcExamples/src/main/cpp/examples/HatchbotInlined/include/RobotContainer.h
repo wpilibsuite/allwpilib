@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,11 +10,11 @@
 #include <frc/XboxController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
-#include <frc2/command/StartEndCommand.h>
 
 #include "Constants.h"
 #include "commands/ComplexAuto.h"
@@ -47,15 +47,21 @@ class RobotContainer {
   HatchSubsystem m_hatch;
 
   // The autonomous routines
-  frc2::ParallelRaceGroup m_simpleAuto =
-      frc2::StartEndCommand(
-          [this] { m_drive.ArcadeDrive(ac::kAutoDriveSpeed, 0); },
-          [this] { m_drive.ArcadeDrive(0, 0); }, {&m_drive})
-          .BeforeStarting([this] { m_drive.ResetEncoders(); })
-          .WithInterrupt([this] {
-            return m_drive.GetAverageEncoderDistance() >=
-                   ac::kAutoDriveDistanceInches;
-          });
+  frc2::FunctionalCommand m_simpleAuto = frc2::FunctionalCommand(
+      // Reset encoders on command start
+      [this] { m_drive.ResetEncoders(); },
+      // Drive forward while the command is executing
+      [this] { m_drive.ArcadeDrive(AutoConstants::kAutoDriveSpeed, 0); },
+      // Stop driving at the end of the command
+      [this](bool interrupted) { m_drive.ArcadeDrive(0, 0); },
+      // End the command when the robot's driven distance exceeds the desired
+      // value
+      [this] {
+        return m_drive.GetAverageEncoderDistance() >=
+               AutoConstants::kAutoDriveDistanceInches;
+      },
+      // Requires the drive subsystem
+      {&m_drive});
   ComplexAuto m_complexAuto{&m_drive, &m_hatch};
 
   // Assorted commands to be bound to buttons
