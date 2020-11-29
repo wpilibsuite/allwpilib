@@ -17,6 +17,32 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_hal_simulation_AccelerometerDataJNI
+ * Method:    getDisplayName
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_AccelerometerDataJNI_getDisplayName
+  (JNIEnv* env, jclass, jint index)
+{
+  const char* displayName = HALSIM_GetAccelerometerDisplayName(index);
+  return wpi::java::MakeJString(env, displayName);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_AccelerometerDataJNI
+ * Method:    setDisplayName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_AccelerometerDataJNI_setDisplayName
+  (JNIEnv* env, jclass, jint index, jstring displayName)
+{
+  wpi::java::JStringRef displayNameRef{env, displayName};
+  HALSIM_SetAccelerometerDisplayName(index, displayNameRef.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_AccelerometerDataJNI
  * Method:    registerActiveCallback
  * Signature: (ILjava/lang/Object;Z)I
  */

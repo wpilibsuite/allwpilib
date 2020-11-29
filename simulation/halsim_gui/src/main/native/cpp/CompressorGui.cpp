@@ -57,7 +57,7 @@ static void DisplayCompressors() {
     if (auto source = gCompressorSources[i].get()) {
       char name[32];
       std::snprintf(name, sizeof(name), "Compressor[%d]", i);
-      if (SimDeviceGui::StartDevice(name)) {
+      if (SimDeviceGui::StartDevice(name, name)) {
         HAL_Value value;
 
         // enabled

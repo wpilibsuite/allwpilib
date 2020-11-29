@@ -17,6 +17,32 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_hal_simulation_AnalogGyroDataJNI
+ * Method:    getDisplayName
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_AnalogGyroDataJNI_getDisplayName
+  (JNIEnv* env, jclass, jint index)
+{
+  const char* displayName = HALSIM_GetAnalogGyroDisplayName(index);
+  return wpi::java::MakeJString(env, displayName);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_AnalogGyroDataJNI
+ * Method:    setDisplayName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_AnalogGyroDataJNI_setDisplayName
+  (JNIEnv* env, jclass, jint index, jstring displayName)
+{
+  wpi::java::JStringRef displayNameRef{env, displayName};
+  HALSIM_SetAnalogGyroDisplayName(index, displayNameRef.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_AnalogGyroDataJNI
  * Method:    registerAngleCallback
  * Signature: (ILjava/lang/Object;Z)I
  */

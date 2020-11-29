@@ -610,4 +610,32 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_resetSimDeviceData
   HALSIM_ResetSimDeviceData();
 }
 
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Method:    getDisplayName
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getDisplayName
+  (JNIEnv* env, jclass, jint handle)
+{
+  const char* displayName =
+      HALSIM_GetSimDeviceDisplayName(static_cast<HAL_SimValueHandle>(handle));
+  return wpi::java::MakeJString(env, displayName);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Method:    setDisplayName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_setDisplayName
+  (JNIEnv* env, jclass, jint handle, jstring displayName)
+{
+  wpi::java::JStringRef displayNameRef{env, displayName};
+  HALSIM_SetSimDeviceDisplayName(static_cast<HAL_SimValueHandle>(handle),
+                                 displayNameRef.c_str());
+}
+
 }  // extern "C"

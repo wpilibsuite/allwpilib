@@ -15,6 +15,8 @@ void HALSIM_ResetAnalogOutData(int32_t index) {}
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, AnalogOut##CAPINAME, RETURN)
 
+const char* HALSIM_GetAnalogOutDisplayName(int32_t index) { return ""; }
+void HALSIM_SetAnalogOutDisplayName(int32_t index, const char* displayName) {}
 DEFINE_CAPI(double, Voltage, 0)
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 

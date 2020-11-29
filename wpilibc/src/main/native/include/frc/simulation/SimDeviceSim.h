@@ -29,6 +29,9 @@ class SimDeviceSim {
    */
   explicit SimDeviceSim(const char* name);
 
+  const char* GetDisplayName() const;
+  void SetDisplayName(const char* displayName);
+
   hal::SimValue GetValue(const char* name) const;
 
   hal::SimDouble GetDouble(const char* name) const;

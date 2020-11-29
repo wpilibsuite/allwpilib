@@ -15,6 +15,10 @@ extern "C" {
 #endif
 
 void HALSIM_ResetRelayData(int32_t index);
+
+const char* HALSIM_GetRelayDisplayName(int32_t index);
+void HALSIM_SetRelayDisplayName(int32_t index, const char* displayName);
+
 int32_t HALSIM_RegisterRelayInitializedForwardCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,
     HAL_Bool initialNotify);

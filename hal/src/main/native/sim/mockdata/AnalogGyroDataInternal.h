@@ -9,6 +9,7 @@
 
 #include "hal/simulation/AnalogGyroData.h"
 #include "hal/simulation/SimDataValue.h"
+#include "hal/simulation/SimDisplayName.h"
 
 namespace hal {
 class AnalogGyroData {
@@ -17,6 +18,7 @@ class AnalogGyroData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
 
  public:
+  SimDisplayName displayName;
   SimDataValue<double, HAL_MakeDouble, GetAngleName> angle{0.0};
   SimDataValue<double, HAL_MakeDouble, GetRateName> rate{0.0};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{

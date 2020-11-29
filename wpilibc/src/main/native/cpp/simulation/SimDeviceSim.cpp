@@ -19,6 +19,13 @@ using namespace frc::sim;
 SimDeviceSim::SimDeviceSim(const char* name)
     : m_handle{HALSIM_GetSimDeviceHandle(name)} {}
 
+const char* SimDeviceSim::GetDisplayName() const {
+  return HALSIM_GetSimDeviceDisplayName(m_handle);
+}
+void SimDeviceSim::SetDisplayName(const char* displayName) {
+  HALSIM_SetSimDeviceDisplayName(m_handle, displayName);
+}
+
 hal::SimValue SimDeviceSim::GetValue(const char* name) const {
   return HALSIM_GetSimValueHandle(m_handle, name);
 }

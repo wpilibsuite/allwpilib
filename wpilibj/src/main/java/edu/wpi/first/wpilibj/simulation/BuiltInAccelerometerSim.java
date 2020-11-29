@@ -34,6 +34,10 @@ public class BuiltInAccelerometerSim {
     m_index = 0;
   }
 
+  public void setDisplayName(String displayName) {
+    AccelerometerDataJNI.setDisplayName(m_index, displayName);
+  }
+
   public CallbackStore registerActiveCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AccelerometerDataJNI.registerActiveCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AccelerometerDataJNI::cancelActiveCallback);

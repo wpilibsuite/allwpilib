@@ -45,6 +45,15 @@ public class DIOSim {
     m_index = channel;
   }
 
+
+  public String getDisplayName() {
+    return DIODataJNI.getDisplayName(m_index);
+  }
+
+  public void setDisplayName(String displayName) {
+    DIODataJNI.setDisplayName(m_index, displayName);
+  }
+
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DIODataJNI::cancelInitializedCallback);

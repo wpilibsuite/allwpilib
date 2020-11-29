@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -31,6 +31,7 @@ void AnalogInData::ResetData() {
   accumulatorCount.Reset(0);
   accumulatorCenter.Reset(0);
   accumulatorDeadband.Reset(0);
+  displayName.Reset();
 }
 
 extern "C" {
@@ -46,6 +47,12 @@ HAL_SimDeviceHandle HALSIM_GetAnalogInSimDevice(int32_t index) {
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, AnalogIn##CAPINAME, \
                                SimAnalogInData, LOWERNAME)
 
+const char* HALSIM_GetAnalogInDisplayName(int32_t index) {
+  return SimAnalogInData[index].displayName.Get();
+}
+void HALSIM_SetAnalogInDisplayName(int32_t index, const char* displayName) {
+  SimAnalogInData[index].displayName.Set(displayName);
+}
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
 DEFINE_CAPI(int32_t, AverageBits, averageBits)
 DEFINE_CAPI(int32_t, OversampleBits, oversampleBits)

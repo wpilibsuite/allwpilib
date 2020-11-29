@@ -58,6 +58,13 @@ public class EncoderSim {
     return new EncoderSim(index);
   }
 
+  public String getDisplayName() {
+    return EncoderDataJNI.getDisplayName(m_index);
+  }
+  public void setDisplayName(String displayName) {
+    EncoderDataJNI.setDisplayName(m_index, displayName);
+  }
+
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = EncoderDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, EncoderDataJNI::cancelInitializedCallback);

@@ -17,6 +17,32 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_hal_simulation_RelayDataJNI
+ * Method:    getDisplayName
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_RelayDataJNI_getDisplayName
+  (JNIEnv* env, jclass, jint index)
+{
+  const char* displayName = HALSIM_GetRelayDisplayName(index);
+  return wpi::java::MakeJString(env, displayName);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RelayDataJNI
+ * Method:    setDisplayName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_RelayDataJNI_setDisplayName
+  (JNIEnv* env, jclass, jint index, jstring displayName)
+{
+  wpi::java::JStringRef displayNameRef{env, displayName};
+  HALSIM_SetRelayDisplayName(index, displayNameRef.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_RelayDataJNI
  * Method:    registerInitializedForwardCallback
  * Signature: (ILjava/lang/Object;Z)I
  */

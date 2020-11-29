@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,6 +27,7 @@ void DIOData::ResetData() {
   pulseLength.Reset(0.0);
   isInput.Reset(true);
   filterIndex.Reset(-1);
+  displayName.Reset();
 }
 
 extern "C" {
@@ -39,6 +40,13 @@ HAL_SimDeviceHandle HALSIM_GetDIOSimDevice(int32_t index) {
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, DIO##CAPINAME, SimDIOData, \
                                LOWERNAME)
+
+const char* HALSIM_GetDIODisplayName(int32_t index) {
+  return SimDIOData[index].displayName.Get();
+}
+void HALSIM_SetDIODisplayName(int32_t index, const char* displayName) {
+  SimDIOData[index].displayName.Set(displayName);
+}
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
 DEFINE_CAPI(HAL_Bool, Value, value)

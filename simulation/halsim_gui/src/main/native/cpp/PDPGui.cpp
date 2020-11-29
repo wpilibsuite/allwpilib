@@ -39,9 +39,23 @@ struct PDPSource {
   PDPVoltageSource voltage;
   std::vector<std::unique_ptr<PDPCurrentSource>> currents;
 };
+
+class PDPNameAccessor {
+ public:
+  void GetLabel(char* buf, size_t size, const char* defaultName,
+                int index) const {
+    const char* displayName = HALSIM_GetPDPDisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+    } else {
+      std::snprintf(buf, size, "%s[%d]###Name%d", defaultName, index, index);
+    }
+  }
+};
+
 }  // namespace
 
-static IniSaver<NameInfo> gChannels{"PDP"};
+static std::vector<PDPNameAccessor> gChannels;
 static std::vector<std::unique_ptr<PDPSource>> gPDPSources;
 
 static void UpdatePDPSources() {
@@ -97,9 +111,6 @@ static void DisplayPDP() {
           if (source->currents[left]->InputDouble(name, &val, 0, 0, "%.3f"))
             HALSIM_SetPDPCurrent(i, left, val);
           float leftWidth = ImGui::GetItemRectSize().x;
-          if (leftInfo.PopupEditName(left)) {
-            source->currents[left]->SetName(leftInfo.GetName());
-          }
           ImGui::PopID();
           ImGui::NextColumn();
 
@@ -111,9 +122,6 @@ static void DisplayPDP() {
           if (source->currents[right]->InputDouble(name, &val, 0, 0, "%.3f"))
             HALSIM_SetPDPCurrent(i, right, val);
           float rightWidth = ImGui::GetItemRectSize().x;
-          if (rightInfo.PopupEditName(right)) {
-            source->currents[right]->SetName(rightInfo.GetName());
-          }
           ImGui::PopID();
           ImGui::NextColumn();
 
@@ -131,7 +139,7 @@ static void DisplayPDP() {
 }
 
 void PDPGui::Initialize() {
-  gChannels.Initialize();
+  gChannels.resize(HAL_GetNumPDPModules());
   gPDPSources.resize(HAL_GetNumPDPModules());
   HALSimGui::AddExecute(UpdatePDPSources);
   HALSimGui::AddWindow("PDP", DisplayPDP);

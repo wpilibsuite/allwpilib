@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,6 +24,7 @@ void PCMData::ResetData() {
   for (int i = 0; i < kNumSolenoidChannels; i++) {
     solenoidInitialized[i].Reset(false);
     solenoidOutput[i].Reset(false);
+    solenoidDisplayName[i].Reset();
   }
   compressorInitialized.Reset(false);
   compressorOn.Reset(false);
@@ -48,6 +49,15 @@ DEFINE_CAPI(HAL_Bool, CompressorOn, compressorOn)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, pressureSwitch)
 DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
+
+const char* HALSIM_GetSolenoidDisplayName(int32_t index, int32_t channel) {
+  return SimPCMData[index].solenoidDisplayName[channel].Get();
+}
+
+void HALSIM_SetSolenoidDisplayName(int32_t index, int32_t channel,
+                                   const char* displayName) {
+  SimPCMData[index].solenoidDisplayName[channel].Set(displayName);
+}
 
 void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) {
   auto& data = SimPCMData[index].solenoidOutput;

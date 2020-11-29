@@ -9,6 +9,7 @@
 
 #include "hal/simulation/RelayData.h"
 #include "hal/simulation/SimDataValue.h"
+#include "hal/simulation/SimDisplayName.h"
 
 namespace hal {
 class RelayData {
@@ -18,6 +19,7 @@ class RelayData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Reverse)
 
  public:
+  SimDisplayName displayName;
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedForwardName>
       initializedForward{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedReverseName>

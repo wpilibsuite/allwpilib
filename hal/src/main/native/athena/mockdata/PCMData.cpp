@@ -18,6 +18,12 @@ void HALSIM_ResetPCMData(int32_t index) {}
 HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidInitialized,
                                    false)
 HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidOutput, false)
+
+const char* HALSIM_GetSolenoidDisplayName(int32_t index, int32_t channel) {
+  return "";
+}
+void HALSIM_SetSolenoidDisplayName(int32_t index, int32_t channel,
+                                   const char* displayName) {}
 DEFINE_CAPI(HAL_Bool, CompressorInitialized, false)
 DEFINE_CAPI(HAL_Bool, CompressorOn, false)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, false)

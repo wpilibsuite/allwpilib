@@ -35,6 +35,14 @@ public class AnalogOutputSim {
     m_index = channel;
   }
 
+  public String getDisplayName() {
+    return AnalogOutDataJNI.getDisplayName(m_index);
+  }
+
+  public void setDisplayName(String displayName) {
+    AnalogOutDataJNI.setDisplayName(m_index, displayName);
+  }
+
   public CallbackStore registerVoltageCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogOutDataJNI.registerVoltageCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogOutDataJNI::cancelVoltageCallback);

@@ -52,7 +52,7 @@ static void DisplayAnalogGyros() {
     if (auto source = gAnalogGyroSources[i].get()) {
       char name[32];
       std::snprintf(name, sizeof(name), "AnalogGyro[%d]", i);
-      if (SimDeviceGui::StartDevice(name)) {
+      if (SimDeviceGui::StartDevice(name, HALSIM_GetAnalogGyroDisplayName(i))) {
         HAL_Value value;
 
         // angle

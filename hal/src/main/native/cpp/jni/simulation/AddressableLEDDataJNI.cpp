@@ -72,6 +72,32 @@ Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setInitialized
 
 /*
  * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Method:    getDisplayName
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_getDisplayName
+  (JNIEnv* env, jclass, jint index)
+{
+  const char* displayName = HALSIM_GetAddressableLEDDisplayName(index);
+  return wpi::java::MakeJString(env, displayName);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
+ * Method:    setDisplayName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_AddressableLEDDataJNI_setDisplayName
+  (JNIEnv* env, jclass, jint index, jstring displayName)
+{
+  wpi::java::JStringRef displayNameRef{env, displayName};
+  HALSIM_SetAddressableLEDDisplayName(index, displayNameRef.c_str());
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_AddressableLEDDataJNI
  * Method:    registerOutputPortCallback
  * Signature: (ILjava/lang/Object;Z)I
  */

@@ -15,6 +15,10 @@ extern "C" {
 #endif
 
 void HALSIM_ResetDIOData(int32_t index);
+
+const char* HALSIM_GetDIODisplayName(int32_t index);
+void HALSIM_SetDIODisplayName(int32_t index, const char* displayName);
+
 int32_t HALSIM_RegisterDIOInitializedCallback(int32_t index,
                                               HAL_NotifyCallback callback,
                                               void* param,

@@ -33,6 +33,7 @@ void EncoderData::ResetData() {
   reverseDirection.Reset(false);
   samplesToAverage.Reset(0);
   distancePerPulse.Reset(1);
+  displayName.Reset();
 }
 
 extern "C" {
@@ -44,6 +45,13 @@ int32_t HALSIM_FindEncoderForChannel(int32_t channel) {
       return i;
   }
   return -1;
+}
+
+const char* HALSIM_GetEncoderDisplayName(int32_t index) {
+  return SimEncoderData[index].displayName.Get();
+}
+void HALSIM_SetEncoderDisplayName(int32_t index, const char* displayName) {
+  SimEncoderData[index].displayName.Set(displayName);
 }
 
 void HALSIM_ResetEncoderData(int32_t index) {

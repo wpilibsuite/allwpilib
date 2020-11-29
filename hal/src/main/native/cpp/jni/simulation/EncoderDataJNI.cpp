@@ -7,6 +7,8 @@
 
 #include <jni.h>
 
+#include <wpi/jni_util.h>
+
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_EncoderDataJNI.h"
 #include "hal/simulation/EncoderData.h"
@@ -14,6 +16,32 @@
 using namespace hal;
 
 extern "C" {
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI
+ * Method:    getDisplayName
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_EncoderDataJNI_getDisplayName
+  (JNIEnv* env, jclass, jint index)
+{
+  const char* displayName = HALSIM_GetEncoderDisplayName(index);
+  return wpi::java::MakeJString(env, displayName);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI
+ * Method:    setDisplayName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_EncoderDataJNI_setDisplayName
+  (JNIEnv* env, jclass, jint index, jstring displayName)
+{
+  wpi::java::JStringRef displayNameRef{env, displayName};
+  HALSIM_SetEncoderDisplayName(index, displayNameRef.c_str());
+}
 
 /*
  * Class:     edu_wpi_first_hal_simulation_EncoderDataJNI

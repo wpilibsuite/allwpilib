@@ -15,6 +15,10 @@ extern "C" {
 #endif
 
 void HALSIM_ResetPDPData(int32_t index);
+
+const char* HALSIM_GetPDPDisplayName(int32_t index);
+void HALSIM_SetPDPDisplayName(int32_t index, const char* displayName);
+
 int32_t HALSIM_RegisterPDPInitializedCallback(int32_t index,
                                               HAL_NotifyCallback callback,
                                               void* param,

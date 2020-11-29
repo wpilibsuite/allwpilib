@@ -15,6 +15,9 @@ public class PCMDataJNI extends JNIWrapper {
   public static native boolean getSolenoidInitialized(int index, int channel);
   public static native void setSolenoidInitialized(int index, int channel, boolean solenoidInitialized);
 
+  public static native String getSolenoidDisplayName(int index, int channel);
+  public static native void setSolenoidDisplayName(int index, int channel, String displayName);
+
   public static native int registerSolenoidOutputCallback(int index, int channel, NotifyCallback callback, boolean initialNotify);
   public static native void cancelSolenoidOutputCallback(int index, int channel, int uid);
   public static native boolean getSolenoidOutput(int index, int channel);

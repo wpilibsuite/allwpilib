@@ -14,6 +14,7 @@
 #include "hal/simulation/AddressableLEDData.h"
 #include "hal/simulation/SimCallbackRegistry.h"
 #include "hal/simulation/SimDataValue.h"
+#include "hal/simulation/SimDisplayName.h"
 
 namespace hal {
 class AddressableLEDData {
@@ -30,6 +31,7 @@ class AddressableLEDData {
   void SetData(const HAL_AddressableLEDData* d, int32_t len);
   int32_t GetData(HAL_AddressableLEDData* d);
 
+  SimDisplayName displayName;
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
   SimDataValue<int32_t, HAL_MakeInt, GetOutputPortName> outputPort{-1};

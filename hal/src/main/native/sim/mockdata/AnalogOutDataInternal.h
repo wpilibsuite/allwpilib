@@ -9,6 +9,7 @@
 
 #include "hal/simulation/AnalogOutData.h"
 #include "hal/simulation/SimDataValue.h"
+#include "hal/simulation/SimDisplayName.h"
 
 namespace hal {
 class AnalogOutData {
@@ -16,6 +17,7 @@ class AnalogOutData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
 
  public:
+  SimDisplayName displayName;
   SimDataValue<double, HAL_MakeDouble, GetVoltageName> voltage{0.0};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{0};
 

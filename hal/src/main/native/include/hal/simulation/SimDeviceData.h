@@ -39,6 +39,9 @@ void HALSIM_CancelSimDeviceFreedCallback(int32_t uid);
 
 HAL_SimDeviceHandle HALSIM_GetSimDeviceHandle(const char* name);
 
+const char* HALSIM_GetSimDeviceDisplayName(HAL_SimDeviceHandle handle);
+void HALSIM_SetSimDeviceDisplayName(HAL_SimDeviceHandle handle,
+                                    const char* displayName);
 const char* HALSIM_GetSimDeviceName(HAL_SimDeviceHandle handle);
 
 HAL_SimDeviceHandle HALSIM_GetSimValueDeviceHandle(HAL_SimValueHandle handle);

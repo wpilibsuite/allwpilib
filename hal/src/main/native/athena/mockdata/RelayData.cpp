@@ -15,6 +15,8 @@ void HALSIM_ResetRelayData(int32_t index) {}
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, Relay##CAPINAME, RETURN)
 
+const char* HALSIM_GetRelayDisplayName(int32_t index) { return ""; }
+void HALSIM_SetRelayDisplayName(int32_t index, const char* displayName) {}
 DEFINE_CAPI(HAL_Bool, InitializedForward, false)
 DEFINE_CAPI(HAL_Bool, InitializedReverse, false)
 DEFINE_CAPI(HAL_Bool, Forward, false)

@@ -27,16 +27,23 @@ using namespace halsimgui;
 
 namespace {
 
-struct ElementInfo : public NameInfo, public OpenInfo {
+struct ElementInfo : public OpenInfo {
   bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
-    if (NameInfo::ReadIni(name, value)) return true;
     if (OpenInfo::ReadIni(name, value)) return true;
     return false;
   }
-  void WriteIni(ImGuiTextBuffer* out) {
-    NameInfo::WriteIni(out);
-    OpenInfo::WriteIni(out);
+  void WriteIni(ImGuiTextBuffer* out) { OpenInfo::WriteIni(out); }
+
+  const char* GetDisplayName(const char* defaultName,
+                             HAL_SimDeviceHandle handle) const {
+    const char* displayName = HALSIM_GetSimDeviceDisplayName(handle);
+    if (displayName[0] == '\0') {
+      return defaultName;
+    } else {
+      return displayName;
+    }
   }
+
   bool visible = true;  // not saved
 };
 
@@ -96,17 +103,15 @@ void SimDeviceGui::Add(std::function<void()> execute) {
   if (execute) gDeviceExecutors.emplace_back(std::move(execute));
 }
 
-bool SimDeviceGui::StartDevice(const char* label, ImGuiTreeNodeFlags flags) {
+bool SimDeviceGui::StartDevice(const char* label, const char* displayName,
+                               ImGuiTreeNodeFlags flags) {
   auto& element = gElements[label];
   if (!element.visible) return false;
 
-  char name[128];
-  element.GetLabel(name, sizeof(name), label);
-
   bool open = ImGui::CollapsingHeader(
-      name, flags | (element.IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0));
+      displayName,
+      flags | (element.IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0));
   element.SetOpen(open);
-  element.PopupEditName(label);
 
   if (open) ImGui::PushID(label);
   return open;
@@ -245,7 +250,9 @@ static void SimDeviceDisplayDevice(const char* name, void*,
   auto it = gElements.find(name);
   if (it != gElements.end() && !it->second.visible) return;
 
-  if (SimDeviceGui::StartDevice(name)) {
+  const char* displayName = it->second.GetDisplayName(name, handle);
+
+  if (SimDeviceGui::StartDevice(name, displayName)) {
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     HALSIM_EnumerateSimValues(handle, nullptr, SimDeviceDisplayValue);
     ImGui::PopItemWidth();
@@ -282,11 +289,5 @@ HAL_Bool HALSIMGUI_DeviceTreeDisplayValue(const char* name, HAL_Bool readonly,
                                           int32_t numOptions) {
   return SimDeviceGui::DisplayValue(name, readonly, value, options, numOptions);
 }
-
-HAL_Bool HALSIMGUI_DeviceTreeStartDevice(const char* label, int32_t flags) {
-  return SimDeviceGui::StartDevice(label, flags);
-}
-
-void HALSIMGUI_DeviceTreeFinishDevice(void) { SimDeviceGui::FinishDevice(); }
 
 }  // extern "C"

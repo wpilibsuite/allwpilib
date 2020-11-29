@@ -25,10 +25,24 @@ using namespace halsimgui;
 
 namespace {
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(AnalogInVoltage, "AIn");
+
+class AnalogInNameAccessor {
+ public:
+  void GetLabel(char* buf, size_t size, const char* defaultName,
+                int index) const {
+    const char* displayName = HALSIM_GetAnalogInDisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+    } else {
+      std::snprintf(buf, size, "%s[%d]###Name%d", defaultName, index, index);
+    }
+  }
+};
+
 }  // namespace
 
 // indexed by channel
-static IniSaver<NameInfo> gAnalogInputs{"AnalogInput"};
+static std::vector<AnalogInNameAccessor> gAnalogInputs;
 static std::vector<std::unique_ptr<AnalogInVoltageSource>> gAnalogInputSources;
 
 static void UpdateAnalogInputSources() {
@@ -37,7 +51,6 @@ static void UpdateAnalogInputSources() {
     if (HALSIM_GetAnalogInInitialized(i)) {
       if (!source) {
         source = std::make_unique<AnalogInVoltageSource>(i);
-        source->SetName(gAnalogInputs[i].GetName());
       }
     } else {
       source.reset();
@@ -81,10 +94,6 @@ static void DisplayAnalogInputs() {
           HALSIM_SetAnalogInVoltage(i, val);
       }
 
-      // context menu to change name
-      if (info.PopupEditName(i)) {
-        source->SetName(info.GetName());
-      }
       ImGui::PopID();
     }
   }
@@ -92,7 +101,7 @@ static void DisplayAnalogInputs() {
 }
 
 void AnalogInputGui::Initialize() {
-  gAnalogInputs.Initialize();
+  gAnalogInputs.resize(HAL_GetNumAnalogInputs());
   gAnalogInputSources.resize(HAL_GetNumAnalogInputs());
 
   HALSimGui::AddExecute(UpdateAnalogInputSources);

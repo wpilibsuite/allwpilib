@@ -26,8 +26,6 @@ HAL_Bool HALSIMGUI_DeviceTreeDisplayValue(const char* name, HAL_Bool readonly,
                                           struct HAL_Value* value,
                                           const char** options,
                                           int32_t numOptions);
-HAL_Bool HALSIMGUI_DeviceTreeStartDevice(const char* label, int32_t flags);
-void HALSIMGUI_DeviceTreeFinishDevice(void);
 
 }  // extern "C"
 
@@ -96,7 +94,8 @@ class SimDeviceGui {
    * @param flags ImGuiTreeNodeFlags flags
    * @return True if expanded
    */
-  static bool StartDevice(const char* label, ImGuiTreeNodeFlags flags = 0);
+  static bool StartDevice(const char* label, const char* displayName,
+                          ImGuiTreeNodeFlags flags = 0);
 
   /**
    * Finish a device block started with StartDevice().

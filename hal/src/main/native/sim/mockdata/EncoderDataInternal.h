@@ -12,6 +12,7 @@
 
 #include "hal/simulation/EncoderData.h"
 #include "hal/simulation/SimDataValue.h"
+#include "hal/simulation/SimDisplayName.h"
 
 namespace hal {
 class EncoderData {
@@ -26,6 +27,7 @@ class EncoderData {
   HAL_SIMDATAVALUE_DEFINE_NAME(DistancePerPulse)
 
  public:
+  SimDisplayName displayName;
   std::atomic<int32_t> digitalChannelA{0};
   std::atomic<int32_t> digitalChannelB{0};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{

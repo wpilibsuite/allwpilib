@@ -24,9 +24,22 @@ using namespace halsimgui;
 
 namespace {
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(AnalogOutVoltage, "AOut");
+
+class AnalogOutNameAccessor {
+ public:
+  void GetLabel(char* buf, size_t size, const char* defaultName,
+                int index) const {
+    const char* displayName = HALSIM_GetAnalogOutDisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+    } else {
+      std::snprintf(buf, size, "%s[%d]###Name%d", defaultName, index, index);
+    }
+  }
+};
 }  // namespace
 
-static IniSaver<NameInfo> gAnalogOuts{"AnalogOut"};  // indexed by channel
+static std::vector<AnalogOutNameAccessor> gAnalogOuts;  // indexed by channel
 static std::vector<std::unique_ptr<AnalogOutVoltageSource>> gAnalogOutSources;
 
 static void UpdateAnalogOutSources() {
@@ -35,7 +48,6 @@ static void UpdateAnalogOutSources() {
     if (HALSIM_GetAnalogOutInitialized(i)) {
       if (!source) {
         source = std::make_unique<AnalogOutVoltageSource>(i);
-        source->SetName(gAnalogOuts[i].GetName());
       }
     } else {
       source.reset();
@@ -51,7 +63,7 @@ static void DisplayAnalogOutputs() {
 
   if (count == 0) return;
 
-  if (SimDeviceGui::StartDevice("Analog Outputs")) {
+  if (SimDeviceGui::StartDevice("Analog Outputs", "Analog Outputs")) {
     for (int i = 0, iend = gAnalogOutSources.size(); i < iend; ++i) {
       if (auto source = gAnalogOutSources[i].get()) {
         ImGui::PushID(i);
@@ -62,9 +74,6 @@ static void DisplayAnalogOutputs() {
         HAL_Value value = HAL_MakeDouble(source->GetValue());
         SimDeviceGui::DisplayValueSource(label, true, &value, source);
 
-        if (info.PopupEditName(i)) {
-          if (source) source->SetName(info.GetName());
-        }
         ImGui::PopID();
       }
     }
@@ -74,7 +83,7 @@ static void DisplayAnalogOutputs() {
 }
 
 void AnalogOutGui::Initialize() {
-  gAnalogOuts.Initialize();
+  gAnalogOuts.resize(HAL_GetNumAnalogOutputs());
   gAnalogOutSources.resize(HAL_GetNumAnalogOutputs());
   HALSimGui::AddExecute(UpdateAnalogOutSources);
   SimDeviceGui::Add(DisplayAnalogOutputs);

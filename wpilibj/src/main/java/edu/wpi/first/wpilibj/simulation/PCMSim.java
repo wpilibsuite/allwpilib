@@ -43,6 +43,13 @@ public class PCMSim {
     m_index = compressor.getModule();
   }
 
+  public String getSolenoidDisplayName(int channel) {
+    return PCMDataJNI.getSolenoidDisplayName(m_index, channel);
+  }
+  public void setSolenoidDisplayName(int channel, String displayName) {
+    PCMDataJNI.setSolenoidDisplayName(m_index, channel, displayName);
+  }
+
   public CallbackStore registerSolenoidInitializedCallback(int channel, NotifyCallback callback, boolean initialNotify) {
     int uid = PCMDataJNI.registerSolenoidInitializedCallback(m_index, channel, callback, initialNotify);
     return new CallbackStore(m_index, channel, uid, PCMDataJNI::cancelSolenoidInitializedCallback);

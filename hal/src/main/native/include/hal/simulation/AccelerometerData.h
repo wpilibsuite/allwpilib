@@ -16,6 +16,10 @@ extern "C" {
 #endif
 
 void HALSIM_ResetAccelerometerData(int32_t index);
+
+const char* HALSIM_GetAccelerometerDisplayName(int32_t index);
+void HALSIM_SetAccelerometerDisplayName(int32_t index, const char* displayName);
+
 int32_t HALSIM_RegisterAccelerometerActiveCallback(int32_t index,
                                                    HAL_NotifyCallback callback,
                                                    void* param,

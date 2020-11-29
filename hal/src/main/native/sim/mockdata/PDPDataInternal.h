@@ -10,6 +10,7 @@
 #include "../PortsInternal.h"
 #include "hal/simulation/PDPData.h"
 #include "hal/simulation/SimDataValue.h"
+#include "hal/simulation/SimDisplayName.h"
 
 namespace hal {
 class PDPData {
@@ -23,6 +24,7 @@ class PDPData {
   }
 
  public:
+  SimDisplayName displayName;
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
   SimDataValue<double, HAL_MakeDouble, GetTemperatureName> temperature{0.0};

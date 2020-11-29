@@ -19,6 +19,10 @@ int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel);
 
 void HALSIM_ResetAddressableLEDData(int32_t index);
 
+const char* HALSIM_GetAddressableLEDDisplayName(int32_t index);
+void HALSIM_SetAddressableLEDDisplayName(int32_t index,
+                                         const char* displayName);
+
 int32_t HALSIM_RegisterAddressableLEDInitializedCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,
     HAL_Bool initialNotify);

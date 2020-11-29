@@ -39,7 +39,8 @@ static void UpdateAccelSources() {
 
 static void DisplayAccelerometers() {
   if (!HALSIM_GetAccelerometerActive(0)) return;
-  if (SimDeviceGui::StartDevice("BuiltInAccel")) {
+  if (SimDeviceGui::StartDevice("BuiltInAccel",
+                                HALSIM_GetAccelerometerDisplayName(0))) {
     HAL_Value value;
 
     // Range

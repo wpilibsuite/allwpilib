@@ -15,6 +15,8 @@ void HALSIM_ResetAnalogGyroData(int32_t index) {}
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, AnalogGyro##CAPINAME, RETURN)
 
+const char* HALSIM_GetAnalogGyroDisplayName(int32_t index) { return ""; }
+void HALSIM_SetAnalogGyroDisplayName(int32_t index, const char* displayName) {}
 DEFINE_CAPI(double, Angle, 0)
 DEFINE_CAPI(double, Rate, 0)
 DEFINE_CAPI(HAL_Bool, Initialized, false)

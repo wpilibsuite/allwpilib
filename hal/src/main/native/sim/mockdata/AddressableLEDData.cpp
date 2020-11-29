@@ -30,6 +30,7 @@ void AddressableLEDData::ResetData() {
   length.Reset(1);
   running.Reset(false);
   data.Reset();
+  displayName.Reset();
 }
 
 void AddressableLEDData::SetData(const HAL_AddressableLEDData* d, int32_t len) {
@@ -61,6 +62,14 @@ int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel) {
 
 void HALSIM_ResetAddressableLEDData(int32_t index) {
   SimAddressableLEDData[index].ResetData();
+}
+
+const char* HALSIM_GetAddressableLEDDisplayName(int32_t index) {
+  return SimAddressableLEDData[index].displayName.Get();
+}
+void HALSIM_SetAddressableLEDDisplayName(int32_t index,
+                                         const char* displayName) {
+  SimAddressableLEDData[index].displayName.Set(displayName);
 }
 
 int32_t HALSIM_GetAddressableLEDData(int32_t index,

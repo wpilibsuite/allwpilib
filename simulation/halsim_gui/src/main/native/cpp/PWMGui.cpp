@@ -26,9 +26,22 @@ using namespace halsimgui;
 
 namespace {
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMSpeed, "PWM");
+
+class PwmNameAccessor {
+ public:
+  void GetLabel(char* buf, size_t size, const char* defaultName,
+                int index) const {
+    const char* displayName = HALSIM_GetPWMDisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+    } else {
+      std::snprintf(buf, size, "%s[%d]###Name%d", defaultName, index, index);
+    }
+  }
+};
 }  // namespace
 
-static IniSaver<NameInfo> gPWM{"PWM"};
+static std::vector<PwmNameAccessor> gPWM;
 static std::vector<std::unique_ptr<PWMSpeedSource>> gPWMSources;
 
 static void UpdatePWMSources() {
@@ -41,7 +54,6 @@ static void UpdatePWMSources() {
     if (HALSIM_GetPWMInitialized(i)) {
       if (!source) {
         source = std::make_unique<PWMSpeedSource>(i);
-        source->SetName(gPWM[i].GetName());
       }
     } else {
       source.reset();
@@ -85,9 +97,6 @@ static void DisplayPWMs() {
         float val = HALSimGui::AreOutputsDisabled() ? 0 : HALSIM_GetPWMSpeed(i);
         source->LabelText(label, "%0.3f", val);
       }
-      if (info.PopupEditName(i)) {
-        source->SetName(info.GetName());
-      }
       ImGui::PopID();
     }
   }
@@ -96,7 +105,7 @@ static void DisplayPWMs() {
 }
 
 void PWMGui::Initialize() {
-  gPWM.Initialize();
+  gPWM.resize(HAL_GetNumPWMChannels());
   HALSimGui::AddExecute(UpdatePWMSources);
   HALSimGui::AddWindow("PWM Outputs", DisplayPWMs,
                        ImGuiWindowFlags_AlwaysAutoResize);

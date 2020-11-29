@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
  */
 @SuppressWarnings("TypeName")
 public class ADXRS450_GyroSim {
+  private final SimDeviceSim m_wrappedSimDevice;
   private final SimDouble m_simAngle;
   private final SimDouble m_simRate;
 
@@ -24,9 +25,13 @@ public class ADXRS450_GyroSim {
    * @param gyro ADXRS450_Gyro to simulate
    */
   public ADXRS450_GyroSim(ADXRS450_Gyro gyro) {
-    SimDeviceSim wrappedSimDevice = new SimDeviceSim("ADXRS450_Gyro" + "[" + gyro.getPort() + "]");
-    m_simAngle = wrappedSimDevice.getDouble("Angle");
-    m_simRate = wrappedSimDevice.getDouble("Rate");
+    m_wrappedSimDevice = new SimDeviceSim("ADXRS450_Gyro" + "[" + gyro.getPort() + "]");
+    m_simAngle = m_wrappedSimDevice.getDouble("Angle");
+    m_simRate = m_wrappedSimDevice.getDouble("Rate");
+  }
+
+  public void setDisplayName(String displayName) {
+    m_wrappedSimDevice.setDisplayName(displayName);
   }
 
   /**

@@ -35,6 +35,12 @@ HAL_SimDeviceHandle HALSIM_GetSimDeviceHandle(const char* name) { return 0; }
 
 const char* HALSIM_GetSimDeviceName(HAL_SimDeviceHandle handle) { return ""; }
 
+const char* HALSIM_GetSimDeviceDisplayName(HAL_SimDeviceHandle handle) {
+  return "";
+}
+void HALSIM_SetSimDeviceDisplayName(HAL_SimDeviceHandle handle,
+                                    const char* displayName) {}
+
 HAL_SimDeviceHandle HALSIM_GetSimValueDeviceHandle(HAL_SimValueHandle handle) {
   return 0;
 }

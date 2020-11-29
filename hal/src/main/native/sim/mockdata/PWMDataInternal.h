@@ -9,6 +9,7 @@
 
 #include "hal/simulation/PWMData.h"
 #include "hal/simulation/SimDataValue.h"
+#include "hal/simulation/SimDisplayName.h"
 
 namespace hal {
 class PWMData {
@@ -20,6 +21,7 @@ class PWMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(ZeroLatch)
 
  public:
+  SimDisplayName displayName;
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
       false};
   SimDataValue<int32_t, HAL_MakeInt, GetRawValueName> rawValue{0};

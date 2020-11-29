@@ -30,6 +30,11 @@ public class SimDeviceSim {
     m_handle = SimDeviceDataJNI.getSimDeviceHandle(name);
   }
 
+  public void setDisplayName(String displayName) {
+    SimDeviceDataJNI.setDisplayName(m_handle, displayName);
+  }
+
+
   public SimValue getValue(String name) {
     int handle = SimDeviceDataJNI.getSimValueHandle(m_handle, name);
     if (handle <= 0) {

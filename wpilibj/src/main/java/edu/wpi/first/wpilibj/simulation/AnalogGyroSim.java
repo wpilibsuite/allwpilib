@@ -26,6 +26,10 @@ public class AnalogGyroSim {
     m_index = gyro.getAnalogInput().getChannel();
   }
 
+  public void setDisplayName(String displayName) {
+    AnalogGyroDataJNI.setDisplayName(m_index, displayName);
+  }
+
   /**
    * Constructs from an analog input channel number.
    *

@@ -9,6 +9,7 @@
 
 #include "hal/simulation/AccelerometerData.h"
 #include "hal/simulation/SimDataValue.h"
+#include "hal/simulation/SimDisplayName.h"
 
 namespace hal {
 class AccelerometerData {
@@ -23,6 +24,7 @@ class AccelerometerData {
   }
 
  public:
+  SimDisplayName displayName;
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetActiveName> active{false};
   SimDataValue<HAL_AccelerometerRange, MakeRangeValue, GetRangeName> range{
       static_cast<HAL_AccelerometerRange>(0)};

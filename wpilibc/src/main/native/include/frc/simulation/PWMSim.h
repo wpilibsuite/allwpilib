@@ -36,6 +36,9 @@ class PWMSim {
    */
   explicit PWMSim(int channel);
 
+  void setDisplayName(const char* displayName);
+  const char* getDisplayName();
+
   std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 

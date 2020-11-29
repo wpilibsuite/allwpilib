@@ -29,9 +29,23 @@ namespace {
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(DIOValue, "DIO");
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DigitalPWMDutyCycle, "DPWM");
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DutyCycleOutput, "DutyCycle");
+
+class DigitalIONameAccessor {
+ public:
+  void GetLabel(char* buf, size_t size, const char* defaultName,
+                int index) const {
+    const char* displayName = HALSIM_GetDIODisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+    } else {
+      std::snprintf(buf, size, "%s[%d]###Name%d", defaultName, index, index);
+    }
+  }
+};
+
 }  // namespace
 
-static IniSaver<NameInfo> gDIO{"DIO"};
+static std::vector<DigitalIONameAccessor> gDIO;
 static std::vector<std::unique_ptr<DIOValueSource>> gDIOSources;
 static std::vector<std::unique_ptr<DigitalPWMDutyCycleSource>> gDPWMSources;
 static std::vector<std::unique_ptr<DutyCycleOutputSource>> gDutyCycleSources;
@@ -48,7 +62,6 @@ static void UpdateDIOSources() {
     if (HALSIM_GetDIOInitialized(i)) {
       if (!source) {
         source = std::make_unique<DIOValueSource>(i);
-        source->SetName(gDIO[i].GetName());
       }
     } else {
       source.reset();
@@ -65,7 +78,6 @@ static void UpdateDPWMSources() {
         int channel = HALSIM_GetDigitalPWMPin(i);
         if (channel >= 0 && channel < numDIO) {
           source = std::make_unique<DigitalPWMDutyCycleSource>(i, channel);
-          source->SetName(gDIO[channel].GetName());
         }
       }
     } else {
@@ -83,7 +95,6 @@ static void UpdateDutyCycleSources() {
         int channel = HALSIM_GetDutyCycleDigitalChannel(i);
         if (channel >= 0 && channel < numDIO) {
           source = std::make_unique<DutyCycleOutputSource>(i, channel);
-          source->SetName(gDIO[channel].GetName());
         }
       }
     } else {
@@ -188,11 +199,6 @@ static void DisplayDIO() {
             HALSIM_SetDIOValue(i, val);
         }
       }
-      if (info.PopupEditName(i)) {
-        dioSource->SetName(info.GetName());
-        if (dpwmSource) dpwmSource->SetName(info.GetName());
-        if (dutyCycleSource) dutyCycleSource->SetName(info.GetName());
-      }
       ImGui::PopID();
     }
   }
@@ -201,7 +207,7 @@ static void DisplayDIO() {
 }
 
 void DIOGui::Initialize() {
-  gDIO.Initialize();
+  gDIO.resize(HAL_GetNumDigitalChannels());
   gDIOSources.resize(HAL_GetNumDigitalChannels());
   gDPWMSources.resize(HAL_GetNumDigitalPWMOutputs());
   gDutyCycleSources.resize(HAL_GetNumDutyCycles());

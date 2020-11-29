@@ -10,6 +10,9 @@ package edu.wpi.first.hal.simulation;
 import edu.wpi.first.hal.JNIWrapper;
 
 public class AnalogOutDataJNI extends JNIWrapper {
+  public static native String getDisplayName(int index);
+  public static native void setDisplayName(int index, String displayName);
+
   public static native int registerVoltageCallback(int index, NotifyCallback callback, boolean initialNotify);
   public static native void cancelVoltageCallback(int index, int uid);
   public static native double getVoltage(int index);

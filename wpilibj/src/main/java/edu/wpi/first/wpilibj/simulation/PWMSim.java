@@ -35,6 +35,14 @@ public class PWMSim {
     m_index = channel;
   }
 
+  public String getDisplayName() {
+    return PWMDataJNI.getDisplayName(m_index);
+  }
+
+  public void setDisplayName(String displayName) {
+    PWMDataJNI.setDisplayName(m_index, displayName);
+  }
+
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = PWMDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, PWMDataJNI::cancelInitializedCallback);

@@ -23,6 +23,8 @@ HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) { return 0; }
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, Encoder##CAPINAME, RETURN)
 
+const char* HALSIM_GetEncoderDisplayName(int32_t index) { return ""; }
+void HALSIM_SetEncoderDisplayName(int32_t index, const char* displayName) {}
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(int32_t, Count, 0)
 DEFINE_CAPI(double, Period, 0)

@@ -17,6 +17,8 @@ HAL_SimDeviceHandle HALSIM_GetAnalogInSimDevice(int32_t index) { return 0; }
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, AnalogIn##CAPINAME, RETURN)
 
+const char* HALSIM_GetAnalogInDisplayName(int32_t index) { return ""; }
+void HALSIM_SetAnalogInDisplayName(int32_t index, const char* displayName) {}
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(int32_t, AverageBits, 0)
 DEFINE_CAPI(int32_t, OversampleBits, 0)

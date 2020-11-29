@@ -7,6 +7,8 @@
 
 #include <jni.h>
 
+#include <wpi/jni_util.h>
+
 #include "CallbackStore.h"
 #include "edu_wpi_first_hal_simulation_DIODataJNI.h"
 #include "hal/simulation/DIOData.h"
@@ -14,6 +16,32 @@
 using namespace hal;
 
 extern "C" {
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DIODataJNI
+ * Method:    getDisplayName
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_DIODataJNI_getDisplayName
+  (JNIEnv* env, jclass, jint index)
+{
+  const char* displayName = HALSIM_GetDIODisplayName(index);
+  return wpi::java::MakeJString(env, displayName);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_DIODataJNI
+ * Method:    setDisplayName
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_DIODataJNI_setDisplayName
+  (JNIEnv* env, jclass, jint index, jstring displayName)
+{
+  wpi::java::JStringRef displayNameRef{env, displayName};
+  HALSIM_SetDIODisplayName(index, displayNameRef.c_str());
+}
 
 /*
  * Class:     edu_wpi_first_hal_simulation_DIODataJNI

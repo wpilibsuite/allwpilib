@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -27,6 +27,7 @@ void PWMData::ResetData() {
   position.Reset(0);
   periodScale.Reset(0);
   zeroLatch.Reset(false);
+  displayName.Reset();
 }
 
 extern "C" {
@@ -35,6 +36,13 @@ void HALSIM_ResetPWMData(int32_t index) { SimPWMData[index].ResetData(); }
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PWM##CAPINAME, SimPWMData, \
                                LOWERNAME)
+
+const char* HALSIM_GetPWMDisplayName(int32_t index) {
+  return SimPWMData[index].displayName.Get();
+}
+void HALSIM_SetPWMDisplayName(int32_t index, const char* displayName) {
+  SimPWMData[index].displayName.Set(displayName);
+}
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
 DEFINE_CAPI(int32_t, RawValue, rawValue)

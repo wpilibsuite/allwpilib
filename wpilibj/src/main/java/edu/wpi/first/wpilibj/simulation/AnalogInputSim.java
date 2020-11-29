@@ -35,6 +35,15 @@ public class AnalogInputSim {
     m_index = channel;
   }
 
+  public String getDisplayName() {
+    return AnalogInDataJNI.getDisplayName(m_index);
+  }
+
+  public void setDisplayName(String displayName) {
+    AnalogInDataJNI.setDisplayName(m_index, displayName);
+  }
+
+
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogInDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogInDataJNI::cancelInitializedCallback);

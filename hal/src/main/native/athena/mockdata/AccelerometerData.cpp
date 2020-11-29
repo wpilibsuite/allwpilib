@@ -15,6 +15,9 @@ void HALSIM_ResetAccelerometerData(int32_t index) {}
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, Accelerometer##CAPINAME, RETURN)
 
+const char* HALSIM_GetAccelerometerDisplayName(int32_t index) { return ""; }
+void HALSIM_SetAccelerometerDisplayName(int32_t index,
+                                        const char* displayName) {}
 DEFINE_CAPI(HAL_Bool, Active, false)
 DEFINE_CAPI(HAL_AccelerometerRange, Range, HAL_AccelerometerRange_k2G)
 DEFINE_CAPI(double, X, 0)

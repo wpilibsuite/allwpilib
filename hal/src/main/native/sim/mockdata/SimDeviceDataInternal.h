@@ -143,6 +143,7 @@ class SimDeviceData {
 
     HAL_SimDeviceHandle handle{0};
     std::string name;
+    std::string displayName;
     wpi::UidVector<std::unique_ptr<Value>, 16> values;
     wpi::StringMap<Value*> valueMap;
     impl::SimUnnamedCallbackRegistry<HALSIM_SimValueCallback> valueCreated;
@@ -187,6 +188,10 @@ class SimDeviceData {
 
   HAL_SimDeviceHandle GetDeviceHandle(const char* name);
   const char* GetDeviceName(HAL_SimDeviceHandle handle);
+
+  const char* GetDeviceDisplayName(HAL_SimDeviceHandle handle);
+  void SetDeviceDisplayName(HAL_SimDeviceHandle handle,
+                            const char* newDeviceName);
 
   void EnumerateDevices(const char* prefix, void* param,
                         HALSIM_SimDeviceCallback callback);

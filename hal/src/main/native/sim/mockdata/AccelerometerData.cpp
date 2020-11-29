@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -26,6 +26,7 @@ void AccelerometerData::ResetData() {
   x.Reset(0.0);
   y.Reset(0.0);
   z.Reset(0.0);
+  displayName.Reset();
 }
 
 extern "C" {
@@ -46,6 +47,14 @@ DEFINE_CAPI(double, Z, z)
 #define REGISTER(NAME)                                               \
   SimAccelerometerData[index].NAME.RegisterCallback(callback, param, \
                                                     initialNotify)
+
+const char* HALSIM_GetAccelerometerDisplayName(int32_t index) {
+  return SimAccelerometerData[index].displayName.Get();
+}
+void HALSIM_SetAccelerometerDisplayName(int32_t index,
+                                        const char* displayName) {
+  SimAccelerometerData[index].displayName.Set(displayName);
+}
 
 void HALSIM_RegisterAccelerometerAllCallbacks(int32_t index,
                                               HAL_NotifyCallback callback,

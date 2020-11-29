@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,6 +25,7 @@ void RelayData::ResetData() {
   initializedReverse.Reset(false);
   forward.Reset(false);
   reverse.Reset(false);
+  displayName.Reset();
 }
 
 extern "C" {
@@ -33,6 +34,13 @@ void HALSIM_ResetRelayData(int32_t index) { SimRelayData[index].ResetData(); }
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                              \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, Relay##CAPINAME, SimRelayData, \
                                LOWERNAME)
+
+const char* HALSIM_GetRelayDisplayName(int32_t index) {
+  return SimRelayData[index].displayName.Get();
+}
+void HALSIM_SetRelayDisplayName(int32_t index, const char* displayName) {
+  SimRelayData[index].displayName.Set(displayName);
+}
 
 DEFINE_CAPI(HAL_Bool, InitializedForward, initializedForward)
 DEFINE_CAPI(HAL_Bool, InitializedReverse, initializedReverse)

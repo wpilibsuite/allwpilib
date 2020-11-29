@@ -15,6 +15,10 @@ extern "C" {
 #endif
 
 void HALSIM_ResetPWMData(int32_t index);
+
+const char* HALSIM_GetPWMDisplayName(int32_t index);
+void HALSIM_SetPWMDisplayName(int32_t index, const char* displayName);
+
 int32_t HALSIM_RegisterPWMInitializedCallback(int32_t index,
                                               HAL_NotifyCallback callback,
                                               void* param,
