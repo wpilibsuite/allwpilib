@@ -33,16 +33,18 @@ struct PCMSource {
   int initCount = 0;
 };
 
-class SolenoidNameAccessor {
+class SolenoidNameAccessor : public NameInfo {
  public:
-  void GetLabel(char* buf, size_t size, int pcmIndex, int solenoidIndex) const {
+  bool GetDisplayName(char* buf, size_t size, int pcmIndex,
+                      int solenoidIndex) const {
     const char* displayName =
         HALSIM_GetSolenoidDisplayName(pcmIndex, solenoidIndex);
     if (displayName[0] != '\0') {
       std::snprintf(buf, size, "%s", displayName);
+      return true;
     } else {
-      std::snprintf(buf, size, "%s[%d]###Name%d", "Solenoid", solenoidIndex,
-                    solenoidIndex);
+      GetLabel(buf, size, "Solenoid", solenoidIndex);
+      return false;
     }
   }
 };
@@ -50,7 +52,7 @@ class SolenoidNameAccessor {
 }  // namespace
 
 static IniSaver<OpenInfo> gPCMs{"PCM"};
-static std::vector<SolenoidNameAccessor> gSolenoids;
+static IniSaver<SolenoidNameAccessor> gSolenoids{"Solenoid"};
 static std::vector<PCMSource> gPCMSources;
 
 static void UpdateSolenoidSources() {
@@ -63,6 +65,7 @@ static void UpdateSolenoidSources() {
       if (HALSIM_GetPCMSolenoidInitialized(i, j)) {
         if (!source) {
           source = std::make_unique<PCMSolenoidOutputSource>(i, j);
+          source->SetName(gSolenoids[i * numChannels + j].GetName());
         }
         ++pcmSource.initCount;
       } else {
@@ -113,10 +116,15 @@ static void DisplaySolenoids() {
       for (int j = 0; j < numChannels; ++j) {
         if (!pcmSource.solenoids[j]) continue;
         auto& info = gSolenoids[i * numChannels + j];
-        info.GetLabel(name, sizeof(name), i, j);
+        bool hasDisplayName = info.GetDisplayName(name, sizeof(name), i, j);
         ImGui::PushID(j);
         pcmSource.solenoids[j]->LabelText(name, "%s",
                                           channels[j] == 1 ? "On" : "Off");
+        if (!hasDisplayName) {
+          if (info.PopupEditName(j)) {
+            pcmSource.solenoids[j]->SetName(info.GetName());
+          }
+        }
         ImGui::PopID();
       }
       ImGui::PopItemWidth();
@@ -128,10 +136,10 @@ static void DisplaySolenoids() {
 
 void SolenoidGui::Initialize() {
   gPCMs.Initialize();
+  gSolenoids.Initialize();
   const int numModules = HAL_GetNumPCMModules();
   const int numChannels = HAL_GetNumSolenoidChannels();
   gPCMSources.reserve(numModules);
-  gSolenoids.resize(numModules * numChannels);
   for (int i = 0; i < numModules; ++i) gPCMSources.emplace_back(numChannels);
 
   HALSimGui::AddExecute(UpdateSolenoidSources);

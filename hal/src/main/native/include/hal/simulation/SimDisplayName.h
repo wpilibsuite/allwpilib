@@ -21,7 +21,7 @@ class SimDisplayName {
     displayName[0] = '\0';
   }
 
-  const char* Get() {
+  const char* Get() const {
     std::scoped_lock lock(m_mutex);
     return displayName;
   }

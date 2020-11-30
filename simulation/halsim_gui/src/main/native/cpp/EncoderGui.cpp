@@ -25,26 +25,28 @@ using namespace halsimgui;
 
 namespace {
 
-class EncoderNameAccessor {
- public:
-  void GetLabel(char* buf, size_t size, const char* defaultName, int index,
-                int channelA, int channelB) const {
-    const char* displayName = HALSIM_GetEncoderDisplayName(index);
-    if (displayName[0] != '\0') {
-      std::snprintf(buf, size, "%s", displayName);
-    } else {
-      std::snprintf(buf, size, "%s[%d,%d]###Name%d", defaultName, channelA,
-                    channelB, index);
-    }
-  }
-};
-
-struct EncoderInfo : public EncoderNameAccessor, public OpenInfo {
+struct EncoderInfo : public NameInfo, public OpenInfo {
   bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
+    if (NameInfo::ReadIni(name, value)) return true;
     if (OpenInfo::ReadIni(name, value)) return true;
     return false;
   }
-  void WriteIni(ImGuiTextBuffer* out) { OpenInfo::WriteIni(out); }
+  void WriteIni(ImGuiTextBuffer* out) {
+    NameInfo::WriteIni(out);
+    OpenInfo::WriteIni(out);
+  }
+
+  bool GetDisplayName(char* buf, size_t size, const char* defaultName,
+                      int index, int channelA, int channelB) const {
+    const char* displayName = HALSIM_GetEncoderDisplayName(index);
+    if (displayName[0] != '\0') {
+      std::snprintf(buf, size, "%s", displayName);
+      return true;
+    } else {
+      GetLabel(buf, size, defaultName, channelA, channelB);
+      return false;
+    }
+  }
 };
 
 class EncoderSource {
@@ -193,6 +195,7 @@ static void UpdateEncoderSources() {
     if (HALSIM_GetEncoderInitialized(i)) {
       if (!source) {
         source = std::make_unique<EncoderSource>(i);
+        source->SetName(gEncoders[source->GetChannelA()].GetName());
       }
     } else {
       source.reset();
@@ -217,12 +220,20 @@ static void DisplayEncoders() {
         // build header name
         auto& info = gEncoders[chA];
         char name[128];
-        info.GetLabel(name, sizeof(name), "Encoder", i, chA, chB);
+        bool hasDisplayName =
+            info.GetDisplayName(name, sizeof(name), "Encoder", i, chA, chB);
 
         // header
         bool open = ImGui::CollapsingHeader(
             name, gEncoders[chA].IsOpen() ? ImGuiTreeNodeFlags_DefaultOpen : 0);
         info.SetOpen(open);
+
+        // context menu to change name
+        if (!hasDisplayName) {
+          if (info.PopupEditName(chA)) {
+            source->SetName(info.GetName());
+          }
+        }
 
         if (open) {
           ImGui::PushID(i);
