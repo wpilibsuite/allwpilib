@@ -528,10 +528,10 @@ public final class SmartDashboard {
    * Puts all sendable data to the dashboard.
    */
   public static synchronized void updateValues() {
+    // Execute posted listener tasks
+    listenerExecutor.runListenerTasks();
     for (Sendable data : tablesToData.values()) {
       SendableRegistry.update(data);
     }
-    // Execute posted listener tasks
-    listenerExecutor.runListenerTasks();
   }
 }

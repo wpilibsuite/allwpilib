@@ -257,7 +257,7 @@ void SmartDashboard::PostListenerTask(std::function<void()> task) {
 void SmartDashboard::UpdateValues() {
   auto& registry = SendableRegistry::GetInstance();
   auto& inst = Singleton::GetInstance();
+  listenerExecutor.RunListenerTasks();
   std::scoped_lock lock(inst.tablesToDataMutex);
   for (auto& i : inst.tablesToData) registry.Update(i.getValue());
-  listenerExecutor.RunListenerTasks();
 }
