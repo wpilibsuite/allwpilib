@@ -18,9 +18,9 @@ public class ReplaceMeParallelDeadlineGroup extends ParallelDeadlineGroup {
    * Creates a new ReplaceMeParallelDeadlineGroup.
    */
   public ReplaceMeParallelDeadlineGroup() {
-    // Add your commands in the super() call.  Add the deadline first.
-    super(
-        new InstantCommand()
-    );
+    // Add the deadline command in the super() call. Add other commands using
+    // addCommands().
+    super(new InstantCommand());
+    // addCommands(new FooCommand(), new BarCommand());
   }
 }
