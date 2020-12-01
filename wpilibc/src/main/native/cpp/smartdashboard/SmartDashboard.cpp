@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -257,7 +257,7 @@ void SmartDashboard::PostListenerTask(std::function<void()> task) {
 void SmartDashboard::UpdateValues() {
   auto& registry = SendableRegistry::GetInstance();
   auto& inst = Singleton::GetInstance();
+  listenerExecutor.RunListenerTasks();
   std::scoped_lock lock(inst.tablesToDataMutex);
   for (auto& i : inst.tablesToData) registry.Update(i.getValue());
-  listenerExecutor.RunListenerTasks();
 }
