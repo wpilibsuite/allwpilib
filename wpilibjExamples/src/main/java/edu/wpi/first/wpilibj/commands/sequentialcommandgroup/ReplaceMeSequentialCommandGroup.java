@@ -18,7 +18,7 @@ public class ReplaceMeSequentialCommandGroup extends SequentialCommandGroup {
    */
   public ReplaceMeSequentialCommandGroup() {
     // Add your commands in the addCommands() call, e.g.
-    // super(new FooCommand(), new BarCommand());
+    // addCommands(new FooCommand(), new BarCommand());
     addCommands();
   }
 }
