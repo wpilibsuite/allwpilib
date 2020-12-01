@@ -34,6 +34,14 @@ HAL_Bool HALSIM_GetPCMSolenoidOutput(int32_t index, int32_t channel);
 void HALSIM_SetPCMSolenoidOutput(int32_t index, int32_t channel,
                                  HAL_Bool solenoidOutput);
 
+int32_t HALSIM_RegisterPCMAnySolenoidInitializedCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify);
+void HALSIM_CancelPCMAnySolenoidInitializedCallback(int32_t index, int32_t uid);
+HAL_Bool HALSIM_GetPCMAnySolenoidInitialized(int32_t index);
+void HALSIM_SetPCMAnySolenoidInitialized(int32_t index,
+                                         HAL_Bool anySolenoidInitialized);
+
 int32_t HALSIM_RegisterPCMCompressorInitializedCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,
     HAL_Bool initialNotify);

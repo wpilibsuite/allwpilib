@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -25,6 +25,7 @@ void PCMData::ResetData() {
     solenoidInitialized[i].Reset(false);
     solenoidOutput[i].Reset(false);
   }
+  anySolenoidInitialized.Reset(false);
   compressorInitialized.Reset(false);
   compressorOn.Reset(false);
   closedLoopEnabled.Reset(true);
@@ -43,6 +44,7 @@ HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidInitialized,
                                      SimPCMData, solenoidInitialized)
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidOutput,
                                      SimPCMData, solenoidOutput)
+DEFINE_CAPI(HAL_Bool, AnySolenoidInitialized, anySolenoidInitialized)
 DEFINE_CAPI(HAL_Bool, CompressorInitialized, compressorInitialized)
 DEFINE_CAPI(HAL_Bool, CompressorOn, compressorOn)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)

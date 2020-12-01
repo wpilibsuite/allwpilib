@@ -75,6 +75,7 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
   solenoidPort->channel = static_cast<uint8_t>(channel);
 
   HALSIM_SetPCMSolenoidInitialized(module, channel, true);
+  HALSIM_SetPCMAnySolenoidInitialized(module, true);
 
   return handle;
 }
@@ -83,6 +84,15 @@ void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle) {
   if (port == nullptr) return;
   solenoidHandles->Free(solenoidPortHandle);
   HALSIM_SetPCMSolenoidInitialized(port->module, port->channel, false);
+  int count = 0;
+  for (int i = 0; i < kNumSolenoidChannels; ++i) {
+    if (HALSIM_GetPCMSolenoidInitialized(port->module, i)) {
+      ++count;
+    }
+  }
+  if (count == 0) {
+    HALSIM_SetPCMAnySolenoidInitialized(port->module, false);
+  }
 }
 HAL_Bool HAL_CheckSolenoidModule(int32_t module) {
   return module < kNumPCMModules && module >= 0;

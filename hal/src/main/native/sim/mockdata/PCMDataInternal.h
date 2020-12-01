@@ -15,6 +15,7 @@ namespace hal {
 class PCMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidOutput)
+  HAL_SIMDATAVALUE_DEFINE_NAME(AnySolenoidInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorOn)
   HAL_SIMDATAVALUE_DEFINE_NAME(ClosedLoopEnabled)
@@ -37,6 +38,8 @@ class PCMData {
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidOutputName,
                GetSolenoidOutputDefault>
       solenoidOutput[kNumSolenoidChannels];
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetAnySolenoidInitializedName>
+      anySolenoidInitialized{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorInitializedName>
       compressorInitialized{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorOnName> compressorOn{
