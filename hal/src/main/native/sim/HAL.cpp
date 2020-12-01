@@ -26,13 +26,38 @@
 #include "hal/Extensions.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/simulation/DriverStationData.h"
+#include "hal/simulation/SimCallbackRegistry.h"
 #include "mockdata/RoboRioDataInternal.h"
 
 using namespace hal;
 
+namespace {
+class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
+ public:
+  int32_t Register(HALSIM_SimPeriodicCallback callback, void* param) {
+    std::scoped_lock lock(m_mutex);
+    return DoRegister(reinterpret_cast<RawFunctor>(callback), param);
+  }
+
+  void operator()() const {
+#ifdef _MSC_VER  // work around VS2019 16.4.0 bug
+    std::scoped_lock<wpi::recursive_spinlock> lock(m_mutex);
+#else
+    std::scoped_lock lock(m_mutex);
+#endif
+    if (m_callbacks) {
+      for (auto&& cb : *m_callbacks)
+        reinterpret_cast<HALSIM_SimPeriodicCallback>(cb.callback)(cb.param);
+    }
+  }
+};
+}  // namespace
+
 static HAL_RuntimeType runtimeType{HAL_Mock};
 static wpi::spinlock gOnShutdownMutex;
 static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
+static SimPeriodicCallbackRegistry gSimPeriodicBefore;
+static SimPeriodicCallbackRegistry gSimPeriodicAfter;
 
 namespace hal {
 namespace init {
@@ -331,6 +356,28 @@ void HAL_Shutdown(void) {
 void HAL_OnShutdown(void* param, void (*func)(void*)) {
   std::scoped_lock lock(gOnShutdownMutex);
   gOnShutdown.emplace_back(param, func);
+}
+
+void HAL_SimPeriodicBefore(void) { gSimPeriodicBefore(); }
+
+void HAL_SimPeriodicAfter(void) { gSimPeriodicAfter(); }
+
+int32_t HALSIM_RegisterSimPeriodicBeforeCallback(
+    HALSIM_SimPeriodicCallback callback, void* param) {
+  return gSimPeriodicBefore.Register(callback, param);
+}
+
+void HALSIM_CancelSimPeriodicBeforeCallback(int32_t uid) {
+  gSimPeriodicBefore.Cancel(uid);
+}
+
+int32_t HALSIM_RegisterSimPeriodicAfterCallback(
+    HALSIM_SimPeriodicCallback callback, void* param) {
+  return gSimPeriodicAfter.Register(callback, param);
+}
+
+void HALSIM_CancelSimPeriodicAfterCallback(int32_t uid) {
+  gSimPeriodicAfter.Cancel(uid);
 }
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,

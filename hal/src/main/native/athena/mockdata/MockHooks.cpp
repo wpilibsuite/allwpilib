@@ -33,4 +33,18 @@ void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {}
 
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {}
 
+int32_t HALSIM_RegisterSimPeriodicBeforeCallback(
+    HALSIM_SimPeriodicCallback callback, void* param) {
+  return 0;
+}
+
+void HALSIM_CancelSimPeriodicBeforeCallback(int32_t uid) {}
+
+int32_t HALSIM_RegisterSimPeriodicAfterCallback(
+    HALSIM_SimPeriodicCallback callback, void* param) {
+  return 0;
+}
+
+void HALSIM_CancelSimPeriodicAfterCallback(int32_t uid) {}
+
 }  // extern "C"

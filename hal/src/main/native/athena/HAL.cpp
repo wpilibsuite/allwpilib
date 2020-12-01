@@ -422,6 +422,10 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
 void HAL_Shutdown(void) {}
 
+void HAL_SimPeriodicBefore(void) {}
+
+void HAL_SimPeriodicAfter(void) {}
+
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
                    const char* feature) {
   if (feature == nullptr) {

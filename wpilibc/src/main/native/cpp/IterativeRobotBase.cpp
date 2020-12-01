@@ -171,7 +171,9 @@ void IterativeRobotBase::LoopFunc() {
   m_watchdog.AddEpoch("Shuffleboard::Update()");
 
   if constexpr (IsSimulation()) {
+    HAL_SimPeriodicBefore();
     SimulationPeriodic();
+    HAL_SimPeriodicAfter();
     m_watchdog.AddEpoch("SimulationPeriodic()");
   }
 
