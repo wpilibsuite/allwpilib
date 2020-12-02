@@ -17,7 +17,8 @@ public class ReplaceMeParallelCommandGroup extends ParallelCommandGroup {
    * Creates a new ReplaceMeParallelCommandGroup.
    */
   public ReplaceMeParallelCommandGroup() {
-    // Add your commands in the super() call, e.g.
-    // super(new FooCommand(), new BarCommand());super();
+    // Add your commands in the addCommands() call, e.g.
+    // addCommands(new FooCommand(), new BarCommand());
+    addCommands();
   }
 }
