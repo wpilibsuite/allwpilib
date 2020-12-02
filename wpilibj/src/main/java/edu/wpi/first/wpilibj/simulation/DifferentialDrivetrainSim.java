@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.math.StateSpaceUtil;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.RungeKutta;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
+import edu.wpi.first.wpiutil.math.numbers.N5;
 import edu.wpi.first.wpiutil.math.numbers.N7;
 
 /**
@@ -29,25 +31,27 @@ import edu.wpi.first.wpiutil.math.numbers.N7;
  *
  *  <p>Our state-space system is:
  *
- *  <p>x = [[x, y, theta, vel_l, vel_r, dist_l, dist_r, voltError_l, voltError_r, headingError]]^T
+ *  <p>x = [[x, y, theta, vel_l, vel_r, dist_l, dist_r]]^T
  *  in the field coordinate system (dist_* are wheel distances.)
  *
  *  <p>u = [[voltage_l, voltage_r]]^T This is typically the control input of the last timestep
  *  from a LTVDiffDriveController.
  *
- *  <p>y = [[x, y, theta]]^T from a global measurement source(ex. vision),
- *  or y = [[dist_l, dist_r, theta]] from encoders and gyro.
+ *  <p>y = [[dist_l, dist_r, theta]] from encoders and gyro.
  *
  */
 public class DifferentialDrivetrainSim {
   private final DCMotor m_motor;
   private final double m_originalGearing;
+  private final Matrix<N5, N1> m_measurementStdDevs;
   private double m_currentGearing;
   private final double m_wheelRadiusMeters;
   @SuppressWarnings("MemberName")
   private Matrix<N2, N1> m_u;
   @SuppressWarnings("MemberName")
   private Matrix<N7, N1> m_x;
+  @SuppressWarnings("MemberName")
+  private Matrix<N5, N1> m_y;
 
   private final double m_rb;
   private final LinearSystem<N2, N2, N2> m_plant;
@@ -55,21 +59,27 @@ public class DifferentialDrivetrainSim {
   /**
    * Create a SimDrivetrain.
    *
-   * @param driveMotor        A {@link DCMotor} representing the left side of the drivetrain.
-   * @param gearing           The gearing on the drive between motor and wheel, as output over input.
-   *                          This must be the same ratio as the ratio used to identify or
-   *                          create the drivetrainPlant.
-   * @param jKgMetersSquared  The moment of inertia of the drivetrain about its center.
-   * @param massKg            The mass of the drivebase.
-   * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
-   * @param trackWidthMeters  The robot's track width, or distance between left and right wheels.
+   * @param driveMotor         A {@link DCMotor} representing the left side of the drivetrain.
+   * @param gearing            The gearing on the drive between motor and wheel, as output over input.
+   *                           This must be the same ratio as the ratio used to identify or
+   *                           create the drivetrainPlant.
+   * @param jKgMetersSquared   The moment of inertia of the drivetrain about its center.
+   * @param massKg             The mass of the drivebase.
+   * @param wheelRadiusMeters  The radius of the wheels on the drivetrain.
+   * @param trackWidthMeters   The robot's track width, or distance between left and right wheels.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [heading, left velocity,
+   *                           right velocity, left distance, right distance]^T. Can be null if no noise is desired.
+   *                           Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *                           and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *                           point.
    */
   public DifferentialDrivetrainSim(DCMotor driveMotor, double gearing,
                                    double jKgMetersSquared, double massKg,
-                                   double wheelRadiusMeters, double trackWidthMeters) {
+                                   double wheelRadiusMeters, double trackWidthMeters,
+                                   Matrix<N5, N1> measurementStdDevs) {
     this(LinearSystemId.createDrivetrainVelocitySystem(driveMotor, massKg, wheelRadiusMeters,
         trackWidthMeters / 2.0, jKgMetersSquared, gearing),
-        driveMotor, gearing, trackWidthMeters, wheelRadiusMeters);
+        driveMotor, gearing, trackWidthMeters, wheelRadiusMeters, measurementStdDevs);
   }
 
   /**
@@ -85,20 +95,27 @@ public class DifferentialDrivetrainSim {
    * @param trackWidthMeters  The distance between the two sides of the drivetrian. Can be
    *                          found with frc-characterization.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [heading, left velocity,
+   *                           right velocity, left distance, right distance]^T. Can be null if no noise is desired.
+   *                           Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *                           and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *                           point.
    */
   public DifferentialDrivetrainSim(LinearSystem<N2, N2, N2> drivetrainPlant,
                                    DCMotor driveMotor, double gearing,
-                                   double trackWidthMeters,
-                                   double wheelRadiusMeters) {
+                                   double trackWidthMeters, double wheelRadiusMeters,
+                                   Matrix<N5, N1> measurementStdDevs) {
     this.m_plant = drivetrainPlant;
     this.m_rb = trackWidthMeters / 2.0;
     this.m_motor = driveMotor;
     this.m_originalGearing = gearing;
+    this.m_measurementStdDevs = measurementStdDevs;
     m_wheelRadiusMeters = wheelRadiusMeters;
     m_currentGearing = m_originalGearing;
 
     m_x = new Matrix<>(Nat.N7(), Nat.N1());
     m_u = VecBuilder.fill(0, 0);
+    m_y = new Matrix<>(Nat.N5(), Nat.N1());
   }
 
   /**
@@ -117,10 +134,14 @@ public class DifferentialDrivetrainSim {
 
     // Update state estimate with RK4
     m_x = RungeKutta.rungeKutta(this::getDynamics, m_x, m_u, dtSeconds);
+    m_y = localOutputs(m_x);
+    if (m_measurementStdDevs != null) {
+      m_y = m_y.plus(StateSpaceUtil.makeWhiteNoiseVector(m_measurementStdDevs));
+    }
   }
 
-  public double getState(State state) {
-    return m_x.get(state.value, 0);
+  private Matrix<N5, N1> localOutputs(Matrix<N7, N1> x) {
+    return x.block(Nat.N5(), Nat.N1(), 2, 0);
   }
 
   /**
@@ -128,6 +149,20 @@ public class DifferentialDrivetrainSim {
    */
   public Matrix<N7, N1> getState() {
     return m_x;
+  }
+
+  double getState(State state) {
+    return m_x.get(state.value, 0);
+  }
+
+  /**
+   * Get the specified "output" of the simulation. These outputs are used to set simulated sensor readings
+   * in user code.
+   * @param output The output to query.
+   * @return The current value of the specified output.
+   */
+  public double getOutput(Output output) {
+    return m_y.get(output.value, 0);
   }
 
   /**
@@ -227,7 +262,23 @@ public class DifferentialDrivetrainSim {
     return xdot;
   }
 
-  public enum State {
+  public enum Output {
+    kHeading(0),
+    kLeftVelocity(1),
+    kRightVelocity(2),
+    kLeftPosition(3),
+    kRightPosition(4);
+
+    @SuppressWarnings("MemberName")
+    public final int value;
+
+    Output(int i) {
+      this.value = i;
+    }
+  }
+
+
+  enum State {
     kX(0),
     kY(1),
     kHeading(2),
@@ -300,15 +351,21 @@ public class DifferentialDrivetrainSim {
    * @param motor     The motors installed in the bot.
    * @param gearing   The gearing reduction used.
    * @param wheelSize The wheel size.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [heading, left velocity,
+   *                           right velocity, left distance, right distance]^T. Can be null if no noise is desired.
+   *                           Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *                           and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *                           point.
    */
   public static DifferentialDrivetrainSim createKitbotSim(KitbotMotor motor, KitbotGearing gearing,
-                                                          KitbotWheelSize wheelSize) {
+                                                          KitbotWheelSize wheelSize,
+                                                          Matrix<N5, N1> measurementStdDevs) {
     // MOI estimation -- note that I = m r^2 for point masses
     var batteryMoi = 12.5 / 2.2 * Math.pow(Units.inchesToMeters(10), 2);
     var gearboxMoi = (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)
         * Math.pow(Units.inchesToMeters(26.0 / 2.0), 2);
 
-    return createKitbotSim(motor, gearing, wheelSize, batteryMoi + gearboxMoi);
+    return createKitbotSim(motor, gearing, wheelSize, batteryMoi + gearboxMoi, measurementStdDevs);
   }
 
   /**
@@ -319,10 +376,16 @@ public class DifferentialDrivetrainSim {
    * @param wheelSize        The wheel size.
    * @param jKgMetersSquared The moment of inertia of the drivebase. This can be calculated using
    *                         frc-characterization.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [heading, left velocity,
+   *                           right velocity, left distance, right distance]^T. Can be null if no noise is desired.
+   *                           Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *                           and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *                           point.
    */
   public static DifferentialDrivetrainSim createKitbotSim(KitbotMotor motor, KitbotGearing gearing,
-                                                          KitbotWheelSize wheelSize, double jKgMetersSquared) {
+                                                          KitbotWheelSize wheelSize, double jKgMetersSquared,
+                                                          Matrix<N5, N1> measurementStdDevs) {
     return new DifferentialDrivetrainSim(motor.value, gearing.value, jKgMetersSquared, 25 / 2.2,
-        wheelSize.value / 2.0, Units.inchesToMeters(26));
+        wheelSize.value / 2.0, Units.inchesToMeters(26), measurementStdDevs);
   }
 }

@@ -36,10 +36,17 @@ class DifferentialDrivetrainSim {
    * create the drivetrainPlant.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in
    * meters.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [heading, left velocity,
+   *                           right velocity, left distance, right distance]^T. Can be omitted if no noise is desired.
+   *                           Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *                           and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *                           point.
    */
   DifferentialDrivetrainSim(const LinearSystem<2, 2, 2>& plant,
                             units::meter_t trackWidth, DCMotor driveMotor,
-                            double gearingRatio, units::meter_t wheelRadius);
+                            double gearingRatio, units::meter_t wheelRadius,
+                            const std::array<double, 5>& measurementStdDevs =
+                      std::array<double, 5>{});
 
   /**
    * Create a SimDrivetrain.
@@ -55,11 +62,18 @@ class DifferentialDrivetrainSim {
    * @param wheelRadius The radius of the wheels on the drivetrain.
    * @param trackWidth  The robot's track width, or distance between left and
    * right wheels.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [heading, left velocity,
+   *                           right velocity, left distance, right distance]^T. Can be omitted if no noise is desired.
+   *                           Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *                           and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *                           point.
    */
   DifferentialDrivetrainSim(frc::DCMotor driveMotor, double gearing,
                             units::kilogram_square_meter_t J,
                             units::kilogram_t mass, units::meter_t wheelRadius,
-                            units::meter_t trackWidth);
+                            units::meter_t trackWidth,
+                            const std::array<double, 5>& measurementStdDevs =
+                      std::array<double, 5>{});
 
   /**
    * Sets the applied voltage to the drivetrain. Note that positive voltage must
@@ -89,9 +103,26 @@ class DifferentialDrivetrainSim {
   /**
    * Returns an element of the state vector.
    *
-   * @param state The row of the state vector.
+   * @param output The row of the output vector.
+   */
+  double GetOutput(int output) const;
+
+  /**
+   * Returns the current output vector y.
+   */
+  Eigen::Matrix<double, 5, 1> GetOutput() const;
+
+  /**
+   * Returns an element of the state vector. Note that this will not include noise!
+   *
+   * @param output The row of the output vector.
    */
   double GetState(int state) const;
+
+  /**
+   * Returns the current state vector x. Note that this will not include noise!
+   */
+  Eigen::Matrix<double, 7, 1> GetState() const;
 
   /**
    * Returns the current gearing reduction of the drivetrain, as output over
@@ -99,10 +130,6 @@ class DifferentialDrivetrainSim {
    */
   double GetGearing() const;
 
-  /**
-   * Returns the current state vector x.
-   */
-  Eigen::Matrix<double, 7, 1> GetState() const;
 
   /**
    * Returns the direction the robot is pointing.
@@ -139,6 +166,10 @@ class DifferentialDrivetrainSim {
   Eigen::Matrix<double, 7, 1> Dynamics(const Eigen::Matrix<double, 7, 1>& x,
                                        const Eigen::Matrix<double, 2, 1>& u);
 
+  Eigen::Matrix<double, 5, 1> LocalOutputs(const Eigen::Matrix<double, 7, 1>& x) {
+    return x.block<5, 1>(2, 0);
+  }
+
   class State {
    public:
     static constexpr int kX = 0;
@@ -148,6 +179,15 @@ class DifferentialDrivetrainSim {
     static constexpr int kRightVelocity = 4;
     static constexpr int kLeftPosition = 5;
     static constexpr int kRightPosition = 6;
+  };
+
+  class Output {
+   public:
+    static constexpr int kHeading = 0;
+    static constexpr int kLeftVelocity = 1;
+    static constexpr int kRightVelocity = 2;
+    static constexpr int kLeftPosition = 3;
+    static constexpr int kRightPosition = 4;
   };
 
   /**
@@ -189,10 +229,16 @@ class DifferentialDrivetrainSim {
    * @param motor     The motors installed in the bot.
    * @param gearing   The gearing reduction used.
    * @param wheelSize The wheel size.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [heading, left velocity,
+   *                           right velocity, left distance, right distance]^T. Can be omitted if no noise is desired.
+   *                           Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *                           and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *                           point.
    */
   static DifferentialDrivetrainSim CreateKitbotSim(frc::DCMotor motor,
                                                    double gearing,
-                                                   units::meter_t wheelSize) {
+                                                   units::meter_t wheelSize, const std::array<double, 5>& measurementStdDevs =
+                      std::array<double, 5>{}) {
     // MOI estimation -- note that I = m r^2 for point masses
     units::kilogram_square_meter_t batteryMoi = 12.5_lb * 10_in * 10_in;
     units::kilogram_square_meter_t gearboxMoi = (2.8_lb + 2.0_lb) *
@@ -200,7 +246,7 @@ class DifferentialDrivetrainSim {
                                                 * (26_in / 2) * (26_in / 2);
 
     return DifferentialDrivetrainSim{
-        motor, gearing, batteryMoi + gearboxMoi, 25_kg, wheelSize / 2.0, 26_in};
+        motor, gearing, batteryMoi + gearboxMoi, 25_kg, wheelSize / 2.0, 26_in, measurementStdDevs};
   }
 
   /**
@@ -211,12 +257,18 @@ class DifferentialDrivetrainSim {
    * @param wheelSize The wheel size.
    * @param J         The moment of inertia of the drivebase. This can be
    * calculated using frc-characterization.
+   * @param measurementStdDevs Standard deviations for measurements, in the form [heading, left velocity,
+   *                           right velocity, left distance, right distance]^T. Can be omitted if no noise is desired.
+   *                           Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s,
+   *                           and position measurement standard deviations of 0.005 meters are a reasonable starting
+   *                           point.
    */
   static DifferentialDrivetrainSim CreateKitbotSim(
       frc::DCMotor motor, double gearing, units::meter_t wheelSize,
-      units::kilogram_square_meter_t J) {
-    return DifferentialDrivetrainSim{motor, gearing,         J,
-                                     25_kg, wheelSize / 2.0, 26_in};
+      units::kilogram_square_meter_t J, const std::array<double, 5>& measurementStdDevs =
+                      std::array<double, 5>{}) {
+    return DifferentialDrivetrainSim{motor, gearing, J,
+                                     25_kg, wheelSize / 2.0, 26_in, measurementStdDevs};
   }
 
  private:
@@ -231,5 +283,7 @@ class DifferentialDrivetrainSim {
 
   Eigen::Matrix<double, 7, 1> m_x;
   Eigen::Matrix<double, 2, 1> m_u;
+  Eigen::Matrix<double, 5, 1> m_y;
+  std::array<double, 5> m_measurementStdDevs;
 };
 }  // namespace frc::sim

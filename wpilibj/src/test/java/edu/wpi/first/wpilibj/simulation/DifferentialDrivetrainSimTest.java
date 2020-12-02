@@ -47,7 +47,7 @@ class DifferentialDrivetrainSimTest {
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim = new DifferentialDrivetrainSim(plant,
-        motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2));
+        motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), VecBuilder.fill(0.0001, 0.1, 0.1, 0.005, 0.005));
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
     var ramsete = new RamseteController();
@@ -99,7 +99,7 @@ class DifferentialDrivetrainSimTest {
         0.5,
         1.0);
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim = new DifferentialDrivetrainSim(plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2));
+    var sim = new DifferentialDrivetrainSim(plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
 
     sim.setInputs(-12, -12);
     for (int i = 0; i < 10; i++) {
@@ -132,7 +132,7 @@ class DifferentialDrivetrainSimTest {
         5.0);
 
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
-    var sim = new DifferentialDrivetrainSim(plant, motor, 5, kinematics.trackWidthMeters, Units.inchesToMeters(2));
+    var sim = new DifferentialDrivetrainSim(plant, motor, 5, kinematics.trackWidthMeters, Units.inchesToMeters(2), VecBuilder.fill(0.0001, 0.1, 0.1, 0.005, 0.005));
 
     sim.setInputs(2, 4);
 
