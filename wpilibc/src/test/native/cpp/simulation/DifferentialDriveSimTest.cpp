@@ -64,9 +64,10 @@ TEST(DifferentialDriveSim, Convergence) {
         groundTruthX, voltages, 20_ms);
   }
 
-  EXPECT_NEAR(groundTruthX(0, 0), sim.GetState(0), 1E-6);
-  EXPECT_NEAR(groundTruthX(1, 0), sim.GetState(1), 1E-6);
-  EXPECT_NEAR(groundTruthX(2, 0), sim.GetState(2), 1E-6);
+  EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().to<double>(), 1E-6);
+  EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().to<double>(), 1E-6);
+  EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().to<double>(),
+              1E-6);
 }
 
 TEST(DifferentialDriveSim, Current) {

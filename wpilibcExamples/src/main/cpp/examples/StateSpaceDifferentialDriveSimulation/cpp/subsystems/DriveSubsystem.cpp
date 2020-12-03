@@ -42,14 +42,10 @@ void DriveSubsystem::SimulationPeriodic() {
                                       frc::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 
-  m_leftEncoderSim.SetDistance(m_drivetrainSimulator.GetOutput(
-      frc::sim::DifferentialDrivetrainSim::Output::kLeftPosition));
-  m_leftEncoderSim.SetRate(m_drivetrainSimulator.GetOutput(
-      frc::sim::DifferentialDrivetrainSim::Output::kLeftVelocity));
-  m_rightEncoderSim.SetDistance(m_drivetrainSimulator.GetOutput(
-      frc::sim::DifferentialDrivetrainSim::Output::kRightPosition));
-  m_rightEncoderSim.SetRate(m_drivetrainSimulator.GetOutput(
-      frc::sim::DifferentialDrivetrainSim::Output::kRightVelocity));
+  m_leftEncoderSim.SetDistance(m_drivetrainSimulator.GetLeftDistance());
+  m_leftEncoderSim.SetRate(m_drivetrainSimulator.GetLeftVelocity());
+  m_rightEncoderSim.SetDistance(m_drivetrainSimulator.GetRightDistance());
+  m_rightEncoderSim.SetRate(m_drivetrainSimulator.GetRightVelocity());
   m_gyroAngleSim.SetAngle(
       -m_drivetrainSimulator.GetHeading().Degrees().to<double>());
 

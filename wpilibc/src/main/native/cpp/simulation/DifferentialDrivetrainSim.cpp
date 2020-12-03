@@ -17,7 +17,7 @@ using namespace frc::sim;
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
     const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
     DCMotor driveMotor, double gearRatio, units::meter_t wheelRadius,
-    const std::array<double, 5>& measurementStdDevs)
+    const std::array<double, 7>& measurementStdDevs)
     : m_plant(plant),
       m_rb(trackWidth / 2.0),
       m_wheelRadius(wheelRadius),
@@ -27,12 +27,13 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
       m_measurementStdDevs(measurementStdDevs) {
   m_x.setZero();
   m_u.setZero();
+  m_y.setZero();
 }
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
     frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
     units::kilogram_t mass, units::meter_t wheelRadius,
-    units::meter_t trackWidth, const std::array<double, 5>& measurementStdDevs)
+    units::meter_t trackWidth, const std::array<double, 7>& measurementStdDevs)
     : DifferentialDrivetrainSim(
           frc::LinearSystemId::DrivetrainVelocitySystem(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
@@ -50,14 +51,14 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
 void DifferentialDrivetrainSim::Update(units::second_t dt) {
   m_x = RungeKutta([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x,
                    m_u, dt);
-  m_y = LocalOutputs(m_x) + frc::MakeWhiteNoiseVector<5>(m_measurementStdDevs);
+  m_y = m_x + frc::MakeWhiteNoiseVector<7>(m_measurementStdDevs);
 }
 
 double DifferentialDrivetrainSim::GetGearing() const {
   return m_currentGearing;
 }
 
-Eigen::Matrix<double, 5, 1> DifferentialDrivetrainSim::GetOutput() const {
+Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::GetOutput() const {
   return m_y;
 }
 
