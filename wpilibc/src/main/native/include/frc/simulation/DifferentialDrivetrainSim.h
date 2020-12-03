@@ -45,8 +45,7 @@ class DifferentialDrivetrainSim {
   DifferentialDrivetrainSim(const LinearSystem<2, 2, 2>& plant,
                             units::meter_t trackWidth, DCMotor driveMotor,
                             double gearingRatio, units::meter_t wheelRadius,
-                            const std::array<double, 5>& measurementStdDevs =
-                      std::array<double, 5>{});
+                            const std::array<double, 5>& measurementStdDevs = {});
 
   /**
    * Create a SimDrivetrain.
@@ -72,8 +71,7 @@ class DifferentialDrivetrainSim {
                             units::kilogram_square_meter_t J,
                             units::kilogram_t mass, units::meter_t wheelRadius,
                             units::meter_t trackWidth,
-                            const std::array<double, 5>& measurementStdDevs =
-                      std::array<double, 5>{});
+                            const std::array<double, 5>& measurementStdDevs = {});
 
   /**
    * Sets the applied voltage to the drivetrain. Note that positive voltage must
@@ -237,8 +235,7 @@ class DifferentialDrivetrainSim {
    */
   static DifferentialDrivetrainSim CreateKitbotSim(frc::DCMotor motor,
                                                    double gearing,
-                                                   units::meter_t wheelSize, const std::array<double, 5>& measurementStdDevs =
-                      std::array<double, 5>{}) {
+                                                   units::meter_t wheelSize, const std::array<double, 5>& measurementStdDevs = {}) {
     // MOI estimation -- note that I = m r^2 for point masses
     units::kilogram_square_meter_t batteryMoi = 12.5_lb * 10_in * 10_in;
     units::kilogram_square_meter_t gearboxMoi = (2.8_lb + 2.0_lb) *
@@ -265,8 +262,7 @@ class DifferentialDrivetrainSim {
    */
   static DifferentialDrivetrainSim CreateKitbotSim(
       frc::DCMotor motor, double gearing, units::meter_t wheelSize,
-      units::kilogram_square_meter_t J, const std::array<double, 5>& measurementStdDevs =
-                      std::array<double, 5>{}) {
+      units::kilogram_square_meter_t J, const std::array<double, 5>& measurementStdDevs = {}) {
     return DifferentialDrivetrainSim{motor, gearing, J,
                                      25_kg, wheelSize / 2.0, 26_in, measurementStdDevs};
   }

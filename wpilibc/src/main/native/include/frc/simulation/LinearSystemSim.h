@@ -39,8 +39,7 @@ class LinearSystemSim {
    * @param measurementStdDevs The standard deviations of the measurements.
    */
   LinearSystemSim(const LinearSystem<States, Inputs, Outputs>& system,
-                  const std::array<double, Outputs>& measurementStdDevs =
-                      std::array<double, Outputs>{})
+                  const std::array<double, Outputs>& measurementStdDevs = {})
       : m_plant(system), m_measurementStdDevs(measurementStdDevs) {
     m_x = Eigen::Matrix<double, States, 1>::Zero();
     m_y = Eigen::Matrix<double, Outputs, 1>::Zero();
