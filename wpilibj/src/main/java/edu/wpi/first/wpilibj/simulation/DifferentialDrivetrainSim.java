@@ -187,7 +187,7 @@ public class DifferentialDrivetrainSim {
   public double getRightVelocityMetersPerSecond() {
     return getOutput(State.kRightVelocity);
   }
-  
+
   /**
    * Get the left encoder distance in meters.
    * @return The encoder distance.
