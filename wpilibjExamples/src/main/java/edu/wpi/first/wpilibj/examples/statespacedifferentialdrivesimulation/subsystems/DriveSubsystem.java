@@ -89,7 +89,7 @@ public class DriveSubsystem extends SubsystemBase {
             Constants.DriveConstants.kDriveGearing,
             Constants.DriveConstants.kTrackwidthMeters,
           Constants.DriveConstants.kWheelDiameterMeters / 2.0,
-            VecBuilder.fill(0.0001, 0.1, 0.1, 0.005, 0.005));
+            VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
       // The encoder and gyro angle sims let us set simulated sensor readings
       m_leftEncoderSim = new EncoderSim(m_leftEncoder);
@@ -120,10 +120,10 @@ public class DriveSubsystem extends SubsystemBase {
           -m_rightMotors.get() * RobotController.getBatteryVoltage());
     m_drivetrainSimulator.update(0.020);
 
-    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getOutput(DifferentialDrivetrainSim.Output.kLeftPosition));
-    m_leftEncoderSim.setRate(m_drivetrainSimulator.getOutput(DifferentialDrivetrainSim.Output.kLeftVelocity));
-    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getOutput(DifferentialDrivetrainSim.Output.kRightPosition));
-    m_rightEncoderSim.setRate(m_drivetrainSimulator.getOutput(DifferentialDrivetrainSim.Output.kRightVelocity));
+    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftDistanceMeters());
+    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
+    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightDistanceMeters());
+    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
     m_gyroAngleSim.set(-m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getPose());
