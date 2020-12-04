@@ -96,7 +96,7 @@ public class OnBoardIO extends SubsystemBase {
 
     double currentTime = Timer.getFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
-      DriverStation.reportError("Button C was not configured");
+      DriverStation.reportError("Button C was not configured", true);
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
     }
     return false;
@@ -111,7 +111,7 @@ public class OnBoardIO extends SubsystemBase {
     } else {
       double currentTime = Timer.getFPGATimestamp();
       if (currentTime > m_nextMessageTime) {
-        DriverStation.reportError("Green LED was not configured");
+        DriverStation.reportError("Green LED was not configured", true);
         m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
       }
     }
@@ -126,7 +126,7 @@ public class OnBoardIO extends SubsystemBase {
     } else {
       double currentTime = Timer.getFPGATimestamp();
       if (currentTime > m_nextMessageTime) {
-        DriverStation.reportError("Red LED was not configured");
+        DriverStation.reportError("Red LED was not configured", true);
         m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
       }
     }
