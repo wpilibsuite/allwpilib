@@ -78,6 +78,13 @@ public class RobotContainer {
   }
 
   /**
+   * Zeros the outputs of all subsystems.
+   */
+  public void zeroAllOutputs() {
+    m_robotDrive.tankDriveVolts(0, 0);
+  }
+
+  /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
