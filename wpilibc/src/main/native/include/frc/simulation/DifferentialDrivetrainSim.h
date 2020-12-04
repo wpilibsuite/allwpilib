@@ -37,10 +37,11 @@ class DifferentialDrivetrainSim {
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in
    * meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form
-   * [heading, left velocity, right velocity, left distance, right distance]^T.
-   * Can be omitted if no noise is desired. Gyro standard deviations of 0.0001
-   * radians, velocity standard deviations of 0.05 m/s, and position measurement
-   * standard deviations of 0.005 meters are a reasonable starting point.
+   * [x, y, heading, left velocity, right velocity, left distance, right
+   * distance]^T. Can be omitted if no noise is desired. Gyro standard
+   * deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s, and
+   * position measurement standard deviations of 0.005 meters are a reasonable
+   * starting point.
    */
   DifferentialDrivetrainSim(
       const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
@@ -62,10 +63,11 @@ class DifferentialDrivetrainSim {
    * @param trackWidth  The robot's track width, or distance between left and
    * right wheels.
    * @param measurementStdDevs Standard deviations for measurements, in the form
-   * [heading, left velocity, right velocity, left distance, right distance]^T.
-   * Can be omitted if no noise is desired. Gyro standard deviations of 0.0001
-   * radians, velocity standard deviations of 0.05 m/s, and position measurement
-   * standard deviations of 0.005 meters are a reasonable starting point.
+   * [x, y, heading, left velocity, right velocity, left distance, right
+   * distance]^T. Can be omitted if no noise is desired. Gyro standard
+   * deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s, and
+   * position measurement standard deviations of 0.005 meters are a reasonable
+   * starting point.
    */
   DifferentialDrivetrainSim(
       frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
@@ -121,25 +123,33 @@ class DifferentialDrivetrainSim {
    * Get the right encoder distance in meters.
    * @return The encoder distance.
    */
-  double GetRightDistance() { return GetOutput(State::kRightPosition); }
+  units::meter_t GetRightDistance() {
+    return units::meter_t{GetOutput(State::kRightPosition)};
+  }
 
   /**
    * Get the right encoder velocity in meters per second.
    * @return The encoder velocity.
    */
-  double GetRightVelocity() { return GetOutput(State::kRightVelocity); }
+  units::meters_per_second_t GetRightVelocity() {
+    return units::meters_per_second_t{GetOutput(State::kRightVelocity)};
+  }
 
   /**
    * Get the left encoder distance in meters.
    * @return The encoder distance.
    */
-  double GetLeftDistance() { return GetOutput(State::kLeftPosition); }
+  units::meter_t GetLeftDistance() {
+    return units::meter_t{GetOutput(State::kLeftPosition)};
+  }
 
   /**
    * Get the left encoder velocity in meters per second.
    * @return The encoder velocity.
    */
-  double GetLeftVelocity() { return GetOutput(State::kLeftVelocity); }
+  units::meters_per_second_t GetLeftVelocity() {
+    return units::meters_per_second_t{(State::kLeftVelocity)};
+  }
 
   /**
    * Returns the currently drawn current.
@@ -214,10 +224,11 @@ class DifferentialDrivetrainSim {
    * @param gearing   The gearing reduction used.
    * @param wheelSize The wheel size.
    * @param measurementStdDevs Standard deviations for measurements, in the form
-   * [heading, left velocity, right velocity, left distance, right distance]^T.
-   * Can be omitted if no noise is desired. Gyro standard deviations of 0.0001
-   * radians, velocity standard deviations of 0.05 m/s, and position measurement
-   * standard deviations of 0.005 meters are a reasonable starting point.
+   * [x, y, heading, left velocity, right velocity, left distance, right
+   * distance]^T. Can be omitted if no noise is desired. Gyro standard
+   * deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s, and
+   * position measurement standard deviations of 0.005 meters are a reasonable
+   * starting point.
    */
   static DifferentialDrivetrainSim CreateKitbotSim(
       frc::DCMotor motor, double gearing, units::meter_t wheelSize,
@@ -242,10 +253,11 @@ class DifferentialDrivetrainSim {
    * @param J         The moment of inertia of the drivebase. This can be
    * calculated using frc-characterization.
    * @param measurementStdDevs Standard deviations for measurements, in the form
-   * [heading, left velocity, right velocity, left distance, right distance]^T.
-   * Can be omitted if no noise is desired. Gyro standard deviations of 0.0001
-   * radians, velocity standard deviations of 0.05 m/s, and position measurement
-   * standard deviations of 0.005 meters are a reasonable starting point.
+   * [x, y, heading, left velocity, right velocity, left distance, right
+   * distance]^T. Can be omitted if no noise is desired. Gyro standard
+   * deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s, and
+   * position measurement standard deviations of 0.005 meters are a reasonable
+   * starting point.
    */
   static DifferentialDrivetrainSim CreateKitbotSim(
       frc::DCMotor motor, double gearing, units::meter_t wheelSize,

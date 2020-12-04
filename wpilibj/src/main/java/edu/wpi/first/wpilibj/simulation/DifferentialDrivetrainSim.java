@@ -36,8 +36,7 @@ import edu.wpi.first.wpiutil.math.numbers.N7;
  *  <p>u = [[voltage_l, voltage_r]]^T This is typically the control input of the last timestep
  *  from a LTVDiffDriveController.
  *
- *  <p>y = [[dist_l, dist_r, theta]] from encoders and gyro.
- *
+ * <p>y = x
  */
 public class DifferentialDrivetrainSim {
   private final DCMotor m_motor;
@@ -161,7 +160,7 @@ public class DifferentialDrivetrainSim {
    * clockwise positive.
    */
   public Rotation2d getHeading() {
-    return new Rotation2d(getState(State.kHeading));
+    return new Rotation2d(getOutput(State.kHeading));
   }
 
   /**
