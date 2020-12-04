@@ -9,6 +9,8 @@ package edu.wpi.first.wpilibj.examples.romireference.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -32,6 +34,9 @@ public class OnBoardIO extends SubsystemBase {
   // DIO 2
   private DigitalInput m_buttonC;
   private DigitalOutput m_redLed;
+
+  private static final double MESSAGE_INTERVAL = 1.0;
+  private double m_nextMessageTime;
 
   public enum ChannelMode {
     INPUT,
@@ -73,7 +78,11 @@ public class OnBoardIO extends SubsystemBase {
       return m_buttonB.get();
     }
 
-    System.err.println("Button B was not configured");
+    double currentTime = Timer.getFPGATimestamp();
+    if (currentTime > m_nextMessageTime) {
+      DriverStation.reportError("Button B was not configured", true);
+      m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
+    }
     return false;
   }
 
@@ -85,7 +94,11 @@ public class OnBoardIO extends SubsystemBase {
       return m_buttonC.get();
     }
 
-    System.err.println("Button C was not configured");
+    double currentTime = Timer.getFPGATimestamp();
+    if (currentTime > m_nextMessageTime) {
+      DriverStation.reportError("Button C was not configured");
+      m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
+    }
     return false;
   }
 
@@ -96,7 +109,11 @@ public class OnBoardIO extends SubsystemBase {
     if (m_greenLed != null) {
       m_greenLed.set(value);
     } else {
-      System.err.println("Green LED was not configured");
+      double currentTime = Timer.getFPGATimestamp();
+      if (currentTime > m_nextMessageTime) {
+        DriverStation.reportError("Green LED was not configured");
+        m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
+      }
     }
   }
 
@@ -107,7 +124,11 @@ public class OnBoardIO extends SubsystemBase {
     if (m_redLed != null) {
       m_redLed.set(value);
     } else {
-      System.err.println("Red LED was not configured");
+      double currentTime = Timer.getFPGATimestamp();
+      if (currentTime > m_nextMessageTime) {
+        DriverStation.reportError("Red LED was not configured");
+        m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
+      }
     }
   }
 
