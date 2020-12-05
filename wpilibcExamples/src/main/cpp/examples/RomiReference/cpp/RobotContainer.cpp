@@ -28,7 +28,6 @@ void RobotContainer::ConfigureButtonBindings() {
   // Setup SmartDashboard options.
   m_chooser.SetDefaultOption("Auto Routine Distance", &m_autoDistance);
   m_chooser.AddOption("Auto Routine Time", &m_autoTime);
-  frc::SmartDashboard::PutData("Auto Selector", &m_chooser);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

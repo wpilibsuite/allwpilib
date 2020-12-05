@@ -34,5 +34,5 @@ class Robot : public frc::TimedRobot {
   frc::Command* m_autonomousCommand = nullptr;
   ExampleCommand m_defaultAuto;
   MyAutoCommand m_myAuto;
-  frc::SendableChooser<frc::Command*> m_chooser;
+  frc::SendableChooser<frc::Command*> m_chooser{"Auto Modes"};
 };

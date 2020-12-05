@@ -6,7 +6,6 @@
 
 #include <frc/XboxController.h>
 #include <frc/controller/PIDController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/PIDCommand.h>
@@ -42,9 +41,6 @@ class RobotContainer {
                                         {}};
   frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
                                         {}};
-
-  // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
 
   void ConfigureButtonBindings();
 };

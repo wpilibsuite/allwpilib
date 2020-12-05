@@ -6,7 +6,6 @@
 
 #include <frc/XboxController.h>
 #include <frc/controller/PIDController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
 
@@ -38,9 +37,6 @@ class RobotContainer {
 
   // The robot's subsystems
   DriveSubsystem m_drive;
-
-  // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
 
   void ConfigureButtonBindings();
 };

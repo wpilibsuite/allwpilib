@@ -47,7 +47,12 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   private final int m_instance;
   private static final AtomicInteger s_instances = new AtomicInteger();
 
-  /** Instantiates a {@link SendableChooser}. */
+  /**
+   * Instantiates a {@link SendableChooser}.
+   *
+   * @deprecated Use {@link #SendableChooser(String)} instead.
+   */
+  @Deprecated
   public SendableChooser() {
     m_instance = s_instances.getAndIncrement();
     SendableRegistry.add(this, "SendableChooser", m_instance);

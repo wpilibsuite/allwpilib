@@ -31,7 +31,7 @@ class Robot : public frc::TimedRobot {
   frc::Command* m_autonomousCommand = nullptr;
   DriveAndShootAutonomous m_driveAndShootAuto;
   DriveForward m_driveForwardAuto;
-  frc::SendableChooser<frc::Command*> m_autoChooser;
+  frc::SendableChooser<frc::Command*> m_autoChooser{"Auto Modes"};
 
   void RobotInit() override;
   void AutonomousInit() override;

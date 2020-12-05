@@ -30,7 +30,6 @@ void Robot::RobotInit() {
   // instantiate the command used for the autonomous period
   m_autoChooser.SetDefaultOption("Drive and Shoot", &m_driveAndShootAuto);
   m_autoChooser.AddOption("Drive Forward", &m_driveForwardAuto);
-  frc::SmartDashboard::PutData("Auto Mode", &m_autoChooser);
 
   pneumatics.Start();  // Pressurize the pneumatics.
 }

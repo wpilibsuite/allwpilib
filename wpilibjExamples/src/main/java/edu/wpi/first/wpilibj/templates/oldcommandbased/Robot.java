@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.oldcommandbased.commands.ExampleCommand;
 import edu.wpi.first.wpilibj.templates.oldcommandbased.subsystems.ExampleSubsystem;
 
@@ -23,7 +22,7 @@ public class Robot extends TimedRobot {
   public static OI m_oi;
 
   Command m_autonomousCommand;
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
+  SendableChooser<Command> m_chooser = new SendableChooser<>("Auto Modes");
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -34,7 +33,6 @@ public class Robot extends TimedRobot {
     m_oi = new OI();
     m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
-    SmartDashboard.putData("Auto mode", m_chooser);
   }
 
   /**

@@ -42,7 +42,7 @@ class RobotContainer {
  private:
   // Assumes a gamepad plugged into channnel 0
   frc::Joystick m_controller{0};
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  frc::SendableChooser<frc2::Command*> m_chooser{"Auto Selector"};
 
   // The robot's subsystems
   Drivetrain m_drive;

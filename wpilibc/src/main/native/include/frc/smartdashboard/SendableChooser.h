@@ -44,6 +44,7 @@ class SendableChooser : public SendableChooserBase {
   /**
    * Instantiates a SendableChooser.
    */
+  WPI_DEPRECATED("Use SendableChooser(StringRef) instead.")
   SendableChooser() = default;
 
   /**

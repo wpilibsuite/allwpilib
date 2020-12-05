@@ -5,7 +5,6 @@
 #pragma once
 
 #include <frc/XboxController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 
 #include "Constants.h"
@@ -39,9 +38,6 @@ class RobotContainer {
   DriveDistance m_simpleAuto{AutoConstants::kAutoDriveDistanceInches,
                              AutoConstants::kAutoDriveSpeed, &m_drive};
   ComplexAuto m_complexAuto{&m_drive, &m_hatch};
-
-  // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
 
   // The driver's controller
   frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
