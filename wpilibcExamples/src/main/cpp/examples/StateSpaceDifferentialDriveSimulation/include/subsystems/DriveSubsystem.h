@@ -161,9 +161,12 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   // These classes help simulate our drivetrain.
   frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      DriveConstants::kDrivetrainPlant, DriveConstants::kTrackwidth,
-      DriveConstants::kDrivetrainGearbox, DriveConstants::kDrivetrainGearing,
-      DriveConstants::kWheelDiameter / 2};
+      DriveConstants::kDrivetrainPlant,
+      DriveConstants::kTrackwidth,
+      DriveConstants::kDrivetrainGearbox,
+      DriveConstants::kDrivetrainGearing,
+      DriveConstants::kWheelDiameter / 2,
+      {0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005}};
 
   frc::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
   frc::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};

@@ -60,7 +60,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * Creates a simulated generic linear system with measurement noise.
    *
    * @param system             The system being controlled.
-   * @param measurementStdDevs Standard deviations of measurements.
+   * @param measurementStdDevs Standard deviations of measurements. Can be null if no noise is desired.
    */
   public LinearSystemSim(LinearSystem<States, Inputs, Outputs> system,
                          Matrix<Outputs, N1> measurementStdDevs) {

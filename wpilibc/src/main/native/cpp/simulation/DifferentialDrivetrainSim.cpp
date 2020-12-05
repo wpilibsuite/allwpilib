@@ -16,25 +16,28 @@ using namespace frc::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
     const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
-    DCMotor driveMotor, double gearRatio, units::meter_t wheelRadius)
+    DCMotor driveMotor, double gearRatio, units::meter_t wheelRadius,
+    const std::array<double, 7>& measurementStdDevs)
     : m_plant(plant),
       m_rb(trackWidth / 2.0),
       m_wheelRadius(wheelRadius),
       m_motor(driveMotor),
       m_originalGearing(gearRatio),
-      m_currentGearing(gearRatio) {
+      m_currentGearing(gearRatio),
+      m_measurementStdDevs(measurementStdDevs) {
   m_x.setZero();
   m_u.setZero();
+  m_y.setZero();
 }
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
     frc::DCMotor driveMotor, double gearing, units::kilogram_square_meter_t J,
     units::kilogram_t mass, units::meter_t wheelRadius,
-    units::meter_t trackWidth)
+    units::meter_t trackWidth, const std::array<double, 7>& measurementStdDevs)
     : DifferentialDrivetrainSim(
           frc::LinearSystemId::DrivetrainVelocitySystem(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
-          trackWidth, driveMotor, gearing, wheelRadius) {}
+          trackWidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 
 void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,
                                           units::volt_t rightVoltage) {
@@ -48,27 +51,36 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
 void DifferentialDrivetrainSim::Update(units::second_t dt) {
   m_x = RungeKutta([this](auto& x, auto& u) { return Dynamics(x, u); }, m_x,
                    m_u, dt);
-}
-
-double DifferentialDrivetrainSim::GetState(int state) const {
-  return m_x(state);
+  m_y = m_x + frc::MakeWhiteNoiseVector<7>(m_measurementStdDevs);
 }
 
 double DifferentialDrivetrainSim::GetGearing() const {
   return m_currentGearing;
 }
 
+Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::GetOutput() const {
+  return m_y;
+}
+
 Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::GetState() const {
   return m_x;
 }
 
+double DifferentialDrivetrainSim::GetOutput(int output) const {
+  return m_y(output);
+}
+
+double DifferentialDrivetrainSim::GetState(int state) const {
+  return m_x(state);
+}
+
 Rotation2d DifferentialDrivetrainSim::GetHeading() const {
-  return Rotation2d(units::radian_t(m_x(State::kHeading)));
+  return Rotation2d(units::radian_t(GetOutput(State::kHeading)));
 }
 
 Pose2d DifferentialDrivetrainSim::GetPose() const {
-  return Pose2d(units::meter_t(m_x(State::kX)), units::meter_t(m_x(State::kY)),
-                Rotation2d(units::radian_t(m_x(State::kHeading))));
+  return Pose2d(units::meter_t(GetOutput(State::kX)),
+                units::meter_t(GetOutput(State::kY)), GetHeading());
 }
 
 units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {

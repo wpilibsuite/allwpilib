@@ -26,7 +26,9 @@ TEST(DifferentialDriveSim, Convergence) {
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
   frc::DifferentialDriveKinematics kinematics{24_in};
-  frc::sim::DifferentialDrivetrainSim sim{plant, 24_in, motor, 1.0, 2_in};
+  frc::sim::DifferentialDrivetrainSim sim{
+      plant, 24_in, motor,
+      1.0,   2_in,  {0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005}};
 
   frc::LinearPlantInversionFeedforward feedforward{plant, 20_ms};
   frc::RamseteController ramsete;
@@ -64,9 +66,10 @@ TEST(DifferentialDriveSim, Convergence) {
         groundTruthX, voltages, 20_ms);
   }
 
-  EXPECT_NEAR(groundTruthX(0, 0), sim.GetState(0), 1E-6);
-  EXPECT_NEAR(groundTruthX(1, 0), sim.GetState(1), 1E-6);
-  EXPECT_NEAR(groundTruthX(2, 0), sim.GetState(2), 1E-6);
+  EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().to<double>(), 0.01);
+  EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().to<double>(), 0.01);
+  EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().to<double>(),
+              0.01);
 }
 
 TEST(DifferentialDriveSim, Current) {
