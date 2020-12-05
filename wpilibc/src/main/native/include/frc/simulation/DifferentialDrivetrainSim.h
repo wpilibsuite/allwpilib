@@ -148,7 +148,7 @@ class DifferentialDrivetrainSim {
    * @return The encoder velocity.
    */
   units::meters_per_second_t GetLeftVelocity() {
-    return units::meters_per_second_t{(State::kLeftVelocity)};
+    return units::meters_per_second_t{GetOutput(State::kLeftVelocity)};
   }
 
   /**
