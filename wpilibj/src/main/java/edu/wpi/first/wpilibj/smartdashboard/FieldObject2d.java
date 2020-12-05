@@ -149,5 +149,5 @@ public class FieldObject2d {
 
   String m_name;
   NetworkTableEntry m_entry;
-  private List<Pose2d> m_poses;
+  private final List<Pose2d> m_poses = new ArrayList<>();
 }
