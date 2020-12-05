@@ -30,6 +30,7 @@ class RobotContainer {
  public:
   RobotContainer();
 
+  void ZeroAllOutputs();
   frc2::Command* GetAutonomousCommand();
   const DriveSubsystem& GetRobotDrive() const;
 

@@ -36,6 +36,8 @@ RobotContainer::RobotContainer() {
       {&m_drive}));
 }
 
+void RobotContainer::ZeroAllOutputs() { m_drive.TankDriveVolts(0_V, 0_V); }
+
 const DriveSubsystem& RobotContainer::GetRobotDrive() const { return m_drive; }
 
 void RobotContainer::ConfigureButtonBindings() {
