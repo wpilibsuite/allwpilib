@@ -120,8 +120,8 @@ class DifferentialDrivetrainSim {
   Pose2d GetPose() const;
 
   /**
-   * Get the right encoder distance in meters.
-   * @return The encoder distance.
+   * Get the right encoder position in meters.
+   * @return The encoder position.
    */
   units::meter_t GetRightPosition() const {
     return units::meter_t{GetOutput(State::kRightPosition)};
@@ -136,8 +136,8 @@ class DifferentialDrivetrainSim {
   }
 
   /**
-   * Get the left encoder distance in meters.
-   * @return The encoder distance.
+   * Get the left encoder position in meters.
+   * @return The encoder position.
    */
   units::meter_t GetLeftPosition() const {
     return units::meter_t{GetOutput(State::kLeftPosition)};

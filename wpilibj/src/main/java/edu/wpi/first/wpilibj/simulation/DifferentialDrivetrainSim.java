@@ -172,8 +172,8 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Get the right encoder distance in meters.
-   * @return The encoder distance.
+   * Get the right encoder position in meters.
+   * @return The encoder position.
    */
   public double getRightPositionMeters() {
     return getOutput(State.kRightPosition);
@@ -188,8 +188,8 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Get the left encoder distance in meters.
-   * @return The encoder distance.
+   * Get the left encoder position in meters.
+   * @return The encoder position.
    */
   public double getLeftPositionMeters() {
     return getOutput(State.kLeftPosition);
