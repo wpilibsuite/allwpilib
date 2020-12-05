@@ -123,7 +123,7 @@ class DifferentialDrivetrainSim {
    * Get the right encoder distance in meters.
    * @return The encoder distance.
    */
-  units::meter_t GetRightDistance() {
+  units::meter_t GetRightPosition() const {
     return units::meter_t{GetOutput(State::kRightPosition)};
   }
 
@@ -131,7 +131,7 @@ class DifferentialDrivetrainSim {
    * Get the right encoder velocity in meters per second.
    * @return The encoder velocity.
    */
-  units::meters_per_second_t GetRightVelocity() {
+  units::meters_per_second_t GetRightVelocity() const {
     return units::meters_per_second_t{GetOutput(State::kRightVelocity)};
   }
 
@@ -139,7 +139,7 @@ class DifferentialDrivetrainSim {
    * Get the left encoder distance in meters.
    * @return The encoder distance.
    */
-  units::meter_t GetLeftDistance() {
+  units::meter_t GetLeftPosition() const {
     return units::meter_t{GetOutput(State::kLeftPosition)};
   }
 
@@ -147,7 +147,7 @@ class DifferentialDrivetrainSim {
    * Get the left encoder velocity in meters per second.
    * @return The encoder velocity.
    */
-  units::meters_per_second_t GetLeftVelocity() {
+  units::meters_per_second_t GetLeftVelocity() const {
     return units::meters_per_second_t{GetOutput(State::kLeftVelocity)};
   }
 
