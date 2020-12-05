@@ -53,6 +53,17 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
     SendableRegistry.add(this, "SendableChooser", m_instance);
   }
 
+  /**
+   * Instantiates a {@link SendableChooser} and adds it to dashboard.
+   *
+   * @param widgetName Name of SendableChooser widget on dashboard.
+   */
+  public SendableChooser(String widgetName) {
+    m_instance = s_instances.getAndIncrement();
+    SendableRegistry.add(this, "SendableChooser", m_instance);
+    SmartDashboard.putData(widgetName, this);
+  }
+
   @Override
   public void close() {
     SendableRegistry.remove(this);

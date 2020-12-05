@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -16,6 +18,11 @@
 #include "frc/smartdashboard/SendableChooser.h"
 
 namespace frc {
+
+template <class T>
+SendableChooser<T>::SendableChooser(std::string_view widgetName) {
+  SmartDashboard::PutData(widgetName, this);
+}
 
 template <class T>
 void SendableChooser<T>::AddOption(std::string_view name, T object) {
