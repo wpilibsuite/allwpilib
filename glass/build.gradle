@@ -92,6 +92,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
             // By default, a development executable will be generated. This is to help the case of
             // testing specific functionality of the library.
             "${nativeName}App"(NativeExecutableSpec) {
+                baseName = 'Glass'
                 sources {
                     cpp {
                         source {
