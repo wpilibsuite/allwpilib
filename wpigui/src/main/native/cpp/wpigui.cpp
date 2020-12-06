@@ -140,6 +140,8 @@ bool gui::Initialize(const char* title, int width, int height) {
   iniHandler.WriteAllFn = IniWriteAll;
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
+  io.IniFilename = gContext->iniPath.c_str();
+
   for (auto&& initialize : gContext->initializers) {
     if (initialize) initialize();
   }
@@ -330,6 +332,25 @@ void gui::SetStyle(Style style) {
 }
 
 void gui::SetClearColor(ImVec4 color) { gContext->clearColor = color; }
+
+void gui::ConfigurePlatformSaveFile(const std::string& name) {
+  gContext->iniPath = name;
+#if defined(_MSC_VER)
+  const char* env = std::getenv("APPDATA");
+  if (env) gContext->iniPath = env + std::string("/" + name);
+#elif defined(__APPLE__)
+  const char* env = std::getenv("HOME");
+  if (env)
+    gContext->iniPath = env + std::string("/Library/Preferences/" + name);
+#else
+  const char* xdg = std::getenv("XDG_CONFIG_HOME");
+  const char* env = std::getenv("HOME");
+  if (xdg)
+    gContext->iniPath = xdg + std::string("/" + name);
+  else if (env)
+    gContext->iniPath = env + std::string("/.config/" + name);
+#endif
+}
 
 void gui::EmitViewMenu() {
   if (ImGui::BeginMenu("View")) {

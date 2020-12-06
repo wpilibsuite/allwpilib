@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
 #include <imgui.h>
 
@@ -122,6 +123,15 @@ void SetStyle(Style style);
  * @param color Color
  */
 void SetClearColor(ImVec4 color);
+
+/**
+ * Configures a save file (.ini) in a platform specific location. On Windows,
+ * the .ini is saved in %APPDATA%; on macOS the .ini is saved in
+ * ~/Library/Preferences; on Linux the .ini is stored in $XDG_CONFIG_HOME or
+ * ~/.config if the former is not defined. This must be called before
+ * gui::Initialize().
+ */
+void ConfigurePlatformSaveFile(const std::string& name);
 
 /**
  * Emits a View menu (e.g. for a main menu bar) that allows setting of
