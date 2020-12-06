@@ -15,6 +15,34 @@ model {
                         // This is the default application path for the ZIP task.
                         def applicationPath = binary.executable.file
 
+                        // Create the macOS bundle.
+                        def bundleTask = project.tasks.create("bundleGlassOsxApp", Copy) {
+                            description("Creates a macOS application bundle for Glass")
+                            from(file("$project.projectDir/Info.plist"))
+                            into(file("$project.buildDir/outputs/bundles/Glass.app/Contents"))
+                            into("MacOS") { with copySpec { from binary.executable.file } }
+
+                            doLast {
+                                if (project.hasProperty("developerID")) {
+                                    // Get path to binary.
+                                    exec {
+                                        workingDir rootDir
+                                        def args = ["sh", "-c", "codesign --force --strict --deep " +
+                                                "--timestamp --options=runtime " +
+                                                "--verbose -s ${project.findProperty("developerID")} " +
+                                                "$project.buildDir/outputs/bundles/Glass.app/"]
+                                        commandLine args
+                                    }
+                                }
+                            }
+                        }
+
+                        // Reset the application path if we are creating a bundle.
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            applicationPath = file("$project.buildDir/outputs/bundles")
+                            project.build.dependsOn bundleTask
+                        }
+
                         // Create the ZIP.
                         def outputsFolder = file("$project.buildDir/outputs")
                         def task = project.tasks.create("copyGlassExecutable", Zip) {
@@ -31,6 +59,11 @@ model {
 
                             from(applicationPath)
                             into(nativeUtils.getPlatformPath(binary))
+                        }
+
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            bundleTask.dependsOn binary.tasks.link
+                            task.dependsOn(bundleTask)
                         }
 
                         task.dependsOn binary.tasks.link
