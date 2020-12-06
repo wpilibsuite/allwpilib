@@ -54,7 +54,7 @@ if (OperatingSystem.current().isWindows()) {
 
         def x86ZipTask = tasks.create('x86RuntimeZip', Zip) {
             destinationDirectory = outputsFolder
-            archiveBaseName = baseArtifactId
+            archiveBaseName = zipBaseName
             classifier = 'x86'
 
             from x86Folder
@@ -62,7 +62,7 @@ if (OperatingSystem.current().isWindows()) {
 
         def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
             destinationDirectory = outputsFolder
-            archiveBaseName = baseArtifactId
+            archiveBaseName = zipBaseName
             classifier = 'x64'
 
             from x64Folder
