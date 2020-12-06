@@ -26,12 +26,6 @@ class SendableBuilder {
   virtual ~SendableBuilder() = default;
 
   /**
-   * Get the network table.
-   * @return The network table
-   */
-  virtual std::shared_ptr<nt::NetworkTable> GetTable() = 0;
-
-  /**
    * Set the string representation of the named data type that will be used
    * by the smart dashboard for this sendable.
    *
@@ -224,6 +218,12 @@ class SendableBuilder {
       const wpi::Twine& key,
       std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
       std::function<void(wpi::StringRef)> setter) = 0;
+
+  /**
+   * Get the network table.
+   * @return The network table
+   */
+  virtual std::shared_ptr<nt::NetworkTable> GetTable() = 0;
 };
 
 }  // namespace frc
