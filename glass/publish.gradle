@@ -9,7 +9,7 @@ model {
         def tasks = []
         $.components.each { component ->
             component.binaries.each { binary ->
-                if (binary in NativeExecutableBinarySpec && binary.application.name.contains("glassApp")) {
+                if (binary in NativeExecutableBinarySpec && binary.component.name.contains("glassApp")) {
                     if (binary.buildable && binary.name.contains("Release")) {
                         // We are now in the binary that we want.
                         // This is the default application path for the ZIP task.
