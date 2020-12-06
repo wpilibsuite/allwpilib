@@ -91,7 +91,7 @@ int main() {
   gPlotProvider = std::make_unique<glass::PlotProvider>("Plot");
   gNtProvider = std::make_unique<glass::NetworkTablesProvider>("NTProvider");
 
-  gui::AddInit([] { ImGui::GetIO().IniFilename = "glass.ini"; });
+  gui::ConfigurePlatformSaveFile("glass.ini");
   gPlotProvider->GlobalInit();
   gui::AddInit([] { gPlotProvider->ResetTime(); });
   gNtProvider->GlobalInit();
