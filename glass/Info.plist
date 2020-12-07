@@ -5,7 +5,7 @@
 	<key>CFBundleName</key>
 	<string>Glass</string>
 	<key>CFBundleExecutable</key>
-	<string>Glass</string>
+	<string>glass</string>
 	<key>CFBundleDisplayName</key>
 	<string>Glass</string>
 	<key>CFBundleIdentifier</key>
