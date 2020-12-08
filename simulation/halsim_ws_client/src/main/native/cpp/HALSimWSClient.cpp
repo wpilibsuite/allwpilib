@@ -13,6 +13,7 @@
 #include <WSProvider_DriverStation.h>
 #include <WSProvider_Encoder.h>
 #include <WSProvider_Joystick.h>
+#include <WSProvider_PCM.h>
 #include <WSProvider_PWM.h>
 #include <WSProvider_Relay.h>
 #include <WSProvider_RoboRIO.h>
@@ -43,6 +44,7 @@ bool HALSimWSClient::Initialize() {
     HALSimWSProviderDriverStation::Initialize(registerFunc);
     HALSimWSProviderEncoder::Initialize(registerFunc);
     HALSimWSProviderJoystick::Initialize(registerFunc);
+    HALSimWSProviderPCM::Initialize(registerFunc);
     HALSimWSProviderPWM::Initialize(registerFunc);
     HALSimWSProviderRelay::Initialize(registerFunc);
     HALSimWSProviderRoboRIO::Initialize(registerFunc);
