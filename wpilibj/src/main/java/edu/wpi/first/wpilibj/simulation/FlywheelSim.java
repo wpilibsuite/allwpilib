@@ -66,7 +66,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    *                         constructor.
    */
   public FlywheelSim(DCMotor gearbox, double gearing, double jKgMetersSquared) {
-    super(LinearSystemId.createFlywheelSystem(gearbox, gearing, jKgMetersSquared));
+    super(LinearSystemId.createFlywheelSystem(gearbox, jKgMetersSquared, gearing));
     m_gearbox = gearbox;
     m_gearing = gearing;
   }
@@ -85,7 +85,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    */
   public FlywheelSim(DCMotor gearbox, double gearing, double jKgMetersSquared,
                      Matrix<N1, N1> measurementStdDevs) {
-    super(LinearSystemId.createFlywheelSystem(gearbox, gearing, jKgMetersSquared),
+    super(LinearSystemId.createFlywheelSystem(gearbox, jKgMetersSquared, gearing),
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
