@@ -51,11 +51,11 @@ install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 
 file(GLOB glass_src src/app/native/cpp/*.cpp)
 
-add_executable(Glass ${glass_src})
-wpilib_link_macos_gui(Glass)
-target_link_libraries(Glass libglassnt libglass)
+add_executable(glass ${glass_src})
+wpilib_link_macos_gui(glass)
+target_link_libraries(glass libglassnt libglass)
 if (WIN32)
-    set_target_properties(Glass PROPERTIES WIN32_EXECUTABLE YES)
+    set_target_properties(glass PROPERTIES WIN32_EXECUTABLE YES)
 endif()
 
 #if (MSVC OR FLAT_INSTALL_WPILIB)
