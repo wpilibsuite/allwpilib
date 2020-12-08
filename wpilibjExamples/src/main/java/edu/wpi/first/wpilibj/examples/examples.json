@@ -633,6 +633,23 @@
     "commandversion": 2
   },
   {
+    "name": "SimpleDifferentialDriveSimulation",
+    "description": "An example of a minimal drivetrain simulation project without the command-based library.",
+    "tags": [
+      "Drivetrain",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Actuators",
+      "Joystick",
+      "Simulation"
+    ],
+    "foldername": "simpledifferentialdrivesimulation",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "StateSpaceDriveSimulation",
     "description": "An example of drivetrain simulation in combination with a RAMSETE path following controller and the Field2d class.",
     "tags": [
