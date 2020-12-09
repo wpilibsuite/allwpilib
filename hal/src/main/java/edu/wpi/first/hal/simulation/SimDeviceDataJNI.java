@@ -22,6 +22,8 @@ public class SimDeviceDataJNI extends JNIWrapper {
 
   public static native int getSimDeviceHandle(String name);
 
+  public static native String getSimDeviceName(int handle);
+
   public static native int getSimValueDeviceHandle(int handle);
 
   public static class SimDeviceInfo {

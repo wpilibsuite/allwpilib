@@ -442,6 +442,18 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimDeviceHandle
 
 /*
  * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Method:    getSimDeviceName
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimDeviceName
+  (JNIEnv* env, jclass, jint handle)
+{
+  return MakeJString(env, HALSIM_GetSimDeviceName(handle));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
  * Method:    getSimValueDeviceHandle
  * Signature: (I)I
  */
