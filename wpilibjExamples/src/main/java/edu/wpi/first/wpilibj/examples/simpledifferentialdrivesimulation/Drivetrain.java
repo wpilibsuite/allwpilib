@@ -138,7 +138,10 @@ public class Drivetrain {
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
     m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
     m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+  }
 
+  public void periodic() {
+    updateOdometry();
     m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
   }
 }

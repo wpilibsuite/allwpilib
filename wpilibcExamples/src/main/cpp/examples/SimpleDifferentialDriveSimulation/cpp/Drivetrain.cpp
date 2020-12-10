@@ -60,6 +60,9 @@ void Drivetrain::SimulationPeriodic() {
       m_drivetrainSimulator.GetRightVelocity().to<double>());
   m_gyroSim.SetAngle(
       -m_drivetrainSimulator.GetHeading().Degrees().to<double>());
+}
 
+void Drivetrain::Periodic() {
+  UpdateOdometry();
   m_fieldSim.SetRobotPose(m_odometry.GetPose());
 }

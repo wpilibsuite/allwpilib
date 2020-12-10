@@ -44,6 +44,11 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void robotPeriodic() {
+    m_drive.periodic();
+  }
+
+  @Override
   public void autonomousInit() {
     m_timer.reset();
     m_timer.start();
@@ -56,7 +61,6 @@ public class Robot extends TimedRobot {
     Trajectory.State reference = m_trajectory.sample(elapsed);
     ChassisSpeeds speeds = m_ramsete.calculate(m_drive.getPose(), reference);
     m_drive.drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
-    m_drive.updateOdometry();
   }
 
   @Override
