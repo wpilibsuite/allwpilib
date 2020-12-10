@@ -34,6 +34,8 @@ class HALSimWSProviderEncoder : public HALSimWSHalChanProvider {
   int32_t m_resetCbKey = 0;
   int32_t m_reverseDirectionCbKey = 0;
   int32_t m_samplesCbKey = 0;
+
+  int32_t m_countOffset = 0;
 };
 
 }  // namespace wpilibws
