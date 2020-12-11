@@ -64,6 +64,7 @@ class Drivetrain {
   frc::Pose2d GetPose() const { return m_odometry.GetPose(); }
 
   void SimulationPeriodic();
+  void Periodic();
 
  private:
   static constexpr units::meter_t kTrackWidth = 0.381_m * 2;

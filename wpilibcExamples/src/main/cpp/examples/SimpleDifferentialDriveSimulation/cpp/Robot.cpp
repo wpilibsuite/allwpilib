@@ -22,6 +22,8 @@ class Robot : public frc::TimedRobot {
         frc::TrajectoryConfig(2_mps, 2_mps_sq));
   }
 
+  void RobotPeriodic() override { m_drive.Periodic(); }
+
   void AutonomousInit() override {
     m_timer.Reset();
     m_timer.Start();
@@ -33,8 +35,6 @@ class Robot : public frc::TimedRobot {
     auto reference = m_trajectory.Sample(elapsed);
     auto speeds = m_ramsete.Calculate(m_drive.GetPose(), reference);
     m_drive.Drive(speeds.vx, speeds.omega);
-
-    m_drive.UpdateOdometry();
   }
 
   void TeleopPeriodic() override {

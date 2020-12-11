@@ -22,6 +22,7 @@ DriveSubsystem::DriveSubsystem() {
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
 
   ResetEncoders();
+  frc::SmartDashboard::PutData("Field", &m_fieldSim);
 }
 
 void DriveSubsystem::Periodic() {
@@ -29,6 +30,7 @@ void DriveSubsystem::Periodic() {
   m_odometry.Update(m_gyro.GetRotation2d(),
                     units::meter_t(m_leftEncoder.GetDistance()),
                     units::meter_t(m_rightEncoder.GetDistance()));
+  m_fieldSim.SetRobotPose(m_odometry.GetPose());
 }
 
 void DriveSubsystem::SimulationPeriodic() {
@@ -52,9 +54,6 @@ void DriveSubsystem::SimulationPeriodic() {
       m_drivetrainSimulator.GetRightVelocity().to<double>());
   m_gyroAngleSim.SetAngle(
       -m_drivetrainSimulator.GetHeading().Degrees().to<double>());
-
-  m_fieldSim.SetRobotPose(m_odometry.GetPose());
-  frc::SmartDashboard::PutData("Field", &m_fieldSim);
 }
 
 units::ampere_t DriveSubsystem::GetCurrentDraw() const {

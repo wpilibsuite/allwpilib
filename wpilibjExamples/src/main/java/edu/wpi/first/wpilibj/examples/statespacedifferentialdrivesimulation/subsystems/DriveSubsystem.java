@@ -100,6 +100,7 @@ public class DriveSubsystem extends SubsystemBase {
 
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
+      SmartDashboard.putData("Field", m_fieldSim);
     }
   }
 
@@ -108,6 +109,7 @@ public class DriveSubsystem extends SubsystemBase {
     // Update the odometry in the periodic block
     m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getDistance(),
           m_rightEncoder.getDistance());
+    m_fieldSim.setRobotPose(getPose());
   }
 
   @Override
@@ -125,9 +127,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
     m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
     m_gyroAngleSim.set(-m_drivetrainSimulator.getHeading().getDegrees());
-
-    m_fieldSim.setRobotPose(getPose());
-    SmartDashboard.putData("Field", m_fieldSim);
   }
 
   /**
