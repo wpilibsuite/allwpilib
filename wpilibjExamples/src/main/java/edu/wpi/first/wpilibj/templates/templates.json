@@ -60,7 +60,7 @@
     "tags": [
       "Timed", "Romi"
     ],
-    "foldername": "timed",
+    "foldername": "romitimed",
     "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
@@ -71,7 +71,7 @@
     "tags": [
       "Command", "Romi"
     ],
-    "foldername": "commandbased",
+    "foldername": "romicommandbased",
     "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
