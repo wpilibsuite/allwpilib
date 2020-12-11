@@ -121,10 +121,10 @@ void WebServerClientTest::AttemptConnect() {
   }
 
   struct sockaddr_in dest;
-  uv::NameToAddr("localhost", 8080, &dest);
+  uv::NameToAddr("localhost", 3300, &dest);
   m_tcp_client->Connect(dest, [this]() {
     m_tcp_connected = true;
-    InitializeWebSocket("localhost", 8080, "/wpilibws");
+    InitializeWebSocket("localhost", 3300, "/wpilibws");
   });
 }
 
