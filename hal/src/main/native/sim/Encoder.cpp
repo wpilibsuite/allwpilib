@@ -174,9 +174,9 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return;
   }
 
+  SimEncoderData[encoder->index].reset = true;
   SimEncoderData[encoder->index].count = 0;
   SimEncoderData[encoder->index].period = std::numeric_limits<double>::max();
-  SimEncoderData[encoder->index].reset = true;
 }
 double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);

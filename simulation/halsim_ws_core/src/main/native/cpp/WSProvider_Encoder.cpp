@@ -49,9 +49,27 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
         provider->ProcessHalCallback(payload);
       },
       this, true);
-  m_countCbKey = REGISTER(Count, ">count", int32_t, int);
+  m_countCbKey = HALSIM_RegisterEncoderCountCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        auto provider = static_cast<HALSimWSProviderEncoder*>(param);
+        provider->ProcessHalCallback(
+            {{">count", static_cast<int32_t>(value->data.v_int +
+                                             provider->m_countOffset)}});
+      },
+      this, true);
   m_periodCbKey = REGISTER(Period, ">period", double, double);
-  m_resetCbKey = REGISTER(Reset, "<reset", bool, boolean);
+  m_resetCbKey = HALSIM_RegisterEncoderResetCallback(
+      m_channel,
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        auto provider = static_cast<HALSimWSProviderEncoder*>(param);
+        bool reset = static_cast<bool>(value->data.v_boolean);
+        if (reset) {
+          provider->m_countOffset +=
+              HALSIM_GetEncoderCount(provider->m_channel);
+        }
+      },
+      this, true);
   m_reverseDirectionCbKey =
       REGISTER(ReverseDirection, "<reverse_direction", bool, boolean);
   m_samplesCbKey = REGISTER(SamplesToAverage, "<samples_to_avg", int32_t, int);
@@ -79,7 +97,8 @@ void HALSimWSProviderEncoder::DoCancelCallbacks() {
 void HALSimWSProviderEncoder::OnNetValueChanged(const wpi::json& json) {
   wpi::json::const_iterator it;
   if ((it = json.find(">count")) != json.end()) {
-    HALSIM_SetEncoderCount(m_channel, it.value());
+    HALSIM_SetEncoderCount(m_channel,
+                           static_cast<int32_t>(it.value()) - m_countOffset);
   }
   if ((it = json.find(">period")) != json.end()) {
     HALSIM_SetEncoderPeriod(m_channel, it.value());
