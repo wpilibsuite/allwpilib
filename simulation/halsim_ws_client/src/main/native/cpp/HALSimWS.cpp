@@ -57,7 +57,7 @@ bool HALSimWS::Initialize() {
       return false;
     }
   } else {
-    m_port = 8080;
+    m_port = 3300;
   }
 
   const char* uri = std::getenv("HALSIMWS_URI");
