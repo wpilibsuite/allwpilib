@@ -156,6 +156,14 @@ class IterativeRobotBase : public RobotBase {
   virtual void TestPeriodic();
 
   /**
+   * Enables or disables flushing NetworkTables every loop iteration.
+   * By default, this is disabled.
+   *
+   * @param enabled True to enable, false to disable
+   */
+  void SetNetworkTablesFlushEnabled(bool enabled);
+
+  /**
    * Constructor for IterativeRobotBase.
    *
    * @param period Period in seconds.
@@ -188,6 +196,7 @@ class IterativeRobotBase : public RobotBase {
 
   Mode m_lastMode = Mode::kNone;
   Watchdog m_watchdog;
+  bool m_ntFlushEnabled = false;
 
   void PrintLoopOverrunMessage();
 };

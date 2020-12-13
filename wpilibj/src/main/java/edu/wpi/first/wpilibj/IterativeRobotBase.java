@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -55,6 +56,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private Mode m_lastMode = Mode.kNone;
   private final Watchdog m_watchdog;
+  private boolean m_ntFlushEnabled;
 
   /**
    * Constructor for IterativeRobotBase.
@@ -218,6 +220,16 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
   }
 
+  /**
+   * Enables or disables flushing NetworkTables every loop iteration.
+   * By default, this is disabled.
+   *
+   * @param enabled True to enable, false to disable
+   */
+  public void setNetworkTablesFlushEnabled(boolean enabled) {
+    m_ntFlushEnabled = enabled;
+  }
+
   @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void loopFunc() {
     m_watchdog.reset();
@@ -299,6 +311,11 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
 
     m_watchdog.disable();
+
+    // Flush NetworkTables
+    if (m_ntFlushEnabled) {
+      NetworkTableInstance.getDefault().flush();
+    }
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {
