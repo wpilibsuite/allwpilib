@@ -12,6 +12,7 @@
 
 #include <wpi/TCPAcceptor.h>
 #include <wpi/TCPConnector.h>
+#include <wpi/timestamp.h>
 
 #include "IConnectionNotifier.h"
 #include "IStorage.h"
@@ -217,11 +218,11 @@ void DispatcherBase::SetIdentity(const Twine& name) {
 }
 
 void DispatcherBase::Flush() {
-  auto now = std::chrono::steady_clock::now();
+  auto now = wpi::Now();
   {
     std::scoped_lock lock(m_flush_mutex);
     // don't allow flushes more often than every 5 ms
-    if ((now - m_last_flush) < std::chrono::milliseconds(5)) return;
+    if ((now - m_last_flush) < 5000) return;
     m_last_flush = now;
     m_do_flush = true;
   }
