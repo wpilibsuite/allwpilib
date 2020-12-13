@@ -8,6 +8,7 @@
 #include "frc/IterativeRobotBase.h"
 
 #include <hal/DriverStation.h>
+#include <networktables/NetworkTableInstance.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
@@ -98,6 +99,10 @@ void IterativeRobotBase::TestPeriodic() {
   }
 }
 
+void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
+  m_ntFlushEnabled = enabled;
+}
+
 void IterativeRobotBase::LoopFunc() {
   m_watchdog.Reset();
 
@@ -178,6 +183,9 @@ void IterativeRobotBase::LoopFunc() {
   }
 
   m_watchdog.Disable();
+
+  // Flush NetworkTables
+  if (m_ntFlushEnabled) nt::NetworkTableInstance::GetDefault().Flush();
 
   // Warn on loop time overruns
   if (m_watchdog.IsExpired()) {
