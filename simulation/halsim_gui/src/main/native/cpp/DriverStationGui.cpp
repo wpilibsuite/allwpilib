@@ -22,10 +22,8 @@
 #include <hal/simulation/MockHooks.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/Format.h>
-#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringRef.h>
-#include <wpi/raw_ostream.h>
 #include <wpigui.h>
 
 #include "HALDataSource.h"
@@ -35,21 +33,126 @@ using namespace halsimgui;
 
 namespace {
 
-struct SystemJoystick {
-  bool present = false;
-  int axisCount = 0;
-  const float* axes = nullptr;
-  int buttonCount = 0;
-  const unsigned char* buttons = nullptr;
-  int hatCount = 0;
-  const unsigned char* hats = nullptr;
-  const char* name = nullptr;
-  bool isGamepad = false;
-  GLFWgamepadstate gamepadState;
+struct HALJoystickData {
+  HALJoystickData() {
+    std::memset(&desc, 0, sizeof(desc));
+    desc.type = -1;
+    std::memset(&axes, 0, sizeof(axes));
+    std::memset(&buttons, 0, sizeof(buttons));
+    std::memset(&povs, 0, sizeof(povs));
+  }
+  HAL_JoystickDescriptor desc;
+  HAL_JoystickAxes axes;
+  HAL_JoystickButtons buttons;
+  HAL_JoystickPOVs povs;
+};
 
-  bool anyButtonPressed = false;
+class SystemJoystick {
+ public:
+  virtual ~SystemJoystick() = default;
 
-  void Update(int i);
+  bool IsPresent() const { return m_present; }
+  bool IsAnyButtonPressed() const { return m_anyButtonPressed; }
+  bool IsGamepad() const { return m_isGamepad; }
+
+  virtual void SettingsDisplay() {}
+  virtual void Update() = 0;
+  virtual const char* GetName() const = 0;
+  virtual void GetData(HALJoystickData* data, bool mapGamepad) const = 0;
+  virtual const char* GetGUID() const = 0;
+  virtual int GetIndex() const = 0;
+
+ protected:
+  bool m_present = false;
+  bool m_anyButtonPressed = false;
+  bool m_isGamepad = false;
+};
+
+class GlfwSystemJoystick : public SystemJoystick {
+ public:
+  explicit GlfwSystemJoystick(int i) : m_index{i} {}
+
+  void Update() override;
+  const char* GetName() const override { return m_name ? m_name : "(null)"; }
+  void GetData(HALJoystickData* data, bool mapGamepad) const override;
+  const char* GetGUID() const override { return glfwGetJoystickGUID(m_index); }
+  int GetIndex() const override { return m_index; }
+
+ private:
+  int m_index;
+  int m_axisCount = 0;
+  const float* m_axes = nullptr;
+  int m_buttonCount = 0;
+  const unsigned char* m_buttons = nullptr;
+  int m_hatCount = 0;
+  const unsigned char* m_hats = nullptr;
+  const char* m_name = nullptr;
+  GLFWgamepadstate m_gamepadState;
+};
+
+class KeyboardJoystick : public SystemJoystick {
+ public:
+  explicit KeyboardJoystick(int index);
+
+  void SettingsDisplay() override;
+  void Update() override;
+  const char* GetName() const override { return m_name; }
+  void GetData(HALJoystickData* data, bool mapGamepad) const override {
+    *data = m_data;
+  }
+  const char* GetGUID() const override { return m_guid; }
+  int GetIndex() const override { return m_index + GLFW_JOYSTICK_LAST + 1; }
+
+  void ClearKey(int key);
+  virtual const char* GetKeyName(int key) const = 0;
+
+  void ReadIni(wpi::StringRef name, wpi::StringRef value);
+  void WriteIni(ImGuiTextBuffer* out_buf) const;
+
+ protected:
+  void EditKey(const char* label, int* key);
+
+  int m_index;
+  char m_name[20];
+  char m_guid[20];
+
+  static int* s_keyEdit;
+
+  HALJoystickData m_data;
+
+  struct AxisConfig {
+    int incKey = -1;
+    int decKey = -1;
+    float keyRate = 0.05;
+    float decayRate = 0.05;
+  };
+  AxisConfig m_axisConfig[HAL_kMaxJoystickAxes];
+
+  static constexpr int kMaxButtonCount = 32;
+  int m_buttonKey[kMaxButtonCount];
+
+  struct PovConfig {
+    int key0 = -1;
+    int key45 = -1;
+    int key90 = -1;
+    int key135 = -1;
+    int key180 = -1;
+    int key225 = -1;
+    int key270 = -1;
+    int key315 = -1;
+  };
+
+  PovConfig m_povConfig[HAL_kMaxJoystickPOVs];
+};
+
+class GlfwKeyboardJoystick : public KeyboardJoystick {
+ public:
+  explicit GlfwKeyboardJoystick(int index, bool noDefaults = false);
+
+  const char* GetKeyName(int key) const override {
+    if (key < 0) return "(None)";
+    return glfwGetKeyName(key, 0);
+  }
 };
 
 struct RobotJoystick {
@@ -58,16 +161,15 @@ struct RobotJoystick {
   const SystemJoystick* sys = nullptr;
   bool useGamepad = false;
 
-  HAL_JoystickDescriptor desc;
-  HAL_JoystickAxes axes;
-  HAL_JoystickButtons buttons;
-  HAL_JoystickPOVs povs;
+  HALJoystickData data;
 
-  void Clear();
+  void Clear() { data = HALJoystickData{}; }
   void Update();
   void SetHAL(int i);
   void GetHAL(int i);
-  bool IsButtonPressed(int i) { return (buttons.buttons & (1u << i)) != 0; }
+  bool IsButtonPressed(int i) {
+    return (data.buttons.buttons & (1u << i)) != 0;
+  }
 };
 
 class JoystickModel {
@@ -169,8 +271,9 @@ class FMSSimModel : public glass::FMSModel {
 }  // namespace
 
 // system joysticks
-static SystemJoystick gSystemJoysticks[GLFW_JOYSTICK_LAST + 1];
-static int gNumSystemJoysticks = 0;
+static std::vector<std::unique_ptr<SystemJoystick>> gGlfwJoysticks;
+static int gNumGlfwJoysticks = 0;
+static std::vector<std::unique_ptr<KeyboardJoystick>> gKeyboardJoysticks;
 
 // robot joysticks
 static RobotJoystick gRobotJoysticks[HAL_kMaxJoysticks];
@@ -184,6 +287,8 @@ DSManager DriverStationGui::dsManager{"DSManager"};
 
 static bool gDisableDS = false;
 static bool gZeroDisconnectedJoysticks = true;
+static bool gUseEnableDisableHotkeys = false;
+static bool gUseEstopHotkey = false;
 static std::atomic<bool>* gDSSocketConnected = nullptr;
 
 static inline bool IsDSDisabled() {
@@ -284,9 +389,42 @@ static void JoystickWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                      joy.useGamepad ? 1 : 0);
     if (joy.name.HasName()) joy.name.WriteIni(out_buf);
     if (joy.sys) {
-      const char* guid = glfwGetJoystickGUID(joy.sys - gSystemJoysticks);
+      const char* guid = joy.sys->GetGUID();
       if (guid) out_buf->appendf("guid=%s\n", guid);
     }
+    out_buf->append("\n");
+  }
+}
+
+// read/write keyboard joystick mapping to ini file
+static void* KeyboardJoystickReadOpen(ImGuiContext* ctx,
+                                      ImGuiSettingsHandler* handler,
+                                      const char* name) {
+  int num;
+  if (wpi::StringRef{name}.getAsInteger(10, num)) return nullptr;
+  if (num < 0 || num >= static_cast<int>(gKeyboardJoysticks.size()))
+    return nullptr;
+  auto joy = gKeyboardJoysticks[num].get();
+  *joy = GlfwKeyboardJoystick(num, true);
+  return joy;
+}
+
+static void KeyboardJoystickReadLine(ImGuiContext* ctx,
+                                     ImGuiSettingsHandler* handler, void* entry,
+                                     const char* lineStr) {
+  auto joy = static_cast<KeyboardJoystick*>(entry);
+  // format: guid=guid or useGamepad=0/1
+  wpi::StringRef line{lineStr};
+  auto [name, value] = line.split('=');
+  joy->ReadIni(name.trim(), value.trim());
+}
+
+static void KeyboardJoystickWriteAll(ImGuiContext* ctx,
+                                     ImGuiSettingsHandler* handler,
+                                     ImGuiTextBuffer* out_buf) {
+  for (unsigned int i = 0; i < gKeyboardJoysticks.size(); ++i) {
+    out_buf->appendf("[KeyboardJoystick][%u]\n", i);
+    gKeyboardJoysticks[i]->WriteIni(out_buf);
     out_buf->append("\n");
   }
 }
@@ -314,6 +452,14 @@ static void DriverStationReadLine(ImGuiContext* ctx,
     int num;
     if (value.getAsInteger(10, num)) return;
     gZeroDisconnectedJoysticks = num;
+  } else if (name == "enableDisableKeys") {
+    int num;
+    if (value.getAsInteger(10, num)) return;
+    gUseEnableDisableHotkeys = num;
+  } else if (name == "estopKey") {
+    int num;
+    if (value.getAsInteger(10, num)) return;
+    gUseEstopHotkey = num;
   }
 }
 
@@ -321,42 +467,44 @@ static void DriverStationWriteAll(ImGuiContext* ctx,
                                   ImGuiSettingsHandler* handler,
                                   ImGuiTextBuffer* out_buf) {
   out_buf->appendf(
-      "[DriverStation][Main]\ndisable=%d\nzeroDisconnectedJoysticks=%d\n\n",
-      gDisableDS ? 1 : 0, gZeroDisconnectedJoysticks ? 1 : 0);
+      "[DriverStation][Main]\ndisable=%d\nzeroDisconnectedJoysticks=%d\n"
+      "enableDisableKeys=%d\nestopKey=%d\n\n",
+      gDisableDS ? 1 : 0, gZeroDisconnectedJoysticks ? 1 : 0,
+      gUseEnableDisableHotkeys ? 1 : 0, gUseEstopHotkey ? 1 : 0);
 }
 
-void SystemJoystick::Update(int i) {
-  bool wasPresent = present;
-  present = glfwJoystickPresent(i);
+void GlfwSystemJoystick::Update() {
+  bool wasPresent = m_present;
+  m_present = glfwJoystickPresent(m_index);
 
-  if (!present) return;
-  axes = glfwGetJoystickAxes(i, &axisCount);
-  buttons = glfwGetJoystickButtons(i, &buttonCount);
-  hats = glfwGetJoystickHats(i, &hatCount);
-  isGamepad = glfwGetGamepadState(i, &gamepadState);
+  if (!m_present) return;
+  m_axes = glfwGetJoystickAxes(m_index, &m_axisCount);
+  m_buttons = glfwGetJoystickButtons(m_index, &m_buttonCount);
+  m_hats = glfwGetJoystickHats(m_index, &m_hatCount);
+  m_isGamepad = glfwGetGamepadState(m_index, &m_gamepadState);
 
-  anyButtonPressed = false;
-  for (int j = 0; j < buttonCount; ++j) {
-    if (buttons[j]) {
-      anyButtonPressed = true;
+  m_anyButtonPressed = false;
+  for (int j = 0; j < m_buttonCount; ++j) {
+    if (m_buttons[j]) {
+      m_anyButtonPressed = true;
       break;
     }
   }
-  for (int j = 0; j < hatCount; ++j) {
-    if (hats[j] != GLFW_HAT_CENTERED) {
-      anyButtonPressed = true;
+  for (int j = 0; j < m_hatCount; ++j) {
+    if (m_hats[j] != GLFW_HAT_CENTERED) {
+      m_anyButtonPressed = true;
       break;
     }
   }
 
-  if (!present || wasPresent) return;
-  name = glfwGetJoystickName(i);
+  if (!m_present || wasPresent) return;
+  m_name = glfwGetJoystickName(m_index);
 
   // try to find matching GUID
-  if (const char* guid = glfwGetJoystickGUID(i)) {
+  if (const char* guid = glfwGetJoystickGUID(m_index)) {
     for (auto&& joy : gRobotJoysticks) {
       if (guid == joy.guid) {
-        joy.sys = &gSystemJoysticks[i];
+        joy.sys = this;
         joy.guid.clear();
         break;
       }
@@ -387,89 +535,459 @@ static int HatToAngle(unsigned char hat) {
   }
 }
 
-void RobotJoystick::Clear() {
-  std::memset(&desc, 0, sizeof(desc));
-  desc.type = -1;
-  std::memset(&axes, 0, sizeof(axes));
-  std::memset(&buttons, 0, sizeof(buttons));
-  std::memset(&povs, 0, sizeof(povs));
-}
-
-void RobotJoystick::Update() {
-  Clear();
-
-  if (!sys || !sys->present) return;
+void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
+  if (!m_present) return;
 
   // use gamepad mappings if present and enabled
   const float* sysAxes;
   const unsigned char* sysButtons;
-  if (sys->isGamepad && useGamepad) {
-    sysAxes = sys->gamepadState.axes;
+  if (m_isGamepad && mapGamepad) {
+    sysAxes = m_gamepadState.axes;
     // don't remap on windows
 #ifdef _WIN32
-    sysButtons = sys->buttons;
+    sysButtons = m_buttons;
 #else
-    sysButtons = sys->gamepadState.buttons;
+    sysButtons = m_gamepadState.buttons;
 #endif
   } else {
-    sysAxes = sys->axes;
-    sysButtons = sys->buttons;
+    sysAxes = m_axes;
+    sysButtons = m_buttons;
   }
 
   // copy into HAL structures
-  desc.isXbox = sys->isGamepad ? 1 : 0;
-  desc.type = sys->isGamepad ? 21 : 20;
-  std::strncpy(desc.name, sys->name, 256);
-  desc.axisCount = (std::min)(sys->axisCount, HAL_kMaxJoystickAxes);
+  data->desc.isXbox = m_isGamepad ? 1 : 0;
+  data->desc.type = m_isGamepad ? 21 : 20;
+  std::strncpy(data->desc.name, m_name, 256);
+  data->desc.axisCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
   // desc.axisTypes ???
-  desc.buttonCount = (std::min)(sys->buttonCount, 32);
-  desc.povCount = (std::min)(sys->hatCount, HAL_kMaxJoystickPOVs);
+  data->desc.buttonCount = (std::min)(m_buttonCount, 32);
+  data->desc.povCount = (std::min)(m_hatCount, HAL_kMaxJoystickPOVs);
 
-  buttons.count = desc.buttonCount;
-  for (int j = 0; j < buttons.count; ++j)
-    buttons.buttons |= (sysButtons[j] ? 1u : 0u) << j;
+  data->buttons.count = data->desc.buttonCount;
+  for (int j = 0; j < data->buttons.count; ++j)
+    data->buttons.buttons |= (sysButtons[j] ? 1u : 0u) << j;
 
-  axes.count = desc.axisCount;
-  if (sys->isGamepad && useGamepad) {
+  data->axes.count = data->desc.axisCount;
+  if (m_isGamepad && mapGamepad) {
     // the FRC DriverStation maps gamepad (XInput) trigger values to 0-1 range
     // on axis 2 and 3.
-    axes.axes[0] = sysAxes[0];
-    axes.axes[1] = sysAxes[1];
-    axes.axes[2] = 0.5 + sysAxes[4] / 2.0;
-    axes.axes[3] = 0.5 + sysAxes[5] / 2.0;
-    axes.axes[4] = sysAxes[2];
-    axes.axes[5] = sysAxes[3];
+    data->axes.axes[0] = sysAxes[0];
+    data->axes.axes[1] = sysAxes[1];
+    data->axes.axes[2] = 0.5 + sysAxes[4] / 2.0;
+    data->axes.axes[3] = 0.5 + sysAxes[5] / 2.0;
+    data->axes.axes[4] = sysAxes[2];
+    data->axes.axes[5] = sysAxes[3];
 
     // the start button for gamepads is not mapped on the FRC DriverStation
     // platforms, so remove it if present
-    if (buttons.count == 11) {
-      --desc.buttonCount;
-      --buttons.count;
-      buttons.buttons =
-          (buttons.buttons & 0xff) | ((buttons.buttons >> 1) & 0x300);
+    if (data->buttons.count == 11) {
+      --data->desc.buttonCount;
+      --data->buttons.count;
+      data->buttons.buttons = (data->buttons.buttons & 0xff) |
+                              ((data->buttons.buttons >> 1) & 0x300);
     }
   } else {
-    std::memcpy(axes.axes, sysAxes, axes.count * sizeof(&axes.axes[0]));
+    std::memcpy(data->axes.axes, sysAxes,
+                data->axes.count * sizeof(&data->axes.axes[0]));
   }
 
-  povs.count = desc.povCount;
-  for (int j = 0; j < povs.count; ++j) povs.povs[j] = HatToAngle(sys->hats[j]);
+  data->povs.count = data->desc.povCount;
+  for (int j = 0; j < data->povs.count; ++j)
+    data->povs.povs[j] = HatToAngle(m_hats[j]);
+}
+
+KeyboardJoystick::KeyboardJoystick(int index) : m_index{index} {
+  std::snprintf(m_name, sizeof(m_name), "Keyboard %d", index);
+  std::snprintf(m_guid, sizeof(m_guid), "Keyboard%d", index);
+
+  // init axes
+  m_data.axes.count = 0;
+
+  // init buttons
+  m_data.buttons.count = 0;
+  for (int i = 0; i < kMaxButtonCount; ++i) {
+    m_buttonKey[i] = -1;
+  }
+
+  // init POVs
+  m_data.povs.count = 0;
+
+  // init desc structure
+  m_data.desc.isXbox = 0;
+  m_data.desc.type = 20;
+  std::strncpy(m_data.desc.name, m_name, 256);
+}
+
+int* KeyboardJoystick::s_keyEdit = nullptr;
+
+void KeyboardJoystick::EditKey(const char* label, int* key) {
+  ImGui::PushID(label);
+  ImGui::Text("%s", label);
+  ImGui::SameLine();
+  char editLabel[32];
+  std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
+                s_keyEdit == key ? "(press key)" : GetKeyName(*key));
+  if (ImGui::SmallButton(editLabel)) s_keyEdit = key;
+  ImGui::SameLine();
+  if (ImGui::SmallButton("Clear")) *key = -1;
+  ImGui::PopID();
+}
+
+void KeyboardJoystick::SettingsDisplay() {
+  if (s_keyEdit) {
+    ImGuiIO& io = ImGui::GetIO();
+    for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); ++i) {
+      if (io.KeysDown[i]) {
+        // remove all other uses
+        for (auto&& joy : gKeyboardJoysticks) joy->ClearKey(i);
+        *s_keyEdit = i;
+        s_keyEdit = nullptr;
+      }
+    }
+  }
+
+  char label[64];
+  ImGui::PushItemWidth(ImGui::GetFontSize() * 6);
+  // axes
+  if (ImGui::CollapsingHeader("Axes", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::PushID("Axes");
+    int axisCount = m_data.axes.count;
+    if (ImGui::InputInt("Count", &axisCount)) {
+      if (axisCount < 0) axisCount = 0;
+      if (axisCount > HAL_kMaxJoystickAxes) axisCount = HAL_kMaxJoystickAxes;
+      m_data.axes.count = axisCount;
+    }
+    for (int i = 0; i < axisCount; ++i) {
+      std::snprintf(label, sizeof(label), "Axis %d", i);
+      if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
+        EditKey("Increase", &m_axisConfig[i].incKey);
+        EditKey("Decrease", &m_axisConfig[i].decKey);
+        ImGui::InputFloat("Key Rate", &m_axisConfig[i].keyRate);
+        ImGui::InputFloat("Decay Rate", &m_axisConfig[i].decayRate);
+        ImGui::TreePop();
+      }
+    }
+    ImGui::PopID();
+  }
+
+  // buttons
+  if (ImGui::CollapsingHeader("Buttons", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::PushID("Buttons");
+    int buttonCount = m_data.buttons.count;
+    if (ImGui::InputInt("Count", &buttonCount)) {
+      if (buttonCount < 0) buttonCount = 0;
+      if (buttonCount > kMaxButtonCount) buttonCount = kMaxButtonCount;
+      m_data.buttons.count = buttonCount;
+    }
+    for (int i = 0; i < buttonCount; ++i) {
+      std::snprintf(label, sizeof(label), "Button %d", i + 1);
+      EditKey(label, &m_buttonKey[i]);
+    }
+    ImGui::PopID();
+  }
+
+  // povs
+  if (ImGui::CollapsingHeader("POVs", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::PushID("POVs");
+    int povCount = m_data.povs.count;
+    if (ImGui::InputInt("Count", &povCount)) {
+      if (povCount < 0) povCount = 0;
+      if (povCount > HAL_kMaxJoystickPOVs) povCount = HAL_kMaxJoystickPOVs;
+      m_data.povs.count = povCount;
+    }
+    for (int i = 0; i < povCount; ++i) {
+      std::snprintf(label, sizeof(label), "POV %d", i);
+      if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
+        EditKey("  0 deg", &m_povConfig[i].key0);
+        EditKey(" 45 deg", &m_povConfig[i].key45);
+        EditKey(" 90 deg", &m_povConfig[i].key90);
+        EditKey("135 deg", &m_povConfig[i].key135);
+        EditKey("180 deg", &m_povConfig[i].key180);
+        EditKey("225 deg", &m_povConfig[i].key225);
+        EditKey("270 deg", &m_povConfig[i].key270);
+        EditKey("315 deg", &m_povConfig[i].key315);
+        ImGui::TreePop();
+      }
+    }
+    ImGui::PopID();
+  }
+
+  ImGui::PopItemWidth();
+}
+
+void KeyboardJoystick::Update() {
+  ImGuiIO& io = ImGui::GetIO();
+
+  if (m_data.axes.count > 0 || m_data.buttons.count > 0 ||
+      m_data.povs.count > 0)
+    m_present = true;
+
+  // axes
+  for (int i = 0; i < m_data.axes.count; ++i) {
+    auto& config = m_axisConfig[i];
+    float& axisValue = m_data.axes.axes[i];
+    // increase/decrease while key held down (to saturation); decay back to 0
+    if (config.incKey >= 0 && io.KeysDown[config.incKey]) {
+      axisValue += config.keyRate;
+      if (axisValue > 1.0) axisValue = 1.0;
+    } else if (axisValue > 0) {
+      if (axisValue < config.decayRate)
+        axisValue = 0;
+      else
+        axisValue -= config.decayRate;
+    }
+
+    if (config.decKey >= 0 && io.KeysDown[config.decKey]) {
+      axisValue -= config.keyRate;
+      if (axisValue < -1.0) axisValue = -1.0;
+    } else if (axisValue < 0) {
+      if (axisValue > -config.decayRate)
+        axisValue = 0;
+      else
+        axisValue += config.decayRate;
+    }
+  }
+
+  // buttons
+  m_data.buttons.buttons = 0;
+  m_anyButtonPressed = false;
+  for (int i = 0; i < m_data.buttons.count; ++i) {
+    if (m_buttonKey[i] >= 0 && io.KeysDown[m_buttonKey[i]]) {
+      m_data.buttons.buttons |= 1u << i;
+      m_anyButtonPressed = true;
+    }
+  }
+
+  // povs
+  for (int i = 0; i < m_data.povs.count; ++i) {
+    auto& config = m_povConfig[i];
+    auto& povValue = m_data.povs.povs[i];
+    povValue = -1;
+    if (config.key0 >= 0 && io.KeysDown[config.key0])
+      povValue = 0;
+    else if (config.key45 >= 0 && io.KeysDown[config.key45])
+      povValue = 45;
+    else if (config.key90 >= 0 && io.KeysDown[config.key90])
+      povValue = 90;
+    else if (config.key135 >= 0 && io.KeysDown[config.key135])
+      povValue = 135;
+    else if (config.key180 >= 0 && io.KeysDown[config.key180])
+      povValue = 180;
+    else if (config.key225 >= 0 && io.KeysDown[config.key225])
+      povValue = 225;
+    else if (config.key270 >= 0 && io.KeysDown[config.key270])
+      povValue = 270;
+    else if (config.key315 >= 0 && io.KeysDown[config.key315])
+      povValue = 315;
+  }
+
+  // try to find matching GUID
+  for (auto&& joy : gRobotJoysticks) {
+    if (m_guid == joy.guid) {
+      joy.sys = this;
+      joy.guid.clear();
+      break;
+    }
+  }
+
+  // update desc
+  m_data.desc.axisCount = m_data.axes.count;
+  m_data.desc.buttonCount = m_data.buttons.count;
+  m_data.desc.povCount = m_data.povs.count;
+}
+
+void KeyboardJoystick::ClearKey(int key) {
+  for (auto&& config : m_axisConfig) {
+    if (config.incKey == key) config.incKey = -1;
+    if (config.decKey == key) config.decKey = -1;
+  }
+  for (auto&& buttonKey : m_buttonKey) {
+    if (buttonKey == key) buttonKey = -1;
+  }
+  for (auto&& config : m_povConfig) {
+    if (config.key0 == key) config.key0 = -1;
+    if (config.key45 == key) config.key45 = -1;
+    if (config.key90 == key) config.key90 = -1;
+    if (config.key135 == key) config.key135 = -1;
+    if (config.key180 == key) config.key180 = -1;
+    if (config.key225 == key) config.key225 = -1;
+    if (config.key270 == key) config.key270 = -1;
+    if (config.key315 == key) config.key315 = -1;
+  }
+}
+
+void KeyboardJoystick::ReadIni(wpi::StringRef name, wpi::StringRef value) {
+  if (name.startswith("axis")) {
+    name = name.drop_front(4);
+    if (name == "Count") {
+      int v;
+      if (value.getAsInteger(10, v)) return;
+      m_data.axes.count = (std::min)(v, HAL_kMaxJoystickAxes);
+      return;
+    }
+
+    unsigned int index;
+    if (name.consumeInteger(10, index)) return;
+    if (index >= HAL_kMaxJoystickAxes) return;
+    if (name == "incKey") {
+      int v;
+      if (value.getAsInteger(10, v)) return;
+      m_axisConfig[index].incKey = v;
+    } else if (name == "decKey") {
+      int v;
+      if (value.getAsInteger(10, v)) return;
+      m_axisConfig[index].decKey = v;
+    } else if (name == "keyRate") {
+      std::sscanf(value.data(), "%f", &m_axisConfig[index].keyRate);
+    } else if (name == "decayRate") {
+      std::sscanf(value.data(), "%f", &m_axisConfig[index].decayRate);
+    }
+  } else if (name.startswith("button")) {
+    name = name.drop_front(6);
+    if (name == "Count") {
+      int v;
+      if (value.getAsInteger(10, v)) return;
+      m_data.buttons.count = (std::min)(v, kMaxButtonCount);
+      return;
+    }
+
+    unsigned int index;
+    if (name.getAsInteger(10, index)) return;
+    if (index >= kMaxButtonCount) return;
+    int v;
+    if (value.getAsInteger(10, v)) return;
+    m_buttonKey[index] = v;
+  } else if (name.startswith("pov")) {
+    name = name.drop_front(3);
+    if (name == "Count") {
+      int v;
+      if (value.getAsInteger(10, v)) return;
+      m_data.povs.count = (std::min)(v, HAL_kMaxJoystickPOVs);
+      return;
+    }
+
+    unsigned int index;
+    if (name.consumeInteger(10, index)) return;
+    if (index >= HAL_kMaxJoystickPOVs) return;
+    int v;
+    if (value.getAsInteger(10, v)) return;
+    if (name == "key0") {
+      m_povConfig[index].key0 = v;
+    } else if (name == "key45") {
+      m_povConfig[index].key45 = v;
+    } else if (name == "key90") {
+      m_povConfig[index].key90 = v;
+    } else if (name == "key135") {
+      m_povConfig[index].key135 = v;
+    } else if (name == "key180") {
+      m_povConfig[index].key180 = v;
+    } else if (name == "key225") {
+      m_povConfig[index].key225 = v;
+    } else if (name == "key270") {
+      m_povConfig[index].key270 = v;
+    } else if (name == "key315") {
+      m_povConfig[index].key315 = v;
+    }
+  }
+}
+
+void KeyboardJoystick::WriteIni(ImGuiTextBuffer* out_buf) const {
+  out_buf->appendf("axisCount=%d\nbuttonCount=%d\npovCount=%d\n",
+                   m_data.axes.count, m_data.buttons.count, m_data.povs.count);
+  for (int i = 0; i < m_data.axes.count; ++i) {
+    auto& c = m_axisConfig[i];
+    out_buf->appendf(
+        "axis%dincKey=%d\naxis%ddecKey=%d\naxis%dkeyRate=%f\n"
+        "axis%ddecayRate=%f\n",
+        i, c.incKey, i, c.decKey, i, c.keyRate, i, c.decayRate);
+  }
+  for (int i = 0; i < m_data.buttons.count; ++i) {
+    out_buf->appendf("button%d=%d\n", i, m_buttonKey[i]);
+  }
+  for (int i = 0; i < m_data.povs.count; ++i) {
+    auto& c = m_povConfig[i];
+    out_buf->appendf(
+        "pov%dkey0=%d\npov%dkey45=%d\npov%dkey90=%d\npov%dkey135=%d\n"
+        "pov%dkey180=%d\npov%dkey225=%d\npov%dkey270=%d\npov%dkey315=%d\n",
+        i, c.key0, i, c.key45, i, c.key90, i, c.key135, i, c.key180, i,
+        c.key225, i, c.key270, i, c.key315);
+  }
+}
+
+GlfwKeyboardJoystick::GlfwKeyboardJoystick(int index, bool noDefaults)
+    : KeyboardJoystick{index} {
+  if (noDefaults) return;
+  // set up a default keyboard config for 0, 1, and 2
+  if (index == 0) {
+    m_data.axes.count = 3;
+    m_axisConfig[0].incKey = GLFW_KEY_D;
+    m_axisConfig[0].decKey = GLFW_KEY_A;
+    m_axisConfig[1].incKey = GLFW_KEY_S;
+    m_axisConfig[1].decKey = GLFW_KEY_W;
+    m_axisConfig[2].incKey = GLFW_KEY_R;
+    m_axisConfig[2].decKey = GLFW_KEY_E;
+    m_axisConfig[2].keyRate = 0.01;
+    m_axisConfig[2].decayRate = 0;  // works like a throttle
+    m_data.buttons.count = 4;
+    m_buttonKey[0] = GLFW_KEY_Z;
+    m_buttonKey[1] = GLFW_KEY_X;
+    m_buttonKey[2] = GLFW_KEY_C;
+    m_buttonKey[3] = GLFW_KEY_V;
+    m_data.povs.count = 1;
+    m_povConfig[0].key0 = GLFW_KEY_KP_8;
+    m_povConfig[0].key45 = GLFW_KEY_KP_9;
+    m_povConfig[0].key90 = GLFW_KEY_KP_6;
+    m_povConfig[0].key135 = GLFW_KEY_KP_3;
+    m_povConfig[0].key180 = GLFW_KEY_KP_2;
+    m_povConfig[0].key225 = GLFW_KEY_KP_1;
+    m_povConfig[0].key270 = GLFW_KEY_KP_4;
+    m_povConfig[0].key315 = GLFW_KEY_KP_7;
+  } else if (index == 1) {
+    m_data.axes.count = 2;
+    m_axisConfig[0].incKey = GLFW_KEY_L;
+    m_axisConfig[0].decKey = GLFW_KEY_J;
+    m_axisConfig[1].incKey = GLFW_KEY_K;
+    m_axisConfig[1].decKey = GLFW_KEY_I;
+    m_data.buttons.count = 4;
+    m_buttonKey[0] = GLFW_KEY_M;
+    m_buttonKey[1] = GLFW_KEY_COMMA;
+    m_buttonKey[2] = GLFW_KEY_PERIOD;
+    m_buttonKey[3] = GLFW_KEY_SLASH;
+  } else if (index == 2) {
+    m_data.axes.count = 2;
+    m_axisConfig[0].incKey = GLFW_KEY_RIGHT;
+    m_axisConfig[0].decKey = GLFW_KEY_LEFT;
+    m_axisConfig[1].incKey = GLFW_KEY_DOWN;
+    m_axisConfig[1].decKey = GLFW_KEY_UP;
+    m_data.buttons.count = 6;
+    m_buttonKey[0] = GLFW_KEY_INSERT;
+    m_buttonKey[1] = GLFW_KEY_HOME;
+    m_buttonKey[2] = GLFW_KEY_PAGE_UP;
+    m_buttonKey[3] = GLFW_KEY_DELETE;
+    m_buttonKey[4] = GLFW_KEY_END;
+    m_buttonKey[5] = GLFW_KEY_PAGE_DOWN;
+  }
+}
+
+void RobotJoystick::Update() {
+  Clear();
+  if (sys) sys->GetData(&data, useGamepad);
 }
 
 void RobotJoystick::SetHAL(int i) {
-  if (!gZeroDisconnectedJoysticks && (!sys || !sys->present)) return;
+  if (!gZeroDisconnectedJoysticks && (!sys || !sys->IsPresent())) return;
   // set at HAL level
-  HALSIM_SetJoystickDescriptor(i, &desc);
-  HALSIM_SetJoystickAxes(i, &axes);
-  HALSIM_SetJoystickButtons(i, &buttons);
-  HALSIM_SetJoystickPOVs(i, &povs);
+  HALSIM_SetJoystickDescriptor(i, &data.desc);
+  HALSIM_SetJoystickAxes(i, &data.axes);
+  HALSIM_SetJoystickButtons(i, &data.buttons);
+  HALSIM_SetJoystickPOVs(i, &data.povs);
 }
 
 void RobotJoystick::GetHAL(int i) {
-  HALSIM_GetJoystickDescriptor(i, &desc);
-  HALSIM_GetJoystickAxes(i, &axes);
-  HALSIM_GetJoystickButtons(i, &buttons);
-  HALSIM_GetJoystickPOVs(i, &povs);
+  HALSIM_GetJoystickDescriptor(i, &data.desc);
+  HALSIM_GetJoystickAxes(i, &data.axes);
+  HALSIM_GetJoystickButtons(i, &data.buttons);
+  HALSIM_GetJoystickPOVs(i, &data.povs);
 }
 
 static void DriverStationExecute() {
@@ -507,10 +1025,12 @@ static void DriverStationExecute() {
   double curTime = glfwGetTime();
 
   // update system joysticks
+  gNumGlfwJoysticks = 0;
   for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i) {
-    gSystemJoysticks[i].Update(i);
-    if (gSystemJoysticks[i].present) gNumSystemJoysticks = i + 1;
+    gGlfwJoysticks[i]->Update();
+    if (gGlfwJoysticks[i]->IsPresent()) gNumGlfwJoysticks = i + 1;
   }
+  for (auto&& joy : gKeyboardJoysticks) joy->Update();
 
   // update robot joysticks
   for (auto&& joy : gRobotJoysticks) joy.Update();
@@ -521,16 +1041,37 @@ static void DriverStationExecute() {
 
   // Robot state
   {
+    // DS hotkeys
+    bool enableHotkey = false;
+    bool disableHotkey = false;
+    if (gUseEnableDisableHotkeys) {
+      ImGuiIO& io = ImGui::GetIO();
+      if (io.KeysDown[GLFW_KEY_ENTER] || io.KeysDown[GLFW_KEY_KP_ENTER])
+        disableHotkey = true;
+      else if (io.KeysDown[GLFW_KEY_LEFT_BRACKET] &&
+               io.KeysDown[GLFW_KEY_RIGHT_BRACKET] &&
+               io.KeysDown[GLFW_KEY_BACKSLASH])
+        enableHotkey = true;
+    }
+    if (gUseEstopHotkey) {
+      ImGuiIO& io = ImGui::GetIO();
+      if (io.KeysDown[GLFW_KEY_SPACE]) {
+        HALSIM_SetDriverStationEnabled(false);
+      }
+    }
+
     ImGui::SetNextWindowPos(ImVec2{5, 20}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Robot State", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-    if (ImGui::Selectable("Disabled", !isEnabled))
+    if (ImGui::Selectable("Disabled", !isEnabled) || disableHotkey) {
       HALSIM_SetDriverStationEnabled(false);
+    }
     if (ImGui::Selectable("Autonomous", isEnabled && isAuto && !isTest)) {
       HALSIM_SetDriverStationAutonomous(true);
       HALSIM_SetDriverStationTest(false);
       HALSIM_SetDriverStationEnabled(true);
     }
-    if (ImGui::Selectable("Teleoperated", isEnabled && !isAuto && !isTest)) {
+    if (ImGui::Selectable("Teleoperated", isEnabled && !isAuto && !isTest) ||
+        enableHotkey) {
       HALSIM_SetDriverStationAutonomous(false);
       HALSIM_SetDriverStationTest(false);
       HALSIM_SetDriverStationEnabled(true);
@@ -596,31 +1137,35 @@ void FMSSimModel::Update() {
 
 bool FMSSimModel::IsReadOnly() { return IsDSDisabled(); }
 
+static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
+  char label[64];
+  std::snprintf(label, sizeof(label), "%d: %s", i, joy.GetName());
+
+  // highlight if any buttons pressed
+  bool anyButtonPressed = joy.IsAnyButtonPressed();
+  if (anyButtonPressed)
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+  ImGui::Selectable(label, false,
+                    joy.IsPresent() ? ImGuiSelectableFlags_None
+                                    : ImGuiSelectableFlags_Disabled);
+  if (anyButtonPressed) ImGui::PopStyleColor();
+
+  // drag and drop sources are the low level joysticks
+  if (ImGui::BeginDragDropSource()) {
+    SystemJoystick* joyPtr = &joy;
+    ImGui::SetDragDropPayload("Joystick", &joyPtr, sizeof(joyPtr));
+    ImGui::Text("%d: %s", i, joy.GetName());
+    ImGui::EndDragDropSource();
+  }
+}
+
 static void DisplaySystemJoysticks() {
   ImGui::Text("(Drag and drop to Joysticks)");
-  int numShowJoysticks = gNumSystemJoysticks < 6 ? 6 : gNumSystemJoysticks;
-  for (int i = 0; i < numShowJoysticks; ++i) {
-    auto& joy = gSystemJoysticks[i];
-    wpi::SmallString<128> label;
-    wpi::raw_svector_ostream os(label);
-    os << wpi::format("%d: %s", i, joy.name);
-
-    // highlight if any buttons pressed
-    if (joy.anyButtonPressed)
-      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
-    ImGui::Selectable(label.c_str(), false,
-                      joy.present ? ImGuiSelectableFlags_None
-                                  : ImGuiSelectableFlags_Disabled);
-    if (joy.anyButtonPressed) ImGui::PopStyleColor();
-
-    // drag and drop sources are the low level joysticks
-    if (ImGui::BeginDragDropSource()) {
-      SystemJoystick* joyPtr = &joy;
-      ImGui::SetDragDropPayload("Joystick", &joyPtr, sizeof(joyPtr));
-      ImGui::Text("%d: %s", i, joy.name);
-      ImGui::EndDragDropSource();
-    }
-  }
+  int numShowJoysticks = gNumGlfwJoysticks < 6 ? 6 : gNumGlfwJoysticks;
+  for (int i = 0; i < numShowJoysticks; ++i)
+    DisplaySystemJoystick(*gGlfwJoysticks[i], i);
+  for (size_t i = 0; i < gKeyboardJoysticks.size(); ++i)
+    DisplaySystemJoystick(*gKeyboardJoysticks[i], i + GLFW_JOYSTICK_LAST + 1);
 }
 
 static void DisplayJoysticks() {
@@ -637,8 +1182,7 @@ static void DisplayJoysticks() {
       ImGui::Selectable(label, false);
       if (ImGui::BeginDragDropSource()) {
         ImGui::SetDragDropPayload("Joystick", &joy.sys, sizeof(joy.sys));
-        ImGui::Text("%d: %s", static_cast<int>(joy.sys - gSystemJoysticks),
-                    joy.sys->name);
+        ImGui::Text("%d: %s", joy.sys->GetIndex(), joy.sys->GetName());
         ImGui::EndDragDropSource();
       }
     } else {
@@ -671,50 +1215,51 @@ static void DisplayJoysticks() {
 
     if (disableDS) joy.GetHAL(i);
 
-    if ((disableDS && joy.desc.type != 0) || (joy.sys && joy.sys->present)) {
+    if ((disableDS && joy.data.desc.type != 0) ||
+        (joy.sys && joy.sys->IsPresent())) {
       // update GUI display
       ImGui::PushID(i);
       if (disableDS) {
-        ImGui::Text("%s", joy.desc.name);
-        ImGui::Text("Gamepad: %s", joy.desc.isXbox ? "Yes" : "No");
+        ImGui::Text("%s", joy.data.desc.name);
+        ImGui::Text("Gamepad: %s", joy.data.desc.isXbox ? "Yes" : "No");
       } else {
-        ImGui::Text("%d: %s", static_cast<int>(joy.sys - gSystemJoysticks),
-                    joy.sys->name);
+        ImGui::Text("%d: %s", joy.sys->GetIndex(), joy.sys->GetName());
 
-        if (joy.sys->isGamepad) ImGui::Checkbox("Map gamepad", &joy.useGamepad);
+        if (joy.sys->IsGamepad())
+          ImGui::Checkbox("Map gamepad", &joy.useGamepad);
       }
 
-      for (int j = 0; j < joy.axes.count; ++j) {
+      for (int j = 0; j < joy.data.axes.count; ++j) {
         if (source && source->axes[j]) {
           char label[64];
           std::snprintf(label, sizeof(label), "Axis[%d]", j);
           ImGui::Selectable(label);
           source->axes[j]->EmitDrag();
           ImGui::SameLine();
-          ImGui::Text(": %.3f", joy.axes.axes[j]);
+          ImGui::Text(": %.3f", joy.data.axes.axes[j]);
         } else {
-          ImGui::Text("Axis[%d]: %.3f", j, joy.axes.axes[j]);
+          ImGui::Text("Axis[%d]: %.3f", j, joy.data.axes.axes[j]);
         }
       }
 
-      for (int j = 0; j < joy.povs.count; ++j) {
+      for (int j = 0; j < joy.data.povs.count; ++j) {
         if (source && source->povs[j]) {
           char label[64];
           std::snprintf(label, sizeof(label), "POVs[%d]", j);
           ImGui::Selectable(label);
           source->povs[j]->EmitDrag();
           ImGui::SameLine();
-          ImGui::Text(": %d", joy.povs.povs[j]);
+          ImGui::Text(": %d", joy.data.povs.povs[j]);
         } else {
-          ImGui::Text("POVs[%d]: %d", j, joy.povs.povs[j]);
+          ImGui::Text("POVs[%d]: %d", j, joy.data.povs.povs[j]);
         }
       }
 
       // show buttons as multiple lines of LED indicators, 8 per line
       static const ImU32 color = IM_COL32(255, 255, 102, 255);
       wpi::SmallVector<int, 64> buttons;
-      buttons.resize(joy.buttons.count);
-      for (int j = 0; j < joy.buttons.count; ++j)
+      buttons.resize(joy.data.buttons.count);
+      for (int j = 0; j < joy.data.buttons.count; ++j)
         buttons[j] = joy.IsButtonPressed(j) ? 1 : -1;
       DrawLEDSources(buttons.data(), source ? source->buttons : nullptr,
                      buttons.size(), 8, &color);
@@ -733,7 +1278,10 @@ void DSManager::DisplayMenu() {
   } else {
     ImGui::MenuItem("Turn off DS", nullptr, &gDisableDS);
     ImGui::MenuItem("Zero disconnected joysticks", nullptr,
-                    &gZeroDisconnectedJoysticks, true);
+                    &gZeroDisconnectedJoysticks);
+    ImGui::MenuItem("Enable on []\\ combo, Disable on Enter", nullptr,
+                    &gUseEnableDisableHotkeys);
+    ImGui::MenuItem("Disable on Spacebar", nullptr, &gUseEstopHotkey);
   }
   ImGui::Separator();
 
@@ -752,6 +1300,14 @@ static void DriverStationInitialize() {
   iniHandler.WriteAllFn = JoystickWriteAll;
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
+  // hook ini handler to save keyboard settings
+  iniHandler.TypeName = "KeyboardJoystick";
+  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
+  iniHandler.ReadOpenFn = KeyboardJoystickReadOpen;
+  iniHandler.ReadLineFn = KeyboardJoystickReadLine;
+  iniHandler.WriteAllFn = KeyboardJoystickWriteAll;
+  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+
   // hook ini handler to save DS settings
   iniHandler.TypeName = "DriverStation";
   iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
@@ -762,6 +1318,12 @@ static void DriverStationInitialize() {
 }
 
 void DriverStationGui::GlobalInit() {
+  // set up system joysticks (both GLFW and keyboard)
+  for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i)
+    gGlfwJoysticks.emplace_back(std::make_unique<GlfwSystemJoystick>(i));
+  for (int i = 0; i < 4; ++i)
+    gKeyboardJoysticks.emplace_back(std::make_unique<GlfwKeyboardJoystick>(i));
+
   dsManager.GlobalInit();
 
   wpi::gui::AddInit(DriverStationInitialize);
@@ -781,12 +1343,25 @@ void DriverStationGui::GlobalInit() {
           dsManager.AddWindow("System Joysticks", DisplaySystemJoysticks)) {
     win->DisableRenamePopup();
     win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
-    win->SetDefaultPos(5, 385);
+    win->SetDefaultPos(5, 350);
   }
   if (auto win = dsManager.AddWindow("Joysticks", DisplayJoysticks)) {
     win->DisableRenamePopup();
     win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
     win->SetDefaultPos(250, 465);
+  }
+  int i = 0;
+  for (auto&& joy : gKeyboardJoysticks) {
+    char label[64];
+    std::snprintf(label, sizeof(label), "%s Settings", joy->GetName());
+    if (auto win = dsManager.AddWindow(
+            label, [j = joy.get()] { j->SettingsDisplay(); })) {
+      win->SetVisible(false);
+      win->DisableRenamePopup();
+      win->SetDefaultPos(10 + 310 * i++, 50);
+      if (i > 3) i = 0;
+      win->SetDefaultSize(300, 560);
+    }
   }
 }
 
