@@ -9,6 +9,7 @@
 
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <wpi/math>
 
 DriveTrain::DriveTrain() {
 // Encoders may measure differently in the real world and in
@@ -21,10 +22,8 @@ DriveTrain::DriveTrain() {
   m_rightEncoder.SetDistancePerPulse(0.042);
 #else
   // Circumference in ft = 4in/12(in/ft)*PI
-  m_leftEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
-                                    360.0);
-  m_rightEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
-                                     360.0);
+  m_leftEncoder.SetDistancePerPulse(4.0 / 12.0 * wpi::math::pi / 360.0);
+  m_rightEncoder.SetDistancePerPulse(4.0 / 12.0 * wpi::math::pi / 360.0);
 #endif
   SetName("DriveTrain");
   // Let's show everything on the LiveWindow

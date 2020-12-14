@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,8 @@
 
 #include "subsystems/DriveTrain.h"
 
-#include <cmath>
-
 #include <frc/Joystick.h>
+#include <wpi/math>
 
 #include "commands/DriveWithJoystick.h"
 
@@ -37,9 +36,9 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   m_leftEncoder.SetDistancePerPulse(0.0785398);
 #else
   // Convert to feet 4in diameter wheels with 360 tick simulated encoders
-  m_rightEncoder.SetDistancePerPulse((4.0 /*in*/ * M_PI) /
+  m_rightEncoder.SetDistancePerPulse(4.0 /*in*/ * wpi::math::pi /
                                      (360.0 * 12.0 /*in/ft*/));
-  m_leftEncoder.SetDistancePerPulse((4.0 /*in*/ * M_PI) /
+  m_leftEncoder.SetDistancePerPulse(4.0 /*in*/ * wpi::math::pi /
                                     (360.0 * 12.0 /*in/ft*/));
 #endif
 
