@@ -51,7 +51,7 @@ public class DriveTrain extends SubsystemBase {
       m_leftEncoder.setDistancePerPulse(0.042);
       m_rightEncoder.setDistancePerPulse(0.042);
     } else {
-      // Circumference in ft = 4in/12(in/ft)*PI
+      // Circumference = diameter in feet * pi. 360 tick simulated encoders.
       m_leftEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
       m_rightEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
     }

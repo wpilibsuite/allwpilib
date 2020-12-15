@@ -8,6 +8,7 @@
 #include "subsystems/DriveTrain.h"
 
 #include <frc/Joystick.h>
+#include <units/length.h>
 #include <wpi/math>
 
 #include "commands/DriveWithJoystick.h"
@@ -35,11 +36,11 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   m_rightEncoder.SetDistancePerPulse(0.0785398);
   m_leftEncoder.SetDistancePerPulse(0.0785398);
 #else
-  // Convert to feet 4in diameter wheels with 360 tick simulated encoders
-  m_rightEncoder.SetDistancePerPulse(4.0 /*in*/ * wpi::math::pi /
-                                     (360.0 * 12.0 /*in/ft*/));
-  m_leftEncoder.SetDistancePerPulse(4.0 /*in*/ * wpi::math::pi /
-                                    (360.0 * 12.0 /*in/ft*/));
+  // Circumference = diameter * pi. 360 tick simulated encoders.
+  m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+                                     wpi::math::pi / 360.0);
+  m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+                                    wpi::math::pi / 360.0);
 #endif
 
   AddChild("Right Encoder", m_rightEncoder);
