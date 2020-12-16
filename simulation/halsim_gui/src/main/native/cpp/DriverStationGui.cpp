@@ -123,8 +123,8 @@ class KeyboardJoystick : public SystemJoystick {
   struct AxisConfig {
     int incKey = -1;
     int decKey = -1;
-    float keyRate = 0.05;
-    float decayRate = 0.05;
+    float keyRate = 0.05f;
+    float decayRate = 0.05f;
   };
   AxisConfig m_axisConfig[HAL_kMaxJoystickAxes];
 
@@ -926,7 +926,7 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(int index, bool noDefaults)
     m_axisConfig[1].decKey = GLFW_KEY_W;
     m_axisConfig[2].incKey = GLFW_KEY_R;
     m_axisConfig[2].decKey = GLFW_KEY_E;
-    m_axisConfig[2].keyRate = 0.01;
+    m_axisConfig[2].keyRate = 0.01f;
     m_axisConfig[2].decayRate = 0;  // works like a throttle
     m_data.buttons.count = 4;
     m_buttonKey[0] = GLFW_KEY_Z;
