@@ -93,7 +93,7 @@ int main() {
 
   gui::ConfigurePlatformSaveFile("glass.ini");
   gPlotProvider->GlobalInit();
-  gui::AddInit([] { gPlotProvider->ResetTime(); });
+  gui::AddInit([] { glass::ResetTime(); });
   gNtProvider->GlobalInit();
   gui::AddInit(NtInitialize);
 
@@ -102,6 +102,10 @@ int main() {
   gui::AddLateExecute([] {
     ImGui::BeginMainMenuBar();
     gui::EmitViewMenu();
+    if (ImGui::BeginMenu("View")) {
+      if (ImGui::MenuItem("Reset Time")) glass::ResetTime();
+      ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("NetworkTables")) {
       if (gNetworkTablesSettingsWindow)
         gNetworkTablesSettingsWindow->DisplayMenuItem("NetworkTables Settings");
@@ -116,7 +120,6 @@ int main() {
       if (ImGui::MenuItem("Pause All Plots", nullptr, &paused)) {
         gPlotProvider->SetPaused(paused);
       }
-      if (ImGui::MenuItem("Reset Plot Time")) gPlotProvider->ResetTime();
       ImGui::Separator();
       gPlotProvider->DisplayMenu();
       ImGui::EndMenu();

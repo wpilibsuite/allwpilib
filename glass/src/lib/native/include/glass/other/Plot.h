@@ -31,14 +31,6 @@ class PlotProvider : private WindowManager {
    */
   bool IsPaused() { return m_paused; }
 
-  /**
-   * Resets time on all plots such that 0 = time when this function is called.
-   * Also clears the plot data.
-   */
-  void ResetTime();
-
-  uint64_t GetStartTime() const { return m_startTime; }
-
   void DisplayMenu() override;
 
  private:
@@ -60,7 +52,6 @@ class PlotProvider : private WindowManager {
 
   IniSaver m_plotSaver;
   IniSaver m_seriesSaver;
-  uint64_t m_startTime = 0;
   bool m_paused = false;
 };
 

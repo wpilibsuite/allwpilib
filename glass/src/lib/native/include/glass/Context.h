@@ -26,6 +26,16 @@ Context* GetCurrentContext();
 void SetCurrentContext(Context* ctx);
 
 /**
+ * Resets zero time to current time.
+ */
+void ResetTime();
+
+/**
+ * Gets the zero time.
+ */
+uint64_t GetZeroTime();
+
+/**
  * Storage provides both persistent and non-persistent key/value storage for
  * widgets.
  *
