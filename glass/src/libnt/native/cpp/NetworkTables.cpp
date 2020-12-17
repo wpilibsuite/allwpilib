@@ -481,7 +481,8 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
 
   if (flags & NetworkTablesFlags_ShowTimestamp) {
     if (entry.value)
-      ImGui::Text("%" PRIu64, entry.value->last_change());
+      ImGui::Text("%f", (entry.value->last_change() * 1.0e-6) -
+                            (GetZeroTime() * 1.0e-6));
     else
       ImGui::TextUnformatted("");
     ImGui::NextColumn();
