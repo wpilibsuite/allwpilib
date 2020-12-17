@@ -15,6 +15,7 @@
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #include <wpi/StringRef.h>
+#include <wpi/timestamp.h>
 #include <wpigui.h>
 
 #include "glass/ContextInternal.h"
@@ -210,6 +211,10 @@ void glass::DestroyContext(Context* ctx) {
 Context* glass::GetCurrentContext() { return gContext; }
 
 void glass::SetCurrentContext(Context* ctx) { gContext = ctx; }
+
+void glass::ResetTime() { gContext->zeroTime = wpi::Now(); }
+
+uint64_t glass::GetZeroTime() { return gContext->zeroTime; }
 
 Storage::Value& Storage::GetValue(wpi::StringRef key) {
   auto it = std::find(m_keys.begin(), m_keys.end(), key);

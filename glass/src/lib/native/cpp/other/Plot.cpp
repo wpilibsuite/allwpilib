@@ -55,8 +55,6 @@ class PlotSeries {
   void SetSource(DataSource* source);
   DataSource* GetSource() const { return m_source; }
 
-  void Clear() { m_size = 0; }
-
   bool ReadIni(wpi::StringRef name, wpi::StringRef value);
   void WriteIni(ImGuiTextBuffer* out);
 
@@ -110,8 +108,6 @@ class Plot {
   bool ReadIni(wpi::StringRef name, wpi::StringRef value);
   void WriteIni(ImGuiTextBuffer* out);
 
-  void Clear();
-
   void DragDropTarget(PlotView& view, size_t i, bool inPlot);
   void EmitPlot(PlotView& view, double now, bool paused, size_t i);
   void EmitSettings(size_t i);
@@ -145,8 +141,6 @@ class Plot {
 class PlotView : public View {
  public:
   explicit PlotView(PlotProvider* provider) : m_provider{provider} {}
-
-  void Clear();
 
   void Display() override;
 
@@ -312,20 +306,24 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   // we handle the offset logic ourselves to avoid wrap issues with size + 1
   struct GetterData {
     double now;
+    double zeroTime;
     ImPlotPoint* data;
     int size;
     int offset;
   };
-  GetterData getterData = {now, m_data, size, offset};
+  GetterData getterData = {now, GetZeroTime() * 1.0e-6, m_data, size, offset};
   auto getter = [](void* data, int idx) {
     auto d = static_cast<GetterData*>(data);
     if (idx == d->size)
       return ImPlotPoint{
-          d->now, d->data[d->offset == 0 ? d->size - 1 : d->offset - 1].y};
+          d->now - d->zeroTime,
+          d->data[d->offset == 0 ? d->size - 1 : d->offset - 1].y};
+    ImPlotPoint* point;
     if (d->offset + idx < d->size)
-      return d->data[d->offset + idx];
+      point = &d->data[d->offset + idx];
     else
-      return d->data[d->offset + idx - d->size];
+      point = &d->data[d->offset + idx - d->size];
+    return ImPlotPoint{point->x - d->zeroTime, point->y};
   };
 
   if (m_color.w == IMPLOT_AUTO_COL.w) m_color = ImPlot::GetColormapColor(i);
@@ -543,10 +541,6 @@ void Plot::WriteIni(ImGuiTextBuffer* out) {
   }
 }
 
-void Plot::Clear() {
-  for (auto&& series : m_series) series->Clear();
-}
-
 void Plot::DragDropTarget(PlotView& view, size_t i, bool inPlot) {
   if (!ImGui::BeginDragDropTarget()) return;
   // handle dragging onto a specific Y axis
@@ -601,8 +595,9 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
                                ImGuiCond_Always);
   } else {
     // also force-pause plots if overall timing is paused
+    double zeroTime = GetZeroTime() * 1.0e-6;
     ImPlot::SetNextPlotLimitsX(
-        now - m_viewTime, now,
+        now - zeroTime - m_viewTime, now - zeroTime,
         (paused || m_paused) ? ImGuiCond_Once : ImGuiCond_Always);
   }
 
@@ -688,10 +683,6 @@ void Plot::EmitSettings(size_t i) {
   }
 }
 
-void PlotView::Clear() {
-  for (auto&& plot : m_plots) plot->Clear();
-}
-
 void PlotView::Display() {
   if (ImGui::BeginPopupContextItem()) {
     if (ImGui::Button("Add plot"))
@@ -760,7 +751,7 @@ void PlotView::Display() {
     }
   }
 
-  double now = (wpi::Now() - m_provider->GetStartTime()) * 1.0e-6;
+  double now = wpi::Now() * 1.0e-6;
   for (size_t i = 0; i < m_plots.size(); ++i) {
     ImGui::PushID(i);
     m_plots[i]->EmitPlot(*this, now, m_provider->IsPaused(), i);
@@ -819,15 +810,6 @@ void PlotProvider::GlobalInit() {
     m_plotSaver.Initialize();
     m_seriesSaver.Initialize();
   });
-}
-
-void PlotProvider::ResetTime() {
-  m_startTime = wpi::Now();
-  for (auto&& window : m_windows) {
-    if (auto view = static_cast<PlotView*>(window->GetView())) {
-      view->Clear();
-    }
-  }
 }
 
 void PlotProvider::DisplayMenu() {

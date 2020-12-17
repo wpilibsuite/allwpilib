@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <memory>
 
 #include <imgui.h>
@@ -42,6 +44,7 @@ struct Context {
   wpi::StringMap<std::unique_ptr<Storage>> storage;
   wpi::StringMap<bool> deviceHidden;
   IniSaverString<DataSourceName> sources{"Data Sources"};
+  uint64_t zeroTime = 0;
 };
 
 extern Context* gContext;
