@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -61,7 +61,7 @@ public class DriveTrain extends Subsystem {
       m_rightEncoder.setDistancePerPulse(0.0785398);
       m_leftEncoder.setDistancePerPulse(0.0785398);
     } else {
-      // Convert to feet 4in diameter wheels with 360 tick sim encoders
+      // Circumference = diameter in feet * pi. 360 tick simulated encoders.
       m_rightEncoder.setDistancePerPulse(
           (4.0/* in */ * Math.PI) / (360.0 * 12.0/* in/ft */));
       m_leftEncoder.setDistancePerPulse(
