@@ -557,7 +557,8 @@ void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
   // copy into HAL structures
   data->desc.isXbox = m_isGamepad ? 1 : 0;
   data->desc.type = m_isGamepad ? 21 : 20;
-  std::strncpy(data->desc.name, m_name, 256);
+  std::strncpy(data->desc.name, m_name, sizeof(data->desc.name) - 1);
+  data->desc.name[sizeof(data->desc.name) - 1] = '\0';
   data->desc.axisCount = (std::min)(m_axisCount, HAL_kMaxJoystickAxes);
   // desc.axisTypes ???
   data->desc.buttonCount = (std::min)(m_buttonCount, 32);
