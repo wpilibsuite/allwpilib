@@ -44,69 +44,174 @@
 #include <wpi/raw_istream.h>
 
 /*
- * DATA STORAGE FORMAT
+ * ===DATA STORAGE FORMAT===
  *
- * **Timestamp File**
+ * The overall file format is structured on a 4 KiB basic block size to
+ * facilitate memory mapping (to match the typical page size).
  *
- * Timestamp file (named whatever the user provides as filename) consists of:
- * - 4KiB header
- * - 0 or more fixed-size records
+ * One or more data "streams" can be stored.  Each data stream is stored
+ * as a doubly linked list of data blocks and does not need to be
+ * contiguous in the file.
  *
- * The timestamp file header contains 0-padded JSON data containing at least
- * the following fields:
+ * Primary data streams are made up of fixed size contiguous records.
+ * Individual records cannot span data block boundaries.  Each record consists
+ * of a timestamp and one or more data fields.  Data fields may be either fixed
+ * or variable size; fixed size data is stored as part of the record, while
+ * variable size data is stored in a separate secondary data stream (and a
+ * pointer is stored in the record).
+ *
+ * ===FILE HEADER===
+ *
+ * The file header is a fixed 4 KiB in size, and contains 0-padded JSON data in
+ * the following format.  Additional data can be added to the "custom" field
+ * (as long as the overall header fits in 4 KiB).
  *
  * {
- *  "dataLayout": <string>,
- *  "dataType": <string>,
- *  "dataWritePos": <integer>,
- *  "fixedSize": <boolean>,
- *  "gapData": <string>,
- *  "recordSize": <integer>,
- *  "timeWritePos": <integer>
+ *  "format": <string>,
+ *  "version": <integer>,
+ *  "directory": <integer>,
+ *  "timeResolution": <string>,
+ *  "timeEpoch": <string>,
+ *  "custom": {...}
  * }
  *
- * dataLayout: user-defined string that describes the detailed layout
- * of the data.
+ * format: always "wpilog"
  *
- * dataType: user-defined string, typically used to make sure there's not
- * a data type conflict when reading the file, or knowing what type of data
- * is stored when opening an arbitrary file.  Suggestions: make this java-style
- * (com.foo.bar) or MIME type.
+ * version: always 0 for this version of the data format
  *
- * dataWritePos: next byte write position in the data file
+ * directory: file offset of block containing directory
  *
- * fixedSize: true if each record is fixed size (in which case there will not
- * be a data file), false if the records are variable size
+ * timeResolution: timestamp resolution, typically "us" (integer microseconds)
+ *
+ * timeEpoch: timestamp epoch in ISO 8601 format.  May be unspecified/empty to
+ * indicate the epoch is unknown.
+ *
+ * custom: custom data, unspecified contents
+ *
+ * ===DATA BLOCK===
+ *
+ * Each data block is a multiple of 4 KiB in size and starts with the
+ * following data block header:
+ * - Data stream ID: 32-bit
+ * - File offset of previous block for this stream: 32-bit (0 if first block)
+ * - File offset of next block for this stream: 32-bit (0 if last block)
+ * - Size of this block in bytes: 32-bit
+ * - Number of bytes used in this block: 32-bit
+ * - Spare: 32-bit
+ *
+ * ===DIRECTORY===
+ *
+ * The directory is a data block that contains 0-padded JSON data in the
+ * following format.  The directory is always a single contiguous block of
+ * data.  The only field used in the directory data block is the block size and
+ * number of bytes used; the other block header fields are unused and set to 0.
+ *
+ * {
+ *  "streams": [
+ *   {
+ *    "name": <string>,
+ *    "id": <integer>,
+ *    "recordSize": <integer>,
+ *    "firstBlock": <integer>,
+ *    "fields" : [
+ *     {
+ *      "name": <string>
+ *      "dataType": <string>,
+ *      "size": <integer>,
+ *      "fixedSize": <boolean>,
+ *      "gapData": <string>,
+ *      "varId": <integer>,
+ *      "varFirstBlock": <integer>
+ *     },
+ *     ...
+ *    ]
+ *   },
+ *   ...
+ *  ]
+ * }
+ *
+ * ==Streams==
+ *
+ * A list of primary stream definitions.
+ *
+ * name: user-defined name for the primary stream.  Must be unique.
+ *
+ * id: stream numeric identifer for the primary data stream.  Used in data
+ * block headers.
+ *
+ * recordSize: the size of each record (including timestamp) in the primary
+ * data stream, in bytes.
+ *
+ * firstBlock: file offset of the first data block for the primary data
+ * stream.  0 if there are no saved data blocks.
+ *
+ * fields: A list of the data fields in the stream.
+ *
+ * ==Fields==
+ *
+ * Each data field may be either fixed or variable size, as indicated by
+ * fixedSize.
+ *
+ * name: user-defined name for the field.  Recommended but not required to
+ * be unique.  May also be blank.
+ *
+ * dataType: standard or user-defined string.  When user-defined, recommend
+ * making this java-style (com.foo.bar) or a MIME type.  Some "standard" data
+ * types are:
+ *  "string"    - UTF-8 string
+ *  "boolean"   - 1-byte boolean
+ *  "float"     - 32-bit IEEE-758 floating point
+ *  "double"    - 64-bit IEEE-758 floating point
+ *  "byte[]"    - array of bytes
+ *  "boolean[]" - array of 1-byte boolean
+ *  "float[]"   - array of 32-bit IEEE-758 floating point
+ *  "double[]"  - array of 64-bit IEEE-758 floating point
+ *
+ * size: the size of the field contents in the primary data stream, in bytes.
+ * For a variable size field, this is always 8 (32-bit offset and 32-bit size).
+ *
+ * fixedSize: true if the field is fixed size, false if the field is variable
+ * size.
  *
  * gapData: user-defined string that contains the data that should be written
- * between each record's data in the data file.  Unused if fixedSize is true.
+ * after the variable-sized data in the secondary data stream.  Unused if
+ * fixedSize is true.
  *
- * recordSize: the size of each record (including timestamp) in the timestamp
- * file, in bytes
+ * varId: stream numeric identifer for the secondary data stream.  Used in
+ * data block headers.  0 if fixedSize is true.
  *
- * timeWritePos: next byte write position in the timestamp file
+ * varFirstBlock: file offset of the first data block for the secondary data
+ * stream.  0 if there are no saved data blocks, or if fixedSize is true.
  *
- * **Timestamp File Records**
+ * ===PRIMARY STREAM STORAGE===
  *
- * Each record in the timestamp file starts with a 64-bit timestamp.  The
- * epoch and resolution of the timestamp is unspecified, but most files
- * use microsecond resolution.  The timestamps must be monotonically
- * increasing for the find function to work.
+ * Each record in the primary data stream starts with a 64-bit timestamp.
+ * The epoch and resolution of the timestamp is specified by the file header.
+ * The timestamps must be monotonically increasing for the find function to
+ * work.
  *
- * If fixedSize=true, the rest of the record contains the user data.
+ * When there is more than a single field in the stream, the timestamp is
+ * followed by a bit array with one bit for each field.  The least significant
+ * bit of the first byte is for the first field.  Each bit is 1 if the field
+ * contents are valid, 0 otherwise.  This bit array takes ceil(# fields / 8)
+ * bytes of storage.
  *
- * If fixedSize=false, the rest of the record contains the offset and size
- * (in that order) of the data contents in the data file.  The offset
- * and size can either be 32-bit or 64-bit (as determined by recordSize, so
- * recordSize=16 if 32-bit offset+size, recordSize=24 if 64-bit offset+size).
+ * The remainder of the record is packed storage of each field in the order
+ * listed in the directory.
  *
- * **Data File**
+ * If fixedSize=true for a field, the value stored in the record contains the
+ * field data.
  *
- * Used only for variable-sized data (fixedSize=false).  File is named with
- * ".data" suffix to whatever the user provided as a filename.
+ * If fixedSize=false for a field, the value stored in the record contains the
+ * offset and size (in that order) of the data contents in the secondary data
+ * stream.  The offset and size are both 32-bit.
  *
- * Contains continuous data contents, potentially with gaps between each
- * record (as configured by gapData).
+ * ===SECONDARY STREAM STORAGE===
+ *
+ * Contains continuous data contents, potentially with data appended after each
+ * record (as configured by gapData).  The data contents for a value and its
+ * appended data cannot span block boundaries.
+ *
  */
 
 using namespace wpi::log;
