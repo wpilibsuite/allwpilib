@@ -15,9 +15,9 @@
 
 #include "SimulatorJNI.h"
 #include "edu_wpi_first_hal_simulation_SimDeviceDataJNI.h"
+#include "hal/SimDevice.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "hal/simulation/SimDeviceData.h"
-#include "hal/SimDevice.h"
 
 using namespace hal;
 using namespace wpi::java;
@@ -91,8 +91,8 @@ jobject ValueInfo::MakeJava(JNIEnv* env) const {
       env->GetMethodID(simValueInfoCls, "<init>", "(Ljava/lang/String;IIIJD)V");
   auto [value1, value2] = ToValue12(value);
   return env->NewObject(simValueInfoCls, func, MakeJString(env, name),
-                        (jint)handle, (jint)direction, (jint)value.type,
-                        value1, value2);
+                        (jint)handle, (jint)direction, (jint)value.type, value1,
+                        value2);
 }
 
 namespace {
@@ -189,8 +189,8 @@ void ValueCallbackStore::performCallback(const char* name,
                         MakeJString(env, name), (jint)handle, (jint)direction,
                         (jint)value.type, value1, value2);
   } else {
-    env->CallVoidMethod(m_call, simValueCallbackCallback, MakeJString(env, name),
-                        (jint)handle,
+    env->CallVoidMethod(m_call, simValueCallbackCallback,
+                        MakeJString(env, name), (jint)handle,
                         (jboolean)(direction == HAL_SimValueOutput),
                         (jint)value.type, value1, value2);
   }
@@ -523,7 +523,7 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueCreatedCallba
 /*
  * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
  * Method:    registerSimValueCreatedCallback2
- * Signature: (ILedu/wpi/first/hal/simulation/SimValueCallback2;Z)I
+ * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueCreatedCallback2
@@ -563,7 +563,7 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueChangedCallba
 /*
  * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
  * Method:    registerSimValueChangedCallback2
- * Signature: (ILedu/wpi/first/hal/simulation/SimValueCallback2;Z)I
+ * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueChangedCallback2

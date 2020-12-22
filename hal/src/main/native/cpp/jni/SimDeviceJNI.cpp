@@ -107,8 +107,8 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnum
 
 /*
  * Class:     edu_wpi_first_hal_SimDeviceJNI
- * Method:    createSimValueEnum
- * Signature: (ILjava/lang/String;I[Ljava/lang/Object;I)I
+ * Method:    createSimValueEnumDouble
+ * Signature: (ILjava/lang/String;I[Ljava/lang/Object;[DI)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnumDouble
@@ -129,8 +129,8 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnumDouble
 
   wpi::SmallVector<const char*, 8> carr;
   for (auto&& val : arr) carr.push_back(val.c_str());
-  return HAL_CreateSimValueEnumDouble(device, JStringRef{env, name}.c_str(),
-      direction, len, carr.data(),
+  return HAL_CreateSimValueEnumDouble(
+      device, JStringRef{env, name}.c_str(), direction, len, carr.data(),
       JDoubleArrayRef{env, optionValues}.array().data(), initialValue);
 }
 
