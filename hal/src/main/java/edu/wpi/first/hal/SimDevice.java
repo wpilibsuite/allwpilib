@@ -11,15 +11,15 @@ package edu.wpi.first.hal;
  * A wrapper around a simulator device handle.
  */
 public class SimDevice implements AutoCloseable {
-  public static enum Direction {
+  public enum Direction {
     kInput(SimDeviceJNI.kInput),
     kOutput(SimDeviceJNI.kOutput),
     kBidir(SimDeviceJNI.kBidir);
 
-    public final int value;
+    public final int m_value;
 
-    private Direction(int value) {
-      this.value = value;
+    Direction(int value) {
+      m_value = value;
     }
   }
 
@@ -132,7 +132,7 @@ public class SimDevice implements AutoCloseable {
    * @return simulated value object
    */
   public SimValue createValue(String name, Direction direction, HALValue initialValue) {
-    int handle = SimDeviceJNI.createSimValue(m_handle, name, direction.value, initialValue);
+    int handle = SimDeviceJNI.createSimValue(m_handle, name, direction.m_value, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -167,7 +167,7 @@ public class SimDevice implements AutoCloseable {
    * @return simulated double value object
    */
   public SimDouble createDouble(String name, Direction direction, double initialValue) {
-    int handle = SimDeviceJNI.createSimValueDouble(m_handle, name, direction.value, initialValue);
+    int handle = SimDeviceJNI.createSimValueDouble(m_handle, name, direction.m_value, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -208,7 +208,8 @@ public class SimDevice implements AutoCloseable {
    * @return simulated enum value object
    */
   public SimEnum createEnum(String name, Direction direction, String[] options, int initialValue) {
-    int handle = SimDeviceJNI.createSimValueEnum(m_handle, name, direction.value, options, initialValue);
+    int handle = SimDeviceJNI.createSimValueEnum(m_handle, name, direction.m_value, options,
+        initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -229,10 +230,10 @@ public class SimDevice implements AutoCloseable {
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  public SimEnum createEnumDouble(String name, Direction direction, String[] options, double[] optionValues,
-      int initialValue) {
-    int handle = SimDeviceJNI.createSimValueEnumDouble(m_handle, name, direction.value, options, optionValues,
-        initialValue);
+  public SimEnum createEnumDouble(String name, Direction direction, String[] options,
+      double[] optionValues, int initialValue) {
+    int handle = SimDeviceJNI.createSimValueEnumDouble(m_handle, name, direction.m_value, options,
+        optionValues, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -267,7 +268,8 @@ public class SimDevice implements AutoCloseable {
    * @return simulated boolean value object
    */
   public SimBoolean createBoolean(String name, Direction direction, boolean initialValue) {
-    int handle = SimDeviceJNI.createSimValueBoolean(m_handle, name, direction.value, initialValue);
+    int handle = SimDeviceJNI.createSimValueBoolean(m_handle, name, direction.m_value,
+        initialValue);
     if (handle <= 0) {
       return null;
     }
