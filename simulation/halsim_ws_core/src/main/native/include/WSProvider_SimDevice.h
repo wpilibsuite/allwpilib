@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
@@ -27,6 +28,8 @@ struct SimDeviceValueData {
   HALSimWSProviderSimDevice* device;
   HAL_SimValueHandle handle;
   std::string key;
+  std::vector<std::string> options;
+  std::vector<double> optionValues;
   HAL_Type valueType;
 };
 

@@ -7,6 +7,9 @@
 
 #include "WSProvider_SimDevice.h"
 
+#include <algorithm>
+#include <cmath>
+
 #include <hal/Ports.h>
 
 namespace wpilibws {
@@ -70,9 +73,27 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
         case HAL_DOUBLE:
           value.data.v_double = it.value();
           break;
-        case HAL_ENUM:
+        case HAL_ENUM: {
+          if (it->is_string()) {
+            auto& options = vd->second->options;
+            auto& str = it.value().get_ref<const std::string&>();
+            auto optionIt =
+                std::find_if(options.begin(), options.end(),
+                             [&](const std::string& v) { return v == str; });
+            if (optionIt != options.end())
+              value.data.v_enum = optionIt - options.begin();
+          } else if (it->is_number()) {
+            auto& values = vd->second->optionValues;
+            double num = it.value();
+            auto valueIt = std::find_if(
+                values.begin(), values.end(),
+                [&](double v) { return std::fabs(v - num) < 1e-4; });
+            if (valueIt != values.end())
+              value.data.v_enum = valueIt - values.begin();
+          }
           value.data.v_enum = it.value();
           break;
+        }
         case HAL_INT:
           value.data.v_int = it.value();
           break;
@@ -120,6 +141,18 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
   data->device = this;
   data->handle = handle;
   data->key = key;
+  if (value->type == HAL_ENUM) {
+    int32_t numOptions = 0;
+
+    const char** options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
+    data->options.reserve(numOptions);
+    for (int32_t i = 0; i < numOptions; ++i)
+      data->options.emplace_back(options[i]);
+
+    const double* values =
+        HALSIM_GetSimValueEnumDoubleValues(handle, &numOptions);
+    data->optionValues.assign(values, values + numOptions);
+  }
   data->valueType = value->type;
 
   auto param = data.get();
@@ -153,9 +186,14 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
       case HAL_DOUBLE:
         ProcessHalCallback({{valueData->key, value->data.v_double}});
         break;
-      case HAL_ENUM:
-        ProcessHalCallback({{valueData->key, value->data.v_enum}});
+      case HAL_ENUM: {
+        int v = value->data.v_enum;
+        if (v >= 0 && v < static_cast<int>(valueData->optionValues.size()))
+          ProcessHalCallback({{valueData->key, valueData->optionValues[v]}});
+        else if (v >= 0 && v < static_cast<int>(valueData->options.size()))
+          ProcessHalCallback({{valueData->key, valueData->options[v]}});
         break;
+      }
       case HAL_INT:
         ProcessHalCallback({{valueData->key, value->data.v_int}});
         break;

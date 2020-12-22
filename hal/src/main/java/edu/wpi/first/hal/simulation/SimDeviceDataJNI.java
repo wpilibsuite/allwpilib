@@ -79,5 +79,7 @@ public class SimDeviceDataJNI extends JNIWrapper {
 
   public static native String[] getSimValueEnumOptions(int handle);
 
+  public static native double[] getSimValueEnumDoubleValues(int handle);
+
   public static native void resetSimDeviceData();
 }

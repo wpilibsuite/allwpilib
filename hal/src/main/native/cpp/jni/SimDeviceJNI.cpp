@@ -107,6 +107,35 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnum
 
 /*
  * Class:     edu_wpi_first_hal_SimDeviceJNI
+ * Method:    createSimValueEnum
+ * Signature: (ILjava/lang/String;I[Ljava/lang/Object;I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnumDouble
+  (JNIEnv* env, jclass, jint device, jstring name, jint direction,
+   jobjectArray options, jdoubleArray optionValues, jint initialValue)
+{
+  size_t len = env->GetArrayLength(options);
+  size_t len2 = env->GetArrayLength(optionValues);
+  if (len != len2) return 0;
+  std::vector<std::string> arr;
+  arr.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(options, i))};
+    if (!elem) return 0;
+    arr.push_back(JStringRef{env, elem}.str());
+  }
+
+  wpi::SmallVector<const char*, 8> carr;
+  for (auto&& val : arr) carr.push_back(val.c_str());
+  return HAL_CreateSimValueEnumDouble(device, JStringRef{env, name}.c_str(),
+      direction, len, carr.data(),
+      JDoubleArrayRef{env, optionValues}.array().data(), initialValue);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_SimDeviceJNI
  * Method:    getSimValue
  * Signature: (I)Ljava/lang/Object;
  */

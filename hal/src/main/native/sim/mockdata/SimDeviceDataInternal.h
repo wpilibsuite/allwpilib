@@ -135,6 +135,7 @@ class SimDeviceData {
     HAL_Value value;
     std::vector<std::string> enumOptions;
     std::vector<const char*> cstrEnumOptions;
+    std::vector<double> enumOptionValues;
     impl::SimUnnamedCallbackRegistry<HALSIM_SimValueCallback> changed;
   };
 
@@ -170,6 +171,7 @@ class SimDeviceData {
   HAL_SimValueHandle CreateValue(HAL_SimDeviceHandle device, const char* name,
                                  int32_t direction, int32_t numOptions,
                                  const char** options,
+                                 const double* optionValues,
                                  const HAL_Value& initialValue);
   HAL_Value GetValue(HAL_SimValueHandle handle);
   void SetValue(HAL_SimValueHandle handle, const HAL_Value& value);
@@ -211,6 +213,9 @@ class SimDeviceData {
 
   const char** GetValueEnumOptions(HAL_SimValueHandle handle,
                                    int32_t* numOptions);
+
+  const double* GetValueEnumDoubleValues(HAL_SimValueHandle handle,
+                                         int32_t* numOptions);
 
   void ResetData();
 };

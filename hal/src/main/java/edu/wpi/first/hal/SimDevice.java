@@ -216,6 +216,30 @@ public class SimDevice implements AutoCloseable {
   }
 
   /**
+   * Creates an enumerated value on the simulated device with double values.
+   *
+   * <p>Enumerated values are always in the range 0 to numOptions-1.
+   *
+   * <p>Returns null if not in simulation.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param options array of option descriptions
+   * @param optionValues array of option values (must be the same size as options)
+   * @param initialValue initial value (selection)
+   * @return simulated enum value object
+   */
+  public SimEnum createEnumDouble(String name, Direction direction, String[] options, double[] optionValues,
+      int initialValue) {
+    int handle = SimDeviceJNI.createSimValueEnumDouble(m_handle, name, direction.value, options, optionValues,
+        initialValue);
+    if (handle <= 0) {
+      return null;
+    }
+    return new SimEnum(handle);
+  }
+
+  /**
    * Creates a boolean value on the simulated device.
    *
    * <p>Returns null if not in simulation.

@@ -158,6 +158,25 @@ public class SimDeviceJNI extends JNIWrapper {
       String[] options, int initialValue);
 
   /**
+   * Creates an enumerated value on a simulated device with double values.
+   *
+   * <p>Enumerated values are always in the range 0 to numOptions-1.
+   *
+   * <p>Returns 0 if not in simulation; this can be used to avoid calls
+   * to Set/Get functions.
+   *
+   * @param device simulated device handle
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param options array of option descriptions
+   * @param optionValues array of option values (must be the same size as options)
+   * @param initialValue initial value (selection)
+   * @return simulated value handle
+   */
+  public static native int createSimValueEnumDouble(int device, String name, int direction,
+      String[] options, double[] optionValues, int initialValue);
+
+  /**
    * Creates a boolean value on a simulated device.
    *
    * <p>Returns 0 if not in simulation; this can be used to avoid calls

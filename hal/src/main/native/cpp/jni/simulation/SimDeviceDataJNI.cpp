@@ -652,6 +652,20 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumOptions
 
 /*
  * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Method:    getSimValueEnumDoubleValues
+ * Signature: (I)[D
+ */
+JNIEXPORT jdoubleArray JNICALL
+Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumDoubleValues
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t numElems = 0;
+  const double* elems = HALSIM_GetSimValueEnumDoubleValues(handle, &numElems);
+  return MakeJDoubleArray(env, wpi::makeArrayRef(elems, numElems));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
  * Method:    resetSimDeviceData
  * Signature: ()V
  */

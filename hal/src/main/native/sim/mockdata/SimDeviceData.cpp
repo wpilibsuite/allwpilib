@@ -122,11 +122,10 @@ void SimDeviceData::FreeDevice(HAL_SimDeviceHandle handle) {
   m_deviceFreed(deviceImpl->name.c_str(), handle + 1);
 }
 
-HAL_SimValueHandle SimDeviceData::CreateValue(HAL_SimDeviceHandle device,
-                                              const char* name, int32_t direction,
-                                              int32_t numOptions,
-                                              const char** options,
-                                              const HAL_Value& initialValue) {
+HAL_SimValueHandle SimDeviceData::CreateValue(
+    HAL_SimDeviceHandle device, const char* name, int32_t direction,
+    int32_t numOptions, const char** options, const double* optionValues,
+    const HAL_Value& initialValue) {
   std::scoped_lock lock(m_mutex);
 
   // look up device
@@ -158,6 +157,10 @@ HAL_SimValueHandle SimDeviceData::CreateValue(HAL_SimDeviceHandle device,
       valueImpl->cstrEnumOptions.emplace_back(
           valueImpl->enumOptions.back().c_str());
     }
+  }
+  // copy option values (if any provided)
+  if (numOptions > 0 && optionValues) {
+    valueImpl->enumOptionValues.assign(optionValues, optionValues + numOptions);
   }
   deviceImpl->valueMap[name] = valueImpl;
 
@@ -355,6 +358,20 @@ const char** SimDeviceData::GetValueEnumOptions(HAL_SimValueHandle handle,
   return options.data();
 }
 
+const double* SimDeviceData::GetValueEnumDoubleValues(HAL_SimValueHandle handle,
+                                                      int32_t* numOptions) {
+  *numOptions = 0;
+
+  std::scoped_lock lock(m_mutex);
+  Value* valueImpl = LookupValue(handle);
+  if (!valueImpl) return nullptr;
+
+  // get list of option values (safe to return as they never change)
+  auto& optionValues = valueImpl->enumOptionValues;
+  *numOptions = optionValues.size();
+  return optionValues.data();
+}
+
 void SimDeviceData::ResetData() {
   std::scoped_lock lock(m_mutex);
   m_devices.clear();
@@ -450,6 +467,11 @@ void HALSIM_EnumerateSimValues(HAL_SimDeviceHandle device, void* param,
 const char** HALSIM_GetSimValueEnumOptions(HAL_SimValueHandle handle,
                                            int32_t* numOptions) {
   return SimSimDeviceData->GetValueEnumOptions(handle, numOptions);
+}
+
+const double* HALSIM_GetSimValueEnumDoubleValues(HAL_SimValueHandle handle,
+                                                 int32_t* numOptions) {
+  return SimSimDeviceData->GetValueEnumDoubleValues(handle, numOptions);
 }
 
 void HALSIM_ResetSimDeviceData(void) { SimSimDeviceData->ResetData(); }

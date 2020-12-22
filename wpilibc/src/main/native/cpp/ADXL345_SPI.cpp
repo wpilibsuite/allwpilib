@@ -17,8 +17,9 @@ using namespace frc;
 ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
     : m_spi(port), m_simDevice("Accel:ADXL345_SPI", port) {
   if (m_simDevice) {
-    m_simRange = m_simDevice.CreateEnum("range", hal::SimDevice::kOutput,
-                                        {"2G", "4G", "8G", "16G"}, 0);
+    m_simRange = m_simDevice.CreateEnumDouble("range", hal::SimDevice::kOutput,
+                                              {"2G", "4G", "8G", "16G"},
+                                              {2.0, 4.0, 8.0, 16.0}, 0);
     m_simX = m_simDevice.CreateDouble("x", hal::SimDevice::kInput, 0.0);
     m_simY = m_simDevice.CreateDouble("y", hal::SimDevice::kInput, 0.0);
     m_simZ = m_simDevice.CreateDouble("z", hal::SimDevice::kInput, 0.0);

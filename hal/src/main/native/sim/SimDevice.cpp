@@ -36,7 +36,7 @@ HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
                                       const char* name, int32_t direction,
                                       const struct HAL_Value* initialValue) {
   return SimSimDeviceData->CreateValue(device, name, direction, 0, nullptr,
-                                       *initialValue);
+                                       nullptr, *initialValue);
 }
 
 HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
@@ -45,7 +45,17 @@ HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
                                           const char** options,
                                           int32_t initialValue) {
   return SimSimDeviceData->CreateValue(device, name, direction, numOptions,
-                                       options, HAL_MakeEnum(initialValue));
+                                       options, nullptr,
+                                       HAL_MakeEnum(initialValue));
+}
+
+HAL_SimValueHandle HAL_CreateSimValueEnumDouble(
+    HAL_SimDeviceHandle device, const char* name, int32_t direction,
+    int32_t numOptions, const char** options, const double* optionValues,
+    int32_t initialValue) {
+  return SimSimDeviceData->CreateValue(device, name, direction, numOptions,
+                                       options, optionValues,
+                                       HAL_MakeEnum(initialValue));
 }
 
 void HAL_GetSimValue(HAL_SimValueHandle handle, struct HAL_Value* value) {

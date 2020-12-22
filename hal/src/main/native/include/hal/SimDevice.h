@@ -140,6 +140,28 @@ HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
                                           int32_t initialValue);
 
 /**
+ * Creates an enumerated value on a simulated device with double values.
+ *
+ * Enumerated values are always in the range 0 to numOptions-1.
+ *
+ * Returns 0 if not in simulation; this can be used to avoid calls
+ * to Set/Get functions.
+ *
+ * @param device simulated device handle
+ * @param name value name
+ * @param direction input/output/bidir (from perspective of user code)
+ * @param numOptions number of enumerated value options (length of options)
+ * @param options array of option descriptions
+ * @param optionValues array of option double values
+ * @param initialValue initial value (selection)
+ * @return simulated value handle
+ */
+HAL_SimValueHandle HAL_CreateSimValueEnumDouble(
+    HAL_SimDeviceHandle device, const char* name, int32_t direction,
+    int32_t numOptions, const char** options, const double* optionValues,
+    int32_t initialValue);
+
+/**
  * Creates a boolean value on a simulated device.
  *
  * Returns 0 if not in simulation; this can be used to avoid calls
@@ -598,6 +620,60 @@ class SimDevice {
     return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
                                   const_cast<const char**>(options.data()),
                                   initialValue);
+  }
+
+  /**
+   * Creates an enumerated value on the simulated device with double values.
+   *
+   * Enumerated values are always in the range 0 to numOptions-1.
+   *
+   * If not in simulation, results in an "empty" object that evaluates to false
+   * in a boolean context.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param options array of option descriptions
+   * @param optionValues array of option values (must be the same size as
+   *                     options)
+   * @param initialValue initial value (selection)
+   * @return simulated enum value object
+   */
+  SimEnum CreateEnumDouble(const char* name, int32_t direction,
+                           std::initializer_list<const char*> options,
+                           std::initializer_list<double> optionValues,
+                           int32_t initialValue) {
+    if (options.size() != optionValues.size()) return {};
+    return HAL_CreateSimValueEnumDouble(
+        m_handle, name, direction, options.size(),
+        const_cast<const char**>(options.begin()), optionValues.begin(),
+        initialValue);
+  }
+
+  /**
+   * Creates an enumerated value on the simulated device with double values.
+   *
+   * Enumerated values are always in the range 0 to numOptions-1.
+   *
+   * If not in simulation, results in an "empty" object that evaluates to false
+   * in a boolean context.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param options array of option descriptions
+   * @param optionValues array of option values (must be the same size as
+   *                     options)
+   * @param initialValue initial value (selection)
+   * @return simulated enum value object
+   */
+  SimEnum CreateEnumDouble(const char* name, int32_t direction,
+                           wpi::ArrayRef<const char*> options,
+                           wpi::ArrayRef<double> optionValues,
+                           int32_t initialValue) {
+    if (options.size() != optionValues.size()) return {};
+    return HAL_CreateSimValueEnumDouble(
+        m_handle, name, direction, options.size(),
+        const_cast<const char**>(options.data()), optionValues.data(),
+        initialValue);
   }
 
   /**

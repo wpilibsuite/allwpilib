@@ -69,6 +69,9 @@ void HALSIM_EnumerateSimValues(HAL_SimDeviceHandle device, void* param,
 const char** HALSIM_GetSimValueEnumOptions(HAL_SimValueHandle handle,
                                            int32_t* numOptions);
 
+const double* HALSIM_GetSimValueEnumDoubleValues(HAL_SimValueHandle handle,
+                                                 int32_t* numOptions);
+
 void HALSIM_ResetSimDeviceData(void);
 
 #ifdef __cplusplus
