@@ -172,7 +172,7 @@ void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
   auto ws = m_ws.lock();
   if (ws) {
     wpi::json netValue = {
-        {"type", "SimDevices"}, {"device", m_deviceId}, {"data", payload}};
+        {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
     ws->OnSimValueChanged(netValue);
   }
 }
@@ -181,10 +181,19 @@ HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() { CancelCallbacks(); }
 
 void HALSimWSProviderSimDevices::DeviceCreatedCallback(
     const char* name, HAL_SimDeviceHandle handle) {
-  auto key = (wpi::Twine("SimDevices/") + name).str();
-  auto dev = std::make_shared<HALSimWSProviderSimDevice>(
-      handle, key, wpi::Twine(name).str());
-  m_providers.Add(key, dev);
+  // Map "Accel:Foo" -> type=Accel, device=Foo
+  auto [type, id] = wpi::StringRef{name}.split(':');
+  std::shared_ptr<HALSimWSProviderSimDevice> dev;
+  if (id.empty()) {
+    auto key = ("SimDevice/" + type).str();
+    dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key, "SimDevice",
+                                                      type);
+    m_providers.Add(key, dev);
+  } else {
+    auto key = (type + "/" + id).str();
+    dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key, type, id);
+    m_providers.Add(key, dev);
+  }
 
   if (m_ws) {
     m_exec->Call([this, dev]() { dev->OnNetworkConnected(GetWSConnection()); });

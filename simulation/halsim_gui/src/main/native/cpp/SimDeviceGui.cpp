@@ -137,7 +137,10 @@ static void DisplaySimValue(const char* name, void* data,
 
 static void DisplaySimDevice(const char* name, void* data,
                              HAL_SimDeviceHandle handle) {
-  if (glass::BeginDevice(name)) {
+  // only show "Foo" portion of "Accel:Foo"
+  auto [type, id] = wpi::StringRef{name}.split(':');
+  if (id.empty()) id = type;
+  if (glass::BeginDevice(id.data())) {
     HALSIM_EnumerateSimValues(handle, data, DisplaySimValue);
     glass::EndDevice();
   }
