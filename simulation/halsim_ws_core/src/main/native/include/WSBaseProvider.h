@@ -47,7 +47,7 @@ class HALSimWSBaseProvider {
   std::string m_key;
 
   std::string m_type;
-  std::string m_deviceId = "";
+  std::string m_deviceId;
 };
 
 }  // namespace wpilibws

@@ -9,6 +9,7 @@
 
 #include <WSProviderContainer.h>
 #include <WSProvider_Analog.h>
+#include <WSProvider_BuiltInAccelerometer.h>
 #include <WSProvider_DIO.h>
 #include <WSProvider_DriverStation.h>
 #include <WSProvider_Encoder.h>
@@ -37,6 +38,7 @@ bool HALSimWSServer::Initialize() {
 
     HALSimWSProviderAnalogIn::Initialize(registerFunc);
     HALSimWSProviderAnalogOut::Initialize(registerFunc);
+    HALSimWSProviderBuiltInAccelerometer::Initialize(registerFunc);
     HALSimWSProviderDIO::Initialize(registerFunc);
     HALSimWSProviderDigitalPWM::Initialize(registerFunc);
     HALSimWSProviderDriverStation::Initialize(registerFunc);
