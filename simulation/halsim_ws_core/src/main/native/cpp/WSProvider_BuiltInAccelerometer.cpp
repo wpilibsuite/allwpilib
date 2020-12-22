@@ -21,13 +21,13 @@
       this, true)
 namespace wpilibws {
 HALSimWSProviderBuiltInAccelerometer::HALSimWSProviderBuiltInAccelerometer()
-    : HALSimWSHalProvider("Accel/BuiltIn", "Accel") {
-  m_deviceId = "BuiltIn";
+    : HALSimWSHalProvider("Accel/BuiltInAccel", "Accel") {
+  m_deviceId = "BuiltInAccel";
 }
 
 void HALSimWSProviderBuiltInAccelerometer::Initialize(
     WSRegisterFunc webRegisterFunc) {
-  webRegisterFunc("Accel/BuiltIn",
+  webRegisterFunc("Accel/BuiltInAccel",
                   std::make_unique<HALSimWSProviderBuiltInAccelerometer>());
 }
 
