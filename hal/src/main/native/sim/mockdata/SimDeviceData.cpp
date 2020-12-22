@@ -123,7 +123,7 @@ void SimDeviceData::FreeDevice(HAL_SimDeviceHandle handle) {
 }
 
 HAL_SimValueHandle SimDeviceData::CreateValue(HAL_SimDeviceHandle device,
-                                              const char* name, bool readonly,
+                                              const char* name, int32_t direction,
                                               int32_t numOptions,
                                               const char** options,
                                               const HAL_Value& initialValue) {
@@ -142,7 +142,7 @@ HAL_SimValueHandle SimDeviceData::CreateValue(HAL_SimDeviceHandle device,
   if (deviceImpl->values.size() >= 4095) return 0;
 
   // create and save; encode device into handle
-  auto valueImplPtr = std::make_unique<Value>(name, readonly, initialValue);
+  auto valueImplPtr = std::make_unique<Value>(name, direction, initialValue);
   Value* valueImpl = valueImplPtr.get();
   HAL_SimValueHandle valueHandle =
       (device << 16) |
@@ -162,7 +162,7 @@ HAL_SimValueHandle SimDeviceData::CreateValue(HAL_SimDeviceHandle device,
   deviceImpl->valueMap[name] = valueImpl;
 
   // notify callbacks
-  deviceImpl->valueCreated(name, valueHandle, readonly, &initialValue);
+  deviceImpl->valueCreated(name, valueHandle, direction, &initialValue);
 
   return valueHandle;
 }
@@ -191,7 +191,7 @@ void SimDeviceData::SetValue(HAL_SimValueHandle handle,
 
   // notify callbacks
   valueImpl->changed(valueImpl->name.c_str(), valueImpl->handle,
-                     valueImpl->readonly, &value);
+                     valueImpl->direction, &value);
 }
 
 int32_t SimDeviceData::RegisterDeviceCreatedCallback(
@@ -273,7 +273,7 @@ int32_t SimDeviceData::RegisterValueCreatedCallback(
   // initial notifications
   if (initialNotify) {
     for (auto&& value : deviceImpl->values)
-      callback(value->name.c_str(), param, value->handle, value->readonly,
+      callback(value->name.c_str(), param, value->handle, value->direction,
                &value->value);
   }
 
@@ -302,7 +302,7 @@ int32_t SimDeviceData::RegisterValueChangedCallback(
   // initial notification
   if (initialNotify)
     callback(valueImpl->name.c_str(), param, valueImpl->handle,
-             valueImpl->readonly, &valueImpl->value);
+             valueImpl->direction, &valueImpl->value);
 
   // encode device and value into uid
   return (((handle >> 16) & 0xfff) << 19) | ((handle & 0xfff) << 7) |
@@ -337,7 +337,7 @@ void SimDeviceData::EnumerateValues(HAL_SimDeviceHandle device, void* param,
   if (!deviceImpl) return;
 
   for (auto&& value : deviceImpl->values)
-    callback(value->name.c_str(), param, value->handle, value->readonly,
+    callback(value->name.c_str(), param, value->handle, value->direction,
              &value->value);
 }
 

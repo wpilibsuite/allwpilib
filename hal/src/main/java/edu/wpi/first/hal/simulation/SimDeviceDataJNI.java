@@ -41,18 +41,21 @@ public class SimDeviceDataJNI extends JNIWrapper {
   public static native SimDeviceInfo[] enumerateSimDevices(String prefix);
 
   public static native int registerSimValueCreatedCallback(int device, SimValueCallback callback, boolean initialNotify);
+  public static native int registerSimValueCreatedCallback2(int device, SimValueCallback2 callback, boolean initialNotify);
   public static native void cancelSimValueCreatedCallback(int uid);
 
   public static native int registerSimValueChangedCallback(int handle, SimValueCallback callback, boolean initialNotify);
+  public static native int registerSimValueChangedCallback2(int handle, SimValueCallback2 callback, boolean initialNotify);
   public static native void cancelSimValueChangedCallback(int uid);
 
   public static native int getSimValueHandle(int device, String name);
 
   public static class SimValueInfo {
-    public SimValueInfo(String name, int handle, boolean readonly, int type, long value1, double value2) {
+    public SimValueInfo(String name, int handle, int direction, int type, long value1, double value2) {
       this.name = name;
       this.handle = handle;
-      this.readonly = readonly;
+      this.readonly = direction == 1;
+      this.direction = direction;
       this.value = HALValue.fromNative(type, value1, value2);
     }
 
@@ -63,7 +66,11 @@ public class SimDeviceDataJNI extends JNIWrapper {
     public int handle;
 
     @SuppressWarnings("MemberName")
+    @Deprecated
     public boolean readonly;
+
+    @SuppressWarnings("MemberName")
+    public int direction;
 
     @SuppressWarnings("MemberName")
     public HALValue value;

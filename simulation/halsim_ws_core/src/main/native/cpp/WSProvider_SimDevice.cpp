@@ -88,15 +88,38 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
   }
 }
 
+void HALSimWSProviderSimDevice::OnValueCreatedStatic(
+    const char* name, void* param, HAL_SimValueHandle handle, int32_t direction,
+    const struct HAL_Value* value) {
+  (reinterpret_cast<HALSimWSProviderSimDevice*>(param))
+      ->OnValueCreated(name, handle, direction, value);
+}
+
 void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
                                                HAL_SimValueHandle handle,
-                                               HAL_Bool readonly,
+                                               int32_t direction,
                                                const struct HAL_Value* value) {
-  wpi::Twine key = wpi::Twine(readonly ? "<" : "<>") + name;
+  const char* prefix = "";
+  if (name[0] != '<' && name[0] != '>') {
+    switch (direction) {
+      case HAL_SimValueInput:
+        prefix = ">";
+        break;
+      case HAL_SimValueOutput:
+        prefix = "<";
+        break;
+      case HAL_SimValueBidir:
+        prefix = "<>";
+        break;
+      default:
+        break;
+    }
+  }
+  std::string key = (wpi::Twine(prefix) + name).str();
   auto data = std::make_unique<SimDeviceValueData>();
   data->device = this;
   data->handle = handle;
-  data->key = key.str();
+  data->key = key;
   data->valueType = value->type;
 
   auto param = data.get();
@@ -109,7 +132,14 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
   int32_t cbKey = HALSIM_RegisterSimValueChangedCallback(
       handle, param, HALSimWSProviderSimDevice::OnValueChangedStatic, true);
 
-  m_simValueChangedCbKeys[key.str()] = cbKey;
+  m_simValueChangedCbKeys[key] = cbKey;
+}
+
+void HALSimWSProviderSimDevice::OnValueChangedStatic(
+    const char* name, void* param, HAL_SimValueHandle handle, int32_t direction,
+    const struct HAL_Value* value) {
+  auto valueData = (reinterpret_cast<SimDeviceValueData*>(param));
+  valueData->device->OnValueChanged(valueData, value);
 }
 
 void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,

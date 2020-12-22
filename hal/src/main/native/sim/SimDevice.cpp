@@ -33,18 +33,18 @@ void HAL_FreeSimDevice(HAL_SimDeviceHandle handle) {
 }
 
 HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
-                                      const char* name, HAL_Bool readonly,
+                                      const char* name, int32_t direction,
                                       const struct HAL_Value* initialValue) {
-  return SimSimDeviceData->CreateValue(device, name, readonly, 0, nullptr,
+  return SimSimDeviceData->CreateValue(device, name, direction, 0, nullptr,
                                        *initialValue);
 }
 
 HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
-                                          const char* name, HAL_Bool readonly,
+                                          const char* name, int32_t direction,
                                           int32_t numOptions,
                                           const char** options,
                                           int32_t initialValue) {
-  return SimSimDeviceData->CreateValue(device, name, readonly, numOptions,
+  return SimSimDeviceData->CreateValue(device, name, direction, numOptions,
                                        options, HAL_MakeEnum(initialValue));
 }
 

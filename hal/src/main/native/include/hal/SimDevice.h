@@ -30,6 +30,17 @@
  * @{
  */
 
+/**
+ * Direction of a simulated value (from the perspective of user code).
+ */
+// clang-format off
+HAL_ENUM(HAL_SimValueDirection) {
+  HAL_SimValueInput = 0,  /**< input to user code from the simulator */
+  HAL_SimValueOutput,     /**< output from user code to the simulator */
+  HAL_SimValueBidir       /**< bidirectional between user code and simulator */
+};
+// clang-format on
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -67,21 +78,21 @@ void HAL_FreeSimDevice(HAL_SimDeviceHandle handle);
  *
  * @param device simulated device handle
  * @param name value name
- * @param readonly if the value should not be written from simulation side
+ * @param direction input/output/bidir (from perspective of user code)
  * @param initialValue initial value
  * @return simulated value handle
  */
 HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
-                                      const char* name, HAL_Bool readonly,
+                                      const char* name, int32_t direction,
                                       const struct HAL_Value* initialValue);
 
 #ifdef __cplusplus
 extern "C++" {
 inline HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
                                              const char* name,
-                                             HAL_Bool readonly,
+                                             int32_t direction,
                                              const HAL_Value& initialValue) {
-  return HAL_CreateSimValue(device, name, readonly, &initialValue);
+  return HAL_CreateSimValue(device, name, direction, &initialValue);
 }
 }  // extern "C++"
 #endif
@@ -94,16 +105,16 @@ inline HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
  *
  * @param device simulated device handle
  * @param name value name
- * @param readonly if the value should not be written from simulation side
+ * @param direction input/output/bidir (from perspective of user code)
  * @param initialValue initial value
  * @return simulated value handle
  */
 inline HAL_SimValueHandle HAL_CreateSimValueDouble(HAL_SimDeviceHandle device,
                                                    const char* name,
-                                                   HAL_Bool readonly,
+                                                   int32_t direction,
                                                    double initialValue) {
   struct HAL_Value v = HAL_MakeDouble(initialValue);
-  return HAL_CreateSimValue(device, name, readonly, &v);
+  return HAL_CreateSimValue(device, name, direction, &v);
 }
 
 /**
@@ -116,14 +127,14 @@ inline HAL_SimValueHandle HAL_CreateSimValueDouble(HAL_SimDeviceHandle device,
  *
  * @param device simulated device handle
  * @param name value name
- * @param readonly if the value should not be written from simulation side
+ * @param direction input/output/bidir (from perspective of user code)
  * @param numOptions number of enumerated value options (length of options)
  * @param options array of option descriptions
  * @param initialValue initial value (selection)
  * @return simulated value handle
  */
 HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
-                                          const char* name, HAL_Bool readonly,
+                                          const char* name, int32_t direction,
                                           int32_t numOptions,
                                           const char** options,
                                           int32_t initialValue);
@@ -136,16 +147,16 @@ HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
  *
  * @param device simulated device handle
  * @param name value name
- * @param readonly if the value should not be written from simulation side
+ * @param direction input/output/bidir (from perspective of user code)
  * @param initialValue initial value
  * @return simulated value handle
  */
 inline HAL_SimValueHandle HAL_CreateSimValueBoolean(HAL_SimDeviceHandle device,
                                                     const char* name,
-                                                    HAL_Bool readonly,
+                                                    int32_t direction,
                                                     HAL_Bool initialValue) {
   struct HAL_Value v = HAL_MakeBoolean(initialValue);
-  return HAL_CreateSimValue(device, name, readonly, &v);
+  return HAL_CreateSimValue(device, name, direction, &v);
 }
 
 /**
@@ -420,6 +431,15 @@ class SimBoolean : public SimValue {
 class SimDevice {
  public:
   /**
+   * Direction of a simulated value (from the perspective of user code).
+   */
+  enum Direction {
+    kInput = HAL_SimValueInput,
+    kOutput = HAL_SimValueOutput,
+    kBidir = HAL_SimValueBidir
+  };
+
+  /**
    * Default constructor that results in an "empty" object that is false in
    * a boolean context.
    */
@@ -512,13 +532,13 @@ class SimDevice {
    * in a boolean context.
    *
    * @param name value name
-   * @param readonly if the value should not be written from simulation side
+   * @param direction input/output/bidir (from perspective of user code)
    * @param initialValue initial value
    * @return simulated value object
    */
-  SimValue CreateValue(const char* name, bool readonly,
+  SimValue CreateValue(const char* name, int32_t direction,
                        const HAL_Value& initialValue) {
-    return HAL_CreateSimValue(m_handle, name, readonly, &initialValue);
+    return HAL_CreateSimValue(m_handle, name, direction, &initialValue);
   }
 
   /**
@@ -528,12 +548,13 @@ class SimDevice {
    * in a boolean context.
    *
    * @param name value name
-   * @param readonly if the value should not be written from simulation side
+   * @param direction input/output/bidir (from perspective of user code)
    * @param initialValue initial value
    * @return simulated double value object
    */
-  SimDouble CreateDouble(const char* name, bool readonly, double initialValue) {
-    return HAL_CreateSimValueDouble(m_handle, name, readonly, initialValue);
+  SimDouble CreateDouble(const char* name, int32_t direction,
+                         double initialValue) {
+    return HAL_CreateSimValueDouble(m_handle, name, direction, initialValue);
   }
 
   /**
@@ -545,15 +566,15 @@ class SimDevice {
    * in a boolean context.
    *
    * @param name value name
-   * @param readonly if the value should not be written from simulation side
+   * @param direction input/output/bidir (from perspective of user code)
    * @param options array of option descriptions
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnum(const char* name, bool readonly,
+  SimEnum CreateEnum(const char* name, int32_t direction,
                      std::initializer_list<const char*> options,
                      int32_t initialValue) {
-    return HAL_CreateSimValueEnum(m_handle, name, readonly, options.size(),
+    return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
                                   const_cast<const char**>(options.begin()),
                                   initialValue);
   }
@@ -567,14 +588,14 @@ class SimDevice {
    * in a boolean context.
    *
    * @param name value name
-   * @param readonly if the value should not be written from simulation side
+   * @param direction input/output/bidir (from perspective of user code)
    * @param options array of option descriptions
    * @param initialValue initial value (selection)
    * @return simulated enum value object
    */
-  SimEnum CreateEnum(const char* name, bool readonly,
+  SimEnum CreateEnum(const char* name, int32_t direction,
                      wpi::ArrayRef<const char*> options, int32_t initialValue) {
-    return HAL_CreateSimValueEnum(m_handle, name, readonly, options.size(),
+    return HAL_CreateSimValueEnum(m_handle, name, direction, options.size(),
                                   const_cast<const char**>(options.data()),
                                   initialValue);
   }
@@ -586,12 +607,13 @@ class SimDevice {
    * in a boolean context.
    *
    * @param name value name
-   * @param readonly if the value should not be written from simulation side
+   * @param direction input/output/bidir (from perspective of user code)
    * @param initialValue initial value
    * @return simulated boolean value object
    */
-  SimBoolean CreateBoolean(const char* name, bool readonly, bool initialValue) {
-    return HAL_CreateSimValueBoolean(m_handle, name, readonly, initialValue);
+  SimBoolean CreateBoolean(const char* name, int32_t direction,
+                           bool initialValue) {
+    return HAL_CreateSimValueBoolean(m_handle, name, direction, initialValue);
   }
 
  protected:

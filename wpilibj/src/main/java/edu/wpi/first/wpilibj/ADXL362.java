@@ -93,12 +93,13 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
     m_spi = new SPI(port);
 
     // simulation
-    m_simDevice = SimDevice.create("ADXL362", port.value);
+    m_simDevice = SimDevice.create("Accel:ADXL362", port.value);
     if (m_simDevice != null) {
-      m_simRange = m_simDevice.createEnum("Range", true, new String[] {"2G", "4G", "8G", "16G"}, 0);
-      m_simX = m_simDevice.createDouble("X Accel", false, 0.0);
-      m_simY = m_simDevice.createDouble("Y Accel", false, 0.0);
-      m_simZ = m_simDevice.createDouble("Z Accel", false, 0.0);
+      m_simRange = m_simDevice.createEnum("range", SimDevice.Direction.kOutput,
+          new String[] {"2G", "4G", "8G", "16G"}, 0);
+      m_simX = m_simDevice.createDouble("x", SimDevice.Direction.kInput, 0.0);
+      m_simY = m_simDevice.createDouble("y", SimDevice.Direction.kInput, 0.0);
+      m_simZ = m_simDevice.createDouble("z", SimDevice.Direction.kInput, 0.0);
     }
 
     m_spi.setClockRate(3000000);

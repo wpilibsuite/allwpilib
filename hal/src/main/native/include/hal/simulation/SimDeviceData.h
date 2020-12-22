@@ -15,7 +15,7 @@ typedef void (*HALSIM_SimDeviceCallback)(const char* name, void* param,
 
 typedef void (*HALSIM_SimValueCallback)(const char* name, void* param,
                                         HAL_SimValueHandle handle,
-                                        HAL_Bool readonly,
+                                        int32_t direction,
                                         const struct HAL_Value* value);
 
 #ifdef __cplusplus

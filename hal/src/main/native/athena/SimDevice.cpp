@@ -14,13 +14,13 @@ HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name) { return 0; }
 void HAL_FreeSimDevice(HAL_SimDeviceHandle handle) {}
 
 HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
-                                      const char* name, HAL_Bool readonly,
+                                      const char* name, int32_t direction,
                                       const struct HAL_Value* initialValue) {
   return 0;
 }
 
 HAL_SimValueHandle HAL_CreateSimValueEnum(HAL_SimDeviceHandle device,
-                                          const char* name, HAL_Bool readonly,
+                                          const char* name, int32_t direction,
                                           int32_t numOptions,
                                           const char** options,
                                           int32_t initialValue) {

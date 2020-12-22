@@ -126,12 +126,12 @@ class SimPrefixCallbackRegistry {
 class SimDeviceData {
  private:
   struct Value {
-    Value(const char* name_, bool readonly_, const HAL_Value& value_)
-        : name{name_}, readonly{readonly_}, value{value_} {}
+    Value(const char* name_, int32_t direction_, const HAL_Value& value_)
+        : name{name_}, direction{direction_}, value{value_} {}
 
     HAL_SimValueHandle handle{0};
     std::string name;
-    bool readonly;
+    int32_t direction;
     HAL_Value value;
     std::vector<std::string> enumOptions;
     std::vector<const char*> cstrEnumOptions;
@@ -168,7 +168,7 @@ class SimDeviceData {
   HAL_SimDeviceHandle CreateDevice(const char* name);
   void FreeDevice(HAL_SimDeviceHandle handle);
   HAL_SimValueHandle CreateValue(HAL_SimDeviceHandle device, const char* name,
-                                 bool readonly, int32_t numOptions,
+                                 int32_t direction, int32_t numOptions,
                                  const char** options,
                                  const HAL_Value& initialValue);
   HAL_Value GetValue(HAL_SimValueHandle handle);

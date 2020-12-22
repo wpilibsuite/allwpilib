@@ -51,20 +51,14 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
  private:
   static void OnValueCreatedStatic(const char* name, void* param,
-                                   HAL_SimValueHandle handle, HAL_Bool readonly,
-                                   const struct HAL_Value* value) {
-    (reinterpret_cast<HALSimWSProviderSimDevice*>(param))
-        ->OnValueCreated(name, handle, readonly, value);
-  }
+                                   HAL_SimValueHandle handle, int32_t direction,
+                                   const struct HAL_Value* value);
   void OnValueCreated(const char* name, HAL_SimValueHandle handle,
-                      HAL_Bool readonly, const struct HAL_Value* value);
+                      int32_t direction, const struct HAL_Value* value);
 
   static void OnValueChangedStatic(const char* name, void* param,
-                                   HAL_SimValueHandle handle, HAL_Bool readonly,
-                                   const struct HAL_Value* value) {
-    auto valueData = (reinterpret_cast<SimDeviceValueData*>(param));
-    valueData->device->OnValueChanged(valueData, value);
-  }
+                                   HAL_SimValueHandle handle, int32_t direction,
+                                   const struct HAL_Value* value);
   void OnValueChanged(SimDeviceValueData* valueData,
                       const struct HAL_Value* value);
 
