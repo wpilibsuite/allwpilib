@@ -12,6 +12,11 @@
 
 #include <imgui.h>
 
+#if __has_include(<wpi/StringRef.h>)
+#include <wpi/StringRef.h>
+#define WPIGUI_HAS_STRINGREF
+#endif
+
 extern "C" struct GLFWwindow;
 
 namespace wpi::gui {
@@ -85,6 +90,22 @@ void AddLateExecute(std::function<void()> execute);
  * Gets GLFW window handle.
  */
 GLFWwindow* GetSystemWindow();
+
+/**
+ * Adds an application icon.  Multiple icons (of different sizes) may be
+ * set.  This must be called prior to initialization to have an effect.
+ *
+ * @param data image data
+ * @param len image data length
+ * @return False if image data could not be read
+ */
+bool AddIcon(const unsigned char* data, int len);
+
+#ifdef WPIGUI_HAS_STRINGREF
+inline bool AddIcon(wpi::StringRef data) {
+  return AddIcon(data.bytes_begin(), data.size());
+}
+#endif
 
 /**
  * Adds a font to the GUI.  The passed function is called during
