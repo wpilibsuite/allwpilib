@@ -32,7 +32,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
-  protected SimDouble m_simDistancePerRotation;
   protected SimBoolean m_simIsConnected;
 
   /**
@@ -69,12 +68,11 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   private void init() {
-    m_simDevice = SimDevice.create("DutyCycleEncoder", m_dutyCycle.getFPGAIndex());
+    m_simDevice = SimDevice.create("DutyCycle:DutyCycleEncoder", m_dutyCycle.getSourceChannel());
 
     if (m_simDevice != null) {
-      m_simPosition = m_simDevice.createDouble("Position", false, 0.0);
-      m_simDistancePerRotation = m_simDevice.createDouble("DistancePerRotation", false, 1.0);
-      m_simIsConnected = m_simDevice.createBoolean("Connected", false, true);
+      m_simPosition = m_simDevice.createDouble("position", SimDevice.Direction.kInput, 0.0);
+      m_simIsConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
     } else {
       m_counter = new Counter();
       m_analogTrigger = new AnalogTrigger(m_dutyCycle);
@@ -142,10 +140,6 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    */
   public void setDistancePerRotation(double distancePerRotation) {
     m_distancePerRotation = distancePerRotation;
-
-    if (m_simDistancePerRotation != null) {
-      m_simDistancePerRotation.set(distancePerRotation);
-    }
   }
 
   /**

@@ -54,13 +54,14 @@ DutyCycleEncoder::DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource)
 }
 
 void DutyCycleEncoder::Init() {
-  m_simDevice = hal::SimDevice{"DutyCycleEncoder", m_dutyCycle->GetFPGAIndex()};
+  m_simDevice = hal::SimDevice{"DutyCycle:DutyCycleEncoder",
+                               m_dutyCycle->GetSourceChannel()};
 
   if (m_simDevice) {
-    m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
-    m_simDistancePerRotation =
-        m_simDevice.CreateDouble("DistancePerRotation", false, 1.0);
-    m_simIsConnected = m_simDevice.CreateBoolean("Connected", false, true);
+    m_simPosition =
+        m_simDevice.CreateDouble("position", hal::SimDevice::kInput, 0.0);
+    m_simIsConnected =
+        m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
   } else {
     m_analogTrigger = std::make_unique<AnalogTrigger>(m_dutyCycle.get());
     m_analogTrigger->SetLimitsDutyCycle(0.25, 0.75);
@@ -100,7 +101,6 @@ units::turn_t DutyCycleEncoder::Get() const {
 
 void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
   m_distancePerRotation = distancePerRotation;
-  m_simDistancePerRotation.Set(distancePerRotation);
 }
 
 double DutyCycleEncoder::GetDistancePerRotation() const {

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,18 @@ package edu.wpi.first.hal;
  * A wrapper around a simulator device handle.
  */
 public class SimDevice implements AutoCloseable {
+  public enum Direction {
+    kInput(SimDeviceJNI.kInput),
+    kOutput(SimDeviceJNI.kOutput),
+    kBidir(SimDeviceJNI.kBidir);
+
+    public final int m_value;
+
+    Direction(int value) {
+      m_value = value;
+    }
+  }
+
   /**
    * Creates a simulated device.
    *
@@ -101,9 +113,26 @@ public class SimDevice implements AutoCloseable {
    * @param readonly if the value should not be written from simulation side
    * @param initialValue initial value
    * @return simulated value object
+   *
+   * @deprecated Use direction function instead
    */
+  @Deprecated
   public SimValue createValue(String name, boolean readonly, HALValue initialValue) {
-    int handle = SimDeviceJNI.createSimValue(m_handle, name, readonly, initialValue);
+    return createValue(name, readonly ? Direction.kOutput : Direction.kInput, initialValue);
+  }
+
+  /**
+   * Creates a value on the simulated device.
+   *
+   * <p>Returns null if not in simulation.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param initialValue initial value
+   * @return simulated value object
+   */
+  public SimValue createValue(String name, Direction direction, HALValue initialValue) {
+    int handle = SimDeviceJNI.createSimValue(m_handle, name, direction.m_value, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -119,9 +148,26 @@ public class SimDevice implements AutoCloseable {
    * @param readonly if the value should not be written from simulation side
    * @param initialValue initial value
    * @return simulated double value object
+   *
+   * @deprecated Use direction function instead
    */
+  @Deprecated
   public SimDouble createDouble(String name, boolean readonly, double initialValue) {
-    int handle = SimDeviceJNI.createSimValueDouble(m_handle, name, readonly, initialValue);
+    return createDouble(name, readonly ? Direction.kOutput : Direction.kInput, initialValue);
+  }
+
+  /**
+   * Creates a double value on the simulated device.
+   *
+   * <p>Returns null if not in simulation.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param initialValue initial value
+   * @return simulated double value object
+   */
+  public SimDouble createDouble(String name, Direction direction, double initialValue) {
+    int handle = SimDeviceJNI.createSimValueDouble(m_handle, name, direction.m_value, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -140,9 +186,54 @@ public class SimDevice implements AutoCloseable {
    * @param options array of option descriptions
    * @param initialValue initial value (selection)
    * @return simulated enum value object
+   *
+   * @deprecated Use direction function instead
    */
+  @Deprecated
   public SimEnum createEnum(String name, boolean readonly, String[] options, int initialValue) {
-    int handle = SimDeviceJNI.createSimValueEnum(m_handle, name, readonly, options, initialValue);
+    return createEnum(name, readonly ? Direction.kOutput : Direction.kInput, options, initialValue);
+  }
+
+  /**
+   * Creates an enumerated value on the simulated device.
+   *
+   * <p>Enumerated values are always in the range 0 to numOptions-1.
+   *
+   * <p>Returns null if not in simulation.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param options array of option descriptions
+   * @param initialValue initial value (selection)
+   * @return simulated enum value object
+   */
+  public SimEnum createEnum(String name, Direction direction, String[] options, int initialValue) {
+    int handle = SimDeviceJNI.createSimValueEnum(m_handle, name, direction.m_value, options,
+        initialValue);
+    if (handle <= 0) {
+      return null;
+    }
+    return new SimEnum(handle);
+  }
+
+  /**
+   * Creates an enumerated value on the simulated device with double values.
+   *
+   * <p>Enumerated values are always in the range 0 to numOptions-1.
+   *
+   * <p>Returns null if not in simulation.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param options array of option descriptions
+   * @param optionValues array of option values (must be the same size as options)
+   * @param initialValue initial value (selection)
+   * @return simulated enum value object
+   */
+  public SimEnum createEnumDouble(String name, Direction direction, String[] options,
+      double[] optionValues, int initialValue) {
+    int handle = SimDeviceJNI.createSimValueEnumDouble(m_handle, name, direction.m_value, options,
+        optionValues, initialValue);
     if (handle <= 0) {
       return null;
     }
@@ -158,9 +249,27 @@ public class SimDevice implements AutoCloseable {
    * @param readonly if the value should not be written from simulation side
    * @param initialValue initial value
    * @return simulated boolean value object
+   *
+   * @deprecated Use direction function instead
    */
+  @Deprecated
   public SimBoolean createBoolean(String name, boolean readonly, boolean initialValue) {
-    int handle = SimDeviceJNI.createSimValueBoolean(m_handle, name, readonly, initialValue);
+    return createBoolean(name, readonly ? Direction.kOutput : Direction.kInput, initialValue);
+  }
+
+  /**
+   * Creates a boolean value on the simulated device.
+   *
+   * <p>Returns null if not in simulation.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param initialValue initial value
+   * @return simulated boolean value object
+   */
+  public SimBoolean createBoolean(String name, Direction direction, boolean initialValue) {
+    int handle = SimDeviceJNI.createSimValueBoolean(m_handle, name, direction.m_value,
+        initialValue);
     if (handle <= 0) {
       return null;
     }

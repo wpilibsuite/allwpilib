@@ -57,9 +57,19 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
           buttonsValues.push_back(((buttons.buttons >> i) & 0x1) == 1);
         }
 
+        // Rumble data
+        int64_t outputs = 0;
+        int32_t leftRumble = 0;
+        int32_t rightRumble = 0;
+        HALSIM_GetJoystickOutputs(provider->GetChannel(), &outputs, &leftRumble,
+                                  &rightRumble);
+
         payload[">axes"] = axesValues;
         payload[">povs"] = povsValues;
         payload[">buttons"] = buttonsValues;
+        payload["<outputs"] = outputs;
+        payload["<rumble_left"] = leftRumble;
+        payload["<rumble_right"] = rightRumble;
 
         provider->ProcessHalCallback(payload);
       },

@@ -7,6 +7,9 @@
 
 #include "WSProvider_SimDevice.h"
 
+#include <algorithm>
+#include <cmath>
+
 #include <hal/Ports.h>
 
 namespace wpilibws {
@@ -70,9 +73,27 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
         case HAL_DOUBLE:
           value.data.v_double = it.value();
           break;
-        case HAL_ENUM:
+        case HAL_ENUM: {
+          if (it->is_string()) {
+            auto& options = vd->second->options;
+            auto& str = it.value().get_ref<const std::string&>();
+            auto optionIt =
+                std::find_if(options.begin(), options.end(),
+                             [&](const std::string& v) { return v == str; });
+            if (optionIt != options.end())
+              value.data.v_enum = optionIt - options.begin();
+          } else if (it->is_number()) {
+            auto& values = vd->second->optionValues;
+            double num = it.value();
+            auto valueIt = std::find_if(
+                values.begin(), values.end(),
+                [&](double v) { return std::fabs(v - num) < 1e-4; });
+            if (valueIt != values.end())
+              value.data.v_enum = valueIt - values.begin();
+          }
           value.data.v_enum = it.value();
           break;
+        }
         case HAL_INT:
           value.data.v_int = it.value();
           break;
@@ -88,15 +109,50 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
   }
 }
 
+void HALSimWSProviderSimDevice::OnValueCreatedStatic(
+    const char* name, void* param, HAL_SimValueHandle handle, int32_t direction,
+    const struct HAL_Value* value) {
+  (reinterpret_cast<HALSimWSProviderSimDevice*>(param))
+      ->OnValueCreated(name, handle, direction, value);
+}
+
 void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
                                                HAL_SimValueHandle handle,
-                                               HAL_Bool readonly,
+                                               int32_t direction,
                                                const struct HAL_Value* value) {
-  wpi::Twine key = wpi::Twine(readonly ? "<" : "<>") + name;
+  const char* prefix = "";
+  if (name[0] != '<' && name[0] != '>') {
+    switch (direction) {
+      case HAL_SimValueInput:
+        prefix = ">";
+        break;
+      case HAL_SimValueOutput:
+        prefix = "<";
+        break;
+      case HAL_SimValueBidir:
+        prefix = "<>";
+        break;
+      default:
+        break;
+    }
+  }
+  std::string key = (wpi::Twine(prefix) + name).str();
   auto data = std::make_unique<SimDeviceValueData>();
   data->device = this;
   data->handle = handle;
-  data->key = key.str();
+  data->key = key;
+  if (value->type == HAL_ENUM) {
+    int32_t numOptions = 0;
+
+    const char** options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
+    data->options.reserve(numOptions);
+    for (int32_t i = 0; i < numOptions; ++i)
+      data->options.emplace_back(options[i]);
+
+    const double* values =
+        HALSIM_GetSimValueEnumDoubleValues(handle, &numOptions);
+    data->optionValues.assign(values, values + numOptions);
+  }
   data->valueType = value->type;
 
   auto param = data.get();
@@ -109,7 +165,14 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
   int32_t cbKey = HALSIM_RegisterSimValueChangedCallback(
       handle, param, HALSimWSProviderSimDevice::OnValueChangedStatic, true);
 
-  m_simValueChangedCbKeys[key.str()] = cbKey;
+  m_simValueChangedCbKeys[key] = cbKey;
+}
+
+void HALSimWSProviderSimDevice::OnValueChangedStatic(
+    const char* name, void* param, HAL_SimValueHandle handle, int32_t direction,
+    const struct HAL_Value* value) {
+  auto valueData = (reinterpret_cast<SimDeviceValueData*>(param));
+  valueData->device->OnValueChanged(valueData, value);
 }
 
 void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
@@ -123,9 +186,14 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
       case HAL_DOUBLE:
         ProcessHalCallback({{valueData->key, value->data.v_double}});
         break;
-      case HAL_ENUM:
-        ProcessHalCallback({{valueData->key, value->data.v_enum}});
+      case HAL_ENUM: {
+        int v = value->data.v_enum;
+        if (v >= 0 && v < static_cast<int>(valueData->optionValues.size()))
+          ProcessHalCallback({{valueData->key, valueData->optionValues[v]}});
+        else if (v >= 0 && v < static_cast<int>(valueData->options.size()))
+          ProcessHalCallback({{valueData->key, valueData->options[v]}});
         break;
+      }
       case HAL_INT:
         ProcessHalCallback({{valueData->key, value->data.v_int}});
         break;
@@ -142,7 +210,7 @@ void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
   auto ws = m_ws.lock();
   if (ws) {
     wpi::json netValue = {
-        {"type", "SimDevices"}, {"device", m_deviceId}, {"data", payload}};
+        {"type", m_type}, {"device", m_deviceId}, {"data", payload}};
     ws->OnSimValueChanged(netValue);
   }
 }
@@ -151,10 +219,19 @@ HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() { CancelCallbacks(); }
 
 void HALSimWSProviderSimDevices::DeviceCreatedCallback(
     const char* name, HAL_SimDeviceHandle handle) {
-  auto key = (wpi::Twine("SimDevices/") + name).str();
-  auto dev = std::make_shared<HALSimWSProviderSimDevice>(
-      handle, key, wpi::Twine(name).str());
-  m_providers.Add(key, dev);
+  // Map "Accel:Foo" -> type=Accel, device=Foo
+  auto [type, id] = wpi::StringRef{name}.split(':');
+  std::shared_ptr<HALSimWSProviderSimDevice> dev;
+  if (id.empty()) {
+    auto key = ("SimDevice/" + type).str();
+    dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key, "SimDevice",
+                                                      type);
+    m_providers.Add(key, dev);
+  } else {
+    auto key = (type + "/" + id).str();
+    dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key, type, id);
+    m_providers.Add(key, dev);
+  }
 
   if (m_ws) {
     m_exec->Call([this, dev]() { dev->OnNetworkConnected(GetWSConnection()); });

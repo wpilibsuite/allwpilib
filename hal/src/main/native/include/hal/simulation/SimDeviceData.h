@@ -15,7 +15,7 @@ typedef void (*HALSIM_SimDeviceCallback)(const char* name, void* param,
 
 typedef void (*HALSIM_SimValueCallback)(const char* name, void* param,
                                         HAL_SimValueHandle handle,
-                                        HAL_Bool readonly,
+                                        int32_t direction,
                                         const struct HAL_Value* value);
 
 #ifdef __cplusplus
@@ -68,6 +68,9 @@ void HALSIM_EnumerateSimValues(HAL_SimDeviceHandle device, void* param,
 
 const char** HALSIM_GetSimValueEnumOptions(HAL_SimValueHandle handle,
                                            int32_t* numOptions);
+
+const double* HALSIM_GetSimValueEnumDoubleValues(HAL_SimValueHandle handle,
+                                                 int32_t* numOptions);
 
 void HALSIM_ResetSimDeviceData(void);
 

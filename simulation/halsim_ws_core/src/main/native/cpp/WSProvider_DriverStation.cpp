@@ -92,7 +92,7 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
       },
       this, true);
 
-  m_matchTimeCbKey = REGISTER(MatchTime, "<match_time", double, double);
+  m_matchTimeCbKey = REGISTER(MatchTime, ">match_time", double, double);
 }
 
 void HALSimWSProviderDriverStation::CancelCallbacks() { DoCancelCallbacks(); }
@@ -158,6 +158,14 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
     } else if (station == "blue3") {
       HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kBlue3);
     }
+  }
+
+  if ((it = json.find(">match_time")) != json.end()) {
+    HALSIM_SetDriverStationMatchTime(it.value());
+  }
+  if ((it = json.find(">game_data")) != json.end()) {
+    HALSIM_SetGameSpecificMessage(
+        it.value().get_ref<const std::string&>().c_str());
   }
 
   // Only notify usercode if we get the new data message

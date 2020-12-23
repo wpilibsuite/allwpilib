@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
@@ -27,14 +28,17 @@ struct SimDeviceValueData {
   HALSimWSProviderSimDevice* device;
   HAL_SimValueHandle handle;
   std::string key;
+  std::vector<std::string> options;
+  std::vector<double> optionValues;
   HAL_Type valueType;
 };
 
 class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
  public:
   HALSimWSProviderSimDevice(HAL_SimDeviceHandle handle, const std::string& key,
+                            const std::string& type,
                             const std::string& deviceId)
-      : HALSimWSBaseProvider(key, "SimDevices"), m_handle(handle) {
+      : HALSimWSBaseProvider(key, type), m_handle(handle) {
     m_deviceId = deviceId;
   }
 
@@ -51,20 +55,14 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
 
  private:
   static void OnValueCreatedStatic(const char* name, void* param,
-                                   HAL_SimValueHandle handle, HAL_Bool readonly,
-                                   const struct HAL_Value* value) {
-    (reinterpret_cast<HALSimWSProviderSimDevice*>(param))
-        ->OnValueCreated(name, handle, readonly, value);
-  }
+                                   HAL_SimValueHandle handle, int32_t direction,
+                                   const struct HAL_Value* value);
   void OnValueCreated(const char* name, HAL_SimValueHandle handle,
-                      HAL_Bool readonly, const struct HAL_Value* value);
+                      int32_t direction, const struct HAL_Value* value);
 
   static void OnValueChangedStatic(const char* name, void* param,
-                                   HAL_SimValueHandle handle, HAL_Bool readonly,
-                                   const struct HAL_Value* value) {
-    auto valueData = (reinterpret_cast<SimDeviceValueData*>(param));
-    valueData->device->OnValueChanged(valueData, value);
-  }
+                                   HAL_SimValueHandle handle, int32_t direction,
+                                   const struct HAL_Value* value);
   void OnValueChanged(SimDeviceValueData* valueData,
                       const struct HAL_Value* value);
 

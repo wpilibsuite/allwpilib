@@ -69,25 +69,25 @@ Java_edu_wpi_first_hal_SimDeviceJNI_freeSimDevice
 /*
  * Class:     edu_wpi_first_hal_SimDeviceJNI
  * Method:    createSimValueNative
- * Signature: (ILjava/lang/String;ZIJD)I
+ * Signature: (ILjava/lang/String;IIJD)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueNative
-  (JNIEnv* env, jclass, jint device, jstring name, jboolean readonly, jint type,
+  (JNIEnv* env, jclass, jint device, jstring name, jint direction, jint type,
    jlong value1, jdouble value2)
 {
-  return HAL_CreateSimValue(device, JStringRef{env, name}.c_str(), readonly,
+  return HAL_CreateSimValue(device, JStringRef{env, name}.c_str(), direction,
                             ValueFromJava(type, value1, value2));
 }
 
 /*
  * Class:     edu_wpi_first_hal_SimDeviceJNI
  * Method:    createSimValueEnum
- * Signature: (ILjava/lang/String;Z[Ljava/lang/Object;I)I
+ * Signature: (ILjava/lang/String;I[Ljava/lang/Object;I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnum
-  (JNIEnv* env, jclass, jint device, jstring name, jboolean readonly,
+  (JNIEnv* env, jclass, jint device, jstring name, jint direction,
    jobjectArray options, jint initialValue)
 {
   size_t len = env->GetArrayLength(options);
@@ -101,8 +101,37 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnum
   }
   wpi::SmallVector<const char*, 8> carr;
   for (auto&& val : arr) carr.push_back(val.c_str());
-  return HAL_CreateSimValueEnum(device, JStringRef{env, name}.c_str(), readonly,
-                                len, carr.data(), initialValue);
+  return HAL_CreateSimValueEnum(device, JStringRef{env, name}.c_str(),
+                                direction, len, carr.data(), initialValue);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_SimDeviceJNI
+ * Method:    createSimValueEnumDouble
+ * Signature: (ILjava/lang/String;I[Ljava/lang/Object;[DI)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnumDouble
+  (JNIEnv* env, jclass, jint device, jstring name, jint direction,
+   jobjectArray options, jdoubleArray optionValues, jint initialValue)
+{
+  size_t len = env->GetArrayLength(options);
+  size_t len2 = env->GetArrayLength(optionValues);
+  if (len != len2) return 0;
+  std::vector<std::string> arr;
+  arr.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(options, i))};
+    if (!elem) return 0;
+    arr.push_back(JStringRef{env, elem}.str());
+  }
+
+  wpi::SmallVector<const char*, 8> carr;
+  for (auto&& val : arr) carr.push_back(val.c_str());
+  return HAL_CreateSimValueEnumDouble(
+      device, JStringRef{env, name}.c_str(), direction, len, carr.data(),
+      JDoubleArrayRef{env, optionValues}.array().data(), initialValue);
 }
 
 /*

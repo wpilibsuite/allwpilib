@@ -74,6 +74,12 @@ const char** HALSIM_GetSimValueEnumOptions(HAL_SimValueHandle handle,
   return nullptr;
 }
 
+const double* HALSIM_GetSimValueEnumDoubleValues(HAL_SimValueHandle handle,
+                                                 int32_t* numOptions) {
+  *numOptions = 0;
+  return nullptr;
+}
+
 void HALSIM_ResetSimDeviceData(void) {}
 
 }  // extern "C"
