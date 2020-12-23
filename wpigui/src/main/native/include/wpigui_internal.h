@@ -57,6 +57,8 @@ struct Context : public SavedSettings {
   int fontScale = 2;  // updated by main loop
   std::vector<Font> fonts;
 
+  std::vector<GLFWimage> icons;
+
   std::string iniPath = "imgui.ini";
 };
 

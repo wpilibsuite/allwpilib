@@ -208,6 +208,14 @@ bool gui::Initialize(const char* title, int width, int height) {
   glfwSetWindowMaximizeCallback(gContext->window, WindowMaximizeCallback);
   glfwSetWindowPosCallback(gContext->window, WindowPosCallback);
 
+  // Set icons
+  if (!gContext->icons.empty()) {
+    glfwSetWindowIcon(gContext->window, gContext->icons.size(),
+                      gContext->icons.data());
+    for (auto&& icon : gContext->icons) stbi_image_free(icon.pixels);
+    gContext->icons.clear();
+  }
+
   // Setup Dear ImGui style
   SetStyle(static_cast<Style>(gContext->style));
 
@@ -303,6 +311,16 @@ void gui::AddLateExecute(std::function<void()> execute) {
 }
 
 GLFWwindow* gui::GetSystemWindow() { return gContext->window; }
+
+bool gui::AddIcon(const unsigned char* data, int len) {
+  // Load from memory
+  GLFWimage image;
+  image.pixels =
+      stbi_load_from_memory(data, len, &image.width, &image.height, nullptr, 4);
+  if (!data) return false;
+  gContext->icons.emplace_back(std::move(image));
+  return true;
+}
 
 int gui::AddFont(
     const char* name,
