@@ -461,6 +461,13 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
   } else {
     ImGui::Text("%s", name);
   }
+  if (ImGui::BeginPopupContextItem(entry.name.c_str())) {
+    ImGui::Text("%s", entry.name.c_str());
+    if (ImGui::Selectable("Remove")) {
+      nt::DeleteEntry(entry.entry);
+    }
+    ImGui::EndPopup();
+  }
   ImGui::NextColumn();
 
   if (flags & NetworkTablesFlags_ReadOnly)
