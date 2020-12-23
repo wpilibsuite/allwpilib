@@ -1,0 +1,49 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
+
+#include <string>
+
+#include <ntcore_cpp.h>
+#include <wpi/StringRef.h>
+
+#include "glass/DataSource.h"
+#include "glass/networktables/NetworkTablesHelper.h"
+#include "glass/other/Subsystem.h"
+
+namespace glass {
+class NTSubsystemModel : public SubsystemModel {
+ public:
+  static constexpr const char* kType = "Subsystem";
+
+  explicit NTSubsystemModel(wpi::StringRef path);
+  NTSubsystemModel(NT_Inst instance, wpi::StringRef path);
+
+  const char* GetName() const override { return m_nameValue.c_str(); }
+  const char* GetDefaultCommand() const override {
+    return m_defaultCommandValue.c_str();
+  }
+  const char* GetCurrentCommand() const override {
+    return m_currentCommandValue.c_str();
+  }
+
+  void Update() override;
+  bool Exists() override;
+  bool IsReadOnly() override { return true; }
+
+ private:
+  NetworkTablesHelper m_nt;
+  NT_Entry m_name;
+  NT_Entry m_defaultCommand;
+  NT_Entry m_currentCommand;
+
+  std::string m_nameValue;
+  std::string m_defaultCommandValue;
+  std::string m_currentCommandValue;
+};
+}  // namespace glass
