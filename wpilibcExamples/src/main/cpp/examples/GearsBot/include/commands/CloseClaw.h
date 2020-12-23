@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,8 +13,7 @@
 #include "subsystems/Claw.h"
 
 /**
- * Opens the claw for one second. Real robots should use sensors, stalling
- * motors is BAD!
+ * Closes the claw until the limit switch is tripped.
  */
 class CloseClaw : public frc2::CommandHelper<frc2::CommandBase, CloseClaw> {
  public:
