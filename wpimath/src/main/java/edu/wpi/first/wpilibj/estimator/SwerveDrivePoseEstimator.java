@@ -60,6 +60,8 @@ public class SwerveDrivePoseEstimator {
   private Rotation2d m_gyroOffset;
   private Rotation2d m_previousAngle;
 
+  private Matrix<N3, N3> m_visionDiscreteR;
+
   /**
    * Constructs a SwerveDrivePoseEstimator.
    *
@@ -67,11 +69,17 @@ public class SwerveDrivePoseEstimator {
    * @param initialPoseMeters        The starting pose estimate.
    * @param kinematics               A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states. Increase these numbers to
-   *                                 trust your wheel and gyro velocities less.
-   * @param localMeasurementStdDevs  Standard deviations of the gyro measurement. Increase this
-   *                                 number to trust gyro angle measurements less.
+   *                                 trust your model's state estimates less. This matrix
+   *                                 is in the form [x, y, theta]^T, with units in
+   *                                 meters and radians.
+   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro measurements.
+   *                                 Increase these numbers to trust sensor readings from encoders
+   *                                 and gyros less. This matrix is in the form
+   *                                 [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
-   *                                 these numbers to trust vision less.
+   *                                 these numbers to trust global measurements from vision less.
+   *                                 This matrix is in the form [x, y, theta]^T, with units in
+   *                                 meters and radians.
    */
   public SwerveDrivePoseEstimator(
           Rotation2d gyroAngle, Pose2d initialPoseMeters, SwerveDriveKinematics kinematics,
@@ -89,11 +97,17 @@ public class SwerveDrivePoseEstimator {
    * @param initialPoseMeters        The starting pose estimate.
    * @param kinematics               A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states. Increase these numbers to
-   *                                 trust your wheel and gyro velocities less.
-   * @param localMeasurementStdDevs  Standard deviations of the gyro measurement. Increase this
-   *                                 number to trust gyro angle measurements less.
+   *                                 trust your model's state estimates less. This matrix
+   *                                 is in the form [x, y, theta]^T, with units in
+   *                                 meters and radians.
+   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro measurements.
+   *                                 Increase these numbers to trust sensor readings from encoders
+   *                                 and gyros less. This matrix is in the form
+   *                                 [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
-   *                                 these numbers to trust vision less.
+   *                                 these numbers to trust global measurements from vision less.
+   *                                 This matrix is in the form [x, y, theta]^T, with units in
+   *                                 meters and radians.
    * @param nominalDtSeconds         The time in seconds between each robot loop.
    */
   @SuppressWarnings("ParameterName")
@@ -120,13 +134,13 @@ public class SwerveDrivePoseEstimator {
     m_kinematics = kinematics;
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
 
-    var visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
-    var visionDiscR = Discretization.discretizeR(visionContR, m_nominalDt);
+    // Initialize vision R
+    setVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
     m_visionCorrect = (u, y) -> m_observer.correct(
         Nat.N3(), u, y,
         (x, u_) -> x,
-        visionDiscR,
+        m_visionDiscreteR,
         AngleStatistics.angleMean(2),
         AngleStatistics.angleResidual(2),
         AngleStatistics.angleResidual(2),
@@ -136,6 +150,21 @@ public class SwerveDrivePoseEstimator {
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
     m_observer.setXhat(StateSpaceUtil.poseTo3dVector(initialPoseMeters));
+  }
+
+  /**
+   * Sets the pose estimator's trust of global measurements. This might be used to change trust
+   * in vision measurements after the autonomous period, or to change trust as distance to a
+   * vision target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
+   *                                 these numbers to trust global measurements from vision less.
+   *                                 This matrix is in the form [x, y, theta]^T, with units in
+   *                                 meters and radians.
+   */
+  public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
+    var visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
+    m_visionDiscreteR = Discretization.discretizeR(visionContR, m_nominalDt);
   }
 
   /**
