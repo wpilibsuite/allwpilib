@@ -14,6 +14,7 @@ model {
                         // We are now in the binary that we want.
                         // This is the default application path for the ZIP task.
                         def applicationPath = binary.executable.file
+                        def icon = file("$project.projectDir/src/app/native/mac/glass.icns")
 
                         // Create the macOS bundle.
                         def bundleTask = project.tasks.create("bundleGlassOsxApp", Copy) {
@@ -21,6 +22,7 @@ model {
                             from(file("$project.projectDir/Info.plist"))
                             into(file("$project.buildDir/outputs/bundles/Glass.app/Contents"))
                             into("MacOS") { with copySpec { from binary.executable.file } }
+                            into("Resources") { with copySpec { from icon } }
 
                             doLast {
                                 if (project.hasProperty("developerID")) {

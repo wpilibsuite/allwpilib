@@ -23,6 +23,16 @@
 
 namespace gui = wpi::gui;
 
+namespace glass {
+wpi::StringRef GetResource_glass_16_png();
+wpi::StringRef GetResource_glass_32_png();
+wpi::StringRef GetResource_glass_48_png();
+wpi::StringRef GetResource_glass_64_png();
+wpi::StringRef GetResource_glass_128_png();
+wpi::StringRef GetResource_glass_256_png();
+wpi::StringRef GetResource_glass_512_png();
+}  // namespace glass
+
 static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 static std::unique_ptr<glass::NetworkTablesProvider> gNtProvider;
 
@@ -87,6 +97,14 @@ int main() {
 #endif
   gui::CreateContext();
   glass::CreateContext();
+
+  gui::AddIcon(glass::GetResource_glass_16_png());
+  gui::AddIcon(glass::GetResource_glass_32_png());
+  gui::AddIcon(glass::GetResource_glass_48_png());
+  gui::AddIcon(glass::GetResource_glass_64_png());
+  gui::AddIcon(glass::GetResource_glass_128_png());
+  gui::AddIcon(glass::GetResource_glass_256_png());
+  gui::AddIcon(glass::GetResource_glass_512_png());
 
   gPlotProvider = std::make_unique<glass::PlotProvider>("Plot");
   gNtProvider = std::make_unique<glass::NetworkTablesProvider>("NTProvider");
