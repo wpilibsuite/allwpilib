@@ -1201,7 +1201,8 @@ static void DisplayJoysticks() {
         }
         joy.sys = payload_sys;
         joy.guid.clear();
-        joy.useGamepad = false;
+        wpi::StringRef name{payload_sys->GetName()};
+        joy.useGamepad = name.startswith("Xbox") || name.contains("pad");
       }
       ImGui::EndDragDropTarget();
     }
