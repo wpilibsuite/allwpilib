@@ -19,12 +19,14 @@ Field2d::Field2d() {
   SendableRegistry::GetInstance().Add(this, "Field");
 }
 
-Field2d::Field2d(Field2d&& rhs) {
+Field2d::Field2d(Field2d&& rhs) : SendableHelper(std::move(rhs)) {
   std::swap(m_table, rhs.m_table);
   std::swap(m_objects, rhs.m_objects);
 }
 
 Field2d& Field2d::operator=(Field2d&& rhs) {
+  SendableHelper::operator=(std::move(rhs));
+
   std::swap(m_table, rhs.m_table);
   std::swap(m_objects, rhs.m_objects);
 
