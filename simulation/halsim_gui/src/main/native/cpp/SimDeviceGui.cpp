@@ -156,6 +156,7 @@ void SimDeviceGui::Initialize() {
         return glass::MakeFunctionView(
             [=] { static_cast<glass::DeviceTreeModel*>(model)->Display(); });
       });
+  HALSimGui::halProvider.ShowDefault("Other Devices");
 
   auto model = std::make_unique<SimDevicesModel>();
   gSimDevicesModel = model.get();
