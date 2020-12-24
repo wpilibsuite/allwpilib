@@ -104,8 +104,8 @@ class AnalogGyro : public GyroBase {
 
   ~AnalogGyro() override;
 
-  AnalogGyro(AnalogGyro&& rhs);
-  AnalogGyro& operator=(AnalogGyro&& rhs);
+  AnalogGyro(AnalogGyro&& rhs) = default;
+  AnalogGyro& operator=(AnalogGyro&& rhs) = default;
 
   /**
    * Return the actual angle in degrees that the robot is currently facing.
