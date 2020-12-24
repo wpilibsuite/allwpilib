@@ -52,8 +52,7 @@ void DriveSubsystem::SimulationPeriodic() {
       m_drivetrainSimulator.GetRightPosition().to<double>());
   m_rightEncoderSim.SetRate(
       m_drivetrainSimulator.GetRightVelocity().to<double>());
-  m_gyroAngleSim.SetAngle(
-      -m_drivetrainSimulator.GetHeading().Degrees().to<double>());
+  m_gyroSim.SetAngle(-m_drivetrainSimulator.GetHeading().Degrees());
 }
 
 units::ampere_t DriveSubsystem::GetCurrentDraw() const {

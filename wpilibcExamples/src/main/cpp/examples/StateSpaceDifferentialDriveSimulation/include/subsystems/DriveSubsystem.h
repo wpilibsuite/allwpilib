@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include <frc/AnalogGyro.h>
+#include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
-#include <frc/simulation/AnalogGyroSim.h>
+#include <frc/simulation/ADXRS450_GyroSim.h>
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/smartdashboard/Field2d.h>
@@ -154,7 +154,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
                               DriveConstants::kRightEncoderPorts[1]};
 
   // The gyro sensor
-  frc::AnalogGyro m_gyro{0};
+  frc::ADXRS450_Gyro m_gyro;
 
   // Odometry class for tracking robot pose
   frc::DifferentialDriveOdometry m_odometry{m_gyro.GetRotation2d()};
@@ -170,7 +170,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   frc::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
   frc::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
-  frc::sim::AnalogGyroSim m_gyroAngleSim{m_gyro};
+  frc::sim::ADXRS450_GyroSim m_gyroSim{m_gyro};
 
   // The Field2d class shows the field in the sim GUI.
   frc::Field2d m_fieldSim;
