@@ -41,6 +41,7 @@ public class Field2d implements Sendable {
     FieldObject2d obj = new FieldObject2d("Robot");
     obj.setPose(new Pose2d());
     m_objects.add(obj);
+    SendableRegistry.add(this, "Field");
   }
 
   /**
