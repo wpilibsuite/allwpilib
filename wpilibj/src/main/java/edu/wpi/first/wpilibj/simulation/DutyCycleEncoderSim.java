@@ -23,9 +23,10 @@ public class DutyCycleEncoderSim {
    * @param encoder DutyCycleEncoder to simulate
    */
   public DutyCycleEncoderSim(DutyCycleEncoder encoder) {
-    SimDeviceSim wrappedSimDevice = new SimDeviceSim("DutyCycleEncoder" + "[" + encoder.getFPGAIndex() + "]");
-    m_simPosition = wrappedSimDevice.getDouble("Position");
-    m_simDistancePerRotation = wrappedSimDevice.getDouble("DistancePerRotation");
+    SimDeviceSim wrappedSimDevice = new SimDeviceSim("DutyCycle:DutyCycleEncoder" + "["
+        + encoder.getSourceChannel() + "]");
+    m_simPosition = wrappedSimDevice.getDouble("position");
+    m_simDistancePerRotation = wrappedSimDevice.getDouble("distance_per_rot");
   }
 
   /**

@@ -72,8 +72,8 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     m_simDevice = SimDevice.create("Gyro:ADXRS450", port.value);
     if (m_simDevice != null) {
       m_simConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
-      m_simAngle = m_simDevice.createDouble("angle", SimDevice.Direction.kInput, 0.0);
-      m_simRate = m_simDevice.createDouble("rate", SimDevice.Direction.kInput, 0.0);
+      m_simAngle = m_simDevice.createDouble("angle_x", SimDevice.Direction.kInput, 0.0);
+      m_simRate = m_simDevice.createDouble("rate_x", SimDevice.Direction.kInput, 0.0);
     }
 
     m_spi.setClockRate(3000000);
