@@ -9,6 +9,20 @@
 
 using namespace frc;
 
+FieldObject2d::FieldObject2d(FieldObject2d&& rhs) {
+  std::swap(m_name, rhs.m_name);
+  std::swap(m_entry, rhs.m_entry);
+  std::swap(m_poses, rhs.m_poses);
+}
+
+FieldObject2d& FieldObject2d::operator=(FieldObject2d&& rhs) {
+  std::swap(m_name, rhs.m_name);
+  std::swap(m_entry, rhs.m_entry);
+  std::swap(m_poses, rhs.m_poses);
+
+  return *this;
+}
+
 void FieldObject2d::SetPose(const Pose2d& pose) {
   SetPoses(wpi::makeArrayRef(pose));
 }

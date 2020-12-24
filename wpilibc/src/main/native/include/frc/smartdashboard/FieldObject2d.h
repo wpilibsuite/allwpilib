@@ -36,6 +36,9 @@ class FieldObject2d {
   FieldObject2d(std::string&& name, const private_init&)
       : m_name{std::move(name)} {}
 
+  FieldObject2d(FieldObject2d&& rhs);
+  FieldObject2d& operator=(FieldObject2d&& rhs);
+
   /**
    * Set the pose from a Pose object.
    *

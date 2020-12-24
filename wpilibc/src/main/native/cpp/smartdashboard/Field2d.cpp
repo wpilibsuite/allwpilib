@@ -17,6 +17,18 @@ Field2d::Field2d() {
   m_objects[0]->SetPose(Pose2d{});
 }
 
+Field2d::Field2d(Field2d&& rhs) {
+  std::swap(m_table, rhs.m_table);
+  std::swap(m_objects, rhs.m_objects);
+}
+
+Field2d& Field2d::operator=(Field2d&& rhs) {
+  std::swap(m_table, rhs.m_table);
+  std::swap(m_objects, rhs.m_objects);
+
+  return *this;
+}
+
 void Field2d::SetRobotPose(const Pose2d& pose) {
   std::scoped_lock lock(m_mutex);
   m_objects[0]->SetPose(pose);

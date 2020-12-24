@@ -47,6 +47,9 @@ class Field2d : public Sendable {
 
   Field2d();
 
+  Field2d(Field2d&& rhs);
+  Field2d& operator=(Field2d&& rhs);
+
   /**
    * Set the robot pose from a Pose object.
    *
