@@ -84,13 +84,14 @@ class UnscentedKalmanFilter {
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param meanFuncX          A function that computes the mean of 2 * States +
-   * 1 state vectors using a given set of weights.
+   *                           1 state vectors using a given set of weights.
    * @param meanFuncY          A function that computes the mean of 2 * States +
-   * 1 measurement vectors using a given set of weights.
+   *                           1 measurement vectors using a given set of
+   *                           weights.
    * @param residualFuncX      A function that computes the residual of two
-   * state vectors (i.e. it subtracts them.)
+   *                           state vectors (i.e. it subtracts them.)
    * @param residualFuncY      A function that computes the residual of two
-   * measurement vectors (i.e. it subtracts them.)
+   *                           measurement vectors (i.e. it subtracts them.)
    * @param addFuncX           A function that adds two state vectors.
    * @param dt                 Nominal discretization timestep.
    */
@@ -250,9 +251,55 @@ class UnscentedKalmanFilter {
    *
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
-   * @param h A vector-valued function of x and u that returns
-   *          the measurement vector.
+   * @param h A vector-valued function of x and u that returns the measurement
+   *          vector.
    * @param R Measurement noise covariance matrix.
+   */
+  template <int Rows>
+  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
+               const Eigen::Matrix<double, Rows, 1>& y,
+               std::function<Eigen::Matrix<double, Rows, 1>(
+                   const Eigen::Matrix<double, States, 1>&,
+                   const Eigen::Matrix<double, Inputs, 1>&)>
+                   h,
+               const Eigen::Matrix<double, Rows, Rows>& R) {
+    auto meanFuncY = [](auto sigmas,
+                        auto Wc) -> Eigen::Matrix<double, Rows, 1> {
+      return sigmas * Wc;
+    };
+    auto residualFuncX = [](auto a,
+                            auto b) -> Eigen::Matrix<double, States, 1> {
+      return a - b;
+    };
+    auto residualFuncY = [](auto a, auto b) -> Eigen::Matrix<double, Rows, 1> {
+      return a - b;
+    };
+    auto addFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
+      return a + b;
+    };
+    Correct<Rows>(u, y, h, R, meanFuncY, residualFuncY, residualFuncX,
+                  addFuncX);
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * This is useful for when the measurements available during a timestep's
+   * Correct() call vary. The h(x, u) passed to the constructor is used if one
+   * is not provided (the two-argument version of this function).
+   *
+   * @param u             Same control input used in the predict step.
+   * @param y             Measurement vector.
+   * @param h             A vector-valued function of x and u that returns the
+   *                      measurement vector.
+   * @param R             Measurement noise covariance matrix.
+   * @param meanFuncY     A function that computes the mean of 2 * States + 1
+   *                      measurement vectors using a given set of weights.
+   * @param residualFuncX A function that computes the residual of two state
+   *                      vectors (i.e. it subtracts them.)
+   * @param residualFuncY A function that computes the residual of two
+   *                      measurement vectors (i.e. it subtracts them.)
+   * @param addFuncX      A function that adds two state vectors.
    */
   template <int Rows>
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,

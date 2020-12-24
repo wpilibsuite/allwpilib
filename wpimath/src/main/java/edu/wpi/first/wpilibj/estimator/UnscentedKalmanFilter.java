@@ -329,9 +329,43 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
    *
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
-   * @param h A vector-valued function of x and u that returns
-   *          the measurement vector.
+   * @param h A vector-valued function of x and u that returns the measurement vector.
    * @param R Measurement noise covariance matrix.
+   */
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
+  public <R extends Num> void correct(
+        Nat<R> rows, Matrix<Inputs, N1> u,
+        Matrix<R, N1> y,
+        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<R, N1>> h,
+        Matrix<R, R> R) {
+    BiFunction<Matrix<R, ?>, Matrix<?, N1>, Matrix<R, N1>> meanFuncY =
+        (sigmas, Wm) -> sigmas.times(Matrix.changeBoundsUnchecked(Wm));
+    BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX =
+        Matrix::minus;
+    BiFunction<Matrix<R, N1>, Matrix<R, N1>, Matrix<R, N1>> residualFuncY = Matrix::minus;
+    BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX = Matrix::plus;
+    correct(rows, u, y, h, R, meanFuncY, residualFuncY, residualFuncX, addFuncX);
+  }
+
+  /**
+   * Correct the state estimate x-hat using the measurements in y.
+   *
+   * <p>This is useful for when the measurements available during a timestep's
+   * Correct() call vary. The h(x, u) passed to the constructor is used if one
+   * is not provided (the two-argument version of this function).
+   *
+   * @param u             Same control input used in the predict step.
+   * @param y             Measurement vector.
+   * @param h             A vector-valued function of x and u that returns the
+   *                      measurement vector.
+   * @param R             Measurement noise covariance matrix.
+   * @param meanFuncY     A function that computes the mean of 2 * States + 1 measurement vectors
+   *                      using a given set of weights.
+   * @param residualFuncX A function that computes the residual of two state vectors (i.e. it
+   *                      subtracts them.)
+   * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
+   *                      subtracts them.)
+   * @param addFuncX      A function that adds two state vectors.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
