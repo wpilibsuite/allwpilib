@@ -506,6 +506,19 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
     if (!node.children.empty()) {
       bool open =
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+      if (ImGui::BeginPopupContextItem()) {
+        ImGui::Text("%s", node.path.c_str());
+        ImGui::Separator();
+
+        ImGui::Separator();
+        if (ImGui::Selectable("Remove All")) {
+          for (auto&& entry :
+               nt::GetEntries(nt::GetDefaultInstance(), node.path, 0)) {
+            nt::DeleteEntry(entry);
+          }
+        }
+        ImGui::EndPopup();
+      }
       ImGui::NextColumn();
       ImGui::NextColumn();
       if (flags & NetworkTablesFlags_ShowFlags) ImGui::NextColumn();
