@@ -463,6 +463,7 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
   }
   if (ImGui::BeginPopupContextItem(entry.name.c_str())) {
     ImGui::Text("%s", entry.name.c_str());
+    ImGui::Separator();
     if (ImGui::Selectable("Remove")) {
       nt::DeleteEntry(entry.entry);
     }
