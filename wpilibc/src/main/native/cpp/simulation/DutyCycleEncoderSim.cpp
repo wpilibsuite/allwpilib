@@ -18,10 +18,11 @@ using namespace frc::sim;
 DutyCycleEncoderSim::DutyCycleEncoderSim(const frc::DutyCycleEncoder& encoder) {
   wpi::SmallString<128> fullname;
   wpi::raw_svector_ostream os(fullname);
-  os << "DutyCycleEncoder" << '[' << encoder.GetFPGAIndex() << ']';
+  os << "DutyCycle:DutyCycleEncoder" << '[' << encoder.GetSourceChannel()
+     << ']';
   frc::sim::SimDeviceSim deviceSim{fullname.c_str()};
-  m_simPosition = deviceSim.GetDouble("Position");
-  m_simDistancePerRotation = deviceSim.GetDouble("DistancePerRotation");
+  m_simPosition = deviceSim.GetDouble("position");
+  m_simDistancePerRotation = deviceSim.GetDouble("distance_per_rot");
 }
 
 void DutyCycleEncoderSim::Set(units::turn_t turns) {

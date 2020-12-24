@@ -24,9 +24,9 @@ public class ADXRS450_GyroSim {
    * @param gyro ADXRS450_Gyro to simulate
    */
   public ADXRS450_GyroSim(ADXRS450_Gyro gyro) {
-    SimDeviceSim wrappedSimDevice = new SimDeviceSim("ADXRS450_Gyro" + "[" + gyro.getPort() + "]");
-    m_simAngle = wrappedSimDevice.getDouble("Angle");
-    m_simRate = wrappedSimDevice.getDouble("Rate");
+    SimDeviceSim wrappedSimDevice = new SimDeviceSim("Gyro:ADXRS450" + "[" + gyro.getPort() + "]");
+    m_simAngle = wrappedSimDevice.getDouble("angle_x");
+    m_simRate = wrappedSimDevice.getDouble("rate_x");
   }
 
   /**

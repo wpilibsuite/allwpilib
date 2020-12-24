@@ -60,6 +60,8 @@ void DutyCycleEncoder::Init() {
   if (m_simDevice) {
     m_simPosition =
         m_simDevice.CreateDouble("position", hal::SimDevice::kInput, 0.0);
+    m_simDistancePerRotation = m_simDevice.CreateDouble(
+        "distance_per_rot", hal::SimDevice::kOutput, 1.0);
     m_simIsConnected =
         m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
   } else {
@@ -101,6 +103,7 @@ units::turn_t DutyCycleEncoder::Get() const {
 
 void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
   m_distancePerRotation = distancePerRotation;
+  m_simDistancePerRotation.Set(distancePerRotation);
 }
 
 double DutyCycleEncoder::GetDistancePerRotation() const {

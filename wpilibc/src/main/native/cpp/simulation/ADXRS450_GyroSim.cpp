@@ -18,10 +18,10 @@ using namespace frc::sim;
 ADXRS450_GyroSim::ADXRS450_GyroSim(const frc::ADXRS450_Gyro& gyro) {
   wpi::SmallString<128> fullname;
   wpi::raw_svector_ostream os(fullname);
-  os << "ADXRS450_Gyro" << '[' << gyro.GetPort() << ']';
+  os << "Gyro:ADXRS450" << '[' << gyro.GetPort() << ']';
   frc::sim::SimDeviceSim deviceSim{fullname.c_str()};
-  m_simAngle = deviceSim.GetDouble("Angle");
-  m_simRate = deviceSim.GetDouble("Rate");
+  m_simAngle = deviceSim.GetDouble("angle_x");
+  m_simRate = deviceSim.GetDouble("rate_x");
 }
 
 void ADXRS450_GyroSim::SetAngle(units::degree_t angle) {
