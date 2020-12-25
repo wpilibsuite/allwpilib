@@ -30,10 +30,7 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
           frc::AngleMean<3, 5>(2), frc::AngleResidual<5>(2),
           frc::AngleResidual<3>(2), frc::AngleAdd<5>(2), nominalDt),
       m_nominalDt(nominalDt) {
-  // Create R (covariances) for vision measurements.
-  Eigen::Matrix<double, 3, 3> visionContR =
-      frc::MakeCovMatrix(visionMeasurmentStdDevs);
-  m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
+  SetVisionMeasurementStdDevs(visionMeasurmentStdDevs);
 
   // Create correction mechanism for vision measurements.
   m_visionCorrect = [&](const Eigen::Matrix<double, 3, 1>& u,
@@ -49,6 +46,14 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
   m_gyroOffset = initialPose.Rotation() - gyroAngle;
   m_previousAngle = initialPose.Rotation();
   m_observer.SetXhat(FillStateVector(initialPose, 0_m, 0_m));
+}
+
+void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
+    const std::array<double, 3>& visionMeasurmentStdDevs) {
+  // Create R (covariances) for vision measurements.
+  Eigen::Matrix<double, 3, 3> visionContR =
+      frc::MakeCovMatrix(visionMeasurmentStdDevs);
+  m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
 }
 
 void DifferentialDrivePoseEstimator::ResetPosition(

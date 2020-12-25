@@ -68,18 +68,25 @@ public class DifferentialDrivePoseEstimator {
   private Rotation2d m_gyroOffset;
   private Rotation2d m_previousAngle;
 
+  private Matrix<N3, N3> m_visionDiscreteR;
+
   /**
    * Constructs a DifferentialDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
    * @param initialPoseMeters        The starting pose estimate.
    * @param stateStdDevs             Standard deviations of model states. Increase these numbers to
-   *                                 trust your wheel and gyro velocities less.
+   *                                 trust your model's state estimates less. This matrix
+   *                                 is in the form [x, y, theta, dist_l, dist_r]^T, with units in
+   *                                 meters and radians.
    * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro measurements.
-   *                                 Increase these numbers to trust encoder distances and gyro
-   *                                 angle less.
+   *                                 Increase these numbers to trust sensor readings from encoders
+   *                                 and gyros less. This matrix is in the form
+   *                                 [dist_l, dist_r, theta]^T, with units in meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
-   *                                 these numbers to trust vision less.
+   *                                 these numbers to trust global measurements from vision less.
+   *                                 This matrix is in the form [x, y, theta]^T, with units in
+   *                                 meters and radians.
    */
   public DifferentialDrivePoseEstimator(
           Rotation2d gyroAngle, Pose2d initialPoseMeters,
@@ -96,12 +103,17 @@ public class DifferentialDrivePoseEstimator {
    * @param gyroAngle                The current gyro angle.
    * @param initialPoseMeters        The starting pose estimate.
    * @param stateStdDevs             Standard deviations of model states. Increase these numbers to
-   *                                 trust your wheel and gyro velocities less.
+   *                                 trust your model's state estimates less. This matrix
+   *                                 is in the form [x, y, theta, dist_l, dist_r]^T, with units in
+   *                                 meters and radians.
    * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro measurements.
-   *                                 Increase these numbers to trust encoder distances and gyro
-   *                                 angle less.
+   *                                 Increase these numbers to trust sensor readings from encoders
+   *                                 and gyros less. This matrix is in the form
+   *                                 [dist_l, dist_r, theta]^T, with units in meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
-   *                                 these numbers to trust vision less.
+   *                                 these numbers to trust global measurements from vision less.
+   *                                 This matrix is in the form [x, y, theta]^T, with units in
+   *                                 meters and radians.
    * @param nominalDtSeconds         The time in seconds between each robot loop.
    */
   @SuppressWarnings("ParameterName")
@@ -127,12 +139,13 @@ public class DifferentialDrivePoseEstimator {
     );
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
 
-    var visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
-    var visionDiscR = Discretization.discretizeR(visionContR, m_nominalDt);
+    // Initialize vision R
+    setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+
     m_visionCorrect = (u, y) -> m_observer.correct(
         Nat.N3(), u, y,
         (x, u_) -> new Matrix<>(x.getStorage().extractMatrix(0, 3, 0, 1)),
-        visionDiscR,
+        m_visionDiscreteR,
         AngleStatistics.angleMean(2),
         AngleStatistics.angleResidual(2),
         AngleStatistics.angleResidual(2),
@@ -142,6 +155,21 @@ public class DifferentialDrivePoseEstimator {
     m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
     m_observer.setXhat(fillStateVector(initialPoseMeters, 0.0, 0.0));
+  }
+
+  /**
+   * Sets the pose estimator's trust of global measurements. This might be used to change trust
+   * in vision measurements after the autonomous period, or to change trust as distance to a
+   * vision target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase
+   *                                 these numbers to trust global measurements from vision less.
+   *                                 This matrix is in the form [x, y, theta]^T, with units in
+   *                                 meters and radians.
+   */
+  public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
+    var visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
+    m_visionDiscreteR = Discretization.discretizeR(visionContR, m_nominalDt);
   }
 
   @SuppressWarnings({"ParameterName", "MethodName"})

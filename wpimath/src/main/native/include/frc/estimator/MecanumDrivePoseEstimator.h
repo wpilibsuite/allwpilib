@@ -54,13 +54,20 @@ class MecanumDrivePoseEstimator {
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
    *                                 Increase these numbers to trust your
-   *                                 wheel and gyro velocities less.
-   * @param localMeasurementStdDevs  Standard deviations of the gyro
-   *                                 measurement. Increase this number
-   *                                 to trust gyro angle measurements less.
-   * @param visionMeasurementStdDevs Standard deviations of the encoder
-   *                                 measurements. Increase these numbers
-   *                                 to trust vision less.
+   *                                 model's state estimates less. This matrix
+   *                                 is in the form [x, y, theta]^T, with units
+   *                                 in meters and radians.
+   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
+   *                                 measurements. Increase these numbers to
+   *                                 trust sensor readings from encoders
+   *                                 and gyros less. This matrix is in the form
+   *                                 [theta], with units in radians.
+   * @param visionMeasurementStdDevs Standard deviations of the vision
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from vision
+   *                                 less. This matrix is in the form
+   *                                 [x, y, theta]^T, with units in meters and
+   *                                 radians.
    * @param nominalDt                The time in seconds between each robot
    *                                 loop.
    */
@@ -71,6 +78,21 @@ class MecanumDrivePoseEstimator {
       const std::array<double, 1>& localMeasurementStdDevs,
       const std::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s);
+
+  /**
+   * Sets the pose estimator's trust of global measurements. This might be used
+   * to change trust in vision measurements after the autonomous period, or to
+   * change trust as distance to a vision target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from vision
+   *                                 less. This matrix is in the form
+   *                                 [x, y, theta]^T, with units in meters and
+   *                                 radians.
+   */
+  void SetVisionMeasurementStdDevs(
+      const std::array<double, 3>& visionMeasurementStdDevs);
 
   /**
    * Resets the robot's position on the field.

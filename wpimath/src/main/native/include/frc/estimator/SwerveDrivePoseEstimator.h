@@ -60,13 +60,20 @@ class SwerveDrivePoseEstimator {
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
    *                                 Increase these numbers to trust your
-   *                                 wheel and gyro velocities less.
-   * @param localMeasurementStdDevs  Standard deviations of the gyro
-   *                                 measurement. Increase this number to
-   *                                 trust gyro angle measurements less.
-   * @param visionMeasurementStdDevs Standard deviations of the encoder
+   *                                 model's state estimates less. This matrix
+   *                                 is in the form [x, y, theta]^T, with units
+   *                                 in meters and radians.
+   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
    *                                 measurements. Increase these numbers to
-   *                                 trust vision less.
+   *                                 trust sensor readings from encoders
+   *                                 and gyros less. This matrix is in the form
+   *                                 [theta], with units in radians.
+   * @param visionMeasurementStdDevs Standard deviations of the vision
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from vision
+   *                                 less. This matrix is in the form
+   *                                 [x, y, theta]^T, with units in meters and
+   *                                 radians.
    * @param nominalDt                The time in seconds between each robot
    *                                 loop.
    */
@@ -89,12 +96,7 @@ class SwerveDrivePoseEstimator {
                    frc::AngleAdd<3>(2), nominalDt),
         m_kinematics(kinematics),
         m_nominalDt(nominalDt) {
-    // Construct R (covariances) matrix for vision measurements.
-    Eigen::Matrix3d visionContR =
-        frc::MakeCovMatrix<3>(visionMeasurementStdDevs);
-
-    // Create and store discrete covariance matrix for vision measurements.
-    m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
+    SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
     // Create correction mechanism for vision measurements.
     m_visionCorrect = [&](const Eigen::Matrix<double, 3, 1>& u,
@@ -144,6 +146,26 @@ class SwerveDrivePoseEstimator {
   Pose2d GetEstimatedPosition() const {
     return Pose2d(m_observer.Xhat(0) * 1_m, m_observer.Xhat(1) * 1_m,
                   Rotation2d(units::radian_t{m_observer.Xhat(2)}));
+  }
+
+  /**
+   * Sets the pose estimator's trust of global measurements. This might be used
+   * to change trust in vision measurements after the autonomous period, or to
+   * change trust as distance to a vision target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from vision
+   *                                 less. This matrix is in the form
+   *                                 [x, y, theta]^T, with units in meters and
+   *                                 radians.
+   */
+  void SetVisionMeasurementStdDevs(
+      const std::array<double, 3>& visionMeasurementStdDevs) {
+    // Create R (covariances) for vision measurements.
+    Eigen::Matrix<double, 3, 3> visionContR =
+        frc::MakeCovMatrix(visionMeasurementStdDevs);
+    m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
   }
 
   /**

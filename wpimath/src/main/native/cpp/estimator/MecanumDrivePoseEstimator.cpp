@@ -32,11 +32,7 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
                  frc::AngleResidual<1>(0), frc::AngleAdd<3>(2), nominalDt),
       m_kinematics(kinematics),
       m_nominalDt(nominalDt) {
-  // Construct R (covariances) matrix for vision measurements.
-  Eigen::Matrix3d visionContR = frc::MakeCovMatrix<3>(visionMeasurementStdDevs);
-
-  // Create and store discrete covariance matrix for vision measurements.
-  m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
+  SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
   // Create vision correction mechanism.
   m_visionCorrect = [&](const Eigen::Matrix<double, 3, 1>& u,
@@ -55,6 +51,14 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
   // Calculate offsets.
   m_gyroOffset = initialPose.Rotation() - gyroAngle;
   m_previousAngle = initialPose.Rotation();
+}
+
+void frc::MecanumDrivePoseEstimator::SetVisionMeasurementStdDevs(
+    const std::array<double, 3>& visionMeasurmentStdDevs) {
+  // Create R (covariances) for vision measurements.
+  Eigen::Matrix<double, 3, 3> visionContR =
+      frc::MakeCovMatrix(visionMeasurmentStdDevs);
+  m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
 }
 
 void frc::MecanumDrivePoseEstimator::ResetPosition(

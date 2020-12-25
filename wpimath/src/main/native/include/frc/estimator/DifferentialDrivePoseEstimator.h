@@ -54,15 +54,25 @@ class DifferentialDrivePoseEstimator {
    *
    * @param gyroAngle                The gyro angle of the robot.
    * @param initialPose              The estimated initial pose.
-   * @param stateStdDevs             Standard deviations of the model states.
-   *                                 Increase these to trust your wheel speeds
-   *                                 less.
-   * @param localMeasurementStdDevs  Standard deviations of the encoder
-   *                                 measurements. Increase these to trust
-   *                                 encoder distances less.
+   * @param stateStdDevs             Standard deviations of model states.
+   *                                 Increase these numbers to trust your
+   *                                 model's state estimates less. This matrix
+   *                                 is in the form
+   *                                 [x, y, theta, dist_l, dist_r]^T,
+   *                                 with units in meters and radians.
+   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
+   *                                 measurements. Increase these numbers to
+   *                                 trust sensor readings from
+   *                                 encoders and gyros less.
+   *                                 This matrix is in the form
+   *                                 [dist_l, dist_r, theta]^T, with units in
+   *                                 meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
-   *                                 measurements. Increase these to trust
-   *                                 vision less.
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from
+   *                                 vision less. This matrix is in the form
+   *                                 [x, y, theta]^T, with units in meters and
+   *                                 radians.
    * @param nominalDt                The period of the loop calling Update().
    */
   DifferentialDrivePoseEstimator(
@@ -71,6 +81,21 @@ class DifferentialDrivePoseEstimator {
       const std::array<double, 3>& localMeasurementStdDevs,
       const std::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s);
+
+  /**
+   * Sets the pose estimator's trust of global measurements. This might be used
+   * to change trust in vision measurements after the autonomous period, or to
+   * change trust as distance to a vision target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from vision
+   *                                 less. This matrix is in the form
+   *                                 [x, y, theta]^T, with units in meters and
+   *                                 radians.
+   */
+  void SetVisionMeasurementStdDevs(
+      const std::array<double, 3>& visionMeasurementStdDevs);
 
   /**
    * Resets the robot's position on the field.
