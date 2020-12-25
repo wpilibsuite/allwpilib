@@ -173,6 +173,17 @@ class DifferentialDrivetrainSim {
   Eigen::Matrix<double, 7, 1> Dynamics(const Eigen::Matrix<double, 7, 1>& x,
                                        const Eigen::Matrix<double, 2, 1>& u);
 
+
+  /**
+   * Clamp the input vector such that no element exceeds the given voltage. If
+   * any does, the relative magnitudes of the input will be maintained.
+   *
+   * @param u          The input vector.
+   * @param maxVoltage The maximum voltage.
+   * @return The normalized input.
+   */
+  Eigen::Matrix<double, 2, 1> ClampInput(Eigen::Matrix<double, 2, 1> u, double maxVoltage);
+
   class State {
    public:
     static constexpr int kX = 0;

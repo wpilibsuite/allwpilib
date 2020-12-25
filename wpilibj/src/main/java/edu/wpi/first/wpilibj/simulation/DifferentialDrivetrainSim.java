@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
@@ -124,7 +125,7 @@ public class DifferentialDrivetrainSim {
    * @param rightVoltageVolts The right voltage.
    */
   public void setInputs(double leftVoltageVolts, double rightVoltageVolts) {
-    m_u = VecBuilder.fill(leftVoltageVolts, rightVoltageVolts);
+    m_u = clampInput(VecBuilder.fill(leftVoltageVolts, rightVoltageVolts));
   }
 
   @SuppressWarnings("LocalVariableName")
@@ -279,6 +280,17 @@ public class DifferentialDrivetrainSim {
         .plus(B.times(u)));
 
     return xdot;
+  }
+
+  /**
+   * Clamp the input vector such that no element exceeds the given voltage. If any does,
+   * the relative magnitudes of the input will be maintained.
+   *
+   * @param u          The input vector.
+   * @return The normalized input.
+   */
+  protected Matrix<N2, N1> clampInput(Matrix<N2, N1> u) {
+    return StateSpaceUtil.normalizeInputVector(u, RobotController.getBatteryVoltage());
   }
 
   enum State {

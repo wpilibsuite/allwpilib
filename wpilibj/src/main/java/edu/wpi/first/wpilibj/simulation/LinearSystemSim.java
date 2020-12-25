@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.wpilibj.RobotController;
 import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 
@@ -116,7 +117,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * @param u The system inputs.
    */
   public void setInput(Matrix<Inputs, N1> u) {
-    this.m_u = u;
+    this.m_u = clampInput(u);
   }
 
   /**
@@ -127,6 +128,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    */
   public void setInput(int row, double value) {
     m_u.set(row, 0, value);
+    m_u = clampInput(m_u);
   }
 
   /**
@@ -172,5 +174,28 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   protected Matrix<States, N1> updateX(Matrix<States, N1> currentXhat,
                                        Matrix<Inputs, N1> u, double dtSeconds) {
     return m_plant.calculateX(currentXhat, u, dtSeconds);
+  }
+
+  /**
+   * Clamp the input vector such that no element exceeds the current battery voltage. If any does,
+   * the relative magnitudes of the input will be maintained.
+   *
+   * @param u The input vector.
+   * @return The normalized input.
+   */
+  protected Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u) {
+      return clampInput(u, RobotController.getBatteryVoltage());
+  }
+
+  /**
+   * Clamp the input vector such that no element exceeds the given voltage. If any does,
+   * the relative magnitudes of the input will be maintained.
+   *
+   * @param u          The input vector.
+   * @param maxVoltage The maximum voltage.
+   * @return The normalized input.
+   */
+  protected Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u, double maxVoltage) {
+    return StateSpaceUtil.normalizeInputVector(u, maxVoltage);
   }
 }
