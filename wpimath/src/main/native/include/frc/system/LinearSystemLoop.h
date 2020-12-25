@@ -18,8 +18,8 @@
 namespace frc {
 
 /**
- * Combines a plant, controller, and observer for controlling a mechanism with
- * full state feedback.
+ * Combines a controller, feedforward, and observer for controlling a mechanism
+ * with full state feedback.
  *
  * For everything in this file, "inputs" and "outputs" are defined from the
  * perspective of the plant. This means U is an input and Y is an output
@@ -81,9 +81,9 @@ class LinearSystemLoop {
             observer, clampFunction) {}
 
   /**
-   * Constructs a state-space loop with the given plant, controller, and
+   * Constructs a state-space loop with the given controller, feedforward and
    * observer. By default, the initial reference is all zeros. Users should
-   * call reset with the initial system state before enabling the loop.
+   * call reset with the initial system state.
    *
    * @param controller  State-space controller.
    * @param feedforward Plant inversion feedforward.
@@ -102,8 +102,9 @@ class LinearSystemLoop {
                          }) {}
 
   /**
-   * Constructs a state-space loop with the given plant, controller, and
-   * observer.
+   * Constructs a state-space loop with the given controller, feedforward,
+   * observer and clamp function. By default, the initial reference is all
+   * zeros. Users should call reset with the initial system state.
    *
    * @param controller    State-space controller.
    * @param feedforward   Plant-inversion feedforward.

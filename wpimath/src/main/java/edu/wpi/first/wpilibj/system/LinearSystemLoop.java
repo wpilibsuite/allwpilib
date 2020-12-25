@@ -21,7 +21,7 @@ import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
 /**
- * Combines a plant, controller, and observer for controlling a mechanism with
+ * Combines a controller, feedforward, and observer for controlling a mechanism with
  * full state feedback.
  *
  * <p>For everything in this file, "inputs" and "outputs" are defined from the
@@ -87,7 +87,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
   }
 
   /**
-   * Constructs a state-space loop with the given plant, controller, and
+   * Constructs a state-space loop with the given controller, feedforward and
    * observer. By default, the initial reference is all zeros. Users should
    * call reset with the initial system state before enabling the loop.
    *
@@ -107,7 +107,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
   }
 
   /**
-   * Constructs a state-space loop with the given plant, controller, and
+   * Constructs a state-space loop with the given controller, feedforward, and
    * observer. By default, the initial reference is all zeros. Users should
    * call reset with the initial system state before enabling the loop.
    *
