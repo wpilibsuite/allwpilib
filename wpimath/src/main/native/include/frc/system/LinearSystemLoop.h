@@ -76,7 +76,8 @@ class LinearSystemLoop {
                        const Eigen::Matrix<double, Inputs, 1>&)>
                        clampFunction,
                    units::second_t dt)
-      : LinearSystemLoop(controller,
+      : LinearSystemLoop(
+            controller,
             LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
             observer, clampFunction) {}
 

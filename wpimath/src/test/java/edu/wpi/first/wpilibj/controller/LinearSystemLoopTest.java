@@ -44,11 +44,11 @@ public class LinearSystemLoopTest {
       m_plant, VecBuilder.fill(0.02, 0.4), VecBuilder.fill(12.0),
         0.00505);
 
-  private final LinearSystemLoop<N2, N1, N1> m_loop = 
+  private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(m_plant, m_controller, m_observer, 12, 0.00505);
 
   @SuppressWarnings("LocalVariableName")
-  private static void updateTwoState(LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> 
+  private static void updateTwoState(LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1>
       loop, double noise) {
     Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(
           VecBuilder.fill(noise)
