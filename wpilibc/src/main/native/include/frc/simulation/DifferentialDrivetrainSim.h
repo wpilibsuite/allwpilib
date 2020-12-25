@@ -76,6 +76,16 @@ class DifferentialDrivetrainSim {
       const std::array<double, 7>& measurementStdDevs = {});
 
   /**
+   * Clamp the input vector such that no element exceeds the given voltage. If
+   * any does, the relative magnitudes of the input will be maintained.
+   *
+   * @param u          The input vector.
+   * @param maxVoltage The maximum voltage.
+   * @return The normalized input.
+   */
+  Eigen::Matrix<double, 2, 1> ClampInput(Eigen::Matrix<double, 2, 1> u);
+
+  /**
    * Sets the applied voltage to the drivetrain. Note that positive voltage must
    * make that side of the drivetrain travel forward (+X).
    *
@@ -172,16 +182,6 @@ class DifferentialDrivetrainSim {
 
   Eigen::Matrix<double, 7, 1> Dynamics(const Eigen::Matrix<double, 7, 1>& x,
                                        const Eigen::Matrix<double, 2, 1>& u);
-
-  /**
-   * Clamp the input vector such that no element exceeds the given voltage. If
-   * any does, the relative magnitudes of the input will be maintained.
-   *
-   * @param u          The input vector.
-   * @param maxVoltage The maximum voltage.
-   * @return The normalized input.
-   */
-  Eigen::Matrix<double, 2, 1> ClampInput(Eigen::Matrix<double, 2, 1> u);
 
   class State {
    public:
