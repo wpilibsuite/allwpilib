@@ -133,29 +133,15 @@ class LinearSystemSim {
   }
 
   /**
-   * Clamp the input vector such that no element exceeds the current battery
-   * voltage. If any does, the relative magnitudes of the input will be
-   * maintained.
-   *
-   * @param u The input vector.
-   * @return The normalized input.
-   */
-  Eigen::Matrix<double, Inputs, 1> ClampInput(
-      Eigen::Matrix<double, Inputs, 1> u) {
-    return ClampInput(u, frc::RobotController::GetInputVoltage());
-  }
-
-  /**
    * Clamp the input vector such that no element exceeds the given voltage. If
    * any does, the relative magnitudes of the input will be maintained.
    *
    * @param u          The input vector.
-   * @param maxVoltage The maximum voltage.
    * @return The normalized input.
    */
   Eigen::Matrix<double, Inputs, 1> ClampInput(
-      Eigen::Matrix<double, Inputs, 1> u, double maxVoltage) {
-    return frc::NormalizeInputVector<Inputs>(u, maxVoltage);
+      Eigen::Matrix<double, Inputs, 1> u) {
+    return frc::NormalizeInputVector<Inputs>(u, frc::RobotController::GetInputVoltage());
   }
 
   LinearSystem<States, Inputs, Outputs> m_plant;

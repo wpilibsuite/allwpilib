@@ -177,25 +177,13 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
   }
 
   /**
-   * Clamp the input vector such that no element exceeds the current battery voltage. If any does,
-   * the relative magnitudes of the input will be maintained.
-   *
-   * @param u The input vector.
-   * @return The normalized input.
-   */
-  protected Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u) {
-      return clampInput(u, RobotController.getBatteryVoltage());
-  }
-
-  /**
    * Clamp the input vector such that no element exceeds the given voltage. If any does,
    * the relative magnitudes of the input will be maintained.
    *
    * @param u          The input vector.
-   * @param maxVoltage The maximum voltage.
    * @return The normalized input.
    */
-  protected Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u, double maxVoltage) {
-    return StateSpaceUtil.normalizeInputVector(u, maxVoltage);
+  protected Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u) {
+    return StateSpaceUtil.normalizeInputVector(u, RobotController.getBatteryVoltage());
   }
 }
