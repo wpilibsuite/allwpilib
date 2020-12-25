@@ -13,9 +13,9 @@
 #include <units/current.h>
 #include <units/time.h>
 
+#include "frc/RobotController.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/LinearSystem.h"
-#include "frc/RobotController.h"
 
 namespace frc::sim {
 /**
@@ -141,7 +141,8 @@ class LinearSystemSim {
    */
   Eigen::Matrix<double, Inputs, 1> ClampInput(
       Eigen::Matrix<double, Inputs, 1> u) {
-    return frc::NormalizeInputVector<Inputs>(u, frc::RobotController::GetInputVoltage());
+    return frc::NormalizeInputVector<Inputs>(
+        u, frc::RobotController::GetInputVoltage());
   }
 
   LinearSystem<States, Inputs, Outputs> m_plant;
