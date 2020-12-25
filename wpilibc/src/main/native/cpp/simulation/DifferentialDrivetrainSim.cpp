@@ -43,6 +43,7 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,
                                           units::volt_t rightVoltage) {
   m_u << leftVoltage.to<double>(), rightVoltage.to<double>();
+  m_u = ClampInput(m_u);
 }
 
 void DifferentialDrivetrainSim::SetGearing(double newGearing) {
@@ -146,8 +147,7 @@ Eigen::Matrix<double, 7, 1> DifferentialDrivetrainSim::Dynamics(
   return xdot;
 }
 
-Eigen::Matrix<double, 2, 1> ClampInput(Eigen::Matrix<double, 2, 1> u,
-                                       double maxVoltage) {
+Eigen::Matrix<double, 2, 1> ClampInput(Eigen::Matrix<double, 2, 1> u) {
   return frc::NormalizeInputVector<2>(u,
                                       frc::RobotController::GetInputVoltage());
 }
