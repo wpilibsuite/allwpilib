@@ -46,10 +46,10 @@ class StateSpace : public testing::Test {
   LinearSystemLoop<2, 1, 1> loop{plant, controller, observer, 12_V, kDt};
 };
 
-void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop, double noise) {
-  Eigen::Matrix<double, 1, 1> y =
-      plant.CalculateY(loop.Xhat(), loop.U()) +
-      Eigen::Matrix<double, 1, 1>(noise);
+void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,
+            double noise) {
+  Eigen::Matrix<double, 1, 1> y = plant.CalculateY(loop.Xhat(), loop.U()) +
+                                  Eigen::Matrix<double, 1, 1>(noise);
   loop.Correct(y);
   loop.Predict(kDt);
 }
