@@ -116,19 +116,22 @@ class LinearSystemLoop {
       std::function<Eigen::Matrix<double, Inputs, 1>(
           const Eigen::Matrix<double, Inputs, 1>&)>
           clampFunction)
-      : m_controller(controller),
+      : m_controller(&controller),
         m_feedforward(feedforward),
-        m_observer(observer),
+        m_observer(&observer),
         m_clampFunc(clampFunction) {
     m_nextR.setZero();
     Reset(m_nextR);
   }
 
+  LinearSystemLoop(LinearSystemLoop&&) = default;
+  LinearSystemLoop& operator=(LinearSystemLoop&&) = default;
+
   /**
    * Returns the observer's state estimate x-hat.
    */
   const Eigen::Matrix<double, States, 1>& Xhat() const {
-    return m_observer.Xhat();
+    return m_observer->Xhat();
   }
 
   /**
@@ -136,7 +139,7 @@ class LinearSystemLoop {
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_observer.Xhat(i); }
+  double Xhat(int i) const { return m_observer->Xhat(i); }
 
   /**
    * Returns the controller's next reference r.
@@ -154,7 +157,7 @@ class LinearSystemLoop {
    * Returns the controller's calculated control input u.
    */
   Eigen::Matrix<double, Inputs, 1> U() const {
-    return ClampInput(m_controller.U() + m_feedforward.Uff());
+    return ClampInput(m_controller->U() + m_feedforward.Uff());
   }
 
   /**
@@ -170,7 +173,7 @@ class LinearSystemLoop {
    * @param xHat The initial state estimate x-hat.
    */
   void SetXhat(const Eigen::Matrix<double, States, 1>& xHat) {
-    m_observer.SetXhat(xHat);
+    m_observer->SetXhat(xHat);
   }
 
   /**
@@ -179,7 +182,7 @@ class LinearSystemLoop {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_observer.SetXhat(i, value); }
+  void SetXhat(int i, double value) { m_observer->SetXhat(i, value); }
 
   /**
    * Set the next reference r.
@@ -194,7 +197,7 @@ class LinearSystemLoop {
    * Return the controller used internally.
    */
   const LinearQuadraticRegulator<States, Inputs>& Controller() const {
-    return m_controller;
+    return *m_controller;
   }
 
   /**
@@ -222,16 +225,16 @@ class LinearSystemLoop {
    */
   void Reset(Eigen::Matrix<double, States, 1> initialState) {
     m_nextR.setZero();
-    m_controller.Reset();
+    m_controller->Reset();
     m_feedforward.Reset(initialState);
-    m_observer.SetXhat(initialState);
+    m_observer->SetXhat(initialState);
   }
 
   /**
    * Returns difference between reference r and current state x-hat.
    */
   const Eigen::Matrix<double, States, 1> Error() const {
-    return m_controller.R() - m_observer.Xhat();
+    return m_controller->R() - m_observer->Xhat();
   }
 
   /**
@@ -240,7 +243,7 @@ class LinearSystemLoop {
    * @param y Measurement vector.
    */
   void Correct(const Eigen::Matrix<double, Outputs, 1>& y) {
-    m_observer.Correct(U(), y);
+    m_observer->Correct(U(), y);
   }
 
   /**
@@ -254,9 +257,9 @@ class LinearSystemLoop {
    */
   void Predict(units::second_t dt) {
     Eigen::Matrix<double, Inputs, 1> u =
-        ClampInput(m_controller.Calculate(m_observer.Xhat(), m_nextR) +
+        ClampInput(m_controller->Calculate(m_observer->Xhat(), m_nextR) +
                    m_feedforward.Calculate(m_nextR));
-    m_observer.Predict(u, dt);
+    m_observer->Predict(u, dt);
   }
 
   /**
@@ -271,9 +274,9 @@ class LinearSystemLoop {
   }
 
  protected:
-  LinearQuadraticRegulator<States, Inputs>& m_controller;
+  LinearQuadraticRegulator<States, Inputs>* m_controller;
   LinearPlantInversionFeedforward<States, Inputs> m_feedforward;
-  KalmanFilter<States, Inputs, Outputs>& m_observer;
+  KalmanFilter<States, Inputs, Outputs>* m_observer;
 
   /**
    * Clamping function.
