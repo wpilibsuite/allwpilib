@@ -38,7 +38,6 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 public class LinearSystemLoop<States extends Num, Inputs extends Num,
         Outputs extends Num> {
 
-  private final LinearSystem<States, Inputs, Outputs> m_plant;
   private final LinearQuadraticRegulator<States, Inputs, Outputs> m_controller;
   private final LinearPlantInversionFeedforward<States, Inputs, Outputs> m_feedforward;
   private final KalmanFilter<States, Inputs, Outputs> m_observer;
@@ -62,7 +61,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
                           KalmanFilter<States, Inputs, Outputs> observer,
                           double maxVoltageVolts,
                           double dtSeconds) {
-    this(plant, controller,
+    this(controller,
         new LinearPlantInversionFeedforward<>(plant, dtSeconds), observer,
         u -> StateSpaceUtil.normalizeInputVector(u, maxVoltageVolts));
   }
@@ -83,7 +82,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
                           KalmanFilter<States, Inputs, Outputs> observer,
                           Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction,
                           double dtSeconds) {
-    this(plant, controller, new LinearPlantInversionFeedforward<>(plant, dtSeconds),
+    this(controller, new LinearPlantInversionFeedforward<>(plant, dtSeconds),
           observer, clampFunction);
   }
 
@@ -92,20 +91,18 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
    * observer. By default, the initial reference is all zeros. Users should
    * call reset with the initial system state before enabling the loop.
    *
-   * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param feedforward Plant inversion feedforward.
    * @param observer   State-space observer.
    * @param maxVoltageVolts The maximum voltage that can be applied. Assumes that the
    *                        inputs are voltages.
    */
-  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
-                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+  public LinearSystemLoop(LinearQuadraticRegulator<States, Inputs, Outputs> controller,
                           LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
                           KalmanFilter<States, Inputs, Outputs> observer,
                           double maxVoltageVolts
   ) {
-    this(plant, controller, feedforward,
+    this(controller, feedforward,
           observer, u -> StateSpaceUtil.normalizeInputVector(u, maxVoltageVolts));
   }
 
@@ -114,18 +111,15 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
    * observer. By default, the initial reference is all zeros. Users should
    * call reset with the initial system state before enabling the loop.
    *
-   * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param feedforward Plant inversion feedforward.
    * @param observer   State-space observer.
    * @param clampFunction The function used to clamp the input U.
    */
-  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
-                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+  public LinearSystemLoop(LinearQuadraticRegulator<States, Inputs, Outputs> controller,
                           LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
                           KalmanFilter<States, Inputs, Outputs> observer,
                           Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction) {
-    this.m_plant = plant;
     this.m_controller = controller;
     this.m_feedforward = feedforward;
     this.m_observer = observer;
@@ -233,15 +227,6 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
    */
   public double getU(int row) {
     return getU().get(row, 0);
-  }
-
-  /**
-   * Return the plant used internally.
-   *
-   * @return the plant used internally.
-   */
-  public LinearSystem<States, Inputs, Outputs> getPlant() {
-    return m_plant;
   }
 
   /**

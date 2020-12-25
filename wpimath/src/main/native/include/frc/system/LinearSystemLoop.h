@@ -40,7 +40,6 @@ class LinearSystemLoop {
    * call reset with the initial system state before enabling the loop. This
    * constructor assumes that the input(s) to this system are voltage.
    *
-   * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param observer   State-space observer.
    * @param maxVoltage The maximum voltage that can be applied. Commonly 12.
@@ -77,8 +76,7 @@ class LinearSystemLoop {
                        const Eigen::Matrix<double, Inputs, 1>&)>
                        clampFunction,
                    units::second_t dt)
-      : LinearSystemLoop(
-            plant, controller,
+      : LinearSystemLoop(controller,
             LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
             observer, clampFunction) {}
 
@@ -87,7 +85,6 @@ class LinearSystemLoop {
    * observer. By default, the initial reference is all zeros. Users should
    * call reset with the initial system state before enabling the loop.
    *
-   * @param plant       State-space plant.
    * @param controller  State-space controller.
    * @param feedforward Plant inversion feedforward.
    * @param observer    State-space observer.
@@ -95,11 +92,10 @@ class LinearSystemLoop {
    * that the inputs are voltages.
    */
   LinearSystemLoop(
-      LinearSystem<States, Inputs, Outputs>& plant,
       LinearQuadraticRegulator<States, Inputs>& controller,
       const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
       KalmanFilter<States, Inputs, Outputs>& observer, units::volt_t maxVoltage)
-      : LinearSystemLoop(plant, controller, feedforward, observer,
+      : LinearSystemLoop(controller, feedforward, observer,
                          [=](Eigen::Matrix<double, Inputs, 1> u) {
                            return frc::NormalizeInputVector<Inputs>(
                                u, maxVoltage.template to<double>());
@@ -109,22 +105,19 @@ class LinearSystemLoop {
    * Constructs a state-space loop with the given plant, controller, and
    * observer.
    *
-   * @param plant         State-space plant.
    * @param controller    State-space controller.
    * @param feedforward   Plant-inversion feedforward.
    * @param observer      State-space observer.
    * @param clampFunction The function used to clamp the input vector.
    */
   LinearSystemLoop(
-      LinearSystem<States, Inputs, Outputs>& plant,
       LinearQuadraticRegulator<States, Inputs>& controller,
       const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
       KalmanFilter<States, Inputs, Outputs>& observer,
       std::function<Eigen::Matrix<double, Inputs, 1>(
           const Eigen::Matrix<double, Inputs, 1>&)>
           clampFunction)
-      : m_plant(plant),
-        m_controller(controller),
+      : m_controller(controller),
         m_feedforward(feedforward),
         m_observer(observer),
         m_clampFunc(clampFunction) {
@@ -197,11 +190,6 @@ class LinearSystemLoop {
   void SetNextR(const Eigen::Matrix<double, States, 1>& nextR) {
     m_nextR = nextR;
   }
-
-  /**
-   * Return the plant used internally.
-   */
-  const LinearSystem<States, Inputs, Outputs>& Plant() const { return m_plant; }
 
   /**
    * Return the controller used internally.
@@ -284,7 +272,6 @@ class LinearSystemLoop {
   }
 
  protected:
-  LinearSystem<States, Inputs, Outputs>& m_plant;
   LinearQuadraticRegulator<States, Inputs>& m_controller;
   LinearPlantInversionFeedforward<States, Inputs> m_feedforward;
   KalmanFilter<States, Inputs, Outputs>& m_observer;
