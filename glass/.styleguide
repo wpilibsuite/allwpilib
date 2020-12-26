@@ -1,5 +1,29 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+  \.inl$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
 generatedFileExclude {
   src/app/native/resources/
   src/app/native/win/glass.ico
   src/app/native/mac/glass.icns
+}
+
+repoRootNameOverride {
+  glass
+}
+
+includeOtherLibs {
+  ^GLFW
+  ^cscore
+  ^imgui
+  ^ntcore
+  ^wpi/
+  ^wpigui
+  ^wpimath/
 }
