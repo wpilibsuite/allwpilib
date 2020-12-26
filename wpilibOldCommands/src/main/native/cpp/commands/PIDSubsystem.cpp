@@ -49,13 +49,21 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
   AddChild("PIDController", m_controller);
 }
 
-void PIDSubsystem::Enable() { m_controller->Enable(); }
+void PIDSubsystem::Enable() {
+  m_controller->Enable();
+}
 
-void PIDSubsystem::Disable() { m_controller->Disable(); }
+void PIDSubsystem::Disable() {
+  m_controller->Disable();
+}
 
-void PIDSubsystem::PIDWrite(double output) { UsePIDOutput(output); }
+void PIDSubsystem::PIDWrite(double output) {
+  UsePIDOutput(output);
+}
 
-double PIDSubsystem::PIDGet() { return ReturnPIDInput(); }
+double PIDSubsystem::PIDGet() {
+  return ReturnPIDInput();
+}
 
 void PIDSubsystem::SetSetpoint(double setpoint) {
   m_controller->SetSetpoint(setpoint);
@@ -73,11 +81,17 @@ void PIDSubsystem::SetOutputRange(double minimumOutput, double maximumOutput) {
   m_controller->SetOutputRange(minimumOutput, maximumOutput);
 }
 
-double PIDSubsystem::GetSetpoint() { return m_controller->GetSetpoint(); }
+double PIDSubsystem::GetSetpoint() {
+  return m_controller->GetSetpoint();
+}
 
-double PIDSubsystem::GetPosition() { return ReturnPIDInput(); }
+double PIDSubsystem::GetPosition() {
+  return ReturnPIDInput();
+}
 
-double PIDSubsystem::GetRate() { return ReturnPIDInput(); }
+double PIDSubsystem::GetRate() {
+  return ReturnPIDInput();
+}
 
 void PIDSubsystem::SetAbsoluteTolerance(double absValue) {
   m_controller->SetAbsoluteTolerance(absValue);
@@ -87,7 +101,9 @@ void PIDSubsystem::SetPercentTolerance(double percent) {
   m_controller->SetPercentTolerance(percent);
 }
 
-bool PIDSubsystem::OnTarget() const { return m_controller->OnTarget(); }
+bool PIDSubsystem::OnTarget() const {
+  return m_controller->OnTarget();
+}
 
 std::shared_ptr<PIDController> PIDSubsystem::GetPIDController() {
   return m_controller;

@@ -63,7 +63,8 @@ void AddressableLEDsModel::Update() {
       if (!model) {
         model = std::make_unique<AddressableLEDModel>(i);
       }
-      if (model) model->Update();
+      if (model)
+        model->Update();
     } else {
       model.reset();
     }
@@ -72,7 +73,8 @@ void AddressableLEDsModel::Update() {
 
 bool AddressableLEDsModel::Exists() {
   for (auto&& model : m_models) {
-    if (model && model->Exists()) return true;
+    if (model && model->Exists())
+      return true;
   }
   return false;
 }
@@ -80,14 +82,16 @@ bool AddressableLEDsModel::Exists() {
 void AddressableLEDsModel::ForEachLEDDisplay(
     wpi::function_ref<void(glass::LEDDisplayModel& model, int index)> func) {
   for (int i = 0; i < static_cast<int>(m_models.size()); ++i) {
-    if (m_models[i]) func(*m_models[i], i);
+    if (m_models[i])
+      func(*m_models[i], i);
   }
 }
 
 static bool AddressableLEDsExists() {
   static const int numLED = HAL_GetNumAddressableLEDs();
   for (int i = 0; i < numLED; ++i) {
-    if (HALSIM_GetAddressableLEDInitialized(i)) return true;
+    if (HALSIM_GetAddressableLEDInitialized(i))
+      return true;
   }
   return false;
 }

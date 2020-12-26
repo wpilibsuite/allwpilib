@@ -92,17 +92,20 @@ HttpQueryMap::HttpQueryMap(wpi::StringRef query) {
     bool err = false;
     auto name = wpi::UnescapeURI(nameEsc, nameBuf, &err);
     // note: ignores duplicates
-    if (!err) m_elems.try_emplace(name, valueEsc);
+    if (!err)
+      m_elems.try_emplace(name, valueEsc);
   }
 }
 
 std::optional<wpi::StringRef> HttpQueryMap::Get(
     wpi::StringRef name, wpi::SmallVectorImpl<char>& buf) const {
   auto it = m_elems.find(name);
-  if (it == m_elems.end()) return {};
+  if (it == m_elems.end())
+    return {};
   bool err = false;
   auto val = wpi::UnescapeURI(it->second, buf, &err);
-  if (err) return {};
+  if (err)
+    return {};
   return val;
 }
 
@@ -128,12 +131,14 @@ HttpPath::HttpPath(wpi::StringRef path) {
 }
 
 bool HttpPath::startswith(size_t start, ArrayRef<StringRef> match) const {
-  if (m_pathEnds.size() < (start + match.size())) return false;
+  if (m_pathEnds.size() < (start + match.size()))
+    return false;
   bool first = start == 0;
   auto p = m_pathEnds.begin() + start;
   for (auto m : match) {
     auto val = m_pathBuf.slice(first ? 0 : *(p - 1), *p);
-    if (val != m) return false;
+    if (val != m)
+      return false;
     first = false;
     ++p;
   }
@@ -142,16 +147,20 @@ bool HttpPath::startswith(size_t start, ArrayRef<StringRef> match) const {
 
 bool ParseHttpHeaders(raw_istream& is, SmallVectorImpl<char>* contentType,
                       SmallVectorImpl<char>* contentLength) {
-  if (contentType) contentType->clear();
-  if (contentLength) contentLength->clear();
+  if (contentType)
+    contentType->clear();
+  if (contentLength)
+    contentLength->clear();
 
   bool inContentType = false;
   bool inContentLength = false;
   SmallString<64> lineBuf;
   for (;;) {
     StringRef line = is.getline(lineBuf, 1024).rtrim();
-    if (is.has_error()) return false;
-    if (line.empty()) return true;  // empty line signals end of headers
+    if (is.has_error())
+      return false;
+    if (line.empty())
+      return true;  // empty line signals end of headers
 
     // header fields start at the beginning of the line
     if (!std::isspace(line[0])) {
@@ -191,7 +200,8 @@ bool FindMultipartBoundary(raw_istream& is, StringRef boundary,
   if (!saveBuf) {
     do {
       is.read(searchBuf.data(), 1);
-      if (is.has_error()) return false;
+      if (is.has_error())
+        return false;
     } while (searchBuf[0] == '\r' || searchBuf[0] == '\n');
     searchPos = 1;
   }
@@ -202,7 +212,8 @@ bool FindMultipartBoundary(raw_istream& is, StringRef boundary,
   // there's a bunch of continuous -'s in the output, but that's unlikely.
   for (;;) {
     is.read(searchBuf.data() + searchPos, searchBuf.size() - searchPos);
-    if (is.has_error()) return false;
+    if (is.has_error())
+      return false;
 
     // Did we find the boundary?
     if (searchBuf[0] == '-' && searchBuf[1] == '-' &&
@@ -212,9 +223,11 @@ bool FindMultipartBoundary(raw_istream& is, StringRef boundary,
     // Fast-scan for '-'
     size_t pos = searchBuf.find('-', searchBuf[0] == '-' ? 1 : 0);
     if (pos == StringRef::npos) {
-      if (saveBuf) saveBuf->append(searchBuf.data(), searchBuf.size());
+      if (saveBuf)
+        saveBuf->append(searchBuf.data(), searchBuf.size());
     } else {
-      if (saveBuf) saveBuf->append(searchBuf.data(), pos);
+      if (saveBuf)
+        saveBuf->append(searchBuf.data(), pos);
 
       // move '-' and following to start of buffer (next read will fill)
       std::memmove(searchBuf.data(), searchBuf.data() + pos,
@@ -305,7 +318,8 @@ HttpLocation::HttpLocation(const Twine& url_, bool* error,
     // split out next param and value
     StringRef rawParam, rawValue;
     std::tie(rawParam, query) = query.split('&');
-    if (rawParam.empty()) continue;  // ignore "&&"
+    if (rawParam.empty())
+      continue;  // ignore "&&"
     std::tie(rawParam, rawValue) = rawParam.split('=');
 
     // unescape param
@@ -404,8 +418,10 @@ void HttpMultipartScanner::Reset(bool saveSkipped) {
 }
 
 StringRef HttpMultipartScanner::Execute(StringRef in) {
-  if (m_state == kDone) Reset(m_saveSkipped);
-  if (m_saveSkipped) m_buf += in;
+  if (m_state == kDone)
+    Reset(m_saveSkipped);
+  if (m_saveSkipped)
+    m_buf += in;
 
   size_t pos = 0;
   if (m_state == kBoundary) {
@@ -451,7 +467,8 @@ StringRef HttpMultipartScanner::Execute(StringRef in) {
       if (ch == '\n') {
         // Found the LF; return remaining input buffer (following it)
         m_state = kDone;
-        if (m_saveSkipped) m_buf.resize(m_buf.size() - in.size() + pos);
+        if (m_saveSkipped)
+          m_buf.resize(m_buf.size() - in.size() + pos);
         return in.drop_front(pos);
       }
     }

@@ -27,7 +27,9 @@ void PWMData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetPWMData(int32_t index) { SimPWMData[index].ResetData(); }
+void HALSIM_ResetPWMData(int32_t index) {
+  SimPWMData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PWM##CAPINAME, SimPWMData, \

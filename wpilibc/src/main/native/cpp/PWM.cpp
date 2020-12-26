@@ -59,14 +59,17 @@ PWM::~PWM() {
   wpi_setHALError(status);
 }
 
-void PWM::StopMotor() { SetDisabled(); }
+void PWM::StopMotor() {
+  SetDisabled();
+}
 
 void PWM::GetDescription(wpi::raw_ostream& desc) const {
   desc << "PWM " << GetChannel();
 }
 
 void PWM::SetRaw(uint16_t value) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
 
   int32_t status = 0;
   HAL_SetPWMRaw(m_handle, value, &status);
@@ -74,7 +77,8 @@ void PWM::SetRaw(uint16_t value) {
 }
 
 uint16_t PWM::GetRaw() const {
-  if (StatusIsFatal()) return 0;
+  if (StatusIsFatal())
+    return 0;
 
   int32_t status = 0;
   uint16_t value = HAL_GetPWMRaw(m_handle, &status);
@@ -84,14 +88,16 @@ uint16_t PWM::GetRaw() const {
 }
 
 void PWM::SetPosition(double pos) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   int32_t status = 0;
   HAL_SetPWMPosition(m_handle, pos, &status);
   wpi_setHALError(status);
 }
 
 double PWM::GetPosition() const {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal())
+    return 0.0;
   int32_t status = 0;
   double position = HAL_GetPWMPosition(m_handle, &status);
   wpi_setHALError(status);
@@ -99,7 +105,8 @@ double PWM::GetPosition() const {
 }
 
 void PWM::SetSpeed(double speed) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   int32_t status = 0;
   HAL_SetPWMSpeed(m_handle, speed, &status);
   wpi_setHALError(status);
@@ -108,7 +115,8 @@ void PWM::SetSpeed(double speed) {
 }
 
 double PWM::GetSpeed() const {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal())
+    return 0.0;
   int32_t status = 0;
   double speed = HAL_GetPWMSpeed(m_handle, &status);
   wpi_setHALError(status);
@@ -116,7 +124,8 @@ double PWM::GetSpeed() const {
 }
 
 void PWM::SetDisabled() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
 
   int32_t status = 0;
 
@@ -125,7 +134,8 @@ void PWM::SetDisabled() {
 }
 
 void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
 
   int32_t status = 0;
 
@@ -149,7 +159,8 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
 }
 
 void PWM::SetZeroLatch() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
 
   int32_t status = 0;
 
@@ -158,7 +169,8 @@ void PWM::SetZeroLatch() {
 }
 
 void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   int32_t status = 0;
   HAL_SetPWMEliminateDeadband(m_handle, eliminateDeadband, &status);
   wpi_setHALError(status);
@@ -166,7 +178,8 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
 
 void PWM::SetBounds(double max, double deadbandMax, double center,
                     double deadbandMin, double min) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   int32_t status = 0;
   HAL_SetPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min,
                    &status);
@@ -175,7 +188,8 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
 
 void PWM::SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
                        int min) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   int32_t status = 0;
   HAL_SetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
                       &status);
@@ -190,7 +204,9 @@ void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
   wpi_setHALError(status);
 }
 
-int PWM::GetChannel() const { return m_channel; }
+int PWM::GetChannel() const {
+  return m_channel;
+}
 
 void PWM::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");

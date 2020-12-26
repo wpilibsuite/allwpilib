@@ -7,7 +7,9 @@
 #include "hal/simulation/SimDataValue.h"
 
 extern "C" {
-int32_t HALSIM_FindDigitalPWMForChannel(int32_t channel) { return 0; }
+int32_t HALSIM_FindDigitalPWMForChannel(int32_t channel) {
+  return 0;
+}
 
 void HALSIM_ResetDigitalPWMData(int32_t index) {}
 

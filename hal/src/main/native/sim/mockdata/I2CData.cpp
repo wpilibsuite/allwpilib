@@ -34,7 +34,9 @@ void I2CData::Read(int32_t deviceAddress, uint8_t* buffer, int32_t count) {
 }
 
 extern "C" {
-void HALSIM_ResetI2CData(int32_t index) { SimI2CData[index].ResetData(); }
+void HALSIM_ResetI2CData(int32_t index) {
+  SimI2CData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, I2C##CAPINAME, SimI2CData, \

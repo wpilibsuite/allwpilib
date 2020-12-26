@@ -73,7 +73,8 @@ void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
 void Scheduler::Run() {
   // Get button input (going backwards preserves button priority)
   {
-    if (!m_impl->enabled) return;
+    if (!m_impl->enabled)
+      return;
 
     std::scoped_lock lock(m_impl->buttonsMutex);
     for (auto& button : m_impl->buttons) {
@@ -152,7 +153,9 @@ void Scheduler::ResetAll() {
   m_impl->commands.clear();
 }
 
-void Scheduler::SetEnabled(bool enabled) { m_impl->enabled = enabled; }
+void Scheduler::SetEnabled(bool enabled) {
+  m_impl->enabled = enabled;
+}
 
 void Scheduler::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
@@ -163,7 +166,8 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
     // Get the list of possible commands to cancel
     auto new_toCancel = cancelEntry.GetValue();
     wpi::ArrayRef<double> toCancel;
-    if (new_toCancel) toCancel = new_toCancel->GetDoubleArray();
+    if (new_toCancel)
+      toCancel = new_toCancel->GetDoubleArray();
 
     // Cancel commands whose cancel buttons were pressed on the SmartDashboard
     if (!toCancel.empty()) {
@@ -212,7 +216,8 @@ Scheduler::~Scheduler() {
 }
 
 void Scheduler::Impl::Remove(Command* command) {
-  if (!commands.erase(command)) return;
+  if (!commands.erase(command))
+    return;
 
   for (auto&& requirement : command->GetRequirements()) {
     requirement->SetCurrentCommand(nullptr);
@@ -222,7 +227,8 @@ void Scheduler::Impl::Remove(Command* command) {
 }
 
 void Scheduler::Impl::ProcessCommandAddition(Command* command) {
-  if (command == nullptr) return;
+  if (command == nullptr)
+    return;
 
   // Only add if not already in
   auto found = commands.find(command);

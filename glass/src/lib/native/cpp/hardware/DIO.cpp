@@ -87,8 +87,10 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
     }
   }
   if (info.PopupEditName(index)) {
-    if (dpwmData) dpwmData->SetName(info.GetName());
-    if (dutyCycleData) dutyCycleData->SetName(info.GetName());
+    if (dpwmData)
+      dpwmData->SetName(info.GetName());
+    if (dutyCycleData)
+      dutyCycleData->SetName(info.GetName());
   }
 }
 

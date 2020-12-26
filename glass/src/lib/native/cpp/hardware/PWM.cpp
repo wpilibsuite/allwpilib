@@ -13,7 +13,8 @@ using namespace glass;
 
 void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
   auto data = model->GetSpeedData();
-  if (!data) return;
+  if (!data)
+    return;
 
   // build label
   std::string* name = GetStorage().GetStringRef("name");

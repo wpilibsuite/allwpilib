@@ -147,7 +147,8 @@ class GlfwKeyboardJoystick : public KeyboardJoystick {
   explicit GlfwKeyboardJoystick(int index, bool noDefaults = false);
 
   const char* GetKeyName(int key) const override {
-    if (key < 0) return "(None)";
+    if (key < 0)
+      return "(None)";
     return glfwGetKeyName(key, 0);
   }
 };
@@ -174,7 +175,8 @@ class JoystickModel {
   explicit JoystickModel(int index);
   ~JoystickModel() {
     HALSIM_CancelDriverStationNewDataCallback(m_callback);
-    for (int i = 0; i < buttonCount; ++i) delete buttons[i];
+    for (int i = 0; i < buttonCount; ++i)
+      delete buttons[i];
   }
   JoystickModel(const JoystickModel&) = delete;
   JoystickModel& operator=(const JoystickModel&) = delete;
@@ -311,7 +313,8 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
                               wpi::Twine{i + 1} + wpi::Twine{']'});
     buttons[i]->SetDigital(true);
   }
-  for (int i = buttonCount; i < 32; ++i) buttons[i] = nullptr;
+  for (int i = buttonCount; i < 32; ++i)
+    buttons[i] = nullptr;
 
   HAL_JoystickPOVs halPOVs;
   HALSIM_GetJoystickPOVs(index, &halPOVs);
@@ -332,7 +335,8 @@ void JoystickModel::CallbackFunc(const char*, void* param, const HAL_Value*) {
   HAL_JoystickAxes halAxes;
   HALSIM_GetJoystickAxes(self->m_index, &halAxes);
   for (int i = 0; i < halAxes.count; ++i) {
-    if (auto axis = self->axes[i].get()) axis->SetValue(halAxes.axes[i]);
+    if (auto axis = self->axes[i].get())
+      axis->SetValue(halAxes.axes[i]);
   }
 
   HAL_JoystickButtons halButtons;
@@ -345,7 +349,8 @@ void JoystickModel::CallbackFunc(const char*, void* param, const HAL_Value*) {
   HAL_JoystickPOVs halPOVs;
   HALSIM_GetJoystickPOVs(self->m_index, &halPOVs);
   for (int i = 0; i < halPOVs.count; ++i) {
-    if (auto pov = self->povs[i].get()) pov->SetValue(halPOVs.povs[i]);
+    if (auto pov = self->povs[i].get())
+      pov->SetValue(halPOVs.povs[i]);
   }
 }
 
@@ -353,8 +358,10 @@ void JoystickModel::CallbackFunc(const char*, void* param, const HAL_Value*) {
 static void* JoystickReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                               const char* name) {
   int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num)) return nullptr;
-  if (num < 0 || num >= HAL_kMaxJoysticks) return nullptr;
+  if (wpi::StringRef{name}.getAsInteger(10, num))
+    return nullptr;
+  if (num < 0 || num >= HAL_kMaxJoysticks)
+    return nullptr;
   return &gRobotJoysticks[num];
 }
 
@@ -370,7 +377,8 @@ static void JoystickReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
     joy->guid = value;
   } else if (name == "useGamepad") {
     int num;
-    if (value.getAsInteger(10, num)) return;
+    if (value.getAsInteger(10, num))
+      return;
     joy->useGamepad = num;
   } else {
     joy->name.ReadIni(name, value);
@@ -381,13 +389,16 @@ static void JoystickWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                              ImGuiTextBuffer* out_buf) {
   for (int i = 0; i < HAL_kMaxJoysticks; ++i) {
     auto& joy = gRobotJoysticks[i];
-    if (!joy.name.HasName() && !joy.sys) continue;
+    if (!joy.name.HasName() && !joy.sys)
+      continue;
     out_buf->appendf("[Joystick][%d]\nuseGamepad=%d\n", i,
                      joy.useGamepad ? 1 : 0);
-    if (joy.name.HasName()) joy.name.WriteIni(out_buf);
+    if (joy.name.HasName())
+      joy.name.WriteIni(out_buf);
     if (joy.sys) {
       const char* guid = joy.sys->GetGUID();
-      if (guid) out_buf->appendf("guid=%s\n", guid);
+      if (guid)
+        out_buf->appendf("guid=%s\n", guid);
     }
     out_buf->append("\n");
   }
@@ -398,7 +409,8 @@ static void* KeyboardJoystickReadOpen(ImGuiContext* ctx,
                                       ImGuiSettingsHandler* handler,
                                       const char* name) {
   int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num)) return nullptr;
+  if (wpi::StringRef{name}.getAsInteger(10, num))
+    return nullptr;
   if (num < 0 || num >= static_cast<int>(gKeyboardJoysticks.size()))
     return nullptr;
   auto joy = gKeyboardJoysticks[num].get();
@@ -430,7 +442,8 @@ static void KeyboardJoystickWriteAll(ImGuiContext* ctx,
 static void* DriverStationReadOpen(ImGuiContext* ctx,
                                    ImGuiSettingsHandler* handler,
                                    const char* name) {
-  if (name == wpi::StringRef{"Main"}) return &gDisableDS;
+  if (name == wpi::StringRef{"Main"})
+    return &gDisableDS;
   return nullptr;
 }
 
@@ -443,19 +456,23 @@ static void DriverStationReadLine(ImGuiContext* ctx,
   value = value.trim();
   if (name == "disable") {
     int num;
-    if (value.getAsInteger(10, num)) return;
+    if (value.getAsInteger(10, num))
+      return;
     gDisableDS = num;
   } else if (name == "zeroDisconnectedJoysticks") {
     int num;
-    if (value.getAsInteger(10, num)) return;
+    if (value.getAsInteger(10, num))
+      return;
     gZeroDisconnectedJoysticks = num;
   } else if (name == "enableDisableKeys") {
     int num;
-    if (value.getAsInteger(10, num)) return;
+    if (value.getAsInteger(10, num))
+      return;
     gUseEnableDisableHotkeys = num;
   } else if (name == "estopKey") {
     int num;
-    if (value.getAsInteger(10, num)) return;
+    if (value.getAsInteger(10, num))
+      return;
     gUseEstopHotkey = num;
   }
 }
@@ -474,7 +491,8 @@ void GlfwSystemJoystick::Update() {
   bool wasPresent = m_present;
   m_present = glfwJoystickPresent(m_index);
 
-  if (!m_present) return;
+  if (!m_present)
+    return;
   m_axes = glfwGetJoystickAxes(m_index, &m_axisCount);
   m_buttons = glfwGetJoystickButtons(m_index, &m_buttonCount);
   m_hats = glfwGetJoystickHats(m_index, &m_hatCount);
@@ -494,7 +512,8 @@ void GlfwSystemJoystick::Update() {
     }
   }
 
-  if (!m_present || wasPresent) return;
+  if (!m_present || wasPresent)
+    return;
   m_name = glfwGetJoystickName(m_index);
 
   // try to find matching GUID
@@ -533,7 +552,8 @@ static int HatToAngle(unsigned char hat) {
 }
 
 void GlfwSystemJoystick::GetData(HALJoystickData* data, bool mapGamepad) const {
-  if (!m_present) return;
+  if (!m_present)
+    return;
 
   // use gamepad mappings if present and enabled
   const float* sysAxes;
@@ -625,9 +645,11 @@ void KeyboardJoystick::EditKey(const char* label, int* key) {
   char editLabel[32];
   std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
                 s_keyEdit == key ? "(press key)" : GetKeyName(*key));
-  if (ImGui::SmallButton(editLabel)) s_keyEdit = key;
+  if (ImGui::SmallButton(editLabel))
+    s_keyEdit = key;
   ImGui::SameLine();
-  if (ImGui::SmallButton("Clear")) *key = -1;
+  if (ImGui::SmallButton("Clear"))
+    *key = -1;
   ImGui::PopID();
 }
 
@@ -637,7 +659,8 @@ void KeyboardJoystick::SettingsDisplay() {
     for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); ++i) {
       if (io.KeysDown[i]) {
         // remove all other uses
-        for (auto&& joy : gKeyboardJoysticks) joy->ClearKey(i);
+        for (auto&& joy : gKeyboardJoysticks)
+          joy->ClearKey(i);
         *s_keyEdit = i;
         s_keyEdit = nullptr;
       }
@@ -651,8 +674,10 @@ void KeyboardJoystick::SettingsDisplay() {
     ImGui::PushID("Axes");
     int axisCount = m_data.axes.count;
     if (ImGui::InputInt("Count", &axisCount)) {
-      if (axisCount < 0) axisCount = 0;
-      if (axisCount > HAL_kMaxJoystickAxes) axisCount = HAL_kMaxJoystickAxes;
+      if (axisCount < 0)
+        axisCount = 0;
+      if (axisCount > HAL_kMaxJoystickAxes)
+        axisCount = HAL_kMaxJoystickAxes;
       m_data.axes.count = axisCount;
     }
     for (int i = 0; i < axisCount; ++i) {
@@ -673,8 +698,10 @@ void KeyboardJoystick::SettingsDisplay() {
     ImGui::PushID("Buttons");
     int buttonCount = m_data.buttons.count;
     if (ImGui::InputInt("Count", &buttonCount)) {
-      if (buttonCount < 0) buttonCount = 0;
-      if (buttonCount > kMaxButtonCount) buttonCount = kMaxButtonCount;
+      if (buttonCount < 0)
+        buttonCount = 0;
+      if (buttonCount > kMaxButtonCount)
+        buttonCount = kMaxButtonCount;
       m_data.buttons.count = buttonCount;
     }
     for (int i = 0; i < buttonCount; ++i) {
@@ -689,8 +716,10 @@ void KeyboardJoystick::SettingsDisplay() {
     ImGui::PushID("POVs");
     int povCount = m_data.povs.count;
     if (ImGui::InputInt("Count", &povCount)) {
-      if (povCount < 0) povCount = 0;
-      if (povCount > HAL_kMaxJoystickPOVs) povCount = HAL_kMaxJoystickPOVs;
+      if (povCount < 0)
+        povCount = 0;
+      if (povCount > HAL_kMaxJoystickPOVs)
+        povCount = HAL_kMaxJoystickPOVs;
       m_data.povs.count = povCount;
     }
     for (int i = 0; i < povCount; ++i) {
@@ -727,7 +756,8 @@ void KeyboardJoystick::Update() {
     // increase/decrease while key held down (to saturation); decay back to 0
     if (config.incKey >= 0 && io.KeysDown[config.incKey]) {
       axisValue += config.keyRate;
-      if (axisValue > 1.0) axisValue = 1.0;
+      if (axisValue > 1.0)
+        axisValue = 1.0;
     } else if (axisValue > 0) {
       if (axisValue < config.decayRate)
         axisValue = 0;
@@ -737,7 +767,8 @@ void KeyboardJoystick::Update() {
 
     if (config.decKey >= 0 && io.KeysDown[config.decKey]) {
       axisValue -= config.keyRate;
-      if (axisValue < -1.0) axisValue = -1.0;
+      if (axisValue < -1.0)
+        axisValue = -1.0;
     } else if (axisValue < 0) {
       if (axisValue > -config.decayRate)
         axisValue = 0;
@@ -796,21 +827,32 @@ void KeyboardJoystick::Update() {
 
 void KeyboardJoystick::ClearKey(int key) {
   for (auto&& config : m_axisConfig) {
-    if (config.incKey == key) config.incKey = -1;
-    if (config.decKey == key) config.decKey = -1;
+    if (config.incKey == key)
+      config.incKey = -1;
+    if (config.decKey == key)
+      config.decKey = -1;
   }
   for (auto&& buttonKey : m_buttonKey) {
-    if (buttonKey == key) buttonKey = -1;
+    if (buttonKey == key)
+      buttonKey = -1;
   }
   for (auto&& config : m_povConfig) {
-    if (config.key0 == key) config.key0 = -1;
-    if (config.key45 == key) config.key45 = -1;
-    if (config.key90 == key) config.key90 = -1;
-    if (config.key135 == key) config.key135 = -1;
-    if (config.key180 == key) config.key180 = -1;
-    if (config.key225 == key) config.key225 = -1;
-    if (config.key270 == key) config.key270 = -1;
-    if (config.key315 == key) config.key315 = -1;
+    if (config.key0 == key)
+      config.key0 = -1;
+    if (config.key45 == key)
+      config.key45 = -1;
+    if (config.key90 == key)
+      config.key90 = -1;
+    if (config.key135 == key)
+      config.key135 = -1;
+    if (config.key180 == key)
+      config.key180 = -1;
+    if (config.key225 == key)
+      config.key225 = -1;
+    if (config.key270 == key)
+      config.key270 = -1;
+    if (config.key315 == key)
+      config.key315 = -1;
   }
 }
 
@@ -819,21 +861,26 @@ void KeyboardJoystick::ReadIni(wpi::StringRef name, wpi::StringRef value) {
     name = name.drop_front(4);
     if (name == "Count") {
       int v;
-      if (value.getAsInteger(10, v)) return;
+      if (value.getAsInteger(10, v))
+        return;
       m_data.axes.count = (std::min)(v, HAL_kMaxJoystickAxes);
       return;
     }
 
     unsigned int index;
-    if (name.consumeInteger(10, index)) return;
-    if (index >= HAL_kMaxJoystickAxes) return;
+    if (name.consumeInteger(10, index))
+      return;
+    if (index >= HAL_kMaxJoystickAxes)
+      return;
     if (name == "incKey") {
       int v;
-      if (value.getAsInteger(10, v)) return;
+      if (value.getAsInteger(10, v))
+        return;
       m_axisConfig[index].incKey = v;
     } else if (name == "decKey") {
       int v;
-      if (value.getAsInteger(10, v)) return;
+      if (value.getAsInteger(10, v))
+        return;
       m_axisConfig[index].decKey = v;
     } else if (name == "keyRate") {
       std::sscanf(value.data(), "%f", &m_axisConfig[index].keyRate);
@@ -844,31 +891,39 @@ void KeyboardJoystick::ReadIni(wpi::StringRef name, wpi::StringRef value) {
     name = name.drop_front(6);
     if (name == "Count") {
       int v;
-      if (value.getAsInteger(10, v)) return;
+      if (value.getAsInteger(10, v))
+        return;
       m_data.buttons.count = (std::min)(v, kMaxButtonCount);
       return;
     }
 
     unsigned int index;
-    if (name.getAsInteger(10, index)) return;
-    if (index >= kMaxButtonCount) return;
+    if (name.getAsInteger(10, index))
+      return;
+    if (index >= kMaxButtonCount)
+      return;
     int v;
-    if (value.getAsInteger(10, v)) return;
+    if (value.getAsInteger(10, v))
+      return;
     m_buttonKey[index] = v;
   } else if (name.startswith("pov")) {
     name = name.drop_front(3);
     if (name == "Count") {
       int v;
-      if (value.getAsInteger(10, v)) return;
+      if (value.getAsInteger(10, v))
+        return;
       m_data.povs.count = (std::min)(v, HAL_kMaxJoystickPOVs);
       return;
     }
 
     unsigned int index;
-    if (name.consumeInteger(10, index)) return;
-    if (index >= HAL_kMaxJoystickPOVs) return;
+    if (name.consumeInteger(10, index))
+      return;
+    if (index >= HAL_kMaxJoystickPOVs)
+      return;
     int v;
-    if (value.getAsInteger(10, v)) return;
+    if (value.getAsInteger(10, v))
+      return;
     if (name == "key0") {
       m_povConfig[index].key0 = v;
     } else if (name == "key45") {
@@ -914,7 +969,8 @@ void KeyboardJoystick::WriteIni(ImGuiTextBuffer* out_buf) const {
 
 GlfwKeyboardJoystick::GlfwKeyboardJoystick(int index, bool noDefaults)
     : KeyboardJoystick{index} {
-  if (noDefaults) return;
+  if (noDefaults)
+    return;
   // set up a default keyboard config for 0, 1, and 2
   if (index == 0) {
     m_data.axes.count = 3;
@@ -969,11 +1025,13 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(int index, bool noDefaults)
 
 void RobotJoystick::Update() {
   Clear();
-  if (sys) sys->GetData(&data, useGamepad);
+  if (sys)
+    sys->GetData(&data, useGamepad);
 }
 
 void RobotJoystick::SetHAL(int i) {
-  if (!gZeroDisconnectedJoysticks && (!sys || !sys->IsPresent())) return;
+  if (!gZeroDisconnectedJoysticks && (!sys || !sys->IsPresent()))
+    return;
   // set at HAL level
   HALSIM_SetJoystickDescriptor(i, &data.desc);
   HALSIM_SetJoystickAxes(i, &data.axes);
@@ -1018,7 +1076,8 @@ static void DriverStationExecute() {
     }
   }
   prevDisableDS = disableDS;
-  if (disableDS) return;
+  if (disableDS)
+    return;
 
   double curTime = glfwGetTime();
 
@@ -1026,12 +1085,15 @@ static void DriverStationExecute() {
   gNumGlfwJoysticks = 0;
   for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i) {
     gGlfwJoysticks[i]->Update();
-    if (gGlfwJoysticks[i]->IsPresent()) gNumGlfwJoysticks = i + 1;
+    if (gGlfwJoysticks[i]->IsPresent())
+      gNumGlfwJoysticks = i + 1;
   }
-  for (auto&& joy : gKeyboardJoysticks) joy->Update();
+  for (auto&& joy : gKeyboardJoysticks)
+    joy->Update();
 
   // update robot joysticks
-  for (auto&& joy : gRobotJoysticks) joy.Update();
+  for (auto&& joy : gRobotJoysticks)
+    joy.Update();
 
   bool isEnabled = HALSIM_GetDriverStationEnabled();
   bool isAuto = HALSIM_GetDriverStationAutonomous();
@@ -1083,7 +1145,8 @@ static void DriverStationExecute() {
   }
 
   // Update HAL
-  for (int i = 0; i < HAL_kMaxJoysticks; ++i) gRobotJoysticks[i].SetHAL(i);
+  for (int i = 0; i < HAL_kMaxJoysticks; ++i)
+    gRobotJoysticks[i].SetHAL(i);
 
   // Send new data every 20 ms (may be slower depending on GUI refresh rate)
   static double lastNewDataTime = 0.0;
@@ -1117,12 +1180,14 @@ void FMSSimModel::Update() {
   if (m_matchTimeEnabled && !IsDSDisabled()) {
     int32_t status = 0;
     double curTime = HAL_GetFPGATime(&status) * 1.0e-6;
-    if (m_startMatchTime == 0.0) m_startMatchTime = curTime;
+    if (m_startMatchTime == 0.0)
+      m_startMatchTime = curTime;
     if (enabled) {
       matchTime = curTime - m_startMatchTime;
       HALSIM_SetDriverStationMatchTime(matchTime);
     } else {
-      if (m_prevTime == 0.0) m_prevTime = curTime;
+      if (m_prevTime == 0.0)
+        m_prevTime = curTime;
       m_startMatchTime += (curTime - m_prevTime);
     }
     m_prevTime = curTime;
@@ -1133,7 +1198,9 @@ void FMSSimModel::Update() {
   m_matchTime.SetValue(matchTime);
 }
 
-bool FMSSimModel::IsReadOnly() { return IsDSDisabled(); }
+bool FMSSimModel::IsReadOnly() {
+  return IsDSDisabled();
+}
 
 static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
   char label[64];
@@ -1146,7 +1213,8 @@ static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
   ImGui::Selectable(label, false,
                     joy.IsPresent() ? ImGuiSelectableFlags_None
                                     : ImGuiSelectableFlags_Disabled);
-  if (anyButtonPressed) ImGui::PopStyleColor();
+  if (anyButtonPressed)
+    ImGui::PopStyleColor();
 
   // drag and drop sources are the low level joysticks
   if (ImGui::BeginDragDropSource()) {
@@ -1194,7 +1262,8 @@ static void DisplayJoysticks() {
             *static_cast<SystemJoystick* const*>(payload->Data);
         // clear it from the other joysticks
         for (auto&& joy2 : gRobotJoysticks) {
-          if (joy2.sys == payload_sys) joy2.sys = nullptr;
+          if (joy2.sys == payload_sys)
+            joy2.sys = nullptr;
         }
         joy.sys = payload_sys;
         joy.guid.clear();
@@ -1212,7 +1281,8 @@ static void DisplayJoysticks() {
     auto& joy = gRobotJoysticks[i];
     auto source = gJoystickSources[i].get();
 
-    if (disableDS) joy.GetHAL(i);
+    if (disableDS)
+      joy.GetHAL(i);
 
     if ((disableDS && joy.data.desc.type != 0) ||
         (joy.sys && joy.sys->IsPresent())) {
@@ -1358,7 +1428,8 @@ void DriverStationGui::GlobalInit() {
       win->SetVisible(false);
       win->DisableRenamePopup();
       win->SetDefaultPos(10 + 310 * i++, 50);
-      if (i > 3) i = 0;
+      if (i > 3)
+        i = 0;
       win->SetDefaultSize(300, 560);
     }
   }

@@ -124,7 +124,8 @@ void HAL_FreeDMA(HAL_DMAHandle handle) {
   auto dma = dmaHandles->Get(handle);
   dmaHandles->Free(handle);
 
-  if (!dma) return;
+  if (!dma)
+    return;
 
   int32_t status = 0;
   if (dma->manager) {
@@ -514,7 +515,8 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
   auto isExternalClock = dma->aDMA->readConfig_ExternalClock(status);
   if (*status == 0 && !isExternalClock) {
     dma->aDMA->writeConfig_ExternalClock(true, status);
-    if (*status != 0) return;
+    if (*status != 0)
+      return;
   } else if (*status != 0) {
     return;
   }
@@ -554,7 +556,8 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
   }
 
   tDMA::tConfig config = dma->aDMA->readConfig(status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
 
   {
     size_t accum_size = 0;

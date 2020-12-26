@@ -33,32 +33,40 @@ void Robot::StartCompetition() {
       m_ds.InDisabled(true);
       Disabled();
       m_ds.InDisabled(false);
-      while (IsDisabled()) m_ds.WaitForData();
+      while (IsDisabled())
+        m_ds.WaitForData();
     } else if (IsAutonomous()) {
       m_ds.InAutonomous(true);
       Autonomous();
       m_ds.InAutonomous(false);
-      while (IsAutonomousEnabled()) m_ds.WaitForData();
+      while (IsAutonomousEnabled())
+        m_ds.WaitForData();
     } else if (IsTest()) {
       lw.SetEnabled(true);
       frc::Shuffleboard::EnableActuatorWidgets();
       m_ds.InTest(true);
       Test();
       m_ds.InTest(false);
-      while (IsTest() && IsEnabled()) m_ds.WaitForData();
+      while (IsTest() && IsEnabled())
+        m_ds.WaitForData();
       lw.SetEnabled(false);
       frc::Shuffleboard::DisableActuatorWidgets();
     } else {
       m_ds.InOperatorControl(true);
       Teleop();
       m_ds.InOperatorControl(false);
-      while (IsOperatorControlEnabled()) m_ds.WaitForData();
+      while (IsOperatorControlEnabled())
+        m_ds.WaitForData();
     }
   }
 }
 
-void Robot::EndCompetition() { m_exit = true; }
+void Robot::EndCompetition() {
+  m_exit = true;
+}
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

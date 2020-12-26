@@ -53,4 +53,6 @@ void VisionRunnerBase::RunForever() {
   }
 }
 
-void VisionRunnerBase::Stop() { m_enabled = false; }
+void VisionRunnerBase::Stop() {
+  m_enabled = false;
+}

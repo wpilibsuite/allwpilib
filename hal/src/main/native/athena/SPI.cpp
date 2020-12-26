@@ -51,7 +51,8 @@ static bool SPIInUseByAuto(HAL_SPIPort port) {
   // SPI engine conflicts with any other chip selects on the same SPI device.
   // There are two SPI devices: one for ports 0-3 (onboard), the other for port
   // 4 (MXP).
-  if (!spiAutoRunning) return false;
+  if (!spiAutoRunning)
+    return false;
   std::scoped_lock lock(spiAutoMutex);
   return (spiAutoPort >= 0 && spiAutoPort <= 3 && port >= 0 && port <= 3) ||
          (spiAutoPort == 4 && port == 4);
@@ -70,7 +71,8 @@ static void CommonSPIPortInit(int32_t* status) {
   if (spiPortCount.fetch_add(1) == 0) {
     // Have not been initialized yet
     initializeDigital(status);
-    if (*status != 0) return;
+    if (*status != 0)
+      return;
     // MISO
     if ((digitalHandles[3] = HAL_InitializeDIOPort(createPortHandleForSPI(29),
                                                    false, status)) ==
@@ -105,11 +107,13 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
   }
 
   int handle;
-  if (HAL_GetSPIHandle(port) != 0) return;
+  if (HAL_GetSPIHandle(port) != 0)
+    return;
   switch (port) {
     case HAL_SPI_kOnboardCS0:
       CommonSPIPortInit(status);
-      if (*status != 0) return;
+      if (*status != 0)
+        return;
       // CS0 is not a DIO port, so nothing to allocate
       handle = open("/dev/spidev0.0", O_RDWR);
       if (handle < 0) {
@@ -122,7 +126,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       break;
     case HAL_SPI_kOnboardCS1:
       CommonSPIPortInit(status);
-      if (*status != 0) return;
+      if (*status != 0)
+        return;
       // CS1, Allocate
       if ((digitalHandles[0] = HAL_InitializeDIOPort(createPortHandleForSPI(26),
                                                      false, status)) ==
@@ -143,7 +148,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       break;
     case HAL_SPI_kOnboardCS2:
       CommonSPIPortInit(status);
-      if (*status != 0) return;
+      if (*status != 0)
+        return;
       // CS2, Allocate
       if ((digitalHandles[1] = HAL_InitializeDIOPort(createPortHandleForSPI(27),
                                                      false, status)) ==
@@ -164,7 +170,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       break;
     case HAL_SPI_kOnboardCS3:
       CommonSPIPortInit(status);
-      if (*status != 0) return;
+      if (*status != 0)
+        return;
       // CS3, Allocate
       if ((digitalHandles[2] = HAL_InitializeDIOPort(createPortHandleForSPI(28),
                                                      false, status)) ==
@@ -185,7 +192,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       break;
     case HAL_SPI_kMXP:
       initializeDigital(status);
-      if (*status != 0) return;
+      if (*status != 0)
+        return;
       if ((digitalHandles[5] = HAL_InitializeDIOPort(createPortHandleForSPI(14),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
@@ -242,7 +250,8 @@ int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
     return -1;
   }
 
-  if (SPIInUseByAuto(port)) return -1;
+  if (SPIInUseByAuto(port))
+    return -1;
 
   struct spi_ioc_transfer xfer;
   std::memset(&xfer, 0, sizeof(xfer));
@@ -260,7 +269,8 @@ int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
     return -1;
   }
 
-  if (SPIInUseByAuto(port)) return -1;
+  if (SPIInUseByAuto(port))
+    return -1;
 
   struct spi_ioc_transfer xfer;
   std::memset(&xfer, 0, sizeof(xfer));
@@ -276,7 +286,8 @@ int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count) {
     return -1;
   }
 
-  if (SPIInUseByAuto(port)) return -1;
+  if (SPIInUseByAuto(port))
+    return -1;
 
   struct spi_ioc_transfer xfer;
   std::memset(&xfer, 0, sizeof(xfer));
@@ -468,7 +479,8 @@ void HAL_FreeSPIAuto(HAL_SPIPort port, int32_t* status) {
   }
 
   std::scoped_lock lock(spiAutoMutex);
-  if (spiAutoPort != port) return;
+  if (spiAutoPort != port)
+    return;
   spiAutoPort = kSpiMaxHandles;
 
   // disable by setting to internal clock and setting rate=0

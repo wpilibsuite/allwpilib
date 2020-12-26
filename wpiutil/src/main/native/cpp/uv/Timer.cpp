@@ -22,7 +22,8 @@ std::shared_ptr<Timer> Timer::Create(Loop& loop) {
 
 void Timer::SingleShot(Loop& loop, Time timeout, std::function<void()> func) {
   auto h = Create(loop);
-  if (!h) return;
+  if (!h)
+    return;
   h->timeout.connect([theTimer = h.get(), func]() {
     func();
     theTimer->Close();

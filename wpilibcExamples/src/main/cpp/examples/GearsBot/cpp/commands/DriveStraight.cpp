@@ -25,4 +25,6 @@ void DriveStraight::Initialize() {
   frc2::PIDCommand::Initialize();
 }
 
-bool DriveStraight::IsFinished() { return m_controller.AtSetpoint(); }
+bool DriveStraight::IsFinished() {
+  return m_controller.AtSetpoint();
+}

@@ -23,13 +23,16 @@ std::shared_ptr<Tcp> Tcp::Create(Loop& loop, unsigned int flags) {
 }
 
 void Tcp::Reuse(std::function<void()> callback, unsigned int flags) {
-  if (IsClosing()) return;
-  if (!m_reuseData) m_reuseData = std::make_unique<ReuseData>();
+  if (IsClosing())
+    return;
+  if (!m_reuseData)
+    m_reuseData = std::make_unique<ReuseData>();
   m_reuseData->callback = callback;
   m_reuseData->flags = flags;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {
     Tcp& h = *static_cast<Tcp*>(handle->data);
-    if (!h.m_reuseData) return;  // just in case
+    if (!h.m_reuseData)
+      return;  // just in case
     auto data = std::move(h.m_reuseData);
     int err = uv_tcp_init_ex(h.GetLoopRef().GetRaw(), h.GetRaw(), data->flags);
     if (err < 0) {
@@ -42,7 +45,8 @@ void Tcp::Reuse(std::function<void()> callback, unsigned int flags) {
 
 std::shared_ptr<Tcp> Tcp::Accept() {
   auto client = Create(GetLoopRef());
-  if (!client) return nullptr;
+  if (!client)
+    return nullptr;
   if (!Accept(client)) {
     client->Release();
     return nullptr;
@@ -50,7 +54,9 @@ std::shared_ptr<Tcp> Tcp::Accept() {
   return client;
 }
 
-Tcp* Tcp::DoAccept() { return Accept().get(); }
+Tcp* Tcp::DoAccept() {
+  return Accept().get();
+}
 
 void Tcp::Bind(const Twine& ip, unsigned int port, unsigned int flags) {
   sockaddr_in addr;

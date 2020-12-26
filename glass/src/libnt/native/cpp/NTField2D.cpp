@@ -24,7 +24,8 @@ class NTField2DModel::GroupModel : public FieldObjectGroupModel {
   void NTUpdate(const nt::Value& value);
 
   void Update() override {
-    if (auto value = nt::GetEntryValue(m_entry)) NTUpdate(*value);
+    if (auto value = nt::GetEntryValue(m_entry))
+      NTUpdate(*value);
   }
   bool Exists() override { return nt::GetEntryType(m_entry) != NT_UNASSIGNED; }
   bool IsReadOnly() override { return false; }
@@ -139,19 +140,25 @@ void NTField2DModel::GroupModel::ObjectModel::SetPoseImpl(double x, double y,
                                                           bool setRot) {
   // get from NT, validate type and size
   auto value = nt::GetEntryValue(m_entry);
-  if (!value || !value->IsDoubleArray()) return;
+  if (!value || !value->IsDoubleArray())
+    return;
   auto origArr = value->GetDoubleArray();
-  if (origArr.size() < static_cast<size_t>((m_index + 1) * 3)) return;
+  if (origArr.size() < static_cast<size_t>((m_index + 1) * 3))
+    return;
 
   // copy existing array
   wpi::SmallVector<double, 8> arr;
   arr.reserve(origArr.size());
-  for (auto&& elem : origArr) arr.emplace_back(elem);
+  for (auto&& elem : origArr)
+    arr.emplace_back(elem);
 
   // update value
-  if (setX) arr[m_index * 3 + 0] = x;
-  if (setY) arr[m_index * 3 + 1] = y;
-  if (setRot) arr[m_index * 3 + 2] = rot;
+  if (setX)
+    arr[m_index * 3 + 0] = x;
+  if (setY)
+    arr[m_index * 3 + 1] = y;
+  if (setRot)
+    arr[m_index * 3 + 2] = rot;
 
   // set back to NT
   nt::SetEntryValue(m_entry, nt::Value::MakeDoubleArray(arr));
@@ -194,14 +201,16 @@ void NTField2DModel::Update() {
     // handle create/delete
     if (wpi::StringRef{event.name}.startswith(m_path)) {
       auto name = wpi::StringRef{event.name}.drop_front(m_path.size());
-      if (name.empty() || name[0] == '.') continue;
+      if (name.empty() || name[0] == '.')
+        continue;
       auto it = std::lower_bound(m_groups.begin(), m_groups.end(), name,
                                  [](const auto& e, wpi::StringRef name) {
                                    return e->GetName() < name;
                                  });
       bool match = (it != m_groups.end() && (*it)->GetName() == name);
       if (event.flags & NT_NOTIFY_DELETE) {
-        if (match) m_groups.erase(it);
+        if (match)
+          m_groups.erase(it);
         continue;
       } else if (event.flags & NT_NOTIFY_NEW) {
         if (!match)
@@ -221,7 +230,9 @@ bool NTField2DModel::Exists() {
   return m_nt.IsConnected() && nt::GetEntryType(m_name) != NT_UNASSIGNED;
 }
 
-bool NTField2DModel::IsReadOnly() { return false; }
+bool NTField2DModel::IsReadOnly() {
+  return false;
+}
 
 void NTField2DModel::ForEachFieldObjectGroup(
     wpi::function_ref<void(FieldObjectGroupModel& model, wpi::StringRef name)>

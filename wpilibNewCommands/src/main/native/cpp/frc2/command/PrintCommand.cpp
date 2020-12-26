@@ -12,4 +12,6 @@ PrintCommand::PrintCommand(const wpi::Twine& message)
     : CommandHelper{[str = message.str()] { wpi::outs() << str << "\n"; }, {}} {
 }
 
-bool PrintCommand::RunsWhenDisabled() const { return true; }
+bool PrintCommand::RunsWhenDisabled() const {
+  return true;
+}

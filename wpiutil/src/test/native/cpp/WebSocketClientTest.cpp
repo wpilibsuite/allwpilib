@@ -19,7 +19,8 @@ class WebSocketClientTest : public WebSocketTest {
     // Bare bones server
     req.header.connect([this](StringRef name, StringRef value) {
       // save key (required for valid response)
-      if (name.equals_lower("sec-websocket-key")) clientKey = value;
+      if (name.equals_lower("sec-websocket-key"))
+        clientKey = value;
     });
     req.headersComplete.connect([this](bool) {
       // send response
@@ -33,7 +34,8 @@ class WebSocketClientTest : public WebSocketTest {
       SHA1 hash;
       hash.Update(clientKey);
       hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-      if (mockBadAccept) hash.Update("1");
+      if (mockBadAccept)
+        hash.Update("1");
       SmallString<64> hashBuf;
       SmallString<64> acceptBuf;
       os << "Sec-WebSocket-Accept: "
@@ -45,11 +47,13 @@ class WebSocketClientTest : public WebSocketTest {
       os << "\r\n";
 
       conn->Write(bufs, [](auto bufs, uv::Error) {
-        for (auto& buf : bufs) buf.Deallocate();
+        for (auto& buf : bufs)
+          buf.Deallocate();
       });
 
       serverHeadersDone = true;
-      if (connected) connected();
+      if (connected)
+        connected();
     });
 
     serverPipe->Listen([this] {
@@ -59,9 +63,11 @@ class WebSocketClientTest : public WebSocketTest {
         StringRef data{buf.base, size};
         if (!serverHeadersDone) {
           data = req.Execute(data);
-          if (req.HasError()) Finish();
+          if (req.HasError())
+            Finish();
           ASSERT_EQ(req.GetError(), HPE_OK) << http_errno_name(req.GetError());
-          if (data.empty()) return;
+          if (data.empty())
+            return;
         }
         wireData.insert(wireData.end(), data.bytes_begin(), data.bytes_end());
       });
@@ -98,7 +104,8 @@ TEST_F(WebSocketClientTest, Open) {
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure())
+    return;
   ASSERT_EQ(gotOpen, 1);
 }
 
@@ -122,7 +129,8 @@ TEST_F(WebSocketClientTest, BadAccept) {
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure())
+    return;
   ASSERT_EQ(gotClosed, 1);
 }
 
@@ -148,7 +156,8 @@ TEST_F(WebSocketClientTest, ProtocolGood) {
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure())
+    return;
   ASSERT_EQ(gotOpen, 1);
 }
 
@@ -172,7 +181,8 @@ TEST_F(WebSocketClientTest, ProtocolRespNotReq) {
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure())
+    return;
   ASSERT_EQ(gotClosed, 1);
 }
 
@@ -195,7 +205,8 @@ TEST_F(WebSocketClientTest, ProtocolReqNotResp) {
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure())
+    return;
   ASSERT_EQ(gotClosed, 1);
 }
 
@@ -210,7 +221,8 @@ class WebSocketClientDataTest : public WebSocketClientTest,
   WebSocketClientDataTest() {
     clientPipe->Connect(pipeName, [&] {
       ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName);
-      if (setupWebSocket) setupWebSocket();
+      if (setupWebSocket)
+        setupWebSocket();
     });
   }
 

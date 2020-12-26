@@ -152,7 +152,8 @@ void PCMSimModel::Update() {
 
 void PCMSimModel::ForEachSolenoid(
     wpi::function_ref<void(glass::SolenoidModel& model, int index)> func) {
-  if (m_solenoidInitCount == 0) return;
+  if (m_solenoidInitCount == 0)
+    return;
   int32_t numSolenoids = m_solenoids.size();
   for (int32_t i = 0; i < numSolenoids; ++i) {
     if (auto model = m_solenoids[i].get()) {

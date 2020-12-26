@@ -14,9 +14,12 @@ namespace glass {
 void DrawLEDSources(const int* values, DataSource** sources, int numValues,
                     int cols, const ImU32* colors, float size, float spacing,
                     const LEDConfig& config) {
-  if (numValues == 0 || cols < 1) return;
-  if (size == 0) size = ImGui::GetFontSize() / 2.0;
-  if (spacing == 0) spacing = ImGui::GetFontSize() / 3.0;
+  if (numValues == 0 || cols < 1)
+    return;
+  if (size == 0)
+    size = ImGui::GetFontSize() / 2.0;
+  if (spacing == 0)
+    spacing = ImGui::GetFontSize() / 3.0;
 
   int rows = (numValues + cols - 1) / cols;
   float inc = size + spacing;
@@ -97,7 +100,8 @@ void DrawLEDSources(const int* values, DataSource** sources, int numValues,
     }
   }
 
-  if (!sources) ImGui::Dummy(ImVec2(inc * cols, inc * rows));
+  if (!sources)
+    ImGui::Dummy(ImVec2(inc * cols, inc * rows));
 }
 
 void DrawLEDs(const int* values, int numValues, int cols, const ImU32* colors,
@@ -120,7 +124,8 @@ bool DeleteButton(ImGuiID id, const ImVec2& pos) {
 
   bool hovered, held;
   bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
-  if (is_clipped) return pressed;
+  if (is_clipped)
+    return pressed;
 
   // Render
   ImU32 col =

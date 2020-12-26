@@ -14,10 +14,16 @@ TankDrive::TankDrive(std::function<double()> left,
 }
 
 // Called repeatedly when this Command is scheduled to run
-void TankDrive::Execute() { m_drivetrain->Drive(m_left(), m_right()); }
+void TankDrive::Execute() {
+  m_drivetrain->Drive(m_left(), m_right());
+}
 
 // Make this return true when this Command no longer needs to run execute()
-bool TankDrive::IsFinished() { return false; }
+bool TankDrive::IsFinished() {
+  return false;
+}
 
 // Called once after isFinished returns true
-void TankDrive::End(bool) { m_drivetrain->Drive(0, 0); }
+void TankDrive::End(bool) {
+  m_drivetrain->Drive(0, 0);
+}

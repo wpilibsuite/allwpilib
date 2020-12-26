@@ -56,7 +56,8 @@ TEST(UvAsync, Test) {
   prepare->error.connect([](Error) { FAIL(); });
   prepare->closed.connect([&] { close_cb_called++; });
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++)
+      return;
     theThread = std::thread([&] {
       for (;;) {
         mutex.lock();
@@ -95,7 +96,8 @@ TEST(UvAsync, Test) {
   ASSERT_EQ(async_cb_called, 3);
   ASSERT_EQ(close_cb_called, 2);
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable())
+    theThread.join();
 }
 
 TEST(UvAsync, Data) {
@@ -113,7 +115,8 @@ TEST(UvAsync, Data) {
 
   prepare->error.connect([](Error) { FAIL(); });
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++)
+      return;
     theThread = std::thread([&] {
       async->Send(0, [&](int v) {
         ASSERT_EQ(v, 0);
@@ -139,7 +142,8 @@ TEST(UvAsync, Data) {
   ASSERT_EQ(async_cb_called[1], 1);
   ASSERT_EQ(close_cb_called, 1);
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable())
+    theThread.join();
 }
 
 TEST(UvAsync, DataRef) {
@@ -153,7 +157,8 @@ TEST(UvAsync, DataRef) {
   auto prepare = Prepare::Create(loop);
 
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++)
+      return;
     theThread = std::thread([&] { async->Send(1, val); });
   });
   prepare->Start();
@@ -168,7 +173,8 @@ TEST(UvAsync, DataRef) {
 
   ASSERT_EQ(val, 1);
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable())
+    theThread.join();
 }
 
 }  // namespace uv

@@ -23,7 +23,8 @@ void ParallelDeadlineGroup::Initialize() {
 
 void ParallelDeadlineGroup::Execute() {
   for (auto& commandRunning : m_commands) {
-    if (!commandRunning.second) continue;
+    if (!commandRunning.second)
+      continue;
     commandRunning.first->Execute();
     if (commandRunning.first->IsFinished()) {
       commandRunning.first->End(false);
@@ -43,7 +44,9 @@ void ParallelDeadlineGroup::End(bool interrupted) {
   }
 }
 
-bool ParallelDeadlineGroup::IsFinished() { return m_finished; }
+bool ParallelDeadlineGroup::IsFinished() {
+  return m_finished;
+}
 
 bool ParallelDeadlineGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;

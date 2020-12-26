@@ -11,7 +11,9 @@
 
 namespace wpilibws {
 
-HALSimWSProviderSimDevice::~HALSimWSProviderSimDevice() { CancelCallbacks(); }
+HALSimWSProviderSimDevice::~HALSimWSProviderSimDevice() {
+  CancelCallbacks();
+}
 
 void HALSimWSProviderSimDevice::OnNetworkConnected(
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
@@ -212,7 +214,9 @@ void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
   }
 }
 
-HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() { CancelCallbacks(); }
+HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() {
+  CancelCallbacks();
+}
 
 void HALSimWSProviderSimDevices::DeviceCreatedCallback(
     const char* name, HAL_SimDeviceHandle handle) {
@@ -265,6 +269,8 @@ void HALSimWSProviderSimDevices::OnNetworkConnected(
   m_ws = hws;
 }
 
-void HALSimWSProviderSimDevices::OnNetworkDisconnected() { m_ws = nullptr; }
+void HALSimWSProviderSimDevices::OnNetworkDisconnected() {
+  m_ws = nullptr;
+}
 
 }  // namespace wpilibws

@@ -57,7 +57,8 @@ class CallbackThread : public wpi::SafeThread {
   ~CallbackThread() {
     // Wake up any blocked pollers
     for (size_t i = 0; i < m_pollers.size(); ++i) {
-      if (auto poller = m_pollers[i]) poller->Terminate();
+      if (auto poller = m_pollers[i])
+        poller->Terminate();
     }
   }
 
@@ -87,9 +88,11 @@ class CallbackThread : public wpi::SafeThread {
   // Must be called with m_mutex held
   template <typename... Args>
   void SendPoller(unsigned int poller_uid, Args&&... args) {
-    if (poller_uid > m_pollers.size()) return;
+    if (poller_uid > m_pollers.size())
+      return;
     auto poller = m_pollers[poller_uid];
-    if (!poller) return;
+    if (!poller)
+      return;
     {
       std::scoped_lock lock(poller->poll_mutex);
       poller->poll_queue.emplace(std::forward<Args>(args)...);
@@ -105,11 +108,13 @@ void CallbackThread<Derived, TUserInfo, TListenerData, TNotifierData>::Main() {
   while (m_active) {
     while (m_queue.empty()) {
       m_cond.wait(lock);
-      if (!m_active) return;
+      if (!m_active)
+        return;
     }
 
     while (!m_queue.empty()) {
-      if (!m_active) return;
+      if (!m_active)
+        return;
       auto item = std::move(m_queue.front());
 
       if (item.first != UINT_MAX) {
@@ -132,7 +137,8 @@ void CallbackThread<Derived, TUserInfo, TListenerData, TNotifierData>::Main() {
         // Use index because iterator might get invalidated.
         for (size_t i = 0; i < m_listeners.size(); ++i) {
           auto& listener = m_listeners[i];
-          if (!listener) continue;
+          if (!listener)
+            continue;
           if (!static_cast<Derived*>(this)->Matches(listener, item.second))
             continue;
           static_cast<Derived*>(this)->SetListener(&item.second,
@@ -171,7 +177,8 @@ class CallbackManager {
 
   void Remove(unsigned int listener_uid) {
     auto thr = m_owner.GetThread();
-    if (!thr) return;
+    if (!thr)
+      return;
     thr->m_listeners.erase(listener_uid);
   }
 
@@ -184,7 +191,8 @@ class CallbackManager {
 
   void RemovePoller(unsigned int poller_uid) {
     auto thr = m_owner.GetThread();
-    if (!thr) return;
+    if (!thr)
+      return;
 
     // Remove any listeners that are associated with this poller
     for (size_t i = 0; i < thr->m_listeners.size(); ++i) {
@@ -193,28 +201,34 @@ class CallbackManager {
     }
 
     // Wake up any blocked pollers
-    if (poller_uid >= thr->m_pollers.size()) return;
+    if (poller_uid >= thr->m_pollers.size())
+      return;
     auto poller = thr->m_pollers[poller_uid];
-    if (!poller) return;
+    if (!poller)
+      return;
     poller->Terminate();
     return thr->m_pollers.erase(poller_uid);
   }
 
   bool WaitForQueue(double timeout) {
     auto thr = m_owner.GetThread();
-    if (!thr) return true;
+    if (!thr)
+      return true;
 
     auto& lock = thr.GetLock();
     auto timeout_time = std::chrono::steady_clock::now() +
                         std::chrono::duration<double>(timeout);
     while (!thr->m_queue.empty()) {
-      if (!thr->m_active) return true;
-      if (timeout == 0) return false;
+      if (!thr->m_active)
+        return true;
+      if (timeout == 0)
+        return false;
       if (timeout < 0) {
         thr->m_queue_empty.wait(lock);
       } else {
         auto cond_timed_out = thr->m_queue_empty.wait_until(lock, timeout_time);
-        if (cond_timed_out == std::cv_status::timeout) return false;
+        if (cond_timed_out == std::cv_status::timeout)
+          return false;
       }
     }
 
@@ -232,10 +246,13 @@ class CallbackManager {
     std::shared_ptr<typename Thread::Poller> poller;
     {
       auto thr = m_owner.GetThread();
-      if (!thr) return infos;
-      if (poller_uid > thr->m_pollers.size()) return infos;
+      if (!thr)
+        return infos;
+      if (poller_uid > thr->m_pollers.size())
+        return infos;
       poller = thr->m_pollers[poller_uid];
-      if (!poller) return infos;
+      if (!poller)
+        return infos;
     }
 
     std::unique_lock lock(poller->poll_mutex);
@@ -243,7 +260,8 @@ class CallbackManager {
                         std::chrono::duration<double>(timeout);
     *timed_out = false;
     while (poller->poll_queue.empty()) {
-      if (poller->terminating) return infos;
+      if (poller->terminating)
+        return infos;
       if (poller->canceling) {
         // Note: this only works if there's a single thread calling this
         // function for any particular poller, but that's the intended use.
@@ -276,10 +294,13 @@ class CallbackManager {
     std::shared_ptr<typename Thread::Poller> poller;
     {
       auto thr = m_owner.GetThread();
-      if (!thr) return;
-      if (poller_uid > thr->m_pollers.size()) return;
+      if (!thr)
+        return;
+      if (poller_uid > thr->m_pollers.size())
+        return;
       poller = thr->m_pollers[poller_uid];
-      if (!poller) return;
+      if (!poller)
+        return;
     }
 
     {
@@ -305,7 +326,8 @@ class CallbackManager {
   template <typename... Args>
   void Send(unsigned int only_listener, Args&&... args) {
     auto thr = m_owner.GetThread();
-    if (!thr || thr->m_listeners.empty()) return;
+    if (!thr || thr->m_listeners.empty())
+      return;
     thr->m_queue.emplace(std::piecewise_construct,
                          std::make_tuple(only_listener),
                          std::forward_as_tuple(std::forward<Args>(args)...));

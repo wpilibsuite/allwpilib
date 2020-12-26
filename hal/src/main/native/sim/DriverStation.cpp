@@ -76,7 +76,8 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   auto curTime = fpga_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
-    if (prevMsg[i] == details) break;
+    if (prevMsg[i] == details)
+      break;
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
@@ -177,9 +178,13 @@ char* HAL_GetJoystickName(int32_t joystickNum) {
   return name;
 }
 
-void HAL_FreeJoystickName(char* name) { std::free(name); }
+void HAL_FreeJoystickName(char* name) {
+  std::free(name);
+}
 
-int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) { return 0; }
+int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
+  return 0;
+}
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble) {
@@ -197,7 +202,9 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
   return 0;
 }
 
-void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
+void HAL_ObserveUserProgramStarting(void) {
+  HALSIM_SetProgramStarted();
+}
 
 void HAL_ObserveUserProgramDisabled(void) {
   // TODO
@@ -228,12 +235,15 @@ HAL_Bool HAL_IsNewControlData(void) {
   std::scoped_lock lock(newDSDataAvailableMutex);
   int& lastCount = GetThreadLocalLastCount();
   int currentCount = newDSDataAvailableCounter;
-  if (lastCount == currentCount) return false;
+  if (lastCount == currentCount)
+    return false;
   lastCount = currentCount;
   return true;
 }
 
-void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
+void HAL_WaitForDSData(void) {
+  HAL_WaitForDSDataTimeout(0);
+}
 
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock lock(newDSDataAvailableMutex);
@@ -270,7 +280,8 @@ constexpr int32_t refNumber = 42;
 static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
-  if (refNum != refNumber) return 0;
+  if (refNum != refNumber)
+    return 0;
   SimDriverStationData->CallNewDataCallbacks();
   std::scoped_lock lock(newDSDataAvailableMutex);
   // Nofify all threads
@@ -284,11 +295,13 @@ void HAL_InitializeDriverStation(void) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized) return;
+  if (initialized)
+    return;
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized) return;
+  if (initialized)
+    return;
 
   SimDriverStationData->ResetData();
 
@@ -300,6 +313,8 @@ void HAL_InitializeDriverStation(void) {
   initialized = true;
 }
 
-void HAL_ReleaseDSMutex(void) { newDataOccur(refNumber); }
+void HAL_ReleaseDSMutex(void) {
+  newDataOccur(refNumber);
+}
 
 }  // extern "C"

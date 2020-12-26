@@ -52,10 +52,16 @@ void HAL_SetMain(void* param, void (*mainFunc)(void*),
   gExitFunc = exitFunc;
 }
 
-HAL_Bool HAL_HasMain(void) { return gHasMain; }
+HAL_Bool HAL_HasMain(void) {
+  return gHasMain;
+}
 
-void HAL_RunMain(void) { gMainFunc(gMainParam); }
+void HAL_RunMain(void) {
+  gMainFunc(gMainParam);
+}
 
-void HAL_ExitMain(void) { gExitFunc(gMainParam); }
+void HAL_ExitMain(void) {
+  gExitFunc(gMainParam);
+}
 
 }  // extern "C"

@@ -104,7 +104,8 @@ void ThrowHalHandleException(JNIEnv* env, int32_t status) {
 }
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
-  if (status == 0) return;
+  if (status == 0)
+    return;
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
   }
@@ -123,7 +124,8 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
 
 void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
                 int32_t requestedValue) {
-  if (status == 0) return;
+  if (status == 0)
+    return;
   if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
       status == RESOURCE_OUT_OF_RANGE) {
     ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
@@ -139,7 +141,8 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
 }
 
 void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
-  if (status >= 0) return;
+  if (status >= 0)
+    return;
   switch (status) {
     case kRioStatusSuccess:
       // Everything is ok... don't throw.
@@ -299,7 +302,9 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
                                      value1, value2);
 }
 
-JavaVM* GetJVM() { return jvm; }
+JavaVM* GetJVM() {
+  return jvm;
+}
 
 namespace sim {
 jint SimOnLoad(JavaVM* vm, void* reserved);
@@ -324,12 +329,14 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 
   for (auto& c : classes) {
     *c.cls = JClass(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls)
+      return JNI_ERR;
   }
 
   for (auto& c : exceptions) {
     *c.cls = JException(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls)
+      return JNI_ERR;
   }
 
   return sim::SimOnLoad(vm, reserved);

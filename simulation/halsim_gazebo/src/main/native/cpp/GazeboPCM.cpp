@@ -21,7 +21,8 @@ static void init_callback(const char* name, void* param,
 static void output_callback(const char* name, void* param,
                             const struct HAL_Value* value) {
   GazeboPCM* pcm = static_cast<GazeboPCM*>(param);
-  if (pcm->IsInitialized()) pcm->Publish(value->data.v_boolean);
+  if (pcm->IsInitialized())
+    pcm->Publish(value->data.v_boolean);
 }
 
 GazeboPCM::GazeboPCM(int index, int channel, HALSimGazebo* halsim) {
@@ -44,7 +45,8 @@ void GazeboPCM::Publish(bool value) {
   }
   gazebo::msgs::Bool msg;
   msg.set_data(value);
-  if (m_pub) m_pub->Publish(msg);
+  if (m_pub)
+    m_pub->Publish(msg);
 }
 
 void GazeboPCM_SetPressureSwitch(int index, bool value) {

@@ -9,7 +9,9 @@
 #include "wpi/SmallVector.h"
 
 namespace wpi {
-TEST(HostNameTest, HostNameNotEmpty) { ASSERT_NE(GetHostname(), ""); }
+TEST(HostNameTest, HostNameNotEmpty) {
+  ASSERT_NE(GetHostname(), "");
+}
 TEST(HostNameTest, HostNameNotEmptySmallVector) {
   SmallVector<char, 256> name;
   ASSERT_NE(GetHostname(name), "");

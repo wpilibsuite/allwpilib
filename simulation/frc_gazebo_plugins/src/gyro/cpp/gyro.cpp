@@ -20,9 +20,12 @@ void Gyro::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   }
 
   std::string axisString = sdf->Get<std::string>("axis");
-  if (axisString == "roll") axis = Roll;
-  if (axisString == "pitch") axis = Pitch;
-  if (axisString == "yaw") axis = Yaw;
+  if (axisString == "roll")
+    axis = Roll;
+  if (axisString == "pitch")
+    axis = Pitch;
+  if (axisString == "yaw")
+    axis = Yaw;
 
   if (sdf->HasElement("units")) {
     radians = sdf->Get<std::string>("units") != "degrees";

@@ -87,7 +87,8 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
       return MakeHandle(i);
     }
   }
-  if (i >= THandle::kIndexMax) return 0;
+  if (i >= THandle::kIndexMax)
+    return 0;
 
   m_structures.emplace_back(
       std::make_shared<TStruct>(std::forward<Args>(args)...));
@@ -105,7 +106,8 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
       return MakeHandle(i);
     }
   }
-  if (i >= THandle::kIndexMax) return 0;
+  if (i >= THandle::kIndexMax)
+    return 0;
 
   m_structures.push_back(structure);
   return MakeHandle(i);
@@ -117,9 +119,11 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Get(
     THandle handle) {
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
-  if (index < 0) return nullptr;
+  if (index < 0)
+    return nullptr;
   std::scoped_lock sync(m_handleMutex);
-  if (index >= static_cast<int>(m_structures.size())) return nullptr;
+  if (index >= static_cast<int>(m_structures.size()))
+    return nullptr;
   return m_structures[index];
 }
 
@@ -129,9 +133,11 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
     THandle handle) {
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
-  if (index < 0) return nullptr;
+  if (index < 0)
+    return nullptr;
   std::scoped_lock sync(m_handleMutex);
-  if (index >= static_cast<int>(m_structures.size())) return nullptr;
+  if (index >= static_cast<int>(m_structures.size()))
+    return nullptr;
   auto rv = std::move(m_structures[index]);
   m_structures[index].reset();
   return rv;
@@ -161,7 +167,8 @@ inline void
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::ForEach(F func) {
   std::scoped_lock sync(m_handleMutex);
   for (size_t i = 0; i < m_structures.size(); i++) {
-    if (m_structures[i] != nullptr) func(MakeHandle(i), *(m_structures[i]));
+    if (m_structures[i] != nullptr)
+      func(MakeHandle(i), *(m_structures[i]));
   }
 }
 

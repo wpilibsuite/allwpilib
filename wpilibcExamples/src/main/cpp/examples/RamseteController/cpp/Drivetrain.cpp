@@ -31,4 +31,6 @@ void Drivetrain::ResetOdometry(const frc::Pose2d& pose) {
   m_odometry.ResetPosition(pose, m_gyro.GetRotation2d());
 }
 
-frc::Pose2d Drivetrain::GetPose() const { return m_odometry.GetPose(); }
+frc::Pose2d Drivetrain::GetPose() const {
+  return m_odometry.GetPose();
+}

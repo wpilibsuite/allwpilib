@@ -12,7 +12,8 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
     const Twine& key) const {
   StringRef simple;
   bool isSimple = key.isSingleStringRef();
-  if (isSimple) simple = key.getSingleStringRef();
+  if (isSimple)
+    simple = key.getSingleStringRef();
   if (isSimple && (simple.empty() || simple == "/")) {
     return std::make_shared<NetworkTable>(m_handle, "",
                                           NetworkTable::private_init{});

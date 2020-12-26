@@ -141,7 +141,9 @@ void RamseteCommand::Execute() {
   m_prevTime = curTime;
 }
 
-void RamseteCommand::End(bool interrupted) { m_timer.Stop(); }
+void RamseteCommand::End(bool interrupted) {
+  m_timer.Stop();
+}
 
 bool RamseteCommand::IsFinished() {
   return m_timer.HasElapsed(m_trajectory.TotalTime());

@@ -36,7 +36,9 @@ void ConditionalCommand::Initialize() {
   m_selectedCommand->Initialize();
 }
 
-void ConditionalCommand::Execute() { m_selectedCommand->Execute(); }
+void ConditionalCommand::Execute() {
+  m_selectedCommand->Execute();
+}
 
 void ConditionalCommand::End(bool interrupted) {
   m_selectedCommand->End(interrupted);
@@ -46,4 +48,6 @@ bool ConditionalCommand::IsFinished() {
   return m_selectedCommand->IsFinished();
 }
 
-bool ConditionalCommand::RunsWhenDisabled() const { return m_runsWhenDisabled; }
+bool ConditionalCommand::RunsWhenDisabled() const {
+  return m_runsWhenDisabled;
+}

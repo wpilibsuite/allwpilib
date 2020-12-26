@@ -17,9 +17,13 @@ void DriveDistance::Initialize() {
   m_drive->ArcadeDrive(m_speed, 0);
 }
 
-void DriveDistance::Execute() { m_drive->ArcadeDrive(m_speed, 0); }
+void DriveDistance::Execute() {
+  m_drive->ArcadeDrive(m_speed, 0);
+}
 
-void DriveDistance::End(bool interrupted) { m_drive->ArcadeDrive(0, 0); }
+void DriveDistance::End(bool interrupted) {
+  m_drive->ArcadeDrive(0, 0);
+}
 
 bool DriveDistance::IsFinished() {
   return std::abs(m_drive->GetAverageEncoderDistance()) >= m_distance;

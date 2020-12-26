@@ -41,7 +41,8 @@ class Logger {
 
   void Log(unsigned int level, const char* file, unsigned int line,
            const char* msg) {
-    if (!m_func || level < m_min_level) return;
+    if (!m_func || level < m_min_level)
+      return;
     m_func(level, file, line, msg);
   }
 

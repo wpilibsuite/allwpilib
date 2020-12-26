@@ -37,7 +37,8 @@ std::vector<VideoSink> VideoSource::EnumerateSinks() {
 
   std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());
-  for (int handle : handles) sinks.emplace_back(VideoSink{handle});
+  for (int handle : handles)
+    sinks.emplace_back(VideoSink{handle});
   return sinks;
 }
 
@@ -48,7 +49,8 @@ std::vector<VideoSource> VideoSource::EnumerateSources() {
 
   std::vector<VideoSource> sources;
   sources.reserve(handles.size());
-  for (int handle : handles) sources.emplace_back(VideoSource{handle});
+  for (int handle : handles)
+    sources.emplace_back(VideoSource{handle});
   return sources;
 }
 
@@ -71,6 +73,7 @@ std::vector<VideoSink> VideoSink::EnumerateSinks() {
 
   std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());
-  for (int handle : handles) sinks.emplace_back(VideoSink{handle});
+  for (int handle : handles)
+    sinks.emplace_back(VideoSink{handle});
   return sinks;
 }

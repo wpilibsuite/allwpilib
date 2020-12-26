@@ -30,4 +30,6 @@ void Handle::AllocBuf(uv_handle_t* handle, size_t size, uv_buf_t* buf) {
   *buf = h.m_allocBuf(size);
 }
 
-void Handle::DefaultFreeBuf(Buffer& buf) { buf.Deallocate(); }
+void Handle::DefaultFreeBuf(Buffer& buf) {
+  buf.Deallocate();
+}

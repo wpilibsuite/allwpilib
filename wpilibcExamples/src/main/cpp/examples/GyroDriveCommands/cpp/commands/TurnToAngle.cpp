@@ -30,4 +30,6 @@ TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
   AddRequirements({drive});
 }
 
-bool TurnToAngle::IsFinished() { return GetController().AtSetpoint(); }
+bool TurnToAngle::IsFinished() {
+  return GetController().AtSetpoint();
+}

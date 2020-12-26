@@ -136,7 +136,8 @@ class AsyncFunction<R(T...)> final
     }
 
     // signal the loop
-    if (loop) this->Invoke(&uv_async_send, this->GetRaw());
+    if (loop)
+      this->Invoke(&uv_async_send, this->GetRaw());
 
     // return future
     return m_promises.CreateFuture(req);

@@ -26,7 +26,8 @@ Loop::~Loop() noexcept {
 
 std::shared_ptr<Loop> Loop::Create() {
   auto loop = std::make_shared<Loop>(private_init{});
-  if (uv_loop_init(&loop->m_loopStruct) < 0) return nullptr;
+  if (uv_loop_init(&loop->m_loopStruct) < 0)
+    return nullptr;
   loop->m_loop = &loop->m_loopStruct;
   loop->m_loop->data = loop.get();
   return loop;
@@ -35,14 +36,16 @@ std::shared_ptr<Loop> Loop::Create() {
 std::shared_ptr<Loop> Loop::GetDefault() {
   static std::shared_ptr<Loop> loop = std::make_shared<Loop>(private_init{});
   loop->m_loop = uv_default_loop();
-  if (!loop->m_loop) return nullptr;
+  if (!loop->m_loop)
+    return nullptr;
   loop->m_loop->data = loop.get();
   return loop;
 }
 
 void Loop::Close() {
   int err = uv_loop_close(m_loop);
-  if (err < 0) ReportError(err);
+  if (err < 0)
+    ReportError(err);
 }
 
 void Loop::Walk(std::function<void(Handle&)> callback) {
@@ -58,5 +61,6 @@ void Loop::Walk(std::function<void(Handle&)> callback) {
 
 void Loop::Fork() {
   int err = uv_loop_fork(m_loop);
-  if (err < 0) ReportError(err);
+  if (err < 0)
+    ReportError(err);
 }

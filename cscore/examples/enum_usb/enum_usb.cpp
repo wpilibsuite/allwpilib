@@ -45,7 +45,8 @@ int main() {
                       << "value=" << prop.Get();
           auto choices = prop.GetChoices();
           for (size_t i = 0; i < choices.size(); ++i) {
-            if (choices[i].empty()) continue;
+            if (choices[i].empty())
+              continue;
             wpi::outs() << "\n    " << i << ": " << choices[i];
           }
           break;

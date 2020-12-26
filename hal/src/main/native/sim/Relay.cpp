@@ -36,7 +36,8 @@ extern "C" {
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
                                         int32_t* status) {
   hal::init::CheckInit();
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0)
+    return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -44,7 +45,8 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
     return HAL_kInvalidHandle;
   }
 
-  if (!fwd) channel += kNumRelayHeaders;  // add 4 to reverse channels
+  if (!fwd)
+    channel += kNumRelayHeaders;  // add 4 to reverse channels
 
   auto handle = relayHandles->Allocate(channel, status);
 
@@ -77,7 +79,8 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle) {
   auto port = relayHandles->Get(relayPortHandle);
   relayHandles->Free(relayPortHandle);
-  if (port == nullptr) return;
+  if (port == nullptr)
+    return;
   if (port->fwd)
     SimRelayData[port->channel].initializedForward = false;
   else

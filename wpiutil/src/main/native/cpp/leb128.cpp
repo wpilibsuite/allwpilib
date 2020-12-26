@@ -47,7 +47,8 @@ uint64_t ReadUleb128(const char* addr, uint64_t* ret) {
     result |= (byte & 0x7f) << shift;
     shift += 7;
 
-    if (!(byte & 0x80)) break;
+    if (!(byte & 0x80))
+      break;
   }
 
   *ret = result;
@@ -62,12 +63,14 @@ bool ReadUleb128(raw_istream& is, uint64_t* ret) {
   while (1) {
     unsigned char byte;
     is.read(reinterpret_cast<char*>(&byte), 1);
-    if (is.has_error()) return false;
+    if (is.has_error())
+      return false;
 
     result |= (byte & 0x7f) << shift;
     shift += 7;
 
-    if (!(byte & 0x80)) break;
+    if (!(byte & 0x80))
+      break;
   }
 
   *ret = result;

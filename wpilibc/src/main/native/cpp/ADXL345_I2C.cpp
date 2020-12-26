@@ -38,16 +38,25 @@ void ADXL345_I2C::SetRange(Range range) {
               kDataFormat_FullRes | static_cast<uint8_t>(range));
 }
 
-double ADXL345_I2C::GetX() { return GetAcceleration(kAxis_X); }
+double ADXL345_I2C::GetX() {
+  return GetAcceleration(kAxis_X);
+}
 
-double ADXL345_I2C::GetY() { return GetAcceleration(kAxis_Y); }
+double ADXL345_I2C::GetY() {
+  return GetAcceleration(kAxis_Y);
+}
 
-double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
+double ADXL345_I2C::GetZ() {
+  return GetAcceleration(kAxis_Z);
+}
 
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
-  if (axis == kAxis_X && m_simX) return m_simX.Get();
-  if (axis == kAxis_Y && m_simY) return m_simY.Get();
-  if (axis == kAxis_Z && m_simZ) return m_simZ.Get();
+  if (axis == kAxis_X && m_simX)
+    return m_simX.Get();
+  if (axis == kAxis_Y && m_simY)
+    return m_simY.Get();
+  if (axis == kAxis_Z && m_simZ)
+    return m_simZ.Get();
   int16_t rawAccel = 0;
   m_i2c.Read(kDataRegister + static_cast<int>(axis), sizeof(rawAccel),
              reinterpret_cast<uint8_t*>(&rawAccel));

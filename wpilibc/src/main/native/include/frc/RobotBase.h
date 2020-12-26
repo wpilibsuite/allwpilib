@@ -74,7 +74,8 @@ int StartRobot() {
     HAL_RunMain();
 
     // signal loop to exit
-    if (robot) robot->EndCompetition();
+    if (robot)
+      robot->EndCompetition();
 
     // prefer to join, but detach to exit if it doesn't exit in a timely manner
     using namespace std::chrono_literals;

@@ -57,7 +57,8 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
         size_t toCopy = (std::min)(2u - store.m_frame.size(), data.size());
         store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
-        if (store.m_frame.size() < 2u) return;  // need more data
+        if (store.m_frame.size() < 2u)
+          return;  // need more data
       }
       store.m_frameSize = (static_cast<uint16_t>(store.m_frame[0]) << 8) |
                           static_cast<uint16_t>(store.m_frame[1]);

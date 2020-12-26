@@ -34,11 +34,17 @@ double GenericHID::GetRawAxis(int axis) const {
   return m_ds->GetStickAxis(m_port, axis);
 }
 
-int GenericHID::GetPOV(int pov) const { return m_ds->GetStickPOV(m_port, pov); }
+int GenericHID::GetPOV(int pov) const {
+  return m_ds->GetStickPOV(m_port, pov);
+}
 
-int GenericHID::GetAxisCount() const { return m_ds->GetStickAxisCount(m_port); }
+int GenericHID::GetAxisCount() const {
+  return m_ds->GetStickAxisCount(m_port);
+}
 
-int GenericHID::GetPOVCount() const { return m_ds->GetStickPOVCount(m_port); }
+int GenericHID::GetPOVCount() const {
+  return m_ds->GetStickPOVCount(m_port);
+}
 
 int GenericHID::GetButtonCount() const {
   return m_ds->GetStickButtonCount(m_port);
@@ -60,7 +66,9 @@ int GenericHID::GetAxisType(int axis) const {
   return m_ds->GetJoystickAxisType(m_port, axis);
 }
 
-int GenericHID::GetPort() const { return m_port; }
+int GenericHID::GetPort() const {
+  return m_port;
+}
 
 void GenericHID::SetOutput(int outputNumber, bool value) {
   m_outputs =

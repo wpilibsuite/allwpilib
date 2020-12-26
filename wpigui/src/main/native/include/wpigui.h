@@ -271,7 +271,8 @@ class Texture {
 
   Texture& operator=(const Texture&) = delete;
   Texture& operator=(Texture&& oth) {
-    if (m_texture) DeleteTexture(m_texture);
+    if (m_texture)
+      DeleteTexture(m_texture);
     m_texture = oth.m_texture;
     oth.m_texture = 0;
     m_format = oth.m_format;
@@ -281,7 +282,8 @@ class Texture {
   }
 
   ~Texture() {
-    if (m_texture) DeleteTexture(m_texture);
+    if (m_texture)
+      DeleteTexture(m_texture);
   }
 
   /**

@@ -96,7 +96,8 @@ void HALSimWeb::Start() {
   // when we get a connection, accept it and start reading
   m_server->connection.connect([this, srv = m_server.get()] {
     auto tcp = srv->Accept();
-    if (!tcp) return;
+    if (!tcp)
+      return;
 
     tcp->SetNoDelay(true);
 

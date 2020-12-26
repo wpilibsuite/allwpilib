@@ -37,8 +37,10 @@ void QueueWork(Loop& loop, const std::shared_ptr<WorkReq>& req) {
 void QueueWork(Loop& loop, std::function<void()> work,
                std::function<void()> afterWork) {
   auto req = std::make_shared<WorkReq>();
-  if (work) req->work.connect(work);
-  if (afterWork) req->afterWork.connect(afterWork);
+  if (work)
+    req->work.connect(work);
+  if (afterWork)
+    req->afterWork.connect(afterWork);
   QueueWork(loop, req);
 }
 

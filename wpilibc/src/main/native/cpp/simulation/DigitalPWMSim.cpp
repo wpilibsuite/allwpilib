@@ -20,7 +20,8 @@ DigitalPWMSim::DigitalPWMSim(const DigitalOutput& digitalOutput)
 
 DigitalPWMSim DigitalPWMSim::CreateForChannel(int channel) {
   int index = HALSIM_FindDigitalPWMForChannel(channel);
-  if (index < 0) throw std::out_of_range("no digital PWM found for channel");
+  if (index < 0)
+    throw std::out_of_range("no digital PWM found for channel");
   return DigitalPWMSim{index};
 }
 
@@ -71,8 +72,14 @@ std::unique_ptr<CallbackStore> DigitalPWMSim::RegisterPinCallback(
   return store;
 }
 
-int DigitalPWMSim::GetPin() const { return HALSIM_GetDigitalPWMPin(m_index); }
+int DigitalPWMSim::GetPin() const {
+  return HALSIM_GetDigitalPWMPin(m_index);
+}
 
-void DigitalPWMSim::SetPin(int pin) { HALSIM_SetDigitalPWMPin(m_index, pin); }
+void DigitalPWMSim::SetPin(int pin) {
+  HALSIM_SetDigitalPWMPin(m_index, pin);
+}
 
-void DigitalPWMSim::ResetData() { HALSIM_ResetDigitalPWMData(m_index); }
+void DigitalPWMSim::ResetData() {
+  HALSIM_ResetDigitalPWMData(m_index);
+}

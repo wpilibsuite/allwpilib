@@ -58,4 +58,6 @@ IniSaverBase::IniSaverBase(const wpi::Twine& typeName, IniSaverBackend* backend)
     : m_typeName(typeName.str()),
       m_backend{backend ? backend : GetSaverInstance()} {}
 
-IniSaverBase::~IniSaverBase() { m_backend->Unregister(this); }
+IniSaverBase::~IniSaverBase() {
+  m_backend->Unregister(this);
+}

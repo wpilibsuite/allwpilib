@@ -38,17 +38,22 @@ StringRef raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
   for (int i = 0; i < maxLen; ++i) {
     char c;
     read(c);
-    if (has_error()) return StringRef{buf.data(), buf.size()};
-    if (c == '\r') continue;
+    if (has_error())
+      return StringRef{buf.data(), buf.size()};
+    if (c == '\r')
+      continue;
     buf.push_back(c);
-    if (c == '\n') break;
+    if (c == '\n')
+      break;
   }
   return StringRef{buf.data(), buf.size()};
 }
 
 void raw_mem_istream::close() {}
 
-size_t raw_mem_istream::in_avail() const { return m_left; }
+size_t raw_mem_istream::in_avail() const {
+  return m_left;
+}
 
 void raw_mem_istream::read_impl(void* data, size_t len) {
   if (len > m_left) {
@@ -73,7 +78,8 @@ static int getFD(const Twine& Filename, std::error_code& EC) {
   int FD;
 
   EC = sys::fs::openFileForRead(Filename, FD);
-  if (EC) return -1;
+  if (EC)
+    return -1;
 
   EC = std::error_code();
   return FD;
@@ -89,7 +95,8 @@ raw_fd_istream::raw_fd_istream(int fd, bool shouldClose, size_t bufSize)
 }
 
 raw_fd_istream::~raw_fd_istream() {
-  if (m_shouldClose) close();
+  if (m_shouldClose)
+    close();
   std::free(m_buf);
 }
 
@@ -100,7 +107,9 @@ void raw_fd_istream::close() {
   }
 }
 
-size_t raw_fd_istream::in_avail() const { return m_end - m_cur; }
+size_t raw_fd_istream::in_avail() const {
+  return m_end - m_cur;
+}
 
 void raw_fd_istream::read_impl(void* data, size_t len) {
   char* cdata = static_cast<char*>(data);

@@ -6,12 +6,22 @@
 
 using namespace frc;
 
-void Button::WhenPressed(Command* command) { WhenActive(command); }
+void Button::WhenPressed(Command* command) {
+  WhenActive(command);
+}
 
-void Button::WhileHeld(Command* command) { WhileActive(command); }
+void Button::WhileHeld(Command* command) {
+  WhileActive(command);
+}
 
-void Button::WhenReleased(Command* command) { WhenInactive(command); }
+void Button::WhenReleased(Command* command) {
+  WhenInactive(command);
+}
 
-void Button::CancelWhenPressed(Command* command) { CancelWhenActive(command); }
+void Button::CancelWhenPressed(Command* command) {
+  CancelWhenActive(command);
+}
 
-void Button::ToggleWhenPressed(Command* command) { ToggleWhenActive(command); }
+void Button::ToggleWhenPressed(Command* command) {
+  ToggleWhenActive(command);
+}

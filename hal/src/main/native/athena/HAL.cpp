@@ -92,14 +92,17 @@ extern "C" {
 
 HAL_PortHandle HAL_GetPort(int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
+  if (channel < 0 || channel >= 255)
+    return HAL_kInvalidHandle;
   return createPortHandle(channel, 1);
 }
 
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
-  if (module < 0 || module >= 255) return HAL_kInvalidHandle;
+  if (channel < 0 || channel >= 255)
+    return HAL_kInvalidHandle;
+  if (module < 0 || module >= 255)
+    return HAL_kInvalidHandle;
   return createPortHandle(channel, module);
 }
 
@@ -232,7 +235,9 @@ const char* HAL_GetErrorMessage(int32_t code) {
   }
 }
 
-HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Athena; }
+HAL_RuntimeType HAL_GetRuntimeType(void) {
+  return HAL_Athena;
+}
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {
   if (!global) {
@@ -259,11 +264,13 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   uint64_t upper1 = global->readLocalTimeUpper(status);
   uint32_t lower = global->readLocalTime(status);
   uint64_t upper2 = global->readLocalTimeUpper(status);
-  if (*status != 0) return 0;
+  if (*status != 0)
+    return 0;
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
     lower = global->readLocalTime(status);
-    if (*status != 0) return 0;
+    if (*status != 0)
+      return 0;
   }
   return (upper2 << 32) + lower;
 }
@@ -272,7 +279,8 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
   // Capture the current FPGA time.  This will give us the upper half of the
   // clock.
   uint64_t fpga_time = HAL_GetFPGATime(status);
-  if (*status != 0) return 0;
+  if (*status != 0)
+    return 0;
 
   // Now, we need to detect the case where the lower bits rolled over after we
   // sampled.  In that case, the upper bits will be 1 bigger than they should
@@ -319,7 +327,8 @@ static bool killExistingProgram(int timeout, int mode) {
   std::fstream fs;
   // By making this both in/out, it won't give us an error if it doesnt exist
   fs.open("/var/lock/frc.pid", std::fstream::in | std::fstream::out);
-  if (fs.bad()) return false;
+  if (fs.bad())
+    return false;
 
   pid_t pid = 0;
   if (!fs.eof() && !fs.fail()) {
@@ -359,11 +368,13 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized) return true;
+  if (initialized)
+    return true;
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized) return true;
+  if (initialized)
+    return true;
 
   hal::init::InitializeHAL();
 
@@ -394,7 +405,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   global.reset(tGlobal::create(&status));
   watchdog.reset(tSysWatchdog::create(&status));
 
-  if (status != 0) return false;
+  if (status != 0)
+    return false;
 
   HAL_InitializeDriverStation();
 

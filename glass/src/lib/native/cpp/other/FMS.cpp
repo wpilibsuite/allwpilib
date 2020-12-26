@@ -15,19 +15,22 @@ static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
                                  "Blue 1", "Blue 2", "Blue 3"};
 
 void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
-  if (!model->Exists() || model->IsReadOnly()) return DisplayFMSReadOnly(model);
+  if (!model->Exists() || model->IsReadOnly())
+    return DisplayFMSReadOnly(model);
 
   // FMS Attached
   if (auto data = model->GetFmsAttachedData()) {
     bool val = data->GetValue();
-    if (ImGui::Checkbox("FMS Attached", &val)) model->SetFmsAttached(val);
+    if (ImGui::Checkbox("FMS Attached", &val))
+      model->SetFmsAttached(val);
     data->EmitDrag();
   }
 
   // DS Attached
   if (auto data = model->GetDsAttachedData()) {
     bool val = data->GetValue();
-    if (ImGui::Checkbox("DS Attached", &val)) model->SetDsAttached(val);
+    if (ImGui::Checkbox("DS Attached", &val))
+      model->SetDsAttached(val);
     data->EmitDrag();
   }
 
@@ -74,7 +77,8 @@ void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
 
 void glass::DisplayFMSReadOnly(FMSModel* model) {
   bool exists = model->Exists();
-  if (!exists) ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+  if (!exists)
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
 
   if (auto data = model->GetEStopData()) {
     ImGui::Selectable("E-Stopped: ");
@@ -133,5 +137,6 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
   model->GetGameSpecificMessage(gameSpecificMessage);
   ImGui::Text("Game Specific: %s", exists ? gameSpecificMessage.c_str() : "?");
 
-  if (!exists) ImGui::PopStyleColor();
+  if (!exists)
+    ImGui::PopStyleColor();
 }

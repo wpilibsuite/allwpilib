@@ -27,7 +27,9 @@ void PDPData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetPDPData(int32_t index) { SimPDPData[index].ResetData(); }
+void HALSIM_ResetPDPData(int32_t index) {
+  SimPDPData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PDP##CAPINAME, SimPDPData, \

@@ -414,7 +414,8 @@ int32_t HAL_GetSerialBytesReceived(HAL_SerialPortHandle handle,
 int32_t HAL_ReadSerial(HAL_SerialPortHandle handle, char* buffer, int32_t count,
                        int32_t* status) {
   // Don't do anything if 0 bytes were requested
-  if (count == 0) return 0;
+  if (count == 0)
+    return 0;
 
   auto port = serialPortHandles->Get(handle);
   if (!port) {

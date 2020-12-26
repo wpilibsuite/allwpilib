@@ -75,7 +75,8 @@ void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
 void HAL_FreeAnalogGyro(HAL_GyroHandle handle) {
   auto gyro = analogGyroHandles->Get(handle);
   analogGyroHandles->Free(handle);
-  if (gyro == nullptr) return;
+  if (gyro == nullptr)
+    return;
   SimAnalogGyroData[gyro->index].initialized = false;
 }
 

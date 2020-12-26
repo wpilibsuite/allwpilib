@@ -43,8 +43,12 @@ void InitializeDigitalInternal() {
 }  // namespace init
 
 namespace detail {
-wpi::mutex& UnsafeGetDIOMutex() { return digitalDIOMutex; }
-tDIO* UnsafeGetDigialSystem() { return digitalSystem.get(); }
+wpi::mutex& UnsafeGetDIOMutex() {
+  return digitalDIOMutex;
+}
+tDIO* UnsafeGetDigialSystem() {
+  return digitalSystem.get();
+}
 int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status) {
   auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
@@ -69,11 +73,13 @@ void initializeDigital(int32_t* status) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized) return;
+  if (initialized)
+    return;
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized) return;
+  if (initialized)
+    return;
 
   digitalSystem.reset(tDIO::create(status));
 
@@ -89,7 +95,8 @@ void initializeDigital(int32_t* status) {
 
   // Make sure that the 9403 IONode has had a chance to initialize before
   // continuing.
-  while (pwmSystem->readLoopTiming(status) == 0) std::this_thread::yield();
+  while (pwmSystem->readLoopTiming(status) == 0)
+    std::this_thread::yield();
 
   if (pwmSystem->readLoopTiming(status) != kExpectedLoopTiming) {
     *status = LOOP_TIMING_ERROR;  // NOTE: Doesn't display the error
@@ -160,7 +167,9 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
   }
 }
 
-int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
+int32_t remapMXPChannel(int32_t channel) {
+  return channel - 10;
+}
 
 int32_t remapMXPPWMChannel(int32_t channel) {
   if (channel < 14) {
@@ -170,7 +179,9 @@ int32_t remapMXPPWMChannel(int32_t channel) {
   }
 }
 
-int32_t remapSPIChannel(int32_t channel) { return channel - 26; }
+int32_t remapSPIChannel(int32_t channel) {
+  return channel - 26;
+}
 
 }  // namespace hal
 

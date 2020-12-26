@@ -75,8 +75,10 @@ static void alarmCallback() {
 
   // process all notifiers
   notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
-    if (notifier->triggerTime == UINT64_MAX) return;
-    if (currentTime == 0) currentTime = HAL_GetFPGATime(&status);
+    if (notifier->triggerTime == UINT64_MAX)
+      return;
+    if (currentTime == 0)
+      currentTime = HAL_GetFPGATime(&status);
     std::unique_lock lock(notifier->mutex);
     if (notifier->triggerTime < currentTime) {
       notifier->triggerTime = UINT64_MAX;
@@ -102,19 +104,23 @@ static void notifierThreadMain() {
   tInterruptManager manager{1 << kTimerInterruptNumber, true, &status};
   while (notifierRunning) {
     auto triggeredMask = manager.watch(10000, false, &status);
-    if (!notifierRunning) break;
-    if (triggeredMask == 0) continue;
+    if (!notifierRunning)
+      break;
+    if (triggeredMask == 0)
+      continue;
     alarmCallback();
   }
 }
 
 static void cleanupNotifierAtExit() {
   int32_t status = 0;
-  if (notifierAlarm) notifierAlarm->writeEnable(false, &status);
+  if (notifierAlarm)
+    notifierAlarm->writeEnable(false, &status);
   notifierAlarm = nullptr;
   notifierRunning = false;
   hal::ReleaseFPGAInterrupt(kTimerInterruptNumber);
-  if (notifierThread.joinable()) notifierThread.join();
+  if (notifierThread.joinable())
+    notifierThread.join();
 }
 
 namespace hal {
@@ -154,7 +160,8 @@ void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
 
 void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier) return;
+  if (!notifier)
+    return;
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -167,7 +174,8 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles->Free(notifierHandle);
-  if (!notifier) return;
+  if (!notifier)
+    return;
 
   // Just in case HAL_StopNotifier() wasn't called...
   {
@@ -184,10 +192,12 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
     // here (the atomic fetch_sub will prevent multiple parallel entries
     // into this function)
 
-    if (notifierAlarm) notifierAlarm->writeEnable(false, status);
+    if (notifierAlarm)
+      notifierAlarm->writeEnable(false, status);
     notifierRunning = false;
     hal::ReleaseFPGAInterrupt(kTimerInterruptNumber);
-    if (notifierThread.joinable()) notifierThread.join();
+    if (notifierThread.joinable())
+      notifierThread.join();
 
     std::scoped_lock lock(notifierMutex);
     notifierAlarm = nullptr;
@@ -198,7 +208,8 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier) return;
+  if (!notifier)
+    return;
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -215,14 +226,16 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
     notifierAlarm->writeTriggerTime(static_cast<uint32_t>(closestTrigger),
                                     status);
     // Enable the alarm.
-    if (!wasActive) notifierAlarm->writeEnable(true, status);
+    if (!wasActive)
+      notifierAlarm->writeEnable(true, status);
   }
 }
 
 void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier) return;
+  if (!notifier)
+    return;
 
   {
     std::scoped_lock lock(notifier->mutex);
@@ -233,7 +246,8 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
 uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
                                   int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);
-  if (!notifier) return 0;
+  if (!notifier)
+    return 0;
   std::unique_lock lock(notifier->mutex);
   notifier->cond.wait(lock, [&] {
     return !notifier->active || notifier->triggeredTime != UINT64_MAX;

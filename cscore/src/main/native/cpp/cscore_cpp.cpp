@@ -57,7 +57,8 @@ namespace cs {
 CS_PropertyKind GetPropertyKind(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return CS_PROP_NONE;
+  if (!container)
+    return CS_PROP_NONE;
   return container->GetPropertyKind(propertyIndex);
 }
 
@@ -65,7 +66,8 @@ std::string GetPropertyName(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return std::string{};
+  if (!container)
+    return std::string{};
   return container->GetPropertyName(propertyIndex, buf, status);
 }
 
@@ -74,49 +76,56 @@ wpi::StringRef GetPropertyName(CS_Property property,
                                CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return wpi::StringRef{};
+  if (!container)
+    return wpi::StringRef{};
   return container->GetPropertyName(propertyIndex, buf, status);
 }
 
 int GetProperty(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return false;
+  if (!container)
+    return false;
   return container->GetProperty(propertyIndex, status);
 }
 
 void SetProperty(CS_Property property, int value, CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return;
+  if (!container)
+    return;
   container->SetProperty(propertyIndex, value, status);
 }
 
 int GetPropertyMin(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return 0.0;
+  if (!container)
+    return 0.0;
   return container->GetPropertyMin(propertyIndex, status);
 }
 
 int GetPropertyMax(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return 0.0;
+  if (!container)
+    return 0.0;
   return container->GetPropertyMax(propertyIndex, status);
 }
 
 int GetPropertyStep(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return 0.0;
+  if (!container)
+    return 0.0;
   return container->GetPropertyStep(propertyIndex, status);
 }
 
 int GetPropertyDefault(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return 0.0;
+  if (!container)
+    return 0.0;
   return container->GetPropertyDefault(propertyIndex, status);
 }
 
@@ -124,7 +133,8 @@ std::string GetStringProperty(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return std::string{};
+  if (!container)
+    return std::string{};
   return container->GetStringProperty(propertyIndex, buf, status);
 }
 
@@ -133,7 +143,8 @@ wpi::StringRef GetStringProperty(CS_Property property,
                                  CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return wpi::StringRef{};
+  if (!container)
+    return wpi::StringRef{};
   return container->GetStringProperty(propertyIndex, buf, status);
 }
 
@@ -141,7 +152,8 @@ void SetStringProperty(CS_Property property, const wpi::Twine& value,
                        CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return;
+  if (!container)
+    return;
   container->SetStringProperty(propertyIndex, value, status);
 }
 
@@ -149,7 +161,8 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
                                                 CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
-  if (!container) return std::vector<std::string>{};
+  if (!container)
+    return std::vector<std::string>{};
   return container->GetEnumPropertyChoices(propertyIndex, status);
 }
 
@@ -383,7 +396,8 @@ wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
 }
 
 CS_Source CopySource(CS_Source source, CS_Status* status) {
-  if (source == 0) return 0;
+  if (source == 0)
+    return 0;
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
@@ -394,14 +408,16 @@ CS_Source CopySource(CS_Source source, CS_Status* status) {
 }
 
 void ReleaseSource(CS_Source source, CS_Status* status) {
-  if (source == 0) return;
+  if (source == 0)
+    return;
   auto& inst = Instance::GetInstance();
   auto data = inst.GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
   }
-  if (data->refCount-- == 0) inst.DestroySource(source);
+  if (data->refCount-- == 0)
+    inst.DestroySource(source);
 }
 
 //
@@ -639,7 +655,8 @@ CS_Property GetSinkSourceProperty(CS_Sink sink, const wpi::Twine& name,
 }
 
 CS_Sink CopySink(CS_Sink sink, CS_Status* status) {
-  if (sink == 0) return 0;
+  if (sink == 0)
+    return 0;
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
@@ -650,14 +667,16 @@ CS_Sink CopySink(CS_Sink sink, CS_Status* status) {
 }
 
 void ReleaseSink(CS_Sink sink, CS_Status* status) {
-  if (sink == 0) return;
+  if (sink == 0)
+    return;
   auto& inst = Instance::GetInstance();
   auto data = inst.GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return;
   }
-  if (data->refCount-- == 0) inst.DestroySink(sink);
+  if (data->refCount-- == 0)
+    inst.DestroySink(sink);
 }
 
 //
@@ -680,7 +699,8 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
   if ((eventMask & CS_NETWORK_INTERFACES_CHANGED) != 0) {
     // start network interface event listener
     inst.networkListener.Start();
-    if (immediateNotify) inst.notifier.NotifyNetworkInterfacesChanged();
+    if (immediateNotify)
+      inst.notifier.NotifyNetworkInterfacesChanged();
   }
   if (immediateNotify) {
     // TODO
@@ -697,7 +717,9 @@ void RemoveListener(CS_Listener handle, CS_Status* status) {
   Instance::GetInstance().notifier.RemoveListener(uid);
 }
 
-bool NotifierDestroyed() { return Notifier::destroyed(); }
+bool NotifierDestroyed() {
+  return Notifier::destroyed();
+}
 
 //
 // Telemetry Functions
@@ -741,7 +763,9 @@ void SetDefaultLogger(unsigned int min_level) {
 //
 // Shutdown Function
 //
-void Shutdown() { Instance::GetInstance().Shutdown(); }
+void Shutdown() {
+  Instance::GetInstance().Shutdown();
+}
 
 //
 // Utility Functions
@@ -757,6 +781,8 @@ wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
   return Instance::GetInstance().EnumerateSinkHandles(vec);
 }
 
-std::string GetHostname() { return wpi::GetHostname(); }
+std::string GetHostname() {
+  return wpi::GetHostname();
+}
 
 }  // namespace cs

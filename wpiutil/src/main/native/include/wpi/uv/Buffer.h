@@ -113,7 +113,8 @@ class SimpleBufferPool {
    * Allocate a buffer.
    */
   Buffer Allocate() {
-    if (m_pool.empty()) return Buffer::Allocate(m_size);
+    if (m_pool.empty())
+      return Buffer::Allocate(m_size);
     auto buf = m_pool.back();
     m_pool.pop_back();
     buf.len = m_size;
@@ -131,14 +132,16 @@ class SimpleBufferPool {
    * allocated with the same size as the buffer pool allocation size.
    */
   void Release(MutableArrayRef<Buffer> bufs) {
-    for (auto& buf : bufs) m_pool.emplace_back(buf.Move());
+    for (auto& buf : bufs)
+      m_pool.emplace_back(buf.Move());
   }
 
   /**
    * Clear the pool, releasing all buffers.
    */
   void Clear() {
-    for (auto& buf : m_pool) buf.Deallocate();
+    for (auto& buf : m_pool)
+      buf.Deallocate();
     m_pool.clear();
   }
 

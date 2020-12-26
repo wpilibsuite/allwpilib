@@ -42,7 +42,8 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
     ImGui::Combo("Start", start, options, 4);
   }
   ImGui::Checkbox("Serpentine", serpentine);
-  if (*numColumns < 1) *numColumns = 1;
+  if (*numColumns < 1)
+    *numColumns = 1;
   ImGui::PopItemWidth();
 
   // show as LED indicators
@@ -57,7 +58,8 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
     iData->colors.resize(length);
   if (!running) {
     iData->colors[0] = IM_COL32(128, 128, 128, 255);
-    for (int j = 0; j < length; ++j) iData->values[j] = -1;
+    for (int j = 0; j < length; ++j)
+      iData->values[j] = -1;
   } else {
     for (int j = 0; j < length; ++j) {
       iData->values[j] = j + 1;
@@ -79,10 +81,12 @@ void glass::DisplayLEDDisplays(LEDDisplaysModel* model) {
 
   model->ForEachLEDDisplay([&](LEDDisplayModel& display, int i) {
     hasAny = true;
-    if (model->GetNumLEDDisplays() > 1) ImGui::Text("LEDs[%d]", i);
+    if (model->GetNumLEDDisplays() > 1)
+      ImGui::Text("LEDs[%d]", i);
     PushID(i);
     DisplayLEDDisplay(&display, i);
     PopID();
   });
-  if (!hasAny) ImGui::Text("No addressable LEDs");
+  if (!hasAny)
+    ImGui::Text("No addressable LEDs");
 }

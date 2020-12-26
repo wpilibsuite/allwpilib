@@ -23,8 +23,10 @@ void glass::DisplayRelay(RelayModel* model, int index, bool outputsEnabled) {
   bool forward = false;
   bool reverse = false;
   if (outputsEnabled) {
-    if (forwardData) forward = forwardData->GetValue();
-    if (reverseData) reverse = reverseData->GetValue();
+    if (forwardData)
+      forward = forwardData->GetValue();
+    if (reverseData)
+      reverse = reverseData->GetValue();
   }
 
   std::string* name = GetStorage().GetStringRef("name");
@@ -35,8 +37,10 @@ void glass::DisplayRelay(RelayModel* model, int index, bool outputsEnabled) {
     ImGui::Text("Relay[%d]", index);
   ImGui::PopID();
   if (PopupEditName("name", name)) {
-    if (forwardData) forwardData->SetName(name->c_str());
-    if (reverseData) reverseData->SetName(name->c_str());
+    if (forwardData)
+      forwardData->SetName(name->c_str());
+    if (reverseData)
+      reverseData->SetName(name->c_str());
   }
   ImGui::SameLine();
 

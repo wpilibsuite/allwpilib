@@ -41,7 +41,8 @@ int main(int argc, char** argv) {
       propName = wpi::StringRef{};
     }
   }
-  if (arg < argc && wpi::StringRef{argv[arg]} == "--") ++arg;
+  if (arg < argc && wpi::StringRef{argv[arg]} == "--")
+    ++arg;
 
   // Wait to connect
   while (!camera.IsConnected())
@@ -88,7 +89,8 @@ int main(int argc, char** argv) {
                     << "value=" << prop.Get();
         auto choices = prop.GetChoices();
         for (size_t i = 0; i < choices.size(); ++i) {
-          if (choices[i].empty()) continue;
+          if (choices[i].empty())
+            continue;
           wpi::outs() << "\n    " << i << ": " << choices[i];
         }
         break;

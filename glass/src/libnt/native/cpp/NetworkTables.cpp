@@ -32,7 +32,8 @@ static std::string BooleanArrayToString(wpi::ArrayRef<int> in) {
   os << '[';
   bool first = true;
   for (auto v : in) {
-    if (!first) os << ',';
+    if (!first)
+      os << ',';
     first = false;
     if (v)
       os << "true";
@@ -49,7 +50,8 @@ static std::string DoubleArrayToString(wpi::ArrayRef<double> in) {
   os << '[';
   bool first = true;
   for (auto v : in) {
-    if (!first) os << ',';
+    if (!first)
+      os << ',';
     first = false;
     os << wpi::format("%.6f", v);
   }
@@ -63,7 +65,8 @@ static std::string StringArrayToString(wpi::ArrayRef<std::string> in) {
   os << '[';
   bool first = true;
   for (auto&& v : in) {
-    if (!first) os << ',';
+    if (!first)
+      os << ',';
     first = false;
     os << '"';
     os.write_escaped(v);
@@ -136,12 +139,14 @@ void NetworkTablesModel::Update() {
         updateTree = true;
       }
     }
-    if (!entry) continue;
+    if (!entry)
+      continue;
     if (event.flags & NT_NOTIFY_DELETE) {
       auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
                           entry.get());
       // will be removed completely below
-      if (it != m_sortedEntries.end()) *it = nullptr;
+      if (it != m_sortedEntries.end())
+        *it = nullptr;
       m_entries.erase(event.entry);
       updateTree = true;
       continue;
@@ -156,7 +161,8 @@ void NetworkTablesModel::Update() {
   }
 
   // shortcut common case (updates)
-  if (!updateTree) return;
+  if (!updateTree)
+    return;
 
   // remove deleted entries
   m_sortedEntries.erase(
@@ -204,15 +210,19 @@ void NetworkTablesModel::Update() {
   }
 }
 
-bool NetworkTablesModel::Exists() { return nt::IsConnected(m_inst); }
+bool NetworkTablesModel::Exists() {
+  return nt::IsConnected(m_inst);
+}
 
 static std::shared_ptr<nt::Value> StringToBooleanArray(wpi::StringRef in) {
   in = in.trim();
   if (in.empty())
     return nt::NetworkTableValue::MakeBooleanArray(
         std::initializer_list<bool>{});
-  if (in.front() == '[') in = in.drop_front();
-  if (in.back() == ']') in = in.drop_back();
+  if (in.front() == '[')
+    in = in.drop_front();
+  if (in.back() == ']')
+    in = in.drop_back();
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -240,8 +250,10 @@ static std::shared_ptr<nt::Value> StringToDoubleArray(wpi::StringRef in) {
   if (in.empty())
     return nt::NetworkTableValue::MakeBooleanArray(
         std::initializer_list<bool>{});
-  if (in.front() == '[') in = in.drop_front();
-  if (in.back() == ']') in = in.drop_back();
+  if (in.front() == '[')
+    in = in.drop_front();
+  if (in.back() == ']')
+    in = in.drop_back();
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -316,8 +328,10 @@ static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
   if (in.empty())
     return nt::NetworkTableValue::MakeStringArray(
         std::initializer_list<std::string>{});
-  if (in.front() == '[') in = in.drop_front();
-  if (in.back() == ']') in = in.drop_back();
+  if (in.front() == '[')
+    in = in.drop_front();
+  if (in.back() == ']')
+    in = in.drop_back();
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -327,7 +341,8 @@ static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
   in.split(inSplit, ',', -1, false);
   for (auto val : inSplit) {
     val = val.trim();
-    if (val.empty()) continue;
+    if (val.empty())
+      continue;
     if (val.front() != '"' || val.back() != '"') {
       wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
                   << "'\n";
@@ -341,7 +356,8 @@ static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
 
 static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry) {
   auto& val = entry.value;
-  if (!val) return;
+  if (!val)
+    return;
 
   switch (val->type()) {
     case NT_BOOLEAN:
@@ -388,7 +404,8 @@ static char* GetTextBuffer(wpi::StringRef in) {
 
 static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
   auto& val = entry.value;
-  if (!val) return;
+  if (!val)
+    return;
 
   ImGui::PushID(entry.name.c_str());
   switch (val->type()) {
@@ -500,8 +517,10 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
       ImGui::NextColumn();
       ImGui::NextColumn();
-      if (flags & NetworkTablesFlags_ShowFlags) ImGui::NextColumn();
-      if (flags & NetworkTablesFlags_ShowTimestamp) ImGui::NextColumn();
+      if (flags & NetworkTablesFlags_ShowFlags)
+        ImGui::NextColumn();
+      if (flags & NetworkTablesFlags_ShowTimestamp)
+        ImGui::NextColumn();
       ImGui::Separator();
       if (open) {
         EmitTree(node.children, flags);
@@ -543,7 +562,8 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
       ImGui::Columns();
     }
 
-    if (!CollapsingHeader("Values", ImGuiTreeNodeFlags_DefaultOpen)) return;
+    if (!CollapsingHeader("Values", ImGuiTreeNodeFlags_DefaultOpen))
+      return;
   }
 
   const bool showFlags = (flags & NetworkTablesFlags_ShowFlags);
@@ -551,13 +571,15 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
 
   static bool first = true;
   ImGui::Columns(2 + (showFlags ? 1 : 0) + (showTimestamp ? 1 : 0), "values");
-  if (first) ImGui::SetColumnWidth(-1, 0.5f * ImGui::GetWindowWidth());
+  if (first)
+    ImGui::SetColumnWidth(-1, 0.5f * ImGui::GetWindowWidth());
   ImGui::Text("Name");
   ImGui::NextColumn();
   ImGui::Text("Value");
   ImGui::NextColumn();
   if (showFlags) {
-    if (first) ImGui::SetColumnWidth(-1, 12 * ImGui::GetFontSize());
+    if (first)
+      ImGui::SetColumnWidth(-1, 12 * ImGui::GetFontSize());
     ImGui::Text("Flags");
     ImGui::NextColumn();
   }

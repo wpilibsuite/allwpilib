@@ -66,7 +66,8 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
 void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analogOutputHandle) {
   // no status, so no need to check for a proper free.
   auto port = analogOutputHandles->Get(analogOutputHandle);
-  if (port == nullptr) return;
+  if (port == nullptr)
+    return;
   analogOutputHandles->Free(analogOutputHandle);
   SimAnalogOutData[port->channel].initialized = false;
 }

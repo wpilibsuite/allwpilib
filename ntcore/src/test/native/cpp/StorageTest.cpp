@@ -446,7 +446,9 @@ TEST_P(StorageTestPopulateOne, GetEntryFlagsExist) {
   EXPECT_EQ(1u, storage.GetEntryFlags("foo"));
 }
 
-TEST_P(StorageTestEmpty, DeleteEntryNotExist) { storage.DeleteEntry("foo"); }
+TEST_P(StorageTestEmpty, DeleteEntryNotExist) {
+  storage.DeleteEntry("foo");
+}
 
 TEST_P(StorageTestPopulated, DeleteEntryExist) {
   // client shouldn't send an update as id not assigned yet
@@ -551,7 +553,8 @@ TEST_P(StorageTestPersistent, SavePersistentEmpty) {
 }
 
 TEST_P(StorageTestPersistent, SavePersistent) {
-  for (auto& i : entries()) i.getValue()->flags = NT_PERSISTENT;
+  for (auto& i : entries())
+    i.getValue()->flags = NT_PERSISTENT;
   wpi::SmallString<256> buf;
   wpi::raw_svector_ostream oss(buf);
   storage.SavePersistent(oss, false);

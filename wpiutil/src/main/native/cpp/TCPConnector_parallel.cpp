@@ -26,7 +26,8 @@ using namespace wpi;
 std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
     ArrayRef<std::pair<const char*, int>> servers, Logger& logger,
     int timeout) {
-  if (servers.empty()) return nullptr;
+  if (servers.empty())
+    return nullptr;
 
   // structure to make sure we don't start duplicate workers
   struct GlobalState {
@@ -72,7 +73,8 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
     // attempt to the same server
     {
       std::scoped_lock lock(local->mtx);
-      if (local->active.count(active_tracker) > 0) continue;  // already in set
+      if (local->active.count(active_tracker) > 0)
+        continue;  // already in set
     }
 
     ++num_workers;
@@ -99,7 +101,8 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
         // successful connection
         if (stream) {
           std::scoped_lock lock(result->mtx);
-          if (!result->done.exchange(true)) result->stream = std::move(stream);
+          if (!result->done.exchange(true))
+            result->stream = std::move(stream);
         }
       }
       ++result->count;

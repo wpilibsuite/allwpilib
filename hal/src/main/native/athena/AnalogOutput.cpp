@@ -43,7 +43,8 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
   hal::init::CheckInit();
   initializeAnalog(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0)
+    return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {

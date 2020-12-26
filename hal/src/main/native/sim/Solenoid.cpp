@@ -78,7 +78,8 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
 }
 void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle) {
   auto port = solenoidHandles->Get(solenoidPortHandle);
-  if (port == nullptr) return;
+  if (port == nullptr)
+    return;
   solenoidHandles->Free(solenoidPortHandle);
   HALSIM_SetPCMSolenoidInitialized(port->module, port->channel, false);
   int count = 0;

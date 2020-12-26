@@ -87,7 +87,8 @@ void DriveMotor::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 
 static double computeForce(double input, double velocity, double max) {
   double output = input;
-  if (max == 0.0) return output;
+  if (max == 0.0)
+    return output;
   if (std::fabs(velocity) >= max) {
     output = 0;
   } else {
@@ -104,7 +105,8 @@ void DriveMotor::Update(const gazebo::common::UpdateInfo& info) {
   ignition::math::Vector3d velocity = parent->GetRelativeLinearVel().Ign();
 #endif
 
-  if (signal == 0) return;
+  if (signal == 0)
+    return;
 
   double x = computeForce(signal * dx * multiplier, velocity.X(),
                           std::fabs(maxSpeed * dx));

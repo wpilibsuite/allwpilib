@@ -230,7 +230,8 @@ void EncodersSimModel::ForEachEncoder(
 static bool EncodersAnyInitialized() {
   static const int32_t num = HAL_GetNumEncoders();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetEncoderInitialized(i)) return true;
+    if (HALSIM_GetEncoderInitialized(i))
+      return true;
   }
   return false;
 }

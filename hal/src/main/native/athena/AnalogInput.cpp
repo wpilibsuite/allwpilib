@@ -28,7 +28,8 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
   hal::init::CheckInit();
   initializeAnalog(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0)
+    return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -66,7 +67,9 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
   analogInputHandles->Free(analogPortHandle);
 }
 
-HAL_Bool HAL_CheckAnalogModule(int32_t module) { return module == 1; }
+HAL_Bool HAL_CheckAnalogModule(int32_t module) {
+  return module == 1;
+}
 
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
   return channel < kNumAnalogInputs && channel >= 0;
@@ -80,13 +83,15 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: Need double comparison with epsilon.
   // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
   initializeAnalog(status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   setAnalogSampleRate(samplesPerSecond, status);
 }
 
 double HAL_GetAnalogSampleRate(int32_t* status) {
   initializeAnalog(status);
-  if (*status != 0) return 0;
+  if (*status != 0)
+    return 0;
   uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
   uint32_t ticksPerSample =
       ticksPerConversion * getAnalogNumActiveChannels(status);

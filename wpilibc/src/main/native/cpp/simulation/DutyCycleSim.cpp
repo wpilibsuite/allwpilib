@@ -20,7 +20,8 @@ DutyCycleSim::DutyCycleSim(const DutyCycle& dutyCycle)
 
 DutyCycleSim DutyCycleSim::CreateForChannel(int channel) {
   int index = HALSIM_FindDutyCycleForChannel(channel);
-  if (index < 0) throw std::out_of_range("no duty cycle found for channel");
+  if (index < 0)
+    throw std::out_of_range("no duty cycle found for channel");
   return DutyCycleSim{index};
 }
 
@@ -79,4 +80,6 @@ void DutyCycleSim::SetOutput(double period) {
   HALSIM_SetDutyCycleOutput(m_index, period);
 }
 
-void DutyCycleSim::ResetData() { HALSIM_ResetDutyCycleData(m_index); }
+void DutyCycleSim::ResetData() {
+  HALSIM_ResetDutyCycleData(m_index);
+}

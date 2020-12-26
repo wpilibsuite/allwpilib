@@ -28,7 +28,8 @@ class InterruptThread : public wpi::SafeThread {
     std::unique_lock lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });
-      if (!m_active) break;
+      if (!m_active)
+        break;
       m_notify = false;
       HAL_InterruptHandlerFunction handler = m_handler;
       uint32_t mask = m_mask;
@@ -49,14 +50,16 @@ class InterruptThreadOwner : public wpi::SafeThreadOwner<InterruptThread> {
  public:
   void SetFunc(HAL_InterruptHandlerFunction handler, void* param) {
     auto thr = GetThread();
-    if (!thr) return;
+    if (!thr)
+      return;
     thr->m_handler = handler;
     thr->m_param = param;
   }
 
   void Notify(uint32_t mask) {
     auto thr = GetThread();
-    if (!thr) return;
+    if (!thr)
+      return;
     thr->m_mask = mask;
     thr->m_notify = true;
     thr->m_cond.notify_one();

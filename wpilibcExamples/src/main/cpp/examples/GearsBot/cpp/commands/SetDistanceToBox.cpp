@@ -25,4 +25,6 @@ void SetDistanceToBox::Initialize() {
   frc2::PIDCommand::Initialize();
 }
 
-bool SetDistanceToBox::IsFinished() { return m_controller.AtSetpoint(); }
+bool SetDistanceToBox::IsFinished() {
+  return m_controller.AtSetpoint();
+}

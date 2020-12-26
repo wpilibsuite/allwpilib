@@ -22,7 +22,9 @@ static std::atomic<uint64_t> programStepTime{0};
 
 namespace hal {
 namespace init {
-void InitializeMockHooks() { wpi::SetNowImpl(GetFPGATime); }
+void InitializeMockHooks() {
+  wpi::SetNowImpl(GetFPGATime);
+}
 }  // namespace init
 }  // namespace hal
 
@@ -30,11 +32,13 @@ namespace hal {
 void RestartTiming() {
   programStartTime = wpi::NowDefault();
   programStepTime = 0;
-  if (programPauseTime != 0) programPauseTime = programStartTime.load();
+  if (programPauseTime != 0)
+    programPauseTime = programStartTime.load();
 }
 
 void PauseTiming() {
-  if (programPauseTime == 0) programPauseTime = wpi::NowDefault();
+  if (programPauseTime == 0)
+    programPauseTime = wpi::NowDefault();
 }
 
 void ResumeTiming() {
@@ -44,20 +48,31 @@ void ResumeTiming() {
   }
 }
 
-bool IsTimingPaused() { return programPauseTime != 0; }
+bool IsTimingPaused() {
+  return programPauseTime != 0;
+}
 
-void StepTiming(uint64_t delta) { programStepTime += delta; }
+void StepTiming(uint64_t delta) {
+  programStepTime += delta;
+}
 
 uint64_t GetFPGATime() {
   uint64_t curTime = programPauseTime;
-  if (curTime == 0) curTime = wpi::NowDefault();
+  if (curTime == 0)
+    curTime = wpi::NowDefault();
   return curTime + programStepTime - programStartTime;
 }
 
-double GetFPGATimestamp() { return GetFPGATime() * 1.0e-6; }
+double GetFPGATimestamp() {
+  return GetFPGATime() * 1.0e-6;
+}
 
-void SetProgramStarted() { programStarted = true; }
-bool GetProgramStarted() { return programStarted; }
+void SetProgramStarted() {
+  programStarted = true;
+}
+bool GetProgramStarted() {
+  return programStarted;
+}
 }  // namespace hal
 
 using namespace hal;
@@ -72,11 +87,17 @@ void HALSIM_WaitForProgramStart(void) {
   }
 }
 
-void HALSIM_SetProgramStarted(void) { SetProgramStarted(); }
+void HALSIM_SetProgramStarted(void) {
+  SetProgramStarted();
+}
 
-HAL_Bool HALSIM_GetProgramStarted(void) { return GetProgramStarted(); }
+HAL_Bool HALSIM_GetProgramStarted(void) {
+  return GetProgramStarted();
+}
 
-void HALSIM_RestartTiming(void) { RestartTiming(); }
+void HALSIM_RestartTiming(void) {
+  RestartTiming();
+}
 
 void HALSIM_PauseTiming(void) {
   PauseTiming();
@@ -88,7 +109,9 @@ void HALSIM_ResumeTiming(void) {
   ResumeNotifiers();
 }
 
-HAL_Bool HALSIM_IsTimingPaused(void) { return IsTimingPaused(); }
+HAL_Bool HALSIM_IsTimingPaused(void) {
+  return IsTimingPaused();
+}
 
 void HALSIM_StepTiming(uint64_t delta) {
   WaitNotifiers();

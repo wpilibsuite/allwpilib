@@ -25,18 +25,24 @@ InstanceImpl::InstanceImpl(int inst)
   logger.set_min_level(logger_impl.GetMinLevel());
 }
 
-InstanceImpl::~InstanceImpl() { logger.SetLogger(nullptr); }
+InstanceImpl::~InstanceImpl() {
+  logger.SetLogger(nullptr);
+}
 
-InstanceImpl* InstanceImpl::GetDefault() { return Get(GetDefaultIndex()); }
+InstanceImpl* InstanceImpl::GetDefault() {
+  return Get(GetDefaultIndex());
+}
 
 InstanceImpl* InstanceImpl::Get(int inst) {
-  if (inst < 0) return nullptr;
+  if (inst < 0)
+    return nullptr;
 
   // fast path, just an atomic read
   if (static_cast<unsigned int>(inst) <
       (sizeof(s_fast_instances) / sizeof(s_fast_instances[0]))) {
     InstanceImpl* ptr = s_fast_instances[inst];
-    if (ptr) return ptr;
+    if (ptr)
+      return ptr;
   }
 
   // slow path
@@ -60,14 +66,16 @@ InstanceImpl* InstanceImpl::Get(int inst) {
 
 int InstanceImpl::GetDefaultIndex() {
   int inst = s_default;
-  if (inst >= 0) return inst;
+  if (inst >= 0)
+    return inst;
 
   // slow path
   std::scoped_lock lock(s_mutex);
 
   // double-check
   inst = s_default;
-  if (inst >= 0) return inst;
+  if (inst >= 0)
+    return inst;
 
   // alloc and save
   inst = AllocImpl();
@@ -94,7 +102,8 @@ int InstanceImpl::AllocImpl() {
 
 void InstanceImpl::Destroy(int inst) {
   std::scoped_lock lock(s_mutex);
-  if (inst < 0 || static_cast<unsigned int>(inst) >= s_instances.size()) return;
+  if (inst < 0 || static_cast<unsigned int>(inst) >= s_instances.size())
+    return;
 
   if (static_cast<unsigned int>(inst) <
       (sizeof(s_fast_instances) / sizeof(s_fast_instances[0]))) {

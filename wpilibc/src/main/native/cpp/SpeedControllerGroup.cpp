@@ -43,7 +43,9 @@ void SpeedControllerGroup::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
 
-bool SpeedControllerGroup::GetInverted() const { return m_isInverted; }
+bool SpeedControllerGroup::GetInverted() const {
+  return m_isInverted;
+}
 
 void SpeedControllerGroup::Disable() {
   for (auto speedController : m_speedControllers) {
@@ -57,7 +59,9 @@ void SpeedControllerGroup::StopMotor() {
   }
 }
 
-void SpeedControllerGroup::PIDWrite(double output) { Set(output); }
+void SpeedControllerGroup::PIDWrite(double output) {
+  Set(output);
+}
 
 void SpeedControllerGroup::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");

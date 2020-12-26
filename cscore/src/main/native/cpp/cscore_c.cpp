@@ -24,7 +24,8 @@ CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
 char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetPropertyName(property, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0)
+    return nullptr;
   return cs::ConvertToC(str);
 }
 
@@ -55,7 +56,8 @@ int CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
 char* CS_GetStringProperty(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetStringProperty(property, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0)
+    return nullptr;
   return cs::ConvertToC(str);
 }
 
@@ -82,14 +84,16 @@ CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0)
+    return nullptr;
   return cs::ConvertToC(str);
 }
 
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceDescription(source, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0)
+    return nullptr;
   return cs::ConvertToC(str);
 }
 
@@ -248,14 +252,16 @@ CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0)
+    return nullptr;
   return cs::ConvertToC(str);
 }
 
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkDescription(sink, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0)
+    return nullptr;
   return cs::ConvertToC(str);
 }
 
@@ -338,9 +344,13 @@ void CS_RemoveListener(CS_Listener handle, CS_Status* status) {
   return cs::RemoveListener(handle, status);
 }
 
-int CS_NotifierDestroyed(void) { return cs::NotifierDestroyed(); }
+int CS_NotifierDestroyed(void) {
+  return cs::NotifierDestroyed();
+}
 
-void CS_SetTelemetryPeriod(double seconds) { cs::SetTelemetryPeriod(seconds); }
+void CS_SetTelemetryPeriod(double seconds) {
+  cs::SetTelemetryPeriod(seconds);
+}
 
 double CS_GetTelemetryElapsedTime(void) {
   return cs::GetTelemetryElapsedTime();
@@ -364,7 +374,9 @@ void CS_SetDefaultLogger(unsigned int min_level) {
   cs::SetDefaultLogger(min_level);
 }
 
-void CS_Shutdown(void) { cs::Shutdown(); }
+void CS_Shutdown(void) {
+  cs::Shutdown();
+}
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
   wpi::SmallVector<CS_Source, 32> buf;
@@ -377,10 +389,12 @@ CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
 }
 
 void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
-  if (!sources) return;
+  if (!sources)
+    return;
   for (int i = 0; i < count; ++i) {
     CS_Status status = 0;
-    if (sources[i] != 0) cs::ReleaseSource(sources[i], &status);
+    if (sources[i] != 0)
+      cs::ReleaseSource(sources[i], &status);
   }
   std::free(sources);
 }
@@ -396,19 +410,25 @@ CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
 }
 
 void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count) {
-  if (!sinks) return;
+  if (!sinks)
+    return;
   for (int i = 0; i < count; ++i) {
     CS_Status status = 0;
-    if (sinks[i] != 0) cs::ReleaseSink(sinks[i], &status);
+    if (sinks[i] != 0)
+      cs::ReleaseSink(sinks[i], &status);
   }
   std::free(sinks);
 }
 
-void CS_FreeString(char* str) { std::free(str); }
+void CS_FreeString(char* str) {
+  std::free(str);
+}
 
 void CS_FreeEnumPropertyChoices(char** choices, int count) {
-  if (!choices) return;
-  for (int i = 0; i < count; ++i) std::free(choices[i]);
+  if (!choices)
+    return;
+  for (int i = 0; i < count; ++i)
+    std::free(choices[i]);
   std::free(choices);
 }
 
@@ -420,7 +440,9 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
   std::free(modes);
 }
 
-char* CS_GetHostname() { return cs::ConvertToC(cs::GetHostname()); }
+char* CS_GetHostname() {
+  return cs::ConvertToC(cs::GetHostname());
+}
 
 char** CS_GetNetworkInterfaces(int* count) {
   auto interfaces = cs::GetNetworkInterfaces();
@@ -433,13 +455,16 @@ char** CS_GetNetworkInterfaces(int* count) {
 }
 
 void CS_FreeNetworkInterfaces(char** interfaces, int count) {
-  if (!interfaces) return;
-  for (int i = 0; i < count; ++i) std::free(interfaces[i]);
+  if (!interfaces)
+    return;
+  for (int i = 0; i < count; ++i)
+    std::free(interfaces[i]);
   std::free(interfaces);
 }
 
 void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
-  if (frame->dataLength >= requestedSize) return;
+  if (frame->dataLength >= requestedSize)
+    return;
   if (frame->data) {
     frame->data =
         static_cast<char*>(wpi::safe_realloc(frame->data, requestedSize));

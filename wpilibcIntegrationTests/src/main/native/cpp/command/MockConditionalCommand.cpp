@@ -20,30 +20,42 @@ void MockConditionalCommand::SetCondition(bool condition) {
   m_condition = condition;
 }
 
-bool MockConditionalCommand::Condition() { return m_condition; }
+bool MockConditionalCommand::Condition() {
+  return m_condition;
+}
 
 bool MockConditionalCommand::HasInitialized() {
   return GetInitializeCount() > 0;
 }
 
-bool MockConditionalCommand::HasEnd() { return GetEndCount() > 0; }
+bool MockConditionalCommand::HasEnd() {
+  return GetEndCount() > 0;
+}
 
 bool MockConditionalCommand::HasInterrupted() {
   return GetInterruptedCount() > 0;
 }
 
-void MockConditionalCommand::Initialize() { ++m_initializeCount; }
+void MockConditionalCommand::Initialize() {
+  ++m_initializeCount;
+}
 
-void MockConditionalCommand::Execute() { ++m_executeCount; }
+void MockConditionalCommand::Execute() {
+  ++m_executeCount;
+}
 
 bool MockConditionalCommand::IsFinished() {
   ++m_isFinishedCount;
   return ConditionalCommand::IsFinished();
 }
 
-void MockConditionalCommand::End() { ++m_endCount; }
+void MockConditionalCommand::End() {
+  ++m_endCount;
+}
 
-void MockConditionalCommand::Interrupted() { ++m_interruptedCount; }
+void MockConditionalCommand::Interrupted() {
+  ++m_interruptedCount;
+}
 
 void MockConditionalCommand::ResetCounters() {
   m_initializeCount = 0;

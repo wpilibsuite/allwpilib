@@ -61,7 +61,9 @@ std::unique_ptr<CallbackStore> RelaySim::RegisterForwardCallback(
   return store;
 }
 
-bool RelaySim::GetForward() const { return HALSIM_GetRelayForward(m_index); }
+bool RelaySim::GetForward() const {
+  return HALSIM_GetRelayForward(m_index);
+}
 
 void RelaySim::SetForward(bool forward) {
   HALSIM_SetRelayForward(m_index, forward);
@@ -76,10 +78,14 @@ std::unique_ptr<CallbackStore> RelaySim::RegisterReverseCallback(
   return store;
 }
 
-bool RelaySim::GetReverse() const { return HALSIM_GetRelayReverse(m_index); }
+bool RelaySim::GetReverse() const {
+  return HALSIM_GetRelayReverse(m_index);
+}
 
 void RelaySim::SetReverse(bool reverse) {
   HALSIM_SetRelayReverse(m_index, reverse);
 }
 
-void RelaySim::ResetData() { HALSIM_ResetRelayData(m_index); }
+void RelaySim::ResetData() {
+  HALSIM_ResetRelayData(m_index);
+}

@@ -130,7 +130,8 @@ void SourceImpl::SetExposureManual(int value, CS_Status* status) {
 }
 
 VideoMode SourceImpl::GetVideoMode(CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return VideoMode{};
+  if (!m_properties_cached && !CacheProperties(status))
+    return VideoMode{};
   std::scoped_lock lock(m_mutex);
   return m_mode;
 }
@@ -138,14 +139,16 @@ VideoMode SourceImpl::GetVideoMode(CS_Status* status) const {
 bool SourceImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
                                 CS_Status* status) {
   auto mode = GetVideoMode(status);
-  if (!mode) return false;
+  if (!mode)
+    return false;
   mode.pixelFormat = pixelFormat;
   return SetVideoMode(mode, status);
 }
 
 bool SourceImpl::SetResolution(int width, int height, CS_Status* status) {
   auto mode = GetVideoMode(status);
-  if (!mode) return false;
+  if (!mode)
+    return false;
   mode.width = width;
   mode.height = height;
   return SetVideoMode(mode, status);
@@ -153,7 +156,8 @@ bool SourceImpl::SetResolution(int width, int height, CS_Status* status) {
 
 bool SourceImpl::SetFPS(int fps, CS_Status* status) {
   auto mode = GetVideoMode(status);
-  if (!mode) return false;
+  if (!mode)
+    return false;
   mode.fps = fps;
   return SetVideoMode(mode, status);
 }
@@ -353,22 +357,27 @@ wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
     default:
       break;
   }
-  if (!pixelFormat.empty()) j.emplace("pixel format", pixelFormat);
+  if (!pixelFormat.empty())
+    j.emplace("pixel format", pixelFormat);
 
   // width
-  if (m_mode.width != 0) j.emplace("width", m_mode.width);
+  if (m_mode.width != 0)
+    j.emplace("width", m_mode.width);
 
   // height
-  if (m_mode.height != 0) j.emplace("height", m_mode.height);
+  if (m_mode.height != 0)
+    j.emplace("height", m_mode.height);
 
   // fps
-  if (m_mode.fps != 0) j.emplace("fps", m_mode.fps);
+  if (m_mode.fps != 0)
+    j.emplace("fps", m_mode.fps);
 
   // TODO: output brightness, white balance, and exposure?
 
   // properties
   wpi::json props = GetPropertiesJsonObject(status);
-  if (props.is_array()) j.emplace("properties", props);
+  if (props.is_array())
+    j.emplace("properties", props);
 
   return j;
 }
@@ -470,7 +479,8 @@ void SourceImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
 void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
                                      const wpi::Twine& valueStr) {
   auto prop = GetProperty(property);
-  if (!prop) return;
+  if (!prop)
+    return;
 
   if (setString)
     prop->SetValue(valueStr);
@@ -487,7 +497,8 @@ void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
 
 void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
   std::scoped_lock lock{m_poolMutex};
-  if (m_destroyFrames) return;
+  if (m_destroyFrames)
+    return;
   // Return the frame to the pool.  First try to find an empty slot, otherwise
   // add it to the end.
   auto it = std::find(m_imagesAvail.begin(), m_imagesAvail.end(), nullptr);
@@ -501,7 +512,8 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
         [](const std::unique_ptr<Image>& a, const std::unique_ptr<Image>& b) {
           return a->capacity() < b->capacity();
         });
-    if ((*it2)->capacity() < image->capacity()) *it2 = std::move(image);
+    if ((*it2)->capacity() < image->capacity())
+      *it2 = std::move(image);
   } else {
     m_imagesAvail.emplace_back(std::move(image));
   }
@@ -510,7 +522,8 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
 std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
   std::scoped_lock lock{m_poolMutex};
 
-  if (m_framesAvail.empty()) return std::make_unique<Frame::Impl>(*this);
+  if (m_framesAvail.empty())
+    return std::make_unique<Frame::Impl>(*this);
 
   auto impl = std::move(m_framesAvail.back());
   m_framesAvail.pop_back();
@@ -519,6 +532,7 @@ std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
 
 void SourceImpl::ReleaseFrameImpl(std::unique_ptr<Frame::Impl> impl) {
   std::scoped_lock lock{m_poolMutex};
-  if (m_destroyFrames) return;
+  if (m_destroyFrames)
+    return;
   m_framesAvail.push_back(std::move(impl));
 }

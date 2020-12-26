@@ -58,12 +58,15 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
   auto port = analogInputHandles->Get(analogPortHandle);
   // no status, so no need to check for a proper free.
   analogInputHandles->Free(analogPortHandle);
-  if (port == nullptr) return;
+  if (port == nullptr)
+    return;
   SimAnalogInData[port->channel].initialized = false;
   SimAnalogInData[port->channel].accumulatorInitialized = false;
 }
 
-HAL_Bool HAL_CheckAnalogModule(int32_t module) { return module == 1; }
+HAL_Bool HAL_CheckAnalogModule(int32_t module) {
+  return module == 1;
+}
 
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
   return channel < kNumAnalogInputs && channel >= 0;
@@ -72,14 +75,17 @@ HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
 void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
                                  HAL_SimDeviceHandle device) {
   auto port = analogInputHandles->Get(handle);
-  if (port == nullptr) return;
+  if (port == nullptr)
+    return;
   SimAnalogInData[port->channel].simDevice = device;
 }
 
 void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // No op
 }
-double HAL_GetAnalogSampleRate(int32_t* status) { return kDefaultSampleRate; }
+double HAL_GetAnalogSampleRate(int32_t* status) {
+  return kDefaultSampleRate;
+}
 void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                               int32_t bits, int32_t* status) {
   auto port = analogInputHandles->Get(analogPortHandle);

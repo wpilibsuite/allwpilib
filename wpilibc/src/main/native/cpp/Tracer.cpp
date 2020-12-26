@@ -12,9 +12,13 @@
 
 using namespace frc;
 
-Tracer::Tracer() { ResetTimer(); }
+Tracer::Tracer() {
+  ResetTimer();
+}
 
-void Tracer::ResetTimer() { m_startTime = hal::fpga_clock::now(); }
+void Tracer::ResetTimer() {
+  m_startTime = hal::fpga_clock::now();
+}
 
 void Tracer::ClearEpochs() {
   ResetTimer();
@@ -31,7 +35,8 @@ void Tracer::PrintEpochs() {
   wpi::SmallString<128> buf;
   wpi::raw_svector_ostream os(buf);
   PrintEpochs(os);
-  if (!buf.empty()) DriverStation::ReportWarning(buf);
+  if (!buf.empty())
+    DriverStation::ReportWarning(buf);
 }
 
 void Tracer::PrintEpochs(wpi::raw_ostream& os) {

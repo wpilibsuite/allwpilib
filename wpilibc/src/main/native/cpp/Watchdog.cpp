@@ -60,7 +60,8 @@ Watchdog::Impl::~Impl() {
   wpi_setGlobalHALError(status);
 
   // Join the thread to ensure the handler has exited.
-  if (m_thread.joinable()) m_thread.join();
+  if (m_thread.joinable())
+    m_thread.join();
 
   HAL_CleanNotifier(handle, &status);
 }
@@ -69,7 +70,8 @@ void Watchdog::Impl::UpdateAlarm() {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
-  if (notifier == 0) return;
+  if (notifier == 0)
+    return;
   if (m_watchdogs.empty())
     HAL_CancelNotifierAlarm(notifier, &status);
   else
@@ -85,13 +87,16 @@ void Watchdog::Impl::Main() {
   for (;;) {
     int32_t status = 0;
     HAL_NotifierHandle notifier = m_notifier.load();
-    if (notifier == 0) break;
+    if (notifier == 0)
+      break;
     uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
-    if (curTime == 0 || status != 0) break;
+    if (curTime == 0 || status != 0)
+      break;
 
     std::unique_lock lock(m_mutex);
 
-    if (m_watchdogs.empty()) continue;
+    if (m_watchdogs.empty())
+      continue;
 
     // If the condition variable timed out, that means a Watchdog timeout
     // has occurred, so call its timeout function.
@@ -128,9 +133,13 @@ Watchdog::Watchdog(double timeout, std::function<void()> callback)
 Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(callback), m_impl(GetImpl()) {}
 
-Watchdog::~Watchdog() { Disable(); }
+Watchdog::~Watchdog() {
+  Disable();
+}
 
-Watchdog::Watchdog(Watchdog&& rhs) { *this = std::move(rhs); }
+Watchdog::Watchdog(Watchdog&& rhs) {
+  *this = std::move(rhs);
+}
 
 Watchdog& Watchdog::operator=(Watchdog&& rhs) {
   m_impl = rhs.m_impl;
@@ -186,9 +195,13 @@ void Watchdog::AddEpoch(wpi::StringRef epochName) {
   m_tracer.AddEpoch(epochName);
 }
 
-void Watchdog::PrintEpochs() { m_tracer.PrintEpochs(); }
+void Watchdog::PrintEpochs() {
+  m_tracer.PrintEpochs();
+}
 
-void Watchdog::Reset() { Enable(); }
+void Watchdog::Reset() {
+  Enable();
+}
 
 void Watchdog::Enable() {
   m_startTime = frc2::Timer::GetFPGATimestamp();

@@ -110,7 +110,8 @@ SIM_JniHandle sim::AllocateSpiBufferCallback(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data) return;
+    if (!data)
+      return;
 
     *outputCount = data->performCallback(name, buffer, numToRead);
   };

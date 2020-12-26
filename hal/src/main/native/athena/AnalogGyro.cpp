@@ -48,7 +48,8 @@ void InitializeAnalogGyro() {
 }  // namespace hal
 
 static void Wait(double seconds) {
-  if (seconds < 0.0) return;
+  if (seconds < 0.0)
+    return;
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
 }
 
@@ -97,17 +98,21 @@ void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   gyro->voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
 
   HAL_SetAnalogAverageBits(gyro->handle, kAverageBits, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   HAL_SetAnalogOversampleBits(gyro->handle, kOversampleBits, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   double sampleRate =
       kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
   HAL_SetAnalogSampleRate(sampleRate, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   Wait(0.1);
 
   HAL_SetAnalogGyroDeadband(handle, 0.0, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
 }
 
 void HAL_FreeAnalogGyro(HAL_GyroHandle handle) {
@@ -148,14 +153,16 @@ void HAL_ResetAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
     return;
   }
   HAL_ResetAccumulator(gyro->handle, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
 
   const double sampleTime = 1.0 / HAL_GetAnalogSampleRate(status);
   const double overSamples =
       1 << HAL_GetAnalogOversampleBits(gyro->handle, status);
   const double averageSamples =
       1 << HAL_GetAnalogAverageBits(gyro->handle, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   Wait(sampleTime * overSamples * averageSamples);
 }
 
@@ -167,7 +174,8 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   }
 
   HAL_InitAccumulator(gyro->handle, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   wpi::outs() << "Calibrating analog gyro for " << kCalibrationSampleTime
               << " seconds." << '\n';
   Wait(kCalibrationSampleTime);
@@ -175,7 +183,8 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   int64_t value;
   int64_t count;
   HAL_GetAccumulatorOutput(gyro->handle, &value, &count, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
 
   gyro->center = static_cast<int32_t>(
       static_cast<double>(value) / static_cast<double>(count) + 0.5);
@@ -183,7 +192,8 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   gyro->offset = static_cast<double>(value) / static_cast<double>(count) -
                  static_cast<double>(gyro->center);
   HAL_SetAccumulatorCenter(gyro->handle, gyro->center, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   HAL_ResetAnalogGyro(handle, status);
 }
 
@@ -197,7 +207,8 @@ void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts,
   int32_t deadband = static_cast<int32_t>(
       volts * 1e9 / HAL_GetAnalogLSBWeight(gyro->handle, status) *
       (1 << HAL_GetAnalogOversampleBits(gyro->handle, status)));
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   HAL_SetAccumulatorDeadband(gyro->handle, deadband, status);
 }
 

@@ -10,7 +10,8 @@
 using namespace frc;
 
 InterruptableSensorBase::~InterruptableSensorBase() {
-  if (m_interrupt == HAL_kInvalidHandle) return;
+  if (m_interrupt == HAL_kInvalidHandle)
+    return;
   int32_t status = 0;
   HAL_CleanInterrupts(m_interrupt, &status);
   // Ignore status, as an invalid handle just needs to be ignored.
@@ -18,11 +19,13 @@ InterruptableSensorBase::~InterruptableSensorBase() {
 
 void InterruptableSensorBase::RequestInterrupts(
     HAL_InterruptHandlerFunction handler, void* param) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
 
   wpi_assert(m_interrupt == HAL_kInvalidHandle);
   AllocateInterrupts(false);
-  if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
+  if (StatusIsFatal())
+    return;  // if allocate failed, out of interrupts
 
   int32_t status = 0;
   HAL_RequestInterrupts(
@@ -35,11 +38,13 @@ void InterruptableSensorBase::RequestInterrupts(
 }
 
 void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
 
   wpi_assert(m_interrupt == HAL_kInvalidHandle);
   AllocateInterrupts(false);
-  if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
+  if (StatusIsFatal())
+    return;  // if allocate failed, out of interrupts
 
   m_interruptHandler =
       std::make_unique<InterruptEventHandler>(std::move(handler));
@@ -68,11 +73,13 @@ void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
 }
 
 void InterruptableSensorBase::RequestInterrupts() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
 
   wpi_assert(m_interrupt == HAL_kInvalidHandle);
   AllocateInterrupts(true);
-  if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
+  if (StatusIsFatal())
+    return;  // if allocate failed, out of interrupts
 
   int32_t status = 0;
   HAL_RequestInterrupts(
@@ -84,7 +91,8 @@ void InterruptableSensorBase::RequestInterrupts() {
 }
 
 void InterruptableSensorBase::CancelInterrupts() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_CleanInterrupts(m_interrupt, &status);
@@ -95,7 +103,8 @@ void InterruptableSensorBase::CancelInterrupts() {
 
 InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
     double timeout, bool ignorePrevious) {
-  if (StatusIsFatal()) return InterruptableSensorBase::kTimeout;
+  if (StatusIsFatal())
+    return InterruptableSensorBase::kTimeout;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int result;
@@ -113,7 +122,8 @@ InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
 }
 
 void InterruptableSensorBase::EnableInterrupts() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_EnableInterrupts(m_interrupt, &status);
@@ -121,7 +131,8 @@ void InterruptableSensorBase::EnableInterrupts() {
 }
 
 void InterruptableSensorBase::DisableInterrupts() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_DisableInterrupts(m_interrupt, &status);
@@ -129,7 +140,8 @@ void InterruptableSensorBase::DisableInterrupts() {
 }
 
 double InterruptableSensorBase::ReadRisingTimestamp() {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal())
+    return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int64_t timestamp = HAL_ReadInterruptRisingTimestamp(m_interrupt, &status);
@@ -138,7 +150,8 @@ double InterruptableSensorBase::ReadRisingTimestamp() {
 }
 
 double InterruptableSensorBase::ReadFallingTimestamp() {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal())
+    return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int64_t timestamp = HAL_ReadInterruptFallingTimestamp(m_interrupt, &status);
@@ -148,7 +161,8 @@ double InterruptableSensorBase::ReadFallingTimestamp() {
 
 void InterruptableSensorBase::SetUpSourceEdge(bool risingEdge,
                                               bool fallingEdge) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   if (m_interrupt == HAL_kInvalidHandle) {
     wpi_setWPIErrorWithContext(
         NullParameter,

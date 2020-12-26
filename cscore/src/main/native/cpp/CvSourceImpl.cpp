@@ -224,7 +224,8 @@ void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                      CS_Status* status) {
   wpi::SmallVector<std::string, 8> vec;
   vec.reserve(count);
-  for (int i = 0; i < count; ++i) vec.push_back(choices[i]);
+  for (int i = 0; i < count; ++i)
+    vec.push_back(choices[i]);
   return cs::SetSourceEnumPropertyChoices(source, property, vec, status);
 }
 

@@ -60,15 +60,19 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
                                        const Twine& extra) {
   os << "HTTP/" << m_request.GetMajor() << '.' << m_request.GetMinor() << ' '
      << code << ' ' << codeText << "\r\n";
-  if (contentLength == 0) m_keepAlive = false;
-  if (!m_keepAlive) os << "Connection: close\r\n";
+  if (contentLength == 0)
+    m_keepAlive = false;
+  if (!m_keepAlive)
+    os << "Connection: close\r\n";
   BuildCommonHeaders(os);
   os << "Content-Type: " << contentType << "\r\n";
-  if (contentLength != 0) os << "Content-Length: " << contentLength << "\r\n";
+  if (contentLength != 0)
+    os << "Content-Length: " << contentLength << "\r\n";
   os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
   SmallString<128> extraBuf;
   StringRef extraStr = extra.toStringRef(extraBuf);
-  if (!extraStr.empty()) os << extraStr;
+  if (!extraStr.empty())
+    os << extraStr;
   os << "\r\n";  // header ends with a blank line
 }
 
@@ -76,8 +80,10 @@ void HttpServerConnection::SendData(ArrayRef<uv::Buffer> bufs,
                                     bool closeAfter) {
   m_stream.Write(bufs, [closeAfter, stream = &m_stream](
                            MutableArrayRef<uv::Buffer> bufs, uv::Error) {
-    for (auto&& buf : bufs) buf.Deallocate();
-    if (closeAfter) stream->Close();
+    for (auto&& buf : bufs)
+      buf.Deallocate();
+    if (closeAfter)
+      stream->Close();
   });
 }
 
@@ -113,8 +119,10 @@ void HttpServerConnection::SendStaticResponse(int code, const Twine& codeText,
   m_stream.Write(bufs, [closeAfter = !m_keepAlive, stream = &m_stream](
                            MutableArrayRef<uv::Buffer> bufs, uv::Error) {
     // don't deallocate the static content
-    for (auto&& buf : bufs.drop_back()) buf.Deallocate();
-    if (closeAfter) stream->Close();
+    for (auto&& buf : bufs.drop_back())
+      buf.Deallocate();
+    if (closeAfter)
+      stream->Close();
   });
 }
 

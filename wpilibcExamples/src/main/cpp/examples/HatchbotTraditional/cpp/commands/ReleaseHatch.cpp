@@ -8,6 +8,10 @@ ReleaseHatch::ReleaseHatch(HatchSubsystem* subsystem) : m_hatch(subsystem) {
   AddRequirements({subsystem});
 }
 
-void ReleaseHatch::Initialize() { m_hatch->ReleaseHatch(); }
+void ReleaseHatch::Initialize() {
+  m_hatch->ReleaseHatch();
+}
 
-bool ReleaseHatch::IsFinished() { return true; }
+bool ReleaseHatch::IsFinished() {
+  return true;
+}

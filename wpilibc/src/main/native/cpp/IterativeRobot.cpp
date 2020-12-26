@@ -32,7 +32,8 @@ void IterativeRobot::StartCompetition() {
   while (true) {
     // Wait for driver station data so the loop doesn't hog the CPU
     DriverStation::GetInstance().WaitForData();
-    if (m_exit) break;
+    if (m_exit)
+      break;
 
     LoopFunc();
   }

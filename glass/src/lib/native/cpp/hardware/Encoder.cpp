@@ -82,7 +82,8 @@ void glass::DisplayEncoder(EncoderModel* model) {
     model->SetName(name->c_str());
   }
 
-  if (!open) return;
+  if (!open)
+    return;
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
   // distance per pulse
@@ -94,7 +95,8 @@ void glass::DisplayEncoder(EncoderModel* model) {
   // count
   if (auto countData = model->GetCountData()) {
     int value = countData->GetValue();
-    if (ImGui::InputInt("##input", &value)) model->SetCount(value);
+    if (ImGui::InputInt("##input", &value))
+      model->SetCount(value);
     ImGui::SameLine();
     if (ImGui::Button("Reset")) {
       model->SetCount(0);

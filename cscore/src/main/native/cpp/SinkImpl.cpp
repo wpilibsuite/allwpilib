@@ -21,7 +21,8 @@ SinkImpl::SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
 
 SinkImpl::~SinkImpl() {
   if (m_source) {
-    if (m_enabledCount > 0) m_source->DisableSink();
+    if (m_enabledCount > 0)
+      m_source->DisableSink();
     m_source->RemoveSink();
   }
 }
@@ -41,7 +42,8 @@ void SinkImpl::Enable() {
   std::scoped_lock lock(m_mutex);
   ++m_enabledCount;
   if (m_enabledCount == 1) {
-    if (m_source) m_source->EnableSink();
+    if (m_source)
+      m_source->EnableSink();
     m_notifier.NotifySink(*this, CS_SINK_ENABLED);
   }
 }
@@ -50,7 +52,8 @@ void SinkImpl::Disable() {
   std::scoped_lock lock(m_mutex);
   --m_enabledCount;
   if (m_enabledCount == 0) {
-    if (m_source) m_source->DisableSink();
+    if (m_source)
+      m_source->DisableSink();
     m_notifier.NotifySink(*this, CS_SINK_DISABLED);
   }
 }
@@ -58,11 +61,13 @@ void SinkImpl::Disable() {
 void SinkImpl::SetEnabled(bool enabled) {
   std::scoped_lock lock(m_mutex);
   if (enabled && m_enabledCount == 0) {
-    if (m_source) m_source->EnableSink();
+    if (m_source)
+      m_source->EnableSink();
     m_enabledCount = 1;
     m_notifier.NotifySink(*this, CS_SINK_ENABLED);
   } else if (!enabled && m_enabledCount > 0) {
-    if (m_source) m_source->DisableSink();
+    if (m_source)
+      m_source->DisableSink();
     m_enabledCount = 0;
     m_notifier.NotifySink(*this, CS_SINK_DISABLED);
   }
@@ -71,15 +76,18 @@ void SinkImpl::SetEnabled(bool enabled) {
 void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
   {
     std::scoped_lock lock(m_mutex);
-    if (m_source == source) return;
+    if (m_source == source)
+      return;
     if (m_source) {
-      if (m_enabledCount > 0) m_source->DisableSink();
+      if (m_enabledCount > 0)
+        m_source->DisableSink();
       m_source->RemoveSink();
     }
     m_source = source;
     if (m_source) {
       m_source->AddSink();
-      if (m_enabledCount > 0) m_source->EnableSink();
+      if (m_enabledCount > 0)
+        m_source->EnableSink();
     }
   }
   SetSourceImpl(source);
@@ -87,13 +95,15 @@ void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
 
 std::string SinkImpl::GetError() const {
   std::scoped_lock lock(m_mutex);
-  if (!m_source) return "no source connected";
+  if (!m_source)
+    return "no source connected";
   return m_source->GetCurFrame().GetError();
 }
 
 wpi::StringRef SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
-  if (!m_source) return "no source connected";
+  if (!m_source)
+    return "no source connected";
   // Make a copy as it's shared data
   wpi::StringRef error = m_source->GetCurFrame().GetError();
   buf.clear();
@@ -133,7 +143,8 @@ wpi::json SinkImpl::GetConfigJsonObject(CS_Status* status) {
   wpi::json j;
 
   wpi::json props = GetPropertiesJsonObject(status);
-  if (props.is_array()) j.emplace("properties", props);
+  if (props.is_array())
+    j.emplace("properties", props);
 
   return j;
 }
@@ -152,7 +163,8 @@ void SinkImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
 void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
                                    const wpi::Twine& valueStr) {
   auto prop = GetProperty(property);
-  if (!prop) return;
+  if (!prop)
+    return;
 
   if (setString)
     prop->SetValue(valueStr);

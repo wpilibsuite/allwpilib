@@ -14,7 +14,8 @@ using namespace cs;
 int PropertyContainer::GetPropertyIndex(const wpi::Twine& name) const {
   // We can't fail, so instead we create a new index if caching fails.
   CS_Status status = 0;
-  if (!m_properties_cached) CacheProperties(&status);
+  if (!m_properties_cached)
+    CacheProperties(&status);
   std::scoped_lock lock(m_mutex);
   wpi::SmallVector<char, 64> nameBuf;
   int& ndx = m_properties[name.toStringRef(nameBuf)];
@@ -32,23 +33,27 @@ wpi::ArrayRef<int> PropertyContainer::EnumerateProperties(
     return wpi::ArrayRef<int>{};
   std::scoped_lock lock(m_mutex);
   for (int i = 0; i < static_cast<int>(m_propertyData.size()); ++i) {
-    if (m_propertyData[i]) vec.push_back(i + 1);
+    if (m_propertyData[i])
+      vec.push_back(i + 1);
   }
   return vec;
 }
 
 CS_PropertyKind PropertyContainer::GetPropertyKind(int property) const {
   CS_Status status = 0;
-  if (!m_properties_cached && !CacheProperties(&status)) return CS_PROP_NONE;
+  if (!m_properties_cached && !CacheProperties(&status))
+    return CS_PROP_NONE;
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
-  if (!prop) return CS_PROP_NONE;
+  if (!prop)
+    return CS_PROP_NONE;
   return prop->propKind;
 }
 
 wpi::StringRef PropertyContainer::GetPropertyName(
     int property, wpi::SmallVectorImpl<char>& buf, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return wpi::StringRef{};
+  if (!m_properties_cached && !CacheProperties(status))
+    return wpi::StringRef{};
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -60,7 +65,8 @@ wpi::StringRef PropertyContainer::GetPropertyName(
 }
 
 int PropertyContainer::GetProperty(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
+  if (!m_properties_cached && !CacheProperties(status))
+    return 0;
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -85,7 +91,8 @@ void PropertyContainer::SetProperty(int property, int value,
   }
 
   // Guess it's integer if we've set before get
-  if (prop->propKind == CS_PROP_NONE) prop->propKind = CS_PROP_INTEGER;
+  if (prop->propKind == CS_PROP_NONE)
+    prop->propKind = CS_PROP_INTEGER;
 
   if ((prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
       0) {
@@ -97,7 +104,8 @@ void PropertyContainer::SetProperty(int property, int value,
 }
 
 int PropertyContainer::GetPropertyMin(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
+  if (!m_properties_cached && !CacheProperties(status))
+    return 0;
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -108,7 +116,8 @@ int PropertyContainer::GetPropertyMin(int property, CS_Status* status) const {
 }
 
 int PropertyContainer::GetPropertyMax(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
+  if (!m_properties_cached && !CacheProperties(status))
+    return 0;
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -119,7 +128,8 @@ int PropertyContainer::GetPropertyMax(int property, CS_Status* status) const {
 }
 
 int PropertyContainer::GetPropertyStep(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
+  if (!m_properties_cached && !CacheProperties(status))
+    return 0;
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -131,7 +141,8 @@ int PropertyContainer::GetPropertyStep(int property, CS_Status* status) const {
 
 int PropertyContainer::GetPropertyDefault(int property,
                                           CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
+  if (!m_properties_cached && !CacheProperties(status))
+    return 0;
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -143,7 +154,8 @@ int PropertyContainer::GetPropertyDefault(int property,
 
 wpi::StringRef PropertyContainer::GetStringProperty(
     int property, wpi::SmallVectorImpl<char>& buf, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return wpi::StringRef{};
+  if (!m_properties_cached && !CacheProperties(status))
+    return wpi::StringRef{};
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -169,7 +181,8 @@ void PropertyContainer::SetStringProperty(int property, const wpi::Twine& value,
   }
 
   // Guess it's string if we've set before get
-  if (prop->propKind == CS_PROP_NONE) prop->propKind = CS_PROP_STRING;
+  if (prop->propKind == CS_PROP_NONE)
+    prop->propKind = CS_PROP_STRING;
 
   if (prop->propKind != CS_PROP_STRING) {
     *status = CS_WRONG_PROPERTY_TYPE;

@@ -18,4 +18,6 @@ TimedCommand::TimedCommand(const wpi::Twine& name, double timeout,
 TimedCommand::TimedCommand(double timeout, Subsystem& subsystem)
     : Command(timeout, subsystem) {}
 
-bool TimedCommand::IsFinished() { return IsTimedOut(); }
+bool TimedCommand::IsFinished() {
+  return IsTimedOut();
+}

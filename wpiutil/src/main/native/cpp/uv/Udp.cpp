@@ -123,7 +123,8 @@ void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
   if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
              &addr, [](uv_udp_send_t* r, int status) {
                auto& h = *static_cast<UdpSendReq*>(r->data);
-               if (status < 0) h.ReportError(status);
+               if (status < 0)
+                 h.ReportError(status);
                h.complete(Error(status));
                h.Release();  // this is always a one-shot
              }))
@@ -139,7 +140,8 @@ void Udp::Send(ArrayRef<Buffer> bufs, const std::shared_ptr<UdpSendReq>& req) {
   if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
              nullptr, [](uv_udp_send_t* r, int status) {
                auto& h = *static_cast<UdpSendReq*>(r->data);
-               if (status < 0) h.ReportError(status);
+               if (status < 0)
+                 h.ReportError(status);
                h.complete(Error(status));
                h.Release();  // this is always a one-shot
              }))

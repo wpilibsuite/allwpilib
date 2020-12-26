@@ -59,7 +59,8 @@ class Tty final : public StreamImpl<Tty, uv_tty_t> {
    */
   void SetMode(uv_tty_mode_t mode) {
     int err = uv_tty_set_mode(GetRaw(), mode);
-    if (err < 0) ReportError(err);
+    if (err < 0)
+      ReportError(err);
   }
 
   /**

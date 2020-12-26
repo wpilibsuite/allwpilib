@@ -18,4 +18,6 @@ void SetPivotSetpoint::Initialize() {
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool SetPivotSetpoint::IsFinished() { return Robot::pivot.OnTarget(); }
+bool SetPivotSetpoint::IsFinished() {
+  return Robot::pivot.OnTarget();
+}

@@ -195,7 +195,8 @@ inline uint64_t RawCvSink::GrabFrameDirect(cv::Mat& image, double timeout) {
   rawFrame.width = 0;
   rawFrame.pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
   m_status = RawSink::GrabFrame(rawFrame, timeout);
-  if (m_status <= 0) return m_status;
+  if (m_status <= 0)
+    return m_status;
   image = cv::Mat{rawFrame.height, rawFrame.width, CV_8UC3, rawFrame.data};
   return m_status;
 }
@@ -205,7 +206,8 @@ inline uint64_t RawCvSink::GrabFrameNoTimeoutDirect(cv::Mat& image) {
   rawFrame.width = 0;
   rawFrame.pixelFormat = CS_PixelFormat::CS_PIXFMT_BGR;
   m_status = RawSink::GrabFrameNoTimeout(rawFrame);
-  if (m_status <= 0) return m_status;
+  if (m_status <= 0)
+    return m_status;
   image = cv::Mat{rawFrame.height, rawFrame.width, CV_8UC3, rawFrame.data};
   return m_status;
 }

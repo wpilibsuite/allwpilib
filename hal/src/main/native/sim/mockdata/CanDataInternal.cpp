@@ -28,7 +28,9 @@ void CanData::ResetData() {
 
 extern "C" {
 
-void HALSIM_ResetCanData(void) { SimCanData->ResetData(); }
+void HALSIM_ResetCanData(void) {
+  SimCanData->ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                             \
   HAL_SIMCALLBACKREGISTRY_DEFINE_CAPI_NOINDEX(TYPE, HALSIM, Can##CAPINAME, \

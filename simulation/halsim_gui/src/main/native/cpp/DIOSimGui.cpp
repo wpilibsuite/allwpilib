@@ -222,7 +222,8 @@ void DIOsSimModel::ForEachDIO(
 static bool DIOAnyInitialized() {
   static const int32_t num = HAL_GetNumDigitalChannels();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetDIOInitialized(i)) return true;
+    if (HALSIM_GetDIOInitialized(i))
+      return true;
   }
   return false;
 }

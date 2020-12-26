@@ -6,4 +6,6 @@
 
 using namespace glass;
 
-bool Model::IsReadOnly() { return false; }
+bool Model::IsReadOnly() {
+  return false;
+}

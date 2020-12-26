@@ -49,7 +49,8 @@ void Stream::Shutdown(const std::shared_ptr<ShutdownReq>& req) {
 
 void Stream::Shutdown(std::function<void()> callback) {
   auto req = std::make_shared<ShutdownReq>();
-  if (callback) req->complete.connect(callback);
+  if (callback)
+    req->complete.connect(callback);
   Shutdown(req);
 }
 
@@ -77,7 +78,8 @@ void Stream::Write(ArrayRef<Buffer> bufs,
   if (Invoke(&uv_write, req->GetRaw(), GetRawStream(), bufs.data(), bufs.size(),
              [](uv_write_t* r, int status) {
                auto& h = *static_cast<WriteReq*>(r->data);
-               if (status < 0) h.ReportError(status);
+               if (status < 0)
+                 h.ReportError(status);
                h.finish(Error(status));
                h.Release();  // this is always a one-shot
              }))

@@ -69,7 +69,8 @@ void glass::DisplayPDP(PDPModel* model, int index) {
 
       float width =
           (std::max)(leftWidth, rightWidth) * 2 + ImGui::GetFontSize() * 4;
-      if (width > maxWidth) maxWidth = width;
+      if (width > maxWidth)
+        maxWidth = width;
     }
     ImGui::Columns(1);
     ImGui::Dummy(ImVec2(maxWidth, 0));

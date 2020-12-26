@@ -130,14 +130,16 @@ void WorkerThreadThread<R, T...>::Main() {
   while (m_active) {
     std::unique_lock lock(m_mutex);
     m_cond.wait(lock, [&] { return !m_active || !m_requests.empty(); });
-    if (!m_active) break;
+    if (!m_active)
+      break;
 
     // don't want to hold the lock while executing the callbacks
     requests.swap(m_requests);
     lock.unlock();
 
     for (auto&& req : requests) {
-      if (!m_active) break;  // requests may be long-running
+      if (!m_active)
+        break;  // requests may be long-running
       RunWorkerThreadRequest(*this, req);
     }
     requests.clear();
@@ -169,7 +171,8 @@ class WorkerThread<R(T...)> final {
    * @param loop the loop to use for running afterWork routines
    */
   void SetLoop(uv::Loop& loop) {
-    if (auto thr = m_owner.GetThread()) thr->m_async.SetLoop(loop);
+    if (auto thr = m_owner.GetThread())
+      thr->m_async.SetLoop(loop);
   }
 
   /**
@@ -186,7 +189,8 @@ class WorkerThread<R(T...)> final {
    * Subsequent calls to QueueWorkThen will no longer run afterWork.
    */
   void UnsetLoop() {
-    if (auto thr = m_owner.GetThread()) thr->m_async.UnsetLoop();
+    if (auto thr = m_owner.GetThread())
+      thr->m_async.UnsetLoop();
   }
 
   /**

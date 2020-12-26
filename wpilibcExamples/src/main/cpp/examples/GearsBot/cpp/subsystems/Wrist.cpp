@@ -23,8 +23,14 @@ void Wrist::Log() {
   frc::SmartDashboard::PutNumber("Wrist Angle", GetMeasurement());
 }
 
-double Wrist::GetMeasurement() { return m_pot.Get(); }
+double Wrist::GetMeasurement() {
+  return m_pot.Get();
+}
 
-void Wrist::UseOutput(double output, double setpoint) { m_motor.Set(output); }
+void Wrist::UseOutput(double output, double setpoint) {
+  m_motor.Set(output);
+}
 
-void Wrist::Periodic() { Log(); }
+void Wrist::Periodic() {
+  Log();
+}

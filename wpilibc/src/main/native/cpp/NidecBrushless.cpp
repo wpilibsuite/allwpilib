@@ -36,11 +36,17 @@ void NidecBrushless::Set(double speed) {
   Feed();
 }
 
-double NidecBrushless::Get() const { return m_speed; }
+double NidecBrushless::Get() const {
+  return m_speed;
+}
 
-void NidecBrushless::SetInverted(bool isInverted) { m_isInverted = isInverted; }
+void NidecBrushless::SetInverted(bool isInverted) {
+  m_isInverted = isInverted;
+}
 
-bool NidecBrushless::GetInverted() const { return m_isInverted; }
+bool NidecBrushless::GetInverted() const {
+  return m_isInverted;
+}
 
 void NidecBrushless::Disable() {
   m_disabled = true;
@@ -48,9 +54,13 @@ void NidecBrushless::Disable() {
   m_pwm.SetDisabled();
 }
 
-void NidecBrushless::Enable() { m_disabled = false; }
+void NidecBrushless::Enable() {
+  m_disabled = false;
+}
 
-void NidecBrushless::PIDWrite(double output) { Set(output); }
+void NidecBrushless::PIDWrite(double output) {
+  Set(output);
+}
 
 void NidecBrushless::StopMotor() {
   m_dio.UpdateDutyCycle(0.5);
@@ -61,7 +71,9 @@ void NidecBrushless::GetDescription(wpi::raw_ostream& desc) const {
   desc << "Nidec " << GetChannel();
 }
 
-int NidecBrushless::GetChannel() const { return m_pwm.GetChannel(); }
+int NidecBrushless::GetChannel() const {
+  return m_pwm.GetChannel();
+}
 
 void NidecBrushless::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Nidec Brushless");

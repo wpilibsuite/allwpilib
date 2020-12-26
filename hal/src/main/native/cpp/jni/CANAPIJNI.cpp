@@ -194,11 +194,13 @@ Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketNew
   if (!CheckStatus(env, status)) {
     return false;
   }
-  if (dataLength > 8) dataLength = 8;
+  if (dataLength > 8)
+    dataLength = 8;
 
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
-  if (javaLen < dataLength) dataLength = javaLen;
+  if (javaLen < dataLength)
+    dataLength = javaLen;
   env->SetByteArrayRegion(toSetArray, 0, dataLength,
                           reinterpret_cast<jbyte*>(dataTemp));
   return true;
@@ -226,11 +228,13 @@ Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketLatest
   if (!CheckStatus(env, status)) {
     return false;
   }
-  if (dataLength > 8) dataLength = 8;
+  if (dataLength > 8)
+    dataLength = 8;
 
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
-  if (javaLen < dataLength) dataLength = javaLen;
+  if (javaLen < dataLength)
+    dataLength = javaLen;
   env->SetByteArrayRegion(toSetArray, 0, dataLength,
                           reinterpret_cast<jbyte*>(dataTemp));
   return true;
@@ -259,11 +263,13 @@ Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketTimeout
   if (!CheckStatus(env, status)) {
     return false;
   }
-  if (dataLength > 8) dataLength = 8;
+  if (dataLength > 8)
+    dataLength = 8;
 
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
-  if (javaLen < dataLength) dataLength = javaLen;
+  if (javaLen < dataLength)
+    dataLength = javaLen;
   env->SetByteArrayRegion(toSetArray, 0, dataLength,
                           reinterpret_cast<jbyte*>(dataTemp));
   return true;

@@ -60,15 +60,19 @@ void Encoder::SetupCounter(HAL_Handle digitalSourceHandleA,
   m_encodingScale = encodingType == HAL_Encoder_k1X ? 1 : 2;
   m_counter =
       HAL_InitializeCounter(HAL_Counter_kExternalDirection, &m_index, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   HAL_SetCounterMaxPeriod(m_counter, 0.5, status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   HAL_SetCounterUpSource(m_counter, digitalSourceHandleA, analogTriggerTypeA,
                          status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   HAL_SetCounterDownSource(m_counter, digitalSourceHandleB, analogTriggerTypeB,
                            status);
-  if (*status != 0) return;
+  if (*status != 0)
+    return;
   if (encodingType == HAL_Encoder_k1X) {
     HAL_SetCounterUpSourceEdge(m_counter, true, false, status);
     HAL_SetCounterAverageSize(m_counter, 1, status);
@@ -240,7 +244,8 @@ bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
                           HAL_FPGAEncoderHandle* fpgaHandle,
                           HAL_CounterHandle* counterHandle) {
   auto encoder = encoderHandles->Get(handle);
-  if (!handle) return false;
+  if (!handle)
+    return false;
 
   *fpgaHandle = encoder->m_encoder;
   *counterHandle = encoder->m_counter;
@@ -258,7 +263,8 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   auto encoder = std::make_shared<Encoder>(
       digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
       analogTriggerTypeB, reverseDirection, encodingType, status);
-  if (*status != 0) return HAL_kInvalidHandle;  // return in creation error
+  if (*status != 0)
+    return HAL_kInvalidHandle;  // return in creation error
   auto handle = encoderHandles->Allocate(encoder);
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;

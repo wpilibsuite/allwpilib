@@ -16,8 +16,12 @@ void InitializePower() {}
 
 // TODO: Fix the naming in here
 extern "C" {
-double HAL_GetVinVoltage(int32_t* status) { return SimRoboRioData->vInVoltage; }
-double HAL_GetVinCurrent(int32_t* status) { return SimRoboRioData->vInCurrent; }
+double HAL_GetVinVoltage(int32_t* status) {
+  return SimRoboRioData->vInVoltage;
+}
+double HAL_GetVinCurrent(int32_t* status) {
+  return SimRoboRioData->vInCurrent;
+}
 double HAL_GetUserVoltage6V(int32_t* status) {
   return SimRoboRioData->userVoltage6V;
 }

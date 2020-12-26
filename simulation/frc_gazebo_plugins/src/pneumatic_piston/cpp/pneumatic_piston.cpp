@@ -78,7 +78,8 @@ void PneumaticPiston::Update(const gazebo::common::UpdateInfo& info) {
        the lack of the forward signal suffices.
        Note that a true simulation would not allow a SingleSolenoid to
        have reverse force, but we put that in the hands of the model builder.*/
-    if (reverse_topic.empty() || reverse_signal) force = reverse_force;
+    if (reverse_topic.empty() || reverse_signal)
+      force = reverse_force;
   }
   joint->SetForce(0, force);
 }

@@ -18,4 +18,6 @@ RunCommand::RunCommand(std::function<void()> toRun,
   AddRequirements(requirements);
 }
 
-void RunCommand::Execute() { m_toRun(); }
+void RunCommand::Execute() {
+  m_toRun();
+}

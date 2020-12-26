@@ -96,7 +96,8 @@ void PWMsSimModel::ForEachPWM(
 static bool PWMsAnyInitialized() {
   static const int32_t num = HAL_GetNumPWMChannels();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetPWMInitialized(i)) return true;
+    if (HALSIM_GetPWMInitialized(i))
+      return true;
   }
   return false;
 }

@@ -32,14 +32,17 @@ std::shared_ptr<Poll> Poll::CreateSocket(Loop& loop, uv_os_sock_t sock) {
 }
 
 void Poll::Reuse(int fd, std::function<void()> callback) {
-  if (IsClosing()) return;
-  if (!m_reuseData) m_reuseData = std::make_unique<ReuseData>();
+  if (IsClosing())
+    return;
+  if (!m_reuseData)
+    m_reuseData = std::make_unique<ReuseData>();
   m_reuseData->callback = callback;
   m_reuseData->isSocket = false;
   m_reuseData->fd = fd;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {
     Poll& h = *static_cast<Poll*>(handle->data);
-    if (!h.m_reuseData || h.m_reuseData->isSocket) return;  // just in case
+    if (!h.m_reuseData || h.m_reuseData->isSocket)
+      return;  // just in case
     auto data = std::move(h.m_reuseData);
     int err = uv_poll_init(h.GetLoopRef().GetRaw(), h.GetRaw(), data->fd);
     if (err < 0) {
@@ -51,14 +54,17 @@ void Poll::Reuse(int fd, std::function<void()> callback) {
 }
 
 void Poll::ReuseSocket(uv_os_sock_t sock, std::function<void()> callback) {
-  if (IsClosing()) return;
-  if (!m_reuseData) m_reuseData = std::make_unique<ReuseData>();
+  if (IsClosing())
+    return;
+  if (!m_reuseData)
+    m_reuseData = std::make_unique<ReuseData>();
   m_reuseData->callback = callback;
   m_reuseData->isSocket = true;
   m_reuseData->sock = sock;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {
     Poll& h = *static_cast<Poll*>(handle->data);
-    if (!h.m_reuseData || !h.m_reuseData->isSocket) return;  // just in case
+    if (!h.m_reuseData || !h.m_reuseData->isSocket)
+      return;  // just in case
     auto data = std::move(h.m_reuseData);
     int err = uv_poll_init(h.GetLoopRef().GetRaw(), h.GetRaw(), data->sock);
     if (err < 0) {

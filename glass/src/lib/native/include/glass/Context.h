@@ -141,7 +141,9 @@ void PushID(const char* str_id);
 void PushID(const char* str_id_begin, const char* str_id_end);
 
 // push string into the ID stack (will hash string).
-inline void PushID(wpi::StringRef str) { PushID(str.begin(), str.end()); }
+inline void PushID(wpi::StringRef str) {
+  PushID(str.begin(), str.end());
+}
 
 // push integer into the ID stack (will hash integer).
 void PushID(int int_id);

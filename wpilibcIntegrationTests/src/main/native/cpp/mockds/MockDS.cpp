@@ -50,7 +50,8 @@ static void generateEnabledDsPacket(wpi::SmallVectorImpl<uint8_t>& data,
 using namespace frc;
 
 void MockDS::start() {
-  if (m_active) return;
+  if (m_active)
+    return;
   m_active = true;
   m_thread = std::thread([&]() {
     wpi::Logger logger(LoggerFunc);
@@ -82,5 +83,6 @@ void MockDS::start() {
 
 void MockDS::stop() {
   m_active = false;
-  if (m_thread.joinable()) m_thread.join();
+  if (m_thread.joinable())
+    m_thread.join();
 }

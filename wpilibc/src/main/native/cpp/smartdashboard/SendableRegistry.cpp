@@ -53,7 +53,8 @@ SendableRegistry::Impl::Component& SendableRegistry::Impl::GetOrAdd(
   UID& compUid = componentMap[sendable];
   if (compUid == 0)
     compUid = components.emplace_back(std::make_unique<Component>()) + 1;
-  if (uid) *uid = compUid;
+  if (uid)
+    *uid = compUid;
 
   return *components[compUid - 1];
 }
@@ -146,13 +147,15 @@ void SendableRegistry::AddChild(Sendable* parent, void* child) {
 bool SendableRegistry::Remove(Sendable* sendable) {
   std::scoped_lock lock(m_impl->mutex);
   auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end()) return false;
+  if (it == m_impl->componentMap.end())
+    return false;
   UID compUid = it->getSecond();
   m_impl->components.erase(compUid - 1);
   m_impl->componentMap.erase(it);
   // update any parent pointers
   for (auto&& comp : m_impl->components) {
-    if (comp->parent == sendable) comp->parent = nullptr;
+    if (comp->parent == sendable)
+      comp->parent = nullptr;
   }
   return true;
 }
@@ -175,7 +178,8 @@ void SendableRegistry::Move(Sendable* to, Sendable* from) {
   }
   // update any parent pointers
   for (auto&& comp : m_impl->components) {
-    if (comp->parent == from) comp->parent = to;
+    if (comp->parent == from)
+      comp->parent = to;
   }
 }
 
@@ -286,7 +290,8 @@ std::shared_ptr<void> SendableRegistry::GetData(Sendable* sendable,
       !m_impl->components[it->getSecond() - 1])
     return nullptr;
   auto& comp = *m_impl->components[it->getSecond() - 1];
-  if (static_cast<size_t>(handle) >= comp.data.size()) return nullptr;
+  if (static_cast<size_t>(handle) >= comp.data.size())
+    return nullptr;
   return comp.data[handle];
 }
 
@@ -317,7 +322,8 @@ SendableRegistry::UID SendableRegistry::GetUniqueId(Sendable* sendable) {
 }
 
 Sendable* SendableRegistry::GetSendable(UID uid) {
-  if (uid == 0) return nullptr;
+  if (uid == 0)
+    return nullptr;
   std::scoped_lock lock(m_impl->mutex);
   if ((uid - 1) >= m_impl->components.size() || !m_impl->components[uid - 1])
     return nullptr;
@@ -339,7 +345,8 @@ void SendableRegistry::Publish(UID sendableUid,
 }
 
 void SendableRegistry::Update(UID sendableUid) {
-  if (sendableUid == 0) return;
+  if (sendableUid == 0)
+    return;
   std::scoped_lock lock(m_impl->mutex);
   if ((sendableUid - 1) >= m_impl->components.size() ||
       !m_impl->components[sendableUid - 1])
@@ -353,7 +360,8 @@ void SendableRegistry::ForeachLiveWindow(
   assert(dataHandle >= 0);
   std::scoped_lock lock(m_impl->mutex);
   wpi::SmallVector<Impl::Component*, 128> components;
-  for (auto&& comp : m_impl->components) components.emplace_back(comp.get());
+  for (auto&& comp : m_impl->components)
+    components.emplace_back(comp.get());
   for (auto comp : components) {
     if (comp && comp->sendable && comp->liveWindow) {
       if (static_cast<size_t>(dataHandle) >= comp->data.size())

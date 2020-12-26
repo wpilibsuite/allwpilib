@@ -104,7 +104,8 @@ void PDPsSimModel::ForEachPDP(
 static bool PDPsAnyInitialized() {
   static const int32_t num = HAL_GetNumPDPModules();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetPDPInitialized(i)) return true;
+    if (HALSIM_GetPDPInitialized(i))
+      return true;
   }
   return false;
 }

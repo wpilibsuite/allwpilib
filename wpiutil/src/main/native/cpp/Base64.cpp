@@ -82,9 +82,11 @@ static const unsigned char pr2six[256] = {
 
 size_t Base64Decode(raw_ostream& os, StringRef encoded) {
   const unsigned char* end = encoded.bytes_begin();
-  while (pr2six[*end] <= 63 && end != encoded.bytes_end()) ++end;
+  while (pr2six[*end] <= 63 && end != encoded.bytes_end())
+    ++end;
   size_t nprbytes = end - encoded.bytes_begin();
-  if (nprbytes == 0) return 0;
+  if (nprbytes == 0)
+    return 0;
 
   const unsigned char* cur = encoded.bytes_begin();
 
@@ -127,7 +129,8 @@ static const char basis_64[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 void Base64Encode(raw_ostream& os, StringRef plain) {
-  if (plain.empty()) return;
+  if (plain.empty())
+    return;
   size_t len = plain.size();
 
   size_t i;

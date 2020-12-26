@@ -83,7 +83,8 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
 void HAL_FreeAddressableLED(HAL_AddressableLEDHandle handle) {
   auto led = ledHandles->Get(handle);
   ledHandles->Free(handle);
-  if (!led) return;
+  if (!led)
+    return;
   SimAddressableLEDData[led->index].running = false;
   SimAddressableLEDData[led->index].initialized = false;
 }

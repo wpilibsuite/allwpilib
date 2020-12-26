@@ -37,7 +37,8 @@ void PropertyImpl::SetValue(int v) {
     value = v;
   bool wasValueSet = valueSet;
   valueSet = true;
-  if (!wasValueSet || value != oldValue) changed();
+  if (!wasValueSet || value != oldValue)
+    changed();
 }
 
 void PropertyImpl::SetValue(const wpi::Twine& v) {
@@ -49,7 +50,8 @@ void PropertyImpl::SetValue(const wpi::Twine& v) {
   }
   bool wasValueSet = valueSet;
   valueSet = true;
-  if (!wasValueSet || valueChanged) changed();
+  if (!wasValueSet || valueChanged)
+    changed();
 }
 
 void PropertyImpl::SetDefaultValue(int v) {

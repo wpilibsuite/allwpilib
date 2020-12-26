@@ -73,7 +73,8 @@ void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,
   wpi::mutex& dioMutex = detail::UnsafeGetDIOMutex();
   tDIO* dSys = detail::UnsafeGetDigialSystem();
   auto mask = detail::ComputeDigitalMask(handle, status);
-  if (status != 0) return;
+  if (status != 0)
+    return;
   std::scoped_lock lock(dioMutex);
 
   tDIO::tOutputEnable enableOE = dSys->readOutputEnable(status);

@@ -6,4 +6,6 @@
 
 #include <wpi/math>
 
-int main() { std::cout << wpi::math::pi << std::endl; }
+int main() {
+  std::cout << wpi::math::pi << std::endl;
+}

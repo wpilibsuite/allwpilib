@@ -113,7 +113,8 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
   auto newWaypoints = waypoints;
   const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
   if (config.IsReversed())
-    for (auto& waypoint : newWaypoints) waypoint += flip;
+    for (auto& waypoint : newWaypoints)
+      waypoint += flip;
 
   std::vector<SplineParameterizer::PoseWithCurvature> points;
   try {

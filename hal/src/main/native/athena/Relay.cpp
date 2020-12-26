@@ -44,7 +44,8 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
   hal::init::CheckInit();
   initializeDigital(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0)
+    return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -52,7 +53,8 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
     return HAL_kInvalidHandle;
   }
 
-  if (!fwd) channel += kNumRelayHeaders;  // add 4 to reverse channels
+  if (!fwd)
+    channel += kNumRelayHeaders;  // add 4 to reverse channels
 
   auto handle = relayHandles->Allocate(channel, status);
 
@@ -105,7 +107,8 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
     relays = relaySystem->readValue_Reverse(status);
   }
 
-  if (*status != 0) return;  // bad status read
+  if (*status != 0)
+    return;  // bad status read
 
   if (on) {
     relays |= 1 << port->channel;

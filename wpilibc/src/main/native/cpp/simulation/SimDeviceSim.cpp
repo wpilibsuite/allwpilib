@@ -37,8 +37,11 @@ std::vector<std::string> SimDeviceSim::GetEnumOptions(hal::SimEnum val) {
   const char** options = HALSIM_GetSimValueEnumOptions(val, &numOptions);
   std::vector<std::string> rv;
   rv.reserve(numOptions);
-  for (int32_t i = 0; i < numOptions; ++i) rv.emplace_back(options[i]);
+  for (int32_t i = 0; i < numOptions; ++i)
+    rv.emplace_back(options[i]);
   return rv;
 }
 
-void SimDeviceSim::ResetData() { HALSIM_ResetSimDeviceData(); }
+void SimDeviceSim::ResetData() {
+  HALSIM_ResetSimDeviceData();
+}

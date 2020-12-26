@@ -57,7 +57,9 @@ TCPStream::TCPStream(int sd, sockaddr_in* address)
   m_peerPort = ntohs(address->sin_port);
 }
 
-TCPStream::~TCPStream() { close(); }
+TCPStream::~TCPStream() {
+  close();
+}
 
 size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   if (m_sd < 0) {
@@ -164,35 +166,46 @@ void TCPStream::close() {
   m_sd = -1;
 }
 
-StringRef TCPStream::getPeerIP() const { return m_peerIP; }
+StringRef TCPStream::getPeerIP() const {
+  return m_peerIP;
+}
 
-int TCPStream::getPeerPort() const { return m_peerPort; }
+int TCPStream::getPeerPort() const {
+  return m_peerPort;
+}
 
 void TCPStream::setNoDelay() {
-  if (m_sd < 0) return;
+  if (m_sd < 0)
+    return;
   int optval = 1;
   setsockopt(m_sd, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char*>(&optval),
              sizeof optval);
 }
 
 bool TCPStream::setBlocking(bool enabled) {
-  if (m_sd < 0) return true;  // silently accept
+  if (m_sd < 0)
+    return true;  // silently accept
 #ifdef _WIN32
   u_long mode = enabled ? 0 : 1;
-  if (ioctlsocket(m_sd, FIONBIO, &mode) == SOCKET_ERROR) return false;
+  if (ioctlsocket(m_sd, FIONBIO, &mode) == SOCKET_ERROR)
+    return false;
 #else
   int flags = fcntl(m_sd, F_GETFL, nullptr);
-  if (flags < 0) return false;
+  if (flags < 0)
+    return false;
   if (enabled)
     flags &= ~O_NONBLOCK;
   else
     flags |= O_NONBLOCK;
-  if (fcntl(m_sd, F_SETFL, flags) < 0) return false;
+  if (fcntl(m_sd, F_SETFL, flags) < 0)
+    return false;
 #endif
   return true;
 }
 
-int TCPStream::getNativeHandle() const { return m_sd; }
+int TCPStream::getNativeHandle() const {
+  return m_sd;
+}
 
 bool TCPStream::WaitForReadEvent(int timeout) {
   fd_set sdset;

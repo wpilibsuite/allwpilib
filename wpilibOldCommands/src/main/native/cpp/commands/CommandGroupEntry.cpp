@@ -13,8 +13,10 @@ CommandGroupEntry::CommandGroupEntry(Command* command, Sequence state,
     : m_timeout(timeout), m_command(command), m_state(state) {}
 
 bool CommandGroupEntry::IsTimedOut() const {
-  if (m_timeout < 0.0) return false;
+  if (m_timeout < 0.0)
+    return false;
   double time = m_command->TimeSinceInitialized();
-  if (time == 0.0) return false;
+  if (time == 0.0)
+    return false;
   return time >= m_timeout;
 }

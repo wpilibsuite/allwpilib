@@ -27,7 +27,9 @@ void DIOData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetDIOData(int32_t index) { SimDIOData[index].ResetData(); }
+void HALSIM_ResetDIOData(int32_t index) {
+  SimDIOData[index].ResetData();
+}
 
 HAL_SimDeviceHandle HALSIM_GetDIOSimDevice(int32_t index) {
   return SimDIOData[index].simDevice;

@@ -26,7 +26,9 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
   return HAL_kInvalidHandle;
 }
 
-int HAL_GetSerialFD(HAL_SerialPortHandle handle, int32_t* status) { return -1; }
+int HAL_GetSerialFD(HAL_SerialPortHandle handle, int32_t* status) {
+  return -1;
+}
 
 void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud,
                            int32_t* status) {}

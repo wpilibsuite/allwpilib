@@ -52,7 +52,9 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
   }
 }
 
-int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
+int32_t remapMXPChannel(int32_t channel) {
+  return channel - 10;
+}
 
 int32_t remapMXPPWMChannel(int32_t channel) {
   if (channel < 14) {

@@ -21,7 +21,9 @@ DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, false)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, false)
 DEFINE_CAPI(double, CompressorCurrent, 0)
 
-void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) { *values = 0; }
+void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) {
+  *values = 0;
+}
 
 void HALSIM_SetPCMAllSolenoids(int32_t index, uint8_t values) {}
 

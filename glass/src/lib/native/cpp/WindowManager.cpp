@@ -34,7 +34,8 @@ void WindowManager::IniSaver::IniWriteAll(ImGuiTextBuffer* out_buf) {
 Window* WindowManager::AddWindow(wpi::StringRef id,
                                  wpi::unique_function<void()> display) {
   auto win = GetOrAddWindow(id, false);
-  if (!win) return nullptr;
+  if (!win)
+    return nullptr;
   if (win->HasView()) {
     wpi::errs() << "GUI: ignoring duplicate window '" << id << "'\n";
     return nullptr;
@@ -46,7 +47,8 @@ Window* WindowManager::AddWindow(wpi::StringRef id,
 Window* WindowManager::AddWindow(wpi::StringRef id,
                                  std::unique_ptr<View> view) {
   auto win = GetOrAddWindow(id, false);
-  if (!win) return nullptr;
+  if (!win)
+    return nullptr;
   if (win->HasView()) {
     wpi::errs() << "GUI: ignoring duplicate window '" << id << "'\n";
     return nullptr;
@@ -76,7 +78,8 @@ Window* WindowManager::GetWindow(wpi::StringRef id) {
   auto it = std::lower_bound(
       m_windows.begin(), m_windows.end(), id,
       [](const auto& elem, wpi::StringRef s) { return elem->GetId() < s; });
-  if (it == m_windows.end() || (*it)->GetId() != id) return nullptr;
+  if (it == m_windows.end() || (*it)->GetId() != id)
+    return nullptr;
   return it->get();
 }
 

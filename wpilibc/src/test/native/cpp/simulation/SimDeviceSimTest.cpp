@@ -27,7 +27,8 @@ TEST(SimDeviceSimTests, TestEnumerateDevices) {
   bool foundit = false;
   SimDeviceSim::EnumerateDevices(
       "te", [&](const char* name, HAL_SimDeviceHandle handle) {
-        if (wpi::StringRef(name) == "test") foundit = true;
+        if (wpi::StringRef(name) == "test")
+          foundit = true;
       });
   EXPECT_TRUE(foundit);
 }

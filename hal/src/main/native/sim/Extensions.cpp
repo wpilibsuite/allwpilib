@@ -85,7 +85,8 @@ int HAL_LoadOneExtension(const char* library) {
   auto init = reinterpret_cast<halsim_extension_init_func_t*>(
       DLSYM(handle, "HALSIM_InitExtension"));
 
-  if (init) rc = (*init)();
+  if (init)
+    rc = (*init)();
 
   if (rc != 0) {
     wpi::outs() << "HAL Extensions: Failed to load extension\n";
@@ -114,7 +115,8 @@ int HAL_LoadExtensions(void) {
   for (auto& libref : libraries) {
     wpi::SmallString<128> library(libref);
     rc = HAL_LoadOneExtension(library.c_str());
-    if (rc < 0) break;
+    if (rc < 0)
+      break;
   }
   return rc;
 }

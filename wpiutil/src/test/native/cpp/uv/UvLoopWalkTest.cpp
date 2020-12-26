@@ -44,7 +44,8 @@ TEST(UvLoop, Walk) {
 
   timer->timeout.connect([&, theTimer = timer.get()] {
     theTimer->GetLoopRef().Walk([&](Handle& it) {
-      if (&it == timer.get()) seen_timer_handle++;
+      if (&it == timer.get())
+        seen_timer_handle++;
     });
     theTimer->Close();
   });
@@ -58,7 +59,8 @@ TEST(UvLoop, Walk) {
   // Loop is finished, should not see our timer handle
   seen_timer_handle = 0;
   loop->Walk([&](Handle& it) {
-    if (&it == timer.get()) seen_timer_handle++;
+    if (&it == timer.get())
+      seen_timer_handle++;
   });
   ASSERT_EQ(seen_timer_handle, 0);
 }

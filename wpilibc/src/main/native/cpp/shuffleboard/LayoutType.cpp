@@ -6,4 +6,6 @@
 
 using namespace frc;
 
-wpi::StringRef LayoutType::GetLayoutName() const { return m_layoutName; }
+wpi::StringRef LayoutType::GetLayoutName() const {
+  return m_layoutName;
+}

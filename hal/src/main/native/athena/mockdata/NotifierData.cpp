@@ -6,9 +6,13 @@
 
 extern "C" {
 
-uint64_t HALSIM_GetNextNotifierTimeout(void) { return 0; }
+uint64_t HALSIM_GetNextNotifierTimeout(void) {
+  return 0;
+}
 
-int32_t HALSIM_GetNumNotifiers(void) { return 0; }
+int32_t HALSIM_GetNumNotifiers(void) {
+  return 0;
+}
 
 int32_t HALSIM_GetNotifierInfo(struct HALSIM_NotifierInfo* arr, int32_t size) {
   return 0;

@@ -52,7 +52,8 @@ char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status) {
 
 CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   auto info = cs::GetUsbCameraInfo(source, status);
-  if (*status != CS_OK) return nullptr;
+  if (*status != CS_OK)
+    return nullptr;
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
       wpi::safe_malloc(sizeof(CS_UsbCameraInfo)));
   ConvertToC(out, info);
@@ -64,18 +65,22 @@ CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status) {
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
       wpi::safe_malloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
   *count = cameras.size();
-  for (size_t i = 0; i < cameras.size(); ++i) ConvertToC(&out[i], cameras[i]);
+  for (size_t i = 0; i < cameras.size(); ++i)
+    ConvertToC(&out[i], cameras[i]);
   return out;
 }
 
 void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count) {
-  if (!cameras) return;
-  for (int i = 0; i < count; ++i) FreeUsbCameraInfo(&cameras[i]);
+  if (!cameras)
+    return;
+  for (int i = 0; i < count; ++i)
+    FreeUsbCameraInfo(&cameras[i]);
   std::free(cameras);
 }
 
 void CS_FreeUsbCameraInfo(CS_UsbCameraInfo* info) {
-  if (!info) return;
+  if (!info)
+    return;
   FreeUsbCameraInfo(info);
   std::free(info);
 }

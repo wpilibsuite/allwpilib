@@ -31,7 +31,9 @@ units::second_t GetTime() {
 
 using namespace frc2;
 
-Timer::Timer() { Reset(); }
+Timer::Timer() {
+  Reset();
+}
 
 Timer::Timer(const Timer& rhs)
     : m_startTime(rhs.m_startTime),
@@ -101,7 +103,9 @@ void Timer::Stop() {
   }
 }
 
-bool Timer::HasElapsed(units::second_t period) const { return Get() > period; }
+bool Timer::HasElapsed(units::second_t period) const {
+  return Get() > period;
+}
 
 bool Timer::HasPeriodPassed(units::second_t period) {
   return AdvanceIfElapsed(period);

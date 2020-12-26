@@ -71,4 +71,6 @@ void AnalogGyroSim::SetInitialized(bool initialized) {
   HALSIM_SetAnalogGyroInitialized(m_index, initialized);
 }
 
-void AnalogGyroSim::ResetData() { HALSIM_ResetAnalogGyroData(m_index); }
+void AnalogGyroSim::ResetData() {
+  HALSIM_ResetAnalogGyroData(m_index);
+}

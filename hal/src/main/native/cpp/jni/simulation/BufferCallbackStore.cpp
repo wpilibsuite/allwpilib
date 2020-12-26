@@ -82,7 +82,9 @@ void BufferCallbackStore::performCallback(const char* name, uint8_t* buffer,
   }
 }
 
-void BufferCallbackStore::free(JNIEnv* env) { m_call.free(env); }
+void BufferCallbackStore::free(JNIEnv* env) {
+  m_call.free(env);
+}
 
 SIM_JniHandle sim::AllocateBufferCallback(
     JNIEnv* env, jint index, jobject callback,
@@ -105,7 +107,8 @@ SIM_JniHandle sim::AllocateBufferCallback(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data) return;
+    if (!data)
+      return;
 
     data->performCallback(name, buffer, length);
   };

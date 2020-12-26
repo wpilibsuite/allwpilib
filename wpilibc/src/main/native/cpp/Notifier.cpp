@@ -29,9 +29,11 @@ Notifier::Notifier(std::function<void()> handler) {
     for (;;) {
       int32_t status = 0;
       HAL_NotifierHandle notifier = m_notifier.load();
-      if (notifier == 0) break;
+      if (notifier == 0)
+        break;
       uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
-      if (curTime == 0 || status != 0) break;
+      if (curTime == 0 || status != 0)
+        break;
 
       std::function<void()> handler;
       {
@@ -47,7 +49,8 @@ Notifier::Notifier(std::function<void()> handler) {
       }
 
       // call callback
-      if (handler) handler();
+      if (handler)
+        handler();
     }
   });
 }
@@ -65,9 +68,11 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
     HAL_SetCurrentThreadPriority(true, priority, &status);
     for (;;) {
       HAL_NotifierHandle notifier = m_notifier.load();
-      if (notifier == 0) break;
+      if (notifier == 0)
+        break;
       uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
-      if (curTime == 0 || status != 0) break;
+      if (curTime == 0 || status != 0)
+        break;
 
       std::function<void()> handler;
       {
@@ -83,7 +88,8 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
       }
 
       // call callback
-      if (handler) handler();
+      if (handler)
+        handler();
     }
   });
 }
@@ -96,7 +102,8 @@ Notifier::~Notifier() {
   wpi_setHALError(status);
 
   // Join the thread to ensure the handler has exited.
-  if (m_thread.joinable()) m_thread.join();
+  if (m_thread.joinable())
+    m_thread.join();
 
   HAL_CleanNotifier(handle, &status);
 }
@@ -174,7 +181,8 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
-  if (notifier == 0) return;
+  if (notifier == 0)
+    return;
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
   wpi_setHALError(status);
 }

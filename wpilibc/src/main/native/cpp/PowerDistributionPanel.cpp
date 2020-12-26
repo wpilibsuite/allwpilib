@@ -133,7 +133,9 @@ void PowerDistributionPanel::ClearStickyFaults() {
   }
 }
 
-int PowerDistributionPanel::GetModule() const { return m_module; }
+int PowerDistributionPanel::GetModule() const {
+  return m_module;
+}
 
 void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");

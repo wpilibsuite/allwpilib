@@ -16,7 +16,9 @@ void HALSimWSHalProvider::OnNetworkConnected(
   RegisterCallbacks();
 }
 
-void HALSimWSHalProvider::OnNetworkDisconnected() { CancelCallbacks(); }
+void HALSimWSHalProvider::OnNetworkDisconnected() {
+  CancelCallbacks();
+}
 
 void HALSimWSHalProvider::ProcessHalCallback(const wpi::json& payload) {
   auto ws = m_ws.lock();

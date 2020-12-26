@@ -21,12 +21,18 @@ Elevator::Elevator()
   AddChild("Pot", &m_pot);
 }
 
-void Elevator::Log() { frc::SmartDashboard::PutData("Wrist Pot", &m_pot); }
+void Elevator::Log() {
+  frc::SmartDashboard::PutData("Wrist Pot", &m_pot);
+}
 
-double Elevator::GetMeasurement() { return m_pot.Get(); }
+double Elevator::GetMeasurement() {
+  return m_pot.Get();
+}
 
 void Elevator::UseOutput(double output, double setpoint) {
   m_motor.Set(output);
 }
 
-void Elevator::Periodic() { Log(); }
+void Elevator::Periodic() {
+  Log();
+}

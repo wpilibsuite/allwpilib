@@ -169,7 +169,8 @@ void HALSimHttpConnection::ProcessRequest() {
   }
 
   wpi::StringRef path;
-  if (url.HasPath()) path = url.GetPath();
+  if (url.HasPath())
+    path = url.GetPath();
 
   if (m_request.GetMethod() == wpi::HTTP_GET && path.startswith("/") &&
       !path.contains("..")) {

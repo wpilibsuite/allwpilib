@@ -18,7 +18,9 @@ void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
                                             webregisterFunc);
 }
 
-HALSimWSProviderJoystick::~HALSimWSProviderJoystick() { DoCancelCallbacks(); }
+HALSimWSProviderJoystick::~HALSimWSProviderJoystick() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderJoystick::RegisterCallbacks() {
   m_dsNewDataCbKey = HALSIM_RegisterDriverStationNewDataCallback(
@@ -73,7 +75,9 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
       this, true);
 }
 
-void HALSimWSProviderJoystick::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderJoystick::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderJoystick::DoCancelCallbacks() {
   HALSIM_CancelDriverStationNewDataCallback(m_dsNewDataCbKey);
@@ -83,7 +87,8 @@ void HALSimWSProviderJoystick::DoCancelCallbacks() {
 
 void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
   // ignore if DS connected
-  if (gDSSocketConnected && *gDSSocketConnected) return;
+  if (gDSSocketConnected && *gDSSocketConnected)
+    return;
 
   wpi::json::const_iterator it;
   if ((it = json.find(">axes")) != json.end()) {

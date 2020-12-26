@@ -28,4 +28,6 @@ bool RobotState::IsAutonomous() {
   return DriverStation::GetInstance().IsAutonomous();
 }
 
-bool RobotState::IsTest() { return DriverStation::GetInstance().IsTest(); }
+bool RobotState::IsTest() {
+  return DriverStation::GetInstance().IsTest();
+}

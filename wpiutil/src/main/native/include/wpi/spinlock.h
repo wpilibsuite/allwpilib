@@ -28,7 +28,8 @@ class spinlock {
   LLVM_ATTRIBUTE_ALWAYS_INLINE
   void lock() {
     for (unsigned int i = 1; !try_lock(); ++i)
-      if ((i & 0xff) == 0) std::this_thread::yield();
+      if ((i & 0xff) == 0)
+        std::this_thread::yield();
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
@@ -65,7 +66,8 @@ class recursive_spinlock1 {
   LLVM_ATTRIBUTE_ALWAYS_INLINE
   void lock() {
     for (unsigned int i = 1; !try_lock(); ++i)
-      if ((i & 0xffff) == 0) std::this_thread::yield();
+      if ((i & 0xffff) == 0)
+        std::this_thread::yield();
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
@@ -97,7 +99,8 @@ class recursive_spinlock2 {
     auto us = std::this_thread::get_id();
     if (!owner_thread_id.compare_exchange_weak(owner, us,
                                                std::memory_order_acquire)) {
-      if (owner != us) return false;
+      if (owner != us)
+        return false;
     }
     ++recursive_counter;
     return true;
@@ -106,7 +109,8 @@ class recursive_spinlock2 {
   LLVM_ATTRIBUTE_ALWAYS_INLINE
   void lock() {
     for (unsigned int i = 1; !try_lock(); ++i)
-      if ((i & 0xffff) == 0) std::this_thread::yield();
+      if ((i & 0xffff) == 0)
+        std::this_thread::yield();
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE

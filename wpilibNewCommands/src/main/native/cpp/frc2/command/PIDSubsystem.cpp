@@ -18,9 +18,13 @@ void PIDSubsystem::Periodic() {
   }
 }
 
-void PIDSubsystem::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
+void PIDSubsystem::SetSetpoint(double setpoint) {
+  m_setpoint = setpoint;
+}
 
-double PIDSubsystem::GetSetpoint() const { return m_setpoint; }
+double PIDSubsystem::GetSetpoint() const {
+  return m_setpoint;
+}
 
 void PIDSubsystem::Enable() {
   m_controller.Reset();
@@ -32,6 +36,10 @@ void PIDSubsystem::Disable() {
   m_enabled = false;
 }
 
-bool PIDSubsystem::IsEnabled() { return m_enabled; }
+bool PIDSubsystem::IsEnabled() {
+  return m_enabled;
+}
 
-PIDController& PIDSubsystem::GetController() { return m_controller; }
+PIDController& PIDSubsystem::GetController() {
+  return m_controller;
+}

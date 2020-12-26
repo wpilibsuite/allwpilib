@@ -26,7 +26,8 @@ NetworkTablesSettings::NetworkTablesSettings(NT_Inst inst,
 }
 
 void NetworkTablesSettings::Update() {
-  if (!m_restart) return;
+  if (!m_restart)
+    return;
   m_restart = false;
   nt::StopClient(m_inst);
   nt::StopServer(m_inst);
@@ -64,5 +65,6 @@ void NetworkTablesSettings::Display() {
     default:
       break;
   }
-  if (ImGui::Button("Apply")) m_restart = true;
+  if (ImGui::Button("Apply"))
+    m_restart = true;
 }

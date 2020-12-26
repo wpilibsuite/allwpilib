@@ -34,7 +34,8 @@ void PrintTo(const Message& msg, std::ostream* os);
 
 inline void PrintTo(std::shared_ptr<Message> msg, std::ostream* os) {
   *os << "shared_ptr{";
-  if (msg) PrintTo(*msg, os);
+  if (msg)
+    PrintTo(*msg, os);
   *os << '}';
 }
 
@@ -42,7 +43,8 @@ void PrintTo(const Value& value, std::ostream* os);
 
 inline void PrintTo(std::shared_ptr<Value> value, std::ostream* os) {
   *os << "shared_ptr{";
-  if (value) PrintTo(*value, os);
+  if (value)
+    PrintTo(*value, os);
   *os << '}';
 }
 

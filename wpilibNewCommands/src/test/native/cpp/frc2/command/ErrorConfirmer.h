@@ -11,7 +11,8 @@
 class ErrorConfirmer {
  public:
   explicit ErrorConfirmer(const char* msg) : m_msg(msg) {
-    if (instance != nullptr) return;
+    if (instance != nullptr)
+      return;
     HALSIM_SetSendError(HandleError);
     EXPECT_CALL(*this, ConfirmError());
     instance = this;

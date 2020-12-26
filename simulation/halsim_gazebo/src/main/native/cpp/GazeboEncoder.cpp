@@ -30,7 +30,8 @@ static void encoder_reset_callback(const char* name, void* param,
 static void encoder_reverse_callback(const char* name, void* param,
                                      const struct HAL_Value* value) {
   GazeboEncoder* encoder = static_cast<GazeboEncoder*>(param);
-  if (encoder->IsInitialized()) encoder->SetReverse(value->data.v_boolean);
+  if (encoder->IsInitialized())
+    encoder->SetReverse(value->data.v_boolean);
 }
 
 GazeboEncoder::GazeboEncoder(int index, HALSimGazebo* halsim) {
@@ -56,7 +57,8 @@ void GazeboEncoder::Control(const char* command) {
   }
   gazebo::msgs::String msg;
   msg.set_data(command);
-  if (m_pub) m_pub->Publish(msg);
+  if (m_pub)
+    m_pub->Publish(msg);
 }
 
 void GazeboEncoder::Listen() {

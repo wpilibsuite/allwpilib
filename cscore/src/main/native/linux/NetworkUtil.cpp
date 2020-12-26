@@ -13,17 +13,21 @@ namespace cs {
 
 std::vector<std::string> GetNetworkInterfaces() {
   struct ifaddrs* ifa;
-  if (::getifaddrs(&ifa) != 0) return std::vector<std::string>{};
+  if (::getifaddrs(&ifa) != 0)
+    return std::vector<std::string>{};
 
   std::vector<std::string> rv;
   char buf[256];
   for (struct ifaddrs* i = ifa; i; i = i->ifa_next) {
-    if (!i->ifa_addr) continue;                       // no address
-    if (i->ifa_addr->sa_family != AF_INET) continue;  // only return IPv4
+    if (!i->ifa_addr)
+      continue;  // no address
+    if (i->ifa_addr->sa_family != AF_INET)
+      continue;  // only return IPv4
     struct sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(i->ifa_addr);
     const char* addr =
         ::inet_ntop(addr_in->sin_family, &addr_in->sin_addr, buf, sizeof(buf));
-    if (!addr) continue;  // error converting address
+    if (!addr)
+      continue;  // error converting address
     rv.emplace_back(addr);
   }
 

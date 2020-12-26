@@ -85,11 +85,17 @@ units::degree_t DriveSubsystem::GetHeading() const {
   return m_gyro.GetRotation2d().Degrees();
 }
 
-void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
+void DriveSubsystem::ZeroHeading() {
+  m_gyro.Reset();
+}
 
-double DriveSubsystem::GetTurnRate() { return -m_gyro.GetRate(); }
+double DriveSubsystem::GetTurnRate() {
+  return -m_gyro.GetRate();
+}
 
-frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+frc::Pose2d DriveSubsystem::GetPose() {
+  return m_odometry.GetPose();
+}
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(pose,

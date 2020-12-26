@@ -22,9 +22,13 @@ Pivot::Pivot() : frc::PIDSubsystem("Pivot", 7.0, 0.0, 8.0) {
 
 void InitDefaultCommand() {}
 
-double Pivot::ReturnPIDInput() { return m_pot.Get(); }
+double Pivot::ReturnPIDInput() {
+  return m_pot.Get();
+}
 
-void Pivot::UsePIDOutput(double output) { m_motor.PIDWrite(output); }
+void Pivot::UsePIDOutput(double output) {
+  m_motor.PIDWrite(output);
+}
 
 bool Pivot::IsAtUpperLimit() {
   return m_upperLimitSwitch.Get();  // TODO: inverted from real robot
@@ -36,4 +40,6 @@ bool Pivot::IsAtLowerLimit() {
                                     // (prefix with !)
 }
 
-double Pivot::GetAngle() { return m_pot.Get(); }
+double Pivot::GetAngle() {
+  return m_pot.Get();
+}

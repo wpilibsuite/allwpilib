@@ -32,6 +32,10 @@ NotifierCommand::NotifierCommand(const NotifierCommand& other)
       m_notifier(frc::Notifier(other.m_toRun)),
       m_period(other.m_period) {}
 
-void NotifierCommand::Initialize() { m_notifier.StartPeriodic(m_period); }
+void NotifierCommand::Initialize() {
+  m_notifier.StartPeriodic(m_period);
+}
 
-void NotifierCommand::End(bool interrupted) { m_notifier.Stop(); }
+void NotifierCommand::End(bool interrupted) {
+  m_notifier.Stop();
+}

@@ -111,7 +111,8 @@ static inline GLenum GLPixelFormat(PixelFormat format) {
 
 ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
                                const unsigned char* data) {
-  if (!gPlatformValid) return nullptr;
+  if (!gPlatformValid)
+    return nullptr;
 
   // Create a OpenGL texture identifier
   GLuint texture;
@@ -133,16 +134,19 @@ ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
 void gui::UpdateTexture(ImTextureID texture, PixelFormat format, int width,
                         int height, const unsigned char* data) {
   GLuint glTexture = static_cast<GLuint>(reinterpret_cast<uintptr_t>(texture));
-  if (glTexture == 0) return;
+  if (glTexture == 0)
+    return;
   glBindTexture(GL_TEXTURE_2D, glTexture);
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GLPixelFormat(format),
                   GL_UNSIGNED_BYTE, data);
 }
 
 void gui::DeleteTexture(ImTextureID texture) {
-  if (!gPlatformValid) return;
+  if (!gPlatformValid)
+    return;
   GLuint glTexture = static_cast<GLuint>(reinterpret_cast<uintptr_t>(texture));
-  if (glTexture != 0) glDeleteTextures(1, &glTexture);
+  if (glTexture != 0)
+    glDeleteTextures(1, &glTexture);
 }
 
 }  // namespace wpi

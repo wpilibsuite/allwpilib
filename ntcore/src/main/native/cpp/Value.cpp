@@ -190,7 +190,8 @@ std::shared_ptr<Value> nt::ConvertFromC(const NT_Value& value) {
 }
 
 bool nt::operator==(const Value& lhs, const Value& rhs) {
-  if (lhs.type() != rhs.type()) return false;
+  if (lhs.type() != rhs.type())
+    return false;
   switch (lhs.type()) {
     case NT_UNASSIGNED:
       return true;  // XXX: is this better being false instead?

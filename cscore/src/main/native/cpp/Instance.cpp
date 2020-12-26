@@ -55,7 +55,9 @@ void Instance::Shutdown() {
   notifier.Stop();
 }
 
-void Instance::SetDefaultLogger() { logger.SetLogger(def_log_func); }
+void Instance::SetDefaultLogger() {
+  logger.SetLogger(def_log_func);
+}
 
 std::pair<CS_Source, std::shared_ptr<SourceData>> Instance::FindSource(
     const SourceImpl& source) {
