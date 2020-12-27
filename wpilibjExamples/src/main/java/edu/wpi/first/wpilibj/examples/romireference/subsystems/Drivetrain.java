@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.wpilibj.examples.romireference.Constants.*;
 
 public class Drivetrain extends SubsystemBase {
-
-
   // The Romi has the left and right motors set to
   // PWM channels 0 and 1 respectively
   private final Spark m_leftMotor = new Spark(0);
@@ -76,7 +74,7 @@ public class Drivetrain extends SubsystemBase {
   /**
   * Gets the left distance driven.
   *
-  * @return the left-side distance driven, in inches 
+  * @return the left-side distance driven, in inches
   */
   public double getLeftDistanceInch() {
     return Math.PI * kWheelDiameterInch * (getLeftEncoderCount() / kCountsPerRevolution);

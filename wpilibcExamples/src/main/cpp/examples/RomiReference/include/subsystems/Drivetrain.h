@@ -1,21 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
-#include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/geometry/Pose2d.h>
-#include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc2/command/SubsystemBase.h>
-#include <units/voltage.h>
+#include <units/length.h>
 
 #include "Constants.h"
 
@@ -49,24 +42,24 @@ class Drivetrain : public frc2::SubsystemBase {
   int GetLeftEncoderCount();
 
   /**
-  * Gets the right drive encoder count.
-  *
-  * @return the right drive encoder count
-  */
+   * Gets the right drive encoder count.
+   *
+   * @return the right drive encoder count
+   */
   int GetRightEncoderCount();
 
   /**
    * Gets the left distance driven.
    *
-   * @return the left-side distance driven 
+   * @return the left-side distance driven
    */
   units::length_t GetLeftDistance();
 
   /**
-  * Gets the right distance driven.
-  *
-  * @return the right-side distance driven 
-  */
+   * Gets the right distance driven.
+   *
+   * @return the right-side distance driven
+   */
   units::length_t GetRightDistance();
 
  private:

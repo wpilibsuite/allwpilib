@@ -1,17 +1,18 @@
-#include "subsystems/OnBoardIO.h"
-#include "frc/DriverStation.h"
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2)
-{
-  if(dio1 == ChannelMode::INPUT)
-  {
+#include <frc/DriverStation.h>
+
+#include "subsystems/OnBoardIO.h"
+
+OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2) {
+  if(dio1 == ChannelMode::INPUT) {
     m_buttonB {1};
-  } else
-  {
+  } else {
     m_greenLed {1};
   }
-  if (dio2 == ChannelMode::INPUT)
-  {
+  if (dio2 == ChannelMode::INPUT) {
     m_buttonC {2};
     m_redLed {2};
   }
@@ -69,7 +70,4 @@ void OnBoardIO::SetRedLed(bool value) {
   }
 }
 
-void OnBoardIO::SetYellowLed(bool value) {
-  m_yellowLed.Set(value);
-}
-
+void OnBoardIO::SetYellowLed(bool value) { m_yellowLed.Set(value); }
