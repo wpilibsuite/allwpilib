@@ -42,7 +42,8 @@ class RobotContainer {
 
   // The robot's subsystems
   Drivetrain m_drive;
-  OnBoardIO m_onboardIO{OnBoardIO::ChannelMode::INPUT, OnBoardIO::ChannelMode::INPUT};
+  OnBoardIO m_onboardIO{OnBoardIO::ChannelMode::INPUT,
+						OnBoardIO::ChannelMode::INPUT};
 
   void ConfigureButtonBindings();
 };

@@ -5,6 +5,8 @@
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
+#include <frc/DigitalInput.h>
+#include <frc/DigitalOutput.h>
 
 /**
  * This class represents the onboard IO of the Romi

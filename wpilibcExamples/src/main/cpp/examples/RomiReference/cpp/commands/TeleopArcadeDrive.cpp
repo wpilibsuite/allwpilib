@@ -6,8 +6,8 @@
 
 #include "subsystems/Drivetrain.h"
 
-TeleopArcadeDrive::TeleopArcadeDrive(Drivetrain* subsystem,
-                                     std::function<double()> xaxisSpeedSupplier,
+TeleopArcadeDrive::TeleopArcadeDrive(
+    Drivetrain* subsystem, std::function<double()> xaxisSpeedSupplier,
     std::function<double()> zaxisRotateSuppplier)
     : m_drive{subsystem},
       m_xaxisSpeedSupplier{xaxisSpeedSupplier},
@@ -15,6 +15,6 @@ TeleopArcadeDrive::TeleopArcadeDrive(Drivetrain* subsystem,
   AddRequirements({subsystem});
 }
 
-void TeleopArcadeDrive::Execute() override { 
+void TeleopArcadeDrive::Execute() override {
     m_drive->ArcadeDrive(m_xaxisSpeedSupplier(), m_zaxisRotateSuppplier());
 }

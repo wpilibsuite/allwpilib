@@ -3,18 +3,18 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+
 #include <frc2/command/PrintCommand.h>
 #include <frc2/command/button/Button.h>
 
 #include "Constants.h"
-#include <include\commands\TeleopArcadeDrive.h>
+#include "commands\TeleopArcadeDrive.h"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
   ConfigureButtonBindings();
-
 }
 
 void RobotContainer::ConfigureButtonBindings() {
@@ -23,8 +23,7 @@ void RobotContainer::ConfigureButtonBindings() {
       &m_drive, [this] { return m_controller.GetRawAxis(1); },
       [this] { return m_controller.GetRawAxis(2); }));
 
-
-    // Example of how to use the onboard IO
+  // Example of how to use the onboard IO
   frc2::Button onboardButtonA{[this] { return m_onboardIO.GetButtonAPressed(); }};
   onboardButtonA
       .WhenPressed(PrintCommand("Button A Pressed"))

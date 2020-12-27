@@ -2,19 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DriverStation.h>
-
 #include "subsystems/OnBoardIO.h"
 
+#include <frc/DriverStation.h>
+#include <frc2/Timer.h>
+
 OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2) {
-  if(dio1 == ChannelMode::INPUT) {
-    m_buttonB {1};
+  if (dio1 == ChannelMode::INPUT) {
+    m_buttonB{1};
   } else {
-    m_greenLed {1};
+    m_greenLed{1};
   }
   if (dio2 == ChannelMode::INPUT) {
-    m_buttonC {2};
-    m_redLed {2};
+    m_buttonC{2};
+    m_redLed{2};
   }
 }
 

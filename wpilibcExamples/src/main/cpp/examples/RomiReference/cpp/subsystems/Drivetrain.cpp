@@ -6,7 +6,6 @@
 
 using namespace DriveConstants;
 
-
 // The Romi has the left and right motors set to
 // PWM channels 0 and 1 respectively
 // The Romi has onboard encoders that are hardcoded
@@ -35,10 +34,10 @@ int Drivetrain::GetRightEncoderCount() { return m_rightEncoder.Get(); }
 
 units::length Drivetrain::GetLeftDistance() {
   return wpi::math::pi * kWheelDiameterInch *
-      (GetLeftEncoderCount() / kCountsPerRevolution);
+          (GetLeftEncoderCount() / kCountsPerRevolution);
 }
 
 units::length Drivetrain::GetRightDistance() {
   return wpi::math::pi * kWheelDiameterInch *
-      (GetRightEncoderCount() / kCountsPerRevolution);
+          (GetRightEncoderCount() / kCountsPerRevolution);
 }
