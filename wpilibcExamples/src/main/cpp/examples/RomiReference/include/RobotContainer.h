@@ -4,17 +4,12 @@
 
 #pragma once
 
-#include <frc/XboxController.h>
-#include <frc/controller/PIDController.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
-#include <frc2/command/InstantCommand.h>
-#include <frc2/command/PIDCommand.h>
-#include <frc2/command/ParallelRaceGroup.h>
-#include <frc2/command/RunCommand.h>
 
 #include "Constants.h"
 #include "subsystems/Drivetrain.h"
+#include "subsystems/OnBoardIO.h"
+
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -24,27 +19,30 @@
  * commands, and button mappings) should be declared here.
  */
 class RobotContainer {
+  // NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the
+  // hardware "overlay"
+  // that is specified when launching the wpilib-ws server on the Romi raspberry
+  // pi. By default, the following are available (listed in order from inside of
+  // the board to outside):
+  // - DIO 8 (mapped to Arduino pin 11, closest to the inside of the board)
+  // - Analog In 0 (mapped to Analog Channel 6 / Arduino Pin 4)
+  // - Analog In 1 (mapped to Analog Channel 2 / Arduino Pin 20)
+  // - PWM 2 (mapped to Arduino Pin 21)
+  // - PWM 3 (mapped to Arduino Pin 22)
+  //
+  // Your subsystem configuration should take the overlays into account
  public:
   RobotContainer();
 
   frc2::Command* GetAutonomousCommand();
 
  private:
-  // The driver's controller
-  frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
-
-  // The robot's subsystems and commands are defined here...
+  // Assumes a gamepad plugged into channnel 0
+  frc::Joystick m_controller{0};
 
   // The robot's subsystems
-  DriveSubsystem m_drive;
-
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
-                                        {}};
-  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-                                        {}};
-
-  // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  Drivetrain m_drive;
+  OnBoardIO m_onboardIO{OnBoardIO::ChannelMode::INPUT, OnBoardIO::ChannelMode::INPUT};
 
   void ConfigureButtonBindings();
 };

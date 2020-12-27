@@ -53,14 +53,14 @@ class Drivetrain : public frc2::SubsystemBase {
    *
    * @return the left-side distance driven
    */
-  units::length_t GetLeftDistance();
+  units::length GetLeftDistance();
 
   /**
    * Gets the right distance driven.
    *
    * @return the right-side distance driven
    */
-  units::length_t GetRightDistance();
+  units::length GetRightDistance();
 
  private:
   frc::PWMVictorSPX m_left;

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <frc2/command/SubsystemBase.h>
+
 /**
  * This class represents the onboard IO of the Romi
  * reference robot. This includes the pushbuttons and

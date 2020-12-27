@@ -27,7 +27,7 @@ bool OnBoardIO::GetButtonBPressed() {
 
   double currentTime = frc2::Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
-    DriverStation::ReportError("Button B was not configured");
+    frc::DriverStation::ReportError("Button B was not configured");
     m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
   }
   return false;
@@ -40,7 +40,7 @@ bool OnBoardIO::GetButtonCPressed() {
 
   double currentTime = frc2::Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
-    DriverStation::ReportError("Button C was not configured");
+    frc::DriverStation::ReportError("Button C was not configured");
     m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
   }
   return false;
@@ -52,7 +52,7 @@ void OnBoardIO::SetGreenLed(bool value) {
   } else {
     double currentTime = frc2::Timer::GetFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
-      DriverStation::ReportError("Green LED was not configured");
+      frc::DriverStation::ReportError("Green LED was not configured");
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
     }
   }
@@ -64,7 +64,7 @@ void OnBoardIO::SetRedLed(bool value) {
   } else {
     double currentTime = frc2::Timer::GetFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
-      DriverStation::ReportError("Red LED was not configured");
+      frc::DriverStation::ReportError("Red LED was not configured");
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
     }
   }
