@@ -91,7 +91,7 @@ class ParallelDeadlineGroup
   bool RunsWhenDisabled() const override;
 
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
 
   void SetDeadline(std::unique_ptr<Command>&& deadline);
 

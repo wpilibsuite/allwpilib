@@ -22,7 +22,6 @@ NTDigitalOutputModel::NTDigitalOutputModel(NT_Inst inst, wpi::StringRef path)
   m_nt.AddListener(m_controllable);
 
   m_valueData.SetDigital(true);
-  Update();
 }
 
 void NTDigitalOutputModel::SetValue(bool val) {

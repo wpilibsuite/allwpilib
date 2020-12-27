@@ -27,7 +27,6 @@ NTPIDControllerModel::NTPIDControllerModel(NT_Inst instance,
   m_nt.AddListener(m_i);
   m_nt.AddListener(m_d);
   m_nt.AddListener(m_setpoint);
-  Update();
 }
 
 void NTPIDControllerModel::SetP(double value) {
