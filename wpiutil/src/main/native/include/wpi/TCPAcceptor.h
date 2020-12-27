@@ -48,7 +48,7 @@ class TCPAcceptor : public NetworkAcceptor {
   ~TCPAcceptor() override;
 
   int start() override;
-  void shutdown() override;
+  void shutdown() final;
   std::unique_ptr<NetworkStream> accept() override;
 };
 

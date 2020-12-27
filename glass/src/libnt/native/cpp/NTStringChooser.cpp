@@ -19,8 +19,6 @@ NTStringChooserModel::NTStringChooserModel(NT_Inst inst, wpi::StringRef path)
   m_nt.AddListener(m_selected);
   m_nt.AddListener(m_active);
   m_nt.AddListener(m_options);
-
-  Update();
 }
 
 void NTStringChooserModel::SetDefault(wpi::StringRef val) {

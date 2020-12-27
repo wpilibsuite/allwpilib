@@ -21,7 +21,6 @@ NTDigitalInputModel::NTDigitalInputModel(NT_Inst inst, wpi::StringRef path)
   m_nt.AddListener(m_name);
 
   m_valueData.SetDigital(true);
-  Update();
 }
 
 void NTDigitalInputModel::Update() {

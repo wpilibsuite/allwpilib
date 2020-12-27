@@ -147,7 +147,7 @@ void NTField2DModel::GroupModel::ObjectModel::SetPoseImpl(double x, double y,
     return;
   }
   auto origArr = value->GetDoubleArray();
-  if (origArr.size() < static_cast<size_t>((m_index + 1) * 3)) {
+  if (static_cast<int>(origArr.size()) < ((m_index + 1) * 3)) {
     return;
   }
 

@@ -17,7 +17,6 @@ NTSubsystemModel::NTSubsystemModel(NT_Inst instance, wpi::StringRef path)
   m_nt.AddListener(m_name);
   m_nt.AddListener(m_defaultCommand);
   m_nt.AddListener(m_currentCommand);
-  Update();
 }
 
 void NTSubsystemModel::Update() {

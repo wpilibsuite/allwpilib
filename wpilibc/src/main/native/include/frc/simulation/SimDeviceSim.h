@@ -45,7 +45,7 @@ class SimDeviceSim {
         });
   }
 
-  operator HAL_SimDeviceHandle() const { return m_handle; }
+  operator HAL_SimDeviceHandle() const { return m_handle; }  // NOLINT
 
   template <typename F>
   static void EnumerateDevices(const char* prefix, F callback) {

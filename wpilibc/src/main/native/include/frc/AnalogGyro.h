@@ -172,16 +172,16 @@ class AnalogGyro : public GyroBase {
    * significant drift in the gyro and it needs to be recalibrated after it has
    * been running.
    */
-  void Reset() override;
+  void Reset() final;
 
   /**
    * Initialize the gyro.
    *
    * Calibration is handled by Calibrate().
    */
-  virtual void InitGyro();
+  void InitGyro();
 
-  void Calibrate() override;
+  void Calibrate() final;
 
   /**
    * Gets the analog input for the gyro.

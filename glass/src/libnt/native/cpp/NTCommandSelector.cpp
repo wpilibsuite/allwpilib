@@ -19,7 +19,6 @@ NTCommandSelectorModel::NTCommandSelectorModel(NT_Inst instance,
   m_runningData.SetDigital(true);
   m_nt.AddListener(m_running);
   m_nt.AddListener(m_name);
-  Update();
 }
 
 void NTCommandSelectorModel::SetRunning(bool run) {
