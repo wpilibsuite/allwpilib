@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <memory>
 
 #include <wpi/FileSystem.h>
 #include <wpi/MemAlloc.h>
@@ -378,8 +379,8 @@ void UsbCameraImpl::CameraThreadMain() {
       close(notify_fd);
       notify_fd = -1;
     } else {
-      notify_is.reset(new wpi::raw_fd_istream{
-          notify_fd, true, sizeof(struct inotify_event) + NAME_MAX + 1});
+      notify_is = std::make_unique<wpi::raw_fd_istream>(
+          notify_fd, true, sizeof(struct inotify_event) + NAME_MAX + 1);
     }
   }
   bool notified = (notify_fd < 0);  // treat as always notified if cannot notify
