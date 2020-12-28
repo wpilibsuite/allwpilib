@@ -39,7 +39,7 @@ namespace {
 
 template <typename T>
 struct object {
-  object(T i) : v{i} {}  // NOLINT(runtime/explicit)
+  object(T i) : v{i} {}  // NOLINT
 
   void inc_val(const T& i) {
     if (i != v) {

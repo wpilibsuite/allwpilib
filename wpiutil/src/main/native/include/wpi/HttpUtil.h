@@ -228,7 +228,7 @@ class HttpPath {
 class HttpPathRef {
  public:
   HttpPathRef() = default;
-  /*implicit*/ HttpPathRef(const HttpPath& path,  // NOLINT(runtime/explicit)
+  /*implicit*/ HttpPathRef(const HttpPath& path,  // NOLINT
                            size_t start = 0)
       : m_path(&path), m_start(start) {}
 
