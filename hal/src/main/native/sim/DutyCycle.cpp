@@ -23,16 +23,14 @@ struct Empty {};
 static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                              HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDutyCycle() {
   static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                                HAL_HandleEnum::DutyCycle>
       dcH;
   dutyCycleHandles = &dcH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,

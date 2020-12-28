@@ -4,8 +4,7 @@
 
 #include "wpi/uv/NetworkStream.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 ConnectReq::ConnectReq() {
   error = [this](Error err) { GetStream().error(err); };
@@ -28,5 +27,4 @@ void NetworkStream::Listen(std::function<void()> callback, int backlog) {
   Listen(backlog);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

@@ -17,8 +17,7 @@
 #include "wpi/uv/Error.h"
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Handle.
@@ -292,7 +291,6 @@ class HandleImpl : public Handle {
   HandleImpl() : Handle{reinterpret_cast<uv_handle_t*>(new U)} {}
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_HANDLE_H_

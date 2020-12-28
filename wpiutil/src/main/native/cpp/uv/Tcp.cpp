@@ -8,8 +8,7 @@
 
 #include "wpi/uv/util.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Tcp> Tcp::Create(Loop& loop, unsigned int flags) {
   auto h = std::make_shared<Tcp>(private_init{});
@@ -168,5 +167,4 @@ void Tcp::Connect6(const Twine& ip, unsigned int port,
   }
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

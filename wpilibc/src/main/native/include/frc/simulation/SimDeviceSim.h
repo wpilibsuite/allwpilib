@@ -11,8 +11,7 @@
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 
 /**
  * Class to control the simulation side of a SimDevice.
@@ -62,5 +61,4 @@ class SimDeviceSim {
  private:
   HAL_SimDeviceHandle m_handle;
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

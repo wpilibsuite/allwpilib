@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePCMData() {
   static PCMData spd[kNumPCMModules];
   ::hal::SimPCMData = spd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 PCMData* hal::SimPCMData;
 void PCMData::ResetData() {

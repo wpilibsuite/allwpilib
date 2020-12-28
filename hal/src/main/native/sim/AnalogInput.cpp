@@ -13,11 +13,9 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogInput() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,

@@ -13,8 +13,7 @@
 #include "wpi/Signal.h"
 #include "wpi/uv/Request.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 
@@ -88,7 +87,6 @@ inline void QueueWork(const std::shared_ptr<Loop>& loop,
   QueueWork(*loop, work, afterWork);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_WORK_H_

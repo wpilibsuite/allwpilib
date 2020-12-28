@@ -15,8 +15,7 @@
 #include "hal/simulation/NotifyListener.h"
 #include "hal/simulation/SPIData.h"
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 class SpiReadAutoReceiveBufferCallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
@@ -42,5 +41,4 @@ SIM_JniHandle AllocateSpiBufferCallback(
     RegisterSpiBufferCallbackFunc createCallback);
 void FreeSpiBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                            FreeSpiBufferCallbackFunc freeCallback);
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim

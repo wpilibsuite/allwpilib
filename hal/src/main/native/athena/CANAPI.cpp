@@ -44,15 +44,13 @@ static uint32_t GetPacketBaseTime() {
   return ms & 0xFFFFFFFF;
 }
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeCANAPI() {
   static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>
       cH;
   canHandles = &cH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
   int32_t createdId = 0;

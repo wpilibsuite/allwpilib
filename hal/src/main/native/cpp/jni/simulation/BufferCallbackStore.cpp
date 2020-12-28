@@ -22,16 +22,14 @@ static hal::UnlimitedHandleResource<SIM_JniHandle, BufferCallbackStore,
                                     hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 void InitializeBufferStore() {
   static hal::UnlimitedHandleResource<SIM_JniHandle, BufferCallbackStore,
                                       hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 void BufferCallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);

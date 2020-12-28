@@ -8,8 +8,7 @@
 
 #include "wpi/SmallString.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Pipe> Pipe::Create(Loop& loop, bool ipc) {
   auto h = std::make_shared<Pipe>(private_init{});
@@ -138,5 +137,4 @@ std::string Pipe::GetPeer() {
   return std::string{};
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

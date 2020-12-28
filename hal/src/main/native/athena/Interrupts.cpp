@@ -83,16 +83,14 @@ static void threadedInterruptHandler(uint32_t mask, void* param) {
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                              HAL_HandleEnum::Interrupt>* interruptHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeInterrupts() {
   static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                                HAL_HandleEnum::Interrupt>
       iH;
   interruptHandles = &iH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

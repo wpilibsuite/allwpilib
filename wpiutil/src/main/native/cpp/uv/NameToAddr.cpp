@@ -8,8 +8,7 @@
 
 #include "wpi/SmallString.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 int NameToAddr(const Twine& ip, unsigned int port, sockaddr_in* addr) {
   SmallString<128> tmp;
@@ -61,5 +60,4 @@ int NameToAddr(const Twine& ip, in6_addr* addr) {
   }
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

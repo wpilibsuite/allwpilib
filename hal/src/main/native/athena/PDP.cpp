@@ -103,15 +103,13 @@ union PdpStatusEnergy {
 static wpi::mutex pdpHandleMutex;
 static HAL_PDPHandle pdpHandles[kNumPDPModules];
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePDP() {
   for (int i = 0; i < kNumPDPModules; i++) {
     pdpHandles[i] = HAL_kInvalidHandle;
   }
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

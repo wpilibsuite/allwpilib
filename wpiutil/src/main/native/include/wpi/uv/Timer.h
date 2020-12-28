@@ -14,8 +14,7 @@
 #include "wpi/Signal.h"
 #include "wpi/uv/Handle.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 
@@ -130,7 +129,6 @@ class Timer final : public HandleImpl<Timer, uv_timer_t> {
   sig::Signal<> timeout;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_TIMER_H_

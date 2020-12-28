@@ -9,8 +9,7 @@
 #include "frc/shuffleboard/ShuffleboardRoot.h"
 #include "frc/shuffleboard/ShuffleboardTab.h"
 
-namespace frc {
-namespace detail {
+namespace frc::detail {
 
 class ShuffleboardInstance final : public ShuffleboardRoot {
  public:
@@ -37,5 +36,4 @@ class ShuffleboardInstance final : public ShuffleboardRoot {
   std::unique_ptr<Impl> m_impl;
 };
 
-}  // namespace detail
-}  // namespace frc
+}  // namespace frc::detail

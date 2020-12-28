@@ -8,11 +8,9 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePower() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 // TODO: Fix the naming in here
 extern "C" {

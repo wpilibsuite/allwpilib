@@ -15,8 +15,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Data buffer.  Convenience wrapper around uv_buf_t.
@@ -159,7 +158,6 @@ class SimpleBufferPool {
   size_t m_size;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_BUFFER_H_

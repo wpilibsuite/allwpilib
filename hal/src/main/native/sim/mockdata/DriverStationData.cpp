@@ -9,14 +9,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDriverStationData() {
   static DriverStationData dsd;
   ::hal::SimDriverStationData = &dsd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 DriverStationData* hal::SimDriverStationData;
 

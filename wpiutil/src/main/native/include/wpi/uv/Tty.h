@@ -12,8 +12,7 @@
 
 #include "wpi/uv/Stream.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 class Tty;
@@ -81,7 +80,6 @@ class Tty final : public StreamImpl<Tty, uv_tty_t> {
   }
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_TTY_H_

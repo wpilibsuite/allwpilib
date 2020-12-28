@@ -12,8 +12,7 @@
 #include "wpi/Signal.h"
 #include "wpi/uv/Handle.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 
@@ -61,7 +60,6 @@ class Prepare final : public HandleImpl<Prepare, uv_prepare_t> {
   sig::Signal<> prepare;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_PREPARE_H_

@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDutyCycleData() {
   static DutyCycleData sed[kNumDutyCycles];
   ::hal::SimDutyCycleData = sed;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 DutyCycleData* hal::SimDutyCycleData;
 

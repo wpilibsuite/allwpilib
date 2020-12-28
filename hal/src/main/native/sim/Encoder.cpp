@@ -31,8 +31,7 @@ static LimitedHandleResource<HAL_EncoderHandle, Encoder,
 static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
                              HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeEncoder() {
   static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
                                HAL_HandleEnum::FPGAEncoder>
@@ -44,8 +43,7 @@ void InitializeEncoder() {
       eH;
   encoderHandles = &eH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(

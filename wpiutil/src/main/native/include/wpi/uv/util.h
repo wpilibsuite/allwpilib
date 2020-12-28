@@ -11,8 +11,7 @@
 
 #include "wpi/Twine.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Convert a binary structure containing an IPv4 address to a string.
@@ -144,7 +143,6 @@ int NameToAddr(const Twine& ip, in_addr* addr);
  */
 int NameToAddr(const Twine& ip, in6_addr* addr);
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_UTIL_H_

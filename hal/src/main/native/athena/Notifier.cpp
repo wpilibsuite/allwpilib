@@ -125,14 +125,12 @@ static void cleanupNotifierAtExit() {
   }
 }
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeNotifier() {
   static NotifierHandleContainer nH;
   notifierHandles = &nH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

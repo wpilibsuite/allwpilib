@@ -6,8 +6,6 @@
 
 #include "hal/Types.h"
 
-namespace hal {
-namespace can {
+namespace hal::can {
 int32_t GetCANModuleFromHandle(HAL_CANHandle handle, int32_t* status);
-}  // namespace can
-}  // namespace hal
+}  // namespace hal::can

@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogInData() {
   static AnalogInData sind[kNumAnalogInputs];
   ::hal::SimAnalogInData = sind;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 AnalogInData* hal::SimAnalogInData;
 void AnalogInData::ResetData() {
