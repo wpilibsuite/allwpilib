@@ -40,7 +40,7 @@ Instance::Instance() : telemetry(notifier), networkListener(logger, notifier) {
   SetDefaultLogger();
 }
 
-Instance::~Instance() {}
+Instance::~Instance() = default;
 
 Instance& Instance::GetInstance() {
   static Instance* inst = new Instance;

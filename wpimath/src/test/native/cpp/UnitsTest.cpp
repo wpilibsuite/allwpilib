@@ -93,64 +93,64 @@ namespace {
 
 class TypeTraits : public ::testing::Test {
  protected:
-  TypeTraits() {}
-  ~TypeTraits() override {}
+  TypeTraits() = default;
+  ~TypeTraits() override = default;
   void SetUp() override {}
   void TearDown() override {}
 };
 
 class UnitManipulators : public ::testing::Test {
  protected:
-  UnitManipulators() {}
-  ~UnitManipulators() override {}
+  UnitManipulators() = default;
+  ~UnitManipulators() override = default;
   void SetUp() override {}
   void TearDown() override {}
 };
 
 class UnitContainer : public ::testing::Test {
  protected:
-  UnitContainer() {}
-  ~UnitContainer() override {}
+  UnitContainer() = default;
+  ~UnitContainer() override = default;
   void SetUp() override {}
   void TearDown() override {}
 };
 
 class UnitConversion : public ::testing::Test {
  protected:
-  UnitConversion() {}
-  ~UnitConversion() override {}
+  UnitConversion() = default;
+  ~UnitConversion() override = default;
   void SetUp() override {}
   void TearDown() override {}
 };
 
 class UnitMath : public ::testing::Test {
  protected:
-  UnitMath() {}
-  ~UnitMath() override {}
+  UnitMath() = default;
+  ~UnitMath() override = default;
   void SetUp() override {}
   void TearDown() override {}
 };
 
 class CompileTimeArithmetic : public ::testing::Test {
  protected:
-  CompileTimeArithmetic() {}
-  ~CompileTimeArithmetic() override {}
+  CompileTimeArithmetic() = default;
+  ~CompileTimeArithmetic() override = default;
   void SetUp() override {}
   void TearDown() override {}
 };
 
 class Constexpr : public ::testing::Test {
  protected:
-  Constexpr() {}
-  ~Constexpr() override {}
+  Constexpr() = default;
+  ~Constexpr() override = default;
   void SetUp() override {}
   void TearDown() override {}
 };
 
 class CaseStudies : public ::testing::Test {
  protected:
-  CaseStudies() {}
-  ~CaseStudies() override {}
+  CaseStudies() = default;
+  ~CaseStudies() override = default;
   void SetUp() override {}
   void TearDown() override {}
 

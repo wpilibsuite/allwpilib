@@ -39,7 +39,7 @@ class SourceReaderCB : public IMFSourceReaderCallback {
 
  private:
   // Destructor is private. Caller should call Release.
-  virtual ~SourceReaderCB() {}
+  virtual ~SourceReaderCB() = default;
   void NotifyError(HRESULT hr);
 
   ULONG m_nRefCount;

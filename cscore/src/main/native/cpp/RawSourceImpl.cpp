@@ -19,7 +19,7 @@ RawSourceImpl::RawSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
                              const VideoMode& mode)
     : ConfigurableSourceImpl{name, logger, notifier, telemetry, mode} {}
 
-RawSourceImpl::~RawSourceImpl() {}
+RawSourceImpl::~RawSourceImpl() = default;
 
 void RawSourceImpl::PutFrame(const CS_RawFrame& image) {
   int type;

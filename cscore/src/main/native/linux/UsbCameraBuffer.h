@@ -13,7 +13,7 @@ namespace cs {
 
 class UsbCameraBuffer {
  public:
-  UsbCameraBuffer() noexcept {}
+  UsbCameraBuffer() noexcept = default;
   UsbCameraBuffer(UsbCameraBuffer&& other) noexcept : UsbCameraBuffer() {
     swap(*this, other);
   }

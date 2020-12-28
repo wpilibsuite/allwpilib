@@ -42,7 +42,7 @@ class Frame {
   };
 
  public:
-  Frame() noexcept {}
+  Frame() noexcept = default;
 
   Frame(SourceImpl& source, const wpi::Twine& error, Time time);
 
