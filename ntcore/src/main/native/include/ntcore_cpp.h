@@ -777,9 +777,8 @@ bool WaitForEntryListenerQueue(NT_Inst inst, double timeout);
  * @param connected       true if event is due to connection being established
  * @param conn            connection info
  */
-typedef std::function<void(NT_ConnectionListener conn_listener, bool connected,
-                           const ConnectionInfo& conn)>
-    ConnectionListenerCallback;
+using ConnectionListenerCallback =
+    std::function<void(NT_ConnectionListener, bool, const ConnectionInfo&)>;
 
 /**
  * Add a connection listener.
@@ -1481,9 +1480,8 @@ uint64_t Now();
  * @param line    origin source line number
  * @param msg     message
  */
-typedef std::function<void(unsigned int level, const char* file,
-                           unsigned int line, const char* msg)>
-    LogFunc;
+using LogFunc =
+    std::function<void(unsigned int, const char*, unsigned int, const char*)>;
 
 /**
  * Set logger callback function.  By default, log messages are sent to stderr;
