@@ -83,6 +83,16 @@ class Mechanism2DInfo {
 
 static Mechanism2DInfo mechanism2DInfo;
 
+//Vector of display functions
+std::vector<void (*)()> displayWindows;
+
+// Struct to hold all of the data for each window
+struct WindowData{
+  BodyConfig bodyConfig;
+  std::string CheckboxButtonName;
+  // Might also need to put the function here
+};
+
 bool ReadIni(wpi::StringRef name, wpi::StringRef value) {
   if (name == "jsonLocation") {
     mechanism2DInfo.jsonLocation = value;
@@ -159,9 +169,9 @@ static void buildDrawList(float startXLocation, float startYLocation,
                           ImDrawList* drawList, float previousAngle,
                           const std::vector<BodyConfig>& subBodyConfigs,
                           ImVec2 windowPos) {
-    // Iterate over all of the body configs
+  // Iterate over all of the body configs
   for (BodyConfig const& bodyConfig : subBodyConfigs) {
-      // Angle
+    // Angle
     hal::SimDouble angleHandle;
     // Length
     hal::SimDouble lengthHandle;
@@ -199,6 +209,7 @@ static void buildDrawList(float startXLocation, float startYLocation,
     // If the line has children then draw them with the stating points being the
     // end of the parent
     if (!bodyConfig.children.empty()) {
+      // Build the draw list
       buildDrawList(drawLine.xEnd, drawLine.yEnd, drawList, drawLine.angle,
                     bodyConfig.children, windowPos);
     }
@@ -281,9 +292,9 @@ static void readJson(std::string jFile) {
 }
 
 static void DisplayAssembly2D() {
-    // Add pop up to gui
+  // Add pop up to gui
   if (ImGui::BeginPopupContextItem()) {
-      // Add menu item
+    // Add menu item
     if (ImGui::MenuItem("Load Json")) {
       m_fileOpener = std::make_unique<pfd::open_file>(
           "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"});
@@ -297,42 +308,82 @@ static void DisplayAssembly2D() {
   if (!mechanism2DInfo.jsonLocation.empty()) {
     // Only read the json file if it changed
     if (mechanism2DInfo.jsonLocation != previousJsonLocation) {
-        // Clear config data from last josn file
+      // Clear config data from last json file
       bodyConfigVector.clear();
       // Read json file
       readJson(mechanism2DInfo.jsonLocation);
     }
     // Save json location
-    // TODO: This will make it so if the name isn't different nothing will happen
+    // TODO: This will make it so if the name isn't different nothing will
+    // happen
     previousJsonLocation = mechanism2DInfo.jsonLocation;
     // Get window position
     ImVec2 windowPos = ImGui::GetWindowPos();
     // Get image drawlist
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    //Add to the draw list
+    // Add to the draw list
     buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(),
                   drawList, 0, bodyConfigVector, windowPos);
   }
 }
 
-void Mechanism2D::Initialize() {
-  // hook ini handler to save settings
-  ImGuiSettingsHandler iniHandler;
-  iniHandler.TypeName = "Mechanism2D";
-  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-  iniHandler.ReadOpenFn = Mechanism2DReadOpen;
-  iniHandler.ReadLineFn = Mechanism2DReadLine;
-  iniHandler.WriteAllFn = Mechanism2DWriteAll;
-  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+// Radio button test bool
+bool radioTest = 0;
 
+static void MainMechanism2D() {
+  ImGui::Checkbox("one", &radioTest);
+  if(radioTest){
+    // hook ini handler to save settings
+    ImGuiSettingsHandler iniHandler;
+    iniHandler.TypeName = "Mechanism2D";
+    iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
+    iniHandler.ReadOpenFn = Mechanism2DReadOpen;
+    iniHandler.ReadLineFn = Mechanism2DReadLine;
+    iniHandler.WriteAllFn = Mechanism2DWriteAll;
+    ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+
+
+    if (auto win =
+          HALSimGui::manager.AddWindow("Mechanism 2D", DisplayAssembly2D)) {
+        win->SetVisibility(glass::Window::kHide);
+        win->SetDefaultPos(200, 200);
+        win->SetDefaultSize(600, 600);
+        win->SetPadding(0, 0);
+      }
+//    // Add DisplayAssembly2D to windows to display
+//    displayWindows.push_back(DisplayAssembly2D);
+//
+//    // Add the main window to the gui
+//    for(auto windowFunction: displayWindows){
+//      if (auto win =
+//          HALSimGui::manager.AddWindow("Mechanism 2D", windowFunction)) {
+//        win->SetVisibility(glass::Window::kHide);
+//        win->SetDefaultPos(200, 200);
+//        win->SetDefaultSize(600, 600);
+//        win->SetPadding(0, 0);
+//      }
+//    }
+  }
+}
+
+void Mechanism2D::Initialize() {
   // Build the color table.
   buildColorTable();
-  // Add the main window to the gui
+
+  // Make main window
   if (auto win =
-          HALSimGui::manager.AddWindow("Mechanism 2D", DisplayAssembly2D)) {
+      HALSimGui::manager.AddWindow("MainMechanism2D", MainMechanism2D)) {
     win->SetVisibility(glass::Window::kHide);
     win->SetDefaultPos(200, 200);
     win->SetDefaultSize(600, 600);
     win->SetPadding(0, 0);
   }
 }
+
+/*
+ * V2 goals
+ *  - Add multi window support
+ *  - Add debug mode
+ *    - button to print everything
+ *    -
+ */
