@@ -514,43 +514,45 @@ static void EmitParentContextMenu(const std::string& path) {
 
       ImGui::InputTextWithHint("New Item name", "example", nameBuffer,
                                kTextBufferSize);
-      auto fullNewPath = (path + wpi::Twine('/') + nameBuffer).str();
+      std::string fullNewPath;
+      if (path == "/") {
+        fullNewPath = path + nameBuffer;
+      } else {
+        fullNewPath = (path + wpi::Twine('/') + nameBuffer).str();
+      }
+
       ImGui::Text("Adding: %s", fullNewPath.c_str());
       ImGui::Separator();
       auto entry = nt::GetEntry(nt::GetDefaultInstance(), fullNewPath);
-      if (ImGui::MenuItem("string")) {
-        if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
-            !nt::SetEntryValue(entry, nt::Value::MakeString(""))) {
+      bool enabled = nameBuffer[0] != '\0' &&
+                     nt::GetEntryType(entry) == NT_Type::NT_UNASSIGNED;
+      if (ImGui::MenuItem("string", NULL, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeString(""))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("double")) {
-        if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
-            !nt::SetEntryValue(entry, nt::Value::MakeDouble(0.0))) {
+      if (ImGui::MenuItem("double", NULL, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeDouble(0.0))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("boolean")) {
-        if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
-            !nt::SetEntryValue(entry, nt::Value::MakeBoolean(false))) {
+      if (ImGui::MenuItem("boolean", NULL, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeBoolean(false))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("string[]")) {
-        if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
-            !nt::SetEntryValue(entry, nt::Value::MakeStringArray({""}))) {
+      if (ImGui::MenuItem("string[]", NULL, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeStringArray({""}))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("double[]")) {
-        if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
-            !nt::SetEntryValue(entry, nt::Value::MakeDoubleArray({0.0}))) {
+      if (ImGui::MenuItem("double[]", NULL, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeDoubleArray({0.0}))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("boolean[]")) {
-        if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
-            !nt::SetEntryValue(entry, nt::Value::MakeBooleanArray({false}))) {
+      if (ImGui::MenuItem("boolean[]", NULL, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeBooleanArray({false}))) {
           openWarningPopup = true;
         }
       }
