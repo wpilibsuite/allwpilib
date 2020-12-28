@@ -143,6 +143,7 @@ void NetworkTablesModel::Update() {
         entry = std::make_unique<Entry>(std::move(event));
         m_sortedEntries.emplace_back(entry.get());
         updateTree = true;
+        continue;
       }
     }
     if (!entry) {
