@@ -13,6 +13,7 @@ In order to build a project using a development build, find the build.gradle fil
 ```groovy
 wpi.maven.useDevelopment = true
 wpi.wpilibVersion = 'YEAR.+'
+wpi.wpimathVersion = 'YEAR.+
 ```
 
 The top of your ``build.gradle`` file should now look similar to the code below. Ignore any differences in versions.
@@ -25,7 +26,8 @@ plugins {
 }
 
 wpi.maven.useDevelopment = true
-wpi.wpilibVersion = '2020.+'
+wpi.wpilibVersion = '2021.+'
+wpi.wpimathVersion = '2021.+'
 ```
 
 C++
@@ -37,7 +39,8 @@ plugins {
 }
 
 wpi.maven.useDevelopment = true
-wpi.wpilibVersion = '2020.+'
+wpi.wpilibVersion = '2021.+'
+wpi.wpimathVersion = '2021.+'
 ```
 
 ## Local Build
@@ -53,6 +56,7 @@ plugins {
 
 wpi.maven.useFrcMavenLocalDevelopment = true
 wpi.wpilibVersion = 'YEAR.424242.+'
+wpi.wpimathVersion = 'YEAR.424242.+'
 ```
 
 C++
@@ -65,4 +69,5 @@ plugins {
 
 wpi.maven.useFrcMavenLocalDevelopment = true
 wpi.wpilibVersion = 'YEAR.424242.+'
+wpi.wpimathVersion = 'YEAR.424242.+'
 ```
