@@ -24,7 +24,7 @@ class OnBoardIO : public frc2::SubsystemBase {
   OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);
 
   static constexpr double MESSAGE_INTERVAL = 1.0;
-  double m_nextMessageTime;
+  double m_nextMessageTime = 0.0;
 
   /**
    * Gets if the A button is pressed.

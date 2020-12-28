@@ -7,8 +7,7 @@
 #include <frc2/command/PrintCommand.h>
 #include <frc2/command/button/Button.h>
 
-#include "Constants.h"
-#include "commands\TeleopArcadeDrive.h"
+#include "commands/TeleopArcadeDrive.h"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -26,8 +25,8 @@ void RobotContainer::ConfigureButtonBindings() {
   // Example of how to use the onboard IO
   frc2::Button onboardButtonA{
       [this] { return m_onboardIO.GetButtonAPressed(); }};
-  onboardButtonA.WhenPressed(PrintCommand("Button A Pressed"))
-      .WhenReleased(PrintCommand("Button A Released"));
+  onboardButtonA.WhenPressed(frc2::PrintCommand("Button A Pressed"))
+      .WhenReleased(frc2::PrintCommand("Button A Released"));
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() { return nullptr; }

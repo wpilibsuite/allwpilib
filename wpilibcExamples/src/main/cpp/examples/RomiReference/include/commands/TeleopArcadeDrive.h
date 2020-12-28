@@ -12,7 +12,7 @@
 class TeleopArcadeDrive
     : public frc2::CommandHelper<frc2::CommandBase, TeleopArcadeDrive> {
  public:
-  TeleopArcadeDrive(Drivetrain* drive,
+  TeleopArcadeDrive(Drivetrain* subsystem,
                     std::function<double()> xaxisSpeedSupplier,
                     std::function<double()> zaxisRotateSupplier);
   void Execute() override;

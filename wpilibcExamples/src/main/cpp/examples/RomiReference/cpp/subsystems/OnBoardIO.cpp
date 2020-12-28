@@ -11,13 +11,13 @@
 
 OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2) {
   if (dio1 == ChannelMode::INPUT) {
-    m_buttonB = DigitalInput(1);
+    m_buttonB = frc::DigitalInput(1);
   } else {
-    m_greenLed = DigitalOutput(1);
+    m_greenLed = frc::DigitalOutput(1);
   }
   if (dio2 == ChannelMode::INPUT) {
-    m_buttonC = DigitalInput(2);
-    m_redLed = DigitalOutput(2);
+    m_buttonC = frc::DigitalInput(2);
+    m_redLed = frc::DigitalOutput(2);
   }
 }
 

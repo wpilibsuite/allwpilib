@@ -15,6 +15,6 @@ TeleopArcadeDrive::TeleopArcadeDrive(
   AddRequirements({subsystem});
 }
 
-void TeleopArcadeDrive::Execute() override {
+void TeleopArcadeDrive::Execute() {
   m_drive->ArcadeDrive(m_xaxisSpeedSupplier(), m_zaxisRotateSuppplier());
 }

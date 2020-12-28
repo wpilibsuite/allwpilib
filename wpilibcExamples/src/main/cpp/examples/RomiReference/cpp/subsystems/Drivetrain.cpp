@@ -4,6 +4,9 @@
 
 #include "subsystems/Drivetrain.h"
 
+#include <wpi/math.h>
+#include "Constants.h"
+
 using namespace DriveConstants;
 
 // The Romi has the left and right motors set to
