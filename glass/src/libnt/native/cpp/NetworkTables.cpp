@@ -456,12 +456,12 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
 static void EmitParentContextMenu(const std::string& path) {
   // Workaround https://github.com/ocornut/imgui/issues/331
   bool openWarningPopup = false;
+  static char nameBuffer[kTextBufferSize];
   if (ImGui::BeginPopupContextItem()) {
     ImGui::Text("%s", path.c_str());
     ImGui::Separator();
 
     if (ImGui::BeginMenu("Add new...")) {
-      static char nameBuffer[kTextBufferSize];
       if (ImGui::IsWindowAppearing()) {
         size_t len = (std::min)(path.size(), kTextBufferSize - 1);
         std::memcpy(nameBuffer, path.data(), len);
@@ -527,7 +527,7 @@ static void EmitParentContextMenu(const std::string& path) {
   }
   if (ImGui::BeginPopupModal("Value exists", NULL,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
-    ImGui::Text("The provided name already exists in the tree!");
+    ImGui::Text("The provided name %s already exists in the tree!", nameBuffer);
     ImGui::Separator();
 
     if (ImGui::Button("OK", ImVec2(120, 0))) {
@@ -591,9 +591,7 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
     if (!node.children.empty()) {
       bool open =
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
-
       EmitParentContextMenu(node.path);
-
       ImGui::NextColumn();
       ImGui::NextColumn();
       if (flags & NetworkTablesFlags_ShowFlags) ImGui::NextColumn();
