@@ -77,7 +77,7 @@ HAL_Handle DigitalOutput::GetPortHandleForRouting() const {
 }
 
 AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
-  return (AnalogTriggerType)0;
+  return static_cast<AnalogTriggerType>(0);
 }
 
 bool DigitalOutput::IsAnalogTrigger() const {

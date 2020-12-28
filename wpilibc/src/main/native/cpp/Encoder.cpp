@@ -237,10 +237,11 @@ void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
 void Encoder::SetIndexSource(const DigitalSource& source,
                              Encoder::IndexingType type) {
   int32_t status = 0;
-  HAL_SetEncoderIndexSource(
-      m_encoder, source.GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(),
-      (HAL_EncoderIndexingType)type, &status);
+  HAL_SetEncoderIndexSource(m_encoder, source.GetPortHandleForRouting(),
+                            static_cast<HAL_AnalogTriggerType>(
+                                source.GetAnalogTriggerTypeForRouting()),
+                            static_cast<HAL_EncoderIndexingType>(type),
+                            &status);
   wpi_setHALError(status);
 }
 
@@ -277,10 +278,13 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
   int32_t status = 0;
   m_encoder = HAL_InitializeEncoder(
       m_aSource->GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)m_aSource->GetAnalogTriggerTypeForRouting(),
+      static_cast<HAL_AnalogTriggerType>(
+          m_aSource->GetAnalogTriggerTypeForRouting()),
       m_bSource->GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)m_bSource->GetAnalogTriggerTypeForRouting(),
-      reverseDirection, (HAL_EncoderEncodingType)encodingType, &status);
+      static_cast<HAL_AnalogTriggerType>(
+          m_bSource->GetAnalogTriggerTypeForRouting()),
+      reverseDirection, static_cast<HAL_EncoderEncodingType>(encodingType),
+      &status);
   wpi_setHALError(status);
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,

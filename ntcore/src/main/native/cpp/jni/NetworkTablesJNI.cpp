@@ -192,10 +192,10 @@ static jobject MakeJObject(JNIEnv* env, const nt::Value& value) {
   switch (value.type()) {
     case NT_BOOLEAN:
       return env->NewObject(booleanCls, booleanConstructor,
-                            (jboolean)(value.GetBoolean() ? 1 : 0));
+                            static_cast<jboolean>(value.GetBoolean() ? 1 : 0));
     case NT_DOUBLE:
       return env->NewObject(doubleCls, doubleConstructor,
-                            (jdouble)value.GetDouble());
+                            static_cast<jdouble>(value.GetDouble()));
     case NT_STRING:
       return MakeJString(env, value.GetString());
     case NT_RAW:
@@ -217,11 +217,13 @@ static jobject MakeJValue(JNIEnv* env, const nt::Value* value) {
   static jmethodID constructor =
       env->GetMethodID(valueCls, "<init>", "(ILjava/lang/Object;J)V");
   if (!value) {
-    return env->NewObject(valueCls, constructor, (jint)NT_UNASSIGNED, nullptr,
-                          (jlong)0);
+    return env->NewObject(valueCls, constructor,
+                          static_cast<jint>(NT_UNASSIGNED), nullptr,
+                          static_cast<jlong>(0));
   }
-  return env->NewObject(valueCls, constructor, (jint)value->type(),
-                        MakeJObject(env, *value), (jlong)value->time());
+  return env->NewObject(valueCls, constructor, static_cast<jint>(value->type()),
+                        MakeJObject(env, *value),
+                        static_cast<jlong>(value->time()));
 }
 
 static jobject MakeJObject(JNIEnv* env, const nt::ConnectionInfo& info) {
@@ -231,8 +233,9 @@ static jobject MakeJObject(JNIEnv* env, const nt::ConnectionInfo& info) {
   JLocal<jstring> remote_id{env, MakeJString(env, info.remote_id)};
   JLocal<jstring> remote_ip{env, MakeJString(env, info.remote_ip)};
   return env->NewObject(connectionInfoCls, constructor, remote_id.obj(),
-                        remote_ip.obj(), (jint)info.remote_port,
-                        (jlong)info.last_update, (jint)info.protocol_version);
+                        remote_ip.obj(), static_cast<jint>(info.remote_port),
+                        static_cast<jlong>(info.last_update),
+                        static_cast<jint>(info.protocol_version));
 }
 
 static jobject MakeJObject(JNIEnv* env, jobject inst,
@@ -243,8 +246,9 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
       "networktables/ConnectionInfo;)V");
   JLocal<jobject> conn{env, MakeJObject(env, notification.conn)};
   return env->NewObject(connectionNotificationCls, constructor, inst,
-                        (jint)notification.listener,
-                        (jboolean)notification.connected, conn.obj());
+                        static_cast<jint>(notification.listener),
+                        static_cast<jboolean>(notification.connected),
+                        conn.obj());
 }
 
 static jobject MakeJObject(JNIEnv* env, jobject inst,
@@ -254,9 +258,10 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
                        "(Ledu/wpi/first/networktables/"
                        "NetworkTableInstance;ILjava/lang/String;IIJ)V");
   JLocal<jstring> name{env, MakeJString(env, info.name)};
-  return env->NewObject(entryInfoCls, constructor, inst, (jint)info.entry,
-                        name.obj(), (jint)info.type, (jint)info.flags,
-                        (jlong)info.last_change);
+  return env->NewObject(
+      entryInfoCls, constructor, inst, static_cast<jint>(info.entry),
+      name.obj(), static_cast<jint>(info.type), static_cast<jint>(info.flags),
+      static_cast<jlong>(info.last_change));
 }
 
 static jobject MakeJObject(JNIEnv* env, jobject inst,
@@ -268,8 +273,9 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
   JLocal<jstring> name{env, MakeJString(env, notification.name)};
   JLocal<jobject> value{env, MakeJValue(env, notification.value.get())};
   return env->NewObject(entryNotificationCls, constructor, inst,
-                        (jint)notification.listener, (jint)notification.entry,
-                        name.obj(), value.obj(), (jint)notification.flags);
+                        static_cast<jint>(notification.listener),
+                        static_cast<jint>(notification.entry), name.obj(),
+                        value.obj(), static_cast<jint>(notification.flags));
 }
 
 static jobject MakeJObject(JNIEnv* env, jobject inst,
@@ -280,9 +286,10 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
       "String;ILjava/lang/String;)V");
   JLocal<jstring> filename{env, MakeJString(env, msg.filename)};
   JLocal<jstring> message{env, MakeJString(env, msg.message)};
-  return env->NewObject(logMessageCls, constructor, inst, (jint)msg.logger,
-                        (jint)msg.level, filename.obj(), (jint)msg.line,
-                        message.obj());
+  return env->NewObject(logMessageCls, constructor, inst,
+                        static_cast<jint>(msg.logger),
+                        static_cast<jint>(msg.level), filename.obj(),
+                        static_cast<jint>(msg.line), message.obj());
 }
 
 static jobject MakeJObject(JNIEnv* env, jobject inst,
@@ -295,9 +302,9 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
   JLocal<jstring> name{env, MakeJString(env, answer.name)};
   JLocal<jbyteArray> params{env, MakeJByteArray(env, answer.params)};
   JLocal<jobject> conn{env, MakeJObject(env, answer.conn)};
-  return env->NewObject(rpcAnswerCls, constructor, inst, (jint)answer.entry,
-                        (jint)answer.call, name.obj(), params.obj(),
-                        conn.obj());
+  return env->NewObject(
+      rpcAnswerCls, constructor, inst, static_cast<jint>(answer.entry),
+      static_cast<jint>(answer.call), name.obj(), params.obj(), conn.obj());
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,

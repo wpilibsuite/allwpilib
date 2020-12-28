@@ -55,7 +55,7 @@ jobject DeviceInfo::MakeJava(JNIEnv* env) const {
   static jmethodID func =
       env->GetMethodID(simDeviceInfoCls, "<init>", "(Ljava/lang/String;I)V");
   return env->NewObject(simDeviceInfoCls, func, MakeJString(env, name),
-                        (jint)handle);
+                        static_cast<jint>(handle));
 }
 
 static std::pair<jlong, jdouble> ToValue12(const HAL_Value& value) {
@@ -88,8 +88,8 @@ jobject ValueInfo::MakeJava(JNIEnv* env) const {
       env->GetMethodID(simValueInfoCls, "<init>", "(Ljava/lang/String;IIIJD)V");
   auto [value1, value2] = ToValue12(value);
   return env->NewObject(simValueInfoCls, func, MakeJString(env, name),
-                        (jint)handle, (jint)direction, (jint)value.type, value1,
-                        value2);
+                        static_cast<jint>(handle), static_cast<jint>(direction),
+                        static_cast<jint>(value.type), value1, value2);
 }
 
 namespace {
@@ -147,7 +147,7 @@ void DeviceCallbackStore::performCallback(const char* name,
   }
 
   env->CallVoidMethod(m_call, simDeviceCallbackCallback, MakeJString(env, name),
-                      (jint)handle);
+                      static_cast<jint>(handle));
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();
@@ -183,13 +183,14 @@ void ValueCallbackStore::performCallback(const char* name,
   auto [value1, value2] = ToValue12(value);
   if (m_dirCallback) {
     env->CallVoidMethod(m_call, simValueCallbackCallback,
-                        MakeJString(env, name), (jint)handle, (jint)direction,
-                        (jint)value.type, value1, value2);
+                        MakeJString(env, name), static_cast<jint>(handle),
+                        static_cast<jint>(direction),
+                        static_cast<jint>(value.type), value1, value2);
   } else {
     env->CallVoidMethod(m_call, simValueCallbackCallback,
-                        MakeJString(env, name), (jint)handle,
-                        (jboolean)(direction == HAL_SimValueOutput),
-                        (jint)value.type, value1, value2);
+                        MakeJString(env, name), static_cast<jint>(handle),
+                        static_cast<jboolean>(direction == HAL_SimValueOutput),
+                        static_cast<jint>(value.type), value1, value2);
   }
 
   if (env->ExceptionCheck()) {

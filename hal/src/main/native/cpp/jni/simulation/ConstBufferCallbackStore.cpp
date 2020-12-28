@@ -61,7 +61,8 @@ void ConstBufferCallbackStore::performCallback(const char* name,
                                          static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetConstBufferCallback(),
-                      MakeJString(env, name), toCallbackArr, (jint)length);
+                      MakeJString(env, name), toCallbackArr,
+                      static_cast<jint>(length));
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();
