@@ -51,7 +51,9 @@ uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
 
 void Resource::Free(uint32_t index) {
   std::unique_lock lock(m_allocateMutex);
-  if (index == std::numeric_limits<uint32_t>::max()) return;
+  if (index == std::numeric_limits<uint32_t>::max()) {
+    return;
+  }
   if (index >= m_isAllocated.size()) {
     wpi_setWPIError(NotAllocated);
     return;

@@ -55,7 +55,9 @@ void RobotContainer::ConfigureButtonBindings() {
       .WhenReleased([this] { m_drive.SetMaxOutput(1); });
 }
 
-void RobotContainer::DisablePIDSubsystems() { m_arm.Disable(); }
+void RobotContainer::DisablePIDSubsystems() {
+  m_arm.Disable();
+}
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous

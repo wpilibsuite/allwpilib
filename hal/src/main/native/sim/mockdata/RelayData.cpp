@@ -25,7 +25,9 @@ void RelayData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetRelayData(int32_t index) { SimRelayData[index].ResetData(); }
+void HALSIM_ResetRelayData(int32_t index) {
+  SimRelayData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                              \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, Relay##CAPINAME, SimRelayData, \

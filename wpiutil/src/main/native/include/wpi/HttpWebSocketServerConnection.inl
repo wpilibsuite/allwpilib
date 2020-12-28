@@ -22,7 +22,8 @@ HttpWebSocketServerConnection<Derived>::HttpWebSocketServerConnection(
     StringRef protocol = m_helper.MatchProtocol(protocols).second;
 
     // Check that the upgrade is valid
-    if (!IsValidWsUpgrade(protocol)) return;
+    if (!IsValidWsUpgrade(protocol))
+      return;
 
     // Disconnect HttpServerConnection header reader
     m_dataConn.disconnect();

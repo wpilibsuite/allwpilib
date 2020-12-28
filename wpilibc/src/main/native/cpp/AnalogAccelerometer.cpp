@@ -44,9 +44,13 @@ void AnalogAccelerometer::SetSensitivity(double sensitivity) {
   m_voltsPerG = sensitivity;
 }
 
-void AnalogAccelerometer::SetZero(double zero) { m_zeroGVoltage = zero; }
+void AnalogAccelerometer::SetZero(double zero) {
+  m_zeroGVoltage = zero;
+}
 
-double AnalogAccelerometer::PIDGet() { return GetAcceleration(); }
+double AnalogAccelerometer::PIDGet() {
+  return GetAcceleration();
+}
 
 void AnalogAccelerometer::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Accelerometer");

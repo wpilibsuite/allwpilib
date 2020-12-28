@@ -12,4 +12,6 @@ SetCollectionSpeed::SetCollectionSpeed(double speed) {
 }
 
 // Called just before this Command runs the first time
-void SetCollectionSpeed::Initialize() { Robot::collector.SetSpeed(m_speed); }
+void SetCollectionSpeed::Initialize() {
+  Robot::collector.SetSpeed(m_speed);
+}

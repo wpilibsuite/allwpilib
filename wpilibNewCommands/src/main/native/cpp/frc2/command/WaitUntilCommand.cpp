@@ -14,6 +14,10 @@ WaitUntilCommand::WaitUntilCommand(std::function<bool()> condition)
 WaitUntilCommand::WaitUntilCommand(units::second_t time)
     : m_condition{[=] { return Timer::GetMatchTime() - time > 0_s; }} {}
 
-bool WaitUntilCommand::IsFinished() { return m_condition(); }
+bool WaitUntilCommand::IsFinished() {
+  return m_condition();
+}
 
-bool WaitUntilCommand::RunsWhenDisabled() const { return true; }
+bool WaitUntilCommand::RunsWhenDisabled() const {
+  return true;
+}

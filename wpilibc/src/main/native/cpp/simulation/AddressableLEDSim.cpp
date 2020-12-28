@@ -20,8 +20,9 @@ AddressableLEDSim::AddressableLEDSim(const AddressableLED& addressableLED)
 
 AddressableLEDSim AddressableLEDSim::CreateForChannel(int pwmChannel) {
   int index = HALSIM_FindAddressableLEDForChannel(pwmChannel);
-  if (index < 0)
+  if (index < 0) {
     throw std::out_of_range("no addressable LED found for PWM channel");
+  }
   return AddressableLEDSim{index};
 }
 

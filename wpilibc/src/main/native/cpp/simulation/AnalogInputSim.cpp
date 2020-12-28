@@ -176,4 +176,6 @@ void AnalogInputSim::SetAccumulatorDeadband(int accumulatorDeadband) {
   HALSIM_SetAnalogInAccumulatorDeadband(m_index, accumulatorDeadband);
 }
 
-void AnalogInputSim::ResetData() { HALSIM_ResetAnalogInData(m_index); }
+void AnalogInputSim::ResetData() {
+  HALSIM_ResetAnalogInData(m_index);
+}

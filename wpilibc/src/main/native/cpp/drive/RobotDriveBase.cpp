@@ -15,13 +15,21 @@
 
 using namespace frc;
 
-RobotDriveBase::RobotDriveBase() { SetSafetyEnabled(true); }
+RobotDriveBase::RobotDriveBase() {
+  SetSafetyEnabled(true);
+}
 
-void RobotDriveBase::SetDeadband(double deadband) { m_deadband = deadband; }
+void RobotDriveBase::SetDeadband(double deadband) {
+  m_deadband = deadband;
+}
 
-void RobotDriveBase::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
+void RobotDriveBase::SetMaxOutput(double maxOutput) {
+  m_maxOutput = maxOutput;
+}
 
-void RobotDriveBase::FeedWatchdog() { Feed(); }
+void RobotDriveBase::FeedWatchdog() {
+  Feed();
+}
 
 double RobotDriveBase::ApplyDeadband(double value, double deadband) {
   if (std::abs(value) > deadband) {

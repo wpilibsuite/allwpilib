@@ -16,8 +16,14 @@ void WaitCommand::Initialize() {
   m_timer.Start();
 }
 
-void WaitCommand::End(bool interrupted) { m_timer.Stop(); }
+void WaitCommand::End(bool interrupted) {
+  m_timer.Stop();
+}
 
-bool WaitCommand::IsFinished() { return m_timer.HasElapsed(m_duration); }
+bool WaitCommand::IsFinished() {
+  return m_timer.HasElapsed(m_duration);
+}
 
-bool WaitCommand::RunsWhenDisabled() const { return true; }
+bool WaitCommand::RunsWhenDisabled() const {
+  return true;
+}

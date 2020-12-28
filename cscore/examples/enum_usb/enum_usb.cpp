@@ -16,8 +16,9 @@ int main() {
                 << ")\n";
     if (!caminfo.otherPaths.empty()) {
       wpi::outs() << "Other device paths:\n";
-      for (auto&& path : caminfo.otherPaths)
+      for (auto&& path : caminfo.otherPaths) {
         wpi::outs() << "  " << path << '\n';
+      }
     }
 
     cs::UsbCamera camera{"usbcam", caminfo.dev};
@@ -45,7 +46,9 @@ int main() {
                       << "value=" << prop.Get();
           auto choices = prop.GetChoices();
           for (size_t i = 0; i < choices.size(); ++i) {
-            if (choices[i].empty()) continue;
+            if (choices[i].empty()) {
+              continue;
+            }
             wpi::outs() << "\n    " << i << ": " << choices[i];
           }
           break;

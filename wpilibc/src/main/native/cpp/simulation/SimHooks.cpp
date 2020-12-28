@@ -9,21 +9,37 @@
 namespace frc {
 namespace sim {
 
-void SetRuntimeType(HAL_RuntimeType type) { HALSIM_SetRuntimeType(type); }
+void SetRuntimeType(HAL_RuntimeType type) {
+  HALSIM_SetRuntimeType(type);
+}
 
-void WaitForProgramStart() { HALSIM_WaitForProgramStart(); }
+void WaitForProgramStart() {
+  HALSIM_WaitForProgramStart();
+}
 
-void SetProgramStarted() { HALSIM_SetProgramStarted(); }
+void SetProgramStarted() {
+  HALSIM_SetProgramStarted();
+}
 
-bool GetProgramStarted() { return HALSIM_GetProgramStarted(); }
+bool GetProgramStarted() {
+  return HALSIM_GetProgramStarted();
+}
 
-void RestartTiming() { HALSIM_RestartTiming(); }
+void RestartTiming() {
+  HALSIM_RestartTiming();
+}
 
-void PauseTiming() { HALSIM_PauseTiming(); }
+void PauseTiming() {
+  HALSIM_PauseTiming();
+}
 
-void ResumeTiming() { HALSIM_ResumeTiming(); }
+void ResumeTiming() {
+  HALSIM_ResumeTiming();
+}
 
-bool IsTimingPaused() { return HALSIM_IsTimingPaused(); }
+bool IsTimingPaused() {
+  return HALSIM_IsTimingPaused();
+}
 
 void StepTiming(units::second_t delta) {
   HALSIM_StepTiming(static_cast<uint64_t>(delta.to<double>() * 1e6));

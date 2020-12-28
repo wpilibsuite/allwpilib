@@ -55,7 +55,9 @@ void Subsystem::SetCurrentCommand(Command* command) {
   m_currentCommandChanged = true;
 }
 
-Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
+Command* Subsystem::GetCurrentCommand() const {
+  return m_currentCommand;
+}
 
 wpi::StringRef Subsystem::GetCurrentCommandName() const {
   Command* currentCommand = GetCurrentCommand();
@@ -100,9 +102,13 @@ void Subsystem::AddChild(const wpi::Twine& name, Sendable& child) {
   registry.AddLW(&child, registry.GetSubsystem(this), name);
 }
 
-void Subsystem::AddChild(std::shared_ptr<Sendable> child) { AddChild(*child); }
+void Subsystem::AddChild(std::shared_ptr<Sendable> child) {
+  AddChild(*child);
+}
 
-void Subsystem::AddChild(Sendable* child) { AddChild(*child); }
+void Subsystem::AddChild(Sendable* child) {
+  AddChild(*child);
+}
 
 void Subsystem::AddChild(Sendable& child) {
   auto& registry = SendableRegistry::GetInstance();
@@ -111,7 +117,9 @@ void Subsystem::AddChild(Sendable& child) {
 }
 
 void Subsystem::ConfirmCommand() {
-  if (m_currentCommandChanged) m_currentCommandChanged = false;
+  if (m_currentCommandChanged) {
+    m_currentCommandChanged = false;
+  }
 }
 
 void Subsystem::InitSendable(SendableBuilder& builder) {

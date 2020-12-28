@@ -55,6 +55,10 @@ void JoystickSim::SetThrottle(double value) {
              value);
 }
 
-void JoystickSim::SetTrigger(bool state) { SetRawButton(1, state); }
+void JoystickSim::SetTrigger(bool state) {
+  SetRawButton(1, state);
+}
 
-void JoystickSim::SetTop(bool state) { SetRawButton(2, state); }
+void JoystickSim::SetTop(bool state) {
+  SetRawButton(2, state);
+}

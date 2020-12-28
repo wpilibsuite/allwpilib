@@ -35,7 +35,9 @@ class WireEncoderTest : public ::testing::Test {
     v_string_array = Value::MakeStringArray(std::move(sa));
 
     sa.clear();
-    for (int i = 0; i < 256; ++i) sa.push_back("h");
+    for (int i = 0; i < 256; ++i) {
+      sa.push_back("h");
+    }
     v_string_array_big = Value::MakeStringArray(std::move(sa));
 
     s_normal = "hello";
@@ -74,7 +76,9 @@ TEST_F(WireEncoderTest, SetProtoRev) {
 TEST_F(WireEncoderTest, Write8) {
   size_t off = BUFSIZE - 1;
   WireEncoder e(0x0300u);
-  for (size_t i = 0; i < off; ++i) e.Write8(0u);  // test across Reserve()
+  for (size_t i = 0; i < off; ++i) {
+    e.Write8(0u);  // test across Reserve()
+  }
   e.Write8(5u);
   e.Write8(0x101u);  // should be truncated
   e.Write8(0u);
@@ -86,7 +90,9 @@ TEST_F(WireEncoderTest, Write8) {
 TEST_F(WireEncoderTest, Write16) {
   size_t off = BUFSIZE - 2;
   WireEncoder e(0x0300u);
-  for (size_t i = 0; i < off; ++i) e.Write8(0u);  // test across Reserve()
+  for (size_t i = 0; i < off; ++i) {
+    e.Write8(0u);  // test across Reserve()
+  }
   e.Write16(5u);
   e.Write16(0x10001u);  // should be truncated
   e.Write16(0x4567u);
@@ -99,7 +105,9 @@ TEST_F(WireEncoderTest, Write16) {
 TEST_F(WireEncoderTest, Write32) {
   size_t off = BUFSIZE - 4;
   WireEncoder e(0x0300u);
-  for (size_t i = 0; i < off; ++i) e.Write8(0u);  // test across Reserve()
+  for (size_t i = 0; i < off; ++i) {
+    e.Write8(0u);  // test across Reserve()
+  }
   e.Write32(5ul);
   e.Write32(1ul);
   e.Write32(0xabcdul);
@@ -115,7 +123,9 @@ TEST_F(WireEncoderTest, Write32) {
 TEST_F(WireEncoderTest, WriteDouble) {
   size_t off = BUFSIZE - 8;
   WireEncoder e(0x0300u);
-  for (size_t i = 0; i < off; ++i) e.Write8(0u);  // test across Reserve()
+  for (size_t i = 0; i < off; ++i) {
+    e.Write8(0u);  // test across Reserve()
+  }
   e.WriteDouble(0.0);
   e.WriteDouble(2.3e5);
   e.WriteDouble(std::numeric_limits<double>::infinity());
@@ -136,7 +146,9 @@ TEST_F(WireEncoderTest, WriteDouble) {
 TEST_F(WireEncoderTest, WriteUleb128) {
   size_t off = BUFSIZE - 2;
   WireEncoder e(0x0300u);
-  for (size_t i = 0; i < off; ++i) e.Write8(0u);  // test across Reserve()
+  for (size_t i = 0; i < off; ++i) {
+    e.Write8(0u);  // test across Reserve()
+  }
   e.WriteUleb128(0ul);
   e.WriteUleb128(0x7ful);
   e.WriteUleb128(0x80ul);
@@ -148,7 +160,9 @@ TEST_F(WireEncoderTest, WriteUleb128) {
 TEST_F(WireEncoderTest, WriteType) {
   size_t off = BUFSIZE - 1;
   WireEncoder e(0x0300u);
-  for (size_t i = 0; i < off; ++i) e.Write8(0u);  // test across Reserve()
+  for (size_t i = 0; i < off; ++i) {
+    e.Write8(0u);  // test across Reserve()
+  }
   e.WriteType(NT_BOOLEAN);
   e.WriteType(NT_DOUBLE);
   e.WriteType(NT_STRING);

@@ -41,7 +41,9 @@ UDPClient::~UDPClient() {
 }
 
 UDPClient& UDPClient::operator=(UDPClient&& other) {
-  if (this == &other) return *this;
+  if (this == &other) {
+    return *this;
+  }
   shutdown();
   m_logger = other.m_logger;
   m_lsd = other.m_lsd;
@@ -52,10 +54,14 @@ UDPClient& UDPClient::operator=(UDPClient&& other) {
   return *this;
 }
 
-int UDPClient::start() { return start(0); }
+int UDPClient::start() {
+  return start(0);
+}
 
 int UDPClient::start(int port) {
-  if (m_lsd > 0) return 0;
+  if (m_lsd > 0) {
+    return 0;
+  }
 
 #ifdef _WIN32
   WSAData wsaData;
@@ -186,14 +192,18 @@ int UDPClient::send(StringRef data, const Twine& server, int port) {
 }
 
 int UDPClient::receive(uint8_t* data_received, int receive_len) {
-  if (m_port == 0) return -1;  // return if not receiving
+  if (m_port == 0) {
+    return -1;  // return if not receiving
+  }
   return recv(m_lsd, reinterpret_cast<char*>(data_received), receive_len, 0);
 }
 
 int UDPClient::receive(uint8_t* data_received, int receive_len,
                        SmallVectorImpl<char>* addr_received,
                        int* port_received) {
-  if (m_port == 0) return -1;  // return if not receiving
+  if (m_port == 0) {
+    return -1;  // return if not receiving
+  }
 
   struct sockaddr_in remote;
   socklen_t remote_len = sizeof(remote);
@@ -222,13 +232,17 @@ int UDPClient::receive(uint8_t* data_received, int receive_len,
 }
 
 int UDPClient::set_timeout(double timeout) {
-  if (timeout < 0) return -1;
+  if (timeout < 0) {
+    return -1;
+  }
   struct timeval tv;
   tv.tv_sec = timeout;             // truncating will give seconds
   timeout -= tv.tv_sec;            // remove seconds portion
   tv.tv_usec = timeout * 1000000;  // fractions of a second to us
   int ret = setsockopt(m_lsd, SOL_SOCKET, SO_RCVTIMEO,
                        reinterpret_cast<char*>(&tv), sizeof(tv));
-  if (ret < 0) WPI_ERROR(m_logger, "set timeout failed");
+  if (ret < 0) {
+    WPI_ERROR(m_logger, "set timeout failed");
+  }
   return ret;
 }

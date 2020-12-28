@@ -7,6 +7,10 @@
 HalveDriveSpeed::HalveDriveSpeed(DriveSubsystem* subsystem)
     : m_drive(subsystem) {}
 
-void HalveDriveSpeed::Initialize() { m_drive->SetMaxOutput(0.5); }
+void HalveDriveSpeed::Initialize() {
+  m_drive->SetMaxOutput(0.5);
+}
 
-void HalveDriveSpeed::End(bool interrupted) { m_drive->SetMaxOutput(1); }
+void HalveDriveSpeed::End(bool interrupted) {
+  m_drive->SetMaxOutput(1);
+}

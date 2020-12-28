@@ -21,7 +21,8 @@ static void init_callback(const char* name, void* param,
 static void speed_callback(const char* name, void* param,
                            const struct HAL_Value* value) {
   GazeboPWM* pwm = static_cast<GazeboPWM*>(param);
-  if (pwm->IsInitialized()) pwm->Publish(value->data.v_double);
+  if (pwm->IsInitialized())
+    pwm->Publish(value->data.v_double);
 }
 
 GazeboPWM::GazeboPWM(int port, HALSimGazebo* halsim) {
@@ -39,5 +40,6 @@ void GazeboPWM::Publish(double value) {
   }
   gazebo::msgs::Float64 msg;
   msg.set_data(value);
-  if (m_pub) m_pub->Publish(msg);
+  if (m_pub)
+    m_pub->Publish(msg);
 }

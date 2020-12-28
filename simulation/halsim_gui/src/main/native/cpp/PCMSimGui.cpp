@@ -152,7 +152,9 @@ void PCMSimModel::Update() {
 
 void PCMSimModel::ForEachSolenoid(
     wpi::function_ref<void(glass::SolenoidModel& model, int index)> func) {
-  if (m_solenoidInitCount == 0) return;
+  if (m_solenoidInitCount == 0) {
+    return;
+  }
   int32_t numSolenoids = m_solenoids.size();
   for (int32_t i = 0; i < numSolenoids; ++i) {
     if (auto model = m_solenoids[i].get()) {
@@ -191,8 +193,9 @@ static bool PCMsAnyInitialized() {
   static const int32_t num = HAL_GetNumPCMModules();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetPCMCompressorInitialized(i) ||
-        HALSIM_GetPCMAnySolenoidInitialized(i))
+        HALSIM_GetPCMAnySolenoidInitialized(i)) {
       return true;
+    }
   }
   return false;
 }
@@ -207,8 +210,9 @@ void PCMSimGui::Initialize() {
         bool any = false;
         static_cast<PCMsSimModel*>(model)->ForEachPCM(
             [&](glass::PCMModel& pcm, int) {
-              if (static_cast<PCMSimModel*>(&pcm)->GetNumSolenoids() > 0)
+              if (static_cast<PCMSimModel*>(&pcm)->GetNumSolenoids() > 0) {
                 any = true;
+              }
             });
         return any;
       },

@@ -31,7 +31,9 @@ void glass::DisplayStringChooser(StringChooserModel* model) {
       if (ImGui::Selectable(option.c_str(), isSelected)) {
         model->SetSelected(option);
       }
-      if (isSelected) ImGui::SetItemDefaultFocus();
+      if (isSelected) {
+        ImGui::SetItemDefaultFocus();
+      }
       ImGui::PopID();
     }
     ImGui::EndCombo();

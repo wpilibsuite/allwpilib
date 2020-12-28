@@ -145,27 +145,41 @@ static void SetupMathShared() {
       std::make_unique<WPILibMathShared>());
 }
 
-bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
+bool RobotBase::IsEnabled() const {
+  return m_ds.IsEnabled();
+}
 
-bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
+bool RobotBase::IsDisabled() const {
+  return m_ds.IsDisabled();
+}
 
-bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
+bool RobotBase::IsAutonomous() const {
+  return m_ds.IsAutonomous();
+}
 
 bool RobotBase::IsAutonomousEnabled() const {
   return m_ds.IsAutonomousEnabled();
 }
 
-bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
+bool RobotBase::IsOperatorControl() const {
+  return m_ds.IsOperatorControl();
+}
 
 bool RobotBase::IsOperatorControlEnabled() const {
   return m_ds.IsOperatorControlEnabled();
 }
 
-bool RobotBase::IsTest() const { return m_ds.IsTest(); }
+bool RobotBase::IsTest() const {
+  return m_ds.IsTest();
+}
 
-bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
+bool RobotBase::IsNewDataAvailable() const {
+  return m_ds.IsNewControlData();
+}
 
-std::thread::id RobotBase::GetThreadId() { return m_threadId; }
+std::thread::id RobotBase::GetThreadId() {
+  return m_threadId;
+}
 
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   m_threadId = std::this_thread::get_id();
@@ -208,4 +222,6 @@ RobotBase::RobotBase(RobotBase&&) noexcept
 
 RobotBase::~RobotBase() {}
 
-RobotBase& RobotBase::operator=(RobotBase&&) noexcept { return *this; }
+RobotBase& RobotBase::operator=(RobotBase&&) noexcept {
+  return *this;
+}

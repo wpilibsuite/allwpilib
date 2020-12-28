@@ -27,31 +27,55 @@ void Shooter::RetractBoth() {
   m_piston2.Set(frc::DoubleSolenoid::kReverse);
 }
 
-void Shooter::Extend1() { m_piston1.Set(frc::DoubleSolenoid::kForward); }
+void Shooter::Extend1() {
+  m_piston1.Set(frc::DoubleSolenoid::kForward);
+}
 
-void Shooter::Retract1() { m_piston1.Set(frc::DoubleSolenoid::kReverse); }
+void Shooter::Retract1() {
+  m_piston1.Set(frc::DoubleSolenoid::kReverse);
+}
 
-void Shooter::Extend2() { m_piston2.Set(frc::DoubleSolenoid::kReverse); }
+void Shooter::Extend2() {
+  m_piston2.Set(frc::DoubleSolenoid::kReverse);
+}
 
-void Shooter::Retract2() { m_piston2.Set(frc::DoubleSolenoid::kForward); }
+void Shooter::Retract2() {
+  m_piston2.Set(frc::DoubleSolenoid::kForward);
+}
 
-void Shooter::Off1() { m_piston1.Set(frc::DoubleSolenoid::kOff); }
+void Shooter::Off1() {
+  m_piston1.Set(frc::DoubleSolenoid::kOff);
+}
 
-void Shooter::Off2() { m_piston2.Set(frc::DoubleSolenoid::kOff); }
+void Shooter::Off2() {
+  m_piston2.Set(frc::DoubleSolenoid::kOff);
+}
 
-void Shooter::Unlatch() { m_latchPiston.Set(true); }
+void Shooter::Unlatch() {
+  m_latchPiston.Set(true);
+}
 
-void Shooter::Latch() { m_latchPiston.Set(false); }
+void Shooter::Latch() {
+  m_latchPiston.Set(false);
+}
 
-void Shooter::ToggleLatchPosition() { m_latchPiston.Set(!m_latchPiston.Get()); }
+void Shooter::ToggleLatchPosition() {
+  m_latchPiston.Set(!m_latchPiston.Get());
+}
 
-bool Shooter::Piston1IsExtended() { return !m_piston1ReedSwitchFront.Get(); }
+bool Shooter::Piston1IsExtended() {
+  return !m_piston1ReedSwitchFront.Get();
+}
 
-bool Shooter::Piston1IsRetracted() { return !m_piston1ReedSwitchBack.Get(); }
+bool Shooter::Piston1IsRetracted() {
+  return !m_piston1ReedSwitchBack.Get();
+}
 
 void Shooter::OffBoth() {
   m_piston1.Set(frc::DoubleSolenoid::kOff);
   m_piston2.Set(frc::DoubleSolenoid::kOff);
 }
 
-bool Shooter::GoalIsHot() { return m_hotGoalSensor.Get(); }
+bool Shooter::GoalIsHot() {
+  return m_hotGoalSensor.Get();
+}

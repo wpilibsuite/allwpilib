@@ -99,7 +99,9 @@ void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
                             int32_t* status) {
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
   analogTriggerHandles->Free(analogTriggerHandle);
-  if (trigger == nullptr) return;
+  if (trigger == nullptr) {
+    return;
+  }
   SimAnalogTriggerData[trigger->index].initialized = false;
   // caller owns the analog input handle.
 }
@@ -128,10 +130,14 @@ void HAL_SetAnalogTriggerLimitsRaw(HAL_AnalogTriggerHandle analogTriggerHandle,
 
   double trigLower =
       GetAnalogValueToVoltage(trigger->analogHandle, lower, status);
-  if (status != 0) return;
+  if (status != 0) {
+    return;
+  }
   double trigUpper =
       GetAnalogValueToVoltage(trigger->analogHandle, upper, status);
-  if (status != 0) return;
+  if (status != 0) {
+    return;
+  }
 
   SimAnalogTriggerData[trigger->index].triggerUpperBound = trigUpper;
   SimAnalogTriggerData[trigger->index].triggerLowerBound = trigLower;

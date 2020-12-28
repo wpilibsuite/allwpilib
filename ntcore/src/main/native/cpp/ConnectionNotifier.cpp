@@ -8,7 +8,9 @@ using namespace nt;
 
 ConnectionNotifier::ConnectionNotifier(int inst) : m_inst(inst) {}
 
-void ConnectionNotifier::Start() { DoStart(m_inst); }
+void ConnectionNotifier::Start() {
+  DoStart(m_inst);
+}
 
 unsigned int ConnectionNotifier::Add(
     std::function<void(const ConnectionNotification& event)> callback) {

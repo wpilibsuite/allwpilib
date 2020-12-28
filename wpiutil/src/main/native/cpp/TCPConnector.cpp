@@ -144,9 +144,10 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
                 "could not set socket to non-blocking: " << SocketStrerror());
   } else {
     arg |= O_NONBLOCK;
-    if (fcntl(sd, F_SETFL, arg) < 0)
+    if (fcntl(sd, F_SETFL, arg) < 0) {
       WPI_WARNING(logger,
                   "could not set socket to non-blocking: " << SocketStrerror());
+    }
   }
 #endif
 
@@ -171,10 +172,10 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
           WPI_ERROR(logger, "select() to " << server << " port " << port
                                            << " error " << valopt << " - "
                                            << SocketStrerror(valopt));
-        }
-        // connection established
-        else
+        } else {
+          // connection established
           result = 0;
+        }
       } else {
         WPI_INFO(logger,
                  "connect() to " << server << " port " << port << " timed out");
@@ -199,9 +200,10 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
                 "could not set socket to blocking: " << SocketStrerror());
   } else {
     arg &= (~O_NONBLOCK);
-    if (fcntl(sd, F_SETFL, arg) < 0)
+    if (fcntl(sd, F_SETFL, arg) < 0) {
       WPI_WARNING(logger,
                   "could not set socket to blocking: " << SocketStrerror());
+    }
   }
 #endif
 

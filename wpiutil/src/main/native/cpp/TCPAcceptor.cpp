@@ -73,7 +73,9 @@ TCPAcceptor::~TCPAcceptor() {
 }
 
 int TCPAcceptor::start() {
-  if (m_listening) return 0;
+  if (m_listening) {
+    return 0;
+  }
 
   m_lsd = socket(PF_INET, SOCK_STREAM, 0);
   if (m_lsd < 0) {
@@ -153,7 +155,8 @@ void TCPAcceptor::shutdown() {
   address.sin_port = htons(m_port);
 
   int result = -1, sd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sd < 0) return;
+  if (sd < 0)
+    return;
 
   // Set socket to non-blocking
   u_long mode = 1;
@@ -176,7 +179,9 @@ void TCPAcceptor::shutdown() {
 }
 
 std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
-  if (!m_listening || m_shutdown) return nullptr;
+  if (!m_listening || m_shutdown) {
+    return nullptr;
+  }
 
   struct sockaddr_in address;
 #ifdef _WIN32
@@ -187,9 +192,10 @@ std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   std::memset(&address, 0, sizeof(address));
   int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
   if (sd < 0) {
-    if (!m_shutdown)
+    if (!m_shutdown) {
       WPI_ERROR(m_logger, "accept() on port "
                               << m_port << " failed: " << SocketStrerror());
+    }
     return nullptr;
   }
   if (m_shutdown) {

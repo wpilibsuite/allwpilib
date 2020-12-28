@@ -50,7 +50,9 @@ void DriveTrain::Drive(double left, double right) {
   m_robotDrive.TankDrive(left, right);
 }
 
-double DriveTrain::GetHeading() { return m_gyro.GetAngle(); }
+double DriveTrain::GetHeading() {
+  return m_gyro.GetAngle();
+}
 
 void DriveTrain::Reset() {
   m_gyro.Reset();
@@ -67,4 +69,6 @@ double DriveTrain::GetDistanceToObstacle() {
   return m_rangefinder.GetAverageVoltage();
 }
 
-void DriveTrain::Periodic() { Log(); }
+void DriveTrain::Periodic() {
+  Log();
+}

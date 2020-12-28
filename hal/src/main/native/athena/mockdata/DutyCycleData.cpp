@@ -7,13 +7,19 @@
 #include "hal/simulation/SimDataValue.h"
 
 extern "C" {
-int32_t HALSIM_FindDutyCycleForChannel(int32_t channel) { return 0; }
+int32_t HALSIM_FindDutyCycleForChannel(int32_t channel) {
+  return 0;
+}
 
 void HALSIM_ResetDutyCycleData(int32_t index) {}
 
-int32_t HALSIM_GetDutyCycleDigitalChannel(int32_t index) { return 0; }
+int32_t HALSIM_GetDutyCycleDigitalChannel(int32_t index) {
+  return 0;
+}
 
-HAL_SimDeviceHandle HALSIM_GetDutyCycleSimDevice(int32_t index) { return 0; }
+HAL_SimDeviceHandle HALSIM_GetDutyCycleSimDevice(int32_t index) {
+  return 0;
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, DutyCycle##CAPINAME, RETURN)

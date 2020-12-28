@@ -23,7 +23,9 @@ void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
                                        webRegisterFunc);
 }
 
-HALSimWSProviderDIO::~HALSimWSProviderDIO() { DoCancelCallbacks(); }
+HALSimWSProviderDIO::~HALSimWSProviderDIO() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderDIO::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
@@ -32,7 +34,9 @@ void HALSimWSProviderDIO::RegisterCallbacks() {
   m_inputCbKey = REGISTER(IsInput, "<input", bool, boolean);
 }
 
-void HALSimWSProviderDIO::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderDIO::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderDIO::DoCancelCallbacks() {
   HALSIM_CancelDIOInitializedCallback(m_channel, m_initCbKey);

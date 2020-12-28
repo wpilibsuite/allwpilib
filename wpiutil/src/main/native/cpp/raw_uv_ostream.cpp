@@ -32,6 +32,8 @@ void raw_uv_ostream::write_impl(const char* data, size_t len) {
 
 uint64_t raw_uv_ostream::current_pos() const {
   uint64_t size = 0;
-  for (auto&& buf : m_bufs) size += buf.len;
+  for (auto&& buf : m_bufs) {
+    size += buf.len;
+  }
   return size;
 }

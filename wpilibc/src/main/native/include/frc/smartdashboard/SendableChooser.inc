@@ -31,7 +31,8 @@ auto SendableChooser<T>::GetSelected()
   std::string selected = m_defaultChoice;
   {
     std::scoped_lock lock(m_mutex);
-    if (m_haveSelected) selected = m_selected;
+    if (m_haveSelected)
+      selected = m_selected;
   }
   if (selected.empty()) {
     return decltype(_unwrap_smart_ptr(m_choices[""])){};
@@ -85,7 +86,8 @@ void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
     std::scoped_lock lock(m_mutex);
     m_haveSelected = true;
     m_selected = val;
-    for (auto& entry : m_activeEntries) entry.SetString(val);
+    for (auto& entry : m_activeEntries)
+      entry.SetString(val);
   });
 }
 

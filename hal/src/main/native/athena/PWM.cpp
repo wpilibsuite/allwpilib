@@ -71,7 +71,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   hal::init::CheckInit();
   initializeDigital(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0) {
+    return HAL_kInvalidHandle;
+  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex || channel >= kNumPWMChannels) {
@@ -90,8 +92,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   auto handle =
       digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
   if (port == nullptr) {  // would only occur on thread issue.
@@ -160,7 +163,9 @@ void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max,
   // calculate the loop time in milliseconds
   double loopTime =
       HAL_GetPWMLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
 
   int32_t maxPwm = static_cast<int32_t>((max - kDefaultPwmCenter) / loopTime +
                                         kDefaultPwmStepsDown - 1);
@@ -356,7 +361,9 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   }
 
   int32_t value = HAL_GetPWMRaw(pwmPortHandle, status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
   DigitalPort* dPort = port.get();
 
   if (value == kPwmDisabled) {
@@ -388,7 +395,9 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   }
 
   int32_t value = HAL_GetPWMRaw(pwmPortHandle, status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
   DigitalPort* dPort = port.get();
 
   if (value < GetMinNegativePwm(dPort)) {
@@ -430,22 +439,30 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
 
 int32_t HAL_GetPWMLoopTiming(int32_t* status) {
   initializeDigital(status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
   return pwmSystem->readLoopTiming(status);
 }
 
 uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
   initializeDigital(status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
 
   uint64_t upper1 = pwmSystem->readCycleStartTimeUpper(status);
   uint32_t lower = pwmSystem->readCycleStartTime(status);
   uint64_t upper2 = pwmSystem->readCycleStartTimeUpper(status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
   if (upper1 != upper2) {
     // Rolled over between the lower call, reread lower
     lower = pwmSystem->readCycleStartTime(status);
-    if (*status != 0) return 0;
+    if (*status != 0) {
+      return 0;
+    }
   }
   return (upper2 << 32) + lower;
 }

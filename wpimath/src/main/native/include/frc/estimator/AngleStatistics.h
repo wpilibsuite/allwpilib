@@ -9,15 +9,15 @@
 #include "Eigen/Core"
 
 namespace frc {
-namespace {
-double NormalizeAngle(double angle) {
+inline double NormalizeAngle(double angle) {
   static constexpr double tau = 2 * wpi::math::pi;
 
   angle -= std::floor(angle / tau) * tau;
-  if (angle > wpi::math::pi) angle -= tau;
+  if (angle > wpi::math::pi) {
+    angle -= tau;
+  }
   return angle;
 }
-}  // namespace
 
 /**
  * Subtracts a and b while normalizing the resulting value in the selected row

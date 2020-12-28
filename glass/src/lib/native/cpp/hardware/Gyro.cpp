@@ -36,8 +36,9 @@ void glass::DisplayGyro(GyroModel* m) {
       m->IsReadOnly() ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_None;
   auto value = angle->GetValue();
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-  if (ImGui::InputDouble("Gyro Angle (Deg)", &value, 0.0, 0.0, "%.4f", flags))
+  if (ImGui::InputDouble("Gyro Angle (Deg)", &value, 0.0, 0.0, "%.4f", flags)) {
     m->SetAngle(value);
+  }
 
   // Draw the gyro indicator.
   ImDrawList* draw = ImGui::GetWindowDrawList();

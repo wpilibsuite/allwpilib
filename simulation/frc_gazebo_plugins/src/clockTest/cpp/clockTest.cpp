@@ -18,7 +18,9 @@ static char* library;
 static char* world_sdf;
 static double latest_time;
 
-void cb(gazebo::msgs::ConstFloat64Ptr& msg) { latest_time = msg->data(); }
+void cb(gazebo::msgs::ConstFloat64Ptr& msg) {
+  latest_time = msg->data();
+}
 
 TEST(ClockTests, test_clock) {
   gazebo::physics::WorldPtr world;
@@ -64,9 +66,13 @@ TEST(ClockTests, test_clock) {
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
 
-  if (argc >= 1) library = argv[1];
+  if (argc >= 1) {
+    library = argv[1];
+  }
 
-  if (argc >= 2) world_sdf = argv[2];
+  if (argc >= 2) {
+    world_sdf = argv[2];
+  }
 
   return RUN_ALL_TESTS();
 }

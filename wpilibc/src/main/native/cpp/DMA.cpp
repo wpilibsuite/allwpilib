@@ -21,7 +21,9 @@ DMA::DMA() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-DMA::~DMA() { HAL_FreeDMA(dmaHandle); }
+DMA::~DMA() {
+  HAL_FreeDMA(dmaHandle);
+}
 
 void DMA::SetPause(bool pause) {
   int32_t status = 0;

@@ -26,8 +26,9 @@ bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
   for (int i = 0; i < n; i++) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
             es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
-        1)
+        1) {
       continue;
+    }
 
     Eigen::MatrixXcd E(n, n + m);
     E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(n, n) - A, B;

@@ -58,10 +58,18 @@ void DriveTrain::TankDrive(double leftAxis, double rightAxis) {
   m_robotDrive.TankDrive(leftAxis, rightAxis);
 }
 
-void DriveTrain::Stop() { m_robotDrive.TankDrive(0.0, 0.0); }
+void DriveTrain::Stop() {
+  m_robotDrive.TankDrive(0.0, 0.0);
+}
 
-frc::Encoder& DriveTrain::GetLeftEncoder() { return m_leftEncoder; }
+frc::Encoder& DriveTrain::GetLeftEncoder() {
+  return m_leftEncoder;
+}
 
-frc::Encoder& DriveTrain::GetRightEncoder() { return m_rightEncoder; }
+frc::Encoder& DriveTrain::GetRightEncoder() {
+  return m_rightEncoder;
+}
 
-double DriveTrain::GetAngle() { return m_gyro.GetAngle(); }
+double DriveTrain::GetAngle() {
+  return m_gyro.GetAngle();
+}

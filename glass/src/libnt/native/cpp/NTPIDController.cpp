@@ -49,20 +49,25 @@ void NTPIDControllerModel::SetSetpoint(double value) {
 void NTPIDControllerModel::Update() {
   for (auto&& event : m_nt.PollListener()) {
     if (event.entry == m_name) {
-      if (event.value && event.value->IsString())
+      if (event.value && event.value->IsString()) {
         m_nameValue = event.value->GetString();
+      }
     } else if (event.entry == m_p) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_pData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_i) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_iData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_d) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_dData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_setpoint) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_setpointData.SetValue(event.value->GetDouble());
+      }
     }
   }
 }

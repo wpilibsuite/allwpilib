@@ -74,4 +74,6 @@ CallbackStore::~CallbackStore() {
   }
 }
 
-void CallbackStore::SetUid(int32_t uid) { this->uid = uid; }
+void CallbackStore::SetUid(int32_t uid) {
+  this->uid = uid;
+}

@@ -85,7 +85,9 @@ int HAL_LoadOneExtension(const char* library) {
   auto init = reinterpret_cast<halsim_extension_init_func_t*>(
       DLSYM(handle, "HALSIM_InitExtension"));
 
-  if (init) rc = (*init)();
+  if (init) {
+    rc = (*init)();
+  }
 
   if (rc != 0) {
     wpi::outs() << "HAL Extensions: Failed to load extension\n";
@@ -114,7 +116,9 @@ int HAL_LoadExtensions(void) {
   for (auto& libref : libraries) {
     wpi::SmallString<128> library(libref);
     rc = HAL_LoadOneExtension(library.c_str());
-    if (rc < 0) break;
+    if (rc < 0) {
+      break;
+    }
   }
   return rc;
 }
@@ -122,8 +126,9 @@ int HAL_LoadExtensions(void) {
 void HAL_RegisterExtension(const char* name, void* data) {
   std::scoped_lock lock(gExtensionRegistryMutex);
   gExtensionRegistry.emplace_back(name, data);
-  for (auto&& listener : gExtensionListeners)
+  for (auto&& listener : gExtensionListeners) {
     listener.second(listener.first, name, data);
+  }
 }
 
 void HAL_RegisterExtensionListener(void* param,
@@ -131,8 +136,9 @@ void HAL_RegisterExtensionListener(void* param,
                                                 void* data)) {
   std::scoped_lock lock(gExtensionRegistryMutex);
   gExtensionListeners.emplace_back(param, func);
-  for (auto&& extension : gExtensionRegistry)
+  for (auto&& extension : gExtensionRegistry) {
     func(param, extension.first, extension.second);
+  }
 }
 
 void HAL_SetShowExtensionsNotFoundMessages(HAL_Bool showMessage) {

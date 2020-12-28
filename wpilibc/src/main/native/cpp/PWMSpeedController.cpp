@@ -12,19 +12,29 @@ void PWMSpeedController::Set(double speed) {
   SetSpeed(m_isInverted ? -speed : speed);
 }
 
-double PWMSpeedController::Get() const { return GetSpeed(); }
+double PWMSpeedController::Get() const {
+  return GetSpeed();
+}
 
 void PWMSpeedController::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
 
-bool PWMSpeedController::GetInverted() const { return m_isInverted; }
+bool PWMSpeedController::GetInverted() const {
+  return m_isInverted;
+}
 
-void PWMSpeedController::Disable() { SetDisabled(); }
+void PWMSpeedController::Disable() {
+  SetDisabled();
+}
 
-void PWMSpeedController::StopMotor() { PWM::StopMotor(); }
+void PWMSpeedController::StopMotor() {
+  PWM::StopMotor();
+}
 
-void PWMSpeedController::PIDWrite(double output) { Set(output); }
+void PWMSpeedController::PIDWrite(double output) {
+  Set(output);
+}
 
 PWMSpeedController::PWMSpeedController(int channel) : PWM(channel) {}
 

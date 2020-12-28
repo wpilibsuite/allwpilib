@@ -22,4 +22,6 @@ PIDSourceType Filter::GetPIDSourceType() const {
   return m_source->GetPIDSourceType();
 }
 
-double Filter::PIDGetSource() { return m_source->PIDGet(); }
+double Filter::PIDGetSource() {
+  return m_source->PIDGet();
+}

@@ -36,7 +36,9 @@ void RoboRioData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetRoboRioData(void) { SimRoboRioData->ResetData(); }
+void HALSIM_ResetRoboRioData(void) {
+  SimRoboRioData->ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI_NOINDEX(TYPE, HALSIM, RoboRio##CAPINAME, \

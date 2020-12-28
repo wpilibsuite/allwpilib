@@ -39,4 +39,6 @@ void InstantCommand::_Initialize() {
   }
 }
 
-bool InstantCommand::IsFinished() { return true; }
+bool InstantCommand::IsFinished() {
+  return true;
+}

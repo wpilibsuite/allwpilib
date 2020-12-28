@@ -30,7 +30,9 @@ void WireEncoder::WriteDouble(double val) {
        static_cast<char>((v >> 8) & 0xff), static_cast<char>(v & 0xff)});
 }
 
-void WireEncoder::WriteUleb128(uint32_t val) { wpi::WriteUleb128(m_data, val); }
+void WireEncoder::WriteUleb128(uint32_t val) {
+  wpi::WriteUleb128(m_data, val);
+}
 
 void WireEncoder::WriteType(NT_Type type) {
   char ch;
@@ -84,29 +86,41 @@ size_t WireEncoder::GetValueSize(const Value& value) const {
     case NT_STRING:
       return GetStringSize(value.GetString());
     case NT_RAW:
-      if (m_proto_rev < 0x0300u) return 0;
+      if (m_proto_rev < 0x0300u) {
+        return 0;
+      }
       return GetStringSize(value.GetRaw());
     case NT_RPC:
-      if (m_proto_rev < 0x0300u) return 0;
+      if (m_proto_rev < 0x0300u) {
+        return 0;
+      }
       return GetStringSize(value.GetRpc());
     case NT_BOOLEAN_ARRAY: {
       // 1-byte size, 1 byte per element
       size_t size = value.GetBooleanArray().size();
-      if (size > 0xff) size = 0xff;  // size is only 1 byte, truncate
+      if (size > 0xff) {
+        size = 0xff;  // size is only 1 byte, truncate
+      }
       return 1 + size;
     }
     case NT_DOUBLE_ARRAY: {
       // 1-byte size, 8 bytes per element
       size_t size = value.GetDoubleArray().size();
-      if (size > 0xff) size = 0xff;  // size is only 1 byte, truncate
+      if (size > 0xff) {
+        size = 0xff;  // size is only 1 byte, truncate
+      }
       return 1 + size * 8;
     }
     case NT_STRING_ARRAY: {
       auto v = value.GetStringArray();
       size_t size = v.size();
-      if (size > 0xff) size = 0xff;  // size is only 1 byte, truncate
-      size_t len = 1;                // 1-byte size
-      for (size_t i = 0; i < size; ++i) len += GetStringSize(v[i]);
+      if (size > 0xff) {
+        size = 0xff;  // size is only 1 byte, truncate
+      }
+      size_t len = 1;  // 1-byte size
+      for (size_t i = 0; i < size; ++i) {
+        len += GetStringSize(v[i]);
+      }
       return len;
     }
     default:
@@ -142,28 +156,40 @@ void WireEncoder::WriteValue(const Value& value) {
     case NT_BOOLEAN_ARRAY: {
       auto v = value.GetBooleanArray();
       size_t size = v.size();
-      if (size > 0xff) size = 0xff;  // size is only 1 byte, truncate
+      if (size > 0xff) {
+        size = 0xff;  // size is only 1 byte, truncate
+      }
       Write8(size);
 
-      for (size_t i = 0; i < size; ++i) Write8(v[i] ? 1 : 0);
+      for (size_t i = 0; i < size; ++i) {
+        Write8(v[i] ? 1 : 0);
+      }
       break;
     }
     case NT_DOUBLE_ARRAY: {
       auto v = value.GetDoubleArray();
       size_t size = v.size();
-      if (size > 0xff) size = 0xff;  // size is only 1 byte, truncate
+      if (size > 0xff) {
+        size = 0xff;  // size is only 1 byte, truncate
+      }
       Write8(size);
 
-      for (size_t i = 0; i < size; ++i) WriteDouble(v[i]);
+      for (size_t i = 0; i < size; ++i) {
+        WriteDouble(v[i]);
+      }
       break;
     }
     case NT_STRING_ARRAY: {
       auto v = value.GetStringArray();
       size_t size = v.size();
-      if (size > 0xff) size = 0xff;  // size is only 1 byte, truncate
+      if (size > 0xff) {
+        size = 0xff;  // size is only 1 byte, truncate
+      }
       Write8(size);
 
-      for (size_t i = 0; i < size; ++i) WriteString(v[i]);
+      for (size_t i = 0; i < size; ++i) {
+        WriteString(v[i]);
+      }
       break;
     }
     default:
@@ -175,7 +201,9 @@ void WireEncoder::WriteValue(const Value& value) {
 size_t WireEncoder::GetStringSize(wpi::StringRef str) const {
   if (m_proto_rev < 0x0300u) {
     size_t len = str.size();
-    if (len > 0xffff) len = 0xffff;  // Limited to 64K length; truncate
+    if (len > 0xffff) {
+      len = 0xffff;  // Limited to 64K length; truncate
+    }
     return 2 + len;
   }
   return wpi::SizeUleb128(str.size()) + str.size();
@@ -185,7 +213,9 @@ void WireEncoder::WriteString(wpi::StringRef str) {
   // length
   size_t len = str.size();
   if (m_proto_rev < 0x0300u) {
-    if (len > 0xffff) len = 0xffff;  // Limited to 64K length; truncate
+    if (len > 0xffff) {
+      len = 0xffff;  // Limited to 64K length; truncate
+    }
     Write16(len);
   } else {
     WriteUleb128(len);

@@ -97,12 +97,16 @@ void Ultrasonic::Ping() {
 }
 
 bool Ultrasonic::IsRangeValid() const {
-  if (m_simRangeValid) return m_simRangeValid.Get();
+  if (m_simRangeValid) {
+    return m_simRangeValid.Get();
+  }
   return m_counter.Get() > 1;
 }
 
 void Ultrasonic::SetAutomaticMode(bool enabling) {
-  if (enabling == m_automaticEnabled) return;  // ignore the case of no change
+  if (enabling == m_automaticEnabled) {
+    return;  // ignore the case of no change
+  }
 
   m_automaticEnabled = enabling;
 
@@ -137,20 +141,30 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 
 double Ultrasonic::GetRangeInches() const {
   if (IsRangeValid()) {
-    if (m_simRange) return m_simRange.Get();
+    if (m_simRange) {
+      return m_simRange.Get();
+    }
     return m_counter.GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
   } else {
     return 0;
   }
 }
 
-double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
+double Ultrasonic::GetRangeMM() const {
+  return GetRangeInches() * 25.4;
+}
 
-bool Ultrasonic::IsEnabled() const { return m_enabled; }
+bool Ultrasonic::IsEnabled() const {
+  return m_enabled;
+}
 
-void Ultrasonic::SetEnabled(bool enable) { m_enabled = enable; }
+void Ultrasonic::SetEnabled(bool enable) {
+  m_enabled = enable;
+}
 
-void Ultrasonic::SetDistanceUnits(DistanceUnit units) { m_units = units; }
+void Ultrasonic::SetDistanceUnits(DistanceUnit units) {
+  m_units = units;
+}
 
 Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits() const {
   return m_units;
@@ -209,7 +223,9 @@ void Ultrasonic::Initialize() {
 void Ultrasonic::UltrasonicChecker() {
   while (m_automaticEnabled) {
     for (auto& sensor : m_sensors) {
-      if (!m_automaticEnabled) break;
+      if (!m_automaticEnabled) {
+        break;
+      }
 
       if (sensor->IsEnabled()) {
         sensor->m_pingChannel->Pulse(kPingTime);  // do the ping

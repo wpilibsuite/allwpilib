@@ -49,7 +49,9 @@ int32_t SPIData::ReadAutoReceivedData(uint32_t* buffer, int32_t numToRead,
 }
 
 extern "C" {
-void HALSIM_ResetSPIData(int32_t index) { SimSPIData[index].ResetData(); }
+void HALSIM_ResetSPIData(int32_t index) {
+  SimSPIData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, SPI##CAPINAME, SimSPIData, \

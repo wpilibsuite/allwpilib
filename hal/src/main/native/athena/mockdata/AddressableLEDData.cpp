@@ -8,7 +8,9 @@
 
 extern "C" {
 
-int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel) { return 0; }
+int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel) {
+  return 0;
+}
 
 void HALSIM_ResetAddressableLEDData(int32_t index) {}
 

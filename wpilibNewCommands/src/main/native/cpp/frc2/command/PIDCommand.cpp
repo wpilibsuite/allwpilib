@@ -46,12 +46,18 @@ PIDCommand::PIDCommand(PIDController controller,
           controller, measurementSource, [setpoint] { return setpoint; },
           useOutput, requirements) {}
 
-void PIDCommand::Initialize() { m_controller.Reset(); }
+void PIDCommand::Initialize() {
+  m_controller.Reset();
+}
 
 void PIDCommand::Execute() {
   m_useOutput(m_controller.Calculate(m_measurement(), m_setpoint()));
 }
 
-void PIDCommand::End(bool interrupted) { m_useOutput(0); }
+void PIDCommand::End(bool interrupted) {
+  m_useOutput(0);
+}
 
-PIDController& PIDCommand::GetController() { return m_controller; }
+PIDController& PIDCommand::GetController() {
+  return m_controller;
+}

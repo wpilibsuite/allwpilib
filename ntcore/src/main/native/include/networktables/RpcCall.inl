@@ -18,7 +18,8 @@ inline RpcCall::RpcCall(RpcCall&& other) noexcept : RpcCall() {
 
 inline RpcCall::~RpcCall() {
   // automatically cancel result if user didn't request it
-  if (m_call != 0) CancelResult();
+  if (m_call != 0)
+    CancelResult();
 }
 
 inline bool RpcCall::GetResult(std::string* result) {

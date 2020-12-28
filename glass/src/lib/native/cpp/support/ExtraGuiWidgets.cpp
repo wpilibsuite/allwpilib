@@ -14,9 +14,15 @@ namespace glass {
 void DrawLEDSources(const int* values, DataSource** sources, int numValues,
                     int cols, const ImU32* colors, float size, float spacing,
                     const LEDConfig& config) {
-  if (numValues == 0 || cols < 1) return;
-  if (size == 0) size = ImGui::GetFontSize() / 2.0;
-  if (spacing == 0) spacing = ImGui::GetFontSize() / 3.0;
+  if (numValues == 0 || cols < 1) {
+    return;
+  }
+  if (size == 0) {
+    size = ImGui::GetFontSize() / 2.0;
+  }
+  if (spacing == 0) {
+    spacing = ImGui::GetFontSize() / 3.0;
+  }
 
   int rows = (numValues + cols - 1) / cols;
   float inc = size + spacing;
@@ -73,12 +79,13 @@ void DrawLEDSources(const int* values, DataSource** sources, int numValues,
         x += xinc;
       }
     }
-    if (values[i] > 0)
+    if (values[i] > 0) {
       drawList->AddRectFilled(ImVec2(x, y), ImVec2(x + size, y + size),
                               colors[values[i] - 1]);
-    else if (values[i] < 0)
+    } else if (values[i] < 0) {
       drawList->AddRect(ImVec2(x, y), ImVec2(x + size, y + size),
                         colors[-values[i] - 1], 0.0f, 0, 1.0);
+    }
     if (sources) {
       ImGui::SetCursorScreenPos(ImVec2(x - sized2, y - sized2));
       if (sources[i]) {
@@ -97,7 +104,9 @@ void DrawLEDSources(const int* values, DataSource** sources, int numValues,
     }
   }
 
-  if (!sources) ImGui::Dummy(ImVec2(inc * cols, inc * rows));
+  if (!sources) {
+    ImGui::Dummy(ImVec2(inc * cols, inc * rows));
+  }
 }
 
 void DrawLEDs(const int* values, int numValues, int cols, const ImU32* colors,
@@ -120,15 +129,18 @@ bool DeleteButton(ImGuiID id, const ImVec2& pos) {
 
   bool hovered, held;
   bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
-  if (is_clipped) return pressed;
+  if (is_clipped) {
+    return pressed;
+  }
 
   // Render
   ImU32 col =
       ImGui::GetColorU32(held ? ImGuiCol_ButtonActive : ImGuiCol_ButtonHovered);
   ImVec2 center = bb.GetCenter();
-  if (hovered)
+  if (hovered) {
     window->DrawList->AddCircleFilled(
         center, ImMax(2.0f, g.FontSize * 0.5f + 1.0f), col, 12);
+  }
 
   ImU32 cross_col = ImGui::GetColorU32(ImGuiCol_Text);
   window->DrawList->AddCircle(center, ImMax(2.0f, g.FontSize * 0.5f + 1.0f),

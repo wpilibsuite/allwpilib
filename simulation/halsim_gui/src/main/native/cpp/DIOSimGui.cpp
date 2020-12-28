@@ -201,11 +201,13 @@ void DIOsSimModel::Update() {
 
   EncoderSimGui::GetEncodersModel().ForEachEncoder([&](auto& encoder, int i) {
     int channel = encoder.GetChannelA();
-    if (channel >= 0 && channel < numDIO && m_dioModels[channel])
+    if (channel >= 0 && channel < numDIO && m_dioModels[channel]) {
       m_dioModels[channel]->SetEncoder(&encoder);
+    }
     channel = encoder.GetChannelB();
-    if (channel >= 0 && channel < numDIO && m_dioModels[channel])
+    if (channel >= 0 && channel < numDIO && m_dioModels[channel]) {
       m_dioModels[channel]->SetEncoder(&encoder);
+    }
   });
 }
 
@@ -222,7 +224,9 @@ void DIOsSimModel::ForEachDIO(
 static bool DIOAnyInitialized() {
   static const int32_t num = HAL_GetNumDigitalChannels();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetDIOInitialized(i)) return true;
+    if (HALSIM_GetDIOInitialized(i)) {
+      return true;
+    }
   }
   return false;
 }

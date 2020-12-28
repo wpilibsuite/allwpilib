@@ -44,7 +44,9 @@ AnalogOutput::AnalogOutput(int channel) {
   SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
 }
 
-AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
+AnalogOutput::~AnalogOutput() {
+  HAL_FreeAnalogOutputPort(m_port);
+}
 
 void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
@@ -62,7 +64,9 @@ double AnalogOutput::GetVoltage() const {
   return voltage;
 }
 
-int AnalogOutput::GetChannel() const { return m_channel; }
+int AnalogOutput::GetChannel() const {
+  return m_channel;
+}
 
 void AnalogOutput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Output");

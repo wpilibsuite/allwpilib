@@ -45,8 +45,12 @@ namespace {
 
 int sum = 0;
 
-void f1(int i) { sum += i; }
-void f2(int i) /*noexcept*/ { sum += 2 * i; }
+void f1(int i) {
+  sum += i;
+}
+void f2(int i) /*noexcept*/ {
+  sum += 2 * i;
+}
 
 struct s {
   static void s1(int i) { sum += i; }

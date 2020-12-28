@@ -246,7 +246,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendPing(std::function<void(uv::Error)> callback = nullptr) {
     SendPing(ArrayRef<uv::Buffer>{}, [callback](auto bufs, uv::Error err) {
-      if (callback) callback(err);
+      if (callback) {
+        callback(err);
+      }
     });
   }
 
@@ -269,7 +271,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendPong(std::function<void(uv::Error)> callback = nullptr) {
     SendPong(ArrayRef<uv::Buffer>{}, [callback](auto bufs, uv::Error err) {
-      if (callback) callback(err);
+      if (callback) {
+        callback(err);
+      }
     });
   }
 

@@ -41,7 +41,9 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
 }
 
 CAN::~CAN() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   if (m_handle != HAL_kInvalidHandle) {
     HAL_CleanCAN(m_handle);
     m_handle = HAL_kInvalidHandle;

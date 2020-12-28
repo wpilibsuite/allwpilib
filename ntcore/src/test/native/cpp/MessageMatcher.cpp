@@ -10,7 +10,9 @@ bool MessageMatcher::MatchAndExplain(
     std::shared_ptr<Message> msg,
     ::testing::MatchResultListener* listener) const {
   bool match = true;
-  if (!msg) return false;
+  if (!msg) {
+    return false;
+  }
   if (msg->str() != goodmsg->str()) {
     *listener << "str mismatch ";
     match = false;

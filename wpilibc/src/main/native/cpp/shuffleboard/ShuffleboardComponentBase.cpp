@@ -65,7 +65,9 @@ ShuffleboardContainer& ShuffleboardComponentBase::GetParent() {
   return m_parent;
 }
 
-const std::string& ShuffleboardComponentBase::GetType() const { return m_type; }
+const std::string& ShuffleboardComponentBase::GetType() const {
+  return m_type;
+}
 
 const wpi::StringMap<std::shared_ptr<nt::Value>>&
 ShuffleboardComponentBase::GetProperties() const {

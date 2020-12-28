@@ -104,7 +104,9 @@ void ThrowHalHandleException(JNIEnv* env, int32_t status) {
 }
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
-  if (status == 0) return;
+  if (status == 0) {
+    return;
+  }
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
   }
@@ -123,7 +125,9 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
 
 void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
                 int32_t requestedValue) {
-  if (status == 0) return;
+  if (status == 0) {
+    return;
+  }
   if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
       status == RESOURCE_OUT_OF_RANGE) {
     ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
@@ -139,7 +143,9 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
 }
 
 void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
-  if (status >= 0) return;
+  if (status >= 0) {
+    return;
+  }
   switch (status) {
     case kRioStatusSuccess:
       // Everything is ok... don't throw.
@@ -147,9 +153,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     case HAL_ERR_CANSessionMux_InvalidBuffer:
     case kRIOStatusBufferInvalidSize: {
       static jmethodID invalidBufConstruct = nullptr;
-      if (!invalidBufConstruct)
+      if (!invalidBufConstruct) {
         invalidBufConstruct =
             env->GetMethodID(canInvalidBufferExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canInvalidBufferExCls, invalidBufConstruct);
       env->Throw(static_cast<jthrowable>(exception));
@@ -158,9 +165,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     case HAL_ERR_CANSessionMux_MessageNotFound:
     case kRIOStatusOperationTimedOut: {
       static jmethodID messageNotFoundConstruct = nullptr;
-      if (!messageNotFoundConstruct)
+      if (!messageNotFoundConstruct) {
         messageNotFoundConstruct =
             env->GetMethodID(canMessageNotFoundExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canMessageNotFoundExCls, messageNotFoundConstruct);
       env->Throw(static_cast<jthrowable>(exception));
@@ -177,9 +185,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     case HAL_ERR_CANSessionMux_NotInitialized:
     case kRIOStatusResourceNotInitialized: {
       static jmethodID notInitConstruct = nullptr;
-      if (!notInitConstruct)
+      if (!notInitConstruct) {
         notInitConstruct =
             env->GetMethodID(canNotInitializedExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canNotInitializedExCls, notInitConstruct);
       env->Throw(static_cast<jthrowable>(exception));
@@ -202,14 +211,16 @@ void ThrowIllegalArgumentException(JNIEnv* env, wpi::StringRef msg) {
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper) {
   static jmethodID getMessage = nullptr;
-  if (!getMessage)
+  if (!getMessage) {
     getMessage = env->GetStaticMethodID(boundaryExCls, "getMessage",
                                         "(DDD)Ljava/lang/String;");
+  }
 
   static jmethodID constructor = nullptr;
-  if (!constructor)
+  if (!constructor) {
     constructor =
         env->GetMethodID(boundaryExCls, "<init>", "(Ljava/lang/String;)V");
+  }
 
   jobject msg = env->CallStaticObjectMethod(
       boundaryExCls, getMessage, static_cast<jdouble>(value),
@@ -299,7 +310,9 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
                                      value1, value2);
 }
 
-JavaVM* GetJVM() { return jvm; }
+JavaVM* GetJVM() {
+  return jvm;
+}
 
 namespace sim {
 jint SimOnLoad(JavaVM* vm, void* reserved);
@@ -319,17 +332,22 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
+  }
 
   for (auto& c : classes) {
     *c.cls = JClass(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   for (auto& c : exceptions) {
     *c.cls = JException(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   return sim::SimOnLoad(vm, reserved);
@@ -339,8 +357,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   sim::SimOnUnload(vm, reserved);
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
+  }
   // Delete global references
 
   for (auto& c : classes) {

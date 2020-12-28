@@ -21,27 +21,45 @@ Joystick::Joystick(int port) : GenericHID(port) {
   HAL_Report(HALUsageReporting::kResourceType_Joystick, port + 1);
 }
 
-void Joystick::SetXChannel(int channel) { m_axes[Axis::kX] = channel; }
+void Joystick::SetXChannel(int channel) {
+  m_axes[Axis::kX] = channel;
+}
 
-void Joystick::SetYChannel(int channel) { m_axes[Axis::kY] = channel; }
+void Joystick::SetYChannel(int channel) {
+  m_axes[Axis::kY] = channel;
+}
 
-void Joystick::SetZChannel(int channel) { m_axes[Axis::kZ] = channel; }
+void Joystick::SetZChannel(int channel) {
+  m_axes[Axis::kZ] = channel;
+}
 
-void Joystick::SetTwistChannel(int channel) { m_axes[Axis::kTwist] = channel; }
+void Joystick::SetTwistChannel(int channel) {
+  m_axes[Axis::kTwist] = channel;
+}
 
 void Joystick::SetThrottleChannel(int channel) {
   m_axes[Axis::kThrottle] = channel;
 }
 
-int Joystick::GetXChannel() const { return m_axes[Axis::kX]; }
+int Joystick::GetXChannel() const {
+  return m_axes[Axis::kX];
+}
 
-int Joystick::GetYChannel() const { return m_axes[Axis::kY]; }
+int Joystick::GetYChannel() const {
+  return m_axes[Axis::kY];
+}
 
-int Joystick::GetZChannel() const { return m_axes[Axis::kZ]; }
+int Joystick::GetZChannel() const {
+  return m_axes[Axis::kZ];
+}
 
-int Joystick::GetTwistChannel() const { return m_axes[Axis::kTwist]; }
+int Joystick::GetTwistChannel() const {
+  return m_axes[Axis::kTwist];
+}
 
-int Joystick::GetThrottleChannel() const { return m_axes[Axis::kThrottle]; }
+int Joystick::GetThrottleChannel() const {
+  return m_axes[Axis::kThrottle];
+}
 
 double Joystick::GetX(JoystickHand hand) const {
   return GetRawAxis(m_axes[Axis::kX]);
@@ -51,15 +69,21 @@ double Joystick::GetY(JoystickHand hand) const {
   return GetRawAxis(m_axes[Axis::kY]);
 }
 
-double Joystick::GetZ() const { return GetRawAxis(m_axes[Axis::kZ]); }
+double Joystick::GetZ() const {
+  return GetRawAxis(m_axes[Axis::kZ]);
+}
 
-double Joystick::GetTwist() const { return GetRawAxis(m_axes[Axis::kTwist]); }
+double Joystick::GetTwist() const {
+  return GetRawAxis(m_axes[Axis::kTwist]);
+}
 
 double Joystick::GetThrottle() const {
   return GetRawAxis(m_axes[Axis::kThrottle]);
 }
 
-bool Joystick::GetTrigger() const { return GetRawButton(Button::kTrigger); }
+bool Joystick::GetTrigger() const {
+  return GetRawButton(Button::kTrigger);
+}
 
 bool Joystick::GetTriggerPressed() {
   return GetRawButtonPressed(Button::kTrigger);
@@ -69,11 +93,17 @@ bool Joystick::GetTriggerReleased() {
   return GetRawButtonReleased(Button::kTrigger);
 }
 
-bool Joystick::GetTop() const { return GetRawButton(Button::kTop); }
+bool Joystick::GetTop() const {
+  return GetRawButton(Button::kTop);
+}
 
-bool Joystick::GetTopPressed() { return GetRawButtonPressed(Button::kTop); }
+bool Joystick::GetTopPressed() {
+  return GetRawButtonPressed(Button::kTop);
+}
 
-bool Joystick::GetTopReleased() { return GetRawButtonReleased(Button::kTop); }
+bool Joystick::GetTopReleased() {
+  return GetRawButtonReleased(Button::kTop);
+}
 
 double Joystick::GetMagnitude() const {
   return std::sqrt(std::pow(GetX(), 2) + std::pow(GetY(), 2));

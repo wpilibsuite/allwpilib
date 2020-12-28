@@ -61,7 +61,9 @@ std::unique_ptr<CallbackStore> PDPSim::RegisterVoltageCallback(
   return store;
 }
 
-double PDPSim::GetVoltage() const { return HALSIM_GetPDPVoltage(m_index); }
+double PDPSim::GetVoltage() const {
+  return HALSIM_GetPDPVoltage(m_index);
+}
 
 void PDPSim::SetVoltage(double voltage) {
   HALSIM_SetPDPVoltage(m_index, voltage);
@@ -92,4 +94,6 @@ void PDPSim::SetAllCurrents(const double* currents) {
   HALSIM_SetPDPAllCurrents(m_index, currents);
 }
 
-void PDPSim::ResetData() { HALSIM_ResetPDPData(m_index); }
+void PDPSim::ResetData() {
+  HALSIM_ResetPDPData(m_index);
+}

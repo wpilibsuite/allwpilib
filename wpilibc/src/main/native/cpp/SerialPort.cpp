@@ -20,7 +20,9 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
       HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
   wpi_setHALError(status);
   // Don't continue if initialization failed
-  if (status < 0) return;
+  if (status < 0) {
+    return;
+  }
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
   wpi_setHALError(status);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
@@ -54,7 +56,9 @@ SerialPort::SerialPort(int baudRate, const wpi::Twine& portName, Port port,
       static_cast<HAL_SerialPort>(port), portNameC, &status);
   wpi_setHALError(status);
   // Don't continue if initialization failed
-  if (status < 0) return;
+  if (status < 0) {
+    return;
+  }
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
   wpi_setHALError(status);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);

@@ -56,7 +56,9 @@ Rotation2d& Rotation2d::operator-=(const Rotation2d& other) {
   return *this;
 }
 
-Rotation2d Rotation2d::operator-() const { return Rotation2d(-m_value); }
+Rotation2d Rotation2d::operator-() const {
+  return Rotation2d(-m_value);
+}
 
 Rotation2d Rotation2d::operator*(double scalar) const {
   return Rotation2d(m_value * scalar);

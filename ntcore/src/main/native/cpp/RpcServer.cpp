@@ -9,7 +9,9 @@ using namespace nt;
 RpcServer::RpcServer(int inst, wpi::Logger& logger)
     : m_inst(inst), m_logger(logger) {}
 
-void RpcServer::Start() { DoStart(m_inst, m_logger); }
+void RpcServer::Start() {
+  DoStart(m_inst, m_logger);
+}
 
 unsigned int RpcServer::Add(
     std::function<void(const RpcAnswer& answer)> callback) {
@@ -20,7 +22,9 @@ unsigned int RpcServer::AddPolled(unsigned int poller_uid) {
   return DoAdd(poller_uid);
 }
 
-void RpcServer::RemoveRpc(unsigned int rpc_uid) { Remove(rpc_uid); }
+void RpcServer::RemoveRpc(unsigned int rpc_uid) {
+  Remove(rpc_uid);
+}
 
 void RpcServer::ProcessRpc(unsigned int local_id, unsigned int call_uid,
                            StringRef name, StringRef params,

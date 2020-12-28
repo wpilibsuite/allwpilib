@@ -6,7 +6,11 @@
 
 #include "Robot.h"
 
-WaitForBall::WaitForBall() { Requires(&Robot::collector); }
+WaitForBall::WaitForBall() {
+  Requires(&Robot::collector);
+}
 
 // Make this return true when this Command no longer needs to run execute()
-bool WaitForBall::IsFinished() { return Robot::collector.HasBall(); }
+bool WaitForBall::IsFinished() {
+  return Robot::collector.HasBall();
+}

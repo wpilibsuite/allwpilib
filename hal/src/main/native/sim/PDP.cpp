@@ -51,7 +51,9 @@ HAL_Bool HAL_CheckPDPChannel(int32_t channel) {
   return channel < kNumPDPChannels && channel >= 0;
 }
 
-void HAL_CleanPDP(HAL_PDPHandle handle) { HAL_CleanCAN(handle); }
+void HAL_CleanPDP(HAL_PDPHandle handle) {
+  HAL_CleanCAN(handle);
+}
 
 double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status) {
   auto module = hal::can::GetCANModuleFromHandle(handle, status);

@@ -24,7 +24,9 @@ const int SensorUtil::kPwmChannels = HAL_GetNumPWMChannels();
 const int SensorUtil::kRelayChannels = HAL_GetNumRelayHeaders();
 const int SensorUtil::kPDPChannels = HAL_GetNumPDPChannels();
 
-int SensorUtil::GetDefaultSolenoidModule() { return 0; }
+int SensorUtil::GetDefaultSolenoidModule() {
+  return 0;
+}
 
 bool SensorUtil::CheckSolenoidModule(int moduleNumber) {
   return HAL_CheckSolenoidModule(moduleNumber);

@@ -24,7 +24,9 @@ extern "C" {
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status) {
   hal::init::CheckInit();
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0) {
+    return HAL_kInvalidHandle;
+  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -43,8 +45,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   auto handle =
       digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
   if (port == nullptr) {  // would only occur on thread issue.
@@ -89,7 +92,9 @@ void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max,
   // calculate the loop time in milliseconds
   double loopTime =
       HAL_GetPWMLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
 
   int32_t maxPwm = static_cast<int32_t>((max - kDefaultPwmCenter) / loopTime +
                                         kDefaultPwmStepsDown - 1);
@@ -249,8 +254,12 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   }
 
   double speed = SimPWMData[port->channel].speed;
-  if (speed > 1) speed = 1;
-  if (speed < -1) speed = -1;
+  if (speed > 1) {
+    speed = 1;
+  }
+  if (speed < -1) {
+    speed = -1;
+  }
   return speed;
 }
 
@@ -266,8 +275,12 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   }
 
   double position = SimPWMData[port->channel].position;
-  if (position > 1) position = 1;
-  if (position < 0) position = 0;
+  if (position > 1) {
+    position = 1;
+  }
+  if (position < 0) {
+    position = 0;
+  }
   return position;
 }
 
@@ -293,7 +306,11 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
   SimPWMData[port->channel].periodScale = squelchMask;
 }
 
-int32_t HAL_GetPWMLoopTiming(int32_t* status) { return kExpectedLoopTiming; }
+int32_t HAL_GetPWMLoopTiming(int32_t* status) {
+  return kExpectedLoopTiming;
+}
 
-uint64_t HAL_GetPWMCycleStartTime(int32_t* status) { return 0; }
+uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
+  return 0;
+}
 }  // extern "C"

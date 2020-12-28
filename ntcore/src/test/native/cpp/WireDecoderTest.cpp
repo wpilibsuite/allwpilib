@@ -34,7 +34,9 @@ class WireDecoderTest : public ::testing::Test {
     v_string_array = Value::MakeStringArray(std::move(sa));
 
     sa.clear();
-    for (int i = 0; i < 255; ++i) sa.push_back("h");
+    for (int i = 0; i < 255; ++i) {
+      sa.push_back("h");
+    }
     v_string_array_big = Value::MakeStringArray(std::move(sa));
 
     s_normal = std::string("hello");
@@ -364,7 +366,9 @@ TEST_F(WireDecoderTest, ReadStringArrayValue2) {
 TEST_F(WireDecoderTest, ReadStringArrayBigValue2) {
   std::string s;
   s.push_back('\xff');
-  for (int i = 0; i < 255; ++i) s.append("\x00\x01h", 3);
+  for (int i = 0; i < 255; ++i) {
+    s.append("\x00\x01h", 3);
+  }
   wpi::raw_mem_istream is(s.data(), s.size());
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
@@ -561,7 +565,9 @@ TEST_F(WireDecoderTest, ReadStringArrayValue3) {
 TEST_F(WireDecoderTest, ReadStringArrayBigValue3) {
   std::string s;
   s.push_back('\xff');
-  for (int i = 0; i < 255; ++i) s.append("\x01h", 2);
+  for (int i = 0; i < 255; ++i) {
+    s.append("\x01h", 2);
+  }
   wpi::raw_mem_istream is(s.data(), s.size());
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);

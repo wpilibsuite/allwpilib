@@ -152,4 +152,6 @@ void PCMSim::SetAllSolenoidOutputs(uint8_t outputs) {
   HALSIM_SetPCMAllSolenoids(m_index, outputs);
 }
 
-void PCMSim::ResetData() { HALSIM_ResetPCMData(m_index); }
+void PCMSim::ResetData() {
+  HALSIM_ResetPCMData(m_index);
+}

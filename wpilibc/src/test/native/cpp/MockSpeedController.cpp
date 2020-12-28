@@ -10,16 +10,26 @@ void MockSpeedController::Set(double speed) {
   m_speed = m_isInverted ? -speed : speed;
 }
 
-double MockSpeedController::Get() const { return m_speed; }
+double MockSpeedController::Get() const {
+  return m_speed;
+}
 
 void MockSpeedController::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
 
-bool MockSpeedController::GetInverted() const { return m_isInverted; }
+bool MockSpeedController::GetInverted() const {
+  return m_isInverted;
+}
 
-void MockSpeedController::Disable() { m_speed = 0; }
+void MockSpeedController::Disable() {
+  m_speed = 0;
+}
 
-void MockSpeedController::StopMotor() { Disable(); }
+void MockSpeedController::StopMotor() {
+  Disable();
+}
 
-void MockSpeedController::PIDWrite(double output) { Set(output); }
+void MockSpeedController::PIDWrite(double output) {
+  Set(output);
+}

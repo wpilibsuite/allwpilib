@@ -6,4 +6,6 @@
 
 ReplaceMeTrigger::ReplaceMeTrigger() {}
 
-bool ReplaceMeTrigger::Get() { return false; }
+bool ReplaceMeTrigger::Get() {
+  return false;
+}

@@ -12,10 +12,14 @@ CloseClaw::CloseClaw(Claw* claw) : m_claw(claw) {
 }
 
 // Called just before this Command runs the first time
-void CloseClaw::Initialize() { m_claw->Close(); }
+void CloseClaw::Initialize() {
+  m_claw->Close();
+}
 
 // Make this return true when this Command no longer needs to run execute()
-bool CloseClaw::IsFinished() { return m_claw->IsGripping(); }
+bool CloseClaw::IsFinished() {
+  return m_claw->IsGripping();
+}
 
 // Called once after isFinished returns true
 void CloseClaw::End(bool) {

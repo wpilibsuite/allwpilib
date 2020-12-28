@@ -30,8 +30,9 @@ class PDPSimModel : public glass::PDPModel {
       : m_index{index}, m_temp{index}, m_voltage{index} {
     const int numChannels = HAL_GetNumPDPChannels();
     m_currents.reserve(numChannels);
-    for (int i = 0; i < numChannels; ++i)
+    for (int i = 0; i < numChannels; ++i) {
       m_currents.emplace_back(std::make_unique<PDPCurrentSource>(index, i));
+    }
   }
 
   void Update() override {}
@@ -104,7 +105,9 @@ void PDPsSimModel::ForEachPDP(
 static bool PDPsAnyInitialized() {
   static const int32_t num = HAL_GetNumPDPModules();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetPDPInitialized(i)) return true;
+    if (HALSIM_GetPDPInitialized(i)) {
+      return true;
+    }
   }
   return false;
 }

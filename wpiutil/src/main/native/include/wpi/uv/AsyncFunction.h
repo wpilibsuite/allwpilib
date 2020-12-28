@@ -41,10 +41,11 @@ class AsyncFunction<R(T...)> final
                 std::function<void(promise<R>, T...)> func, const private_init&)
       : wakeup{func}, m_loop{loop} {}
   ~AsyncFunction() noexcept override {
-    if (auto loop = m_loop.lock())
+    if (auto loop = m_loop.lock()) {
       this->Close();
-    else
+    } else {
       this->ForceClosed();
+    }
   }
 
   /**
@@ -86,10 +87,11 @@ class AsyncFunction<R(T...)> final
             // waiting for it
             for (auto&& v : h.m_params) {
               auto p = h.m_promises.CreatePromise(v.first);
-              if (h.wakeup)
+              if (h.wakeup) {
                 std::apply(h.wakeup,
                            std::tuple_cat(std::make_tuple(std::move(p)),
                                           std::move(v.second)));
+              }
             }
             h.m_params.clear();
             // wake up any threads that might be waiting for the result
@@ -136,7 +138,9 @@ class AsyncFunction<R(T...)> final
     }
 
     // signal the loop
-    if (loop) this->Invoke(&uv_async_send, this->GetRaw());
+    if (loop) {
+      this->Invoke(&uv_async_send, this->GetRaw());
+    }
 
     // return future
     return m_promises.CreateFuture(req);

@@ -26,6 +26,10 @@ StartEndCommand::StartEndCommand(const StartEndCommand& other)
   m_onEnd = other.m_onEnd;
 }
 
-void StartEndCommand::Initialize() { m_onInit(); }
+void StartEndCommand::Initialize() {
+  m_onInit();
+}
 
-void StartEndCommand::End(bool interrupted) { m_onEnd(); }
+void StartEndCommand::End(bool interrupted) {
+  m_onEnd();
+}

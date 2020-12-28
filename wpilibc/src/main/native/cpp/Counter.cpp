@@ -93,7 +93,9 @@ Counter::~Counter() {
 }
 
 void Counter::SetUpSource(int channel) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   SetUpSource(std::make_shared<DigitalInput>(channel));
   SendableRegistry::GetInstance().AddChild(this, m_upSource.get());
 }
@@ -107,7 +109,9 @@ void Counter::SetUpSource(AnalogTrigger* analogTrigger,
 
 void Counter::SetUpSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                           AnalogTriggerType triggerType) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   SetUpSource(analogTrigger->CreateOutput(triggerType));
 }
 
@@ -117,7 +121,9 @@ void Counter::SetUpSource(DigitalSource* source) {
 }
 
 void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   m_upSource = source;
   if (m_upSource->StatusIsFatal()) {
     CloneError(*m_upSource);
@@ -137,7 +143,9 @@ void Counter::SetUpSource(DigitalSource& source) {
 }
 
 void Counter::SetUpSourceEdge(bool risingEdge, bool fallingEdge) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   if (m_upSource == nullptr) {
     wpi_setWPIErrorWithContext(
         NullParameter,
@@ -149,7 +157,9 @@ void Counter::SetUpSourceEdge(bool risingEdge, bool fallingEdge) {
 }
 
 void Counter::ClearUpSource() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   m_upSource.reset();
   int32_t status = 0;
   HAL_ClearCounterUpSource(m_counter, &status);
@@ -157,7 +167,9 @@ void Counter::ClearUpSource() {
 }
 
 void Counter::SetDownSource(int channel) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   SetDownSource(std::make_shared<DigitalInput>(channel));
   SendableRegistry::GetInstance().AddChild(this, m_downSource.get());
 }
@@ -171,7 +183,9 @@ void Counter::SetDownSource(AnalogTrigger* analogTrigger,
 
 void Counter::SetDownSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                             AnalogTriggerType triggerType) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   SetDownSource(analogTrigger->CreateOutput(triggerType));
 }
 
@@ -186,7 +200,9 @@ void Counter::SetDownSource(DigitalSource& source) {
 }
 
 void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   m_downSource = source;
   if (m_downSource->StatusIsFatal()) {
     CloneError(*m_downSource);
@@ -201,7 +217,9 @@ void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {
 }
 
 void Counter::SetDownSourceEdge(bool risingEdge, bool fallingEdge) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   if (m_downSource == nullptr) {
     wpi_setWPIErrorWithContext(
         NullParameter,
@@ -213,7 +231,9 @@ void Counter::SetDownSourceEdge(bool risingEdge, bool fallingEdge) {
 }
 
 void Counter::ClearDownSource() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   m_downSource.reset();
   int32_t status = 0;
   HAL_ClearCounterDownSource(m_counter, &status);
@@ -221,35 +241,45 @@ void Counter::ClearDownSource() {
 }
 
 void Counter::SetUpDownCounterMode() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetCounterUpDownMode(m_counter, &status);
   wpi_setHALError(status);
 }
 
 void Counter::SetExternalDirectionMode() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetCounterExternalDirectionMode(m_counter, &status);
   wpi_setHALError(status);
 }
 
 void Counter::SetSemiPeriodMode(bool highSemiPeriod) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetCounterSemiPeriodMode(m_counter, highSemiPeriod, &status);
   wpi_setHALError(status);
 }
 
 void Counter::SetPulseLengthMode(double threshold) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetCounterPulseLengthMode(m_counter, threshold, &status);
   wpi_setHALError(status);
 }
 
 void Counter::SetReverseDirection(bool reverseDirection) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetCounterReverseDirection(m_counter, reverseDirection, &status);
   wpi_setHALError(status);
@@ -273,10 +303,14 @@ int Counter::GetSamplesToAverage() const {
   return samples;
 }
 
-int Counter::GetFPGAIndex() const { return m_index; }
+int Counter::GetFPGAIndex() const {
+  return m_index;
+}
 
 int Counter::Get() const {
-  if (StatusIsFatal()) return 0;
+  if (StatusIsFatal()) {
+    return 0;
+  }
   int32_t status = 0;
   int value = HAL_GetCounter(m_counter, &status);
   wpi_setHALError(status);
@@ -284,14 +318,18 @@ int Counter::Get() const {
 }
 
 void Counter::Reset() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_ResetCounter(m_counter, &status);
   wpi_setHALError(status);
 }
 
 double Counter::GetPeriod() const {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal()) {
+    return 0.0;
+  }
   int32_t status = 0;
   double value = HAL_GetCounterPeriod(m_counter, &status);
   wpi_setHALError(status);
@@ -299,21 +337,27 @@ double Counter::GetPeriod() const {
 }
 
 void Counter::SetMaxPeriod(double maxPeriod) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetCounterMaxPeriod(m_counter, maxPeriod, &status);
   wpi_setHALError(status);
 }
 
 void Counter::SetUpdateWhenEmpty(bool enabled) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetCounterUpdateWhenEmpty(m_counter, enabled, &status);
   wpi_setHALError(status);
 }
 
 bool Counter::GetStopped() const {
-  if (StatusIsFatal()) return false;
+  if (StatusIsFatal()) {
+    return false;
+  }
   int32_t status = 0;
   bool value = HAL_GetCounterStopped(m_counter, &status);
   wpi_setHALError(status);
@@ -321,7 +365,9 @@ bool Counter::GetStopped() const {
 }
 
 bool Counter::GetDirection() const {
-  if (StatusIsFatal()) return false;
+  if (StatusIsFatal()) {
+    return false;
+  }
   int32_t status = 0;
   bool value = HAL_GetCounterDirection(m_counter, &status);
   wpi_setHALError(status);

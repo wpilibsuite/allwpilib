@@ -44,7 +44,9 @@ static void WINAPI OnInterfaceChange(PVOID callerContext,
 NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
     : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
-NetworkListener::~NetworkListener() { Stop(); }
+NetworkListener::~NetworkListener() {
+  Stop();
+}
 
 void NetworkListener::Start() {
   NotifyIpInterfaceChange(AF_INET, OnInterfaceChange, &m_impl->m_notifier, true,

@@ -11,8 +11,10 @@ namespace glass {
 template <typename Info>
 void* IniSaverVector<Info>::IniReadOpen(const char* name) {
   unsigned int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num)) return nullptr;
-  if (num >= this->size()) this->resize(num + 1);
+  if (wpi::StringRef{name}.getAsInteger(10, num))
+    return nullptr;
+  if (num >= this->size())
+    this->resize(num + 1);
   return &(*this)[num];
 }
 

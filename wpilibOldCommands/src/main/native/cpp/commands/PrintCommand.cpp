@@ -13,4 +13,6 @@ PrintCommand::PrintCommand(const wpi::Twine& message)
   m_message = message.str();
 }
 
-void PrintCommand::Initialize() { wpi::outs() << m_message << '\n'; }
+void PrintCommand::Initialize() {
+  wpi::outs() << m_message << '\n';
+}

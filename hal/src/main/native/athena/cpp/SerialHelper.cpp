@@ -191,25 +191,30 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     // Open the resource, grab its interface name, and close it.
     ViSession vSession;
     *status = viOpen(m_resourceHandle, desc, VI_NULL, VI_NULL, &vSession);
-    if (*status < 0) goto done;
+    if (*status < 0)
+      goto done;
     *status = 0;
 
     *status = viGetAttribute(vSession, VI_ATTR_INTF_INST_NAME, &osName);
     // Ignore an error here, as we want to close the session on an error
     // Use a separate close variable so we can check
     ViStatus closeStatus = viClose(vSession);
-    if (*status < 0) goto done;
-    if (closeStatus < 0) goto done;
+    if (*status < 0)
+      goto done;
+    if (closeStatus < 0)
+      goto done;
     *status = 0;
 
     // split until (/dev/
     wpi::StringRef devNameRef = wpi::StringRef{osName}.split("(/dev/").second;
     // String not found, continue
-    if (devNameRef.equals("")) continue;
+    if (devNameRef.equals(""))
+      continue;
 
     // Split at )
     wpi::StringRef matchString = devNameRef.split(')').first;
-    if (matchString.equals(devNameRef)) continue;
+    if (matchString.equals(devNameRef))
+      continue;
 
     // Search directories to get a list of system accessors
     // The directories we need are not symbolic, so we can safely
@@ -218,11 +223,15 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     for (auto p = wpi::sys::fs::recursive_directory_iterator(
              "/sys/devices/soc0", ec, false);
          p != wpi::sys::fs::recursive_directory_iterator(); p.increment(ec)) {
-      if (ec) break;
+      if (ec)
+        break;
       wpi::StringRef path{p->path()};
-      if (path.find("amba") == wpi::StringRef::npos) continue;
-      if (path.find("usb") == wpi::StringRef::npos) continue;
-      if (path.find(matchString) == wpi::StringRef::npos) continue;
+      if (path.find("amba") == wpi::StringRef::npos)
+        continue;
+      if (path.find("usb") == wpi::StringRef::npos)
+        continue;
+      if (path.find(matchString) == wpi::StringRef::npos)
+        continue;
 
       wpi::SmallVector<wpi::StringRef, 16> pathSplitVec;
       // Split path into individual directories
@@ -246,11 +255,13 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
 
       // Get the index for our device
       int hubIndex = findtty;
-      if (findtty == -1) hubIndex = findregex;
+      if (findtty == -1)
+        hubIndex = findregex;
 
       int devStart = findusb + 1;
 
-      if (hubIndex < devStart) continue;
+      if (hubIndex < devStart)
+        continue;
 
       // Add our devices to our list
       m_unsortedHubPath.emplace_back(

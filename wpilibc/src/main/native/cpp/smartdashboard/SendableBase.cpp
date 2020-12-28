@@ -9,8 +9,9 @@
 using namespace frc;
 
 SendableBase::SendableBase(bool addLiveWindow) {
-  if (addLiveWindow)
+  if (addLiveWindow) {
     SendableRegistry::GetInstance().AddLW(this, "");
-  else
+  } else {
     SendableRegistry::GetInstance().Add(this, "");
+  }
 }

@@ -6,7 +6,9 @@
 
 extern "C" {
 
-HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name) { return 0; }
+HAL_SimDeviceHandle HAL_CreateSimDevice(const char* name) {
+  return 0;
+}
 
 void HAL_FreeSimDevice(HAL_SimDeviceHandle handle) {}
 

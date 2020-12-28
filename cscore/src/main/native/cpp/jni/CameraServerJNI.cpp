@@ -50,22 +50,29 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/Exception", &exceptionEx}};
 
 static void ListenerOnStart() {
-  if (!jvm) return;
+  if (!jvm) {
+    return;
+  }
   JNIEnv* env;
   JavaVMAttachArgs args;
   args.version = JNI_VERSION_1_2;
   args.name = const_cast<char*>("CSListener");
   args.group = nullptr;
   if (jvm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(&env), &args) !=
-      JNI_OK)
+      JNI_OK) {
     return;
-  if (!env || !env->functions) return;
+  }
+  if (!env || !env->functions) {
+    return;
+  }
   listenerEnv = env;
 }
 
 static void ListenerOnExit() {
   listenerEnv = nullptr;
-  if (!jvm) return;
+  if (!jvm) {
+    return;
+  }
   jvm->DetachCurrentThread();
 }
 
@@ -89,7 +96,9 @@ static void ThrowJavaException(JNIEnv* env, const std::exception* e) {
     what = "unknown exception";
   }
 
-  if (!je) je = exceptionEx;
+  if (!je) {
+    je = exceptionEx;
+  }
   env->ThrowNew(je, what.c_str());
 }
 
@@ -99,18 +108,23 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
+  }
 
   // Cache references to classes
   for (auto& c : classes) {
     *c.cls = JClass(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   for (auto& c : exceptions) {
     *c.cls = JException(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   // Initial configuration of listener start/exit
@@ -124,8 +138,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   cs::Shutdown();
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
+  }
   // Delete global references
   for (auto& c : classes) {
     c.cls->free(env);
@@ -147,20 +162,27 @@ class JCSGlobal {
   JCSGlobal(JNIEnv* env, T obj)
       : m_obj(static_cast<T>(env->NewGlobalRef(obj))) {}
   ~JCSGlobal() {
-    if (!jvm || cs::NotifierDestroyed()) return;
+    if (!jvm || cs::NotifierDestroyed()) {
+      return;
+    }
     JNIEnv* env;
     bool attached = false;
     // don't attach and de-attach if already attached to a thread.
     if (jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) ==
         JNI_EDETACHED) {
       if (jvm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) !=
-          JNI_OK)
+          JNI_OK) {
         return;
+      }
       attached = true;
     }
-    if (!env || !env->functions) return;
+    if (!env || !env->functions) {
+      return;
+    }
     env->DeleteGlobalRef(m_obj);
-    if (attached) jvm->DetachCurrentThread();
+    if (attached) {
+      jvm->DetachCurrentThread();
+    }
   }
   operator T() { return m_obj; }
   T obj() { return m_obj; }
@@ -170,7 +192,9 @@ class JCSGlobal {
 };
 
 static void ReportError(JNIEnv* env, CS_Status status) {
-  if (status == CS_OK) return;
+  if (status == CS_OK) {
+    return;
+  }
   wpi::SmallString<64> msg;
   switch (status) {
     case CS_PROPERTY_WRITE_FAILED:
@@ -213,7 +237,9 @@ static void ReportError(JNIEnv* env, CS_Status status) {
 }
 
 static inline bool CheckStatus(JNIEnv* env, CS_Status status) {
-  if (status != CS_OK) ReportError(env, status);
+  if (status != CS_OK) {
+    ReportError(env, status);
+  }
   return status == CS_OK;
 }
 
@@ -293,7 +319,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getPropertyName
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetPropertyName(property, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -398,7 +426,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getStringProperty
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetStringProperty(property, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -431,7 +461,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getEnumPropertyChoices
 {
   CS_Status status = 0;
   auto arr = cs::GetEnumPropertyChoices(property, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJStringArray(env, arr);
 }
 
@@ -617,7 +649,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceName
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -633,7 +667,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceDescription
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceDescription(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -729,7 +765,9 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceProperties
   CS_Status status = 0;
   wpi::SmallVector<CS_Property, 32> buf;
   auto arr = cs::EnumerateSourceProperties(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
@@ -744,7 +782,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getSourceVideoMode
 {
   CS_Status status = 0;
   auto val = cs::GetSourceVideoMode(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJObject(env, val);
 }
 
@@ -855,9 +895,13 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceVideoModes
 {
   CS_Status status = 0;
   auto arr = cs::EnumerateSourceVideoModes(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   jobjectArray jarr = env->NewObjectArray(arr.size(), videoModeCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
@@ -877,7 +921,9 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceSinks
   CS_Status status = 0;
   wpi::SmallVector<CS_Sink, 16> buf;
   auto arr = cs::EnumerateSourceSinks(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
@@ -1048,7 +1094,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getUsbCameraPath
 {
   CS_Status status = 0;
   auto str = cs::GetUsbCameraPath(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -1063,7 +1111,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getUsbCameraInfo
 {
   CS_Status status = 0;
   auto info = cs::GetUsbCameraInfo(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJObject(env, info);
 }
 
@@ -1078,7 +1128,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getHttpCameraKind
 {
   CS_Status status = 0;
   auto kind = cs::GetHttpCameraKind(source, &status);
-  if (!CheckStatus(env, status)) return 0;
+  if (!CheckStatus(env, status)) {
+    return 0;
+  }
   return kind;
 }
 
@@ -1123,7 +1175,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getHttpCameraUrls
 {
   CS_Status status = 0;
   auto arr = cs::GetHttpCameraUrls(source, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJStringArray(env, arr);
 }
 
@@ -1381,7 +1435,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkName
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -1397,7 +1453,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkDescription
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkDescription(sink, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -1432,7 +1490,9 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateSinkProperties
   CS_Status status = 0;
   wpi::SmallVector<CS_Property, 32> buf;
   auto arr = cs::EnumerateSinkProperties(source, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
@@ -1555,7 +1615,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerListenAddress
 {
   CS_Status status = 0;
   auto str = cs::GetMjpegServerListenAddress(sink, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -1721,7 +1783,9 @@ Java_edu_wpi_cscore_CameraServerJNI_getSinkError
   CS_Status status = 0;
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkError(sink, buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJString(env, str);
 }
 
@@ -1760,17 +1824,23 @@ Java_edu_wpi_cscore_CameraServerJNI_addListener
 
   // cls is a temporary here; cannot be used within callback functor
   jclass cls = envouter->GetObjectClass(listener);
-  if (!cls) return 0;
+  if (!cls) {
+    return 0;
+  }
 
   // method ids, on the other hand, are safe to retain
   jmethodID mid = envouter->GetMethodID(cls, "accept", "(Ljava/lang/Object;)V");
-  if (!mid) return 0;
+  if (!mid) {
+    return 0;
+  }
 
   CS_Status status = 0;
   CS_Listener handle = cs::AddListener(
       [=](const cs::RawEvent& event) {
         JNIEnv* env = listenerEnv;
-        if (!env || !env->functions) return;
+        if (!env || !env->functions) {
+          return;
+        }
 
         // get the handler
         auto handler = listener_global->obj();
@@ -1782,7 +1852,9 @@ Java_edu_wpi_cscore_CameraServerJNI_addListener
           env->ExceptionClear();
           return;
         }
-        if (!jobj) return;
+        if (!jobj) {
+          return;
+        }
 
         env->CallVoidMethod(handler, mid, jobj.obj());
         if (env->ExceptionCheck()) {
@@ -1876,10 +1948,14 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateUsbCameras
 {
   CS_Status status = 0;
   auto arr = cs::EnumerateUsbCameras(&status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), usbCameraInfoCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
@@ -1899,7 +1975,9 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateSources
   CS_Status status = 0;
   wpi::SmallVector<CS_Source, 16> buf;
   auto arr = cs::EnumerateSourceHandles(buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
@@ -1915,7 +1993,9 @@ Java_edu_wpi_cscore_CameraServerJNI_enumerateSinks
   CS_Status status = 0;
   wpi::SmallVector<CS_Sink, 16> buf;
   auto arr = cs::EnumerateSinkHandles(buf, &status);
-  if (!CheckStatus(env, status)) return nullptr;
+  if (!CheckStatus(env, status)) {
+    return nullptr;
+  }
   return MakeJIntArray(env, arr);
 }
 
@@ -1991,12 +2071,16 @@ Java_edu_wpi_cscore_CameraServerJNI_setLogger
   }
   // cls is a temporary here; cannot be used within callback functor
   jclass cls = env->GetObjectClass(func);
-  if (!cls) return;
+  if (!cls) {
+    return;
+  }
 
   // method ids, on the other hand, are safe to retain
   jmethodID mid = env->GetMethodID(cls, "apply",
                                    "(ILjava/lang/String;ILjava/lang/String;)V");
-  if (!mid) return;
+  if (!mid) {
+    return;
+  }
 
   auto& logger = LoggerJNI::GetInstance();
   logger.Start();

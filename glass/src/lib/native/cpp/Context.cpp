@@ -26,8 +26,9 @@ static bool ConvertInt(Storage::Value* value) {
   if (value->stringVal.empty()) {
     return false;
   } else {
-    if (wpi::StringRef{value->stringVal}.getAsInteger(10, value->intVal))
+    if (wpi::StringRef{value->stringVal}.getAsInteger(10, value->intVal)) {
       return false;
+    }
   }
   return true;
 }
@@ -37,8 +38,9 @@ static bool ConvertInt64(Storage::Value* value) {
   if (value->stringVal.empty()) {
     return false;
   } else {
-    if (wpi::StringRef{value->stringVal}.getAsInteger(10, value->int64Val))
+    if (wpi::StringRef{value->stringVal}.getAsInteger(10, value->int64Val)) {
       return false;
+    }
   }
   return true;
 }
@@ -62,8 +64,9 @@ static bool ConvertFloat(Storage::Value* value) {
   if (value->stringVal.empty()) {
     return false;
   } else {
-    if (std::sscanf(value->stringVal.c_str(), "%f", &value->floatVal) != 1)
+    if (std::sscanf(value->stringVal.c_str(), "%f", &value->floatVal) != 1) {
       return false;
+    }
   }
   return true;
 }
@@ -73,8 +76,9 @@ static bool ConvertDouble(Storage::Value* value) {
   if (value->stringVal.empty()) {
     return false;
   } else {
-    if (std::sscanf(value->stringVal.c_str(), "%lf", &value->doubleVal) != 1)
+    if (std::sscanf(value->stringVal.c_str(), "%lf", &value->doubleVal) != 1) {
       return false;
+    }
   }
   return true;
 }
@@ -83,7 +87,9 @@ static void* GlassStorageReadOpen(ImGuiContext*, ImGuiSettingsHandler* handler,
                                   const char* name) {
   auto ctx = static_cast<Context*>(handler->UserData);
   auto& storage = ctx->storage[name];
-  if (!storage) storage = std::make_unique<Storage>();
+  if (!storage) {
+    storage = std::make_unique<Storage>();
+  }
   return storage.get();
 }
 
@@ -193,25 +199,39 @@ static void Shutdown(Context* ctx) {}
 
 Context* glass::CreateContext() {
   Context* ctx = new Context;
-  if (!gContext) SetCurrentContext(ctx);
+  if (!gContext) {
+    SetCurrentContext(ctx);
+  }
   Initialize(ctx);
   return ctx;
 }
 
 void glass::DestroyContext(Context* ctx) {
-  if (!ctx) ctx = gContext;
+  if (!ctx) {
+    ctx = gContext;
+  }
   Shutdown(ctx);
-  if (gContext == ctx) SetCurrentContext(nullptr);
+  if (gContext == ctx) {
+    SetCurrentContext(nullptr);
+  }
   delete ctx;
 }
 
-Context* glass::GetCurrentContext() { return gContext; }
+Context* glass::GetCurrentContext() {
+  return gContext;
+}
 
-void glass::SetCurrentContext(Context* ctx) { gContext = ctx; }
+void glass::SetCurrentContext(Context* ctx) {
+  gContext = ctx;
+}
 
-void glass::ResetTime() { gContext->zeroTime = wpi::Now(); }
+void glass::ResetTime() {
+  gContext->zeroTime = wpi::Now();
+}
 
-uint64_t glass::GetZeroTime() { return gContext->zeroTime; }
+uint64_t glass::GetZeroTime() {
+  return gContext->zeroTime;
+}
 
 Storage::Value& Storage::GetValue(wpi::StringRef key) {
   auto it = std::find(m_keys.begin(), m_keys.end(), key);
@@ -227,10 +247,12 @@ Storage::Value& Storage::GetValue(wpi::StringRef key) {
 #define DEFUN(CapsName, LowerName, CType)                                    \
   CType Storage::Get##CapsName(wpi::StringRef key, CType defaultVal) const { \
     auto it = std::find(m_keys.begin(), m_keys.end(), key);                  \
-    if (it == m_keys.end()) return defaultVal;                               \
+    if (it == m_keys.end())                                                  \
+      return defaultVal;                                                     \
     Value& value = *m_values[it - m_keys.begin()];                           \
     if (value.type != Value::k##CapsName) {                                  \
-      if (!Convert##CapsName(&value)) value.LowerName##Val = defaultVal;     \
+      if (!Convert##CapsName(&value))                                        \
+        value.LowerName##Val = defaultVal;                                   \
     }                                                                        \
     return value.LowerName##Val;                                             \
   }                                                                          \
@@ -260,7 +282,8 @@ Storage::Value& Storage::GetValue(wpi::StringRef key) {
     } else {                                                                 \
       Value& value = *m_values[it - m_keys.begin()];                         \
       if (value.type != Value::k##CapsName) {                                \
-        if (!Convert##CapsName(&value)) value.LowerName##Val = defaultVal;   \
+        if (!Convert##CapsName(&value))                                      \
+          value.LowerName##Val = defaultVal;                                 \
       }                                                                      \
       return &value.LowerName##Val;                                          \
     }                                                                        \
@@ -275,7 +298,9 @@ DEFUN(Double, double, double)
 std::string Storage::GetString(wpi::StringRef key,
                                const std::string& defaultVal) const {
   auto it = std::find(m_keys.begin(), m_keys.end(), key);
-  if (it == m_keys.end()) return defaultVal;
+  if (it == m_keys.end()) {
+    return defaultVal;
+  }
   Value& value = *m_values[it - m_keys.begin()];
   value.type = Value::kString;
   return value.stringVal;
@@ -311,13 +336,17 @@ std::string* Storage::GetStringRef(wpi::StringRef key,
 
 Storage& glass::GetStorage() {
   auto& storage = gContext->storage[gContext->curId];
-  if (!storage) storage = std::make_unique<Storage>();
+  if (!storage) {
+    storage = std::make_unique<Storage>();
+  }
   return *storage;
 }
 
 Storage& glass::GetStorage(wpi::StringRef id) {
   auto& storage = gContext->storage[id];
-  if (!storage) storage = std::make_unique<Storage>();
+  if (!storage) {
+    storage = std::make_unique<Storage>();
+  }
   return *storage;
 }
 
@@ -326,8 +355,12 @@ static void PushIDStack(wpi::StringRef label_id) {
 
   auto [label, id] = wpi::StringRef{label_id}.split("###");
   // if no ###id, use label as id
-  if (id.empty()) id = label;
-  if (!gContext->curId.empty()) gContext->curId += "###";
+  if (id.empty()) {
+    id = label;
+  }
+  if (!gContext->curId.empty()) {
+    gContext->curId += "###";
+  }
   gContext->curId += id;
 }
 
@@ -361,7 +394,9 @@ bool glass::CollapsingHeader(const char* label, ImGuiTreeNodeFlags flags) {
   wpi::SmallString<64> openKey;
   auto [name, id] = wpi::StringRef{label}.split("###");
   // if no ###id, use name as id
-  if (id.empty()) id = name;
+  if (id.empty()) {
+    id = name;
+  }
   openKey = id;
   openKey += "###open";
 
@@ -376,7 +411,9 @@ bool glass::TreeNodeEx(const char* label, ImGuiTreeNodeFlags flags) {
   bool* open = GetStorage().GetBoolRef("open");
   *open = ImGui::TreeNodeEx(
       label, flags | (*open ? ImGuiTreeNodeFlags_DefaultOpen : 0));
-  if (!*open) PopIDStack();
+  if (!*open) {
+    PopIDStack();
+  }
   return *open;
 }
 

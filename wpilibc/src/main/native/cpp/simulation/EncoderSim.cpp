@@ -20,11 +20,15 @@ EncoderSim::EncoderSim(const Encoder& encoder)
 
 EncoderSim EncoderSim::CreateForChannel(int channel) {
   int index = HALSIM_FindEncoderForChannel(channel);
-  if (index < 0) throw std::out_of_range("no encoder found for channel");
+  if (index < 0) {
+    throw std::out_of_range("no encoder found for channel");
+  }
   return EncoderSim{index};
 }
 
-EncoderSim EncoderSim::CreateForIndex(int index) { return EncoderSim{index}; }
+EncoderSim EncoderSim::CreateForIndex(int index) {
+  return EncoderSim{index};
+}
 
 std::unique_ptr<CallbackStore> EncoderSim::RegisterInitializedCallback(
     NotifyCallback callback, bool initialNotify) {
@@ -52,9 +56,13 @@ std::unique_ptr<CallbackStore> EncoderSim::RegisterCountCallback(
   return store;
 }
 
-int EncoderSim::GetCount() const { return HALSIM_GetEncoderCount(m_index); }
+int EncoderSim::GetCount() const {
+  return HALSIM_GetEncoderCount(m_index);
+}
 
-void EncoderSim::SetCount(int count) { HALSIM_SetEncoderCount(m_index, count); }
+void EncoderSim::SetCount(int count) {
+  HALSIM_SetEncoderCount(m_index, count);
+}
 
 std::unique_ptr<CallbackStore> EncoderSim::RegisterPeriodCallback(
     NotifyCallback callback, bool initialNotify) {
@@ -82,7 +90,9 @@ std::unique_ptr<CallbackStore> EncoderSim::RegisterResetCallback(
   return store;
 }
 
-bool EncoderSim::GetReset() const { return HALSIM_GetEncoderReset(m_index); }
+bool EncoderSim::GetReset() const {
+  return HALSIM_GetEncoderReset(m_index);
+}
 
 void EncoderSim::SetReset(bool reset) {
   HALSIM_SetEncoderReset(m_index, reset);
@@ -173,14 +183,22 @@ void EncoderSim::SetDistancePerPulse(double distancePerPulse) {
   HALSIM_SetEncoderDistancePerPulse(m_index, distancePerPulse);
 }
 
-void EncoderSim::ResetData() { HALSIM_ResetEncoderData(m_index); }
+void EncoderSim::ResetData() {
+  HALSIM_ResetEncoderData(m_index);
+}
 
 void EncoderSim::SetDistance(double distance) {
   HALSIM_SetEncoderDistance(m_index, distance);
 }
 
-double EncoderSim::GetDistance() { return HALSIM_GetEncoderDistance(m_index); }
+double EncoderSim::GetDistance() {
+  return HALSIM_GetEncoderDistance(m_index);
+}
 
-void EncoderSim::SetRate(double rate) { HALSIM_SetEncoderRate(m_index, rate); }
+void EncoderSim::SetRate(double rate) {
+  HALSIM_SetEncoderRate(m_index, rate);
+}
 
-double EncoderSim::GetRate() { return HALSIM_GetEncoderRate(m_index); }
+double EncoderSim::GetRate() {
+  return HALSIM_GetEncoderRate(m_index);
+}

@@ -30,8 +30,9 @@ extern "C" {
 int32_t HALSIM_FindDutyCycleForChannel(int32_t channel) {
   for (int i = 0; i < kNumDutyCycles; ++i) {
     if (SimDutyCycleData[i].initialized &&
-        SimDutyCycleData[i].digitalChannel == channel)
+        SimDutyCycleData[i].digitalChannel == channel) {
       return i;
+    }
   }
   return -1;
 }

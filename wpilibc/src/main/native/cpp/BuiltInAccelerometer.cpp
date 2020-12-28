@@ -32,11 +32,17 @@ void BuiltInAccelerometer::SetRange(Range range) {
   HAL_SetAccelerometerActive(true);
 }
 
-double BuiltInAccelerometer::GetX() { return HAL_GetAccelerometerX(); }
+double BuiltInAccelerometer::GetX() {
+  return HAL_GetAccelerometerX();
+}
 
-double BuiltInAccelerometer::GetY() { return HAL_GetAccelerometerY(); }
+double BuiltInAccelerometer::GetY() {
+  return HAL_GetAccelerometerY();
+}
 
-double BuiltInAccelerometer::GetZ() { return HAL_GetAccelerometerZ(); }
+double BuiltInAccelerometer::GetZ() {
+  return HAL_GetAccelerometerZ();
+}
 
 void BuiltInAccelerometer::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");

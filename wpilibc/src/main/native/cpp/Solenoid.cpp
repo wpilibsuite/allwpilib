@@ -49,10 +49,14 @@ Solenoid::Solenoid(int moduleNumber, int channel)
                                         m_channel);
 }
 
-Solenoid::~Solenoid() { HAL_FreeSolenoidPort(m_solenoidHandle); }
+Solenoid::~Solenoid() {
+  HAL_FreeSolenoidPort(m_solenoidHandle);
+}
 
 void Solenoid::Set(bool on) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
 
   int32_t status = 0;
   HAL_SetSolenoid(m_solenoidHandle, on, &status);
@@ -60,7 +64,9 @@ void Solenoid::Set(bool on) {
 }
 
 bool Solenoid::Get() const {
-  if (StatusIsFatal()) return false;
+  if (StatusIsFatal()) {
+    return false;
+  }
 
   int32_t status = 0;
   bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
@@ -69,7 +75,9 @@ bool Solenoid::Get() const {
   return value;
 }
 
-void Solenoid::Toggle() { Set(!Get()); }
+void Solenoid::Toggle() {
+  Set(!Get());
+}
 
 bool Solenoid::IsBlackListed() const {
   int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
@@ -78,14 +86,18 @@ bool Solenoid::IsBlackListed() const {
 
 void Solenoid::SetPulseDuration(double durationSeconds) {
   int32_t durationMS = durationSeconds * 1000;
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetOneShotDuration(m_solenoidHandle, durationMS, &status);
   wpi_setHALError(status);
 }
 
 void Solenoid::StartPulse() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_FireOneShot(m_solenoidHandle, &status);
   wpi_setHALError(status);

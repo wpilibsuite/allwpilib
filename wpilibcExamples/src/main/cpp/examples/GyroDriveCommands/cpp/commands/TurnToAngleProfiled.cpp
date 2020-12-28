@@ -33,4 +33,6 @@ TurnToAngleProfiled::TurnToAngleProfiled(units::degree_t target,
   AddRequirements({drive});
 }
 
-bool TurnToAngleProfiled::IsFinished() { return GetController().AtGoal(); }
+bool TurnToAngleProfiled::IsFinished() {
+  return GetController().AtGoal();
+}

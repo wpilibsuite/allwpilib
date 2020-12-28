@@ -103,7 +103,9 @@ void DigitalGlitchFilter::Add(Counter* input) {
   Add(input->m_downSource.get());
 }
 
-void DigitalGlitchFilter::Remove(DigitalSource* input) { DoAdd(input, 0); }
+void DigitalGlitchFilter::Remove(DigitalSource* input) {
+  DoAdd(input, 0);
+}
 
 void DigitalGlitchFilter::Remove(Encoder* input) {
   Remove(input->m_aSource.get());

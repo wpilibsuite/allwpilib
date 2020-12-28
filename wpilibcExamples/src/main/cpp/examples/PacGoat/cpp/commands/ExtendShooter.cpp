@@ -11,7 +11,11 @@ ExtendShooter::ExtendShooter() : frc::TimedCommand(1.0) {
 }
 
 // Called just before this Command runs the first time
-void ExtendShooter::Initialize() { Robot::shooter.ExtendBoth(); }
+void ExtendShooter::Initialize() {
+  Robot::shooter.ExtendBoth();
+}
 
 // Called once after isFinished returns true
-void ExtendShooter::End() { Robot::shooter.RetractBoth(); }
+void ExtendShooter::End() {
+  Robot::shooter.RetractBoth();
+}

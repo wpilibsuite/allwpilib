@@ -31,7 +31,9 @@ void PCMData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetPCMData(int32_t index) { SimPCMData[index].ResetData(); }
+void HALSIM_ResetPCMData(int32_t index) {
+  SimPCMData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PCM##CAPINAME, SimPCMData, \

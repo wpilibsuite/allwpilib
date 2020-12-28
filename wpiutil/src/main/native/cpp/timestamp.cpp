@@ -92,14 +92,22 @@ void wpi::SetNowImpl(uint64_t (*func)(void)) {
   now_impl = func ? func : NowDefault;
 }
 
-uint64_t wpi::Now() { return (now_impl.load())(); }
+uint64_t wpi::Now() {
+  return (now_impl.load())();
+}
 
 extern "C" {
 
-uint64_t WPI_NowDefault(void) { return wpi::NowDefault(); }
+uint64_t WPI_NowDefault(void) {
+  return wpi::NowDefault();
+}
 
-void WPI_SetNowImpl(uint64_t (*func)(void)) { wpi::SetNowImpl(func); }
+void WPI_SetNowImpl(uint64_t (*func)(void)) {
+  wpi::SetNowImpl(func);
+}
 
-uint64_t WPI_Now(void) { return wpi::Now(); }
+uint64_t WPI_Now(void) {
+  return wpi::Now();
+}
 
 }  // extern "C"

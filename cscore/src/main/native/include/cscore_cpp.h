@@ -124,10 +124,11 @@ struct RawEvent {
   RawEvent(const wpi::Twine& name_, CS_Handle handle_, RawEvent::Kind kind_)
       : kind{kind_}, name{name_.str()} {
     if (kind_ == kSinkCreated || kind_ == kSinkDestroyed ||
-        kind_ == kSinkEnabled || kind_ == kSinkDisabled)
+        kind_ == kSinkEnabled || kind_ == kSinkDisabled) {
       sinkHandle = handle_;
-    else
+    } else {
       sourceHandle = handle_;
+    }
   }
   RawEvent(const wpi::Twine& name_, CS_Source source_, const VideoMode& mode_)
       : kind{kSourceVideoModeChanged},

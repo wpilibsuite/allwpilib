@@ -11,4 +11,6 @@ StartCommand::StartCommand(Command* commandToStart)
   m_commandToFork = commandToStart;
 }
 
-void StartCommand::Initialize() { m_commandToFork->Start(); }
+void StartCommand::Initialize() {
+  m_commandToFork->Start();
+}

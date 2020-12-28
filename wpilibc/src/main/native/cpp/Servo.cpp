@@ -28,11 +28,17 @@ Servo::Servo(int channel) : PWM(channel) {
   SendableRegistry::GetInstance().SetName(this, "Servo", channel);
 }
 
-void Servo::Set(double value) { SetPosition(value); }
+void Servo::Set(double value) {
+  SetPosition(value);
+}
 
-void Servo::SetOffline() { SetRaw(0); }
+void Servo::SetOffline() {
+  SetRaw(0);
+}
 
-double Servo::Get() const { return GetPosition(); }
+double Servo::Get() const {
+  return GetPosition();
+}
 
 void Servo::SetAngle(double degrees) {
   if (degrees < kMinServoAngle) {
@@ -48,9 +54,13 @@ double Servo::GetAngle() const {
   return GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-double Servo::GetMaxAngle() const { return kMaxServoAngle; }
+double Servo::GetMaxAngle() const {
+  return kMaxServoAngle;
+}
 
-double Servo::GetMinAngle() const { return kMinServoAngle; }
+double Servo::GetMinAngle() const {
+  return kMinServoAngle;
+}
 
 void Servo::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Servo");

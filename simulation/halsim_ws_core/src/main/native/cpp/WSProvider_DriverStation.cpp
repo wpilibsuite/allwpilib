@@ -92,7 +92,9 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
   m_matchTimeCbKey = REGISTER(MatchTime, ">match_time", double, double);
 }
 
-void HALSimWSProviderDriverStation::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderDriverStation::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   HALSIM_CancelDriverStationEnabledCallback(m_enabledCbKey);
@@ -118,7 +120,9 @@ void HALSimWSProviderDriverStation::DoCancelCallbacks() {
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
   // ignore if DS connected
-  if (gDSSocketConnected && *gDSSocketConnected) return;
+  if (gDSSocketConnected && *gDSSocketConnected) {
+    return;
+  }
 
   wpi::json::const_iterator it;
   if ((it = json.find(">enabled")) != json.end()) {

@@ -23,20 +23,29 @@ void glass::DisplayRelay(RelayModel* model, int index, bool outputsEnabled) {
   bool forward = false;
   bool reverse = false;
   if (outputsEnabled) {
-    if (forwardData) forward = forwardData->GetValue();
-    if (reverseData) reverse = reverseData->GetValue();
+    if (forwardData) {
+      forward = forwardData->GetValue();
+    }
+    if (reverseData) {
+      reverse = reverseData->GetValue();
+    }
   }
 
   std::string* name = GetStorage().GetStringRef("name");
   ImGui::PushID("name");
-  if (!name->empty())
+  if (!name->empty()) {
     ImGui::Text("%s [%d]", name->c_str(), index);
-  else
+  } else {
     ImGui::Text("Relay[%d]", index);
+  }
   ImGui::PopID();
   if (PopupEditName("name", name)) {
-    if (forwardData) forwardData->SetName(name->c_str());
-    if (reverseData) reverseData->SetName(name->c_str());
+    if (forwardData) {
+      forwardData->SetName(name->c_str());
+    }
+    if (reverseData) {
+      reverseData->SetName(name->c_str());
+    }
   }
   ImGui::SameLine();
 
@@ -57,15 +66,17 @@ void glass::DisplayRelays(RelaysModel* model, bool outputsEnabled,
   model->ForEachRelay([&](RelayModel& relay, int i) {
     hasAny = true;
 
-    if (!first)
+    if (!first) {
       ImGui::Separator();
-    else
+    } else {
       first = false;
+    }
 
     PushID(i);
     DisplayRelay(&relay, i, outputsEnabled);
     PopID();
   });
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

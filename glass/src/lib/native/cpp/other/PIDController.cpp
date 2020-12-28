@@ -23,7 +23,9 @@ void glass::DisplayPIDController(PIDControllerModel* m) {
     auto createTuningParameter = [](const char* name, double* v,
                                     std::function<void(double)> callback) {
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-      if (ImGui::InputDouble(name, v, 0.0, 0.0, "%.3f")) callback(*v);
+      if (ImGui::InputDouble(name, v, 0.0, 0.0, "%.3f")) {
+        callback(*v);
+      }
     };
 
     if (auto p = m->GetPData()) {

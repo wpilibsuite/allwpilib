@@ -51,45 +51,50 @@ std::shared_ptr<Udp> Udp::Create(Loop& loop, unsigned int flags) {
 void Udp::Bind(const Twine& ip, unsigned int port, unsigned int flags) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
-  if (err < 0)
+  if (err < 0) {
     ReportError(err);
-  else
+  } else {
     Bind(reinterpret_cast<const sockaddr&>(addr), flags);
+  }
 }
 
 void Udp::Bind6(const Twine& ip, unsigned int port, unsigned int flags) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);
-  if (err < 0)
+  if (err < 0) {
     ReportError(err);
-  else
+  } else {
     Bind(reinterpret_cast<const sockaddr&>(addr), flags);
+  }
 }
 
 void Udp::Connect(const Twine& ip, unsigned int port) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
-  if (err < 0)
+  if (err < 0) {
     ReportError(err);
-  else
+  } else {
     Connect(reinterpret_cast<const sockaddr&>(addr));
+  }
 }
 
 void Udp::Connect6(const Twine& ip, unsigned int port) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);
-  if (err < 0)
+  if (err < 0) {
     ReportError(err);
-  else
+  } else {
     Connect(reinterpret_cast<const sockaddr&>(addr));
+  }
 }
 
 sockaddr_storage Udp::GetPeer() {
   sockaddr_storage name;
   int len = sizeof(name);
   if (!Invoke(&uv_udp_getpeername, GetRaw(), reinterpret_cast<sockaddr*>(&name),
-              &len))
+              &len)) {
     std::memset(&name, 0, sizeof(name));
+  }
   return name;
 }
 
@@ -97,8 +102,9 @@ sockaddr_storage Udp::GetSock() {
   sockaddr_storage name;
   int len = sizeof(name);
   if (!Invoke(&uv_udp_getsockname, GetRaw(), reinterpret_cast<sockaddr*>(&name),
-              &len))
+              &len)) {
     std::memset(&name, 0, sizeof(name));
+  }
   return name;
 }
 
@@ -123,11 +129,14 @@ void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
   if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
              &addr, [](uv_udp_send_t* r, int status) {
                auto& h = *static_cast<UdpSendReq*>(r->data);
-               if (status < 0) h.ReportError(status);
+               if (status < 0) {
+                 h.ReportError(status);
+               }
                h.complete(Error(status));
                h.Release();  // this is always a one-shot
-             }))
+             })) {
     req->Keep();
+  }
 }
 
 void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
@@ -139,11 +148,14 @@ void Udp::Send(ArrayRef<Buffer> bufs, const std::shared_ptr<UdpSendReq>& req) {
   if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
              nullptr, [](uv_udp_send_t* r, int status) {
                auto& h = *static_cast<UdpSendReq*>(r->data);
-               if (status < 0) h.ReportError(status);
+               if (status < 0) {
+                 h.ReportError(status);
+               }
                h.complete(Error(status));
                h.Release();  // this is always a one-shot
-             }))
+             })) {
     req->Keep();
+  }
 }
 
 void Udp::Send(ArrayRef<Buffer> bufs,
@@ -159,10 +171,11 @@ void Udp::StartRecv() {
            Buffer data = *buf;
 
            // nread=0 is simply ignored
-           if (nread > 0)
+           if (nread > 0) {
              h.received(data, static_cast<size_t>(nread), *addr, flags);
-           else if (nread < 0)
+           } else if (nread < 0) {
              h.ReportError(nread);
+           }
 
            // free the buffer
            h.FreeBuf(data);

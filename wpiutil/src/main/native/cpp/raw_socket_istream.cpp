@@ -24,6 +24,10 @@ void raw_socket_istream::read_impl(void* data, size_t len) {
   set_read_count(pos);
 }
 
-void raw_socket_istream::close() { m_stream.close(); }
+void raw_socket_istream::close() {
+  m_stream.close();
+}
 
-size_t raw_socket_istream::in_avail() const { return 0; }
+size_t raw_socket_istream::in_avail() const {
+  return 0;
+}
