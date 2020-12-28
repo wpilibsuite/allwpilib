@@ -42,7 +42,7 @@ class Frame {
   };
 
  public:
-  Frame() noexcept : m_impl{nullptr} {}
+  Frame() noexcept {}
 
   Frame(SourceImpl& source, const wpi::Twine& error, Time time);
 
@@ -231,7 +231,7 @@ class Frame {
   }
   void ReleaseFrame();
 
-  Impl* m_impl;
+  Impl* m_impl{nullptr};
 };
 
 }  // namespace cs

@@ -23,7 +23,7 @@ class RpcCall final {
   /**
    * Construct invalid instance.
    */
-  RpcCall() : m_entry(0), m_call(0) {}
+  RpcCall() {}
 
   /**
    * Construct from native handles.
@@ -95,8 +95,8 @@ class RpcCall final {
   }
 
  private:
-  NT_Entry m_entry;
-  NT_RpcCall m_call;
+  NT_Entry m_entry{0};
+  NT_RpcCall m_call{0};
 };
 
 }  // namespace nt
