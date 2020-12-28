@@ -509,15 +509,15 @@ static void EmitParentContextMenu(const std::string& path) {
 
     if (ImGui::BeginMenu("Add new...")) {
       if (ImGui::IsWindowAppearing()) {
-        size_t len = (std::min)(path.size(), kTextBufferSize - 1);
-        std::memcpy(nameBuffer, path.data(), len);
-        nameBuffer[len] = '\0';
+        nameBuffer[0] = '\0';
       }
 
-      ImGui::InputTextWithHint("name", "The name of the new item", nameBuffer,
+      ImGui::InputTextWithHint("New Item name", "example", nameBuffer,
                                kTextBufferSize);
+      auto fullNewPath = (path + wpi::Twine('/') + nameBuffer).str();
+      ImGui::Text("Adding: %s", fullNewPath.c_str());
       ImGui::Separator();
-      auto entry = nt::GetEntry(nt::GetDefaultInstance(), nameBuffer);
+      auto entry = nt::GetEntry(nt::GetDefaultInstance(), fullNewPath);
       if (ImGui::MenuItem("string")) {
         if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
             !nt::SetEntryValue(entry, nt::Value::MakeString(""))) {
