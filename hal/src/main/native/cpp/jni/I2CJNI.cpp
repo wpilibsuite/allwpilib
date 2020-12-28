@@ -42,7 +42,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CTransaction
    jbyte sendSize, jobject dataReceived, jbyte receiveSize)
 {
   uint8_t* dataToSendPtr = nullptr;
-  if (dataToSend != 0) {
+  if (dataToSend != nullptr) {
     dataToSendPtr =
         reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataToSend));
   }
@@ -88,7 +88,7 @@ Java_edu_wpi_first_hal_I2CJNI_i2CWrite
 {
   uint8_t* dataToSendPtr = nullptr;
 
-  if (dataToSend != 0) {
+  if (dataToSend != nullptr) {
     dataToSendPtr =
         reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataToSend));
   }

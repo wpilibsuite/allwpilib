@@ -271,12 +271,12 @@ Java_edu_wpi_first_hal_InterruptJNI_attachInterruptHandler
   (JNIEnv* env, jclass, jint interruptHandle, jobject handler, jobject param)
 {
   jclass cls = env->GetObjectClass(handler);
-  if (cls == 0) {
+  if (cls == nullptr) {
     assert(false);
     return;
   }
   jmethodID mid = env->GetMethodID(cls, "apply", "(ILjava/lang/Object;)V");
-  if (mid == 0) {
+  if (mid == nullptr) {
     assert(false);
     return;
   }

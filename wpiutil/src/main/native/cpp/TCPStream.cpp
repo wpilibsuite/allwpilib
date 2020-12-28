@@ -223,7 +223,7 @@ bool TCPStream::WaitForReadEvent(int timeout) {
   tv.tv_usec = 0;
   FD_ZERO(&sdset);
   FD_SET(m_sd, &sdset);
-  if (select(m_sd + 1, &sdset, NULL, NULL, &tv) > 0) {
+  if (select(m_sd + 1, &sdset, nullptr, nullptr, &tv) > 0) {
     return true;
   }
   return false;
