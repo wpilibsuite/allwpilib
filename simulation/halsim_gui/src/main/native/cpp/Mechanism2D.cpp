@@ -137,6 +137,7 @@ DrawLineStruct DrawLine(float startXLocation, float startYLocation, int length,
                         ImColor color, const BodyConfig& bodyConfig,
                         const std::string& previousPath) {
   DrawLineStruct drawLineStruct;
+  // Set the angle
   drawLineStruct.angle = angle;
   // Find the current path do the ligament
   std::string currentPath = previousPath + bodyConfig.name;
@@ -158,8 +159,11 @@ static void buildDrawList(float startXLocation, float startYLocation,
                           ImDrawList* drawList, float previousAngle,
                           const std::vector<BodyConfig>& subBodyConfigs,
                           ImVec2 windowPos) {
+    // Iterate over all of the body configs
   for (BodyConfig const& bodyConfig : subBodyConfigs) {
+      // Angle
     hal::SimDouble angleHandle;
+    // Length
     hal::SimDouble lengthHandle;
     float angle = 0;
     float length = 0;
@@ -277,7 +281,9 @@ static void readJson(std::string jFile) {
 }
 
 static void DisplayAssembly2D() {
+    // Add pop up to gui
   if (ImGui::BeginPopupContextItem()) {
+      // Add menu item
     if (ImGui::MenuItem("Load Json")) {
       m_fileOpener = std::make_unique<pfd::open_file>(
           "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"});
@@ -285,16 +291,25 @@ static void DisplayAssembly2D() {
     ImGui::EndPopup();
   }
 
+  // Get file location if we can
   GetJsonFileLocation();
+  // If the file information is no empty
   if (!mechanism2DInfo.jsonLocation.empty()) {
     // Only read the json file if it changed
     if (mechanism2DInfo.jsonLocation != previousJsonLocation) {
+        // Clear config data from last josn file
       bodyConfigVector.clear();
+      // Read json file
       readJson(mechanism2DInfo.jsonLocation);
     }
+    // Save json location
+    // TODO: This will make it so if the name isn't different nothing will happen
     previousJsonLocation = mechanism2DInfo.jsonLocation;
+    // Get window position
     ImVec2 windowPos = ImGui::GetWindowPos();
+    // Get image drawlist
     ImDrawList* drawList = ImGui::GetWindowDrawList();
+    //Add to the draw list
     buildDrawList(ImGui::GetWindowWidth() / 2, ImGui::GetWindowHeight(),
                   drawList, 0, bodyConfigVector, windowPos);
   }
@@ -310,7 +325,9 @@ void Mechanism2D::Initialize() {
   iniHandler.WriteAllFn = Mechanism2DWriteAll;
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
+  // Build the color table.
   buildColorTable();
+  // Add the main window to the gui
   if (auto win =
           HALSimGui::manager.AddWindow("Mechanism 2D", DisplayAssembly2D)) {
     win->SetVisibility(glass::Window::kHide);
