@@ -15,7 +15,7 @@ namespace uv {
  */
 class Error {
  public:
-  Error() : m_err(UV_UNKNOWN) {}
+  Error() {}
   explicit Error(int err) : m_err(err) {}
 
   /**
@@ -39,7 +39,7 @@ class Error {
   const char* name() const { return uv_err_name(m_err); }
 
  private:
-  int m_err;
+  int m_err{UV_UNKNOWN};
 };
 
 }  // namespace uv

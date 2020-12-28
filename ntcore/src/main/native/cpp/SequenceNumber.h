@@ -10,7 +10,7 @@ namespace nt {
 /* A sequence number per RFC 1982 */
 class SequenceNumber {
  public:
-  SequenceNumber() : m_value(0) {}
+  SequenceNumber() {}
   explicit SequenceNumber(unsigned int value) : m_value(value) {}
   unsigned int value() const { return m_value; }
 
@@ -35,7 +35,7 @@ class SequenceNumber {
   friend bool operator!=(const SequenceNumber& lhs, const SequenceNumber& rhs);
 
  private:
-  unsigned int m_value;
+  unsigned int m_value{0};
 };
 
 bool operator<(const SequenceNumber& lhs, const SequenceNumber& rhs);

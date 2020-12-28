@@ -130,16 +130,16 @@ struct RpcDefinition {
 /** NetworkTables Remote Procedure Call (Server Side) */
 class RpcAnswer {
  public:
-  RpcAnswer() : entry(0), call(0) {}
+  RpcAnswer() {}
   RpcAnswer(NT_Entry entry_, NT_RpcCall call_, StringRef name_,
             StringRef params_, const ConnectionInfo& conn_)
       : entry(entry_), call(call_), name(name_), params(params_), conn(conn_) {}
 
   /** Entry handle. */
-  NT_Entry entry;
+  NT_Entry entry{0};
 
   /** Call handle. */
-  mutable NT_RpcCall call;
+  mutable NT_RpcCall call{0};
 
   /** Entry name. */
   std::string name;
@@ -176,7 +176,7 @@ class RpcAnswer {
 /** NetworkTables Entry Notification */
 class EntryNotification {
  public:
-  EntryNotification() : listener(0), entry(0), flags(0) {}
+  EntryNotification() {}
   EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
                     StringRef name_, std::shared_ptr<Value> value_,
                     unsigned int flags_)
@@ -187,10 +187,10 @@ class EntryNotification {
         flags(flags_) {}
 
   /** Listener that was triggered. */
-  NT_EntryListener listener;
+  NT_EntryListener listener{0};
 
   /** Entry handle. */
-  NT_Entry entry;
+  NT_Entry entry{0};
 
   /** Entry name. */
   std::string name;
@@ -202,7 +202,7 @@ class EntryNotification {
    * Update flags.  For example, NT_NOTIFY_NEW if the key did not previously
    * exist.
    */
-  unsigned int flags;
+  unsigned int flags{0};
 
   friend void swap(EntryNotification& first, EntryNotification& second) {
     using std::swap;
@@ -217,13 +217,13 @@ class EntryNotification {
 /** NetworkTables Connection Notification */
 class ConnectionNotification {
  public:
-  ConnectionNotification() : listener(0), connected(false) {}
+  ConnectionNotification() {}
   ConnectionNotification(NT_ConnectionListener listener_, bool connected_,
                          const ConnectionInfo& conn_)
       : listener(listener_), connected(connected_), conn(conn_) {}
 
   /** Listener that was triggered. */
-  NT_ConnectionListener listener;
+  NT_ConnectionListener listener{0};
 
   /** True if event is due to connection being established. */
   bool connected = false;
@@ -243,7 +243,7 @@ class ConnectionNotification {
 /** NetworkTables log message. */
 class LogMessage {
  public:
-  LogMessage() : logger(0), level(0), filename(""), line(0) {}
+  LogMessage() {}
   LogMessage(NT_Logger logger_, unsigned int level_, const char* filename_,
              unsigned int line_, StringRef message_)
       : logger(logger_),
@@ -253,16 +253,16 @@ class LogMessage {
         message(message_) {}
 
   /** The logger that generated the message. */
-  NT_Logger logger;
+  NT_Logger logger{0};
 
   /** Log level of the message.  See NT_LogLevel. */
-  unsigned int level;
+  unsigned int level{0};
 
   /** The filename of the source file that generated the message. */
-  const char* filename;
+  const char* filename{""};
 
   /** The line number in the source file that generated the message. */
-  unsigned int line;
+  unsigned int line{0};
 
   /** The message. */
   std::string message;
