@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <frc2/command/SubsystemBase.h>
 #include <frc/DigitalInput.h>
 #include <frc/DigitalOutput.h>
+#include <frc2/command/SubsystemBase.h>
 
 /**
  * This class represents the onboard IO of the Romi
@@ -21,7 +21,7 @@
 class OnBoardIO : public frc2::SubsystemBase {
  public:
   enum ChannelMode { INPUT, OUTPUT };
-  OnBoardIO(OnBoardIO::ChannelMode dio1, ChannelMode dio2);
+  OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);
 
   static constexpr double MESSAGE_INTERVAL = 1.0;
   double m_nextMessageTime;

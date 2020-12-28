@@ -24,9 +24,9 @@ void RobotContainer::ConfigureButtonBindings() {
       [this] { return m_controller.GetRawAxis(2); }));
 
   // Example of how to use the onboard IO
-  frc2::Button onboardButtonA{[this] { return m_onboardIO.GetButtonAPressed(); }};
-  onboardButtonA
-      .WhenPressed(PrintCommand("Button A Pressed"))
+  frc2::Button onboardButtonA{
+      [this] { return m_onboardIO.GetButtonAPressed(); }};
+  onboardButtonA.WhenPressed(PrintCommand("Button A Pressed"))
       .WhenReleased(PrintCommand("Button A Released"));
 }
 

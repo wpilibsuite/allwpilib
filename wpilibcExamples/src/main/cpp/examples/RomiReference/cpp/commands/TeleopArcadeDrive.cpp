@@ -16,5 +16,5 @@ TeleopArcadeDrive::TeleopArcadeDrive(
 }
 
 void TeleopArcadeDrive::Execute() override {
-    m_drive->ArcadeDrive(m_xaxisSpeedSupplier(), m_zaxisRotateSuppplier());
+  m_drive->ArcadeDrive(m_xaxisSpeedSupplier(), m_zaxisRotateSuppplier());
 }

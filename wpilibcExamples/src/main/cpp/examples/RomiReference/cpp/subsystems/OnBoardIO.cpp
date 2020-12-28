@@ -4,18 +4,20 @@
 
 #include "subsystems/OnBoardIO.h"
 
+#include <frc/DigitalInput.h>
+#include <frc/DigitalOutput.h>
 #include <frc/DriverStation.h>
 #include <frc2/Timer.h>
 
 OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2) {
   if (dio1 == ChannelMode::INPUT) {
-    m_buttonB{1};
+    m_buttonB = DigitalInput(1);
   } else {
-    m_greenLed{1};
+    m_greenLed = DigitalOutput(1);
   }
   if (dio2 == ChannelMode::INPUT) {
-    m_buttonC{2};
-    m_redLed{2};
+    m_buttonC = DigitalInput(2);
+    m_redLed = DigitalOutput(2);
   }
 }
 
@@ -26,7 +28,7 @@ bool OnBoardIO::GetButtonBPressed() {
     return m_buttonB.Get();
   }
 
-  double currentTime = frc2::Timer::GetFPGATimestamp();
+  double currentTime = frc2::Timer::GetFPGATimestamp().to<double>();
   if (currentTime > m_nextMessageTime) {
     frc::DriverStation::ReportError("Button B was not configured");
     m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
@@ -39,7 +41,7 @@ bool OnBoardIO::GetButtonCPressed() {
     return m_buttonC.Get();
   }
 
-  double currentTime = frc2::Timer::GetFPGATimestamp();
+  double currentTime = frc2::Timer::GetFPGATimestamp().to<double>();
   if (currentTime > m_nextMessageTime) {
     frc::DriverStation::ReportError("Button C was not configured");
     m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
@@ -51,7 +53,7 @@ void OnBoardIO::SetGreenLed(bool value) {
   if (m_greenLed != nullptr) {
     m_greenLed.Set(value);
   } else {
-    double currentTime = frc2::Timer::GetFPGATimestamp();
+    double currentTime = frc2::Timer::GetFPGATimestamp().to<double>();
     if (currentTime > m_nextMessageTime) {
       frc::DriverStation::ReportError("Green LED was not configured");
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
@@ -63,7 +65,7 @@ void OnBoardIO::SetRedLed(bool value) {
   if (m_redLed != nullptr) {
     m_redLed.Set(value);
   } else {
-    double currentTime = frc2::Timer::GetFPGATimestamp();
+    double currentTime = frc2::Timer::GetFPGATimestamp().to<double>();
     if (currentTime > m_nextMessageTime) {
       frc::DriverStation::ReportError("Red LED was not configured");
       m_nextMessageTime = currentTime + MESSAGE_INTERVAL;

@@ -32,12 +32,12 @@ int Drivetrain::GetLeftEncoderCount() { return m_leftEncoder.Get(); }
 
 int Drivetrain::GetRightEncoderCount() { return m_rightEncoder.Get(); }
 
-units::length Drivetrain::GetLeftDistance() {
+units::meter_t Drivetrain::GetLeftDistance() {
   return wpi::math::pi * kWheelDiameterInch *
-          (GetLeftEncoderCount() / kCountsPerRevolution);
+         (GetLeftEncoderCount() / kCountsPerRevolution);
 }
 
-units::length Drivetrain::GetRightDistance() {
+units::meter_t Drivetrain::GetRightDistance() {
   return wpi::math::pi * kWheelDiameterInch *
-          (GetRightEncoderCount() / kCountsPerRevolution);
+         (GetRightEncoderCount() / kCountsPerRevolution);
 }
