@@ -2036,8 +2036,8 @@ struct LogMessage {
   void CallJava(JNIEnv* env, jobject func, jmethodID mid) {
     JLocal<jstring> file{env, MakeJString(env, m_file)};
     JLocal<jstring> msg{env, MakeJString(env, m_msg)};
-    env->CallVoidMethod(func, mid, (jint)m_level, file.obj(), (jint)m_line,
-                        msg.obj());
+    env->CallVoidMethod(func, mid, static_cast<jint>(m_level), file.obj(),
+                        static_cast<jint>(m_line), msg.obj());
   }
 
   static const char* GetName() { return "CSLogger"; }

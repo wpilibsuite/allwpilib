@@ -283,10 +283,10 @@ void SPI::StartAutoRate(double period) {
 
 void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
   int32_t status = 0;
-  HAL_StartSPIAutoTrigger(
-      m_port, source.GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(), rising,
-      falling, &status);
+  HAL_StartSPIAutoTrigger(m_port, source.GetPortHandleForRouting(),
+                          static_cast<HAL_AnalogTriggerType>(
+                              source.GetAnalogTriggerTypeForRouting()),
+                          rising, falling, &status);
   wpi_setHALError(status);
 }
 

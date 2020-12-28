@@ -28,7 +28,7 @@ void BuiltInAccelerometer::SetRange(Range range) {
   }
 
   HAL_SetAccelerometerActive(false);
-  HAL_SetAccelerometerRange((HAL_AccelerometerRange)range);
+  HAL_SetAccelerometerRange(static_cast<HAL_AccelerometerRange>(range));
   HAL_SetAccelerometerActive(true);
 }
 

@@ -60,7 +60,7 @@ void BufferCallbackStore::performCallback(const char* name, uint8_t* buffer,
                                          static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetBufferCallback(), MakeJString(env, name),
-                      toCallbackArr, (jint)length);
+                      toCallbackArr, static_cast<jint>(length));
 
   jbyte* fromCallbackArr = reinterpret_cast<jbyte*>(
       env->GetPrimitiveArrayCritical(toCallbackArr, nullptr));

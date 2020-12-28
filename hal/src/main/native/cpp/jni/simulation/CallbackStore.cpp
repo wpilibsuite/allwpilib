@@ -55,8 +55,9 @@ void CallbackStore::performCallback(const char* name, const HAL_Value* value) {
   }
 
   env->CallVoidMethod(m_call, sim::GetNotifyCallback(), MakeJString(env, name),
-                      (jint)value->type, (jlong)value->data.v_long,
-                      (jdouble)value->data.v_double);
+                      static_cast<jint>(value->type),
+                      static_cast<jlong>(value->data.v_long),
+                      static_cast<jdouble>(value->data.v_double));
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();

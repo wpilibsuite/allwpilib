@@ -61,7 +61,7 @@ int32_t SpiReadAutoReceiveBufferCallbackStore::performCallback(
 
   jint ret = env->CallIntMethod(m_call, sim::GetBufferCallback(),
                                 MakeJString(env, name), toCallbackArr,
-                                (jint)numToRead);
+                                static_cast<jint>(numToRead));
 
   jint* fromCallbackArr = reinterpret_cast<jint*>(
       env->GetPrimitiveArrayCritical(toCallbackArr, nullptr));
