@@ -28,8 +28,9 @@ class InterruptThread : public wpi::SafeThread {
     std::unique_lock lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });
-      if (!m_active)
+      if (!m_active) {
         break;
+      }
       m_notify = false;
       HAL_InterruptHandlerFunction handler = m_handler;
       uint32_t mask = m_mask;

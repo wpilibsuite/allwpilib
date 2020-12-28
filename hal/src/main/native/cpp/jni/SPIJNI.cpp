@@ -367,8 +367,9 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3IID
   jint retval =
       HAL_ReadSPIAutoReceivedData(static_cast<HAL_SPIPort>(port),
                                   recvBuf.data(), numToRead, timeout, &status);
-  if (!CheckStatus(env, status))
+  if (!CheckStatus(env, status)) {
     return retval;
+  }
   if (numToRead > 0) {
     env->SetIntArrayRegion(buffer, 0, numToRead,
                            reinterpret_cast<const jint*>(recvBuf.data()));

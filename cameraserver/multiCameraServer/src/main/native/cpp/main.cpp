@@ -143,8 +143,9 @@ bool ReadConfig() {
   // cameras
   try {
     for (auto&& camera : j.at("cameras")) {
-      if (!ReadCameraConfig(camera))
+      if (!ReadCameraConfig(camera)) {
         return false;
+      }
     }
   } catch (const wpi::json::exception& e) {
     ParseError() << "could not read cameras: " << e.what() << '\n';
@@ -165,12 +166,14 @@ void StartCamera(const CameraConfig& config) {
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  if (argc >= 2)
+  if (argc >= 2) {
     configFile = argv[1];
+  }
 
   // read configuration
-  if (!ReadConfig())
+  if (!ReadConfig()) {
     return EXIT_FAILURE;
+  }
 
   // start NetworkTables
   auto ntinst = nt::NetworkTableInstance::GetDefault();
@@ -183,10 +186,12 @@ int main(int argc, char* argv[]) {
   }
 
   // start cameras
-  for (auto&& camera : cameras)
+  for (auto&& camera : cameras) {
     StartCamera(camera);
+  }
 
   // loop forever
-  for (;;)
+  for (;;) {
     std::this_thread::sleep_for(std::chrono::seconds(10));
+  }
 }

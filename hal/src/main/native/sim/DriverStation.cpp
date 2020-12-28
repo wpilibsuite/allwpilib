@@ -56,9 +56,10 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
   auto errorHandler = sendErrorHandler.load();
-  if (errorHandler)
+  if (errorHandler) {
     return errorHandler(isError, errorCode, isLVCode, details, location,
                         callStack, printMsg);
+  }
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
@@ -76,8 +77,9 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   auto curTime = fpga_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
-    if (prevMsg[i] == details)
+    if (prevMsg[i] == details) {
       break;
+    }
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
@@ -235,8 +237,9 @@ HAL_Bool HAL_IsNewControlData(void) {
   std::scoped_lock lock(newDSDataAvailableMutex);
   int& lastCount = GetThreadLocalLastCount();
   int currentCount = newDSDataAvailableCounter;
-  if (lastCount == currentCount)
+  if (lastCount == currentCount) {
     return false;
+  }
   lastCount = currentCount;
   return true;
 }
@@ -280,8 +283,9 @@ constexpr int32_t refNumber = 42;
 static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
-  if (refNum != refNumber)
+  if (refNum != refNumber) {
     return 0;
+  }
   SimDriverStationData->CallNewDataCallbacks();
   std::scoped_lock lock(newDSDataAvailableMutex);
   // Nofify all threads
@@ -295,13 +299,15 @@ void HAL_InitializeDriverStation(void) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized)
+  if (initialized) {
     return;
+  }
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized)
+  if (initialized) {
     return;
+  }
 
   SimDriverStationData->ResetData();
 

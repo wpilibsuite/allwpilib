@@ -32,13 +32,15 @@ namespace hal {
 void RestartTiming() {
   programStartTime = wpi::NowDefault();
   programStepTime = 0;
-  if (programPauseTime != 0)
+  if (programPauseTime != 0) {
     programPauseTime = programStartTime.load();
+  }
 }
 
 void PauseTiming() {
-  if (programPauseTime == 0)
+  if (programPauseTime == 0) {
     programPauseTime = wpi::NowDefault();
+  }
 }
 
 void ResumeTiming() {
@@ -58,8 +60,9 @@ void StepTiming(uint64_t delta) {
 
 uint64_t GetFPGATime() {
   uint64_t curTime = programPauseTime;
-  if (curTime == 0)
+  if (curTime == 0) {
     curTime = wpi::NowDefault();
+  }
   return curTime + programStepTime - programStartTime;
 }
 

@@ -24,8 +24,9 @@ CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
 char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetPropertyName(property, buf, status);
-  if (*status != 0)
+  if (*status != 0) {
     return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
@@ -56,8 +57,9 @@ int CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
 char* CS_GetStringProperty(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetStringProperty(property, buf, status);
-  if (*status != 0)
+  if (*status != 0) {
     return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
@@ -72,8 +74,9 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
   char** out =
       static_cast<char**>(wpi::safe_malloc(choices.size() * sizeof(char*)));
   *count = choices.size();
-  for (size_t i = 0; i < choices.size(); ++i)
+  for (size_t i = 0; i < choices.size(); ++i) {
     out[i] = cs::ConvertToC(choices[i]);
+  }
   return out;
 }
 
@@ -84,16 +87,18 @@ CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, status);
-  if (*status != 0)
+  if (*status != 0) {
     return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceDescription(source, buf, status);
-  if (*status != 0)
+  if (*status != 0) {
     return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
@@ -252,16 +257,18 @@ CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, status);
-  if (*status != 0)
+  if (*status != 0) {
     return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkDescription(sink, buf, status);
-  if (*status != 0)
+  if (*status != 0) {
     return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
@@ -389,12 +396,14 @@ CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
 }
 
 void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
-  if (!sources)
+  if (!sources) {
     return;
+  }
   for (int i = 0; i < count; ++i) {
     CS_Status status = 0;
-    if (sources[i] != 0)
+    if (sources[i] != 0) {
       cs::ReleaseSource(sources[i], &status);
+    }
   }
   std::free(sources);
 }
@@ -410,12 +419,14 @@ CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
 }
 
 void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count) {
-  if (!sinks)
+  if (!sinks) {
     return;
+  }
   for (int i = 0; i < count; ++i) {
     CS_Status status = 0;
-    if (sinks[i] != 0)
+    if (sinks[i] != 0) {
       cs::ReleaseSink(sinks[i], &status);
+    }
   }
   std::free(sinks);
 }
@@ -425,10 +436,12 @@ void CS_FreeString(char* str) {
 }
 
 void CS_FreeEnumPropertyChoices(char** choices, int count) {
-  if (!choices)
+  if (!choices) {
     return;
-  for (int i = 0; i < count; ++i)
+  }
+  for (int i = 0; i < count; ++i) {
     std::free(choices[i]);
+  }
   std::free(choices);
 }
 
@@ -449,22 +462,26 @@ char** CS_GetNetworkInterfaces(int* count) {
   char** out =
       static_cast<char**>(wpi::safe_malloc(interfaces.size() * sizeof(char*)));
   *count = interfaces.size();
-  for (size_t i = 0; i < interfaces.size(); ++i)
+  for (size_t i = 0; i < interfaces.size(); ++i) {
     out[i] = cs::ConvertToC(interfaces[i]);
+  }
   return out;
 }
 
 void CS_FreeNetworkInterfaces(char** interfaces, int count) {
-  if (!interfaces)
+  if (!interfaces) {
     return;
-  for (int i = 0; i < count; ++i)
+  }
+  for (int i = 0; i < count; ++i) {
     std::free(interfaces[i]);
+  }
   std::free(interfaces);
 }
 
 void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
-  if (frame->dataLength >= requestedSize)
+  if (frame->dataLength >= requestedSize) {
     return;
+  }
   if (frame->data) {
     frame->data =
         static_cast<char*>(wpi::safe_realloc(frame->data, requestedSize));

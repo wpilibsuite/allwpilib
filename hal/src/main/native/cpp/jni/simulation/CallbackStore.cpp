@@ -94,8 +94,9 @@ SIM_JniHandle sim::AllocateCallback(JNIEnv* env, jint index, jobject callback,
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data)
+    if (!data) {
       return;
+    }
 
     data->performCallback(name, value);
   };
@@ -135,8 +136,9 @@ SIM_JniHandle sim::AllocateChannelCallback(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data)
+    if (!data) {
       return;
+    }
 
     data->performCallback(name, value);
   };
@@ -178,8 +180,9 @@ SIM_JniHandle sim::AllocateCallbackNoIndex(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data)
+    if (!data) {
       return;
+    }
 
     data->performCallback(name, value);
   };

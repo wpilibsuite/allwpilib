@@ -29,11 +29,13 @@ void NTCommandSelectorModel::SetRunning(bool run) {
 void NTCommandSelectorModel::Update() {
   for (auto&& event : m_nt.PollListener()) {
     if (event.entry == m_running) {
-      if (event.value && event.value->IsBoolean())
+      if (event.value && event.value->IsBoolean()) {
         m_runningData.SetValue(event.value->GetBoolean());
+      }
     } else if (event.entry == m_name) {
-      if (event.value && event.value->IsString())
+      if (event.value && event.value->IsString()) {
         m_nameValue = event.value->GetString();
+      }
     }
   }
 }

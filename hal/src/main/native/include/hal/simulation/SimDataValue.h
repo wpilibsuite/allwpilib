@@ -43,8 +43,9 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
                              HAL_Bool initialNotify, const char* name) {
     std::unique_lock lock(m_mutex);
     int32_t newUid = DoRegister(reinterpret_cast<RawFunctor>(callback), param);
-    if (newUid == -1)
+    if (newUid == -1) {
       return -1;
+    }
     if (initialNotify) {
       // We know that the callback is not null because of earlier null check
       HAL_Value value = MakeValue(m_value);
@@ -60,9 +61,10 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
       m_value = value;
       if (m_callbacks) {
         HAL_Value halValue = MakeValue(value);
-        for (auto&& cb : *m_callbacks)
+        for (auto&& cb : *m_callbacks) {
           reinterpret_cast<HAL_NotifyCallback>(cb.callback)(name, cb.param,
                                                             &halValue);
+        }
       }
     }
   }

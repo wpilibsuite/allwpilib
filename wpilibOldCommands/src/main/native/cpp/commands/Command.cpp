@@ -31,8 +31,9 @@ Command::Command(Subsystem& subsystem) : Command("", -1.0) {
 
 Command::Command(const wpi::Twine& name, double timeout) {
   // We use -1.0 to indicate no timeout.
-  if (timeout < 0.0 && timeout != -1.0)
+  if (timeout < 0.0 && timeout != -1.0) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
+  }
 
   m_timeout = timeout;
 
@@ -61,39 +62,45 @@ Command::Command(const wpi::Twine& name, double timeout, Subsystem& subsystem)
 }
 
 double Command::TimeSinceInitialized() const {
-  if (m_startTime < 0.0)
+  if (m_startTime < 0.0) {
     return 0.0;
-  else
+  } else {
     return Timer::GetFPGATimestamp() - m_startTime;
+  }
 }
 
 void Command::Requires(Subsystem* subsystem) {
-  if (!AssertUnlocked("Can not add new requirement to command"))
+  if (!AssertUnlocked("Can not add new requirement to command")) {
     return;
+  }
 
-  if (subsystem != nullptr)
+  if (subsystem != nullptr) {
     m_requirements.insert(subsystem);
-  else
+  } else {
     wpi_setWPIErrorWithContext(NullParameter, "subsystem");
+  }
 }
 
 void Command::Start() {
   LockChanges();
-  if (m_parent != nullptr)
+  if (m_parent != nullptr) {
     wpi_setWPIErrorWithContext(
         CommandIllegalUse,
         "Can not start a command that is part of a command group");
+  }
 
   m_completed = false;
   Scheduler::GetInstance()->AddCommand(this);
 }
 
 bool Command::Run() {
-  if (!m_runWhenDisabled && m_parent == nullptr && RobotState::IsDisabled())
+  if (!m_runWhenDisabled && m_parent == nullptr && RobotState::IsDisabled()) {
     Cancel();
+  }
 
-  if (IsCanceled())
+  if (IsCanceled()) {
     return false;
+  }
 
   if (!m_initialized) {
     m_initialized = true;
@@ -107,10 +114,11 @@ bool Command::Run() {
 }
 
 void Command::Cancel() {
-  if (m_parent != nullptr)
+  if (m_parent != nullptr) {
     wpi_setWPIErrorWithContext(
         CommandIllegalUse,
         "Can not cancel a command that is part of a command group");
+  }
 
   _Cancel();
 }
@@ -164,10 +172,11 @@ int Command::GetID() const {
 }
 
 void Command::SetTimeout(double timeout) {
-  if (timeout < 0.0)
+  if (timeout < 0.0) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
-  else
+  } else {
     m_timeout = timeout;
+  }
 }
 
 bool Command::IsTimedOut() const {
@@ -230,8 +239,9 @@ void Command::_End() {
 }
 
 void Command::_Cancel() {
-  if (IsRunning())
+  if (IsRunning()) {
     m_canceled = true;
+  }
 }
 
 void Command::LockChanges() {
@@ -289,11 +299,13 @@ void Command::InitSendable(SendableBuilder& builder) {
       "running", [=]() { return IsRunning(); },
       [=](bool value) {
         if (value) {
-          if (!IsRunning())
+          if (!IsRunning()) {
             Start();
+          }
         } else {
-          if (IsRunning())
+          if (IsRunning()) {
             Cancel();
+          }
         }
       });
   builder.AddBooleanProperty(

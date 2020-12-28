@@ -41,8 +41,9 @@ extern "C" {
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   hal::init::CheckInit();
   initializeDigital(status);
-  if (*status != 0)
+  if (*status != 0) {
     return;
+  }
 
   if (port < 0 || port > 1) {
     // Set port out of range error here
@@ -52,8 +53,9 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   if (port == HAL_I2C_kOnboard) {
     std::scoped_lock lock(digitalI2COnBoardMutex);
     i2COnboardObjCount++;
-    if (i2COnboardObjCount > 1)
+    if (i2COnboardObjCount > 1) {
       return;
+    }
     int handle = open("/dev/i2c-2", O_RDWR);
     if (handle < 0) {
       std::printf("Failed to open onboard i2c bus: %s\n", std::strerror(errno));
@@ -63,8 +65,9 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   } else {
     std::scoped_lock lock(digitalI2CMXPMutex);
     i2CMXPObjCount++;
-    if (i2CMXPObjCount > 1)
+    if (i2CMXPObjCount > 1) {
       return;
+    }
     if ((i2CMXPDigitalHandle1 = HAL_InitializeDIOPort(
              HAL_GetPort(24), false, status)) == HAL_kInvalidHandle) {
       return;

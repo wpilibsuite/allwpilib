@@ -19,10 +19,11 @@ const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
 std::function<void(const char*)> TrajectoryGenerator::s_errorFunc;
 
 void TrajectoryGenerator::ReportError(const char* error) {
-  if (s_errorFunc)
+  if (s_errorFunc) {
     s_errorFunc(error);
-  else
+  } else {
     wpi::errs() << "TrajectoryGenerator error: " << error << "\n";
+  }
 }
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
@@ -112,9 +113,11 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config) {
   auto newWaypoints = waypoints;
   const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
-  if (config.IsReversed())
-    for (auto& waypoint : newWaypoints)
+  if (config.IsReversed()) {
+    for (auto& waypoint : newWaypoints) {
       waypoint += flip;
+    }
+  }
 
   std::vector<SplineParameterizer::PoseWithCurvature> points;
   try {

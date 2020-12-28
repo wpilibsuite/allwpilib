@@ -306,18 +306,21 @@ void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
   PdpStatus1 pdpStatus;
   HAL_ReadCANPacketTimeout(handle, Status1, pdpStatus.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
-  if (*status != 0)
+  if (*status != 0) {
     return;
+  }
   PdpStatus2 pdpStatus2;
   HAL_ReadCANPacketTimeout(handle, Status2, pdpStatus2.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
-  if (*status != 0)
+  if (*status != 0) {
     return;
+  }
   PdpStatus3 pdpStatus3;
   HAL_ReadCANPacketTimeout(handle, Status3, pdpStatus3.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
-  if (*status != 0)
+  if (*status != 0) {
     return;
+  }
 
   currents[0] = ((static_cast<uint32_t>(pdpStatus.bits.chan1_h8) << 2) |
                  pdpStatus.bits.chan1_l2) *

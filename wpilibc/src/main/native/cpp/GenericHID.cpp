@@ -83,10 +83,11 @@ void GenericHID::SetOutputs(int value) {
 }
 
 void GenericHID::SetRumble(RumbleType type, double value) {
-  if (value < 0)
+  if (value < 0) {
     value = 0;
-  else if (value > 1)
+  } else if (value > 1) {
     value = 1;
+  }
   if (type == kLeftRumble) {
     m_leftRumble = value * 65535;
   } else {

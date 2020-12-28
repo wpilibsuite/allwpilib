@@ -47,8 +47,9 @@ void DSCommPacket::SetAlliance(uint8_t station_code) {
 }
 
 void DSCommPacket::ReadMatchtimeTag(wpi::ArrayRef<uint8_t> tagData) {
-  if (tagData.size() < 6)
+  if (tagData.size() < 6) {
     return;
+  }
 
   uint32_t store = tagData[2] << 24;
   store |= tagData[3] << 16;
@@ -138,8 +139,9 @@ void DSCommPacket::DecodeTCP(wpi::ArrayRef<uint8_t> packet) {
 }
 
 void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
-  if (packet.size() < 6)
+  if (packet.size() < 6) {
     return;
+  }
   // Decode fixed header
   m_hi = packet[0];
   m_lo = packet[1];
@@ -148,8 +150,9 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
   SetAlliance(packet[5]);
 
   // Return if packet finished
-  if (packet.size() == 6)
+  if (packet.size() == 6) {
     return;
+  }
 
   // Else, handle tagged data
   packet = packet.slice(6);
@@ -176,8 +179,9 @@ void DSCommPacket::DecodeUDP(wpi::ArrayRef<uint8_t> packet) {
 
 void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
   // Size 2 bytes, tag 1 byte
-  if (data.size() <= 3)
+  if (data.size() <= 3) {
     return;
+  }
 
   int nameLength = std::min<size_t>(data[3], sizeof(matchInfo.eventName) - 1);
 
@@ -189,8 +193,9 @@ void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
 
   data = data.slice(4 + nameLength);
 
-  if (data.size() < 4)
+  if (data.size() < 4) {
     return;
+  }
 
   matchInfo.matchType = static_cast<HAL_MatchType>(
       data[0]);  // None, Practice, Qualification, Elimination, Test
@@ -202,8 +207,9 @@ void DSCommPacket::ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
 
 void DSCommPacket::ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data) {
   // Size 2 bytes, tag 1 byte
-  if (data.size() <= 3)
+  if (data.size() <= 3) {
     return;
+  }
 
   int length = std::min<size_t>(((data[0] << 8) | data[1]) - 1,
                                 sizeof(matchInfo.gameSpecificMessage));
@@ -216,8 +222,9 @@ void DSCommPacket::ReadGameSpecificMessageTag(wpi::ArrayRef<uint8_t> data) {
   HALSIM_SetMatchInfo(&matchInfo);
 }
 void DSCommPacket::ReadJoystickDescriptionTag(wpi::ArrayRef<uint8_t> data) {
-  if (data.size() < 3)
+  if (data.size() < 3) {
     return;
+  }
   data = data.slice(3);
   int joystickNum = data[0];
   DSCommJoystickPacket& packet = m_joystick_packets[joystickNum];

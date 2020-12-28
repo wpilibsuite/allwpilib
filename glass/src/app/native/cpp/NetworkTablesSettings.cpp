@@ -26,8 +26,9 @@ NetworkTablesSettings::NetworkTablesSettings(NT_Inst inst,
 }
 
 void NetworkTablesSettings::Update() {
-  if (!m_restart)
+  if (!m_restart) {
     return;
+  }
   m_restart = false;
   nt::StopClient(m_inst);
   nt::StopServer(m_inst);
@@ -41,8 +42,9 @@ void NetworkTablesSettings::Update() {
       wpi::SmallVector<wpi::StringRef, 4> serverNames;
       wpi::SmallVector<std::pair<wpi::StringRef, unsigned int>, 4> servers;
       serverTeam.split(serverNames, ',', -1, false);
-      for (auto&& serverName : serverNames)
+      for (auto&& serverName : serverNames) {
         servers.emplace_back(serverName, NT_DEFAULT_PORT);
+      }
       nt::StartClient(m_inst, servers);
     }
   } else if (*m_pMode == 2) {
@@ -65,6 +67,7 @@ void NetworkTablesSettings::Display() {
     default:
       break;
   }
-  if (ImGui::Button("Apply"))
+  if (ImGui::Button("Apply")) {
     m_restart = true;
+  }
 }

@@ -57,15 +57,19 @@ class EncoderSimModel : public glass::EncoderModel {
                         HALSIM_GetEncoderDigitalChannelB(index)) {}
 
   ~EncoderSimModel() {
-    if (m_distancePerPulseCallback != 0)
+    if (m_distancePerPulseCallback != 0) {
       HALSIM_CancelEncoderDistancePerPulseCallback(m_index,
                                                    m_distancePerPulseCallback);
-    if (m_countCallback != 0)
+    }
+    if (m_countCallback != 0) {
       HALSIM_CancelEncoderCountCallback(m_index, m_countCallback);
-    if (m_periodCallback != 0)
+    }
+    if (m_periodCallback != 0) {
       HALSIM_CancelEncoderCountCallback(m_index, m_periodCallback);
-    if (m_directionCallback != 0)
+    }
+    if (m_directionCallback != 0) {
       HALSIM_CancelEncoderCountCallback(m_index, m_directionCallback);
+    }
   }
 
   void Update() override {}
@@ -75,10 +79,11 @@ class EncoderSimModel : public glass::EncoderModel {
   int32_t GetIndex() const { return m_index; }
 
   const char* GetSimDevice() const override {
-    if (auto simDevice = HALSIM_GetEncoderSimDevice(m_index))
+    if (auto simDevice = HALSIM_GetEncoderSimDevice(m_index)) {
       return HALSIM_GetSimDeviceName(simDevice);
-    else
+    } else {
       return nullptr;
+    }
   }
 
   int GetChannelA() const override { return m_channelA; }
@@ -127,12 +132,13 @@ class EncoderSimModel : public glass::EncoderModel {
       self->m_distancePerPulse.SetValue(distPerPulse);
       self->m_distance.SetValue(self->m_count.GetValue() * distPerPulse);
       double period = self->m_period.GetValue();
-      if (period == 0)
+      if (period == 0) {
         self->m_rate.SetValue(std::numeric_limits<double>::infinity());
-      else if (period == std::numeric_limits<double>::infinity())
+      } else if (period == std::numeric_limits<double>::infinity()) {
         self->m_rate.SetValue(0);
-      else
+      } else {
         self->m_rate.SetValue(static_cast<float>(distPerPulse / period));
+      }
     }
   }
 
@@ -152,13 +158,14 @@ class EncoderSimModel : public glass::EncoderModel {
       auto self = static_cast<EncoderSimModel*>(param);
       double period = value->data.v_double;
       self->m_period.SetValue(period);
-      if (period == 0)
+      if (period == 0) {
         self->m_rate.SetValue(std::numeric_limits<double>::infinity());
-      else if (period == std::numeric_limits<double>::infinity())
+      } else if (period == std::numeric_limits<double>::infinity()) {
         self->m_rate.SetValue(0);
-      else
+      } else {
         self->m_rate.SetValue(
             static_cast<float>(self->m_distancePerPulse.GetValue() / period));
+      }
     }
   }
 
@@ -230,8 +237,9 @@ void EncodersSimModel::ForEachEncoder(
 static bool EncodersAnyInitialized() {
   static const int32_t num = HAL_GetNumEncoders();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetEncoderInitialized(i))
+    if (HALSIM_GetEncoderInitialized(i)) {
       return true;
+    }
   }
   return false;
 }

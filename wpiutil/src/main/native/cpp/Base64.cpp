@@ -82,11 +82,13 @@ static const unsigned char pr2six[256] = {
 
 size_t Base64Decode(raw_ostream& os, StringRef encoded) {
   const unsigned char* end = encoded.bytes_begin();
-  while (pr2six[*end] <= 63 && end != encoded.bytes_end())
+  while (pr2six[*end] <= 63 && end != encoded.bytes_end()) {
     ++end;
+  }
   size_t nprbytes = end - encoded.bytes_begin();
-  if (nprbytes == 0)
+  if (nprbytes == 0) {
     return 0;
+  }
 
   const unsigned char* cur = encoded.bytes_begin();
 
@@ -99,12 +101,15 @@ size_t Base64Decode(raw_ostream& os, StringRef encoded) {
   }
 
   // Note: (nprbytes == 1) would be an error, so just ignore that case
-  if (nprbytes > 1)
+  if (nprbytes > 1) {
     os << static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
-  if (nprbytes > 2)
+  }
+  if (nprbytes > 2) {
     os << static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
-  if (nprbytes > 3)
+  }
+  if (nprbytes > 3) {
     os << static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+  }
 
   return (end - encoded.bytes_begin()) + ((4 - nprbytes) & 3);
 }
@@ -129,8 +134,9 @@ static const char basis_64[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 void Base64Encode(raw_ostream& os, StringRef plain) {
-  if (plain.empty())
+  if (plain.empty()) {
     return;
+  }
   size_t len = plain.size();
 
   size_t i;

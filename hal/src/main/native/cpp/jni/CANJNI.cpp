@@ -61,8 +61,9 @@ Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
   HAL_CAN_ReceiveMessage(messageIDPtr, messageIDMask, buffer, &dataSize,
                          timeStampPtr, &status);
 
-  if (!CheckCANStatus(env, status, *messageIDPtr))
+  if (!CheckCANStatus(env, status, *messageIDPtr)) {
     return nullptr;
+  }
   return MakeJByteArray(env,
                         wpi::StringRef{reinterpret_cast<const char*>(buffer),
                                        static_cast<size_t>(dataSize)});
@@ -86,8 +87,9 @@ Java_edu_wpi_first_hal_can_CANJNI_GetCANStatus
   HAL_CAN_GetCANStatus(&percentBusUtilization, &busOffCount, &txFullCount,
                        &receiveErrorCount, &transmitErrorCount, &status);
 
-  if (!CheckStatus(env, status))
+  if (!CheckStatus(env, status)) {
     return;
+  }
 
   SetCanStatusObject(env, canStatus, percentBusUtilization, busOffCount,
                      txFullCount, receiveErrorCount, transmitErrorCount);

@@ -21,8 +21,9 @@ static wpi::mutex setLock;
 
 MathShared& MathSharedStore::GetMathShared() {
   std::scoped_lock lock(setLock);
-  if (!mathShared)
+  if (!mathShared) {
     mathShared = std::make_unique<DefaultMathShared>();
+  }
   return *mathShared;
 }
 

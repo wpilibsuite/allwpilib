@@ -59,13 +59,17 @@ class PropertyContainer {
  protected:
   // Get a property; must be called with m_mutex held.
   PropertyImpl* GetProperty(int property) {
-    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
+    if (property <= 0 ||
+        static_cast<size_t>(property) > m_propertyData.size()) {
       return nullptr;
+    }
     return m_propertyData[property - 1].get();
   }
   const PropertyImpl* GetProperty(int property) const {
-    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
+    if (property <= 0 ||
+        static_cast<size_t>(property) > m_propertyData.size()) {
       return nullptr;
+    }
     return m_propertyData[property - 1].get();
   }
   // Create or update a property; must be called with m_mutex held.

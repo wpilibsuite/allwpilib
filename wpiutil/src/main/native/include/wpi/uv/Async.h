@@ -40,10 +40,11 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
   Async(const std::shared_ptr<Loop>& loop, const private_init&)
       : m_loop{loop} {}
   ~Async() noexcept override {
-    if (auto loop = m_loop.lock())
+    if (auto loop = m_loop.lock()) {
       this->Close();
-    else
+    } else {
       this->ForceClosed();
+    }
   }
 
   /**
@@ -66,8 +67,9 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
         uv_async_init(loop->GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
           auto& h = *static_cast<Async*>(handle->data);
           std::scoped_lock lock(h.m_mutex);
-          for (auto&& v : h.m_data)
+          for (auto&& v : h.m_data) {
             std::apply(h.wakeup, v);
+          }
           h.m_data.clear();
         });
     if (err < 0) {
@@ -97,8 +99,9 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
       std::scoped_lock lock(m_mutex);
       m_data.emplace_back(std::forward_as_tuple(std::forward<U>(u)...));
     }
-    if (loop)
+    if (loop) {
       this->Invoke(&uv_async_send, this->GetRaw());
+    }
   }
 
   /**
@@ -148,8 +151,9 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
    * An async event will be emitted on the loop thread.
    */
   void Send() {
-    if (auto loop = m_loop.lock())
+    if (auto loop = m_loop.lock()) {
       Invoke(&uv_async_send, GetRaw());
+    }
   }
 
   /**

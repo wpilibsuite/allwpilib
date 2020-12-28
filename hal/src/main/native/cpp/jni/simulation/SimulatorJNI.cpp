@@ -34,64 +34,75 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
+  }
 
   notifyCallbackCls =
       JClass(env, "edu/wpi/first/hal/simulation/NotifyCallback");
-  if (!notifyCallbackCls)
+  if (!notifyCallbackCls) {
     return JNI_ERR;
+  }
 
   notifyCallbackCallback = env->GetMethodID(notifyCallbackCls, "callbackNative",
                                             "(Ljava/lang/String;IJD)V");
-  if (!notifyCallbackCallback)
+  if (!notifyCallbackCallback) {
     return JNI_ERR;
+  }
 
   bufferCallbackCls =
       JClass(env, "edu/wpi/first/hal/simulation/BufferCallback");
-  if (!bufferCallbackCls)
+  if (!bufferCallbackCls) {
     return JNI_ERR;
+  }
 
   bufferCallbackCallback = env->GetMethodID(bufferCallbackCls, "callback",
                                             "(Ljava/lang/String;[BI)V");
-  if (!bufferCallbackCallback)
+  if (!bufferCallbackCallback) {
     return JNI_ERR;
+  }
 
   constBufferCallbackCls =
       JClass(env, "edu/wpi/first/hal/simulation/ConstBufferCallback");
-  if (!constBufferCallbackCls)
+  if (!constBufferCallbackCls) {
     return JNI_ERR;
+  }
 
   constBufferCallbackCallback = env->GetMethodID(
       constBufferCallbackCls, "callback", "(Ljava/lang/String;[BI)V");
-  if (!constBufferCallbackCallback)
+  if (!constBufferCallbackCallback) {
     return JNI_ERR;
+  }
 
   spiReadAutoReceiveBufferCallbackCls = JClass(
       env, "edu/wpi/first/hal/simulation/SpiReadAutoReceiveBufferCallback");
-  if (!spiReadAutoReceiveBufferCallbackCls)
+  if (!spiReadAutoReceiveBufferCallbackCls) {
     return JNI_ERR;
+  }
 
   spiReadAutoReceiveBufferCallbackCallback =
       env->GetMethodID(spiReadAutoReceiveBufferCallbackCls, "callback",
                        "(Ljava/lang/String;[II)I");
-  if (!spiReadAutoReceiveBufferCallbackCallback)
+  if (!spiReadAutoReceiveBufferCallbackCallback) {
     return JNI_ERR;
+  }
 
   InitializeStore();
   InitializeBufferStore();
   InitializeConstBufferStore();
   InitializeSpiBufferStore();
-  if (!InitializeSimDeviceDataJNI(env))
+  if (!InitializeSimDeviceDataJNI(env)) {
     return JNI_ERR;
+  }
 
   return JNI_VERSION_1_6;
 }
 
 void SimOnUnload(JavaVM* vm, void* reserved) {
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
+  }
 
   notifyCallbackCls.free(env);
   bufferCallbackCls.free(env);

@@ -50,8 +50,9 @@ int main() {
       } else {
         {
           std::scoped_lock lock(sharedFreeListMutex);
-          for (auto mat : sharedFreeList)
+          for (auto mat : sharedFreeList) {
             sourceFreeList.emplace_back(mat);
+          }
           sharedFreeList.clear();
         }
         if (!sourceFreeList.empty()) {
@@ -69,8 +70,9 @@ int main() {
       auto prev = latestFrame.exchange(out);
 
       // put prev on free list
-      if (prev)
+      if (prev) {
         sourceFreeList.emplace_back(prev);
+      }
     }
   });
 

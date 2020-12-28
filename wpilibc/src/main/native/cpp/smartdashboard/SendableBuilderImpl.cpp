@@ -31,8 +31,9 @@ bool SendableBuilderImpl::IsActuator() const {
 void SendableBuilderImpl::UpdateTable() {
   uint64_t time = nt::Now();
   for (auto& property : m_properties) {
-    if (property.update)
+    if (property.update) {
       property.update(property.entry, time);
+    }
   }
   for (auto& updateTable : m_updateTables) {
     updateTable();
@@ -40,29 +41,35 @@ void SendableBuilderImpl::UpdateTable() {
 }
 
 void SendableBuilderImpl::StartListeners() {
-  for (auto& property : m_properties)
+  for (auto& property : m_properties) {
     property.StartListener();
-  if (m_controllableEntry)
+  }
+  if (m_controllableEntry) {
     m_controllableEntry.SetBoolean(true);
+  }
 }
 
 void SendableBuilderImpl::StopListeners() {
-  for (auto& property : m_properties)
+  for (auto& property : m_properties) {
     property.StopListener();
-  if (m_controllableEntry)
+  }
+  if (m_controllableEntry) {
     m_controllableEntry.SetBoolean(false);
+  }
 }
 
 void SendableBuilderImpl::StartLiveWindowMode() {
-  if (m_safeState)
+  if (m_safeState) {
     m_safeState();
+  }
   StartListeners();
 }
 
 void SendableBuilderImpl::StopLiveWindowMode() {
   StopListeners();
-  if (m_safeState)
+  if (m_safeState) {
     m_safeState();
+  }
 }
 
 void SendableBuilderImpl::ClearProperties() {
@@ -105,8 +112,9 @@ void SendableBuilderImpl::AddBooleanProperty(const wpi::Twine& key,
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsBoolean())
+            if (!event.value->IsBoolean()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetBoolean()); });
           },
@@ -130,8 +138,9 @@ void SendableBuilderImpl::AddDoubleProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsDouble())
+            if (!event.value->IsDouble()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetDouble()); });
           },
@@ -155,8 +164,9 @@ void SendableBuilderImpl::AddStringProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsString())
+            if (!event.value->IsString()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetString()); });
           },
@@ -180,8 +190,9 @@ void SendableBuilderImpl::AddBooleanArrayProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsBooleanArray())
+            if (!event.value->IsBooleanArray()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetBooleanArray()); });
           },
@@ -205,8 +216,9 @@ void SendableBuilderImpl::AddDoubleArrayProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsDoubleArray())
+            if (!event.value->IsDoubleArray()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetDoubleArray()); });
           },
@@ -230,8 +242,9 @@ void SendableBuilderImpl::AddStringArrayProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsStringArray())
+            if (!event.value->IsStringArray()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetStringArray()); });
           },
@@ -255,8 +268,9 @@ void SendableBuilderImpl::AddRawProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsRaw())
+            if (!event.value->IsRaw()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetRaw()); });
           },
@@ -304,8 +318,9 @@ void SendableBuilderImpl::AddSmallStringProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsString())
+            if (!event.value->IsString()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetString()); });
           },
@@ -331,8 +346,9 @@ void SendableBuilderImpl::AddSmallBooleanArrayProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsBooleanArray())
+            if (!event.value->IsBooleanArray()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetBooleanArray()); });
           },
@@ -359,8 +375,9 @@ void SendableBuilderImpl::AddSmallDoubleArrayProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsDoubleArray())
+            if (!event.value->IsDoubleArray()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetDoubleArray()); });
           },
@@ -388,8 +405,9 @@ void SendableBuilderImpl::AddSmallStringArrayProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsStringArray())
+            if (!event.value->IsStringArray()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetStringArray()); });
           },
@@ -415,8 +433,9 @@ void SendableBuilderImpl::AddSmallRawProperty(
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
-            if (!event.value->IsRaw())
+            if (!event.value->IsRaw()) {
               return;
+            }
             SmartDashboard::PostListenerTask(
                 [=] { setter(event.value->GetRaw()); });
           },

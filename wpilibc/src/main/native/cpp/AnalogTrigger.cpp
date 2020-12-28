@@ -83,48 +83,54 @@ AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
 }
 
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);
   wpi_setHALError(status);
 }
 
 void AnalogTrigger::SetLimitsDutyCycle(double lower, double upper) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsDutyCycle(m_trigger, lower, upper, &status);
   wpi_setHALError(status);
 }
 
 void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsRaw(m_trigger, lower, upper, &status);
   wpi_setHALError(status);
 }
 
 void AnalogTrigger::SetAveraged(bool useAveragedValue) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_SetAnalogTriggerAveraged(m_trigger, useAveragedValue, &status);
   wpi_setHALError(status);
 }
 
 void AnalogTrigger::SetFiltered(bool useFilteredValue) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_SetAnalogTriggerFiltered(m_trigger, useFilteredValue, &status);
   wpi_setHALError(status);
 }
 
 int AnalogTrigger::GetIndex() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return -1;
+  }
   int32_t status = 0;
   auto ret = HAL_GetAnalogTriggerFPGAIndex(m_trigger, &status);
   wpi_setHALError(status);
@@ -132,8 +138,9 @@ int AnalogTrigger::GetIndex() const {
 }
 
 bool AnalogTrigger::GetInWindow() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerInWindow(m_trigger, &status);
   wpi_setHALError(status);
@@ -141,8 +148,9 @@ bool AnalogTrigger::GetInWindow() {
 }
 
 bool AnalogTrigger::GetTriggerState() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerTriggerState(m_trigger, &status);
   wpi_setHALError(status);
@@ -151,13 +159,15 @@ bool AnalogTrigger::GetTriggerState() {
 
 std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
     AnalogTriggerType type) const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return nullptr;
+  }
   return std::shared_ptr<AnalogTriggerOutput>(
       new AnalogTriggerOutput(*this, type), NullDeleter<AnalogTriggerOutput>());
 }
 
 void AnalogTrigger::InitSendable(SendableBuilder& builder) {
-  if (m_ownsAnalog)
+  if (m_ownsAnalog) {
     m_analogInput->InitSendable(builder);
+  }
 }

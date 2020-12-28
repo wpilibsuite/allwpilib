@@ -93,8 +93,9 @@ HAL_EncoderHandle HAL_InitializeEncoder(
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
   encoderHandles->Free(encoderHandle);
-  if (encoder == nullptr)
+  if (encoder == nullptr) {
     return;
+  }
   if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::FPGAEncoder)) {
     fpgaEncoderHandles->Free(encoder->nativeHandle);
   } else if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::Counter)) {
@@ -106,8 +107,9 @@ void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
 void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
                              HAL_SimDeviceHandle device) {
   auto encoder = encoderHandles->Get(handle);
-  if (encoder == nullptr)
+  if (encoder == nullptr) {
     return;
+  }
   SimEncoderData[encoder->index].simDevice = device;
 }
 

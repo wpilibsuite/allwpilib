@@ -133,12 +133,13 @@ void PIDBase::SetSetpoint(double setpoint) {
     std::scoped_lock lock(m_thisMutex);
 
     if (m_maximumInput > m_minimumInput) {
-      if (setpoint > m_maximumInput)
+      if (setpoint > m_maximumInput) {
         m_setpoint = m_maximumInput;
-      else if (setpoint < m_minimumInput)
+      } else if (setpoint < m_minimumInput) {
         m_setpoint = m_minimumInput;
-      else
+      } else {
         m_setpoint = setpoint;
+      }
     } else {
       m_setpoint = setpoint;
     }
@@ -244,8 +245,9 @@ void PIDBase::InitSendable(SendableBuilder& builder) {
 }
 
 void PIDBase::Calculate() {
-  if (m_pidInput == nullptr || m_pidOutput == nullptr)
+  if (m_pidInput == nullptr || m_pidOutput == nullptr) {
     return;
+  }
 
   bool enabled;
   {

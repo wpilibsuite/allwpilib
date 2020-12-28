@@ -87,12 +87,14 @@ bool I2C::VerifySensor(int registerAddress, int count,
        i += 4, curRegisterAddress += 4) {
     int toRead = count - i < 4 ? count - i : 4;
     // Read the chunk of data.  Return false if the sensor does not respond.
-    if (Read(curRegisterAddress, toRead, deviceData))
+    if (Read(curRegisterAddress, toRead, deviceData)) {
       return false;
+    }
 
     for (int j = 0; j < toRead; j++) {
-      if (deviceData[j] != expected[i + j])
+      if (deviceData[j] != expected[i + j]) {
         return false;
+      }
     }
   }
   return true;

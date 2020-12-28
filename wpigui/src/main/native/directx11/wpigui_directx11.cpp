@@ -175,8 +175,9 @@ static inline DXGI_FORMAT DXPixelFormat(PixelFormat format) {
 
 ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
                                const unsigned char* data) {
-  if (!gPlatformValid)
+  if (!gPlatformValid) {
     return nullptr;
+  }
 
   // Create texture
   D3D11_TEXTURE2D_DESC desc;
@@ -215,8 +216,9 @@ ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
 
 void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
                         const unsigned char* data) {
-  if (!texture)
+  if (!texture) {
     return;
+  }
 
   D3D11_BOX box;
   box.front = 0;
@@ -238,8 +240,9 @@ void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
 }
 
 void gui::DeleteTexture(ImTextureID texture) {
-  if (!gPlatformValid)
+  if (!gPlatformValid) {
     return;
+  }
   if (texture)
     static_cast<ID3D11ShaderResourceView*>(texture)->Release();
 }

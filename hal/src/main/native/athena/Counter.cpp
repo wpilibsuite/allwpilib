@@ -359,10 +359,11 @@ void HAL_SetCounterReverseDirection(HAL_CounterHandle counterHandle,
   }
   if (counter->counter->readConfig_Mode(status) ==
       HAL_Counter_kExternalDirection) {
-    if (reverseDirection)
+    if (reverseDirection) {
       HAL_SetCounterDownSourceEdge(counterHandle, true, true, status);
-    else
+    } else {
       HAL_SetCounterDownSourceEdge(counterHandle, false, true, status);
+    }
   }
 }
 

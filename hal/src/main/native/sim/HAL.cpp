@@ -43,8 +43,9 @@ class SimPeriodicCallbackRegistry : public impl::SimCallbackRegistryBase {
     std::scoped_lock lock(m_mutex);
 #endif
     if (m_callbacks) {
-      for (auto&& cb : *m_callbacks)
+      for (auto&& cb : *m_callbacks) {
         reinterpret_cast<HALSIM_SimPeriodicCallback>(cb.callback)(cb.param);
+      }
     }
   }
 };
@@ -122,17 +123,20 @@ extern "C" {
 
 HAL_PortHandle HAL_GetPort(int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255)
+  if (channel < 0 || channel >= 255) {
     return HAL_kInvalidHandle;
+  }
   return createPortHandle(channel, 1);
 }
 
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
-  if (channel < 0 || channel >= 255)
+  if (channel < 0 || channel >= 255) {
     return HAL_kInvalidHandle;
-  if (module < 0 || module >= 255)
+  }
+  if (module < 0 || module >= 255) {
     return HAL_kInvalidHandle;
+  }
   return createPortHandle(channel, module);
 }
 
@@ -277,8 +281,9 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
   // Capture the current FPGA time.  This will give us the upper half of the
   // clock.
   uint64_t fpga_time = HAL_GetFPGATime(status);
-  if (*status != 0)
+  if (*status != 0) {
     return 0;
+  }
 
   // Now, we need to detect the case where the lower bits rolled over after we
   // sampled.  In that case, the upper bits will be 1 bigger than they should
@@ -312,13 +317,15 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized)
+  if (initialized) {
     return true;
+  }
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized)
+  if (initialized) {
     return true;
+  }
 
   hal::init::InitializeHAL();
 
@@ -346,8 +353,9 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 #endif  // _WIN32
 
   wpi::outs().SetUnbuffered();
-  if (HAL_LoadExtensions() < 0)
+  if (HAL_LoadExtensions() < 0) {
     return false;
+  }
 
   return true;  // Add initialization if we need to at a later point
 }

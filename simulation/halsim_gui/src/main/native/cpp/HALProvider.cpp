@@ -44,25 +44,29 @@ void HALProvider::Update() {
   // check for visible windows that need displays (typically this is due to
   // file loading)
   for (auto&& window : m_windows) {
-    if (!window->IsVisible() || window->HasView())
+    if (!window->IsVisible() || window->HasView()) {
       continue;
+    }
     auto id = window->GetId();
     auto it = FindViewEntry(id);
-    if (it == m_viewEntries.end() || (*it)->name != id)
+    if (it == m_viewEntries.end() || (*it)->name != id) {
       continue;
+    }
     Show(it->get(), window.get());
   }
 }
 
 glass::Model* HALProvider::GetModel(wpi::StringRef name) {
   auto it = FindModelEntry(name);
-  if (it == m_modelEntries.end() || (*it)->name != name)
+  if (it == m_modelEntries.end() || (*it)->name != name) {
     return nullptr;
+  }
   auto entry = it->get();
 
   // get or create model
-  if (!entry->model)
+  if (!entry->model) {
     entry->model = entry->createModel();
+  }
   return entry->model.get();
 }
 
@@ -74,22 +78,27 @@ void HALProvider::Show(ViewEntry* entry, glass::Window* window) {
   }
 
   // get or create model
-  if (!entry->modelEntry->model)
+  if (!entry->modelEntry->model) {
     entry->modelEntry->model = entry->modelEntry->createModel();
-  if (!entry->modelEntry->model)
+  }
+  if (!entry->modelEntry->model) {
     return;
+  }
 
   // the window might exist and we're just not associated to it yet
-  if (!window)
+  if (!window) {
     window = GetOrAddWindow(entry->name, true);
-  if (!window)
+  }
+  if (!window) {
     return;
+  }
   entry->window = window;
 
   // create view
   auto view = entry->createView(window, entry->modelEntry->model.get());
-  if (!view)
+  if (!view) {
     return;
+  }
   window->SetView(std::move(view));
 
   entry->window->SetVisible(true);

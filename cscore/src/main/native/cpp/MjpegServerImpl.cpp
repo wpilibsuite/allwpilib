@@ -108,15 +108,17 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 
   void StartStream() {
     std::scoped_lock lock(m_mutex);
-    if (m_source)
+    if (m_source) {
       m_source->EnableSink();
+    }
     m_streaming = true;
   }
 
   void StopStream() {
     std::scoped_lock lock(m_mutex);
-    if (m_source)
+    if (m_source) {
       m_source->DisableSink();
+    }
     m_streaming = false;
   }
 };
@@ -142,8 +144,9 @@ static void SendHeader(wpi::raw_ostream& os, int code,
   os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
   wpi::SmallString<128> extraBuf;
   wpi::StringRef extraStr = extra.toStringRef(extraBuf);
-  if (!extraStr.empty())
+  if (!extraStr.empty()) {
     os << extraStr << "\r\n";
+  }
   os << "\r\n";  // header ends with a blank line
 }
 
@@ -201,11 +204,13 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
     // split out next param and value
     wpi::StringRef rawParam, rawValue;
     std::tie(rawParam, parameters) = parameters.split('&');
-    if (rawParam.empty())
+    if (rawParam.empty()) {
       continue;  // ignore "&&"
+    }
     std::tie(rawParam, rawValue) = rawParam.split('=');
-    if (rawParam.empty() || rawValue.empty())
+    if (rawParam.empty() || rawValue.empty()) {
       continue;  // ignore "param="
+    }
     SDEBUG4("HTTP parameter \"" << rawParam << "\" value \"" << rawValue
                                 << "\"");
 
@@ -287,8 +292,9 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
     }
 
     // ignore name parameter
-    if (param == "name")
+    if (param == "name") {
       continue;
+    }
 
     // try to assign parameter
     auto prop = source.GetPropertyIndex(param);
@@ -345,8 +351,9 @@ void MjpegServerImpl::ConnThread::SendHTMLHeadTitle(
 // Send the root html file with controls for all the settable properties.
 void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
                                            SourceImpl& source, bool header) {
-  if (header)
+  if (header) {
     SendHeader(os, 200, "OK", "text/html");
+  }
 
   SendHTMLHeadTitle(os);
   os << startRootPage;
@@ -355,8 +362,9 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
   for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
     wpi::SmallString<128> name_buf;
     auto name = source.GetPropertyName(prop, name_buf, &status);
-    if (name.startswith("raw_"))
+    if (name.startswith("raw_")) {
       continue;
+    }
     auto kind = source.GetPropertyKind(prop);
     os << "<p />"
        << "<label for=\"" << name << "\">" << name << "</label>\n";
@@ -365,10 +373,11 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
         os << "<input id=\"" << name
            << "\" type=\"checkbox\" onclick=\"update('" << name
            << "', this.checked ? 1 : 0)\" ";
-        if (source.GetProperty(prop, &status) != 0)
+        if (source.GetProperty(prop, &status) != 0) {
           os << "checked />\n";
-        else
+        } else {
           os << " />\n";
+        }
         break;
       case CS_PROP_INTEGER: {
         auto valI = source.GetProperty(prop, &status);
@@ -389,12 +398,14 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
         int j = 0;
         for (auto choice = choices.begin(), end = choices.end(); choice != end;
              ++j, ++choice) {
-          if (choice->empty())
+          if (choice->empty()) {
             continue;  // skip empty choices
+          }
           // replace any non-printable characters in name with spaces
           wpi::SmallString<128> ch_name;
-          for (char ch : *choice)
+          for (char ch : *choice) {
             ch_name.push_back(std::isprint(ch) ? ch : ' ');
+          }
           os << "<input id=\"" << name << j << "\" type=\"radio\" name=\""
              << name << "\" value=\"" << ch_name << "\" onclick=\"update('"
              << name << "', " << j << ")\"";
@@ -425,8 +436,9 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
                                &status);
   if (status == CS_OK) {
     os << "<p>USB device path: " << info.path << '\n';
-    for (auto&& path : info.otherPaths)
+    for (auto&& path : info.otherPaths) {
       os << "<p>Alternate device path: " << path << '\n';
+    }
   }
 
   os << "<p>Supported Video Modes:</p>\n";
@@ -470,18 +482,20 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
 // Send a JSON file which is contains information about the source parameters.
 void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
                                            SourceImpl& source, bool header) {
-  if (header)
+  if (header) {
     SendHeader(os, 200, "OK", "application/json");
+  }
 
   os << "{\n\"controls\": [\n";
   wpi::SmallVector<int, 32> properties_vec;
   bool first = true;
   CS_Status status = 0;
   for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
-    if (first)
+    if (first) {
       first = false;
-    else
+    } else {
       os << ",\n";
+    }
     os << '{';
     wpi::SmallString<128> name_buf;
     auto name = source.GetPropertyName(prop, name_buf, &status);
@@ -521,12 +535,14 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
       int j = 0;
       for (auto choice = choices.begin(), end = choices.end(); choice != end;
            ++j, ++choice) {
-        if (j != 0)
+        if (j != 0) {
           os << ", ";
+        }
         // replace any non-printable characters in name with spaces
         wpi::SmallString<128> ch_name;
-        for (char ch : *choice)
+        for (char ch : *choice) {
           ch_name.push_back(std::isprint(ch) ? ch : ' ');
+        }
         os << '"' << j << "\": \"" << ch_name << '"';
       }
       os << "}\n";
@@ -536,10 +552,11 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
   os << "\n],\n\"modes\": [\n";
   first = true;
   for (auto mode : source.EnumerateVideoModes(&status)) {
-    if (first)
+    if (first) {
       first = false;
-    else
+    } else {
       os << ",\n";
+    }
     os << '{';
     os << "\n\"pixelFormat\": \"";
     switch (mode.pixelFormat) {
@@ -619,21 +636,24 @@ void MjpegServerImpl::Stop() {
   m_acceptor->shutdown();
 
   // join server thread
-  if (m_serverThread.joinable())
+  if (m_serverThread.joinable()) {
     m_serverThread.join();
+  }
 
   // close streams
   for (auto& connThread : m_connThreads) {
     if (auto thr = connThread.GetThread()) {
-      if (thr->m_stream)
+      if (thr->m_stream) {
         thr->m_stream->close();
+      }
     }
     connThread.Stop();
   }
 
   // wake up connection threads by forcing an empty frame to be sent
-  if (auto source = GetSource())
+  if (auto source = GetSource()) {
     source->Wakeup();
+  }
 }
 
 // Send HTTP response and a stream of JPG-frames
@@ -656,12 +676,14 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
   Frame::Time lastFrameTime = 0;
   Frame::Time timePerFrame = 0;
-  if (m_fps != 0)
+  if (m_fps != 0) {
     timePerFrame = 1000000.0 / m_fps;
+  }
   Frame::Time averageFrameTime = 0;
   Frame::Time averagePeriod = 1000000;  // 1 second window
-  if (averagePeriod < timePerFrame)
+  if (averagePeriod < timePerFrame) {
     averagePeriod = timePerFrame * 10;
+  }
 
   StartStream();
   while (m_active && !os.has_error()) {
@@ -674,8 +696,9 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     }
     SDEBUG4("waiting for frame");
     Frame frame = source->GetNextFrame(0.225);  // blocks
-    if (!m_active)
+    if (!m_active) {
       break;
+    }
     if (!frame) {
       // Bad frame; sleep for 20 ms so we don't consume all processor time.
       os << "\r\n";  // Keep connection alive
@@ -824,10 +847,12 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   // The end of the request is marked by a single, empty line
   wpi::SmallString<128> lineBuf;
   for (;;) {
-    if (is.getline(lineBuf, 4096).startswith("\n"))
+    if (is.getline(lineBuf, 4096).startswith("\n")) {
       break;
-    if (is.has_error())
+    }
+    if (is.has_error()) {
       return;
+    }
   }
 
   // Send response
@@ -835,8 +860,9 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
     case kStream:
       if (auto source = GetSource()) {
         SDEBUG("request for stream " << source->GetName());
-        if (!ProcessCommand(os, *source, parameters, false))
+        if (!ProcessCommand(os, *source, parameters, false)) {
           return;
+        }
       }
       SendStream(os);
       break;
@@ -852,10 +878,11 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       break;
     case kGetSettings:
       SDEBUG("request for JSON file");
-      if (auto source = GetSource())
+      if (auto source = GetSource()) {
         SendJSON(os, *source, true);
-      else
+      } else {
         SendError(os, 404, "Resource not found");
+      }
       break;
     case kGetSourceConfig:
       SDEBUG("request for JSON file");
@@ -889,8 +916,9 @@ void MjpegServerImpl::ConnThread::Main() {
   while (m_active) {
     while (!m_stream) {
       m_cond.wait(lock);
-      if (!m_active)
+      if (!m_active) {
         return;
+      }
     }
     lock.unlock();
     ProcessRequest();
@@ -913,8 +941,9 @@ void MjpegServerImpl::ServerThreadMain() {
       m_active = false;
       return;
     }
-    if (!m_active)
+    if (!m_active) {
       return;
+    }
 
     SDEBUG("client connection from " << stream->getPeerIP());
 
@@ -964,11 +993,13 @@ void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
     if (auto thr = connThread.GetThread()) {
       if (thr->m_source != source) {
         bool streaming = thr->m_streaming;
-        if (thr->m_source && streaming)
+        if (thr->m_source && streaming) {
           thr->m_source->DisableSink();
+        }
         thr->m_source = source;
-        if (source && streaming)
+        if (source && streaming) {
           thr->m_source->EnableSink();
+        }
       }
     }
   }

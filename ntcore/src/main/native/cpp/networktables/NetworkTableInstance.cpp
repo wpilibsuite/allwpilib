@@ -12,8 +12,9 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
     const Twine& key) const {
   StringRef simple;
   bool isSimple = key.isSingleStringRef();
-  if (isSimple)
+  if (isSimple) {
     simple = key.getSingleStringRef();
+  }
   if (isSimple && (simple.empty() || simple == "/")) {
     return std::make_shared<NetworkTable>(m_handle, "",
                                           NetworkTable::private_init{});
@@ -30,16 +31,18 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
 void NetworkTableInstance::StartClient(ArrayRef<StringRef> servers,
                                        unsigned int port) {
   wpi::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
-  for (const auto& server : servers)
+  for (const auto& server : servers) {
     server_ports.emplace_back(std::make_pair(server, port));
+  }
   StartClient(server_ports);
 }
 
 void NetworkTableInstance::SetServer(ArrayRef<StringRef> servers,
                                      unsigned int port) {
   wpi::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
-  for (const auto& server : servers)
+  for (const auto& server : servers) {
     server_ports.emplace_back(std::make_pair(server, port));
+  }
   SetServer(server_ports);
 }
 

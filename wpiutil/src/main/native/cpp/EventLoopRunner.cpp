@@ -18,8 +18,9 @@ class EventLoopRunner::Thread : public SafeThread {
 
   Thread() : m_loop(uv::Loop::Create()) {
     // set up async handles
-    if (!m_loop)
+    if (!m_loop) {
       return;
+    }
 
     // run function
     m_doExec = UvExecFunc::Create(
@@ -30,8 +31,9 @@ class EventLoopRunner::Thread : public SafeThread {
   }
 
   void Main() {
-    if (m_loop)
+    if (m_loop) {
       m_loop->Run();
+    }
   }
 
   // the loop
@@ -75,12 +77,14 @@ void EventLoopRunner::ExecSync(LoopFunc func) {
       f = doExec->Call(func);
     }
   }
-  if (f.valid())
+  if (f.valid()) {
     f.wait();
+  }
 }
 
 std::shared_ptr<uv::Loop> EventLoopRunner::GetLoop() {
-  if (auto thr = m_owner.GetThread())
+  if (auto thr = m_owner.GetThread()) {
     return thr->m_loop;
+  }
   return nullptr;
 }

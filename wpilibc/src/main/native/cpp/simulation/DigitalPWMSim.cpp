@@ -20,8 +20,9 @@ DigitalPWMSim::DigitalPWMSim(const DigitalOutput& digitalOutput)
 
 DigitalPWMSim DigitalPWMSim::CreateForChannel(int channel) {
   int index = HALSIM_FindDigitalPWMForChannel(channel);
-  if (index < 0)
+  if (index < 0) {
     throw std::out_of_range("no digital PWM found for channel");
+  }
   return DigitalPWMSim{index};
 }
 

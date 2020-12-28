@@ -233,8 +233,9 @@ static SIM_JniHandle AllocateDeviceCallback(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle jnihandle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = deviceCallbackHandles->Get(jnihandle);
-    if (!data)
+    if (!data) {
       return;
+    }
 
     data->performCallback(name, handle);
   };
@@ -288,8 +289,9 @@ static SIM_JniHandle AllocateValueCallback(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle jnihandle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = valueCallbackHandles->Get(jnihandle);
-    if (!data)
+    if (!data) {
       return;
+    }
 
     data->performCallback(name, handle, direction, *value);
   };
@@ -314,33 +316,39 @@ namespace sim {
 bool InitializeSimDeviceDataJNI(JNIEnv* env) {
   simDeviceInfoCls = JClass(
       env, "edu/wpi/first/hal/simulation/SimDeviceDataJNI$SimDeviceInfo");
-  if (!simDeviceInfoCls)
+  if (!simDeviceInfoCls) {
     return false;
+  }
 
   simValueInfoCls =
       JClass(env, "edu/wpi/first/hal/simulation/SimDeviceDataJNI$SimValueInfo");
-  if (!simValueInfoCls)
+  if (!simValueInfoCls) {
     return false;
+  }
 
   simDeviceCallbackCls =
       JClass(env, "edu/wpi/first/hal/simulation/SimDeviceCallback");
-  if (!simDeviceCallbackCls)
+  if (!simDeviceCallbackCls) {
     return false;
+  }
 
   simDeviceCallbackCallback = env->GetMethodID(simDeviceCallbackCls, "callback",
                                                "(Ljava/lang/String;I)V");
-  if (!simDeviceCallbackCallback)
+  if (!simDeviceCallbackCallback) {
     return false;
+  }
 
   simValueCallbackCls =
       JClass(env, "edu/wpi/first/hal/simulation/SimValueCallback");
-  if (!simValueCallbackCls)
+  if (!simValueCallbackCls) {
     return false;
+  }
 
   simValueCallbackCallback = env->GetMethodID(
       simValueCallbackCls, "callbackNative", "(Ljava/lang/String;IZIJD)V");
-  if (!simValueCallbackCallback)
+  if (!simValueCallbackCallback) {
     return false;
+  }
 
   static hal::UnlimitedHandleResource<SIM_JniHandle, DeviceCallbackStore,
                                       hal::HAL_HandleEnum::SimulationJni>
@@ -503,8 +511,9 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_enumerateSimDevices
   size_t numElems = arr.size();
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), simDeviceInfoCls, nullptr);
-  if (!jarr)
+  if (!jarr) {
     return nullptr;
+  }
   for (size_t i = 0; i < numElems; ++i) {
     JLocal<jobject> elem{env, arr[i].MakeJava(env)};
     env->SetObjectArrayElement(jarr, i, elem.obj());
@@ -626,8 +635,9 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_enumerateSimValues
   // convert to java
   size_t numElems = arr.size();
   jobjectArray jarr = env->NewObjectArray(arr.size(), simValueInfoCls, nullptr);
-  if (!jarr)
+  if (!jarr) {
     return nullptr;
+  }
   for (size_t i = 0; i < numElems; ++i) {
     JLocal<jobject> elem{env, arr[i].MakeJava(env)};
     env->SetObjectArrayElement(jarr, i, elem.obj());
@@ -645,13 +655,15 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumOptions
   (JNIEnv* env, jclass, jint handle)
 {
   static JClass stringCls{env, "java/lang/String"};
-  if (!stringCls)
+  if (!stringCls) {
     return nullptr;
+  }
   int32_t numElems = 0;
   const char** elems = HALSIM_GetSimValueEnumOptions(handle, &numElems);
   jobjectArray jarr = env->NewObjectArray(numElems, stringCls, nullptr);
-  if (!jarr)
+  if (!jarr) {
     return nullptr;
+  }
   for (int32_t i = 0; i < numElems; ++i) {
     JLocal<jstring> elem{env, MakeJString(env, elems[i])};
     env->SetObjectArrayElement(jarr, i, elem.obj());

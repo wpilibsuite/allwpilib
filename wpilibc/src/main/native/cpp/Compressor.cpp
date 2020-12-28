@@ -29,20 +29,23 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
 }
 
 void Compressor::Start() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   SetClosedLoopControl(true);
 }
 
 void Compressor::Stop() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   SetClosedLoopControl(false);
 }
 
 bool Compressor::Enabled() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -56,8 +59,9 @@ bool Compressor::Enabled() const {
 }
 
 bool Compressor::GetPressureSwitchValue() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -71,8 +75,9 @@ bool Compressor::GetPressureSwitchValue() const {
 }
 
 double Compressor::GetCompressorCurrent() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return 0;
+  }
   int32_t status = 0;
   double value;
 
@@ -86,8 +91,9 @@ double Compressor::GetCompressorCurrent() const {
 }
 
 void Compressor::SetClosedLoopControl(bool on) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
 
   HAL_SetCompressorClosedLoopControl(m_compressorHandle, on, &status);
@@ -98,8 +104,9 @@ void Compressor::SetClosedLoopControl(bool on) {
 }
 
 bool Compressor::GetClosedLoopControl() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -113,8 +120,9 @@ bool Compressor::GetClosedLoopControl() const {
 }
 
 bool Compressor::GetCompressorCurrentTooHighFault() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -128,8 +136,9 @@ bool Compressor::GetCompressorCurrentTooHighFault() const {
 }
 
 bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -144,8 +153,9 @@ bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
 }
 
 bool Compressor::GetCompressorShortedStickyFault() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -159,8 +169,9 @@ bool Compressor::GetCompressorShortedStickyFault() const {
 }
 
 bool Compressor::GetCompressorShortedFault() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -174,8 +185,9 @@ bool Compressor::GetCompressorShortedFault() const {
 }
 
 bool Compressor::GetCompressorNotConnectedStickyFault() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -189,8 +201,9 @@ bool Compressor::GetCompressorNotConnectedStickyFault() const {
 }
 
 bool Compressor::GetCompressorNotConnectedFault() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value;
 
@@ -204,8 +217,9 @@ bool Compressor::GetCompressorNotConnectedFault() const {
 }
 
 void Compressor::ClearAllPCMStickyFaults() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
 
   HAL_ClearAllPCMStickyFaults(m_module, &status);
@@ -224,10 +238,11 @@ void Compressor::InitSendable(SendableBuilder& builder) {
   builder.AddBooleanProperty(
       "Enabled", [=]() { return Enabled(); },
       [=](bool value) {
-        if (value)
+        if (value) {
           Start();
-        else
+        } else {
           Stop();
+        }
       });
   builder.AddBooleanProperty(
       "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);

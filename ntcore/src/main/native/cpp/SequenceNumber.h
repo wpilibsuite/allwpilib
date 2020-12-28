@@ -16,8 +16,9 @@ class SequenceNumber {
 
   SequenceNumber& operator++() {
     ++m_value;
-    if (m_value > 0xffff)
+    if (m_value > 0xffff) {
       m_value = 0;
+    }
     return *this;
   }
   SequenceNumber operator++(int) {

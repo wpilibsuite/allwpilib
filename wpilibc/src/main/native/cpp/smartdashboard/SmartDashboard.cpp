@@ -108,8 +108,9 @@ void SmartDashboard::PutData(Sendable* value) {
     return;
   }
   auto name = SendableRegistry::GetInstance().GetName(value);
-  if (!name.empty())
+  if (!name.empty()) {
     PutData(name, value);
+  }
 }
 
 Sendable* SmartDashboard::GetData(wpi::StringRef key) {
@@ -259,6 +260,7 @@ void SmartDashboard::UpdateValues() {
   auto& inst = Singleton::GetInstance();
   listenerExecutor.RunListenerTasks();
   std::scoped_lock lock(inst.tablesToDataMutex);
-  for (auto& i : inst.tablesToData)
+  for (auto& i : inst.tablesToData) {
     registry.Update(i.getValue());
+  }
 }

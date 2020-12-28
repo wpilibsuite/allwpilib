@@ -161,8 +161,9 @@ class HttpPath {
     return equals(start, makeArrayRef(match.begin(), match.end()));
   }
   bool equals(size_t start, ArrayRef<StringRef> match) const {
-    if (m_pathEnds.size() != (start + match.size()))
+    if (m_pathEnds.size() != (start + match.size())) {
       return false;
+    }
     return startswith(start, match);
   }
   bool equals(size_t start, StringRef match) const {

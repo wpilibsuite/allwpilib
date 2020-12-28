@@ -47,8 +47,9 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
   HAL_AnalogOutputHandle handle =
       analogOutputHandles->Allocate(channel, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   auto port = analogOutputHandles->Get(handle);
   if (port == nullptr) {  // would only error on thread issue
@@ -66,8 +67,9 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
 void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analogOutputHandle) {
   // no status, so no need to check for a proper free.
   auto port = analogOutputHandles->Get(analogOutputHandle);
-  if (port == nullptr)
+  if (port == nullptr) {
     return;
+  }
   analogOutputHandles->Free(analogOutputHandle);
   SimAnalogOutData[port->channel].initialized = false;
 }

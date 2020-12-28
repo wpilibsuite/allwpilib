@@ -98,8 +98,9 @@ void WriteIni(ImGuiTextBuffer* out) {
 static void* Mechanism2DReadOpen(ImGuiContext* ctx,
                                  ImGuiSettingsHandler* handler,
                                  const char* name) {
-  if (name == wpi::StringRef{"Mechanism2D"})
+  if (name == wpi::StringRef{"Mechanism2D"}) {
     return &mechanism2DInfo;
+  }
   return nullptr;
 }
 
@@ -110,8 +111,9 @@ static void Mechanism2DReadLine(ImGuiContext* ctx,
   auto [name, value] = line.split('=');
   name = name.trim();
   value = value.trim();
-  if (entry == &mechanism2DInfo)
+  if (entry == &mechanism2DInfo) {
     ReadIni(name, value);
+  }
 }
 
 static void Mechanism2DWriteAll(ImGuiContext* ctx,
@@ -168,23 +170,28 @@ static void buildDrawList(float startXLocation, float startYLocation,
     minSize = ImGui::GetWindowHeight() > ImGui::GetWindowWidth()
                   ? ImGui::GetWindowWidth()
                   : ImGui::GetWindowHeight();
-    if (devHandle == 0)
+    if (devHandle == 0) {
       devHandle = HALSIM_GetSimDeviceHandle("Mechanism2D");
+    }
     // Get the length
-    if (!lengthHandle)
+    if (!lengthHandle) {
       lengthHandle = HALSIM_GetSimValueHandle(
           devHandle, (bodyConfig.name + "/length").c_str());
-    if (lengthHandle)
+    }
+    if (lengthHandle) {
       length = lengthHandle.Get();
+    }
     if (length <= 0) {
       length = bodyConfig.length;
     }
     // Get the angle
-    if (!angleHandle)
+    if (!angleHandle) {
       angleHandle = HALSIM_GetSimValueHandle(
           devHandle, (bodyConfig.name + "/angle").c_str());
-    if (angleHandle)
+    }
+    if (angleHandle) {
       angle = angleHandle.Get();
+    }
     // Calculate the next angle to go to
     float angleToGoTo = angle + bodyConfig.angle + previousAngle;
     // Draw the first line and get the ending coordinates

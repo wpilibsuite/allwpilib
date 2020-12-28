@@ -318,8 +318,9 @@ void CommandScheduler::Cancel(Command* command) {
   }
 
   auto find = m_impl->scheduledCommands.find(command);
-  if (find == m_impl->scheduledCommands.end())
+  if (find == m_impl->scheduledCommands.end()) {
     return;
+  }
   command->End(true);
   for (auto&& action : m_impl->interruptActions) {
     action(*command);

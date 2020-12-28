@@ -15,22 +15,25 @@ static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
                                  "Blue 1", "Blue 2", "Blue 3"};
 
 void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
-  if (!model->Exists() || model->IsReadOnly())
+  if (!model->Exists() || model->IsReadOnly()) {
     return DisplayFMSReadOnly(model);
+  }
 
   // FMS Attached
   if (auto data = model->GetFmsAttachedData()) {
     bool val = data->GetValue();
-    if (ImGui::Checkbox("FMS Attached", &val))
+    if (ImGui::Checkbox("FMS Attached", &val)) {
       model->SetFmsAttached(val);
+    }
     data->EmitDrag();
   }
 
   // DS Attached
   if (auto data = model->GetDsAttachedData()) {
     bool val = data->GetValue();
-    if (ImGui::Checkbox("DS Attached", &val))
+    if (ImGui::Checkbox("DS Attached", &val)) {
       model->SetDsAttached(val);
+    }
     data->EmitDrag();
   }
 
@@ -38,15 +41,17 @@ void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
   if (auto data = model->GetAllianceStationIdData()) {
     int val = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-    if (ImGui::Combo("Alliance Station", &val, stations, 6))
+    if (ImGui::Combo("Alliance Station", &val, stations, 6)) {
       model->SetAllianceStationId(val);
+    }
     data->EmitDrag();
   }
 
   // Match Time
   if (auto data = model->GetMatchTimeData()) {
-    if (matchTimeEnabled)
+    if (matchTimeEnabled) {
       ImGui::Checkbox("Match Time Enabled", matchTimeEnabled);
+    }
 
     double val = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
@@ -77,8 +82,9 @@ void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
 
 void glass::DisplayFMSReadOnly(FMSModel* model) {
   bool exists = model->Exists();
-  if (!exists)
+  if (!exists) {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+  }
 
   if (auto data = model->GetEStopData()) {
     ImGui::Selectable("E-Stopped: ");
@@ -127,16 +133,18 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     ImGui::Selectable("Match Time: ");
     data->EmitDrag();
     ImGui::SameLine();
-    if (exists)
+    if (exists) {
       ImGui::Text("%.1f", data->GetValue());
-    else
+    } else {
       ImGui::TextUnformatted("?");
+    }
   }
 
   wpi::SmallString<64> gameSpecificMessage;
   model->GetGameSpecificMessage(gameSpecificMessage);
   ImGui::Text("Game Specific: %s", exists ? gameSpecificMessage.c_str() : "?");
 
-  if (!exists)
+  if (!exists) {
     ImGui::PopStyleColor();
+  }
 }

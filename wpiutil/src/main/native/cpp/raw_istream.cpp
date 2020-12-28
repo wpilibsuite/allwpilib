@@ -38,13 +38,16 @@ StringRef raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
   for (int i = 0; i < maxLen; ++i) {
     char c;
     read(c);
-    if (has_error())
+    if (has_error()) {
       return StringRef{buf.data(), buf.size()};
-    if (c == '\r')
+    }
+    if (c == '\r') {
       continue;
+    }
     buf.push_back(c);
-    if (c == '\n')
+    if (c == '\n') {
       break;
+    }
   }
   return StringRef{buf.data(), buf.size()};
 }
@@ -78,8 +81,9 @@ static int getFD(const Twine& Filename, std::error_code& EC) {
   int FD;
 
   EC = sys::fs::openFileForRead(Filename, FD);
-  if (EC)
+  if (EC) {
     return -1;
+  }
 
   EC = std::error_code();
   return FD;
@@ -95,8 +99,9 @@ raw_fd_istream::raw_fd_istream(int fd, bool shouldClose, size_t bufSize)
 }
 
 raw_fd_istream::~raw_fd_istream() {
-  if (m_shouldClose)
+  if (m_shouldClose) {
     close();
+  }
   std::free(m_buf);
 }
 

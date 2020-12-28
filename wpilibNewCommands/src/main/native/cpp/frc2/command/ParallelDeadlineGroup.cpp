@@ -23,8 +23,9 @@ void ParallelDeadlineGroup::Initialize() {
 
 void ParallelDeadlineGroup::Execute() {
   for (auto& commandRunning : m_commands) {
-    if (!commandRunning.second)
+    if (!commandRunning.second) {
       continue;
+    }
     commandRunning.first->Execute();
     if (commandRunning.first->IsFinished()) {
       commandRunning.first->End(false);

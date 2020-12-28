@@ -71,8 +71,9 @@ static wpi::StringRef MakeSourceValue(CS_Source source,
       wpi::StringRef prefix{"ip:"};
       buf.append(prefix.begin(), prefix.end());
       auto urls = cs::GetHttpCameraUrls(source, &status);
-      if (!urls.empty())
+      if (!urls.empty()) {
         buf.append(urls[0].begin(), urls[0].end());
+      }
       break;
     }
     case CS_SOURCE_CV:
@@ -100,8 +101,9 @@ std::vector<std::string> CameraServer::Impl::GetSinkStreamValues(CS_Sink sink) {
   CS_Status status = 0;
 
   // Ignore all but MjpegServer
-  if (cs::GetSinkKind(sink, &status) != CS_SINK_MJPEG)
-    return std::vector<std::string>{};
+  if (cs::GetSinkKind(sink, &status) != CS_SINK_MJPEG) {
+    return {};
+  }
 
   // Get port
   int port = cs::GetMjpegServerPort(sink, &status);
@@ -117,8 +119,9 @@ std::vector<std::string> CameraServer::Impl::GetSinkStreamValues(CS_Sink sink) {
     values.emplace_back(MakeStreamValue(cs::GetHostname() + ".local", port));
 
     for (const auto& addr : m_addresses) {
-      if (addr == "127.0.0.1")
+      if (addr == "127.0.0.1") {
         continue;  // ignore localhost
+      }
       values.emplace_back(MakeStreamValue(addr, port));
     }
   }
@@ -131,13 +134,15 @@ std::vector<std::string> CameraServer::Impl::GetSourceStreamValues(
   CS_Status status = 0;
 
   // Ignore all but HttpCamera
-  if (cs::GetSourceKind(source, &status) != CS_SOURCE_HTTP)
-    return std::vector<std::string>{};
+  if (cs::GetSourceKind(source, &status) != CS_SOURCE_HTTP) {
+    return {};
+  }
 
   // Generate values
   auto values = cs::GetHttpCameraUrls(source, &status);
-  for (auto& value : values)
+  for (auto& value : values) {
     value = "mjpg:" + value;
+  }
 
 #ifdef __FRC_ROBORIO__
   // Look to see if we have a passthrough server for this source
@@ -168,20 +173,24 @@ void CameraServer::Impl::UpdateStreamValues() {
 
     // Get the source's subtable (if none exists, we're done)
     CS_Source source = m_fixedSources.lookup(sink);
-    if (source == 0)
+    if (source == 0) {
       source = cs::GetSinkSource(sink, &status);
-    if (source == 0)
+    }
+    if (source == 0) {
       continue;
+    }
     auto table = m_tables.lookup(source);
     if (table) {
       // Don't set stream values if this is a HttpCamera passthrough
-      if (cs::GetSourceKind(source, &status) == CS_SOURCE_HTTP)
+      if (cs::GetSourceKind(source, &status) == CS_SOURCE_HTTP) {
         continue;
+      }
 
       // Set table value
       auto values = GetSinkStreamValues(sink);
-      if (!values.empty())
+      if (!values.empty()) {
         table->GetEntry("streams").SetStringArray(values);
+      }
     }
   }
 
@@ -194,8 +203,9 @@ void CameraServer::Impl::UpdateStreamValues() {
     if (table) {
       // Set table value
       auto values = GetSourceStreamValues(source);
-      if (!values.empty())
+      if (!values.empty()) {
         table->GetEntry("streams").SetStringArray(values);
+      }
     }
   }
 }
@@ -229,8 +239,9 @@ static std::string VideoModeToString(const cs::VideoMode& mode) {
 static std::vector<std::string> GetSourceModeValues(int source) {
   std::vector<std::string> rv;
   CS_Status status = 0;
-  for (const auto& mode : cs::EnumerateSourceVideoModes(source, &status))
+  for (const auto& mode : cs::EnumerateSourceVideoModes(source, &status)) {
     rv.emplace_back(VideoModeToString(mode));
+  }
   return rv;
 }
 
@@ -255,10 +266,11 @@ static void PutSourcePropertyValue(nt::NetworkTable* table,
   nt::NetworkTableEntry entry = table->GetEntry(name);
   switch (event.propertyKind) {
     case CS_PROP_BOOLEAN:
-      if (isNew)
+      if (isNew) {
         entry.SetDefaultBoolean(event.value != 0);
-      else
+      } else {
         entry.SetBoolean(event.value != 0);
+      }
       break;
     case CS_PROP_INTEGER:
     case CS_PROP_ENUM:
@@ -277,10 +289,11 @@ static void PutSourcePropertyValue(nt::NetworkTable* table,
       }
       break;
     case CS_PROP_STRING:
-      if (isNew)
+      if (isNew) {
         entry.SetDefaultString(event.valueStr);
-      else
+      } else {
         entry.SetString(event.valueStr);
+      }
       break;
     default:
       break;
@@ -356,33 +369,38 @@ CameraServer::Impl::Impl()
           }
           case cs::VideoEvent::kSourceDisconnected: {
             auto table = GetSourceTable(event.sourceHandle);
-            if (table)
+            if (table) {
               table->GetEntry("connected").SetBoolean(false);
+            }
             break;
           }
           case cs::VideoEvent::kSourceVideoModesUpdated: {
             auto table = GetSourceTable(event.sourceHandle);
-            if (table)
+            if (table) {
               table->GetEntry("modes").SetStringArray(
                   GetSourceModeValues(event.sourceHandle));
+            }
             break;
           }
           case cs::VideoEvent::kSourceVideoModeChanged: {
             auto table = GetSourceTable(event.sourceHandle);
-            if (table)
+            if (table) {
               table->GetEntry("mode").SetString(VideoModeToString(event.mode));
+            }
             break;
           }
           case cs::VideoEvent::kSourcePropertyCreated: {
             auto table = GetSourceTable(event.sourceHandle);
-            if (table)
+            if (table) {
               PutSourcePropertyValue(table.get(), event, true);
+            }
             break;
           }
           case cs::VideoEvent::kSourcePropertyValueUpdated: {
             auto table = GetSourceTable(event.sourceHandle);
-            if (table)
+            if (table) {
               PutSourcePropertyValue(table.get(), event, false);
+            }
             break;
           }
           case cs::VideoEvent::kSourcePropertyChoicesUpdated: {
@@ -424,12 +442,14 @@ CameraServer::Impl::Impl()
 
         // get source (sourceName/...)
         auto subKeyIndex = relativeKey.find('/');
-        if (subKeyIndex == wpi::StringRef::npos)
+        if (subKeyIndex == wpi::StringRef::npos) {
           return;
+        }
         wpi::StringRef sourceName = relativeKey.slice(0, subKeyIndex);
         auto sourceIt = m_sources.find(sourceName);
-        if (sourceIt == m_sources.end())
+        if (sourceIt == m_sources.end()) {
           return;
+        }
 
         // get subkey
         relativeKey = relativeKey.substr(subKeyIndex + 1);
@@ -702,8 +722,9 @@ cs::VideoSink CameraServer::GetServer(const wpi::Twine& name) {
 void CameraServer::AddCamera(const cs::VideoSource& camera) {
   std::string name = camera.GetName();
   std::scoped_lock lock(m_impl->m_mutex);
-  if (m_impl->m_primarySourceName.empty())
+  if (m_impl->m_primarySourceName.empty()) {
     m_impl->m_primarySourceName = name;
+  }
   m_impl->m_sources.try_emplace(name, camera);
 }
 
@@ -715,15 +736,18 @@ void CameraServer::RemoveCamera(const wpi::Twine& name) {
 
 void CameraServer::SetSize(int size) {
   std::scoped_lock lock(m_impl->m_mutex);
-  if (m_impl->m_primarySourceName.empty())
+  if (m_impl->m_primarySourceName.empty()) {
     return;
+  }
   auto it = m_impl->m_sources.find(m_impl->m_primarySourceName);
-  if (it == m_impl->m_sources.end())
+  if (it == m_impl->m_sources.end()) {
     return;
-  if (size == kSize160x120)
+  }
+  if (size == kSize160x120) {
     it->second.SetResolution(160, 120);
-  else if (size == kSize320x240)
+  } else if (size == kSize320x240) {
     it->second.SetResolution(320, 240);
-  else if (size == kSize640x480)
+  } else if (size == kSize640x480) {
     it->second.SetResolution(640, 480);
+  }
 }

@@ -38,12 +38,14 @@ void CvSinkImpl::Stop() {
   m_active = false;
 
   // wake up any waiters by forcing an empty frame to be sent
-  if (auto source = GetSource())
+  if (auto source = GetSource()) {
     source->Wakeup();
+  }
 
   // join thread
-  if (m_thread.joinable())
+  if (m_thread.joinable()) {
     m_thread.join();
+  }
 }
 
 uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
@@ -110,8 +112,9 @@ void CvSinkImpl::ThreadMain() {
     }
     SDEBUG4("waiting for frame");
     Frame frame = source->GetNextFrame();  // blocks
-    if (!m_active)
+    if (!m_active) {
       break;
+    }
     if (!frame) {
       // Bad frame; sleep for 10 ms so we don't consume all processor time.
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -245,8 +248,9 @@ uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkError(sink, buf, status);
-  if (*status != 0)
+  if (*status != 0) {
     return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 

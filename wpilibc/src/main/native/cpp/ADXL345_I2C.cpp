@@ -51,12 +51,15 @@ double ADXL345_I2C::GetZ() {
 }
 
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
-  if (axis == kAxis_X && m_simX)
+  if (axis == kAxis_X && m_simX) {
     return m_simX.Get();
-  if (axis == kAxis_Y && m_simY)
+  }
+  if (axis == kAxis_Y && m_simY) {
     return m_simY.Get();
-  if (axis == kAxis_Z && m_simZ)
+  }
+  if (axis == kAxis_Z && m_simZ) {
     return m_simZ.Get();
+  }
   int16_t rawAccel = 0;
   m_i2c.Read(kDataRegister + static_cast<int>(axis), sizeof(rawAccel),
              reinterpret_cast<uint8_t*>(&rawAccel));

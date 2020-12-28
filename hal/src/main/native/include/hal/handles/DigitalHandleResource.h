@@ -88,8 +88,9 @@ void DigitalHandleResource<THandle, TStruct, size>::Free(
     THandle handle, HAL_HandleEnum enumValue) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = GetIndex(handle, enumValue);
-  if (index < 0 || index >= size)
+  if (index < 0 || index >= size) {
     return;
+  }
   // lock and deallocated handle
   std::scoped_lock lock(m_handleMutexes[index]);
   m_structures[index].reset();

@@ -21,8 +21,9 @@ class WebSocketServerTest : public WebSocketTest {
     serverPipe->Listen([this]() {
       auto conn = serverPipe->Accept();
       ws = WebSocket::CreateServer(*conn, "foo", "13");
-      if (setupWebSocket)
+      if (setupWebSocket) {
         setupWebSocket();
+      }
     });
     clientPipe->Connect(pipeName, [this]() {
       clientPipe->StartRead();
@@ -30,16 +31,19 @@ class WebSocketServerTest : public WebSocketTest {
         StringRef data{buf.base, size};
         if (!headersDone) {
           data = resp.Execute(data);
-          if (resp.HasError())
+          if (resp.HasError()) {
             Finish();
+          }
           ASSERT_EQ(resp.GetError(), HPE_OK)
               << http_errno_name(resp.GetError());
-          if (data.empty())
+          if (data.empty()) {
             return;
+          }
         }
         wireData.insert(wireData.end(), data.bytes_begin(), data.bytes_end());
-        if (handleData)
+        if (handleData) {
           handleData(data);
+        }
       });
       clientPipe->end.connect([this]() { Finish(); });
     });

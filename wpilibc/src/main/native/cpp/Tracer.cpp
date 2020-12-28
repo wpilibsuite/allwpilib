@@ -35,8 +35,9 @@ void Tracer::PrintEpochs() {
   wpi::SmallString<128> buf;
   wpi::raw_svector_ostream os(buf);
   PrintEpochs(os);
-  if (!buf.empty())
+  if (!buf.empty()) {
     DriverStation::ReportWarning(buf);
+  }
 }
 
 void Tracer::PrintEpochs(wpi::raw_ostream& os) {

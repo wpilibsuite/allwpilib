@@ -17,8 +17,9 @@ using namespace nt;
 std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
                                        GetEntryTypeFunc get_entry_type) {
   unsigned int msg_type = 0;
-  if (!decoder.Read8(&msg_type))
+  if (!decoder.Read8(&msg_type)) {
     return nullptr;
+  }
   auto msg =
       std::make_shared<Message>(static_cast<MsgType>(msg_type), private_init());
   switch (msg_type) {
@@ -26,20 +27,23 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       break;
     case kClientHello: {
       unsigned int proto_rev;
-      if (!decoder.Read16(&proto_rev))
+      if (!decoder.Read16(&proto_rev)) {
         return nullptr;
+      }
       msg->m_id = proto_rev;
       // This intentionally uses the provided proto_rev instead of
       // decoder.proto_rev().
       if (proto_rev >= 0x0300u) {
-        if (!decoder.ReadString(&msg->m_str))
+        if (!decoder.ReadString(&msg->m_str)) {
           return nullptr;
+        }
       }
       break;
     }
     case kProtoUnsup: {
-      if (!decoder.Read16(&msg->m_id))
+      if (!decoder.Read16(&msg->m_id)) {
         return nullptr;  // proto rev
+      }
       break;
     }
     case kServerHelloDone:
@@ -49,10 +53,12 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         decoder.set_error("received SERVER_HELLO in protocol < 3.0");
         return nullptr;
       }
-      if (!decoder.Read8(&msg->m_flags))
+      if (!decoder.Read8(&msg->m_flags)) {
         return nullptr;
-      if (!decoder.ReadString(&msg->m_str))
+      }
+      if (!decoder.ReadString(&msg->m_str)) {
         return nullptr;
+      }
       break;
     case kClientHelloDone:
       if (decoder.proto_rev() < 0x0300u) {
@@ -61,40 +67,50 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       }
       break;
     case kEntryAssign: {
-      if (!decoder.ReadString(&msg->m_str))
+      if (!decoder.ReadString(&msg->m_str)) {
         return nullptr;  // name
+      }
       NT_Type type;
-      if (!decoder.ReadType(&type))
+      if (!decoder.ReadType(&type)) {
         return nullptr;  // entry type
-      if (!decoder.Read16(&msg->m_id))
+      }
+      if (!decoder.Read16(&msg->m_id)) {
         return nullptr;  // id
-      if (!decoder.Read16(&msg->m_seq_num_uid))
+      }
+      if (!decoder.Read16(&msg->m_seq_num_uid)) {
         return nullptr;  // seq num
+      }
       if (decoder.proto_rev() >= 0x0300u) {
-        if (!decoder.Read8(&msg->m_flags))
+        if (!decoder.Read8(&msg->m_flags)) {
           return nullptr;  // flags
+        }
       }
       msg->m_value = decoder.ReadValue(type);
-      if (!msg->m_value)
+      if (!msg->m_value) {
         return nullptr;
+      }
       break;
     }
     case kEntryUpdate: {
-      if (!decoder.Read16(&msg->m_id))
+      if (!decoder.Read16(&msg->m_id)) {
         return nullptr;  // id
-      if (!decoder.Read16(&msg->m_seq_num_uid))
+      }
+      if (!decoder.Read16(&msg->m_seq_num_uid)) {
         return nullptr;  // seq num
+      }
       NT_Type type;
       if (decoder.proto_rev() >= 0x0300u) {
-        if (!decoder.ReadType(&type))
+        if (!decoder.ReadType(&type)) {
           return nullptr;
+        }
       } else {
         type = get_entry_type(msg->m_id);
       }
       WPI_DEBUG4(decoder.logger(), "update message data type: " << type);
       msg->m_value = decoder.ReadValue(type);
-      if (!msg->m_value)
+      if (!msg->m_value) {
         return nullptr;
+      }
       break;
     }
     case kFlagsUpdate: {
@@ -102,10 +118,12 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         decoder.set_error("received FLAGS_UPDATE in protocol < 3.0");
         return nullptr;
       }
-      if (!decoder.Read16(&msg->m_id))
+      if (!decoder.Read16(&msg->m_id)) {
         return nullptr;
-      if (!decoder.Read8(&msg->m_flags))
+      }
+      if (!decoder.Read8(&msg->m_flags)) {
         return nullptr;
+      }
       break;
     }
     case kEntryDelete: {
@@ -113,8 +131,9 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         decoder.set_error("received ENTRY_DELETE in protocol < 3.0");
         return nullptr;
       }
-      if (!decoder.Read16(&msg->m_id))
+      if (!decoder.Read16(&msg->m_id)) {
         return nullptr;
+      }
       break;
     }
     case kClearEntries: {
@@ -123,8 +142,9 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         return nullptr;
       }
       uint32_t magic;
-      if (!decoder.Read32(&magic))
+      if (!decoder.Read32(&magic)) {
         return nullptr;
+      }
       if (magic != kClearAllMagic) {
         decoder.set_error(
             "received incorrect CLEAR_ENTRIES magic value, ignoring");
@@ -137,16 +157,20 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         decoder.set_error("received EXECUTE_RPC in protocol < 3.0");
         return nullptr;
       }
-      if (!decoder.Read16(&msg->m_id))
+      if (!decoder.Read16(&msg->m_id)) {
         return nullptr;
-      if (!decoder.Read16(&msg->m_seq_num_uid))
+      }
+      if (!decoder.Read16(&msg->m_seq_num_uid)) {
         return nullptr;  // uid
+      }
       uint64_t size;
-      if (!decoder.ReadUleb128(&size))
+      if (!decoder.ReadUleb128(&size)) {
         return nullptr;
+      }
       const char* params;
-      if (!decoder.Read(&params, size))
+      if (!decoder.Read(&params, size)) {
         return nullptr;
+      }
       msg->m_str = wpi::StringRef(params, size);
       break;
     }
@@ -155,16 +179,20 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         decoder.set_error("received RPC_RESPONSE in protocol < 3.0");
         return nullptr;
       }
-      if (!decoder.Read16(&msg->m_id))
+      if (!decoder.Read16(&msg->m_id)) {
         return nullptr;
-      if (!decoder.Read16(&msg->m_seq_num_uid))
+      }
+      if (!decoder.Read16(&msg->m_seq_num_uid)) {
         return nullptr;  // uid
+      }
       uint64_t size;
-      if (!decoder.ReadUleb128(&size))
+      if (!decoder.ReadUleb128(&size)) {
         return nullptr;
+      }
       const char* results;
-      if (!decoder.Read(&results, size))
+      if (!decoder.Read(&results, size)) {
         return nullptr;
+      }
       msg->m_str = wpi::StringRef(results, size);
       break;
     }
@@ -254,8 +282,9 @@ void Message::Write(WireEncoder& encoder) const {
     case kClientHello:
       encoder.Write8(kClientHello);
       encoder.Write16(encoder.proto_rev());
-      if (encoder.proto_rev() < 0x0300u)
+      if (encoder.proto_rev() < 0x0300u) {
         return;
+      }
       encoder.WriteString(m_str);
       break;
     case kProtoUnsup:
@@ -266,15 +295,17 @@ void Message::Write(WireEncoder& encoder) const {
       encoder.Write8(kServerHelloDone);
       break;
     case kServerHello:
-      if (encoder.proto_rev() < 0x0300u)
+      if (encoder.proto_rev() < 0x0300u) {
         return;  // new message in version 3.0
+      }
       encoder.Write8(kServerHello);
       encoder.Write8(m_flags);
       encoder.WriteString(m_str);
       break;
     case kClientHelloDone:
-      if (encoder.proto_rev() < 0x0300u)
+      if (encoder.proto_rev() < 0x0300u) {
         return;  // new message in version 3.0
+      }
       encoder.Write8(kClientHelloDone);
       break;
     case kEntryAssign:
@@ -283,48 +314,55 @@ void Message::Write(WireEncoder& encoder) const {
       encoder.WriteType(m_value->type());
       encoder.Write16(m_id);
       encoder.Write16(m_seq_num_uid);
-      if (encoder.proto_rev() >= 0x0300u)
+      if (encoder.proto_rev() >= 0x0300u) {
         encoder.Write8(m_flags);
+      }
       encoder.WriteValue(*m_value);
       break;
     case kEntryUpdate:
       encoder.Write8(kEntryUpdate);
       encoder.Write16(m_id);
       encoder.Write16(m_seq_num_uid);
-      if (encoder.proto_rev() >= 0x0300u)
+      if (encoder.proto_rev() >= 0x0300u) {
         encoder.WriteType(m_value->type());
+      }
       encoder.WriteValue(*m_value);
       break;
     case kFlagsUpdate:
-      if (encoder.proto_rev() < 0x0300u)
+      if (encoder.proto_rev() < 0x0300u) {
         return;  // new message in version 3.0
+      }
       encoder.Write8(kFlagsUpdate);
       encoder.Write16(m_id);
       encoder.Write8(m_flags);
       break;
     case kEntryDelete:
-      if (encoder.proto_rev() < 0x0300u)
+      if (encoder.proto_rev() < 0x0300u) {
         return;  // new message in version 3.0
+      }
       encoder.Write8(kEntryDelete);
       encoder.Write16(m_id);
       break;
     case kClearEntries:
-      if (encoder.proto_rev() < 0x0300u)
+      if (encoder.proto_rev() < 0x0300u) {
         return;  // new message in version 3.0
+      }
       encoder.Write8(kClearEntries);
       encoder.Write32(kClearAllMagic);
       break;
     case kExecuteRpc:
-      if (encoder.proto_rev() < 0x0300u)
+      if (encoder.proto_rev() < 0x0300u) {
         return;  // new message in version 3.0
+      }
       encoder.Write8(kExecuteRpc);
       encoder.Write16(m_id);
       encoder.Write16(m_seq_num_uid);
       encoder.WriteString(m_str);
       break;
     case kRpcResponse:
-      if (encoder.proto_rev() < 0x0300u)
+      if (encoder.proto_rev() < 0x0300u) {
         return;  // new message in version 3.0
+      }
       encoder.Write8(kRpcResponse);
       encoder.Write16(m_id);
       encoder.Write16(m_seq_num_uid);

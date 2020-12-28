@@ -35,8 +35,9 @@ class UsbCameraBuffer {
   }
 
   ~UsbCameraBuffer() {
-    if (m_data)
+    if (m_data) {
       munmap(m_data, m_length);
+    }
   }
 
   friend void swap(UsbCameraBuffer& first, UsbCameraBuffer& second) noexcept {

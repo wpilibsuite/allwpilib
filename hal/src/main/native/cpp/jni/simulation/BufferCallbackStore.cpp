@@ -107,8 +107,9 @@ SIM_JniHandle sim::AllocateBufferCallback(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data)
+    if (!data) {
       return;
+    }
 
     data->performCallback(name, buffer, length);
   };

@@ -20,8 +20,9 @@ void SequentialCommandGroup::Initialize() {
 }
 
 void SequentialCommandGroup::Execute() {
-  if (m_commands.empty())
+  if (m_commands.empty()) {
     return;
+  }
 
   auto& currentCommand = m_commands[m_currentCommandIndex];
 

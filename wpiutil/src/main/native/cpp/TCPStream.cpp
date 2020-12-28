@@ -103,10 +103,11 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   ssize_t rv = ::send(m_sd, buffer, len, 0);
 #endif
   if (rv < 0) {
-    if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK))
+    if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK)) {
       *err = kWouldBlock;
-    else
+    } else {
       *err = kConnectionReset;
+    }
     return 0;
   }
 #endif
@@ -141,13 +142,14 @@ size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
   }
   if (rv < 0) {
 #ifdef _WIN32
-    if (!m_blocking && WSAGetLastError() == WSAEWOULDBLOCK)
+    if (!m_blocking && WSAGetLastError() == WSAEWOULDBLOCK) {
 #else
-    if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK))
+    if (!m_blocking && (errno == EAGAIN || errno == EWOULDBLOCK)) {
 #endif
       *err = kWouldBlock;
-    else
+    } else {
       *err = kConnectionReset;
+    }
     return 0;
   }
   return static_cast<size_t>(rv);
@@ -175,30 +177,36 @@ int TCPStream::getPeerPort() const {
 }
 
 void TCPStream::setNoDelay() {
-  if (m_sd < 0)
+  if (m_sd < 0) {
     return;
+  }
   int optval = 1;
   setsockopt(m_sd, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char*>(&optval),
              sizeof optval);
 }
 
 bool TCPStream::setBlocking(bool enabled) {
-  if (m_sd < 0)
+  if (m_sd < 0) {
     return true;  // silently accept
+  }
 #ifdef _WIN32
   u_long mode = enabled ? 0 : 1;
-  if (ioctlsocket(m_sd, FIONBIO, &mode) == SOCKET_ERROR)
+  if (ioctlsocket(m_sd, FIONBIO, &mode) == SOCKET_ERROR) {
     return false;
+  }
 #else
   int flags = fcntl(m_sd, F_GETFL, nullptr);
-  if (flags < 0)
+  if (flags < 0) {
     return false;
-  if (enabled)
+  }
+  if (enabled) {
     flags &= ~O_NONBLOCK;
-  else
+  } else {
     flags |= O_NONBLOCK;
-  if (fcntl(m_sd, F_SETFL, flags) < 0)
+  }
+  if (fcntl(m_sd, F_SETFL, flags) < 0) {
     return false;
+  }
 #endif
   return true;
 }

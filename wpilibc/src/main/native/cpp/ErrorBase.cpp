@@ -174,8 +174,9 @@ void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
 Error ErrorBase::GetGlobalError() {
   auto& inst = GlobalErrors::GetInstance();
   std::scoped_lock mutex(inst.mutex);
-  if (!inst.lastError)
-    return Error{};
+  if (!inst.lastError) {
+    return {};
+  }
   return *inst.lastError;
 }
 
@@ -183,8 +184,9 @@ std::vector<Error> ErrorBase::GetGlobalErrors() {
   auto& inst = GlobalErrors::GetInstance();
   std::scoped_lock mutex(inst.mutex);
   std::vector<Error> rv;
-  for (auto&& error : inst.errors)
+  for (auto&& error : inst.errors) {
     rv.push_back(error);
+  }
   return rv;
 }
 

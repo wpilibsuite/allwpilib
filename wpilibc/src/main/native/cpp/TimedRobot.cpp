@@ -42,8 +42,9 @@ void TimedRobot::StartCompetition() {
     wpi_setHALError(status);
 
     uint64_t curTime = HAL_WaitForNotifierAlarm(m_notifier, &status);
-    if (curTime == 0 || status != 0)
+    if (curTime == 0 || status != 0) {
       break;
+    }
 
     callback.func();
 

@@ -23,16 +23,19 @@ std::shared_ptr<Pipe> Pipe::Create(Loop& loop, bool ipc) {
 }
 
 void Pipe::Reuse(std::function<void()> callback, bool ipc) {
-  if (IsClosing())
+  if (IsClosing()) {
     return;
-  if (!m_reuseData)
+  }
+  if (!m_reuseData) {
     m_reuseData = std::make_unique<ReuseData>();
+  }
   m_reuseData->callback = callback;
   m_reuseData->ipc = ipc;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {
     Pipe& h = *static_cast<Pipe*>(handle->data);
-    if (!h.m_reuseData)
+    if (!h.m_reuseData) {
       return;
+    }
     auto data = std::move(h.m_reuseData);
     auto err =
         uv_pipe_init(h.GetLoopRef().GetRaw(), h.GetRaw(), data->ipc ? 1 : 0);
@@ -46,8 +49,9 @@ void Pipe::Reuse(std::function<void()> callback, bool ipc) {
 
 std::shared_ptr<Pipe> Pipe::Accept() {
   auto client = Create(GetLoopRef(), GetRaw()->ipc);
-  if (!client)
+  if (!client) {
     return nullptr;
+  }
   if (!Accept(client)) {
     client->Release();
     return nullptr;
@@ -72,10 +76,11 @@ void Pipe::Connect(const Twine& name,
                   name.toNullTerminatedStringRef(nameBuf).data(),
                   [](uv_connect_t* req, int status) {
                     auto& h = *static_cast<PipeConnectReq*>(req->data);
-                    if (status < 0)
+                    if (status < 0) {
                       h.ReportError(status);
-                    else
+                    } else {
                       h.connected();
+                    }
                     h.Release();  // this is always a one-shot
                   });
   req->Keep();

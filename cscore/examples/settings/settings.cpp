@@ -34,19 +34,22 @@ int main(int argc, char** argv) {
     } else {
       wpi::StringRef propVal{argv[arg]};
       int intVal;
-      if (propVal.getAsInteger(10, intVal))
+      if (propVal.getAsInteger(10, intVal)) {
         camera.GetProperty(propName).SetString(propVal);
-      else
+      } else {
         camera.GetProperty(propName).Set(intVal);
+      }
       propName = wpi::StringRef{};
     }
   }
-  if (arg < argc && wpi::StringRef{argv[arg]} == "--")
+  if (arg < argc && wpi::StringRef{argv[arg]} == "--") {
     ++arg;
+  }
 
   // Wait to connect
-  while (!camera.IsConnected())
+  while (!camera.IsConnected()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
 
   // Set rest
   propName = wpi::StringRef{};
@@ -56,10 +59,11 @@ int main(int argc, char** argv) {
     } else {
       wpi::StringRef propVal{argv[arg]};
       int intVal;
-      if (propVal.getAsInteger(10, intVal))
+      if (propVal.getAsInteger(10, intVal)) {
         camera.GetProperty(propName).SetString(propVal);
-      else
+      } else {
         camera.GetProperty(propName).Set(intVal);
+      }
       propName = wpi::StringRef{};
     }
   }
@@ -89,8 +93,9 @@ int main(int argc, char** argv) {
                     << "value=" << prop.Get();
         auto choices = prop.GetChoices();
         for (size_t i = 0; i < choices.size(); ++i) {
-          if (choices[i].empty())
+          if (choices[i].empty()) {
             continue;
+          }
           wpi::outs() << "\n    " << i << ": " << choices[i];
         }
         break;

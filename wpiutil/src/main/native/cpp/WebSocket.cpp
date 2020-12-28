@@ -23,8 +23,9 @@ class WebSocketWriteReq : public uv::WriteReq {
       std::function<void(MutableArrayRef<uv::Buffer>, uv::Error)> callback) {
     finish.connect([=](uv::Error err) {
       MutableArrayRef<uv::Buffer> bufs{m_bufs};
-      for (auto&& buf : bufs.slice(0, m_startUser))
+      for (auto&& buf : bufs.slice(0, m_startUser)) {
         buf.Deallocate();
+      }
       callback(bufs.slice(m_startUser), err);
     });
   }
@@ -42,8 +43,9 @@ class WebSocket::ClientHandshakeData {
     static std::default_random_engine gen{rd()};
     std::uniform_int_distribution<unsigned int> dist(0, 255);
     char nonce[16];  // the nonce sent to the server
-    for (char& v : nonce)
+    for (char& v : nonce) {
       v = static_cast<char>(dist(gen));
+    }
     raw_svector_ostream os(key);
     Base64Encode(os, StringRef{nonce, 16});
   }
@@ -113,21 +115,24 @@ std::shared_ptr<WebSocket> WebSocket::CreateServer(uv::Stream& stream,
 
 void WebSocket::Close(uint16_t code, const Twine& reason) {
   SendClose(code, reason);
-  if (m_state != FAILED && m_state != CLOSED)
+  if (m_state != FAILED && m_state != CLOSED) {
     m_state = CLOSING;
+  }
 }
 
 void WebSocket::Fail(uint16_t code, const Twine& reason) {
-  if (m_state == FAILED || m_state == CLOSED)
+  if (m_state == FAILED || m_state == CLOSED) {
     return;
+  }
   SendClose(code, reason);
   SetClosed(code, reason, true);
   Shutdown();
 }
 
 void WebSocket::Terminate(uint16_t code, const Twine& reason) {
-  if (m_state == FAILED || m_state == CLOSED)
+  if (m_state == FAILED || m_state == CLOSED) {
     return;
+  }
   SetClosed(code, reason);
   Shutdown();
 }
@@ -154,10 +159,11 @@ void WebSocket::StartClient(const Twine& uri, const Twine& host,
     os << "Sec-WebSocket-Protocol: ";
     bool first = true;
     for (auto protocol : protocols) {
-      if (!first)
+      if (!first) {
         os << ", ";
-      else
+      } else {
         first = false;
+      }
       os << protocol;
       // also save for later checking against server response
       m_clientHandshake->protocols.emplace_back(protocol);
@@ -166,45 +172,52 @@ void WebSocket::StartClient(const Twine& uri, const Twine& host,
   }
 
   // other headers
-  for (auto&& header : options.extraHeaders)
+  for (auto&& header : options.extraHeaders) {
     os << header.first << ": " << header.second << "\r\n";
+  }
 
   // finish headers
   os << "\r\n";
 
   // Send client request
   m_stream.Write(bufs, [](auto bufs, uv::Error) {
-    for (auto& buf : bufs)
+    for (auto& buf : bufs) {
       buf.Deallocate();
+    }
   });
 
   // Set up client response handling
   m_clientHandshake->parser.status.connect([this](StringRef status) {
     unsigned int code = m_clientHandshake->parser.GetStatusCode();
-    if (code != 101)
+    if (code != 101) {
       Terminate(code, status);
+    }
   });
   m_clientHandshake->parser.header.connect(
       [this](StringRef name, StringRef value) {
         value = value.trim();
         if (name.equals_lower("upgrade")) {
-          if (!value.equals_lower("websocket"))
+          if (!value.equals_lower("websocket")) {
             return Terminate(1002, "invalid upgrade response value");
+          }
           m_clientHandshake->hasUpgrade = true;
         } else if (name.equals_lower("connection")) {
-          if (!value.equals_lower("upgrade"))
+          if (!value.equals_lower("upgrade")) {
             return Terminate(1002, "invalid connection response value");
+          }
           m_clientHandshake->hasConnection = true;
         } else if (name.equals_lower("sec-websocket-accept")) {
           // Check against expected response
           SmallString<64> acceptBuf;
-          if (!value.equals(AcceptHash(m_clientHandshake->key, acceptBuf)))
+          if (!value.equals(AcceptHash(m_clientHandshake->key, acceptBuf))) {
             return Terminate(1002, "invalid accept key");
+          }
           m_clientHandshake->hasAccept = true;
         } else if (name.equals_lower("sec-websocket-extensions")) {
           // No extensions are supported
-          if (!value.empty())
+          if (!value.empty()) {
             return Terminate(1010, "unsupported extension");
+          }
         } else if (name.equals_lower("sec-websocket-protocol")) {
           // Make sure it was one of the provided protocols
           bool match = false;
@@ -214,8 +227,9 @@ void WebSocket::StartClient(const Twine& uri, const Twine& host,
               break;
             }
           }
-          if (!match)
+          if (!match) {
             return Terminate(1003, "unsupported protocol");
+          }
           m_clientHandshake->hasProtocol = true;
           m_protocol = value;
         }
@@ -257,8 +271,9 @@ void WebSocket::StartServer(StringRef key, StringRef version,
     os << "Upgrade: WebSocket\r\n";
     os << "Sec-WebSocket-Version: 13\r\n\r\n";
     m_stream.Write(bufs, [this](auto bufs, uv::Error) {
-      for (auto& buf : bufs)
+      for (auto& buf : bufs) {
         buf.Deallocate();
+      }
       // XXX: Should we support sending a new handshake on the same connection?
       // XXX: "this->" is required by GCC 5.5 (bug)
       this->Terminate(1003, "unsupported protocol version");
@@ -274,16 +289,18 @@ void WebSocket::StartServer(StringRef key, StringRef version,
   SmallString<64> acceptBuf;
   os << "Sec-WebSocket-Accept: " << AcceptHash(key, acceptBuf) << "\r\n";
 
-  if (!protocol.empty())
+  if (!protocol.empty()) {
     os << "Sec-WebSocket-Protocol: " << protocol << "\r\n";
+  }
 
   // end headers
   os << "\r\n";
 
   // Send server response
   m_stream.Write(bufs, [this](auto bufs, uv::Error) {
-    for (auto& buf : bufs)
+    for (auto& buf : bufs) {
       buf.Deallocate();
+    }
     if (m_state == CONNECTING) {
       m_state = OPEN;
       open(m_protocol);
@@ -301,14 +318,16 @@ void WebSocket::SendClose(uint16_t code, const Twine& reason) {
     reason.print(os);
   }
   Send(kFlagFin | kOpClose, bufs, [](auto bufs, uv::Error) {
-    for (auto&& buf : bufs)
+    for (auto&& buf : bufs) {
       buf.Deallocate();
+    }
   });
 }
 
 void WebSocket::SetClosed(uint16_t code, const Twine& reason, bool failed) {
-  if (m_state == FAILED || m_state == CLOSED)
+  if (m_state == FAILED || m_state == CLOSED) {
     return;
+  }
   m_state = failed ? FAILED : CLOSED;
   SmallString<64> reasonBuf;
   closed(code, reason.toStringRef(reasonBuf));
@@ -320,8 +339,9 @@ void WebSocket::Shutdown() {
 
 void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
   // ignore incoming data if we're failed or closed
-  if (m_state == FAILED || m_state == CLOSED)
+  if (m_state == FAILED || m_state == CLOSED) {
     return;
+  }
 
   StringRef data{buf.base, size};
 
@@ -330,10 +350,12 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
     if (m_clientHandshake) {
       data = m_clientHandshake->parser.Execute(data);
       // check for parser failure
-      if (m_clientHandshake->parser.HasError())
+      if (m_clientHandshake->parser.HasError()) {
         return Terminate(1003, "invalid response");
-      if (m_state != OPEN)
+      }
+      if (m_state != OPEN) {
         return;  // not done with handshake yet
+      }
 
       // we're done with the handshake, so release its memory
       m_clientHandshake.reset();
@@ -352,31 +374,37 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
         size_t toCopy = (std::min)(2u - m_header.size(), data.size());
         m_header.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
-        if (m_header.size() < 2u)
+        if (m_header.size() < 2u) {
           return;  // need more data
+        }
 
         // Validate RSV bits are zero
-        if ((m_header[0] & 0x70) != 0)
+        if ((m_header[0] & 0x70) != 0) {
           return Fail(1002, "nonzero RSV");
+        }
       }
 
       // Once we have first two bytes, we can calculate the header size
       if (m_headerSize == 0) {
         m_headerSize = 2;
         uint8_t len = m_header[1] & kLenMask;
-        if (len == 126)
+        if (len == 126) {
           m_headerSize += 2;
-        else if (len == 127)
+        } else if (len == 127) {
           m_headerSize += 8;
+        }
         bool masking = (m_header[1] & kFlagMasking) != 0;
-        if (masking)
+        if (masking) {
           m_headerSize += 4;  // masking key
+        }
         // On server side, incoming messages MUST be masked
         // On client side, incoming messages MUST NOT be masked
-        if (m_server && !masking)
+        if (m_server && !masking) {
           return Fail(1002, "client data not masked");
-        if (!m_server && masking)
+        }
+        if (!m_server && masking) {
           return Fail(1002, "server data masked");
+        }
       }
 
       // Need to complete header to calculate message size
@@ -384,17 +412,18 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
         size_t toCopy = (std::min)(m_headerSize - m_header.size(), data.size());
         m_header.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
-        if (m_header.size() < m_headerSize)
+        if (m_header.size() < m_headerSize) {
           return;  // need more data
+        }
       }
 
       if (m_header.size() >= m_headerSize) {
         // get payload length
         uint8_t len = m_header[1] & kLenMask;
-        if (len == 126)
+        if (len == 126) {
           m_frameSize = (static_cast<uint16_t>(m_header[2]) << 8) |
                         static_cast<uint16_t>(m_header[3]);
-        else if (len == 127)
+        } else if (len == 127) {
           m_frameSize = (static_cast<uint64_t>(m_header[2]) << 56) |
                         (static_cast<uint64_t>(m_header[3]) << 48) |
                         (static_cast<uint64_t>(m_header[4]) << 40) |
@@ -403,12 +432,14 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
                         (static_cast<uint64_t>(m_header[7]) << 16) |
                         (static_cast<uint64_t>(m_header[8]) << 8) |
                         static_cast<uint64_t>(m_header[9]);
-        else
+        } else {
           m_frameSize = len;
+        }
 
         // limit maximum size
-        if ((m_payload.size() + m_frameSize) > m_maxMessageSize)
+        if ((m_payload.size() + m_frameSize) > m_maxMessageSize) {
           return Fail(1009, "message too large");
+        }
       }
     }
 
@@ -429,8 +460,9 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
           for (uint8_t& ch :
                MutableArrayRef<uint8_t>{m_payload}.slice(m_frameStart)) {
             ch ^= key[n++];
-            if (n >= 4)
+            if (n >= 4) {
               n = 0;
+            }
           }
         }
 
@@ -441,39 +473,48 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
           case kOpCont:
             switch (m_fragmentOpcode) {
               case kOpText:
-                if (!m_combineFragments || fin)
+                if (!m_combineFragments || fin) {
                   text(StringRef{reinterpret_cast<char*>(m_payload.data()),
                                  m_payload.size()},
                        fin);
+                }
                 break;
               case kOpBinary:
-                if (!m_combineFragments || fin)
+                if (!m_combineFragments || fin) {
                   binary(m_payload, fin);
+                }
                 break;
               default:
                 // no preceding message?
                 return Fail(1002, "invalid continuation message");
             }
-            if (fin)
+            if (fin) {
               m_fragmentOpcode = 0;
+            }
             break;
           case kOpText:
-            if (m_fragmentOpcode != 0)
+            if (m_fragmentOpcode != 0) {
               return Fail(1002, "incomplete fragment");
-            if (!m_combineFragments || fin)
+            }
+            if (!m_combineFragments || fin) {
               text(StringRef{reinterpret_cast<char*>(m_payload.data()),
                              m_payload.size()},
                    fin);
-            if (!fin)
+            }
+            if (!fin) {
               m_fragmentOpcode = opcode;
+            }
             break;
           case kOpBinary:
-            if (m_fragmentOpcode != 0)
+            if (m_fragmentOpcode != 0) {
               return Fail(1002, "incomplete fragment");
-            if (!m_combineFragments || fin)
+            }
+            if (!m_combineFragments || fin) {
               binary(m_payload, fin);
-            if (!fin)
+            }
+            if (!fin) {
               m_fragmentOpcode = opcode;
+            }
             break;
           case kOpClose: {
             uint16_t code;
@@ -491,22 +532,26 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
                            .drop_front(2);
             }
             // Echo the close if we didn't previously send it
-            if (m_state != CLOSING)
+            if (m_state != CLOSING) {
               SendClose(code, reason);
+            }
             SetClosed(code, reason);
             // If we're the server, shutdown the connection.
-            if (m_server)
+            if (m_server) {
               Shutdown();
+            }
             break;
           }
           case kOpPing:
-            if (!fin)
+            if (!fin) {
               return Fail(1002, "cannot fragment control frames");
+            }
             ping(m_payload);
             break;
           case kOpPong:
-            if (!fin)
+            if (!fin) {
               return Fail(1002, "cannot fragment control frames");
+            }
             pong(m_payload);
             break;
           default:
@@ -516,8 +561,9 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
         // Prepare for next message
         m_header.clear();
         m_headerSize = 0;
-        if (!m_combineFragments || fin)
+        if (!m_combineFragments || fin) {
           m_payload.clear();
+        }
         m_frameStart = m_payload.size();
         m_frameSize = UINT64_MAX;
       }
@@ -531,10 +577,11 @@ void WebSocket::Send(
   // If we're not open, emit an error and don't send the data
   if (m_state != OPEN) {
     int err;
-    if (m_state == CONNECTING)
+    if (m_state == CONNECTING) {
       err = UV_EAGAIN;
-    else
+    } else {
       err = UV_ESHUTDOWN;
+    }
     SmallVector<uv::Buffer, 4> bufs{data.begin(), data.end()};
     callback(bufs, uv::Error{err});
     return;
@@ -548,8 +595,9 @@ void WebSocket::Send(
 
   // payload length
   uint64_t size = 0;
-  for (auto&& buf : data)
+  for (auto&& buf : data) {
     size += buf.len;
+  }
   if (size < 126) {
     os << static_cast<unsigned char>((m_server ? 0x00 : kFlagMasking) | size);
   } else if (size <= 0xffff) {
@@ -577,16 +625,18 @@ void WebSocket::Send(
     static std::default_random_engine gen{rd()};
     std::uniform_int_distribution<unsigned int> dist(0, 255);
     uint8_t key[4];
-    for (uint8_t& v : key)
+    for (uint8_t& v : key) {
       v = dist(gen);
+    }
     os << ArrayRef<uint8_t>{key, 4};
     // copy and mask data
     int n = 0;
     for (auto&& buf : data) {
       for (auto&& ch : buf.data()) {
         os << static_cast<unsigned char>(static_cast<uint8_t>(ch) ^ key[n++]);
-        if (n >= 4)
+        if (n >= 4) {
           n = 0;
+        }
       }
     }
     req->m_startUser = req->m_bufs.size();

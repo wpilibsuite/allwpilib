@@ -54,8 +54,9 @@ Solenoid::~Solenoid() {
 }
 
 void Solenoid::Set(bool on) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
 
   int32_t status = 0;
   HAL_SetSolenoid(m_solenoidHandle, on, &status);
@@ -63,8 +64,9 @@ void Solenoid::Set(bool on) {
 }
 
 bool Solenoid::Get() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
 
   int32_t status = 0;
   bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
@@ -84,16 +86,18 @@ bool Solenoid::IsBlackListed() const {
 
 void Solenoid::SetPulseDuration(double durationSeconds) {
   int32_t durationMS = durationSeconds * 1000;
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_SetOneShotDuration(m_solenoidHandle, durationMS, &status);
   wpi_setHALError(status);
 }
 
 void Solenoid::StartPulse() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_FireOneShot(m_solenoidHandle, &status);
   wpi_setHALError(status);

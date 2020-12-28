@@ -28,11 +28,13 @@ void NTSpeedControllerModel::SetPercent(double value) {
 void NTSpeedControllerModel::Update() {
   for (auto&& event : m_nt.PollListener()) {
     if (event.entry == m_value) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_valueData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_name) {
-      if (event.value && event.value->IsString())
+      if (event.value && event.value->IsString()) {
         m_nameValue = event.value->GetString();
+      }
     }
   }
 }

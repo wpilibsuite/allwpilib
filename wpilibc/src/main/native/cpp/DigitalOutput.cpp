@@ -42,8 +42,9 @@ DigitalOutput::DigitalOutput(int channel) {
 }
 
 DigitalOutput::~DigitalOutput() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   // Disable the PWM in case it was running.
   DisablePWM();
 
@@ -51,8 +52,9 @@ DigitalOutput::~DigitalOutput() {
 }
 
 void DigitalOutput::Set(bool value) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
 
   int32_t status = 0;
   HAL_SetDIO(m_handle, value, &status);
@@ -60,8 +62,9 @@ void DigitalOutput::Set(bool value) {
 }
 
 bool DigitalOutput::Get() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
 
   int32_t status = 0;
   bool val = HAL_GetDIO(m_handle, &status);
@@ -86,8 +89,9 @@ int DigitalOutput::GetChannel() const {
 }
 
 void DigitalOutput::Pulse(double length) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
 
   int32_t status = 0;
   HAL_Pulse(m_handle, length, &status);
@@ -95,8 +99,9 @@ void DigitalOutput::Pulse(double length) {
 }
 
 bool DigitalOutput::IsPulsing() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
 
   int32_t status = 0;
   bool value = HAL_IsPulsing(m_handle, &status);
@@ -105,8 +110,9 @@ bool DigitalOutput::IsPulsing() const {
 }
 
 void DigitalOutput::SetPWMRate(double rate) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
 
   int32_t status = 0;
   HAL_SetDigitalPWMRate(rate, &status);
@@ -114,32 +120,38 @@ void DigitalOutput::SetPWMRate(double rate) {
 }
 
 void DigitalOutput::EnablePWM(double initialDutyCycle) {
-  if (m_pwmGenerator != HAL_kInvalidHandle)
+  if (m_pwmGenerator != HAL_kInvalidHandle) {
     return;
+  }
 
   int32_t status = 0;
 
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   m_pwmGenerator = HAL_AllocateDigitalPWM(&status);
   wpi_setHALError(status);
 
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, initialDutyCycle, &status);
   wpi_setHALError(status);
 
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, m_channel, &status);
   wpi_setHALError(status);
 }
 
 void DigitalOutput::DisablePWM() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
-  if (m_pwmGenerator == HAL_kInvalidHandle)
+  }
+  if (m_pwmGenerator == HAL_kInvalidHandle) {
     return;
+  }
 
   int32_t status = 0;
 
@@ -155,8 +167,9 @@ void DigitalOutput::DisablePWM() {
 }
 
 void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
 
   int32_t status = 0;
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);

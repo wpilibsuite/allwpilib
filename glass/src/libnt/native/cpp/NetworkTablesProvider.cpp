@@ -57,8 +57,9 @@ void NetworkTablesProvider::DisplayMenu() {
       }
     }
 
-    for (; depth > 0; --depth)
+    for (; depth > 0; --depth) {
       ImGui::EndMenu();
+    }
   }
 }
 
@@ -70,14 +71,16 @@ void NetworkTablesProvider::Update() {
     // look for .type fields
     wpi::StringRef eventName{event.name};
     if (!eventName.endswith("/.type") || !event.value ||
-        !event.value->IsString())
+        !event.value->IsString()) {
       continue;
+    }
     auto tableName = eventName.drop_back(6);
 
     // only handle ones where we have a builder
     auto builderIt = m_typeMap.find(event.value->GetString());
-    if (builderIt == m_typeMap.end())
+    if (builderIt == m_typeMap.end()) {
       continue;
+    }
 
     if (event.flags & NT_NOTIFY_DELETE) {
       auto it = std::find_if(
@@ -98,22 +101,26 @@ void NetworkTablesProvider::Update() {
   // check for visible windows that need displays (typically this is due to
   // file loading)
   for (auto&& window : m_windows) {
-    if (!window->IsVisible() || window->HasView())
+    if (!window->IsVisible() || window->HasView()) {
       continue;
+    }
     auto id = window->GetId();
     auto typeIt = m_typeCache.find(id);
-    if (typeIt == m_typeCache.end())
+    if (typeIt == m_typeCache.end()) {
       continue;
+    }
 
     // only handle ones where we have a builder
     auto builderIt = m_typeMap.find(typeIt->second.GetName());
-    if (builderIt == m_typeMap.end())
+    if (builderIt == m_typeMap.end()) {
       continue;
+    }
 
     auto entry = GetOrCreateView(
         builderIt->second, nt::GetEntry(m_nt.GetInstance(), id + "/.type"), id);
-    if (entry)
+    if (entry) {
       Show(entry, window.get());
+    }
   }
 }
 
@@ -131,24 +138,29 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
   }
 
   // get or create model
-  if (!entry->modelEntry->model)
+  if (!entry->modelEntry->model) {
     entry->modelEntry->model =
         entry->modelEntry->createModel(m_nt.GetInstance(), entry->name.c_str());
-  if (!entry->modelEntry->model)
+  }
+  if (!entry->modelEntry->model) {
     return;
+  }
 
   // the window might exist and we're just not associated to it yet
-  if (!window)
+  if (!window) {
     window = GetOrAddWindow(entry->name, true);
-  if (!window)
+  }
+  if (!window) {
     return;
+  }
   entry->window = window;
 
   // create view
   auto view = entry->createView(window, entry->modelEntry->model.get(),
                                 entry->name.c_str());
-  if (!view)
+  if (!view) {
     return;
+  }
   window->SetView(std::move(view));
 
   entry->window->SetVisible(true);

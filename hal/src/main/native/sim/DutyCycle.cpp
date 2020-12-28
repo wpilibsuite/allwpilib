@@ -62,16 +62,18 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
 void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   dutyCycleHandles->Free(dutyCycleHandle);
-  if (dutyCycle == nullptr)
+  if (dutyCycle == nullptr) {
     return;
+  }
   SimDutyCycleData[dutyCycle->index].initialized = false;
 }
 
 void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
                                HAL_SimDeviceHandle device) {
   auto dutyCycle = dutyCycleHandles->Get(handle);
-  if (dutyCycle == nullptr)
+  if (dutyCycle == nullptr) {
     return;
+  }
   SimDutyCycleData[dutyCycle->index].simDevice = device;
 }
 

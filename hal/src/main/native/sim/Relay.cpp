@@ -36,8 +36,9 @@ extern "C" {
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
                                         int32_t* status) {
   hal::init::CheckInit();
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;
+  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -45,13 +46,15 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
     return HAL_kInvalidHandle;
   }
 
-  if (!fwd)
+  if (!fwd) {
     channel += kNumRelayHeaders;  // add 4 to reverse channels
+  }
 
   auto handle = relayHandles->Allocate(channel, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   auto port = relayHandles->Get(handle);
   if (port == nullptr) {  // would only occur on thread issue.
@@ -79,12 +82,14 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle) {
   auto port = relayHandles->Get(relayPortHandle);
   relayHandles->Free(relayPortHandle);
-  if (port == nullptr)
+  if (port == nullptr) {
     return;
-  if (port->fwd)
+  }
+  if (port->fwd) {
     SimRelayData[port->channel].initializedForward = false;
-  else
+  } else {
     SimRelayData[port->channel].initializedReverse = false;
+  }
 }
 
 HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
@@ -101,10 +106,11 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (port->fwd)
+  if (port->fwd) {
     SimRelayData[port->channel].forward = on;
-  else
+  } else {
     SimRelayData[port->channel].reverse = on;
+  }
 }
 
 HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
@@ -113,9 +119,10 @@ HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  if (port->fwd)
+  if (port->fwd) {
     return SimRelayData[port->channel].forward;
-  else
+  } else {
     return SimRelayData[port->channel].reverse;
+  }
 }
 }  // extern "C"

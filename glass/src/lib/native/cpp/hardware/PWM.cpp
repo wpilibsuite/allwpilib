@@ -13,8 +13,9 @@ using namespace glass;
 
 void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
   auto data = model->GetSpeedData();
-  if (!data)
+  if (!data) {
     return;
+  }
 
   // build label
   std::string* name = GetStorage().GetStringRef("name");
@@ -47,14 +48,16 @@ void glass::DisplayPWMs(PWMsModel* model, bool outputsEnabled,
     hasAny = true;
     PushID(i);
 
-    if (!first)
+    if (!first) {
       ImGui::Separator();
-    else
+    } else {
       first = false;
+    }
 
     DisplayPWM(&pwm, i, outputsEnabled);
     PopID();
   });
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

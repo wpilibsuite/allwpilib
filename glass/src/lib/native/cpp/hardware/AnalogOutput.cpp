@@ -13,14 +13,16 @@ using namespace glass;
 void glass::DisplayAnalogOutputsDevice(AnalogOutputsModel* model) {
   int count = 0;
   model->ForEachAnalogOutput([&](auto&, int) { ++count; });
-  if (count == 0)
+  if (count == 0) {
     return;
+  }
 
   if (BeginDevice("Analog Outputs")) {
     model->ForEachAnalogOutput([&](auto& analogOut, int i) {
       auto analogOutData = analogOut.GetVoltageData();
-      if (!analogOutData)
+      if (!analogOutData) {
         return;
+      }
       PushID(i);
 
       // build label
@@ -36,8 +38,9 @@ void glass::DisplayAnalogOutputsDevice(AnalogOutputsModel* model) {
       DeviceDouble(label, true, &value, analogOutData);
 
       if (PopupEditName("name", name)) {
-        if (analogOutData)
+        if (analogOutData) {
           analogOutData->SetName(name->c_str());
+        }
       }
       PopID();
     });

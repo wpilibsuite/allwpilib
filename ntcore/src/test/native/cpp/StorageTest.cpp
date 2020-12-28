@@ -378,10 +378,11 @@ TEST_P(StorageTestPopulated, SetDefaultEntryEmptyName) {
   EXPECT_FALSE(ret_val);
   // assert that no entries get added
   EXPECT_EQ(4u, entries().size());
-  if (GetParam())
+  if (GetParam()) {
     EXPECT_EQ(4u, idmap().size());
-  else
+  } else {
     EXPECT_EQ(0u, idmap().size());
+  }
 }
 
 TEST_P(StorageTestPopulated, SetDefaultEntryEmptyValue) {
@@ -390,10 +391,11 @@ TEST_P(StorageTestPopulated, SetDefaultEntryEmptyValue) {
   EXPECT_FALSE(ret_val);
   // assert that no entries get added
   EXPECT_EQ(4u, entries().size());
-  if (GetParam())
+  if (GetParam()) {
     EXPECT_EQ(4u, idmap().size());
-  else
+  } else {
     EXPECT_EQ(0u, idmap().size());
+  }
 }
 
 TEST_P(StorageTestEmpty, SetEntryFlagsNew) {
@@ -553,8 +555,9 @@ TEST_P(StorageTestPersistent, SavePersistentEmpty) {
 }
 
 TEST_P(StorageTestPersistent, SavePersistent) {
-  for (auto& i : entries())
+  for (auto& i : entries()) {
     i.getValue()->flags = NT_PERSISTENT;
+  }
   wpi::SmallString<256> buf;
   wpi::raw_svector_ostream oss(buf);
   storage.SavePersistent(oss, false);

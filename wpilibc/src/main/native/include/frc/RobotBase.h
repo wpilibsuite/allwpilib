@@ -74,16 +74,18 @@ int StartRobot() {
     HAL_RunMain();
 
     // signal loop to exit
-    if (robot)
+    if (robot) {
       robot->EndCompetition();
+    }
 
     // prefer to join, but detach to exit if it doesn't exit in a timely manner
     using namespace std::chrono_literals;
     std::unique_lock lock{m};
-    if (cv.wait_for(lock, 1s, [] { return exited; }))
+    if (cv.wait_for(lock, 1s, [] { return exited; })) {
       thr.join();
-    else
+    } else {
       thr.detach();
+    }
   } else {
     impl::RunRobot<Robot>(m, &robot);
   }

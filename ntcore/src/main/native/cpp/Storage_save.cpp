@@ -83,15 +83,17 @@ void SavePersistentImpl::WriteHeader() {
 
 void SavePersistentImpl::WriteEntries(wpi::ArrayRef<Entry> entries) {
   for (auto& i : entries) {
-    if (!i.second)
+    if (!i.second) {
       continue;
+    }
     WriteEntry(i.first, *i.second);
   }
 }
 
 void SavePersistentImpl::WriteEntry(wpi::StringRef name, const Value& value) {
-  if (!WriteType(value.type()))
-    return;           // type
+  if (!WriteType(value.type())) {
+    return;  // type
+  }
   WriteString(name);  // name
   m_os << '=';        // '='
   WriteValue(value);  // value
@@ -145,8 +147,9 @@ void SavePersistentImpl::WriteValue(const Value& value) {
     case NT_BOOLEAN_ARRAY: {
       bool first = true;
       for (auto elem : value.GetBooleanArray()) {
-        if (!first)
+        if (!first) {
           m_os << ',';
+        }
         first = false;
         m_os << (elem ? "true" : "false");
       }
@@ -155,8 +158,9 @@ void SavePersistentImpl::WriteValue(const Value& value) {
     case NT_DOUBLE_ARRAY: {
       bool first = true;
       for (auto elem : value.GetDoubleArray()) {
-        if (!first)
+        if (!first) {
           m_os << ',';
+        }
         first = false;
         m_os << wpi::format("%g", elem);
       }
@@ -165,8 +169,9 @@ void SavePersistentImpl::WriteValue(const Value& value) {
     case NT_STRING_ARRAY: {
       bool first = true;
       for (auto& elem : value.GetStringArray()) {
-        if (!first)
+        if (!first) {
           m_os << ',';
+        }
         first = false;
         WriteString(elem);
       }
@@ -179,8 +184,9 @@ void SavePersistentImpl::WriteValue(const Value& value) {
 
 void Storage::SavePersistent(wpi::raw_ostream& os, bool periodic) const {
   std::vector<SavePersistentImpl::Entry> entries;
-  if (!GetPersistentEntries(periodic, &entries))
+  if (!GetPersistentEntries(periodic, &entries)) {
     return;
+  }
   SavePersistentImpl(os).Save(entries);
 }
 
@@ -195,8 +201,9 @@ const char* Storage::SavePersistent(const Twine& filename,
 
   // Get entries before creating file
   std::vector<SavePersistentImpl::Entry> entries;
-  if (!GetPersistentEntries(periodic, &entries))
+  if (!GetPersistentEntries(periodic, &entries)) {
     return nullptr;
+  }
 
   const char* err = nullptr;
 
@@ -227,15 +234,17 @@ const char* Storage::SavePersistent(const Twine& filename,
 
 done:
   // try again if there was an error
-  if (err && periodic)
+  if (err && periodic) {
     m_persistent_dirty = true;
+  }
   return err;
 }
 
 void Storage::SaveEntries(wpi::raw_ostream& os, const Twine& prefix) const {
   std::vector<SavePersistentImpl::Entry> entries;
-  if (!GetEntries(prefix, &entries))
+  if (!GetEntries(prefix, &entries)) {
     return;
+  }
   SavePersistentImpl(os).Save(entries);
 }
 
@@ -250,8 +259,9 @@ const char* Storage::SaveEntries(const Twine& filename,
 
   // Get entries before creating file
   std::vector<SavePersistentImpl::Entry> entries;
-  if (!GetEntries(prefix, &entries))
+  if (!GetEntries(prefix, &entries)) {
     return nullptr;
+  }
 
   // start by writing to temporary file
   std::error_code ec;

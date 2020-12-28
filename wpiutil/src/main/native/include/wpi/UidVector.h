@@ -24,8 +24,9 @@ class UidVectorIterator {
   UidVectorIterator() = default;
   explicit UidVectorIterator(It it, It end) : m_it(it), m_end(end) {
     // advance to first non-empty element
-    while (m_it != m_end && !*m_it)
+    while (m_it != m_end && !*m_it) {
       ++m_it;
+    }
   }
 
   reference operator*() const noexcept { return *m_it; }
@@ -105,8 +106,9 @@ class UidVector {
   // Removes the identified element by replacing it with a default-constructed
   // one.  The element is added to the freelist for later reuse.
   void erase(size_type uid) {
-    if (uid >= m_vector.size() || !m_vector[uid])
+    if (uid >= m_vector.size() || !m_vector[uid]) {
       return;
+    }
     m_free.push_back(uid);
     m_vector[uid] = T();
     --m_active_count;

@@ -9,8 +9,9 @@ using namespace wpi;
 detail::SafeThreadProxyBase::SafeThreadProxyBase(
     std::shared_ptr<SafeThread> thr)
     : m_thread(std::move(thr)) {
-  if (!m_thread)
+  if (!m_thread) {
     return;
+  }
   m_lock = std::unique_lock<wpi::mutex>(m_thread->m_mutex);
   if (!m_thread->m_active) {
     m_lock.unlock();
@@ -20,16 +21,18 @@ detail::SafeThreadProxyBase::SafeThreadProxyBase(
 }
 
 detail::SafeThreadOwnerBase::~SafeThreadOwnerBase() {
-  if (m_joinAtExit)
+  if (m_joinAtExit) {
     Join();
-  else
+  } else {
     Stop();
+  }
 }
 
 void detail::SafeThreadOwnerBase::Start(std::shared_ptr<SafeThread> thr) {
   std::scoped_lock lock(m_mutex);
-  if (auto thr = m_thread.lock())
+  if (auto thr = m_thread.lock()) {
     return;
+  }
   m_stdThread = std::thread([=] { thr->Main(); });
   thr->m_threadId = m_stdThread.get_id();
   m_thread = thr;
@@ -42,8 +45,9 @@ void detail::SafeThreadOwnerBase::Stop() {
     thr->m_cond.notify_all();
     m_thread.reset();
   }
-  if (m_stdThread.joinable())
+  if (m_stdThread.joinable()) {
     m_stdThread.detach();
+  }
 }
 
 void detail::SafeThreadOwnerBase::Join() {
@@ -62,8 +66,9 @@ void detail::SafeThreadOwnerBase::Join() {
 
 void detail::swap(SafeThreadOwnerBase& lhs, SafeThreadOwnerBase& rhs) noexcept {
   using std::swap;
-  if (&lhs == &rhs)
+  if (&lhs == &rhs) {
     return;
+  }
   std::scoped_lock lock(lhs.m_mutex, rhs.m_mutex);
   std::swap(lhs.m_stdThread, rhs.m_stdThread);
   std::swap(lhs.m_thread, rhs.m_thread);

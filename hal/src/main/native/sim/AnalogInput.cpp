@@ -31,8 +31,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
 
   HAL_AnalogInputHandle handle = analogInputHandles->Allocate(channel, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   // Initialize port structure
   auto analog_port = analogInputHandles->Get(handle);
@@ -58,8 +59,9 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
   auto port = analogInputHandles->Get(analogPortHandle);
   // no status, so no need to check for a proper free.
   analogInputHandles->Free(analogPortHandle);
-  if (port == nullptr)
+  if (port == nullptr) {
     return;
+  }
   SimAnalogInData[port->channel].initialized = false;
   SimAnalogInData[port->channel].accumulatorInitialized = false;
 }
@@ -75,8 +77,9 @@ HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
 void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
                                  HAL_SimDeviceHandle device) {
   auto port = analogInputHandles->Get(handle);
-  if (port == nullptr)
+  if (port == nullptr) {
     return;
+  }
   SimAnalogInData[port->channel].simDevice = device;
 }
 

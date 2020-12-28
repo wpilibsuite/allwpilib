@@ -85,8 +85,9 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // Now enforce all acceleration limits.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.to<double>() < kEpsilon)
+      if (ds.to<double>() < kEpsilon) {
         break;
+      }
 
       // If the actual acceleration for this state is higher than the max
       // acceleration that we applied, then we need to reduce the max
@@ -131,16 +132,18 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
                             successor.minAcceleration * ds * 2.0);
 
       // No more limits to impose! This state can be finalized.
-      if (newMaxVelocity >= constrainedState.maxVelocity)
+      if (newMaxVelocity >= constrainedState.maxVelocity) {
         break;
+      }
 
       constrainedState.maxVelocity = newMaxVelocity;
 
       // Check all acceleration constraints with the new max velocity.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.to<double>() > -kEpsilon)
+      if (ds.to<double>() > -kEpsilon) {
         break;
+      }
 
       // If the actual acceleration for this state is lower than the min
       // acceleration, then we need to lower the min acceleration of the

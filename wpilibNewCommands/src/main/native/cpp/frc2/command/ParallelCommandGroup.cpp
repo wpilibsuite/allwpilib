@@ -21,8 +21,9 @@ void ParallelCommandGroup::Initialize() {
 
 void ParallelCommandGroup::Execute() {
   for (auto& commandRunning : m_commands) {
-    if (!commandRunning.second)
+    if (!commandRunning.second) {
       continue;
+    }
     commandRunning.first->Execute();
     if (commandRunning.first->IsFinished()) {
       commandRunning.first->End(false);
@@ -44,8 +45,9 @@ void ParallelCommandGroup::End(bool interrupted) {
 
 bool ParallelCommandGroup::IsFinished() {
   for (auto& command : m_commands) {
-    if (command.second)
+    if (command.second) {
       return false;
+    }
   }
   return true;
 }
@@ -57,8 +59,9 @@ bool ParallelCommandGroup::RunsWhenDisabled() const {
 void ParallelCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
   for (auto&& command : commands) {
-    if (!RequireUngrouped(*command))
+    if (!RequireUngrouped(*command)) {
       return;
+    }
   }
 
   if (isRunning) {

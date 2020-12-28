@@ -25,8 +25,9 @@ std::vector<VideoProperty> VideoSource::EnumerateProperties() const {
 
   std::vector<VideoProperty> properties;
   properties.reserve(handles.size());
-  for (CS_Property handle : handles)
+  for (CS_Property handle : handles) {
     properties.emplace_back(VideoProperty{handle});
+  }
   return properties;
 }
 
@@ -37,8 +38,9 @@ std::vector<VideoSink> VideoSource::EnumerateSinks() {
 
   std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());
-  for (int handle : handles)
+  for (int handle : handles) {
     sinks.emplace_back(VideoSink{handle});
+  }
   return sinks;
 }
 
@@ -49,8 +51,9 @@ std::vector<VideoSource> VideoSource::EnumerateSources() {
 
   std::vector<VideoSource> sources;
   sources.reserve(handles.size());
-  for (int handle : handles)
+  for (int handle : handles) {
     sources.emplace_back(VideoSource{handle});
+  }
   return sources;
 }
 
@@ -61,8 +64,9 @@ std::vector<VideoProperty> VideoSink::EnumerateProperties() const {
 
   std::vector<VideoProperty> properties;
   properties.reserve(handles.size());
-  for (CS_Property handle : handles)
+  for (CS_Property handle : handles) {
     properties.emplace_back(VideoProperty{handle});
+  }
   return properties;
 }
 
@@ -73,7 +77,8 @@ std::vector<VideoSink> VideoSink::EnumerateSinks() {
 
   std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());
-  for (int handle : handles)
+  for (int handle : handles) {
     sinks.emplace_back(VideoSink{handle});
+  }
   return sinks;
 }

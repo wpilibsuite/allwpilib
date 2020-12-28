@@ -33,13 +33,15 @@ void MyHttpServerConnection::ProcessRequest() {
   }
 
   wpi::StringRef path;
-  if (url.HasPath())
+  if (url.HasPath()) {
     path = url.GetPath();
+  }
   wpi::errs() << "path: \"" << path << "\"\n";
 
   wpi::StringRef query;
-  if (url.HasQuery())
+  if (url.HasQuery()) {
     query = url.GetQuery();
+  }
   wpi::errs() << "query: \"" << query << "\"\n";
 
   const bool isGET = m_request.GetMethod() == wpi::HTTP_GET;
@@ -68,8 +70,9 @@ int main() {
     // when we get a connection, accept it and start reading
     tcp->connection.connect([srv = tcp.get()] {
       auto tcp = srv->Accept();
-      if (!tcp)
+      if (!tcp) {
         return;
+      }
       wpi::errs() << "Got a connection\n";
       auto conn = std::make_shared<MyHttpServerConnection>(tcp);
       tcp->SetData(conn);

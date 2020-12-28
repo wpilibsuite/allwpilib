@@ -182,8 +182,9 @@ void FieldInfo::LoadImage() {
     m_fileOpener.reset();
   }
   if (!m_texture && !m_pFilename->empty()) {
-    if (!LoadImageImpl(m_pFilename->c_str()))
+    if (!LoadImageImpl(m_pFilename->c_str())) {
       m_pFilename->clear();
+    }
   }
 }
 
@@ -265,8 +266,9 @@ void FieldInfo::LoadJson(const wpi::Twine& jsonfile) {
   wpi::sys::path::append(pathname, image);
 
   // load field image
-  if (!LoadImageImpl(pathname.c_str()))
+  if (!LoadImageImpl(pathname.c_str())) {
     return;
+  }
 
   // save to field info
   *m_pFilename = pathname.str();
@@ -294,8 +296,9 @@ bool FieldInfo::LoadImageImpl(const char* fn) {
 
 FieldFrameData FieldInfo::GetFrameData(ImVec2 min, ImVec2 max) const {
   // fit the image into the window
-  if (m_texture && m_imageHeight != 0 && m_imageWidth != 0)
+  if (m_texture && m_imageHeight != 0 && m_imageWidth != 0) {
     gui::MaxFit(&min, &max, m_imageWidth, m_imageHeight);
+  }
 
   FieldFrameData ffd;
   ffd.imageMin = min;
@@ -342,13 +345,15 @@ void ObjectGroupInfo::Reset() {
 void ObjectGroupInfo::LoadImage() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
-    if (!result.empty())
+    if (!result.empty()) {
       LoadImageImpl(result[0].c_str());
+    }
     m_fileOpener.reset();
   }
   if (!m_texture && !m_pFilename->empty()) {
-    if (!LoadImageImpl(m_pFilename->c_str()))
+    if (!LoadImageImpl(m_pFilename->c_str())) {
       m_pFilename->clear();
+    }
   }
 }
 
@@ -372,12 +377,15 @@ ObjectFrameData::ObjectFrameData(FieldObjectModel& model,
       m_width2(ffd.scale * width / 2),
       m_length2(ffd.scale * length / 2),
       m_hitRadius((std::min)(m_width2, m_length2) / 2) {
-  if (auto xData = model.GetXData())
+  if (auto xData = model.GetXData()) {
     m_x = xData->GetValue();
-  if (auto yData = model.GetYData())
+  }
+  if (auto yData = model.GetYData()) {
     m_y = yData->GetValue();
-  if (auto rotationData = model.GetRotationData())
+  }
+  if (auto rotationData = model.GetRotationData()) {
     m_rot = rotationData->GetValue();
+  }
   UpdateFrameData();
 }
 
@@ -424,23 +432,25 @@ int ObjectFrameData::IsHovered(const ImVec2& cursor) const {
   // only allow initiation of dragging when invisible button is hovered;
   // this prevents the window resize handles from simultaneously activating
   // the drag functionality
-  if (!ImGui::IsItemHovered())
+  if (!ImGui::IsItemHovered()) {
     return 0;
+  }
 
   float hitRadiusSquared = m_hitRadius * m_hitRadius;
   // it's within the hit radius of the center?
-  if (gui::GetDistSquared(cursor, m_center) < hitRadiusSquared)
+  if (gui::GetDistSquared(cursor, m_center) < hitRadiusSquared) {
     return 1;
-  else if (gui::GetDistSquared(cursor, m_corners[0]) < hitRadiusSquared)
+  } else if (gui::GetDistSquared(cursor, m_corners[0]) < hitRadiusSquared) {
     return 2;
-  else if (gui::GetDistSquared(cursor, m_corners[1]) < hitRadiusSquared)
+  } else if (gui::GetDistSquared(cursor, m_corners[1]) < hitRadiusSquared) {
     return 3;
-  else if (gui::GetDistSquared(cursor, m_corners[2]) < hitRadiusSquared)
+  } else if (gui::GetDistSquared(cursor, m_corners[2]) < hitRadiusSquared) {
     return 4;
-  else if (gui::GetDistSquared(cursor, m_corners[3]) < hitRadiusSquared)
+  } else if (gui::GetDistSquared(cursor, m_corners[3]) < hitRadiusSquared) {
     return 5;
-  else
+  } else {
     return 0;
+  }
 }
 
 bool ObjectFrameData::HandleDrag(const ImVec2& cursor, int hitCorner,
@@ -532,12 +542,14 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
   }
 
   model->ForEachFieldObjectGroup([&](auto& groupModel, auto name) {
-    if (!groupModel.Exists())
+    if (!groupModel.Exists()) {
       return;
+    }
     PushID(name);
     auto& objGroupRef = field->m_objectGroups[name];
-    if (!objGroupRef)
+    if (!objGroupRef) {
       objGroupRef = std::make_unique<ObjectGroupInfo>();
+    }
     auto objGroup = objGroupRef.get();
 
     wpi::SmallString<64> nameBuf = name;
@@ -574,8 +586,9 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 
   // for dragging to work, there needs to be a button (otherwise the window is
   // dragged)
-  if (contentSize.x <= 0 || contentSize.y <= 0)
+  if (contentSize.x <= 0 || contentSize.y <= 0) {
     return;
+  }
   ImVec2 cursorPos = windowPos + ImGui::GetCursorPos();  // screen coords
   ImGui::InvisibleButton("field", contentSize);
 
@@ -586,12 +599,14 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
   field->Draw(drawList, ffd);
 
   model->ForEachFieldObjectGroup([&](auto& groupModel, auto name) {
-    if (!groupModel.Exists())
+    if (!groupModel.Exists()) {
       return;
+    }
     PushID(name);
     auto& objGroupRef = field->m_objectGroups[name];
-    if (!objGroupRef)
+    if (!objGroupRef) {
       objGroupRef = std::make_unique<ObjectGroupInfo>();
+    }
     auto objGroup = objGroupRef.get();
     objGroup->LoadImage();
 
@@ -605,8 +620,9 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
       if (objGroup->m_dragState.object == 0 ||
           objGroup->m_dragState.object == i) {
         hitCorner = ofd.IsHovered(mousePos);
-        if (ofd.HandleDrag(mousePos, hitCorner, &objGroup->m_dragState))
+        if (ofd.HandleDrag(mousePos, hitCorner, &objGroup->m_dragState)) {
           objGroup->m_dragState.object = i;
+        }
       }
 
       // draw

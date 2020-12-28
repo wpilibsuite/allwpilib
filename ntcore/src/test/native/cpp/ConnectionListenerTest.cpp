@@ -35,8 +35,9 @@ void ConnectionListenerTest::Connect() {
   nt::StartClient(client_inst, "127.0.0.1", 10000);
 
   // wait for client to report it's started, then wait another 0.1 sec
-  while ((nt::GetNetworkMode(client_inst) & NT_NET_MODE_STARTING) != 0)
+  while ((nt::GetNetworkMode(client_inst) & NT_NET_MODE_STARTING) != 0) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 

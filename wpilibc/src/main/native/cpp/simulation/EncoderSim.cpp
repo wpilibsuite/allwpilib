@@ -20,8 +20,9 @@ EncoderSim::EncoderSim(const Encoder& encoder)
 
 EncoderSim EncoderSim::CreateForChannel(int channel) {
   int index = HALSIM_FindEncoderForChannel(channel);
-  if (index < 0)
+  if (index < 0) {
     throw std::out_of_range("no encoder found for channel");
+  }
   return EncoderSim{index};
 }
 

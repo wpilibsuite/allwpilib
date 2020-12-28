@@ -83,8 +83,9 @@ inline SendableCameraWrapper& SendableCameraWrapper::Wrap(
 
 inline SendableCameraWrapper& SendableCameraWrapper::Wrap(CS_Source source) {
   auto& wrapper = detail::GetSendableCameraWrapper(source);
-  if (!wrapper)
+  if (!wrapper) {
     wrapper = std::make_shared<SendableCameraWrapper>(source, private_init{});
+  }
   return *wrapper;
 }
 #endif

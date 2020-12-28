@@ -41,14 +41,16 @@ DigitalInput::DigitalInput(int channel) {
 }
 
 DigitalInput::~DigitalInput() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   HAL_FreeDIOPort(m_handle);
 }
 
 bool DigitalInput::Get() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return false;
+  }
   int32_t status = 0;
   bool value = HAL_GetDIO(m_handle, &status);
   wpi_setHALError(status);

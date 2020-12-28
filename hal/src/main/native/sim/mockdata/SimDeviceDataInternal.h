@@ -33,21 +33,25 @@ class SimUnnamedCallbackRegistry {
 
  public:
   void Cancel(int32_t uid) {
-    if (m_callbacks)
+    if (m_callbacks) {
       m_callbacks->erase(uid - 1);
+    }
   }
 
   void Reset() {
-    if (m_callbacks)
+    if (m_callbacks) {
       m_callbacks->clear();
+    }
   }
 
   int32_t Register(CallbackFunction callback, void* param) {
     // Must return -1 on a null callback for error handling
-    if (callback == nullptr)
+    if (callback == nullptr) {
       return -1;
-    if (!m_callbacks)
+    }
+    if (!m_callbacks) {
       m_callbacks = std::make_unique<CallbackVector>();
+    }
     return m_callbacks->emplace_back(param,
                                      reinterpret_cast<RawFunctor>(callback)) +
            1;
@@ -88,21 +92,25 @@ class SimPrefixCallbackRegistry {
 
  public:
   void Cancel(int32_t uid) {
-    if (m_callbacks)
+    if (m_callbacks) {
       m_callbacks->erase(uid - 1);
+    }
   }
 
   void Reset() {
-    if (m_callbacks)
+    if (m_callbacks) {
       m_callbacks->clear();
+    }
   }
 
   int32_t Register(const char* prefix, void* param, CallbackFunction callback) {
     // Must return -1 on a null callback for error handling
-    if (callback == nullptr)
+    if (callback == nullptr) {
       return -1;
-    if (!m_callbacks)
+    }
+    if (!m_callbacks) {
       m_callbacks = std::make_unique<CallbackVector>();
+    }
     return m_callbacks->emplace_back(prefix, param, callback) + 1;
   }
 

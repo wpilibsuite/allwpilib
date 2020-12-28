@@ -81,15 +81,18 @@ Relay::~Relay() {
   HAL_SetRelay(m_forwardHandle, false, &status);
   HAL_SetRelay(m_reverseHandle, false, &status);
   // ignore errors, as we want to make sure a free happens.
-  if (m_forwardHandle != HAL_kInvalidHandle)
+  if (m_forwardHandle != HAL_kInvalidHandle) {
     HAL_FreeRelayPort(m_forwardHandle);
-  if (m_reverseHandle != HAL_kInvalidHandle)
+  }
+  if (m_reverseHandle != HAL_kInvalidHandle) {
     HAL_FreeRelayPort(m_reverseHandle);
+  }
 }
 
 void Relay::Set(Relay::Value value) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
 
   int32_t status = 0;
 
@@ -204,13 +207,14 @@ void Relay::InitSendable(SendableBuilder& builder) {
         }
       },
       [=](wpi::StringRef value) {
-        if (value == "Off")
+        if (value == "Off") {
           Set(kOff);
-        else if (value == "Forward")
+        } else if (value == "Forward") {
           Set(kForward);
-        else if (value == "Reverse")
+        } else if (value == "Reverse") {
           Set(kReverse);
-        else if (value == "On")
+        } else if (value == "On") {
           Set(kOn);
+        }
       });
 }

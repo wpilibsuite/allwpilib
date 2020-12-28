@@ -67,8 +67,9 @@ AnalogGyro::~AnalogGyro() {
 }
 
 double AnalogGyro::GetAngle() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return 0.0;
+  }
   int32_t status = 0;
   double value = HAL_GetAnalogGyroAngle(m_gyroHandle, &status);
   wpi_setHALError(status);
@@ -76,8 +77,9 @@ double AnalogGyro::GetAngle() const {
 }
 
 double AnalogGyro::GetRate() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return 0.0;
+  }
   int32_t status = 0;
   double value = HAL_GetAnalogGyroRate(m_gyroHandle, &status);
   wpi_setHALError(status);
@@ -85,8 +87,9 @@ double AnalogGyro::GetRate() const {
 }
 
 int AnalogGyro::GetCenter() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return 0;
+  }
   int32_t status = 0;
   int value = HAL_GetAnalogGyroCenter(m_gyroHandle, &status);
   wpi_setHALError(status);
@@ -94,8 +97,9 @@ int AnalogGyro::GetCenter() const {
 }
 
 double AnalogGyro::GetOffset() const {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return 0.0;
+  }
   int32_t status = 0;
   double value = HAL_GetAnalogGyroOffset(m_gyroHandle, &status);
   wpi_setHALError(status);
@@ -110,24 +114,27 @@ void AnalogGyro::SetSensitivity(double voltsPerDegreePerSecond) {
 }
 
 void AnalogGyro::SetDeadband(double volts) {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_SetAnalogGyroDeadband(m_gyroHandle, volts, &status);
   wpi_setHALError(status);
 }
 
 void AnalogGyro::Reset() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_ResetAnalogGyro(m_gyroHandle, &status);
   wpi_setHALError(status);
 }
 
 void AnalogGyro::InitGyro() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   if (m_gyroHandle == HAL_kInvalidHandle) {
     int32_t status = 0;
     m_gyroHandle = HAL_InitializeAnalogGyro(m_analog->m_port, &status);
@@ -162,8 +169,9 @@ void AnalogGyro::InitGyro() {
 }
 
 void AnalogGyro::Calibrate() {
-  if (StatusIsFatal())
+  if (StatusIsFatal()) {
     return;
+  }
   int32_t status = 0;
   HAL_CalibrateAnalogGyro(m_gyroHandle, &status);
   wpi_setHALError(status);

@@ -23,8 +23,9 @@ int main() {
 
   auto foo = nt::GetEntry(inst, "/foo");
   auto foo_val = nt::GetEntryValue(foo);
-  if (foo_val && foo_val->IsDouble())
+  if (foo_val && foo_val->IsDouble()) {
     std::printf("Got foo: %g\n", foo_val->GetDouble());
+  }
 
   auto bar = nt::GetEntry(inst, "/bar");
   nt::SetEntryValue(bar, nt::Value::MakeBoolean(false));

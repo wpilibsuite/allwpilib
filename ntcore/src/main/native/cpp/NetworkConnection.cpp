@@ -41,13 +41,15 @@ NetworkConnection::~NetworkConnection() {
 }
 
 void NetworkConnection::Start() {
-  if (m_active)
+  if (m_active) {
     return;
+  }
   m_active = true;
   set_state(kInit);
   // clear queue
-  while (!m_outgoing.empty())
+  while (!m_outgoing.empty()) {
     m_outgoing.pop();
+  }
   // reset shutdown flags
   {
     std::scoped_lock lock(m_shutdown_mutex);
@@ -64,8 +66,9 @@ void NetworkConnection::Stop() {
   set_state(kDead);
   m_active = false;
   // closing the stream so the read thread terminates
-  if (m_stream)
+  if (m_stream) {
     m_stream->close();
+  }
   // send an empty outgoing message set so the write thread terminates
   m_outgoing.push(Outgoing());
   // wait for threads to terminate, with timeout
@@ -74,24 +77,27 @@ void NetworkConnection::Stop() {
     auto timeout_time =
         std::chrono::steady_clock::now() + std::chrono::milliseconds(200);
     if (m_write_shutdown_cv.wait_until(lock, timeout_time,
-                                       [&] { return m_write_shutdown; }))
+                                       [&] { return m_write_shutdown; })) {
       m_write_thread.join();
-    else
+    } else {
       m_write_thread.detach();  // timed out, detach it
+    }
   }
   if (m_read_thread.joinable()) {
     std::unique_lock lock(m_shutdown_mutex);
     auto timeout_time =
         std::chrono::steady_clock::now() + std::chrono::milliseconds(200);
     if (m_read_shutdown_cv.wait_until(lock, timeout_time,
-                                      [&] { return m_read_shutdown; }))
+                                      [&] { return m_read_shutdown; })) {
       m_read_thread.join();
-    else
+    } else {
       m_read_thread.detach();  // timed out, detach it
+    }
   }
   // clear queue
-  while (!m_outgoing.empty())
+  while (!m_outgoing.empty()) {
     m_outgoing.pop();
+  }
 }
 
 ConnectionInfo NetworkConnection::info() const {
@@ -116,13 +122,16 @@ NetworkConnection::State NetworkConnection::state() const {
 void NetworkConnection::set_state(State state) {
   std::scoped_lock lock(m_state_mutex);
   // Don't update state any more once we've died
-  if (m_state == kDead)
+  if (m_state == kDead) {
     return;
+  }
   // One-shot notify state changes
-  if (m_state != kActive && state == kActive)
+  if (m_state != kActive && state == kActive) {
     m_notifier.NotifyConnection(true, info());
-  if (m_state != kDead && state == kDead)
+  }
+  if (m_state != kDead && state == kDead) {
     m_notifier.NotifyConnection(false, info());
+  }
   m_state = state;
 }
 
@@ -146,8 +155,9 @@ void NetworkConnection::ReadThreadMain() {
           [&] {
             decoder.set_proto_rev(m_proto_rev);
             auto msg = Message::Read(decoder, m_get_entry_type);
-            if (!msg && decoder.error())
+            if (!msg && decoder.error()) {
               DEBUG0("error reading in handshake: " << decoder.error());
+            }
             return msg;
           },
           [&](wpi::ArrayRef<std::shared_ptr<Message>> msgs) {
@@ -160,17 +170,20 @@ void NetworkConnection::ReadThreadMain() {
 
   set_state(kActive);
   while (m_active) {
-    if (!m_stream)
+    if (!m_stream) {
       break;
+    }
     decoder.set_proto_rev(m_proto_rev);
     decoder.Reset();
     auto msg = Message::Read(decoder, m_get_entry_type);
     if (!msg) {
-      if (decoder.error())
+      if (decoder.error()) {
         INFO("read error: " << decoder.error());
+      }
       // terminate connection on bad message
-      if (m_stream)
+      if (m_stream) {
         m_stream->close();
+      }
       break;
     }
     DEBUG3("received type=" << msg->type() << " with str=" << msg->str()
@@ -199,8 +212,9 @@ void NetworkConnection::WriteThreadMain() {
   while (m_active) {
     auto msgs = m_outgoing.pop();
     DEBUG4("write thread woke up");
-    if (msgs.empty())
+    if (msgs.empty()) {
       continue;
+    }
     encoder.set_proto_rev(m_proto_rev);
     encoder.Reset();
     DEBUG3("sending " << msgs.size() << " messages");
@@ -213,19 +227,23 @@ void NetworkConnection::WriteThreadMain() {
       }
     }
     wpi::NetworkStream::Error err;
-    if (!m_stream)
+    if (!m_stream) {
       break;
-    if (encoder.size() == 0)
+    }
+    if (encoder.size() == 0) {
       continue;
-    if (m_stream->send(encoder.data(), encoder.size(), &err) == 0)
+    }
+    if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) {
       break;
+    }
     DEBUG4("sent " << encoder.size() << " bytes");
   }
   DEBUG2("write thread died (" << this << ")");
   set_state(kDead);
   m_active = false;
-  if (m_stream)
+  if (m_stream) {
     m_stream->close();  // also kill read thread
+  }
 
   // use condition variable to signal thread shutdown
   {
@@ -263,8 +281,9 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
         // new, but remember it
         size_t pos = m_pending_outgoing.size();
         m_pending_outgoing.push_back(msg);
-        if (id >= m_pending_update.size())
+        if (id >= m_pending_update.size()) {
           m_pending_update.resize(id + 1);
+        }
         m_pending_update[id].first = pos + 1;
       }
       break;
@@ -307,8 +326,9 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
         // new, but remember it
         size_t pos = m_pending_outgoing.size();
         m_pending_outgoing.push_back(msg);
-        if (id >= m_pending_update.size())
+        if (id >= m_pending_update.size()) {
           m_pending_update.resize(id + 1);
+        }
         m_pending_update[id].second = pos + 1;
       }
       break;
@@ -316,13 +336,15 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
     case Message::kClearEntries: {
       // knock out all previous assigns/updates!
       for (auto& i : m_pending_outgoing) {
-        if (!i)
+        if (!i) {
           continue;
+        }
         auto t = i->type();
         if (t == Message::kEntryAssign || t == Message::kEntryUpdate ||
             t == Message::kFlagsUpdate || t == Message::kEntryDelete ||
-            t == Message::kClearEntries)
+            t == Message::kClearEntries) {
           i.reset();
+        }
       }
       m_pending_update.resize(0);
       m_pending_outgoing.push_back(msg);
@@ -338,11 +360,13 @@ void NetworkConnection::PostOutgoing(bool keep_alive) {
   std::scoped_lock lock(m_pending_mutex);
   auto now = std::chrono::steady_clock::now();
   if (m_pending_outgoing.empty()) {
-    if (!keep_alive)
+    if (!keep_alive) {
       return;
+    }
     // send keep-alives once a second (if no other messages have been sent)
-    if ((now - m_last_post) < std::chrono::seconds(1))
+    if ((now - m_last_post) < std::chrono::seconds(1)) {
       return;
+    }
     m_outgoing.emplace(Outgoing{Message::KeepAlive()});
   } else {
     m_outgoing.emplace(std::move(m_pending_outgoing));

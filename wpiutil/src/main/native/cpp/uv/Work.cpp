@@ -22,25 +22,29 @@ void QueueWork(Loop& loop, const std::shared_ptr<WorkReq>& req) {
       },
       [](uv_work_t* req, int status) {
         auto& h = *static_cast<WorkReq*>(req->data);
-        if (status < 0)
+        if (status < 0) {
           h.ReportError(status);
-        else
+        } else {
           h.afterWork();
+        }
         h.Release();  // this is always a one-shot
       });
-  if (err < 0)
+  if (err < 0) {
     loop.ReportError(err);
-  else
+  } else {
     req->Keep();
+  }
 }
 
 void QueueWork(Loop& loop, std::function<void()> work,
                std::function<void()> afterWork) {
   auto req = std::make_shared<WorkReq>();
-  if (work)
+  if (work) {
     req->work.connect(work);
-  if (afterWork)
+  }
+  if (afterWork) {
     req->afterWork.connect(afterWork);
+  }
   QueueWork(loop, req);
 }
 

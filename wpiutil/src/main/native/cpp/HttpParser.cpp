@@ -34,8 +34,9 @@ HttpParser::HttpParser(Type type) {
   m_settings.on_url = [](http_parser* p, const char* at, size_t length) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     // append to buffer
-    if ((self.m_urlBuf.size() + length) > self.m_maxLength)
+    if ((self.m_urlBuf.size() + length) > self.m_maxLength) {
       return 1;
+    }
     self.m_urlBuf += StringRef{at, length};
     self.m_state = kUrl;
     return 0;
@@ -46,8 +47,9 @@ HttpParser::HttpParser(Type type) {
                             size_t length) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
     // use valueBuf for the status
-    if ((self.m_valueBuf.size() + length) > self.m_maxLength)
+    if ((self.m_valueBuf.size() + length) > self.m_maxLength) {
       return 1;
+    }
     self.m_valueBuf += StringRef{at, length};
     self.m_state = kStatus;
     return 0;
@@ -61,22 +63,25 @@ HttpParser::HttpParser(Type type) {
     // once we're in header, we know the URL is complete
     if (self.m_state == kUrl) {
       self.url(self.m_urlBuf);
-      if (self.m_aborted)
+      if (self.m_aborted) {
         return 1;
+      }
     }
 
     // once we're in header, we know the status is complete
     if (self.m_state == kStatus) {
       self.status(self.m_valueBuf);
-      if (self.m_aborted)
+      if (self.m_aborted) {
         return 1;
+      }
     }
 
     // if we previously were in value state, that means we finished a header
     if (self.m_state == kValue) {
       self.header(self.m_fieldBuf, self.m_valueBuf);
-      if (self.m_aborted)
+      if (self.m_aborted) {
         return 1;
+      }
     }
 
     // clear field and value when we enter this state
@@ -87,8 +92,9 @@ HttpParser::HttpParser(Type type) {
     }
 
     // append data to field buffer
-    if ((self.m_fieldBuf.size() + length) > self.m_maxLength)
+    if ((self.m_fieldBuf.size() + length) > self.m_maxLength) {
       return 1;
+    }
     self.m_fieldBuf += StringRef{at, length};
     return 0;
   };
@@ -105,8 +111,9 @@ HttpParser::HttpParser(Type type) {
     }
 
     // append data to value buffer
-    if ((self.m_valueBuf.size() + length) > self.m_maxLength)
+    if ((self.m_valueBuf.size() + length) > self.m_maxLength) {
       return 1;
+    }
     self.m_valueBuf += StringRef{at, length};
     return 0;
   };
@@ -118,22 +125,25 @@ HttpParser::HttpParser(Type type) {
     // if we previously were in url state, that means we finished the url
     if (self.m_state == kUrl) {
       self.url(self.m_urlBuf);
-      if (self.m_aborted)
+      if (self.m_aborted) {
         return 1;
+      }
     }
 
     // if we previously were in status state, that means we finished the status
     if (self.m_state == kStatus) {
       self.status(self.m_valueBuf);
-      if (self.m_aborted)
+      if (self.m_aborted) {
         return 1;
+      }
     }
 
     // if we previously were in value state, that means we finished a header
     if (self.m_state == kValue) {
       self.header(self.m_fieldBuf, self.m_valueBuf);
-      if (self.m_aborted)
+      if (self.m_aborted) {
         return 1;
+      }
     }
 
     self.headersComplete(self.ShouldKeepAlive());

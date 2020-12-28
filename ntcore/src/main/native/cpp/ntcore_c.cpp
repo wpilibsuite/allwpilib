@@ -56,14 +56,16 @@ static void ConvertToC(const RpcDefinition& in, NT_RpcDefinition* out) {
   out->num_params = in.params.size();
   out->params = static_cast<NT_RpcParamDef*>(
       wpi::safe_malloc(in.params.size() * sizeof(NT_RpcParamDef)));
-  for (size_t i = 0; i < in.params.size(); ++i)
+  for (size_t i = 0; i < in.params.size(); ++i) {
     ConvertToC(in.params[i], &out->params[i]);
+  }
 
   out->num_results = in.results.size();
   out->results = static_cast<NT_RpcResultDef*>(
       wpi::safe_malloc(in.results.size() * sizeof(NT_RpcResultDef)));
-  for (size_t i = 0; i < in.results.size(); ++i)
+  for (size_t i = 0; i < in.results.size(); ++i) {
     ConvertToC(in.results[i], &out->results[i]);
+  }
 }
 
 static void ConvertToC(const RpcAnswer& in, NT_RpcAnswer* out) {
@@ -99,14 +101,17 @@ static void ConvertToC(const LogMessage& in, NT_LogMessage* out) {
 
 template <typename O, typename I>
 static O* ConvertToC(const std::vector<I>& in, size_t* out_len) {
-  if (!out_len)
+  if (!out_len) {
     return nullptr;
+  }
   *out_len = in.size();
-  if (in.empty())
+  if (in.empty()) {
     return nullptr;
+  }
   O* out = static_cast<O*>(wpi::safe_malloc(sizeof(O) * in.size()));
-  for (size_t i = 0; i < in.size(); ++i)
+  for (size_t i = 0; i < in.size(); ++i) {
     ConvertToC(in[i], &out[i]);
+  }
   return out;
 }
 
@@ -148,12 +153,14 @@ static RpcDefinition ConvertFromC(const NT_RpcDefinition& in) {
   out.name = ConvertFromC(in.name);
 
   out.params.reserve(in.num_params);
-  for (size_t i = 0; i < in.num_params; ++i)
+  for (size_t i = 0; i < in.num_params; ++i) {
     out.params.push_back(ConvertFromC(in.params[i]));
+  }
 
   out.results.reserve(in.num_results);
-  for (size_t i = 0; i < in.num_results; ++i)
+  for (size_t i = 0; i < in.num_results; ++i) {
     out.results.push_back(ConvertFromC(in.results[i]));
+  }
 
   return out;
 }
@@ -192,8 +199,9 @@ NT_Entry* NT_GetEntries(NT_Inst inst, const char* prefix, size_t prefix_len,
                         unsigned int types, size_t* count) {
   auto info_v = nt::GetEntries(inst, StringRef(prefix, prefix_len), types);
   *count = info_v.size();
-  if (info_v.size() == 0)
+  if (info_v.size() == 0) {
     return nullptr;
+  }
 
   // create array and copy into it
   NT_Entry* info = static_cast<NT_Entry*>(
@@ -220,8 +228,9 @@ uint64_t NT_GetEntryLastChange(NT_Entry entry) {
 void NT_GetEntryValue(NT_Entry entry, struct NT_Value* value) {
   NT_InitValue(value);
   auto v = nt::GetEntryValue(entry);
-  if (!v)
+  if (!v) {
     return;
+  }
   ConvertToC(*v, value);
 }
 
@@ -263,8 +272,9 @@ struct NT_EntryInfo* NT_GetEntryInfo(NT_Inst inst, const char* prefix,
 
 NT_Bool NT_GetEntryInfoHandle(NT_Entry entry, struct NT_EntryInfo* info) {
   auto info_v = nt::GetEntryInfo(entry);
-  if (info_v.name.empty())
+  if (info_v.name.empty()) {
     return false;
+  }
   ConvertToC(info_v, info);
   return true;
 }
@@ -464,8 +474,9 @@ NT_RpcCall NT_CallRpc(NT_Entry entry, const char* params, size_t params_len) {
 
 char* NT_GetRpcResult(NT_Entry entry, NT_RpcCall call, size_t* result_len) {
   std::string result;
-  if (!nt::GetRpcResult(entry, call, &result))
+  if (!nt::GetRpcResult(entry, call, &result)) {
     return nullptr;
+  }
 
   // convert result
   *result_len = result.size();
@@ -509,8 +520,9 @@ char* NT_PackRpcDefinition(const NT_RpcDefinition* def, size_t* packed_len) {
 NT_Bool NT_UnpackRpcDefinition(const char* packed, size_t packed_len,
                                NT_RpcDefinition* def) {
   nt::RpcDefinition def_v;
-  if (!nt::UnpackRpcDefinition(StringRef(packed, packed_len), &def_v))
+  if (!nt::UnpackRpcDefinition(StringRef(packed, packed_len), &def_v)) {
     return 0;
+  }
 
   // convert result
   ConvertToC(def_v, def);
@@ -522,8 +534,9 @@ char* NT_PackRpcValues(const NT_Value** values, size_t values_len,
   // create input vector
   std::vector<std::shared_ptr<Value>> values_v;
   values_v.reserve(values_len);
-  for (size_t i = 0; i < values_len; ++i)
+  for (size_t i = 0; i < values_len; ++i) {
     values_v.push_back(ConvertFromC(*values[i]));
+  }
 
   // make the call
   auto packed = nt::PackRpcValues(values_v);
@@ -539,8 +552,9 @@ NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
                               const NT_Type* types, size_t types_len) {
   auto values_v = nt::UnpackRpcValues(StringRef(packed, packed_len),
                                       ArrayRef<NT_Type>(types, types_len));
-  if (values_v.size() == 0)
+  if (values_v.size() == 0) {
     return nullptr;
+  }
 
   // create array and copy into it
   NT_Value** values = static_cast<NT_Value**>(
@@ -593,8 +607,9 @@ void NT_StartClientMulti(NT_Inst inst, size_t count, const char** server_names,
                          const unsigned int* ports) {
   std::vector<std::pair<StringRef, unsigned int>> servers;
   servers.reserve(count);
-  for (size_t i = 0; i < count; ++i)
+  for (size_t i = 0; i < count; ++i) {
     servers.emplace_back(std::make_pair(server_names[i], ports[i]));
+  }
   nt::StartClient(inst, servers);
 }
 
@@ -614,8 +629,9 @@ void NT_SetServerMulti(NT_Inst inst, size_t count, const char** server_names,
                        const unsigned int* ports) {
   std::vector<std::pair<StringRef, unsigned int>> servers;
   servers.reserve(count);
-  for (size_t i = 0; i < count; ++i)
+  for (size_t i = 0; i < count; ++i) {
     servers.emplace_back(std::make_pair(server_names[i], ports[i]));
+  }
   nt::SetServer(inst, servers);
 }
 
@@ -749,8 +765,9 @@ void NT_DisposeValue(NT_Value* value) {
       std::free(value->data.arr_double.arr);
       break;
     case NT_STRING_ARRAY: {
-      for (size_t i = 0; i < value->data.arr_string.size; i++)
+      for (size_t i = 0; i < value->data.arr_string.size; i++) {
         std::free(value->data.arr_string.arr[i].str);
+      }
       std::free(value->data.arr_string.arr);
       break;
     }
@@ -782,14 +799,16 @@ void NT_DisposeEntryArray(NT_Entry* arr, size_t /*count*/) {
 }
 
 void NT_DisposeConnectionInfoArray(NT_ConnectionInfo* arr, size_t count) {
-  for (size_t i = 0; i < count; i++)
+  for (size_t i = 0; i < count; i++) {
     DisposeConnectionInfo(&arr[i]);
+  }
   std::free(arr);
 }
 
 void NT_DisposeEntryInfoArray(NT_EntryInfo* arr, size_t count) {
-  for (size_t i = 0; i < count; i++)
+  for (size_t i = 0; i < count; i++) {
     DisposeEntryInfo(&arr[i]);
+  }
   std::free(arr);
 }
 
@@ -798,8 +817,9 @@ void NT_DisposeEntryInfo(NT_EntryInfo* info) {
 }
 
 void NT_DisposeEntryNotificationArray(NT_EntryNotification* arr, size_t count) {
-  for (size_t i = 0; i < count; i++)
+  for (size_t i = 0; i < count; i++) {
     DisposeEntryNotification(&arr[i]);
+  }
   std::free(arr);
 }
 
@@ -809,8 +829,9 @@ void NT_DisposeEntryNotification(NT_EntryNotification* info) {
 
 void NT_DisposeConnectionNotificationArray(NT_ConnectionNotification* arr,
                                            size_t count) {
-  for (size_t i = 0; i < count; i++)
+  for (size_t i = 0; i < count; i++) {
     DisposeConnectionNotification(&arr[i]);
+  }
   std::free(arr);
 }
 
@@ -819,8 +840,9 @@ void NT_DisposeConnectionNotification(NT_ConnectionNotification* info) {
 }
 
 void NT_DisposeLogMessageArray(NT_LogMessage* arr, size_t count) {
-  for (size_t i = 0; i < count; i++)
+  for (size_t i = 0; i < count; i++) {
     NT_DisposeLogMessage(&arr[i]);
+  }
   std::free(arr);
 }
 
@@ -839,16 +861,18 @@ void NT_DisposeRpcDefinition(NT_RpcDefinition* def) {
   def->params = nullptr;
   def->num_params = 0;
 
-  for (size_t i = 0; i < def->num_results; ++i)
+  for (size_t i = 0; i < def->num_results; ++i) {
     NT_DisposeString(&def->results[i].name);
+  }
   std::free(def->results);
   def->results = nullptr;
   def->num_results = 0;
 }
 
 void NT_DisposeRpcAnswerArray(NT_RpcAnswer* arr, size_t count) {
-  for (size_t i = 0; i < count; i++)
+  for (size_t i = 0; i < count; i++) {
     NT_DisposeRpcAnswer(&arr[i]);
+  }
   std::free(arr);
 }
 
@@ -898,8 +922,9 @@ void NT_FreeBooleanArray(int* v_boolean) {
   std::free(v_boolean);
 }
 void NT_FreeStringArray(struct NT_String* v_string, size_t arr_size) {
-  for (size_t i = 0; i < arr_size; i++)
+  for (size_t i = 0; i < arr_size; i++) {
     std::free(v_string[i].str);
+  }
   std::free(v_string);
 }
 
@@ -976,8 +1001,9 @@ NT_Bool NT_SetEntryStringArray(NT_Entry entry, uint64_t time,
                                NT_Bool force) {
   std::vector<std::string> v;
   v.reserve(size);
-  for (size_t i = 0; i < size; ++i)
+  for (size_t i = 0; i < size; ++i) {
     v.push_back(ConvertFromC(arr[i]));
+  }
 
   if (force != 0) {
     nt::SetEntryTypeValue(entry, Value::MakeStringArray(std::move(v), time));
@@ -988,15 +1014,17 @@ NT_Bool NT_SetEntryStringArray(NT_Entry entry, uint64_t time,
 }
 
 enum NT_Type NT_GetValueType(const struct NT_Value* value) {
-  if (!value)
+  if (!value) {
     return NT_Type::NT_UNASSIGNED;
+  }
   return value->type;
 }
 
 NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
                            NT_Bool* v_boolean) {
-  if (!value || value->type != NT_Type::NT_BOOLEAN)
+  if (!value || value->type != NT_Type::NT_BOOLEAN) {
     return 0;
+  }
   *v_boolean = value->data.v_boolean;
   *last_change = value->last_change;
   return 1;
@@ -1004,8 +1032,9 @@ NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
 
 NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
                           double* v_double) {
-  if (!value || value->type != NT_Type::NT_DOUBLE)
+  if (!value || value->type != NT_Type::NT_DOUBLE) {
     return 0;
+  }
   *last_change = value->last_change;
   *v_double = value->data.v_double;
   return 1;
@@ -1013,8 +1042,9 @@ NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
 
 char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
                         size_t* str_len) {
-  if (!value || value->type != NT_Type::NT_STRING)
+  if (!value || value->type != NT_Type::NT_STRING) {
     return nullptr;
+  }
   *last_change = value->last_change;
   *str_len = value->data.v_string.len;
   char* str =
@@ -1025,8 +1055,9 @@ char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
 
 char* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
                      size_t* raw_len) {
-  if (!value || value->type != NT_Type::NT_RAW)
+  if (!value || value->type != NT_Type::NT_RAW) {
     return nullptr;
+  }
   *last_change = value->last_change;
   *raw_len = value->data.v_string.len;
   char* raw =
@@ -1037,8 +1068,9 @@ char* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
 
 NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
                                  uint64_t* last_change, size_t* arr_size) {
-  if (!value || value->type != NT_Type::NT_BOOLEAN_ARRAY)
+  if (!value || value->type != NT_Type::NT_BOOLEAN_ARRAY) {
     return nullptr;
+  }
   *last_change = value->last_change;
   *arr_size = value->data.arr_boolean.size;
   NT_Bool* arr = static_cast<int*>(
@@ -1050,8 +1082,9 @@ NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
 
 double* NT_GetValueDoubleArray(const struct NT_Value* value,
                                uint64_t* last_change, size_t* arr_size) {
-  if (!value || value->type != NT_Type::NT_DOUBLE_ARRAY)
+  if (!value || value->type != NT_Type::NT_DOUBLE_ARRAY) {
     return nullptr;
+  }
   *last_change = value->last_change;
   *arr_size = value->data.arr_double.size;
   double* arr = static_cast<double*>(
@@ -1063,8 +1096,9 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
 
 NT_String* NT_GetValueStringArray(const struct NT_Value* value,
                                   uint64_t* last_change, size_t* arr_size) {
-  if (!value || value->type != NT_Type::NT_STRING_ARRAY)
+  if (!value || value->type != NT_Type::NT_STRING_ARRAY) {
     return nullptr;
+  }
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
   NT_String* arr = static_cast<NT_String*>(
@@ -1124,8 +1158,9 @@ NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, uint64_t time,
                                       size_t default_size) {
   std::vector<std::string> vec;
   vec.reserve(default_size);
-  for (size_t i = 0; i < default_size; ++i)
+  for (size_t i = 0; i < default_size; ++i) {
     vec.push_back(ConvertFromC(default_value[i]));
+  }
 
   return nt::SetDefaultEntryValue(entry,
                                   Value::MakeStringArray(std::move(vec), time));
@@ -1134,8 +1169,9 @@ NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, uint64_t time,
 NT_Bool NT_GetEntryBoolean(NT_Entry entry, uint64_t* last_change,
                            NT_Bool* v_boolean) {
   auto v = nt::GetEntryValue(entry);
-  if (!v || !v->IsBoolean())
+  if (!v || !v->IsBoolean()) {
     return 0;
+  }
   *v_boolean = v->GetBoolean();
   *last_change = v->last_change();
   return 1;
@@ -1144,8 +1180,9 @@ NT_Bool NT_GetEntryBoolean(NT_Entry entry, uint64_t* last_change,
 NT_Bool NT_GetEntryDouble(NT_Entry entry, uint64_t* last_change,
                           double* v_double) {
   auto v = nt::GetEntryValue(entry);
-  if (!v || !v->IsDouble())
+  if (!v || !v->IsDouble()) {
     return 0;
+  }
   *last_change = v->last_change();
   *v_double = v->GetDouble();
   return 1;
@@ -1154,8 +1191,9 @@ NT_Bool NT_GetEntryDouble(NT_Entry entry, uint64_t* last_change,
 char* NT_GetEntryString(NT_Entry entry, uint64_t* last_change,
                         size_t* str_len) {
   auto v = nt::GetEntryValue(entry);
-  if (!v || !v->IsString())
+  if (!v || !v->IsString()) {
     return nullptr;
+  }
   *last_change = v->last_change();
   struct NT_String v_string;
   nt::ConvertToC(v->GetString(), &v_string);
@@ -1165,8 +1203,9 @@ char* NT_GetEntryString(NT_Entry entry, uint64_t* last_change,
 
 char* NT_GetEntryRaw(NT_Entry entry, uint64_t* last_change, size_t* raw_len) {
   auto v = nt::GetEntryValue(entry);
-  if (!v || !v->IsRaw())
+  if (!v || !v->IsRaw()) {
     return nullptr;
+  }
   *last_change = v->last_change();
   struct NT_String v_raw;
   nt::ConvertToC(v->GetRaw(), &v_raw);
@@ -1177,8 +1216,9 @@ char* NT_GetEntryRaw(NT_Entry entry, uint64_t* last_change, size_t* raw_len) {
 NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry, uint64_t* last_change,
                                  size_t* arr_size) {
   auto v = nt::GetEntryValue(entry);
-  if (!v || !v->IsBooleanArray())
+  if (!v || !v->IsBooleanArray()) {
     return nullptr;
+  }
   *last_change = v->last_change();
   auto vArr = v->GetBooleanArray();
   NT_Bool* arr =
@@ -1191,8 +1231,9 @@ NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry, uint64_t* last_change,
 double* NT_GetEntryDoubleArray(NT_Entry entry, uint64_t* last_change,
                                size_t* arr_size) {
   auto v = nt::GetEntryValue(entry);
-  if (!v || !v->IsDoubleArray())
+  if (!v || !v->IsDoubleArray()) {
     return nullptr;
+  }
   *last_change = v->last_change();
   auto vArr = v->GetDoubleArray();
   double* arr =
@@ -1205,8 +1246,9 @@ double* NT_GetEntryDoubleArray(NT_Entry entry, uint64_t* last_change,
 NT_String* NT_GetEntryStringArray(NT_Entry entry, uint64_t* last_change,
                                   size_t* arr_size) {
   auto v = nt::GetEntryValue(entry);
-  if (!v || !v->IsStringArray())
+  if (!v || !v->IsStringArray()) {
     return nullptr;
+  }
   *last_change = v->last_change();
   auto vArr = v->GetStringArray();
   NT_String* arr = static_cast<NT_String*>(

@@ -76,8 +76,9 @@ ADXL362::ADXL362(SPI::Port port, Range range)
 }
 
 void ADXL362::SetRange(Range range) {
-  if (m_gsPerLSB == 0.0)
+  if (m_gsPerLSB == 0.0) {
     return;
+  }
 
   uint8_t commands[3];
 
@@ -101,8 +102,9 @@ void ADXL362::SetRange(Range range) {
       kFilterCtl_ODR_100Hz | static_cast<uint8_t>((range & 0x03) << 6);
   m_spi.Write(commands, 3);
 
-  if (m_simRange)
+  if (m_simRange) {
     m_simRange.Set(range);
+  }
 }
 
 double ADXL362::GetX() {
@@ -118,15 +120,19 @@ double ADXL362::GetZ() {
 }
 
 double ADXL362::GetAcceleration(ADXL362::Axes axis) {
-  if (m_gsPerLSB == 0.0)
+  if (m_gsPerLSB == 0.0) {
     return 0.0;
+  }
 
-  if (axis == kAxis_X && m_simX)
+  if (axis == kAxis_X && m_simX) {
     return m_simX.Get();
-  if (axis == kAxis_Y && m_simY)
+  }
+  if (axis == kAxis_Y && m_simY) {
     return m_simY.Get();
-  if (axis == kAxis_Z && m_simZ)
+  }
+  if (axis == kAxis_Z && m_simZ) {
     return m_simZ.Get();
+  }
 
   uint8_t buffer[4];
   uint8_t command[4] = {0, 0, 0, 0};

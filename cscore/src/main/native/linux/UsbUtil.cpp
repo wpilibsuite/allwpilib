@@ -21,8 +21,9 @@ namespace cs {
 static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
                                          wpi::SmallVectorImpl<char>& buf) {
   int fd = open("/var/lib/usbutils/usb.ids", O_RDONLY);
-  if (fd < 0)
-    return wpi::StringRef{};
+  if (fd < 0) {
+    return {};
+  }
 
   wpi::raw_svector_ostream os{buf};
   wpi::raw_fd_istream is{fd, true};
@@ -38,11 +39,13 @@ static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
   bool foundVendor = false;
   for (;;) {
     auto line = is.getline(lineBuf, 4096);
-    if (is.has_error())
+    if (is.has_error()) {
       break;
+    }
 
-    if (line.empty())
+    if (line.empty()) {
       continue;
+    }
 
     // look for vendor at start of line
     if (line.startswith(vendorStr)) {
@@ -66,15 +69,16 @@ static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
     }
   }
 
-  return wpi::StringRef{};
+  return {};
 }
 
 wpi::StringRef GetUsbNameFromId(int vendor, int product,
                                 wpi::SmallVectorImpl<char>& buf) {
   // try reading usb.ids
   wpi::StringRef rv = GetUsbNameFromFile(vendor, product, buf);
-  if (!rv.empty())
+  if (!rv.empty()) {
     return rv;
+  }
 
   // Fall back to internal database
   wpi::raw_svector_ostream os{buf};

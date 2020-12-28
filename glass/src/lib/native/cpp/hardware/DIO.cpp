@@ -59,11 +59,12 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
     }
   } else {
     const char* name = model->GetName();
-    if (name[0] != '\0')
+    if (name[0] != '\0') {
       info.GetLabel(label, sizeof(label), name);
-    else
+    } else {
       info.GetLabel(label, sizeof(label), model->IsInput() ? " In" : "Out",
                     index);
+    }
     if (auto simDevice = model->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {
@@ -87,10 +88,12 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
     }
   }
   if (info.PopupEditName(index)) {
-    if (dpwmData)
+    if (dpwmData) {
       dpwmData->SetName(info.GetName());
-    if (dutyCycleData)
+    }
+    if (dutyCycleData) {
       dutyCycleData->SetName(info.GetName());
+    }
   }
 }
 
@@ -112,6 +115,7 @@ void glass::DisplayDIOs(DIOsModel* model, bool outputsEnabled,
     ImGui::PopID();
   });
   ImGui::PopItemWidth();
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

@@ -41,8 +41,9 @@ void AddressableLEDData::SetData(const HAL_AddressableLEDData* d, int32_t len) {
 int32_t AddressableLEDData::GetData(HAL_AddressableLEDData* d) {
   std::scoped_lock lock(m_dataMutex);
   int32_t len = length;
-  if (d)
+  if (d) {
     std::memcpy(d, m_data, len * sizeof(d[0]));
+  }
   return len;
 }
 
@@ -51,8 +52,9 @@ extern "C" {
 int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel) {
   for (int i = 0; i < kNumAddressableLEDs; ++i) {
     if (SimAddressableLEDData[i].initialized &&
-        SimAddressableLEDData[i].outputPort == channel)
+        SimAddressableLEDData[i].outputPort == channel) {
       return i;
+    }
   }
   return -1;
 }

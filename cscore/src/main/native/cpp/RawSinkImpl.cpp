@@ -30,12 +30,14 @@ void RawSinkImpl::Stop() {
   m_active = false;
 
   // wake up any waiters by forcing an empty frame to be sent
-  if (auto source = GetSource())
+  if (auto source = GetSource()) {
     source->Wakeup();
+  }
 
   // join thread
-  if (m_thread.joinable())
+  if (m_thread.joinable()) {
     m_thread.join();
+  }
 }
 
 uint64_t RawSinkImpl::GrabFrame(CS_RawFrame& image) {
@@ -127,8 +129,9 @@ void RawSinkImpl::ThreadMain() {
     }
     SDEBUG4("waiting for frame");
     Frame frame = source->GetNextFrame();  // blocks
-    if (!m_active)
+    if (!m_active) {
       break;
+    }
     if (!frame) {
       // Bad frame; sleep for 10 ms so we don't consume all processor time.
       std::this_thread::sleep_for(std::chrono::milliseconds(10));

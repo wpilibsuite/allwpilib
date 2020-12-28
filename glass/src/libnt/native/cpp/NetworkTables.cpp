@@ -32,13 +32,15 @@ static std::string BooleanArrayToString(wpi::ArrayRef<int> in) {
   os << '[';
   bool first = true;
   for (auto v : in) {
-    if (!first)
+    if (!first) {
       os << ',';
+    }
     first = false;
-    if (v)
+    if (v) {
       os << "true";
-    else
+    } else {
       os << "false";
+    }
   }
   os << ']';
   return rv;
@@ -50,8 +52,9 @@ static std::string DoubleArrayToString(wpi::ArrayRef<double> in) {
   os << '[';
   bool first = true;
   for (auto v : in) {
-    if (!first)
+    if (!first) {
       os << ',';
+    }
     first = false;
     os << wpi::format("%.6f", v);
   }
@@ -65,8 +68,9 @@ static std::string StringArrayToString(wpi::ArrayRef<std::string> in) {
   os << '[';
   bool first = true;
   for (auto&& v : in) {
-    if (!first)
+    if (!first) {
       os << ',';
+    }
     first = false;
     os << '"';
     os.write_escaped(v);
@@ -102,14 +106,16 @@ NetworkTablesModel::Entry::Entry(nt::EntryNotification&& event)
 void NetworkTablesModel::Entry::UpdateValue() {
   switch (value->type()) {
     case NT_BOOLEAN:
-      if (!source)
+      if (!source) {
         source = std::make_unique<DataSource>(wpi::Twine{"NT:"} + name);
+      }
       source->SetValue(value->GetBoolean() ? 1 : 0);
       source->SetDigital(true);
       break;
     case NT_DOUBLE:
-      if (!source)
+      if (!source) {
         source = std::make_unique<DataSource>(wpi::Twine{"NT:"} + name);
+      }
       source->SetValue(value->GetDouble());
       source->SetDigital(false);
       break;
@@ -139,14 +145,16 @@ void NetworkTablesModel::Update() {
         updateTree = true;
       }
     }
-    if (!entry)
+    if (!entry) {
       continue;
+    }
     if (event.flags & NT_NOTIFY_DELETE) {
       auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
                           entry.get());
       // will be removed completely below
-      if (it != m_sortedEntries.end())
+      if (it != m_sortedEntries.end()) {
         *it = nullptr;
+      }
       m_entries.erase(event.entry);
       updateTree = true;
       continue;
@@ -161,8 +169,9 @@ void NetworkTablesModel::Update() {
   }
 
   // shortcut common case (updates)
-  if (!updateTree)
+  if (!updateTree) {
     return;
+  }
 
   // remove deleted entries
   m_sortedEntries.erase(
@@ -216,13 +225,16 @@ bool NetworkTablesModel::Exists() {
 
 static std::shared_ptr<nt::Value> StringToBooleanArray(wpi::StringRef in) {
   in = in.trim();
-  if (in.empty())
+  if (in.empty()) {
     return nt::NetworkTableValue::MakeBooleanArray(
         std::initializer_list<bool>{});
-  if (in.front() == '[')
+  }
+  if (in.front() == '[') {
     in = in.drop_front();
-  if (in.back() == ']')
+  }
+  if (in.back() == ']') {
     in = in.drop_back();
+  }
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -247,13 +259,16 @@ static std::shared_ptr<nt::Value> StringToBooleanArray(wpi::StringRef in) {
 
 static std::shared_ptr<nt::Value> StringToDoubleArray(wpi::StringRef in) {
   in = in.trim();
-  if (in.empty())
+  if (in.empty()) {
     return nt::NetworkTableValue::MakeBooleanArray(
         std::initializer_list<bool>{});
-  if (in.front() == '[')
+  }
+  if (in.front() == '[') {
     in = in.drop_front();
-  if (in.back() == ']')
+  }
+  if (in.back() == ']') {
     in = in.drop_back();
+  }
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -277,12 +292,13 @@ static std::shared_ptr<nt::Value> StringToDoubleArray(wpi::StringRef in) {
 }
 
 static int fromxdigit(char ch) {
-  if (ch >= 'a' && ch <= 'f')
+  if (ch >= 'a' && ch <= 'f') {
     return (ch - 'a' + 10);
-  else if (ch >= 'A' && ch <= 'F')
+  } else if (ch >= 'A' && ch <= 'F') {
     return (ch - 'A' + 10);
-  else
+  } else {
     return ch - '0';
+  }
 }
 
 static wpi::StringRef UnescapeString(wpi::StringRef source,
@@ -325,13 +341,16 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
 
 static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
   in = in.trim();
-  if (in.empty())
+  if (in.empty()) {
     return nt::NetworkTableValue::MakeStringArray(
         std::initializer_list<std::string>{});
-  if (in.front() == '[')
+  }
+  if (in.front() == '[') {
     in = in.drop_front();
-  if (in.back() == ']')
+  }
+  if (in.back() == ']') {
     in = in.drop_back();
+  }
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -341,8 +360,9 @@ static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
   in.split(inSplit, ',', -1, false);
   for (auto val : inSplit) {
     val = val.trim();
-    if (val.empty())
+    if (val.empty()) {
       continue;
+    }
     if (val.front() != '"' || val.back() != '"') {
       wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
                   << "'\n";
@@ -356,8 +376,9 @@ static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
 
 static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry) {
   auto& val = entry.value;
-  if (!val)
+  if (!val) {
     return;
+  }
 
   switch (val->type()) {
     case NT_BOOLEAN:
@@ -404,38 +425,43 @@ static char* GetTextBuffer(wpi::StringRef in) {
 
 static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
   auto& val = entry.value;
-  if (!val)
+  if (!val) {
     return;
+  }
 
   ImGui::PushID(entry.name.c_str());
   switch (val->type()) {
     case NT_BOOLEAN: {
       static const char* boolOptions[] = {"false", "true"};
       int v = val->GetBoolean() ? 1 : 0;
-      if (ImGui::Combo("boolean", &v, boolOptions, 2))
+      if (ImGui::Combo("boolean", &v, boolOptions, 2)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeBoolean(v));
+      }
       break;
     }
     case NT_DOUBLE: {
       double v = val->GetDouble();
       if (ImGui::InputDouble("double", &v, 0, 0, "%.6f",
-                             ImGuiInputTextFlags_EnterReturnsTrue))
+                             ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeDouble(v));
+      }
       break;
     }
     case NT_STRING: {
       char* v = GetTextBuffer(val->GetString());
       if (ImGui::InputText("string", v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue))
+                           ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeString(v));
+      }
       break;
     }
     case NT_BOOLEAN_ARRAY: {
       char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText("boolean[]", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (auto outv = StringToBooleanArray(v))
+        if (auto outv = StringToBooleanArray(v)) {
           nt::SetEntryValue(entry.entry, std::move(outv));
+        }
       }
       break;
     }
@@ -443,8 +469,9 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
       char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText("double[]", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (auto outv = StringToDoubleArray(v))
+        if (auto outv = StringToDoubleArray(v)) {
           nt::SetEntryValue(entry.entry, std::move(outv));
+        }
       }
       break;
     }
@@ -452,8 +479,9 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
       char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText("string[]", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (auto outv = StringToStringArray(v))
+        if (auto outv = StringToStringArray(v)) {
           nt::SetEntryValue(entry.entry, std::move(outv));
+        }
       }
       break;
     }
@@ -480,26 +508,29 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
   }
   ImGui::NextColumn();
 
-  if (flags & NetworkTablesFlags_ReadOnly)
+  if (flags & NetworkTablesFlags_ReadOnly) {
     EmitEntryValueReadonly(entry);
-  else
+  } else {
     EmitEntryValueEditable(entry);
+  }
   ImGui::NextColumn();
 
   if (flags & NetworkTablesFlags_ShowFlags) {
-    if ((entry.flags & NT_PERSISTENT) != 0)
+    if ((entry.flags & NT_PERSISTENT) != 0) {
       ImGui::Text("Persistent");
-    else if (entry.flags != 0)
+    } else if (entry.flags != 0) {
       ImGui::Text("%02x", entry.flags);
+    }
     ImGui::NextColumn();
   }
 
   if (flags & NetworkTablesFlags_ShowTimestamp) {
-    if (entry.value)
+    if (entry.value) {
       ImGui::Text("%f", (entry.value->last_change() * 1.0e-6) -
                             (GetZeroTime() * 1.0e-6));
-    else
+    } else {
       ImGui::TextUnformatted("");
+    }
     ImGui::NextColumn();
   }
   ImGui::Separator();
@@ -517,10 +548,12 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
       ImGui::NextColumn();
       ImGui::NextColumn();
-      if (flags & NetworkTablesFlags_ShowFlags)
+      if (flags & NetworkTablesFlags_ShowFlags) {
         ImGui::NextColumn();
-      if (flags & NetworkTablesFlags_ShowTimestamp)
+      }
+      if (flags & NetworkTablesFlags_ShowTimestamp) {
         ImGui::NextColumn();
+      }
       ImGui::Separator();
       if (open) {
         EmitTree(node.children, flags);
@@ -562,8 +595,9 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
       ImGui::Columns();
     }
 
-    if (!CollapsingHeader("Values", ImGuiTreeNodeFlags_DefaultOpen))
+    if (!CollapsingHeader("Values", ImGuiTreeNodeFlags_DefaultOpen)) {
       return;
+    }
   }
 
   const bool showFlags = (flags & NetworkTablesFlags_ShowFlags);
@@ -571,15 +605,17 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
 
   static bool first = true;
   ImGui::Columns(2 + (showFlags ? 1 : 0) + (showTimestamp ? 1 : 0), "values");
-  if (first)
+  if (first) {
     ImGui::SetColumnWidth(-1, 0.5f * ImGui::GetWindowWidth());
+  }
   ImGui::Text("Name");
   ImGui::NextColumn();
   ImGui::Text("Value");
   ImGui::NextColumn();
   if (showFlags) {
-    if (first)
+    if (first) {
       ImGui::SetColumnWidth(-1, 12 * ImGui::GetFontSize());
+    }
     ImGui::Text("Flags");
     ImGui::NextColumn();
   }

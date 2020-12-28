@@ -20,8 +20,9 @@ AnalogTriggerSim::AnalogTriggerSim(const AnalogTrigger& analogTrigger)
 
 AnalogTriggerSim AnalogTriggerSim::CreateForChannel(int channel) {
   int index = HALSIM_FindAnalogTriggerForChannel(channel);
-  if (index < 0)
+  if (index < 0) {
     throw std::out_of_range("no analog trigger found for channel");
+  }
   return AnalogTriggerSim{index};
 }
 

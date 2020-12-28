@@ -180,8 +180,9 @@ class SendableBuilderImpl : public SendableBuilder {
     ~Property() { StopListener(); }
 
     void StartListener() {
-      if (entry && listener == 0 && createListener)
+      if (entry && listener == 0 && createListener) {
         listener = createListener(entry);
+      }
     }
 
     void StopListener() {

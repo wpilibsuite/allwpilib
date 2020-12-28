@@ -73,13 +73,15 @@ void initializeDigital(int32_t* status) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized)
+  if (initialized) {
     return;
+  }
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized)
+  if (initialized) {
     return;
+  }
 
   digitalSystem.reset(tDIO::create(status));
 

@@ -51,8 +51,9 @@ void AnalogEncoder::Init() {
 }
 
 units::turn_t AnalogEncoder::Get() const {
-  if (m_simPosition)
+  if (m_simPosition) {
     return units::turn_t{m_simPosition.Get()};
+  }
 
   // As the values are not atomic, keep trying until we get 2 reads of the same
   // value If we don't within 10 attempts, error

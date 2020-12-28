@@ -43,8 +43,9 @@ class LoadPersistentImpl {
   std::shared_ptr<Value> ReadStringArrayValue();
 
   void Warn(const char* msg) {
-    if (m_warn)
+    if (m_warn) {
       m_warn(m_line_num, msg);
+    }
   }
 
   wpi::raw_istream& m_is;
@@ -72,8 +73,9 @@ class LoadPersistentImpl {
 static std::pair<wpi::StringRef, wpi::StringRef> ReadStringToken(
     wpi::StringRef source) {
   // Match opening quote
-  if (source.empty() || source.front() != '"')
+  if (source.empty() || source.front() != '"') {
     return std::make_pair(wpi::StringRef(), source);
+  }
 
   // Scan for ending double quote, checking for escaped as we go.
   size_t size = source.size();
@@ -88,12 +90,13 @@ static std::pair<wpi::StringRef, wpi::StringRef> ReadStringToken(
 }
 
 static int fromxdigit(char ch) {
-  if (ch >= 'a' && ch <= 'f')
+  if (ch >= 'a' && ch <= 'f') {
     return (ch - 'a' + 10);
-  else if (ch >= 'A' && ch <= 'F')
+  } else if (ch >= 'A' && ch <= 'F') {
     return (ch - 'A' + 10);
-  else
+  } else {
     return ch - '0';
+  }
 }
 
 static wpi::StringRef UnescapeString(wpi::StringRef source,
@@ -135,8 +138,9 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
 }
 
 bool LoadPersistentImpl::Load(StringRef prefix, std::vector<Entry>* entries) {
-  if (!ReadHeader())
+  if (!ReadHeader()) {
     return false;  // header
+  }
 
   while (ReadLine()) {
     // type
@@ -149,8 +153,9 @@ bool LoadPersistentImpl::Load(StringRef prefix, std::vector<Entry>* entries) {
     // name
     wpi::SmallString<128> buf;
     wpi::StringRef name = ReadName(buf);
-    if (name.empty() || !name.startswith(prefix))
+    if (name.empty() || !name.startswith(prefix)) {
       continue;
+    }
 
     // =
     m_line = m_line.ltrim(" \t");
@@ -164,8 +169,9 @@ bool LoadPersistentImpl::Load(StringRef prefix, std::vector<Entry>* entries) {
     auto value = ReadValue(type);
 
     // move to entries
-    if (value)
+    if (value) {
       entries->emplace_back(name, std::move(value));
+    }
   }
   return true;
 }
@@ -175,8 +181,9 @@ bool LoadPersistentImpl::ReadLine() {
   while (!m_is.has_error()) {
     ++m_line_num;
     m_line = m_is.getline(m_line_buf, INT_MAX).trim();
-    if (!m_line.empty() && m_line.front() != ';' && m_line.front() != '#')
+    if (!m_line.empty() && m_line.front() != ';' && m_line.front() != '#') {
       return true;
+    }
   }
   return false;
 }
@@ -204,12 +211,13 @@ NT_Type LoadPersistentImpl::ReadType() {
   } else if (tok == "array") {
     wpi::StringRef array_tok;
     std::tie(array_tok, m_line) = m_line.split(' ');
-    if (array_tok == "boolean")
+    if (array_tok == "boolean") {
       return NT_BOOLEAN_ARRAY;
-    else if (array_tok == "double")
+    } else if (array_tok == "double") {
       return NT_DOUBLE_ARRAY;
-    else if (array_tok == "string")
+    } else if (array_tok == "string") {
       return NT_STRING_ARRAY;
+    }
   }
   return NT_UNASSIGNED;
 }
@@ -251,10 +259,12 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadValue(NT_Type type) {
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanValue() {
   // only true or false is accepted
-  if (m_line == "true")
+  if (m_line == "true") {
     return Value::MakeBoolean(true);
-  if (m_line == "false")
+  }
+  if (m_line == "false") {
     return Value::MakeBoolean(false);
+  }
   Warn("unrecognized boolean value, not 'true' or 'false'");
   return nullptr;
 }
@@ -348,8 +358,9 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
     m_buf_string_array.push_back(UnescapeString(tok, buf));
 
     m_line = m_line.ltrim(" \t");
-    if (m_line.empty())
+    if (m_line.empty()) {
       break;
+    }
     if (m_line.front() != ',') {
       Warn("expected comma between strings");
       return nullptr;
@@ -370,8 +381,9 @@ bool Storage::LoadEntries(
   std::vector<LoadPersistentImpl::Entry> entries;
 
   // load file
-  if (!LoadPersistentImpl(is, warn).Load(prefixStr, &entries))
+  if (!LoadPersistentImpl(is, warn).Load(prefixStr, &entries)) {
     return false;
+  }
 
   // copy values into storage as quickly as possible so lock isn't held
   std::vector<std::shared_ptr<Message>> msgs;
@@ -381,8 +393,9 @@ bool Storage::LoadEntries(
     auto old_value = entry->value;
     entry->value = i.second;
     bool was_persist = entry->IsPersistent();
-    if (!was_persist && persistent)
+    if (!was_persist && persistent) {
       entry->flags |= NT_PERSISTENT;
+    }
 
     // if we're the server, assign an id if it doesn't have one
     if (m_server && entry->id == 0xffff) {
@@ -398,8 +411,9 @@ bool Storage::LoadEntries(
                                NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
       } else if (*old_value != *i.second) {
         unsigned int notify_flags = NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL;
-        if (!was_persist && persistent)
+        if (!was_persist && persistent) {
           notify_flags |= NT_NOTIFY_FLAGS;
+        }
         m_notifier.NotifyEntry(entry->local_id, i.first, i.second,
                                notify_flags);
       } else if (!was_persist && persistent) {
@@ -408,8 +422,9 @@ bool Storage::LoadEntries(
       }
     }
 
-    if (!m_dispatcher)
+    if (!m_dispatcher) {
       continue;  // shortcut
+    }
     ++entry->seq_num;
 
     // put on update queue
@@ -418,19 +433,22 @@ bool Storage::LoadEntries(
           i.first, entry->id, entry->seq_num.value(), i.second, entry->flags));
     } else if (entry->id != 0xffff) {
       // don't send an update if we don't have an assigned id yet
-      if (*old_value != *i.second)
+      if (*old_value != *i.second) {
         msgs.emplace_back(
             Message::EntryUpdate(entry->id, entry->seq_num.value(), i.second));
-      if (!was_persist)
+      }
+      if (!was_persist) {
         msgs.emplace_back(Message::FlagsUpdate(entry->id, entry->flags));
+      }
     }
   }
 
   if (m_dispatcher) {
     auto dispatcher = m_dispatcher;
     lock.unlock();
-    for (auto& msg : msgs)
+    for (auto& msg : msgs) {
       dispatcher->QueueOutgoing(std::move(msg), nullptr, nullptr);
+    }
   }
 
   return true;
@@ -441,10 +459,12 @@ const char* Storage::LoadPersistent(
     std::function<void(size_t line, const char* msg)> warn) {
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);
-  if (ec.value() != 0)
+  if (ec.value() != 0) {
     return "could not open file";
-  if (!LoadEntries(is, "", true, warn))
+  }
+  if (!LoadEntries(is, "", true, warn)) {
     return "error reading file";
+  }
   return nullptr;
 }
 
@@ -453,9 +473,11 @@ const char* Storage::LoadEntries(
     std::function<void(size_t line, const char* msg)> warn) {
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);
-  if (ec.value() != 0)
+  if (ec.value() != 0) {
     return "could not open file";
-  if (!LoadEntries(is, prefix, false, warn))
+  }
+  if (!LoadEntries(is, prefix, false, warn)) {
     return "error reading file";
+  }
   return nullptr;
 }

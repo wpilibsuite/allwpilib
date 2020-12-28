@@ -32,26 +32,31 @@ Frame::Frame(SourceImpl& source, std::unique_ptr<Image> image, Time time)
 }
 
 Image* Frame::GetNearestImage(int width, int height) const {
-  if (!m_impl)
+  if (!m_impl) {
     return nullptr;
+  }
   std::scoped_lock lock(m_impl->mutex);
   Image* found = nullptr;
 
   // Ideally we want the smallest image at least width/height in size
   for (auto i : m_impl->images) {
-    if (i->IsLarger(width, height) && (!found || (i->IsSmaller(*found))))
+    if (i->IsLarger(width, height) && (!found || (i->IsSmaller(*found)))) {
       found = i;
+    }
   }
-  if (found)
+  if (found) {
     return found;
+  }
 
   // Find the largest image (will be less than width/height)
   for (auto i : m_impl->images) {
-    if (!found || (i->IsLarger(*found)))
+    if (!found || (i->IsLarger(*found))) {
       found = i;
+    }
   }
-  if (found)
+  if (found) {
     return found;
+  }
 
   // Shouldn't reach this, but just in case...
   return m_impl->images.empty() ? nullptr : m_impl->images[0];
@@ -60,8 +65,9 @@ Image* Frame::GetNearestImage(int width, int height) const {
 Image* Frame::GetNearestImage(int width, int height,
                               VideoMode::PixelFormat pixelFormat,
                               int jpegQuality) const {
-  if (!m_impl)
+  if (!m_impl) {
     return nullptr;
+  }
   std::scoped_lock lock(m_impl->mutex);
   Image* found = nullptr;
 
@@ -76,22 +82,25 @@ Image* Frame::GetNearestImage(int width, int height,
   // 1) Same width, height, pixelFormat, and (possibly) JPEG quality
   //    (e.g. exactly what we want)
   for (auto i : m_impl->images) {
-    if (i->Is(width, height, pixelFormat, jpegQuality))
+    if (i->Is(width, height, pixelFormat, jpegQuality)) {
       return i;
+    }
   }
 
   // 2) Same width, height, different (but non-JPEG) pixelFormat (color conv)
   // 2a) If we want JPEG output, prefer BGR over other pixel formats
   if (pixelFormat == VideoMode::kMJPEG) {
     for (auto i : m_impl->images) {
-      if (i->Is(width, height, VideoMode::kBGR))
+      if (i->Is(width, height, VideoMode::kBGR)) {
         return i;
+      }
     }
   }
 
   for (auto i : m_impl->images) {
-    if (i->Is(width, height) && i->pixelFormat != VideoMode::kMJPEG)
+    if (i->Is(width, height) && i->pixelFormat != VideoMode::kMJPEG) {
       return i;
+    }
   }
 
   // 3) Different width, height, same pixelFormat (only if non-JPEG) (resample)
@@ -99,19 +108,23 @@ Image* Frame::GetNearestImage(int width, int height,
     // 3a) Smallest image at least width/height in size
     for (auto i : m_impl->images) {
       if (i->IsLarger(width, height) && i->pixelFormat == pixelFormat &&
-          (!found || (i->IsSmaller(*found))))
+          (!found || (i->IsSmaller(*found)))) {
         found = i;
+      }
     }
-    if (found)
+    if (found) {
       return found;
+    }
 
     // 3b) Largest image (less than width/height)
     for (auto i : m_impl->images) {
-      if (i->pixelFormat == pixelFormat && (!found || (i->IsLarger(*found))))
+      if (i->pixelFormat == pixelFormat && (!found || (i->IsLarger(*found)))) {
         found = i;
+      }
     }
-    if (found)
+    if (found) {
       return found;
+    }
   }
 
   // 4) Different width, height, different (but non-JPEG) pixelFormat
@@ -119,20 +132,24 @@ Image* Frame::GetNearestImage(int width, int height,
   // 4a) Smallest image at least width/height in size
   for (auto i : m_impl->images) {
     if (i->IsLarger(width, height) && i->pixelFormat != VideoMode::kMJPEG &&
-        (!found || (i->IsSmaller(*found))))
+        (!found || (i->IsSmaller(*found)))) {
       found = i;
+    }
   }
-  if (found)
+  if (found) {
     return found;
+  }
 
   // 4b) Largest image (less than width/height)
   for (auto i : m_impl->images) {
     if (i->pixelFormat != VideoMode::kMJPEG &&
-        (!found || (i->IsLarger(*found))))
+        (!found || (i->IsLarger(*found)))) {
       found = i;
+    }
   }
-  if (found)
+  if (found) {
     return found;
+  }
 
   // 5) Same width, height, JPEG pixelFormat (decompression).  As there may be
   //    multiple JPEG images, find the highest quality one.
@@ -142,31 +159,37 @@ Image* Frame::GetNearestImage(int width, int height,
       found = i;
       // consider one without a quality setting to be the highest quality
       // (e.g. directly from the camera)
-      if (i->jpegQuality == -1)
+      if (i->jpegQuality == -1) {
         break;
+      }
     }
   }
-  if (found)
+  if (found) {
     return found;
+  }
 
   // 6) Different width, height, JPEG pixelFormat (decompression)
   // 6a) Smallest image at least width/height in size
   for (auto i : m_impl->images) {
     if (i->IsLarger(width, height) && i->pixelFormat == VideoMode::kMJPEG &&
-        (!found || (i->IsSmaller(*found))))
+        (!found || (i->IsSmaller(*found)))) {
       found = i;
+    }
   }
-  if (found)
+  if (found) {
     return found;
+  }
 
   // 6b) Largest image (less than width/height)
   for (auto i : m_impl->images) {
     if (i->pixelFormat != VideoMode::kMJPEG &&
-        (!found || (i->IsLarger(*found))))
+        (!found || (i->IsLarger(*found)))) {
       found = i;
+    }
   }
-  if (found)
+  if (found) {
     return found;
+  }
 
   // Shouldn't reach this, but just in case...
   return m_impl->images.empty() ? nullptr : m_impl->images[0];
@@ -174,9 +197,10 @@ Image* Frame::GetNearestImage(int width, int height,
 
 Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
                           int requiredJpegQuality, int defaultJpegQuality) {
-  if (!image ||
-      image->Is(image->width, image->height, pixelFormat, requiredJpegQuality))
+  if (!image || image->Is(image->width, image->height, pixelFormat,
+                          requiredJpegQuality)) {
     return image;
+  }
   Image* cur = image;
 
   // If the source image is a JPEG, we need to decode it before we can do
@@ -185,8 +209,9 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
   // would have returned above).
   if (cur->pixelFormat == VideoMode::kMJPEG) {
     cur = ConvertMJPEGToBGR(cur);
-    if (pixelFormat == VideoMode::kBGR)
+    if (pixelFormat == VideoMode::kBGR) {
       return cur;
+    }
   }
 
   // Color convert
@@ -196,17 +221,19 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       if (cur->pixelFormat == VideoMode::kYUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR))
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
           cur = newImage;
-        else
+        } else {
           cur = ConvertYUYVToBGR(cur);
+        }
       } else if (cur->pixelFormat == VideoMode::kGray) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR))
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
           cur = newImage;
-        else
+        } else {
           cur = ConvertGrayToBGR(cur);
+        }
       }
       return ConvertBGRToRGB565(cur);
     case VideoMode::kGray:
@@ -214,17 +241,19 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       if (cur->pixelFormat == VideoMode::kYUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR))
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
           cur = newImage;
-        else
+        } else {
           cur = ConvertYUYVToBGR(cur);
+        }
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
-                GetExistingImage(cur->width, cur->height, VideoMode::kBGR))
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR)) {
           cur = newImage;
-        else
+        } else {
           cur = ConvertRGB565ToBGR(cur);
+        }
       }
       return ConvertBGRToGray(cur);
     case VideoMode::kBGR:
@@ -234,10 +263,11 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
       } else if (cur->pixelFormat == VideoMode::kRGB565) {
         cur = ConvertRGB565ToBGR(cur);
       } else if (cur->pixelFormat == VideoMode::kGray) {
-        if (pixelFormat == VideoMode::kBGR)
+        if (pixelFormat == VideoMode::kBGR) {
           return ConvertGrayToBGR(cur);
-        else
+        } else {
           return ConvertGrayToMJPEG(cur, defaultJpegQuality);
+        }
       }
       break;
     case VideoMode::kYUYV:
@@ -246,15 +276,17 @@ Image* Frame::ConvertImpl(Image* image, VideoMode::PixelFormat pixelFormat,
   }
 
   // Compress if destination is JPEG
-  if (pixelFormat == VideoMode::kMJPEG)
+  if (pixelFormat == VideoMode::kMJPEG) {
     cur = ConvertBGRToMJPEG(cur, defaultJpegQuality);
+  }
 
   return cur;
 }
 
 Image* Frame::ConvertMJPEGToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kMJPEG)
+  if (!image || image->pixelFormat != VideoMode::kMJPEG) {
     return nullptr;
+  }
 
   // Allocate an BGR image
   auto newImage =
@@ -275,8 +307,9 @@ Image* Frame::ConvertMJPEGToBGR(Image* image) {
 }
 
 Image* Frame::ConvertMJPEGToGray(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kMJPEG)
+  if (!image || image->pixelFormat != VideoMode::kMJPEG) {
     return nullptr;
+  }
 
   // Allocate an grayscale image
   auto newImage =
@@ -297,8 +330,9 @@ Image* Frame::ConvertMJPEGToGray(Image* image) {
 }
 
 Image* Frame::ConvertYUYVToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kYUYV)
+  if (!image || image->pixelFormat != VideoMode::kYUYV) {
     return nullptr;
+  }
 
   // Allocate a BGR image
   auto newImage =
@@ -318,8 +352,9 @@ Image* Frame::ConvertYUYVToBGR(Image* image) {
 }
 
 Image* Frame::ConvertBGRToRGB565(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kBGR)
+  if (!image || image->pixelFormat != VideoMode::kBGR) {
     return nullptr;
+  }
 
   // Allocate a RGB565 image
   auto newImage =
@@ -339,8 +374,9 @@ Image* Frame::ConvertBGRToRGB565(Image* image) {
 }
 
 Image* Frame::ConvertRGB565ToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kRGB565)
+  if (!image || image->pixelFormat != VideoMode::kRGB565) {
     return nullptr;
+  }
 
   // Allocate a BGR image
   auto newImage =
@@ -360,8 +396,9 @@ Image* Frame::ConvertRGB565ToBGR(Image* image) {
 }
 
 Image* Frame::ConvertBGRToGray(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kBGR)
+  if (!image || image->pixelFormat != VideoMode::kBGR) {
     return nullptr;
+  }
 
   // Allocate a Grayscale image
   auto newImage =
@@ -381,8 +418,9 @@ Image* Frame::ConvertBGRToGray(Image* image) {
 }
 
 Image* Frame::ConvertGrayToBGR(Image* image) {
-  if (!image || image->pixelFormat != VideoMode::kGray)
+  if (!image || image->pixelFormat != VideoMode::kGray) {
     return nullptr;
+  }
 
   // Allocate a BGR image
   auto newImage =
@@ -402,10 +440,12 @@ Image* Frame::ConvertGrayToBGR(Image* image) {
 }
 
 Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
-  if (!image || image->pixelFormat != VideoMode::kBGR)
+  if (!image || image->pixelFormat != VideoMode::kBGR) {
     return nullptr;
-  if (!m_impl)
+  }
+  if (!m_impl) {
     return nullptr;
+  }
   std::scoped_lock lock(m_impl->mutex);
 
   // Allocate a JPEG image.  We don't actually know what the resulting size
@@ -435,10 +475,12 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
 }
 
 Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
-  if (!image || image->pixelFormat != VideoMode::kGray)
+  if (!image || image->pixelFormat != VideoMode::kGray) {
     return nullptr;
-  if (!m_impl)
+  }
+  if (!m_impl) {
     return nullptr;
+  }
   std::scoped_lock lock(m_impl->mutex);
 
   // Allocate a JPEG image.  We don't actually know what the resulting size
@@ -470,12 +512,14 @@ Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
 Image* Frame::GetImageImpl(int width, int height,
                            VideoMode::PixelFormat pixelFormat,
                            int requiredJpegQuality, int defaultJpegQuality) {
-  if (!m_impl)
+  if (!m_impl) {
     return nullptr;
+  }
   std::scoped_lock lock(m_impl->mutex);
   Image* cur = GetNearestImage(width, height, pixelFormat, requiredJpegQuality);
-  if (!cur || cur->Is(width, height, pixelFormat, requiredJpegQuality))
+  if (!cur || cur->Is(width, height, pixelFormat, requiredJpegQuality)) {
     return cur;
+  }
 
   WPI_DEBUG4(Instance::GetInstance().logger,
              "converting image from " << cur->width << "x" << cur->height
@@ -487,8 +531,9 @@ Image* Frame::GetImageImpl(int width, int height,
   // anything else with it.  Note that if the destination format is JPEG, we
   // still need to do this (unless the width/height/compression were the same,
   // in which case we already returned the existing JPEG above).
-  if (cur->pixelFormat == VideoMode::kMJPEG)
+  if (cur->pixelFormat == VideoMode::kMJPEG) {
     cur = ConvertMJPEGToBGR(cur);
+  }
 
   // Resize
   if (!cur->Is(width, height)) {
@@ -512,15 +557,17 @@ Image* Frame::GetImageImpl(int width, int height,
 
 bool Frame::GetCv(cv::Mat& image, int width, int height) {
   Image* rawImage = GetImage(width, height, VideoMode::kBGR);
-  if (!rawImage)
+  if (!rawImage) {
     return false;
+  }
   rawImage->AsMat().copyTo(image);
   return true;
 }
 
 void Frame::ReleaseFrame() {
-  for (auto image : m_impl->images)
+  for (auto image : m_impl->images) {
     m_impl->source.ReleaseImage(std::unique_ptr<Image>(image));
+  }
   m_impl->images.clear();
   m_impl->source.ReleaseFrameImpl(std::unique_ptr<Impl>(m_impl));
   m_impl = nullptr;

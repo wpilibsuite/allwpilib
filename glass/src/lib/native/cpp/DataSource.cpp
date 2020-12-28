@@ -14,8 +14,9 @@ DataSource::DataSource(const wpi::Twine& id) : m_id{id.str()} {
   auto it = gContext->sources.try_emplace(m_id, this);
   auto& srcName = it.first->getValue();
   m_name = srcName.name.get();
-  if (!srcName.source)
+  if (!srcName.source) {
     srcName.source = this;
+  }
   sourceCreated(m_id.c_str(), this);
 }
 
@@ -27,14 +28,17 @@ DataSource::DataSource(const wpi::Twine& id, int index, int index2)
                  wpi::Twine(index2) + wpi::Twine(']')} {}
 
 DataSource::~DataSource() {
-  if (!gContext)
+  if (!gContext) {
     return;
+  }
   auto it = gContext->sources.find(m_id);
-  if (it == gContext->sources.end())
+  if (it == gContext->sources.end()) {
     return;
+  }
   auto& srcName = it->getValue();
-  if (srcName.source == this)
+  if (srcName.source == this) {
     srcName.source = nullptr;
+  }
 }
 
 void DataSource::SetName(const wpi::Twine& name) {
@@ -144,7 +148,8 @@ void DataSource::EmitDrag(ImGuiDragDropFlags flags) const {
 
 DataSource* DataSource::Find(wpi::StringRef id) {
   auto it = gContext->sources.find(id);
-  if (it == gContext->sources.end())
+  if (it == gContext->sources.end()) {
     return nullptr;
+  }
   return it->getValue().source;
 }

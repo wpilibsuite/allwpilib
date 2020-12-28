@@ -363,8 +363,9 @@ HAL_Bool HAL_IsNewControlData(void) {
   std::scoped_lock lock{*newDSDataAvailableMutex};
   int& lastCount = GetThreadLocalLastCount();
   int currentCount = newDSDataAvailableCounter;
-  if (lastCount == currentCount)
+  if (lastCount == currentCount) {
     return false;
+  }
   lastCount = currentCount;
   return true;
 }
@@ -412,8 +413,9 @@ constexpr int32_t refNumber = 42;
 static void newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
-  if (refNum != refNumber)
+  if (refNum != refNumber) {
     return;
+  }
   std::scoped_lock lock{*newDSDataAvailableMutex};
   // Notify all threads
   ++newDSDataAvailableCounter;
@@ -429,13 +431,15 @@ void HAL_InitializeDriverStation(void) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized)
+  if (initialized) {
     return;
+  }
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized)
+  if (initialized) {
     return;
+  }
 
   // Set up the occur function internally with NetComm
   NetCommRPCProxy_SetOccurFuncPointer(newDataOccur);

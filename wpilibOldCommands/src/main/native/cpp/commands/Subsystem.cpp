@@ -117,8 +117,9 @@ void Subsystem::AddChild(Sendable& child) {
 }
 
 void Subsystem::ConfirmCommand() {
-  if (m_currentCommandChanged)
+  if (m_currentCommandChanged) {
     m_currentCommandChanged = false;
+  }
 }
 
 void Subsystem::InitSendable(SendableBuilder& builder) {

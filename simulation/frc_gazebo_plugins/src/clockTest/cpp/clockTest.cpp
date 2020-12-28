@@ -66,11 +66,13 @@ TEST(ClockTests, test_clock) {
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
 
-  if (argc >= 1)
+  if (argc >= 1) {
     library = argv[1];
+  }
 
-  if (argc >= 2)
+  if (argc >= 2) {
     world_sdf = argv[2];
+  }
 
   return RUN_ALL_TESTS();
 }

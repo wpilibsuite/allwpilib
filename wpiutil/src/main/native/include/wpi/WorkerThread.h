@@ -105,8 +105,9 @@ void RunWorkerThreadRequest(WorkerThreadThread<R, T...>& thr,
                             WorkerThreadRequest<R, T...>& req) {
   R result = std::apply(req.work, std::move(req.params));
   if (req.afterWork) {
-    if (auto async = thr.m_async.m_async.lock())
+    if (auto async = thr.m_async.m_async.lock()) {
       async->Send(std::move(req.afterWork), std::move(result));
+    }
   } else {
     thr.m_promises.SetValue(req.promiseId, std::move(result));
   }
@@ -117,8 +118,9 @@ void RunWorkerThreadRequest(WorkerThreadThread<void, T...>& thr,
                             WorkerThreadRequest<void, T...>& req) {
   std::apply(req.work, req.params);
   if (req.afterWork) {
-    if (auto async = thr.m_async.m_async.lock())
+    if (auto async = thr.m_async.m_async.lock()) {
       async->Send(std::move(req.afterWork));
+    }
   } else {
     thr.m_promises.SetValue(req.promiseId);
   }
@@ -130,16 +132,18 @@ void WorkerThreadThread<R, T...>::Main() {
   while (m_active) {
     std::unique_lock lock(m_mutex);
     m_cond.wait(lock, [&] { return !m_active || !m_requests.empty(); });
-    if (!m_active)
+    if (!m_active) {
       break;
+    }
 
     // don't want to hold the lock while executing the callbacks
     requests.swap(m_requests);
     lock.unlock();
 
     for (auto&& req : requests) {
-      if (!m_active)
+      if (!m_active) {
         break;  // requests may be long-running
+      }
       RunWorkerThreadRequest(*this, req);
     }
     requests.clear();
@@ -171,8 +175,9 @@ class WorkerThread<R(T...)> final {
    * @param loop the loop to use for running afterWork routines
    */
   void SetLoop(uv::Loop& loop) {
-    if (auto thr = m_owner.GetThread())
+    if (auto thr = m_owner.GetThread()) {
       thr->m_async.SetLoop(loop);
+    }
   }
 
   /**
@@ -189,8 +194,9 @@ class WorkerThread<R(T...)> final {
    * Subsequent calls to QueueWorkThen will no longer run afterWork.
    */
   void UnsetLoop() {
-    if (auto thr = m_owner.GetThread())
+    if (auto thr = m_owner.GetThread()) {
       thr->m_async.UnsetLoop();
+    }
   }
 
   /**
@@ -201,10 +207,11 @@ class WorkerThread<R(T...)> final {
    * @return The handle (if nullptr, no handle is set)
    */
   std::shared_ptr<uv::Handle> GetHandle() const {
-    if (auto thr = m_owner.GetThread())
+    if (auto thr = m_owner.GetThread()) {
       return thr->m_async.m_async.lock();
-    else
+    } else {
       return nullptr;
+    }
   }
 
   /**

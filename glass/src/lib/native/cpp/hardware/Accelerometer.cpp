@@ -10,8 +10,9 @@
 using namespace glass;
 
 void glass::DisplayAccelerometerDevice(AccelerometerModel* model) {
-  if (!model->Exists())
+  if (!model->Exists()) {
     return;
+  }
   if (BeginDevice("BuiltInAccel")) {
     // Range
     {

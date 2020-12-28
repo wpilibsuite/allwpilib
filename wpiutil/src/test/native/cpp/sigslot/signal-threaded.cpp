@@ -50,15 +50,17 @@ void f(int i) {
 }
 
 void emit_many(Signal_mt<int>& sig) {
-  for (int i = 0; i < 10000; ++i)
+  for (int i = 0; i < 10000; ++i) {
     sig(1);
+  }
 }
 
 void connect_emit(Signal_mt<int>& sig) {
   for (int i = 0; i < 100; ++i) {
     auto s = sig.connect_scoped(f);
-    for (int j = 0; j < 100; ++j)
+    for (int j = 0; j < 100; ++j) {
       sig(1);
+    }
   }
 }
 
@@ -72,11 +74,13 @@ TEST(Signal, ThreadedMix) {
   Signal_mt<int> sig;
 
   std::array<std::thread, 10> threads;
-  for (auto& t : threads)
+  for (auto& t : threads) {
     t = std::thread(connect_emit, std::ref(sig));
+  }
 
-  for (auto& t : threads)
+  for (auto& t : threads) {
     t.join();
+  }
 }
 
 TEST(Signal, ThreadedEmission) {
@@ -86,11 +90,13 @@ TEST(Signal, ThreadedEmission) {
   sig.connect(f);
 
   std::array<std::thread, 10> threads;
-  for (auto& t : threads)
+  for (auto& t : threads) {
     t = std::thread(emit_many, std::ref(sig));
+  }
 
-  for (auto& t : threads)
+  for (auto& t : threads) {
     t.join();
+  }
 
   ASSERT_EQ(sum, 100000);
 }

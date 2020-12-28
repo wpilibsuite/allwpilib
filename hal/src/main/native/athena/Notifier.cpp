@@ -104,8 +104,9 @@ static void notifierThreadMain() {
   tInterruptManager manager{1 << kTimerInterruptNumber, true, &status};
   while (notifierRunning) {
     auto triggeredMask = manager.watch(10000, false, &status);
-    if (!notifierRunning)
+    if (!notifierRunning) {
       break;
+    }
     if (triggeredMask == 0)
       continue;
     alarmCallback();
@@ -119,8 +120,9 @@ static void cleanupNotifierAtExit() {
   notifierAlarm = nullptr;
   notifierRunning = false;
   hal::ReleaseFPGAInterrupt(kTimerInterruptNumber);
-  if (notifierThread.joinable())
+  if (notifierThread.joinable()) {
     notifierThread.join();
+  }
 }
 
 namespace hal {
@@ -136,8 +138,9 @@ extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
   hal::init::CheckInit();
-  if (!notifierAtexitRegistered.test_and_set())
+  if (!notifierAtexitRegistered.test_and_set()) {
     std::atexit(cleanupNotifierAtExit);
+  }
 
   if (notifierRefCount.fetch_add(1) == 0) {
     std::scoped_lock lock(notifierMutex);
@@ -196,8 +199,9 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
       notifierAlarm->writeEnable(false, status);
     notifierRunning = false;
     hal::ReleaseFPGAInterrupt(kTimerInterruptNumber);
-    if (notifierThread.joinable())
+    if (notifierThread.joinable()) {
       notifierThread.join();
+    }
 
     std::scoped_lock lock(notifierMutex);
     notifierAlarm = nullptr;

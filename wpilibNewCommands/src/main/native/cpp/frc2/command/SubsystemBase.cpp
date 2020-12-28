@@ -26,8 +26,9 @@ void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
       ".default",
       [this]() -> std::string {
         auto command = GetDefaultCommand();
-        if (command == nullptr)
+        if (command == nullptr) {
           return "none";
+        }
         return command->GetName();
       },
       nullptr);
@@ -38,8 +39,9 @@ void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
       ".command",
       [this]() -> std::string {
         auto command = GetCurrentCommand();
-        if (command == nullptr)
+        if (command == nullptr) {
           return "none";
+        }
         return command->GetName();
       },
       nullptr);

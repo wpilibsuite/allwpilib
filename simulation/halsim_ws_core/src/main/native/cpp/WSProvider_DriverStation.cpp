@@ -120,8 +120,9 @@ void HALSimWSProviderDriverStation::DoCancelCallbacks() {
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
   // ignore if DS connected
-  if (gDSSocketConnected && *gDSSocketConnected)
+  if (gDSSocketConnected && *gDSSocketConnected) {
     return;
+  }
 
   wpi::json::const_iterator it;
   if ((it = json.find(">enabled")) != json.end()) {

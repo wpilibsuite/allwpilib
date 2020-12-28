@@ -101,8 +101,9 @@ void AnalogInputsSimModel::ForEachAnalogInput(
 static bool AnalogInputsAnyInitialized() {
   static const int32_t num = HAL_GetNumAnalogInputs();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetAnalogInInitialized(i))
+    if (HALSIM_GetAnalogInInitialized(i)) {
       return true;
+    }
   }
   return false;
 }

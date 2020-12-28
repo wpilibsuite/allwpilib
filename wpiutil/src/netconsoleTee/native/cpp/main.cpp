@@ -69,13 +69,15 @@ static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out, int port,
           uv::Buffer& buf, size_t len) {
         // build buffers
         wpi::SmallVector<uv::Buffer, 4> bufs;
-        if (!NewlineBuffer(*rem, buf, len, bufs, false, 0))
+        if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) {
           return;
+        }
 
         // send output
         outPtr->Send(addr, bufs, [](auto bufs2, uv::Error) {
-          for (auto buf : bufs2)
+          for (auto buf : bufs2) {
             buf.Deallocate();
+          }
         });
       },
       out);
@@ -91,13 +93,15 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
           uv::Buffer& buf, size_t len) {
         // build buffers
         wpi::SmallVector<uv::Buffer, 4> bufs;
-        if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++))
+        if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++)) {
           return;
+        }
 
         // send output
         outPtr->Write(bufs, [](auto bufs2, uv::Error) {
-          for (auto buf : bufs2)
+          for (auto buf : bufs2) {
             buf.Deallocate();
+          }
         });
       },
       out);
@@ -108,8 +112,9 @@ static void CopyStream(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
     uv::Buffer buf2 = buf.Dup();
     buf2.len = len;
     out->Write(buf2, [](auto bufs, uv::Error) {
-      for (auto buf : bufs)
+      for (auto buf : bufs) {
         buf.Deallocate();
+      }
     });
   });
 }
@@ -160,12 +165,14 @@ int main(int argc, char* argv[]) {
   auto stdoutTty = uv::Tty::Create(loop, 1, false);
 
   // don't bother continuing if we don't have a stdin
-  if (!stdinTty)
+  if (!stdinTty) {
     return EXIT_SUCCESS;
+  }
 
   // pass through our input to output
-  if (stdoutTty)
+  if (stdoutTty) {
     CopyStream(*stdinTty, stdoutTty);
+  }
 
   // when our stdin closes, exit
   stdinTty->end.connect([] { std::exit(EXIT_SUCCESS); });
@@ -183,8 +190,9 @@ int main(int argc, char* argv[]) {
     // when we get a connection, accept it
     tcp->connection.connect([srv = tcp.get(), stdinTty] {
       auto tcp = srv->Accept();
-      if (!tcp)
+      if (!tcp) {
         return;
+      }
 
       // close on error
       tcp->error.connect([s = tcp.get()](wpi::uv::Error err) { s->Close(); });
@@ -198,8 +206,9 @@ int main(int argc, char* argv[]) {
   }
 
   // start reading
-  if (stdinTty)
+  if (stdinTty) {
     stdinTty->StartRead();
+  }
 
   // run the loop!
   loop->Run();

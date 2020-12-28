@@ -27,8 +27,9 @@ void glass::DisplayCommandScheduler(CommandSchedulerModel* m) {
       ImGui::SameLine(pos);
 
       ImGui::PushID(i);
-      if (ImGui::Button("Cancel"))
+      if (ImGui::Button("Cancel")) {
         m->CancelCommand(i);
+      }
       ImGui::PopID();
     }
   } else {

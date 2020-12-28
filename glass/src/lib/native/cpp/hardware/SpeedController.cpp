@@ -23,13 +23,15 @@ void glass::DisplaySpeedController(SpeedControllerModel* m) {
   }
 
   // Add button to zero output.
-  if (ImGui::Button("Zero"))
+  if (ImGui::Button("Zero")) {
     m->SetPercent(0.0);
+  }
   ImGui::SameLine();
 
   // Display a slider for the data.
   float value = dc->GetValue();
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-  if (dc->SliderFloat("% Output", &value, -1.0f, 1.0f))
+  if (dc->SliderFloat("% Output", &value, -1.0f, 1.0f)) {
     m->SetPercent(value);
+  }
 }
