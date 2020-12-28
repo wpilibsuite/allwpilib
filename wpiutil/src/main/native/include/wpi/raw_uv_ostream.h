@@ -5,6 +5,8 @@
 #ifndef WPIUTIL_WPI_RAW_UV_OSTREAM_H_
 #define WPIUTIL_WPI_RAW_UV_OSTREAM_H_
 
+#include <utility>
+
 #include "wpi/ArrayRef.h"
 #include "wpi/SmallVector.h"
 #include "wpi/raw_ostream.h"
@@ -38,7 +40,7 @@ class raw_uv_ostream : public raw_ostream {
    */
   raw_uv_ostream(SmallVectorImpl<uv::Buffer>& bufs,
                  std::function<uv::Buffer()> alloc)
-      : m_bufs(bufs), m_alloc(alloc) {
+      : m_bufs(bufs), m_alloc(std::move(alloc)) {
     SetUnbuffered();
   }
 

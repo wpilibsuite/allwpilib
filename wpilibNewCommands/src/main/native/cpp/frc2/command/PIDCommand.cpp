@@ -4,6 +4,8 @@
 
 #include "frc2/command/PIDCommand.h"
 
+#include <utility>
+
 using namespace frc2;
 
 PIDCommand::PIDCommand(PIDController controller,
@@ -11,7 +13,7 @@ PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> setpointSource,
                        std::function<void(double)> useOutput,
                        std::initializer_list<Subsystem*> requirements)
-    : m_controller{controller},
+    : m_controller{std::move(controller)},
       m_measurement{std::move(measurementSource)},
       m_setpoint{std::move(setpointSource)},
       m_useOutput{std::move(useOutput)} {
@@ -23,7 +25,7 @@ PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> setpointSource,
                        std::function<void(double)> useOutput,
                        wpi::ArrayRef<Subsystem*> requirements)
-    : m_controller{controller},
+    : m_controller{std::move(controller)},
       m_measurement{std::move(measurementSource)},
       m_setpoint{std::move(setpointSource)},
       m_useOutput{std::move(useOutput)} {

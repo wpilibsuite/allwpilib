@@ -48,7 +48,7 @@ Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
 Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
                  std::shared_ptr<DigitalSource> bSource, bool reverseDirection,
                  EncodingType encodingType)
-    : m_aSource(aSource), m_bSource(bSource) {
+    : m_aSource(std::move(aSource)), m_bSource(std::move(bSource)) {
   if (m_aSource == nullptr || m_bSource == nullptr) {
     wpi_setWPIError(NullParameter);
   } else {

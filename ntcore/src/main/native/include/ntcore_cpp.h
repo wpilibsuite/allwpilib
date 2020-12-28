@@ -104,7 +104,7 @@ struct ConnectionInfo {
 struct RpcParamDef {
   RpcParamDef() = default;
   RpcParamDef(StringRef name_, std::shared_ptr<Value> def_value_)
-      : name(name_), def_value(def_value_) {}
+      : name(name_), def_value(std::move(def_value_)) {}
 
   std::string name;
   std::shared_ptr<Value> def_value;
@@ -132,8 +132,12 @@ class RpcAnswer {
  public:
   RpcAnswer() = default;
   RpcAnswer(NT_Entry entry_, NT_RpcCall call_, StringRef name_,
-            StringRef params_, const ConnectionInfo& conn_)
-      : entry(entry_), call(call_), name(name_), params(params_), conn(conn_) {}
+            StringRef params_, ConnectionInfo conn_)
+      : entry(entry_),
+        call(call_),
+        name(name_),
+        params(params_),
+        conn(std::move(conn_)) {}
 
   /** Entry handle. */
   NT_Entry entry{0};
@@ -183,7 +187,7 @@ class EntryNotification {
       : listener(listener_),
         entry(entry_),
         name(name_),
-        value(value_),
+        value(std::move(value_)),
         flags(flags_) {}
 
   /** Listener that was triggered. */
@@ -219,8 +223,8 @@ class ConnectionNotification {
  public:
   ConnectionNotification() = default;
   ConnectionNotification(NT_ConnectionListener listener_, bool connected_,
-                         const ConnectionInfo& conn_)
-      : listener(listener_), connected(connected_), conn(conn_) {}
+                         ConnectionInfo conn_)
+      : listener(listener_), connected(connected_), conn(std::move(conn_)) {}
 
   /** Listener that was triggered. */
   NT_ConnectionListener listener{0};

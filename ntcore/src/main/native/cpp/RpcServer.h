@@ -26,7 +26,7 @@ struct RpcNotifierData : public RpcAnswer {
                   StringRef params_, const ConnectionInfo& conn_,
                   IRpcServer::SendResponseFunc send_response_)
       : RpcAnswer{entry_, call_, name_, params_, conn_},
-        send_response{send_response_} {}
+        send_response{std::move(send_response_)} {}
 
   IRpcServer::SendResponseFunc send_response;
 };

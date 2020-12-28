@@ -5,6 +5,7 @@
 #include "frc/Watchdog.h"
 
 #include <atomic>
+#include <utility>
 
 #include <hal/Notifier.h>
 #include <wpi/Format.h>
@@ -137,7 +138,7 @@ Watchdog::Watchdog(double timeout, std::function<void()> callback)
     : Watchdog(units::second_t{timeout}, callback) {}
 
 Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
-    : m_timeout(timeout), m_callback(callback), m_impl(GetImpl()) {}
+    : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
 Watchdog::~Watchdog() {
   Disable();

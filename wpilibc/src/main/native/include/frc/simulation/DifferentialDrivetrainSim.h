@@ -41,7 +41,7 @@ class DifferentialDrivetrainSim {
    * starting point.
    */
   DifferentialDrivetrainSim(
-      const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
+      LinearSystem<2, 2, 2> plant, units::meter_t trackWidth,
       DCMotor driveMotor, double gearingRatio, units::meter_t wheelRadius,
       const std::array<double, 7>& measurementStdDevs = {});
 

@@ -23,7 +23,7 @@ namespace cs {
 
 struct SourceData {
   SourceData(CS_SourceKind kind_, std::shared_ptr<SourceImpl> source_)
-      : kind{kind_}, refCount{0}, source{source_} {}
+      : kind{kind_}, refCount{0}, source{std::move(source_)} {}
 
   CS_SourceKind kind;
   std::atomic_int refCount;
@@ -32,7 +32,7 @@ struct SourceData {
 
 struct SinkData {
   explicit SinkData(CS_SinkKind kind_, std::shared_ptr<SinkImpl> sink_)
-      : kind{kind_}, refCount{0}, sourceHandle{0}, sink{sink_} {}
+      : kind{kind_}, refCount{0}, sourceHandle{0}, sink{std::move(sink_)} {}
 
   CS_SinkKind kind;
   std::atomic_int refCount;

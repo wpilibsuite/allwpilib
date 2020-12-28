@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <utility>
 #include <vector>
 
 #include <hal/Types.h>
@@ -102,7 +103,7 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
      */
     Callback(std::function<void()> func, units::second_t startTime,
              units::second_t period, units::second_t offset)
-        : func{func},
+        : func{std::move(func)},
           period{period},
           expirationTime{
               startTime + offset +

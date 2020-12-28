@@ -4,17 +4,18 @@
 
 #include "frc/controller/HolonomicDriveController.h"
 
+#include <utility>
+
 #include <units/angular_velocity.h>
 
 using namespace frc;
 
 HolonomicDriveController::HolonomicDriveController(
-    const frc2::PIDController& xController,
-    const frc2::PIDController& yController,
-    const ProfiledPIDController<units::radian>& thetaController)
-    : m_xController(xController),
-      m_yController(yController),
-      m_thetaController(thetaController) {}
+    frc2::PIDController xController, frc2::PIDController yController,
+    ProfiledPIDController<units::radian> thetaController)
+    : m_xController(std::move(xController)),
+      m_yController(std::move(yController)),
+      m_thetaController(std::move(thetaController)) {}
 
 bool HolonomicDriveController::AtReference() const {
   const auto& eTranslate = m_poseError.Translation();

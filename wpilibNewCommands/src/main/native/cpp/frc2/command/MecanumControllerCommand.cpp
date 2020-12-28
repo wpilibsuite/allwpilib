@@ -4,6 +4,8 @@
 
 #include "frc2/command/MecanumControllerCommand.h"
 
+#include <utility>
+
 using namespace frc2;
 using namespace units;
 
@@ -24,12 +26,12 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::volt_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_feedforward(feedforward),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
-      m_desiredRotation(desiredRotation),
+      m_desiredRotation(std::move(desiredRotation)),
       m_maxWheelVelocity(maxWheelVelocity),
       m_frontLeftController(
           std::make_unique<frc2::PIDController>(frontLeftController)),
@@ -39,8 +41,8 @@ MecanumControllerCommand::MecanumControllerCommand(
           std::make_unique<frc2::PIDController>(frontRightController)),
       m_rearRightController(
           std::make_unique<frc2::PIDController>(rearRightController)),
-      m_currentWheelSpeeds(currentWheelSpeeds),
-      m_outputVolts(output),
+      m_currentWheelSpeeds(std::move(currentWheelSpeeds)),
+      m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
 }
@@ -61,8 +63,8 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::volt_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_feedforward(feedforward),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
@@ -75,8 +77,8 @@ MecanumControllerCommand::MecanumControllerCommand(
           std::make_unique<frc2::PIDController>(frontRightController)),
       m_rearRightController(
           std::make_unique<frc2::PIDController>(rearRightController)),
-      m_currentWheelSpeeds(currentWheelSpeeds),
-      m_outputVolts(output),
+      m_currentWheelSpeeds(std::move(currentWheelSpeeds)),
+      m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
   m_desiredRotation = [&] {
@@ -101,12 +103,12 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::volt_t)>
         output,
     wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_feedforward(feedforward),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
-      m_desiredRotation(desiredRotation),
+      m_desiredRotation(std::move(desiredRotation)),
       m_maxWheelVelocity(maxWheelVelocity),
       m_frontLeftController(
           std::make_unique<frc2::PIDController>(frontLeftController)),
@@ -116,8 +118,8 @@ MecanumControllerCommand::MecanumControllerCommand(
           std::make_unique<frc2::PIDController>(frontRightController)),
       m_rearRightController(
           std::make_unique<frc2::PIDController>(rearRightController)),
-      m_currentWheelSpeeds(currentWheelSpeeds),
-      m_outputVolts(output),
+      m_currentWheelSpeeds(std::move(currentWheelSpeeds)),
+      m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
 }
@@ -138,8 +140,8 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::volt_t)>
         output,
     wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_feedforward(feedforward),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
@@ -152,8 +154,8 @@ MecanumControllerCommand::MecanumControllerCommand(
           std::make_unique<frc2::PIDController>(frontRightController)),
       m_rearRightController(
           std::make_unique<frc2::PIDController>(rearRightController)),
-      m_currentWheelSpeeds(currentWheelSpeeds),
-      m_outputVolts(output),
+      m_currentWheelSpeeds(std::move(currentWheelSpeeds)),
+      m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
   m_desiredRotation = [&] {
@@ -172,13 +174,13 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
-      m_desiredRotation(desiredRotation),
+      m_desiredRotation(std::move(desiredRotation)),
       m_maxWheelVelocity(maxWheelVelocity),
-      m_outputVel(output),
+      m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
 }
@@ -193,12 +195,12 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
       m_maxWheelVelocity(maxWheelVelocity),
-      m_outputVel(output),
+      m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
   m_desiredRotation = [&] {
@@ -217,13 +219,13 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
     wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
-      m_desiredRotation(desiredRotation),
+      m_desiredRotation(std::move(desiredRotation)),
       m_maxWheelVelocity(maxWheelVelocity),
-      m_outputVel(output),
+      m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
 }
@@ -238,12 +240,12 @@ MecanumControllerCommand::MecanumControllerCommand(
                        units::meters_per_second_t, units::meters_per_second_t)>
         output,
     wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
       m_maxWheelVelocity(maxWheelVelocity),
-      m_outputVel(output),
+      m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
   m_desiredRotation = [&] {
