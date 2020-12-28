@@ -10,6 +10,7 @@
 #include <units/current.h>
 #include <units/time.h>
 
+#include "frc/RobotController.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/LinearSystem.h"
 
@@ -82,7 +83,9 @@ class LinearSystemSim {
    *
    * @param u The system inputs.
    */
-  void SetInput(const Eigen::Matrix<double, Inputs, 1>& u) { m_u = u; }
+  void SetInput(const Eigen::Matrix<double, Inputs, 1>& u) {
+    m_u = ClampInput(u);
+  }
 
   /*
    * Sets the system inputs.
@@ -90,7 +93,10 @@ class LinearSystemSim {
    * @param row   The row in the input matrix to set.
    * @param value The value to set the row to.
    */
-  void SetInput(int row, double value) { m_u(row, 0) = value; }
+  void SetInput(int row, double value) {
+    m_u(row, 0) = value;
+    ClampInput(m_u);
+  }
 
   /**
    * Sets the system state.
@@ -121,6 +127,19 @@ class LinearSystemSim {
       const Eigen::Matrix<double, States, 1>& currentXhat,
       const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
     return m_plant.CalculateX(currentXhat, u, dt);
+  }
+
+  /**
+   * Clamp the input vector such that no element exceeds the given voltage. If
+   * any does, the relative magnitudes of the input will be maintained.
+   *
+   * @param u          The input vector.
+   * @return The normalized input.
+   */
+  Eigen::Matrix<double, Inputs, 1> ClampInput(
+      Eigen::Matrix<double, Inputs, 1> u) {
+    return frc::NormalizeInputVector<Inputs>(
+        u, frc::RobotController::GetInputVoltage());
   }
 
   LinearSystem<States, Inputs, Outputs> m_plant;

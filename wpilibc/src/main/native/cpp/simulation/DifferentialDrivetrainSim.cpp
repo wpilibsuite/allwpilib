@@ -6,6 +6,7 @@
 
 #include <frc/system/plant/LinearSystemId.h>
 
+#include "frc/RobotController.h"
 #include "frc/system/RungeKutta.h"
 
 using namespace frc;
@@ -36,9 +37,16 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
           trackWidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 
+Eigen::Matrix<double, 2, 1> DifferentialDrivetrainSim::ClampInput(
+    Eigen::Matrix<double, 2, 1> u) {
+  return frc::NormalizeInputVector<2>(u,
+                                      frc::RobotController::GetInputVoltage());
+}
+
 void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,
                                           units::volt_t rightVoltage) {
   m_u << leftVoltage.to<double>(), rightVoltage.to<double>();
+  m_u = ClampInput(m_u);
 }
 
 void DifferentialDrivetrainSim::SetGearing(double newGearing) {
