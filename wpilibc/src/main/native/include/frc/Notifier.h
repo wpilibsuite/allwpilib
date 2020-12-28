@@ -62,7 +62,7 @@ class Notifier : public ErrorBase {
   /**
    * Free the resources for a timer event.
    */
-  virtual ~Notifier();
+  ~Notifier() override;
 
   Notifier(Notifier&& rhs);
   Notifier& operator=(Notifier&& rhs);

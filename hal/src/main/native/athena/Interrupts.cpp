@@ -24,7 +24,7 @@ namespace {
 // Safe thread to allow callbacks to run on their own thread
 class InterruptThread : public wpi::SafeThread {
  public:
-  void Main() {
+  void Main() override {
     std::unique_lock lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });

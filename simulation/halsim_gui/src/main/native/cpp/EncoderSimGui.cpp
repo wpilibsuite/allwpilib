@@ -56,7 +56,7 @@ class EncoderSimModel : public glass::EncoderModel {
       : EncoderSimModel(index, HALSIM_GetEncoderDigitalChannelA(index),
                         HALSIM_GetEncoderDigitalChannelB(index)) {}
 
-  ~EncoderSimModel() {
+  ~EncoderSimModel() override {
     if (m_distancePerPulseCallback != 0) {
       HALSIM_CancelEncoderDistancePerPulseCallback(m_index,
                                                    m_distancePerPulseCallback);

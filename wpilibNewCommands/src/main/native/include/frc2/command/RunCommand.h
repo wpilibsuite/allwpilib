@@ -45,7 +45,7 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
 
   RunCommand(const RunCommand& other) = default;
 
-  void Execute();
+  void Execute() override;
 
  protected:
   std::function<void()> m_toRun;

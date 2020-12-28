@@ -68,7 +68,7 @@ class Notifier::Thread : public wpi::SafeThread {
   Thread(std::function<void()> on_start, std::function<void()> on_exit)
       : m_on_start(on_start), m_on_exit(on_exit) {}
 
-  void Main();
+  void Main() override;
 
   struct Listener {
     Listener() = default;

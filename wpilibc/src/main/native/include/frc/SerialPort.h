@@ -87,7 +87,7 @@ class SerialPort : public ErrorBase {
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
 
-  ~SerialPort();
+  ~SerialPort() override;
 
   SerialPort(SerialPort&& rhs) = default;
   SerialPort& operator=(SerialPort&& rhs) = default;

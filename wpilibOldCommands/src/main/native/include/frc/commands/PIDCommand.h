@@ -35,7 +35,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   PIDCommand(double p, double i, double d, double period, Subsystem& subsystem);
   PIDCommand(double p, double i, double d, double f, double period,
              Subsystem& subsystem);
-  virtual ~PIDCommand() = default;
+  ~PIDCommand() override = default;
 
   PIDCommand(PIDCommand&&) = default;
   PIDCommand& operator=(PIDCommand&&) = default;

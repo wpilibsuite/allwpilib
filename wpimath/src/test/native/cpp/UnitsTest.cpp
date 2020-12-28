@@ -94,65 +94,65 @@ namespace {
 class TypeTraits : public ::testing::Test {
  protected:
   TypeTraits() {}
-  virtual ~TypeTraits() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  ~TypeTraits() override {}
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class UnitManipulators : public ::testing::Test {
  protected:
   UnitManipulators() {}
-  virtual ~UnitManipulators() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  ~UnitManipulators() override {}
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class UnitContainer : public ::testing::Test {
  protected:
   UnitContainer() {}
-  virtual ~UnitContainer() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  ~UnitContainer() override {}
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class UnitConversion : public ::testing::Test {
  protected:
   UnitConversion() {}
-  virtual ~UnitConversion() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  ~UnitConversion() override {}
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class UnitMath : public ::testing::Test {
  protected:
   UnitMath() {}
-  virtual ~UnitMath() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  ~UnitMath() override {}
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class CompileTimeArithmetic : public ::testing::Test {
  protected:
   CompileTimeArithmetic() {}
-  virtual ~CompileTimeArithmetic() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  ~CompileTimeArithmetic() override {}
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class Constexpr : public ::testing::Test {
  protected:
   Constexpr() {}
-  virtual ~Constexpr() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  ~Constexpr() override {}
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class CaseStudies : public ::testing::Test {
  protected:
   CaseStudies() {}
-  virtual ~CaseStudies() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  ~CaseStudies() override {}
+  void SetUp() override {}
+  void TearDown() override {}
 
   struct RightTriangle {
     using a = unit_value_t<meters, 3>;

@@ -44,7 +44,7 @@ class GenericHID : public ErrorBase {
   enum JoystickHand { kLeftHand = 0, kRightHand = 1 };
 
   explicit GenericHID(int port);
-  virtual ~GenericHID() = default;
+  ~GenericHID() override = default;
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;

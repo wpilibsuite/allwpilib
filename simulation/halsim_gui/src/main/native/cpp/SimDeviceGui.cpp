@@ -24,7 +24,7 @@ class SimValueSource : public glass::DataSource {
       : DataSource(wpi::Twine{device} + wpi::Twine{'-'} + name),
         m_callback{HALSIM_RegisterSimValueChangedCallback(
             handle, this, CallbackFunc, true)} {}
-  ~SimValueSource() {
+  ~SimValueSource() override {
     if (m_callback != 0) {
       HALSIM_CancelSimValueChangedCallback(m_callback);
     }

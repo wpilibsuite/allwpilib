@@ -49,7 +49,7 @@ class ProxyScheduleCommand;
 class Command : public frc::ErrorBase {
  public:
   Command() = default;
-  virtual ~Command();
+  ~Command() override;
 
   Command(const Command&);
   Command& operator=(const Command&);

@@ -47,7 +47,7 @@ class Storage : public IStorage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
-  ~Storage();
+  ~Storage() override;
 
   // Accessors required by Dispatcher.  An interface is used for
   // generation of outgoing messages to break a dependency loop between

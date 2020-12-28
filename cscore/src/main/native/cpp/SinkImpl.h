@@ -29,7 +29,7 @@ class SinkImpl : public PropertyContainer {
  public:
   explicit SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
                     Notifier& notifier, Telemetry& telemetry);
-  virtual ~SinkImpl();
+  ~SinkImpl() override;
   SinkImpl(const SinkImpl& queue) = delete;
   SinkImpl& operator=(const SinkImpl& queue) = delete;
 

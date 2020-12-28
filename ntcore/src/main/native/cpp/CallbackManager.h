@@ -54,7 +54,7 @@ class CallbackThread : public wpi::SafeThread {
   using NotifierData = TNotifierData;
   using ListenerData = TListenerData;
 
-  ~CallbackThread() {
+  ~CallbackThread() override {
     // Wake up any blocked pollers
     for (size_t i = 0; i < m_pollers.size(); ++i) {
       if (auto poller = m_pollers[i]) {

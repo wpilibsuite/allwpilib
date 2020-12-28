@@ -178,7 +178,7 @@ class IterativeRobotBase : public RobotBase {
    */
   explicit IterativeRobotBase(units::second_t period);
 
-  virtual ~IterativeRobotBase() = default;
+  ~IterativeRobotBase() override = default;
 
  protected:
   IterativeRobotBase(IterativeRobotBase&&) = default;

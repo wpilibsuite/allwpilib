@@ -126,7 +126,7 @@ class RobotDrive : public MotorSafety {
              std::shared_ptr<SpeedController> frontRightMotor,
              std::shared_ptr<SpeedController> rearRightMotor);
 
-  virtual ~RobotDrive() = default;
+  ~RobotDrive() override = default;
 
   RobotDrive(RobotDrive&&) = default;
   RobotDrive& operator=(RobotDrive&&) = default;

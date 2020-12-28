@@ -29,7 +29,7 @@ class ShuffleboardComponent : public ShuffleboardComponentBase {
   ShuffleboardComponent(ShuffleboardContainer& parent, const wpi::Twine& title,
                         const wpi::Twine& type = "");
 
-  virtual ~ShuffleboardComponent() = default;
+  ~ShuffleboardComponent() override = default;
 
   /**
    * Sets custom properties for this component. Property names are

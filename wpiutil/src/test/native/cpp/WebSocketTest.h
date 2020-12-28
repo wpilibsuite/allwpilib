@@ -48,7 +48,7 @@ class WebSocketTest : public ::testing::Test {
     failTimer->Unreference();
   }
 
-  ~WebSocketTest() { Finish(); }
+  ~WebSocketTest() override { Finish(); }
 
   void Finish() {
     loop->Walk([](uv::Handle& it) { it.Close(); });

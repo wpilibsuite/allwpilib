@@ -75,7 +75,7 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   explicit ConnThread(const wpi::Twine& name, wpi::Logger& logger)
       : m_name(name.str()), m_logger(logger) {}
 
-  void Main();
+  void Main() override;
 
   bool ProcessCommand(wpi::raw_ostream& os, SourceImpl& source,
                       wpi::StringRef parameters, bool respond);

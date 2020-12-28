@@ -49,7 +49,7 @@ class IndexedClassedHandleResource : public HandleBase {
   }
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);
-  void ResetHandles();
+  void ResetHandles() override;
 
  private:
   std::array<std::shared_ptr<TStruct>, size> m_structures;

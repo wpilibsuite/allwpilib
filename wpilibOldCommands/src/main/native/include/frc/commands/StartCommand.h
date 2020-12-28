@@ -11,13 +11,13 @@ namespace frc {
 class StartCommand : public InstantCommand {
  public:
   explicit StartCommand(Command* commandToStart);
-  virtual ~StartCommand() = default;
+  ~StartCommand() override = default;
 
   StartCommand(StartCommand&&) = default;
   StartCommand& operator=(StartCommand&&) = default;
 
  protected:
-  virtual void Initialize();
+  void Initialize() override;
 
  private:
   Command* m_commandToFork;
