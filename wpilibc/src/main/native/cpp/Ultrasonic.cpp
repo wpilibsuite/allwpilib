@@ -4,6 +4,8 @@
 
 #include "frc/Ultrasonic.h"
 
+#include <utility>
+
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/Base.h"
@@ -61,8 +63,8 @@ Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel,
 Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
                        std::shared_ptr<DigitalInput> echoChannel,
                        DistanceUnit units)
-    : m_pingChannel(pingChannel),
-      m_echoChannel(echoChannel),
+    : m_pingChannel(std::move(pingChannel)),
+      m_echoChannel(std::move(echoChannel)),
       m_counter(m_echoChannel) {
   m_units = units;
   Initialize();

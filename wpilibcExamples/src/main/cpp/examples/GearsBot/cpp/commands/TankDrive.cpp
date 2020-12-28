@@ -4,11 +4,15 @@
 
 #include "commands/TankDrive.h"
 
+#include <utility>
+
 #include "Robot.h"
 
 TankDrive::TankDrive(std::function<double()> left,
                      std::function<double()> right, DriveTrain* drivetrain)
-    : m_left(left), m_right(right), m_drivetrain(drivetrain) {
+    : m_left(std::move(left)),
+      m_right(std::move(right)),
+      m_drivetrain(drivetrain) {
   SetName("TankDrive");
   AddRequirements({m_drivetrain});
 }

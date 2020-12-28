@@ -99,7 +99,8 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
    *
    * @param toRun a supplier providing the command to run
    */
-  explicit SelectCommand(std::function<Command*()> toRun) : m_toRun{toRun} {}
+  explicit SelectCommand(std::function<Command*()> toRun)
+      : m_toRun{std::move(toRun)} {}
 
   SelectCommand(SelectCommand&& other) = default;
 

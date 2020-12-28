@@ -122,7 +122,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
    * Private constructor.
    */
   WebSocketServer(uv::Stream& stream, ArrayRef<StringRef> protocols,
-                  const ServerOptions& options, const private_init&);
+                  ServerOptions options, const private_init&);
 
   /**
    * Starts a dedicated WebSocket server on the provided connection.  The

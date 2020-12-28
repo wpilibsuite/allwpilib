@@ -4,6 +4,8 @@
 
 #include "NetworkConnection.h"
 
+#include <utility>
+
 #include <wpi/NetworkStream.h>
 #include <wpi/raw_socket_istream.h>
 #include <wpi/timestamp.h>
@@ -25,8 +27,8 @@ NetworkConnection::NetworkConnection(unsigned int uid,
       m_stream(std::move(stream)),
       m_notifier(notifier),
       m_logger(logger),
-      m_handshake(handshake),
-      m_get_entry_type(get_entry_type),
+      m_handshake(std::move(handshake)),
+      m_get_entry_type(std::move(get_entry_type)),
       m_state(kCreated) {
   m_active = false;
   m_proto_rev = 0x0300;

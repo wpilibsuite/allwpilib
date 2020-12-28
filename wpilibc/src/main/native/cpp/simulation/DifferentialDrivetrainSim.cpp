@@ -6,6 +6,8 @@
 
 #include <frc/system/plant/LinearSystemId.h>
 
+#include <utility>
+
 #include "frc/RobotController.h"
 #include "frc/system/RungeKutta.h"
 
@@ -13,10 +15,10 @@ using namespace frc;
 using namespace frc::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
-    DCMotor driveMotor, double gearRatio, units::meter_t wheelRadius,
+    LinearSystem<2, 2, 2> plant, units::meter_t trackWidth, DCMotor driveMotor,
+    double gearRatio, units::meter_t wheelRadius,
     const std::array<double, 7>& measurementStdDevs)
-    : m_plant(plant),
+    : m_plant(std::move(plant)),
       m_rb(trackWidth / 2.0),
       m_wheelRadius(wheelRadius),
       m_motor(driveMotor),

@@ -5,6 +5,7 @@
 #include "Notifier.h"
 
 #include <queue>
+#include <utility>
 #include <vector>
 
 #include "Handle.h"
@@ -66,7 +67,7 @@ class UidVector {
 class Notifier::Thread : public wpi::SafeThread {
  public:
   Thread(std::function<void()> on_start, std::function<void()> on_exit)
-      : m_on_start(on_start), m_on_exit(on_exit) {}
+      : m_on_start(std::move(on_start)), m_on_exit(std::move(on_exit)) {}
 
   void Main() override;
 
@@ -74,7 +75,7 @@ class Notifier::Thread : public wpi::SafeThread {
     Listener() = default;
     Listener(std::function<void(const RawEvent& event)> callback_,
              int eventMask_)
-        : callback(callback_), eventMask(eventMask_) {}
+        : callback(std::move(callback_)), eventMask(eventMask_) {}
 
     explicit operator bool() const { return static_cast<bool>(callback); }
 
