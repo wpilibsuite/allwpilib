@@ -28,7 +28,7 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
     return m_value;
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE operator T() const { return Get(); }
+  LLVM_ATTRIBUTE_ALWAYS_INLINE operator T() const { return Get(); }  // NOLINT
 
   void Reset(T value) {
     std::scoped_lock lock(m_mutex);

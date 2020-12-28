@@ -38,8 +38,8 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
    * @param toRun        the Runnable to run
    * @param requirements the subsystems to require
    */
-  RunCommand(std::function<void()> toRun,
-             wpi::ArrayRef<Subsystem*> requirements = {});
+  explicit RunCommand(std::function<void()> toRun,
+                      wpi::ArrayRef<Subsystem*> requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 

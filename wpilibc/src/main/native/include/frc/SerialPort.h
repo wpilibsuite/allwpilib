@@ -65,8 +65,9 @@ class SerialPort : public ErrorBase {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
-             Parity parity = kParity_None, StopBits stopBits = kStopBits_One);
+  explicit SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
+                      Parity parity = kParity_None,
+                      StopBits stopBits = kStopBits_One);
 
   /**
    * Create an instance of a Serial Port class.

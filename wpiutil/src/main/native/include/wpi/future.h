@@ -287,7 +287,7 @@ class future final {
   future(const future&) = delete;
 
   template <typename R>
-  future(future<R>&& oth) noexcept
+  future(future<R>&& oth) noexcept  // NOLINT
       : future(oth.then([](R&& val) -> T { return val; })) {}
 
   /**

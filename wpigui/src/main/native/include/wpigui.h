@@ -296,7 +296,7 @@ class Texture {
   /**
    * Implicit conversion to ImTextureID.
    */
-  operator ImTextureID() const { return m_texture; }
+  operator ImTextureID() const { return m_texture; }  // NOLINT
 
   /**
    * Gets the texture pixel format.
