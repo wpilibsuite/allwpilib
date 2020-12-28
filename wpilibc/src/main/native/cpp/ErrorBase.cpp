@@ -48,13 +48,21 @@ void GlobalErrors::Insert(Error&& error) {
   inst.lastError = &(*inst.errors.insert(std::move(error)).first);
 }
 
-ErrorBase::ErrorBase() { HAL_Initialize(500, 0); }
+ErrorBase::ErrorBase() {
+  HAL_Initialize(500, 0);
+}
 
-Error& ErrorBase::GetError() { return m_error; }
+Error& ErrorBase::GetError() {
+  return m_error;
+}
 
-const Error& ErrorBase::GetError() const { return m_error; }
+const Error& ErrorBase::GetError() const {
+  return m_error;
+}
 
-void ErrorBase::ClearError() const { m_error.Clear(); }
+void ErrorBase::ClearError() const {
+  m_error.Clear();
+}
 
 void ErrorBase::SetErrnoError(const wpi::Twine& contextMessage,
                               wpi::StringRef filename, wpi::StringRef function,
@@ -139,7 +147,9 @@ void ErrorBase::CloneError(const ErrorBase& rhs) const {
   m_error = rhs.GetError();
 }
 
-bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
+bool ErrorBase::StatusIsFatal() const {
+  return m_error.GetCode() < 0;
+}
 
 void ErrorBase::SetGlobalError(Error::Code code,
                                const wpi::Twine& contextMessage,
@@ -164,7 +174,9 @@ void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
 Error ErrorBase::GetGlobalError() {
   auto& inst = GlobalErrors::GetInstance();
   std::scoped_lock mutex(inst.mutex);
-  if (!inst.lastError) return Error{};
+  if (!inst.lastError) {
+    return {};
+  }
   return *inst.lastError;
 }
 
@@ -172,7 +184,9 @@ std::vector<Error> ErrorBase::GetGlobalErrors() {
   auto& inst = GlobalErrors::GetInstance();
   std::scoped_lock mutex(inst.mutex);
   std::vector<Error> rv;
-  for (auto&& error : inst.errors) rv.push_back(error);
+  for (auto&& error : inst.errors) {
+    rv.push_back(error);
+  }
   return rv;
 }
 

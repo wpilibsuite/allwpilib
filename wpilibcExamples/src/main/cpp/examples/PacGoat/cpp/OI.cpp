@@ -35,4 +35,6 @@ OI::OI() {
                                new SetCollectionSpeed(Collector::kReverse));
 }
 
-frc::Joystick& OI::GetJoystick() { return m_joystick; }
+frc::Joystick& OI::GetJoystick() {
+  return m_joystick;
+}

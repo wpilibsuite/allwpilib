@@ -99,7 +99,9 @@ void CommandScheduler::AddButton(wpi::unique_function<void()> button) {
   m_impl->buttons.emplace_back(std::move(button));
 }
 
-void CommandScheduler::ClearButtons() { m_impl->buttons.clear(); }
+void CommandScheduler::ClearButtons() {
+  m_impl->buttons.clear();
+}
 
 void CommandScheduler::Schedule(bool interruptible, Command* command) {
   if (m_impl->inRunLoop) {
@@ -152,7 +154,9 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
 }
 
-void CommandScheduler::Schedule(Command* command) { Schedule(true, command); }
+void CommandScheduler::Schedule(Command* command) {
+  Schedule(true, command);
+}
 
 void CommandScheduler::Schedule(bool interruptible,
                                 wpi::ArrayRef<Command*> commands) {
@@ -314,7 +318,9 @@ void CommandScheduler::Cancel(Command* command) {
   }
 
   auto find = m_impl->scheduledCommands.find(command);
-  if (find == m_impl->scheduledCommands.end()) return;
+  if (find == m_impl->scheduledCommands.end()) {
+    return;
+  }
   command->End(true);
   for (auto&& action : m_impl->interruptActions) {
     action(*command);
@@ -390,9 +396,13 @@ Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {
   }
 }
 
-void CommandScheduler::Disable() { m_impl->disabled = true; }
+void CommandScheduler::Disable() {
+  m_impl->disabled = true;
+}
 
-void CommandScheduler::Enable() { m_impl->disabled = false; }
+void CommandScheduler::Enable() {
+  m_impl->disabled = false;
+}
 
 void CommandScheduler::OnCommandInitialize(Action action) {
   m_impl->initActions.emplace_back(std::move(action));

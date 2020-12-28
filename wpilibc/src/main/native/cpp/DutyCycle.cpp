@@ -37,7 +37,9 @@ DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
   }
 }
 
-DutyCycle::~DutyCycle() { HAL_FreeDutyCycle(m_handle); }
+DutyCycle::~DutyCycle() {
+  HAL_FreeDutyCycle(m_handle);
+}
 
 void DutyCycle::InitDutyCycle() {
   int32_t status = 0;
@@ -87,7 +89,9 @@ unsigned int DutyCycle::GetOutputScaleFactor() const {
   return retVal;
 }
 
-int DutyCycle::GetSourceChannel() const { return m_source->GetChannel(); }
+int DutyCycle::GetSourceChannel() const {
+  return m_source->GetChannel();
+}
 
 void DutyCycle::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");

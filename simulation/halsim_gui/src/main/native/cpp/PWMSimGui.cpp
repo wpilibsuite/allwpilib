@@ -77,8 +77,9 @@ void PWMsSimModel::Update() {
   for (int32_t i = 0; i < numLED; ++i) {
     if (HALSIM_GetAddressableLEDInitialized(i)) {
       int32_t channel = HALSIM_GetAddressableLEDOutputPort(i);
-      if (channel >= 0 && channel < numPWM && m_sources[channel])
+      if (channel >= 0 && channel < numPWM && m_sources[channel]) {
         m_sources[channel]->SetAddressableLED(i);
+      }
     }
   }
 }
@@ -96,7 +97,9 @@ void PWMsSimModel::ForEachPWM(
 static bool PWMsAnyInitialized() {
   static const int32_t num = HAL_GetNumPWMChannels();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetPWMInitialized(i)) return true;
+    if (HALSIM_GetPWMInitialized(i)) {
+      return true;
+    }
   }
   return false;
 }

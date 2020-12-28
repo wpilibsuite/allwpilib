@@ -13,9 +13,13 @@ CommandTestBase::CommandTestBase() {
   scheduler.ClearButtons();
 }
 
-CommandScheduler CommandTestBase::GetScheduler() { return CommandScheduler(); }
+CommandScheduler CommandTestBase::GetScheduler() {
+  return CommandScheduler();
+}
 
-void CommandTestBase::SetUp() { frc::sim::DriverStationSim::SetEnabled(true); }
+void CommandTestBase::SetUp() {
+  frc::sim::DriverStationSim::SetEnabled(true);
+}
 
 void CommandTestBase::TearDown() {
   CommandScheduler::GetInstance().ClearButtons();

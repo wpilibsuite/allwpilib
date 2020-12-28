@@ -133,12 +133,13 @@ void PIDBase::SetSetpoint(double setpoint) {
     std::scoped_lock lock(m_thisMutex);
 
     if (m_maximumInput > m_minimumInput) {
-      if (setpoint > m_maximumInput)
+      if (setpoint > m_maximumInput) {
         m_setpoint = m_maximumInput;
-      else if (setpoint < m_minimumInput)
+      } else if (setpoint < m_minimumInput) {
         m_setpoint = m_minimumInput;
-      else
+      } else {
         m_setpoint = setpoint;
+      }
     } else {
       m_setpoint = setpoint;
     }
@@ -163,7 +164,9 @@ double PIDBase::GetError() const {
   }
 }
 
-double PIDBase::GetAvgError() const { return GetError(); }
+double PIDBase::GetAvgError() const {
+  return GetError();
+}
 
 void PIDBase::SetPIDSourceType(PIDSourceType pidSource) {
   m_pidInput->SetPIDSourceType(pidSource);
@@ -221,7 +224,9 @@ void PIDBase::Reset() {
   m_result = 0;
 }
 
-void PIDBase::PIDWrite(double output) { SetSetpoint(output); }
+void PIDBase::PIDWrite(double output) {
+  SetSetpoint(output);
+}
 
 void PIDBase::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
@@ -240,7 +245,9 @@ void PIDBase::InitSendable(SendableBuilder& builder) {
 }
 
 void PIDBase::Calculate() {
-  if (m_pidInput == nullptr || m_pidOutput == nullptr) return;
+  if (m_pidInput == nullptr || m_pidOutput == nullptr) {
+    return;
+  }
 
   bool enabled;
   {

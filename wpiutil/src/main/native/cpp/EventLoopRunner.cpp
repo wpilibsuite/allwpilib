@@ -18,7 +18,9 @@ class EventLoopRunner::Thread : public SafeThread {
 
   Thread() : m_loop(uv::Loop::Create()) {
     // set up async handles
-    if (!m_loop) return;
+    if (!m_loop) {
+      return;
+    }
 
     // run function
     m_doExec = UvExecFunc::Create(
@@ -29,7 +31,9 @@ class EventLoopRunner::Thread : public SafeThread {
   }
 
   void Main() {
-    if (m_loop) m_loop->Run();
+    if (m_loop) {
+      m_loop->Run();
+    }
   }
 
   // the loop
@@ -39,9 +43,13 @@ class EventLoopRunner::Thread : public SafeThread {
   std::weak_ptr<UvExecFunc> m_doExec;
 };
 
-EventLoopRunner::EventLoopRunner() { m_owner.Start(); }
+EventLoopRunner::EventLoopRunner() {
+  m_owner.Start();
+}
 
-EventLoopRunner::~EventLoopRunner() { Stop(); }
+EventLoopRunner::~EventLoopRunner() {
+  Stop();
+}
 
 void EventLoopRunner::Stop() {
   ExecAsync([](uv::Loop& loop) {
@@ -69,10 +77,14 @@ void EventLoopRunner::ExecSync(LoopFunc func) {
       f = doExec->Call(func);
     }
   }
-  if (f.valid()) f.wait();
+  if (f.valid()) {
+    f.wait();
+  }
 }
 
 std::shared_ptr<uv::Loop> EventLoopRunner::GetLoop() {
-  if (auto thr = m_owner.GetThread()) return thr->m_loop;
+  if (auto thr = m_owner.GetThread()) {
+    return thr->m_loop;
+  }
   return nullptr;
 }

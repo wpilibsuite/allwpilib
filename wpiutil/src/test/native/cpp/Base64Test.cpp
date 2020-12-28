@@ -24,10 +24,11 @@ std::ostream& operator<<(std::ostream& os, const Base64TestParam& param) {
 class Base64Test : public ::testing::TestWithParam<Base64TestParam> {
  protected:
   StringRef GetPlain() {
-    if (GetParam().plain_len < 0)
+    if (GetParam().plain_len < 0) {
       return StringRef(GetParam().plain);
-    else
+    } else {
       return StringRef(GetParam().plain, GetParam().plain_len);
+    }
   }
 };
 

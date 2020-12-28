@@ -56,9 +56,13 @@ STDMETHODIMP_(ULONG) SourceReaderCB::Release() {
   return uCount;
 }
 
-STDMETHODIMP SourceReaderCB::OnEvent(DWORD, IMFMediaEvent*) { return S_OK; }
+STDMETHODIMP SourceReaderCB::OnEvent(DWORD, IMFMediaEvent*) {
+  return S_OK;
+}
 
-STDMETHODIMP SourceReaderCB::OnFlush(DWORD) { return S_OK; }
+STDMETHODIMP SourceReaderCB::OnFlush(DWORD) {
+  return S_OK;
+}
 
 void SourceReaderCB::NotifyError(HRESULT hr) {
   wprintf(L"Source Reader error: 0x%X\n", hr);
@@ -70,7 +74,8 @@ STDMETHODIMP SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
                                           IMFSample* pSample  // Can be NULL
 ) {
   auto source = m_source.lock();
-  if (!source) return S_OK;
+  if (!source)
+    return S_OK;
   if (SUCCEEDED(hrStatus)) {
     if (pSample) {
       // Prcoess sample

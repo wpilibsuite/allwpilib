@@ -38,7 +38,8 @@ UsbCameraProperty::UsbCameraProperty(const wpi::Twine& name_,
 
 bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
                                   IAMVideoProcAmp* pProcAmp) {
-  if (!pProcAmp) return true;
+  if (!pProcAmp)
+    return true;
 
   lock.unlock();
   long newValue = 0, paramFlag = 0;  // NOLINT(runtime/int)
@@ -57,7 +58,8 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
                                   IAMVideoProcAmp* pProcAmp,
                                   int newValue) const {
-  if (!pProcAmp) return true;
+  if (!pProcAmp)
+    return true;
 
   lock.unlock();
   if (SUCCEEDED(
@@ -100,7 +102,8 @@ UsbCameraProperty::UsbCameraProperty(const wpi::Twine& name_,
 
 bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
                                   IAMCameraControl* pProcAmp) {
-  if (!pProcAmp) return true;
+  if (!pProcAmp)
+    return true;
 
   lock.unlock();
   long newValue = 0, paramFlag = 0;  // NOLINT(runtime/int)
@@ -119,7 +122,8 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
                                   IAMCameraControl* pProcAmp,
                                   int newValue) const {
-  if (!pProcAmp) return true;
+  if (!pProcAmp)
+    return true;
 
   lock.unlock();
   if (SUCCEEDED(pProcAmp->Set(tagCameraControl, newValue,
@@ -133,7 +137,8 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
 
 bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock,
                                   IMFSourceReader* sourceReader) {
-  if (!sourceReader) return true;
+  if (!sourceReader)
+    return true;
 
   if (isControlProperty) {
     ComPtr<IAMCameraControl> pProcAmp;
@@ -162,7 +167,8 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
 bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
                                   IMFSourceReader* sourceReader,
                                   int newValue) const {
-  if (!sourceReader) return true;
+  if (!sourceReader)
+    return true;
 
   if (isControlProperty) {
     ComPtr<IAMCameraControl> pProcAmp;

@@ -21,7 +21,9 @@ std::vector<std::string> GetNetworkInterfaces() {
   char ip[50];
 
   for (int i = 0; i < counts; i++) {
-    if (adrs[i].is_internal) continue;
+    if (adrs[i].is_internal) {
+      continue;
+    }
     InetNtop(PF_INET, &(adrs[i].netmask.netmask4.sin_addr.s_addr), ip,
              sizeof(ip) - 1);
     ip[49] = '\0';

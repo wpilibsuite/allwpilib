@@ -23,11 +23,13 @@ NTGyroModel::NTGyroModel(NT_Inst instance, wpi::StringRef path)
 void NTGyroModel::Update() {
   for (auto&& event : m_nt.PollListener()) {
     if (event.entry == m_angle) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_angleData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_name) {
-      if (event.value && event.value->IsString())
+      if (event.value && event.value->IsString()) {
         m_nameValue = event.value->GetString();
+      }
     }
   }
 }

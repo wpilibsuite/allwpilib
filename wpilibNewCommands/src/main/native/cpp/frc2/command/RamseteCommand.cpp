@@ -102,10 +102,11 @@ void RamseteCommand::Execute() {
   auto dt = curTime - m_prevTime;
 
   if (m_prevTime < 0_s) {
-    if (m_usePID)
+    if (m_usePID) {
       m_outputVolts(0_V, 0_V);
-    else
+    } else {
       m_outputVel(0_mps, 0_mps);
+    }
 
     m_prevTime = curTime;
     return;
@@ -141,7 +142,9 @@ void RamseteCommand::Execute() {
   m_prevTime = curTime;
 }
 
-void RamseteCommand::End(bool interrupted) { m_timer.Stop(); }
+void RamseteCommand::End(bool interrupted) {
+  m_timer.Stop();
+}
 
 bool RamseteCommand::IsFinished() {
   return m_timer.HasElapsed(m_trajectory.TotalTime());

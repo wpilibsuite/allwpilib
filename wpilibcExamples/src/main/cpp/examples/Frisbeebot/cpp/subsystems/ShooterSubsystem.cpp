@@ -26,10 +26,18 @@ void ShooterSubsystem::UseOutput(double output, double setpoint) {
                             m_shooterFeedforward.Calculate(kShooterTargetRPS));
 }
 
-bool ShooterSubsystem::AtSetpoint() { return m_controller.AtSetpoint(); }
+bool ShooterSubsystem::AtSetpoint() {
+  return m_controller.AtSetpoint();
+}
 
-double ShooterSubsystem::GetMeasurement() { return m_shooterEncoder.GetRate(); }
+double ShooterSubsystem::GetMeasurement() {
+  return m_shooterEncoder.GetRate();
+}
 
-void ShooterSubsystem::RunFeeder() { m_feederMotor.Set(kFeederSpeed); }
+void ShooterSubsystem::RunFeeder() {
+  m_feederMotor.Set(kFeederSpeed);
+}
 
-void ShooterSubsystem::StopFeeder() { m_feederMotor.Set(0); }
+void ShooterSubsystem::StopFeeder() {
+  m_feederMotor.Set(0);
+}

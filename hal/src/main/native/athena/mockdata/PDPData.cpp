@@ -19,7 +19,9 @@ DEFINE_CAPI(double, Voltage, 0)
 HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(double, HALSIM, PDPCurrent, 0)
 
 void HALSIM_GetPDPAllCurrents(int32_t index, double* currents) {
-  for (int i = 0; i < hal::kNumPDPChannels; i++) currents[i] = 0;
+  for (int i = 0; i < hal::kNumPDPChannels; i++) {
+    currents[i] = 0;
+  }
 }
 
 void HALSIM_SetPDPAllCurrents(int32_t index, const double* currents) {}

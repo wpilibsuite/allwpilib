@@ -21,7 +21,9 @@ void HALSimWSProviderRoboRIO::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateSingleProvider<HALSimWSProviderRoboRIO>("RoboRIO", webRegisterFunc);
 }
 
-HALSimWSProviderRoboRIO::~HALSimWSProviderRoboRIO() { DoCancelCallbacks(); }
+HALSimWSProviderRoboRIO::~HALSimWSProviderRoboRIO() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderRoboRIO::RegisterCallbacks() {
   m_fpgaCbKey = REGISTER(FPGAButton, ">fpga_button", bool, boolean);
@@ -44,7 +46,9 @@ void HALSimWSProviderRoboRIO::RegisterCallbacks() {
   m_3v3FaultsCbKey = REGISTER(UserFaults3V3, ">3v3_faults", int32_t, int);
 }
 
-void HALSimWSProviderRoboRIO::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderRoboRIO::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderRoboRIO::DoCancelCallbacks() {
   HALSIM_CancelRoboRioFPGAButtonCallback(m_fpgaCbKey);

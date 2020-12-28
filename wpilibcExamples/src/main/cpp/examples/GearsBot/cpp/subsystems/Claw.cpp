@@ -12,16 +12,26 @@ Claw::Claw() {
   AddChild("Motor", &m_motor);
 }
 
-void Claw::Open() { m_motor.Set(-1); }
+void Claw::Open() {
+  m_motor.Set(-1);
+}
 
-void Claw::Close() { m_motor.Set(1); }
+void Claw::Close() {
+  m_motor.Set(1);
+}
 
-void Claw::Stop() { m_motor.Set(0); }
+void Claw::Stop() {
+  m_motor.Set(0);
+}
 
-bool Claw::IsGripping() { return m_contact.Get(); }
+bool Claw::IsGripping() {
+  return m_contact.Get();
+}
 
 void Claw::Log() {
   frc::SmartDashboard::PutBoolean("Claw switch", IsGripping());
 }
 
-void Claw::Periodic() { Log(); }
+void Claw::Periodic() {
+  Log();
+}

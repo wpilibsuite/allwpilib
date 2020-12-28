@@ -33,7 +33,9 @@ Trigger& Trigger::operator=(Trigger&& rhs) {
   return *this;
 }
 
-bool Trigger::Grab() { return Get() || m_sendablePressed; }
+bool Trigger::Grab() {
+  return Get() || m_sendablePressed;
+}
 
 void Trigger::WhenActive(Command* command) {
   auto pbs = new PressedButtonScheduler(Grab(), this, command);

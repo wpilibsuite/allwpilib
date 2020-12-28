@@ -42,4 +42,6 @@ class MyRobot : public frc::TimedRobot {
   void RobotPeriodic() override {}
 };
 
-int main() { return frc::StartRobot<MyRobot>(); }
+int main() {
+  return frc::StartRobot<MyRobot>();
+}

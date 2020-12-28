@@ -47,7 +47,9 @@ class raw_istream {
 
   size_t readsome(void* data, size_t len) {
     size_t readlen = (std::min)(in_avail(), len);
-    if (readlen == 0) return 0;
+    if (readlen == 0) {
+      return 0;
+    }
     read_impl(data, readlen);
     return m_read_count;
   }

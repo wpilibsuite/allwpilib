@@ -93,11 +93,15 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnum
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(options, i))};
-    if (!elem) return 0;
+    if (!elem) {
+      return 0;
+    }
     arr.push_back(JStringRef{env, elem}.str());
   }
   wpi::SmallVector<const char*, 8> carr;
-  for (auto&& val : arr) carr.push_back(val.c_str());
+  for (auto&& val : arr) {
+    carr.push_back(val.c_str());
+  }
   return HAL_CreateSimValueEnum(device, JStringRef{env, name}.c_str(),
                                 direction, len, carr.data(), initialValue);
 }
@@ -114,18 +118,24 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnumDouble
 {
   size_t len = env->GetArrayLength(options);
   size_t len2 = env->GetArrayLength(optionValues);
-  if (len != len2) return 0;
+  if (len != len2) {
+    return 0;
+  }
   std::vector<std::string> arr;
   arr.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(options, i))};
-    if (!elem) return 0;
+    if (!elem) {
+      return 0;
+    }
     arr.push_back(JStringRef{env, elem}.str());
   }
 
   wpi::SmallVector<const char*, 8> carr;
-  for (auto&& val : arr) carr.push_back(val.c_str());
+  for (auto&& val : arr) {
+    carr.push_back(val.c_str());
+  }
   return HAL_CreateSimValueEnumDouble(
       device, JStringRef{env, name}.c_str(), direction, len, carr.data(),
       JDoubleArrayRef{env, optionValues}.array().data(), initialValue);

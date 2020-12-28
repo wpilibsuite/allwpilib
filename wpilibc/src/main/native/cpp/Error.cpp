@@ -39,21 +39,33 @@ bool Error::operator<(const Error& rhs) const {
   }
 }
 
-Error::Code Error::GetCode() const { return m_code; }
+Error::Code Error::GetCode() const {
+  return m_code;
+}
 
-std::string Error::GetMessage() const { return m_message; }
+std::string Error::GetMessage() const {
+  return m_message;
+}
 
-std::string Error::GetFilename() const { return m_filename; }
+std::string Error::GetFilename() const {
+  return m_filename;
+}
 
-std::string Error::GetFunction() const { return m_function; }
+std::string Error::GetFunction() const {
+  return m_function;
+}
 
-int Error::GetLineNumber() const { return m_lineNumber; }
+int Error::GetLineNumber() const {
+  return m_lineNumber;
+}
 
 const ErrorBase* Error::GetOriginatingObject() const {
   return m_originatingObject;
 }
 
-double Error::GetTimestamp() const { return m_timestamp; }
+double Error::GetTimestamp() const {
+  return m_timestamp;
+}
 
 void Error::Set(Code code, const wpi::Twine& contextMessage,
                 wpi::StringRef filename, wpi::StringRef function,

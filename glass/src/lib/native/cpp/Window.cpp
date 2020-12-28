@@ -28,7 +28,9 @@ void Window::SetVisibility(Visibility visibility) {
 }
 
 void Window::Display() {
-  if (!m_view) return;
+  if (!m_view) {
+    return;
+  }
   if (!m_visible || !m_enabled) {
     PushID(m_id);
     m_view->Hidden();
@@ -36,22 +38,32 @@ void Window::Display() {
     return;
   }
 
-  if (m_posCond != 0) ImGui::SetNextWindowPos(m_pos, m_posCond);
-  if (m_sizeCond != 0) ImGui::SetNextWindowSize(m_size, m_sizeCond);
-  if (m_setPadding) ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
+  if (m_posCond != 0) {
+    ImGui::SetNextWindowPos(m_pos, m_posCond);
+  }
+  if (m_sizeCond != 0) {
+    ImGui::SetNextWindowSize(m_size, m_sizeCond);
+  }
+  if (m_setPadding) {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
+  }
 
   char label[128];
   std::snprintf(label, sizeof(label), "%s###%s",
                 m_name.empty() ? m_id.c_str() : m_name.c_str(), m_id.c_str());
 
   if (Begin(label, &m_visible, m_flags)) {
-    if (m_renamePopupEnabled) PopupEditName(nullptr, &m_name);
+    if (m_renamePopupEnabled) {
+      PopupEditName(nullptr, &m_name);
+    }
     m_view->Display();
   } else {
     m_view->Hidden();
   }
   End();
-  if (m_setPadding) ImGui::PopStyleVar();
+  if (m_setPadding) {
+    ImGui::PopStyleVar();
+  }
 }
 
 bool Window::DisplayMenuItem(const char* label) {
@@ -83,11 +95,15 @@ void Window::IniReadLine(const char* lineStr) {
     m_name = value;
   } else if (name == "visible") {
     int num;
-    if (value.getAsInteger(10, num)) return;
+    if (value.getAsInteger(10, num)) {
+      return;
+    }
     m_visible = num;
   } else if (name == "enabled") {
     int num;
-    if (value.getAsInteger(10, num)) return;
+    if (value.getAsInteger(10, num)) {
+      return;
+    }
     m_enabled = num;
   }
 }

@@ -23,7 +23,8 @@ std::string Demangle(const Twine& mangledSymbol) {
   DWORD sz =
       UnDecorateSymbolName(mangledSymbol.toNullTerminatedStringRef(buf).data(),
                            buffer, sizeof(buffer), UNDNAME_COMPLETE);
-  if (sz == 0) return mangledSymbol.str();
+  if (sz == 0)
+    return mangledSymbol.str();
   return std::string(buffer, sz);
 }
 

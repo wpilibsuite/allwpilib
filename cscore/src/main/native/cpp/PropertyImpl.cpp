@@ -29,15 +29,18 @@ PropertyImpl::PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_,
 
 void PropertyImpl::SetValue(int v) {
   int oldValue = value;
-  if (hasMinimum && v < minimum)
+  if (hasMinimum && v < minimum) {
     value = minimum;
-  else if (hasMaximum && v > maximum)
+  } else if (hasMaximum && v > maximum) {
     value = maximum;
-  else
+  } else {
     value = v;
+  }
   bool wasValueSet = valueSet;
   valueSet = true;
-  if (!wasValueSet || value != oldValue) changed();
+  if (!wasValueSet || value != oldValue) {
+    changed();
+  }
 }
 
 void PropertyImpl::SetValue(const wpi::Twine& v) {
@@ -49,14 +52,17 @@ void PropertyImpl::SetValue(const wpi::Twine& v) {
   }
   bool wasValueSet = valueSet;
   valueSet = true;
-  if (!wasValueSet || valueChanged) changed();
+  if (!wasValueSet || valueChanged) {
+    changed();
+  }
 }
 
 void PropertyImpl::SetDefaultValue(int v) {
-  if (hasMinimum && v < minimum)
+  if (hasMinimum && v < minimum) {
     defaultValue = minimum;
-  else if (hasMaximum && v > maximum)
+  } else if (hasMaximum && v > maximum) {
     defaultValue = maximum;
-  else
+  } else {
     defaultValue = v;
+  }
 }

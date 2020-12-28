@@ -63,10 +63,12 @@ int AddrToName(const sockaddr_in6& addr, T* ip, unsigned int* port) {
  */
 template <typename T>
 int AddrToName(const sockaddr_storage& addr, T* ip, unsigned int* port) {
-  if (addr.ss_family == AF_INET)
+  if (addr.ss_family == AF_INET) {
     return AddrToName(reinterpret_cast<const sockaddr_in&>(addr), ip, port);
-  if (addr.ss_family == AF_INET6)
+  }
+  if (addr.ss_family == AF_INET6) {
     return AddrToName(reinterpret_cast<const sockaddr_in6&>(addr), ip, port);
+  }
   char name[1];
   ip->assign(name, name);
   return -1;
@@ -82,10 +84,11 @@ template <typename T>
 int AddrToName(const in_addr& addr, T* ip) {
   char name[128];
   int err = uv_inet_ntop(AF_INET, &addr, name, 128);
-  if (err == 0)
+  if (err == 0) {
     ip->assign(name, name + std::strlen(name));
-  else
+  } else {
     ip->assign(name, name);
+  }
   return err;
 }
 
@@ -99,10 +102,11 @@ template <typename T>
 int AddrToName(const in6_addr& addr, T* ip) {
   char name[128];
   int err = uv_inet_ntop(AF_INET6, &addr, name, 128);
-  if (err == 0)
+  if (err == 0) {
     ip->assign(name, name + std::strlen(name));
-  else
+  } else {
     ip->assign(name, name);
+  }
   return err;
 }
 

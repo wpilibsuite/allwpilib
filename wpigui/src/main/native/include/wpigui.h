@@ -271,7 +271,9 @@ class Texture {
 
   Texture& operator=(const Texture&) = delete;
   Texture& operator=(Texture&& oth) {
-    if (m_texture) DeleteTexture(m_texture);
+    if (m_texture) {
+      DeleteTexture(m_texture);
+    }
     m_texture = oth.m_texture;
     oth.m_texture = 0;
     m_format = oth.m_format;
@@ -281,7 +283,9 @@ class Texture {
   }
 
   ~Texture() {
-    if (m_texture) DeleteTexture(m_texture);
+    if (m_texture) {
+      DeleteTexture(m_texture);
+    }
   }
 
   /**
@@ -351,8 +355,9 @@ class Texture {
   static Texture CreateFromFile(const char* filename) {
     Texture texture;
     if (!CreateTextureFromFile(filename, &texture.m_texture, &texture.m_width,
-                               &texture.m_height))
+                               &texture.m_height)) {
       return {};
+    }
     return texture;
   }
 
@@ -367,8 +372,9 @@ class Texture {
   static Texture CreateFromImage(const unsigned char* data, int len) {
     Texture texture;
     if (!CreateTextureFromImage(data, len, &texture.m_texture, &texture.m_width,
-                                &texture.m_height))
+                                &texture.m_height)) {
       return {};
+    }
     return texture;
   }
 

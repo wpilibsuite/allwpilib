@@ -9,6 +9,8 @@
 namespace hal {
 namespace init {
 std::atomic_bool HAL_IsInitialized{false};
-void RunInitialize() { HAL_Initialize(500, 0); }
+void RunInitialize() {
+  HAL_Initialize(500, 0);
+}
 }  // namespace init
 }  // namespace hal

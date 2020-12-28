@@ -16,6 +16,10 @@ void ScheduleCommand::Initialize() {
   }
 }
 
-bool ScheduleCommand::IsFinished() { return true; }
+bool ScheduleCommand::IsFinished() {
+  return true;
+}
 
-bool ScheduleCommand::RunsWhenDisabled() const { return true; }
+bool ScheduleCommand::RunsWhenDisabled() const {
+  return true;
+}

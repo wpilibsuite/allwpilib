@@ -10,10 +10,11 @@ namespace wpi {
 namespace uv {
 
 Async<>::~Async() noexcept {
-  if (auto loop = m_loop.lock())
+  if (auto loop = m_loop.lock()) {
     Close();
-  else
+  } else {
     ForceClosed();
+  }
 }
 
 std::shared_ptr<Async<>> Async<>::Create(const std::shared_ptr<Loop>& loop) {

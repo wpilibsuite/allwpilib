@@ -98,7 +98,9 @@ void IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = GetIndex(handle);
-  if (index < 0 || index >= size) return;
+  if (index < 0 || index >= size) {
+    return;
+  }
   // lock and deallocated handle
   std::scoped_lock lock(m_handleMutexes[index]);
   m_structures[index].reset();

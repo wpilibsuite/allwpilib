@@ -16,27 +16,37 @@ using namespace glass;
 
 void DeviceTreeModel::Update() {
   for (auto&& display : m_displays) {
-    if (display.first) display.first->Update();
+    if (display.first) {
+      display.first->Update();
+    }
   }
 }
 
 bool DeviceTreeModel::Exists() {
   for (auto&& display : m_displays) {
-    if (display.first && display.first->Exists()) return true;
+    if (display.first && display.first->Exists()) {
+      return true;
+    }
   }
   return false;
 }
 
 void DeviceTreeModel::Display() {
   for (auto&& display : m_displays) {
-    if (display.second) display.second(display.first);
+    if (display.second) {
+      display.second(display.first);
+    }
   }
 }
 
-void glass::HideDevice(const char* id) { gContext->deviceHidden[id] = true; }
+void glass::HideDevice(const char* id) {
+  gContext->deviceHidden[id] = true;
+}
 
 bool glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
-  if (gContext->deviceHidden[id]) return false;
+  if (gContext->deviceHidden[id]) {
+    return false;
+  }
 
   PushID(id);
 
@@ -49,11 +59,15 @@ bool glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
   bool open = CollapsingHeader(label, flags);
   PopupEditName("name", name);
 
-  if (!open) PopID();
+  if (!open) {
+    PopID();
+  }
   return open;
 }
 
-void glass::EndDevice() { PopID(); }
+void glass::EndDevice() {
+  PopID();
+}
 
 static bool DeviceBooleanImpl(const char* name, bool readonly, bool* value) {
   if (readonly) {
@@ -82,10 +96,11 @@ static bool DeviceDoubleImpl(const char* name, bool readonly, double* value) {
 static bool DeviceEnumImpl(const char* name, bool readonly, int* value,
                            const char** options, int32_t numOptions) {
   if (readonly) {
-    if (*value < 0 || *value >= numOptions)
+    if (*value < 0 || *value >= numOptions) {
       ImGui::LabelText(name, "%d (unknown)", *value);
-    else
+    } else {
       ImGui::LabelText(name, "%s", options[*value]);
+    }
     return false;
   } else {
     return ImGui::Combo(name, value, options, numOptions);

@@ -18,4 +18,6 @@ WaitUntilCommand::WaitUntilCommand(const wpi::Twine& name, double time)
   m_time = time;
 }
 
-bool WaitUntilCommand::IsFinished() { return Timer::GetMatchTime() >= m_time; }
+bool WaitUntilCommand::IsFinished() {
+  return Timer::GetMatchTime() >= m_time;
+}

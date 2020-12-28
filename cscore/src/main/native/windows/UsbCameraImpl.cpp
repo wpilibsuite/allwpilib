@@ -86,7 +86,9 @@ UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
   StartMessagePump();
 }
 
-UsbCameraImpl::~UsbCameraImpl() { m_messagePump = nullptr; }
+UsbCameraImpl::~UsbCameraImpl() {
+  m_messagePump = nullptr;
+}
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   Message msg{Message::kCmdSetProperty};
@@ -254,7 +256,8 @@ bool UsbCameraImpl::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
 }
 
 void UsbCameraImpl::DeviceDisconnect() {
-  if (m_connectVerbose) SINFO("Disconnected from " << m_path);
+  if (m_connectVerbose)
+    SINFO("Disconnected from " << m_path);
   m_sourceReader.Reset();
   m_mediaSource.Reset();
   if (m_imageCallback) {
@@ -266,7 +269,8 @@ void UsbCameraImpl::DeviceDisconnect() {
 }
 
 static bool IsPercentageProperty(wpi::StringRef name) {
-  if (name.startswith("raw_")) name = name.substr(4);
+  if (name.startswith("raw_"))
+    name = name.substr(4);
   return name == "Brightness" || name == "Contrast" || name == "Saturation" ||
          name == "Hue" || name == "Sharpness" || name == "Gain" ||
          name == "Exposure";
@@ -274,14 +278,17 @@ static bool IsPercentageProperty(wpi::StringRef name) {
 
 void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
                                  const VideoMode& mode) {
-  if (!videoSample) return;
+  if (!videoSample)
+    return;
 
   ComPtr<IMFMediaBuffer> buf;
 
   if (!SUCCEEDED(videoSample->ConvertToContiguousBuffer(buf.GetAddressOf()))) {
     DWORD bcnt = 0;
-    if (!SUCCEEDED(videoSample->GetBufferCount(&bcnt))) return;
-    if (bcnt == 0) return;
+    if (!SUCCEEDED(videoSample->GetBufferCount(&bcnt)))
+      return;
+    if (bcnt == 0)
+      return;
     if (!SUCCEEDED(videoSample->GetBufferByIndex(0, buf.GetAddressOf())))
       return;
   }
@@ -310,7 +317,8 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
       return;
     }
   }
-  if (!ptr) return;
+  if (!ptr)
+    return;
 
   cv::Mat tmpMat;
   std::unique_ptr<Image> dest;
@@ -451,16 +459,19 @@ static cs::VideoMode::PixelFormat GetFromGUID(const GUID& guid) {
 }
 
 bool UsbCameraImpl::DeviceConnect() {
-  if (m_mediaSource && m_sourceReader) return true;
+  if (m_mediaSource && m_sourceReader)
+    return true;
 
-  if (m_connectVerbose) SINFO("Connecting to USB camera on " << m_path);
+  if (m_connectVerbose)
+    SINFO("Connecting to USB camera on " << m_path);
 
   SDEBUG3("opening device");
 
   const wchar_t* path = m_widePath.c_str();
   m_mediaSource = CreateVideoCaptureDevice(path);
 
-  if (!m_mediaSource) return false;
+  if (!m_mediaSource)
+    return false;
   m_imageCallback = CreateSourceReaderCB(shared_from_this(), m_mode);
 
   m_sourceReader =
@@ -510,7 +521,8 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   auto result = m_messagePump->SendWindowMessage<CS_Status>(
       WaitForStartupMessage, nullptr, nullptr);
   *status = result;
-  if (*status != CS_OK) return false;
+  if (*status != CS_OK)
+    return false;
   if (!m_properties_cached) {
     *status = CS_SOURCE_IS_DISCONNECTED;
     return false;
@@ -545,7 +557,8 @@ template void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
   DeviceAddProperty(#val, CameraControl_##val, pCamControl);
 
 void UsbCameraImpl::DeviceCacheProperties() {
-  if (!m_sourceReader) return;
+  if (!m_sourceReader)
+    return;
 
   IAMVideoProcAmp* pProcAmp = NULL;
 
@@ -693,7 +706,8 @@ void UsbCameraImpl::DeviceCacheProperty(
   }
 
   NotifyPropertyCreated(*rawIndex, *rawPropPtr);
-  if (perPropPtr && perIndex) NotifyPropertyCreated(*perIndex, *perPropPtr);
+  if (perPropPtr && perIndex)
+    NotifyPropertyCreated(*perIndex, *perPropPtr);
 }
 
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
@@ -740,7 +754,8 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
 
   // Look up
   auto prop = static_cast<UsbCameraProperty*>(GetProperty(property));
-  if (!prop) return CS_INVALID_PROPERTY;
+  if (!prop)
+    return CS_INVALID_PROPERTY;
 
   // If setting before we get, guess initial type based on set
   if (prop->propKind == CS_PROP_NONE) {
@@ -771,7 +786,8 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
 
   // Actually set the new value on the device (if possible)
   if (!prop->device) {
-    if (prop->id == kPropConnectVerboseId) m_connectVerbose = value;
+    if (prop->id == kPropConnectVerboseId)
+      m_connectVerbose = value;
   } else {
     if (!prop->DeviceSet(lock, m_sourceReader.Get())) {
       return CS_PROPERTY_WRITE_FAILED;
@@ -855,8 +871,10 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
 }
 
 bool UsbCameraImpl::DeviceStreamOn() {
-  if (m_streaming) return false;
-  if (!m_deviceValid) return false;
+  if (m_streaming)
+    return false;
+  if (!m_deviceValid)
+    return false;
   m_streaming = true;
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, NULL, NULL,
                              NULL, NULL);
@@ -869,9 +887,11 @@ bool UsbCameraImpl::DeviceStreamOff() {
 }
 
 void UsbCameraImpl::DeviceCacheMode() {
-  if (!m_sourceReader) return;
+  if (!m_sourceReader)
+    return;
 
-  if (m_windowsVideoModes.size() == 0) return;
+  if (m_windowsVideoModes.size() == 0)
+    return;
 
   if (!m_currentMode) {
     // First, see if our set mode is valid
@@ -936,7 +956,8 @@ CS_StatusValue UsbCameraImpl::DeviceSetMode() {
 }
 
 void UsbCameraImpl::DeviceCacheVideoModes() {
-  if (!m_sourceReader) return;
+  if (!m_sourceReader)
+    return;
 
   std::vector<VideoMode> modes;
   m_windowsVideoModes.clear();

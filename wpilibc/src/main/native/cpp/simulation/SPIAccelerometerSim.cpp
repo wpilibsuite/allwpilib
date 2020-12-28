@@ -12,7 +12,9 @@
 using namespace frc;
 using namespace frc::sim;
 
-SPIAccelerometerSim::SPIAccelerometerSim(int index) { m_index = index; }
+SPIAccelerometerSim::SPIAccelerometerSim(int index) {
+  m_index = index;
+}
 
 std::unique_ptr<CallbackStore> SPIAccelerometerSim::RegisterActiveCallback(
     NotifyCallback callback, bool initialNotify) {

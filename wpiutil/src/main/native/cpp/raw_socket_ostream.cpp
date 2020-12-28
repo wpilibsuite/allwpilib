@@ -10,7 +10,9 @@ using namespace wpi;
 
 raw_socket_ostream::~raw_socket_ostream() {
   flush();
-  if (m_shouldClose) close();
+  if (m_shouldClose) {
+    close();
+  }
 }
 
 void raw_socket_ostream::write_impl(const char* data, size_t len) {
@@ -27,10 +29,14 @@ void raw_socket_ostream::write_impl(const char* data, size_t len) {
   }
 }
 
-uint64_t raw_socket_ostream::current_pos() const { return 0; }
+uint64_t raw_socket_ostream::current_pos() const {
+  return 0;
+}
 
 void raw_socket_ostream::close() {
-  if (!m_shouldClose) return;
+  if (!m_shouldClose) {
+    return;
+  }
   flush();
   m_stream.close();
 }

@@ -20,6 +20,10 @@ InstantCommand::InstantCommand(std::function<void()> toRun,
 
 InstantCommand::InstantCommand() : m_toRun{[] {}} {}
 
-void InstantCommand::Initialize() { m_toRun(); }
+void InstantCommand::Initialize() {
+  m_toRun();
+}
 
-bool InstantCommand::IsFinished() { return true; }
+bool InstantCommand::IsFinished() {
+  return true;
+}

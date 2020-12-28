@@ -11,11 +11,15 @@
 using namespace glass;
 
 void MainMenuBar::AddMainMenu(std::function<void()> menu) {
-  if (menu) m_menus.emplace_back(std::move(menu));
+  if (menu) {
+    m_menus.emplace_back(std::move(menu));
+  }
 }
 
 void MainMenuBar::AddOptionMenu(std::function<void()> menu) {
-  if (menu) m_optionMenus.emplace_back(std::move(menu));
+  if (menu) {
+    m_optionMenus.emplace_back(std::move(menu));
+  }
 }
 
 void MainMenuBar::Display() {
@@ -24,7 +28,9 @@ void MainMenuBar::Display() {
   if (!m_optionMenus.empty()) {
     if (ImGui::BeginMenu("Options")) {
       for (auto&& menu : m_optionMenus) {
-        if (menu) menu();
+        if (menu) {
+          menu();
+        }
       }
       ImGui::EndMenu();
     }
@@ -33,7 +39,9 @@ void MainMenuBar::Display() {
   wpi::gui::EmitViewMenu();
 
   for (auto&& menu : m_menus) {
-    if (menu) menu();
+    if (menu) {
+      menu();
+    }
   }
 
 #if 0

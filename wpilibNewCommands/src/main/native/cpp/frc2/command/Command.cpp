@@ -17,7 +17,9 @@
 
 using namespace frc2;
 
-Command::~Command() { CommandScheduler::GetInstance().Cancel(this); }
+Command::~Command() {
+  CommandScheduler::GetInstance().Cancel(this);
+}
 
 Command::Command(const Command& rhs) : ErrorBase(rhs) {}
 
@@ -83,13 +85,17 @@ PerpetualCommand Command::Perpetually() && {
   return PerpetualCommand(std::move(*this).TransferOwnership());
 }
 
-ProxyScheduleCommand Command::AsProxy() { return ProxyScheduleCommand(this); }
+ProxyScheduleCommand Command::AsProxy() {
+  return ProxyScheduleCommand(this);
+}
 
 void Command::Schedule(bool interruptible) {
   CommandScheduler::GetInstance().Schedule(interruptible, this);
 }
 
-void Command::Cancel() { CommandScheduler::GetInstance().Cancel(this); }
+void Command::Cancel() {
+  CommandScheduler::GetInstance().Cancel(this);
+}
 
 bool Command::IsScheduled() const {
   return CommandScheduler::GetInstance().IsScheduled(this);
@@ -103,11 +109,17 @@ bool Command::HasRequirement(Subsystem* requirement) const {
   return hasRequirement;
 }
 
-std::string Command::GetName() const { return GetTypeName(*this); }
+std::string Command::GetName() const {
+  return GetTypeName(*this);
+}
 
-bool Command::IsGrouped() const { return m_isGrouped; }
+bool Command::IsGrouped() const {
+  return m_isGrouped;
+}
 
-void Command::SetGrouped(bool grouped) { m_isGrouped = grouped; }
+void Command::SetGrouped(bool grouped) {
+  m_isGrouped = grouped;
+}
 
 namespace frc2 {
 bool RequirementsDisjoint(Command* first, Command* second) {

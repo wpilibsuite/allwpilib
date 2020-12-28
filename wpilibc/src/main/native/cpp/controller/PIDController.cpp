@@ -30,25 +30,41 @@ void PIDController::SetPID(double Kp, double Ki, double Kd) {
   m_Kd = Kd;
 }
 
-void PIDController::SetP(double Kp) { m_Kp = Kp; }
+void PIDController::SetP(double Kp) {
+  m_Kp = Kp;
+}
 
-void PIDController::SetI(double Ki) { m_Ki = Ki; }
+void PIDController::SetI(double Ki) {
+  m_Ki = Ki;
+}
 
-void PIDController::SetD(double Kd) { m_Kd = Kd; }
+void PIDController::SetD(double Kd) {
+  m_Kd = Kd;
+}
 
-double PIDController::GetP() const { return m_Kp; }
+double PIDController::GetP() const {
+  return m_Kp;
+}
 
-double PIDController::GetI() const { return m_Ki; }
+double PIDController::GetI() const {
+  return m_Ki;
+}
 
-double PIDController::GetD() const { return m_Kd; }
+double PIDController::GetD() const {
+  return m_Kd;
+}
 
 units::second_t PIDController::GetPeriod() const {
   return units::second_t(m_period);
 }
 
-void PIDController::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
+void PIDController::SetSetpoint(double setpoint) {
+  m_setpoint = setpoint;
+}
 
-double PIDController::GetSetpoint() const { return m_setpoint; }
+double PIDController::GetSetpoint() const {
+  return m_setpoint;
+}
 
 bool PIDController::AtSetpoint() const {
   double positionError;
@@ -72,9 +88,13 @@ void PIDController::EnableContinuousInput(double minimumInput,
   m_maximumInput = maximumInput;
 }
 
-void PIDController::DisableContinuousInput() { m_continuous = false; }
+void PIDController::DisableContinuousInput() {
+  m_continuous = false;
+}
 
-bool PIDController::IsContinuousInputEnabled() const { return m_continuous; }
+bool PIDController::IsContinuousInputEnabled() const {
+  return m_continuous;
+}
 
 void PIDController::SetIntegratorRange(double minimumIntegral,
                                        double maximumIntegral) {
@@ -88,9 +108,13 @@ void PIDController::SetTolerance(double positionTolerance,
   m_velocityTolerance = velocityTolerance;
 }
 
-double PIDController::GetPositionError() const { return m_positionError; }
+double PIDController::GetPositionError() const {
+  return m_positionError;
+}
 
-double PIDController::GetVelocityError() const { return m_velocityError; }
+double PIDController::GetVelocityError() const {
+  return m_velocityError;
+}
 
 double PIDController::Calculate(double measurement) {
   m_measurement = measurement;

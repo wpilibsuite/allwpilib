@@ -23,10 +23,11 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
       loop.GetRaw(), req->GetRaw(),
       [](uv_getaddrinfo_t* req, int status, addrinfo* res) {
         auto& h = *static_cast<GetAddrInfoReq*>(req->data);
-        if (status < 0)
+        if (status < 0) {
           h.ReportError(status);
-        else
+        } else {
           h.resolved(*res);
+        }
         uv_freeaddrinfo(res);
         h.Release();  // this is always a one-shot
       },
@@ -34,10 +35,11 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
       service.isNull() ? nullptr
                        : service.toNullTerminatedStringRef(serviceStr).data(),
       hints);
-  if (err < 0)
+  if (err < 0) {
     loop.ReportError(err);
-  else
+  } else {
     req->Keep();
+  }
 }
 
 void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,

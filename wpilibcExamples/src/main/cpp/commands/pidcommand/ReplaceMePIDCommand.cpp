@@ -20,4 +20,6 @@ ReplaceMePIDCommand::ReplaceMePIDCommand()
           }) {}
 
 // Returns true when the command should end.
-bool ReplaceMePIDCommand::IsFinished() { return false; }
+bool ReplaceMePIDCommand::IsFinished() {
+  return false;
+}

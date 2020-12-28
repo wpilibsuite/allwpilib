@@ -14,7 +14,9 @@ using namespace frc;
 
 unsigned notifierCounter;
 
-void notifierHandler(void*) { notifierCounter++; }
+void notifierHandler(void*) {
+  notifierCounter++;
+}
 
 /**
  * Test if the Wait function works

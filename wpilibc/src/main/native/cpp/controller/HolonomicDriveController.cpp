@@ -64,4 +64,6 @@ ChassisSpeeds HolonomicDriveController::Calculate(
                    angleRef);
 }
 
-void HolonomicDriveController::SetEnabled(bool enabled) { m_enabled = enabled; }
+void HolonomicDriveController::SetEnabled(bool enabled) {
+  m_enabled = enabled;
+}

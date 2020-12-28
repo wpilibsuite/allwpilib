@@ -10,12 +10,14 @@ using namespace frc;
 
 static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
   if (onTrue != nullptr) {
-    for (auto requirement : onTrue->GetRequirements())
+    for (auto requirement : onTrue->GetRequirements()) {
       command.Requires(requirement);
+    }
   }
   if (onFalse != nullptr) {
-    for (auto requirement : onFalse->GetRequirements())
+    for (auto requirement : onFalse->GetRequirements()) {
       command.Requires(requirement);
+    }
   }
 }
 

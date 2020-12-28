@@ -27,22 +27,26 @@ NTCommandSchedulerModel::NTCommandSchedulerModel(NT_Inst instance,
 }
 
 void NTCommandSchedulerModel::CancelCommand(size_t index) {
-  if (index < m_idsValue.size())
+  if (index < m_idsValue.size()) {
     nt::SetEntryValue(
         m_cancel, nt::NetworkTableValue::MakeDoubleArray({m_idsValue[index]}));
+  }
 }
 
 void NTCommandSchedulerModel::Update() {
   for (auto&& event : m_nt.PollListener()) {
     if (event.entry == m_name) {
-      if (event.value && event.value->IsString())
+      if (event.value && event.value->IsString()) {
         m_nameValue = event.value->GetString();
+      }
     } else if (event.entry == m_commands) {
-      if (event.value && event.value->IsStringArray())
+      if (event.value && event.value->IsStringArray()) {
         m_commandsValue = event.value->GetStringArray();
+      }
     } else if (event.entry == m_ids) {
-      if (event.value && event.value->IsDoubleArray())
+      if (event.value && event.value->IsDoubleArray()) {
         m_idsValue = event.value->GetDoubleArray();
+      }
     }
   }
 }

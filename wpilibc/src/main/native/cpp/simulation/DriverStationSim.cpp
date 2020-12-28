@@ -24,7 +24,9 @@ std::unique_ptr<CallbackStore> DriverStationSim::RegisterEnabledCallback(
   return store;
 }
 
-bool DriverStationSim::GetEnabled() { return HALSIM_GetDriverStationEnabled(); }
+bool DriverStationSim::GetEnabled() {
+  return HALSIM_GetDriverStationEnabled();
+}
 
 void DriverStationSim::SetEnabled(bool enabled) {
   HALSIM_SetDriverStationEnabled(enabled);
@@ -56,9 +58,13 @@ std::unique_ptr<CallbackStore> DriverStationSim::RegisterTestCallback(
   return store;
 }
 
-bool DriverStationSim::GetTest() { return HALSIM_GetDriverStationTest(); }
+bool DriverStationSim::GetTest() {
+  return HALSIM_GetDriverStationTest();
+}
 
-void DriverStationSim::SetTest(bool test) { HALSIM_SetDriverStationTest(test); }
+void DriverStationSim::SetTest(bool test) {
+  HALSIM_SetDriverStationTest(test);
+}
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEStopCallback(
     NotifyCallback callback, bool initialNotify) {
@@ -69,7 +75,9 @@ std::unique_ptr<CallbackStore> DriverStationSim::RegisterEStopCallback(
   return store;
 }
 
-bool DriverStationSim::GetEStop() { return HALSIM_GetDriverStationEStop(); }
+bool DriverStationSim::GetEStop() {
+  return HALSIM_GetDriverStationEStop();
+}
 
 void DriverStationSim::SetEStop(bool eStop) {
   HALSIM_SetDriverStationEStop(eStop);
@@ -249,4 +257,6 @@ void DriverStationSim::SetReplayNumber(int replayNumber) {
   HALSIM_SetReplayNumber(replayNumber);
 }
 
-void DriverStationSim::ResetData() { HALSIM_ResetDriverStationData(); }
+void DriverStationSim::ResetData() {
+  HALSIM_ResetDriverStationData();
+}

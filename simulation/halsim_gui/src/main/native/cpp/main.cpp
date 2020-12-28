@@ -99,7 +99,9 @@ __declspec(dllexport)
     }
   });
 
-  if (!gui::Initialize("Robot Simulation", 1280, 720)) return 0;
+  if (!gui::Initialize("Robot Simulation", 1280, 720)) {
+    return 0;
+  }
   HAL_RegisterExtensionListener(
       nullptr, [](void*, const char* name, void* data) {
         if (wpi::StringRef{name} == "ds_socket") {

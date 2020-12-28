@@ -15,7 +15,9 @@ GenericHIDSim::GenericHIDSim(const GenericHID& joystick)
 
 GenericHIDSim::GenericHIDSim(int port) : m_port{port} {}
 
-void GenericHIDSim::NotifyNewData() { DriverStationSim::NotifyNewData(); }
+void GenericHIDSim::NotifyNewData() {
+  DriverStationSim::NotifyNewData();
+}
 
 void GenericHIDSim::SetRawButton(int button, bool value) {
   DriverStationSim::SetJoystickButton(m_port, button, value);
@@ -29,7 +31,9 @@ void GenericHIDSim::SetPOV(int pov, int value) {
   DriverStationSim::SetJoystickPOV(m_port, pov, value);
 }
 
-void GenericHIDSim::SetPOV(int value) { SetPOV(0, value); }
+void GenericHIDSim::SetPOV(int value) {
+  SetPOV(0, value);
+}
 
 void GenericHIDSim::SetAxisCount(int count) {
   DriverStationSim::SetJoystickAxisCount(m_port, count);

@@ -10,13 +10,17 @@
 
 using namespace frc;
 
-void Shuffleboard::Update() { GetInstance().Update(); }
+void Shuffleboard::Update() {
+  GetInstance().Update();
+}
 
 ShuffleboardTab& Shuffleboard::GetTab(wpi::StringRef title) {
   return GetInstance().GetTab(title);
 }
 
-void Shuffleboard::SelectTab(int index) { GetInstance().SelectTab(index); }
+void Shuffleboard::SelectTab(int index) {
+  GetInstance().SelectTab(index);
+}
 
 void Shuffleboard::SelectTab(wpi::StringRef title) {
   GetInstance().SelectTab(title);
@@ -36,7 +40,9 @@ void Shuffleboard::StartRecording() {
   GetRecordingController().StartRecording();
 }
 
-void Shuffleboard::StopRecording() { GetRecordingController().StopRecording(); }
+void Shuffleboard::StopRecording() {
+  GetRecordingController().StopRecording();
+}
 
 void Shuffleboard::SetRecordingFileNameFormat(wpi::StringRef format) {
   GetRecordingController().SetRecordingFileNameFormat(format);

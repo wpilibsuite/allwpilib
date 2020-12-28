@@ -11,7 +11,9 @@ namespace init {
 extern std::atomic_bool HAL_IsInitialized;
 extern void RunInitialize();
 static inline void CheckInit() {
-  if (HAL_IsInitialized.load(std::memory_order_relaxed)) return;
+  if (HAL_IsInitialized.load(std::memory_order_relaxed)) {
+    return;
+  }
   RunInitialize();
 }
 

@@ -36,7 +36,9 @@ TEST(UidVectorTest, Iterate) {
   v.emplace_back(2);
   v.emplace_back(1);
   std::vector<int> out;
-  for (auto&& val : v) out.push_back(val);
+  for (auto&& val : v) {
+    out.push_back(val);
+  }
   ASSERT_EQ(out.size(), 2u);
   EXPECT_EQ(out[0], 2);
   EXPECT_EQ(out[1], 1);

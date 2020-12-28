@@ -9,7 +9,9 @@ using namespace frc;
 ShuffleboardTab::ShuffleboardTab(ShuffleboardRoot& root, wpi::StringRef title)
     : ShuffleboardValue(title), ShuffleboardContainer(title), m_root(root) {}
 
-ShuffleboardRoot& ShuffleboardTab::GetRoot() { return m_root; }
+ShuffleboardRoot& ShuffleboardTab::GetRoot() {
+  return m_root;
+}
 
 void ShuffleboardTab::BuildInto(std::shared_ptr<nt::NetworkTable> parentTable,
                                 std::shared_ptr<nt::NetworkTable> metaTable) {

@@ -33,7 +33,9 @@ void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
   m_pinCbKey = REGISTER(Pin, "<dio_pin", int32_t, int);
 }
 
-void HALSimWSProviderDigitalPWM::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderDigitalPWM::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderDigitalPWM::DoCancelCallbacks() {
   HALSIM_CancelDigitalPWMInitializedCallback(m_channel, m_initCbKey);

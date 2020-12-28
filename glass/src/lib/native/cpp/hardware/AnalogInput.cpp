@@ -13,7 +13,9 @@ using namespace glass;
 
 void glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
   auto voltageData = model->GetVoltageData();
-  if (!voltageData) return;
+  if (!voltageData) {
+    return;
+  }
 
   // build label
   std::string* name = GetStorage().GetStringRef("name");
@@ -34,11 +36,15 @@ void glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
     ImGui::PopStyleColor();
   } else {
     float val = voltageData->GetValue();
-    if (voltageData->SliderFloat(label, &val, 0.0, 5.0)) model->SetVoltage(val);
+    if (voltageData->SliderFloat(label, &val, 0.0, 5.0)) {
+      model->SetVoltage(val);
+    }
   }
 
   // context menu to change name
-  if (PopupEditName("name", name)) voltageData->SetName(name->c_str());
+  if (PopupEditName("name", name)) {
+    voltageData->SetName(name->c_str());
+  }
 }
 
 void glass::DisplayAnalogInputs(AnalogInputsModel* model,
@@ -58,6 +64,7 @@ void glass::DisplayAnalogInputs(AnalogInputsModel* model,
     PopID();
     hasAny = true;
   });
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

@@ -49,19 +49,33 @@ void ADXL345_SPI::SetRange(Range range) {
   commands[1] = kDataFormat_FullRes | static_cast<uint8_t>(range & 0x03);
   m_spi.Transaction(commands, commands, 2);
 
-  if (m_simRange) m_simRange.Set(range);
+  if (m_simRange) {
+    m_simRange.Set(range);
+  }
 }
 
-double ADXL345_SPI::GetX() { return GetAcceleration(kAxis_X); }
+double ADXL345_SPI::GetX() {
+  return GetAcceleration(kAxis_X);
+}
 
-double ADXL345_SPI::GetY() { return GetAcceleration(kAxis_Y); }
+double ADXL345_SPI::GetY() {
+  return GetAcceleration(kAxis_Y);
+}
 
-double ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
+double ADXL345_SPI::GetZ() {
+  return GetAcceleration(kAxis_Z);
+}
 
 double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
-  if (axis == kAxis_X && m_simX) return m_simX.Get();
-  if (axis == kAxis_Y && m_simY) return m_simY.Get();
-  if (axis == kAxis_Z && m_simZ) return m_simZ.Get();
+  if (axis == kAxis_X && m_simX) {
+    return m_simX.Get();
+  }
+  if (axis == kAxis_Y && m_simY) {
+    return m_simY.Get();
+  }
+  if (axis == kAxis_Z && m_simZ) {
+    return m_simZ.Get();
+  }
   uint8_t buffer[3];
   uint8_t command[3] = {0, 0, 0};
   command[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister) +

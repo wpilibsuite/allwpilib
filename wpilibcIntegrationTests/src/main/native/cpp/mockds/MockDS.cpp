@@ -24,14 +24,15 @@ static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
   }
 
   wpi::StringRef levelmsg;
-  if (level >= 50)
+  if (level >= 50) {
     levelmsg = "CRITICAL: ";
-  else if (level >= 40)
+  } else if (level >= 40) {
     levelmsg = "ERROR: ";
-  else if (level >= 30)
+  } else if (level >= 30) {
     levelmsg = "WARNING: ";
-  else
+  } else {
     return;
+  }
   oss << "DS: " << levelmsg << msg << " (" << file << ':' << line << ")\n";
   wpi::errs() << oss.str();
 }
@@ -50,7 +51,9 @@ static void generateEnabledDsPacket(wpi::SmallVectorImpl<uint8_t>& data,
 using namespace frc;
 
 void MockDS::start() {
-  if (m_active) return;
+  if (m_active) {
+    return;
+  }
   m_active = true;
   m_thread = std::thread([&]() {
     wpi::Logger logger(LoggerFunc);
@@ -82,5 +85,7 @@ void MockDS::start() {
 
 void MockDS::stop() {
   m_active = false;
-  if (m_thread.joinable()) m_thread.join();
+  if (m_thread.joinable()) {
+    m_thread.join();
+  }
 }

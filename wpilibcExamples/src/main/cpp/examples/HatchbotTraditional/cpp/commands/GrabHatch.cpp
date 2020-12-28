@@ -8,6 +8,10 @@ GrabHatch::GrabHatch(HatchSubsystem* subsystem) : m_hatch(subsystem) {
   AddRequirements({subsystem});
 }
 
-void GrabHatch::Initialize() { m_hatch->GrabHatch(); }
+void GrabHatch::Initialize() {
+  m_hatch->GrabHatch();
+}
 
-bool GrabHatch::IsFinished() { return true; }
+bool GrabHatch::IsFinished() {
+  return true;
+}

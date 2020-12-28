@@ -49,7 +49,9 @@ class UidVector {
   // one.  The element is added to the freelist for later reuse.
   void erase(unsigned int uid) {
     --uid;
-    if (uid >= m_vector.size() || !m_vector[uid]) return;
+    if (uid >= m_vector.size() || !m_vector[uid]) {
+      return;
+    }
     m_free.push_back(uid);
     m_vector[uid] = T();
   }
@@ -88,35 +90,53 @@ class Notifier::Thread : public wpi::SafeThread {
   std::function<void()> m_on_exit;
 };
 
-Notifier::Notifier() { s_destroyed = false; }
+Notifier::Notifier() {
+  s_destroyed = false;
+}
 
-Notifier::~Notifier() { s_destroyed = true; }
+Notifier::~Notifier() {
+  s_destroyed = true;
+}
 
-void Notifier::Start() { m_owner.Start(m_on_start, m_on_exit); }
+void Notifier::Start() {
+  m_owner.Start(m_on_start, m_on_exit);
+}
 
-void Notifier::Stop() { m_owner.Stop(); }
+void Notifier::Stop() {
+  m_owner.Stop();
+}
 
 void Notifier::Thread::Main() {
-  if (m_on_start) m_on_start();
+  if (m_on_start) {
+    m_on_start();
+  }
 
   std::unique_lock lock(m_mutex);
   while (m_active) {
     while (m_notifications.empty()) {
       m_cond.wait(lock);
-      if (!m_active) goto done;
+      if (!m_active) {
+        goto done;
+      }
     }
 
     while (!m_notifications.empty()) {
-      if (!m_active) goto done;
+      if (!m_active) {
+        goto done;
+      }
       auto item = std::move(m_notifications.front());
       m_notifications.pop();
 
       // Use index because iterator might get invalidated.
       for (size_t i = 0; i < m_listeners.size(); ++i) {
-        if (!m_listeners[i]) continue;  // removed
+        if (!m_listeners[i]) {
+          continue;  // removed
+        }
 
         // Event type must be within requested set for this listener.
-        if ((item.kind & m_listeners[i].eventMask) == 0) continue;
+        if ((item.kind & m_listeners[i].eventMask) == 0) {
+          continue;
+        }
 
         // make a copy of the callback so we can safely release the mutex
         auto callback = m_listeners[i].callback;
@@ -130,7 +150,9 @@ void Notifier::Thread::Main() {
   }
 
 done:
-  if (m_on_exit) m_on_exit();
+  if (m_on_exit) {
+    m_on_exit();
+  }
 }
 
 int Notifier::AddListener(std::function<void(const RawEvent& event)> callback,
@@ -142,14 +164,18 @@ int Notifier::AddListener(std::function<void(const RawEvent& event)> callback,
 
 void Notifier::RemoveListener(int uid) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
   thr->m_listeners.erase(uid);
 }
 
 void Notifier::NotifySource(const wpi::Twine& name, CS_Source source,
                             CS_EventKind kind) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
   thr->m_notifications.emplace(name, source, static_cast<RawEvent::Kind>(kind));
   thr->m_cond.notify_one();
 }
@@ -162,7 +188,9 @@ void Notifier::NotifySource(const SourceImpl& source, CS_EventKind kind) {
 void Notifier::NotifySourceVideoMode(const SourceImpl& source,
                                      const VideoMode& mode) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
 
   auto handleData = Instance::GetInstance().FindSource(source);
 
@@ -175,7 +203,9 @@ void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
                                     int property, CS_PropertyKind propertyKind,
                                     int value, const wpi::Twine& valueStr) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
 
   auto handleData = Instance::GetInstance().FindSource(source);
 
@@ -189,7 +219,9 @@ void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
 void Notifier::NotifySink(const wpi::Twine& name, CS_Sink sink,
                           CS_EventKind kind) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
 
   thr->m_notifications.emplace(name, sink, static_cast<RawEvent::Kind>(kind));
   thr->m_cond.notify_one();
@@ -203,7 +235,9 @@ void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
 void Notifier::NotifySinkSourceChanged(const wpi::Twine& name, CS_Sink sink,
                                        CS_Source source) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
 
   RawEvent event{name, sink, RawEvent::kSinkSourceChanged};
   event.sourceHandle = source;
@@ -217,7 +251,9 @@ void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
                                   CS_PropertyKind propertyKind, int value,
                                   const wpi::Twine& valueStr) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
 
   auto handleData = Instance::GetInstance().FindSink(sink);
 
@@ -230,7 +266,9 @@ void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
 
 void Notifier::NotifyNetworkInterfacesChanged() {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
 
   thr->m_notifications.emplace(RawEvent::kNetworkInterfacesChanged);
   thr->m_cond.notify_one();
@@ -238,7 +276,9 @@ void Notifier::NotifyNetworkInterfacesChanged() {
 
 void Notifier::NotifyTelemetryUpdated() {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
 
   thr->m_notifications.emplace(RawEvent::kTelemetryUpdated);
   thr->m_cond.notify_one();

@@ -55,27 +55,37 @@ WireDecoder::WireDecoder(wpi::raw_istream& is, unsigned int proto_rev,
   m_error = nullptr;
 }
 
-WireDecoder::~WireDecoder() { std::free(m_buf); }
+WireDecoder::~WireDecoder() {
+  std::free(m_buf);
+}
 
 bool WireDecoder::ReadDouble(double* val) {
   const char* buf;
-  if (!Read(&buf, 8)) return false;
+  if (!Read(&buf, 8)) {
+    return false;
+  }
   *val = ::ReadDouble(buf);
   return true;
 }
 
 void WireDecoder::Realloc(size_t len) {
   // Double current buffer size until we have enough space.
-  if (m_allocated >= len) return;
+  if (m_allocated >= len) {
+    return;
+  }
   size_t newlen = m_allocated * 2;
-  while (newlen < len) newlen *= 2;
+  while (newlen < len) {
+    newlen *= 2;
+  }
   m_buf = static_cast<char*>(wpi::safe_realloc(m_buf, newlen));
   m_allocated = newlen;
 }
 
 bool WireDecoder::ReadType(NT_Type* type) {
   unsigned int itype;
-  if (!Read8(&itype)) return false;
+  if (!Read8(&itype)) {
+    return false;
+  }
   // Convert from byte value to enum
   switch (itype) {
     case 0x00:
@@ -114,17 +124,23 @@ std::shared_ptr<Value> WireDecoder::ReadValue(NT_Type type) {
   switch (type) {
     case NT_BOOLEAN: {
       unsigned int v;
-      if (!Read8(&v)) return nullptr;
+      if (!Read8(&v)) {
+        return nullptr;
+      }
       return Value::MakeBoolean(v != 0);
     }
     case NT_DOUBLE: {
       double v;
-      if (!ReadDouble(&v)) return nullptr;
+      if (!ReadDouble(&v)) {
+        return nullptr;
+      }
       return Value::MakeDouble(v);
     }
     case NT_STRING: {
       std::string v;
-      if (!ReadString(&v)) return nullptr;
+      if (!ReadString(&v)) {
+        return nullptr;
+      }
       return Value::MakeString(std::move(v));
     }
     case NT_RAW: {
@@ -133,7 +149,9 @@ std::shared_ptr<Value> WireDecoder::ReadValue(NT_Type type) {
         return nullptr;
       }
       std::string v;
-      if (!ReadString(&v)) return nullptr;
+      if (!ReadString(&v)) {
+        return nullptr;
+      }
       return Value::MakeRaw(std::move(v));
     }
     case NT_RPC: {
@@ -142,42 +160,60 @@ std::shared_ptr<Value> WireDecoder::ReadValue(NT_Type type) {
         return nullptr;
       }
       std::string v;
-      if (!ReadString(&v)) return nullptr;
+      if (!ReadString(&v)) {
+        return nullptr;
+      }
       return Value::MakeRpc(std::move(v));
     }
     case NT_BOOLEAN_ARRAY: {
       // size
       unsigned int size;
-      if (!Read8(&size)) return nullptr;
+      if (!Read8(&size)) {
+        return nullptr;
+      }
 
       // array values
       const char* buf;
-      if (!Read(&buf, size)) return nullptr;
+      if (!Read(&buf, size)) {
+        return nullptr;
+      }
       std::vector<int> v(size);
-      for (unsigned int i = 0; i < size; ++i) v[i] = buf[i] ? 1 : 0;
+      for (unsigned int i = 0; i < size; ++i) {
+        v[i] = buf[i] ? 1 : 0;
+      }
       return Value::MakeBooleanArray(std::move(v));
     }
     case NT_DOUBLE_ARRAY: {
       // size
       unsigned int size;
-      if (!Read8(&size)) return nullptr;
+      if (!Read8(&size)) {
+        return nullptr;
+      }
 
       // array values
       const char* buf;
-      if (!Read(&buf, size * 8)) return nullptr;
+      if (!Read(&buf, size * 8)) {
+        return nullptr;
+      }
       std::vector<double> v(size);
-      for (unsigned int i = 0; i < size; ++i) v[i] = ::ReadDouble(buf);
+      for (unsigned int i = 0; i < size; ++i) {
+        v[i] = ::ReadDouble(buf);
+      }
       return Value::MakeDoubleArray(std::move(v));
     }
     case NT_STRING_ARRAY: {
       // size
       unsigned int size;
-      if (!Read8(&size)) return nullptr;
+      if (!Read8(&size)) {
+        return nullptr;
+      }
 
       // array values
       std::vector<std::string> v(size);
       for (unsigned int i = 0; i < size; ++i) {
-        if (!ReadString(&v[i])) return nullptr;
+        if (!ReadString(&v[i])) {
+          return nullptr;
+        }
       }
       return Value::MakeStringArray(std::move(v));
     }
@@ -191,15 +227,21 @@ bool WireDecoder::ReadString(std::string* str) {
   size_t len;
   if (m_proto_rev < 0x0300u) {
     unsigned int v;
-    if (!Read16(&v)) return false;
+    if (!Read16(&v)) {
+      return false;
+    }
     len = v;
   } else {
     uint64_t v;
-    if (!ReadUleb128(&v)) return false;
+    if (!ReadUleb128(&v)) {
+      return false;
+    }
     len = v;
   }
   const char* buf;
-  if (!Read(&buf, len)) return false;
+  if (!Read(&buf, len)) {
+    return false;
+  }
   *str = wpi::StringRef(buf, len);
   return true;
 }

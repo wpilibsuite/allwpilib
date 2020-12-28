@@ -29,7 +29,9 @@ TEST(UvAsyncFunction, Test) {
 
   prepare->error.connect([](Error) { FAIL(); });
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] {
       auto call0 = async->Call(0);
       auto call1 = async->Call(1);
@@ -56,7 +58,9 @@ TEST(UvAsyncFunction, Test) {
   ASSERT_EQ(async_cb_called[1], 1);
   ASSERT_EQ(close_cb_called, 1);
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 TEST(UvAsyncFunction, Ref) {
@@ -70,7 +74,9 @@ TEST(UvAsyncFunction, Ref) {
   auto prepare = Prepare::Create(loop);
 
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] { ASSERT_EQ(async->Call(1, val).get(), 2); });
   });
   prepare->Start();
@@ -86,7 +92,9 @@ TEST(UvAsyncFunction, Ref) {
 
   ASSERT_EQ(val, 1);
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 TEST(UvAsyncFunction, Movable) {
@@ -100,7 +108,9 @@ TEST(UvAsyncFunction, Movable) {
   auto prepare = Prepare::Create(loop);
 
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] {
       auto val = std::make_unique<int>(1);
       auto val2 = async->Call(std::move(val)).get();
@@ -119,7 +129,9 @@ TEST(UvAsyncFunction, Movable) {
 
   loop->Run();
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 TEST(UvAsyncFunction, CallIgnoreResult) {
@@ -133,7 +145,9 @@ TEST(UvAsyncFunction, CallIgnoreResult) {
   auto prepare = Prepare::Create(loop);
 
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] { async->Call(std::make_unique<int>(1)); });
   });
   prepare->Start();
@@ -147,7 +161,9 @@ TEST(UvAsyncFunction, CallIgnoreResult) {
 
   loop->Run();
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 TEST(UvAsyncFunction, VoidCall) {
@@ -160,7 +176,9 @@ TEST(UvAsyncFunction, VoidCall) {
   auto prepare = Prepare::Create(loop);
 
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] { async->Call(); });
   });
   prepare->Start();
@@ -173,7 +191,9 @@ TEST(UvAsyncFunction, VoidCall) {
 
   loop->Run();
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 TEST(UvAsyncFunction, WaitFor) {
@@ -186,7 +206,9 @@ TEST(UvAsyncFunction, WaitFor) {
   auto prepare = Prepare::Create(loop);
 
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] {
       ASSERT_FALSE(async->Call().wait_for(std::chrono::milliseconds(10)));
     });
@@ -202,7 +224,9 @@ TEST(UvAsyncFunction, WaitFor) {
 
   loop->Run();
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 TEST(UvAsyncFunction, VoidWaitFor) {
@@ -215,7 +239,9 @@ TEST(UvAsyncFunction, VoidWaitFor) {
   auto prepare = Prepare::Create(loop);
 
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] {
       ASSERT_FALSE(async->Call().wait_for(std::chrono::milliseconds(10)));
     });
@@ -231,7 +257,9 @@ TEST(UvAsyncFunction, VoidWaitFor) {
 
   loop->Run();
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 }  // namespace uv

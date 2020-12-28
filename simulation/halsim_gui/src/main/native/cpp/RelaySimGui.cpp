@@ -96,8 +96,9 @@ static bool RelayAnyInitialized() {
   static const int32_t num = HAL_GetNumRelayHeaders();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetRelayInitializedForward(i) ||
-        HALSIM_GetRelayInitializedReverse(i))
+        HALSIM_GetRelayInitializedReverse(i)) {
       return true;
+    }
   }
   return false;
 }

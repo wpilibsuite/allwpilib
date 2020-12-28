@@ -45,7 +45,9 @@ static void NtInitialize() {
   nt::AddPolledConnectionListener(poller, true);
   gui::AddEarlyExecute([poller] {
     auto win = gui::GetSystemWindow();
-    if (!win) return;
+    if (!win) {
+      return;
+    }
     bool timedOut;
     for (auto&& event : nt::PollConnectionListener(poller, 0, &timedOut)) {
       if (event.connected) {
@@ -118,14 +120,18 @@ int main() {
     ImGui::BeginMainMenuBar();
     gui::EmitViewMenu();
     if (ImGui::BeginMenu("View")) {
-      if (ImGui::MenuItem("Reset Time")) glass::ResetTime();
+      if (ImGui::MenuItem("Reset Time")) {
+        glass::ResetTime();
+      }
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("NetworkTables")) {
-      if (gNetworkTablesSettingsWindow)
+      if (gNetworkTablesSettingsWindow) {
         gNetworkTablesSettingsWindow->DisplayMenuItem("NetworkTables Settings");
-      if (gNetworkTablesWindow)
+      }
+      if (gNetworkTablesWindow) {
         gNetworkTablesWindow->DisplayMenuItem("NetworkTables View");
+      }
       ImGui::Separator();
       gNtProvider->DisplayMenu();
       ImGui::EndMenu();

@@ -17,7 +17,8 @@
     }                                                                         \
                                                                               \
     ~cbname##Source() {                                                       \
-      if (m_callback != 0) HALSIM_Cancel##cbname##Callback(m_callback);       \
+      if (m_callback != 0)                                                    \
+        HALSIM_Cancel##cbname##Callback(m_callback);                          \
     }                                                                         \
                                                                               \
    private:                                                                   \

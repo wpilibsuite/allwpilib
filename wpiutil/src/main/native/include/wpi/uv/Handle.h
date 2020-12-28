@@ -249,7 +249,9 @@ class Handle : public std::enable_shared_from_this<Handle> {
   template <typename F, typename... Args>
   bool Invoke(F&& f, Args&&... args) const {
     auto err = std::forward<F>(f)(std::forward<Args>(args)...);
-    if (err < 0) ReportError(err);
+    if (err < 0) {
+      ReportError(err);
+    }
     return err == 0;
   }
 

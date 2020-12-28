@@ -22,7 +22,9 @@ Preferences* Preferences::GetInstance() {
   return &instance;
 }
 
-std::vector<std::string> Preferences::GetKeys() { return m_table->GetKeys(); }
+std::vector<std::string> Preferences::GetKeys() {
+  return m_table->GetKeys();
+}
 
 std::string Preferences::GetString(wpi::StringRef key,
                                    wpi::StringRef defaultValue) {
@@ -119,7 +121,9 @@ bool Preferences::ContainsKey(wpi::StringRef key) {
   return m_table->ContainsKey(key);
 }
 
-void Preferences::Remove(wpi::StringRef key) { m_table->Delete(key); }
+void Preferences::Remove(wpi::StringRef key) {
+  m_table->Delete(key);
+}
 
 void Preferences::RemoveAll() {
   for (auto preference : GetKeys()) {

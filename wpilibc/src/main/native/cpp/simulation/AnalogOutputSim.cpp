@@ -53,4 +53,6 @@ void AnalogOutputSim::SetInitialized(bool initialized) {
   HALSIM_SetAnalogOutInitialized(m_index, initialized);
 }
 
-void AnalogOutputSim::ResetData() { HALSIM_ResetAnalogOutData(m_index); }
+void AnalogOutputSim::ResetData() {
+  HALSIM_ResetAnalogOutData(m_index);
+}

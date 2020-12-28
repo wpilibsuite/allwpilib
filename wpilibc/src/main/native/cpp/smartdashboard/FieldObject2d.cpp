@@ -32,7 +32,9 @@ void FieldObject2d::SetPose(units::meter_t x, units::meter_t y,
 Pose2d FieldObject2d::GetPose() const {
   std::scoped_lock lock(m_mutex);
   UpdateFromEntry();
-  if (m_poses.empty()) return {};
+  if (m_poses.empty()) {
+    return {};
+  }
   return m_poses[0];
 }
 
@@ -61,7 +63,9 @@ wpi::ArrayRef<Pose2d> FieldObject2d::GetPoses(
 }
 
 void FieldObject2d::UpdateEntry(bool setDefault) {
-  if (!m_entry) return;
+  if (!m_entry) {
+    return;
+  }
   wpi::SmallVector<double, 9> arr;
   for (auto&& pose : m_poses) {
     auto& translation = pose.Translation();
@@ -69,19 +73,26 @@ void FieldObject2d::UpdateEntry(bool setDefault) {
     arr.push_back(translation.Y().to<double>());
     arr.push_back(pose.Rotation().Degrees().to<double>());
   }
-  if (setDefault)
+  if (setDefault) {
     m_entry.SetDefaultDoubleArray(arr);
-  else
+  } else {
     m_entry.SetDoubleArray(arr);
+  }
 }
 
 void FieldObject2d::UpdateFromEntry() const {
-  if (!m_entry) return;
+  if (!m_entry) {
+    return;
+  }
   auto val = m_entry.GetValue();
-  if (!val || !val->IsDoubleArray()) return;
+  if (!val || !val->IsDoubleArray()) {
+    return;
+  }
   auto arr = val->GetDoubleArray();
   auto size = arr.size();
-  if ((size % 3) != 0) return;
+  if ((size % 3) != 0) {
+    return;
+  }
   m_poses.resize(size / 3);
   for (size_t i = 0; i < size / 3; ++i) {
     m_poses[i] =

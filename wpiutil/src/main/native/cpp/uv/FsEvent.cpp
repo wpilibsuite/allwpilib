@@ -29,10 +29,11 @@ void FsEvent::Start(const Twine& path, unsigned int flags) {
       &uv_fs_event_start, GetRaw(),
       [](uv_fs_event_t* handle, const char* filename, int events, int status) {
         FsEvent& h = *static_cast<FsEvent*>(handle->data);
-        if (status < 0)
+        if (status < 0) {
           h.ReportError(status);
-        else
+        } else {
           h.fsEvent(filename, events);
+        }
       },
       path.toNullTerminatedStringRef(pathBuf).data(), flags);
 }

@@ -23,7 +23,9 @@ class TestEnvironment : public testing::Environment {
   void SetUp() override {
     /* Only set up once.  This allows gtest_repeat to be used to
             automatically repeat tests. */
-    if (m_alreadySetUp) return;
+    if (m_alreadySetUp) {
+      return;
+    }
     m_alreadySetUp = true;
 
     if (!HAL_Initialize(500, 0)) {

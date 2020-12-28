@@ -98,7 +98,9 @@ class Instance {
       CS_Source source, wpi::SmallVectorImpl<CS_Sink>& vec) {
     vec.clear();
     m_sinks.ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
-      if (source == data.sourceHandle.load()) vec.push_back(sinkHandle);
+      if (source == data.sourceHandle.load()) {
+        vec.push_back(sinkHandle);
+      }
     });
     return vec;
   }

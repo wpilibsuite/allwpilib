@@ -513,7 +513,9 @@ class SimDevice {
   SimDevice(const char* name, int index, int channel);
 
   ~SimDevice() {
-    if (m_handle != HAL_kInvalidHandle) HAL_FreeSimDevice(m_handle);
+    if (m_handle != HAL_kInvalidHandle) {
+      HAL_FreeSimDevice(m_handle);
+    }
   }
 
   SimDevice(const SimDevice&) = delete;
@@ -639,7 +641,9 @@ class SimDevice {
                            std::initializer_list<const char*> options,
                            std::initializer_list<double> optionValues,
                            int32_t initialValue) {
-    if (options.size() != optionValues.size()) return {};
+    if (options.size() != optionValues.size()) {
+      return {};
+    }
     return HAL_CreateSimValueEnumDouble(
         m_handle, name, direction, options.size(),
         const_cast<const char**>(options.begin()), optionValues.begin(),
@@ -666,7 +670,9 @@ class SimDevice {
                            wpi::ArrayRef<const char*> options,
                            wpi::ArrayRef<double> optionValues,
                            int32_t initialValue) {
-    if (options.size() != optionValues.size()) return {};
+    if (options.size() != optionValues.size()) {
+      return {};
+    }
     return HAL_CreateSimValueEnumDouble(
         m_handle, name, direction, options.size(),
         const_cast<const char**>(options.data()), optionValues.data(),

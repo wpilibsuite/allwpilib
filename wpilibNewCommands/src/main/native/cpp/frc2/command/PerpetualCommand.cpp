@@ -15,8 +15,14 @@ PerpetualCommand::PerpetualCommand(std::unique_ptr<Command>&& command) {
   AddRequirements(m_command->GetRequirements());
 }
 
-void PerpetualCommand::Initialize() { m_command->Initialize(); }
+void PerpetualCommand::Initialize() {
+  m_command->Initialize();
+}
 
-void PerpetualCommand::Execute() { m_command->Execute(); }
+void PerpetualCommand::Execute() {
+  m_command->Execute();
+}
 
-void PerpetualCommand::End(bool interrupted) { m_command->End(interrupted); }
+void PerpetualCommand::End(bool interrupted) {
+  m_command->End(interrupted);
+}

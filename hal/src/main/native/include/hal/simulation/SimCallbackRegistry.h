@@ -27,7 +27,9 @@ class SimCallbackRegistryBase {
  public:
   void Cancel(int32_t uid) {
     std::scoped_lock lock(m_mutex);
-    if (m_callbacks && uid > 0) m_callbacks->erase(uid - 1);
+    if (m_callbacks && uid > 0) {
+      m_callbacks->erase(uid - 1);
+    }
   }
 
   void Reset() {
@@ -40,13 +42,19 @@ class SimCallbackRegistryBase {
  protected:
   int32_t DoRegister(RawFunctor callback, void* param) {
     // Must return -1 on a null callback for error handling
-    if (callback == nullptr) return -1;
-    if (!m_callbacks) m_callbacks = std::make_unique<CallbackVector>();
+    if (callback == nullptr) {
+      return -1;
+    }
+    if (!m_callbacks) {
+      m_callbacks = std::make_unique<CallbackVector>();
+    }
     return m_callbacks->emplace_back(param, callback) + 1;
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE void DoReset() {
-    if (m_callbacks) m_callbacks->clear();
+    if (m_callbacks) {
+      m_callbacks->clear();
+    }
   }
 
   mutable wpi::recursive_spinlock m_mutex;
@@ -78,9 +86,10 @@ class SimCallbackRegistry : public impl::SimCallbackRegistryBase {
 #endif
     if (m_callbacks) {
       const char* name = GetName();
-      for (auto&& cb : *m_callbacks)
+      for (auto&& cb : *m_callbacks) {
         reinterpret_cast<CallbackFunction>(cb.callback)(name, cb.param,
                                                         std::forward<U>(u)...);
+      }
     }
   }
 

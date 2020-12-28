@@ -421,7 +421,9 @@ bool DriverStation::IsNewControlData() const {
   std::unique_lock lock(m_waitForDataMutex);
   int& lastCount = GetDSLastCount();
   int currentCount = m_waitForDataCounter;
-  if (lastCount == currentCount) return false;
+  if (lastCount == currentCount) {
+    return false;
+  }
   lastCount = currentCount;
   return true;
 }
@@ -498,7 +500,9 @@ int DriverStation::GetLocation() const {
   }
 }
 
-void DriverStation::WaitForData() { WaitForData(0); }
+void DriverStation::WaitForData() {
+  WaitForData(0);
+}
 
 bool DriverStation::WaitForData(double timeout) {
   auto timeoutTime =
@@ -621,16 +625,26 @@ void DriverStation::Run() {
     HAL_WaitForDSData();
     GetData();
 
-    if (IsDisabled()) safetyCounter = 0;
+    if (IsDisabled()) {
+      safetyCounter = 0;
+    }
 
     if (++safetyCounter >= 4) {
       MotorSafety::CheckMotors();
       safetyCounter = 0;
     }
-    if (m_userInDisabled) HAL_ObserveUserProgramDisabled();
-    if (m_userInAutonomous) HAL_ObserveUserProgramAutonomous();
-    if (m_userInTeleop) HAL_ObserveUserProgramTeleop();
-    if (m_userInTest) HAL_ObserveUserProgramTest();
+    if (m_userInDisabled) {
+      HAL_ObserveUserProgramDisabled();
+    }
+    if (m_userInAutonomous) {
+      HAL_ObserveUserProgramAutonomous();
+    }
+    if (m_userInTeleop) {
+      HAL_ObserveUserProgramTeleop();
+    }
+    if (m_userInTest) {
+      HAL_ObserveUserProgramTest();
+    }
   }
 }
 

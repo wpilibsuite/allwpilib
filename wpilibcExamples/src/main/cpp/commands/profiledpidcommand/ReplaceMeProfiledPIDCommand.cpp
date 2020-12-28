@@ -31,4 +31,6 @@ ReplaceMeProfiledPIDCommand::ReplaceMeProfiledPIDCommand()
           }) {}
 
 // Returns true when the command should end.
-bool ReplaceMeProfiledPIDCommand::IsFinished() { return false; }
+bool ReplaceMeProfiledPIDCommand::IsFinished() {
+  return false;
+}

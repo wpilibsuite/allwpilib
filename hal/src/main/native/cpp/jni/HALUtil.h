@@ -21,25 +21,33 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
                 int32_t requestedValue);
 
 inline bool CheckStatus(JNIEnv* env, int32_t status, bool doThrow = true) {
-  if (status != 0) ReportError(env, status, doThrow);
+  if (status != 0) {
+    ReportError(env, status, doThrow);
+  }
   return status == 0;
 }
 
 inline bool CheckStatusRange(JNIEnv* env, int32_t status, int32_t minRange,
                              int32_t maxRange, int32_t requestedValue) {
-  if (status != 0) ThrowError(env, status, minRange, maxRange, requestedValue);
+  if (status != 0) {
+    ThrowError(env, status, minRange, maxRange, requestedValue);
+  }
   return status == 0;
 }
 
 inline bool CheckStatusForceThrow(JNIEnv* env, int32_t status) {
-  if (status != 0) ThrowError(env, status, 0, 0, 0);
+  if (status != 0) {
+    ThrowError(env, status, 0, 0, 0);
+  }
   return status == 0;
 }
 
 void ReportCANError(JNIEnv* env, int32_t status, int32_t message_id);
 
 inline bool CheckCANStatus(JNIEnv* env, int32_t status, int32_t message_id) {
-  if (status != 0) ReportCANError(env, status, message_id);
+  if (status != 0) {
+    ReportCANError(env, status, message_id);
+  }
   return status == 0;
 }
 

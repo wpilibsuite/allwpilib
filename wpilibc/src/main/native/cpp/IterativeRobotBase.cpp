@@ -182,7 +182,9 @@ void IterativeRobotBase::LoopFunc() {
   m_watchdog.Disable();
 
   // Flush NetworkTables
-  if (m_ntFlushEnabled) nt::NetworkTableInstance::GetDefault().Flush();
+  if (m_ntFlushEnabled) {
+    nt::NetworkTableInstance::GetDefault().Flush();
+  }
 
   // Warn on loop time overruns
   if (m_watchdog.IsExpired()) {

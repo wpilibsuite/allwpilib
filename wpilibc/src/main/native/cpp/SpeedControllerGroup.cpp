@@ -19,8 +19,9 @@ SpeedControllerGroup::SpeedControllerGroup(
 }
 
 void SpeedControllerGroup::Initialize() {
-  for (auto& speedController : m_speedControllers)
+  for (auto& speedController : m_speedControllers) {
     SendableRegistry::GetInstance().AddChild(this, &speedController.get());
+  }
   static int instances = 0;
   ++instances;
   SendableRegistry::GetInstance().Add(this, "SpeedControllerGroup", instances);
@@ -43,7 +44,9 @@ void SpeedControllerGroup::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
 
-bool SpeedControllerGroup::GetInverted() const { return m_isInverted; }
+bool SpeedControllerGroup::GetInverted() const {
+  return m_isInverted;
+}
 
 void SpeedControllerGroup::Disable() {
   for (auto speedController : m_speedControllers) {
@@ -57,7 +60,9 @@ void SpeedControllerGroup::StopMotor() {
   }
 }
 
-void SpeedControllerGroup::PIDWrite(double output) { Set(output); }
+void SpeedControllerGroup::PIDWrite(double output) {
+  Set(output);
+}
 
 void SpeedControllerGroup::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");

@@ -5,7 +5,9 @@
 #include "hal/DMA.h"
 
 extern "C" {
-HAL_DMAHandle HAL_InitializeDMA(int32_t* status) { return HAL_kInvalidHandle; }
+HAL_DMAHandle HAL_InitializeDMA(int32_t* status) {
+  return HAL_kInvalidHandle;
+}
 void HAL_FreeDMA(HAL_DMAHandle handle) {}
 
 void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status) {}
@@ -47,7 +49,9 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {}
 void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status) {}
 
-void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) { return nullptr; }
+void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) {
+  return nullptr;
+}
 
 enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                                          HAL_DMASample* dmaSample,

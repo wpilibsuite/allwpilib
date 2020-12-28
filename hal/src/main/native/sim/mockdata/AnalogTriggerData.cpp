@@ -29,8 +29,9 @@ extern "C" {
 int32_t HALSIM_FindAnalogTriggerForChannel(int32_t channel) {
   for (int i = 0; i < kNumAnalogTriggers; ++i) {
     if (SimAnalogTriggerData[i].initialized &&
-        SimAnalogTriggerData[i].inputPort == channel)
+        SimAnalogTriggerData[i].inputPort == channel) {
       return i;
+    }
   }
   return -1;
 }

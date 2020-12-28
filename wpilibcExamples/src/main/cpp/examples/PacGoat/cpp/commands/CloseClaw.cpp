@@ -6,7 +6,11 @@
 
 #include "Robot.h"
 
-CloseClaw::CloseClaw() { Requires(&Robot::collector); }
+CloseClaw::CloseClaw() {
+  Requires(&Robot::collector);
+}
 
 // Called just before this Command runs the first time
-void CloseClaw::Initialize() { Robot::collector.Close(); }
+void CloseClaw::Initialize() {
+  Robot::collector.Close();
+}

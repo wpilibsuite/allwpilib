@@ -85,7 +85,9 @@ DoubleSolenoid::~DoubleSolenoid() {
 }
 
 void DoubleSolenoid::Set(Value value) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
 
   bool forward = false;
   bool reverse = false;
@@ -115,7 +117,9 @@ void DoubleSolenoid::Set(Value value) {
 }
 
 DoubleSolenoid::Value DoubleSolenoid::Get() const {
-  if (StatusIsFatal()) return kOff;
+  if (StatusIsFatal()) {
+    return kOff;
+  }
 
   int fstatus = 0;
   int rstatus = 0;
@@ -172,10 +176,11 @@ void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
       },
       [=](wpi::StringRef value) {
         Value lvalue = kOff;
-        if (value == "Forward")
+        if (value == "Forward") {
           lvalue = kForward;
-        else if (value == "Reverse")
+        } else if (value == "Reverse") {
           lvalue = kReverse;
+        }
         Set(lvalue);
       });
 }

@@ -82,7 +82,9 @@ TEST_F(EntryListenerTest, EntryNewLocal) {
 
 TEST_F(EntryListenerTest, DISABLED_EntryNewRemote) {
   Connect();
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure()) {
+    return;
+  }
   std::vector<nt::EntryNotification> events;
   auto handle = nt::AddEntryListener(
       nt::GetEntry(server_inst, "/foo"),
@@ -134,7 +136,9 @@ TEST_F(EntryListenerTest, PrefixNewLocal) {
 
 TEST_F(EntryListenerTest, DISABLED_PrefixNewRemote) {
   Connect();
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure()) {
+    return;
+  }
   std::vector<nt::EntryNotification> events;
   auto handle = nt::AddEntryListener(
       server_inst, "/foo",

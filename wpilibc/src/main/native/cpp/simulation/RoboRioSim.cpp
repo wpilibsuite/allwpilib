@@ -21,7 +21,9 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterFPGAButtonCallback(
   return store;
 }
 
-bool RoboRioSim::GetFPGAButton() { return HALSIM_GetRoboRioFPGAButton(); }
+bool RoboRioSim::GetFPGAButton() {
+  return HALSIM_GetRoboRioFPGAButton();
+}
 
 void RoboRioSim::SetFPGAButton(bool fPGAButton) {
   HALSIM_SetRoboRioFPGAButton(fPGAButton);
@@ -104,7 +106,9 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserActive6VCallback(
   return store;
 }
 
-bool RoboRioSim::GetUserActive6V() { return HALSIM_GetRoboRioUserActive6V(); }
+bool RoboRioSim::GetUserActive6V() {
+  return HALSIM_GetRoboRioUserActive6V();
+}
 
 void RoboRioSim::SetUserActive6V(bool userActive6V) {
   HALSIM_SetRoboRioUserActive6V(userActive6V);
@@ -153,7 +157,9 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserActive5VCallback(
   return store;
 }
 
-bool RoboRioSim::GetUserActive5V() { return HALSIM_GetRoboRioUserActive5V(); }
+bool RoboRioSim::GetUserActive5V() {
+  return HALSIM_GetRoboRioUserActive5V();
+}
 
 void RoboRioSim::SetUserActive5V(bool userActive5V) {
   HALSIM_SetRoboRioUserActive5V(userActive5V);
@@ -202,7 +208,9 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserActive3V3Callback(
   return store;
 }
 
-bool RoboRioSim::GetUserActive3V3() { return HALSIM_GetRoboRioUserActive3V3(); }
+bool RoboRioSim::GetUserActive3V3() {
+  return HALSIM_GetRoboRioUserActive3V3();
+}
 
 void RoboRioSim::SetUserActive3V3(bool userActive3V3) {
   HALSIM_SetRoboRioUserActive3V3(userActive3V3);
@@ -217,7 +225,9 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserFaults6VCallback(
   return store;
 }
 
-int RoboRioSim::GetUserFaults6V() { return HALSIM_GetRoboRioUserFaults6V(); }
+int RoboRioSim::GetUserFaults6V() {
+  return HALSIM_GetRoboRioUserFaults6V();
+}
 
 void RoboRioSim::SetUserFaults6V(int userFaults6V) {
   HALSIM_SetRoboRioUserFaults6V(userFaults6V);
@@ -232,7 +242,9 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserFaults5VCallback(
   return store;
 }
 
-int RoboRioSim::GetUserFaults5V() { return HALSIM_GetRoboRioUserFaults5V(); }
+int RoboRioSim::GetUserFaults5V() {
+  return HALSIM_GetRoboRioUserFaults5V();
+}
 
 void RoboRioSim::SetUserFaults5V(int userFaults5V) {
   HALSIM_SetRoboRioUserFaults5V(userFaults5V);
@@ -247,10 +259,14 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserFaults3V3Callback(
   return store;
 }
 
-int RoboRioSim::GetUserFaults3V3() { return HALSIM_GetRoboRioUserFaults3V3(); }
+int RoboRioSim::GetUserFaults3V3() {
+  return HALSIM_GetRoboRioUserFaults3V3();
+}
 
 void RoboRioSim::SetUserFaults3V3(int userFaults3V3) {
   HALSIM_SetRoboRioUserFaults3V3(userFaults3V3);
 }
 
-void ResetData() { HALSIM_ResetRoboRioData(); }
+void ResetData() {
+  HALSIM_ResetRoboRioData();
+}

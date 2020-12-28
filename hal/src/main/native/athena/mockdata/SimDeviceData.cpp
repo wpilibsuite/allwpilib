@@ -10,7 +10,9 @@ extern "C" {
 
 void HALSIM_SetSimDeviceEnabled(const char* prefix, HAL_Bool enabled) {}
 
-HAL_Bool HALSIM_IsSimDeviceEnabled(const char* name) { return false; }
+HAL_Bool HALSIM_IsSimDeviceEnabled(const char* name) {
+  return false;
+}
 
 int32_t HALSIM_RegisterSimDeviceCreatedCallback(
     const char* prefix, void* param, HALSIM_SimDeviceCallback callback,
@@ -28,9 +30,13 @@ int32_t HALSIM_RegisterSimDeviceFreedCallback(const char* prefix, void* param,
 
 void HALSIM_CancelSimDeviceFreedCallback(int32_t uid) {}
 
-HAL_SimDeviceHandle HALSIM_GetSimDeviceHandle(const char* name) { return 0; }
+HAL_SimDeviceHandle HALSIM_GetSimDeviceHandle(const char* name) {
+  return 0;
+}
 
-const char* HALSIM_GetSimDeviceName(HAL_SimDeviceHandle handle) { return ""; }
+const char* HALSIM_GetSimDeviceName(HAL_SimDeviceHandle handle) {
+  return "";
+}
 
 HAL_SimDeviceHandle HALSIM_GetSimValueDeviceHandle(HAL_SimValueHandle handle) {
   return 0;

@@ -212,7 +212,9 @@ static void buffer_to_block(const unsigned char* buffer,
   }
 }
 
-SHA1::SHA1() { reset(digest, buf_size, transforms); }
+SHA1::SHA1() {
+  reset(digest, buf_size, transforms);
+}
 
 void SHA1::Update(StringRef s) {
   raw_mem_istream is(makeArrayRef(s.data(), s.size()));

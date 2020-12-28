@@ -24,7 +24,9 @@ std::string GetHostname() {
   } else if (err == UV_ENOBUFS) {
     char* name2 = static_cast<char*>(std::malloc(size));
     err = uv_os_gethostname(name2, &size);
-    if (err == 0) rv.assign(name2, size);
+    if (err == 0) {
+      rv.assign(name2, size);
+    }
     std::free(name2);
   }
 
@@ -44,7 +46,9 @@ StringRef GetHostname(SmallVectorImpl<char>& name) {
   } else if (err == UV_ENOBUFS) {
     name.resize(size);
     err = uv_os_gethostname(name.data(), &size);
-    if (err != 0) size = 0;
+    if (err != 0) {
+      size = 0;
+    }
   }
 
   return StringRef{name.data(), size};

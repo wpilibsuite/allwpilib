@@ -31,10 +31,11 @@ Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
                  bool reverseDirection, EncodingType encodingType)
     : m_aSource(aSource, NullDeleter<DigitalSource>()),
       m_bSource(bSource, NullDeleter<DigitalSource>()) {
-  if (m_aSource == nullptr || m_bSource == nullptr)
+  if (m_aSource == nullptr || m_bSource == nullptr) {
     wpi_setWPIError(NullParameter);
-  else
+  } else {
     InitEncoder(reverseDirection, encodingType);
+  }
 }
 
 Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
@@ -48,10 +49,11 @@ Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
                  std::shared_ptr<DigitalSource> bSource, bool reverseDirection,
                  EncodingType encodingType)
     : m_aSource(aSource), m_bSource(bSource) {
-  if (m_aSource == nullptr || m_bSource == nullptr)
+  if (m_aSource == nullptr || m_bSource == nullptr) {
     wpi_setWPIError(NullParameter);
-  else
+  } else {
     InitEncoder(reverseDirection, encodingType);
+  }
 }
 
 Encoder::~Encoder() {
@@ -61,7 +63,9 @@ Encoder::~Encoder() {
 }
 
 int Encoder::Get() const {
-  if (StatusIsFatal()) return 0;
+  if (StatusIsFatal()) {
+    return 0;
+  }
   int32_t status = 0;
   int value = HAL_GetEncoder(m_encoder, &status);
   wpi_setHALError(status);
@@ -69,14 +73,18 @@ int Encoder::Get() const {
 }
 
 void Encoder::Reset() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_ResetEncoder(m_encoder, &status);
   wpi_setHALError(status);
 }
 
 double Encoder::GetPeriod() const {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal()) {
+    return 0.0;
+  }
   int32_t status = 0;
   double value = HAL_GetEncoderPeriod(m_encoder, &status);
   wpi_setHALError(status);
@@ -84,14 +92,18 @@ double Encoder::GetPeriod() const {
 }
 
 void Encoder::SetMaxPeriod(double maxPeriod) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod, &status);
   wpi_setHALError(status);
 }
 
 bool Encoder::GetStopped() const {
-  if (StatusIsFatal()) return true;
+  if (StatusIsFatal()) {
+    return true;
+  }
   int32_t status = 0;
   bool value = HAL_GetEncoderStopped(m_encoder, &status);
   wpi_setHALError(status);
@@ -99,7 +111,9 @@ bool Encoder::GetStopped() const {
 }
 
 bool Encoder::GetDirection() const {
-  if (StatusIsFatal()) return false;
+  if (StatusIsFatal()) {
+    return false;
+  }
   int32_t status = 0;
   bool value = HAL_GetEncoderDirection(m_encoder, &status);
   wpi_setHALError(status);
@@ -107,7 +121,9 @@ bool Encoder::GetDirection() const {
 }
 
 int Encoder::GetRaw() const {
-  if (StatusIsFatal()) return 0;
+  if (StatusIsFatal()) {
+    return 0;
+  }
   int32_t status = 0;
   int value = HAL_GetEncoderRaw(m_encoder, &status);
   wpi_setHALError(status);
@@ -122,7 +138,9 @@ int Encoder::GetEncodingScale() const {
 }
 
 double Encoder::GetDistance() const {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal()) {
+    return 0.0;
+  }
   int32_t status = 0;
   double value = HAL_GetEncoderDistance(m_encoder, &status);
   wpi_setHALError(status);
@@ -130,7 +148,9 @@ double Encoder::GetDistance() const {
 }
 
 double Encoder::GetRate() const {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal()) {
+    return 0.0;
+  }
   int32_t status = 0;
   double value = HAL_GetEncoderRate(m_encoder, &status);
   wpi_setHALError(status);
@@ -138,21 +158,27 @@ double Encoder::GetRate() const {
 }
 
 void Encoder::SetMinRate(double minRate) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetEncoderMinRate(m_encoder, minRate, &status);
   wpi_setHALError(status);
 }
 
 void Encoder::SetDistancePerPulse(double distancePerPulse) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);
   wpi_setHALError(status);
 }
 
 double Encoder::GetDistancePerPulse() const {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal()) {
+    return 0.0;
+  }
   int32_t status = 0;
   double distancePerPulse = HAL_GetEncoderDistancePerPulse(m_encoder, &status);
   wpi_setHALError(status);
@@ -160,7 +186,9 @@ double Encoder::GetDistancePerPulse() const {
 }
 
 void Encoder::SetReverseDirection(bool reverseDirection) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   int32_t status = 0;
   HAL_SetEncoderReverseDirection(m_encoder, reverseDirection, &status);
   wpi_setHALError(status);
@@ -186,7 +214,9 @@ int Encoder::GetSamplesToAverage() const {
 }
 
 double Encoder::PIDGet() {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal()) {
+    return 0.0;
+  }
   switch (GetPIDSourceType()) {
     case PIDSourceType::kDisplacement:
       return GetDistance();
@@ -229,10 +259,11 @@ void Encoder::InitSendable(SendableBuilder& builder) {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
   wpi_setHALError(status);
-  if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X)
+  if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
     builder.SetSmartDashboardType("Quadrature Encoder");
-  else
+  } else {
     builder.SetSmartDashboardType("Encoder");
+  }
 
   builder.AddDoubleProperty(
       "Speed", [=]() { return GetRate(); }, nullptr);
@@ -259,7 +290,9 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
 }
 
 double Encoder::DecodingScaleFactor() const {
-  if (StatusIsFatal()) return 0.0;
+  if (StatusIsFatal()) {
+    return 0.0;
+  }
   int32_t status = 0;
   double val = HAL_GetEncoderDecodingScaleFactor(m_encoder, &status);
   wpi_setHALError(status);

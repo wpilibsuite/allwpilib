@@ -22,7 +22,9 @@ void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
                                        webRegisterFunc);
 }
 
-HALSimWSProviderPWM::~HALSimWSProviderPWM() { DoCancelCallbacks(); }
+HALSimWSProviderPWM::~HALSimWSProviderPWM() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderPWM::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
@@ -33,7 +35,9 @@ void HALSimWSProviderPWM::RegisterCallbacks() {
   m_zeroLatchCbKey = REGISTER(ZeroLatch, "<zero_latch", bool, boolean);
 }
 
-void HALSimWSProviderPWM::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderPWM::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderPWM::DoCancelCallbacks() {
   HALSIM_CancelPWMInitializedCallback(m_channel, m_initCbKey);

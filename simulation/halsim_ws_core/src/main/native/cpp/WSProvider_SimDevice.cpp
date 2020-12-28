@@ -11,7 +11,9 @@
 
 namespace wpilibws {
 
-HALSimWSProviderSimDevice::~HALSimWSProviderSimDevice() { CancelCallbacks(); }
+HALSimWSProviderSimDevice::~HALSimWSProviderSimDevice() {
+  CancelCallbacks();
+}
 
 void HALSimWSProviderSimDevice::OnNetworkConnected(
     std::shared_ptr<HALSimBaseWebSocketConnection> ws) {
@@ -77,16 +79,18 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
             auto optionIt =
                 std::find_if(options.begin(), options.end(),
                              [&](const std::string& v) { return v == str; });
-            if (optionIt != options.end())
+            if (optionIt != options.end()) {
               value.data.v_enum = optionIt - options.begin();
+            }
           } else if (it->is_number()) {
             auto& values = vd->second->optionValues;
             double num = it.value();
             auto valueIt = std::find_if(
                 values.begin(), values.end(),
                 [&](double v) { return std::fabs(v - num) < 1e-4; });
-            if (valueIt != values.end())
+            if (valueIt != values.end()) {
               value.data.v_enum = valueIt - values.begin();
+            }
           }
           value.data.v_enum = it.value();
           break;
@@ -143,8 +147,9 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
 
     const char** options = HALSIM_GetSimValueEnumOptions(handle, &numOptions);
     data->options.reserve(numOptions);
-    for (int32_t i = 0; i < numOptions; ++i)
+    for (int32_t i = 0; i < numOptions; ++i) {
       data->options.emplace_back(options[i]);
+    }
 
     const double* values =
         HALSIM_GetSimValueEnumDoubleValues(handle, &numOptions);
@@ -185,10 +190,11 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
         break;
       case HAL_ENUM: {
         int v = value->data.v_enum;
-        if (v >= 0 && v < static_cast<int>(valueData->optionValues.size()))
+        if (v >= 0 && v < static_cast<int>(valueData->optionValues.size())) {
           ProcessHalCallback({{valueData->key, valueData->optionValues[v]}});
-        else if (v >= 0 && v < static_cast<int>(valueData->options.size()))
+        } else if (v >= 0 && v < static_cast<int>(valueData->options.size())) {
           ProcessHalCallback({{valueData->key, valueData->options[v]}});
+        }
         break;
       }
       case HAL_INT:
@@ -212,7 +218,9 @@ void HALSimWSProviderSimDevice::ProcessHalCallback(const wpi::json& payload) {
   }
 }
 
-HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() { CancelCallbacks(); }
+HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() {
+  CancelCallbacks();
+}
 
 void HALSimWSProviderSimDevices::DeviceCreatedCallback(
     const char* name, HAL_SimDeviceHandle handle) {
@@ -265,6 +273,8 @@ void HALSimWSProviderSimDevices::OnNetworkConnected(
   m_ws = hws;
 }
 
-void HALSimWSProviderSimDevices::OnNetworkDisconnected() { m_ws = nullptr; }
+void HALSimWSProviderSimDevices::OnNetworkDisconnected() {
+  m_ws = nullptr;
+}
 
 }  // namespace wpilibws

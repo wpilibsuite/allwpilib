@@ -61,9 +61,13 @@ void Robot::TeleopPeriodic() {
 
 void Robot::TestPeriodic() {}
 
-void Robot::DisabledInit() { shooter.Unlatch(); }
+void Robot::DisabledInit() {
+  shooter.Unlatch();
+}
 
-void Robot::DisabledPeriodic() { Log(); }
+void Robot::DisabledPeriodic() {
+  Log();
+}
 
 /**
  * Log interesting values to the SmartDashboard.
@@ -78,5 +82,7 @@ void Robot::Log() {
 }
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

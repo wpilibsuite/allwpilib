@@ -154,6 +154,8 @@ void WebServerClientTest::SendMessage(const wpi::json& msg) {
   });
 }
 
-const wpi::json& WebServerClientTest::GetLastMessage() { return m_json; }
+const wpi::json& WebServerClientTest::GetLastMessage() {
+  return m_json;
+}
 
 }  // namespace wpilibws

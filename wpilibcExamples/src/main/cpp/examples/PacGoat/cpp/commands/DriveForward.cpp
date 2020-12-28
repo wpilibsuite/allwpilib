@@ -14,9 +14,13 @@ void DriveForward::init(double dist, double maxSpeed) {
   m_driveForwardSpeed = maxSpeed;
 }
 
-DriveForward::DriveForward() { init(10, 0.5); }
+DriveForward::DriveForward() {
+  init(10, 0.5);
+}
 
-DriveForward::DriveForward(double dist) { init(dist, 0.5); }
+DriveForward::DriveForward(double dist) {
+  init(dist, 0.5);
+}
 
 DriveForward::DriveForward(double dist, double maxSpeed) {
   init(dist, maxSpeed);
@@ -45,4 +49,6 @@ bool DriveForward::IsFinished() {
 }
 
 // Called once after isFinished returns true
-void DriveForward::End() { Robot::drivetrain.Stop(); }
+void DriveForward::End() {
+  Robot::drivetrain.Stop();
+}

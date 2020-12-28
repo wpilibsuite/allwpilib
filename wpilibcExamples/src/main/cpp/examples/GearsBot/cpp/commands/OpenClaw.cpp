@@ -19,4 +19,6 @@ void OpenClaw::Initialize() {
 }
 
 // Called once after isFinished returns true
-void OpenClaw::End(bool) { m_claw->Stop(); }
+void OpenClaw::End(bool) {
+  m_claw->Stop();
+}

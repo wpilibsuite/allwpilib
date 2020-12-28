@@ -35,9 +35,13 @@ void ParallelRaceGroup::End(bool interrupted) {
   isRunning = false;
 }
 
-bool ParallelRaceGroup::IsFinished() { return m_finished; }
+bool ParallelRaceGroup::IsFinished() {
+  return m_finished;
+}
 
-bool ParallelRaceGroup::RunsWhenDisabled() const { return m_runWhenDisabled; }
+bool ParallelRaceGroup::RunsWhenDisabled() const {
+  return m_runWhenDisabled;
+}
 
 void ParallelRaceGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {

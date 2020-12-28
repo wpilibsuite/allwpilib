@@ -25,7 +25,9 @@ class SimValueSource : public glass::DataSource {
         m_callback{HALSIM_RegisterSimValueChangedCallback(
             handle, this, CallbackFunc, true)} {}
   ~SimValueSource() {
-    if (m_callback != 0) HALSIM_CancelSimValueChangedCallback(m_callback);
+    if (m_callback != 0) {
+      HALSIM_CancelSimValueChangedCallback(m_callback);
+    }
   }
 
  private:
@@ -136,7 +138,9 @@ static void DisplaySimDevice(const char* name, void* data,
                              HAL_SimDeviceHandle handle) {
   // only show "Foo" portion of "Accel:Foo"
   auto [type, id] = wpi::StringRef{name}.split(':');
-  if (id.empty()) id = type;
+  if (id.empty()) {
+    id = type;
+  }
   if (glass::BeginDevice(id.data())) {
     HALSIM_EnumerateSimValues(handle, data, DisplaySimValue);
     glass::EndDevice();

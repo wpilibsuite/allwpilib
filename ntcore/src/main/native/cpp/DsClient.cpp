@@ -32,10 +32,11 @@ DsClient::DsClient(Dispatcher& dispatcher, wpi::Logger& logger)
 
 void DsClient::Start(unsigned int port) {
   auto thr = m_owner.GetThread();
-  if (!thr)
+  if (!thr) {
     m_owner.Start(m_dispatcher, m_logger, port);
-  else
+  } else {
     thr->m_port = port;
+  }
 }
 
 void DsClient::Stop() {
@@ -44,7 +45,9 @@ void DsClient::Stop() {
     auto thr = m_owner.GetThread();
     if (thr) {
       thr->m_active = false;
-      if (thr->m_stream) thr->m_stream->close();
+      if (thr->m_stream) {
+        thr->m_stream->close();
+      }
     }
   }
   m_owner.Stop();
@@ -64,12 +67,18 @@ void DsClient::Thread::Main() {
       m_cond.wait_until(lock, timeout_time, [&] { return !m_active; });
       port = m_port;
     }
-    if (!m_active) goto done;
+    if (!m_active) {
+      goto done;
+    }
 
     // Try to connect to DS on the local machine
     m_stream = wpi::TCPConnector::connect("127.0.0.1", 1742, nolog, 1);
-    if (!m_active) goto done;
-    if (!m_stream) continue;
+    if (!m_active) {
+      goto done;
+    }
+    if (!m_stream) {
+      continue;
+    }
 
     DEBUG3("connected to DS");
     wpi::raw_socket_istream is(*m_stream);
@@ -83,8 +92,12 @@ void DsClient::Thread::Main() {
       // Throw away characters until {
       do {
         is.read(ch);
-        if (is.has_error()) break;
-        if (!m_active) goto done;
+        if (is.has_error()) {
+          break;
+        }
+        if (!m_active) {
+          goto done;
+        }
       } while (ch != '{');
       json += '{';
 
@@ -96,8 +109,12 @@ void DsClient::Thread::Main() {
       // Read characters until }
       do {
         is.read(ch);
-        if (is.has_error()) break;
-        if (!m_active) goto done;
+        if (is.has_error()) {
+          break;
+        }
+        if (!m_active) {
+          goto done;
+        }
         json += ch;
       } while (ch != '}');
 
@@ -109,16 +126,22 @@ void DsClient::Thread::Main() {
 
       // Look for "robotIP":12345, and get 12345 portion
       size_t pos = json.find("\"robotIP\"");
-      if (pos == wpi::StringRef::npos) continue;  // could not find?
+      if (pos == wpi::StringRef::npos) {
+        continue;  // could not find?
+      }
       pos += 9;
       pos = json.find(':', pos);
-      if (pos == wpi::StringRef::npos) continue;  // could not find?
+      if (pos == wpi::StringRef::npos) {
+        continue;  // could not find?
+      }
       size_t endpos = json.find_first_not_of("0123456789", pos + 1);
       DEBUG3("found robotIP=" << json.slice(pos + 1, endpos));
 
       // Parse into number
       unsigned int ip = 0;
-      if (json.slice(pos + 1, endpos).getAsInteger(10, ip)) continue;  // error
+      if (json.slice(pos + 1, endpos).getAsInteger(10, ip)) {
+        continue;  // error
+      }
 
       // If zero, clear the server override
       if (ip == 0) {
@@ -128,7 +151,9 @@ void DsClient::Thread::Main() {
       }
 
       // If unchanged, don't reconnect
-      if (ip == oldip) continue;
+      if (ip == oldip) {
+        continue;
+      }
       oldip = ip;
 
       // Convert number into dotted quad

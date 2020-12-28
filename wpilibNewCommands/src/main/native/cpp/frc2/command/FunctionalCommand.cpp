@@ -29,10 +29,18 @@ FunctionalCommand::FunctionalCommand(std::function<void()> onInit,
   AddRequirements(requirements);
 }
 
-void FunctionalCommand::Initialize() { m_onInit(); }
+void FunctionalCommand::Initialize() {
+  m_onInit();
+}
 
-void FunctionalCommand::Execute() { m_onExecute(); }
+void FunctionalCommand::Execute() {
+  m_onExecute();
+}
 
-void FunctionalCommand::End(bool interrupted) { m_onEnd(interrupted); }
+void FunctionalCommand::End(bool interrupted) {
+  m_onEnd(interrupted);
+}
 
-bool FunctionalCommand::IsFinished() { return m_isFinished(); }
+bool FunctionalCommand::IsFinished() {
+  return m_isFinished();
+}

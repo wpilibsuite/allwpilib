@@ -9,7 +9,9 @@
 extern "C" {
 void HALSIM_ResetDIOData(int32_t index) {}
 
-HAL_SimDeviceHandle HALSIM_GetDIOSimDevice(int32_t index) { return 0; }
+HAL_SimDeviceHandle HALSIM_GetDIOSimDevice(int32_t index) {
+  return 0;
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, DIO##CAPINAME, RETURN)

@@ -18,4 +18,6 @@ void ReplaceMeCommand2::Execute() {}
 void ReplaceMeCommand2::End(bool interrupted) {}
 
 // Returns true when the command should end.
-bool ReplaceMeCommand2::IsFinished() { return false; }
+bool ReplaceMeCommand2::IsFinished() {
+  return false;
+}

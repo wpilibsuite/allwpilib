@@ -45,7 +45,9 @@ namespace {
 
 int sum = 0;
 
-void f1(int i) { sum += i; }
+void f1(int i) {
+  sum += i;
+}
 struct o1 {
   void operator()(int i) { sum += 2 * i; }
 };
