@@ -504,7 +504,8 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
   ImGui::PopID();
 }
 
-static void EmitParentContextMenu(const std::string& path) {
+static void EmitParentContextMenu(const std::string& path,
+                                  NetworkTablesFlags flags) {
   // Workaround https://github.com/ocornut/imgui/issues/331
   bool openWarningPopup = false;
   static char nameBuffer[kTextBufferSize];
@@ -529,7 +530,8 @@ static void EmitParentContextMenu(const std::string& path) {
       ImGui::Text("Adding: %s", fullNewPath.c_str());
       ImGui::Separator();
       auto entry = nt::GetEntry(nt::GetDefaultInstance(), fullNewPath);
-      bool enabled = nameBuffer[0] != '\0' &&
+      bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
+                      nameBuffer[0] != '\0') &&
                      nt::GetEntryType(entry) == NT_Type::NT_UNASSIGNED;
       if (ImGui::MenuItem("string", NULL, false, enabled)) {
         if (!nt::SetEntryValue(entry, nt::Value::MakeString(""))) {
@@ -647,7 +649,7 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
     if (!node.children.empty()) {
       bool open =
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
-      EmitParentContextMenu(node.path);
+      EmitParentContextMenu(node.path, flags);
       ImGui::NextColumn();
       ImGui::NextColumn();
       if (flags & NetworkTablesFlags_ShowFlags) {
@@ -711,7 +713,7 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
     ImGui::SetColumnWidth(-1, 0.5f * ImGui::GetWindowWidth());
   }
   ImGui::Text("Name");
-  EmitParentContextMenu("/");
+  EmitParentContextMenu("/", flags);
   ImGui::NextColumn();
   ImGui::Text("Value");
   ImGui::NextColumn();
@@ -750,19 +752,29 @@ void NetworkTablesView::Display() {
         "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
     auto pShowTimestamp = storage.GetBoolRef(
         "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
+    auto pCreateNoncanonicalKeys = storage.GetBoolRef(
+        "createNonCanonical",
+        m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
 
     ImGui::MenuItem("Tree View", "", pTreeView);
     ImGui::MenuItem("Show Connections", "", pShowConnections);
     ImGui::MenuItem("Show Flags", "", pShowFlags);
     ImGui::MenuItem("Show Timestamp", "", pShowTimestamp);
+    ImGui::Separator();
+    ImGui::MenuItem("Allow creation of non-canonical keys", "",
+                    pCreateNoncanonicalKeys);
 
     m_flags &=
         ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
-          NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp);
-    m_flags |= (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
-               (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
-               (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
-               (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0);
+          NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
+          NetworkTablesFlags_CreateNoncanonicalKeys);
+    m_flags |=
+        (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
+        (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
+        (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
+        (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
+        (*pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
+                                  : 0);
     ImGui::EndPopup();
   }
 
