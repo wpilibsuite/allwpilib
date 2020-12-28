@@ -37,8 +37,8 @@ class MerweScaledSigmaPoints {
    *             For Gaussian distributions, beta = 2 is optimal.
    * @param kappa Secondary scaling parameter usually set to 0 or 3 - States.
    */
-  MerweScaledSigmaPoints(double alpha = 1e-3, double beta = 2,
-                         int kappa = 3 - States) {
+  explicit MerweScaledSigmaPoints(double alpha = 1e-3, double beta = 2,
+                                  int kappa = 3 - States) {
     m_alpha = alpha;
     m_kappa = kappa;
 

@@ -322,7 +322,7 @@ class SimValue {
    *
    * @return internal handle
    */
-  operator HAL_SimValueHandle() const { return m_handle; }
+  operator HAL_SimValueHandle() const { return m_handle; }  // NOLINT
 
   /**
    * Gets the simulated value.
@@ -544,7 +544,7 @@ class SimDevice {
    *
    * @return internal handle
    */
-  operator HAL_SimDeviceHandle() const { return m_handle; }
+  operator HAL_SimDeviceHandle() const { return m_handle; }  // NOLINT
 
   /**
    * Creates a value on the simulated device.

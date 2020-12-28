@@ -48,8 +48,8 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<
                 std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  SelectCommand(std::function<Key()> selector,
-                std::pair<Key, Types>... commands)
+  explicit SelectCommand(std::function<Key()> selector,
+                         std::pair<Key, Types>... commands)
       : m_selector{std::move(selector)} {
     std::vector<std::pair<Key, std::unique_ptr<Command>>> foo;
 

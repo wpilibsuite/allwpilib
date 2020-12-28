@@ -12,7 +12,7 @@
 namespace cs {
 class WindowsMessagePump {
  public:
-  WindowsMessagePump(
+  explicit WindowsMessagePump(
       std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> callback);
   ~WindowsMessagePump();
 

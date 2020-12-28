@@ -34,12 +34,12 @@ class Color8Bit {
    *
    * @param color The color
    */
-  constexpr Color8Bit(const Color& color)
+  constexpr Color8Bit(const Color& color)  // NOLINT
       : red(color.red * 255),
         green(color.green * 255),
         blue(color.blue * 255) {}
 
-  constexpr operator Color() const {
+  constexpr operator Color() const {  // NOLINT
     return Color(red / 255.0, green / 255.0, blue / 255.0);
   }
 
