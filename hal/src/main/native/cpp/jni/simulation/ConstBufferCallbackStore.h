@@ -32,9 +32,9 @@ class ConstBufferCallbackStore {
 
 void InitializeConstBufferStore();
 
-typedef int32_t (*RegisterConstBufferCallbackFunc)(
-    int32_t index, HAL_ConstBufferCallback callback, void* param);
-typedef void (*FreeConstBufferCallbackFunc)(int32_t index, int32_t uid);
+using RegisterConstBufferCallbackFunc =
+    int32_t (*)(int32_t index, HAL_ConstBufferCallback callback, void* param);
+using FreeConstBufferCallbackFunc = void (*)(int32_t index, int32_t uid);
 
 SIM_JniHandle AllocateConstBufferCallback(
     JNIEnv* env, jint index, jobject callback,

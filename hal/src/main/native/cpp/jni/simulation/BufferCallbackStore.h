@@ -31,10 +31,10 @@ class BufferCallbackStore {
 
 void InitializeBufferStore();
 
-typedef int32_t (*RegisterBufferCallbackFunc)(int32_t index,
-                                              HAL_BufferCallback callback,
-                                              void* param);
-typedef void (*FreeBufferCallbackFunc)(int32_t index, int32_t uid);
+using RegisterBufferCallbackFunc = int32_t (*)(int32_t index,
+                                               HAL_BufferCallback callback,
+                                               void* param);
+using FreeBufferCallbackFunc = void (*)(int32_t index, int32_t uid);
 
 SIM_JniHandle AllocateBufferCallback(JNIEnv* env, jint index, jobject callback,
                                      RegisterBufferCallbackFunc createCallback);

@@ -51,8 +51,8 @@ template <typename Derived, typename TUserInfo,
 class CallbackThread : public wpi::SafeThread {
  public:
   typedef TUserInfo UserInfo;
-  typedef TNotifierData NotifierData;
-  typedef TListenerData ListenerData;
+  using NotifierData = TNotifierData;
+  using ListenerData = TListenerData;
 
   ~CallbackThread() {
     // Wake up any blocked pollers

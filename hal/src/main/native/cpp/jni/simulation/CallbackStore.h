@@ -31,20 +31,20 @@ class CallbackStore {
 
 void InitializeStore();
 
-typedef int32_t (*RegisterCallbackFunc)(int32_t index,
-                                        HAL_NotifyCallback callback,
-                                        void* param, HAL_Bool initialNotify);
-typedef void (*FreeCallbackFunc)(int32_t index, int32_t uid);
-typedef int32_t (*RegisterChannelCallbackFunc)(int32_t index, int32_t channel,
-                                               HAL_NotifyCallback callback,
-                                               void* param,
-                                               HAL_Bool initialNotify);
-typedef void (*FreeChannelCallbackFunc)(int32_t index, int32_t channel,
-                                        int32_t uid);
-typedef int32_t (*RegisterCallbackNoIndexFunc)(HAL_NotifyCallback callback,
-                                               void* param,
-                                               HAL_Bool initialNotify);
-typedef void (*FreeCallbackNoIndexFunc)(int32_t uid);
+using RegisterCallbackFunc = int32_t (*)(int32_t index,
+                                         HAL_NotifyCallback callback,
+                                         void* param, HAL_Bool initialNotify);
+using FreeCallbackFunc = void (*)(int32_t index, int32_t uid);
+using RegisterChannelCallbackFunc = int32_t (*)(int32_t index, int32_t channel,
+                                                HAL_NotifyCallback callback,
+                                                void* param,
+                                                HAL_Bool initialNotify);
+using FreeChannelCallbackFunc = void (*)(int32_t index, int32_t channel,
+                                         int32_t uid);
+using RegisterCallbackNoIndexFunc = int32_t (*)(HAL_NotifyCallback callback,
+                                                void* param,
+                                                HAL_Bool initialNotify);
+using FreeCallbackNoIndexFunc = void (*)(int32_t uid);
 
 SIM_JniHandle AllocateCallback(JNIEnv* env, jint index, jobject callback,
                                jboolean initialNotify,

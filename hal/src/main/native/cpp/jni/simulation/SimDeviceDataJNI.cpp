@@ -206,10 +206,10 @@ static hal::UnlimitedHandleResource<SIM_JniHandle, DeviceCallbackStore,
     deviceCallbackHandles;
 
 namespace {
-typedef int32_t (*RegisterDeviceCallbackFunc)(const char* prefix, void* param,
-                                              HALSIM_SimDeviceCallback callback,
-                                              HAL_Bool initialNotify);
-typedef void (*FreeDeviceCallbackFunc)(int32_t uid);
+using RegisterDeviceCallbackFunc =
+    int32_t (*)(const char* prefix, void* param,
+                HALSIM_SimDeviceCallback callback, HAL_Bool initialNotify);
+using FreeDeviceCallbackFunc = void (*)(int32_t uid);
 }  // namespace
 
 static SIM_JniHandle AllocateDeviceCallback(
@@ -260,7 +260,7 @@ static hal::UnlimitedHandleResource<SIM_JniHandle, ValueCallbackStore,
     valueCallbackHandles;
 
 namespace {
-typedef void (*FreeValueCallbackFunc)(int32_t uid);
+using FreeValueCallbackFunc = void (*)(int32_t uid);
 }  // namespace
 
 template <typename THandle>
