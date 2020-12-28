@@ -643,31 +643,31 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
 }
 
 void NetworkTablesView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
-    auto& storage = GetStorage();
-    auto pTreeView = storage.GetBoolRef(
-        "tree", m_defaultFlags & NetworkTablesFlags_TreeView);
-    auto pShowConnections = storage.GetBoolRef(
-        "connections", m_defaultFlags & NetworkTablesFlags_ShowConnections);
-    auto pShowFlags = storage.GetBoolRef(
-        "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
-    auto pShowTimestamp = storage.GetBoolRef(
-        "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
+  auto& storage = GetStorage();
+  auto pTreeView =
+      storage.GetBoolRef("tree", m_defaultFlags & NetworkTablesFlags_TreeView);
+  auto pShowConnections = storage.GetBoolRef(
+      "connections", m_defaultFlags & NetworkTablesFlags_ShowConnections);
+  auto pShowFlags = storage.GetBoolRef(
+      "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
+  auto pShowTimestamp = storage.GetBoolRef(
+      "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
 
+  if (ImGui::BeginPopupContextItem()) {
     ImGui::MenuItem("Tree View", "", pTreeView);
     ImGui::MenuItem("Show Connections", "", pShowConnections);
     ImGui::MenuItem("Show Flags", "", pShowFlags);
     ImGui::MenuItem("Show Timestamp", "", pShowTimestamp);
 
-    m_flags &=
-        ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
-          NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp);
-    m_flags |= (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
-               (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
-               (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
-               (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0);
     ImGui::EndPopup();
   }
 
+  m_flags &=
+      ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
+        NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp);
+  m_flags |= (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
+             (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
+             (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
+             (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0);
   DisplayNetworkTables(m_model, m_flags);
 }
