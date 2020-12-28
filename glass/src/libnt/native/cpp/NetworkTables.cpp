@@ -464,7 +464,7 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
   if (ImGui::BeginPopupContextItem(entry.name.c_str())) {
     ImGui::Text("%s", entry.name.c_str());
     ImGui::Separator();
-    if (ImGui::Selectable("Remove")) {
+    if (ImGui::MenuItem("Remove")) {
       nt::DeleteEntry(entry.entry);
     }
     ImGui::EndPopup();
@@ -506,12 +506,67 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
     if (!node.children.empty()) {
       bool open =
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+      // Workaround https://github.com/ocornut/imgui/issues/331
+      bool openWarningPopup = false;
       if (ImGui::BeginPopupContextItem()) {
         ImGui::Text("%s", node.path.c_str());
         ImGui::Separator();
 
+        if (ImGui::BeginMenu("Add new...")) {
+          static char nameBuffer[kTextBufferSize];
+          if (ImGui::IsWindowAppearing()) {
+            size_t len = (std::min)(node.path.size(), kTextBufferSize - 1);
+            std::memcpy(nameBuffer, node.path.data(), len);
+            nameBuffer[len] = '\0';
+          }
+
+          ImGui::InputTextWithHint("name", "The name of the new item",
+                                   nameBuffer, kTextBufferSize);
+          ImGui::Separator();
+          auto entry = nt::GetEntry(nt::GetDefaultInstance(), nameBuffer);
+          if (ImGui::MenuItem("string")) {
+            if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
+                !nt::SetEntryValue(entry, nt::Value::MakeString(""))) {
+              openWarningPopup = true;
+            }
+          }
+          if (ImGui::MenuItem("double")) {
+            if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
+                !nt::SetEntryValue(entry, nt::Value::MakeDouble(0.0))) {
+              openWarningPopup = true;
+            }
+          }
+          if (ImGui::MenuItem("boolean")) {
+            if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
+                !nt::SetEntryValue(entry, nt::Value::MakeBoolean(false))) {
+              openWarningPopup = true;
+            }
+          }
+          if (ImGui::MenuItem("string[]")) {
+            if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
+                !nt::SetEntryValue(entry, nt::Value::MakeStringArray({""}))) {
+              openWarningPopup = true;
+            }
+          }
+          if (ImGui::MenuItem("double[]")) {
+            if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
+                !nt::SetEntryValue(entry, nt::Value::MakeDoubleArray({0.0}))) {
+              openWarningPopup = true;
+            }
+          }
+          if (ImGui::MenuItem("boolean[]")) {
+            if (nt::GetEntryType(entry) != NT_Type::NT_UNASSIGNED ||
+                !nt::SetEntryValue(entry,
+                                   nt::Value::MakeBooleanArray({false}))) {
+              openWarningPopup = true;
+            }
+          }
+
+          ImGui::EndMenu();
+        }
+
         ImGui::Separator();
-        if (ImGui::Selectable("Remove All")) {
+        if (ImGui::MenuItem("Remove All")) {
           for (auto&& entry :
                nt::GetEntries(nt::GetDefaultInstance(), node.path, 0)) {
             nt::DeleteEntry(entry);
@@ -519,6 +574,23 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
         }
         ImGui::EndPopup();
       }
+
+      // Workaround https://github.com/ocornut/imgui/issues/331
+      if (openWarningPopup) {
+        ImGui::OpenPopup("Value exists");
+      }
+      if (ImGui::BeginPopupModal("Value exists", NULL,
+                                 ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("The provided name already exists in the tree!");
+        ImGui::Separator();
+
+        if (ImGui::Button("OK", ImVec2(120, 0))) {
+          ImGui::CloseCurrentPopup();
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::EndPopup();
+      }
+
       ImGui::NextColumn();
       ImGui::NextColumn();
       if (flags & NetworkTablesFlags_ShowFlags) ImGui::NextColumn();
