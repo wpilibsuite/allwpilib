@@ -83,7 +83,7 @@ template <typename CType, int32_t CInvalid = HAL_kInvalidHandle>
 class Handle {
  public:
   Handle() = default;
-  /*implicit*/ Handle(CType val) : m_handle(val) {}  // NOLINT(runtime/explicit)
+  /*implicit*/ Handle(CType val) : m_handle(val) {}  // NOLINT
 
   Handle(const Handle&) = delete;
   Handle& operator=(const Handle&) = delete;

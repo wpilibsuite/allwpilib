@@ -507,7 +507,7 @@ TEST(Signal, SignalMoving) {
 template <typename T>
 struct object {
   object();
-  object(T i) : v{i} {}  // NOLINT(runtime/explicit)
+  object(T i) : v{i} {}  // NOLINT
 
   const T& val() const { return v; }
   T& val() { return v; }
