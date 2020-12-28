@@ -11,8 +11,7 @@
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Prepare.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 TEST(UvAsyncFunction, Test) {
   int prepare_cb_called = 0;
@@ -262,5 +261,4 @@ TEST(UvAsyncFunction, VoidWaitFor) {
   }
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

@@ -14,8 +14,7 @@
 #include "wpi/Twine.h"
 #include "wpi/uv/Request.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 
@@ -219,7 +218,6 @@ inline void GetNameInfo6(const std::shared_ptr<Loop>& loop,
   return GetNameInfo6(*loop, callback, ip, port, flags);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_GETNAMEINFO_H_

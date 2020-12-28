@@ -31,8 +31,7 @@
 
 #define CONCURRENT_COUNT 10
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 TEST(UvGetAddrInfo, BothNull) {
   int fail_cb_called = 0;
@@ -107,5 +106,4 @@ TEST(UvGetAddrInfo, Concurrent) {
 }
 #endif
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

@@ -7,8 +7,7 @@
 
 #include <uv.h>
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Error code.
@@ -42,7 +41,6 @@ class Error {
   int m_err{UV_UNKNOWN};
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_ERROR_H_

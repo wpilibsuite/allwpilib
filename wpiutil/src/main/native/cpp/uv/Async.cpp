@@ -6,8 +6,7 @@
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 Async<>::~Async() noexcept {
   if (auto loop = m_loop.lock()) {
@@ -31,5 +30,4 @@ std::shared_ptr<Async<>> Async<>::Create(const std::shared_ptr<Loop>& loop) {
   return h;
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

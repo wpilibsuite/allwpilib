@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePWMData() {
   static PWMData spd[kNumPWMChannels];
   ::hal::SimPWMData = spd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 PWMData* hal::SimPWMData;
 void PWMData::ResetData() {

@@ -12,8 +12,7 @@
 
 #include "wpi/uv/Error.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Request.  Requests are not moveable or copyable.
@@ -162,7 +161,6 @@ class RequestImpl : public Request {
   U m_uv_req;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_REQUEST_H_

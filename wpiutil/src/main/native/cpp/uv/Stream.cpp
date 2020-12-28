@@ -23,8 +23,7 @@ class CallbackWriteReq : public WriteReq {
 };
 }  // namespace
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 ShutdownReq::ShutdownReq() {
   error = [this](Error err) { GetStream().error(err); };
@@ -107,5 +106,4 @@ int Stream::TryWrite(ArrayRef<Buffer> bufs) {
   return val;
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

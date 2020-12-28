@@ -11,8 +11,7 @@
 
 #include "frc/simulation/CallbackStore.h"
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 
 /**
  * Class to control a simulated RoboRIO.
@@ -126,5 +125,4 @@ class RoboRioSim {
 
   static void ResetData();
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

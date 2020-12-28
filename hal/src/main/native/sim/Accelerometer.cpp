@@ -8,11 +8,9 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAccelerometer() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 void HAL_SetAccelerometerActive(HAL_Bool active) {

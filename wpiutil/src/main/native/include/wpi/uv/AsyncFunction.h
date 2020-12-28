@@ -20,8 +20,7 @@
 #include "wpi/uv/Handle.h"
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 template <typename T>
 class AsyncFunction;
@@ -163,7 +162,6 @@ class AsyncFunction<R(T...)> final
   std::weak_ptr<Loop> m_loop;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_ASYNCFUNCTION_H_

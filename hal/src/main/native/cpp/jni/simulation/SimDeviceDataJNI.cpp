@@ -310,8 +310,7 @@ static void FreeValueCallback(JNIEnv* env, SIM_JniHandle handle,
   callback->free(env);
 }
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 
 bool InitializeSimDeviceDataJNI(JNIEnv* env) {
   simDeviceInfoCls = JClass(
@@ -370,8 +369,7 @@ void FreeSimDeviceDataJNI(JNIEnv* env) {
   simValueCallbackCls.free(env);
 }
 
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 extern "C" {
 

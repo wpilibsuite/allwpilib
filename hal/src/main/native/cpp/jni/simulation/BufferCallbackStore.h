@@ -14,8 +14,7 @@
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "hal/simulation/NotifyListener.h"
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 class BufferCallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
@@ -40,5 +39,4 @@ SIM_JniHandle AllocateBufferCallback(JNIEnv* env, jint index, jobject callback,
                                      RegisterBufferCallbackFunc createCallback);
 void FreeBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                         FreeBufferCallbackFunc freeCallback);
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim

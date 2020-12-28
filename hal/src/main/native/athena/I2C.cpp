@@ -30,11 +30,9 @@ static int i2CMXPHandle{-1};
 static HAL_DigitalHandle i2CMXPDigitalHandle1{HAL_kInvalidHandle};
 static HAL_DigitalHandle i2CMXPDigitalHandle2{HAL_kInvalidHandle};
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeI2C() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

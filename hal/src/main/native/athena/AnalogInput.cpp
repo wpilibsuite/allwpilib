@@ -13,11 +13,9 @@
 #include "hal/AnalogAccumulator.h"
 #include "hal/handles/HandlesInternal.h"
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogInput() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 using namespace hal;
 

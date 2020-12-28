@@ -24,11 +24,9 @@ static void initializePower(int32_t* status) {
 
 }  // namespace hal
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePower() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

@@ -4,11 +4,9 @@
 
 #include "hal/Threads.h"
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeThreads() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
                               int32_t* status) {

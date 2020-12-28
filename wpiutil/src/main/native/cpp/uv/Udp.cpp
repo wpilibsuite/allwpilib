@@ -30,8 +30,7 @@ class CallbackUdpSendReq : public UdpSendReq {
 
 }  // namespace
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 UdpSendReq::UdpSendReq() {
   error = [this](Error err) { GetUdp().error(err); };
@@ -182,5 +181,4 @@ void Udp::StartRecv() {
          });
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

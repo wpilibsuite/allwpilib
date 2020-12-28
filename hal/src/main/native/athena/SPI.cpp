@@ -59,11 +59,9 @@ static bool SPIInUseByAuto(HAL_SPIPort port) {
          (spiAutoPort == 4 && port == 4);
 }
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSPI() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

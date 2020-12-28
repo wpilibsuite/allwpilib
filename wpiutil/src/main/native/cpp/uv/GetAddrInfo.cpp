@@ -7,8 +7,7 @@
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/util.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 GetAddrInfoReq::GetAddrInfoReq() {
   error = [this](Error err) { GetLoop().error(err); };
@@ -50,5 +49,4 @@ void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
   GetAddrInfo(loop, req, node, service, hints);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

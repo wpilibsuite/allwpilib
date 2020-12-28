@@ -6,8 +6,7 @@
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Timer> Timer::Create(Loop& loop) {
   auto h = std::make_shared<Timer>(private_init{});
@@ -42,5 +41,4 @@ void Timer::Start(Time timeout, Time repeat) {
       timeout.count(), repeat.count());
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

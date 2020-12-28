@@ -14,8 +14,7 @@
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "hal/simulation/NotifyListener.h"
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 class CallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
@@ -61,5 +60,4 @@ void FreeChannelCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                          jint channel, FreeChannelCallbackFunc freeCallback);
 void FreeCallbackNoIndex(JNIEnv* env, SIM_JniHandle handle,
                          FreeCallbackNoIndexFunc freeCallback);
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim

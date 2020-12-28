@@ -10,14 +10,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAddressableLEDData() {
   static AddressableLEDData sad[kNumAddressableLEDs];
   ::hal::SimAddressableLEDData = sad;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 AddressableLEDData* hal::SimAddressableLEDData;
 

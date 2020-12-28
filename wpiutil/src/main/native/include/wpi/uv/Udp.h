@@ -16,8 +16,7 @@
 #include "wpi/uv/Handle.h"
 #include "wpi/uv/Request.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 class Udp;
@@ -373,7 +372,6 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
   sig::Signal<Buffer&, size_t, const sockaddr&, unsigned> received;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_UDP_H_

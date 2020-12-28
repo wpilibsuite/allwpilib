@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSPIAccelerometerData() {
   static SPIAccelerometerData ssad[5];
   ::hal::SimSPIAccelerometerData = ssad;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 SPIAccelerometerData* hal::SimSPIAccelerometerData;
 void SPIAccelerometerData::ResetData() {
