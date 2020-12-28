@@ -190,6 +190,11 @@ void NetworkTablesModel::Update() {
     parts.clear();
     wpi::StringRef{entry->name}.split(parts, '/', -1, false);
 
+    // ignore a raw "/" key
+    if (parts.empty()) {
+      continue;
+    }
+
     // get to leaf
     auto nodes = &m_root;
     for (auto part : wpi::ArrayRef(parts.begin(), parts.end()).drop_back()) {
