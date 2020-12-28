@@ -77,5 +77,5 @@ TEST_F(CommandRequirementsTest, DefaultCommandRequirementErrorTest) {
 
   requirement1.SetDefaultCommand(std::move(command1));
 
-  EXPECT_TRUE(requirement1.GetDefaultCommand() == NULL);
+  EXPECT_TRUE(requirement1.GetDefaultCommand() == nullptr);
 }

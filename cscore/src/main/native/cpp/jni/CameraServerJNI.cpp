@@ -79,7 +79,7 @@ static void ListenerOnExit() {
 /// throw java exception
 static void ThrowJavaException(JNIEnv* env, const std::exception* e) {
   wpi::SmallString<128> what;
-  jclass je = 0;
+  jclass je = nullptr;
 
   if (e) {
     const char* exception_type = "std::exception";
@@ -1198,7 +1198,7 @@ Java_edu_wpi_cscore_CameraServerCvJNI_putSourceFrame
   } catch (const std::exception& e) {
     ThrowJavaException(env, &e);
   } catch (...) {
-    ThrowJavaException(env, 0);
+    ThrowJavaException(env, nullptr);
   }
 }
 
@@ -1673,7 +1673,7 @@ Java_edu_wpi_cscore_CameraServerCvJNI_grabSinkFrame
     ThrowJavaException(env, &e);
     return 0;
   } catch (...) {
-    ThrowJavaException(env, 0);
+    ThrowJavaException(env, nullptr);
     return 0;
   }
 }
@@ -1697,7 +1697,7 @@ Java_edu_wpi_cscore_CameraServerCvJNI_grabSinkFrameTimeout
     ThrowJavaException(env, &e);
     return 0;
   } catch (...) {
-    ThrowJavaException(env, 0);
+    ThrowJavaException(env, nullptr);
     return 0;
   }
 }
