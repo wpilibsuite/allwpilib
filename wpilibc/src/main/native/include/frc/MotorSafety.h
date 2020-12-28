@@ -21,7 +21,7 @@ namespace frc {
 class MotorSafety : public ErrorBase {
  public:
   MotorSafety();
-  virtual ~MotorSafety();
+  ~MotorSafety() override;
 
   MotorSafety(MotorSafety&& rhs);
   MotorSafety& operator=(MotorSafety&& rhs);

@@ -15,7 +15,7 @@ class HALSimWSProviderRelay : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderRelay();
+  ~HALSimWSProviderRelay() override;
 
  protected:
   void RegisterCallbacks() override;

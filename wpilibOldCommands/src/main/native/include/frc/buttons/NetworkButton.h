@@ -19,12 +19,12 @@ class NetworkButton : public Button {
   NetworkButton(const wpi::Twine& tableName, const wpi::Twine& field);
   NetworkButton(std::shared_ptr<nt::NetworkTable> table,
                 const wpi::Twine& field);
-  virtual ~NetworkButton() = default;
+  ~NetworkButton() override = default;
 
   NetworkButton(NetworkButton&&) = default;
   NetworkButton& operator=(NetworkButton&&) = default;
 
-  virtual bool Get();
+  bool Get() override;
 
  private:
   nt::NetworkTableEntry m_entry;

@@ -14,12 +14,12 @@ class Command;
 class CancelButtonScheduler : public ButtonScheduler {
  public:
   CancelButtonScheduler(bool last, Trigger* button, Command* orders);
-  virtual ~CancelButtonScheduler() = default;
+  ~CancelButtonScheduler() override = default;
 
   CancelButtonScheduler(CancelButtonScheduler&&) = default;
   CancelButtonScheduler& operator=(CancelButtonScheduler&&) = default;
 
-  virtual void Execute();
+  void Execute() override;
 };
 
 }  // namespace frc

@@ -14,7 +14,7 @@ class DoubleButton : public frc::Trigger {
  public:
   DoubleButton(frc::Joystick* joy, int button1, int button2);
 
-  bool Get();
+  bool Get() override;
 
  private:
   frc::Joystick& m_joy;

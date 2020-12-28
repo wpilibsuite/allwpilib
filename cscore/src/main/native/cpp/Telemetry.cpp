@@ -22,7 +22,7 @@ class Telemetry::Thread : public wpi::SafeThread {
  public:
   explicit Thread(Notifier& notifier) : m_notifier(notifier) {}
 
-  void Main();
+  void Main() override;
 
   Notifier& m_notifier;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;

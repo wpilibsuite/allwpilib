@@ -15,7 +15,7 @@ class HALSimWSProviderDIO : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderDIO();
+  ~HALSimWSProviderDIO() override;
 
   void OnNetValueChanged(const wpi::json& json) override;
 

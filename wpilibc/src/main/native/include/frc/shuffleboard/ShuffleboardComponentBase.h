@@ -27,7 +27,7 @@ class ShuffleboardComponentBase : public virtual ShuffleboardValue {
                             const wpi::Twine& title,
                             const wpi::Twine& type = "");
 
-  virtual ~ShuffleboardComponentBase() = default;
+  ~ShuffleboardComponentBase() override = default;
 
   void SetType(const wpi::Twine& type);
 

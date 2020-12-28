@@ -12,12 +12,12 @@ namespace frc {
 class JoystickButton : public Button {
  public:
   JoystickButton(GenericHID* joystick, int buttonNumber);
-  virtual ~JoystickButton() = default;
+  ~JoystickButton() override = default;
 
   JoystickButton(JoystickButton&&) = default;
   JoystickButton& operator=(JoystickButton&&) = default;
 
-  virtual bool Get();
+  bool Get() override;
 
  private:
   GenericHID* m_joystick;

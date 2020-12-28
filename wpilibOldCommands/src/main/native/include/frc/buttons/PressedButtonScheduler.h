@@ -14,12 +14,12 @@ class Command;
 class PressedButtonScheduler : public ButtonScheduler {
  public:
   PressedButtonScheduler(bool last, Trigger* button, Command* orders);
-  virtual ~PressedButtonScheduler() = default;
+  ~PressedButtonScheduler() override = default;
 
   PressedButtonScheduler(PressedButtonScheduler&&) = default;
   PressedButtonScheduler& operator=(PressedButtonScheduler&&) = default;
 
-  virtual void Execute();
+  void Execute() override;
 };
 
 }  // namespace frc

@@ -15,7 +15,7 @@ class raw_socket_ostream : public raw_ostream {
  public:
   raw_socket_ostream(NetworkStream& stream, bool shouldClose)
       : m_stream(stream), m_shouldClose(shouldClose) {}
-  ~raw_socket_ostream();
+  ~raw_socket_ostream() override;
 
   void close();
 

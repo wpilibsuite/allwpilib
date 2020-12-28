@@ -62,9 +62,11 @@ class Robot : public frc::TimedRobot {
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
  public:
-  void RobotInit() { m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse); }
+  void RobotInit() override {
+    m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);
+  }
 
-  void SimulationPeriodic() {
+  void SimulationPeriodic() override {
     // In this method, we update our simulation of what our elevator is doing
     // First, we set our "inputs" (voltages)
     m_elevatorSim.SetInput(frc::MakeMatrix<1, 1>(
@@ -81,7 +83,7 @@ class Robot : public frc::TimedRobot {
         frc::sim::BatterySim::Calculate({m_elevatorSim.GetCurrentDraw()}));
   }
 
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       double pidOutput =
@@ -93,7 +95,7 @@ class Robot : public frc::TimedRobot {
     }
   }
 
-  void DisabledInit() {
+  void DisabledInit() override {
     // This just makes sure that our simulation code knows that the motor's off.
     m_motor.Set(0.0);
   }

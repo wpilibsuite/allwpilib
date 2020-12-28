@@ -15,7 +15,7 @@ class HALSimWSProviderDriverStation : public HALSimWSHalProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalProvider::HALSimWSHalProvider;
-  ~HALSimWSProviderDriverStation();
+  ~HALSimWSProviderDriverStation() override;
 
   void OnNetValueChanged(const wpi::json& json) override;
 

@@ -15,7 +15,7 @@ class HALSimWSProviderDigitalPWM : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderDigitalPWM();
+  ~HALSimWSProviderDigitalPWM() override;
 
  protected:
   void RegisterCallbacks() override;

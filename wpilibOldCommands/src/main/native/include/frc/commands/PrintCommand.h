@@ -15,13 +15,13 @@ namespace frc {
 class PrintCommand : public InstantCommand {
  public:
   explicit PrintCommand(const wpi::Twine& message);
-  virtual ~PrintCommand() = default;
+  ~PrintCommand() override = default;
 
   PrintCommand(PrintCommand&&) = default;
   PrintCommand& operator=(PrintCommand&&) = default;
 
  protected:
-  virtual void Initialize();
+  void Initialize() override;
 
  private:
   std::string m_message;

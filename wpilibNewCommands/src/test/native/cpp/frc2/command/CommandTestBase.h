@@ -72,13 +72,13 @@ class CommandTestBase : public ::testing::Test {
           .WillRepeatedly(::testing::Return(finished));
     }
 
-    ~MockCommand() {
+    ~MockCommand() {  // NOLINT
       auto& scheduler = CommandScheduler::GetInstance();
       scheduler.Cancel(this);
     }
 
    protected:
-    std::unique_ptr<Command> TransferOwnership() && {
+    std::unique_ptr<Command> TransferOwnership() && {  // NOLINT
       return std::make_unique<MockCommand>(std::move(*this));
     }
 

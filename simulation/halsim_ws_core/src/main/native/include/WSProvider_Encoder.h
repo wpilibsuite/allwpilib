@@ -15,7 +15,7 @@ class HALSimWSProviderEncoder : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderEncoder();
+  ~HALSimWSProviderEncoder() override;
 
   void OnNetValueChanged(const wpi::json& json) override;
 

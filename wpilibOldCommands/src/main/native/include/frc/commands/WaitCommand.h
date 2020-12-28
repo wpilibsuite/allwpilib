@@ -27,7 +27,7 @@ class WaitCommand : public TimedCommand {
    */
   WaitCommand(const wpi::Twine& name, double timeout);
 
-  virtual ~WaitCommand() = default;
+  ~WaitCommand() override = default;
 
   WaitCommand(WaitCommand&&) = default;
   WaitCommand& operator=(WaitCommand&&) = default;

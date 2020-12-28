@@ -49,7 +49,7 @@ class NetworkConnection : public INetworkConnection {
                     IConnectionNotifier& notifier, wpi::Logger& logger,
                     HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type);
-  ~NetworkConnection();
+  ~NetworkConnection() override;
 
   // Set the input processor function.  This must be called before Start().
   void set_process_incoming(ProcessIncomingFunc func) {

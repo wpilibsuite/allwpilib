@@ -31,7 +31,7 @@ using namespace hal;
 // process, we will just ignore the redundant wakeup.
 class InterruptThreadJNI : public wpi::SafeThread {
  public:
-  void Main();
+  void Main() override;
 
   bool m_notify = false;
   uint32_t m_mask = 0;
