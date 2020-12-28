@@ -15,7 +15,7 @@ namespace uv {
  */
 class Error {
  public:
-  Error() {}
+  Error() = default;
   explicit Error(int err) : m_err(err) {}
 
   /**

@@ -23,7 +23,7 @@ ConfigurableSourceImpl::ConfigurableSourceImpl(const wpi::Twine& name,
   m_videoModes.push_back(m_mode);
 }
 
-ConfigurableSourceImpl::~ConfigurableSourceImpl() {}
+ConfigurableSourceImpl::~ConfigurableSourceImpl() = default;
 
 void ConfigurableSourceImpl::Start() {
   m_notifier.NotifySource(*this, CS_SOURCE_CONNECTED);

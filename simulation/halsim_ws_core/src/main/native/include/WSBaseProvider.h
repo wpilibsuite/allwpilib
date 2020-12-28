@@ -18,7 +18,7 @@ class HALSimWSBaseProvider {
  public:
   explicit HALSimWSBaseProvider(const std::string& key,
                                 const std::string& type = "");
-  virtual ~HALSimWSBaseProvider() {}
+  virtual ~HALSimWSBaseProvider() = default;
 
   HALSimWSBaseProvider(const HALSimWSBaseProvider&) = delete;
   HALSimWSBaseProvider& operator=(const HALSimWSBaseProvider&) = delete;

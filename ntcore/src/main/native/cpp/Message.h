@@ -38,7 +38,7 @@ class Message {
   };
   typedef std::function<NT_Type(unsigned int id)> GetEntryTypeFunc;
 
-  Message() {}
+  Message() = default;
   Message(MsgType type, const private_init&) : m_type(type) {}
 
   MsgType type() const { return m_type; }

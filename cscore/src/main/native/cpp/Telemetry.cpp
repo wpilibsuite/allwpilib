@@ -43,7 +43,7 @@ int64_t Telemetry::Thread::GetValue(CS_Handle handle, CS_TelemetryKind kind,
   return it->getSecond();
 }
 
-Telemetry::~Telemetry() {}
+Telemetry::~Telemetry() = default;
 
 void Telemetry::Start() {
   m_owner.Start(m_notifier);

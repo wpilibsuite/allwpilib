@@ -92,7 +92,7 @@ WebSocket::WebSocket(uv::Stream& stream, bool server, const private_init&)
       [this]() { Terminate(1006, "remote end closed connection"); });
 }
 
-WebSocket::~WebSocket() {}
+WebSocket::~WebSocket() = default;
 
 std::shared_ptr<WebSocket> WebSocket::CreateClient(
     uv::Stream& stream, const Twine& uri, const Twine& host,

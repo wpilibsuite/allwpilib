@@ -23,7 +23,7 @@ class RpcCall final {
   /**
    * Construct invalid instance.
    */
-  RpcCall() {}
+  RpcCall() = default;
 
   /**
    * Construct from native handles.

@@ -184,7 +184,7 @@ NTField2DModel::NTField2DModel(NT_Inst inst, wpi::StringRef path)
                                NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE);
 }
 
-NTField2DModel::~NTField2DModel() {}
+NTField2DModel::~NTField2DModel() = default;
 
 void NTField2DModel::Update() {
   for (auto&& event : m_nt.PollListener()) {

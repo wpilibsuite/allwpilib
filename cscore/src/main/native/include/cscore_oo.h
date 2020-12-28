@@ -48,7 +48,7 @@ class VideoProperty {
     kEnum = CS_PROP_ENUM
   };
 
-  VideoProperty() {}
+  VideoProperty() = default;
 
   std::string GetName() const;
 
@@ -124,7 +124,7 @@ class VideoSource {
     kConnectionForceClose = CS_CONNECTION_FORCE_CLOSE
   };
 
-  VideoSource() noexcept {}
+  VideoSource() noexcept = default;
   VideoSource(const VideoSource& source);
   VideoSource(VideoSource&& other) noexcept;
   VideoSource& operator=(VideoSource other) noexcept;
@@ -733,7 +733,7 @@ class VideoSink {
     kCv = CS_SINK_CV
   };
 
-  VideoSink() noexcept {}
+  VideoSink() noexcept = default;
   VideoSink(const VideoSink& sink);
   VideoSink(VideoSink&& sink) noexcept;
   VideoSink& operator=(VideoSink other) noexcept;
@@ -1008,7 +1008,7 @@ class VideoEvent : public RawEvent {
  */
 class VideoListener {
  public:
-  VideoListener() {}
+  VideoListener() = default;
 
   /**
    * Create an event listener.

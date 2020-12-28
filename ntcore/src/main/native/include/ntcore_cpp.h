@@ -130,7 +130,7 @@ struct RpcDefinition {
 /** NetworkTables Remote Procedure Call (Server Side) */
 class RpcAnswer {
  public:
-  RpcAnswer() {}
+  RpcAnswer() = default;
   RpcAnswer(NT_Entry entry_, NT_RpcCall call_, StringRef name_,
             StringRef params_, const ConnectionInfo& conn_)
       : entry(entry_), call(call_), name(name_), params(params_), conn(conn_) {}
@@ -176,7 +176,7 @@ class RpcAnswer {
 /** NetworkTables Entry Notification */
 class EntryNotification {
  public:
-  EntryNotification() {}
+  EntryNotification() = default;
   EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
                     StringRef name_, std::shared_ptr<Value> value_,
                     unsigned int flags_)
@@ -217,7 +217,7 @@ class EntryNotification {
 /** NetworkTables Connection Notification */
 class ConnectionNotification {
  public:
-  ConnectionNotification() {}
+  ConnectionNotification() = default;
   ConnectionNotification(NT_ConnectionListener listener_, bool connected_,
                          const ConnectionInfo& conn_)
       : listener(listener_), connected(connected_), conn(conn_) {}
@@ -243,7 +243,7 @@ class ConnectionNotification {
 /** NetworkTables log message. */
 class LogMessage {
  public:
-  LogMessage() {}
+  LogMessage() = default;
   LogMessage(NT_Logger logger_, unsigned int level_, const char* filename_,
              unsigned int line_, StringRef message_)
       : logger(logger_),

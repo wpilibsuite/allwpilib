@@ -491,7 +491,7 @@ CameraServer::Impl::Impl() : m_nextPort(kBasePort) {
 
 CameraServer::CameraServer() : m_impl(new Impl) {}
 
-CameraServer::~CameraServer() {}
+CameraServer::~CameraServer() = default;
 
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
   cs::UsbCamera camera = StartAutomaticCapture(m_impl->m_defaultUsbDevice++);

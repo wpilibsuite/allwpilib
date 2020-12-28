@@ -8,7 +8,7 @@
 
 using namespace frc2;
 
-Trigger::Trigger(const Trigger& other) : m_isActive(other.m_isActive) {}
+Trigger::Trigger(const Trigger& other) = default;
 
 Trigger Trigger::WhenActive(Command* command, bool interruptible) {
   CommandScheduler::GetInstance().AddButton(
