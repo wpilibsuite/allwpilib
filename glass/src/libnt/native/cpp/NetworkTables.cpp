@@ -518,7 +518,7 @@ static void EmitParentContextMenu(const std::string& path,
         nameBuffer[0] = '\0';
       }
 
-      ImGui::InputTextWithHint("New Item name", "example", nameBuffer,
+      ImGui::InputTextWithHint("New item name", "example", nameBuffer,
                                kTextBufferSize);
       std::string fullNewPath;
       if (path == "/") {
@@ -533,32 +533,32 @@ static void EmitParentContextMenu(const std::string& path,
       bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
                       nameBuffer[0] != '\0') &&
                      nt::GetEntryType(entry) == NT_Type::NT_UNASSIGNED;
-      if (ImGui::MenuItem("string", NULL, false, enabled)) {
+      if (ImGui::MenuItem("string", nullptr, false, enabled)) {
         if (!nt::SetEntryValue(entry, nt::Value::MakeString(""))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("double", NULL, false, enabled)) {
+      if (ImGui::MenuItem("double", nullptr, false, enabled)) {
         if (!nt::SetEntryValue(entry, nt::Value::MakeDouble(0.0))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("boolean", NULL, false, enabled)) {
+      if (ImGui::MenuItem("boolean", nullptr, false, enabled)) {
         if (!nt::SetEntryValue(entry, nt::Value::MakeBoolean(false))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("string[]", NULL, false, enabled)) {
+      if (ImGui::MenuItem("string[]", nullptr, false, enabled)) {
         if (!nt::SetEntryValue(entry, nt::Value::MakeStringArray({""}))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("double[]", NULL, false, enabled)) {
+      if (ImGui::MenuItem("double[]", nullptr, false, enabled)) {
         if (!nt::SetEntryValue(entry, nt::Value::MakeDoubleArray({0.0}))) {
           openWarningPopup = true;
         }
       }
-      if (ImGui::MenuItem("boolean[]", NULL, false, enabled)) {
+      if (ImGui::MenuItem("boolean[]", nullptr, false, enabled)) {
         if (!nt::SetEntryValue(entry, nt::Value::MakeBooleanArray({false}))) {
           openWarningPopup = true;
         }
