@@ -39,6 +39,7 @@ abstract class ShuffleboardWidget<W extends ShuffleboardWidget<W>>
    * @param widgetType the type of the widget used to display the data
    * @return this widget object
    */
+  @SuppressWarnings("unchecked")
   public final W withWidget(String widgetType) {
     setType(widgetType);
     return (W) this;
