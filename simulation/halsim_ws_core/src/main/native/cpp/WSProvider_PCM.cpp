@@ -7,10 +7,12 @@
 #include <hal/Ports.h>
 #include <hal/simulation/PCMData.h>
 
+namespace {
 int32_t GetPcmChannelsToPublish() {
   // TODO should we do all 64?
   return 2;
 }
+}  // namespace
 
 #define REGISTER_PCM(halsim, jsonid, ctype, haltype)                     \
   HALSIM_RegisterPCM##halsim##Callback(                                  \
@@ -20,22 +22,15 @@ int32_t GetPcmChannelsToPublish() {
             {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});    \
       },                                                                 \
       this, true)
-
-#define REGISTER_SOLENOID(halsim, jsonid, ctype, haltype)                     \
-  HALSIM_RegisterPCMSolenoid##halsim##Callback(                               \
-      m_pcmIndex, m_solenoidIndex,                                            \
-      [](const char* name, void* param, const struct HAL_Value* value) {      \
-        static_cast<HALSimWSProviderPCMSolenoid*>(param)->ProcessHalCallback( \
-            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});         \
-      },                                                                      \
-      this, true)
 namespace wpilibws {
 void HALSimWSProviderPCM::Initialize(WSRegisterFunc webRegisterFunc) {
   CreateProviders<HALSimWSProviderPCM>("PCM", GetPcmChannelsToPublish(),
                                        webRegisterFunc);
 }
 
-HALSimWSProviderPCM::~HALSimWSProviderPCM() { DoCancelCallbacks(); }
+HALSimWSProviderPCM::~HALSimWSProviderPCM() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderPCM::RegisterCallbacks() {
   m_initCbKey = REGISTER_PCM(CompressorInitialized, "<init", bool, boolean);
@@ -47,7 +42,9 @@ void HALSimWSProviderPCM::RegisterCallbacks() {
   m_currentCbKey = REGISTER_PCM(CompressorCurrent, ">current", double, double);
 }
 
-void HALSimWSProviderPCM::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderPCM::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderPCM::DoCancelCallbacks() {
   HALSIM_CancelPCMCompressorInitializedCallback(m_channel, m_initCbKey);
@@ -63,50 +60,4 @@ void HALSimWSProviderPCM::DoCancelCallbacks() {
   m_currentCbKey = 0;
 }
 
-void HALSimWSProviderPCMSolenoid::Initialize(WSRegisterFunc webRegisterFunc) {
-  std::string prefix = "PCM";
-
-  for (int32_t pcmIndex = 0; pcmIndex < GetPcmChannelsToPublish(); ++pcmIndex) {
-    for (int32_t solenoidIndex = 0;
-         solenoidIndex < HAL_GetNumSolenoidChannels(); ++solenoidIndex) {
-      auto key = (prefix + "/" + wpi::Twine(pcmIndex) + "/" +
-                  wpi::Twine(solenoidIndex))
-                     .str();
-      auto ptr = std::make_unique<HALSimWSProviderPCMSolenoid>(
-          pcmIndex, solenoidIndex, key, prefix);
-      webRegisterFunc(key, std::move(ptr));
-    }
-  }
-}
-
-HALSimWSProviderPCMSolenoid::HALSimWSProviderPCMSolenoid(
-    int32_t pcmChannel, int32_t solenoidChannel, const std::string& key,
-    const std::string& type)
-    : HALSimWSHalProvider(key, type),
-      m_pcmIndex(pcmChannel),
-      m_solenoidIndex(solenoidChannel) {
-  m_deviceId = std::to_string(m_pcmIndex) + "/solenoids/" +
-               std::to_string(solenoidChannel);
-}
-
-HALSimWSProviderPCMSolenoid::~HALSimWSProviderPCMSolenoid() {
-  DoCancelCallbacks();
-}
-
-void HALSimWSProviderPCMSolenoid::RegisterCallbacks() {
-  m_initCbKey = REGISTER_SOLENOID(Initialized, "<init", bool, boolean);
-  m_outputCbKey = REGISTER_SOLENOID(Output, "<>output", bool, boolean);
-}
-
-void HALSimWSProviderPCMSolenoid::CancelCallbacks() { DoCancelCallbacks(); }
-
-void HALSimWSProviderPCMSolenoid::DoCancelCallbacks() {
-  HALSIM_CancelPCMSolenoidInitializedCallback(m_pcmIndex, m_solenoidIndex,
-                                              m_initCbKey);
-  HALSIM_CancelPCMSolenoidOutputCallback(m_pcmIndex, m_solenoidIndex,
-                                         m_outputCbKey);
-
-  m_initCbKey = 0;
-  m_outputCbKey = 0;
-}
 }  // namespace wpilibws

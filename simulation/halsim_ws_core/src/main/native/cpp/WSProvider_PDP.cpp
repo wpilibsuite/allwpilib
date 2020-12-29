@@ -7,10 +7,12 @@
 #include <hal/Ports.h>
 #include <hal/simulation/PDPData.h>
 
+namespace {
 int32_t GetPdpChannelsToPublish() {
   // TODO should we do all 64?
   return 2;
 }
+}  // namespace
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterPDP##halsim##Callback(                                  \
@@ -37,7 +39,9 @@ void HALSimWSProviderPDP::Initialize(WSRegisterFunc webRegisterFunc) {
                                        webRegisterFunc);
 }
 
-HALSimWSProviderPDP::~HALSimWSProviderPDP() { DoCancelCallbacks(); }
+HALSimWSProviderPDP::~HALSimWSProviderPDP() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderPDP::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
@@ -45,7 +49,9 @@ void HALSimWSProviderPDP::RegisterCallbacks() {
   m_voltageCbKey = REGISTER(Voltage, ">voltage", double, double);
 }
 
-void HALSimWSProviderPDP::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderPDP::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderPDP::DoCancelCallbacks() {
   HALSIM_CancelPDPInitializedCallback(m_channel, m_initCbKey);
