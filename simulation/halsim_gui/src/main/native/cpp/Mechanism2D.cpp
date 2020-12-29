@@ -83,11 +83,11 @@ class Mechanism2DInfo {
 
 static Mechanism2DInfo mechanism2DInfo;
 
-//Vector of display functions
+// Vector of display functions
 std::vector<void (*)()> displayWindows;
 
 // Struct to hold all of the data for each window
-struct WindowData{
+struct WindowData {
   BodyConfig bodyConfig;
   std::string CheckboxButtonName;
   // Might also need to put the function here
@@ -330,49 +330,42 @@ static void DisplayAssembly2D() {
 // Radio button test bool
 bool radioTest = 0;
 
+static void dummyWindow() {}
+
 static void MainMechanism2D() {
-  ImGui::Checkbox("one", &radioTest);
-  if(radioTest){
-    // hook ini handler to save settings
-    ImGuiSettingsHandler iniHandler;
-    iniHandler.TypeName = "Mechanism2D";
-    iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
-    iniHandler.ReadOpenFn = Mechanism2DReadOpen;
-    iniHandler.ReadLineFn = Mechanism2DReadLine;
-    iniHandler.WriteAllFn = Mechanism2DWriteAll;
-    ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
-
-
-    if (auto win =
-          HALSimGui::manager.AddWindow("Mechanism 2D", DisplayAssembly2D)) {
-        win->SetVisibility(glass::Window::kHide);
-        win->SetDefaultPos(200, 200);
-        win->SetDefaultSize(600, 600);
-        win->SetPadding(0, 0);
-      }
-//    // Add DisplayAssembly2D to windows to display
-//    displayWindows.push_back(DisplayAssembly2D);
-//
-//    // Add the main window to the gui
-//    for(auto windowFunction: displayWindows){
-//      if (auto win =
-//          HALSimGui::manager.AddWindow("Mechanism 2D", windowFunction)) {
-//        win->SetVisibility(glass::Window::kHide);
-//        win->SetDefaultPos(200, 200);
-//        win->SetDefaultSize(600, 600);
-//        win->SetPadding(0, 0);
-//      }
-//    }
-  }
+//    ImGui::Checkbox("one", &radioTest);
+//  if (radioTest) {
+    if (auto win = HALSimGui::manager.AddWindow("dummyWindowTwo", dummyWindow)) {
+      win->SetVisibility(glass::Window::kHide);
+      win->SetDefaultPos(200, 200);
+      win->SetDefaultSize(600, 600);
+      win->SetPadding(0, 0);
+    }
+//  }
 }
 
 void Mechanism2D::Initialize() {
   // Build the color table.
   buildColorTable();
 
+  ImGuiSettingsHandler iniHandler;
+  iniHandler.TypeName = "Mechanism2D";
+  iniHandler.TypeHash = ImHashStr(iniHandler.TypeName);
+  iniHandler.ReadOpenFn = Mechanism2DReadOpen;
+  iniHandler.ReadLineFn = Mechanism2DReadLine;
+  iniHandler.WriteAllFn = Mechanism2DWriteAll;
+  ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
+
+  if (auto win =
+          HALSimGui::manager.AddWindow("Mechanism 2D", DisplayAssembly2D)) {
+    win->SetVisibility(glass::Window::kHide);
+    win->SetDefaultPos(200, 200);
+    win->SetDefaultSize(600, 600);
+    win->SetPadding(0, 0);
+  }
   // Make main window
   if (auto win =
-      HALSimGui::manager.AddWindow("MainMechanism2D", MainMechanism2D)) {
+          HALSimGui::manager.AddWindow("MainMechanism2D", MainMechanism2D)) {
     win->SetVisibility(glass::Window::kHide);
     win->SetDefaultPos(200, 200);
     win->SetDefaultSize(600, 600);
