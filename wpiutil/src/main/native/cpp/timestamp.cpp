@@ -16,7 +16,7 @@
 #endif
 
 // offset in microseconds
-static uint64_t zerotime() {
+static uint64_t zerotime() noexcept {
 #ifdef _WIN32
   FILETIME ft;
   uint64_t tmpres = 0;
@@ -40,7 +40,7 @@ static uint64_t zerotime() {
 #endif
 }
 
-static uint64_t timestamp() {
+static uint64_t timestamp() noexcept {
 #ifdef _WIN32
   LARGE_INTEGER li;
   QueryPerformanceCounter(&li);

@@ -58,26 +58,25 @@ class Process final : public HandleImpl<Process, uv_process_t> {
 
     Option() : m_type(kNone) {}
 
-    /*implicit*/ Option(const char* arg) {  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(const char* arg) {  // NOLINT
       m_data.str = arg;
     }
 
-    /*implicit*/ Option(const std::string& arg) {  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(const std::string& arg) {  // NOLINT
       m_data.str = arg.data();
     }
 
-    /*implicit*/ Option(StringRef arg)  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(StringRef arg)  // NOLINT
         : m_strData(arg) {
       m_data.str = m_strData.c_str();
     }
 
-    /*implicit*/ Option(
-        const SmallVectorImpl<char>& arg)  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(const SmallVectorImpl<char>& arg)  // NOLINT
         : m_strData(arg.data(), arg.size()) {
       m_data.str = m_strData.c_str();
     }
 
-    /*implicit*/ Option(const Twine& arg)  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(const Twine& arg)  // NOLINT
         : m_strData(arg.str()) {
       m_data.str = m_strData.c_str();
     }

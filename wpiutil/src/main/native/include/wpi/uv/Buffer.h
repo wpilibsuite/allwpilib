@@ -27,13 +27,13 @@ class Buffer : public uv_buf_t {
     base = nullptr;
     len = 0;
   }
-  /*implicit*/ Buffer(const uv_buf_t& oth) {  // NOLINT(runtime/explicit)
+  /*implicit*/ Buffer(const uv_buf_t& oth) {  // NOLINT
     base = oth.base;
     len = oth.len;
   }
-  /*implicit*/ Buffer(StringRef str)  // NOLINT(runtime/explicit)
+  /*implicit*/ Buffer(StringRef str)  // NOLINT
       : Buffer{str.data(), str.size()} {}
-  /*implicit*/ Buffer(ArrayRef<uint8_t> arr)  // NOLINT(runtime/explicit)
+  /*implicit*/ Buffer(ArrayRef<uint8_t> arr)  // NOLINT
       : Buffer{reinterpret_cast<const char*>(arr.data()), arr.size()} {}
   Buffer(char* base_, size_t len_) {
     base = base_;

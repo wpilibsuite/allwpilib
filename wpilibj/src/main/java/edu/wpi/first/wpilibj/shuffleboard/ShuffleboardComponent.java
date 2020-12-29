@@ -69,6 +69,7 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
    * @param properties the properties for this component
    * @return this component
    */
+  @SuppressWarnings("unchecked")
   public final C withProperties(Map<String, Object> properties) {
     m_properties = properties;
     m_metadataDirty = true;
@@ -87,6 +88,7 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
    * @param rowIndex    the row in the tab to place this component
    * @return this component
    */
+  @SuppressWarnings("unchecked")
   public final C withPosition(int columnIndex, int rowIndex) {
     m_column = columnIndex;
     m_row = rowIndex;
@@ -102,6 +104,7 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
    * @param height how many rows high the component should be
    * @return this component
    */
+  @SuppressWarnings("unchecked")
   public final C withSize(int width, int height) {
     m_width = width;
     m_height = height;
