@@ -24,7 +24,7 @@ class ComPtr {
   template <typename T>
   friend class ComPtr;
 
-  ComPtr(std::nullptr_t = nullptr) noexcept {}  // NOLINT(runtime/explicit)
+  ComPtr(std::nullptr_t = nullptr) noexcept {}  // NOLINT
   ComPtr(const ComPtr& other) noexcept : m_ptr(other.m_ptr) {
     InternalAddRef();
   }

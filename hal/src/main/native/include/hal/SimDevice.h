@@ -306,7 +306,7 @@ class SimValue {
    *
    * @param handle simulated value handle
    */
-  /*implicit*/ SimValue(HAL_SimValueHandle val)  // NOLINT(runtime/explicit)
+  /*implicit*/ SimValue(HAL_SimValueHandle val)  // NOLINT
       : m_handle(val) {}
 
   /**
@@ -358,7 +358,7 @@ class SimDouble : public SimValue {
    *
    * @param handle simulated value handle
    */
-  /*implicit*/ SimDouble(HAL_SimValueHandle val)  // NOLINT(runtime/explicit)
+  /*implicit*/ SimDouble(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
 
   /**
@@ -392,7 +392,7 @@ class SimEnum : public SimValue {
    *
    * @param handle simulated value handle
    */
-  /*implicit*/ SimEnum(HAL_SimValueHandle val)  // NOLINT(runtime/explicit)
+  /*implicit*/ SimEnum(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
 
   /**
@@ -426,7 +426,7 @@ class SimBoolean : public SimValue {
    *
    * @param handle simulated value handle
    */
-  /*implicit*/ SimBoolean(HAL_SimValueHandle val)  // NOLINT(runtime/explicit)
+  /*implicit*/ SimBoolean(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
 
   /**
