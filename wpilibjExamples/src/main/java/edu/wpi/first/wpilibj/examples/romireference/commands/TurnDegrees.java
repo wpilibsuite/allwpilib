@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 /*
- * Creates a new TurnDegrees command. This command will turn your robot for a 
+ * Creates a new TurnDegrees command. This command will turn your robot for a
  * desired rotation (in degrees) and rotational speed.
  */
 public class TurnDegrees extends CommandBase {
@@ -41,7 +38,7 @@ public class TurnDegrees extends CommandBase {
     m_drive.arcadeDrive(0, 0);
     m_drive.resetEncoders();
   }
-  
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -59,7 +56,7 @@ public class TurnDegrees extends CommandBase {
   public boolean isFinished() {
     /* Need to convert distance travelled to degrees. The Standard
        Romi Chassis found here, https://www.pololu.com/category/203/romi-chassis-kits,
-       has a wheel placement diameter (149 mm) - width of the wheel (8 mm) = 141 mm or 5.551 inches. We then take 
+       has a wheel placement diameter (149 mm) - width of the wheel (8 mm) = 141 mm or 5.551 inches. We then take
        into consideration the width of the tires.
     */
     double inchPerDegree = Math.PI * 5.551 / 360;
@@ -70,7 +67,7 @@ public class TurnDegrees extends CommandBase {
   private double getAverageTurningDistance() {
     double leftDistance = Math.abs(m_drive.getLeftDistanceInch());
     double rightDistance = Math.abs(m_drive.getRightDistanceInch());
-    return (leftDistance + rightDistance) / 2.0; 
+    return (leftDistance + rightDistance) / 2.0;
   }
 
 }
