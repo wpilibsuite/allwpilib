@@ -10,9 +10,9 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * A base for CommandGroups.  Statically tracks commands that have been allocated to groups to
- * ensure those commands are not also used independently, which can result in inconsistent command
- * state and unpredictable execution.
+ * A base for CommandGroups. Statically tracks commands that have been allocated to groups to ensure
+ * those commands are not also used independently, which can result in inconsistent command state
+ * and unpredictable execution.
  */
 public abstract class CommandGroupBase extends CommandBase implements Command {
   private static final Set<Command> m_groupedCommands =
@@ -25,8 +25,8 @@ public abstract class CommandGroupBase extends CommandBase implements Command {
   /**
    * Clears the list of grouped commands, allowing all commands to be freely used again.
    *
-   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior.  Do not
-   * use this unless you fully understand what you are doing.
+   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior. Do not use
+   * this unless you fully understand what you are doing.
    */
   public static void clearGroupedCommands() {
     m_groupedCommands.clear();
@@ -36,8 +36,8 @@ public abstract class CommandGroupBase extends CommandBase implements Command {
    * Removes a single command from the list of grouped commands, allowing it to be freely used
    * again.
    *
-   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior.  Do not
-   * use this unless you fully understand what you are doing.
+   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior. Do not use
+   * this unless you fully understand what you are doing.
    *
    * @param command the command to remove from the list of grouped commands
    */

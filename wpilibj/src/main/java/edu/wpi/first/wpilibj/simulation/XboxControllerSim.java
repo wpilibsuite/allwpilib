@@ -7,9 +7,7 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 
-/**
- * Class to control a simulated Xbox 360 or Xbox One controller.
- */
+/** Class to control a simulated Xbox 360 or Xbox One controller. */
 public class XboxControllerSim extends GenericHIDSim {
   /**
    * Constructs from a XboxController object.

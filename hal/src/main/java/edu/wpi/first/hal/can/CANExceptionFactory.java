@@ -15,8 +15,9 @@ public final class CANExceptionFactory {
   static final int ERR_CANSessionMux_NotInitialized = -44089;
 
   @SuppressWarnings({"MissingJavadocMethod", "PMD.CyclomaticComplexity"})
-  public static void checkStatus(int status, int messageID) throws CANInvalidBufferException,
-      CANMessageNotAllowedException, CANNotInitializedException, UncleanStatusException {
+  public static void checkStatus(int status, int messageID)
+      throws CANInvalidBufferException, CANMessageNotAllowedException, CANNotInitializedException,
+          UncleanStatusException {
     switch (status) {
       case NIRioStatus.kRioStatusSuccess:
         // Everything is ok... don't throw.
@@ -38,7 +39,5 @@ public final class CANExceptionFactory {
     }
   }
 
-  private CANExceptionFactory() {
-
-  }
+  private CANExceptionFactory() {}
 }

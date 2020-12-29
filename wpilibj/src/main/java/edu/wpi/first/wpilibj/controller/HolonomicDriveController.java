@@ -10,15 +10,15 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 
 /**
- * This holonomic drive controller can be used to follow trajectories using a
- * holonomic drive train (i.e. swerve or mecanum). Holonomic trajectory following
- * is a much simpler problem to solve compared to skid-steer style drivetrains because
- * it is possible to individually control forward, sideways, and angular velocity.
+ * This holonomic drive controller can be used to follow trajectories using a holonomic drive train
+ * (i.e. swerve or mecanum). Holonomic trajectory following is a much simpler problem to solve
+ * compared to skid-steer style drivetrains because it is possible to individually control forward,
+ * sideways, and angular velocity.
  *
- * <p>The holonomic drive controller takes in one PID controller for each direction, forward
- * and sideways, and one profiled PID controller for the angular direction. Because the
- * heading dynamics are decoupled from translations, users can specify a custom heading
- * that the drivetrain should point toward. This heading reference is profiled for smoothness.
+ * <p>The holonomic drive controller takes in one PID controller for each direction, forward and
+ * sideways, and one profiled PID controller for the angular direction. Because the heading dynamics
+ * are decoupled from translations, users can specify a custom heading that the drivetrain should
+ * point toward. This heading reference is profiled for smoothness.
  */
 @SuppressWarnings("MemberName")
 public class HolonomicDriveController {
@@ -33,14 +33,13 @@ public class HolonomicDriveController {
   /**
    * Constructs a holonomic drive controller.
    *
-   * @param xController     A PID Controller to respond to error in the field-relative x direction.
-   * @param yController     A PID Controller to respond to error in the field-relative y direction.
+   * @param xController A PID Controller to respond to error in the field-relative x direction.
+   * @param yController A PID Controller to respond to error in the field-relative y direction.
    * @param thetaController A profiled PID controller to respond to error in angle.
    */
   @SuppressWarnings("ParameterName")
-  public HolonomicDriveController(PIDController xController,
-                                  PIDController yController,
-                                  ProfiledPIDController thetaController) {
+  public HolonomicDriveController(
+      PIDController xController, PIDController yController, ProfiledPIDController thetaController) {
     m_xController = xController;
     m_yController = yController;
     m_thetaController = thetaController;
@@ -73,22 +72,20 @@ public class HolonomicDriveController {
   /**
    * Returns the next output of the holonomic drive controller.
    *
-   * @param currentPose             The current pose.
-   * @param poseRef                 The desired pose.
+   * @param currentPose The current pose.
+   * @param poseRef The desired pose.
    * @param linearVelocityRefMeters The linear velocity reference.
-   * @param angleRef                The angular reference.
+   * @param angleRef The angular reference.
    * @return The next output of the holonomic drive controller.
    */
   @SuppressWarnings("LocalVariableName")
-  public ChassisSpeeds calculate(Pose2d currentPose,
-                                 Pose2d poseRef,
-                                 double linearVelocityRefMeters,
-                                 Rotation2d angleRef) {
+  public ChassisSpeeds calculate(
+      Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters, Rotation2d angleRef) {
     // Calculate feedforward velocities (field-relative).
     double xFF = linearVelocityRefMeters * poseRef.getRotation().getCos();
     double yFF = linearVelocityRefMeters * poseRef.getRotation().getSin();
-    double thetaFF = m_thetaController.calculate(currentPose.getRotation().getRadians(),
-        angleRef.getRadians());
+    double thetaFF =
+        m_thetaController.calculate(currentPose.getRotation().getRadians(), angleRef.getRadians());
 
     m_poseError = poseRef.relativeTo(currentPose);
 
@@ -101,27 +98,27 @@ public class HolonomicDriveController {
     double yFeedback = m_yController.calculate(currentPose.getY(), poseRef.getY());
 
     // Return next output.
-    return ChassisSpeeds.fromFieldRelativeSpeeds(xFF + xFeedback,
-        yFF + yFeedback, thetaFF, currentPose.getRotation());
+    return ChassisSpeeds.fromFieldRelativeSpeeds(
+        xFF + xFeedback, yFF + yFeedback, thetaFF, currentPose.getRotation());
   }
 
   /**
    * Returns the next output of the holonomic drive controller.
    *
-   * @param currentPose  The current pose.
+   * @param currentPose The current pose.
    * @param desiredState The desired trajectory state.
-   * @param angleRef     The desired end-angle.
+   * @param angleRef The desired end-angle.
    * @return The next output of the holonomic drive controller.
    */
-  public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState,
-                                 Rotation2d angleRef) {
-    return calculate(currentPose, desiredState.poseMeters, desiredState.velocityMetersPerSecond,
-        angleRef);
+  public ChassisSpeeds calculate(
+      Pose2d currentPose, Trajectory.State desiredState, Rotation2d angleRef) {
+    return calculate(
+        currentPose, desiredState.poseMeters, desiredState.velocityMetersPerSecond, angleRef);
   }
 
   /**
-   * Enables and disables the controller for troubleshooting problems. When calculate()
-   * is called on a disabled controller, only feedforward values are returned.
+   * Enables and disables the controller for troubleshooting problems. When calculate() is called on
+   * a disabled controller, only feedforward values are returned.
    *
    * @param enabled If the controller is enabled or not.
    */

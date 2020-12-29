@@ -10,17 +10,14 @@ import edu.wpi.first.hal.PowerJNI;
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
 
-/**
- * Contains functions for roboRIO functionality.
- */
+/** Contains functions for roboRIO functionality. */
 public final class RobotController {
   private RobotController() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
-   * Return the FPGA Version number. For now, expect this to be the current
-   * year.
+   * Return the FPGA Version number. For now, expect this to be the current year.
    *
    * @return FPGA Version number.
    */

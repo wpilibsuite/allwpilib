@@ -26,9 +26,7 @@ public class Drivetrain extends SubsystemBase {
   // Set up the differential drive controller
   private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 
-  /**
-   * Creates a new Drivetrain.
-   */
+  /** Creates a new Drivetrain. */
   public Drivetrain() {
     // DifferentialDrive defaults to having the right side flipped
     // We don't need to do this because the Romi has accounted for this

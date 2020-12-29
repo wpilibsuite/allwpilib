@@ -14,11 +14,11 @@ public class Mechanism2D {
   private static final Map<String, SimDouble> m_createdItems = new HashMap<String, SimDouble>();
 
   /**
-     * Set/Create the angle of a ligament.
-     *
-     * @param ligamentPath json path to the ligament
-     * @param angle        to set the ligament
-     */
+   * Set/Create the angle of a ligament.
+   *
+   * @param ligamentPath json path to the ligament
+   * @param angle to set the ligament
+   */
   public void setLigamentAngle(String ligamentPath, float angle) {
     ligamentPath = ligamentPath + "/angle";
     if (m_device != null) {
@@ -33,7 +33,7 @@ public class Mechanism2D {
    * Set/Create the length of a ligament.
    *
    * @param ligamentPath json path to the ligament
-   * @param length       to set the ligament
+   * @param length to set the ligament
    */
   public void setLigamentLength(String ligamentPath, float length) {
     ligamentPath = ligamentPath + "/length";

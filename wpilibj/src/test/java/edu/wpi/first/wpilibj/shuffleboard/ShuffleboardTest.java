@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import edu.wpi.first.wpilibj.UtilityClassTest;
-
-import static org.junit.jupiter.api.Assertions.assertSame;
+import org.junit.jupiter.api.Test;
 
 public class ShuffleboardTest extends UtilityClassTest<Shuffleboard> {
   public ShuffleboardTest() {
@@ -23,5 +22,4 @@ public class ShuffleboardTest extends UtilityClassTest<Shuffleboard> {
     ShuffleboardTab tab2 = Shuffleboard.getTab("testTabObjectsCached");
     assertSame(tab1, tab2, "Tab objects were not cached");
   }
-
 }

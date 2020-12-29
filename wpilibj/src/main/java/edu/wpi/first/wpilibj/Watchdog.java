@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.NotifierJNI;
 import java.io.Closeable;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
-
-import edu.wpi.first.hal.NotifierJNI;
 
 /**
  * A class that's a wrapper around a watchdog timer.
@@ -47,7 +46,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Watchdog constructor.
    *
-   * @param timeout  The watchdog's timeout in seconds with microsecond resolution.
+   * @param timeout The watchdog's timeout in seconds with microsecond resolution.
    * @param callback This function is called when the timeout expires.
    */
   public Watchdog(double timeout, Runnable callback) {
@@ -82,9 +81,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     return Double.hashCode(m_expirationTime);
   }
 
-  /**
-   * Returns the time in seconds since the watchdog was last fed.
-   */
+  /** Returns the time in seconds since the watchdog was last fed. */
   public double getTime() {
     return Timer.getFPGATimestamp() - m_startTime;
   }
@@ -92,8 +89,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Sets the watchdog's timeout.
    *
-   * @param timeout The watchdog's timeout in seconds with microsecond
-   *                resolution.
+   * @param timeout The watchdog's timeout in seconds with microsecond resolution.
    */
   public void setTimeout(double timeout) {
     m_startTime = Timer.getFPGATimestamp();
@@ -113,9 +109,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     }
   }
 
-  /**
-   * Returns the watchdog's timeout in seconds.
-   */
+  /** Returns the watchdog's timeout in seconds. */
   public double getTimeout() {
     m_queueMutex.lock();
     try {
@@ -125,9 +119,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     }
   }
 
-  /**
-   * Returns true if the watchdog timer has expired.
-   */
+  /** Returns true if the watchdog timer has expired. */
   public boolean isExpired() {
     m_queueMutex.lock();
     try {
@@ -141,7 +133,6 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * Adds time since last epoch to the list printed by printEpochs().
    *
    * @see Tracer#addEpoch(String)
-   *
    * @param epochName The name to associate with the epoch.
    */
   public void addEpoch(String epochName) {
@@ -150,6 +141,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   /**
    * Prints list of epochs added so far and their times.
+   *
    * @see Tracer#printEpochs()
    */
   public void printEpochs() {
@@ -165,9 +157,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     enable();
   }
 
-  /**
-   * Enables the watchdog timer.
-   */
+  /** Enables the watchdog timer. */
   public void enable() {
     m_startTime = Timer.getFPGATimestamp();
     m_tracer.clearEpochs();
@@ -185,9 +175,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     }
   }
 
-  /**
-   * Disables the watchdog timer.
-   */
+  /** Disables the watchdog timer. */
   public void disable() {
     m_queueMutex.lock();
     try {
@@ -213,8 +201,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     if (m_watchdogs.size() == 0) {
       NotifierJNI.cancelNotifierAlarm(m_notifier);
     } else {
-      NotifierJNI.updateNotifierAlarm(m_notifier,
-          (long) (m_watchdogs.peek().m_expirationTime * 1e6));
+      NotifierJNI.updateNotifierAlarm(
+          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e6));
     }
   }
 
@@ -248,8 +236,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
           watchdog.m_lastTimeoutPrintTime = now;
           if (!watchdog.m_suppressTimeoutMessage) {
             DriverStation.reportWarning(
-                String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout),
-                false);
+                String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout), false);
           }
         }
 

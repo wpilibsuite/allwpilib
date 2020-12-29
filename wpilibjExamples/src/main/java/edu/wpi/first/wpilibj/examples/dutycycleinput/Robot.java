@@ -32,5 +32,4 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Frequency", frequency);
     SmartDashboard.putNumber("Duty Cycle", output);
   }
-
 }

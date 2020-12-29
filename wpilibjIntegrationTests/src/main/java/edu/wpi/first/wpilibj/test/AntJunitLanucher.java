@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.test;
 
 import java.io.File;
-
 import org.apache.tools.ant.BuildLogger;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -76,13 +75,13 @@ public class AntJunitLanucher {
         ex.printStackTrace();
       }
     } else {
-      TestBench.out().println(
-          "Run will not output XML for Jenkins because " + "tests are not being run with ANT");
+      TestBench.out()
+          .println(
+              "Run will not output XML for Jenkins because " + "tests are not being run with ANT");
       // This should never return as it makes its own call to
       // System.exit();
       TestSuite.main(args);
     }
     System.exit(0);
   }
-
 }

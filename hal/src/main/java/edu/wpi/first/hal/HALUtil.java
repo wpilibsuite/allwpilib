@@ -35,7 +35,5 @@ public final class HALUtil extends JNIWrapper {
     return getHALstrerror(getHALErrno());
   }
 
-  private HALUtil() {
-
-  }
+  private HALUtil() {}
 }

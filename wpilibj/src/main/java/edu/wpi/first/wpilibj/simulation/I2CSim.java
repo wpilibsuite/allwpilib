@@ -20,9 +20,11 @@ public class I2CSim {
     int uid = I2CDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, I2CDataJNI::cancelInitializedCallback);
   }
+
   public boolean getInitialized() {
     return I2CDataJNI.getInitialized(m_index);
   }
+
   public void setInitialized(boolean initialized) {
     I2CDataJNI.setInitialized(m_index, initialized);
   }

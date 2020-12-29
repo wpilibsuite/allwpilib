@@ -4,9 +4,7 @@
 
 package edu.wpi.first.hal;
 
-/**
- * A wrapper around a simulator double value handle.
- */
+/** A wrapper around a simulator double value handle. */
 public class SimDouble extends SimValue {
   /**
    * Wraps a simulated value handle as returned by SimDeviceJNI.createSimValueDouble().

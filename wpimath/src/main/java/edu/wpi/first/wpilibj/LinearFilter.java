@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Arrays;
-
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.wpiutil.CircularBuffer;
+import java.util.Arrays;
 
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.
@@ -25,8 +24,8 @@ import edu.wpi.first.wpiutil.CircularBuffer;
  * <p>What can linear filters do? Basically, they can filter, or diminish, the effects of
  * undesirable input frequencies. High frequencies, or rapid changes, can be indicative of sensor
  * noise or be otherwise undesirable. A "low pass" filter smooths out the signal, reducing the
- * impact of these high frequency components.  Likewise, a "high pass" filter gets rid of
- * slow-moving signal components, letting you detect large changes more easily.
+ * impact of these high frequency components. Likewise, a "high pass" filter gets rid of slow-moving
+ * signal components, letting you detect large changes more easily.
  *
  * <p>Example FRC applications of filters: - Getting rid of noise from an analog sensor input (note:
  * the roboRIO's FPGA can do this faster in hardware) - Smoothing out joystick input to prevent the
@@ -78,10 +77,9 @@ public class LinearFilter {
    * <p>This filter is stable for time constants greater than zero.
    *
    * @param timeConstant The discrete-time time constant in seconds.
-   * @param period       The period in seconds between samples taken by the user.
+   * @param period The period in seconds between samples taken by the user.
    */
-  public static LinearFilter singlePoleIIR(double timeConstant,
-                                           double period) {
+  public static LinearFilter singlePoleIIR(double timeConstant, double period) {
     double gain = Math.exp(-period / timeConstant);
     double[] ffGains = {1.0 - gain};
     double[] fbGains = {-gain};
@@ -96,10 +94,9 @@ public class LinearFilter {
    * <p>This filter is stable for time constants greater than zero.
    *
    * @param timeConstant The discrete-time time constant in seconds.
-   * @param period       The period in seconds between samples taken by the user.
+   * @param period The period in seconds between samples taken by the user.
    */
-  public static LinearFilter highPass(double timeConstant,
-                                      double period) {
+  public static LinearFilter highPass(double timeConstant, double period) {
     double gain = Math.exp(-period / timeConstant);
     double[] ffGains = {gain, -gain};
     double[] fbGains = {-gain};
@@ -131,9 +128,7 @@ public class LinearFilter {
     return new LinearFilter(ffGains, fbGains);
   }
 
-  /**
-   * Reset the filter state.
-   */
+  /** Reset the filter state. */
   public void reset() {
     m_inputs.clear();
     m_outputs.clear();
@@ -143,7 +138,6 @@ public class LinearFilter {
    * Calculates the next value of the filter.
    *
    * @param input Current input value.
-   *
    * @return The filtered value at this step
    */
   public double calculate(double input) {

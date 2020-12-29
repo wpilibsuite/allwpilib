@@ -10,9 +10,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ReplaceMeParallelRaceGroup extends ParallelRaceGroup {
-  /**
-   * Creates a new ReplaceMeParallelRaceGroup.
-   */
+  /** Creates a new ReplaceMeParallelRaceGroup. */
   public ReplaceMeParallelRaceGroup() {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());

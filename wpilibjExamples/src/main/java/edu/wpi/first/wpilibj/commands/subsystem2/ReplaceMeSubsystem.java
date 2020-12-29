@@ -7,12 +7,8 @@ package edu.wpi.first.wpilibj.commands.subsystem2;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ReplaceMeSubsystem extends SubsystemBase {
-  /**
-   * Creates a new ReplaceMeSubsystem.
-   */
-  public ReplaceMeSubsystem() {
-
-  }
+  /** Creates a new ReplaceMeSubsystem. */
+  public ReplaceMeSubsystem() {}
 
   @Override
   public void periodic() {

@@ -13,13 +13,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 /**
  * Class to read a duty cycle PWM input.
  *
- * <p>PWM input signals are specified with a frequency and a ratio of high to low
- * in that frequency. There are 8 of these in the roboRIO, and they can be
- * attached to any {@link DigitalSource}.
+ * <p>PWM input signals are specified with a frequency and a ratio of high to low in that frequency.
+ * There are 8 of these in the roboRIO, and they can be attached to any {@link DigitalSource}.
  *
- * <p>These can be combined as the input of an AnalogTrigger to a Counter in order
- * to implement rollover checking.
- *
+ * <p>These can be combined as the input of an AnalogTrigger to a Counter in order to implement
+ * rollover checking.
  */
 public class DutyCycle implements Sendable, AutoCloseable {
   // Explicitly package private
@@ -35,8 +33,10 @@ public class DutyCycle implements Sendable, AutoCloseable {
    * @param digitalSource The DigitalSource to use.
    */
   public DutyCycle(DigitalSource digitalSource) {
-    m_handle = DutyCycleJNI.initialize(digitalSource.getPortHandleForRouting(),
-        digitalSource.getAnalogTriggerTypeForRouting());
+    m_handle =
+        DutyCycleJNI.initialize(
+            digitalSource.getPortHandleForRouting(),
+            digitalSource.getAnalogTriggerTypeForRouting());
 
     m_source = digitalSource;
     int index = getFPGAIndex();
@@ -44,9 +44,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "Duty Cycle", index);
   }
 
-  /**
-   * Close the DutyCycle and free all resources.
-   */
+  /** Close the DutyCycle and free all resources. */
   @Override
   public void close() {
     DutyCycleJNI.free(m_handle);
@@ -75,8 +73,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
   /**
    * Get the raw output ratio of the duty cycle signal.
    *
-   * <p>0 means always low, an output equal to getOutputScaleFactor() means always
-   * high.
+   * <p>0 means always low, an output equal to getOutputScaleFactor() means always high.
    *
    * @return output ratio in raw units
    */
@@ -87,9 +84,8 @@ public class DutyCycle implements Sendable, AutoCloseable {
   /**
    * Get the scale factor of the output.
    *
-   * <p>An output equal to this value is always high, and then linearly scales down
-   * to 0. Divide the result of getOutputRaw by this in order to get the
-   * percentage between 0 and 1.
+   * <p>An output equal to this value is always high, and then linearly scales down to 0. Divide the
+   * result of getOutputRaw by this in order to get the percentage between 0 and 1.
    *
    * @return the output scale factor
    */
@@ -116,6 +112,5 @@ public class DutyCycle implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("Duty Cycle");
     builder.addDoubleProperty("Frequency", this::getFrequency, null);
     builder.addDoubleProperty("Output", this::getOutput, null);
-
   }
 }

@@ -24,18 +24,14 @@ public class IterativeRobot extends IterativeRobotBase {
   private static final double kPacketPeriod = 0.02;
   private volatile boolean m_exit;
 
-  /**
-   * Create a new IterativeRobot.
-   */
+  /** Create a new IterativeRobot. */
   public IterativeRobot() {
     super(kPacketPeriod);
 
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
   }
 
-  /**
-   * Provide an alternate "main loop" via startCompetition().
-   */
+  /** Provide an alternate "main loop" via startCompetition(). */
   @Override
   public void startCompetition() {
     robotInit();
@@ -59,9 +55,7 @@ public class IterativeRobot extends IterativeRobotBase {
     }
   }
 
-  /**
-   * Ends the main loop in startCompetition().
-   */
+  /** Ends the main loop in startCompetition(). */
   @Override
   public void endCompetition() {
     m_exit = true;

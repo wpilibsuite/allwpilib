@@ -13,21 +13,13 @@ package edu.wpi.first.wpilibj;
  * before use.
  */
 public interface CounterBase {
-  /**
-   * The number of edges for the counterbase to increment or decrement on.
-   */
+  /** The number of edges for the counterbase to increment or decrement on. */
   enum EncodingType {
-    /**
-     * Count only the rising edge.
-     */
+    /** Count only the rising edge. */
     k1X(0),
-    /**
-     * Count both the rising and falling edge.
-     */
+    /** Count both the rising and falling edge. */
     k2X(1),
-    /**
-     * Count rising and falling on both channels.
-     */
+    /** Count rising and falling on both channels. */
     k4X(2);
 
     public final int value;
@@ -44,9 +36,7 @@ public interface CounterBase {
    */
   int get();
 
-  /**
-   * Reset the count to zero.
-   */
+  /** Reset the count to zero. */
   void reset();
 
   /**

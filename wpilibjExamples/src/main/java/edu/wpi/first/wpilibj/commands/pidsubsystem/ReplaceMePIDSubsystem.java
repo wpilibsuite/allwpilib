@@ -6,13 +6,9 @@ package edu.wpi.first.wpilibj.commands.pidsubsystem;
 
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
-/**
- * Add your docs here.
- */
+/** Add your docs here. */
 public class ReplaceMePIDSubsystem extends PIDSubsystem {
-  /**
-   * Add your docs here.
-   */
+  /** Add your docs here. */
   public ReplaceMePIDSubsystem() {
     // Intert a subsystem name and PID values here
     super("SubsystemName", 1, 2, 3);

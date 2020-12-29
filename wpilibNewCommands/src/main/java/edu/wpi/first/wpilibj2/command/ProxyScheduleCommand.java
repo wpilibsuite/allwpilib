@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * Schedules the given commands when this command is initialized, and ends when all the commands are
- * no longer scheduled.  Useful for forking off from CommandGroups.  If this command is interrupted,
+ * no longer scheduled. Useful for forking off from CommandGroups. If this command is interrupted,
  * it will cancel all of the commands.
  */
 public class ProxyScheduleCommand extends CommandBase {
@@ -16,8 +16,8 @@ public class ProxyScheduleCommand extends CommandBase {
   private boolean m_finished;
 
   /**
-   * Creates a new ProxyScheduleCommand that schedules the given commands when initialized,
-   * and ends when they are all no longer scheduled.
+   * Creates a new ProxyScheduleCommand that schedules the given commands when initialized, and ends
+   * when they are all no longer scheduled.
    *
    * @param toSchedule the commands to schedule
    */

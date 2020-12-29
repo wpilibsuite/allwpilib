@@ -18,9 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * controlled by two separate channels.
  */
 public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoCloseable {
-  /**
-   * Possible values for a DoubleSolenoid.
-   */
+  /** Possible values for a DoubleSolenoid. */
   public enum Value {
     kOff,
     kForward,
@@ -45,12 +43,12 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
   /**
    * Constructor.
    *
-   * @param moduleNumber   The module number of the solenoid module to use.
+   * @param moduleNumber The module number of the solenoid module to use.
    * @param forwardChannel The forward channel on the module to control (0..7).
    * @param reverseChannel The reverse channel on the module to control (0..7).
    */
-  public DoubleSolenoid(final int moduleNumber, final int forwardChannel,
-                        final int reverseChannel) {
+  public DoubleSolenoid(
+      final int moduleNumber, final int forwardChannel, final int reverseChannel) {
     super(moduleNumber);
 
     SensorUtil.checkSolenoidModule(m_moduleNumber);
@@ -74,10 +72,8 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
     m_forwardMask = (byte) (1 << forwardChannel);
     m_reverseMask = (byte) (1 << reverseChannel);
 
-    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel + 1,
-                                   m_moduleNumber + 1);
-    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel + 1,
-                                   m_moduleNumber + 1);
+    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_moduleNumber + 1);
+    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel + 1, m_moduleNumber + 1);
     SendableRegistry.addLW(this, "DoubleSolenoid", m_moduleNumber, forwardChannel);
   }
 
@@ -112,7 +108,6 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
         break;
       default:
         throw new AssertionError("Illegal value: " + value);
-
     }
 
     SolenoidJNI.setSolenoid(m_forwardHandle, forward);
@@ -182,14 +177,17 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
     builder.setSmartDashboardType("Double Solenoid");
     builder.setActuator(true);
     builder.setSafeState(() -> set(Value.kOff));
-    builder.addStringProperty("Value", () -> get().name().substring(1), value -> {
-      if ("Forward".equals(value)) {
-        set(Value.kForward);
-      } else if ("Reverse".equals(value)) {
-        set(Value.kReverse);
-      } else {
-        set(Value.kOff);
-      }
-    });
+    builder.addStringProperty(
+        "Value",
+        () -> get().name().substring(1),
+        value -> {
+          if ("Forward".equals(value)) {
+            set(Value.kForward);
+          } else if ("Reverse".equals(value)) {
+            set(Value.kReverse);
+          } else {
+            set(Value.kOff);
+          }
+        });
   }
 }

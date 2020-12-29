@@ -4,21 +4,19 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ProfiledPIDInputOutputTest {
   private ProfiledPIDController m_controller;
 
   @BeforeEach
   void setUp() {
-    m_controller = new ProfiledPIDController(0, 0, 0,
-        new TrapezoidProfile.Constraints(360, 180));
+    m_controller = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(360, 180));
   }
 
   @Test

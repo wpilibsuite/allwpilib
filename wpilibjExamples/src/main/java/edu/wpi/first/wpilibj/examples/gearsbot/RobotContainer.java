@@ -8,11 +8,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.Autonomous;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.CloseClaw;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.OpenClaw;
@@ -26,12 +21,16 @@ import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
@@ -45,9 +44,7 @@ public class RobotContainer {
   private final CommandBase m_autonomousCommand =
       new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator);
 
-  /**
-   * The container for the robot.  Contains subsystems, OI devices, and commands.
-   */
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Put Some buttons on the SmartDashboard
     SmartDashboard.putData("Elevator Bottom", new SetElevatorSetpoint(0, m_elevator));
@@ -60,12 +57,13 @@ public class RobotContainer {
     SmartDashboard.putData("Open Claw", new OpenClaw(m_claw));
     SmartDashboard.putData("Close Claw", new CloseClaw(m_claw));
 
-    SmartDashboard
-        .putData("Deliver Soda", new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
+    SmartDashboard.putData(
+        "Deliver Soda", new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
 
     // Assign default commands
-    m_drivetrain.setDefaultCommand(new TankDrive(() -> m_joystick.getY(Hand.kLeft),
-        () -> m_joystick.getY(Hand.kRight), m_drivetrain));
+    m_drivetrain.setDefaultCommand(
+        new TankDrive(
+            () -> m_joystick.getY(Hand.kLeft), () -> m_joystick.getY(Hand.kRight), m_drivetrain));
 
     // Show what command your subsystem is running on the SmartDashboard
     SmartDashboard.putData(m_drivetrain);
@@ -78,10 +76,10 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings.  Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Create some buttons
@@ -105,7 +103,6 @@ public class RobotContainer {
     l1.whenPressed(new Place(m_claw, m_wrist, m_elevator));
     l2.whenPressed(new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator));
   }
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

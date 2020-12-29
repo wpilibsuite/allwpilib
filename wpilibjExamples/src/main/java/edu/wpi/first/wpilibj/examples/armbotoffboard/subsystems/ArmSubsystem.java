@@ -5,29 +5,26 @@
 package edu.wpi.first.wpilibj.examples.armbotoffboard.subsystems;
 
 import edu.wpi.first.wpilibj.controller.ArmFeedforward;
+import edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.ArmConstants;
+import edu.wpi.first.wpilibj.examples.armbotoffboard.ExampleSmartMotorController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 
-import edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.ArmConstants;
-import edu.wpi.first.wpilibj.examples.armbotoffboard.ExampleSmartMotorController;
-
-/**
- * A robot arm subsystem that moves with a motion profile.
- */
+/** A robot arm subsystem that moves with a motion profile. */
 public class ArmSubsystem extends TrapezoidProfileSubsystem {
   private final ExampleSmartMotorController m_motor =
       new ExampleSmartMotorController(ArmConstants.kMotorPort);
   private final ArmFeedforward m_feedforward =
-      new ArmFeedforward(ArmConstants.kSVolts, ArmConstants.kCosVolts,
-                         ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
+      new ArmFeedforward(
+          ArmConstants.kSVolts, ArmConstants.kCosVolts,
+          ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
 
-  /**
-   * Create a new ArmSubsystem.
-   */
+  /** Create a new ArmSubsystem. */
   public ArmSubsystem() {
-    super(new TrapezoidProfile.Constraints(ArmConstants.kMaxVelocityRadPerSecond,
-                                           ArmConstants.kMaxAccelerationRadPerSecSquared),
-          ArmConstants.kArmOffsetRads);
+    super(
+        new TrapezoidProfile.Constraints(
+            ArmConstants.kMaxVelocityRadPerSecond, ArmConstants.kMaxAccelerationRadPerSecSquared),
+        ArmConstants.kArmOffsetRads);
     m_motor.setPID(ArmConstants.kP, 0, 0);
   }
 
@@ -36,7 +33,7 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem {
     // Calculate the feedforward from the sepoint
     double feedforward = m_feedforward.calculate(setpoint.position, setpoint.velocity);
     // Add the feedforward to the PID output to get the motor output
-    m_motor.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition, setpoint.position,
-                        feedforward / 12.0);
+    m_motor.setSetpoint(
+        ExampleSmartMotorController.PIDMode.kPosition, setpoint.position, feedforward / 12.0);
   }
 }

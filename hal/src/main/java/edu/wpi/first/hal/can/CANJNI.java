@@ -4,10 +4,9 @@
 
 package edu.wpi.first.hal.can;
 
+import edu.wpi.first.hal.JNIWrapper;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-
-import edu.wpi.first.hal.JNIWrapper;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class CANJNI extends JNIWrapper {
@@ -19,14 +18,12 @@ public class CANJNI extends JNIWrapper {
   public static final int CAN_IS_FRAME_11BIT = 0x40000000;
 
   @SuppressWarnings("MethodName")
-  public static native void FRCNetCommCANSessionMuxSendMessage(int messageID,
-                                                               byte[] data,
-                                                               int periodMs);
+  public static native void FRCNetCommCANSessionMuxSendMessage(
+      int messageID, byte[] data, int periodMs);
 
   @SuppressWarnings("MethodName")
   public static native byte[] FRCNetCommCANSessionMuxReceiveMessage(
       IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp);
-
 
   @SuppressWarnings("MethodName")
   public static native void GetCANStatus(CANStatus status);

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer.Range;
  * The types of the widgets bundled with Shuffleboard.
  *
  * <p>For example, setting a number to be displayed with a slider:
+ *
  * <pre>{@code
  * NetworkTableEntry example = Shuffleboard.getTab("My Tab")
  *   .add("My Number", 0)
@@ -23,23 +24,30 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer.Range;
  */
 public enum BuiltInWidgets implements WidgetType {
   /**
-   * Displays a value with a simple text field.
-   * <br>Supported types:
+   * Displays a value with a simple text field. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>String</li>
-   * <li>Number</li>
-   * <li>Boolean</li>
+   *   <li>String
+   *   <li>Number
+   *   <li>Boolean
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kTextView("Text View"),
   /**
-   * Displays a number with a controllable slider.
-   * <br>Supported types:
+   * Displays a number with a controllable slider. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>Number</li>
+   *   <li>Number
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Min</td><td>Number</td><td>-1.0</td><td>The minimum value of the slider</td></tr>
@@ -50,12 +58,16 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kNumberSlider("Number Slider"),
   /**
-   * Displays a number with a view-only bar.
-   * <br>Supported types:
+   * Displays a number with a view-only bar. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>Number</li>
+   *   <li>Number
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Min</td><td>Number</td><td>-1.0</td><td>The minimum value of the bar</td></tr>
@@ -66,11 +78,16 @@ public enum BuiltInWidgets implements WidgetType {
   kNumberBar("Number Bar"),
   /**
    * Displays a number with a view-only dial. Displayed values are rounded to the nearest integer.
-   * <br>Supported types:
+   * <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>Number</li>
+   *   <li>Number
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Min</td><td>Number</td><td>0</td><td>The minimum value of the dial</td></tr>
@@ -83,13 +100,17 @@ public enum BuiltInWidgets implements WidgetType {
   /**
    * Displays a number with a graph. <strong>NOTE:</strong> graphs can be taxing on the computer
    * running the dashboard. Keep the number of visible data points to a minimum. Making the widget
-   * smaller also helps with performance, but may cause the graph to become difficult to read.
-   * <br>Supported types:
+   * smaller also helps with performance, but may cause the graph to become difficult to read. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>Number</li>
-   * <li>Number array</li>
+   *   <li>Number
+   *   <li>Number array
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Visible time</td><td>Number</td><td>30</td>
@@ -98,12 +119,16 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kGraph("Graph"),
   /**
-   * Displays a boolean value as a large colored box.
-   * <br>Supported types:
+   * Displays a boolean value as a large colored box. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>Boolean</li>
+   *   <li>Boolean
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Color when true</td><td>Color</td><td>"green"</td>
@@ -115,31 +140,41 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kBooleanBox("Boolean Box"),
   /**
-   * Displays a boolean with a large interactive toggle button.
-   * <br>Supported types:
+   * Displays a boolean with a large interactive toggle button. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>Boolean</li>
+   *   <li>Boolean
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kToggleButton("Toggle Button"),
   /**
-   * Displays a boolean with a fixed-size toggle switch.
-   * <br>Supported types:
+   * Displays a boolean with a fixed-size toggle switch. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>Boolean</li>
+   *   <li>Boolean
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kToggleSwitch("Toggle Switch"),
   /**
-   * Displays an analog input or a raw number with a number bar.
-   * <br>Supported types:
+   * Displays an analog input or a raw number with a number bar. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>Number</li>
-   * <li>{@link edu.wpi.first.wpilibj.AnalogInput}</li>
+   *   <li>Number
+   *   <li>{@link edu.wpi.first.wpilibj.AnalogInput}
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Min</td><td>Number</td><td>0</td><td>The minimum value of the bar</td></tr>
@@ -153,12 +188,16 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kVoltageView("Voltage View"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.PowerDistributionPanel PowerDistributionPanel}.
-   * <br>Supported types:
+   * Displays a {@link edu.wpi.first.wpilibj.PowerDistributionPanel PowerDistributionPanel}. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.PowerDistributionPanel}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.PowerDistributionPanel}
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Show voltage and current values</td><td>Boolean</td><td>true</td>
@@ -167,58 +206,71 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kPowerDistributionPanel("PDP"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with
-   * a dropdown combo box with a list of options.
-   * <br>Supported types:
+   * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with a
+   * dropdown combo box with a list of options. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser}
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kComboBoxChooser("ComboBox Chooser"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with
-   * a toggle button for each available option.
-   * <br>Supported types:
+   * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with a
+   * toggle button for each available option. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser}
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kSplitButtonChooser("Split Button Chooser"),
   /**
    * Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed, total traveled
-   * distance, and its distance per tick.
-   * <br>Supported types:
+   * distance, and its distance per tick. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.Encoder}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.Encoder}
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kEncoder("Encoder"),
   /**
    * Displays a {@link edu.wpi.first.wpilibj.SpeedController SpeedController}. The speed controller
    * will be controllable from the dashboard when test mode is enabled, but will otherwise be
-   * view-only.
-   * <br>Supported types:
+   * view-only. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.PWMSpeedController}</li>
-   * <li>{@link edu.wpi.first.wpilibj.DMC60}</li>
-   * <li>{@link edu.wpi.first.wpilibj.Jaguar}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMSparkMax}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMTalonFX}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMTalonSRX}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMVenom}</li>
-   * <li>{@link edu.wpi.first.wpilibj.PWMVictorSPX}</li>
-   * <li>{@link edu.wpi.first.wpilibj.SD540}</li>
-   * <li>{@link edu.wpi.first.wpilibj.Spark}</li>
-   * <li>{@link edu.wpi.first.wpilibj.Talon}</li>
-   * <li>{@link edu.wpi.first.wpilibj.Victor}</li>
-   * <li>{@link edu.wpi.first.wpilibj.VictorSP}</li>
-   * <li>{@link edu.wpi.first.wpilibj.SpeedControllerGroup}</li>
-   * <li>Any custom subclass of {@code SpeedController}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.PWMSpeedController}
+   *   <li>{@link edu.wpi.first.wpilibj.DMC60}
+   *   <li>{@link edu.wpi.first.wpilibj.Jaguar}
+   *   <li>{@link edu.wpi.first.wpilibj.PWMSparkMax}
+   *   <li>{@link edu.wpi.first.wpilibj.PWMTalonFX}
+   *   <li>{@link edu.wpi.first.wpilibj.PWMTalonSRX}
+   *   <li>{@link edu.wpi.first.wpilibj.PWMVenom}
+   *   <li>{@link edu.wpi.first.wpilibj.PWMVictorSPX}
+   *   <li>{@link edu.wpi.first.wpilibj.SD540}
+   *   <li>{@link edu.wpi.first.wpilibj.Spark}
+   *   <li>{@link edu.wpi.first.wpilibj.Talon}
+   *   <li>{@link edu.wpi.first.wpilibj.Victor}
+   *   <li>{@link edu.wpi.first.wpilibj.VictorSP}
+   *   <li>{@link edu.wpi.first.wpilibj.SpeedControllerGroup}
+   *   <li>Any custom subclass of {@code SpeedController}
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Orientation</td><td>String</td><td>"HORIZONTAL"</td>
@@ -228,46 +280,59 @@ public enum BuiltInWidgets implements WidgetType {
   kSpeedController("Speed Controller"),
   /**
    * Displays a command with a toggle button. Pressing the button will start the command, and the
-   * button will automatically release when the command completes.
-   * <br>Supported types:
+   * button will automatically release when the command completes. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.command.Command}</li>
-   * <li>{@link edu.wpi.first.wpilibj.command.CommandGroup}</li>
-   * <li>Any custom subclass of {@code Command} or {@code CommandGroup}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.command.Command}
+   *   <li>{@link edu.wpi.first.wpilibj.command.CommandGroup}
+   *   <li>Any custom subclass of {@code Command} or {@code CommandGroup}
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kCommand("Command"),
   /**
    * Displays a PID command with a checkbox and an editor for the PIDF constants. Selecting the
    * checkbox will start the command, and the checkbox will automatically deselect when the command
-   * completes.
-   * <br>Supported types:
+   * completes. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.command.PIDCommand}</li>
-   * <li>Any custom subclass of {@code PIDCommand}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.command.PIDCommand}
+   *   <li>Any custom subclass of {@code PIDCommand}
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kPIDCommand("PID Command"),
   /**
    * Displays a PID controller with an editor for the PIDF constants and a toggle switch for
-   * enabling and disabling the controller.
-   * <br>Supported types:
+   * enabling and disabling the controller. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.PIDController}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.PIDController}
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kPIDController("PID Controller"),
   /**
    * Displays an accelerometer with a number bar displaying the magnitude of the acceleration and
-   * text displaying the exact value.
-   * <br>Supported types:
+   * text displaying the exact value. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.AnalogAccelerometer}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.AnalogAccelerometer}
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Min</td><td>Number</td><td>-1</td>
@@ -284,14 +349,18 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kAccelerometer("Accelerometer"),
   /**
-   * Displays a 3-axis accelerometer with a number bar for each axis' acceleration.
-   * <br>Supported types:
+   * Displays a 3-axis accelerometer with a number bar for each axis' acceleration. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.ADXL345_I2C}</li>
-   * <li>{@link edu.wpi.first.wpilibj.ADXL345_SPI}</li>
-   * <li>{@link edu.wpi.first.wpilibj.ADXL362}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.ADXL345_I2C}
+   *   <li>{@link edu.wpi.first.wpilibj.ADXL345_SPI}
+   *   <li>{@link edu.wpi.first.wpilibj.ADXL362}
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Range</td><td>{@link Range}</td><td>k16G</td><td>The accelerometer range</td></tr>
@@ -305,14 +374,18 @@ public enum BuiltInWidgets implements WidgetType {
    */
   k3AxisAccelerometer("3-Axis Accelerometer"),
   /**
-   * Displays a gyro with a dial from 0 to 360 degrees.
-   * <br>Supported types:
+   * Displays a gyro with a dial from 0 to 360 degrees. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.ADXRS450_Gyro}</li>
-   * <li>{@link edu.wpi.first.wpilibj.AnalogGyro}</li>
-   * <li>Any custom subclass of {@code GyroBase} (such as a MXP gyro)</li>
+   *   <li>{@link edu.wpi.first.wpilibj.ADXRS450_Gyro}
+   *   <li>{@link edu.wpi.first.wpilibj.AnalogGyro}
+   *   <li>Any custom subclass of {@code GyroBase} (such as a MXP gyro)
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Major tick spacing</td><td>Number</td><td>45</td><td>Degrees</td></tr>
@@ -323,23 +396,30 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kGyro("Gyro"),
   /**
-   * Displays a relay with toggle buttons for each supported mode (off, on, forward, reverse).
-   * <br>Supported types:
+   * Displays a relay with toggle buttons for each supported mode (off, on, forward, reverse). <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.Relay}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.Relay}
    * </ul>
-   * <br>This widget has no custom properties.
+   *
+   * <br>
+   * This widget has no custom properties.
    */
   kRelay("Relay"),
   /**
    * Displays a differential drive with a widget that displays the speed of each side of the
    * drivebase and a vector for the direction and rotation of the drivebase. The widget will be
-   * controllable if the robot is in test mode.
-   * <br>Supported types:
+   * controllable if the robot is in test mode. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.drive.DifferentialDrive}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.drive.DifferentialDrive}
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Number of wheels</td><td>Number</td><td>4</td><td>Must be a positive even integer
@@ -351,13 +431,17 @@ public enum BuiltInWidgets implements WidgetType {
   kDifferentialDrive("Differential Drivebase"),
   /**
    * Displays a mecanum drive with a widget that displays the speed of each wheel, and vectors for
-   * the direction and rotation of the drivebase. The widget will be controllable if the robot is
-   * in test mode.
-   * <br>Supported types:
+   * the direction and rotation of the drivebase. The widget will be controllable if the robot is in
+   * test mode. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.first.wpilibj.drive.MecanumDrive}</li>
+   *   <li>{@link edu.wpi.first.wpilibj.drive.MecanumDrive}
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Show velocity vectors</td><td>Boolean</td><td>true</td></tr>
@@ -365,12 +449,16 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kMecanumDrive("Mecanum Drivebase"),
   /**
-   * Displays a camera stream.
-   * <br>Supported types:
+   * Displays a camera stream. <br>
+   * Supported types:
+   *
    * <ul>
-   * <li>{@link edu.wpi.cscore.VideoSource} (as long as it is streaming on an MJPEG server)</li>
+   *   <li>{@link edu.wpi.cscore.VideoSource} (as long as it is streaming on an MJPEG server)
    * </ul>
-   * <br>Custom properties:
+   *
+   * <br>
+   * Custom properties:
+   *
    * <table>
    * <tr><th>Name</th><th>Type</th><th>Default Value</th><th>Notes</th></tr>
    * <tr><td>Show crosshair</td><td>Boolean</td><td>true</td>

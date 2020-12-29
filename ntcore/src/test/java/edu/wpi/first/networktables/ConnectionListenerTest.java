@@ -4,9 +4,15 @@
 
 package edu.wpi.first.networktables;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +20,6 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class ConnectionListenerTest {
   private NetworkTableInstance m_serverInst;
@@ -41,9 +40,7 @@ class ConnectionListenerTest {
     m_serverInst.close();
   }
 
-  /**
-   * Connect to the server.
-   */
+  /** Connect to the server. */
   @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
   private void connect() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
@@ -108,13 +105,12 @@ class ConnectionListenerTest {
     assertEquals(1, events.length);
     assertEquals(handle, events[0].listener);
     assertFalse(events[0].connected);
-
   }
 
   @ParameterizedTest
   @DisabledOnOs(OS.WINDOWS)
   @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-  @ValueSource(strings = { "127.0.0.1", "127.0.0.1 ", " 127.0.0.1 " })
+  @ValueSource(strings = {"127.0.0.1", "127.0.0.1 ", " 127.0.0.1 "})
   void testThreaded(String address) {
     m_serverInst.startServer("connectionlistenertest.ini", address, 10000);
     List<ConnectionNotification> events = new ArrayList<>();

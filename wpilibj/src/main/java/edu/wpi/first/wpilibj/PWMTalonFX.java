@@ -12,25 +12,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * Cross the Road Electronics (CTRE) Talon FX Speed Controller with PWM control.
  *
  * <p>Note that the TalonFX uses the following bounds for PWM values. These values should work
- * reasonably well for most controllers, but if users experience issues such as asymmetric
- * behavior around the deadband or inability to saturate the controller in either direction,
- * calibration is recommended. The calibration procedure can be found in the TalonFX User Manual
- * available from CTRE.
+ * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
+ * around the deadband or inability to saturate the controller in either direction, calibration is
+ * recommended. The calibration procedure can be found in the TalonFX User Manual available from
+ * CTRE.
  *
- * <p><ul>
- * <li>2.004ms = full "forward"
- * <li>1.520ms = the "high end" of the deadband range
- * <li>1.500ms = center of the deadband range (off)
- * <li>1.480ms = the "low end" of the deadband range
- * <li>0.997ms = full "reverse"
+ * <p>
+ *
+ * <ul>
+ *   <li>2.004ms = full "forward"
+ *   <li>1.520ms = the "high end" of the deadband range
+ *   <li>1.500ms = center of the deadband range (off)
+ *   <li>1.480ms = the "low end" of the deadband range
+ *   <li>0.997ms = full "reverse"
  * </ul>
  */
 public class PWMTalonFX extends PWMSpeedController {
   /**
    * Constructor for a TalonFX connected via PWM.
    *
-   * @param channel The PWM channel that the Talon FX is attached to. 0-9 are on-board, 10-19 are
-   *                on the MXP port
+   * @param channel The PWM channel that the Talon FX is attached to. 0-9 are on-board, 10-19 are on
+   *     the MXP port
    */
   public PWMTalonFX(final int channel) {
     super(channel);

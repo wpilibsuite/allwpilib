@@ -4,13 +4,12 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import org.junit.jupiter.api.Test;
 
 class PrintCommandTest extends CommandTestBase {
   @Test

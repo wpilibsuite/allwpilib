@@ -8,5 +8,6 @@ import edu.wpi.first.hal.JNIWrapper;
 
 public class NotifierDataJNI extends JNIWrapper {
   public static native long getNextTimeout();
+
   public static native int getNumNotifiers();
 }

@@ -11,9 +11,7 @@ import edu.wpi.first.wpilibj2.command.TrapezoidProfileCommand;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ReplaceMeTrapezoidProfileCommand extends TrapezoidProfileCommand {
-  /**
-   * Creates a new ReplaceMeTrapezoidProfileCommand.
-   */
+  /** Creates a new ReplaceMeTrapezoidProfileCommand. */
   public ReplaceMeTrapezoidProfileCommand() {
     super(
         // The motion profile to be executed

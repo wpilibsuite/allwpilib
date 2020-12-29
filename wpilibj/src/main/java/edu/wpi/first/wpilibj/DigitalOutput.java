@@ -23,11 +23,10 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
   private int m_handle;
 
   /**
-   * Create an instance of a digital output. Create an instance of a digital output given a
-   * channel.
+   * Create an instance of a digital output. Create an instance of a digital output given a channel.
    *
    * @param channel the DIO channel to use for the digital output. 0-9 are on-board, 10-25 are on
-   *                the MXP
+   *     the MXP
    */
   public DigitalOutput(int channel) {
     SensorUtil.checkDigitalChannel(channel);
@@ -150,8 +149,7 @@ public class DigitalOutput extends DigitalSource implements Sendable, AutoClosea
    * Change the duty-cycle that is being generated on the line.
    *
    * <p>The resolution of the duty cycle is 8-bit for low frequencies (1kHz or less) but is reduced
-   * the
-   * higher the frequency of the PWM signal is.
+   * the higher the frequency of the PWM signal is.
    *
    * @param dutyCycle The duty-cycle to change to. [0..1]
    */

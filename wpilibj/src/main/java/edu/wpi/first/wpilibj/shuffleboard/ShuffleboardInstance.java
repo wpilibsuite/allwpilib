@@ -4,17 +4,16 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 final class ShuffleboardInstance implements ShuffleboardRoot {
   private final Map<String, ShuffleboardTab> m_tabs = new LinkedHashMap<>();
@@ -50,10 +49,8 @@ final class ShuffleboardInstance implements ShuffleboardRoot {
   @Override
   public void update() {
     if (m_tabsChanged) {
-      String[] tabTitles = m_tabs.values()
-          .stream()
-          .map(ShuffleboardTab::getTitle)
-          .toArray(String[]::new);
+      String[] tabTitles =
+          m_tabs.values().stream().map(ShuffleboardTab::getTitle).toArray(String[]::new);
       m_rootMetaTable.getEntry("Tabs").forceSetStringArray(tabTitles);
       m_tabsChanged = false;
     }

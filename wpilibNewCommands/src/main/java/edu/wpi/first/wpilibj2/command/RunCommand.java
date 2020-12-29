@@ -4,24 +4,23 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.function.BooleanSupplier;
-
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import java.util.function.BooleanSupplier;
+
 /**
- * A command that runs a Runnable continuously.  Has no end condition as-is;
- * either subclass it or use {@link Command#withTimeout(double)} or
- * {@link Command#withInterrupt(BooleanSupplier)} to give it one.  If you only wish
- * to execute a Runnable once, use {@link InstantCommand}.
+ * A command that runs a Runnable continuously. Has no end condition as-is; either subclass it or
+ * use {@link Command#withTimeout(double)} or {@link Command#withInterrupt(BooleanSupplier)} to give
+ * it one. If you only wish to execute a Runnable once, use {@link InstantCommand}.
  */
 public class RunCommand extends CommandBase {
   protected final Runnable m_toRun;
 
   /**
-   * Creates a new RunCommand.  The Runnable will be run continuously until the command
-   * ends.  Does not run when disabled.
+   * Creates a new RunCommand. The Runnable will be run continuously until the command ends. Does
+   * not run when disabled.
    *
-   * @param toRun        the Runnable to run
+   * @param toRun the Runnable to run
    * @param requirements the subsystems to require
    */
   public RunCommand(Runnable toRun, Subsystem... requirements) {

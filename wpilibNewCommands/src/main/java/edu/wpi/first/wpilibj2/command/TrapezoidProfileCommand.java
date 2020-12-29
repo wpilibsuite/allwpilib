@@ -4,17 +4,15 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.function.Consumer;
-
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-
 import static edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import java.util.function.Consumer;
+
 /**
- * A command that runs a {@link TrapezoidProfile}.  Useful for smoothly controlling mechanism
- * motion.
+ * A command that runs a {@link TrapezoidProfile}. Useful for smoothly controlling mechanism motion.
  */
 public class TrapezoidProfileCommand extends CommandBase {
   private final TrapezoidProfile m_profile;
@@ -26,13 +24,12 @@ public class TrapezoidProfileCommand extends CommandBase {
    * Creates a new TrapezoidProfileCommand that will execute the given {@link TrapezoidProfile}.
    * Output will be piped to the provided consumer function.
    *
-   * @param profile      The motion profile to execute.
-   * @param output       The consumer for the profile output.
+   * @param profile The motion profile to execute.
+   * @param output The consumer for the profile output.
    * @param requirements The subsystems required by this command.
    */
-  public TrapezoidProfileCommand(TrapezoidProfile profile,
-                                 Consumer<State> output,
-                                 Subsystem... requirements) {
+  public TrapezoidProfileCommand(
+      TrapezoidProfile profile, Consumer<State> output, Subsystem... requirements) {
     m_profile = requireNonNullParam(profile, "profile", "TrapezoidProfileCommand");
     m_output = requireNonNullParam(output, "output", "TrapezoidProfileCommand");
     addRequirements(requirements);

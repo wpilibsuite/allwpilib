@@ -7,18 +7,18 @@ package edu.wpi.first.wpilibj;
 import java.io.File;
 
 /**
- * Class for interacting with the Filesystem, particularly, interacting with
- * FRC-related paths on the system, such as the launch and deploy directories.
+ * Class for interacting with the Filesystem, particularly, interacting with FRC-related paths on
+ * the system, such as the launch and deploy directories.
  *
- * <p>This class is primarily used for obtaining resources in src/main/deploy, and
- * the RoboRIO path /home/lvuser in a simulation-compatible way.</p>
+ * <p>This class is primarily used for obtaining resources in src/main/deploy, and the RoboRIO path
+ * /home/lvuser in a simulation-compatible way.
  */
 public final class Filesystem {
   private Filesystem() {}
 
   /**
-   * Obtains the current working path that the program was launched with.
-   * This is analogous to the `pwd` command on unix.
+   * Obtains the current working path that the program was launched with. This is analogous to the
+   * `pwd` command on unix.
    *
    * @return The current working directory (launch directory)
    */
@@ -27,9 +27,8 @@ public final class Filesystem {
   }
 
   /**
-   * Obtains the operating directory of the program. On the roboRIO, this is
-   * /home/lvuser. In simulation, it is where the simulation was launched from
-   * (`pwd`).
+   * Obtains the operating directory of the program. On the roboRIO, this is /home/lvuser. In
+   * simulation, it is where the simulation was launched from (`pwd`).
    *
    * @return The operating directory
    */
@@ -42,10 +41,10 @@ public final class Filesystem {
   }
 
   /**
-   * Obtains the deploy directory of the program, which is the remote location
-   * src/main/deploy is deployed to by default. On the roboRIO, this is
-   * /home/lvuser/deploy. In simulation, it is where the simulation was launched
-   * from, in the subdirectory "src/main/deploy" (`pwd`/src/main/deploy).
+   * Obtains the deploy directory of the program, which is the remote location src/main/deploy is
+   * deployed to by default. On the roboRIO, this is /home/lvuser/deploy. In simulation, it is where
+   * the simulation was launched from, in the subdirectory "src/main/deploy"
+   * (`pwd`/src/main/deploy).
    *
    * @return The deploy directory
    */
@@ -53,8 +52,8 @@ public final class Filesystem {
     if (RobotBase.isReal()) {
       return new File(getOperatingDirectory(), "deploy");
     } else {
-      return new File(getOperatingDirectory(), "src" + File.separator + "main"
-          + File.separator + "deploy");
+      return new File(
+          getOperatingDirectory(), "src" + File.separator + "main" + File.separator + "deploy");
     }
   }
 }

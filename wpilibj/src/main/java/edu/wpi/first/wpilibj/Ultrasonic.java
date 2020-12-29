@@ -4,8 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.ArrayList;
-import java.util.List;
+import static java.util.Objects.requireNonNull;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -14,8 +13,8 @@ import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import static java.util.Objects.requireNonNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Ultrasonic rangefinder class. The Ultrasonic rangefinder measures absolute distance based on the
@@ -27,17 +26,11 @@ import static java.util.Objects.requireNonNull;
  * flight).
  */
 public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
-  /**
-   * The units to return when PIDGet is called.
-   */
+  /** The units to return when PIDGet is called. */
   public enum Unit {
-    /**
-     * Use inches for PIDGet.
-     */
+    /** Use inches for PIDGet. */
     kInches,
-    /**
-     * Use millimeters for PIDGet.
-     */
+    /** Use millimeters for PIDGet. */
     kMillimeters
   }
 
@@ -76,16 +69,16 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
     @Override
     public synchronized void run() {
       while (m_automaticEnabled) {
-        for (Ultrasonic sensor: m_sensors) {
+        for (Ultrasonic sensor : m_sensors) {
           if (!m_automaticEnabled) {
             break;
           }
 
           if (sensor.isEnabled()) {
-            sensor.m_pingChannel.pulse(kPingTime);  // do the ping
+            sensor.m_pingChannel.pulse(kPingTime); // do the ping
           }
 
-          Timer.delay(0.1);  // wait for ping to return
+          Timer.delay(0.1); // wait for ping to return
         }
       }
     }
@@ -131,11 +124,10 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * and Vex ultrasonic sensors.
    *
    * @param pingChannel The digital output channel that sends the pulse to initiate the sensor
-   *                    sending the ping.
+   *     sending the ping.
    * @param echoChannel The digital input channel that receives the echo. The length of time that
-   *                    the echo is high represents the round trip time of the ping, and the
-   *                    distance.
-   * @param units       The units returned in either kInches or kMilliMeters
+   *     the echo is high represents the round trip time of the ping, and the distance.
+   * @param units The units returned in either kInches or kMilliMeters
    */
   public Ultrasonic(final int pingChannel, final int echoChannel, Unit units) {
     m_pingChannel = new DigitalOutput(pingChannel);
@@ -152,10 +144,9 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * and Vex ultrasonic sensors. Default unit is inches.
    *
    * @param pingChannel The digital output channel that sends the pulse to initiate the sensor
-   *                    sending the ping.
+   *     sending the ping.
    * @param echoChannel The digital input channel that receives the echo. The length of time that
-   *                    the echo is high represents the round trip time of the ping, and the
-   *                    distance.
+   *     the echo is high represents the round trip time of the ping, and the distance.
    */
   public Ultrasonic(final int pingChannel, final int echoChannel) {
     this(pingChannel, echoChannel, Unit.kInches);
@@ -166,10 +157,9 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * DigitalOutput for the ping channel.
    *
    * @param pingChannel The digital output object that starts the sensor doing a ping. Requires a
-   *                    10uS pulse to start.
-   * @param echoChannel The digital input object that times the return pulse to determine the
-   *                    range.
-   * @param units       The units returned in either kInches or kMilliMeters
+   *     10uS pulse to start.
+   * @param echoChannel The digital input object that times the return pulse to determine the range.
+   * @param units The units returned in either kInches or kMilliMeters
    */
   public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel, Unit units) {
     requireNonNull(pingChannel, "Provided ping channel was null");
@@ -187,9 +177,8 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * DigitalOutput for the ping channel. Default unit is inches.
    *
    * @param pingChannel The digital output object that starts the sensor doing a ping. Requires a
-   *                    10uS pulse to start.
-   * @param echoChannel The digital input object that times the return pulse to determine the
-   *                    range.
+   *     10uS pulse to start.
+   * @param echoChannel The digital input object that times the return pulse to determine the range.
    */
   public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
     this(pingChannel, echoChannel, Unit.kInches);
@@ -242,10 +231,9 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * each sensor.
    *
    * @param enabling Set to true if round robin scheduling should start for all the ultrasonic
-   *                 sensors. This scheduling method assures that the sensors are non-interfering
-   *                 because no two sensors fire at the same time. If another scheduling algorithm
-   *                 is preferred, it can be implemented by pinging the sensors manually and waiting
-   *                 for the results to come back.
+   *     sensors. This scheduling method assures that the sensors are non-interfering because no two
+   *     sensors fire at the same time. If another scheduling algorithm is preferred, it can be
+   *     implemented by pinging the sensors manually and waiting for the results to come back.
    */
   public static void setAutomaticMode(boolean enabling) {
     if (enabling == m_automaticEnabled) {

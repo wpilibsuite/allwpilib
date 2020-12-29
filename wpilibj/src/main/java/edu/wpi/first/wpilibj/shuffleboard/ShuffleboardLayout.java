@@ -4,20 +4,17 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.Sendable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.Sendable;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-
-/**
- * A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts.
- */
+/** A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts. */
 public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout>
     implements ShuffleboardContainer {
   private final ContainerHelper m_helper = new ContainerHelper(this);
@@ -57,50 +54,43 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
   }
 
   @Override
-  public SuppliedValueWidget<String> addString(String title,
-                                               Supplier<String> valueSupplier)
+  public SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addString(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<Double> addNumber(String title,
-                                               DoubleSupplier valueSupplier)
+  public SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addNumber(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<Boolean> addBoolean(String title,
-                                                 BooleanSupplier valueSupplier)
+  public SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addBoolean(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<String[]> addStringArray(String title,
-                                                      Supplier<String[]> valueSupplier)
-      throws IllegalArgumentException {
+  public SuppliedValueWidget<String[]> addStringArray(
+      String title, Supplier<String[]> valueSupplier) throws IllegalArgumentException {
     return m_helper.addStringArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<double[]> addDoubleArray(String title,
-                                                      Supplier<double[]> valueSupplier)
-      throws IllegalArgumentException {
+  public SuppliedValueWidget<double[]> addDoubleArray(
+      String title, Supplier<double[]> valueSupplier) throws IllegalArgumentException {
     return m_helper.addDoubleArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<boolean[]> addBooleanArray(String title,
-                                                        Supplier<boolean[]> valueSupplier)
-      throws IllegalArgumentException {
+  public SuppliedValueWidget<boolean[]> addBooleanArray(
+      String title, Supplier<boolean[]> valueSupplier) throws IllegalArgumentException {
     return m_helper.addBooleanArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<byte[]> addRaw(String title,
-                                            Supplier<byte[]> valueSupplier)
+  public SuppliedValueWidget<byte[]> addRaw(String title, Supplier<byte[]> valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addRaw(title, valueSupplier);
   }
@@ -114,5 +104,4 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
       component.buildInto(table, metaTable.getSubTable(component.getTitle()));
     }
   }
-
 }

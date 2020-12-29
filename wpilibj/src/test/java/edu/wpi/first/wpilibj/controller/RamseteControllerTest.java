@@ -4,9 +4,8 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import java.util.ArrayList;
-
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -14,9 +13,8 @@ import edu.wpi.first.wpilibj.geometry.Twist2d;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpiutil.math.MathUtil;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.ArrayList;
+import org.junit.jupiter.api.Test;
 
 class RamseteControllerTest {
   private static final double kTolerance = 1 / 12.0;
@@ -40,8 +38,9 @@ class RamseteControllerTest {
       var state = trajectory.sample(kDt * i);
 
       var output = controller.calculate(robotPose, state);
-      robotPose = robotPose.exp(new Twist2d(output.vxMetersPerSecond * kDt, 0,
-          output.omegaRadiansPerSecond * kDt));
+      robotPose =
+          robotPose.exp(
+              new Twist2d(output.vxMetersPerSecond * kDt, 0, output.omegaRadiansPerSecond * kDt));
     }
 
     final var states = trajectory.getStates();
@@ -51,14 +50,13 @@ class RamseteControllerTest {
     // must be final or effectively final.
     final var finalRobotPose = robotPose;
     assertAll(
-        () -> assertEquals(endPose.getX(), finalRobotPose.getX(),
-            kTolerance),
-        () -> assertEquals(endPose.getY(), finalRobotPose.getY(),
-            kTolerance),
-        () -> assertEquals(0.0,
-            MathUtil.normalizeAngle(endPose.getRotation().getRadians()
-                - finalRobotPose.getRotation().getRadians()),
-            kAngularTolerance)
-    );
+        () -> assertEquals(endPose.getX(), finalRobotPose.getX(), kTolerance),
+        () -> assertEquals(endPose.getY(), finalRobotPose.getY(), kTolerance),
+        () ->
+            assertEquals(
+                0.0,
+                MathUtil.normalizeAngle(
+                    endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
+                kAngularTolerance));
   }
 }

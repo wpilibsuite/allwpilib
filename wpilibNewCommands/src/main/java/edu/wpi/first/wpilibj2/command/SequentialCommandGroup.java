@@ -18,8 +18,8 @@ public class SequentialCommandGroup extends CommandGroupBase {
   private boolean m_runWhenDisabled = true;
 
   /**
-   * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
-   * the CommandGroup finishing when the last command finishes.
+   * Creates a new SequentialCommandGroup. The given commands will be run sequentially, with the
+   * CommandGroup finishing when the last command finishes.
    *
    * @param commands the commands to include in this group.
    */
@@ -74,9 +74,10 @@ public class SequentialCommandGroup extends CommandGroupBase {
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted && !m_commands.isEmpty() && m_currentCommandIndex > -1
-        && m_currentCommandIndex < m_commands.size()
-    ) {
+    if (interrupted
+        && !m_commands.isEmpty()
+        && m_currentCommandIndex > -1
+        && m_currentCommandIndex < m_commands.size()) {
       m_commands.get(m_currentCommandIndex).end(true);
     }
     m_currentCommandIndex = -1;

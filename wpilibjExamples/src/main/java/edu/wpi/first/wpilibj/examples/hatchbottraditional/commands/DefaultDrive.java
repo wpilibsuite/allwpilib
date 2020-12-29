@@ -4,11 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.commands;
 
-import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.function.DoubleSupplier;
 
 /**
  * A command to drive the robot with joystick input (passed in as {@link DoubleSupplier}s). Written

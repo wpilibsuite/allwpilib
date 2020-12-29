@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
 class TrapezoidProfileTest {
@@ -32,8 +32,9 @@ class TrapezoidProfileTest {
    * @param eps Tolerance for whether values are near to each other.
    */
   private static void assertNear(double val1, double val2, double eps) {
-    assertTrue(Math.abs(val1 - val2) <= eps, "Difference between " + val1 + " and " + val2
-        + " is greater than " + eps);
+    assertTrue(
+        Math.abs(val1 - val2) <= eps,
+        "Difference between " + val1 + " and " + val2 + " is greater than " + eps);
   }
 
   /**
@@ -53,8 +54,7 @@ class TrapezoidProfileTest {
 
   @Test
   void reachesGoal() {
-    TrapezoidProfile.Constraints constraints =
-        new TrapezoidProfile.Constraints(1.75, 0.75);
+    TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(1.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(3, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 

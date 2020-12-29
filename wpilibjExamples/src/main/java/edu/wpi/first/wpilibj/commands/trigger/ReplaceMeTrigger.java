@@ -6,9 +6,7 @@ package edu.wpi.first.wpilibj.commands.trigger;
 
 import edu.wpi.first.wpilibj.buttons.Trigger;
 
-/**
- * Add your docs here.
- */
+/** Add your docs here. */
 public class ReplaceMeTrigger extends Trigger {
   @Override
   public boolean get() {

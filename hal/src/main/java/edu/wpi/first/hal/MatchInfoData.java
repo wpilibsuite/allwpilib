@@ -4,46 +4,36 @@
 
 package edu.wpi.first.hal;
 
-/**
- * Structure for holding the match info data request.
- */
+/** Structure for holding the match info data request. */
 public class MatchInfoData {
-  /**
-   * Stores the event name.
-   */
+  /** Stores the event name. */
   @SuppressWarnings("MemberName")
   public String eventName = "";
 
-  /**
-   * Stores the game specific message.
-   */
+  /** Stores the game specific message. */
   @SuppressWarnings("MemberName")
   public String gameSpecificMessage = "";
 
-  /**
-   * Stores the match number.
-   */
+  /** Stores the match number. */
   @SuppressWarnings("MemberName")
   public int matchNumber;
 
-  /**
-   * Stores the replay number.
-   */
+  /** Stores the replay number. */
   @SuppressWarnings("MemberName")
   public int replayNumber;
 
-  /**
-   * Stores the match type.
-   */
+  /** Stores the match type. */
   @SuppressWarnings("MemberName")
   public int matchType;
 
-  /**
-   * Called from JNI to set the structure data.
-   */
+  /** Called from JNI to set the structure data. */
   @SuppressWarnings("MissingJavadocMethod")
-  public void setData(String eventName, String gameSpecificMessage,
-                      int matchNumber, int replayNumber, int matchType) {
+  public void setData(
+      String eventName,
+      String gameSpecificMessage,
+      int matchNumber,
+      int replayNumber,
+      int matchType) {
     this.eventName = eventName;
     this.gameSpecificMessage = gameSpecificMessage;
     this.matchNumber = matchNumber;

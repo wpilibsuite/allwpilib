@@ -6,9 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-/**
- * Common base class for all PWM Speed Controllers.
- */
+/** Common base class for all PWM Speed Controllers. */
 public abstract class PWMSpeedController extends PWM implements SpeedController {
   private boolean m_isInverted;
 
@@ -16,7 +14,7 @@ public abstract class PWMSpeedController extends PWM implements SpeedController 
    * Constructor.
    *
    * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
-   *                on the MXP port
+   *     on the MXP port
    */
   protected PWMSpeedController(int channel) {
     super(channel);

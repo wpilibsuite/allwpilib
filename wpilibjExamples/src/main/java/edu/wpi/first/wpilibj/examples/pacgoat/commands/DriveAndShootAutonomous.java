@@ -5,17 +5,14 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
- * Drive over the line and then shoot the ball. If the hot goal is not detected,
- * it will wait briefly.
+ * Drive over the line and then shoot the ball. If the hot goal is not detected, it will wait
+ * briefly.
  */
 public class DriveAndShootAutonomous extends CommandGroup {
-  /**
-   * Create a new drive and shoot autonomous.
-   */
+  /** Create a new drive and shoot autonomous. */
   public DriveAndShootAutonomous() {
     addSequential(new CloseClaw());
     addSequential(new WaitForPressure(), 2);

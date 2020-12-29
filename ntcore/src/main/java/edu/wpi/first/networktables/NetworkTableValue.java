@@ -6,9 +6,7 @@ package edu.wpi.first.networktables;
 
 import java.util.Objects;
 
-/**
- * A network table entry value.
- */
+/** A network table entry value. */
 public final class NetworkTableValue {
   NetworkTableValue(NetworkTableType type, Object value, long time) {
     m_type = type;

@@ -4,14 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
-
-import org.junit.Test;
-
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
 import static org.junit.Assert.assertEquals;
 
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.logging.Logger;
+import org.junit.Test;
 
 public class DriverStationTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(TimerTest.class.getName());
@@ -34,8 +31,10 @@ public class DriverStationTest extends AbstractComsSetup {
     long endTime = RobotController.getFPGATime();
     long difference = endTime - startTime;
 
-    assertEquals("DriverStation waitForData did not wait long enough", TIMER_RUNTIME, difference,
+    assertEquals(
+        "DriverStation waitForData did not wait long enough",
+        TIMER_RUNTIME,
+        difference,
         TIMER_TOLERANCE * TIMER_RUNTIME);
   }
-
 }

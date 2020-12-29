@@ -10,7 +10,8 @@ import edu.wpi.first.hal.HALValue;
 public interface SimValueCallback2 {
   void callback(String name, int handle, int direction, HALValue value);
 
-  default void callbackNative(String name, int handle, int direction, int type, long value1, double value2) {
+  default void callbackNative(
+      String name, int handle, int direction, int type, long value1, double value2) {
     callback(name, handle, direction, HALValue.fromNative(type, value1, value2));
   }
 }

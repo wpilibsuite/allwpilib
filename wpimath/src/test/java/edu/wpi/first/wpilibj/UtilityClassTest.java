@@ -4,21 +4,20 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class UtilityClassTest<T> {
@@ -30,8 +29,7 @@ public abstract class UtilityClassTest<T> {
 
   @Test
   public void singleConstructorTest() {
-    assertEquals(1, m_clazz.getDeclaredConstructors().length,
-        "More than one constructor defined");
+    assertEquals(1, m_clazz.getDeclaredConstructors().length, "More than one constructor defined");
   }
 
   @Test
@@ -52,7 +50,9 @@ public abstract class UtilityClassTest<T> {
   Stream<DynamicTest> publicMethodsStaticTestFactory() {
     return Arrays.stream(m_clazz.getDeclaredMethods())
         .filter(method -> Modifier.isPublic(method.getModifiers()))
-        .map(method -> dynamicTest(method.getName(),
-            () -> assertTrue(Modifier.isStatic(method.getModifiers()))));
+        .map(
+            method ->
+                dynamicTest(
+                    method.getName(), () -> assertTrue(Modifier.isStatic(method.getModifiers()))));
   }
 }

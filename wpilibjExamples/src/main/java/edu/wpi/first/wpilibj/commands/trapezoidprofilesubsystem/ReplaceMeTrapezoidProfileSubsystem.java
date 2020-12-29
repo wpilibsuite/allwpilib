@@ -8,9 +8,7 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 
 public class ReplaceMeTrapezoidProfileSubsystem extends TrapezoidProfileSubsystem {
-  /**
-   * Creates a new ReplaceMeTrapezoidProfileSubsystem.
-   */
+  /** Creates a new ReplaceMeTrapezoidProfileSubsystem. */
   public ReplaceMeTrapezoidProfileSubsystem() {
     super(
         // The constraints for the generated profiles

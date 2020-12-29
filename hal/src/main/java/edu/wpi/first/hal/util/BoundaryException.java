@@ -28,8 +28,8 @@ public class BoundaryException extends RuntimeException {
    */
   public static void assertWithinBounds(double value, double lower, double upper) {
     if (value < lower || value > upper) {
-      throw new BoundaryException("Value must be between " + lower + " and " + upper + ", " + value
-          + " given");
+      throw new BoundaryException(
+          "Value must be between " + lower + " and " + upper + ", " + value + " given");
     }
   }
 

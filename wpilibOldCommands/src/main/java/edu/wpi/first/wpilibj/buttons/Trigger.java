@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 /**
  * This class provides an easy way to link commands to inputs.
  *
- * <p>It is very easy to link a button to a command. For instance, you could link the trigger
- * button of a joystick to a "score" command.
+ * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
+ * of a joystick to a "score" command.
  *
  * <p>It is encouraged that teams write a subclass of Trigger if they want to have something unusual
  * (for instance, if they want to react to the user holding a button while the robot is reading a
@@ -66,7 +66,7 @@ public abstract class Trigger implements Sendable {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * {@link Command#start()} will be called repeatedly while the trigger is active, and will be
+   * <p>{@link Command#start()} will be called repeatedly while the trigger is active, and will be
    * canceled when the trigger becomes inactive.
    *
    * @param command the command to start

@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.Test;
 
 class ScheduleCommandTest extends CommandTestBase {
   @Test

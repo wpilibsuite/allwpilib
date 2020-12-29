@@ -7,8 +7,7 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.SimulatorJNI;
 
 public final class SimHooks {
-  private SimHooks() {
-  }
+  private SimHooks() {}
 
   public static void setHALRuntimeType(int type) {
     SimulatorJNI.setRuntimeType(type);

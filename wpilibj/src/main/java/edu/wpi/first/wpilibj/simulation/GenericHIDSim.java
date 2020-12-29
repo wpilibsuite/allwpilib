@@ -6,9 +6,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.wpilibj.GenericHID;
 
-/**
- * Class to control a simulated generic joystick.
- */
+/** Class to control a simulated generic joystick. */
 public class GenericHIDSim {
   protected final int m_port;
 
@@ -30,9 +28,7 @@ public class GenericHIDSim {
     m_port = port;
   }
 
-  /**
-   * Updates joystick data so that new values are visible to the user program.
-   */
+  /** Updates joystick data so that new values are visible to the user program. */
   public void notifyNewData() {
     DriverStationSim.notifyNewData();
   }
@@ -87,8 +83,9 @@ public class GenericHIDSim {
   }
 
   public double getRumble(GenericHID.RumbleType type) {
-    int value = DriverStationSim.getJoystickRumble(
-        m_port, type == GenericHID.RumbleType.kLeftRumble ? 0 : 1);
+    int value =
+        DriverStationSim.getJoystickRumble(
+            m_port, type == GenericHID.RumbleType.kLeftRumble ? 0 : 1);
     return value / 65535.0;
   }
 }

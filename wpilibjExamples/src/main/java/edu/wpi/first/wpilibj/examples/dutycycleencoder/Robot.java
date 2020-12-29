@@ -39,5 +39,4 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Output", output);
     SmartDashboard.putNumber("Distance", distance);
   }
-
 }

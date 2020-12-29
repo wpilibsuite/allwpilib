@@ -55,8 +55,8 @@ public class AddressableLED implements AutoCloseable {
   /**
    * Sets the led output data.
    *
-   * <p>If the output is enabled, this will start writing the next data cycle.
-   * It is safe to call, even while output is enabled.
+   * <p>If the output is enabled, this will start writing the next data cycle. It is safe to call,
+   * even while output is enabled.
    *
    * @param buffer the buffer to write
    */
@@ -74,10 +74,16 @@ public class AddressableLED implements AutoCloseable {
    * @param lowTime1NanoSeconds low time for 1 bit
    * @param highTime1NanoSeconds high time for 1 bit
    */
-  public void setBitTiming(int lowTime0NanoSeconds, int highTime0NanoSeconds,
-      int lowTime1NanoSeconds, int highTime1NanoSeconds) {
-    AddressableLEDJNI.setBitTiming(m_handle, lowTime0NanoSeconds,
-        highTime0NanoSeconds, lowTime1NanoSeconds,
+  public void setBitTiming(
+      int lowTime0NanoSeconds,
+      int highTime0NanoSeconds,
+      int lowTime1NanoSeconds,
+      int highTime1NanoSeconds) {
+    AddressableLEDJNI.setBitTiming(
+        m_handle,
+        lowTime0NanoSeconds,
+        highTime0NanoSeconds,
+        lowTime1NanoSeconds,
         highTime1NanoSeconds);
   }
 
@@ -101,9 +107,7 @@ public class AddressableLED implements AutoCloseable {
     AddressableLEDJNI.start(m_handle);
   }
 
-  /**
-   * Stops the output.
-   */
+  /** Stops the output. */
   public void stop() {
     AddressableLEDJNI.stop(m_handle);
   }

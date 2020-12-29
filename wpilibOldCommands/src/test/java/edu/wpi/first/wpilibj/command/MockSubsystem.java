@@ -4,9 +4,7 @@
 
 package edu.wpi.first.wpilibj.command;
 
-/**
- * A class to simulate a simple subsystem.
- */
+/** A class to simulate a simple subsystem. */
 public class MockSubsystem extends Subsystem {
   @Override
   protected void initDefaultCommand() {}

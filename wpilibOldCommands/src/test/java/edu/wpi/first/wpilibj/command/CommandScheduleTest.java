@@ -6,9 +6,7 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Ported from the old CrioTest Classes.
- */
+/** Ported from the old CrioTest Classes. */
 class CommandScheduleTest extends AbstractCommandTest {
   /**
    * Simple scheduling of a command and making sure the command is run and successfully terminates.
@@ -32,9 +30,7 @@ class CommandScheduleTest extends AbstractCommandTest {
     assertCommandState(command, 1, 3, 3, 1, 0);
   }
 
-  /**
-   * Simple scheduling of a command and making sure the command is run and cancels correctly.
-   */
+  /** Simple scheduling of a command and making sure the command is run and cancels correctly. */
   @Test
   void runAndCancelTest() {
     final MockCommand command = new MockCommand();

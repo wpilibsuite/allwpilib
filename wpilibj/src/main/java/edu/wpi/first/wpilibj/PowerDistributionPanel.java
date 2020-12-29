@@ -32,9 +32,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "PowerDistributionPanel", module);
   }
 
-  /**
-   * Constructor.  Uses the default CAN ID (0).
-   */
+  /** Constructor. Uses the default CAN ID (0). */
   public PowerDistributionPanel() {
     this(0);
   }
@@ -102,23 +100,17 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
     return PDPJNI.getPDPTotalEnergy(m_handle);
   }
 
-  /**
-   * Reset the total energy to 0.
-   */
+  /** Reset the total energy to 0. */
   public void resetTotalEnergy() {
     PDPJNI.resetPDPTotalEnergy(m_handle);
   }
 
-  /**
-   * Clear all PDP sticky faults.
-   */
+  /** Clear all PDP sticky faults. */
   public void clearStickyFaults() {
     PDPJNI.clearPDPStickyFaults(m_handle);
   }
 
-  /**
-   * Gets module number (CAN ID).
-   */
+  /** Gets module number (CAN ID). */
   public int getModule() {
     return m_module;
   }

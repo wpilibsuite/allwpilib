@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 class RunCommandTest extends CommandTestBase {
   @Test

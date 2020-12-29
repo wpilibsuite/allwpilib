@@ -4,17 +4,16 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 public final class TrajectoryUtil {
   private static final ObjectReader READER = new ObjectMapper().readerFor(Trajectory.State[].class);
@@ -26,6 +25,7 @@ public final class TrajectoryUtil {
 
   /**
    * Imports a Trajectory from a PathWeaver-style JSON file.
+   *
    * @param path the path of the json file to import from
    * @return The trajectory represented by the file.
    * @throws IOException if reading from the file fails
@@ -39,6 +39,7 @@ public final class TrajectoryUtil {
 
   /**
    * Exports a Trajectory to a PathWeaver-style JSON file.
+   *
    * @param trajectory the trajectory to export
    * @param path the path of the file to export to
    * @throws IOException if writing to the file fails
@@ -52,6 +53,7 @@ public final class TrajectoryUtil {
 
   /**
    * Deserializes a Trajectory from PathWeaver-style JSON.
+   *
    * @param json the string containing the serialized JSON
    * @return the trajectory represented by the JSON
    * @throws JsonProcessingException if deserializing the JSON fails
@@ -63,6 +65,7 @@ public final class TrajectoryUtil {
 
   /**
    * Serializes a Trajectory to PathWeaver-style JSON.
+   *
    * @param trajectory the trajectory to export
    * @return the string containing the serialized JSON
    * @throws JsonProcessingException if serializing the Trajectory fails

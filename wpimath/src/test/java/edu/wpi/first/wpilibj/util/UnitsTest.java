@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.util;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.UtilityClassTest;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class UnitsTest extends UtilityClassTest<Units> {
   UnitsTest() {

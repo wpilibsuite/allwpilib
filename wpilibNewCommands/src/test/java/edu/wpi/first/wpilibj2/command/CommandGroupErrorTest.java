@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 class CommandGroupErrorTest extends CommandTestBase {
   @Test
@@ -20,8 +20,8 @@ class CommandGroupErrorTest extends CommandTestBase {
 
     @SuppressWarnings("PMD.UnusedLocalVariable")
     Command group = new ParallelCommandGroup(command1, command2);
-    assertThrows(IllegalArgumentException.class,
-        () -> new ParallelCommandGroup(command1, command2));
+    assertThrows(
+        IllegalArgumentException.class, () -> new ParallelCommandGroup(command1, command2));
   }
 
   @Test
@@ -35,8 +35,7 @@ class CommandGroupErrorTest extends CommandTestBase {
       @SuppressWarnings("PMD.UnusedLocalVariable")
       Command group = new ParallelCommandGroup(command1, command2);
 
-      assertThrows(IllegalArgumentException.class,
-          () -> scheduler.schedule(command1));
+      assertThrows(IllegalArgumentException.class, () -> scheduler.schedule(command1));
     }
   }
 

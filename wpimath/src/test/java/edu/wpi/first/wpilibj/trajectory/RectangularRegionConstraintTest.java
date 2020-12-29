@@ -4,9 +4,8 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -14,9 +13,8 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.constraint.MaxVelocityConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.RectangularRegionConstraint;
 import edu.wpi.first.wpilibj.util.Units;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 public class RectangularRegionConstraintTest {
   @Test
@@ -24,11 +22,11 @@ public class RectangularRegionConstraintTest {
     // Create constraints
     double maxVelocity = Units.feetToMeters(3.0);
     var maxVelocityConstraint = new MaxVelocityConstraint(maxVelocity);
-    var regionConstraint = new RectangularRegionConstraint(
-        new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
-        new Translation2d(Units.feetToMeters(7.0), Units.feetToMeters(27.0)),
-        maxVelocityConstraint
-    );
+    var regionConstraint =
+        new RectangularRegionConstraint(
+            new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
+            new Translation2d(Units.feetToMeters(7.0), Units.feetToMeters(27.0)),
+            maxVelocityConstraint);
 
     // Get trajectory
     var trajectory = TrajectoryGeneratorTest.getTrajectory(List.of(regionConstraint));
@@ -49,14 +47,15 @@ public class RectangularRegionConstraintTest {
   void testIsPoseWithinRegion() {
     double maxVelocity = Units.feetToMeters(3.0);
     var maxVelocityConstraint = new MaxVelocityConstraint(maxVelocity);
-    var regionConstraint = new RectangularRegionConstraint(
-        new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
-        new Translation2d(Units.feetToMeters(7.0), Units.feetToMeters(27.0)),
-        maxVelocityConstraint
-    );
+    var regionConstraint =
+        new RectangularRegionConstraint(
+            new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
+            new Translation2d(Units.feetToMeters(7.0), Units.feetToMeters(27.0)),
+            maxVelocityConstraint);
 
     assertFalse(regionConstraint.isPoseInRegion(new Pose2d()));
-    assertTrue(regionConstraint.isPoseInRegion(new Pose2d(Units.feetToMeters(3.0),
-        Units.feetToMeters(14.5), new Rotation2d())));
+    assertTrue(
+        regionConstraint.isPoseInRegion(
+            new Pose2d(Units.feetToMeters(3.0), Units.feetToMeters(14.5), new Rotation2d())));
   }
 }

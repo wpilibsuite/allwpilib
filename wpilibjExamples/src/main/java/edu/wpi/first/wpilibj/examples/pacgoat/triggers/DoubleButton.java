@@ -7,10 +7,7 @@ package edu.wpi.first.wpilibj.examples.pacgoat.triggers;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Trigger;
 
-/**
- * A custom button that is triggered when TWO buttons on a Joystick are
- * simultaneously pressed.
- */
+/** A custom button that is triggered when TWO buttons on a Joystick are simultaneously pressed. */
 public class DoubleButton extends Trigger {
   private final Joystick m_joy;
   private final int m_button1;
@@ -18,6 +15,7 @@ public class DoubleButton extends Trigger {
 
   /**
    * Create a new double button trigger.
+   *
    * @param joy The joystick
    * @param button1 The first button
    * @param button2 The second button

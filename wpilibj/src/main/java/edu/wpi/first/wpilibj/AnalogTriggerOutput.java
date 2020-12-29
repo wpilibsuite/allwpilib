@@ -4,12 +4,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Class to represent a specific output from an analog trigger. This class is used to get the
@@ -38,9 +38,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * limited.
  */
 public class AnalogTriggerOutput extends DigitalSource implements Sendable {
-  /**
-   * Exceptions dealing with improper operation of the Analog trigger output.
-   */
+  /** Exceptions dealing with improper operation of the Analog trigger output. */
   @SuppressWarnings("serial")
   public static class AnalogTriggerOutputException extends RuntimeException {
     /**
@@ -62,7 +60,7 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
    * <p>Because this class derives from DigitalSource, it can be passed into routing functions for
    * Counter, Encoder, etc.
    *
-   * @param trigger    The trigger for which this is an output.
+   * @param trigger The trigger for which this is an output.
    * @param outputType An enum that specifies the output on the trigger to represent.
    */
   public AnalogTriggerOutput(AnalogTrigger trigger, final AnalogTriggerType outputType) {
@@ -71,8 +69,10 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
 
     m_trigger = trigger;
     m_outputType = outputType;
-    HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
-        trigger.getIndex() + 1, outputType.value + 1);
+    HAL.report(
+        tResourceType.kResourceType_AnalogTriggerOutput,
+        trigger.getIndex() + 1,
+        outputType.value + 1);
   }
 
   /**
@@ -104,11 +104,10 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
     return true;
   }
 
-  /**
-   * Defines the state in which the AnalogTrigger triggers.
-   */
+  /** Defines the state in which the AnalogTrigger triggers. */
   public enum AnalogTriggerType {
-    kInWindow(AnalogJNI.AnalogTriggerType.kInWindow), kState(AnalogJNI.AnalogTriggerType.kState),
+    kInWindow(AnalogJNI.AnalogTriggerType.kInWindow),
+    kState(AnalogJNI.AnalogTriggerType.kState),
     kRisingPulse(AnalogJNI.AnalogTriggerType.kRisingPulse),
     kFallingPulse(AnalogJNI.AnalogTriggerType.kFallingPulse);
 
@@ -120,6 +119,5 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-  }
+  public void initSendable(SendableBuilder builder) {}
 }

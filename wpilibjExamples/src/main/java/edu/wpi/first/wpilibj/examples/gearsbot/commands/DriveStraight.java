@@ -5,28 +5,25 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
-
 /**
- * Drive the given distance straight (negative values go backwards). Uses a
- * local PID controller to run a simple PID loop that is only enabled while this
- * command is running. The input is the averaged values of the left and right
- * encoders.
+ * Drive the given distance straight (negative values go backwards). Uses a local PID controller to
+ * run a simple PID loop that is only enabled while this command is running. The input is the
+ * averaged values of the left and right encoders.
  */
 public class DriveStraight extends PIDCommand {
   private final DriveTrain m_drivetrain;
 
   /**
    * Create a new DriveStraight command.
+   *
    * @param distance The distance to drive
    */
   public DriveStraight(double distance, DriveTrain drivetrain) {
-    super(new PIDController(4, 0, 0),
-        drivetrain::getDistance,
-        distance,
-        d -> drivetrain.drive(d, d));
+    super(
+        new PIDController(4, 0, 0), drivetrain::getDistance, distance, d -> drivetrain.drive(d, d));
 
     m_drivetrain = drivetrain;
     addRequirements(m_drivetrain);

@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
- * This is a demo program showing the use of the DifferentialDrive class.
- * Runs the motors with arcade steering.
+ * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with
+ * arcade steering.
  */
 public class Robot extends TimedRobot {
   private final PWMVictorSPX m_leftMotor = new PWMVictorSPX(0);

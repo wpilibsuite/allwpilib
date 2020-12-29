@@ -4,9 +4,7 @@
 
 package edu.wpi.first.networktables;
 
-/**
- * A listener that listens to changes in values in a {@link NetworkTable}.
- */
+/** A listener that listens to changes in values in a {@link NetworkTable}. */
 @FunctionalInterface
 public interface TableEntryListener extends EntryListenerFlags {
   /**
@@ -16,9 +14,9 @@ public interface TableEntryListener extends EntryListenerFlags {
    * @param key the key associated with the value that changed
    * @param entry the entry associated with the value that changed
    * @param value the new value
-   * @param flags update flags; for example, EntryListenerFlags.kNew if the key
-   *     did not previously exist in the table
+   * @param flags update flags; for example, EntryListenerFlags.kNew if the key did not previously
+   *     exist in the table
    */
-  void valueChanged(NetworkTable table, String key, NetworkTableEntry entry,
-                    NetworkTableValue value, int flags);
+  void valueChanged(
+      NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags);
 }

@@ -10,9 +10,7 @@ import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-/**
- * Class for supporting continuous analog encoders, such as the US Digital MA3.
- */
+/** Class for supporting continuous analog encoders, such as the US Digital MA3. */
 public class AnalogEncoder implements Sendable, AutoCloseable {
   private final AnalogInput m_analogInput;
   private AnalogTrigger m_analogTrigger;
@@ -86,9 +84,9 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Get the offset of position relative to the last reset.
    *
-   * <p>getPositionInRotation() - getPositionOffset() will give an encoder absolute
-   * position relative to the last reset. This could potentially be negative,
-   * which needs to be accounted for.
+   * <p>getPositionInRotation() - getPositionOffset() will give an encoder absolute position
+   * relative to the last reset. This could potentially be negative, which needs to be accounted
+   * for.
    *
    * @return the position offset
    */
@@ -97,11 +95,10 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Set the distance per rotation of the encoder. This sets the multiplier used
-   * to determine the distance driven based on the rotation value from the
-   * encoder. Set this value based on the how far the mechanism travels in 1
-   * rotation of the encoder, and factor in gearing reductions following the
-   * encoder shaft. This distance can be in any units you like, linear or angular.
+   * Set the distance per rotation of the encoder. This sets the multiplier used to determine the
+   * distance driven based on the rotation value from the encoder. Set this value based on the how
+   * far the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions
+   * following the encoder shaft. This distance can be in any units you like, linear or angular.
    *
    * @param distancePerRotation the distance per rotation of the encoder
    */
@@ -112,16 +109,15 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   /**
    * Get the distance per rotation for this encoder.
    *
-   * @return The scale factor that will be used to convert rotation to useful
-   *         units.
+   * @return The scale factor that will be used to convert rotation to useful units.
    */
   public double getDistancePerRotation() {
     return m_distancePerRotation;
   }
 
   /**
-   * Get the distance the sensor has driven since the last reset as scaled by the
-   * value from {@link #setDistancePerRotation(double)}.
+   * Get the distance the sensor has driven since the last reset as scaled by the value from {@link
+   * #setDistancePerRotation(double)}.
    *
    * @return The distance driven since the last reset
    */
@@ -138,9 +134,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     return m_analogInput.getChannel();
   }
 
-  /**
-   * Reset the Encoder distance to zero.
-   */
+  /** Reset the Encoder distance to zero. */
   public void reset() {
     m_counter.reset();
     m_positionOffset = m_analogInput.getVoltage();

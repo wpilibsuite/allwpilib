@@ -17,9 +17,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 
-/**
- * Represents a differential drive style drivetrain.
- */
+/** Represents a differential drive style drivetrain. */
 public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // meters per second
   public static final double kMaxAngularSpeed = 2 * Math.PI; // one rotation per second
@@ -36,18 +34,18 @@ public class Drivetrain {
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 
-  private final SpeedControllerGroup m_leftGroup
-      = new SpeedControllerGroup(m_leftLeader, m_leftFollower);
-  private final SpeedControllerGroup m_rightGroup
-      = new SpeedControllerGroup(m_rightLeader, m_rightFollower);
+  private final SpeedControllerGroup m_leftGroup =
+      new SpeedControllerGroup(m_leftLeader, m_leftFollower);
+  private final SpeedControllerGroup m_rightGroup =
+      new SpeedControllerGroup(m_rightLeader, m_rightFollower);
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   private final PIDController m_leftPIDController = new PIDController(1, 0, 0);
   private final PIDController m_rightPIDController = new PIDController(1, 0, 0);
 
-  private final DifferentialDriveKinematics m_kinematics
-      = new DifferentialDriveKinematics(kTrackWidth);
+  private final DifferentialDriveKinematics m_kinematics =
+      new DifferentialDriveKinematics(kTrackWidth);
 
   private final DifferentialDriveOdometry m_odometry;
 
@@ -55,8 +53,8 @@ public class Drivetrain {
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
 
   /**
-   * Constructs a differential drive object.
-   * Sets the encoder distance per pulse and resets the gyro.
+   * Constructs a differential drive object. Sets the encoder distance per pulse and resets the
+   * gyro.
    */
   public Drivetrain() {
     m_gyro.reset();
@@ -82,10 +80,10 @@ public class Drivetrain {
     final double leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
     final double rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
 
-    final double leftOutput = m_leftPIDController.calculate(m_leftEncoder.getRate(),
-        speeds.leftMetersPerSecond);
-    final double rightOutput = m_rightPIDController.calculate(m_rightEncoder.getRate(),
-        speeds.rightMetersPerSecond);
+    final double leftOutput =
+        m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
+    final double rightOutput =
+        m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.rightMetersPerSecond);
     m_leftGroup.setVoltage(leftOutput + leftFeedforward);
     m_rightGroup.setVoltage(rightOutput + rightFeedforward);
   }
@@ -94,7 +92,7 @@ public class Drivetrain {
    * Drives the robot with the given linear velocity and angular velocity.
    *
    * @param xSpeed Linear velocity in m/s.
-   * @param rot    Angular velocity in rad/s.
+   * @param rot Angular velocity in rad/s.
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double rot) {
@@ -102,16 +100,15 @@ public class Drivetrain {
     setSpeeds(wheelSpeeds);
   }
 
-  /**
-   * Updates the field-relative position.
-   */
+  /** Updates the field-relative position. */
   public void updateOdometry() {
-    m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(),
-        m_rightEncoder.getDistance());
+    m_odometry.update(
+        m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
   }
 
   /**
    * Resets the field-relative position to a specific location.
+   *
    * @param pose The position to reset to.
    */
   public void resetOdometry(Pose2d pose) {
@@ -120,6 +117,7 @@ public class Drivetrain {
 
   /**
    * Returns the pose of the robot.
+   *
    * @return The pose of the robot.
    */
   public Pose2d getPose() {

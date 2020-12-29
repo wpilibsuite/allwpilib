@@ -7,8 +7,8 @@ package edu.wpi.first.wpiutil.net;
 import edu.wpi.first.wpiutil.WPIUtilJNI;
 
 /**
- * Forward ports to another host. This is primarily useful for accessing
- * Ethernet-connected devices from a computer tethered to the RoboRIO USB port.
+ * Forward ports to another host. This is primarily useful for accessing Ethernet-connected devices
+ * from a computer tethered to the RoboRIO USB port.
  */
 public final class PortForwarder {
   private PortForwarder() {
@@ -16,10 +16,10 @@ public final class PortForwarder {
   }
 
   /**
-   * Forward a local TCP port to a remote host and port.
-   * Note that local ports less than 1024 won't work as a normal user.
+   * Forward a local TCP port to a remote host and port. Note that local ports less than 1024 won't
+   * work as a normal user.
    *
-   * @param port       local port number
+   * @param port local port number
    * @param remoteHost remote IP address / DNS name
    * @param remotePort remote port number
    */

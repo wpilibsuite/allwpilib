@@ -4,23 +4,21 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.command.InstantCommand;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.command.InstantCommand;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ShuffleboardTabTest {
   private NetworkTableInstance m_ntInstance;
@@ -63,7 +61,6 @@ public class ShuffleboardTabTest {
         () -> assertEquals(1.0, entry.getValue().getDouble()));
   }
 
-
   @Test
   void testAddBoolean() {
     NetworkTableEntry entry = m_tab.add("Bool", false).getEntry();
@@ -84,47 +81,51 @@ public class ShuffleboardTabTest {
   void testAddNamedSendableWithProperties() {
     Sendable sendable = new InstantCommand("Command");
     String widgetType = "Command Widget";
-    m_tab.add(sendable)
-        .withWidget(widgetType)
-        .withProperties(mapOf("foo", 1234, "bar", "baz"));
+    m_tab.add(sendable).withWidget(widgetType).withProperties(mapOf("foo", 1234, "bar", "baz"));
 
     m_instance.update();
     String meta = "/Shuffleboard/.metadata/Tab/Command";
 
     assertAll(
-        () -> assertEquals(1234,
-                           m_ntInstance.getEntry(meta + "/Properties/foo").getDouble(-1),
-                           "Property 'foo' not set correctly"),
-        () -> assertEquals("baz",
-                           m_ntInstance.getEntry(meta + "/Properties/bar").getString(null),
-                           "Property 'bar' not set correctly"),
-        () -> assertEquals(widgetType,
-                           m_ntInstance.getEntry(meta + "/PreferredComponent").getString(null),
-                           "Preferred component not set correctly"));
+        () ->
+            assertEquals(
+                1234,
+                m_ntInstance.getEntry(meta + "/Properties/foo").getDouble(-1),
+                "Property 'foo' not set correctly"),
+        () ->
+            assertEquals(
+                "baz",
+                m_ntInstance.getEntry(meta + "/Properties/bar").getString(null),
+                "Property 'bar' not set correctly"),
+        () ->
+            assertEquals(
+                widgetType,
+                m_ntInstance.getEntry(meta + "/PreferredComponent").getString(null),
+                "Preferred component not set correctly"));
   }
 
   @Test
   void testAddNumberArray() {
-    NetworkTableEntry entry = m_tab.add("DoubleArray", new double[]{1, 2, 3}).getEntry();
+    NetworkTableEntry entry = m_tab.add("DoubleArray", new double[] {1, 2, 3}).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/DoubleArray", entry.getName()),
-        () -> assertArrayEquals(new double[]{1, 2, 3}, entry.getValue().getDoubleArray()));
+        () -> assertArrayEquals(new double[] {1, 2, 3}, entry.getValue().getDoubleArray()));
   }
 
   @Test
   void testAddBooleanArray() {
-    NetworkTableEntry entry = m_tab.add("BoolArray", new boolean[]{true, false}).getEntry();
+    NetworkTableEntry entry = m_tab.add("BoolArray", new boolean[] {true, false}).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/BoolArray", entry.getName()),
-        () -> assertArrayEquals(new boolean[]{true, false}, entry.getValue().getBooleanArray()));
+        () -> assertArrayEquals(new boolean[] {true, false}, entry.getValue().getBooleanArray()));
   }
 
   @Test
   void testAddStringArray() {
-    NetworkTableEntry entry = m_tab.add("StringArray", new String[]{"foo", "bar"}).getEntry();
+    NetworkTableEntry entry = m_tab.add("StringArray", new String[] {"foo", "bar"}).getEntry();
     assertAll(
         () -> assertEquals("/Shuffleboard/Tab/StringArray", entry.getName()),
-        () -> assertArrayEquals(new String[]{"foo", "bar"}, entry.getValue().getStringArray()));
+        () -> assertArrayEquals(new String[] {"foo", "bar"}, entry.getValue().getStringArray()));
   }
 
   @Test
@@ -133,9 +134,7 @@ public class ShuffleboardTabTest {
     assertThrows(IllegalArgumentException.class, () -> m_tab.add("foo", "baz"));
   }
 
-  /**
-   * Stub for Java 9 {@code Map.of()}.
-   */
+  /** Stub for Java 9 {@code Map.of()}. */
   @SuppressWarnings({"unchecked", "PMD"})
   private static <K, V> Map<K, V> mapOf(Object... entries) {
     Map<K, V> map = new HashMap<>();
@@ -144,5 +143,4 @@ public class ShuffleboardTabTest {
     }
     return map;
   }
-
 }

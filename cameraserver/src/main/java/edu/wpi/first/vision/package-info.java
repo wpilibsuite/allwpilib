@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 /**
- * Classes in the {@code edu.wpi.first.vision} package are designed to
- * simplify using OpenCV vision processing code from a robot program.
+ * Classes in the {@code edu.wpi.first.vision} package are designed to simplify using OpenCV vision
+ * processing code from a robot program.
  *
- * <p>An example use case for grabbing a yellow tote from 2015 in autonomous:
- * <br>
+ * <p>An example use case for grabbing a yellow tote from 2015 in autonomous: <br>
+ *
  * <pre><code>
  * public class Robot extends IterativeRobot
  *     implements VisionRunner.Listener&lt;MyFindTotePipeline&gt; {

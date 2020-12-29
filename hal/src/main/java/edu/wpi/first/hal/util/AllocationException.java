@@ -4,9 +4,7 @@
 
 package edu.wpi.first.hal.util;
 
-/**
- * Exception indicating that the resource is already allocated.
- */
+/** Exception indicating that the resource is already allocated. */
 @SuppressWarnings("serial")
 public class AllocationException extends RuntimeException {
   /**

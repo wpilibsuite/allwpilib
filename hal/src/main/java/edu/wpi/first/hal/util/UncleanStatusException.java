@@ -4,9 +4,7 @@
 
 package edu.wpi.first.hal.util;
 
-/**
- * Exception for bad status codes from the chip object.
- */
+/** Exception for bad status codes from the chip object. */
 @SuppressWarnings("serial")
 public final class UncleanStatusException extends IllegalStateException {
   private final int m_statusCode;
@@ -14,7 +12,7 @@ public final class UncleanStatusException extends IllegalStateException {
   /**
    * Create a new UncleanStatusException.
    *
-   * @param status  the status code that caused the exception
+   * @param status the status code that caused the exception
    * @param message A message describing the exception
    */
   public UncleanStatusException(int status, String message) {
@@ -40,9 +38,7 @@ public final class UncleanStatusException extends IllegalStateException {
     this(-1, message);
   }
 
-  /**
-   * Create a new UncleanStatusException.
-   */
+  /** Create a new UncleanStatusException. */
   public UncleanStatusException() {
     this(-1, "Status code was non-zero");
   }

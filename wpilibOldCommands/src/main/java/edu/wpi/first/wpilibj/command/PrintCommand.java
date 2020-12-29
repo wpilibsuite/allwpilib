@@ -10,9 +10,7 @@ package edu.wpi.first.wpilibj.command;
  * it reaches a certain point.
  */
 public class PrintCommand extends InstantCommand {
-  /**
-   * The message to print out.
-   */
+  /** The message to print out. */
   private final String m_message;
 
   /**

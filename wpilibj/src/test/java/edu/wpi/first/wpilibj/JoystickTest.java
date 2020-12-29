@@ -4,12 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class JoystickTest {
   @Test
