@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -35,6 +32,7 @@ HAL_ENUM(HAL_CANDeviceType) {
   HAL_CAN_Dev_kPowerDistribution = 8,
   HAL_CAN_Dev_kPneumatics = 9,
   HAL_CAN_Dev_kMiscellaneous = 10,
+  HAL_CAN_Dev_kIOBreakout = 11,
   HAL_CAN_Dev_kFirmwareUpdate = 31
 };
 
@@ -54,7 +52,9 @@ HAL_ENUM(HAL_CANManufacturer) {
   HAL_CAN_Man_kMS = 7,
   HAL_CAN_Man_kTeamUse = 8,
   HAL_CAN_Man_kKauaiLabs = 9,
-  HAL_CAN_Man_kCopperforge = 10
+  HAL_CAN_Man_kCopperforge = 10,
+  HAL_CAN_Man_kPWF = 11,
+  HAL_CAN_Man_kStudica = 12
 };
 // clang-format on
 /** @} */

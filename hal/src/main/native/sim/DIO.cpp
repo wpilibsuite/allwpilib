@@ -1,13 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DIO.h"
-
-#include <cmath>
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
@@ -40,7 +35,9 @@ extern "C" {
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
                                         HAL_Bool input, int32_t* status) {
   hal::init::CheckInit();
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0) {
+    return HAL_kInvalidHandle;
+  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -51,8 +48,9 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   auto handle =
       digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
   if (port == nullptr) {  // would only occur on thread issue.
@@ -63,8 +61,8 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   port->channel = static_cast<uint8_t>(channel);
 
   SimDIOData[channel].initialized = true;
-
   SimDIOData[channel].isInput = input;
+  SimDIOData[channel].simDevice = 0;
 
   return handle;
 }
@@ -77,8 +75,18 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
   digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) return;
-  SimDIOData[port->channel].initialized = true;
+  if (port == nullptr) {
+    return;
+  }
+  SimDIOData[port->channel].initialized = false;
+}
+
+void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
+  if (port == nullptr) {
+    return;
+  }
+  SimDIOData[port->channel].simDevice = device;
 }
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
@@ -103,7 +111,9 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status) {
   auto port = digitalPWMHandles->Get(pwmGenerator);
   digitalPWMHandles->Free(pwmGenerator);
-  if (port == nullptr) return;
+  if (port == nullptr) {
+    return;
+  }
   int32_t id = *port;
   SimDigitalPWMData[id].initialized = false;
 }
@@ -128,8 +138,12 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
     return;
   }
   int32_t id = *port;
-  if (dutyCycle > 1.0) dutyCycle = 1.0;
-  if (dutyCycle < 0.0) dutyCycle = 0.0;
+  if (dutyCycle > 1.0) {
+    dutyCycle = 1.0;
+  }
+  if (dutyCycle < 0.0) {
+    dutyCycle = 0.0;
+  }
   SimDigitalPWMData[id].dutyCycle = dutyCycle;
 }
 
@@ -152,7 +166,9 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     return;
   }
   if (value != 0 && value != 1) {
-    if (value != 0) value = 1;
+    if (value != 0) {
+      value = 1;
+    }
   }
   SimDIOData[port->channel].value = value;
 }
@@ -175,8 +191,12 @@ HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     return false;
   }
   HAL_Bool value = SimDIOData[port->channel].value;
-  if (value > 1) value = 1;
-  if (value < 0) value = 0;
+  if (value > 1) {
+    value = 1;
+  }
+  if (value < 0) {
+    value = 0;
+  }
   return value;
 }
 
@@ -187,8 +207,12 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     return false;
   }
   HAL_Bool value = SimDIOData[port->channel].isInput;
-  if (value > 1) value = 1;
-  if (value < 0) value = 0;
+  if (value > 1) {
+    value = 1;
+  }
+  if (value < 0) {
+    value = 0;
+  }
   return value;
 }
 

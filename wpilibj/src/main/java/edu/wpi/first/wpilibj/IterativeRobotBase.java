@@ -1,13 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,7 +40,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *   - teleopPeriodic()
  *   - testPeriodic()
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public abstract class IterativeRobotBase extends RobotBase {
   protected double m_period;
 
@@ -56,6 +53,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private Mode m_lastMode = Mode.kNone;
   private final Watchdog m_watchdog;
+  private boolean m_ntFlushEnabled;
 
   /**
    * Constructor for IterativeRobotBase.
@@ -87,6 +85,18 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   public void robotInit() {
     System.out.println("Default robotInit() method... Override me!");
+  }
+
+  /**
+   * Robot-wide simulation initialization code should go here.
+   *
+   * <p>Users should override this method for default Robot-wide simulation
+   * related initialization which will be called when the robot is first
+   * started. It will be called exactly one time after RobotInit is called
+   * only when the robot is in simulation.
+   */
+  public void simulationInit() {
+    System.out.println("Default simulationInit() method... Override me!");
   }
 
   /**
@@ -144,6 +154,20 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
   }
 
+  private boolean m_spFirstRun = true;
+
+  /**
+   * Periodic simulation code should go here.
+   *
+   * <p>This function is called in a simulated robot after user code executes.
+   */
+  public void simulationPeriodic() {
+    if (m_spFirstRun) {
+      System.out.println("Default simulationPeriodic() method... Override me!");
+      m_spFirstRun = false;
+    }
+  }
+
   private boolean m_dpFirstRun = true;
 
   /**
@@ -193,6 +217,17 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
   }
 
+  /**
+   * Enables or disables flushing NetworkTables every loop iteration.
+   * By default, this is disabled.
+   *
+   * @param enabled True to enable, false to disable
+   */
+  public void setNetworkTablesFlushEnabled(boolean enabled) {
+    m_ntFlushEnabled = enabled;
+  }
+
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void loopFunc() {
     m_watchdog.reset();
 
@@ -264,7 +299,20 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.addEpoch("LiveWindow.updateValues()");
     Shuffleboard.update();
     m_watchdog.addEpoch("Shuffleboard.update()");
+
+    if (isSimulation()) {
+      HAL.simPeriodicBefore();
+      simulationPeriodic();
+      HAL.simPeriodicAfter();
+      m_watchdog.addEpoch("simulationPeriodic()");
+    }
+
     m_watchdog.disable();
+
+    // Flush NetworkTables
+    if (m_ntFlushEnabled) {
+      NetworkTableInstance.getDefault().flush();
+    }
 
     // Warn on loop time overruns
     if (m_watchdog.isExpired()) {

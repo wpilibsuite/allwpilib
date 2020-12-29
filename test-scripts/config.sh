@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #*----------------------------------------------------------------------------*#
-#* Copyright (c) FIRST 2014. All Rights Reserved.							  *#
+#* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        *#
 #* Open Source Software - may be modified and shared by FRC teams. The code   *#
 #* must be accompanied by the FIRST BSD license file in the root directory of *#
-#* the project.															      *#
+#* the project.                                                               *#
 #*----------------------------------------------------------------------------*#
 
 # If this is changed, update the .gitignore
-# so that test results are not commited to the repo
+# so that test results are not committed to the repo
 DEFAULT_LOCAL_TEST_RESULTS_DIR=../test-reports
 
 ROBOT_ADDRESS=admin@roboRIO-190-FRC.local

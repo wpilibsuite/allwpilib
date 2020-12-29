@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -18,9 +15,8 @@
 #include "hal/CAN.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
-#include "hal/cpp/Log.h"
 
-using namespace frc;
+using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
@@ -95,6 +91,74 @@ Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeating
 
 /*
  * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    writeCANRTRFrame
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrame
+  (JNIEnv* env, jclass, jint handle, jint length, jint apiId)
+{
+  auto halHandle = static_cast<HAL_CANHandle>(handle);
+  int32_t status = 0;
+  HAL_WriteCANRTRFrame(halHandle, static_cast<int32_t>(length), apiId, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    writeCANPacketNoThrow
+ * Signature: (I[BI)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketNoThrow
+  (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId)
+{
+  auto halHandle = static_cast<HAL_CANHandle>(handle);
+  JByteArrayRef arr{env, data};
+  auto arrRef = arr.array();
+  int32_t status = 0;
+  HAL_WriteCANPacket(halHandle, reinterpret_cast<const uint8_t*>(arrRef.data()),
+                     arrRef.size(), apiId, &status);
+  return status;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    writeCANPacketRepeatingNoThrow
+ * Signature: (I[BII)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANPacketRepeatingNoThrow
+  (JNIEnv* env, jclass, jint handle, jbyteArray data, jint apiId,
+   jint timeoutMs)
+{
+  auto halHandle = static_cast<HAL_CANHandle>(handle);
+  JByteArrayRef arr{env, data};
+  auto arrRef = arr.array();
+  int32_t status = 0;
+  HAL_WriteCANPacketRepeating(halHandle,
+                              reinterpret_cast<const uint8_t*>(arrRef.data()),
+                              arrRef.size(), apiId, timeoutMs, &status);
+  return status;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
+ * Method:    writeCANRTRFrameNoThrow
+ * Signature: (III)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_CANAPIJNI_writeCANRTRFrameNoThrow
+  (JNIEnv* env, jclass, jint handle, jint length, jint apiId)
+{
+  auto halHandle = static_cast<HAL_CANHandle>(handle);
+  int32_t status = 0;
+  HAL_WriteCANRTRFrame(halHandle, static_cast<int32_t>(length), apiId, &status);
+  return status;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_CANAPIJNI
  * Method:    stopCANPacketRepeating
  * Signature: (II)V
  */
@@ -130,11 +194,15 @@ Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketNew
   if (!CheckStatus(env, status)) {
     return false;
   }
-  if (dataLength > 8) dataLength = 8;
+  if (dataLength > 8) {
+    dataLength = 8;
+  }
 
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
-  if (javaLen < dataLength) dataLength = javaLen;
+  if (javaLen < dataLength) {
+    dataLength = javaLen;
+  }
   env->SetByteArrayRegion(toSetArray, 0, dataLength,
                           reinterpret_cast<jbyte*>(dataTemp));
   return true;
@@ -162,11 +230,15 @@ Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketLatest
   if (!CheckStatus(env, status)) {
     return false;
   }
-  if (dataLength > 8) dataLength = 8;
+  if (dataLength > 8) {
+    dataLength = 8;
+  }
 
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
-  if (javaLen < dataLength) dataLength = javaLen;
+  if (javaLen < dataLength) {
+    dataLength = javaLen;
+  }
   env->SetByteArrayRegion(toSetArray, 0, dataLength,
                           reinterpret_cast<jbyte*>(dataTemp));
   return true;
@@ -195,45 +267,15 @@ Java_edu_wpi_first_hal_CANAPIJNI_readCANPacketTimeout
   if (!CheckStatus(env, status)) {
     return false;
   }
-  if (dataLength > 8) dataLength = 8;
+  if (dataLength > 8) {
+    dataLength = 8;
+  }
 
   jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
   auto javaLen = env->GetArrayLength(toSetArray);
-  if (javaLen < dataLength) dataLength = javaLen;
-  env->SetByteArrayRegion(toSetArray, 0, dataLength,
-                          reinterpret_cast<jbyte*>(dataTemp));
-  return true;
-}
-
-/*
- * Class:     edu_wpi_first_hal_CANAPIJNI
- * Method:    readCANPeriodicPacket
- * Signature: (IIIILjava/lang/Object;)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_CANAPIJNI_readCANPeriodicPacket
-  (JNIEnv* env, jclass, jint handle, jint apiId, jint timeoutMs, jint periodMs,
-   jobject data)
-{
-  auto halHandle = static_cast<HAL_CANHandle>(handle);
-  uint8_t dataTemp[8];
-  int32_t dataLength = 0;
-  uint64_t timestamp = 0;
-  int32_t status = 0;
-  HAL_ReadCANPeriodicPacket(halHandle, apiId, dataTemp, &dataLength, &timestamp,
-                            timeoutMs, periodMs, &status);
-  if (status == HAL_CAN_TIMEOUT ||
-      status == HAL_ERR_CANSessionMux_MessageNotFound) {
-    return false;
+  if (javaLen < dataLength) {
+    dataLength = javaLen;
   }
-  if (!CheckStatus(env, status)) {
-    return false;
-  }
-  if (dataLength > 8) dataLength = 8;
-
-  jbyteArray toSetArray = SetCANDataObject(env, data, dataLength, timestamp);
-  auto javaLen = env->GetArrayLength(toSetArray);
-  if (javaLen < dataLength) dataLength = javaLen;
   env->SetByteArrayRegion(toSetArray, 0, dataLength,
                           reinterpret_cast<jbyte*>(dataTemp));
   return true;

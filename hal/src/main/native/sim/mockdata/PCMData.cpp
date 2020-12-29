@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "PCMDataInternal.h"
@@ -25,6 +22,7 @@ void PCMData::ResetData() {
     solenoidInitialized[i].Reset(false);
     solenoidOutput[i].Reset(false);
   }
+  anySolenoidInitialized.Reset(false);
   compressorInitialized.Reset(false);
   compressorOn.Reset(false);
   closedLoopEnabled.Reset(true);
@@ -33,7 +31,9 @@ void PCMData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetPCMData(int32_t index) { SimPCMData[index].ResetData(); }
+void HALSIM_ResetPCMData(int32_t index) {
+  SimPCMData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PCM##CAPINAME, SimPCMData, \
@@ -43,11 +43,29 @@ HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidInitialized,
                                      SimPCMData, solenoidInitialized)
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidOutput,
                                      SimPCMData, solenoidOutput)
+DEFINE_CAPI(HAL_Bool, AnySolenoidInitialized, anySolenoidInitialized)
 DEFINE_CAPI(HAL_Bool, CompressorInitialized, compressorInitialized)
 DEFINE_CAPI(HAL_Bool, CompressorOn, compressorOn)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, pressureSwitch)
 DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
+
+void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) {
+  auto& data = SimPCMData[index].solenoidOutput;
+  uint8_t ret = 0;
+  for (int i = 0; i < kNumSolenoidChannels; i++) {
+    ret |= (data[i] << i);
+  }
+  *values = ret;
+}
+
+void HALSIM_SetPCMAllSolenoids(int32_t index, uint8_t values) {
+  auto& data = SimPCMData[index].solenoidOutput;
+  for (int i = 0; i < kNumSolenoidChannels; i++) {
+    data[i] = (values & 0x1) != 0;
+    values >>= 1;
+  }
+}
 
 #define REGISTER(NAME) \
   SimPCMData[index].NAME.RegisterCallback(callback, param, initialNotify)

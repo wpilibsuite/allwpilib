@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -12,8 +9,8 @@
 #include <frc/Encoder.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/SpeedControllerGroup.h>
-#include <frc/commands/Subsystem.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc2/command/SubsystemBase.h>
 
 namespace frc {
 class Joystick;
@@ -24,15 +21,9 @@ class Joystick;
  * the robots chassis. These include four drive motors, a left and right encoder
  * and a gyro.
  */
-class DriveTrain : public frc::Subsystem {
+class DriveTrain : public frc2::SubsystemBase {
  public:
   DriveTrain();
-
-  /**
-   * When no other command is running let the operator drive around
-   * using the PS3 joystick.
-   */
-  void InitDefaultCommand() override;
 
   /**
    * The log method puts interesting information to the SmartDashboard.
@@ -65,6 +56,12 @@ class DriveTrain : public frc::Subsystem {
    * @return The distance to the obstacle detected by the rangefinder.
    */
   double GetDistanceToObstacle();
+
+  /**
+   * Log the data periodically. This method is automatically called
+   * by the subsystem.
+   */
+  void Periodic() override;
 
  private:
   frc::PWMVictorSPX m_frontLeft{1};

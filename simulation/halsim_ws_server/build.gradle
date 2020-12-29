@@ -1,0 +1,72 @@
+
+description = "WebSocket Server Extension"
+
+ext {
+    includeWpiutil = true
+    pluginName = 'halsim_ws_server'
+}
+
+apply plugin: 'google-test-test-suite'
+
+
+ext {
+    staticGtestConfigs = [:]
+}
+
+staticGtestConfigs["${pluginName}Test"] = []
+apply from: "${rootDir}/shared/googletest.gradle"
+
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+
+model {
+    testSuites {
+        def comps = $.components
+        if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+            "${pluginName}Test"(GoogleTestTestSuiteSpec) {
+                for(NativeComponentSpec c : comps) {
+                    if (c.name == pluginName) {
+                        testing c
+                        break
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/test/native/cpp'
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    binaries {
+        all {
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                it.buildable = false
+                return
+            }
+
+            lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
+        }
+
+        withType(GoogleTestTestSuiteBinarySpec) {
+            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib library: pluginName, linkage: 'shared'
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+            }
+        }
+    }
+
+}
+
+tasks.withType(RunTestExecutable) {
+    args "--gtest_output=xml:test_detail.xml"
+    outputs.dir outputDir
+}

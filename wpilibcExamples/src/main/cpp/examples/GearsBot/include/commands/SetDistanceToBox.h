@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <frc/PIDController.h>
-#include <frc/PIDOutput.h>
-#include <frc/PIDSource.h>
-#include <frc/commands/Command.h>
+#include <frc2/command/CommandHelper.h>
+#include <frc2/command/PIDCommand.h>
+
+#include "subsystems/DriveTrain.h"
 
 /**
  * Drive until the robot is the given distance away from the box. Uses a local
@@ -18,27 +15,13 @@
  * command is running. The input is the averaged values of the left and right
  * encoders.
  */
-class SetDistanceToBox : public frc::Command {
+class SetDistanceToBox
+    : public frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox> {
  public:
-  explicit SetDistanceToBox(double distance);
+  explicit SetDistanceToBox(double distance, DriveTrain* drivetrain);
   void Initialize() override;
   bool IsFinished() override;
-  void End() override;
-
-  class SetDistanceToBoxPIDSource : public frc::PIDSource {
-   public:
-    virtual ~SetDistanceToBoxPIDSource() = default;
-    double PIDGet() override;
-  };
-
-  class SetDistanceToBoxPIDOutput : public frc::PIDOutput {
-   public:
-    virtual ~SetDistanceToBoxPIDOutput() = default;
-    void PIDWrite(double d) override;
-  };
 
  private:
-  SetDistanceToBoxPIDSource m_source;
-  SetDistanceToBoxPIDOutput m_output;
-  frc::PIDController m_pid{-2, 0, 0, &m_source, &m_output};
+  DriveTrain* m_drivetrain;
 };

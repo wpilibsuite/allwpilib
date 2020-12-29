@@ -1,25 +1,24 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "commands/SetWristSetpoint.h"
 
 #include "Robot.h"
 
-SetWristSetpoint::SetWristSetpoint(double setpoint)
-    : frc::Command("SetWristSetpoint") {
-  m_setpoint = setpoint;
-  Requires(&Robot::wrist);
+SetWristSetpoint::SetWristSetpoint(double setpoint, Wrist* wrist)
+    : m_setpoint(setpoint), m_wrist(wrist) {
+  SetName("SetWristSetpoint");
+  AddRequirements({m_wrist});
 }
 
 // Called just before this Command runs the first time
 void SetWristSetpoint::Initialize() {
-  Robot::wrist.SetSetpoint(m_setpoint);
-  Robot::wrist.Enable();
+  m_wrist->SetSetpoint(m_setpoint);
+  m_wrist->Enable();
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool SetWristSetpoint::IsFinished() { return Robot::wrist.OnTarget(); }
+bool SetWristSetpoint::IsFinished() {
+  return m_wrist->GetController().AtSetpoint();
+}

@@ -43,8 +43,6 @@ def generateUsageReporting = tasks.register('generateUsageReporting') {
     }
 }
 
-apply plugin: DisableBuildingGTest
-
 ext {
     addHalDependency = { binary, shared->
         binary.tasks.withType(AbstractNativeSourceCompileTask) {
@@ -62,39 +60,12 @@ ext {
 
     nativeName = 'hal'
     setBaseName = 'wpiHal'
-    devMain = 'DevMain'
+    devMain = 'edu.wpi.first.hal.DevMain'
     niLibraries = true
     generatedHeaders = "$buildDir/generated/headers"
     jniSplitSetup = {
         it.tasks.withType(AbstractNativeSourceCompileTask) {
             it.dependsOn generateUsageReporting
-        }
-        if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-            it.sources {
-                athenaJniCpp(CppSourceSet) {
-                    source {
-                        srcDirs = ["${rootDir}/shared/singlelib", "$buildDir/generated/cpp"]
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                    }
-                }
-            }
-        } else {
-            it.sources {
-                simJniCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/sim'
-                        include '**/jni/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDir 'src/main/native/include'
-                        srcDir generatedHeaders
-                    }
-                }
-            }
         }
     }
     splitSetup = {
@@ -107,7 +78,6 @@ ext {
                     source {
                         srcDirs = ['src/main/native/athena']
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -121,7 +91,6 @@ ext {
                     source {
                         srcDirs 'src/main/native/sim'
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -134,7 +103,6 @@ ext {
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
-apply from: 'simjni.gradle'
 
 sourceSets.main.java.srcDir "${buildDir}/generated/java/"
 
@@ -150,12 +118,6 @@ cppSourcesZip {
     from('src/main/native/sim') {
         into '/sim'
     }
-
-    from("$buildDir/generated/cpp") {
-        into '/athena/jni'
-    }
-
-    dependsOn generateAthenaSimFiles
 }
 
 cppHeadersZip {
@@ -182,6 +144,17 @@ nativeUtils.exportsConfigs {
         }
         x64SymbolFilter = { symbols ->
             symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
+        }
+    }
+}
+
+model {
+    binaries {
+        all {
+            if (!(it instanceof NativeBinarySpec)) return
+            if (it.component.name != 'hal' && it.component.name != 'halBase') return
+            if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
+            nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared')
         }
     }
 }

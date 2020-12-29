@@ -1,23 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/ErrorBase.h"
 
 #include <cerrno>
-#include <cstdio>
 #include <cstring>
 #include <set>
+#include <utility>
 
-#include <hal/HAL.h>
+#include <hal/HALBase.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
+#include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Base.h"
 
 using namespace frc;
 
@@ -50,13 +48,21 @@ void GlobalErrors::Insert(Error&& error) {
   inst.lastError = &(*inst.errors.insert(std::move(error)).first);
 }
 
-ErrorBase::ErrorBase() { HAL_Initialize(500, 0); }
+ErrorBase::ErrorBase() {
+  HAL_Initialize(500, 0);
+}
 
-Error& ErrorBase::GetError() { return m_error; }
+Error& ErrorBase::GetError() {
+  return m_error;
+}
 
-const Error& ErrorBase::GetError() const { return m_error; }
+const Error& ErrorBase::GetError() const {
+  return m_error;
+}
 
-void ErrorBase::ClearError() const { m_error.Clear(); }
+void ErrorBase::ClearError() const {
+  m_error.Clear();
+}
 
 void ErrorBase::SetErrnoError(const wpi::Twine& contextMessage,
                               wpi::StringRef filename, wpi::StringRef function,
@@ -141,7 +147,9 @@ void ErrorBase::CloneError(const ErrorBase& rhs) const {
   m_error = rhs.GetError();
 }
 
-bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
+bool ErrorBase::StatusIsFatal() const {
+  return m_error.GetCode() < 0;
+}
 
 void ErrorBase::SetGlobalError(Error::Code code,
                                const wpi::Twine& contextMessage,
@@ -166,7 +174,9 @@ void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
 Error ErrorBase::GetGlobalError() {
   auto& inst = GlobalErrors::GetInstance();
   std::scoped_lock mutex(inst.mutex);
-  if (!inst.lastError) return Error{};
+  if (!inst.lastError) {
+    return {};
+  }
   return *inst.lastError;
 }
 
@@ -174,7 +184,9 @@ std::vector<Error> ErrorBase::GetGlobalErrors() {
   auto& inst = GlobalErrors::GetInstance();
   std::scoped_lock mutex(inst.mutex);
   std::vector<Error> rv;
-  for (auto&& error : inst.errors) rv.push_back(error);
+  for (auto&& error : inst.errors) {
+    rv.push_back(error);
+  }
   return rv;
 }
 

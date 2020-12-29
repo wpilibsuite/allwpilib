@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -12,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import edu.wpi.cscore.CameraServerJNI;
@@ -21,6 +19,9 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.math.MathShared;
+import edu.wpi.first.math.MathSharedStore;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -38,19 +39,19 @@ public abstract class RobotBase implements AutoCloseable {
    * The ID of the main Java thread.
    */
   // This is usually 1, but it is best to make sure
-  public static final long MAIN_THREAD_ID = Thread.currentThread().getId();
+  private static long m_threadId = -1;
 
   private static void setupCameraServerShared() {
     CameraServerShared shared = new CameraServerShared() {
 
       @Override
       public void reportVideoServer(int id) {
-        HAL.report(tResourceType.kResourceType_PCVideoServer, id);
+        HAL.report(tResourceType.kResourceType_PCVideoServer, id + 1);
       }
 
       @Override
       public void reportUsbCamera(int id) {
-        HAL.report(tResourceType.kResourceType_UsbCamera, id);
+        HAL.report(tResourceType.kResourceType_UsbCamera, id + 1);
       }
 
       @Override
@@ -60,12 +61,12 @@ public abstract class RobotBase implements AutoCloseable {
 
       @Override
       public void reportAxisCamera(int id) {
-        HAL.report(tResourceType.kResourceType_AxisCamera, id);
+        HAL.report(tResourceType.kResourceType_AxisCamera, id + 1);
       }
 
       @Override
       public Long getRobotMainThreadId() {
-        return MAIN_THREAD_ID;
+        return RobotBase.getMainThreadId();
       }
 
       @Override
@@ -75,6 +76,53 @@ public abstract class RobotBase implements AutoCloseable {
     };
 
     CameraServerSharedStore.setCameraServerShared(shared);
+  }
+
+  private static void setupMathShared() {
+    MathSharedStore.setMathShared(new MathShared() {
+      @Override
+      public void reportError(String error, StackTraceElement[] stackTrace) {
+        DriverStation.reportError(error, stackTrace);
+      }
+
+      @Override
+      public void reportUsage(MathUsageId id, int count) {
+        switch (id) {
+          case kKinematics_DifferentialDrive:
+            HAL.report(tResourceType.kResourceType_Kinematics,
+                tInstances.kKinematics_DifferentialDrive);
+            break;
+          case kKinematics_MecanumDrive:
+            HAL.report(tResourceType.kResourceType_Kinematics,
+                tInstances.kKinematics_MecanumDrive);
+            break;
+          case kKinematics_SwerveDrive:
+            HAL.report(tResourceType.kResourceType_Kinematics,
+                tInstances.kKinematics_SwerveDrive);
+            break;
+          case kTrajectory_TrapezoidProfile:
+            HAL.report(tResourceType.kResourceType_TrapezoidProfile, count);
+            break;
+          case kFilter_Linear:
+            HAL.report(tResourceType.kResourceType_LinearFilter, count);
+            break;
+          case kOdometry_DifferentialDrive:
+            HAL.report(tResourceType.kResourceType_Odometry,
+                tInstances.kOdometry_DifferentialDrive);
+            break;
+          case kOdometry_SwerveDrive:
+            HAL.report(tResourceType.kResourceType_Odometry,
+                tInstances.kOdometry_SwerveDrive);
+            break;
+          case kOdometry_MecanumDrive:
+            HAL.report(tResourceType.kResourceType_Odometry,
+                tInstances.kOdometry_MecanumDrive);
+            break;
+          default:
+            break;
+        }
+      }
+    });
   }
 
   protected final DriverStation m_ds;
@@ -89,10 +137,16 @@ public abstract class RobotBase implements AutoCloseable {
    * to put this code into it's own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    m_threadId = Thread.currentThread().getId();
     setupCameraServerShared();
+    setupMathShared();
     inst.setNetworkIdentity("Robot");
-    inst.startServer("/home/lvuser/networktables.ini");
+    if (isReal()) {
+      inst.startServer("/home/lvuser/networktables.ini");
+    } else {
+      inst.startServer();
+    }
     m_ds = DriverStation.getInstance();
     inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
@@ -100,8 +154,8 @@ public abstract class RobotBase implements AutoCloseable {
     Shuffleboard.disableActuatorWidgets();
   }
 
-  @Deprecated
-  public void free() {
+  public static long getMainThreadId() {
+    return m_threadId;
   }
 
   @Override
@@ -155,6 +209,16 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
+   * Determine if the robot is current in Autonomous mode and enabled as determined by
+   * the field controls.
+   *
+   * @return True if the robot is currently operating autonomously while enabled.
+   */
+  public boolean isAutonomousEnabled() {
+    return m_ds.isAutonomousEnabled();
+  }
+
+  /**
    * Determine if the robot is currently in Test mode as determined by the driver
    * station.
    *
@@ -175,6 +239,16 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
+   * Determine if the robot is current in Operator Control mode and enabled as determined by
+   * the field controls.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while enabled.
+   */
+  public boolean isOperatorControlEnabled() {
+    return m_ds.isOperatorControlEnabled();
+  }
+
+  /**
    * Indicates if new data is available from the driver station.
    *
    * @return Has new data arrived over the network since the last time this function was called?
@@ -187,6 +261,11 @@ public abstract class RobotBase implements AutoCloseable {
    * Provide an alternate "main loop" via startCompetition().
    */
   public abstract void startCompetition();
+
+  /**
+   * Ends the main loop in startCompetition().
+   */
+  public abstract void endCompetition();
 
   @SuppressWarnings("JavadocMethod")
   public static boolean getBooleanProperty(String name, boolean defaultValue) {
@@ -203,22 +282,16 @@ public abstract class RobotBase implements AutoCloseable {
     }
   }
 
+  private static final ReentrantLock m_runMutex = new ReentrantLock();
+  private static RobotBase m_robotCopy;
+  private static boolean m_suppressExitWarning;
+
   /**
-   * Starting point for the applications.
+   * Run the robot main loop.
    */
   @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable",
                      "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
-  public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
-    if (!HAL.initialize(500, 0)) {
-      throw new IllegalStateException("Failed to initialize. Terminating");
-    }
-
-    // Call a CameraServer JNI function to force OpenCV native library loading
-    // Needed because all the OpenCV JNI functions don't have built in loading
-    CameraServerJNI.enumerateSinks();
-
-    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
-
+  private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 
     T robot;
@@ -238,9 +311,12 @@ public abstract class RobotBase implements AutoCloseable {
           + throwable.toString(), elements);
       DriverStation.reportWarning("Robots should not quit, but yours did!", false);
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
-      System.exit(1);
       return;
     }
+
+    m_runMutex.lock();
+    m_robotCopy = robot;
+    m_runMutex.unlock();
 
     if (isReal()) {
       try {
@@ -275,16 +351,73 @@ public abstract class RobotBase implements AutoCloseable {
           throwable.getStackTrace());
       errorOnExit = true;
     } finally {
-      // startCompetition never returns unless exception occurs....
-      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
-      if (errorOnExit) {
-        DriverStation.reportError(
-            "The startCompetition() method (or methods called by it) should have "
-                + "handled the exception above.", false);
-      } else {
-        DriverStation.reportError("Unexpected return from startCompetition() method.", false);
+      m_runMutex.lock();
+      boolean suppressExitWarning = m_suppressExitWarning;
+      m_runMutex.unlock();
+      if (!suppressExitWarning) {
+        // startCompetition never returns unless exception occurs....
+        DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+        if (errorOnExit) {
+          DriverStation.reportError(
+              "The startCompetition() method (or methods called by it) should have "
+                  + "handled the exception above.", false);
+        } else {
+          DriverStation.reportError("Unexpected return from startCompetition() method.", false);
+        }
       }
     }
-    System.exit(1);
+  }
+
+  /**
+   * Suppress the "Robots should not quit" message.
+   */
+  public static void suppressExitWarning(boolean value) {
+    m_runMutex.lock();
+    m_suppressExitWarning = value;
+    m_runMutex.unlock();
+  }
+
+  /**
+   * Starting point for the applications.
+   */
+  public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
+    if (!HAL.initialize(500, 0)) {
+      throw new IllegalStateException("Failed to initialize. Terminating");
+    }
+
+    // Call a CameraServer JNI function to force OpenCV native library loading
+    // Needed because all the OpenCV JNI functions don't have built in loading
+    CameraServerJNI.enumerateSinks();
+
+    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0,
+        WPILibVersion.Version);
+
+    if (HAL.hasMain()) {
+      Thread thread = new Thread(() -> {
+        runRobot(robotSupplier);
+        HAL.exitMain();
+      }, "robot main");
+      thread.setDaemon(true);
+      thread.start();
+      HAL.runMain();
+      suppressExitWarning(true);
+      m_runMutex.lock();
+      RobotBase robot = m_robotCopy;
+      m_runMutex.unlock();
+      if (robot != null) {
+        robot.endCompetition();
+      }
+      try {
+        thread.join(1000);
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+      }
+    } else {
+      runRobot(robotSupplier);
+    }
+
+    HAL.shutdown();
+
+    System.exit(0);
   }
 }

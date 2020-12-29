@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AnalogTrigger.h"
 
@@ -63,7 +60,7 @@ int32_t hal::GetAnalogTriggerInputIndex(HAL_AnalogTriggerHandle handle,
 extern "C" {
 
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
-    HAL_AnalogInputHandle portHandle, int32_t* index, int32_t* status) {
+    HAL_AnalogInputHandle portHandle, int32_t* status) {
   hal::init::CheckInit();
   // ensure we are given a valid and active AnalogInput handle
   auto analog_port = analogInputHandles->Get(portHandle);
@@ -83,20 +80,28 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
   }
   trigger->analogHandle = portHandle;
   trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
-  *index = trigger->index;
 
   SimAnalogTriggerData[trigger->index].initialized = true;
+  SimAnalogTriggerData[trigger->index].inputPort = analog_port->channel;
 
   trigger->trigState = false;
 
   return handle;
 }
 
+HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
+    HAL_DutyCycleHandle dutyCycleHandle, int32_t* status) {
+  *status = HAL_SIM_NOT_SUPPORTED;
+  return HAL_kInvalidHandle;
+}
+
 void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
                             int32_t* status) {
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
   analogTriggerHandles->Free(analogTriggerHandle);
-  if (trigger == nullptr) return;
+  if (trigger == nullptr) {
+    return;
+  }
   SimAnalogTriggerData[trigger->index].initialized = false;
   // caller owns the analog input handle.
 }
@@ -125,14 +130,25 @@ void HAL_SetAnalogTriggerLimitsRaw(HAL_AnalogTriggerHandle analogTriggerHandle,
 
   double trigLower =
       GetAnalogValueToVoltage(trigger->analogHandle, lower, status);
-  if (status != 0) return;
+  if (status != 0) {
+    return;
+  }
   double trigUpper =
       GetAnalogValueToVoltage(trigger->analogHandle, upper, status);
-  if (status != 0) return;
+  if (status != 0) {
+    return;
+  }
 
   SimAnalogTriggerData[trigger->index].triggerUpperBound = trigUpper;
   SimAnalogTriggerData[trigger->index].triggerLowerBound = trigLower;
 }
+
+void HAL_SetAnalogTriggerLimitsDutyCycle(
+    HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
+    int32_t* status) {
+  *status = HAL_SIM_NOT_SUPPORTED;
+}
+
 void HAL_SetAnalogTriggerLimitsVoltage(
     HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
     int32_t* status) {
@@ -158,7 +174,7 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
 
   AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
 
-  if (triggerData->triggerMode.Get() == HALSIM_AnalogTriggerFiltered) {
+  if (triggerData->triggerMode.Get() != HALSIM_AnalogTriggerUnassigned) {
     *status = INCOMPATIBLE_STATE;
     return;
   }
@@ -167,6 +183,7 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
                                  : HALSIM_AnalogTriggerUnassigned;
   triggerData->triggerMode = setVal;
 }
+
 void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
                                   HAL_Bool useFilteredValue, int32_t* status) {
   auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
@@ -177,12 +194,12 @@ void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
 
   AnalogTriggerData* triggerData = &SimAnalogTriggerData[trigger->index];
 
-  if (triggerData->triggerMode.Get() == HALSIM_AnalogTriggerAveraged) {
+  if (triggerData->triggerMode.Get() != HALSIM_AnalogTriggerUnassigned) {
     *status = INCOMPATIBLE_STATE;
     return;
   }
 
-  auto setVal = useFilteredValue ? HALSIM_AnalogTriggerAveraged
+  auto setVal = useFilteredValue ? HALSIM_AnalogTriggerFiltered
                                  : HALSIM_AnalogTriggerUnassigned;
   triggerData->triggerMode = setVal;
 }
@@ -258,4 +275,15 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
     return false;
   }
 }
+
+int32_t HAL_GetAnalogTriggerFPGAIndex(
+    HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status) {
+  auto trigger = analogTriggerHandles->Get(analogTriggerHandle);
+  if (trigger == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return -1;
+  }
+  return trigger->index;
+}
+
 }  // extern "C"

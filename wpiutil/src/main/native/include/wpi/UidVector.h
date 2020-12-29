@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_UIDVECTOR_H_
 #define WPIUTIL_WPI_UIDVECTOR_H_
@@ -27,7 +24,9 @@ class UidVectorIterator {
   UidVectorIterator() = default;
   explicit UidVectorIterator(It it, It end) : m_it(it), m_end(end) {
     // advance to first non-empty element
-    while (m_it != m_end && !*m_it) ++m_it;
+    while (m_it != m_end && !*m_it) {
+      ++m_it;
+    }
   }
 
   reference operator*() const noexcept { return *m_it; }
@@ -107,7 +106,9 @@ class UidVector {
   // Removes the identified element by replacing it with a default-constructed
   // one.  The element is added to the freelist for later reuse.
   void erase(size_type uid) {
-    if (uid >= m_vector.size() || !m_vector[uid]) return;
+    if (uid >= m_vector.size() || !m_vector[uid]) {
+      return;
+    }
     m_free.push_back(uid);
     m_vector[uid] = T();
     --m_active_count;

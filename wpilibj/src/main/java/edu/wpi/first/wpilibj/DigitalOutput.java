@@ -1,22 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
-public class DigitalOutput extends SendableBase {
+public class DigitalOutput extends DigitalSource implements Sendable, AutoCloseable {
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 
@@ -36,13 +35,14 @@ public class DigitalOutput extends SendableBase {
 
     m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), false);
 
-    HAL.report(tResourceType.kResourceType_DigitalOutput, channel);
-    setName("DigitalOutput", channel);
+    HAL.report(tResourceType.kResourceType_DigitalOutput, channel + 1);
+    SendableRegistry.addLW(this, "DigitalOutput", channel);
   }
 
   @Override
   public void close() {
     super.close();
+    SendableRegistry.remove(this);
     // Disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();
@@ -74,6 +74,7 @@ public class DigitalOutput extends SendableBase {
    *
    * @return The GPIO channel number.
    */
+  @Override
   public int getChannel() {
     return m_channel;
   }
@@ -161,9 +162,48 @@ public class DigitalOutput extends SendableBase {
     DIOJNI.setDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle);
   }
 
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  public void setSimDevice(SimDevice device) {
+    DIOJNI.setDIOSimDevice(m_handle, device.getNativeHandle());
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Digital Output");
     builder.addBooleanProperty("Value", this::get, this::set);
+  }
+
+  /**
+   * Is this an analog trigger.
+   *
+   * @return true if this is an analog trigger
+   */
+  @Override
+  public boolean isAnalogTrigger() {
+    return false;
+  }
+
+  /**
+   * Get the analog trigger type.
+   *
+   * @return false
+   */
+  @Override
+  public int getAnalogTriggerTypeForRouting() {
+    return 0;
+  }
+
+  /**
+   * Get the HAL Port Handle.
+   *
+   * @return The HAL Handle to the specified source.
+   */
+  @Override
+  public int getPortHandleForRouting() {
+    return m_handle;
   }
 }

@@ -37,6 +37,7 @@
 #include "wpi/PointerIntPair.h"
 #include "wpi/PointerUnion.h"
 #include <memory>
+#include <type_traits>
 
 namespace wpi {
 
@@ -237,7 +238,11 @@ public:
     return *this;
   }
 
-  template <typename CallableT> unique_function(CallableT Callable) {
+  template <typename CallableT>
+  unique_function(CallableT Callable,
+                  std::enable_if_t<
+                    std::is_invocable_r_v<
+                      ReturnT, CallableT, ParamTs...>>* = nullptr) {
     bool IsInlineStorage = true;
     void *CallableAddr = getInlineStorage();
     if (sizeof(CallableT) > InlineStorageSize ||

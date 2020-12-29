@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_NTCORE_C_H_
 #define NTCORE_NTCORE_C_H_
@@ -95,6 +92,7 @@ enum NT_NetworkMode {
   NT_NET_MODE_CLIENT = 0x02,   /* running in client mode */
   NT_NET_MODE_STARTING = 0x04, /* flag for starting (either client or server) */
   NT_NET_MODE_FAILURE = 0x08,  /* flag for failure (either client or server) */
+  NT_NET_MODE_LOCAL = 0x10,    /* running in local-only mode */
 };
 
 /*
@@ -1038,6 +1036,19 @@ void NT_SetNetworkIdentity(NT_Inst inst, const char* name, size_t name_len);
 unsigned int NT_GetNetworkMode(NT_Inst inst);
 
 /**
+ * Starts local-only operation.  Prevents calls to NT_StartServer or
+ * NT_StartClient from taking effect.  Has no effect if NT_StartServer or
+ * NT_StartClient has already been called.
+ */
+void NT_StartLocal(NT_Inst inst);
+
+/**
+ * Stops local-only operation.  NT_StartServer or NT_StartClient can be called
+ * after this call to start a server or client.
+ */
+void NT_StopLocal(NT_Inst inst);
+
+/**
  * Starts a server using the specified filename, listening address, and port.
  *
  * @param inst              instance handle
@@ -1733,7 +1744,7 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeStringArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
- * freed seperately. Note that the individual NT_Strings should not be freed,
+ * freed separately. Note that the individual NT_Strings should not be freed,
  * but the entire array should be freed at once. The NT_FreeStringArray()
  * function will free all the NT_Strings.
  */

@@ -1,17 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include "frc/DigitalSource.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
+class SendableBuilder;
 
 /**
  * Class to read a digital input.
@@ -22,7 +22,9 @@ class DigitalGlitchFilter;
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public DigitalSource {
+class DigitalInput : public DigitalSource,
+                     public Sendable,
+                     public SendableHelper<DigitalInput> {
  public:
   /**
    * Create an instance of a Digital Input class.
@@ -35,8 +37,8 @@ class DigitalInput : public DigitalSource {
 
   ~DigitalInput() override;
 
-  DigitalInput(DigitalInput&& rhs);
-  DigitalInput& operator=(DigitalInput&& rhs);
+  DigitalInput(DigitalInput&&) = default;
+  DigitalInput& operator=(DigitalInput&&) = default;
 
   /**
    * Get the value from a digital input channel.
@@ -66,11 +68,18 @@ class DigitalInput : public DigitalSource {
    */
   int GetChannel() const override;
 
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:
   int m_channel;
-  HAL_DigitalHandle m_handle = HAL_kInvalidHandle;
+  hal::Handle<HAL_DigitalHandle> m_handle;
 
   friend class DigitalGlitchFilter;
 };

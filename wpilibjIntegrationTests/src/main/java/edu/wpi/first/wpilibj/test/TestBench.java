@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.test;
 
@@ -80,7 +77,7 @@ public final class TestBench {
    * @return a freshly allocated Talon, Encoder pair
    */
   public MotorEncoderFixture<Talon> getTalonPair() {
-    MotorEncoderFixture<Talon> talonPair = new MotorEncoderFixture<Talon>() {
+    return new MotorEncoderFixture<Talon>() {
       @Override
       protected Talon giveSpeedController() {
         return new Talon(kTalonChannel);
@@ -101,7 +98,6 @@ public final class TestBench {
         return kTalonPDPChannel;
       }
     };
-    return talonPair;
   }
 
   /**
@@ -111,7 +107,7 @@ public final class TestBench {
    * @return a freshly allocated Victor, Encoder pair
    */
   public MotorEncoderFixture<Victor> getVictorPair() {
-    MotorEncoderFixture<Victor> vicPair = new MotorEncoderFixture<Victor>() {
+    return new MotorEncoderFixture<Victor>() {
       @Override
       protected Victor giveSpeedController() {
         return new Victor(kVictorChannel);
@@ -132,7 +128,6 @@ public final class TestBench {
         return kVictorPDPChannel;
       }
     };
-    return vicPair;
   }
 
   /**
@@ -142,7 +137,7 @@ public final class TestBench {
    * @return a freshly allocated Jaguar, Encoder pair
    */
   public MotorEncoderFixture<Jaguar> getJaguarPair() {
-    MotorEncoderFixture<Jaguar> jagPair = new MotorEncoderFixture<Jaguar>() {
+    return new MotorEncoderFixture<Jaguar>() {
       @Override
       protected Jaguar giveSpeedController() {
         return new Jaguar(kJaguarChannel);
@@ -163,7 +158,6 @@ public final class TestBench {
         return kJaguarPDPChannel;
       }
     };
-    return jagPair;
   }
 
   /**
@@ -172,7 +166,8 @@ public final class TestBench {
    * @return a freshly allocated Servo's and a freshly allocated Gyroscope
    */
   public TiltPanCameraFixture getTiltPanCam() {
-    TiltPanCameraFixture tpcam = new TiltPanCameraFixture() {
+
+    return new TiltPanCameraFixture() {
       @Override
       protected AnalogGyro giveGyro() {
         AnalogGyro gyro = new AnalogGyro(kGyroChannel);
@@ -197,13 +192,10 @@ public final class TestBench {
         return new Servo(kPanServoChannel);
       }
     };
-
-    return tpcam;
   }
 
   public DIOCrossConnectFixture getDIOCrossConnectFixture(int inputPort, int outputPort) {
-    DIOCrossConnectFixture dio = new DIOCrossConnectFixture(inputPort, outputPort);
-    return dio;
+    return new DIOCrossConnectFixture(inputPort, outputPort);
   }
 
   /**
@@ -213,14 +205,14 @@ public final class TestBench {
     List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
     List<Integer[]> setA =
         Arrays.asList(new Integer[][]{
-            {new Integer(DIOCrossConnectA1), new Integer(DIOCrossConnectA2)},
-            {new Integer(DIOCrossConnectA2), new Integer(DIOCrossConnectA1)}});
+            {DIOCrossConnectA1, DIOCrossConnectA2},
+            {DIOCrossConnectA2, DIOCrossConnectA1}});
     pairs.add(setA);
 
     List<Integer[]> setB =
         Arrays.asList(new Integer[][]{
-            {new Integer(DIOCrossConnectB1), new Integer(DIOCrossConnectB2)},
-            {new Integer(DIOCrossConnectB2), new Integer(DIOCrossConnectB1)}});
+            {DIOCrossConnectB1, DIOCrossConnectB2},
+            {DIOCrossConnectB2, DIOCrossConnectB1}});
     pairs.add(setB);
     // NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
     return pairs;
@@ -228,7 +220,7 @@ public final class TestBench {
 
   @SuppressWarnings("JavadocMethod")
   public static AnalogCrossConnectFixture getAnalogCrossConnectFixture() {
-    AnalogCrossConnectFixture analogIO = new AnalogCrossConnectFixture() {
+    return new AnalogCrossConnectFixture() {
       @Override
       protected AnalogOutput giveAnalogOutput() {
         return new AnalogOutput(0);
@@ -239,12 +231,11 @@ public final class TestBench {
         return new AnalogInput(2);
       }
     };
-    return analogIO;
   }
 
   @SuppressWarnings("JavadocMethod")
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
-    RelayCrossConnectFixture relay = new RelayCrossConnectFixture() {
+    return new RelayCrossConnectFixture() {
       @Override
       protected Relay giveRelay() {
         return new Relay(0);
@@ -260,7 +251,6 @@ public final class TestBench {
         return new DigitalInput(19);
       }
     };
-    return relay;
   }
 
   /**

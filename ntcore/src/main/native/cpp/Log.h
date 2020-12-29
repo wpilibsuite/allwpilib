@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_LOG_H_
 #define NTCORE_LOG_H_
@@ -17,7 +14,7 @@
 #define WARNING(x) WPI_WARNING(m_logger, x)
 #define INFO(x) WPI_INFO(m_logger, x)
 
-#define DEBUG(x) WPI_DEBUG(m_logger, x)
+#define DEBUG0(x) WPI_DEBUG(m_logger, x)
 #define DEBUG1(x) WPI_DEBUG1(m_logger, x)
 #define DEBUG2(x) WPI_DEBUG2(m_logger, x)
 #define DEBUG3(x) WPI_DEBUG3(m_logger, x)

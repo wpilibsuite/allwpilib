@@ -1,15 +1,5 @@
 [
   {
-    "name": "Iterative Robot",
-    "description": "Iterative style",
-    "tags": [
-      "Iterative"
-    ],
-    "foldername": "iterative",
-    "gradlebase": "java",
-    "mainclass": "Main"
-  },
-  {
     "name": "Timed Robot",
     "description": "Timed style",
     "tags": [
@@ -17,7 +7,8 @@
     ],
     "foldername": "timed",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Timed Skeleton (Advanced)",
@@ -27,7 +18,8 @@
     ],
     "foldername": "timedskeleton",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "RobotBase Skeleton (Advanced)",
@@ -37,7 +29,8 @@
     ],
     "foldername": "robotbaseskeleton",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 1
   },
   {
     "name": "Command Robot",
@@ -47,6 +40,40 @@
     ],
     "foldername": "commandbased",
     "gradlebase": "java",
-    "mainclass": "Main"
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Old Command Robot",
+    "description": "Old-command style (deprecated)",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "oldcommandbased",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 1
+  },
+  {
+    "name": "Romi - Timed Robot",
+    "description": "Romi - Timed style",
+    "tags": [
+      "Timed", "Romi"
+    ],
+    "foldername": "romitimed",
+    "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Romi - Command Robot",
+    "description": "Romi - Command style",
+    "tags": [
+      "Command", "Romi"
+    ],
+    "foldername": "romicommandbased",
+    "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]

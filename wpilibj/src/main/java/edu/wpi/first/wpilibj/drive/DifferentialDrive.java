@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.drive;
 
@@ -12,9 +9,12 @@ import java.util.StringJoiner;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -28,12 +28,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>Four motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Spark m_frontLeft = new Spark(1);
- *   Spark m_rearLeft = new Spark(2);
+ *   SpeedController m_frontLeft = new PWMVictorSPX(1);
+ *   SpeedController m_rearLeft = new PWMVictorSPX(2);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
  *
- *   Spark m_frontRight = new Spark(3);
- *   Spark m_rearRight = new Spark(4);
+ *   SpeedController m_frontRight = new PWMVictorSPX(3);
+ *   SpeedController m_rearRight = new PWMVictorSPX(4);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
@@ -43,14 +43,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>Six motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Spark m_frontLeft = new Spark(1);
- *   Spark m_midLeft = new Spark(2);
- *   Spark m_rearLeft = new Spark(3);
+ *   SpeedController m_frontLeft = new PWMVictorSPX(1);
+ *   SpeedController m_midLeft = new PWMVictorSPX(2);
+ *   SpeedController m_rearLeft = new PWMVictorSPX(3);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_midLeft, m_rearLeft);
  *
- *   Spark m_frontRight = new Spark(4);
- *   Spark m_midRight = new Spark(5);
- *   Spark m_rearRight = new Spark(6);
+ *   SpeedController m_frontRight = new PWMVictorSPX(4);
+ *   SpeedController m_midRight = new PWMVictorSPX(5);
+ *   SpeedController m_rearRight = new PWMVictorSPX(6);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_midRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
@@ -93,7 +93,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * {@link edu.wpi.first.wpilibj.RobotDrive#drive(double, double)} with the addition of a quick turn
  * mode. However, it is not designed to give exactly the same response.
  */
-public class DifferentialDrive extends RobotDriveBase {
+public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
 
@@ -118,10 +118,15 @@ public class DifferentialDrive extends RobotDriveBase {
     verify(leftMotor, rightMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
-    addChild(m_leftMotor);
-    addChild(m_rightMotor);
+    SendableRegistry.addChild(this, m_leftMotor);
+    SendableRegistry.addChild(this, m_rightMotor);
     instances++;
-    setName("DifferentialDrive", instances);
+    SendableRegistry.addLW(this, "DifferentialDrive", instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**
@@ -171,15 +176,15 @@ public class DifferentialDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialArcade);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialArcade, 2);
       m_reported = true;
     }
 
-    xSpeed = limit(xSpeed);
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    zRotation = limit(zRotation);
+    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
     zRotation = applyDeadband(zRotation, m_deadband);
 
     // Square the inputs (while preserving the sign) to increase fine control
@@ -214,8 +219,9 @@ public class DifferentialDrive extends RobotDriveBase {
       }
     }
 
-    m_leftMotor.set(limit(leftMotorOutput) * m_maxOutput);
-    m_rightMotor.set(limit(rightMotorOutput) * m_maxOutput * m_rightSideInvertMultiplier);
+    m_leftMotor.set(MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * m_maxOutput);
+    double maxOutput = m_maxOutput * m_rightSideInvertMultiplier;
+    m_rightMotor.set(MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * maxOutput);
 
     feed();
   }
@@ -237,15 +243,15 @@ public class DifferentialDrive extends RobotDriveBase {
   @SuppressWarnings({"ParameterName", "PMD.CyclomaticComplexity"})
   public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialCurvature);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialCurvature, 2);
       m_reported = true;
     }
 
-    xSpeed = limit(xSpeed);
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    zRotation = limit(zRotation);
+    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
     zRotation = applyDeadband(zRotation, m_deadband);
 
     double angularPower;
@@ -254,7 +260,7 @@ public class DifferentialDrive extends RobotDriveBase {
     if (isQuickTurn) {
       if (Math.abs(xSpeed) < m_quickStopThreshold) {
         m_quickStopAccumulator = (1 - m_quickStopAlpha) * m_quickStopAccumulator
-            + m_quickStopAlpha * limit(zRotation) * 2;
+            + m_quickStopAlpha * MathUtil.clamp(zRotation, -1.0, 1.0) * 2;
       }
       overPower = true;
       angularPower = zRotation;
@@ -328,15 +334,15 @@ public class DifferentialDrive extends RobotDriveBase {
    */
   public void tankDrive(double leftSpeed, double rightSpeed, boolean squareInputs) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 2,
-                 tInstances.kRobotDrive2_DifferentialTank);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_DifferentialTank, 2);
       m_reported = true;
     }
 
-    leftSpeed = limit(leftSpeed);
+    leftSpeed = MathUtil.clamp(leftSpeed, -1.0, 1.0);
     leftSpeed = applyDeadband(leftSpeed, m_deadband);
 
-    rightSpeed = limit(rightSpeed);
+    rightSpeed = MathUtil.clamp(rightSpeed, -1.0, 1.0);
     rightSpeed = applyDeadband(rightSpeed, m_deadband);
 
     // Square the inputs (while preserving the sign) to increase fine control
@@ -384,7 +390,7 @@ public class DifferentialDrive extends RobotDriveBase {
   }
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+   * Gets if the power sent to the right side of the drivetrain is multiplied by -1.
    *
    * @return true if the right side is inverted
    */
@@ -393,9 +399,9 @@ public class DifferentialDrive extends RobotDriveBase {
   }
 
   /**
-   * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+   * Sets if the power sent to the right side of the drivetrain should be multiplied by -1.
    *
-   * @param rightSideInverted true if right side power should be multipled by -1
+   * @param rightSideInverted true if right side power should be multiplied by -1
    */
   public void setRightSideInverted(boolean rightSideInverted) {
     m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -232,7 +229,6 @@ class XboxController : public GenericHID {
    */
   bool GetStartButtonReleased();
 
- private:
   enum class Button {
     kBumperLeft = 5,
     kBumperRight = 6,
@@ -244,6 +240,15 @@ class XboxController : public GenericHID {
     kY = 4,
     kBack = 7,
     kStart = 8
+  };
+
+  enum class Axis {
+    kLeftX = 0,
+    kRightX = 4,
+    kLeftY = 1,
+    kRightY = 5,
+    kLeftTrigger = 2,
+    kRightTrigger = 3
   };
 };
 

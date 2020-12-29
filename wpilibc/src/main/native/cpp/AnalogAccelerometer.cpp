@@ -1,22 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/AnalogAccelerometer.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
+#include "frc/Base.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogAccelerometer::AnalogAccelerometer(int channel)
     : AnalogAccelerometer(std::make_shared<AnalogInput>(channel)) {
-  AddChild(m_analogInput);
+  SendableRegistry::GetInstance().AddChild(this, m_analogInput.get());
 }
 
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
@@ -45,18 +44,24 @@ void AnalogAccelerometer::SetSensitivity(double sensitivity) {
   m_voltsPerG = sensitivity;
 }
 
-void AnalogAccelerometer::SetZero(double zero) { m_zeroGVoltage = zero; }
+void AnalogAccelerometer::SetZero(double zero) {
+  m_zeroGVoltage = zero;
+}
 
-double AnalogAccelerometer::PIDGet() { return GetAcceleration(); }
+double AnalogAccelerometer::PIDGet() {
+  return GetAcceleration();
+}
 
 void AnalogAccelerometer::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Accelerometer");
-  builder.AddDoubleProperty("Value", [=]() { return GetAcceleration(); },
-                            nullptr);
+  builder.AddDoubleProperty(
+      "Value", [=]() { return GetAcceleration(); }, nullptr);
 }
 
 void AnalogAccelerometer::InitAccelerometer() {
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer,
-             m_analogInput->GetChannel());
-  SetName("Accelerometer", m_analogInput->GetChannel());
+             m_analogInput->GetChannel() + 1);
+
+  SendableRegistry::GetInstance().AddLW(this, "Accelerometer",
+                                        m_analogInput->GetChannel());
 }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -12,7 +9,11 @@ import java.util.List;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimBoolean;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import static java.util.Objects.requireNonNull;
 
@@ -25,7 +26,7 @@ import static java.util.Objects.requireNonNull;
  * echo is received. The time that the line is high determines the round trip distance (time of
  * flight).
  */
-public class Ultrasonic extends SendableBase implements PIDSource {
+public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   /**
    * The units to return when PIDGet is called.
    */
@@ -57,6 +58,10 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   private Unit m_units;
   private static int m_instances;
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
+
+  private SimDevice m_simDevice;
+  private SimBoolean m_simRangeValid;
+  private SimDouble m_simRange;
 
   /**
    * Background task that goes through the list of ultrasonic sensors and pings each one in turn.
@@ -93,6 +98,13 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    * then automatic mode is restored.
    */
   private synchronized void initialize() {
+    m_simDevice = SimDevice.create("Ultrasonic", m_echoChannel.getChannel());
+    if (m_simDevice != null) {
+      m_simRangeValid = m_simDevice.createBoolean("Range Valid", false, true);
+      m_simRange = m_simDevice.createDouble("Range (in)", false, 0.0);
+      m_pingChannel.setSimDevice(m_simDevice);
+      m_echoChannel.setSimDevice(m_simDevice);
+    }
     if (m_task == null) {
       m_task = new UltrasonicChecker();
     }
@@ -101,7 +113,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
     m_sensors.add(this);
 
     m_counter = new Counter(m_echoChannel); // set up counter for this
-    addChild(m_counter);
+    SendableRegistry.addChild(this, m_counter);
     // sensor
     m_counter.setMaxPeriod(1.0);
     m_counter.setSemiPeriodMode(true);
@@ -111,7 +123,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
 
     m_instances++;
     HAL.report(tResourceType.kResourceType_Ultrasonic, m_instances);
-    setName("Ultrasonic", m_echoChannel.getChannel());
+    SendableRegistry.addLW(this, "Ultrasonic", m_echoChannel.getChannel());
   }
 
   /**
@@ -128,8 +140,8 @@ public class Ultrasonic extends SendableBase implements PIDSource {
   public Ultrasonic(final int pingChannel, final int echoChannel, Unit units) {
     m_pingChannel = new DigitalOutput(pingChannel);
     m_echoChannel = new DigitalInput(echoChannel);
-    addChild(m_pingChannel);
-    addChild(m_echoChannel);
+    SendableRegistry.addChild(this, m_pingChannel);
+    SendableRegistry.addChild(this, m_echoChannel);
     m_allocatedChannels = true;
     m_units = units;
     initialize();
@@ -191,7 +203,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    */
   @Override
   public synchronized void close() {
-    super.close();
+    SendableRegistry.remove(this);
     final boolean wasAutomaticMode = m_automaticEnabled;
     setAutomaticMode(false);
     if (m_allocatedChannels) {
@@ -216,11 +228,18 @@ public class Ultrasonic extends SendableBase implements PIDSource {
     if (!m_sensors.isEmpty() && wasAutomaticMode) {
       setAutomaticMode(true);
     }
+
+    if (m_simDevice != null) {
+      m_simDevice.close();
+      m_simDevice = null;
+    }
   }
 
   /**
-   * Turn Automatic mode on/off. When in Automatic mode, all sensors will fire in round robin,
-   * waiting a set time between each sensor.
+   * Turn Automatic mode on/off for all sensors.
+   *
+   * <p>When in Automatic mode, all sensors will fire in round robin, waiting a set time between
+   * each sensor.
    *
    * @param enabling Set to true if round robin scheduling should start for all the ultrasonic
    *                 sensors. This scheduling method assures that the sensors are non-interfering
@@ -228,7 +247,7 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    *                 is preferred, it can be implemented by pinging the sensors manually and waiting
    *                 for the results to come back.
    */
-  public void setAutomaticMode(boolean enabling) {
+  public static void setAutomaticMode(boolean enabling) {
     if (enabling == m_automaticEnabled) {
       return; // ignore the case of no change
     }
@@ -285,6 +304,9 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    * @return true if the range is valid
    */
   public boolean isRangeValid() {
+    if (m_simRangeValid != null) {
+      return m_simRangeValid.get();
+    }
     return m_counter.get() > 1;
   }
 
@@ -296,6 +318,9 @@ public class Ultrasonic extends SendableBase implements PIDSource {
    */
   public double getRangeInches() {
     if (isRangeValid()) {
+      if (m_simRange != null) {
+        return m_simRange.get();
+      }
       return m_counter.getPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
     } else {
       return 0;

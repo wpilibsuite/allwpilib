@@ -1,40 +1,27 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/smartdashboard/SmartDashboard.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 
 #include "frc/WPIErrors.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableBuilderImpl.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 namespace {
-class SmartDashboardData {
- public:
-  SmartDashboardData() = default;
-  explicit SmartDashboardData(Sendable* sendable_) : sendable(sendable_) {}
-
-  Sendable* sendable = nullptr;
-  SendableBuilderImpl builder;
-};
-
 class Singleton {
  public:
   static Singleton& GetInstance();
 
   std::shared_ptr<nt::NetworkTable> table;
-  wpi::StringMap<SmartDashboardData> tablesToData;
+  wpi::StringMap<SendableRegistry::UID> tablesToData;
   wpi::mutex tablesToDataMutex;
 
  private:
@@ -53,7 +40,9 @@ Singleton& Singleton::GetInstance() {
   return instance;
 }
 
-void SmartDashboard::init() { Singleton::GetInstance(); }
+void SmartDashboard::init() {
+  Singleton::GetInstance();
+}
 
 bool SmartDashboard::ContainsKey(wpi::StringRef key) {
   return Singleton::GetInstance().table->ContainsKey(key);
@@ -91,6 +80,10 @@ void SmartDashboard::Delete(wpi::StringRef key) {
   Singleton::GetInstance().table->Delete(key);
 }
 
+nt::NetworkTableEntry SmartDashboard::GetEntry(wpi::StringRef key) {
+  return Singleton::GetInstance().table->GetEntry(key);
+}
+
 void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
   if (data == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
@@ -98,14 +91,13 @@ void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
   }
   auto& inst = Singleton::GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
-  auto& sddata = inst.tablesToData[key];
-  if (!sddata.sendable || sddata.sendable != data) {
-    sddata = SmartDashboardData(data);
+  auto& uid = inst.tablesToData[key];
+  auto& registry = SendableRegistry::GetInstance();
+  Sendable* sddata = registry.GetSendable(uid);
+  if (sddata != data) {
+    uid = registry.GetUniqueId(data);
     auto dataTable = inst.table->GetSubTable(key);
-    sddata.builder.SetTable(dataTable);
-    data->InitSendable(sddata.builder);
-    sddata.builder.UpdateTable();
-    sddata.builder.StartListeners();
+    registry.Publish(uid, dataTable);
     dataTable->GetEntry(".name").SetString(key);
   }
 }
@@ -115,18 +107,21 @@ void SmartDashboard::PutData(Sendable* value) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
   }
-  PutData(value->GetName(), value);
+  auto name = SendableRegistry::GetInstance().GetName(value);
+  if (!name.empty()) {
+    PutData(name, value);
+  }
 }
 
 Sendable* SmartDashboard::GetData(wpi::StringRef key) {
   auto& inst = Singleton::GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
-  auto data = inst.tablesToData.find(key);
-  if (data == inst.tablesToData.end()) {
+  auto it = inst.tablesToData.find(key);
+  if (it == inst.tablesToData.end()) {
     wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key);
     return nullptr;
   }
-  return data->getValue().sendable;
+  return SendableRegistry::GetInstance().GetSendable(it->getValue());
 }
 
 bool SmartDashboard::PutBoolean(wpi::StringRef keyName, bool value) {
@@ -254,10 +249,18 @@ std::shared_ptr<nt::Value> SmartDashboard::GetValue(wpi::StringRef keyName) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetValue();
 }
 
+detail::ListenerExecutor SmartDashboard::listenerExecutor;
+
+void SmartDashboard::PostListenerTask(std::function<void()> task) {
+  listenerExecutor.Execute(task);
+}
+
 void SmartDashboard::UpdateValues() {
+  auto& registry = SendableRegistry::GetInstance();
   auto& inst = Singleton::GetInstance();
+  listenerExecutor.RunListenerTasks();
   std::scoped_lock lock(inst.tablesToDataMutex);
   for (auto& i : inst.tablesToData) {
-    i.getValue().builder.UpdateTable();
+    registry.Update(i.getValue());
   }
 }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -11,16 +8,19 @@
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/ListenerExecutor.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class Sendable;
-
-class SmartDashboard : public ErrorBase, public SendableBase {
+class SmartDashboard : public ErrorBase,
+                       public Sendable,
+                       public SendableHelper<SmartDashboard> {
  public:
   static void init();
 
@@ -95,10 +95,23 @@ class SmartDashboard : public ErrorBase, public SendableBase {
   static void Delete(wpi::StringRef key);
 
   /**
+   * Returns an NT Entry mapping to the specified key
+   *
+   * This is useful if an entry is used often, or is read and then modified.
+   *
+   * @param key the key
+   * @return    the entry for the key
+   */
+  static nt::NetworkTableEntry GetEntry(wpi::StringRef key);
+
+  /**
    * Maps the specified key to the specified value in this table.
    *
    * The value can be retrieved by calling the get method with a key that is
    * equal to the original key.
+   *
+   * In order for the value to appear in the dashboard, it must be registered
+   * with SendableRegistry.  WPILib components do this automatically.
    *
    * @param keyName the key
    * @param value   the value
@@ -111,6 +124,9 @@ class SmartDashboard : public ErrorBase, public SendableBase {
    *
    * The value can be retrieved by calling the get method with a key that is
    * equal to the original key.
+   *
+   * In order for the value to appear in the dashboard, it must be registered
+   * with SendableRegistry.  WPILib components do this automatically.
    *
    * @param value the value
    */
@@ -402,12 +418,23 @@ class SmartDashboard : public ErrorBase, public SendableBase {
   static std::shared_ptr<nt::Value> GetValue(wpi::StringRef keyName);
 
   /**
+   * Posts a task from a listener to the ListenerExecutor, so that it can be run
+   * synchronously from the main loop on the next call to {@link
+   * SmartDashboard#updateValues()}.
+   *
+   * @param task The task to run synchronously from the main thread.
+   */
+  static void PostListenerTask(std::function<void()> task);
+
+  /**
    * Puts all sendable data to the dashboard.
    */
   static void UpdateValues();
 
  private:
   virtual ~SmartDashboard() = default;
+
+  static detail::ListenerExecutor listenerExecutor;
 };
 
 }  // namespace frc

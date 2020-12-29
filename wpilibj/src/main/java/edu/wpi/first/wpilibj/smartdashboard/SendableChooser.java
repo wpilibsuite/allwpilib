@@ -1,21 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.SendableBase;
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.Sendable;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -24,14 +21,14 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * {@link SmartDashboard}.
  *
  * <p>For instance, you may wish to be able to select between multiple autonomous modes. You can do
- * this by putting every possible {@link Command} you want to run as an autonomous into a {@link
+ * this by putting every possible Command you want to run as an autonomous into a {@link
  * SendableChooser} and then put it into the {@link SmartDashboard} to have a list of options appear
  * on the laptop. Once autonomous starts, simply ask the {@link SendableChooser} what the selected
  * value is.
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> extends SendableBase {
+public class SendableChooser<V> implements Sendable, AutoCloseable {
   /**
    * The key for the default value.
    */
@@ -55,8 +52,7 @@ public class SendableChooser<V> extends SendableBase {
   /**
    * A map linking strings to the objects the represent.
    */
-  @SuppressWarnings("PMD.LooseCoupling")
-  private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
+  private final Map<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = "";
   private final int m_instance;
   private static final AtomicInteger s_instances = new AtomicInteger();
@@ -65,8 +61,13 @@ public class SendableChooser<V> extends SendableBase {
    * Instantiates a {@link SendableChooser}.
    */
   public SendableChooser() {
-    super(false);
     m_instance = s_instances.getAndIncrement();
+    SendableRegistry.add(this, "SendableChooser", m_instance);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**
@@ -148,12 +149,8 @@ public class SendableChooser<V> extends SendableBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
     builder.getEntry(INSTANCE).setDouble(m_instance);
-    builder.addStringProperty(DEFAULT, () -> {
-      return m_defaultChoice;
-    }, null);
-    builder.addStringArrayProperty(OPTIONS, () -> {
-      return m_map.keySet().toArray(new String[0]);
-    }, null);
+    builder.addStringProperty(DEFAULT, () -> m_defaultChoice, null);
+    builder.addStringArrayProperty(OPTIONS, () -> m_map.keySet().toArray(new String[0]), null);
     builder.addStringProperty(ACTIVE, () -> {
       m_mutex.lock();
       try {

@@ -1,13 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -15,19 +11,10 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
 
 /**
- * Driver for the RS-232 serial port on the roboRIO.
- *
- * <p>The current implementation uses the VISA formatted I/O mode. This means that all traffic goes
- * through the formatted buffers. This allows the intermingled use of print(), readString(), and the
- * raw buffer accessors read() and write().
- *
- * <p>More information can be found in the NI-VISA User Manual here: http://www.ni
- * .com/pdf/manuals/370423a.pdf and the NI-VISA Programmer's Reference Manual here:
- * http://www.ni.com/pdf/manuals/370132c.pdf
+ * Driver for the serial ports (USB, MXP, Onboard) on the roboRIO.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class SerialPort implements AutoCloseable {
-  private byte m_port;
+  private int m_portHandle;
 
   public enum Port {
     kOnboard(0), kMXP(1), kUSB(2), kUSB1(2), kUSB2(3);
@@ -79,7 +66,7 @@ public class SerialPort implements AutoCloseable {
   }
 
   /**
-   * Represents which type of buffer mode to use when writing to a serial m_port.
+   * Represents which type of buffer mode to use when writing to a serial port.
    */
   public enum WriteBufferMode {
     kFlushOnAccess(1), kFlushWhenFull(2);
@@ -94,6 +81,9 @@ public class SerialPort implements AutoCloseable {
   /**
    * Create an instance of a Serial Port class.
    *
+   * <p>Prefer to use the constructor that doesn't take a port name, but in some
+   * cases the automatic detection might not work correctly.
+   *
    * @param baudRate The baud rate to configure the serial port.
    * @param port     The Serial port to use
    * @param portName The direct portName to use
@@ -102,16 +92,13 @@ public class SerialPort implements AutoCloseable {
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.
    * @deprecated     Will be removed for 2019
    */
-  @Deprecated
   public SerialPort(final int baudRate, String portName, Port port, final int dataBits,
                     Parity parity, StopBits stopBits) {
-    m_port = (byte) port.value;
-
-    SerialPortJNI.serialInitializePortDirect(m_port, portName);
-    SerialPortJNI.serialSetBaudRate(m_port, baudRate);
-    SerialPortJNI.serialSetDataBits(m_port, (byte) dataBits);
-    SerialPortJNI.serialSetParity(m_port, (byte) parity.value);
-    SerialPortJNI.serialSetStopBits(m_port, (byte) stopBits.value);
+    m_portHandle = SerialPortJNI.serialInitializePortDirect((byte) port.value, portName);
+    SerialPortJNI.serialSetBaudRate(m_portHandle, baudRate);
+    SerialPortJNI.serialSetDataBits(m_portHandle, (byte) dataBits);
+    SerialPortJNI.serialSetParity(m_portHandle, (byte) parity.value);
+    SerialPortJNI.serialSetStopBits(m_portHandle, (byte) stopBits.value);
 
     // Set the default read buffer size to 1 to return bytes immediately
     setReadBufferSize(1);
@@ -124,7 +111,7 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.report(tResourceType.kResourceType_SerialPort, 0);
+    HAL.report(tResourceType.kResourceType_SerialPort, port.value + 1);
   }
 
   /**
@@ -138,13 +125,11 @@ public class SerialPort implements AutoCloseable {
    */
   public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity,
                     StopBits stopBits) {
-    m_port = (byte) port.value;
-
-    SerialPortJNI.serialInitializePort(m_port);
-    SerialPortJNI.serialSetBaudRate(m_port, baudRate);
-    SerialPortJNI.serialSetDataBits(m_port, (byte) dataBits);
-    SerialPortJNI.serialSetParity(m_port, (byte) parity.value);
-    SerialPortJNI.serialSetStopBits(m_port, (byte) stopBits.value);
+    m_portHandle = SerialPortJNI.serialInitializePort((byte) port.value);
+    SerialPortJNI.serialSetBaudRate(m_portHandle, baudRate);
+    SerialPortJNI.serialSetDataBits(m_portHandle, (byte) dataBits);
+    SerialPortJNI.serialSetParity(m_portHandle, (byte) parity.value);
+    SerialPortJNI.serialSetStopBits(m_portHandle, (byte) stopBits.value);
 
     // Set the default read buffer size to 1 to return bytes immediately
     setReadBufferSize(1);
@@ -157,7 +142,7 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.report(tResourceType.kResourceType_SerialPort, 0);
+    HAL.report(tResourceType.kResourceType_SerialPort, port.value + 1);
   }
 
   /**
@@ -193,7 +178,7 @@ public class SerialPort implements AutoCloseable {
 
   @Override
   public void close() {
-    SerialPortJNI.serialClose(m_port);
+    SerialPortJNI.serialClose(m_portHandle);
   }
 
   /**
@@ -204,7 +189,7 @@ public class SerialPort implements AutoCloseable {
    * @param flowControl the FlowControl m_value to use
    */
   public void setFlowControl(FlowControl flowControl) {
-    SerialPortJNI.serialSetFlowControl(m_port, (byte) flowControl.value);
+    SerialPortJNI.serialSetFlowControl(m_portHandle, (byte) flowControl.value);
   }
 
   /**
@@ -217,7 +202,7 @@ public class SerialPort implements AutoCloseable {
    * @param terminator The character to use for termination.
    */
   public void enableTermination(char terminator) {
-    SerialPortJNI.serialEnableTermination(m_port, terminator);
+    SerialPortJNI.serialEnableTermination(m_portHandle, terminator);
   }
 
   /**
@@ -237,7 +222,7 @@ public class SerialPort implements AutoCloseable {
    * Disable termination behavior.
    */
   public void disableTermination() {
-    SerialPortJNI.serialDisableTermination(m_port);
+    SerialPortJNI.serialDisableTermination(m_portHandle);
   }
 
   /**
@@ -246,7 +231,7 @@ public class SerialPort implements AutoCloseable {
    * @return The number of bytes available to read.
    */
   public int getBytesReceived() {
-    return SerialPortJNI.serialGetBytesReceived(m_port);
+    return SerialPortJNI.serialGetBytesReceived(m_portHandle);
   }
 
   /**
@@ -266,12 +251,7 @@ public class SerialPort implements AutoCloseable {
    */
   public String readString(int count) {
     byte[] out = read(count);
-    try {
-      return new String(out, 0, out.length, "US-ASCII");
-    } catch (UnsupportedEncodingException ex) {
-      ex.printStackTrace();
-      return "";
-    }
+    return new String(out, 0, out.length, StandardCharsets.US_ASCII);
   }
 
   /**
@@ -282,7 +262,7 @@ public class SerialPort implements AutoCloseable {
    */
   public byte[] read(final int count) {
     byte[] dataReceivedBuffer = new byte[count];
-    int gotten = SerialPortJNI.serialRead(m_port, dataReceivedBuffer, count);
+    int gotten = SerialPortJNI.serialRead(m_portHandle, dataReceivedBuffer, count);
     if (gotten == count) {
       return dataReceivedBuffer;
     }
@@ -302,7 +282,7 @@ public class SerialPort implements AutoCloseable {
     if (buffer.length < count) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + count);
     }
-    return SerialPortJNI.serialWrite(m_port, buffer, count);
+    return SerialPortJNI.serialWrite(m_portHandle, buffer, count);
   }
 
   /**
@@ -324,7 +304,7 @@ public class SerialPort implements AutoCloseable {
    * @param timeout The number of seconds to to wait for I/O.
    */
   public void setTimeout(double timeout) {
-    SerialPortJNI.serialSetTimeout(m_port, timeout);
+    SerialPortJNI.serialSetTimeout(m_portHandle, timeout);
   }
 
   /**
@@ -339,7 +319,7 @@ public class SerialPort implements AutoCloseable {
    * @param size The read buffer size.
    */
   public void setReadBufferSize(int size) {
-    SerialPortJNI.serialSetReadBufferSize(m_port, size);
+    SerialPortJNI.serialSetReadBufferSize(m_portHandle, size);
   }
 
   /**
@@ -350,7 +330,7 @@ public class SerialPort implements AutoCloseable {
    * @param size The write buffer size.
    */
   public void setWriteBufferSize(int size) {
-    SerialPortJNI.serialSetWriteBufferSize(m_port, size);
+    SerialPortJNI.serialSetWriteBufferSize(m_portHandle, size);
   }
 
   /**
@@ -365,7 +345,7 @@ public class SerialPort implements AutoCloseable {
    * @param mode The write buffer mode.
    */
   public void setWriteBufferMode(WriteBufferMode mode) {
-    SerialPortJNI.serialSetWriteMode(m_port, (byte) mode.value);
+    SerialPortJNI.serialSetWriteMode(m_portHandle, (byte) mode.value);
   }
 
   /**
@@ -375,7 +355,7 @@ public class SerialPort implements AutoCloseable {
    * buffer is full.
    */
   public void flush() {
-    SerialPortJNI.serialFlush(m_port);
+    SerialPortJNI.serialFlush(m_portHandle);
   }
 
   /**
@@ -384,6 +364,6 @@ public class SerialPort implements AutoCloseable {
    * <p>Empty the transmit and receive buffers in the device and formatted I/O.
    */
   public void reset() {
-    SerialPortJNI.serialClear(m_port);
+    SerialPortJNI.serialClear(m_portHandle);
   }
 }

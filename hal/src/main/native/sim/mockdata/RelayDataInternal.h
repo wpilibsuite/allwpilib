@@ -1,14 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include "mockdata/RelayData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/RelayData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class RelayData {
@@ -18,12 +15,12 @@ class RelayData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Reverse)
 
  public:
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedForwardName>
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedForwardName>
       initializedForward{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedReverseName>
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedReverseName>
       initializedReverse{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetForwardName> forward{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetReverseName> reverse{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetForwardName> forward{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetReverseName> reverse{false};
 
   virtual void ResetData();
 };

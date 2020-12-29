@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -67,18 +64,23 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
+  }
 
   // Cache references to classes
   for (auto& c : classes) {
     *c.cls = JClass(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   for (auto& c : exceptions) {
     *c.cls = JException(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   return JNI_VERSION_1_6;
@@ -86,8 +88,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
+  }
   // Delete global references
   for (auto& c : classes) {
     c.cls->free(env);
@@ -107,40 +110,52 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 inline std::shared_ptr<nt::Value> FromJavaRaw(JNIEnv* env, jbyteArray jarr,
                                               jlong time) {
   CriticalJByteArrayRef ref{env, jarr};
-  if (!ref) return nullptr;
+  if (!ref) {
+    return nullptr;
+  }
   return nt::Value::MakeRaw(ref, time);
 }
 
 inline std::shared_ptr<nt::Value> FromJavaRawBB(JNIEnv* env, jobject jbb,
                                                 int len, jlong time) {
   JByteArrayRef ref{env, jbb, len};
-  if (!ref) return nullptr;
+  if (!ref) {
+    return nullptr;
+  }
   return nt::Value::MakeRaw(ref.str(), time);
 }
 
 inline std::shared_ptr<nt::Value> FromJavaRpc(JNIEnv* env, jbyteArray jarr,
                                               jlong time) {
   CriticalJByteArrayRef ref{env, jarr};
-  if (!ref) return nullptr;
+  if (!ref) {
+    return nullptr;
+  }
   return nt::Value::MakeRpc(ref.str(), time);
 }
 
 std::shared_ptr<nt::Value> FromJavaBooleanArray(JNIEnv* env, jbooleanArray jarr,
                                                 jlong time) {
   CriticalJBooleanArrayRef ref{env, jarr};
-  if (!ref) return nullptr;
+  if (!ref) {
+    return nullptr;
+  }
   wpi::ArrayRef<jboolean> elements{ref};
   size_t len = elements.size();
   std::vector<int> arr;
   arr.reserve(len);
-  for (size_t i = 0; i < len; ++i) arr.push_back(elements[i]);
+  for (size_t i = 0; i < len; ++i) {
+    arr.push_back(elements[i]);
+  }
   return nt::Value::MakeBooleanArray(arr, time);
 }
 
 std::shared_ptr<nt::Value> FromJavaDoubleArray(JNIEnv* env, jdoubleArray jarr,
                                                jlong time) {
   CriticalJDoubleArrayRef ref{env, jarr};
-  if (!ref) return nullptr;
+  if (!ref) {
+    return nullptr;
+  }
   return nt::Value::MakeDoubleArray(ref, time);
 }
 
@@ -152,7 +167,9 @@ std::shared_ptr<nt::Value> FromJavaStringArray(JNIEnv* env, jobjectArray jarr,
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(jarr, i))};
-    if (!elem) return nullptr;
+    if (!elem) {
+      return nullptr;
+    }
     arr.push_back(JStringRef{env, elem}.str());
   }
   return nt::Value::MakeStringArray(std::move(arr), time);
@@ -165,10 +182,12 @@ std::shared_ptr<nt::Value> FromJavaStringArray(JNIEnv* env, jobjectArray jarr,
 static jobject MakeJObject(JNIEnv* env, const nt::Value& value) {
   static jmethodID booleanConstructor = nullptr;
   static jmethodID doubleConstructor = nullptr;
-  if (!booleanConstructor)
+  if (!booleanConstructor) {
     booleanConstructor = env->GetMethodID(booleanCls, "<init>", "(Z)V");
-  if (!doubleConstructor)
+  }
+  if (!doubleConstructor) {
     doubleConstructor = env->GetMethodID(doubleCls, "<init>", "(D)V");
+  }
 
   switch (value.type()) {
     case NT_BOOLEAN:
@@ -197,9 +216,10 @@ static jobject MakeJObject(JNIEnv* env, const nt::Value& value) {
 static jobject MakeJValue(JNIEnv* env, const nt::Value* value) {
   static jmethodID constructor =
       env->GetMethodID(valueCls, "<init>", "(ILjava/lang/Object;J)V");
-  if (!value)
+  if (!value) {
     return env->NewObject(valueCls, constructor, (jint)NT_UNASSIGNED, nullptr,
                           (jlong)0);
+  }
   return env->NewObject(valueCls, constructor, (jint)value->type(),
                         MakeJObject(env, *value), (jlong)value->time());
 }
@@ -284,7 +304,9 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
                                 wpi::ArrayRef<nt::ConnectionNotification> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), connectionNotificationCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> elem{env, MakeJObject(env, inst, arr[i])};
     env->SetObjectArrayElement(jarr, i, elem.obj());
@@ -296,7 +318,9 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
                                 wpi::ArrayRef<nt::EntryNotification> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), entryNotificationCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> elem{env, MakeJObject(env, inst, arr[i])};
     env->SetObjectArrayElement(jarr, i, elem.obj());
@@ -307,7 +331,9 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
                                 wpi::ArrayRef<nt::LogMessage> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), logMessageCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> elem{env, MakeJObject(env, inst, arr[i])};
     env->SetObjectArrayElement(jarr, i, elem.obj());
@@ -318,7 +344,9 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
                                 wpi::ArrayRef<nt::RpcAnswer> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), rpcAnswerCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> elem{env, MakeJObject(env, inst, arr[i])};
     env->SetObjectArrayElement(jarr, i, elem.obj());
@@ -516,7 +544,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJ_3BZ
     return false;
   }
   auto v = FromJavaRaw(env, value, time);
-  if (!v) return false;
+  if (!v) {
+    return false;
+  }
   if (force) {
     nt::SetEntryTypeValue(entry, v);
     return JNI_TRUE;
@@ -539,7 +569,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJLjava_nio_ByteBuffer
     return false;
   }
   auto v = FromJavaRawBB(env, value, len, time);
-  if (!v) return false;
+  if (!v) {
+    return false;
+  }
   if (force) {
     nt::SetEntryTypeValue(entry, v);
     return JNI_TRUE;
@@ -562,7 +594,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setBooleanArray
     return false;
   }
   auto v = FromJavaBooleanArray(env, value, time);
-  if (!v) return false;
+  if (!v) {
+    return false;
+  }
   if (force) {
     nt::SetEntryTypeValue(entry, v);
     return JNI_TRUE;
@@ -585,7 +619,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setDoubleArray
     return false;
   }
   auto v = FromJavaDoubleArray(env, value, time);
-  if (!v) return false;
+  if (!v) {
+    return false;
+  }
   if (force) {
     nt::SetEntryTypeValue(entry, v);
     return JNI_TRUE;
@@ -608,7 +644,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setStringArray
     return false;
   }
   auto v = FromJavaStringArray(env, value, time);
-  if (!v) return false;
+  if (!v) {
+    return false;
+  }
   if (force) {
     nt::SetEntryTypeValue(entry, v);
     return JNI_TRUE;
@@ -639,7 +677,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getBoolean
   (JNIEnv*, jclass, jint entry, jboolean defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
-  if (!val || !val->IsBoolean()) return defaultValue;
+  if (!val || !val->IsBoolean()) {
+    return defaultValue;
+  }
   return val->GetBoolean();
 }
 
@@ -653,7 +693,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getDouble
   (JNIEnv*, jclass, jint entry, jdouble defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
-  if (!val || !val->IsDouble()) return defaultValue;
+  if (!val || !val->IsDouble()) {
+    return defaultValue;
+  }
   return val->GetDouble();
 }
 
@@ -667,7 +709,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getString
   (JNIEnv* env, jclass, jint entry, jstring defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
-  if (!val || !val->IsString()) return defaultValue;
+  if (!val || !val->IsString()) {
+    return defaultValue;
+  }
   return MakeJString(env, val->GetString());
 }
 
@@ -681,7 +725,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRaw
   (JNIEnv* env, jclass, jint entry, jbyteArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
-  if (!val || !val->IsRaw()) return defaultValue;
+  if (!val || !val->IsRaw()) {
+    return defaultValue;
+  }
   return MakeJByteArray(env, val->GetRaw());
 }
 
@@ -695,7 +741,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getBooleanArray
   (JNIEnv* env, jclass, jint entry, jbooleanArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
-  if (!val || !val->IsBooleanArray()) return defaultValue;
+  if (!val || !val->IsBooleanArray()) {
+    return defaultValue;
+  }
   return MakeJBooleanArray(env, val->GetBooleanArray());
 }
 
@@ -709,7 +757,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getDoubleArray
   (JNIEnv* env, jclass, jint entry, jdoubleArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
-  if (!val || !val->IsDoubleArray()) return defaultValue;
+  if (!val || !val->IsDoubleArray()) {
+    return defaultValue;
+  }
   return MakeJDoubleArray(env, val->GetDoubleArray());
 }
 
@@ -723,7 +773,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getStringArray
   (JNIEnv* env, jclass, jint entry, jobjectArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
-  if (!val || !val->IsStringArray()) return defaultValue;
+  if (!val || !val->IsStringArray()) {
+    return defaultValue;
+  }
   return MakeJStringArray(env, val->GetStringArray());
 }
 
@@ -914,7 +966,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntryInfo
   }
   auto arr = nt::GetEntryInfo(inst, JStringRef{env, prefix}.str(), types);
   jobjectArray jarr = env->NewObjectArray(arr.size(), entryInfoCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> jelem{env, MakeJObject(env, instObject, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
@@ -1294,7 +1348,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpcResult__II
   (JNIEnv* env, jclass, jint entry, jint call)
 {
   std::string result;
-  if (!nt::GetRpcResult(entry, call, &result)) return nullptr;
+  if (!nt::GetRpcResult(entry, call, &result)) {
+    return nullptr;
+  }
   return MakeJByteArray(env, result);
 }
 
@@ -1309,8 +1365,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpcResult__IID
 {
   std::string result;
   bool timed_out = false;
-  if (!nt::GetRpcResult(entry, call, &result, timeout, &timed_out))
+  if (!nt::GetRpcResult(entry, call, &result, timeout, &timed_out)) {
     return nullptr;
+  }
   return MakeJByteArray(env, result);
 }
 
@@ -1336,7 +1393,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getRpc
   (JNIEnv* env, jclass, jint entry, jbyteArray defaultValue)
 {
   auto val = nt::GetEntryValue(entry);
-  if (!val || !val->IsRpc()) return defaultValue;
+  if (!val || !val->IsRpc()) {
+    return defaultValue;
+  }
   return MakeJByteArray(env, val->GetRpc());
 }
 
@@ -1366,6 +1425,30 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getNetworkMode
   (JNIEnv*, jclass, jint inst)
 {
   return nt::GetNetworkMode(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    startLocal
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_startLocal
+  (JNIEnv*, jclass, jint inst)
+{
+  nt::StartLocal(inst);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    stopLocal
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_stopLocal
+  (JNIEnv*, jclass, jint inst)
+{
+  nt::StopLocal(inst);
 }
 
 /*
@@ -1454,7 +1537,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I_3Ljava_lang_Str
     return;
   }
   jint* portInts = env->GetIntArrayElements(ports, nullptr);
-  if (!portInts) return;
+  if (!portInts) {
+    return;
+  }
 
   std::vector<std::string> names;
   std::vector<std::pair<nt::StringRef, unsigned int>> servers;
@@ -1539,7 +1624,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
     return;
   }
   jint* portInts = env->GetIntArrayElements(ports, nullptr);
-  if (!portInts) return;
+  if (!portInts) {
+    return;
+  }
 
   std::vector<std::string> names;
   std::vector<std::pair<nt::StringRef, unsigned int>> servers;
@@ -1632,7 +1719,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getConnections
   auto arr = nt::GetConnections(inst);
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), connectionInfoCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
@@ -1666,7 +1755,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_savePersistent
     return;
   }
   const char* err = nt::SavePersistent(inst, JStringRef{env, filename}.str());
-  if (err) persistentEx.Throw(env, err);
+  if (err) {
+    persistentEx.Throw(env, err);
+  }
 }
 
 /*
@@ -1716,7 +1807,9 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_saveEntries
   }
   const char* err = nt::SaveEntries(inst, JStringRef{env, filename}.str(),
                                     JStringRef{env, prefix}.str());
-  if (err) persistentEx.Throw(env, err);
+  if (err) {
+    persistentEx.Throw(env, err);
+  }
 }
 
 /*

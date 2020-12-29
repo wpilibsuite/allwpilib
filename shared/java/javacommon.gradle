@@ -1,14 +1,7 @@
 apply plugin: 'maven-publish'
-apply plugin: 'java'
+apply plugin: 'java-library'
 //apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'jacoco'
-
-def pubVersion
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
@@ -27,21 +20,21 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 task outputJar(type: Jar, dependsOn: classes) {
-    baseName javaBaseName
-    destinationDir outputsFolder
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
     from sourceSets.main.output
 }
 
 task outputSourcesJar(type: Jar, dependsOn: classes) {
-    baseName javaBaseName
-    destinationDir outputsFolder
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task outputJavadocJar(type: Jar, dependsOn: javadoc) {
-    baseName javaBaseName
-    destinationDir outputsFolder
+    archiveBaseName = javaBaseName
+    destinationDirectory = outputsFolder
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
@@ -74,7 +67,7 @@ publishing {
 
             artifactId = "${baseArtifactId}-java"
             groupId artifactGroupId
-            version pubVersion
+            version wpilibVersioning.version.get()
         }
     }
 }
@@ -89,7 +82,7 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian')) {
+if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxraspbian') || project.hasProperty('onlylinuxaarch64bionic')) {
     test.enabled = false
 }
 
@@ -111,7 +104,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
 
-    devCompile sourceSets.main.output
+    devImplementation sourceSets.main.output
 
     //errorprone 'com.google.errorprone:error_prone_core:2.3.2-SNAPSHOT'
     //errorproneJavac 'com.google.errorprone:error_prone_core:2.3.1'

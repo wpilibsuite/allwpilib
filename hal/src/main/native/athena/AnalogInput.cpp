@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AnalogInput.h"
 
@@ -31,7 +28,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
   hal::init::CheckInit();
   initializeAnalog(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0) {
+    return HAL_kInvalidHandle;
+  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -41,8 +40,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
 
   HAL_AnalogInputHandle handle = analogInputHandles->Allocate(channel, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   // Initialize port structure
   auto analog_port = analogInputHandles->Get(handle);
@@ -69,24 +69,33 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
   analogInputHandles->Free(analogPortHandle);
 }
 
-HAL_Bool HAL_CheckAnalogModule(int32_t module) { return module == 1; }
+HAL_Bool HAL_CheckAnalogModule(int32_t module) {
+  return module == 1;
+}
 
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
   return channel < kNumAnalogInputs && channel >= 0;
 }
+
+void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
+                                 HAL_SimDeviceHandle device) {}
 
 void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need double comparison with epsilon.
   // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
   initializeAnalog(status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   setAnalogSampleRate(samplesPerSecond, status);
 }
 
 double HAL_GetAnalogSampleRate(int32_t* status) {
   initializeAnalog(status);
-  if (*status != 0) return 0;
+  if (*status != 0) {
+    return 0;
+  }
   uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
   uint32_t ticksPerSample =
       ticksPerConversion * getAnalogNumActiveChannels(status);
@@ -198,6 +207,14 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analogPortHandle,
   return voltage;
 }
 
+double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
+                                 int32_t rawValue, int32_t* status) {
+  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analogPortHandle, status);
+  int32_t offset = HAL_GetAnalogOffset(analogPortHandle, status);
+  double voltage = LSBWeight * 1.0e-9 * rawValue - offset * 1.0e-9;
+  return voltage;
+}
+
 double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
                                    int32_t* status) {
   int32_t value = HAL_GetAnalogAverageValue(analogPortHandle, status);
@@ -213,26 +230,38 @@ double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analogPortHandle,
 
 int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
                                int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  int32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
-      0, port->channel, status);  // XXX: aiSystemIndex == 0?
-  return lsbWeight;
+  // On the roboRIO, LSB is the same for all channels. So the channel lookup can
+  // be avoided
+  return FRC_NetworkCommunication_nAICalibration_getLSBWeight(0, 0, status);
+
+  // Keep the old code for future hardware
+
+  // auto port = analogInputHandles->Get(analogPortHandle);
+  // if (port == nullptr) {
+  //   *status = HAL_HANDLE_ERROR;
+  //   return 0;
+  // }
+  // int32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
+  //     0, port->channel, status);  // XXX: aiSystemIndex == 0?
+  // return lsbWeight;
 }
 
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
-  auto port = analogInputHandles->Get(analogPortHandle);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return 0;
-  }
-  int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
-      0, port->channel, status);  // XXX: aiSystemIndex == 0?
-  return offset;
+  // On the roboRIO, offset is the same for all channels. So the channel lookup
+  // can be avoided
+  return FRC_NetworkCommunication_nAICalibration_getOffset(0, 0, status);
+
+  // Keep the old code for future hardware
+
+  // auto port = analogInputHandles->Get(analogPortHandle);
+  // if (port == nullptr) {
+  //   *status = HAL_HANDLE_ERROR;
+  //   return 0;
+  // }
+  // int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
+  //     0, port->channel, status);  // XXX: aiSystemIndex == 0?
+  // return offset;
 }
 
 }  // extern "C"

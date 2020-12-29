@@ -19,14 +19,6 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
-ext {
-    chipObjectComponents = ['wpilibcIntegrationTests']
-    netCommComponents = ['wpilibcIntegrationTests']
-    useNiJava = false
-}
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
 model {
     components {
         wpilibcIntegrationTests(NativeExecutableSpec) {
@@ -52,7 +44,9 @@ model {
                         cppCompiler.args "-Wno-unused-variable"
                         cppCompiler.args "-Wno-error=deprecated-declarations"
                     }
+                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
@@ -61,6 +55,9 @@ model {
                     project(':hal').addHalJniDependency(binary)
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    }
                 } else {
                     binary.sources {
                         simCpp(CppSourceSet) {

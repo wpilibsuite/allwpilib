@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -144,6 +141,20 @@ int32_t HAL_GetNumPDPModules(void);
  * @return the number of PDP channels
  */
 int32_t HAL_GetNumPDPChannels(void);
+
+/**
+ * Gets the number of duty cycle inputs in the current system.
+ *
+ * @return the number of Duty Cycle inputs
+ */
+int32_t HAL_GetNumDutyCycles(void);
+
+/**
+ * Gets the number of addressable LED generators in the current system.
+ *
+ * @return the number of Addressable LED generators
+ */
+int32_t HAL_GetNumAddressableLEDs(void);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

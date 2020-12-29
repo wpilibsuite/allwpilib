@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Preferences.h"
 
 #include <algorithm>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringRef.h>
 
@@ -25,7 +22,9 @@ Preferences* Preferences::GetInstance() {
   return &instance;
 }
 
-std::vector<std::string> Preferences::GetKeys() { return m_table->GetKeys(); }
+std::vector<std::string> Preferences::GetKeys() {
+  return m_table->GetKeys();
+}
 
 std::string Preferences::GetString(wpi::StringRef key,
                                    wpi::StringRef defaultValue) {
@@ -58,10 +57,20 @@ void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
   entry.SetPersistent();
 }
 
+void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultString(value);
+}
+
 void Preferences::PutInt(wpi::StringRef key, int value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::InitInt(wpi::StringRef key, int value) {
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultDouble(value);
 }
 
 void Preferences::PutDouble(wpi::StringRef key, double value) {
@@ -70,10 +79,20 @@ void Preferences::PutDouble(wpi::StringRef key, double value) {
   entry.SetPersistent();
 }
 
+void Preferences::InitDouble(wpi::StringRef key, double value) {
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultDouble(value);
+}
+
 void Preferences::PutFloat(wpi::StringRef key, float value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::InitFloat(wpi::StringRef key, float value) {
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultDouble(value);
 }
 
 void Preferences::PutBoolean(wpi::StringRef key, bool value) {
@@ -82,17 +101,29 @@ void Preferences::PutBoolean(wpi::StringRef key, bool value) {
   entry.SetPersistent();
 }
 
+void Preferences::InitBoolean(wpi::StringRef key, bool value) {
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultBoolean(value);
+}
+
 void Preferences::PutLong(wpi::StringRef key, int64_t value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
 
+void Preferences::InitLong(wpi::StringRef key, int64_t value) {
+  auto entry = m_table->GetEntry(key);
+  entry.SetDefaultDouble(value);
+}
+
 bool Preferences::ContainsKey(wpi::StringRef key) {
   return m_table->ContainsKey(key);
 }
 
-void Preferences::Remove(wpi::StringRef key) { m_table->Delete(key); }
+void Preferences::Remove(wpi::StringRef key) {
+  m_table->Delete(key);
+}
 
 void Preferences::RemoveAll() {
   for (auto preference : GetKeys()) {

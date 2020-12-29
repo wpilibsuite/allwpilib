@@ -1,20 +1,27 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <frc/commands/Subsystem.h>
+#include <frc2/command/SubsystemBase.h>
 
-class ExampleSubsystem : public frc::Subsystem {
+class ExampleSubsystem : public frc2::SubsystemBase {
  public:
   ExampleSubsystem();
-  void InitDefaultCommand() override;
+
+  /**
+   * Will be called periodically whenever the CommandScheduler runs.
+   */
+  void Periodic() override;
+
+  /**
+   * Will be called periodically whenever the CommandScheduler runs during
+   * simulation.
+   */
+  void SimulationPeriodic() override;
 
  private:
-  // It's desirable that everything possible under private except
-  // for methods that implement subsystem capabilities
+  // Components (e.g. motor controllers and sensors) should generally be
+  // declared private and exposed only through public methods.
 };

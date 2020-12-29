@@ -3,8 +3,8 @@ apply plugin: 'checkstyle'
 
 checkstyle {
     toolVersion = "8.12"
-    configDir = file("${project.rootDir}/styleguide")
-    config = resources.text.fromFile(new File(configDir, "checkstyle.xml"))
+    configDirectory = file("${project.rootDir}/styleguide")
+    config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
 }
 
 if (!project.hasProperty('skipPMD')) {
@@ -17,4 +17,9 @@ if (!project.hasProperty('skipPMD')) {
         ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
         ruleSets = []
     }
+}
+
+task javaFormat {
+    dependsOn(tasks.withType(Checkstyle))
+    dependsOn(tasks.withType(Pmd))
 }

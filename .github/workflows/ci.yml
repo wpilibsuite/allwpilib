@@ -1,0 +1,238 @@
+name: CI
+
+on: [pull_request, push]
+
+jobs:
+  build-docker:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - container: wpilib/roborio-cross-ubuntu:2021-18.04
+            artifact-name: Athena
+            build-options: "-Ponlylinuxathena"
+          - container: wpilib/raspbian-cross-ubuntu:10-18.04
+            artifact-name: Raspbian
+            build-options: "-Ponlylinuxraspbian"
+          - container: wpilib/aarch64-cross-ubuntu:bionic-18.04
+            artifact-name: Aarch64
+            build-options: "-Ponlylinuxaarch64bionic"
+          - container: wpilib/ubuntu-base:18.04
+            artifact-name: Linux
+            build-options: "-Dorg.gradle.jvmargs=-Xmx2g"
+    name: "Build - ${{ matrix.artifact-name }}"
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Build with Gradle
+        run: ./gradlew build -PbuildServer ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: build/allOutputs
+
+  build-host:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact-name: Win64
+            architecture: x64
+          - os: windows-latest
+            artifact-name: Win32
+            architecture: x86
+          - os: macos-latest
+            artifact-name: macOS
+            architecture: x64
+    name: "Build - ${{ matrix.artifact-name }}"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          architecture: ${{ matrix.architecture }}
+      - name: Import Developer ID Certificate
+        uses: wpilibsuite/import-signing-certificate@v1
+        with:
+          certificate-data: ${{ secrets.APPLE_CERTIFICATE_DATA }}
+          certificate-passphrase: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
+      - name: Set Keychain Lock Timeout
+        run: security set-keychain-settings -lut 3600
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Build with Gradle
+        run: ./gradlew build -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+      - name: Sign Libraries with Developer ID
+        run: ./gradlew build -PbuildServer -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ env.EXTRA_GRADLE_ARGS }}
+        if: |
+          matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
+          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: build/allOutputs
+
+  build-documentation:
+    name: "Build - Documentation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      - name: Set release environment variable
+        run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Build with Gradle
+        run: ./gradlew docs:zipDocs -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Documentation
+          path: docs/build/outputs
+
+  build-cmake:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: Linux
+            container: wpilib/roborio-cross-ubuntu:2020-18.04
+            flags: ""
+          - os: macos-latest
+            name: macOS
+            container: ""
+            flags: "-DWITH_JAVA=OFF"
+    name: "Build - CMake ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: |
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            brew install opencv
+          fi
+      - name: configure
+        run: mkdir build && cd build && cmake ${{ matrix.flags }} ..
+      - name: build
+        working-directory: build
+        run: make -j3
+      - name: test
+        working-directory: build
+        run: make test
+
+  build-cmake-vcpkg:
+    name: "Build - CMake Windows"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare vcpkg
+        uses: lukka/run-vcpkg@v4
+        with:
+          vcpkgArguments: opencv
+          vcpkgDirectory: ${{ runner.workspace }}/vcpkg/
+          vcpkgGitCommitId: 544f8e4593764f78faa94bac2adb81cca5232943
+          vcpkgTriplet: x64-windows
+      - name: Configure & Build
+        uses: lukka/run-cmake@v3
+        with:
+          buildDirectory: ${{ runner.workspace }}/build/
+          cmakeAppendedArgs: -DWITH_JAVA=OFF
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          useVcpkgToolchainFile: true
+      - name: Run Tests
+        run: ctest -C "Debug"
+        working-directory: ${{ runner.workspace }}/build/
+
+  wpiformat:
+    name: "wpiformat"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch all history and metadata
+        run: |
+          git fetch --prune --unshallow
+          git checkout -b pr
+          git branch -f master origin/master
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install clang-format
+        run: sudo apt-get update -q && sudo apt-get install clang-format-10
+      - name: Install wpiformat
+        run: pip3 install wpiformat
+      - name: Run
+        run: wpiformat -clang 10
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+
+  combine:
+    name: Combine
+    needs: [build-docker, build-host, build-documentation]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: wpilibsuite/build-tools
+      - uses: actions/download-artifact@v2
+        with:
+          path: combiner/products/build/allOutputs
+      - name: Flatten Artifacts
+        run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
+      - name: Check version number exists
+        run: |
+          cat combiner/products/build/allOutputs/version.txt
+          test -s combiner/products/build/allOutputs/version.txt
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Combine
+        if: |
+          !startsWith(github.ref, 'refs/tags/v') &&
+          github.ref != 'refs/heads/master'
+        run: cd combiner && ./gradlew publish -Pallwpilib
+      - name: Combine (Master)
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          github.ref == 'refs/heads/master'
+        run: cd combiner && ./gradlew publish -Pallwpilib
+        env:
+          RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: Combine (Release)
+        if: |
+          github.repository_owner == 'wpilibsuite' &&
+          startsWith(github.ref, 'refs/tags/v')
+        run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish
+        env:
+          RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Maven
+          path: ~/releases

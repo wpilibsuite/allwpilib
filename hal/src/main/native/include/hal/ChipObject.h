@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 #pragma GCC diagnostic push
@@ -24,9 +21,12 @@
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tCounter.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tDIO.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tDMA.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tDutyCycle.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tEncoder.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tGlobal.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tHMB.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tInterrupt.h>
+#include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tLED.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tPWM.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tPower.h>
 #include <FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tRelay.h>

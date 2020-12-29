@@ -1,16 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include "frc/ErrorBase.h"
 #include "frc/PIDSource.h"
 #include "frc/interfaces/Gyro.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -20,8 +18,9 @@ namespace frc {
  */
 class GyroBase : public Gyro,
                  public ErrorBase,
-                 public SendableBase,
-                 public PIDSource {
+                 public PIDSource,
+                 public Sendable,
+                 public SendableHelper<GyroBase> {
  public:
   GyroBase() = default;
   GyroBase(GyroBase&&) = default;

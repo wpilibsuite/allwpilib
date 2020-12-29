@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -54,6 +51,15 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module);
  * @return Analog channel is valid
  */
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel);
+
+/**
+ * Indicates the analog input is used by a simulated device.
+ *
+ * @param handle the analog input handle
+ * @param device simulated device handle
+ */
+void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,
+                                 HAL_SimDeviceHandle device);
 
 /**
  * Sets the sample rate.
@@ -224,6 +230,16 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
  */
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status);
+
+/**
+ *  Get the analog voltage from a raw value.
+ *
+ * @param analogPortHandle  Handle to the analog port the values were read from.
+ * @param rawValue          The raw analog value
+ * @return                  The voltage relating to the value
+ */
+double HAL_GetAnalogValueToVolts(HAL_AnalogInputHandle analogPortHandle,
+                                 int32_t rawValue, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "NetworkListener.h"
 
@@ -50,7 +47,9 @@ class NetworkListener::Impl {
 NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier)
     : m_impl(std::make_unique<Impl>(logger, notifier)) {}
 
-NetworkListener::~NetworkListener() { Stop(); }
+NetworkListener::~NetworkListener() {
+  Stop();
+}
 
 void NetworkListener::Start() {
   m_impl->m_owner.Start(m_impl->m_logger, m_impl->m_notifier);
@@ -60,7 +59,9 @@ void NetworkListener::Stop() {
   // Wake up thread
   if (auto thr = m_impl->m_owner.GetThread()) {
     thr->m_active = false;
-    if (thr->m_command_fd >= 0) eventfd_write(thr->m_command_fd, 1);
+    if (thr->m_command_fd >= 0) {
+      eventfd_write(thr->m_command_fd, 1);
+    }
   }
   m_impl->m_owner.Stop();
 }
@@ -117,25 +118,35 @@ void NetworkListener::Impl::Thread::Main() {
     }
 
     // Double-check to see if we're shutting down
-    if (!m_active) break;
+    if (!m_active) {
+      break;
+    }
 
-    if (!FD_ISSET(sd, &readfds)) continue;
+    if (!FD_ISSET(sd, &readfds)) {
+      continue;
+    }
 
     std::memset(&addr, 0, sizeof(addr));
     struct iovec iov = {buf, sizeof(buf)};
     struct msghdr msg = {&addr, sizeof(addr), &iov, 1, nullptr, 0, 0};
     int len = ::recvmsg(sd, &msg, 0);
     if (len < 0) {
-      if (errno == EWOULDBLOCK || errno == EAGAIN) continue;
+      if (errno == EWOULDBLOCK || errno == EAGAIN) {
+        continue;
+      }
       ERROR(
           "NetworkListener: could not read netlink: " << std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
-    if (len == 0) continue;  // EOF?
+    if (len == 0) {
+      continue;  // EOF?
+    }
     unsigned int ulen = static_cast<unsigned int>(len);
     for (struct nlmsghdr* nh = reinterpret_cast<struct nlmsghdr*>(buf);
          NLMSG_OK(nh, ulen); nh = NLMSG_NEXT(nh, ulen)) {
-      if (nh->nlmsg_type == NLMSG_DONE) break;
+      if (nh->nlmsg_type == NLMSG_DONE) {
+        break;
+      }
       if (nh->nlmsg_type == RTM_NEWLINK || nh->nlmsg_type == RTM_DELLINK ||
           nh->nlmsg_type == RTM_NEWADDR || nh->nlmsg_type == RTM_DELADDR) {
         m_notifier.NotifyNetworkInterfacesChanged();

@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include "mockdata/I2CData.h"
-#include "mockdata/SimCallbackRegistry.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/I2CData.h"
+#include "hal/simulation/SimCallbackRegistry.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class I2CData {
@@ -22,7 +19,8 @@ class I2CData {
              int32_t sendSize);
   void Read(int32_t deviceAddress, uint8_t* buffer, int32_t count);
 
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
+      false};
   SimCallbackRegistry<HAL_BufferCallback, GetReadName> read;
   SimCallbackRegistry<HAL_ConstBufferCallback, GetWriteName> write;
 

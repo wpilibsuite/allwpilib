@@ -1,17 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <hal/Types.h>
 
 #include "frc/SolenoidBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
@@ -20,7 +21,9 @@ namespace frc {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public SolenoidBase {
+class DoubleSolenoid : public SolenoidBase,
+                       public Sendable,
+                       public SendableHelper<DoubleSolenoid> {
  public:
   enum Value { kOff, kForward, kReverse };
 
@@ -45,8 +48,8 @@ class DoubleSolenoid : public SolenoidBase {
 
   ~DoubleSolenoid() override;
 
-  DoubleSolenoid(DoubleSolenoid&& rhs);
-  DoubleSolenoid& operator=(DoubleSolenoid&& rhs);
+  DoubleSolenoid(DoubleSolenoid&&) = default;
+  DoubleSolenoid& operator=(DoubleSolenoid&&) = default;
 
   /**
    * Set the value of a solenoid.
@@ -61,6 +64,15 @@ class DoubleSolenoid : public SolenoidBase {
    * @return The current value of the solenoid.
    */
   virtual Value Get() const;
+
+  /**
+   * Toggle the value of the solenoid.
+   *
+   * If the solenoid is set to forward, it'll be set to reverse. If the solenoid
+   * is set to reverse, it'll be set to forward. If the solenoid is set to off,
+   * nothing happens.
+   */
+  void Toggle();
 
   /**
    * Check if the forward solenoid is blacklisted.
@@ -91,8 +103,8 @@ class DoubleSolenoid : public SolenoidBase {
   int m_reverseChannel;  // The reverse channel on the module to control.
   int m_forwardMask;     // The mask for the forward channel.
   int m_reverseMask;     // The mask for the reverse channel.
-  HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
-  HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
+  hal::Handle<HAL_SolenoidHandle> m_forwardHandle;
+  hal::Handle<HAL_SolenoidHandle> m_reverseHandle;
 };
 
 }  // namespace frc

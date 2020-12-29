@@ -1,14 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include "mockdata/SPIAccelerometerData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/SPIAccelerometerData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class SPIAccelerometerData {
@@ -19,11 +16,11 @@ class SPIAccelerometerData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Z)
 
  public:
-  SimDataValue<HAL_Bool, MakeBoolean, GetActiveName> active{false};
-  SimDataValue<int32_t, MakeInt, GetRangeName> range{0};
-  SimDataValue<double, MakeDouble, GetXName> x{0.0};
-  SimDataValue<double, MakeDouble, GetYName> y{0.0};
-  SimDataValue<double, MakeDouble, GetZName> z{0.0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetActiveName> active{false};
+  SimDataValue<int32_t, HAL_MakeInt, GetRangeName> range{0};
+  SimDataValue<double, HAL_MakeDouble, GetXName> x{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetYName> y{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetZName> z{0.0};
 
   virtual void ResetData();
 };

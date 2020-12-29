@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <frc/PIDController.h>
-#include <frc/PIDOutput.h>
-#include <frc/PIDSource.h>
-#include <frc/commands/Command.h>
+#include <frc2/command/CommandHelper.h>
+#include <frc2/command/PIDCommand.h>
+
+#include "subsystems/DriveTrain.h"
 
 /**
  * Drive the given distance straight (negative values go backwards).
@@ -18,27 +15,13 @@
  * enabled while this command is running. The input is the averaged
  * values of the left and right encoders.
  */
-class DriveStraight : public frc::Command {
+class DriveStraight
+    : public frc2::CommandHelper<frc2::PIDCommand, DriveStraight> {
  public:
-  explicit DriveStraight(double distance);
+  explicit DriveStraight(double distance, DriveTrain* drivetrain);
   void Initialize() override;
   bool IsFinished() override;
-  void End() override;
-
-  class DriveStraightPIDSource : public frc::PIDSource {
-   public:
-    virtual ~DriveStraightPIDSource() = default;
-    double PIDGet() override;
-  };
-
-  class DriveStraightPIDOutput : public frc::PIDOutput {
-   public:
-    virtual ~DriveStraightPIDOutput() = default;
-    void PIDWrite(double d) override;
-  };
 
  private:
-  DriveStraightPIDSource m_source;
-  DriveStraightPIDOutput m_output;
-  frc::PIDController m_pid{4, 0, 0, &m_source, &m_output};
+  DriveTrain* m_drivetrain;
 };

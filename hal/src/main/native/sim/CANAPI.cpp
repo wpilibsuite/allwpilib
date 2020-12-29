@@ -1,14 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/CANAPI.h"
-
-#include <atomic>
-#include <ctime>
 
 #include <wpi/DenseMap.h>
 
@@ -16,7 +10,7 @@
 #include "HALInitializer.h"
 #include "hal/CAN.h"
 #include "hal/Errors.h"
-#include "hal/HAL.h"
+#include "hal/HALBase.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 
 using namespace hal;
@@ -145,6 +139,27 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
   }
   std::scoped_lock lock(can->mapMutex);
   can->periodicSends[apiId] = repeatMs;
+}
+
+void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
+                          int32_t* status) {
+  auto can = canHandles->Get(handle);
+  if (!can) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  auto id = CreateCANId(can.get(), apiId);
+  id |= HAL_CAN_IS_FRAME_REMOTE;
+  uint8_t data[8];
+  std::memset(data, 0, sizeof(data));
+
+  HAL_CAN_SendMessage(id, data, length, HAL_CAN_SEND_PERIOD_NO_REPEAT, status);
+
+  if (*status != 0) {
+    return;
+  }
+  std::scoped_lock lock(can->mapMutex);
+  can->periodicSends[apiId] = -1;
 }
 
 void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,

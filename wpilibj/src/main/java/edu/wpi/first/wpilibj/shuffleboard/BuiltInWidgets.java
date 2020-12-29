@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
@@ -190,7 +187,7 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kSplitButtonChooser("Split Button Chooser"),
   /**
-   * Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed, total travelled
+   * Displays an {@link edu.wpi.first.wpilibj.Encoder} displaying its speed, total traveled
    * distance, and its distance per tick.
    * <br>Supported types:
    * <ul>
@@ -208,7 +205,10 @@ public enum BuiltInWidgets implements WidgetType {
    * <li>{@link edu.wpi.first.wpilibj.PWMSpeedController}</li>
    * <li>{@link edu.wpi.first.wpilibj.DMC60}</li>
    * <li>{@link edu.wpi.first.wpilibj.Jaguar}</li>
+   * <li>{@link edu.wpi.first.wpilibj.PWMSparkMax}</li>
+   * <li>{@link edu.wpi.first.wpilibj.PWMTalonFX}</li>
    * <li>{@link edu.wpi.first.wpilibj.PWMTalonSRX}</li>
+   * <li>{@link edu.wpi.first.wpilibj.PWMVenom}</li>
    * <li>{@link edu.wpi.first.wpilibj.PWMVictorSPX}</li>
    * <li>{@link edu.wpi.first.wpilibj.SD540}</li>
    * <li>{@link edu.wpi.first.wpilibj.Spark}</li>
@@ -216,6 +216,7 @@ public enum BuiltInWidgets implements WidgetType {
    * <li>{@link edu.wpi.first.wpilibj.Victor}</li>
    * <li>{@link edu.wpi.first.wpilibj.VictorSP}</li>
    * <li>{@link edu.wpi.first.wpilibj.SpeedControllerGroup}</li>
+   * <li>Any custom subclass of {@code SpeedController}</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -283,7 +284,7 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kAccelerometer("Accelerometer"),
   /**
-   * Displays a 3-axis accelerometer with a number bar for each axis' accleration.
+   * Displays a 3-axis accelerometer with a number bar for each axis' acceleration.
    * <br>Supported types:
    * <ul>
    * <li>{@link edu.wpi.first.wpilibj.ADXL345_I2C}</li>

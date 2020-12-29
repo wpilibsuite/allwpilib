@@ -21,16 +21,14 @@ try {
     gazebo_linker_args = "pkg-config --libs gazebo protobuf".execute().text.split()
 } catch(Exception ex) { }
 
-if (!gazebo_version?.trim()) {
-    println "Gazebo development files are not available. (pkg-config --modversion gazebo failed)"
-    if (project.hasProperty("makeSim")) {
-        /* Force the build even though we did not find protobuf. */
+if (project.hasProperty("makeSim")) {
+    if (!gazebo_version?.trim()) {
+        println "Gazebo development files are not available. (pkg-config --modversion gazebo failed)"
         println "makeSim set. Forcing build - failure likely."
     }
-    else {
-        ext.skip_frc_plugins = true
-        println "Skipping FRC Plugins."
-    }
+} else {
+    ext.skip_frc_plugins = true
+    println "Skipping FRC Plugins."
 }
 
 evaluationDependsOn(":simulation:gz_msgs")

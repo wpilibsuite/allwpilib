@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
 #include <frc/PWMVictorSPX.h>
-#include <frc/commands/PIDSubsystem.h>
+#include <frc2/command/PIDSubsystem.h>
 
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in
@@ -17,11 +14,9 @@
  * state PID values for simulation are different than in the real world do to
  * minor differences.
  */
-class Elevator : public frc::PIDSubsystem {
+class Elevator : public frc2::PIDSubsystem {
  public:
   Elevator();
-
-  void InitDefaultCommand() override;
 
   /**
    * The log method puts interesting information to the SmartDashboard.
@@ -32,17 +27,24 @@ class Elevator : public frc::PIDSubsystem {
    * Use the potentiometer as the PID sensor. This method is automatically
    * called by the subsystem.
    */
-  double ReturnPIDInput() override;
+  double GetMeasurement() override;
 
   /**
    * Use the motor as the PID output. This method is automatically called
    * by
    * the subsystem.
    */
-  void UsePIDOutput(double d) override;
+  void UseOutput(double output, double setpoint) override;
+
+  /**
+   * Log the data periodically. This method is automatically called
+   * by the subsystem.
+   */
+  void Periodic() override;
 
  private:
   frc::PWMVictorSPX m_motor{5};
+  double m_setpoint = 0;
 
 // Conversion value of potentiometer varies between the real world and
 // simulation

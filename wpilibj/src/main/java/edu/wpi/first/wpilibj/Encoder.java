@@ -1,17 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.EncoderJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -28,7 +27,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder extends SendableBase implements CounterBase, PIDSource {
+public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable {
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
 
@@ -75,8 +74,8 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
     m_pidSource = PIDSourceType.kDisplacement;
 
     int fpgaIndex = getFPGAIndex();
-    HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex, type.value);
-    setName("Encoder", fpgaIndex);
+    HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
+    SendableRegistry.addLW(this, "Encoder", fpgaIndex);
   }
 
   /**
@@ -130,8 +129,8 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
     m_allocatedI = false;
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
-    addChild(m_aSource);
-    addChild(m_bSource);
+    SendableRegistry.addChild(this, m_aSource);
+    SendableRegistry.addChild(this, m_bSource);
     initEncoder(reverseDirection, encodingType);
   }
 
@@ -152,7 +151,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
     this(channelA, channelB, reverseDirection);
     m_allocatedI = true;
     m_indexSource = new DigitalInput(indexChannel);
-    addChild(m_indexSource);
+    SendableRegistry.addChild(this, m_indexSource);
     setIndexSource(m_indexSource);
   }
 
@@ -289,7 +288,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
 
   @Override
   public void close() {
-    super.close();
+    SendableRegistry.remove(this);
     if (m_aSource != null && m_allocatedA) {
       m_aSource.close();
       m_allocatedA = false;
@@ -541,7 +540,7 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
     }
     m_indexSource = new DigitalInput(channel);
     m_allocatedI = true;
-    addChild(m_indexSource);
+    SendableRegistry.addChild(this, m_indexSource);
     setIndexSource(m_indexSource, type);
   }
 
@@ -555,6 +554,15 @@ public class Encoder extends SendableBase implements CounterBase, PIDSource {
   public void setIndexSource(DigitalSource source, IndexingType type) {
     EncoderJNI.setEncoderIndexSource(m_encoder, source.getPortHandleForRouting(),
         source.getAnalogTriggerTypeForRouting(), type.value);
+  }
+
+  /**
+   * Indicates this input is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  public void setSimDevice(SimDevice device) {
+    EncoderJNI.setEncoderSimDevice(m_encoder, device.getNativeHandle());
   }
 
   @Override

@@ -1,21 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/DoubleSolenoid.h"
 
 #include <utility>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
+#include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
 
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -49,8 +48,8 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   m_forwardHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_forwardChannel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
-                                 forwardChannel, HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(),
+                             forwardChannel);
     m_forwardHandle = HAL_kInvalidHandle;
     m_reverseHandle = HAL_kInvalidHandle;
     return;
@@ -59,8 +58,8 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   m_reverseHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_reverseChannel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
-                                 reverseChannel, HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(),
+                             reverseChannel);
     // free forward solenoid
     HAL_FreeSolenoidPort(m_forwardHandle);
     m_forwardHandle = HAL_kInvalidHandle;
@@ -71,11 +70,13 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
   m_forwardMask = 1 << m_forwardChannel;
   m_reverseMask = 1 << m_reverseChannel;
 
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel,
-             m_moduleNumber);
-  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel,
-             m_moduleNumber);
-  SetName("DoubleSolenoid", m_moduleNumber, m_forwardChannel);
+  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel + 1,
+             m_moduleNumber + 1);
+  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel + 1,
+             m_moduleNumber + 1);
+
+  SendableRegistry::GetInstance().AddLW(this, "DoubleSolenoid", m_moduleNumber,
+                                        m_forwardChannel);
 }
 
 DoubleSolenoid::~DoubleSolenoid() {
@@ -83,34 +84,14 @@ DoubleSolenoid::~DoubleSolenoid() {
   HAL_FreeSolenoidPort(m_reverseHandle);
 }
 
-DoubleSolenoid::DoubleSolenoid(DoubleSolenoid&& rhs)
-    : SolenoidBase(std::move(rhs)),
-      m_forwardChannel(std::move(rhs.m_forwardChannel)),
-      m_reverseChannel(std::move(rhs.m_reverseChannel)),
-      m_forwardMask(std::move(rhs.m_forwardMask)),
-      m_reverseMask(std::move(rhs.m_reverseMask)) {
-  std::swap(m_forwardHandle, rhs.m_forwardHandle);
-  std::swap(m_reverseHandle, rhs.m_reverseHandle);
-}
-
-DoubleSolenoid& DoubleSolenoid::operator=(DoubleSolenoid&& rhs) {
-  SolenoidBase::operator=(std::move(rhs));
-
-  m_forwardChannel = std::move(rhs.m_forwardChannel);
-  m_reverseChannel = std::move(rhs.m_reverseChannel);
-  m_forwardMask = std::move(rhs.m_forwardMask);
-  m_reverseMask = std::move(rhs.m_reverseMask);
-  std::swap(m_forwardHandle, rhs.m_forwardHandle);
-  std::swap(m_reverseHandle, rhs.m_reverseHandle);
-
-  return *this;
-}
-
 void DoubleSolenoid::Set(Value value) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
 
   bool forward = false;
   bool reverse = false;
+
   switch (value) {
     case kOff:
       forward = false;
@@ -125,28 +106,46 @@ void DoubleSolenoid::Set(Value value) {
       reverse = true;
       break;
   }
+
   int fstatus = 0;
   HAL_SetSolenoid(m_forwardHandle, forward, &fstatus);
   int rstatus = 0;
   HAL_SetSolenoid(m_reverseHandle, reverse, &rstatus);
 
-  wpi_setErrorWithContext(fstatus, HAL_GetErrorMessage(fstatus));
-  wpi_setErrorWithContext(rstatus, HAL_GetErrorMessage(rstatus));
+  wpi_setHALError(fstatus);
+  wpi_setHALError(rstatus);
 }
 
 DoubleSolenoid::Value DoubleSolenoid::Get() const {
-  if (StatusIsFatal()) return kOff;
+  if (StatusIsFatal()) {
+    return kOff;
+  }
+
   int fstatus = 0;
   int rstatus = 0;
   bool valueForward = HAL_GetSolenoid(m_forwardHandle, &fstatus);
   bool valueReverse = HAL_GetSolenoid(m_reverseHandle, &rstatus);
 
-  wpi_setErrorWithContext(fstatus, HAL_GetErrorMessage(fstatus));
-  wpi_setErrorWithContext(rstatus, HAL_GetErrorMessage(rstatus));
+  wpi_setHALError(fstatus);
+  wpi_setHALError(rstatus);
 
-  if (valueForward) return kForward;
-  if (valueReverse) return kReverse;
-  return kOff;
+  if (valueForward) {
+    return kForward;
+  } else if (valueReverse) {
+    return kReverse;
+  } else {
+    return kOff;
+  }
+}
+
+void DoubleSolenoid::Toggle() {
+  Value value = Get();
+
+  if (value == kForward) {
+    Set(kReverse);
+  } else if (value == kReverse) {
+    Set(kForward);
+  }
 }
 
 bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
@@ -177,10 +176,11 @@ void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
       },
       [=](wpi::StringRef value) {
         Value lvalue = kOff;
-        if (value == "Forward")
+        if (value == "Forward") {
           lvalue = kForward;
-        else if (value == "Reverse")
+        } else if (value == "Reverse") {
           lvalue = kReverse;
+        }
         Set(lvalue);
       });
 }

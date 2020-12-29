@@ -1,14 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -16,15 +10,17 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 
 /**
  * Class for creating and configuring Analog Triggers.
  */
-public class AnalogTrigger extends SendableBase {
+public class AnalogTrigger implements Sendable, AutoCloseable {
   /**
    * Exceptions dealing with improper operation of the Analog trigger.
    */
+  @SuppressWarnings("serial")
   public static class AnalogTriggerException extends RuntimeException {
     /**
      * Create a new exception with the given message.
@@ -41,8 +37,8 @@ public class AnalogTrigger extends SendableBase {
    * Where the analog trigger is attached.
    */
   protected int m_port;
-  protected int m_index;
   protected AnalogInput m_analogInput;
+  protected DutyCycle m_dutyCycle;
   protected boolean m_ownsAnalog;
 
   /**
@@ -53,7 +49,7 @@ public class AnalogTrigger extends SendableBase {
   public AnalogTrigger(final int channel) {
     this(new AnalogInput(channel));
     m_ownsAnalog = true;
-    addChild(m_analogInput);
+    SendableRegistry.addChild(this, m_analogInput);
   }
 
   /**
@@ -64,20 +60,34 @@ public class AnalogTrigger extends SendableBase {
    */
   public AnalogTrigger(AnalogInput channel) {
     m_analogInput = channel;
-    ByteBuffer index = ByteBuffer.allocateDirect(4);
-    index.order(ByteOrder.LITTLE_ENDIAN);
 
-    m_port =
-        AnalogJNI.initializeAnalogTrigger(channel.m_port, index.asIntBuffer());
-    m_index = index.asIntBuffer().get(0);
+    m_port = AnalogJNI.initializeAnalogTrigger(channel.m_port);
 
-    HAL.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());
-    setName("AnalogTrigger", channel.getChannel());
+    int index = getIndex();
+
+    HAL.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
+    SendableRegistry.addLW(this, "AnalogTrigger", index);
+  }
+
+  /**
+   * Construct an analog trigger given a duty cycle input.
+   *
+   * @param input the DutyCycle to use for the analog trigger
+   */
+  public AnalogTrigger(DutyCycle input) {
+    m_dutyCycle = input;
+
+    m_port = AnalogJNI.initializeAnalogTriggerDutyCycle(input.m_handle);
+
+    int index = getIndex();
+
+    HAL.report(tResourceType.kResourceType_AnalogTrigger, index + 1);
+    SendableRegistry.addLW(this, "AnalogTrigger", index);
   }
 
   @Override
   public void close() {
-    super.close();
+    SendableRegistry.remove(this);
     AnalogJNI.cleanAnalogTrigger(m_port);
     m_port = 0;
     if (m_ownsAnalog && m_analogInput != null) {
@@ -97,6 +107,20 @@ public class AnalogTrigger extends SendableBase {
       throw new BoundaryException("Lower bound is greater than upper");
     }
     AnalogJNI.setAnalogTriggerLimitsRaw(m_port, lower, upper);
+  }
+
+  /**
+   * Set the upper and lower limits of the analog trigger. The limits are given as floating point
+   * values between 0 and 1.
+   *
+   * @param lower the lower duty cycle limit
+   * @param upper the upper duty cycle limit
+   */
+  public void setLimitsDutyCycle(double lower, double upper) {
+    if (lower > upper) {
+      throw new BoundaryException("Lower bound is greater than upper bound");
+    }
+    AnalogJNI.setAnalogTriggerLimitsDutyCycle(m_port, lower, upper);
   }
 
   /**
@@ -140,8 +164,8 @@ public class AnalogTrigger extends SendableBase {
    *
    * @return The index of the analog trigger.
    */
-  public int getIndex() {
-    return m_index;
+  public final int getIndex() {
+    return AnalogJNI.getAnalogTriggerFPGAIndex(m_port);
   }
 
   /**

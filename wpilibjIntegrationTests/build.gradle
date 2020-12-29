@@ -20,17 +20,18 @@ repositories {
 }
 
 dependencies {
-    compile project(':wpilibj')
-    compile project(':hal')
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    compile project(':cameraserver')
-    compile 'junit:junit:4.11'
-    testCompile 'org.hamcrest:hamcrest-all:1.3'
-    compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
-    compile 'org.apache.ant:ant:1.9.4'
-    compile 'org.apache.ant:ant-junit:1.9.4'
+    implementation project(':wpilibj')
+    implementation project(':wpimath')
+    implementation project(':hal')
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':cameraserver')
+    implementation 'junit:junit:4.11'
+    testImplementation 'org.hamcrest:hamcrest-all:1.3'
+    implementation 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
+    implementation 'org.apache.ant:ant:1.9.4'
+    implementation 'org.apache.ant:ant-junit:1.9.4'
 }
 
 build.dependsOn shadowJar

@@ -1,22 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
- * The claw subsystem is a simple system with a motor for opening and closing.
- * If using stronger motors, you should probably use a sensor so that the motors
- * don't stall.
+ * The claw subsystem is a simple system with a motor for opening and closing. If using stronger
+ * motors, you should probably use a sensor so that the motors don't stall.
  */
-public class Claw extends Subsystem {
+public class Claw extends SubsystemBase {
   private final Victor m_motor = new Victor(7);
   private final DigitalInput m_contact = new DigitalInput(5);
 
@@ -24,18 +21,13 @@ public class Claw extends Subsystem {
    * Create a new claw subsystem.
    */
   public Claw() {
-    super();
-
     // Let's name everything on the LiveWindow
     addChild("Motor", m_motor);
     addChild("Limit Switch", m_contact);
   }
 
-  @Override
-  public void initDefaultCommand() {
-  }
-
   public void log() {
+    SmartDashboard.putData("Claw switch", m_contact);
   }
 
   /**
@@ -48,7 +40,6 @@ public class Claw extends Subsystem {
   /**
    * Set the claw motor to move in the close direction.
    */
-  @Override
   public void close() {
     m_motor.set(1);
   }
@@ -61,10 +52,17 @@ public class Claw extends Subsystem {
   }
 
   /**
-   * Return true when the robot is grabbing an object hard enough to trigger
-   * the limit switch.
+   * Return true when the robot is grabbing an object hard enough to trigger the limit switch.
    */
   public boolean isGrabbing() {
     return m_contact.get();
+  }
+
+  /**
+   * Call log method every loop.
+   */
+  @Override
+  public void periodic() {
+    log();
   }
 }

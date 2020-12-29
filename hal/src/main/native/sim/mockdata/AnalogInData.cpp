@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "AnalogInDataInternal.h"
@@ -22,6 +19,7 @@ void InitializeAnalogInData() {
 AnalogInData* hal::SimAnalogInData;
 void AnalogInData::ResetData() {
   initialized.Reset(false);
+  simDevice = 0;
   averageBits.Reset(7);
   oversampleBits.Reset(0);
   voltage.Reset(0.0);
@@ -35,6 +33,10 @@ void AnalogInData::ResetData() {
 extern "C" {
 void HALSIM_ResetAnalogInData(int32_t index) {
   SimAnalogInData[index].ResetData();
+}
+
+HAL_SimDeviceHandle HALSIM_GetAnalogInSimDevice(int32_t index) {
+  return SimAnalogInData[index].simDevice;
 }
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                   \

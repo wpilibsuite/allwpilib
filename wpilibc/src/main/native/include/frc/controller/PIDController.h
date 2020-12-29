@@ -1,28 +1,25 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <functional>
 #include <limits>
 
-#include <wpi/mutex.h>
+#include <units/time.h>
 
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc2 {
 
 /**
  * Implements a PID control loop.
  */
-class PIDController : public frc::SendableBase {
+class PIDController : public frc::Sendable,
+                      public frc::SendableHelper<PIDController> {
  public:
-  enum class Tolerance { kAbsolute, kPercent };
-
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
    *
@@ -30,14 +27,17 @@ class PIDController : public frc::SendableBase {
    * @param Ki     The integral coefficient.
    * @param Kd     The derivative coefficient.
    * @param period The period between controller updates in seconds. The
-   *               default is 0.02 seconds.
+   *               default is 20 milliseconds.
    */
-  PIDController(double Kp, double Ki, double Kd, double period = 0.02);
+  PIDController(double Kp, double Ki, double Kd,
+                units::second_t period = 20_ms);
 
   ~PIDController() override = default;
 
-  PIDController(PIDController&& rhs);
-  PIDController& operator=(PIDController&& rhs);
+  PIDController(const PIDController&) = default;
+  PIDController& operator=(const PIDController&) = default;
+  PIDController(PIDController&&) = default;
+  PIDController& operator=(PIDController&&) = default;
 
   /**
    * Sets the PID Controller gain parameters.
@@ -97,17 +97,7 @@ class PIDController : public frc::SendableBase {
    *
    * @return The period of the controller.
    */
-  double GetPeriod() const;
-
-  /**
-   * Returns the current controller output.
-   *
-   * This is always centered around zero and constrained to the min and max
-   * outputs.
-   *
-   * @return The latest calculated output.
-   */
-  double GetOutput() const;
+  units::second_t GetPeriod() const;
 
   /**
    * Sets the setpoint for the PIDController.
@@ -124,91 +114,64 @@ class PIDController : public frc::SendableBase {
   double GetSetpoint() const;
 
   /**
-   * Returns true if the error is within tolerance of the setpoint.
-   *
-   * This will return false until at least one input value has been computed.
-   *
-   * @param tolerance The maximum allowable error.
-   * @param deltaTolerance The maximum allowable change in error.
-   * @param toleranceType The type of tolerances specified.
-   */
-  bool AtSetpoint(
-      double tolerance,
-      double deltaTolerance = std::numeric_limits<double>::infinity(),
-      Tolerance toleranceType = Tolerance::kAbsolute) const;
-
-  /**
-   * Returns true if the error is within the tolerance of the error.
-   *
-   * Currently this just reports on target as the actual value passes through
-   * the setpoint. Ideally it should be based on being within the tolerance for
-   * some period of time.
+   * Returns true if the error is within the tolerance of the setpoint.
    *
    * This will return false until at least one input value has been computed.
    */
   bool AtSetpoint() const;
 
   /**
-   * Sets the PID controller to consider the input to be continuous.
+   * Enables continuous input.
    *
    * Rather then using the max and min input range as constraints, it considers
    * them to be the same point and automatically calculates the shortest route
    * to the setpoint.
    *
-   * @param continuous true turns on continuous, false turns off continuous
-   */
-  void SetContinuous(bool continuous = true);
-
-  /**
-   * Sets the minimum and maximum values expected from the input.
-   *
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  void SetInputRange(double minimumInput, double maximumInput);
+  void EnableContinuousInput(double minimumInput, double maximumInput);
 
   /**
-   * Sets the minimum and maximum values to write.
-   *
-   * @param minimumOutput the minimum value to write to the output
-   * @param maximumOutput the maximum value to write to the output
+   * Disables continuous input.
    */
-  void SetOutputRange(double minimumOutput, double maximumOutput);
+  void DisableContinuousInput();
 
   /**
-   * Sets the absolute error which is considered tolerable for use with
-   * AtSetpoint().
-   *
-   * @param tolerance      Error which is tolerable.
-   * @param deltaTolerance Change in error per second which is tolerable.
+   * Returns true if continuous input is enabled.
    */
-  void SetAbsoluteTolerance(
-      double tolerance,
-      double deltaTolerance = std::numeric_limits<double>::infinity());
+  bool IsContinuousInputEnabled() const;
 
   /**
-   * Sets the percentage error which is considered tolerable for use with
-   * AtSetpoint().
+   * Sets the minimum and maximum values for the integrator.
    *
-   * @param tolerance      Percent error which is tolerable.
-   * @param deltaTolerance Change in percent error per second which is
-   *                       tolerable.
+   * When the cap is reached, the integrator value is added to the controller
+   * output rather than the integrator value times the integral gain.
+   *
+   * @param minimumIntegral The minimum value of the integrator.
+   * @param maximumIntegral The maximum value of the integrator.
    */
-  void SetPercentTolerance(
-      double tolerance,
-      double deltaTolerance = std::numeric_limits<double>::infinity());
+  void SetIntegratorRange(double minimumIntegral, double maximumIntegral);
+
+  /**
+   * Sets the error which is considered tolerable for use with AtSetpoint().
+   *
+   * @param positionTolerance Position error which is tolerable.
+   * @param velociytTolerance Velocity error which is tolerable.
+   */
+  void SetTolerance(
+      double positionTolerance,
+      double velocityTolerance = std::numeric_limits<double>::infinity());
 
   /**
    * Returns the difference between the setpoint and the measurement.
-   *
-   * @return The error.
    */
-  double GetError() const;
+  double GetPositionError() const;
 
   /**
-   * Returns the change in error per second.
+   * Returns the velocity error.
    */
-  double GetDeltaError() const;
+  double GetVelocityError() const;
 
   /**
    * Returns the next output of the PID controller.
@@ -232,18 +195,6 @@ class PIDController : public frc::SendableBase {
 
   void InitSendable(frc::SendableBuilder& builder) override;
 
- protected:
-  mutable wpi::mutex m_thisMutex;
-
-  /**
-   * Wraps error around for continuous inputs. The original error is returned if
-   * continuous mode is disabled. This is an unsynchronized function.
-   *
-   * @param error The current error of the PID controller.
-   * @return Error for continuous inputs.
-   */
-  double GetContinuousError(double error) const;
-
  private:
   // Factor for "proportional" control
   double m_Kp;
@@ -255,53 +206,36 @@ class PIDController : public frc::SendableBase {
   double m_Kd;
 
   // The period (in seconds) of the control loop running this controller
-  double m_period;
+  units::second_t m_period;
 
-  // |maximum output|
-  double m_maximumOutput = 1.0;
+  double m_maximumIntegral = 1.0;
 
-  // |minimum output|
-  double m_minimumOutput = -1.0;
+  double m_minimumIntegral = -1.0;
 
-  // Maximum input - limit setpoint to this
   double m_maximumInput = 0;
 
-  // Minimum input - limit setpoint to this
   double m_minimumInput = 0;
-
-  // input range - difference between maximum and minimum
-  double m_inputRange = 0;
 
   // Do the endpoints wrap around? eg. Absolute encoder
   bool m_continuous = false;
 
-  // The error at the time of the most recent call to calculate()
-  double m_currError = 0;
+  // The error at the time of the most recent call to Calculate()
+  double m_positionError = 0;
+  double m_velocityError = 0;
 
-  // The error at the time of the second-most-recent call to calculate() (used
+  // The error at the time of the second-most-recent call to Calculate() (used
   // to compute velocity)
-  double m_prevError = std::numeric_limits<double>::infinity();
+  double m_prevError = 0;
 
   // The sum of the errors for use in the integral calc
   double m_totalError = 0;
 
-  Tolerance m_toleranceType = Tolerance::kAbsolute;
-
-  // The percentage or absolute error that is considered at setpoint.
-  double m_tolerance = 0.05;
-  double m_deltaTolerance = std::numeric_limits<double>::infinity();
+  // The error that is considered at setpoint.
+  double m_positionTolerance = 0.05;
+  double m_velocityTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
-  double m_output = 0;
-
-  /**
-   * Returns the next output of the PID controller.
-   *
-   * Unlike the public functions above, this function doesn't lock the mutex.
-   *
-   * @param measurement The current measurement of the process variable.
-   */
-  double CalculateUnsafe(double measurement);
+  double m_measurement = 0;
 };
 
 }  // namespace frc2

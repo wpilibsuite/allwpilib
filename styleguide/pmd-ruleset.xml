@@ -39,6 +39,7 @@
     <exclude name="NcssConstructorCount" />
     <exclude name="NcssCount" />
     <exclude name="NcssMethodCount" />
+    <exclude name="TooManyMethods" />
   </rule>
 
   <rule ref="category/java/errorprone.xml">

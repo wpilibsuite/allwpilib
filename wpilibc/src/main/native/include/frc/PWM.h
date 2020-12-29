@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -13,9 +10,12 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/MotorSafety.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+class AddressableLED;
+class SendableBuilder;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -31,11 +31,12 @@ namespace frc {
  *   - 1999 to 1001 = linear scaling from "full forward" to "center"
  *   - 1000 = center value
  *   - 999 to 2 = linear scaling from "center" to "full reverse"
- *   - 1 = minimum pulse width (currently .5ms)
+ *   - 1 = minimum pulse width (currently 0.5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public MotorSafety, public SendableBase {
+class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
  public:
+  friend class AddressableLED;
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */
@@ -73,8 +74,8 @@ class PWM : public MotorSafety, public SendableBase {
    */
   ~PWM() override;
 
-  PWM(PWM&& rhs);
-  PWM& operator=(PWM&& rhs);
+  PWM(PWM&&) = default;
+  PWM& operator=(PWM&&) = default;
 
   // MotorSafety interface
   void StopMotor() override;
@@ -231,7 +232,7 @@ class PWM : public MotorSafety, public SendableBase {
 
  private:
   int m_channel;
-  HAL_DigitalHandle m_handle = HAL_kInvalidHandle;
+  hal::Handle<HAL_DigitalHandle> m_handle;
 };
 
 }  // namespace frc

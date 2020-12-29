@@ -1,44 +1,27 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.livewindow;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 
 /**
  * The LiveWindow class is the public interface for putting sensors and actuators on the
  * LiveWindow.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class LiveWindow {
   private static class Component {
-    Component(Sendable sendable, Sendable parent) {
-      m_sendable = sendable;
-      m_parent = parent;
-    }
-
-    final Sendable m_sendable;
-    Sendable m_parent;
-    final SendableBuilderImpl m_builder = new SendableBuilderImpl();
     boolean m_firstTime = true;
     boolean m_telemetryEnabled = true;
   }
 
-  @SuppressWarnings("PMD.UseConcurrentHashMap")
-  private static final Map<Object, Component> components = new HashMap<>();
+  private static final int dataHandle = SendableRegistry.getDataHandle();
   private static final NetworkTable liveWindowTable =
       NetworkTableInstance.getDefault().getTable("LiveWindow");
   private static final NetworkTable statusTable = liveWindowTable.getSubTable(".status");
@@ -47,8 +30,28 @@ public class LiveWindow {
   private static boolean liveWindowEnabled;
   private static boolean telemetryEnabled = true;
 
+  private static Runnable enabledListener;
+  private static Runnable disabledListener;
+
+  private static Component getOrAdd(Sendable sendable) {
+    Component data = (Component) SendableRegistry.getData(sendable, dataHandle);
+    if (data == null) {
+      data = new Component();
+      SendableRegistry.setData(sendable, dataHandle, data);
+    }
+    return data;
+  }
+
   private LiveWindow() {
     throw new UnsupportedOperationException("This is a utility class!");
+  }
+
+  public static synchronized void setEnabledListener(Runnable runnable) {
+    enabledListener = runnable;
+  }
+
+  public static synchronized void setDisabledListener(Runnable runnable) {
+    disabledListener = runnable;
   }
 
   public static synchronized boolean isEnabled() {
@@ -68,57 +71,21 @@ public class LiveWindow {
       startLiveWindow = enabled;
       liveWindowEnabled = enabled;
       updateValues(); // Force table generation now to make sure everything is defined
-      Scheduler scheduler = Scheduler.getInstance();
       if (enabled) {
         System.out.println("Starting live window mode.");
-        scheduler.disable();
-        scheduler.removeAll();
+        if (enabledListener != null) {
+          enabledListener.run();
+        }
       } else {
         System.out.println("stopping live window mode.");
-        for (Component component : components.values()) {
-          component.m_builder.stopLiveWindowMode();
+        SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+          cbdata.builder.stopLiveWindowMode();
+        });
+        if (disabledListener != null) {
+          disabledListener.run();
         }
-        scheduler.enable();
       }
       enabledEntry.setBoolean(enabled);
-    }
-  }
-
-  /**
-   * Add a component to the LiveWindow.
-   *
-   * @param sendable component to add
-   */
-  public static synchronized void add(Sendable sendable) {
-    components.putIfAbsent(sendable, new Component(sendable, null));
-  }
-
-  /**
-   * Add a child component to a component.
-   *
-   * @param parent parent component
-   * @param child child component
-   */
-  public static synchronized void addChild(Sendable parent, Object child) {
-    Component component = components.get(child);
-    if (component == null) {
-      component = new Component(null, parent);
-      components.put(child, component);
-    } else {
-      component.m_parent = parent;
-    }
-    component.m_telemetryEnabled = false;
-  }
-
-  /**
-   * Remove a component from the LiveWindow.
-   *
-   * @param sendable component to remove
-   */
-  public static synchronized void remove(Sendable sendable) {
-    Component component = components.remove(sendable);
-    if (component != null && isEnabled()) {
-      component.m_builder.stopLiveWindowMode();
     }
   }
 
@@ -130,10 +97,7 @@ public class LiveWindow {
   public static synchronized void enableTelemetry(Sendable sendable) {
     // Re-enable global setting in case disableAllTelemetry() was called.
     telemetryEnabled = true;
-    Component component = components.get(sendable);
-    if (component != null) {
-      component.m_telemetryEnabled = true;
-    }
+    getOrAdd(sendable).m_telemetryEnabled = true;
   }
 
   /**
@@ -142,10 +106,7 @@ public class LiveWindow {
    * @param sendable component
    */
   public static synchronized void disableTelemetry(Sendable sendable) {
-    Component component = components.get(sendable);
-    if (component != null) {
-      component.m_telemetryEnabled = false;
-    }
+    getOrAdd(sendable).m_telemetryEnabled = false;
   }
 
   /**
@@ -153,9 +114,12 @@ public class LiveWindow {
    */
   public static synchronized void disableAllTelemetry() {
     telemetryEnabled = false;
-    for (Component component : components.values()) {
-      component.m_telemetryEnabled = false;
-    }
+    SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+      if (cbdata.data == null) {
+        cbdata.data = new Component();
+      }
+      ((Component) cbdata.data).m_telemetryEnabled = false;
+    });
   }
 
   /**
@@ -164,48 +128,57 @@ public class LiveWindow {
    * <p>Actuators are handled through callbacks on their value changing from the
    * SmartDashboard widgets.
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public static synchronized void updateValues() {
     // Only do this if either LiveWindow mode or telemetry is enabled.
     if (!liveWindowEnabled && !telemetryEnabled) {
       return;
     }
 
-    for (Component component : components.values()) {
-      if (component.m_sendable != null && component.m_parent == null
-          && (liveWindowEnabled || component.m_telemetryEnabled)) {
-        if (component.m_firstTime) {
-          // By holding off creating the NetworkTable entries, it allows the
-          // components to be redefined. This allows default sensor and actuator
-          // values to be created that are replaced with the custom names from
-          // users calling setName.
-          String name = component.m_sendable.getName();
-          if (name.isEmpty()) {
-            continue;
-          }
-          String subsystem = component.m_sendable.getSubsystem();
-          NetworkTable ssTable = liveWindowTable.getSubTable(subsystem);
-          NetworkTable table;
-          // Treat name==subsystem as top level of subsystem
-          if (name.equals(subsystem)) {
-            table = ssTable;
-          } else {
-            table = ssTable.getSubTable(name);
-          }
-          table.getEntry(".name").setString(name);
-          component.m_builder.setTable(table);
-          component.m_sendable.initSendable(component.m_builder);
-          ssTable.getEntry(".type").setString("LW Subsystem");
-
-          component.m_firstTime = false;
-        }
-
-        if (startLiveWindow) {
-          component.m_builder.startLiveWindowMode();
-        }
-        component.m_builder.updateTable();
+    SendableRegistry.foreachLiveWindow(dataHandle, cbdata -> {
+      if (cbdata.sendable == null || cbdata.parent != null) {
+        return;
       }
-    }
+
+      if (cbdata.data == null) {
+        cbdata.data = new Component();
+      }
+
+      Component component = (Component) cbdata.data;
+
+      if (!liveWindowEnabled && !component.m_telemetryEnabled) {
+        return;
+      }
+
+      if (component.m_firstTime) {
+        // By holding off creating the NetworkTable entries, it allows the
+        // components to be redefined. This allows default sensor and actuator
+        // values to be created that are replaced with the custom names from
+        // users calling setName.
+        if (cbdata.name.isEmpty()) {
+          return;
+        }
+        NetworkTable ssTable = liveWindowTable.getSubTable(cbdata.subsystem);
+        NetworkTable table;
+        // Treat name==subsystem as top level of subsystem
+        if (cbdata.name.equals(cbdata.subsystem)) {
+          table = ssTable;
+        } else {
+          table = ssTable.getSubTable(cbdata.name);
+        }
+        table.getEntry(".name").setString(cbdata.name);
+        cbdata.builder.setTable(table);
+        cbdata.sendable.initSendable(cbdata.builder);
+        ssTable.getEntry(".type").setString("LW Subsystem");
+
+        component.m_firstTime = false;
+      }
+
+      if (startLiveWindow) {
+        cbdata.builder.startLiveWindowMode();
+      }
+      cbdata.builder.updateTable();
+    });
 
     startLiveWindow = false;
   }

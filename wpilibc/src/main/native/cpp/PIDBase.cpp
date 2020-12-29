@@ -1,19 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/PIDBase.h"
 
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/PIDOutput.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -27,15 +25,14 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, PIDSource& source,
     : PIDBase(Kp, Ki, Kd, 0.0, source, output) {}
 
 PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
-                 PIDOutput& output)
-    : SendableBase(false) {
+                 PIDOutput& output) {
   m_P = Kp;
   m_I = Ki;
   m_D = Kd;
   m_F = Kf;
 
   m_pidInput = &source;
-  m_filter = LinearFilter::MovingAverage(1);
+  m_filter = LinearFilter<double>::MovingAverage(1);
 
   m_pidOutput = &output;
 
@@ -44,7 +41,7 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
-  SetName("PIDController", instances);
+  SendableRegistry::GetInstance().Add(this, "PIDController", instances);
 }
 
 double PIDBase::Get() const {
@@ -136,12 +133,13 @@ void PIDBase::SetSetpoint(double setpoint) {
     std::scoped_lock lock(m_thisMutex);
 
     if (m_maximumInput > m_minimumInput) {
-      if (setpoint > m_maximumInput)
+      if (setpoint > m_maximumInput) {
         m_setpoint = m_maximumInput;
-      else if (setpoint < m_minimumInput)
+      } else if (setpoint < m_minimumInput) {
         m_setpoint = m_minimumInput;
-      else
+      } else {
         m_setpoint = setpoint;
+      }
     } else {
       m_setpoint = setpoint;
     }
@@ -166,7 +164,9 @@ double PIDBase::GetError() const {
   }
 }
 
-double PIDBase::GetAvgError() const { return GetError(); }
+double PIDBase::GetAvgError() const {
+  return GetError();
+}
 
 void PIDBase::SetPIDSourceType(PIDSourceType pidSource) {
   m_pidInput->SetPIDSourceType(pidSource);
@@ -196,7 +196,7 @@ void PIDBase::SetPercentTolerance(double percent) {
 
 void PIDBase::SetToleranceBuffer(int bufLength) {
   std::scoped_lock lock(m_thisMutex);
-  m_filter = LinearFilter::MovingAverage(bufLength);
+  m_filter = LinearFilter<double>::MovingAverage(bufLength);
 }
 
 bool PIDBase::OnTarget() const {
@@ -224,25 +224,30 @@ void PIDBase::Reset() {
   m_result = 0;
 }
 
-void PIDBase::PIDWrite(double output) { SetSetpoint(output); }
+void PIDBase::PIDWrite(double output) {
+  SetSetpoint(output);
+}
 
 void PIDBase::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
   builder.SetSafeState([=]() { Reset(); });
-  builder.AddDoubleProperty("p", [=]() { return GetP(); },
-                            [=](double value) { SetP(value); });
-  builder.AddDoubleProperty("i", [=]() { return GetI(); },
-                            [=](double value) { SetI(value); });
-  builder.AddDoubleProperty("d", [=]() { return GetD(); },
-                            [=](double value) { SetD(value); });
-  builder.AddDoubleProperty("f", [=]() { return GetF(); },
-                            [=](double value) { SetF(value); });
-  builder.AddDoubleProperty("setpoint", [=]() { return GetSetpoint(); },
-                            [=](double value) { SetSetpoint(value); });
+  builder.AddDoubleProperty(
+      "p", [=]() { return GetP(); }, [=](double value) { SetP(value); });
+  builder.AddDoubleProperty(
+      "i", [=]() { return GetI(); }, [=](double value) { SetI(value); });
+  builder.AddDoubleProperty(
+      "d", [=]() { return GetD(); }, [=](double value) { SetD(value); });
+  builder.AddDoubleProperty(
+      "f", [=]() { return GetF(); }, [=](double value) { SetF(value); });
+  builder.AddDoubleProperty(
+      "setpoint", [=]() { return GetSetpoint(); },
+      [=](double value) { SetSetpoint(value); });
 }
 
 void PIDBase::Calculate() {
-  if (m_pidInput == nullptr || m_pidOutput == nullptr) return;
+  if (m_pidInput == nullptr || m_pidOutput == nullptr) {
+    return;
+  }
 
   bool enabled;
   {

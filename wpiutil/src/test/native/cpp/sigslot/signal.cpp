@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /*
 
@@ -48,8 +45,12 @@ namespace {
 
 int sum = 0;
 
-void f1(int i) { sum += i; }
-void f2(int i) /*noexcept*/ { sum += 2 * i; }
+void f1(int i) {
+  sum += i;
+}
+void f2(int i) /*noexcept*/ {
+  sum += 2 * i;
+}
 
 struct s {
   static void s1(int i) { sum += i; }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AnalogAccumulator.h"
 
@@ -27,7 +24,9 @@ HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analogPortHandle,
     return false;
   }
   for (int32_t i = 0; i < kNumAccumulators; i++) {
-    if (port->channel == kAccumulatorChannels[i]) return true;
+    if (port->channel == kAccumulatorChannels[i]) {
+      return true;
+    }
   }
   return false;
 }

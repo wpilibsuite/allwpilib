@@ -1,11 +1,16 @@
 apply from: "${rootDir}/shared/resources.gradle"
 
 ext {
+    noWpiutil = true
+    skipJniCheck = true
+    baseId = 'wpiutil'
+    groupId = 'edu.wpi.first.wpiutil'
+
     nativeName = 'wpiutil'
     devMain = 'edu.wpi.first.wpiutil.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
-    extraSetup = {
+    splitSetup = {
         it.tasks.withType(CppCompile) {
             dependsOn generateTask
         }
@@ -60,6 +65,16 @@ ext {
                         srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                     }
                 }
+                wpiutilUnixCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/unix'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
             }
         }
         if (it.targetPlatform.operatingSystem.isWindows()) {
@@ -74,6 +89,16 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                    }
+                }
+                wpiutilWindowsCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/windows'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
                     }
                 }
             }
@@ -129,7 +154,7 @@ file("$projectDir/examples").list(new FilenameFilter() {
     examplesMap.put(it, [])
 }
 
-apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
 nativeUtils.exportsConfigs {
     wpiutil {
@@ -212,4 +237,10 @@ model {
             }
         }
     }
+}
+
+dependencies {
+    api "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
+    api "com.fasterxml.jackson.core:jackson-core:2.10.0"
+    api "com.fasterxml.jackson.core:jackson-databind:2.10.0"
 }

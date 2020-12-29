@@ -5,33 +5,83 @@ ext {
     devMain = 'edu.wpi.cscore.DevMain'
 }
 
-if (OperatingSystem.current().isMacOsX()) {
-    apply plugin: 'objective-cpp'
-}
+// Removed because having the objective-cpp plugin added breaks
+// embedded tools and its toolchain check. It causes an obj-cpp
+// source set to be added to all binaries, even cross binaries
+// with no support.
+// if (OperatingSystem.current().isMacOsX()) {
+//     apply plugin: 'objective-cpp'
+// }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
+
+model {
+    components {
+        cscoreJNICvStatic(JniNativeLibrarySpec) {
+            baseName = 'cscorejnicvstatic'
+
+            enableCheckTask true
+            javaCompileTasks << compileJava
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/jni/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        include '**/*.h'
+                    }
+
+                }
+            }
+            binaries.all {
+                if (it instanceof StaticLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+
+                if (it.targetPlatform.operatingSystem.linux) {
+                    it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
+                } else if (it.targetPlatform.operatingSystem.macOsX) {
+                    it.linker.args '-exported_symbols_list'
+                    it.linker.args file('src/main/native/MacSymbolScript.txt').toString()
+                }
+            }
+        }
+    }
+}
+
 
 ext {
     sharedCvConfigs = [cscore    : [],
                        cscoreBase: [],
                        cscoreDev : [],
-                       cscoreTest: []]
-    staticCvConfigs = [cscoreJNI: []]
+                       cscoreTest: [],
+                       cscoreJNIShared: []]
+    staticCvConfigs = [cscoreJNI: [],
+                       cscoreJNICvStatic: []]
     useJava = true
     useCpp = true
+    cvStaticBuild = true
     splitSetup = {
         if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
-                macObjCpp(ObjectiveCppSourceSet) {
-                    source {
-                        srcDirs = ['src/main/native/objcpp']
-                        include '**/*.mm'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include'
-                        include '**/*.h'
-                    }
-                }
+                // macObjCpp(ObjectiveCppSourceSet) {
+                //     source {
+                //         srcDirs = ['src/main/native/objcpp']
+                //         include '**/*.mm'
+                //     }
+                //     exportedHeaders {
+                //         srcDirs 'src/main/native/include'
+                //         include '**/*.h'
+                //     }
+                // }
                 cscoreMacCpp(CppSourceSet) {
                     source {
                         srcDirs 'src/main/native/osx'
@@ -107,22 +157,63 @@ nativeUtils.exportsConfigs {
             symbols.removeIf({ !it.startsWith('CS_') })
         }
     }
+    cscoreJNICvStatic {
+        x86SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
+        }
+        x64SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
+        }
+    }
 }
 
 model {
     components {
         examplesMap.each { key, value ->
-            "${key}"(NativeExecutableSpec) {
-                targetBuildTypes 'debug'
-                binaries.all {
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    lib library: 'cscore', linkage: 'shared'
+            if (key == "usbviewer") {
+                if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+                    "${key}"(NativeExecutableSpec) {
+                        targetBuildTypes 'debug'
+                        binaries.all {
+                            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                            lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                            lib library: 'cscore', linkage: 'shared'
+                            nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                                it.buildable = false
+                                return
+                            }
+                            if (it.targetPlatform.operatingSystem.isWindows()) {
+                                it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                            } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                            } else {
+                                it.linker.args << '-lX11'
+                            }
+                        }
+                        sources {
+                            cpp {
+                                source {
+                                    srcDirs 'examples/' + "${key}"
+                                    include '**/*.cpp'
+                                }
+                            }
+                        }
+                    }
                 }
-                sources {
-                    cpp {
-                        source {
-                            srcDirs 'examples/' + "${key}"
-                            include '**/*.cpp'
+            } else {
+                "${key}"(NativeExecutableSpec) {
+                    targetBuildTypes 'debug'
+                    binaries.all {
+                        lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                        lib library: 'cscore', linkage: 'shared'
+                    }
+                    sources {
+                        cpp {
+                            source {
+                                srcDirs 'examples/' + "${key}"
+                                include '**/*.cpp'
+                            }
                         }
                     }
                 }

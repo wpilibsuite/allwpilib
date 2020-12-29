@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <string>
 
+#include <hal/Types.h>
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 #include <wpi/deprecated.h>
@@ -73,6 +71,9 @@ class SerialPort : public ErrorBase {
   /**
    * Create an instance of a Serial Port class.
    *
+   * Prefer to use the constructor that doesn't take a port name, but in some
+   * cases the automatic detection might not work correctly.
+   *
    * @param baudRate The baud rate to configure the serial port.
    * @param port     The physical port to use
    * @param portName The direct port name to use
@@ -82,15 +83,14 @@ class SerialPort : public ErrorBase {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  WPI_DEPRECATED("Will be removed for 2020")
   SerialPort(int baudRate, const wpi::Twine& portName, Port port = kOnboard,
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
 
   ~SerialPort();
 
-  SerialPort(SerialPort&& rhs);
-  SerialPort& operator=(SerialPort&& rhs);
+  SerialPort(SerialPort&& rhs) = default;
+  SerialPort& operator=(SerialPort&& rhs) = default;
 
   /**
    * Set the type of flow control to enable on this port.
@@ -103,7 +103,7 @@ class SerialPort : public ErrorBase {
    * Enable termination and specify the termination character.
    *
    * Termination is currently only implemented for receive.
-   * When the the terminator is recieved, the Read() or Scanf() will return
+   * When the the terminator is received, the Read() or Scanf() will return
    * fewer bytes than requested, stopping after the terminator.
    *
    * @param terminator The character to use for termination.
@@ -166,7 +166,7 @@ class SerialPort : public ErrorBase {
    *
    * Specify the amount of data that can be stored before data
    * from the device is returned to Read or Scanf.  If you want
-   * data that is recieved to be returned immediately, set this to 1.
+   * data that is received to be returned immediately, set this to 1.
    *
    * It the buffer is not filled before the read timeout expires, all
    * data that has been received so far will be returned.
@@ -214,10 +214,7 @@ class SerialPort : public ErrorBase {
   void Reset();
 
  private:
-  int m_resourceManagerHandle = 0;
-  int m_portHandle = 0;
-  bool m_consoleModeEnabled = false;
-  Port m_port = kOnboard;
+  hal::Handle<HAL_SerialPortHandle> m_portHandle;
 };
 
 }  // namespace frc

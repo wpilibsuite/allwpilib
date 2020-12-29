@@ -1,0 +1,29 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+repoRootNameOverride {
+  wpilib
+}
+
+includeOtherLibs {
+  ^cameraserver/
+  ^cscore
+  ^frc/
+  ^hal/
+  ^imgui
+  ^mockdata/
+  ^networktables/
+  ^ntcore
+  ^opencv2/
+  ^support/
+  ^units/
+  ^vision/
+  ^wpi/
+}

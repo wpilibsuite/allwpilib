@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -65,6 +62,10 @@ enum class HAL_HandleEnum {
   Vendor = 17,
   SimulationJni = 18,
   CAN = 19,
+  SerialPort = 20,
+  DutyCycle = 21,
+  DMA = 22,
+  AddressableLED = 23,
 };
 
 /**
@@ -127,9 +128,13 @@ static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
 static inline int16_t getHandleTypedIndex(HAL_Handle handle,
                                           HAL_HandleEnum enumType,
                                           int16_t version) {
-  if (!isHandleType(handle, enumType)) return InvalidHandleIndex;
+  if (!isHandleType(handle, enumType)) {
+    return InvalidHandleIndex;
+  }
 #if !defined(__FRC_ROBORIO__)
-  if (!isHandleCorrectVersion(handle, version)) return InvalidHandleIndex;
+  if (!isHandleCorrectVersion(handle, version)) {
+    return InvalidHandleIndex;
+  }
 #endif
   return getHandleIndex(handle);
 }
@@ -151,7 +156,9 @@ static inline int16_t getHandleTypedIndex(HAL_Handle handle,
  * @return       the port channel
  */
 static inline int16_t getPortHandleChannel(HAL_PortHandle handle) {
-  if (!isHandleType(handle, HAL_HandleEnum::Port)) return InvalidHandleIndex;
+  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
+    return InvalidHandleIndex;
+  }
   return static_cast<uint8_t>(handle & 0xff);
 }
 
@@ -163,7 +170,9 @@ static inline int16_t getPortHandleChannel(HAL_PortHandle handle) {
  * @return       the port module
  */
 static inline int16_t getPortHandleModule(HAL_PortHandle handle) {
-  if (!isHandleType(handle, HAL_HandleEnum::Port)) return InvalidHandleIndex;
+  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
+    return InvalidHandleIndex;
+  }
   return static_cast<uint8_t>((handle >> 8) & 0xff);
 }
 
@@ -175,7 +184,9 @@ static inline int16_t getPortHandleModule(HAL_PortHandle handle) {
  * @return       the port SPI channel
  */
 static inline int16_t getPortHandleSPIEnable(HAL_PortHandle handle) {
-  if (!isHandleType(handle, HAL_HandleEnum::Port)) return InvalidHandleIndex;
+  if (!isHandleType(handle, HAL_HandleEnum::Port)) {
+    return InvalidHandleIndex;
+  }
   return static_cast<uint8_t>((handle >> 16) & 0xff);
 }
 

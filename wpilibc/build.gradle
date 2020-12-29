@@ -22,7 +22,7 @@ task generateCppVersion() {
     outputs.file wpilibVersionFileOutput
     inputs.file wpilibVersionFileInput
 
-    if (WPILibVersion.releaseType.toString().equalsIgnoreCase('official')) {
+    if (wpilibVersioning.releaseMode) {
         outputs.upToDateWhen { false }
     }
 
@@ -32,12 +32,13 @@ task generateCppVersion() {
     // 3. If there is a generated build number, and the release type is development, then we will
     //    only generate if the publish task is run.
     doLast {
-        println "Writing version ${WPILibVersion.version} to $wpilibVersionFileOutput"
+        def version = wpilibVersioning.version.get()
+        println "Writing version ${version} to $wpilibVersionFileOutput"
 
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
-        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', WPILibVersion.version)
+        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
         wpilibVersionFileOutput.write(read)
     }
 }
@@ -49,18 +50,6 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
     }
 }
 
-ext {
-    sharedCvConfigs = [wpilibc    : [],
-                       wpilibcBase: [],
-                       wpilibcDev : [],
-                       wpilibcTest: []]
-    staticCvConfigs = [:]
-    useJava = false
-    useCpp = true
-}
-
-apply from: "${rootDir}/shared/opencv.gradle"
-
 project(':').libraryBuild.dependsOn build
 
 ext {
@@ -70,18 +59,6 @@ ext {
 staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
-
-ext {
-    chipObjectComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
-                            "${nativeName}Test".toString()]
-    netCommComponents = ["$nativeName".toString(), "${nativeName}Dev".toString(), "${nativeName}Base".toString(),
-                            "${nativeName}Test".toString()]
-    useNiJava = false
-}
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
-apply plugin: DisableBuildingGTest
 
 nativeUtils.exportsConfigs {
     wpilibc {
@@ -115,31 +92,42 @@ model {
                     it.buildable = false
                     return
                 }
+                cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             }
         }
         "${nativeName}"(NativeLibrarySpec) {
             sources {
                 cpp {
                     source {
-                        srcDirs "${rootDir}/shared/singlelib"
+                        srcDirs "src/main/native/cppcs"
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/native/include', '../cameraserver/src/main/native/include'
                     }
                 }
             }
             binaries.all {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+
+                if (it instanceof SharedLibraryBinarySpec) {
+                    cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
+                    if (buildType == buildTypes.debug) {
+                        cppCompiler.define 'DYNAMIC_CAMERA_SERVER_DEBUG'
+                    }
+                } else {
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+                }
+
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -164,7 +152,12 @@ model {
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                nativeUtils.useRequiredLibrary(it, 'opencv_shared')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                }
             }
         }
     }
@@ -209,8 +202,13 @@ model {
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+            nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             lib library: nativeName, linkage: 'shared'
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+            }
         }
     }
     tasks {
@@ -234,6 +232,8 @@ model {
         }
     }
 }
+
+apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
 
 tasks.withType(RunTestExecutable) {
     args "--gtest_output=xml:test_detail.xml"

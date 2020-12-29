@@ -1,20 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
-#include <wpi/Twine.h>
-#include <wpi/deprecated.h>
-
-#include "frc/smartdashboard/Sendable.h"
-
 namespace frc {
+
+class Sendable;
 
 /**
  * The LiveWindow class is the public interface for putting sensors and
@@ -25,6 +20,9 @@ class LiveWindow {
   LiveWindow(const LiveWindow&) = delete;
   LiveWindow& operator=(const LiveWindow&) = delete;
 
+  std::function<void()> enabled;
+  std::function<void()> disabled;
+
   /**
    * Get an instance of the LiveWindow main class.
    *
@@ -32,43 +30,6 @@ class LiveWindow {
    * regardless of how many times GetInstance is called.
    */
   static LiveWindow* GetInstance();
-
-  /**
-   * Add a component to the LiveWindow.
-   *
-   * @param sendable component to add
-   */
-  void Add(std::shared_ptr<Sendable> component);
-
-  /**
-   * Add a component to the LiveWindow.
-   *
-   * @param sendable component to add
-   */
-  void Add(Sendable* component);
-
-  /**
-   * Add a child component to a component.
-   *
-   * @param parent parent component
-   * @param child child component
-   */
-  void AddChild(Sendable* parent, std::shared_ptr<Sendable> component);
-
-  /**
-   * Add a child component to a component.
-   *
-   * @param parent parent component
-   * @param child child component
-   */
-  void AddChild(Sendable* parent, void* component);
-
-  /**
-   * Remove the component from the LiveWindow.
-   *
-   * @param sendable component to remove
-   */
-  void Remove(Sendable* component);
 
   /**
    * Enable telemetry for a single component.

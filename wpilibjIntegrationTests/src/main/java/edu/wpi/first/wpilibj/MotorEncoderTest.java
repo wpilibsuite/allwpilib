@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -20,10 +17,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.PIDControllerRunner;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -34,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 public class MotorEncoderTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(MotorEncoderTest.class.getName());
 
-  private static final double MOTOR_RUNTIME = .25;
+  private static final double MOTOR_RUNTIME = 0.25;
 
   // private static final List<MotorEncoderFixture> pairs = new
   // ArrayList<MotorEncoderFixture>();
@@ -68,14 +65,15 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Before
   public void setUp() {
     double initialSpeed = me.getMotor().get();
-    assertTrue(me.getType() + " Did not start with an initial speed of 0 instead got: "
-        + initialSpeed, Math.abs(initialSpeed) < 0.001);
+    assertTrue(
+        me.getType() + " Did not start with an initial speed of 0 instead got: " + initialSpeed,
+        Math.abs(initialSpeed) < 0.001);
     me.setup();
 
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     me.reset();
     encodersResetCheck(me);
   }
@@ -108,7 +106,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testIncrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(.2);
+    me.getMotor().set(0.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not incremented: start: " + startValue + "; current: "
@@ -124,7 +122,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   public void testDecrement() {
     int startValue = me.getEncoder().get();
 
-    me.getMotor().set(-.2);
+    me.getMotor().set(-0.2);
     Timer.delay(MOTOR_RUNTIME);
     int currentValue = me.getEncoder().get();
     assertTrue(me.getType() + " Encoder not decremented: start: " + startValue + "; current: "
@@ -139,7 +137,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     final int counter1Start = me.getCounters()[0].get();
     final int counter2Start = me.getCounters()[1].get();
 
-    me.getMotor().set(.75);
+    me.getMotor().set(0.75);
     Timer.delay(MOTOR_RUNTIME);
     int counter1End = me.getCounters()[0].get();
     int counter2End = me.getCounters()[1].get();
@@ -176,45 +174,45 @@ public class MotorEncoderTest extends AbstractComsSetup {
 
   @Test
   public void testPositionPIDController() {
-    PIDController pidController = new PIDController(0.001, 0.0005, 0);
-    pidController.setAbsoluteTolerance(50.0);
-    pidController.setOutputRange(-0.2, 0.2);
-    pidController.setSetpoint(1000);
+    try (PIDController pidController = new PIDController(0.001, 0.0005, 0)) {
+      pidController.setTolerance(50.0);
+      pidController.setIntegratorRange(-0.2, 0.2);
+      pidController.setSetpoint(1000);
 
-    PIDControllerRunner pidRunner = new PIDControllerRunner(pidController,
-        me.getEncoder()::getDistance, output -> me.getMotor().set(output));
-    pidRunner.enable();
-    Timer.delay(10.0);
-    pidRunner.disable();
+      try (Notifier pidRunner = new Notifier(() -> {
+        var speed = pidController.calculate(me.getEncoder().getDistance());
+        me.getMotor().set(MathUtil.clamp(speed, -0.2, 0.2));
+      })) {
+        pidRunner.startPeriodic(pidController.getPeriod());
+        Timer.delay(10.0);
+        pidRunner.stop();
 
-    assertTrue(
-        "PID loop did not reach reference within 10 seconds. The current error was" + pidController
-            .getError(), pidController.atSetpoint());
-
-    pidController.close();
+        assertTrue(
+            "PID loop did not reach reference within 10 seconds. The current error was"
+            + pidController.getPositionError(), pidController.atSetpoint());
+      }
+    }
   }
 
   @Test
   public void testVelocityPIDController() {
     LinearFilter filter = LinearFilter.movingAverage(50);
-    PIDController pidController = new PIDController(1e-5, 0.0, 0.0006);
-    pidController.setAbsoluteTolerance(200);
-    pidController.setOutputRange(-0.3, 0.3);
-    pidController.setSetpoint(600);
+    try (PIDController pidController = new PIDController(1e-5, 0.0, 0.0006)) {
+      pidController.setTolerance(200);
+      pidController.setSetpoint(600);
 
-    PIDControllerRunner pidRunner = new PIDControllerRunner(pidController,
-        () -> filter.calculate(me.getEncoder().getRate()),
-        output -> me.getMotor().set(output + 8e-5));
+      try (Notifier pidRunner = new Notifier(() -> {
+        var speed = filter.calculate(me.getEncoder().getRate());
+        me.getMotor().set(MathUtil.clamp(speed, -0.3, 0.3));
+      })) {
+        pidRunner.startPeriodic(pidController.getPeriod());
+        Timer.delay(10.0);
+        pidRunner.stop();
 
-    pidRunner.enable();
-    Timer.delay(10.0);
-    pidRunner.disable();
-
-    assertTrue(
-        "PID loop did not reach reference within 10 seconds. The error was: "
-        + pidController.getError(), pidController.atSetpoint());
-
-    pidController.close();
+        assertTrue("PID loop did not reach reference within 10 seconds. The error was: "
+            + pidController.getPositionError(), pidController.atSetpoint());
+      }
+    }
   }
 
   /**
@@ -233,8 +231,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
         me.getCounters()[1].get(), 0);
     Timer.delay(0.5); // so this doesn't fail with the 0.5 second default
     // timeout on the encoders
-    assertTrue(me.getType() + " Encoder.getStopped() returned false after the motor was reset.", me
-        .getEncoder().getStopped());
+    assertTrue(me.getType() + " Encoder.getStopped() returned false after the motor was reset.",
+        me.getEncoder().getStopped());
   }
 
 }

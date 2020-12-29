@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "HALUtil.h"
 
@@ -24,18 +21,8 @@
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
 #include "hal/HAL.h"
-#include "hal/cpp/Log.h"
 
 using namespace wpi::java;
-
-// set the logging level
-TLogLevel halUtilLogLevel = logWARNING;
-
-#define HALUTIL_LOG(level)     \
-  if (level > halUtilLogLevel) \
-    ;                          \
-  else                         \
-    Log().Get(level)
 
 #define kRioStatusOffset -63000
 #define kRioStatusSuccess 0
@@ -59,13 +46,15 @@ static JClass canStatusCls;
 static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
 static JClass canDataCls;
+static JClass halValueCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
-    {"edu/wpi/first/hal/CANData", &canDataCls}};
+    {"edu/wpi/first/hal/CANData", &canDataCls},
+    {"edu/wpi/first/hal/HALValue", &halValueCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -81,7 +70,7 @@ static const JExceptionInit exceptions[] = {
      &canNotInitializedExCls},
     {"edu/wpi/first/hal/util/UncleanStatusException", &uncleanStatusExCls}};
 
-namespace frc {
+namespace hal {
 
 void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
                                  int32_t status) {
@@ -115,7 +104,9 @@ void ThrowHalHandleException(JNIEnv* env, int32_t status) {
 }
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
-  if (status == 0) return;
+  if (status == 0) {
+    return;
+  }
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
   }
@@ -134,7 +125,9 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
 
 void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
                 int32_t requestedValue) {
-  if (status == 0) return;
+  if (status == 0) {
+    return;
+  }
   if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
       status == RESOURCE_OUT_OF_RANGE) {
     ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
@@ -150,7 +143,9 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
 }
 
 void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
-  if (status >= 0) return;
+  if (status >= 0) {
+    return;
+  }
   switch (status) {
     case kRioStatusSuccess:
       // Everything is ok... don't throw.
@@ -158,9 +153,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     case HAL_ERR_CANSessionMux_InvalidBuffer:
     case kRIOStatusBufferInvalidSize: {
       static jmethodID invalidBufConstruct = nullptr;
-      if (!invalidBufConstruct)
+      if (!invalidBufConstruct) {
         invalidBufConstruct =
             env->GetMethodID(canInvalidBufferExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canInvalidBufferExCls, invalidBufConstruct);
       env->Throw(static_cast<jthrowable>(exception));
@@ -169,9 +165,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     case HAL_ERR_CANSessionMux_MessageNotFound:
     case kRIOStatusOperationTimedOut: {
       static jmethodID messageNotFoundConstruct = nullptr;
-      if (!messageNotFoundConstruct)
+      if (!messageNotFoundConstruct) {
         messageNotFoundConstruct =
             env->GetMethodID(canMessageNotFoundExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canMessageNotFoundExCls, messageNotFoundConstruct);
       env->Throw(static_cast<jthrowable>(exception));
@@ -188,9 +185,10 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     case HAL_ERR_CANSessionMux_NotInitialized:
     case kRIOStatusResourceNotInitialized: {
       static jmethodID notInitConstruct = nullptr;
-      if (!notInitConstruct)
+      if (!notInitConstruct) {
         notInitConstruct =
             env->GetMethodID(canNotInitializedExCls, "<init>", "()V");
+      }
       jobject exception =
           env->NewObject(canNotInitializedExCls, notInitConstruct);
       env->Throw(static_cast<jthrowable>(exception));
@@ -213,14 +211,16 @@ void ThrowIllegalArgumentException(JNIEnv* env, wpi::StringRef msg) {
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper) {
   static jmethodID getMessage = nullptr;
-  if (!getMessage)
+  if (!getMessage) {
     getMessage = env->GetStaticMethodID(boundaryExCls, "getMessage",
                                         "(DDD)Ljava/lang/String;");
+  }
 
   static jmethodID constructor = nullptr;
-  if (!constructor)
+  if (!constructor) {
     constructor =
         env->GetMethodID(boundaryExCls, "<init>", "(Ljava/lang/String;)V");
+  }
 
   jobject msg = env->CallStaticObjectMethod(
       boundaryExCls, getMessage, static_cast<jdouble>(value),
@@ -234,8 +234,9 @@ jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
                                   int32_t deadbandMinPwm, int32_t minPwm) {
   static jmethodID constructor =
       env->GetMethodID(pwmConfigDataResultCls, "<init>", "(IIIII)V");
-  return env->NewObject(pwmConfigDataResultCls, constructor, maxPwm,
-                        deadbandMaxPwm, centerPwm, deadbandMinPwm, minPwm);
+  return env->NewObject(pwmConfigDataResultCls, constructor, (jint)maxPwm,
+                        (jint)deadbandMaxPwm, (jint)centerPwm,
+                        (jint)deadbandMinPwm, (jint)minPwm);
 }
 
 void SetCanStatusObject(JNIEnv* env, jobject canStatus,
@@ -281,16 +282,46 @@ jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
   return retVal;
 }
 
-JavaVM* GetJVM() { return jvm; }
+jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
+  static jmethodID fromNative = env->GetStaticMethodID(
+      halValueCls, "fromNative", "(IJD)Ledu/wpi/first/hal/HALValue;");
+  jlong value1 = 0;
+  jdouble value2 = 0.0;
+  switch (value.type) {
+    case HAL_BOOLEAN:
+      value1 = value.data.v_boolean;
+      break;
+    case HAL_DOUBLE:
+      value2 = value.data.v_double;
+      break;
+    case HAL_ENUM:
+      value1 = value.data.v_enum;
+      break;
+    case HAL_INT:
+      value1 = value.data.v_int;
+      break;
+    case HAL_LONG:
+      value1 = value.data.v_long;
+      break;
+    default:
+      break;
+  }
+  return env->CallStaticObjectMethod(halValueCls, fromNative, (jint)value.type,
+                                     value1, value2);
+}
 
-}  // namespace frc
+JavaVM* GetJVM() {
+  return jvm;
+}
 
 namespace sim {
 jint SimOnLoad(JavaVM* vm, void* reserved);
 void SimOnUnload(JavaVM* vm, void* reserved);
 }  // namespace sim
 
-using namespace frc;
+}  // namespace hal
+
+using namespace hal;
 
 extern "C" {
 
@@ -300,21 +331,23 @@ extern "C" {
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
-  // set our logging level
-  Log::ReportingLevel() = logDEBUG;
-
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
+  }
 
   for (auto& c : classes) {
     *c.cls = JClass(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   for (auto& c : exceptions) {
     *c.cls = JException(env, c.name);
-    if (!*c.cls) return JNI_ERR;
+    if (!*c.cls) {
+      return JNI_ERR;
+    }
   }
 
   return sim::SimOnLoad(vm, reserved);
@@ -324,8 +357,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   sim::SimOnUnload(vm, reserved);
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
+  }
   // Delete global references
 
   for (auto& c : classes) {
@@ -346,11 +380,8 @@ JNIEXPORT jshort JNICALL
 Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
   (JNIEnv* env, jclass)
 {
-  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGAVersion";
   int32_t status = 0;
   jshort returnValue = HAL_GetFPGAVersion(&status);
-  HALUTIL_LOG(logDEBUG) << "Status = " << status;
-  HALUTIL_LOG(logDEBUG) << "FPGAVersion = " << returnValue;
   CheckStatus(env, status);
   return returnValue;
 }
@@ -364,11 +395,8 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HALUtil_getFPGARevision
   (JNIEnv* env, jclass)
 {
-  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGARevision";
   int32_t status = 0;
   jint returnValue = HAL_GetFPGARevision(&status);
-  HALUTIL_LOG(logDEBUG) << "Status = " << status;
-  HALUTIL_LOG(logDEBUG) << "FPGARevision = " << returnValue;
   CheckStatus(env, status);
   return returnValue;
 }
@@ -382,11 +410,8 @@ JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_HALUtil_getFPGATime
   (JNIEnv* env, jclass)
 {
-  // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   int32_t status = 0;
   jlong returnValue = HAL_GetFPGATime(&status);
-  // HALUTIL_LOG(logDEBUG) << "Status = " << status;
-  // HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
   CheckStatus(env, status);
   return returnValue;
 }
@@ -400,9 +425,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
   (JNIEnv* env, jclass)
 {
-  // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALRuntimeType";
   jint returnValue = HAL_GetRuntimeType();
-  // HALUTIL_LOG(logDEBUG) << "RuntimeType = " << returnValue;
   return returnValue;
 }
 
@@ -415,11 +438,8 @@ JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_hal_HALUtil_getFPGAButton
   (JNIEnv* env, jclass)
 {
-  // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   int32_t status = 0;
   jboolean returnValue = HAL_GetFPGAButton(&status);
-  // HALUTIL_LOG(logDEBUG) << "Status = " << status;
-  // HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
   CheckStatus(env, status);
   return returnValue;
 }
@@ -434,8 +454,6 @@ Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
   (JNIEnv* paramEnv, jclass, jint paramId)
 {
   const char* msg = HAL_GetErrorMessage(paramId);
-  HALUTIL_LOG(logDEBUG) << "Calling HALUtil HAL_GetErrorMessage id=" << paramId
-                        << " msg=" << msg;
   return MakeJString(paramEnv, msg);
 }
 
@@ -461,8 +479,6 @@ Java_edu_wpi_first_hal_HALUtil_getHALstrerror
   (JNIEnv* env, jclass, jint errorCode)
 {
   const char* msg = std::strerror(errno);
-  HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode="
-                        << errorCode << " msg=" << msg;
   return MakeJString(env, msg);
 }
 

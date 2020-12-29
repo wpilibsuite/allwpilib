@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -125,6 +122,9 @@ public abstract class GenericHID {
    * <p>The buttons are returned in a single 16 bit value with one bit representing the state of
    * each button. The appropriate button is returned as a boolean value.
    *
+   * <p>This method returns true if the button is being held down at the time
+   * that this method is being called.
+   *
    * @param button The button number to be read (starting at 1)
    * @return The state of the button.
    */
@@ -136,6 +136,10 @@ public abstract class GenericHID {
    * Whether the button was pressed since the last check. Button indexes begin at
    * 1.
    *
+   * <p>This method returns true if the button went from not pressed to held down
+   * since the last time this method was called. This is useful if you only
+   * want to call a function once when you press the button.
+   *
    * @param button The button index, beginning at 1.
    * @return Whether the button was pressed since the last check.
    */
@@ -146,6 +150,10 @@ public abstract class GenericHID {
   /**
    * Whether the button was released since the last check. Button indexes begin at
    * 1.
+   *
+   * <p>This method returns true if the button went from held down to not pressed
+   * since the last time this method was called. This is useful if you only
+   * want to call a function once when you release the button.
    *
    * @param button The button index, beginning at 1.
    * @return Whether the button was released since the last check.
@@ -202,6 +210,15 @@ public abstract class GenericHID {
    */
   public int getButtonCount() {
     return m_ds.getStickButtonCount(m_port);
+  }
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  public boolean isConnected() {
+    return m_ds.isJoystickConnected(m_port);
   }
 
   /**

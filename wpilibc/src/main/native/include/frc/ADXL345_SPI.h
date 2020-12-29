@@ -1,16 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
+#include <hal/SimDevice.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/SPI.h"
 #include "frc/interfaces/Accelerometer.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -21,8 +21,9 @@ namespace frc {
  * via SPI. This class assumes the sensor is wired in 4-wire SPI mode.
  */
 class ADXL345_SPI : public ErrorBase,
-                    public SendableBase,
-                    public Accelerometer {
+                    public Accelerometer,
+                    public Sendable,
+                    public SendableHelper<ADXL345_SPI> {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 
@@ -71,6 +72,12 @@ class ADXL345_SPI : public ErrorBase,
 
  protected:
   SPI m_spi;
+
+  hal::SimDevice m_simDevice;
+  hal::SimEnum m_simRange;
+  hal::SimDouble m_simX;
+  hal::SimDouble m_simY;
+  hal::SimDouble m_simZ;
 
   static constexpr int kPowerCtlRegister = 0x2D;
   static constexpr int kDataFormatRegister = 0x31;

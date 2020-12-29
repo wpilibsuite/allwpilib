@@ -36,6 +36,11 @@ module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
   </module>
   <module name="SuppressWarningsFilter" />
   <module name="TreeWalker">
+    <module name="SuppressionCommentFilter">
+        <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/>
+        <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/>
+        <property name="checkFormat" value="$1"/>
+    </module>
     <module name="SuppressWarningsHolder" />
     <module name="OuterTypeFilename" />
     <module name="IllegalTokenText">
@@ -45,6 +50,26 @@ module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
                 value="\\u00(08|09|0(a|A)|0(c|C)|0(d|D)|22|27|5(C|c))|\\(0(10|11|12|14|15|42|47)|134)" />
       <property name="message"
                 value="Avoid using corresponding octal or Unicode escape." />
+    </module>
+    <module name="IllegalTokenText">
+      <property name="tokens"
+                value="NUM_INT,NUM_LONG"/>
+      <property name="format"
+                value="^0[^lx]"/>
+      <property name="ignoreCase"
+                value="true"/>
+      <property name="message"
+                value="Forbid leading zeros in an integer literal, other than zero and a hex literal." />
+    </module>
+    <module name="IllegalTokenText">
+      <property name="tokens"
+                value="NUM_DOUBLE,NUM_FLOAT"/>
+      <property name="format"
+                value="(^\.|\.$)"/>
+      <property name="ignoreCase"
+                value="true"/>
+      <property name="message"
+                value="Must use leading and trailing zero in floating point numbers." />
     </module>
     <module name="AvoidEscapedUnicodeCharacters">
       <property name="allowEscapesForControlCharacters"
@@ -294,5 +319,6 @@ module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
                 value="expected" />
     </module>
     <module name="CommentsIndentation" />
+    <module name="PackageDeclaration"/>
   </module>
 </module>

@@ -141,6 +141,9 @@ model {
     }
 }
 
+apply from: "${rootDir}/shared/cppDesktopTestTask.gradle"
+apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"
+
 tasks.withType(RunTestExecutable) {
     args "--gtest_output=xml:test_detail.xml"
     outputs.dir outputDir

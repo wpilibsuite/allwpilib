@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -12,6 +9,8 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/drive/RobotDriveBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -62,7 +61,9 @@ class SpeedController;
  * RobotDrive#MecanumDrive_Polar(double, double, double) if a
  * deadband of 0 is used.
  */
-class MecanumDrive : public RobotDriveBase {
+class MecanumDrive : public RobotDriveBase,
+                     public Sendable,
+                     public SendableHelper<MecanumDrive> {
  public:
   /**
    * Construct a MecanumDrive.
@@ -112,7 +113,7 @@ class MecanumDrive : public RobotDriveBase {
   void DrivePolar(double magnitude, double angle, double zRotation);
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multipled by
+   * Gets if the power sent to the right side of the drivetrain is multiplied by
    * -1.
    *
    * @return true if the right side is inverted
@@ -121,9 +122,10 @@ class MecanumDrive : public RobotDriveBase {
 
   /**
    * Sets if the power sent to the right side of the drivetrain should be
-   * multipled by -1.
+   * multiplied by -1.
    *
-   * @param rightSideInverted true if right side power should be multipled by -1
+   * @param rightSideInverted true if right side power should be multiplied by
+   * -1
    */
   void SetRightSideInverted(bool rightSideInverted);
 
@@ -133,10 +135,10 @@ class MecanumDrive : public RobotDriveBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController& m_frontLeftMotor;
-  SpeedController& m_rearLeftMotor;
-  SpeedController& m_frontRightMotor;
-  SpeedController& m_rearRightMotor;
+  SpeedController* m_frontLeftMotor;
+  SpeedController* m_rearLeftMotor;
+  SpeedController* m_frontRightMotor;
+  SpeedController* m_rearRightMotor;
 
   double m_rightSideInvertMultiplier = -1.0;
 

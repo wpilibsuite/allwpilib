@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -22,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @deprecated Use {@link edu.wpi.first.wpilibj.controller.PIDController} instead.
  */
 @Deprecated(since = "2020", forRemoval = true)
-public class PIDController extends PIDBase implements Controller {
+public class PIDController extends PIDBase implements Controller, AutoCloseable {
   Notifier m_controlLoop = new Notifier(this::calculate);
 
   /**
@@ -97,7 +94,6 @@ public class PIDController extends PIDBase implements Controller {
 
   @Override
   public void close() {
-    super.close();
     m_controlLoop.close();
     m_thisMutex.lock();
     try {

@@ -1,29 +1,35 @@
 import org.gradle.internal.os.OperatingSystem
 
 nativeUtils.addWpiNativeUtils()
+nativeUtils.withRoboRIO()
 nativeUtils.withRaspbian()
+nativeUtils.withBionic()
 nativeUtils {
   wpi {
     configureDependencies {
       wpiVersion = "-1"
-      niLibVersion = "2019.12.1"
-      opencvVersion = "3.4.4-5"
-      googleTestVersion = "1.8.1-1-f71fb4f"
+      niLibVersion = "2020.10.1"
+      opencvVersion = "3.4.7-5"
+      googleTestVersion = "1.9.0-5-437e100-1"
+      imguiVersion = "1.76-10"
+      wpimathVersion = "-1"
     }
   }
 }
 
 nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
+nativeUtils.wpi.addReleaseSymbolGeneration()
 
 nativeUtils.setSinglePrintPerPlatform()
+nativeUtils.enableSourceLink()
 
-toolchainsPlugin.crossCompilers.named(nativeUtils.wpi.platforms.roborio) {
-    optional.set(true)
-}
-
-nativeUtils.configurePlatform(nativeUtils.wpi.platforms.raspbian) {
-  linker.args << '-latomic'
+nativeUtils.platformConfigs.each {
+    if (it.name.contains('windows')) return
+    it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
+    if (it.name == 'osxx86-64') {
+        it.linker.args << "-headerpad_max_install_names"
+    }
 }
 
 model {
@@ -35,6 +41,19 @@ model {
     binaries {
         withType(NativeBinarySpec).all {
             nativeUtils.usePlatformArguments(it)
+        }
+    }
+}
+
+apply plugin: DisableBuildingGTest
+
+if (project.hasProperty('buildServer')) {
+    tasks.withType(org.gradle.nativeplatform.test.tasks.RunTestExecutable) {
+        def exeFile = file(it.executable)
+        def folder = exeFile.parentFile
+
+        it.doLast {
+            folder.deleteDir()
         }
     }
 }
@@ -95,9 +114,9 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
     configMap.each { key, value ->
         def task = project.tasks.create(base + "-${key}", type) {
             description = 'Creates component archive for platform ' + key
-            destinationDir = outputsFolder
+            destinationDirectory = outputsFolder
             classifier = key
-            baseName = '_M_' + base
+            archiveBaseName = '_M_' + base
             duplicatesStrategy = 'exclude'
 
             from(licenseFile) {
@@ -116,33 +135,6 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
         addTaskToCopyAllOutputs(task)
     }
     return taskList
-}
-
-ext.createAllCombined = { list, name, base, type, project ->
-    def outputsFolder = file("$project.buildDir/outputs")
-
-    def task = project.tasks.create(base + "-all", type) {
-        description = "Creates component archive for all classifiers"
-        destinationDir = outputsFolder
-        classifier = "all"
-        baseName = base
-        duplicatesStrategy = 'exclude'
-
-        list.each {
-            if (it.name.endsWith('debug')) return
-            from project.zipTree(it.archivePath)
-            dependsOn it
-        }
-    }
-
-    project.build.dependsOn task
-
-    project.artifacts {
-        task
-    }
-
-    return task
-
 }
 
 ext.includeStandardZipFormat = { task, value ->
@@ -168,6 +160,14 @@ ext.includeStandardZipFormat = { task, value ->
             } else  if (binary instanceof StaticLibraryBinarySpec) {
                 task.dependsOn binary.tasks.createStaticLib
                 task.from(binary.staticLibraryFile) {
+                    into nativeUtils.getPlatformPath(binary) + '/static'
+                }
+                def pdbDir = binary.staticLibraryFile.parentFile
+                task.from(pdbDir) {
+                    include '*.pdb'
+                    into nativeUtils.getPlatformPath(binary) + '/static'
+                }
+                task.from(new File(pdbDir, "SourceLink.json")) {
                     into nativeUtils.getPlatformPath(binary) + '/static'
                 }
             }

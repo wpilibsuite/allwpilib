@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -26,6 +23,10 @@ class CameraServerShared {
   virtual std::pair<std::thread::id, bool> GetRobotMainThreadId() const = 0;
 };
 
-void SetCameraServerShared(std::unique_ptr<CameraServerShared> shared);
 CameraServerShared* GetCameraServerShared();
 }  // namespace frc
+
+extern "C" {
+// Takes ownership
+void CameraServer_SetCameraServerShared(frc::CameraServerShared* shared);
+}  // extern "C"

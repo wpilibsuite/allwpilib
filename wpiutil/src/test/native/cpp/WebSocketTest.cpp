@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/WebSocket.h"  // NOLINT(build/include_order)
 
@@ -38,9 +35,13 @@ std::vector<uint8_t> WebSocketTest::BuildHeader(uint8_t opcode, bool fin,
     data.push_back(len & 0xff);
   } else {
     data.push_back(127u | (masking ? 0x80u : 0x00u));
-    for (int i = 56; i >= 0; i -= 8) data.push_back((len >> i) & 0xff);
+    for (int i = 56; i >= 0; i -= 8) {
+      data.push_back((len >> i) & 0xff);
+    }
   }
-  if (masking) data.insert(data.end(), &testMask[0], &testMask[4]);
+  if (masking) {
+    data.insert(data.end(), &testMask[0], &testMask[4]);
+  }
   return data;
 }
 
@@ -56,7 +57,9 @@ std::vector<uint8_t> WebSocketTest::BuildMessage(uint8_t opcode, bool fin,
     int n = 0;
     for (size_t i = headerSize, end = finalData.size(); i < end; ++i) {
       finalData[i] ^= mask[n++];
-      if (n >= 4) n = 0;
+      if (n >= 4) {
+        n = 0;
+      }
     }
   }
   return finalData;
@@ -65,16 +68,21 @@ std::vector<uint8_t> WebSocketTest::BuildMessage(uint8_t opcode, bool fin,
 // If the message is masked, changes the mask to match the mask set by
 // BuildHeader() by unmasking and remasking.
 void WebSocketTest::AdjustMasking(MutableArrayRef<uint8_t> message) {
-  if (message.size() < 2) return;
-  if ((message[1] & 0x80) == 0) return;  // not masked
+  if (message.size() < 2) {
+    return;
+  }
+  if ((message[1] & 0x80) == 0) {
+    return;  // not masked
+  }
   size_t maskPos;
   uint8_t len = message[1] & 0x7f;
-  if (len == 126)
+  if (len == 126) {
     maskPos = 4;
-  else if (len == 127)
+  } else if (len == 127) {
     maskPos = 10;
-  else
+  } else {
     maskPos = 2;
+  }
   uint8_t mask[4] = {message[maskPos], message[maskPos + 1],
                      message[maskPos + 2], message[maskPos + 3]};
   message[maskPos] = testMask[0];
@@ -84,7 +92,9 @@ void WebSocketTest::AdjustMasking(MutableArrayRef<uint8_t> message) {
   int n = 0;
   for (auto& ch : message.slice(maskPos + 4)) {
     ch ^= mask[n] ^ testMask[n];
-    if (++n >= 4) n = 0;
+    if (++n >= 4) {
+      n = 0;
+    }
   }
 }
 
@@ -123,7 +133,9 @@ TEST_F(WebSocketTest, CreateClientBasic) {
     conn->StartRead();
     conn->data.connect([&](uv::Buffer& buf, size_t size) {
       req.Execute(StringRef{buf.base, size});
-      if (req.HasError()) Finish();
+      if (req.HasError()) {
+        Finish();
+      }
       ASSERT_EQ(req.GetError(), HPE_OK) << http_errno_name(req.GetError());
     });
   });
@@ -133,7 +145,9 @@ TEST_F(WebSocketTest, CreateClientBasic) {
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure()) {
+    return;
+  }
   ASSERT_EQ(gotHost, 1);
   ASSERT_EQ(gotUpgrade, 1);
   ASSERT_EQ(gotConnection, 1);
@@ -161,7 +175,9 @@ TEST_F(WebSocketTest, CreateClientExtraHeaders) {
     conn->StartRead();
     conn->data.connect([&](uv::Buffer& buf, size_t size) {
       req.Execute(StringRef{buf.base, size});
-      if (req.HasError()) Finish();
+      if (req.HasError()) {
+        Finish();
+      }
       ASSERT_EQ(req.GetError(), HPE_OK) << http_errno_name(req.GetError());
     });
   });
@@ -177,7 +193,9 @@ TEST_F(WebSocketTest, CreateClientExtraHeaders) {
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure()) {
+    return;
+  }
   ASSERT_EQ(gotExtra1, 1);
   ASSERT_EQ(gotExtra2, 1);
 }
@@ -199,7 +217,9 @@ TEST_F(WebSocketTest, CreateClientTimeout) {
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure()) {
+    return;
+  }
   ASSERT_EQ(gotClosed, 1);
 }
 
@@ -243,14 +263,18 @@ TEST_F(WebSocketTest, CreateServerBasic) {
     clientPipe->StartRead();
     clientPipe->data.connect([&](uv::Buffer& buf, size_t size) {
       resp.Execute(StringRef{buf.base, size});
-      if (resp.HasError()) Finish();
+      if (resp.HasError()) {
+        Finish();
+      }
       ASSERT_EQ(resp.GetError(), HPE_OK) << http_errno_name(resp.GetError());
     });
   });
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure()) {
+    return;
+  }
   ASSERT_EQ(gotStatus, 1);
   ASSERT_EQ(gotUpgrade, 1);
   ASSERT_EQ(gotConnection, 1);
@@ -283,14 +307,18 @@ TEST_F(WebSocketTest, CreateServerProtocol) {
     clientPipe->StartRead();
     clientPipe->data.connect([&](uv::Buffer& buf, size_t size) {
       resp.Execute(StringRef{buf.base, size});
-      if (resp.HasError()) Finish();
+      if (resp.HasError()) {
+        Finish();
+      }
       ASSERT_EQ(resp.GetError(), HPE_OK) << http_errno_name(resp.GetError());
     });
   });
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure()) {
+    return;
+  }
   ASSERT_EQ(gotProtocol, 1);
   ASSERT_EQ(gotOpen, 1);
 }
@@ -330,14 +358,18 @@ TEST_F(WebSocketTest, CreateServerBadVersion) {
     clientPipe->StartRead();
     clientPipe->data.connect([&](uv::Buffer& buf, size_t size) {
       resp.Execute(StringRef{buf.base, size});
-      if (resp.HasError()) Finish();
+      if (resp.HasError()) {
+        Finish();
+      }
       ASSERT_EQ(resp.GetError(), HPE_OK) << http_errno_name(resp.GetError());
     });
   });
 
   loop->Run();
 
-  if (HasFatalFailure()) return;
+  if (HasFatalFailure()) {
+    return;
+  }
   ASSERT_EQ(gotStatus, 1);
   ASSERT_EQ(gotVersion, 1);
   ASSERT_EQ(gotUpgrade, 1);

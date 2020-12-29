@@ -1,12 +1,5 @@
 apply plugin: 'maven-publish'
 
-def pubVersion = ''
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
-
 def baseArtifactId = 'wpilibc-cpp'
 def artifactGroupId = 'edu.wpi.first.wpilibc'
 def zipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_wpilibc-cpp_CLS'
@@ -14,8 +7,8 @@ def zipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_wpilibc-cpp_CLS'
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppSourcesZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "sources"
 
     from(licenseFile) {
@@ -33,8 +26,8 @@ task cppSourcesZip(type: Zip) {
 cppSourcesZip.dependsOn generateCppVersion
 
 task cppHeadersZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = zipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
     classifier = "headers"
 
     from(licenseFile) {
@@ -67,7 +60,7 @@ model {
 
                 artifactId = baseArtifactId
                 groupId artifactGroupId
-                version pubVersion
+                version wpilibVersioning.version.get()
             }
         }
     }

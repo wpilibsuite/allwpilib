@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.networktables;
 
@@ -139,6 +136,8 @@ public final class NetworkTablesJNI {
 
   public static native void setNetworkIdentity(int inst, String name);
   public static native int getNetworkMode(int inst);
+  public static native void startLocal(int inst);
+  public static native void stopLocal(int inst);
   public static native void startServer(int inst, String persistFilename, String listenAddress, int port);
   public static native void stopServer(int inst);
   public static native void startClient(int inst);

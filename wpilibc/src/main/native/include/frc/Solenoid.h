@@ -1,17 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <hal/Types.h>
 
 #include "frc/SolenoidBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Solenoid class for running high voltage Digital Output (PCM).
@@ -19,7 +20,9 @@ namespace frc {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the PCM.
  */
-class Solenoid : public SolenoidBase {
+class Solenoid : public SolenoidBase,
+                 public Sendable,
+                 public SendableHelper<Solenoid> {
  public:
   /**
    * Constructor using the default PCM ID (0).
@@ -38,8 +41,8 @@ class Solenoid : public SolenoidBase {
 
   ~Solenoid() override;
 
-  Solenoid(Solenoid&& rhs);
-  Solenoid& operator=(Solenoid&& rhs);
+  Solenoid(Solenoid&&) = default;
+  Solenoid& operator=(Solenoid&&) = default;
 
   /**
    * Set the value of a solenoid.
@@ -54,6 +57,14 @@ class Solenoid : public SolenoidBase {
    * @return The current value of the solenoid.
    */
   virtual bool Get() const;
+
+  /**
+   * Toggle the value of the solenoid.
+   *
+   * If the solenoid is set to on, it'll be turned off. If the solenoid is set
+   * to off, it'll be turned on.
+   */
+  void Toggle();
 
   /**
    * Check if solenoid is blacklisted.
@@ -90,7 +101,7 @@ class Solenoid : public SolenoidBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  HAL_SolenoidHandle m_solenoidHandle = HAL_kInvalidHandle;
+  hal::Handle<HAL_SolenoidHandle> m_solenoidHandle;
   int m_channel;  // The channel on the module to control
 };
 

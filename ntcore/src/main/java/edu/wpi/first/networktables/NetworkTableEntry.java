@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.networktables;
 
@@ -280,7 +277,7 @@ public final class NetworkTableEntry {
       switch (((NetworkTableValue) defaultValue).getType()) {
         case kBoolean:
           return NetworkTablesJNI.setDefaultBoolean(m_handle, time,
-              ((Boolean) otherValue).booleanValue());
+              (Boolean) otherValue);
         case kDouble:
           return NetworkTablesJNI.setDefaultDouble(m_handle, time,
               ((Number) otherValue).doubleValue());
@@ -438,7 +435,7 @@ public final class NetworkTableEntry {
       Object otherValue = ((NetworkTableValue) value).getValue();
       switch (((NetworkTableValue) value).getType()) {
         case kBoolean:
-          return NetworkTablesJNI.setBoolean(m_handle, time, ((Boolean) otherValue).booleanValue(),
+          return NetworkTablesJNI.setBoolean(m_handle, time, (Boolean) otherValue,
               false);
         case kDouble:
           return NetworkTablesJNI.setDouble(m_handle, time, ((Number) otherValue).doubleValue(),
@@ -612,7 +609,7 @@ public final class NetworkTableEntry {
       Object otherValue = ((NetworkTableValue) value).getValue();
       switch (((NetworkTableValue) value).getType()) {
         case kBoolean:
-          NetworkTablesJNI.setBoolean(m_handle, time, ((Boolean) otherValue).booleanValue(), true);
+          NetworkTablesJNI.setBoolean(m_handle, time, (Boolean) otherValue, true);
           return;
         case kDouble:
           NetworkTablesJNI.setDouble(m_handle, time, ((Number) otherValue).doubleValue(), true);

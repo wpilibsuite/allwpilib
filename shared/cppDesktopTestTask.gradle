@@ -1,0 +1,21 @@
+model {
+    tasks {
+        def ts = $.testSuites
+        project.tasks.register('testDesktopCpp') { testTask->
+            def systemArch = getCurrentArch()
+            def found = false
+            ts.each {
+                if (it in GoogleTestTestSuiteSpec && it.name == "${nativeName}Test") {
+                    it.binaries.each {
+                        if (found) return
+                        def arch = it.targetPlatform.name
+                        if (arch == systemArch && it.buildType.name == 'debug') {
+                            testTask.dependsOn it.tasks.run
+                            found = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

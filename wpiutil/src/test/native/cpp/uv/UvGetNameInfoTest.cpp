@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /* Copyright Joyent, Inc. and other Node contributors. All rights reserved.
  *
@@ -41,13 +38,14 @@ TEST(UvGetNameInfo, BasicIp4) {
   auto loop = Loop::Create();
   loop->error.connect([](Error) { FAIL(); });
 
-  GetNameInfo4(loop,
-               [&](const char* hostname, const char* service) {
-                 ASSERT_NE(hostname, nullptr);
-                 ASSERT_NE(service, nullptr);
-                 getnameinfo_cbs++;
-               },
-               "127.0.0.1", 80);
+  GetNameInfo4(
+      loop,
+      [&](const char* hostname, const char* service) {
+        ASSERT_NE(hostname, nullptr);
+        ASSERT_NE(service, nullptr);
+        getnameinfo_cbs++;
+      },
+      "127.0.0.1", 80);
 
   loop->Run();
 
@@ -60,13 +58,14 @@ TEST(UvGetNameInfo, BasicIp6) {
   auto loop = Loop::Create();
   loop->error.connect([](Error) { FAIL(); });
 
-  GetNameInfo6(loop,
-               [&](const char* hostname, const char* service) {
-                 ASSERT_NE(hostname, nullptr);
-                 ASSERT_NE(service, nullptr);
-                 getnameinfo_cbs++;
-               },
-               "::1", 80);
+  GetNameInfo6(
+      loop,
+      [&](const char* hostname, const char* service) {
+        ASSERT_NE(hostname, nullptr);
+        ASSERT_NE(service, nullptr);
+        getnameinfo_cbs++;
+      },
+      "::1", 80);
 
   loop->Run();
 

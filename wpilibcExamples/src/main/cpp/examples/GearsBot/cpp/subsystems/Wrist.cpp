@@ -1,31 +1,36 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/Wrist.h"
 
+#include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-Wrist::Wrist() : frc::PIDSubsystem("Wrist", kP_real, 0.0, 0.0) {
+Wrist::Wrist() : frc2::PIDSubsystem(frc2::PIDController(kP_real, 0, 0)) {
 #ifdef SIMULATION  // Check for simulation and update PID values
   GetPIDController()->SetPID(kP_simulation, 0, 0, 0);
 #endif
-  SetAbsoluteTolerance(2.5);
+  m_controller.SetTolerance(2.5);
 
+  SetName("Wrist");
   // Let's show everything on the LiveWindow
-  AddChild("Motor", m_motor);
-  AddChild("Pot", m_pot);
+  AddChild("Motor", &m_motor);
+  AddChild("Pot", &m_pot);
 }
-
-void Wrist::InitDefaultCommand() {}
 
 void Wrist::Log() {
-  // frc::SmartDashboard::PutData("Wrist Angle", &m_pot);
+  frc::SmartDashboard::PutNumber("Wrist Angle", GetMeasurement());
 }
 
-double Wrist::ReturnPIDInput() { return m_pot.Get(); }
+double Wrist::GetMeasurement() {
+  return m_pot.Get();
+}
 
-void Wrist::UsePIDOutput(double d) { m_motor.Set(d); }
+void Wrist::UseOutput(double output, double setpoint) {
+  m_motor.Set(output);
+}
+
+void Wrist::Periodic() {
+  Log();
+}

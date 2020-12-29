@@ -5,28 +5,78 @@ include(GenResources)
 include(CompileWarnings)
 include(AddTest)
 
+file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
+
 # Java bindings
-if (NOT WITHOUT_JAVA)
-  find_package(Java)
+if (WITH_JAVA)
+  find_package(Java REQUIRED)
+  find_package(JNI REQUIRED)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
-  set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar)
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
+        set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
+        set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
+
+        message(STATUS "Downloading Jackson jarfiles...")
+
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.10.0/jackson-core-2.10.0.jar"
+            "${JAR_ROOT}/jackson-core-2.10.0.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.10.0/jackson-databind-2.10.0.jar"
+            "${JAR_ROOT}/jackson-databind-2.10.0.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.10.0/jackson-annotations-2.10.0.jar"
+            "${JAR_ROOT}/jackson-annotations-2.10.0.jar")
+
+        message(STATUS "All files downloaded.")
+    endif()
+
+  file(GLOB JACKSON_JARS
+        ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
+
+  set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${JACKSON_JARS})
+
+  set(CMAKE_JNI_TARGET true)
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-  add_jar(wpiutil_jar ${JAVA_SOURCES} OUTPUT_NAME wpiutil)
+
+  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+    set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} OUTPUT_NAME wpiutil)
+  else()
+    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
+  endif()
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
   install(FILES ${WPIUTIL_JAR_FILE} DESTINATION "${java_lib_dest}")
 
   set_property(TARGET wpiutil_jar PROPERTY FOLDER "java")
 
+  add_library(wpiutiljni ${wpiutil_jni_src})
+  wpilib_target_warnings(wpiutiljni)
+  target_link_libraries(wpiutiljni PUBLIC wpiutil)
+
+  set_property(TARGET wpiutiljni PROPERTY FOLDER "libraries")
+
+  if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+    target_include_directories(wpiutiljni PRIVATE ${JNI_INCLUDE_DIRS})
+    target_include_directories(wpiutiljni PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
+  else()
+    target_link_libraries(wpiutiljni PRIVATE wpiutil_jni_headers)
+  endif()
+  add_dependencies(wpiutiljni wpiutil_jar)
+
+  if (MSVC)
+    install(TARGETS wpiutiljni RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
+  endif()
+
+  install(TARGETS wpiutiljni EXPORT wpiutiljni DESTINATION "${main_lib_dest}")
+
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-if (NOT MSVC)
+if (NOT MSVC AND NOT APPLE)
     find_library(ATOMIC NAMES atomic libatomic.so.1)
     if (ATOMIC)
         message(STATUS "Found libatomic: ${ATOMIC}")
@@ -36,6 +86,9 @@ endif()
 GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_resources_src)
 
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
+list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
+file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
+file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB uv_native_src src/main/native/libuv/src/*.cpp)
 
@@ -86,7 +139,7 @@ set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
 target_compile_features(wpiutil PUBLIC cxx_std_17)
 if (MSVC)
-    target_compile_options(wpiutil PUBLIC /permissive- /Zc:throwingNew)
+    target_compile_options(wpiutil PUBLIC /permissive- /Zc:throwingNew /MP /bigobj)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
@@ -119,6 +172,12 @@ else()
     target_link_libraries(wpiutil unofficial::libuv::libuv)
 endif()
 
+if (MSVC)
+    target_sources(wpiutil PRIVATE ${wpiutil_windows_src})
+else ()
+    target_sources(wpiutil PRIVATE ${wpiutil_unix_src})
+endif()
+
 target_include_directories(wpiutil PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
@@ -126,18 +185,18 @@ target_include_directories(wpiutil PUBLIC
 install(TARGETS wpiutil EXPORT wpiutil DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpiutil")
 
-if (NOT WITHOUT_JAVA AND MSVC)
+if (WITH_JAVA AND MSVC)
     install(TARGETS wpiutil RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
 endif()
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (wpiutil_config_dir ${wpilib_dest})
 else()
     set (wpiutil_config_dir share/wpiutil)
 endif()
 
-configure_file(wpiutil-config.cmake.in ${CMAKE_BINARY_DIR}/wpiutil-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
+configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
 install(EXPORT wpiutil DESTINATION ${wpiutil_config_dir})
 
 SUBDIR_LIST(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
@@ -172,5 +231,6 @@ set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
 if (WITH_TESTS)
     wpilib_add_test(wpiutil src/test/native/cpp)
+    target_include_directories(wpiutil_test PRIVATE src/test/native/include)
     target_link_libraries(wpiutil_test wpiutil ${LIBUTIL} gmock_main)
 endif()

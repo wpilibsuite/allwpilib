@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -35,14 +32,14 @@ public class GyroTest extends AbstractComsSetup {
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     logger.fine("Setup: TiltPan camera");
     m_tpcam = TestBench.getInstance().getTiltPanCam();
     m_tpcam.setup();
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
     m_tpcam.teardown();
   }
 
@@ -56,7 +53,7 @@ public class GyroTest extends AbstractComsSetup {
 
   public void testInitial(AnalogGyro gyro) {
     double angle = gyro.getAngle();
-    assertEquals(errorMessage(angle, 0), 0, angle, .5);
+    assertEquals(errorMessage(angle, 0), 0, angle, 0.5);
   }
 
   /**
@@ -68,7 +65,7 @@ public class GyroTest extends AbstractComsSetup {
     // Set angle
     for (int i = 0; i < 5; i++) {
       m_tpcam.getPan().set(0);
-      Timer.delay(.1);
+      Timer.delay(0.1);
     }
 
     Timer.delay(0.5);
@@ -99,7 +96,7 @@ public class GyroTest extends AbstractComsSetup {
     gyro.reset();
     Timer.delay(0.25);
     double angle = gyro.getAngle();
-    assertEquals(errorMessage(angle, 0), 0, angle, .5);
+    assertEquals(errorMessage(angle, 0), 0, angle, 0.5);
     Timer.delay(5);
     angle = gyro.getAngle();
     assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 2.0);

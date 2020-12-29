@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -18,11 +15,11 @@ import edu.wpi.first.hal.HAL;
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
 public class Joystick extends GenericHID {
-  static final byte kDefaultXChannel = 0;
-  static final byte kDefaultYChannel = 1;
-  static final byte kDefaultZChannel = 2;
-  static final byte kDefaultTwistChannel = 2;
-  static final byte kDefaultThrottleChannel = 3;
+  public static final byte kDefaultXChannel = 0;
+  public static final byte kDefaultYChannel = 1;
+  public static final byte kDefaultZChannel = 2;
+  public static final byte kDefaultTwistChannel = 2;
+  public static final byte kDefaultThrottleChannel = 3;
 
   /**
    * Represents an analog axis on a joystick.
@@ -93,7 +90,7 @@ public class Joystick extends GenericHID {
     m_axes[Axis.kTwist.value] = kDefaultTwistChannel;
     m_axes[Axis.kThrottle.value] = kDefaultThrottleChannel;
 
-    HAL.report(tResourceType.kResourceType_Joystick, port);
+    HAL.report(tResourceType.kResourceType_Joystick, port + 1);
   }
 
   /**

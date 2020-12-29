@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -94,6 +91,14 @@
 #define HAL_HANDLE_ERROR_MESSAGE \
   "HAL: A handle parameter was passed incorrectly"
 
+#define HAL_LED_CHANNEL_ERROR -1099
+#define HAL_LED_CHANNEL_ERROR_MESSAGE \
+  "HAL: Addressable LEDs only supported on PWM Headers, not MXP or DIO"
+
+#define HAL_INVALID_DMA_ADDITION -1102
+#define HAL_INVALID_DMA_ADDITION_MESSAGE \
+  "HAL_AddDMA() only works before HAL_StartDMA()"
+
 #define HAL_SERIAL_PORT_NOT_FOUND -1123
 #define HAL_SERIAL_PORT_NOT_FOUND_MESSAGE \
   "HAL: The specified serial port device was not found"
@@ -116,6 +121,13 @@
 
 #define HAL_CAN_TIMEOUT -1154
 #define HAL_CAN_TIMEOUT_MESSAGE "HAL: CAN Receive has Timed Out"
+
+#define HAL_SIM_NOT_SUPPORTED -1155
+#define HAL_SIM_NOT_SUPPORTED_MESSAGE "HAL: Method not supported in sim"
+
+#define HAL_CAN_BUFFER_OVERRUN -35007
+#define HAL_CAN_BUFFER_OVERRUN_MESSAGE \
+  "HAL: CAN Output Buffer Full. Ensure a device is attached"
 
 #define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"

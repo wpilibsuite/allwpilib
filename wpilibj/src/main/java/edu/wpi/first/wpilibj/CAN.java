@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -40,7 +37,7 @@ public class CAN implements Closeable {
    */
   public CAN(int deviceId) {
     m_handle = CANAPIJNI.initializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType);
-    HAL.report(tResourceType.kResourceType_CAN, deviceId);
+    HAL.report(tResourceType.kResourceType_CAN, deviceId + 1);
   }
 
   /**
@@ -54,7 +51,7 @@ public class CAN implements Closeable {
    */
   public CAN(int deviceId, int deviceManufacturer, int deviceType) {
     m_handle = CANAPIJNI.initializeCAN(deviceManufacturer, deviceId, deviceType);
-    HAL.report(tResourceType.kResourceType_CAN, deviceId);
+    HAL.report(tResourceType.kResourceType_CAN, deviceId + 1);
   }
 
   /**
@@ -87,6 +84,50 @@ public class CAN implements Closeable {
    */
   public void writePacketRepeating(byte[] data, int apiId, int repeatMs) {
     CANAPIJNI.writeCANPacketRepeating(m_handle, data, apiId, repeatMs);
+  }
+
+  /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10 bits.
+   * The length by spec must match what is returned by the responding device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  public void writeRTRFrame(int length, int apiId) {
+    CANAPIJNI.writeCANRTRFrame(m_handle, length, apiId);
+  }
+
+  /**
+   * Write a packet to the CAN device with a specific ID. This ID is 10 bits.
+   *
+   * @param data The data to write (8 bytes max)
+   * @param apiId The API ID to write.
+   */
+  public int writePacketNoThrow(byte[] data, int apiId) {
+    return CANAPIJNI.writeCANPacketNoThrow(m_handle, data, apiId);
+  }
+
+  /**
+   * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits.
+   * The RoboRIO will automatically repeat the packet at the specified interval
+   *
+   * @param data The data to write (8 bytes max)
+   * @param apiId The API ID to write.
+   * @param repeatMs The period to repeat the packet at.
+   */
+  public int writePacketRepeatingNoThrow(byte[] data, int apiId, int repeatMs) {
+    return CANAPIJNI.writeCANPacketRepeatingNoThrow(m_handle, data, apiId, repeatMs);
+  }
+
+  /**
+   * Write an RTR frame to the CAN device with a specific ID. This ID is 10 bits.
+   * The length by spec must match what is returned by the responding device
+   *
+   * @param length The length to request (0 to 8)
+   * @param apiId The API ID to write.
+   */
+  public int writeRTRFrameNoThrow(int length, int apiId) {
+    return CANAPIJNI.writeCANRTRFrameNoThrow(m_handle, length, apiId);
   }
 
   /**
@@ -133,23 +174,5 @@ public class CAN implements Closeable {
    */
   public boolean readPacketTimeout(int apiId, int timeoutMs, CANData data) {
     return CANAPIJNI.readCANPacketTimeout(m_handle, apiId, timeoutMs, data);
-  }
-
-  /**
-   * Read a CAN packet. The will return the last packet received until the
-   * packet is older then the requested timeout. Then it will return false.
-   * The period parameter is used when you know the packet is sent at specific
-   * intervals, so calls will not attempt to read a new packet from the
-   * network until that period has passed. We do not recommend users use this
-   * API unless they know the implications.
-   *
-   * @param apiId The API ID to read.
-   * @param timeoutMs The timeout time for the packet
-   * @param periodMs The usual period for the packet
-   * @param data Storage for the received data.
-   * @return True if the data is valid, otherwise false.
-   */
-  public boolean readPeriodicPacket(int apiId, int timeoutMs, int periodMs, CANData data) {
-    return CANAPIJNI.readCANPeriodicPacket(m_handle, apiId, timeoutMs, periodMs, data);
   }
 }

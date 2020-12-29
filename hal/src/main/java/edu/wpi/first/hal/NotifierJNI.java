@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
@@ -18,6 +15,11 @@ public class NotifierJNI extends JNIWrapper {
    * Initializes the notifier.
    */
   public static native int initializeNotifier();
+
+  /**
+   * Sets the name of the notifier.
+   */
+  public static native void setNotifierName(int notifierHandle, String name);
 
   /**
    * Wakes up the waiter with time=0.  Note: after this function is called, all

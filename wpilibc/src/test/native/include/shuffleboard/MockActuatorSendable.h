@@ -1,23 +1,22 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <wpi/StringRef.h>
 
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 /**
  * A mock sendable that marks itself as an actuator.
  */
-class MockActuatorSendable : public SendableBase {
+class MockActuatorSendable : public Sendable,
+                             public SendableHelper<MockActuatorSendable> {
  public:
   explicit MockActuatorSendable(wpi::StringRef name);
 

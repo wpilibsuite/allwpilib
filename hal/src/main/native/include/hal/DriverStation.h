@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2013-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -37,6 +34,12 @@ extern "C" {
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg);
+/**
+ * Sends a line to the driver station console.
+ *
+ * @param line the line to send (null terminated)
+ */
+int32_t HAL_SendConsoleLine(const char* line);
 
 /**
  * Gets the current control word of the driver station.
@@ -171,7 +174,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
  * Warning: This is not an official time (so it cannot be used to dispute ref
  * calls or guarantee that a function will trigger before the match ends).
  *
- * The Practice Match function of the DS approximates the behaviour seen on
+ * The Practice Match function of the DS approximates the behavior seen on
  * the field.
  *
  * @param status the error code, or 0 for success
@@ -186,8 +189,6 @@ double HAL_GetMatchTime(int32_t* status);
  * @return     the error code, or 0 for success
  */
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
-
-#ifndef HAL_USE_LABVIEW
 
 /**
  * Releases the DS Mutex to allow proper shutdown of any threads that are
@@ -205,6 +206,9 @@ HAL_Bool HAL_IsNewControlData(void);
 
 /**
  * Waits for the newest DS packet to arrive. Note that this is a blocking call.
+ * Checks if new control data has arrived since the last HAL_WaitForDSData or
+ * HAL_IsNewControlData call. If new data has not arrived, waits for new data
+ * to arrive. Otherwise, returns immediately.
  */
 void HAL_WaitForDSData(void);
 
@@ -267,8 +271,6 @@ void HAL_ObserveUserProgramTeleop(void);
  * disabled by the DS.
  */
 void HAL_ObserveUserProgramTest(void);
-
-#endif  // HAL_USE_LABVIEW
 
 #ifdef __cplusplus
 }  // extern "C"

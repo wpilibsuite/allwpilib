@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -74,6 +71,20 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
                                  int32_t repeatMs, int32_t* status);
 
 /**
+ * Writes an RTR frame of the specified length to the CAN device with the
+ * specific ID.
+ *
+ * By spec, the length must be equal to the length sent by the other device,
+ * otherwise behavior is unspecified.
+ *
+ * @param handle   the CAN handle
+ * @param length   the length of data to request (0-8)
+ * @param apiId    the ID to write (0-1023)
+ */
+void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
+                          int32_t* status);
+
+/**
  * Stops a repeating packet with a specific ID.
  *
  * This ID is 10 bits.
@@ -133,28 +144,6 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
                               uint8_t* data, int32_t* length,
                               uint64_t* receivedTimestamp, int32_t timeoutMs,
                               int32_t* status);
-
-/**
- * Reads a CAN packet. The will return the last packet received until the
- * packet is older then the requested timeout. Then it will return an error
- * code. The period parameter is used when you know the packet is sent at
- * specific intervals, so calls will not attempt to read a new packet from the
- * network until that period has passed. We do not recommend users use this
- * API unless they know the implications.
- *
- * @param handle            the CAN handle
- * @param apiId             the ID to read (0-1023)
- * @param data              the packet data (8 bytes)
- * @param length            the received length (0-8 bytes)
- * @param receivedTimestamp the packet received timestamp (based off of
- * CLOCK_MONOTONIC)
- * @param timeoutMs         the timeout time for the packet
- * @param periodMs          the standard period for the packet
- */
-void HAL_ReadCANPeriodicPacket(HAL_CANHandle handle, int32_t apiId,
-                               uint8_t* data, int32_t* length,
-                               uint64_t* receivedTimestamp, int32_t timeoutMs,
-                               int32_t periodMs, int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

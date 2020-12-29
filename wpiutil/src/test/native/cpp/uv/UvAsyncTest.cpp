@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /* Copyright Joyent, Inc. and other Node contributors. All rights reserved.
  *
@@ -59,7 +56,9 @@ TEST(UvAsync, Test) {
   prepare->error.connect([](Error) { FAIL(); });
   prepare->closed.connect([&] { close_cb_called++; });
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] {
       for (;;) {
         mutex.lock();
@@ -98,7 +97,9 @@ TEST(UvAsync, Test) {
   ASSERT_EQ(async_cb_called, 3);
   ASSERT_EQ(close_cb_called, 2);
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 TEST(UvAsync, Data) {
@@ -116,7 +117,9 @@ TEST(UvAsync, Data) {
 
   prepare->error.connect([](Error) { FAIL(); });
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] {
       async->Send(0, [&](int v) {
         ASSERT_EQ(v, 0);
@@ -142,7 +145,9 @@ TEST(UvAsync, Data) {
   ASSERT_EQ(async_cb_called[1], 1);
   ASSERT_EQ(close_cb_called, 1);
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 TEST(UvAsync, DataRef) {
@@ -156,7 +161,9 @@ TEST(UvAsync, DataRef) {
   auto prepare = Prepare::Create(loop);
 
   prepare->prepare.connect([&] {
-    if (prepare_cb_called++) return;
+    if (prepare_cb_called++) {
+      return;
+    }
     theThread = std::thread([&] { async->Send(1, val); });
   });
   prepare->Start();
@@ -171,7 +178,9 @@ TEST(UvAsync, DataRef) {
 
   ASSERT_EQ(val, 1);
 
-  if (theThread.joinable()) theThread.join();
+  if (theThread.joinable()) {
+    theThread.join();
+  }
 }
 
 }  // namespace uv

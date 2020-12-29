@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -13,6 +10,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.util.BoundaryException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -25,9 +23,12 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * <p>This feedback controller runs in discrete time, so time deltas are not used in the integral
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
+ *
+ * @deprecated All APIs which use this have been deprecated.
  */
+@Deprecated(since = "2020", forRemoval = true)
 @SuppressWarnings("PMD.TooManyFields")
-public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
+public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable {
   public static final double kDefaultPeriod = 0.05;
   private static int instances;
 
@@ -154,7 +155,6 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   @SuppressWarnings("ParameterName")
   public PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource source,
                  PIDOutput output) {
-    super(false);
     requireNonNullParam(source, "PIDSource", "PIDBase");
     requireNonNullParam(output, "output", "PIDBase");
 
@@ -174,7 +174,7 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
     instances++;
     HAL.report(tResourceType.kResourceType_PIDController, instances);
     m_tolerance = new NullTolerance();
-    setName("PIDController", instances);
+    SendableRegistry.add(this, "PIDController", instances);
   }
 
   /**
@@ -189,6 +189,11 @@ public class PIDBase extends SendableBase implements PIDInterface, PIDOutput {
   @SuppressWarnings("ParameterName")
   public PIDBase(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output) {
     this(Kp, Ki, Kd, 0.0, source, output);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**

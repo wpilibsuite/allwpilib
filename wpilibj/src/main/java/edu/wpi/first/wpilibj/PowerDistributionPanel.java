@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -11,13 +8,15 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the Power Distribution
  * Panel over CAN.
  */
-public class PowerDistributionPanel extends SendableBase  {
+public class PowerDistributionPanel implements Sendable, AutoCloseable {
   private final int m_handle;
+  private final int m_module;
 
   /**
    * Constructor.
@@ -27,9 +26,10 @@ public class PowerDistributionPanel extends SendableBase  {
   public PowerDistributionPanel(int module) {
     SensorUtil.checkPDPModule(module);
     m_handle = PDPJNI.initializePDP(module);
+    m_module = module;
 
-    HAL.report(tResourceType.kResourceType_PDP, module);
-    setName("PowerDistributionPanel", module);
+    HAL.report(tResourceType.kResourceType_PDP, module + 1);
+    SendableRegistry.addLW(this, "PowerDistributionPanel", module);
   }
 
   /**
@@ -37,6 +37,11 @@ public class PowerDistributionPanel extends SendableBase  {
    */
   public PowerDistributionPanel() {
     this(0);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**
@@ -109,6 +114,13 @@ public class PowerDistributionPanel extends SendableBase  {
    */
   public void clearStickyFaults() {
     PDPJNI.clearPDPStickyFaults(m_handle);
+  }
+
+  /**
+   * Gets module number (CAN ID).
+   */
+  public int getModule() {
+    return m_module;
   }
 
   @Override

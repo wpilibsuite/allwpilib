@@ -1,14 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include "mockdata/RoboRioData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/RoboRioData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class RoboRioData {
@@ -29,22 +26,26 @@ class RoboRioData {
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults3V3)
 
  public:
-  SimDataValue<HAL_Bool, MakeBoolean, GetFPGAButtonName> fpgaButton{false};
-  SimDataValue<double, MakeDouble, GetVInVoltageName> vInVoltage{0.0};
-  SimDataValue<double, MakeDouble, GetVInCurrentName> vInCurrent{0.0};
-  SimDataValue<double, MakeDouble, GetUserVoltage6VName> userVoltage6V{6.0};
-  SimDataValue<double, MakeDouble, GetUserCurrent6VName> userCurrent6V{0.0};
-  SimDataValue<HAL_Bool, MakeBoolean, GetUserActive6VName> userActive6V{false};
-  SimDataValue<double, MakeDouble, GetUserVoltage5VName> userVoltage5V{5.0};
-  SimDataValue<double, MakeDouble, GetUserCurrent5VName> userCurrent5V{0.0};
-  SimDataValue<HAL_Bool, MakeBoolean, GetUserActive5VName> userActive5V{false};
-  SimDataValue<double, MakeDouble, GetUserVoltage3V3Name> userVoltage3V3{3.3};
-  SimDataValue<double, MakeDouble, GetUserCurrent3V3Name> userCurrent3V3{0.0};
-  SimDataValue<HAL_Bool, MakeBoolean, GetUserActive3V3Name> userActive3V3{
-      false};
-  SimDataValue<int32_t, MakeInt, GetUserFaults6VName> userFaults6V{0};
-  SimDataValue<int32_t, MakeInt, GetUserFaults5VName> userFaults5V{0};
-  SimDataValue<int32_t, MakeInt, GetUserFaults3V3Name> userFaults3V3{0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetFPGAButtonName> fpgaButton{false};
+  SimDataValue<double, HAL_MakeDouble, GetVInVoltageName> vInVoltage{12.0};
+  SimDataValue<double, HAL_MakeDouble, GetVInCurrentName> vInCurrent{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetUserVoltage6VName> userVoltage6V{6.0};
+  SimDataValue<double, HAL_MakeDouble, GetUserCurrent6VName> userCurrent6V{0.0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetUserActive6VName> userActive6V{
+      true};
+  SimDataValue<double, HAL_MakeDouble, GetUserVoltage5VName> userVoltage5V{5.0};
+  SimDataValue<double, HAL_MakeDouble, GetUserCurrent5VName> userCurrent5V{0.0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetUserActive5VName> userActive5V{
+      true};
+  SimDataValue<double, HAL_MakeDouble, GetUserVoltage3V3Name> userVoltage3V3{
+      3.3};
+  SimDataValue<double, HAL_MakeDouble, GetUserCurrent3V3Name> userCurrent3V3{
+      0.0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetUserActive3V3Name> userActive3V3{
+      true};
+  SimDataValue<int32_t, HAL_MakeInt, GetUserFaults6VName> userFaults6V{0};
+  SimDataValue<int32_t, HAL_MakeInt, GetUserFaults5VName> userFaults5V{0};
+  SimDataValue<int32_t, HAL_MakeInt, GetUserFaults3V3Name> userFaults3V3{0};
 
   virtual void ResetData();
 };

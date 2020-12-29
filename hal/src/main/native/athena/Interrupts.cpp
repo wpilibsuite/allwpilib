@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Interrupts.h"
 
@@ -13,9 +10,11 @@
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
+#include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 
@@ -29,7 +28,9 @@ class InterruptThread : public wpi::SafeThread {
     std::unique_lock lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });
-      if (!m_active) break;
+      if (!m_active) {
+        break;
+      }
       m_notify = false;
       HAL_InterruptHandlerFunction handler = m_handler;
       uint32_t mask = m_mask;
@@ -50,25 +51,21 @@ class InterruptThreadOwner : public wpi::SafeThreadOwner<InterruptThread> {
  public:
   void SetFunc(HAL_InterruptHandlerFunction handler, void* param) {
     auto thr = GetThread();
-    if (!thr) return;
+    if (!thr)
+      return;
     thr->m_handler = handler;
     thr->m_param = param;
   }
 
   void Notify(uint32_t mask) {
     auto thr = GetThread();
-    if (!thr) return;
+    if (!thr)
+      return;
     thr->m_mask = mask;
     thr->m_notify = true;
     thr->m_cond.notify_one();
   }
 };
-
-}  // namespace
-
-static void threadedInterruptHandler(uint32_t mask, void* param) {
-  static_cast<InterruptThreadOwner*>(param)->Notify(mask);
-}
 
 struct Interrupt {
   std::unique_ptr<tInterrupt> anInterrupt;
@@ -77,12 +74,18 @@ struct Interrupt {
   void* param = nullptr;
 };
 
+}  // namespace
+
+static void threadedInterruptHandler(uint32_t mask, void* param) {
+  static_cast<InterruptThreadOwner*>(param)->Notify(mask);
+}
+
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                              HAL_HandleEnum::Interrupt>* interruptHandles;
 
 namespace hal {
 namespace init {
-void InitialzeInterrupts() {
+void InitializeInterrupts() {
   static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                                HAL_HandleEnum::Interrupt>
       iH;
@@ -118,7 +121,11 @@ void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle,
   if (anInterrupt == nullptr) {
     return nullptr;
   }
-  anInterrupt->manager->enable(status);
+
+  if (anInterrupt->manager->isEnabled(status)) {
+    anInterrupt->manager->disable(status);
+  }
+
   void* param = anInterrupt->param;
   return param;
 }
@@ -152,7 +159,10 @@ void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  anInterrupt->manager->enable(status);
+
+  if (!anInterrupt->manager->isEnabled(status)) {
+    anInterrupt->manager->enable(status);
+  }
 }
 
 void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
@@ -162,7 +172,9 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  anInterrupt->manager->disable(status);
+  if (anInterrupt->manager->isEnabled(status)) {
+    anInterrupt->manager->disable(status);
+  }
 }
 
 int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
@@ -257,6 +269,21 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
   }
   anInterrupt->anInterrupt->writeConfig_RisingEdge(risingEdge, status);
   anInterrupt->anInterrupt->writeConfig_FallingEdge(fallingEdge, status);
+}
+
+void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
+                                 int32_t* status) {
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
+  if (anInterrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  uint32_t interruptIndex =
+      static_cast<uint32_t>(getHandleIndex(interruptHandle));
+
+  hal::ReleaseFPGAInterrupt(interruptIndex);
+  hal::ReleaseFPGAInterrupt(interruptIndex + 8);
 }
 
 }  // extern "C"

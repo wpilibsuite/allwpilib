@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Encoder.h"
 
@@ -35,7 +32,7 @@ Encoder::Encoder(HAL_Handle digitalSourceHandleA,
         return;
       }
       m_counter = HAL_kInvalidHandle;
-      SetMaxPeriod(.5, status);
+      SetMaxPeriod(0.5, status);
       break;
     }
     case HAL_Encoder_k1X:
@@ -63,15 +60,23 @@ void Encoder::SetupCounter(HAL_Handle digitalSourceHandleA,
   m_encodingScale = encodingType == HAL_Encoder_k1X ? 1 : 2;
   m_counter =
       HAL_InitializeCounter(HAL_Counter_kExternalDirection, &m_index, status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   HAL_SetCounterMaxPeriod(m_counter, 0.5, status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   HAL_SetCounterUpSource(m_counter, digitalSourceHandleA, analogTriggerTypeA,
                          status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   HAL_SetCounterDownSource(m_counter, digitalSourceHandleB, analogTriggerTypeB,
                            status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   if (encodingType == HAL_Encoder_k1X) {
     HAL_SetCounterUpSourceEdge(m_counter, true, false, status);
     HAL_SetCounterAverageSize(m_counter, 1, status);
@@ -238,6 +243,21 @@ void InitializeEncoder() {
 }  // namespace init
 }  // namespace hal
 
+namespace hal {
+bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
+                          HAL_FPGAEncoderHandle* fpgaHandle,
+                          HAL_CounterHandle* counterHandle) {
+  auto encoder = encoderHandles->Get(handle);
+  if (!handle) {
+    return false;
+  }
+
+  *fpgaHandle = encoder->m_encoder;
+  *counterHandle = encoder->m_counter;
+  return true;
+}
+}  // namespace hal
+
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
@@ -248,7 +268,9 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   auto encoder = std::make_shared<Encoder>(
       digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
       analogTriggerTypeB, reverseDirection, encodingType, status);
-  if (*status != 0) return HAL_kInvalidHandle;  // return in creation error
+  if (*status != 0) {
+    return HAL_kInvalidHandle;  // return in creation error
+  }
   auto handle = encoderHandles->Allocate(encoder);
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
@@ -260,6 +282,9 @@ HAL_EncoderHandle HAL_InitializeEncoder(
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   encoderHandles->Free(encoderHandle);
 }
+
+void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
+                             HAL_SimDeviceHandle device) {}
 
 int32_t HAL_GetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);

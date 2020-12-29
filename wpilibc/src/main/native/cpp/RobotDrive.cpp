@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/RobotDrive.h"
 
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
 #include "frc/GenericHID.h"
 #include "frc/Joystick.h"
@@ -120,21 +117,25 @@ void RobotDrive::Drive(double outputMagnitude, double curve) {
   double leftOutput, rightOutput;
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_ArcadeRatioCurve);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_ArcadeRatioCurve, GetNumMotors());
     reported = true;
   }
 
   if (curve < 0) {
     double value = std::log(-curve);
     double ratio = (value - m_sensitivity) / (value + m_sensitivity);
-    if (ratio == 0) ratio = .0000000001;
+    if (ratio == 0) {
+      ratio = 0.0000000001;
+    }
     leftOutput = outputMagnitude / ratio;
     rightOutput = outputMagnitude;
   } else if (curve > 0) {
     double value = std::log(curve);
     double ratio = (value - m_sensitivity) / (value + m_sensitivity);
-    if (ratio == 0) ratio = .0000000001;
+    if (ratio == 0) {
+      ratio = 0.0000000001;
+    }
     leftOutput = outputMagnitude;
     rightOutput = outputMagnitude / ratio;
   } else {
@@ -180,8 +181,8 @@ void RobotDrive::TankDrive(double leftValue, double rightValue,
                            bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_Tank);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_Tank, GetNumMotors());
     reported = true;
   }
 
@@ -230,8 +231,8 @@ void RobotDrive::ArcadeDrive(double moveValue, double rotateValue,
                              bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_ArcadeStandard);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_ArcadeStandard, GetNumMotors());
     reported = true;
   }
 
@@ -273,8 +274,8 @@ void RobotDrive::MecanumDrive_Cartesian(double x, double y, double rotation,
                                         double gyroAngle) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_MecanumCartesian);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_MecanumCartesian, GetNumMotors());
     reported = true;
   }
 
@@ -282,7 +283,7 @@ void RobotDrive::MecanumDrive_Cartesian(double x, double y, double rotation,
   double yIn = y;
   // Negate y for the joystick.
   yIn = -yIn;
-  // Compenstate for gyro angle.
+  // Compensate for gyro angle.
   RotateVector(xIn, yIn, gyroAngle);
 
   double wheelSpeeds[kMaxNumberOfMotors];
@@ -305,8 +306,8 @@ void RobotDrive::MecanumDrive_Polar(double magnitude, double direction,
                                     double rotation) {
   static bool reported = false;
   if (!reported) {
-    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-               HALUsageReporting::kRobotDrive_MecanumPolar);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive,
+               HALUsageReporting::kRobotDrive_MecanumPolar, GetNumMotors());
     reported = true;
   }
 
@@ -342,12 +343,14 @@ void RobotDrive::SetLeftRightMotorOutputs(double leftOutput,
                                           double rightOutput) {
   wpi_assert(m_rearLeftMotor != nullptr && m_rearRightMotor != nullptr);
 
-  if (m_frontLeftMotor != nullptr)
+  if (m_frontLeftMotor != nullptr) {
     m_frontLeftMotor->Set(Limit(leftOutput) * m_maxOutput);
+  }
   m_rearLeftMotor->Set(Limit(leftOutput) * m_maxOutput);
 
-  if (m_frontRightMotor != nullptr)
+  if (m_frontRightMotor != nullptr) {
     m_frontRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
+  }
   m_rearRightMotor->Set(-Limit(rightOutput) * m_maxOutput);
 
   Feed();
@@ -378,21 +381,33 @@ void RobotDrive::SetSensitivity(double sensitivity) {
   m_sensitivity = sensitivity;
 }
 
-void RobotDrive::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
+void RobotDrive::SetMaxOutput(double maxOutput) {
+  m_maxOutput = maxOutput;
+}
 
 void RobotDrive::GetDescription(wpi::raw_ostream& desc) const {
   desc << "RobotDrive";
 }
 
 void RobotDrive::StopMotor() {
-  if (m_frontLeftMotor != nullptr) m_frontLeftMotor->StopMotor();
-  if (m_frontRightMotor != nullptr) m_frontRightMotor->StopMotor();
-  if (m_rearLeftMotor != nullptr) m_rearLeftMotor->StopMotor();
-  if (m_rearRightMotor != nullptr) m_rearRightMotor->StopMotor();
+  if (m_frontLeftMotor != nullptr) {
+    m_frontLeftMotor->StopMotor();
+  }
+  if (m_frontRightMotor != nullptr) {
+    m_frontRightMotor->StopMotor();
+  }
+  if (m_rearLeftMotor != nullptr) {
+    m_rearLeftMotor->StopMotor();
+  }
+  if (m_rearRightMotor != nullptr) {
+    m_rearRightMotor->StopMotor();
+  }
   Feed();
 }
 
-void RobotDrive::InitRobotDrive() { SetSafetyEnabled(true); }
+void RobotDrive::InitRobotDrive() {
+  SetSafetyEnabled(true);
+}
 
 double RobotDrive::Limit(double number) {
   if (number > 1.0) {
@@ -408,7 +423,9 @@ void RobotDrive::Normalize(double* wheelSpeeds) {
   double maxMagnitude = std::fabs(wheelSpeeds[0]);
   for (int i = 1; i < kMaxNumberOfMotors; i++) {
     double temp = std::fabs(wheelSpeeds[i]);
-    if (maxMagnitude < temp) maxMagnitude = temp;
+    if (maxMagnitude < temp) {
+      maxMagnitude = temp;
+    }
   }
   if (maxMagnitude > 1.0) {
     for (int i = 0; i < kMaxNumberOfMotors; i++) {

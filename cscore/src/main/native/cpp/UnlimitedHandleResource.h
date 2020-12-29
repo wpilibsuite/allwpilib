@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_UNLIMITEDHANDLERESOURCE_H_
 #define CSCORE_UNLIMITEDHANDLERESOURCE_H_
@@ -78,7 +75,11 @@ template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename... Args>
 THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
     Args&&... args) {
+#ifdef _MSC_VER  // work around VS2019 16.4.0 bug
+  std::scoped_lock<TMutex> lock(m_handleMutex);
+#else
   std::scoped_lock sync(m_handleMutex);
+#endif
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
@@ -86,7 +87,9 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
       return MakeHandle(i);
     }
   }
-  if (i >= THandle::kIndexMax) return 0;
+  if (i >= THandle::kIndexMax) {
+    return 0;
+  }
 
   m_structures.emplace_back(
       std::make_shared<TStruct>(std::forward<Args>(args)...));
@@ -104,7 +107,9 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
       return MakeHandle(i);
     }
   }
-  if (i >= THandle::kIndexMax) return 0;
+  if (i >= THandle::kIndexMax) {
+    return 0;
+  }
 
   m_structures.push_back(structure);
   return MakeHandle(i);
@@ -116,9 +121,13 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Get(
     THandle handle) {
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
-  if (index < 0) return nullptr;
+  if (index < 0) {
+    return nullptr;
+  }
   std::scoped_lock sync(m_handleMutex);
-  if (index >= static_cast<int>(m_structures.size())) return nullptr;
+  if (index >= static_cast<int>(m_structures.size())) {
+    return nullptr;
+  }
   return m_structures[index];
 }
 
@@ -128,9 +137,13 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
     THandle handle) {
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
-  if (index < 0) return nullptr;
+  if (index < 0) {
+    return nullptr;
+  }
   std::scoped_lock sync(m_handleMutex);
-  if (index >= static_cast<int>(m_structures.size())) return nullptr;
+  if (index >= static_cast<int>(m_structures.size())) {
+    return nullptr;
+  }
   auto rv = std::move(m_structures[index]);
   m_structures[index].reset();
   return rv;
@@ -160,7 +173,9 @@ inline void
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::ForEach(F func) {
   std::scoped_lock sync(m_handleMutex);
   for (size_t i = 0; i < m_structures.size(); i++) {
-    if (m_structures[i] != nullptr) func(MakeHandle(i), *(m_structures[i]));
+    if (m_structures[i] != nullptr) {
+      func(MakeHandle(i), *(m_structures[i]));
+    }
   }
 }
 
@@ -171,8 +186,9 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FindIf(F func) {
   std::scoped_lock sync(m_handleMutex);
   for (size_t i = 0; i < m_structures.size(); i++) {
     auto& structure = m_structures[i];
-    if (structure != nullptr && func(*structure))
+    if (structure != nullptr && func(*structure)) {
       return std::make_pair(MakeHandle(i), structure);
+    }
   }
   return std::make_pair(0, nullptr);
 }

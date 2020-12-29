@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -40,10 +37,11 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * the averaging engine may help with this, but rotational speeds of the sensor will then be
  * limited.
  */
-public class AnalogTriggerOutput extends DigitalSource {
+public class AnalogTriggerOutput extends DigitalSource implements Sendable {
   /**
    * Exceptions dealing with improper operation of the Analog trigger output.
    */
+  @SuppressWarnings("serial")
   public static class AnalogTriggerOutputException extends RuntimeException {
     /**
      * Create a new exception with the given message.
@@ -74,7 +72,7 @@ public class AnalogTriggerOutput extends DigitalSource {
     m_trigger = trigger;
     m_outputType = outputType;
     HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
-        trigger.getIndex(), outputType.value);
+        trigger.getIndex() + 1, outputType.value + 1);
   }
 
   /**
@@ -98,7 +96,7 @@ public class AnalogTriggerOutput extends DigitalSource {
 
   @Override
   public int getChannel() {
-    return m_trigger.m_index;
+    return m_trigger.getIndex();
   }
 
   @Override

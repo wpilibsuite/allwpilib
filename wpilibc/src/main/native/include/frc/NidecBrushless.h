@@ -1,29 +1,28 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-
-#include <atomic>
 
 #include "frc/DigitalOutput.h"
 #include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
 #include "frc/SpeedController.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Nidec Brushless Motor.
  */
-class NidecBrushless : public SendableBase,
-                       public SpeedController,
-                       public MotorSafety {
+class NidecBrushless : public SpeedController,
+                       public MotorSafety,
+                       public Sendable,
+                       public SendableHelper<NidecBrushless> {
  public:
   /**
    * Constructor.
@@ -98,7 +97,7 @@ class NidecBrushless : public SendableBase,
 
  private:
   bool m_isInverted = false;
-  std::atomic_bool m_disabled{false};
+  bool m_disabled = false;
   DigitalOutput m_dio;
   PWM m_pwm;
   double m_speed = 0.0;

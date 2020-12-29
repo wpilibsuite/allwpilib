@@ -1,13 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/PowerDistributionPanel.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/PDP.h>
 #include <hal/Ports.h>
 #include <wpi/SmallString.h>
@@ -16,6 +13,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -24,17 +22,16 @@ PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 /**
  * Initialize the PDP.
  */
-PowerDistributionPanel::PowerDistributionPanel(int module) {
+PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
   int32_t status = 0;
   m_handle = HAL_InitializePDP(module, &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumPDPModules(), module,
-                                 HAL_GetErrorMessage(status));
+    wpi_setHALErrorWithRange(status, 0, HAL_GetNumPDPModules(), module);
     return;
   }
 
-  HAL_Report(HALUsageReporting::kResourceType_PDP, module);
-  SetName("PowerDistributionPanel", module);
+  HAL_Report(HALUsageReporting::kResourceType_PDP, module + 1);
+  SendableRegistry::GetInstance().AddLW(this, "PowerDistributionPanel", module);
 }
 
 double PowerDistributionPanel::GetVoltage() const {
@@ -136,13 +133,18 @@ void PowerDistributionPanel::ClearStickyFaults() {
   }
 }
 
+int PowerDistributionPanel::GetModule() const {
+  return m_module;
+}
+
 void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
   for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
-    builder.AddDoubleProperty("Chan" + wpi::Twine(i),
-                              [=]() { return GetCurrent(i); }, nullptr);
+    builder.AddDoubleProperty(
+        "Chan" + wpi::Twine(i), [=]() { return GetCurrent(i); }, nullptr);
   }
-  builder.AddDoubleProperty("Voltage", [=]() { return GetVoltage(); }, nullptr);
-  builder.AddDoubleProperty("TotalCurrent", [=]() { return GetTotalCurrent(); },
-                            nullptr);
+  builder.AddDoubleProperty(
+      "Voltage", [=]() { return GetVoltage(); }, nullptr);
+  builder.AddDoubleProperty(
+      "TotalCurrent", [=]() { return GetTotalCurrent(); }, nullptr);
 }

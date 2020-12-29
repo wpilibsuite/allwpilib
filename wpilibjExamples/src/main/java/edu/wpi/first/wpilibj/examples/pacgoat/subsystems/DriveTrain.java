@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
@@ -11,7 +8,6 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Victor;
@@ -58,15 +54,11 @@ public class DriveTrain extends Subsystem {
     m_drive.setExpiration(0.1);
     m_drive.setMaxOutput(1.0);
 
-    // Configure encoders
-    m_rightEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
-    m_leftEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
-
     if (Robot.isReal()) { // Converts to feet
       m_rightEncoder.setDistancePerPulse(0.0785398);
       m_leftEncoder.setDistancePerPulse(0.0785398);
     } else {
-      // Convert to feet 4in diameter wheels with 360 tick sim encoders
+      // Circumference = diameter in feet * pi. 360 tick simulated encoders.
       m_rightEncoder.setDistancePerPulse(
           (4.0/* in */ * Math.PI) / (360.0 * 12.0/* in/ft */));
       m_leftEncoder.setDistancePerPulse(

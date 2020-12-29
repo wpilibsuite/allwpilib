@@ -1,14 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include "mockdata/AccelerometerData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/AccelerometerData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class AccelerometerData {
@@ -19,16 +16,16 @@ class AccelerometerData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Z)
 
   static inline HAL_Value MakeRangeValue(HAL_AccelerometerRange value) {
-    return MakeEnum(value);
+    return HAL_MakeEnum(value);
   }
 
  public:
-  SimDataValue<HAL_Bool, MakeBoolean, GetActiveName> active{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetActiveName> active{false};
   SimDataValue<HAL_AccelerometerRange, MakeRangeValue, GetRangeName> range{
       static_cast<HAL_AccelerometerRange>(0)};
-  SimDataValue<double, MakeDouble, GetXName> x{0.0};
-  SimDataValue<double, MakeDouble, GetYName> y{0.0};
-  SimDataValue<double, MakeDouble, GetZName> z{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetXName> x{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetYName> y{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetZName> z{0.0};
 
   virtual void ResetData();
 };

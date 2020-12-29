@@ -1,44 +1,30 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "commands/SetDistanceToBox.h"
 
-#include <frc/PIDController.h>
+#include <frc/controller/PIDController.h>
 
 #include "Robot.h"
 
-SetDistanceToBox::SetDistanceToBox(double distance) {
-  Requires(&Robot::drivetrain);
-  m_pid.SetAbsoluteTolerance(0.01);
-  m_pid.SetSetpoint(distance);
+SetDistanceToBox::SetDistanceToBox(double distance, DriveTrain* drivetrain)
+    : frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox>(
+          frc2::PIDController(-2, 0, 0),
+          [this]() { return m_drivetrain->GetDistanceToObstacle(); }, distance,
+          [this](double output) { m_drivetrain->Drive(output, output); },
+          {drivetrain}),
+      m_drivetrain(drivetrain) {
+  m_controller.SetTolerance(0.01);
 }
 
 // Called just before this Command runs the first time
 void SetDistanceToBox::Initialize() {
   // Get everything in a safe starting state.
-  Robot::drivetrain.Reset();
-  m_pid.Reset();
-  m_pid.Enable();
+  m_drivetrain->Reset();
+  frc2::PIDCommand::Initialize();
 }
 
-// Make this return true when this Command no longer needs to run execute()
-bool SetDistanceToBox::IsFinished() { return m_pid.OnTarget(); }
-
-// Called once after isFinished returns true
-void SetDistanceToBox::End() {
-  // Stop PID and the wheels
-  m_pid.Disable();
-  Robot::drivetrain.Drive(0, 0);
-}
-
-double SetDistanceToBox::SetDistanceToBoxPIDSource::PIDGet() {
-  return Robot::drivetrain.GetDistanceToObstacle();
-}
-
-void SetDistanceToBox::SetDistanceToBoxPIDOutput::PIDWrite(double d) {
-  Robot::drivetrain.Drive(d, d);
+bool SetDistanceToBox::IsFinished() {
+  return m_controller.AtSetpoint();
 }

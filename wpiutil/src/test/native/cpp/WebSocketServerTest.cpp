@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/WebSocket.h"  // NOLINT(build/include_order)
 
@@ -24,7 +21,9 @@ class WebSocketServerTest : public WebSocketTest {
     serverPipe->Listen([this]() {
       auto conn = serverPipe->Accept();
       ws = WebSocket::CreateServer(*conn, "foo", "13");
-      if (setupWebSocket) setupWebSocket();
+      if (setupWebSocket) {
+        setupWebSocket();
+      }
     });
     clientPipe->Connect(pipeName, [this]() {
       clientPipe->StartRead();
@@ -32,13 +31,19 @@ class WebSocketServerTest : public WebSocketTest {
         StringRef data{buf.base, size};
         if (!headersDone) {
           data = resp.Execute(data);
-          if (resp.HasError()) Finish();
+          if (resp.HasError()) {
+            Finish();
+          }
           ASSERT_EQ(resp.GetError(), HPE_OK)
               << http_errno_name(resp.GetError());
-          if (data.empty()) return;
+          if (data.empty()) {
+            return;
+          }
         }
         wireData.insert(wireData.end(), data.bytes_begin(), data.bytes_end());
-        if (handleData) handleData(data);
+        if (handleData) {
+          handleData(data);
+        }
       });
       clientPipe->end.connect([this]() { Finish(); });
     });

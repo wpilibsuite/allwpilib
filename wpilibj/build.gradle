@@ -21,7 +21,7 @@ task generateJavaVersion() {
     outputs.file wpilibVersionFileOutput
     inputs.file wpilibVersionFileInput
 
-    if (WPILibVersion.releaseType.toString().equalsIgnoreCase('official')) {
+    if (wpilibVersioning.releaseMode) {
         outputs.upToDateWhen { false }
     }
 
@@ -31,12 +31,13 @@ task generateJavaVersion() {
     // 3. If there is a generated build number, and the release type is development, then we will
     //    only generate if the publish task is run.
     doLast {
-        println "Writing version ${WPILibVersion.version} to $wpilibVersionFileOutput"
+        def version = wpilibVersioning.version.get()
+        println "Writing version ${version} to $wpilibVersionFileOutput"
 
         if (wpilibVersionFileOutput.exists()) {
             wpilibVersionFileOutput.delete()
         }
-        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', WPILibVersion.version)
+        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
         wpilibVersionFileOutput.write(read)
     }
 }
@@ -54,19 +55,26 @@ compileJava {
     dependsOn generateJavaVersion
 }
 
+repositories {
+    jcenter()
+}
+
 dependencies {
-    compile project(':hal')
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    compile project(':cameraserver')
-    testCompile 'com.google.guava:guava:19.0'
-    devCompile project(':hal')
-    devCompile project(':wpiutil')
-    devCompile project(':ntcore')
-    devCompile project(':cscore')
-    devCompile project(':cameraserver')
-    devCompile sourceSets.main.output
+    implementation project(':hal')
+    implementation project(':wpiutil')
+    implementation project(':wpimath')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':cameraserver')
+    testImplementation 'com.google.guava:guava:19.0'
+    testImplementation 'org.mockito:mockito-core:2.27.0'
+    devImplementation project(':hal')
+    devImplementation project(':wpiutil')
+    devImplementation project(':wpimath')
+    devImplementation project(':ntcore')
+    devImplementation project(':cscore')
+    devImplementation project(':cameraserver')
+    devImplementation sourceSets.main.output
 }
 
 apply plugin: 'cpp'
@@ -83,14 +91,6 @@ ext {
     useCpp = true
 }
 
-ext {
-    chipObjectComponents = ['wpilibjDev']
-    netCommComponents = ['wpilibjDev']
-    useNiJava = true
-}
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
 apply from: "${rootDir}/shared/opencv.gradle"
 
 model {
@@ -102,13 +102,6 @@ model {
                     source {
                         srcDirs 'src/dev/native/cpp'
                         include '**/*.cpp'
-                        lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                        lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                        lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                        lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
-                        lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
-                        lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                        lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     }
                     exportedHeaders {
                         srcDirs 'src/dev/native/include'
@@ -116,8 +109,20 @@ model {
                 }
             }
             binaries.all {
+                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+                lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 project(':hal').addHalJniDependency(it)
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                }
             }
         }
     }
@@ -169,3 +174,5 @@ test {
         showStandardStreams = true
     }
 }
+
+apply from: "${rootDir}/shared/javaDesktopTestTask.gradle"

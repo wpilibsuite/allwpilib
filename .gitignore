@@ -2,7 +2,8 @@
 
 dependency-reduced-pom.xml
 doxygen.log
-buildcmake/
+build*/
+!buildSrc/
 
 # Created by the jenkins test script
 test-reports
@@ -214,3 +215,12 @@ ipch/
 
 # Visual Studio 2015 cache/options directory
 .vs/
+
+# compile_commands
+compile_commands.json
+
+# clang configuration and clangd cache
+.clang
+.clangd/
+
+imgui.ini

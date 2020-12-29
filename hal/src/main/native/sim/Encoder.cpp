@@ -1,16 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Encoder.h"
 
 #include "CounterInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
-#include "hal/Counter.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
@@ -82,8 +78,10 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   }
   int16_t index = getHandleIndex(handle);
   SimEncoderData[index].digitalChannelA = getHandleIndex(digitalSourceHandleA);
+  SimEncoderData[index].digitalChannelB = getHandleIndex(digitalSourceHandleB);
   SimEncoderData[index].initialized = true;
   SimEncoderData[index].reverseDirection = reverseDirection;
+  SimEncoderData[index].simDevice = 0;
   // TODO: Add encoding type to Sim data
   encoder->index = index;
   encoder->nativeHandle = nativeHandle;
@@ -95,13 +93,24 @@ HAL_EncoderHandle HAL_InitializeEncoder(
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
   encoderHandles->Free(encoderHandle);
-  if (encoder == nullptr) return;
+  if (encoder == nullptr) {
+    return;
+  }
   if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::FPGAEncoder)) {
     fpgaEncoderHandles->Free(encoder->nativeHandle);
   } else if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::Counter)) {
     counterHandles->Free(encoder->nativeHandle);
   }
   SimEncoderData[encoder->index].initialized = false;
+}
+
+void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
+                             HAL_SimDeviceHandle device) {
+  auto encoder = encoderHandles->Get(handle);
+  if (encoder == nullptr) {
+    return;
+  }
+  SimEncoderData[encoder->index].simDevice = device;
 }
 
 static inline int EncodingScaleFactor(Encoder* encoder) {
@@ -166,9 +175,9 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
     return;
   }
 
+  SimEncoderData[encoder->index].reset = true;
   SimEncoderData[encoder->index].count = 0;
   SimEncoderData[encoder->index].period = std::numeric_limits<double>::max();
-  SimEncoderData[encoder->index].reset = true;
 }
 double HAL_GetEncoderPeriod(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);

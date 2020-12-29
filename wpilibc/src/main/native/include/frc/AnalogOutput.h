@@ -1,23 +1,25 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <hal/Types.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * MXP analog output class.
  */
-class AnalogOutput : public ErrorBase, public SendableBase {
+class AnalogOutput : public ErrorBase,
+                     public Sendable,
+                     public SendableHelper<AnalogOutput> {
  public:
   /**
    * Construct an analog output on the given channel.
@@ -30,8 +32,8 @@ class AnalogOutput : public ErrorBase, public SendableBase {
 
   ~AnalogOutput() override;
 
-  AnalogOutput(AnalogOutput&& rhs);
-  AnalogOutput& operator=(AnalogOutput&& rhs);
+  AnalogOutput(AnalogOutput&&) = default;
+  AnalogOutput& operator=(AnalogOutput&&) = default;
 
   /**
    * Set the value of the analog output.
@@ -50,13 +52,13 @@ class AnalogOutput : public ErrorBase, public SendableBase {
   /**
    * Get the channel of this AnalogOutput.
    */
-  int GetChannel();
+  int GetChannel() const;
 
   void InitSendable(SendableBuilder& builder) override;
 
  protected:
   int m_channel;
-  HAL_AnalogOutputHandle m_port = HAL_kInvalidHandle;
+  hal::Handle<HAL_AnalogOutputHandle> m_port;
 };
 
 }  // namespace frc

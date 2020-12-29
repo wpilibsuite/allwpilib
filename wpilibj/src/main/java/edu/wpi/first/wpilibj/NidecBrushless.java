@@ -1,15 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Nidec Brushless Motor.
@@ -22,8 +20,6 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
   private volatile double m_speed;
   private volatile boolean m_disabled;
 
-  private final SendableImpl m_sendableImpl;
-
   /**
    * Constructor.
    *
@@ -33,79 +29,27 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
    *                   0-9 are on-board, 10-25 are on the MXP port
    */
   public NidecBrushless(final int pwmChannel, final int dioChannel) {
-    m_sendableImpl = new SendableImpl(true);
-
     setSafetyEnabled(false);
 
     // the dio controls the output (in PWM mode)
     m_dio = new DigitalOutput(dioChannel);
-    addChild(m_dio);
+    SendableRegistry.addChild(this, m_dio);
     m_dio.setPWMRate(15625);
     m_dio.enablePWM(0.5);
 
     // the pwm enables the controller
     m_pwm = new PWM(pwmChannel);
-    addChild(m_pwm);
+    SendableRegistry.addChild(this, m_pwm);
 
-    HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel);
-    setName("Nidec Brushless", pwmChannel);
+    HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel + 1);
+    SendableRegistry.addLW(this, "Nidec Brushless", pwmChannel);
   }
 
   @Override
   public void close() {
-    m_sendableImpl.close();
+    SendableRegistry.remove(this);
     m_dio.close();
     m_pwm.close();
-  }
-
-  @Override
-  public final synchronized String getName() {
-    return m_sendableImpl.getName();
-  }
-
-  @Override
-  public final synchronized void setName(String name) {
-    m_sendableImpl.setName(name);
-  }
-
-  /**
-   * Sets the name of the sensor with a channel number.
-   *
-   * @param moduleType A string that defines the module name in the label for the value
-   * @param channel    The channel number the device is plugged into
-   */
-  protected final void setName(String moduleType, int channel) {
-    m_sendableImpl.setName(moduleType, channel);
-  }
-
-  /**
-   * Sets the name of the sensor with a module and channel number.
-   *
-   * @param moduleType   A string that defines the module name in the label for the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually PWM)
-   */
-  protected final void setName(String moduleType, int moduleNumber, int channel) {
-    m_sendableImpl.setName(moduleType, moduleNumber, channel);
-  }
-
-  @Override
-  public final synchronized String getSubsystem() {
-    return m_sendableImpl.getSubsystem();
-  }
-
-  @Override
-  public final synchronized void setSubsystem(String subsystem) {
-    m_sendableImpl.setSubsystem(subsystem);
-  }
-
-  /**
-   * Add a child component.
-   *
-   * @param child child component
-   */
-  protected final void addChild(Object child) {
-    m_sendableImpl.addChild(child);
   }
 
   /**

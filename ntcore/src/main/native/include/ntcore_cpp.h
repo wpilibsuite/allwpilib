@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_NTCORE_CPP_H_
 #define NTCORE_NTCORE_CPP_H_
@@ -1129,6 +1126,19 @@ unsigned int GetNetworkMode();
  * @return Bitmask of NT_NetworkMode.
  */
 unsigned int GetNetworkMode(NT_Inst inst);
+
+/**
+ * Starts local-only operation.  Prevents calls to StartServer or StartClient
+ * from taking effect.  Has no effect if StartServer or StartClient
+ * has already been called.
+ */
+void StartLocal(NT_Inst inst);
+
+/**
+ * Stops local-only operation.  StartServer or StartClient can be called after
+ * this call to start a server or client.
+ */
+void StopLocal(NT_Inst inst);
 
 /**
  * Starts a server using the specified filename, listening address, and port.

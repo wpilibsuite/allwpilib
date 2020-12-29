@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -43,7 +40,13 @@ class SendableBuilderImpl : public SendableBuilder {
    * Get the network table.
    * @return The network table
    */
-  std::shared_ptr<nt::NetworkTable> GetTable();
+  std::shared_ptr<nt::NetworkTable> GetTable() override;
+
+  /**
+   * Return whether this sendable has an associated table.
+   * @return True if it has a table, false if not.
+   */
+  bool HasTable() const;
 
   /**
    * Return whether this sendable should be treated as an actuator.
@@ -77,6 +80,11 @@ class SendableBuilderImpl : public SendableBuilder {
    * calls the SafeState function if one was provided.
    */
   void StopLiveWindowMode();
+
+  /**
+   * Clear properties.
+   */
+  void ClearProperties();
 
   void SetSmartDashboardType(const wpi::Twine& type) override;
   void SetActuator(bool value) override;
@@ -172,8 +180,9 @@ class SendableBuilderImpl : public SendableBuilder {
     ~Property() { StopListener(); }
 
     void StartListener() {
-      if (entry && listener == 0 && createListener)
+      if (entry && listener == 0 && createListener) {
         listener = createListener(entry);
+      }
     }
 
     void StopListener() {
@@ -191,7 +200,7 @@ class SendableBuilderImpl : public SendableBuilder {
 
   std::vector<Property> m_properties;
   std::function<void()> m_safeState;
-  std::function<void()> m_updateTable;
+  std::vector<std::function<void()>> m_updateTables;
   std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_controllableEntry;
   bool m_actuator = false;

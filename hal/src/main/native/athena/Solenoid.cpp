@@ -1,21 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Solenoid.h"
-
-#include <FRC_NetworkCommunication/LoadOut.h>
 
 #include "HALInitializer.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
-#include "hal/ChipObject.h"
 #include "hal/Errors.h"
-#include "hal/Ports.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 
@@ -112,7 +105,9 @@ HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoidPortHandle,
 }
 
 int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status) {
-  if (!checkPCMInit(module, status)) return 0;
+  if (!checkPCMInit(module, status)) {
+    return 0;
+  }
   uint8_t value;
 
   *status = PCM_modules[module]->GetAllSolenoids(value);
@@ -132,13 +127,17 @@ void HAL_SetSolenoid(HAL_SolenoidHandle solenoidPortHandle, HAL_Bool value,
 }
 
 void HAL_SetAllSolenoids(int32_t module, int32_t state, int32_t* status) {
-  if (!checkPCMInit(module, status)) return;
+  if (!checkPCMInit(module, status)) {
+    return;
+  }
 
   *status = PCM_modules[module]->SetAllSolenoids(state);
 }
 
 int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status) {
-  if (!checkPCMInit(module, status)) return 0;
+  if (!checkPCMInit(module, status)) {
+    return 0;
+  }
   uint8_t value;
 
   *status = PCM_modules[module]->GetSolenoidBlackList(value);
@@ -146,7 +145,9 @@ int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status) {
   return value;
 }
 HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status) {
-  if (!checkPCMInit(module, status)) return 0;
+  if (!checkPCMInit(module, status)) {
+    return 0;
+  }
   bool value;
 
   *status = PCM_modules[module]->GetSolenoidStickyFault(value);
@@ -154,7 +155,9 @@ HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status) {
   return value;
 }
 HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status) {
-  if (!checkPCMInit(module, status)) return false;
+  if (!checkPCMInit(module, status)) {
+    return false;
+  }
   bool value;
 
   *status = PCM_modules[module]->GetSolenoidFault(value);
@@ -162,7 +165,9 @@ HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status) {
   return value;
 }
 void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status) {
-  if (!checkPCMInit(module, status)) return;
+  if (!checkPCMInit(module, status)) {
+    return;
+  }
 
   *status = PCM_modules[module]->ClearStickyFaults();
 }

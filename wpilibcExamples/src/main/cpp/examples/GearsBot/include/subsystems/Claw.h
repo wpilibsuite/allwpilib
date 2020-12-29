@@ -1,26 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <frc/DigitalInput.h>
 #include <frc/PWMVictorSPX.h>
-#include <frc/commands/Subsystem.h>
+#include <frc2/command/SubsystemBase.h>
 
 /**
  * The claw subsystem is a simple system with a motor for opening and closing.
  * If using stronger motors, you should probably use a sensor so that the
  * motors don't stall.
  */
-class Claw : public frc::Subsystem {
+class Claw : public frc2::SubsystemBase {
  public:
   Claw();
-
-  void InitDefaultCommand() override;
 
   /**
    * Set the claw motor to move in the open direction.
@@ -43,7 +38,16 @@ class Claw : public frc::Subsystem {
    */
   bool IsGripping();
 
+  /**
+   * The log method puts interesting information to the SmartDashboard.
+   */
   void Log();
+
+  /**
+   * Log the data periodically. This method is automatically called
+   * by the subsystem.
+   */
+  void Periodic() override;
 
  private:
   frc::PWMVictorSPX m_motor{7};

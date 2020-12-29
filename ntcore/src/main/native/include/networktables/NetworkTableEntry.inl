@@ -1,12 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017-2019. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#ifndef NT_ENTRY_INL_
-#define NT_ENTRY_INL_
+#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INL_
+#define NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INL_
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace nt {
 
@@ -15,7 +16,9 @@ inline NetworkTableEntry::NetworkTableEntry() : m_handle{0} {}
 inline NetworkTableEntry::NetworkTableEntry(NT_Entry handle)
     : m_handle{handle} {}
 
-inline NT_Entry NetworkTableEntry::GetHandle() const { return m_handle; }
+inline NT_Entry NetworkTableEntry::GetHandle() const {
+  return m_handle;
+}
 
 inline bool NetworkTableEntry::Exists() const {
   return GetEntryType(m_handle) != NT_UNASSIGNED;
@@ -47,32 +50,37 @@ inline std::shared_ptr<Value> NetworkTableEntry::GetValue() const {
 
 inline bool NetworkTableEntry::GetBoolean(bool defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_BOOLEAN) return defaultValue;
+  if (!value || value->type() != NT_BOOLEAN)
+    return defaultValue;
   return value->GetBoolean();
 }
 
 inline double NetworkTableEntry::GetDouble(double defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_DOUBLE) return defaultValue;
+  if (!value || value->type() != NT_DOUBLE)
+    return defaultValue;
   return value->GetDouble();
 }
 
 inline std::string NetworkTableEntry::GetString(StringRef defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_STRING) return defaultValue;
+  if (!value || value->type() != NT_STRING)
+    return defaultValue;
   return value->GetString();
 }
 
 inline std::string NetworkTableEntry::GetRaw(StringRef defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_RAW) return defaultValue;
+  if (!value || value->type() != NT_RAW)
+    return defaultValue;
   return value->GetString();
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
     ArrayRef<int> defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_BOOLEAN_ARRAY) return defaultValue;
+  if (!value || value->type() != NT_BOOLEAN_ARRAY)
+    return defaultValue;
   return value->GetBooleanArray();
 }
 
@@ -85,7 +93,8 @@ inline std::vector<int> NetworkTableEntry::GetBooleanArray(
 inline std::vector<double> NetworkTableEntry::GetDoubleArray(
     ArrayRef<double> defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_DOUBLE_ARRAY) return defaultValue;
+  if (!value || value->type() != NT_DOUBLE_ARRAY)
+    return defaultValue;
   return value->GetDoubleArray();
 }
 
@@ -98,7 +107,8 @@ inline std::vector<double> NetworkTableEntry::GetDoubleArray(
 inline std::vector<std::string> NetworkTableEntry::GetStringArray(
     ArrayRef<std::string> defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_STRING_ARRAY) return defaultValue;
+  if (!value || value->type() != NT_STRING_ARRAY)
+    return defaultValue;
   return value->GetStringArray();
 }
 
@@ -133,13 +143,28 @@ inline bool NetworkTableEntry::SetDefaultBooleanArray(
   return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
 }
 
+inline bool NetworkTableEntry::SetDefaultBooleanArray(
+    std::initializer_list<int> defaultValue) {
+  return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
+}
+
 inline bool NetworkTableEntry::SetDefaultDoubleArray(
     ArrayRef<double> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(defaultValue));
 }
 
+inline bool NetworkTableEntry::SetDefaultDoubleArray(
+    std::initializer_list<double> value) {
+  return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(value));
+}
+
 inline bool NetworkTableEntry::SetDefaultStringArray(
     ArrayRef<std::string> defaultValue) {
+  return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
+}
+
+inline bool NetworkTableEntry::SetDefaultStringArray(
+    std::initializer_list<std::string> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
 }
 
@@ -264,15 +289,21 @@ inline void NetworkTableEntry::ClearFlags(unsigned int flags) {
   SetEntryFlags(m_handle, GetFlags() & ~flags);
 }
 
-inline void NetworkTableEntry::SetPersistent() { SetFlags(kPersistent); }
+inline void NetworkTableEntry::SetPersistent() {
+  SetFlags(kPersistent);
+}
 
-inline void NetworkTableEntry::ClearPersistent() { ClearFlags(kPersistent); }
+inline void NetworkTableEntry::ClearPersistent() {
+  ClearFlags(kPersistent);
+}
 
 inline bool NetworkTableEntry::IsPersistent() const {
   return (GetFlags() & kPersistent) != 0;
 }
 
-inline void NetworkTableEntry::Delete() { DeleteEntry(m_handle); }
+inline void NetworkTableEntry::Delete() {
+  DeleteEntry(m_handle);
+}
 
 inline void NetworkTableEntry::CreateRpc(
     std::function<void(const RpcAnswer& answer)> callback) {
@@ -295,4 +326,4 @@ inline void NetworkTableEntry::RemoveListener(NT_EntryListener entry_listener) {
 
 }  // namespace nt
 
-#endif  // NT_ENTRY_INL_
+#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_INL_

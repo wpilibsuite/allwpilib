@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <mfapi.h>
 #include <mfidl.h>
@@ -59,9 +56,13 @@ STDMETHODIMP_(ULONG) SourceReaderCB::Release() {
   return uCount;
 }
 
-STDMETHODIMP SourceReaderCB::OnEvent(DWORD, IMFMediaEvent*) { return S_OK; }
+STDMETHODIMP SourceReaderCB::OnEvent(DWORD, IMFMediaEvent*) {
+  return S_OK;
+}
 
-STDMETHODIMP SourceReaderCB::OnFlush(DWORD) { return S_OK; }
+STDMETHODIMP SourceReaderCB::OnFlush(DWORD) {
+  return S_OK;
+}
 
 void SourceReaderCB::NotifyError(HRESULT hr) {
   wprintf(L"Source Reader error: 0x%X\n", hr);
@@ -73,7 +74,8 @@ STDMETHODIMP SourceReaderCB::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
                                           IMFSample* pSample  // Can be NULL
 ) {
   auto source = m_source.lock();
-  if (!source) return S_OK;
+  if (!source)
+    return S_OK;
   if (SUCCEEDED(hrStatus)) {
     if (pSample) {
       // Prcoess sample

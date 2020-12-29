@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_LOGGER_H_
 #define WPIUTIL_WPI_LOGGER_H_
@@ -44,7 +41,9 @@ class Logger {
 
   void Log(unsigned int level, const char* file, unsigned int line,
            const char* msg) {
-    if (!m_func || level < m_min_level) return;
+    if (!m_func || level < m_min_level) {
+      return;
+    }
     m_func(level, file, line, msg);
   }
 

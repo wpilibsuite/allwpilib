@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #*----------------------------------------------------------------------------*#
-#* Copyright (c) FIRST 2014. All Rights Reserved.							  *#
+#* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        *#
 #* Open Source Software - may be modified and shared by FRC teams. The code   *#
 #* must be accompanied by the FIRST BSD license file in the root directory of *#
-#* the project.															      *#
+#* the project.                                                               *#
 #*----------------------------------------------------------------------------*#
 
 # Configurable variables
@@ -19,10 +19,10 @@ DEFAULT_DESTINATION_RUN_TEST_SCRIPT=${DEFAULT_DESTINATION_DIR}/${DEFAULT_LOCAL_R
 
 usage="$(basename "$0") [-h] (java|cpp) [-A] [arg] [arg]...
 A script designed to run the integration tests.
-This script should only be run on the roborio.
+This script should only be run on the computer connected to the roboRIO.
 Where:
     -h    Show this help text.
-    -A    Disable language recomended arguments.
+    -A    Disable language recommended arguments.
     arg   Additional arguments to be passed to test."
 
 
@@ -30,20 +30,26 @@ Where:
 LANGUAGE=none
 LOCAL_TEST_FILE=none
 DESTINATION_TEST_FILE=none
-LIBRARY_FILES=none
 TEST_RUN_ARGS=""
+DESTINATION_TEST_RESULTS=none
+LOCAL_TEST_RESULTS=none
 
-# Begin searching for options from the third paramater on
+
+# Begin searching for options from the second paramater on
 PARAM_ARGS=${@:2}
 
 if [[ "$1" = java ]]; then
     LANGUAGE=$1
     LOCAL_TEST_FILE=$DEFAULT_LOCAL_JAVA_TEST_FILE
     DESTINATION_TEST_FILE=$DEFAULT_DESTINATION_JAVA_TEST_FILE
+    DESTINATION_TEST_RESULTS=$DEFAULT_DESTINATION_JAVA_TEST_RESULTS
+    LOCAL_TEST_RESULTS=$DEFAULT_LOCAL_JAVA_TEST_RESULT
 elif [[ "$1" = cpp ]]; then
     LANGUAGE=$1
     LOCAL_TEST_FILE=$DEFAULT_LOCAL_CPP_TEST_FILE
     DESTINATION_TEST_FILE=$DEFAULT_DESTINATION_CPP_TEST_FILE
+    DESTINATION_TEST_RESULTS=$DEFAULT_DESTINATION_CPP_TEST_RESULTS
+    LOCAL_TEST_RESULTS=$DEFAULT_LOCAL_CPP_TEST_RESULT
 elif [[ "$1" = "-h" ]]; then
     printf "Usage:\n"
     echo "$usage"
@@ -65,25 +71,14 @@ TEST_RUN_ARGS="${@:2}"
 
 shopt -s huponexit
 
-SCP_TEST_SCRIPT="scp config.sh ${DEFAULT_LOCAL_RUN_TEST_SCRIPT} ${ROBOT_ADDRESS}:/${DEFAULT_DESTINATION_DIR}"
-SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR="ssh -t ${ROBOT_ADDRESS} \"chmod a+x ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT}; mkdir ${DEFAULT_TEST_SCP_DIR}; touch ${DESTINATION_TEST_FILE}\""
-SCP_TEST_PROGRAM="scp ${LOCAL_TEST_FILE} ${ROBOT_ADDRESS}:${DESTINATION_TEST_FILE}"
-SSH_RUN_TESTS="ssh -t ${ROBOT_ADDRESS} ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT} ${LANGUAGE} $(whoami) -d ${DEFAULT_TEST_SCP_DIR} ${TEST_RUN_ARGS}"
-SCP_NATIVE_LIBRARIES="scp ${DEFAULT_LIBRARY_NATIVE_FILES}/* ${ROBOT_ADDRESS}:${DEFAULT_LIBRARY_NATIVE_DESTINATION}"
-CONFIG_NATIVE_LIBRARIES="ssh -t ${ADMIN_ROBOT_ADDRESS} ldconfig"
+# Fail if any command fails
+set -e
 
-if [ $(which sshpass) ]; then
-    sshpass -p "" ${SCP_NATIVE_LIBRARIES}
-    sshpass -p "" ${CONFIG_NATIVE_LIBRARIES}
-    sshpass -p "" ${SCP_TEST_SCRIPT}
-    sshpass -p "" ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
-    sshpass -p "" ${SCP_TEST_PROGRAM}
-    sshpass -p "" ${SSH_RUN_TESTS}
-else
-    eval ${SCP_NATIVE_LIBRARIES}
-    eval ${CONFIG_NATIVE_LIBRARIES}
-    eval ${SCP_TEST_SCRIPT}
-    eval ${SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR}
-    eval ${SCP_TEST_PROGRAM}
-    eval ${SSH_RUN_TESTS}
-fi
+ssh ${ROBOT_ADDRESS} "rm -R ${DEFAULT_DESTINATION_TEST_RESULTS_DIR}; mkdir ${DEFAULT_DESTINATION_TEST_RESULTS_DIR}"
+scp ${DEFAULT_LIBRARY_NATIVE_FILES}/* ${ROBOT_ADDRESS}:${DEFAULT_LIBRARY_NATIVE_DESTINATION}
+ssh ${ADMIN_ROBOT_ADDRESS} ldconfig
+scp config.sh ${DEFAULT_LOCAL_RUN_TEST_SCRIPT} ${ROBOT_ADDRESS}:/${DEFAULT_DESTINATION_DIR}
+ssh ${ROBOT_ADDRESS} "chmod a+x ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT}; mkdir ${DEFAULT_TEST_SCP_DIR}; touch ${DESTINATION_TEST_FILE}"
+scp ${LOCAL_TEST_FILE} ${ROBOT_ADDRESS}:${DESTINATION_TEST_FILE}
+ssh ${ROBOT_ADDRESS} ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT} ${LANGUAGE} -d ${DEFAULT_TEST_SCP_DIR} ${TEST_RUN_ARGS}
+mkdir ${DEFAULT_LOCAL_TEST_RESULTS_DIR}; scp ${ROBOT_ADDRESS}:${DESTINATION_TEST_RESULTS} ${LOCAL_TEST_RESULTS}

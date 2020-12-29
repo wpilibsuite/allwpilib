@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/timestamp.h"
 
@@ -95,14 +92,22 @@ void wpi::SetNowImpl(uint64_t (*func)(void)) {
   now_impl = func ? func : NowDefault;
 }
 
-uint64_t wpi::Now() { return (now_impl.load())(); }
+uint64_t wpi::Now() {
+  return (now_impl.load())();
+}
 
 extern "C" {
 
-uint64_t WPI_NowDefault(void) { return wpi::NowDefault(); }
+uint64_t WPI_NowDefault(void) {
+  return wpi::NowDefault();
+}
 
-void WPI_SetNowImpl(uint64_t (*func)(void)) { wpi::SetNowImpl(func); }
+void WPI_SetNowImpl(uint64_t (*func)(void)) {
+  wpi::SetNowImpl(func);
+}
 
-uint64_t WPI_Now(void) { return wpi::Now(); }
+uint64_t WPI_Now(void) {
+  return wpi::Now();
+}
 
 }  // extern "C"

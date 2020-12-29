@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -71,6 +68,15 @@ HAL_EncoderHandle HAL_InitializeEncoder(
  * @param encoderHandle the encoder handle
  */
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status);
+
+/**
+ * Indicates the encoder is used by a simulated device.
+ *
+ * @param handle the encoder handle
+ * @param device simulated device handle
+ */
+void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
+                             HAL_SimDeviceHandle device);
 
 /**
  * Gets the current counts of the encoder after encoding type scaling.

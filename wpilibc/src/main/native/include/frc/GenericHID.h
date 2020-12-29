@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -62,6 +59,9 @@ class GenericHID : public ErrorBase {
    * the state of each button. The appropriate button is returned as a boolean
    * value.
    *
+   * This method returns true if the button is being held down at the time
+   * that this method is being called.
+   *
    * @param button The button number to be read (starting at 1)
    * @return The state of the button.
    */
@@ -71,6 +71,10 @@ class GenericHID : public ErrorBase {
    * Whether the button was pressed since the last check. Button indexes begin
    * at 1.
    *
+   * This method returns true if the button went from not pressed to held down
+   * since the last time this method was called. This is useful if you only
+   * want to call a function once when you press the button.
+   *
    * @param button The button index, beginning at 1.
    * @return Whether the button was pressed since the last check.
    */
@@ -79,6 +83,10 @@ class GenericHID : public ErrorBase {
   /**
    * Whether the button was released since the last check. Button indexes begin
    * at 1.
+   *
+   * This method returns true if the button went from held down to not pressed
+   * since the last time this method was called. This is useful if you only
+   * want to call a function once when you release the button.
    *
    * @param button The button index, beginning at 1.
    * @return Whether the button was released since the last check.
@@ -124,6 +132,13 @@ class GenericHID : public ErrorBase {
    * @return the number of buttons on the current HID
    */
   int GetButtonCount() const;
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  bool IsConnected() const;
 
   /**
    * Get the type of the HID.
@@ -179,7 +194,7 @@ class GenericHID : public ErrorBase {
   void SetRumble(RumbleType type, double value);
 
  private:
-  DriverStation& m_ds;
+  DriverStation* m_ds;
   int m_port;
   int m_outputs = 0;
   uint16_t m_leftRumble = 0;

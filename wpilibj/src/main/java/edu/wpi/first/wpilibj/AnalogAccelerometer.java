@@ -1,15 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -18,7 +16,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * through the sensor. Many sensors have multiple axis and can be treated as multiple devices. Each
  * is calibrated by finding the center value over a period of time.
  */
-public class AnalogAccelerometer extends SendableBase implements PIDSource {
+public class AnalogAccelerometer implements PIDSource, Sendable, AutoCloseable {
   private AnalogInput m_analogChannel;
   private double m_voltsPerG = 1.0;
   private double m_zeroGVoltage = 2.5;
@@ -30,8 +28,8 @@ public class AnalogAccelerometer extends SendableBase implements PIDSource {
    */
   private void initAccelerometer() {
     HAL.report(tResourceType.kResourceType_Accelerometer,
-                                   m_analogChannel.getChannel());
-    setName("Accelerometer", m_analogChannel.getChannel());
+                                   m_analogChannel.getChannel() + 1);
+    SendableRegistry.addLW(this, "Accelerometer", m_analogChannel.getChannel());
   }
 
   /**
@@ -43,7 +41,7 @@ public class AnalogAccelerometer extends SendableBase implements PIDSource {
    */
   public AnalogAccelerometer(final int channel) {
     this(new AnalogInput(channel), true);
-    addChild(m_analogChannel);
+    SendableRegistry.addChild(this, m_analogChannel);
   }
 
   /**
@@ -70,7 +68,7 @@ public class AnalogAccelerometer extends SendableBase implements PIDSource {
    */
   @Override
   public void close() {
-    super.close();
+    SendableRegistry.remove(this);
     if (m_analogChannel != null && m_allocatedChannel) {
       m_analogChannel.close();
     }

@@ -1,18 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/DriveTrain.h"
 
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <units/length.h>
+#include <wpi/math>
 
-#include "commands/TankDriveWithJoystick.h"
-
-DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
+DriveTrain::DriveTrain() {
 // Encoders may measure differently in the real world and in
 // simulation. In this example the robot moves 0.042 barleycorns
 // per tick in the real world, but the simulated encoders
@@ -22,26 +19,22 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   m_leftEncoder.SetDistancePerPulse(0.042);
   m_rightEncoder.SetDistancePerPulse(0.042);
 #else
-  // Circumference in ft = 4in/12(in/ft)*PI
-  m_leftEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
-                                    360.0);
-  m_rightEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
-                                     360.0);
+  // Circumference = diameter * pi. 360 tick simulated encoders.
+  m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+                                    wpi::math::pi / 360.0);
+  m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+                                     wpi::math::pi / 360.0);
 #endif
-
+  SetName("DriveTrain");
   // Let's show everything on the LiveWindow
-  // AddChild("Front_Left Motor", m_frontLeft);
-  // AddChild("Rear Left Motor", m_rearLeft);
-  // AddChild("Front Right Motor", m_frontRight);
-  // AddChild("Rear Right Motor", m_rearRight);
-  AddChild("Left Encoder", m_leftEncoder);
-  AddChild("Right Encoder", m_rightEncoder);
-  AddChild("Rangefinder", m_rangefinder);
-  AddChild("Gyro", m_gyro);
-}
-
-void DriveTrain::InitDefaultCommand() {
-  SetDefaultCommand(new TankDriveWithJoystick());
+  AddChild("Front_Left Motor", &m_frontLeft);
+  AddChild("Rear Left Motor", &m_rearLeft);
+  AddChild("Front Right Motor", &m_frontRight);
+  AddChild("Rear Right Motor", &m_rearRight);
+  AddChild("Left Encoder", &m_leftEncoder);
+  AddChild("Right Encoder", &m_rightEncoder);
+  AddChild("Rangefinder", &m_rangefinder);
+  AddChild("Gyro", &m_gyro);
 }
 
 void DriveTrain::Log() {
@@ -57,7 +50,9 @@ void DriveTrain::Drive(double left, double right) {
   m_robotDrive.TankDrive(left, right);
 }
 
-double DriveTrain::GetHeading() { return m_gyro.GetAngle(); }
+double DriveTrain::GetHeading() {
+  return m_gyro.GetAngle();
+}
 
 void DriveTrain::Reset() {
   m_gyro.Reset();
@@ -72,4 +67,8 @@ double DriveTrain::GetDistance() {
 double DriveTrain::GetDistanceToObstacle() {
   // Really meters in simulation since it's a rangefinder...
   return m_rangefinder.GetAverageVoltage();
+}
+
+void DriveTrain::Periodic() {
+  Log();
 }

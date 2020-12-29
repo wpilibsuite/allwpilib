@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -14,9 +11,12 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class for Spike style relay outputs.
@@ -30,7 +30,9 @@ namespace frc {
  * independently for something that does not care about voltage polarity (like
  * a solenoid).
  */
-class Relay : public MotorSafety, public SendableBase {
+class Relay : public MotorSafety,
+              public Sendable,
+              public SendableHelper<Relay> {
  public:
   enum Value { kOff, kOn, kForward, kReverse };
   enum Direction { kBothDirections, kForwardOnly, kReverseOnly };
@@ -53,8 +55,8 @@ class Relay : public MotorSafety, public SendableBase {
    */
   ~Relay() override;
 
-  Relay(Relay&& rhs);
-  Relay& operator=(Relay&& rhs);
+  Relay(Relay&&) = default;
+  Relay& operator=(Relay&&) = default;
 
   /**
    * Set the relay state.
@@ -98,8 +100,8 @@ class Relay : public MotorSafety, public SendableBase {
   int m_channel;
   Direction m_direction;
 
-  HAL_RelayHandle m_forwardHandle = HAL_kInvalidHandle;
-  HAL_RelayHandle m_reverseHandle = HAL_kInvalidHandle;
+  hal::Handle<HAL_RelayHandle> m_forwardHandle;
+  hal::Handle<HAL_RelayHandle> m_reverseHandle;
 };
 
 }  // namespace frc

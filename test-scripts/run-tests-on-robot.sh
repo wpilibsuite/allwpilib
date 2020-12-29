@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #*----------------------------------------------------------------------------*#
-#* Copyright (c) FIRST 2014. All Rights Reserved.							  *#
+#* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        *#
 #* Open Source Software - may be modified and shared by FRC teams. The code   *#
 #* must be accompanied by the FIRST BSD license file in the root directory of *#
-#* the project.															      *#
+#* the project.                                                               *#
 #*----------------------------------------------------------------------------*#
 
 # This file is intended to be run in the DEFAULT_TEST_DIR on the roboRIO.
@@ -17,12 +17,11 @@ source config.sh
 DEFAULT_TEST_DIR=${DEFAULT_DESTINATION_DIR}
 DEFAULT_PATH_TO_JRE=/usr/local/frc/JRE/bin/java
 
-usage="$(basename "$0") [-h] (java|cpp) name [-d test_dir] [-A] [arg] [arg]...
+usage="$(basename "$0") [-h] (java|cpp) [-d test_dir] [-A] [arg] [arg]...
 A script designed to run the integration tests.
 This script should only be run on the roborio.
 Where:
     -h    Show this help text
-    name  The name of the user trying to run the tests (used for driver station)
     -d    The directory where the tests have been placed.
           This is done to prevent overwriting an already running program.
           This scrip will automatically move the test into the ${DEFAULT_TEST_DIR}
@@ -42,12 +41,11 @@ fi
 
 LANGUAGE=none
 TEST_FILE=none
-NAME=$2
 TEST_DIR="$DEFAULT_TEST_DIR"
-# Begin searching for options from the third paramater on
-PARAM_ARGS=${@:3}
+# Begin searching for options from the second paramater on
+PARAM_ARGS=${@:2}
 # Where the test arguments start
-TEST_RUN_ARGS=${@:3}
+TEST_RUN_ARGS=${@:2}
 RUN_WITH_DEFAULT_ARGS=true
 DEFAULT_ARGS=""
 
@@ -70,10 +68,10 @@ else
     exit 1
 fi
 
-PARAM_COUNTER=2
+PARAM_COUNTER=1
 printf "Param Args ${PARAM_ARGS}\n"
 
-# Check for optional paramaters
+# Check for optional parameters
 while  getopts ':hmd:A' option $PARAM_ARGS ; do
     case "$option" in
     h)
@@ -105,7 +103,7 @@ if [[ "$RUN_WITH_DEFAULT_ARGS" == true ]]; then
     TEST_RUN_ARGS="${DEFAULT_ARGS} ${TEST_RUN_ARGS}"
 fi
 
-# Make sure at least two paramaters are passed or four if running with -d option
+# Make sure at least two parameters are passed or four if running with -d option
 if [[ $# -lt $PARAM_COUNTER ]]; then
     printf "Invalid arg count. Should be %s, was %s.\n" "${PARAM_COUNTER}" "$#"
     echo "$usage"

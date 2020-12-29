@@ -8,15 +8,11 @@ evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':cameraserver')
+evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
-
-def pubVersion = ''
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
+evaluationDependsOn(':wpilibOldCommands')
+evaluationDependsOn(':wpilibNewCommands')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'edu.wpi.first.wpilibc'
@@ -35,12 +31,16 @@ cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
+cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
+cppProjectZips.add(project(':wpilibOldCommands').cppHeadersZip)
+cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 
 doxygen {
-  executables {
-     doxygen version : '1.8.8'
-  }
+    executables {
+        doxygen version : '1.8.18',
+            baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+    }
 }
 
 doxygen {
@@ -51,9 +51,16 @@ doxygen {
         source it.source
     }
 
+    exclude 'Eigen/**'
+    exclude 'unsupported/**'
+    exclude 'units/**'
+    exclude 'uv.h'
+    exclude 'uv/**'
+
+
     extension_mapping 'inc=C++'
     project_name 'WPILibC++'
-    project_number pubVersion
+    project_number wpilibVersioning.version.get()
     javadoc_autobrief true
     recursive true
     quiet true
@@ -67,16 +74,16 @@ doxygen {
     use_mathjax true
     html_timestamp true
     generate_treeview true
+    extract_static true
 }
 
 tasks.register("zipCppDocs", Zip) {
-    baseName = zipBaseNameCpp
-    destinationDir = outputsFolder
+    archiveBaseName = zipBaseNameCpp
+    destinationDirectory = outputsFolder
     dependsOn doxygen
     from ("$buildDir/docs/doxygen/html")
     into '/'
 }
-
 
 // Java
 configurations {
@@ -97,27 +104,35 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 task generateJavaDocs(type: Javadoc) {
+    classpath += project(":wpimath").sourceSets.main.compileClasspath
     options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
-    options.addStringOption('Xdoclint:accessibility,html,missing,reference,syntax')
+    options.addBooleanOption "Xdoclint:html,missing,reference,syntax", true
     options.addBooleanOption('html5', true)
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
+    dependsOn project(':wpimath').generateNat
     source project(':hal').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
+    source project(':wpimath').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
+    source project(':wpilibOldCommands').sourceSets.main.java
+    source project(':wpilibNewCommands').sourceSets.main.java
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
+    options.encoding = 'UTF-8'
 
-    title = "WPILib API $pubVersion"
+    title = "WPILib API ${wpilibVersioning.version.get()}"
     ext.entryPoint = "$destinationDir/index.html"
 
     if (JavaVersion.current().isJava11Compatible()) {
-        options.addBooleanOption('-no-module-directories', true)
+        if (!JavaVersion.current().isJava12Compatible()) {
+            options.addBooleanOption('-no-module-directories', true)
+        }
         doLast {
             // This is a work-around for https://bugs.openjdk.java.net/browse/JDK-8211194. Can be removed once that issue is fixed on JDK's side
             // Since JDK 11, package-list is missing from javadoc output files and superseded by element-list file, but a lot of external tools still need it
@@ -128,18 +143,17 @@ task generateJavaDocs(type: Javadoc) {
 }
 
 tasks.register("zipJavaDocs", Zip) {
-    baseName = zipBaseNameJava
-    destinationDir = outputsFolder
+    archiveBaseName = zipBaseNameJava
+    destinationDirectory = outputsFolder
     dependsOn generateJavaDocs
     from ("$buildDir/docs/javadoc")
     into '/'
 }
 
-addTaskToCopyAllOutputs(zipCppDocs)
-addTaskToCopyAllOutputs(zipJavaDocs)
-
-build.dependsOn zipCppDocs
-build.dependsOn zipJavaDocs
+tasks.register("zipDocs") {
+    dependsOn zipCppDocs
+    dependsOn zipJavaDocs
+}
 
 apply plugin: 'maven-publish'
 
@@ -150,14 +164,14 @@ publishing {
 
             artifactId = "${baseArtifactIdJava}"
             groupId artifactGroupIdJava
-            version pubVersion
+            version wpilibVersioning.version.get()
         }
         cpp(MavenPublication) {
             artifact zipCppDocs
 
             artifactId = "${baseArtifactIdCpp}"
             groupId artifactGroupIdCpp
-            version pubVersion
+            version wpilibVersioning.version.get()
         }
     }
 }

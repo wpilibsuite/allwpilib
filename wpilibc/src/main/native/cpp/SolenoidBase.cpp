@@ -1,13 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/SolenoidBase.h"
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 #include <hal/Solenoid.h>
 
 using namespace frc;
@@ -16,7 +13,7 @@ int SolenoidBase::GetAll(int module) {
   int value = 0;
   int32_t status = 0;
   value = HAL_GetAllSolenoids(module, &status);
-  wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
+  wpi_setGlobalHALError(status);
   return value;
 }
 

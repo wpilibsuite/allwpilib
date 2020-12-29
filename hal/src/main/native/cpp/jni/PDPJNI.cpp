@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_PDPJNI.h"
 #include "hal/PDP.h"
 #include "hal/Ports.h"
 
-using namespace frc;
+using namespace hal;
 
 extern "C" {
 
@@ -96,6 +93,25 @@ Java_edu_wpi_first_hal_PDPJNI_getPDPChannelCurrent
   double current = HAL_GetPDPChannelCurrent(handle, channel, &status);
   CheckStatus(env, status, false);
   return current;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PDPJNI
+ * Method:    getPDPAllCurrents
+ * Signature: (I[D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PDPJNI_getPDPAllCurrents
+  (JNIEnv* env, jclass, jint handle, jdoubleArray jarr)
+{
+  double storage[16];
+  int32_t status = 0;
+  HAL_GetPDPAllChannelCurrents(handle, storage, &status);
+  if (!CheckStatus(env, status, false)) {
+    return;
+  }
+
+  env->SetDoubleArrayRegion(jarr, 0, 16, storage);
 }
 
 /*

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -25,7 +22,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  *             or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
  */
 @Deprecated
-@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
+@SuppressWarnings("PMD.GodClass")
 public class RobotDrive extends MotorSafety implements AutoCloseable {
   /**
    * The location of a motor on the robot for the purpose of driving.
@@ -169,15 +166,15 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
     final double rightOutput;
 
     if (!kArcadeRatioCurve_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
-          tInstances.kRobotDrive_ArcadeRatioCurve);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_ArcadeRatioCurve,
+          getNumMotors());
       kArcadeRatioCurve_Reported = true;
     }
     if (curve < 0) {
       double value = Math.log(-curve);
       double ratio = (value - m_sensitivity) / (value + m_sensitivity);
       if (ratio == 0) {
-        ratio = .0000000001;
+        ratio = 0.0000000001;
       }
       leftOutput = outputMagnitude / ratio;
       rightOutput = outputMagnitude;
@@ -185,7 +182,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
       double value = Math.log(curve);
       double ratio = (value - m_sensitivity) / (value + m_sensitivity);
       if (ratio == 0) {
-        ratio = .0000000001;
+        ratio = 0.0000000001;
       }
       leftOutput = outputMagnitude;
       rightOutput = outputMagnitude / ratio;
@@ -272,8 +269,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
     if (!kTank_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
-          tInstances.kRobotDrive_Tank);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_Tank,
+          getNumMotors());
       kTank_Reported = true;
     }
 
@@ -377,8 +374,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
   public void arcadeDrive(double moveValue, double rotateValue, boolean squaredInputs) {
     // local variables to hold the computed PWM values for the motors
     if (!kArcadeStandard_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
-          tInstances.kRobotDrive_ArcadeStandard);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_ArcadeStandard,
+          getNumMotors());
       kArcadeStandard_Reported = true;
     }
 
@@ -449,8 +446,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
     if (!kMecanumCartesian_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
-          tInstances.kRobotDrive_MecanumCartesian);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_MecanumCartesian,
+          getNumMotors());
       kMecanumCartesian_Reported = true;
     }
     // Negate y for the joystick.
@@ -490,8 +487,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
     if (!kMecanumPolar_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
-          tInstances.kRobotDrive_MecanumPolar);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_MecanumPolar,
+          getNumMotors());
       kMecanumPolar_Reported = true;
     }
     // Normalized for full power along the Cartesian axes.
@@ -644,11 +641,6 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    */
   public void setMaxOutput(double maxOutput) {
     m_maxOutput = maxOutput;
-  }
-
-  @Deprecated
-  public void free() {
-    close();
   }
 
   /**

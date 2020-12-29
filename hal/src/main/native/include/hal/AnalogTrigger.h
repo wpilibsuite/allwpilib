@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -37,11 +34,17 @@ extern "C" {
  * Initializes an analog trigger.
  *
  * @param portHandle the analog input to use for triggering
- * @param index      the trigger index value (output)
  * @return           the created analog trigger handle
  */
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
-    HAL_AnalogInputHandle portHandle, int32_t* index, int32_t* status);
+    HAL_AnalogInputHandle portHandle, int32_t* status);
+
+/**
+ * Initializes an analog trigger with a Duty Cycle input
+ *
+ */
+HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
+    HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);
 
 /**
  * Frees an analog trigger.
@@ -54,7 +57,8 @@ void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
 /**
  * Sets the raw ADC upper and lower limits of the analog trigger.
  *
- * HAL_SetAnalogTriggerLimitsVoltage is likely better in most cases.
+ * HAL_SetAnalogTriggerLimitsVoltage or HAL_SetAnalogTriggerLimitsDutyCycle
+ * is likely better in most cases.
  *
  * @param analogTriggerHandle the trigger handle
  * @param lower               the lower ADC value
@@ -77,11 +81,18 @@ void HAL_SetAnalogTriggerLimitsVoltage(
     HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
     int32_t* status);
 
+void HAL_SetAnalogTriggerLimitsDutyCycle(
+    HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
+    int32_t* status);
+
 /**
  * Configures the analog trigger to use the averaged vs. raw values.
  *
  * If the value is true, then the averaged value is selected for the analog
  * trigger, otherwise the immediate value is used.
+ *
+ * This is not allowed to be used if filtered mode is set.
+ * This is not allowed to be used with Duty Cycle based inputs.
  *
  * @param analogTriggerHandle the trigger handle
  * @param useAveragedValue    true to use averaged values, false for raw
@@ -95,6 +106,8 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
  * The analog trigger will operate with a 3 point average rejection filter. This
  * is designed to help with 360 degree pot applications for the period where the
  * pot crosses through zero.
+ *
+ * This is not allowed to be used if averaged mode is set.
  *
  * @param analogTriggerHandle the trigger handle
  * @param useFilteredValue    true to use filtered values, false for average or
@@ -137,6 +150,15 @@ HAL_Bool HAL_GetAnalogTriggerTriggerState(
 HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
                                     HAL_AnalogTriggerType type,
                                     int32_t* status);
+
+/**
+ * Get the FPGA index for the AnlogTrigger.
+ *
+ * @param analogTriggerHandle the trigger handle
+ * @return the FPGA index
+ */
+int32_t HAL_GetAnalogTriggerFPGAIndex(
+    HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

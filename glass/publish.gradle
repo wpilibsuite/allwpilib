@@ -1,0 +1,90 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = 'Glass'
+def artifactGroupId = 'edu.wpi.first.tools'
+def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_Glass_CLS'
+
+model {
+    publishing {
+        def tasks = []
+        $.components.each { component ->
+            component.binaries.each { binary ->
+                if (binary in NativeExecutableBinarySpec && binary.component.name.contains("glassApp")) {
+                    if (binary.buildable && binary.name.contains("Release")) {
+                        // We are now in the binary that we want.
+                        // This is the default application path for the ZIP task.
+                        def applicationPath = binary.executable.file
+                        def icon = file("$project.projectDir/src/app/native/mac/glass.icns")
+
+                        // Create the macOS bundle.
+                        def bundleTask = project.tasks.create("bundleGlassOsxApp", Copy) {
+                            description("Creates a macOS application bundle for Glass")
+                            from(file("$project.projectDir/Info.plist"))
+                            into(file("$project.buildDir/outputs/bundles/Glass.app/Contents"))
+                            into("MacOS") { with copySpec { from binary.executable.file } }
+                            into("Resources") { with copySpec { from icon } }
+
+                            doLast {
+                                if (project.hasProperty("developerID")) {
+                                    // Get path to binary.
+                                    exec {
+                                        workingDir rootDir
+                                        def args = ["sh", "-c", "codesign --force --strict --deep " +
+                                                "--timestamp --options=runtime " +
+                                                "--verbose -s ${project.findProperty("developerID")} " +
+                                                "$project.buildDir/outputs/bundles/Glass.app/"]
+                                        commandLine args
+                                    }
+                                }
+                            }
+                        }
+
+                        // Reset the application path if we are creating a bundle.
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            applicationPath = file("$project.buildDir/outputs/bundles")
+                            project.build.dependsOn bundleTask
+                        }
+
+                        // Create the ZIP.
+                        def outputsFolder = file("$project.buildDir/outputs")
+                        def task = project.tasks.create("copyGlassExecutable", Zip) {
+                            description("Copies the Glass executable to the outputs directory.")
+                            destinationDir(outputsFolder)
+
+                            archiveBaseName = '_M_' + zipBaseName
+                            duplicatesStrategy = 'exclude'
+                            classifier = nativeUtils.getPublishClassifier(binary)
+
+                            from(licenseFile) {
+                                into '/'
+                            }
+
+                            from(applicationPath)
+                            into(nativeUtils.getPlatformPath(binary))
+                        }
+
+                        if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+                            bundleTask.dependsOn binary.tasks.link
+                            task.dependsOn(bundleTask)
+                        }
+
+                        task.dependsOn binary.tasks.link
+                        tasks.add(task)
+                        project.build.dependsOn task
+                        project.artifacts { task }
+                        addTaskToCopyAllOutputs(task)
+                    }
+                }
+            }
+        }
+
+        publications {
+            cpp(MavenPublication) {
+                tasks.each { artifact it }
+                artifactId = baseArtifactId
+                groupId = artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}

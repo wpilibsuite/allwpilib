@@ -1,12 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#ifndef NT_RPCCALL_INL_
-#define NT_RPCCALL_INL_
+#ifndef NTCORE_NETWORKTABLES_RPCCALL_INL_
+#define NTCORE_NETWORKTABLES_RPCCALL_INL_
+
+#include <string>
+#include <utility>
 
 #include "ntcore_cpp.h"
 
@@ -18,7 +18,8 @@ inline RpcCall::RpcCall(RpcCall&& other) noexcept : RpcCall() {
 
 inline RpcCall::~RpcCall() {
   // automatically cancel result if user didn't request it
-  if (m_call != 0) CancelResult();
+  if (m_call != 0)
+    CancelResult();
 }
 
 inline bool RpcCall::GetResult(std::string* result) {
@@ -45,4 +46,4 @@ inline void RpcCall::CancelResult() {
 
 }  // namespace nt
 
-#endif  // NT_RPCCALL_INL_
+#endif  // NTCORE_NETWORKTABLES_RPCCALL_INL_

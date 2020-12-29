@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -11,9 +8,12 @@
 
 #include "frc/ErrorBase.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class for operating a compressor connected to a %PCM (Pneumatic Control
@@ -30,7 +30,9 @@ namespace frc {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public ErrorBase, public SendableBase {
+class Compressor : public ErrorBase,
+                   public Sendable,
+                   public SendableHelper<Compressor> {
  public:
   /**
    * Constructor. The default PCM ID is 0.
@@ -166,10 +168,17 @@ class Compressor : public ErrorBase, public SendableBase {
    */
   void ClearAllPCMStickyFaults();
 
+  /**
+   * Gets module number (CAN ID).
+   *
+   * @return Module number
+   */
+  int GetModule() const;
+
   void InitSendable(SendableBuilder& builder) override;
 
  protected:
-  HAL_CompressorHandle m_compressorHandle = HAL_kInvalidHandle;
+  hal::Handle<HAL_CompressorHandle> m_compressorHandle;
 
  private:
   void SetCompressor(bool on);

@@ -1,22 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
- * The wrist subsystem is like the elevator, but with a rotational joint instead
- * of a linear joint.
+ * The wrist subsystem is like the elevator, but with a rotational joint instead of a linear joint.
  */
 public class Wrist extends PIDSubsystem {
   private final Victor m_motor;
@@ -29,11 +26,11 @@ public class Wrist extends PIDSubsystem {
    * Create a new wrist subsystem.
    */
   public Wrist() {
-    super(kP_real, 0, 0);
+    super(new PIDController(kP_real, 0, 0));
     if (Robot.isSimulation()) { // Check for simulation and update PID values
-      getPIDController().setPID(kP_simulation, 0, 0, 0);
+      getController().setPID(kP_simulation, 0, 0);
     }
-    setAbsoluteTolerance(2.5);
+    getController().setTolerance(2.5);
 
     m_motor = new Victor(6);
 
@@ -50,32 +47,34 @@ public class Wrist extends PIDSubsystem {
     addChild("Pot", m_pot);
   }
 
-  @Override
-  public void initDefaultCommand() {
-  }
-
   /**
    * The log method puts interesting information to the SmartDashboard.
    */
   public void log() {
-    SmartDashboard.putData("Wrist Angle", (AnalogPotentiometer) m_pot);
+    SmartDashboard.putData("Wrist Angle", m_pot);
   }
 
   /**
-   * Use the potentiometer as the PID sensor. This method is automatically
-   * called by the subsystem.
+   * Use the potentiometer as the PID sensor. This method is automatically called by the subsystem.
    */
   @Override
-  protected double returnPIDInput() {
+  public double getMeasurement() {
     return m_pot.get();
   }
 
   /**
-   * Use the motor as the PID output. This method is automatically called by
-   * the subsystem.
+   * Use the motor as the PID output. This method is automatically called by the subsystem.
    */
   @Override
-  protected void usePIDOutput(double power) {
-    m_motor.set(power);
+  public void useOutput(double output, double setpoint) {
+    m_motor.set(output);
+  }
+
+  /**
+   * Call log method every loop.
+   */
+  @Override
+  public void periodic() {
+    log();
   }
 }

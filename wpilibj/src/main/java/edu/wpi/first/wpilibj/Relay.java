@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -15,6 +12,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.RelayJNI;
 import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -32,6 +30,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * This class represents errors in trying to set relay values contradictory to the direction to
    * which the relay is set.
    */
+  @SuppressWarnings("serial")
   public static class InvalidValueException extends RuntimeException {
     /**
      * Create a new exception with the given message.
@@ -93,8 +92,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   private Direction m_direction;
 
-  private final SendableImpl m_sendableImpl;
-
   /**
    * Common relay initialization method. This code is common to all Relay constructors and
    * initializes the relay and reserves all resources that need to be locked. Initially the relay is
@@ -106,7 +103,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
     int portHandle = HAL.getPort((byte) m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
       m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);
-      HAL.report(tResourceType.kResourceType_Relay, m_channel);
+      HAL.report(tResourceType.kResourceType_Relay, m_channel + 1);
     }
     if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
       m_reverseHandle = RelayJNI.initializeRelayPort(portHandle, false);
@@ -115,7 +112,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
     setSafetyEnabled(false);
 
-    setName("Relay", m_channel);
+    SendableRegistry.addLW(this, "Relay", m_channel);
   }
 
   /**
@@ -125,8 +122,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    * @param direction The direction that the Relay object will control.
    */
   public Relay(final int channel, Direction direction) {
-    m_sendableImpl = new SendableImpl(true);
-
     m_channel = channel;
     m_direction = requireNonNullParam(direction, "direction", "Relay");
     initRelay();
@@ -144,7 +139,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   @Override
   public void close() {
-    m_sendableImpl.close();
+    SendableRegistry.remove(this);
     freeRelay();
   }
 
@@ -165,56 +160,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
     m_forwardHandle = 0;
     m_reverseHandle = 0;
-  }
-
-  @Override
-  public final synchronized String getName() {
-    return m_sendableImpl.getName();
-  }
-
-  @Override
-  public final synchronized void setName(String name) {
-    m_sendableImpl.setName(name);
-  }
-
-  /**
-   * Sets the name of the sensor with a channel number.
-   *
-   * @param moduleType A string that defines the module name in the label for the value
-   * @param channel    The channel number the device is plugged into
-   */
-  protected final void setName(String moduleType, int channel) {
-    m_sendableImpl.setName(moduleType, channel);
-  }
-
-  /**
-   * Sets the name of the sensor with a module and channel number.
-   *
-   * @param moduleType   A string that defines the module name in the label for the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually PWM)
-   */
-  protected final void setName(String moduleType, int moduleNumber, int channel) {
-    m_sendableImpl.setName(moduleType, moduleNumber, channel);
-  }
-
-  @Override
-  public final synchronized String getSubsystem() {
-    return m_sendableImpl.getSubsystem();
-  }
-
-  @Override
-  public final synchronized void setSubsystem(String subsystem) {
-    m_sendableImpl.setSubsystem(subsystem);
-  }
-
-  /**
-   * Add a child component.
-   *
-   * @param child child component
-   */
-  protected final void addChild(Object child) {
-    m_sendableImpl.addChild(child);
   }
 
   /**

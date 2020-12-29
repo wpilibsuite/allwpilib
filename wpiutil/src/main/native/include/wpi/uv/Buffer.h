@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_UV_BUFFER_H_
 #define WPIUTIL_WPI_UV_BUFFER_H_
@@ -107,6 +104,7 @@ class SimpleBufferPool {
    * @param size Size of each buffer to allocate.
    */
   explicit SimpleBufferPool(size_t size = 4096) : m_size{size} {}
+  ~SimpleBufferPool() { Clear(); }
 
   SimpleBufferPool(const SimpleBufferPool& other) = delete;
   SimpleBufferPool& operator=(const SimpleBufferPool& other) = delete;
@@ -115,7 +113,9 @@ class SimpleBufferPool {
    * Allocate a buffer.
    */
   Buffer Allocate() {
-    if (m_pool.empty()) return Buffer::Allocate(m_size);
+    if (m_pool.empty()) {
+      return Buffer::Allocate(m_size);
+    }
     auto buf = m_pool.back();
     m_pool.pop_back();
     buf.len = m_size;
@@ -133,14 +133,18 @@ class SimpleBufferPool {
    * allocated with the same size as the buffer pool allocation size.
    */
   void Release(MutableArrayRef<Buffer> bufs) {
-    for (auto& buf : bufs) m_pool.emplace_back(buf.Move());
+    for (auto& buf : bufs) {
+      m_pool.emplace_back(buf.Move());
+    }
   }
 
   /**
    * Clear the pool, releasing all buffers.
    */
   void Clear() {
-    for (auto& buf : m_pool) buf.Deallocate();
+    for (auto& buf : m_pool) {
+      buf.Deallocate();
+    }
     m_pool.clear();
   }
 

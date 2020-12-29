@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -62,7 +59,7 @@ class ShuffleboardWidget : public ShuffleboardComponent<Derived> {
    * Sets the type of widget used to display the data. If not set, the default
    * widget type will be used. This method should only be used to use a widget
    * that does not come built into Shuffleboard (i.e. one that comes with a
-   * custom or thrid-party plugin). To use a widget that is built into
+   * custom or third-party plugin). To use a widget that is built into
    * Shuffleboard, use {@link #withWidget(WidgetType)} and {@link
    * BuiltInWidgets}.
    *

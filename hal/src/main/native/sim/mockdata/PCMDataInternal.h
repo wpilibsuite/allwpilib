@@ -1,20 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include "../PortsInternal.h"
-#include "mockdata/PCMData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/PCMData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class PCMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidOutput)
+  HAL_SIMDATAVALUE_DEFINE_NAME(AnySolenoidInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorOn)
   HAL_SIMDATAVALUE_DEFINE_NAME(ClosedLoopEnabled)
@@ -31,21 +29,24 @@ class PCMData {
   }
 
  public:
-  SimDataValue<HAL_Bool, MakeBoolean, GetSolenoidInitializedName,
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidInitializedName,
                GetSolenoidInitializedDefault>
       solenoidInitialized[kNumSolenoidChannels];
-  SimDataValue<HAL_Bool, MakeBoolean, GetSolenoidOutputName,
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidOutputName,
                GetSolenoidOutputDefault>
       solenoidOutput[kNumSolenoidChannels];
-  SimDataValue<HAL_Bool, MakeBoolean, GetCompressorInitializedName>
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetAnySolenoidInitializedName>
+      anySolenoidInitialized{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorInitializedName>
       compressorInitialized{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetCompressorOnName> compressorOn{false};
-  SimDataValue<HAL_Bool, MakeBoolean, GetClosedLoopEnabledName>
-      closedLoopEnabled{true};
-  SimDataValue<HAL_Bool, MakeBoolean, GetPressureSwitchName> pressureSwitch{
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorOnName> compressorOn{
       false};
-  SimDataValue<double, MakeDouble, GetCompressorCurrentName> compressorCurrent{
-      0.0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetClosedLoopEnabledName>
+      closedLoopEnabled{true};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetPressureSwitchName> pressureSwitch{
+      false};
+  SimDataValue<double, HAL_MakeDouble, GetCompressorCurrentName>
+      compressorCurrent{0.0};
 
   virtual void ResetData();
 };

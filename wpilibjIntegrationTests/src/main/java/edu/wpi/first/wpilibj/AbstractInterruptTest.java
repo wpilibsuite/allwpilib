@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -137,7 +134,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
     // Delay until the interrupt is complete
     while (!function.m_interruptComplete.get()) {
-      Timer.delay(.005);
+      Timer.delay(0.005);
     }
 
 
@@ -161,7 +158,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   }
 
   @Test(timeout = 2000)
-  public void testMultipleInterruptsTriggering() throws Exception {
+  public void testMultipleInterruptsTriggering() {
     // Given
     final InterruptCounter counter = new InterruptCounter();
     TestInterruptHandlerFunction function = new TestInterruptHandlerFunction(counter);
@@ -176,7 +173,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
       setInterruptHigh();
       // Wait for the interrupt to complete before moving on
       while (!function.m_interruptComplete.getAndSet(false)) {
-        Timer.delay(.005);
+        Timer.delay(0.005);
       }
     }
     // Then
@@ -194,7 +191,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     // Given
     getInterruptable().requestInterrupts();
 
-    final double synchronousDelay = synchronousTimeout / 2.;
+    final double synchronousDelay = synchronousTimeout / 2.0;
     final Runnable runnable = () -> {
       Timer.delay(synchronousDelay);
       setInterruptLow();
@@ -215,7 +212,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     // The test will not have timed out and:
     final double interruptRunTime = (stopTimeStamp - startTimeStamp) * 1e-6;
     assertEquals("The interrupt did not run for the expected amount of time (units in seconds)",
-        synchronousDelay, interruptRunTime, .1);
+        synchronousDelay, interruptRunTime, 0.1);
   }
 
   @Test(timeout = (long) (synchronousTimeout * 1e3))
@@ -236,7 +233,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     // Given
     getInterruptable().requestInterrupts();
 
-    final double synchronousDelay = synchronousTimeout / 2.;
+    final double synchronousDelay = synchronousTimeout / 2.0;
     final Runnable runnable = () -> {
       Timer.delay(synchronousDelay);
       setInterruptLow();
@@ -258,7 +255,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     getInterruptable().requestInterrupts();
     getInterruptable().setUpSourceEdge(false, true);
 
-    final double synchronousDelay = synchronousTimeout / 2.;
+    final double synchronousDelay = synchronousTimeout / 2.0;
     final Runnable runnable = () -> {
       Timer.delay(synchronousDelay);
       setInterruptHigh();
@@ -290,7 +287,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
       setInterruptHigh();
       // Wait for the interrupt to complete before moving on
       while (!function.m_interruptComplete.getAndSet(false)) {
-        Timer.delay(.005);
+        Timer.delay(0.005);
       }
     }
     getInterruptable().disableInterrupts();
@@ -300,7 +297,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
       setInterruptLow();
       setInterruptHigh();
       // Just wait because the interrupt should not fire
-      Timer.delay(.005);
+      Timer.delay(0.005);
     }
 
     // Then

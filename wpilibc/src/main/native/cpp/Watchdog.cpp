@@ -1,22 +1,27 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Watchdog.h"
 
+#include <atomic>
+
+#include <hal/Notifier.h>
 #include <wpi/Format.h>
-#include <wpi/PriorityQueue.h>
+#include <wpi/SmallString.h>
+#include <wpi/priority_queue.h>
 #include <wpi/raw_ostream.h>
+
+#include "frc/DriverStation.h"
+#include "frc2/Timer.h"
 
 using namespace frc;
 
-constexpr std::chrono::milliseconds Watchdog::kMinPrintPeriod;
-
-class Watchdog::Thread : public wpi::SafeThread {
+class Watchdog::Impl {
  public:
+  Impl();
+  ~Impl();
+
   template <typename T>
   struct DerefGreater {
     constexpr bool operator()(const T& lhs, const T& rhs) const {
@@ -24,159 +29,218 @@ class Watchdog::Thread : public wpi::SafeThread {
     }
   };
 
-  wpi::PriorityQueue<Watchdog*, std::vector<Watchdog*>, DerefGreater<Watchdog*>>
+  wpi::mutex m_mutex;
+  std::atomic<HAL_NotifierHandle> m_notifier;
+  wpi::priority_queue<Watchdog*, std::vector<Watchdog*>,
+                      DerefGreater<Watchdog*>>
       m_watchdogs;
 
+  void UpdateAlarm();
+
  private:
-  void Main() override;
+  void Main();
+
+  std::thread m_thread;
 };
 
-void Watchdog::Thread::Main() {
-  std::unique_lock lock(m_mutex);
+Watchdog::Impl::Impl() {
+  int32_t status = 0;
+  m_notifier = HAL_InitializeNotifier(&status);
+  wpi_setGlobalHALError(status);
+  HAL_SetNotifierName(m_notifier, "Watchdog", &status);
 
-  while (m_active) {
-    if (m_watchdogs.size() > 0) {
-      if (m_cond.wait_until(lock, m_watchdogs.top()->m_expirationTime) ==
-          std::cv_status::timeout) {
-        if (m_watchdogs.size() == 0 ||
-            m_watchdogs.top()->m_expirationTime > hal::fpga_clock::now()) {
-          continue;
-        }
+  m_thread = std::thread([=] { Main(); });
+}
 
-        // If the condition variable timed out, that means a Watchdog timeout
-        // has occurred, so call its timeout function.
-        auto watchdog = m_watchdogs.top();
-        m_watchdogs.pop();
+Watchdog::Impl::~Impl() {
+  int32_t status = 0;
+  // atomically set handle to 0, then clean
+  HAL_NotifierHandle handle = m_notifier.exchange(0);
+  HAL_StopNotifier(handle, &status);
+  wpi_setGlobalHALError(status);
 
-        auto now = hal::fpga_clock::now();
-        if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
-          watchdog->m_lastTimeoutPrintTime = now;
-          if (!watchdog->m_suppressTimeoutMessage) {
-            wpi::outs() << "Watchdog not fed within "
-                        << wpi::format("%.6f",
-                                       watchdog->m_timeout.count() / 1.0e6)
-                        << "s\n";
-          }
-        }
+  // Join the thread to ensure the handler has exited.
+  if (m_thread.joinable()) {
+    m_thread.join();
+  }
 
-        // Set expiration flag before calling the callback so any manipulation
-        // of the flag in the callback (e.g., calling Disable()) isn't
-        // clobbered.
-        watchdog->m_isExpired = true;
+  HAL_CleanNotifier(handle, &status);
+}
 
-        lock.unlock();
-        watchdog->m_callback();
-        lock.lock();
-      }
-      // Otherwise, a Watchdog removed itself from the queue (it notifies the
-      // scheduler of this) or a spurious wakeup occurred, so just rewait with
-      // the soonest watchdog timeout.
-    } else {
-      m_cond.wait(lock, [&] { return m_watchdogs.size() > 0 || !m_active; });
+void Watchdog::Impl::UpdateAlarm() {
+  int32_t status = 0;
+  // Return if we are being destructed, or were not created successfully
+  auto notifier = m_notifier.load();
+  if (notifier == 0) {
+    return;
+  }
+  if (m_watchdogs.empty()) {
+    HAL_CancelNotifierAlarm(notifier, &status);
+  } else {
+    HAL_UpdateNotifierAlarm(
+        notifier,
+        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.to<double>() *
+                              1e6),
+        &status);
+  }
+  wpi_setGlobalHALError(status);
+}
+
+void Watchdog::Impl::Main() {
+  for (;;) {
+    int32_t status = 0;
+    HAL_NotifierHandle notifier = m_notifier.load();
+    if (notifier == 0) {
+      break;
     }
+    uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
+    if (curTime == 0 || status != 0) {
+      break;
+    }
+
+    std::unique_lock lock(m_mutex);
+
+    if (m_watchdogs.empty()) {
+      continue;
+    }
+
+    // If the condition variable timed out, that means a Watchdog timeout
+    // has occurred, so call its timeout function.
+    auto watchdog = m_watchdogs.pop();
+
+    units::second_t now{curTime * 1e-6};
+    if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
+      watchdog->m_lastTimeoutPrintTime = now;
+      if (!watchdog->m_suppressTimeoutMessage) {
+        wpi::SmallString<128> buf;
+        wpi::raw_svector_ostream err(buf);
+        err << "Watchdog not fed within "
+            << wpi::format("%.6f", watchdog->m_timeout.to<double>()) << "s\n";
+        frc::DriverStation::ReportWarning(err.str());
+      }
+    }
+
+    // Set expiration flag before calling the callback so any manipulation
+    // of the flag in the callback (e.g., calling Disable()) isn't
+    // clobbered.
+    watchdog->m_isExpired = true;
+
+    lock.unlock();
+    watchdog->m_callback();
+    lock.lock();
+
+    UpdateAlarm();
   }
 }
 
 Watchdog::Watchdog(double timeout, std::function<void()> callback)
-    : m_timeout(static_cast<int64_t>(timeout * 1.0e6)),
-      m_callback(callback),
-      m_owner(&GetThreadOwner()) {}
+    : Watchdog(units::second_t{timeout}, callback) {}
 
-Watchdog::~Watchdog() { Disable(); }
+Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
+    : m_timeout(timeout), m_callback(callback), m_impl(GetImpl()) {}
+
+Watchdog::~Watchdog() {
+  Disable();
+}
+
+Watchdog::Watchdog(Watchdog&& rhs) {
+  *this = std::move(rhs);
+}
+
+Watchdog& Watchdog::operator=(Watchdog&& rhs) {
+  m_impl = rhs.m_impl;
+  std::scoped_lock lock(m_impl->m_mutex);
+  m_startTime = rhs.m_startTime;
+  m_timeout = rhs.m_timeout;
+  m_expirationTime = rhs.m_expirationTime;
+  m_callback = std::move(rhs.m_callback);
+  m_lastTimeoutPrintTime = rhs.m_lastTimeoutPrintTime;
+  m_suppressTimeoutMessage = rhs.m_suppressTimeoutMessage;
+  m_tracer = std::move(rhs.m_tracer);
+  m_isExpired = rhs.m_isExpired;
+  if (m_expirationTime != 0_s) {
+    m_impl->m_watchdogs.remove(&rhs);
+    m_impl->m_watchdogs.emplace(this);
+  }
+  return *this;
+}
 
 double Watchdog::GetTime() const {
-  return (hal::fpga_clock::now() - m_startTime).count() / 1.0e6;
+  return (frc2::Timer::GetFPGATimestamp() - m_startTime).to<double>();
 }
 
 void Watchdog::SetTimeout(double timeout) {
-  m_startTime = hal::fpga_clock::now();
-  m_epochs.clear();
+  SetTimeout(units::second_t{timeout});
+}
 
-  // Locks mutex
-  auto thr = m_owner->GetThread();
-  if (!thr) return;
+void Watchdog::SetTimeout(units::second_t timeout) {
+  m_startTime = frc2::Timer::GetFPGATimestamp();
+  m_tracer.ClearEpochs();
 
-  m_timeout = std::chrono::microseconds(static_cast<int64_t>(timeout * 1.0e6));
+  std::scoped_lock lock(m_impl->m_mutex);
+  m_timeout = timeout;
   m_isExpired = false;
 
-  thr->m_watchdogs.remove(this);
+  m_impl->m_watchdogs.remove(this);
   m_expirationTime = m_startTime + m_timeout;
-  thr->m_watchdogs.emplace(this);
-  thr->m_cond.notify_all();
+  m_impl->m_watchdogs.emplace(this);
+  m_impl->UpdateAlarm();
 }
 
 double Watchdog::GetTimeout() const {
-  // Locks mutex
-  auto thr = m_owner->GetThread();
-
-  return m_timeout.count() / 1.0e6;
+  std::scoped_lock lock(m_impl->m_mutex);
+  return m_timeout.to<double>();
 }
 
 bool Watchdog::IsExpired() const {
-  // Locks mutex
-  auto thr = m_owner->GetThread();
-
+  std::scoped_lock lock(m_impl->m_mutex);
   return m_isExpired;
 }
 
 void Watchdog::AddEpoch(wpi::StringRef epochName) {
-  auto currentTime = hal::fpga_clock::now();
-  m_epochs[epochName] = currentTime - m_startTime;
-  m_startTime = currentTime;
+  m_tracer.AddEpoch(epochName);
 }
 
 void Watchdog::PrintEpochs() {
-  auto now = hal::fpga_clock::now();
-  if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
-    m_lastEpochsPrintTime = now;
-    for (const auto& epoch : m_epochs) {
-      wpi::outs() << '\t' << epoch.getKey() << ": "
-                  << wpi::format("%.6f", epoch.getValue().count() / 1.0e6)
-                  << "s\n";
-    }
-  }
+  m_tracer.PrintEpochs();
 }
 
-void Watchdog::Reset() { Enable(); }
+void Watchdog::Reset() {
+  Enable();
+}
 
 void Watchdog::Enable() {
-  m_startTime = hal::fpga_clock::now();
-  m_epochs.clear();
+  m_startTime = frc2::Timer::GetFPGATimestamp();
+  m_tracer.ClearEpochs();
 
-  // Locks mutex
-  auto thr = m_owner->GetThread();
-  if (!thr) return;
-
+  std::scoped_lock lock(m_impl->m_mutex);
   m_isExpired = false;
 
-  thr->m_watchdogs.remove(this);
+  m_impl->m_watchdogs.remove(this);
   m_expirationTime = m_startTime + m_timeout;
-  thr->m_watchdogs.emplace(this);
-  thr->m_cond.notify_all();
+  m_impl->m_watchdogs.emplace(this);
+  m_impl->UpdateAlarm();
 }
 
 void Watchdog::Disable() {
-  // Locks mutex
-  auto thr = m_owner->GetThread();
-  if (!thr) return;
+  std::scoped_lock lock(m_impl->m_mutex);
 
-  thr->m_watchdogs.remove(this);
-  thr->m_cond.notify_all();
+  if (m_expirationTime != 0_s) {
+    m_impl->m_watchdogs.remove(this);
+    m_expirationTime = 0_s;
+    m_impl->UpdateAlarm();
+  }
 }
 
 void Watchdog::SuppressTimeoutMessage(bool suppress) {
   m_suppressTimeoutMessage = suppress;
 }
 
-bool Watchdog::operator>(const Watchdog& rhs) {
+bool Watchdog::operator>(const Watchdog& rhs) const {
   return m_expirationTime > rhs.m_expirationTime;
 }
 
-wpi::SafeThreadOwner<Watchdog::Thread>& Watchdog::GetThreadOwner() {
-  static wpi::SafeThreadOwner<Thread> inst = [] {
-    wpi::SafeThreadOwner<Watchdog::Thread> inst;
-    inst.Start();
-    return inst;
-  }();
-  return inst;
+Watchdog::Impl* Watchdog::GetImpl() {
+  static Impl inst;
+  return &inst;
 }

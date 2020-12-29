@@ -1,25 +1,22 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AccelerometerJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.sim.AccelerometerSim;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Built-in accelerometer.
  *
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer extends SendableBase implements Accelerometer {
+public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoCloseable {
   /**
    * Constructor.
    *
@@ -28,7 +25,7 @@ public class BuiltInAccelerometer extends SendableBase implements Accelerometer 
   public BuiltInAccelerometer(Range range) {
     setRange(range);
     HAL.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
-    setName("BuiltInAccel", 0);
+    SendableRegistry.addLW(this, "BuiltInAccel", 0);
   }
 
   /**
@@ -36,6 +33,11 @@ public class BuiltInAccelerometer extends SendableBase implements Accelerometer 
    */
   public BuiltInAccelerometer() {
     this(Range.k8G);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   @Override
@@ -97,9 +99,5 @@ public class BuiltInAccelerometer extends SendableBase implements Accelerometer 
     builder.addDoubleProperty("X", this::getX, null);
     builder.addDoubleProperty("Y", this::getY, null);
     builder.addDoubleProperty("Z", this::getZ, null);
-  }
-
-  public AccelerometerSim getSimObject() {
-    return new AccelerometerSim();
   }
 }

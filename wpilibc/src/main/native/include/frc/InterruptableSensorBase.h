@@ -1,24 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <atomic>
 #include <functional>
+#include <memory>
 
 #include <hal/Interrupts.h>
 
 #include "frc/AnalogTriggerType.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
 
 namespace frc {
 
-class InterruptableSensorBase : public ErrorBase, public SendableBase {
+class InterruptableSensorBase : public ErrorBase {
  public:
   enum WaitResult {
     kTimeout = 0x0,
@@ -41,8 +37,8 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
    */
   virtual ~InterruptableSensorBase();
 
-  InterruptableSensorBase(InterruptableSensorBase&&);
-  InterruptableSensorBase& operator=(InterruptableSensorBase&&);
+  InterruptableSensorBase(InterruptableSensorBase&&) = default;
+  InterruptableSensorBase& operator=(InterruptableSensorBase&&) = default;
 
   virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
@@ -116,9 +112,8 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
   /**
    * Return the timestamp for the rising interrupt that occurred most recently.
    *
-   * This is in the same time domain as GetClock().
-   * The rising-edge interrupt should be enabled with
-   * {@link #DigitalInput.SetUpSourceEdge}
+   * This is in the same time domain as GetClock(). The rising-edge interrupt
+   * should be enabled with SetUpSourceEdge().
    *
    * @return Timestamp in seconds since boot.
    */
@@ -144,8 +139,8 @@ class InterruptableSensorBase : public ErrorBase, public SendableBase {
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  // atomic for proper destruction
-  std::atomic<HAL_InterruptHandle> m_interrupt{HAL_kInvalidHandle};
+  hal::Handle<HAL_InterruptHandle> m_interrupt;
+  std::unique_ptr<InterruptEventHandler> m_interruptHandler{nullptr};
 
   void AllocateInterrupts(bool watcher);
 };

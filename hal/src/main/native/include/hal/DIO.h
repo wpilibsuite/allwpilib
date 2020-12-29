@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -40,6 +37,14 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
 HAL_Bool HAL_CheckDIOChannel(int32_t channel);
 
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle);
+
+/**
+ * Indicates the DIO channel is used by a simulated device.
+ *
+ * @param handle the DIO channel handle
+ * @param device simulated device handle
+ */
+void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device);
 
 /**
  * Allocates a DO PWM Generator.

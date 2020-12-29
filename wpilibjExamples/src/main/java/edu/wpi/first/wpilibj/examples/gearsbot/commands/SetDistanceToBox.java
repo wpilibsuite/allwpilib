@@ -1,18 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
+
 
 /**
  * Drive until the robot is the given distance away from the box. Uses a local
@@ -20,58 +16,36 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * command is running. The input is the averaged values of the left and right
  * encoders.
  */
-public class SetDistanceToBox extends Command {
-  private final PIDController m_pid;
+public class SetDistanceToBox extends PIDCommand {
+  private final DriveTrain m_drivetrain;
 
   /**
    * Create a new set distance to box command.
+   *
    * @param distance The distance away from the box to drive to
    */
-  public SetDistanceToBox(double distance) {
-    requires(Robot.m_drivetrain);
-    m_pid = new PIDController(-2, 0, 0, new PIDSource() {
-      PIDSourceType m_sourceType = PIDSourceType.kDisplacement;
+  public SetDistanceToBox(double distance, DriveTrain drivetrain) {
+    super(new PIDController(-2, 0, 0),
+        drivetrain::getDistanceToObstacle, distance,
+        d -> drivetrain.drive(d, d));
 
-      @Override
-      public double pidGet() {
-        return Robot.m_drivetrain.getDistanceToObstacle();
-      }
+    m_drivetrain = drivetrain;
+    addRequirements(m_drivetrain);
 
-      @Override
-      public void setPIDSourceType(PIDSourceType pidSource) {
-        m_sourceType = pidSource;
-      }
-
-      @Override
-      public PIDSourceType getPIDSourceType() {
-        return m_sourceType;
-      }
-    }, d -> Robot.m_drivetrain.drive(d, d));
-
-    m_pid.setAbsoluteTolerance(0.01);
-    m_pid.setSetpoint(distance);
+    getController().setTolerance(0.01);
   }
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
+  public void initialize() {
     // Get everything in a safe starting state.
-    Robot.m_drivetrain.reset();
-    m_pid.reset();
-    m_pid.enable();
+    m_drivetrain.reset();
+    super.initialize();
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
-  protected boolean isFinished() {
-    return m_pid.onTarget();
-  }
-
-  // Called once after isFinished returns true
-  @Override
-  protected void end() {
-    // Stop PID and the wheels
-    m_pid.disable();
-    Robot.m_drivetrain.drive(0, 0);
+  public boolean isFinished() {
+    return getController().atSetpoint();
   }
 }

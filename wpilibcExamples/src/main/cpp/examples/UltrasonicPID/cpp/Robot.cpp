@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/AnalogInput.h>
-#include <frc/PIDController.h>
-#include <frc/PIDOutput.h>
+#include <frc/MedianFilter.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
+#include <frc/controller/PIDController.h>
 #include <frc/drive/DifferentialDrive.h>
 
 /**
@@ -23,34 +20,17 @@ class Robot : public frc::TimedRobot {
    * ultrasonic sensor.
    */
   void TeleopInit() override {
-    // Set expected range to 0-24 inches; e.g. at 24 inches from object go full
-    // forward, at 0 inches from object go full backward.
-    m_pidController.SetInputRange(0, 24 * kValueToInches);
-
     // Set setpoint of the PID Controller
     m_pidController.SetSetpoint(kHoldDistance * kValueToInches);
+  }
 
-    // Begin PID control
-    m_pidController.Enable();
+  void TeleopPeriodic() override {
+    double output =
+        m_pidController.Calculate(m_filter.Calculate(m_ultrasonic.GetValue()));
+    m_robotDrive.ArcadeDrive(output, 0);
   }
 
  private:
-  // Internal class to write to robot drive using a PIDOutput
-  class MyPIDOutput : public frc::PIDOutput {
-   public:
-    explicit MyPIDOutput(frc::DifferentialDrive& r) : m_rd(r) {
-      m_rd.SetSafetyEnabled(false);
-    }
-
-    void PIDWrite(double output) override {
-      // Write to robot drive by reference
-      m_rd.ArcadeDrive(output, 0);
-    }
-
-   private:
-    frc::DifferentialDrive& m_rd;
-  };
-
   // Distance in inches the robot wants to stay from an object
   static constexpr int kHoldDistance = 12;
 
@@ -70,16 +50,20 @@ class Robot : public frc::TimedRobot {
   static constexpr int kRightMotorPort = 1;
   static constexpr int kUltrasonicPort = 0;
 
+  // median filter to discard outliers; filters over 5 samples
+  frc::MedianFilter<double> m_filter{5};
+
   frc::AnalogInput m_ultrasonic{kUltrasonicPort};
 
   frc::PWMVictorSPX m_left{kLeftMotorPort};
   frc::PWMVictorSPX m_right{kRightMotorPort};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
-  MyPIDOutput m_pidOutput{m_robotDrive};
 
-  frc::PIDController m_pidController{kP, kI, kD, m_ultrasonic, m_pidOutput};
+  frc2::PIDController m_pidController{kP, kI, kD};
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

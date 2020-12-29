@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
@@ -22,11 +19,11 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * A helper class for Shuffleboard containers to handle common child operations.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 final class ContainerHelper {
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();
@@ -43,7 +40,7 @@ final class ContainerHelper {
 
   ShuffleboardLayout getLayout(String title, String type) {
     if (!m_layouts.containsKey(title)) {
-      ShuffleboardLayout layout = new ShuffleboardLayout(m_container, type, title);
+      ShuffleboardLayout layout = new ShuffleboardLayout(m_container, title, type);
       m_components.add(layout);
       m_layouts.put(title, layout);
     }
@@ -66,10 +63,11 @@ final class ContainerHelper {
   }
 
   ComplexWidget add(Sendable sendable) throws IllegalArgumentException {
-    if (sendable.getName() == null || sendable.getName().isEmpty()) {
+    String name = SendableRegistry.getName(sendable);
+    if (name.isEmpty()) {
       throw new IllegalArgumentException("Sendable must have a name");
     }
-    return add(sendable.getName(), sendable);
+    return add(name, sendable);
   }
 
   SimpleWidget add(String title, Object defaultValue) {

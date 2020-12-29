@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -11,6 +8,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Solenoid class for running high voltage Digital Output on the PCM.
@@ -18,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any
  * device within the current spec of the PCM.
  */
-public class Solenoid extends SolenoidBase {
+public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
   private final int m_channel; // The channel to control.
   private int m_solenoidHandle;
 
@@ -47,13 +45,13 @@ public class Solenoid extends SolenoidBase {
     int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
     m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
-    HAL.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
-    setName("Solenoid", m_moduleNumber, m_channel);
+    HAL.report(tResourceType.kResourceType_Solenoid, m_channel + 1, m_moduleNumber + 1);
+    SendableRegistry.addLW(this, "Solenoid", m_moduleNumber, m_channel);
   }
 
   @Override
   public void close() {
-    super.close();
+    SendableRegistry.remove(this);
     SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
     m_solenoidHandle = 0;
   }
@@ -74,6 +72,16 @@ public class Solenoid extends SolenoidBase {
    */
   public boolean get() {
     return SolenoidJNI.getSolenoid(m_solenoidHandle);
+  }
+
+  /**
+   * Toggle the value of the solenoid.
+   *
+   * <p>If the solenoid is set to on, it'll be turned off. If the solenoid is set to off, it'll be
+   * turned on.
+   */
+  public void toggle() {
+    set(!get());
   }
 
   /**

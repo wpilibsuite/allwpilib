@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -11,13 +8,8 @@
  * @file Contains global utility functions
  */
 
-#include <stdint.h>
-
-#include <string>
-
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
-#include <wpi/deprecated.h>
 
 #define wpi_assert(condition) \
   wpi_assert_impl(condition, #condition, "", __FILE__, __LINE__, __FUNCTION__)
@@ -71,14 +63,3 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB,
                              const wpi::Twine& valueBString,
                              const wpi::Twine& message, wpi::StringRef fileName,
                              int lineNumber, wpi::StringRef funcName);
-
-namespace frc {
-
-/**
- * Get a stack trace, ignoring the first "offset" symbols.
- *
- * @param offset The number of symbols at the top of the stack to ignore
- */
-std::string GetStackTrace(int offset);
-
-}  // namespace frc

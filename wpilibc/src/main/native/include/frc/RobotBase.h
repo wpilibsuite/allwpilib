@@ -1,14 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <chrono>
 #include <thread>
 
+#include <hal/HALBase.h>
+#include <hal/Main.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Base.h"
@@ -19,14 +21,76 @@ class DriverStation;
 
 int RunHALInitialization();
 
+namespace impl {
+
+template <class Robot>
+void RunRobot(wpi::mutex& m, Robot** robot) {
+  static Robot theRobot;
+  {
+    std::scoped_lock lock{m};
+    *robot = &theRobot;
+  }
+  theRobot.StartCompetition();
+}
+
+}  // namespace impl
+
 template <class Robot>
 int StartRobot() {
   int halInit = RunHALInitialization();
   if (halInit != 0) {
     return halInit;
   }
-  static Robot robot;
-  robot.StartCompetition();
+
+  static wpi::mutex m;
+  static wpi::condition_variable cv;
+  static Robot* robot = nullptr;
+  static bool exited = false;
+
+  if (HAL_HasMain()) {
+    std::thread thr([] {
+      try {
+        impl::RunRobot<Robot>(m, &robot);
+      } catch (...) {
+        HAL_ExitMain();
+        {
+          std::scoped_lock lock{m};
+          robot = nullptr;
+          exited = true;
+        }
+        cv.notify_all();
+        throw;
+      }
+
+      HAL_ExitMain();
+      {
+        std::scoped_lock lock{m};
+        robot = nullptr;
+        exited = true;
+      }
+      cv.notify_all();
+    });
+
+    HAL_RunMain();
+
+    // signal loop to exit
+    if (robot) {
+      robot->EndCompetition();
+    }
+
+    // prefer to join, but detach to exit if it doesn't exit in a timely manner
+    using namespace std::chrono_literals;
+    std::unique_lock lock{m};
+    if (cv.wait_for(lock, 1s, [] { return exited; })) {
+      thr.join();
+    } else {
+      thr.detach();
+    }
+  } else {
+    impl::RunRobot<Robot>(m, &robot);
+  }
+
+  HAL_Shutdown();
 
   return 0;
 }
@@ -73,12 +137,28 @@ class RobotBase {
   bool IsAutonomous() const;
 
   /**
+   * Determine if the robot is currently in Autonomous mode and enabled.
+   *
+   * @return True if the robot us currently operating Autonomously while enabled
+   * as determined by the field controls.
+   */
+  bool IsAutonomousEnabled() const;
+
+  /**
    * Determine if the robot is currently in Operator Control mode.
    *
    * @return True if the robot is currently operating in Tele-Op mode as
    *         determined by the field controls.
    */
   bool IsOperatorControl() const;
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while
+   * wnabled as determined by the field-controls.
+   */
+  bool IsOperatorControlEnabled() const;
 
   /**
    * Determine if the robot is currently in Test mode.
@@ -103,6 +183,13 @@ class RobotBase {
 
   virtual void StartCompetition() = 0;
 
+  virtual void EndCompetition() = 0;
+
+  /**
+   * Get if the robot is real.
+   *
+   * @return If the robot is running in the real world.
+   */
   static constexpr bool IsReal() {
 #ifdef __FRC_ROBORIO__
     return true;
@@ -111,9 +198,13 @@ class RobotBase {
 #endif
   }
 
+  /**
+   * Get if the robot is a simulation.
+   *
+   * @return If the robot is running in simulation.
+   */
   static constexpr bool IsSimulation() { return !IsReal(); }
 
- protected:
   /**
    * Constructor for a generic robot program.
    *
@@ -129,6 +220,7 @@ class RobotBase {
 
   virtual ~RobotBase();
 
+ protected:
   // m_ds isn't moved in these because DriverStation is a singleton; every
   // instance of RobotBase has a reference to the same object.
   RobotBase(RobotBase&&) noexcept;

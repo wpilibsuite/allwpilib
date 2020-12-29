@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.networktables;
 
@@ -20,11 +17,6 @@ public final class RpcCall implements AutoCloseable {
   public RpcCall(NetworkTableEntry entry, int call) {
     m_entry = entry;
     m_call = call;
-  }
-
-  @Deprecated
-  public void free() {
-    close();
   }
 
   /**

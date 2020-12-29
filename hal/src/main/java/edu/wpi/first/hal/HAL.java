@@ -1,22 +1,63 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * JNI Wrapper for HAL<br>.
  */
-@SuppressWarnings({"AbbreviationAsWordInName", "MethodName", "PMD.TooManyMethods"})
+@SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
 public final class HAL extends JNIWrapper {
   public static native void waitForDSData();
 
   public static native boolean initialize(int timeout, int mode);
+
+  public static native void shutdown();
+
+  public static native boolean hasMain();
+
+  public static native void runMain();
+
+  public static native void exitMain();
+
+  private static native void simPeriodicBeforeNative();
+
+  public static final List<Runnable> s_simPeriodicBefore = new ArrayList<>();
+
+  /**
+   * Runs SimPeriodicBefore callbacks.  IterativeRobotBase calls this prior
+   * to the user's simulationPeriodic code.
+   */
+  public static void simPeriodicBefore() {
+    simPeriodicBeforeNative();
+    synchronized (s_simPeriodicBefore) {
+      for (Runnable r : s_simPeriodicBefore) {
+        r.run();
+      }
+    }
+  }
+
+  private static native void simPeriodicAfterNative();
+
+  public static final List<Runnable> s_simPeriodicAfter = new ArrayList<>();
+
+  /**
+   * Runs SimPeriodicAfter callbacks.  IterativeRobotBase calls this after
+   * the user's simulationPeriodic code.
+   */
+  public static void simPeriodicAfter() {
+    simPeriodicAfterNative();
+    synchronized (s_simPeriodicAfter) {
+      for (Runnable r : s_simPeriodicAfter) {
+        r.run();
+      }
+    }
+  }
 
   public static native void observeUserProgramStarting();
 
@@ -123,6 +164,8 @@ public final class HAL extends JNIWrapper {
   public static native int sendError(boolean isError, int errorCode, boolean isLVCode,
                                      String details, String location, String callStack,
                                      boolean printMsg);
+
+  public static native int sendConsoleLine(String line);
 
   public static native int getPortWithModule(byte module, byte channel);
 

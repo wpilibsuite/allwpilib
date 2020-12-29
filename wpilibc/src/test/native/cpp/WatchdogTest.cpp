@@ -1,109 +1,97 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Watchdog.h"  // NOLINT(build/include_order)
 
 #include <stdint.h>
 
-#include <thread>
-
-#include <wpi/raw_ostream.h>
-
+#include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
 
-#ifdef __APPLE__
-TEST(WatchdogTest, DISABLED_EnableDisable) {
-#else
-TEST(WatchdogTest, EnableDisable) {
-#endif
+namespace {
+class WatchdogTest : public ::testing::Test {
+ protected:
+  void SetUp() override { frc::sim::PauseTiming(); }
+
+  void TearDown() override { frc::sim::ResumeTiming(); }
+};
+
+}  // namespace
+
+TEST_F(WatchdogTest, EnableDisable) {
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(0.4, [&] { watchdogCounter++; });
+  Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
-  wpi::outs() << "Run 1\n";
+  // Run 1
   watchdog.Enable();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  frc::sim::StepTiming(0.2_s);
   watchdog.Disable();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 
-  wpi::outs() << "Run 2\n";
+  // Run 2
   watchdogCounter = 0;
   watchdog.Enable();
-  std::this_thread::sleep_for(std::chrono::milliseconds(600));
+  frc::sim::StepTiming(0.4_s);
   watchdog.Disable();
 
   EXPECT_EQ(1u, watchdogCounter)
       << "Watchdog either didn't trigger or triggered more than once";
 
-  wpi::outs() << "Run 3\n";
+  // Run 3
   watchdogCounter = 0;
   watchdog.Enable();
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  frc::sim::StepTiming(1_s);
   watchdog.Disable();
 
   EXPECT_EQ(1u, watchdogCounter)
       << "Watchdog either didn't trigger or triggered more than once";
 }
 
-#ifdef __APPLE__
-TEST(WatchdogTest, DISABLED_Reset) {
-#else
-TEST(WatchdogTest, Reset) {
-#endif
+TEST_F(WatchdogTest, Reset) {
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(0.4, [&] { watchdogCounter++; });
+  Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
   watchdog.Enable();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  frc::sim::StepTiming(0.2_s);
   watchdog.Reset();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  frc::sim::StepTiming(0.2_s);
   watchdog.Disable();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 }
 
-#ifdef __APPLE__
-TEST(WatchdogTest, DISABLED_SetTimeout) {
-#else
-TEST(WatchdogTest, SetTimeout) {
-#endif
+TEST_F(WatchdogTest, SetTimeout) {
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(1.0, [&] { watchdogCounter++; });
+  Watchdog watchdog(1_s, [&] { watchdogCounter++; });
 
   watchdog.Enable();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  watchdog.SetTimeout(0.2);
+  frc::sim::StepTiming(0.2_s);
+  watchdog.SetTimeout(0.2_s);
 
   EXPECT_EQ(0.2, watchdog.GetTimeout());
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  frc::sim::StepTiming(0.3_s);
   watchdog.Disable();
 
   EXPECT_EQ(1u, watchdogCounter)
       << "Watchdog either didn't trigger or triggered more than once";
 }
 
-#ifdef __APPLE__
-TEST(WatchdogTest, DISABLED_IsExpired) {
-#else
-TEST(WatchdogTest, IsExpired) {
-#endif
-  Watchdog watchdog(0.2, [] {});
+TEST_F(WatchdogTest, IsExpired) {
+  Watchdog watchdog(0.2_s, [] {});
   EXPECT_FALSE(watchdog.IsExpired());
   watchdog.Enable();
 
   EXPECT_FALSE(watchdog.IsExpired());
-  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  frc::sim::StepTiming(0.3_s);
   EXPECT_TRUE(watchdog.IsExpired());
 
   watchdog.Disable();
@@ -113,57 +101,49 @@ TEST(WatchdogTest, IsExpired) {
   EXPECT_FALSE(watchdog.IsExpired());
 }
 
-#ifdef __APPLE__
-TEST(WatchdogTest, DISABLED_Epochs) {
-#else
-TEST(WatchdogTest, Epochs) {
-#endif
+TEST_F(WatchdogTest, Epochs) {
   uint32_t watchdogCounter = 0;
 
-  Watchdog watchdog(0.4, [&] { watchdogCounter++; });
+  Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
 
-  wpi::outs() << "Run 1\n";
+  // Run 1
   watchdog.Enable();
   watchdog.AddEpoch("Epoch 1");
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  frc::sim::StepTiming(0.1_s);
   watchdog.AddEpoch("Epoch 2");
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  frc::sim::StepTiming(0.1_s);
   watchdog.AddEpoch("Epoch 3");
   watchdog.Disable();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 
-  wpi::outs() << "Run 2\n";
+  // Run 2
   watchdog.Enable();
   watchdog.AddEpoch("Epoch 1");
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  frc::sim::StepTiming(0.2_s);
   watchdog.Reset();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  frc::sim::StepTiming(0.2_s);
   watchdog.AddEpoch("Epoch 2");
   watchdog.Disable();
 
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 }
 
-#ifdef __APPLE__
-TEST(WatchdogTest, DISABLED_MultiWatchdog) {
-#else
-TEST(WatchdogTest, MultiWatchdog) {
-#endif
+TEST_F(WatchdogTest, MultiWatchdog) {
   uint32_t watchdogCounter1 = 0;
   uint32_t watchdogCounter2 = 0;
 
-  Watchdog watchdog1(0.2, [&] { watchdogCounter1++; });
-  Watchdog watchdog2(0.6, [&] { watchdogCounter2++; });
+  Watchdog watchdog1(0.2_s, [&] { watchdogCounter1++; });
+  Watchdog watchdog2(0.6_s, [&] { watchdogCounter2++; });
 
   watchdog2.Enable();
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  frc::sim::StepTiming(0.25_s);
   EXPECT_EQ(0u, watchdogCounter1) << "Watchdog triggered early";
   EXPECT_EQ(0u, watchdogCounter2) << "Watchdog triggered early";
 
   // Sleep enough such that only the watchdog enabled later times out first
   watchdog1.Enable();
-  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  frc::sim::StepTiming(0.25_s);
   watchdog1.Disable();
   watchdog2.Disable();
 

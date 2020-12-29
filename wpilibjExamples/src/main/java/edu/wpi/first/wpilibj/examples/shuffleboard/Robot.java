@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.shuffleboard;
 
@@ -30,7 +27,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // Add a 'max speed' widget to a tab named 'Configuration', using a number slider
-    // The widget will be placed in the second column and row and will be two columns wide
+    // The widget will be placed in the second column and row and will be TWO columns wide
     m_maxSpeed = Shuffleboard.getTab("Configuration")
                            .add("Max Speed", 1)
                            .withWidget("Number Slider")

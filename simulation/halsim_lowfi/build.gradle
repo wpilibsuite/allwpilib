@@ -1,9 +1,0 @@
-description = "A simulation shared object that publishes basic robot I/O to NetworkTables."
-
-ext {
-    includeNtCore = true
-    includeWpiutil = true
-    pluginName = 'halsim_lowfi'
-}
-
-apply from: "${rootDir}/shared/plugins/setupBuild.gradle"

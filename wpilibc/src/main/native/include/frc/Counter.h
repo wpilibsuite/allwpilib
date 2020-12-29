@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -14,11 +11,15 @@
 #include "frc/AnalogTrigger.h"
 #include "frc/CounterBase.h"
 #include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
+class SendableBuilder;
+class DMA;
+class DMASample;
 
 /**
  * Class for counting the number of ticks on a digital input channel.
@@ -30,7 +31,13 @@ class DigitalGlitchFilter;
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Counter : public ErrorBase, public SendableBase, public CounterBase {
+class Counter : public ErrorBase,
+                public CounterBase,
+                public Sendable,
+                public SendableHelper<Counter> {
+  friend class DMA;
+  friend class DMASample;
+
  public:
   enum Mode {
     kTwoPulse = 0,
@@ -139,8 +146,8 @@ class Counter : public ErrorBase, public SendableBase, public CounterBase {
 
   ~Counter() override;
 
-  Counter(Counter&& rhs);
-  Counter& operator=(Counter&& rhs);
+  Counter(Counter&&) = default;
+  Counter& operator=(Counter&&) = default;
 
   /**
    * Set the upsource for the counter as a digital input channel.
@@ -425,7 +432,7 @@ class Counter : public ErrorBase, public SendableBase, public CounterBase {
   std::shared_ptr<DigitalSource> m_downSource;
 
   // The FPGA counter object
-  HAL_CounterHandle m_counter = HAL_kInvalidHandle;
+  hal::Handle<HAL_CounterHandle> m_counter;
 
  private:
   int m_index = 0;  // The index of this counter.

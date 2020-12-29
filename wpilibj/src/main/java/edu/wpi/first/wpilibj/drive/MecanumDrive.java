@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.drive;
 
@@ -12,8 +9,11 @@ import java.util.StringJoiner;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -58,7 +58,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * {@link edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Polar(double, double, double)} if a
  * deadband of 0 is used.
  */
-public class MecanumDrive extends RobotDriveBase {
+public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 
   private final SpeedController m_frontLeftMotor;
@@ -81,12 +81,17 @@ public class MecanumDrive extends RobotDriveBase {
     m_rearLeftMotor = rearLeftMotor;
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
-    addChild(m_frontLeftMotor);
-    addChild(m_rearLeftMotor);
-    addChild(m_frontRightMotor);
-    addChild(m_rearRightMotor);
+    SendableRegistry.addChild(this, m_frontLeftMotor);
+    SendableRegistry.addChild(this, m_rearLeftMotor);
+    SendableRegistry.addChild(this, m_frontRightMotor);
+    SendableRegistry.addChild(this, m_rearRightMotor);
     instances++;
-    setName("MecanumDrive", instances);
+    SendableRegistry.addLW(this, "MecanumDrive", instances);
+  }
+
+  @Override
+  public void close() {
+    SendableRegistry.remove(this);
   }
 
   /**
@@ -151,15 +156,15 @@ public class MecanumDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 4,
-                 tInstances.kRobotDrive2_MecanumCartesian);
+      HAL.report(tResourceType.kResourceType_RobotDrive,
+                 tInstances.kRobotDrive2_MecanumCartesian, 4);
       m_reported = true;
     }
 
-    ySpeed = limit(ySpeed);
+    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
     ySpeed = applyDeadband(ySpeed, m_deadband);
 
-    xSpeed = limit(xSpeed);
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
     // Compensate for gyro angle.
@@ -198,7 +203,7 @@ public class MecanumDrive extends RobotDriveBase {
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, 4, tInstances.kRobotDrive2_MecanumPolar);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumPolar, 4);
       m_reported = true;
     }
 
@@ -207,7 +212,7 @@ public class MecanumDrive extends RobotDriveBase {
   }
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multipled by -1.
+   * Gets if the power sent to the right side of the drivetrain is multiplied by -1.
    *
    * @return true if the right side is inverted
    */
@@ -216,9 +221,9 @@ public class MecanumDrive extends RobotDriveBase {
   }
 
   /**
-   * Sets if the power sent to the right side of the drivetrain should be multipled by -1.
+   * Sets if the power sent to the right side of the drivetrain should be multiplied by -1.
    *
-   * @param rightSideInverted true if right side power should be multipled by -1
+   * @param rightSideInverted true if right side power should be multiplied by -1
    */
   public void setRightSideInverted(boolean rightSideInverted) {
     m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;

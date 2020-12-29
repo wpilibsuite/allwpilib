@@ -3,6 +3,7 @@ project(cscore)
 include(SubDirList)
 include(CompileWarnings)
 include(AddTest)
+include(LinkMacOSGUI)
 
 find_package( OpenCV REQUIRED )
 
@@ -39,29 +40,42 @@ set_property(TARGET cscore PROPERTY FOLDER "libraries")
 install(TARGETS cscore EXPORT cscore DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/cscore")
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (cscore_config_dir ${wpilib_dest})
 else()
     set (cscore_config_dir share/cscore)
 endif()
 
-configure_file(cscore-config.cmake.in ${CMAKE_BINARY_DIR}/cscore-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/cscore-config.cmake DESTINATION ${cscore_config_dir})
+configure_file(cscore-config.cmake.in ${WPILIB_BINARY_DIR}/cscore-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/cscore-config.cmake DESTINATION ${cscore_config_dir})
 install(EXPORT cscore DESTINATION ${cscore_config_dir})
 
 SUBDIR_LIST(cscore_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 foreach(example ${cscore_examples})
     file(GLOB cscore_example_src examples/${example}/*.cpp)
+    unset(add_libs)
+    if(${example} STREQUAL "usbviewer")
+        if(TARGET wpigui)
+            set(add_libs wpigui)
+        else()
+            unset(cscore_example_src)
+        endif()
+    endif()
     if(cscore_example_src)
         add_executable(cscore_${example} ${cscore_example_src})
         wpilib_target_warnings(cscore_${example})
-        target_link_libraries(cscore_${example} cscore)
+
+        if (${example} STREQUAL "usbviewer")
+            wpilib_link_macos_gui(cscore_${example})
+        endif()
+
+        target_link_libraries(cscore_${example} cscore ${add_libs})
         set_property(TARGET cscore_${example} PROPERTY FOLDER "examples")
     endif()
 endforeach()
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
@@ -69,7 +83,9 @@ if (NOT WITHOUT_JAVA)
 
     #find java files, copy them locally
 
-    set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/OpenCV/java/)
+    if("${OPENCV_JAVA_INSTALL_DIR}" STREQUAL "")
+        set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/OpenCV/java/)
+    endif()
 
     find_file(OPENCV_JAR_FILE NAMES opencv-${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.jar PATHS ${OPENCV_JAVA_INSTALL_DIR} ${OpenCV_INSTALL_PATH}/bin NO_DEFAULT_PATH)
     find_file(OPENCV_JNI_FILE NAMES libopencv_java${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}.so

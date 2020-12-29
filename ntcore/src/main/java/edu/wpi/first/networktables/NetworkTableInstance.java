@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.networktables;
 
@@ -44,6 +41,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public static final int kNetModeClient = 0x02;
   public static final int kNetModeStarting = 0x04;
   public static final int kNetModeFailure = 0x08;
+  public static final int kNetModeLocal = 0x10;
 
   /**
    * The default port that network tables operates on.
@@ -58,11 +56,6 @@ public final class NetworkTableInstance implements AutoCloseable {
   private NetworkTableInstance(int handle) {
     m_owned = false;
     m_handle = handle;
-  }
-
-  @Deprecated
-  public void free() {
-    close();
   }
 
   /**
@@ -678,6 +671,23 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public int getNetworkMode() {
     return NetworkTablesJNI.getNetworkMode(m_handle);
+  }
+
+  /**
+   * Starts local-only operation.  Prevents calls to startServer or startClient
+   * from taking effect.  Has no effect if startServer or startClient
+   * has already been called.
+   */
+  public void startLocal() {
+    NetworkTablesJNI.startLocal(m_handle);
+  }
+
+  /**
+   * Stops local-only operation.  startServer or startClient can be called after
+   * this call to start a server or client.
+   */
+  public void stopLocal() {
+    NetworkTablesJNI.stopLocal(m_handle);
   }
 
   /**

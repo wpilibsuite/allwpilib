@@ -1,17 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <array>
 
 #include <frc/AnalogInput.h>
 #include <frc/Joystick.h>
-#include <frc/PIDController.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
+#include <frc/controller/PIDController.h>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a
@@ -20,10 +17,6 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void RobotInit() override { m_pidController.SetInputRange(0, 5); }
-
-  void TeleopInit() override { m_pidController.Enable(); }
-
   void TeleopPeriodic() override {
     // When the button is pressed once, the selected elevator setpoint is
     // incremented.
@@ -35,6 +28,9 @@ class Robot : public frc::TimedRobot {
     m_previousButtonValue = currentButtonValue;
 
     m_pidController.SetSetpoint(kSetPoints[m_index]);
+    double output =
+        m_pidController.Calculate(m_potentiometer.GetAverageVoltage());
+    m_elevatorMotor.Set(output);
   }
 
  private:
@@ -64,15 +60,13 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{kJoystickChannel};
   frc::PWMVictorSPX m_elevatorMotor{kMotorChannel};
 
-  /* Potentiometer (AnalogInput) and elevatorMotor (Victor) can be used as a
-   * PIDSource and PIDOutput respectively.
-   */
-  frc::PIDController m_pidController{kP, kI, kD, m_potentiometer,
-                                     m_elevatorMotor};
+  frc2::PIDController m_pidController{kP, kI, kD};
 };
 
 constexpr std::array<double, 3> Robot::kSetPoints;
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

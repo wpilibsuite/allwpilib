@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -12,6 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SolenoidJNI;
 import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
@@ -19,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
  */
-public class DoubleSolenoid extends SolenoidBase {
+public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoCloseable {
   /**
    * Possible values for a DoubleSolenoid.
    */
@@ -76,16 +74,16 @@ public class DoubleSolenoid extends SolenoidBase {
     m_forwardMask = (byte) (1 << forwardChannel);
     m_reverseMask = (byte) (1 << reverseChannel);
 
-    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel,
-                                   m_moduleNumber);
-    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel,
-                                   m_moduleNumber);
-    setName("DoubleSolenoid", m_moduleNumber, forwardChannel);
+    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel + 1,
+                                   m_moduleNumber + 1);
+    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel + 1,
+                                   m_moduleNumber + 1);
+    SendableRegistry.addLW(this, "DoubleSolenoid", m_moduleNumber, forwardChannel);
   }
 
   @Override
   public synchronized void close() {
-    super.close();
+    SendableRegistry.remove(this);
     SolenoidJNI.freeSolenoidPort(m_forwardHandle);
     SolenoidJNI.freeSolenoidPort(m_reverseHandle);
   }
@@ -132,11 +130,27 @@ public class DoubleSolenoid extends SolenoidBase {
 
     if (valueForward) {
       return Value.kForward;
-    }
-    if (valueReverse) {
+    } else if (valueReverse) {
       return Value.kReverse;
+    } else {
+      return Value.kOff;
     }
-    return Value.kOff;
+  }
+
+  /**
+   * Toggle the value of the solenoid.
+   *
+   * <p>If the solenoid is set to forward, it'll be set to reverse. If the solenoid is set to
+   * reverse, it'll be set to forward. If the solenoid is set to off, nothing happens.
+   */
+  public void toggle() {
+    Value value = get();
+
+    if (value == Value.kForward) {
+      set(Value.kReverse);
+    } else if (value == Value.kReverse) {
+      set(Value.kForward);
+    }
   }
 
   /**

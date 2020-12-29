@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "cameraserver/CameraServerShared.h"
 
@@ -24,15 +21,10 @@ class DefaultCameraServerShared : public frc::CameraServerShared {
 };
 }  // namespace
 
-namespace frc {
-
-static std::unique_ptr<CameraServerShared> cameraServerShared = nullptr;
+static std::unique_ptr<frc::CameraServerShared> cameraServerShared = nullptr;
 static wpi::mutex setLock;
 
-void SetCameraServerShared(std::unique_ptr<CameraServerShared> shared) {
-  std::unique_lock lock(setLock);
-  cameraServerShared = std::move(shared);
-}
+namespace frc {
 CameraServerShared* GetCameraServerShared() {
   std::unique_lock lock(setLock);
   if (!cameraServerShared) {
@@ -41,3 +33,10 @@ CameraServerShared* GetCameraServerShared() {
   return cameraServerShared.get();
 }
 }  // namespace frc
+
+extern "C" {
+void CameraServer_SetCameraServerShared(frc::CameraServerShared* shared) {
+  std::unique_lock lock(setLock);
+  cameraServerShared.reset(shared);
+}
+}  // extern "C"

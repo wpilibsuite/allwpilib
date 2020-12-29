@@ -2,6 +2,7 @@ cppHeaderFileInclude {
   \.h$
   \.hpp$
   \.inc$
+  \.inl$
 }
 
 cppSrcFileInclude {
@@ -9,16 +10,8 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gtest/
-  ni-libraries/include/
-  ni-libraries/lib/
   FRCNetComm\.java$
-  simulation/frc_gazebo_plugins/frcgazebo/
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
-}
-
-modifiableFileExclude {
-  \.so$
 }
 
 repoRootNameOverride {
@@ -26,15 +19,22 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^Eigen/
   ^cameraserver/
   ^cscore
+  ^drake/
   ^hal/
+  ^imgui
+  ^implot
   ^mockdata/
   ^networktables/
   ^ntcore
   ^opencv2/
   ^support/
   ^units/
+  ^unsupported/
   ^vision/
   ^wpi/
+  ^wpigui
+  ^wpimath/
 }

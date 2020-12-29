@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/uv/Pipe.h"
 
@@ -26,13 +23,19 @@ std::shared_ptr<Pipe> Pipe::Create(Loop& loop, bool ipc) {
 }
 
 void Pipe::Reuse(std::function<void()> callback, bool ipc) {
-  if (IsClosing()) return;
-  if (!m_reuseData) m_reuseData = std::make_unique<ReuseData>();
+  if (IsClosing()) {
+    return;
+  }
+  if (!m_reuseData) {
+    m_reuseData = std::make_unique<ReuseData>();
+  }
   m_reuseData->callback = callback;
   m_reuseData->ipc = ipc;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {
     Pipe& h = *static_cast<Pipe*>(handle->data);
-    if (!h.m_reuseData) return;
+    if (!h.m_reuseData) {
+      return;
+    }
     auto data = std::move(h.m_reuseData);
     auto err =
         uv_pipe_init(h.GetLoopRef().GetRaw(), h.GetRaw(), data->ipc ? 1 : 0);
@@ -46,7 +49,9 @@ void Pipe::Reuse(std::function<void()> callback, bool ipc) {
 
 std::shared_ptr<Pipe> Pipe::Accept() {
   auto client = Create(GetLoopRef(), GetRaw()->ipc);
-  if (!client) return nullptr;
+  if (!client) {
+    return nullptr;
+  }
   if (!Accept(client)) {
     client->Release();
     return nullptr;
@@ -54,7 +59,9 @@ std::shared_ptr<Pipe> Pipe::Accept() {
   return client;
 }
 
-Pipe* Pipe::DoAccept() { return Accept().get(); }
+Pipe* Pipe::DoAccept() {
+  return Accept().get();
+}
 
 void Pipe::Bind(const Twine& name) {
   SmallString<128> nameBuf;
@@ -69,10 +76,11 @@ void Pipe::Connect(const Twine& name,
                   name.toNullTerminatedStringRef(nameBuf).data(),
                   [](uv_connect_t* req, int status) {
                     auto& h = *static_cast<PipeConnectReq*>(req->data);
-                    if (status < 0)
+                    if (status < 0) {
                       h.ReportError(status);
-                    else
+                    } else {
                       h.connected();
+                    }
                     h.Release();  // this is always a one-shot
                   });
   req->Keep();

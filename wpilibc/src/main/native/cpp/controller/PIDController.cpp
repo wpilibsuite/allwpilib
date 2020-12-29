@@ -1,265 +1,163 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/controller/PIDController.h"
 
 #include <algorithm>
 #include <cmath>
 
-#include <hal/HAL.h>
+#include <hal/FRCUsageReporting.h>
 
+#include "frc/controller/ControllerUtil.h"
 #include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc2;
 
-PIDController::PIDController(double Kp, double Ki, double Kd, double period)
-    : frc::SendableBase(false), m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+PIDController::PIDController(double Kp, double Ki, double Kd,
+                             units::second_t period)
+    : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   static int instances = 0;
   instances++;
-  HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
-  SetName("PIDController", instances);
+  HAL_Report(HALUsageReporting::kResourceType_PIDController2, instances);
+  frc::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
 }
 
-PIDController::PIDController(PIDController&& rhs)
-    : SendableBase(std::move(rhs)),
-      m_Kp(std::move(rhs.m_Kp)),
-      m_Ki(std::move(rhs.m_Ki)),
-      m_Kd(std::move(rhs.m_Kd)),
-      m_period(std::move(rhs.m_period)),
-      m_maximumOutput(std::move(rhs.m_maximumOutput)),
-      m_minimumOutput(std::move(rhs.m_minimumOutput)),
-      m_maximumInput(std::move(rhs.m_maximumInput)),
-      m_minimumInput(std::move(rhs.m_minimumInput)),
-      m_inputRange(std::move(rhs.m_inputRange)),
-      m_continuous(std::move(rhs.m_continuous)),
-      m_currError(std::move(rhs.m_currError)),
-      m_prevError(std::move(rhs.m_prevError)),
-      m_totalError(std::move(rhs.m_totalError)),
-      m_toleranceType(std::move(rhs.m_toleranceType)),
-      m_tolerance(std::move(rhs.m_tolerance)),
-      m_deltaTolerance(std::move(rhs.m_deltaTolerance)),
-      m_setpoint(std::move(rhs.m_setpoint)),
-      m_output(std::move(rhs.m_output)) {}
-
-PIDController& PIDController::operator=(PIDController&& rhs) {
-  std::scoped_lock lock(m_thisMutex, rhs.m_thisMutex);
-
-  SendableBase::operator=(std::move(rhs));
-
-  m_Kp = std::move(rhs.m_Kp);
-  m_Ki = std::move(rhs.m_Ki);
-  m_Kd = std::move(rhs.m_Kd);
-  m_period = std::move(rhs.m_period);
-  m_maximumOutput = std::move(rhs.m_maximumOutput);
-  m_minimumOutput = std::move(rhs.m_minimumOutput);
-  m_maximumInput = std::move(rhs.m_maximumInput);
-  m_minimumInput = std::move(rhs.m_minimumInput);
-  m_inputRange = std::move(rhs.m_inputRange);
-  m_continuous = std::move(rhs.m_continuous);
-  m_currError = std::move(rhs.m_currError);
-  m_prevError = std::move(rhs.m_prevError);
-  m_totalError = std::move(rhs.m_totalError);
-  m_toleranceType = std::move(rhs.m_toleranceType);
-  m_tolerance = std::move(rhs.m_tolerance);
-  m_deltaTolerance = std::move(rhs.m_deltaTolerance);
-  m_setpoint = std::move(rhs.m_setpoint);
-  m_output = std::move(rhs.m_output);
-
-  return *this;
+void PIDController::SetPID(double Kp, double Ki, double Kd) {
+  m_Kp = Kp;
+  m_Ki = Ki;
+  m_Kd = Kd;
 }
 
 void PIDController::SetP(double Kp) {
-  std::scoped_lock lock(m_thisMutex);
   m_Kp = Kp;
 }
 
 void PIDController::SetI(double Ki) {
-  std::scoped_lock lock(m_thisMutex);
   m_Ki = Ki;
 }
 
 void PIDController::SetD(double Kd) {
-  std::scoped_lock lock(m_thisMutex);
   m_Kd = Kd;
 }
 
 double PIDController::GetP() const {
-  std::scoped_lock lock(m_thisMutex);
   return m_Kp;
 }
 
 double PIDController::GetI() const {
-  std::scoped_lock lock(m_thisMutex);
   return m_Ki;
 }
 
 double PIDController::GetD() const {
-  std::scoped_lock lock(m_thisMutex);
   return m_Kd;
 }
 
-double PIDController::GetPeriod() const { return m_period; }
-
-double PIDController::GetOutput() const {
-  std::scoped_lock lock(m_thisMutex);
-  return m_output;
+units::second_t PIDController::GetPeriod() const {
+  return units::second_t(m_period);
 }
 
 void PIDController::SetSetpoint(double setpoint) {
-  std::scoped_lock lock(m_thisMutex);
-
-  if (m_maximumInput > m_minimumInput) {
-    m_setpoint = std::clamp(setpoint, m_minimumInput, m_maximumInput);
-  } else {
-    m_setpoint = setpoint;
-  }
+  m_setpoint = setpoint;
 }
 
 double PIDController::GetSetpoint() const {
-  std::scoped_lock lock(m_thisMutex);
   return m_setpoint;
 }
 
-bool PIDController::AtSetpoint(double tolerance, double deltaTolerance,
-                               Tolerance toleranceType) const {
-  double deltaError = GetDeltaError();
-
-  std::scoped_lock lock(m_thisMutex);
-  if (toleranceType == Tolerance::kPercent) {
-    return std::abs(m_currError) < tolerance / 100 * m_inputRange &&
-           std::abs(deltaError) < deltaTolerance / 100 * m_inputRange;
-  } else {
-    return std::abs(m_currError) < tolerance &&
-           std::abs(deltaError) < deltaTolerance;
-  }
-}
-
 bool PIDController::AtSetpoint() const {
-  return AtSetpoint(m_tolerance, m_deltaTolerance, m_toleranceType);
+  double positionError;
+  if (m_continuous) {
+    positionError = frc::GetModulusError<double>(
+        m_setpoint, m_measurement, m_minimumInput, m_maximumInput);
+  } else {
+    positionError = m_setpoint - m_measurement;
+  }
+
+  double velocityError = (positionError - m_prevError) / m_period.to<double>();
+
+  return std::abs(positionError) < m_positionTolerance &&
+         std::abs(velocityError) < m_velocityTolerance;
 }
 
-void PIDController::SetContinuous(bool continuous) {
-  std::scoped_lock lock(m_thisMutex);
-  m_continuous = continuous;
-}
-
-void PIDController::SetInputRange(double minimumInput, double maximumInput) {
-  std::scoped_lock lock(m_thisMutex);
+void PIDController::EnableContinuousInput(double minimumInput,
+                                          double maximumInput) {
+  m_continuous = true;
   m_minimumInput = minimumInput;
   m_maximumInput = maximumInput;
-  m_inputRange = maximumInput - minimumInput;
-
-  // Clamp setpoint to new input range
-  if (m_maximumInput > m_minimumInput) {
-    m_setpoint = std::clamp(m_setpoint, m_minimumInput, m_maximumInput);
-  }
 }
 
-void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
-  std::scoped_lock lock(m_thisMutex);
-  m_minimumOutput = minimumOutput;
-  m_maximumOutput = maximumOutput;
+void PIDController::DisableContinuousInput() {
+  m_continuous = false;
 }
 
-void PIDController::SetAbsoluteTolerance(double tolerance,
-                                         double deltaTolerance) {
-  std::scoped_lock lock(m_thisMutex);
-  m_toleranceType = Tolerance::kAbsolute;
-  m_tolerance = tolerance;
-  m_deltaTolerance = deltaTolerance;
+bool PIDController::IsContinuousInputEnabled() const {
+  return m_continuous;
 }
 
-void PIDController::SetPercentTolerance(double tolerance,
-                                        double deltaTolerance) {
-  std::scoped_lock lock(m_thisMutex);
-  m_toleranceType = Tolerance::kPercent;
-  m_tolerance = tolerance;
-  m_deltaTolerance = deltaTolerance;
+void PIDController::SetIntegratorRange(double minimumIntegral,
+                                       double maximumIntegral) {
+  m_minimumIntegral = minimumIntegral;
+  m_maximumIntegral = maximumIntegral;
 }
 
-double PIDController::GetError() const {
-  std::scoped_lock lock(m_thisMutex);
-  return GetContinuousError(m_currError);
+void PIDController::SetTolerance(double positionTolerance,
+                                 double velocityTolerance) {
+  m_positionTolerance = positionTolerance;
+  m_velocityTolerance = velocityTolerance;
 }
 
-/**
- * Returns the change in error per second of the PIDController.
- *
- * @return The change in error per second.
- */
-double PIDController::GetDeltaError() const {
-  std::scoped_lock lock(m_thisMutex);
-  return (m_currError - m_prevError) / GetPeriod();
+double PIDController::GetPositionError() const {
+  return m_positionError;
+}
+
+double PIDController::GetVelocityError() const {
+  return m_velocityError;
 }
 
 double PIDController::Calculate(double measurement) {
-  std::scoped_lock lock(m_thisMutex);
-  return CalculateUnsafe(measurement);
+  m_measurement = measurement;
+  m_prevError = m_positionError;
+
+  if (m_continuous) {
+    m_positionError = frc::GetModulusError<double>(
+        m_setpoint, measurement, m_minimumInput, m_maximumInput);
+  } else {
+    m_positionError = m_setpoint - measurement;
+  }
+
+  m_velocityError = (m_positionError - m_prevError) / m_period.to<double>();
+
+  if (m_Ki != 0) {
+    m_totalError =
+        std::clamp(m_totalError + m_positionError * m_period.to<double>(),
+                   m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
+  }
+
+  return m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError;
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
-  std::scoped_lock lock(m_thisMutex);
-
   // Set setpoint to provided value
-  if (m_maximumInput > m_minimumInput) {
-    m_setpoint = std::clamp(setpoint, m_minimumInput, m_maximumInput);
-  } else {
-    m_setpoint = setpoint;
-  }
-
-  return CalculateUnsafe(measurement);
+  SetSetpoint(setpoint);
+  return Calculate(measurement);
 }
 
 void PIDController::Reset() {
-  std::scoped_lock lock(m_thisMutex);
   m_prevError = 0;
   m_totalError = 0;
-  m_output = 0;
 }
 
 void PIDController::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
-  builder.AddDoubleProperty("p", [this] { return GetP(); },
-                            [this](double value) { SetP(value); });
-  builder.AddDoubleProperty("i", [this] { return GetI(); },
-                            [this](double value) { SetI(value); });
-  builder.AddDoubleProperty("d", [this] { return GetD(); },
-                            [this](double value) { SetD(value); });
-  builder.AddDoubleProperty("setpoint", [this] { return GetSetpoint(); },
-                            [this](double value) { SetSetpoint(value); });
-}
-
-double PIDController::GetContinuousError(double error) const {
-  if (m_continuous && m_inputRange > 0) {
-    error = std::fmod(error, m_inputRange);
-    if (std::abs(error) > m_inputRange / 2) {
-      if (error > 0) {
-        return error - m_inputRange;
-      } else {
-        return error + m_inputRange;
-      }
-    }
-  }
-
-  return error;
-}
-
-double PIDController::CalculateUnsafe(double measurement) {
-  m_prevError = m_currError;
-  m_currError = GetContinuousError(m_setpoint - measurement);
-
-  if (m_Ki != 0) {
-    m_totalError = std::clamp(m_totalError + m_currError * GetPeriod(),
-                              m_minimumOutput / m_Ki, m_maximumOutput / m_Ki);
-  }
-
-  m_output = std::clamp(m_Kp * m_currError + m_Ki * m_totalError +
-                            m_Kd * (m_currError - m_prevError) / GetPeriod(),
-                        m_minimumOutput, m_maximumOutput);
-
-  return m_output;
+  builder.AddDoubleProperty(
+      "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
+  builder.AddDoubleProperty(
+      "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
+  builder.AddDoubleProperty(
+      "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+  builder.AddDoubleProperty(
+      "setpoint", [this] { return GetSetpoint(); },
+      [this](double value) { SetSetpoint(value); });
 }

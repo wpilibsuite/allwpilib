@@ -1,15 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_DISPATCHER_H_
 #define NTCORE_DISPATCHER_H_
 
 #include <atomic>
-#include <chrono>
 #include <functional>
 #include <memory>
 #include <string>
@@ -48,6 +44,7 @@ class DispatcherBase : public IDispatcher {
   virtual ~DispatcherBase();
 
   unsigned int GetNetworkMode() const;
+  void StartLocal();
   void StartServer(const Twine& persist_filename,
                    std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   void StartClient();
@@ -115,7 +112,7 @@ class DispatcherBase : public IDispatcher {
   // Condition variable for forced dispatch wakeup (flush)
   wpi::mutex m_flush_mutex;
   wpi::condition_variable m_flush_cv;
-  std::chrono::steady_clock::time_point m_last_flush;
+  uint64_t m_last_flush;
   bool m_do_flush = false;
 
   // Condition variable for client reconnect (uses user mutex)

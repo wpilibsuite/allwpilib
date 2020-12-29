@@ -1,0 +1,35 @@
+if (!project.hasProperty('onlylinuxathena')) {
+
+    description = "WebSocket Client Extension"
+
+    ext {
+        includeWpiutil = true
+        pluginName = 'halsim_ws_client'
+    }
+
+    apply plugin: 'google-test-test-suite'
+
+
+    ext {
+        staticGtestConfigs = [:]
+    }
+
+    staticGtestConfigs["${pluginName}Test"] = []
+    apply from: "${rootDir}/shared/googletest.gradle"
+
+    apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+
+    model {
+        binaries {
+            all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    it.buildable = false
+                    return
+                }
+
+                lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
+
+            }
+        }
+    }
+}

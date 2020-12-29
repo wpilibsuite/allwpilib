@@ -1,14 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include "mockdata/AnalogGyroData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/AnalogGyroData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class AnalogGyroData {
@@ -17,9 +14,10 @@ class AnalogGyroData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
 
  public:
-  SimDataValue<double, MakeDouble, GetAngleName> angle{0.0};
-  SimDataValue<double, MakeDouble, GetRateName> rate{0.0};
-  SimDataValue<HAL_Bool, MakeBoolean, GetInitializedName> initialized{false};
+  SimDataValue<double, HAL_MakeDouble, GetAngleName> angle{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetRateName> rate{0.0};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
+      false};
 
   virtual void ResetData();
 };

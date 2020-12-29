@@ -1,18 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/DigitalSource.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+class SendableBuilder;
 
 /**
  * Class to write to digital outputs.
@@ -21,7 +21,9 @@ namespace frc {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public ErrorBase, public SendableBase {
+class DigitalOutput : public DigitalSource,
+                      public Sendable,
+                      public SendableHelper<DigitalOutput> {
  public:
   /**
    * Create an instance of a digital output.
@@ -35,8 +37,8 @@ class DigitalOutput : public ErrorBase, public SendableBase {
 
   ~DigitalOutput() override;
 
-  DigitalOutput(DigitalOutput&& rhs);
-  DigitalOutput& operator=(DigitalOutput&& rhs);
+  DigitalOutput(DigitalOutput&&) = default;
+  DigitalOutput& operator=(DigitalOutput&&) = default;
 
   /**
    * Set the value of a digital output.
@@ -54,10 +56,26 @@ class DigitalOutput : public ErrorBase, public SendableBase {
    */
   bool Get() const;
 
+  // Digital Source Interface
+  /**
+   * @return The HAL Handle to the specified source.
+   */
+  HAL_Handle GetPortHandleForRouting() const override;
+
+  /**
+   * @return The type of analog trigger output to be used. 0 for Digitals
+   */
+  AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
+
+  /**
+   * Is source an AnalogTrigger
+   */
+  bool IsAnalogTrigger() const override;
+
   /**
    * @return The GPIO channel number that this object represents.
    */
-  int GetChannel() const;
+  int GetChannel() const override;
 
   /**
    * Output a single pulse on the digital output line.
@@ -120,12 +138,19 @@ class DigitalOutput : public ErrorBase, public SendableBase {
    */
   void UpdateDutyCycle(double dutyCycle);
 
+  /**
+   * Indicates this output is used by a simulated device.
+   *
+   * @param device simulated device handle
+   */
+  void SetSimDevice(HAL_SimDeviceHandle device);
+
   void InitSendable(SendableBuilder& builder) override;
 
  private:
   int m_channel;
-  HAL_DigitalHandle m_handle = HAL_kInvalidHandle;
-  HAL_DigitalPWMHandle m_pwmGenerator = HAL_kInvalidHandle;
+  hal::Handle<HAL_DigitalHandle> m_handle;
+  hal::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
 };
 
 }  // namespace frc

@@ -1,11 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/AnalogInput.h>
+#include <frc/MedianFilter.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
@@ -22,7 +20,10 @@ class Robot : public frc::TimedRobot {
    */
   void TeleopPeriodic() override {
     // Sensor returns a value from 0-4095 that is scaled to inches
-    double currentDistance = m_ultrasonic.GetValue() * kValueToInches;
+    // returned value is filtered with a rolling median filter, since
+    // ultrasonics tend to be quite noisy and susceptible to sudden outliers
+    double currentDistance =
+        m_filter.Calculate(m_ultrasonic.GetVoltage()) * kValueToInches;
     // Convert distance error to a motor speed
     double currentSpeed = (kHoldDistance - currentDistance) * kP;
     // Drive robot
@@ -43,6 +44,9 @@ class Robot : public frc::TimedRobot {
   static constexpr int kRightMotorPort = 1;
   static constexpr int kUltrasonicPort = 0;
 
+  // median filter to discard outliers; filters over 10 samples
+  frc::MedianFilter<double> m_filter{10};
+
   frc::AnalogInput m_ultrasonic{kUltrasonicPort};
 
   frc::PWMVictorSPX m_left{kLeftMotorPort};
@@ -51,5 +55,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

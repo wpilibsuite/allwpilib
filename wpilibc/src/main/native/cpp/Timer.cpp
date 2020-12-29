@@ -1,120 +1,53 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Timer.h"
 
-#include <chrono>
-#include <thread>
-
-#include <hal/HAL.h>
-
-#include "frc/DriverStation.h"
-#include "frc/RobotController.h"
+#include <units/time.h>
 
 namespace frc {
 
 void Wait(double seconds) {
-  std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
+  frc2::Wait(units::second_t(seconds));
 }
 
 double GetTime() {
-  using std::chrono::duration;
-  using std::chrono::duration_cast;
-  using std::chrono::system_clock;
-
-  return duration_cast<duration<double>>(system_clock::now().time_since_epoch())
-      .count();
+  return frc2::GetTime().to<double>();
 }
 
 }  // namespace frc
 
 using namespace frc;
 
-// for compatibility with msvc12--see C2864
-const double Timer::kRolloverTime = (1ll << 32) / 1e6;
-
-Timer::Timer() { Reset(); }
-
-Timer::Timer(Timer&& rhs)
-    : m_startTime(std::move(rhs.m_startTime)),
-      m_accumulatedTime(std::move(rhs.m_accumulatedTime)),
-      m_running(std::move(rhs.m_running)) {}
-
-Timer& Timer::operator=(Timer&& rhs) {
-  std::scoped_lock lock(m_mutex, rhs.m_mutex);
-
-  m_startTime = std::move(rhs.m_startTime);
-  m_accumulatedTime = std::move(rhs.m_accumulatedTime);
-  m_running = std::move(rhs.m_running);
-
-  return *this;
+Timer::Timer() {
+  Reset();
 }
 
 double Timer::Get() const {
-  double result;
-  double currentTime = GetFPGATimestamp();
-
-  std::scoped_lock lock(m_mutex);
-  if (m_running) {
-    // If the current time is before the start time, then the FPGA clock rolled
-    // over. Compensate by adding the ~71 minutes that it takes to roll over to
-    // the current time.
-    if (currentTime < m_startTime) {
-      currentTime += kRolloverTime;
-    }
-
-    result = (currentTime - m_startTime) + m_accumulatedTime;
-  } else {
-    result = m_accumulatedTime;
-  }
-
-  return result;
+  return m_timer.Get().to<double>();
 }
 
 void Timer::Reset() {
-  std::scoped_lock lock(m_mutex);
-  m_accumulatedTime = 0;
-  m_startTime = GetFPGATimestamp();
+  m_timer.Reset();
 }
 
 void Timer::Start() {
-  std::scoped_lock lock(m_mutex);
-  if (!m_running) {
-    m_startTime = GetFPGATimestamp();
-    m_running = true;
-  }
+  m_timer.Start();
 }
 
 void Timer::Stop() {
-  double temp = Get();
-
-  std::scoped_lock lock(m_mutex);
-  if (m_running) {
-    m_accumulatedTime = temp;
-    m_running = false;
-  }
+  m_timer.Stop();
 }
 
 bool Timer::HasPeriodPassed(double period) {
-  if (Get() > period) {
-    std::scoped_lock lock(m_mutex);
-    // Advance the start time by the period.
-    m_startTime += period;
-    // Don't set it to the current time... we want to avoid drift.
-    return true;
-  }
-  return false;
+  return m_timer.HasPeriodPassed(units::second_t(period));
 }
 
 double Timer::GetFPGATimestamp() {
-  // FPGA returns the timestamp in microseconds
-  return RobotController::GetFPGATime() * 1.0e-6;
+  return frc2::Timer::GetFPGATimestamp().to<double>();
 }
 
 double Timer::GetMatchTime() {
-  return DriverStation::GetInstance().GetMatchTime();
+  return frc2::Timer::GetMatchTime().to<double>();
 }

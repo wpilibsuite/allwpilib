@@ -1,3 +1,7 @@
+import jaci.gradle.toolchains.*
+import jaci.gradle.nativedeps.*
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     id 'java'
     id 'application'
@@ -6,8 +10,15 @@ plugins {
 }
 
 apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'jaci.gradle.EmbeddedTools'
 
 apply from: '../shared/config.gradle'
+
+application {
+    if (OperatingSystem.current().isMacOsX()) {
+        applicationDefaultJvmArgs = ['-XstartOnFirstThread']
+    }
+}
 
 ext {
     sharedCvConfigs = [myRobotCpp: []]
@@ -17,17 +28,95 @@ ext {
     skipDev = true
 }
 
-ext {
-    chipObjectComponents = ['myRobotCpp', 'myRobotCppStatic']
-    netCommComponents = ['myRobotCpp', 'myRobotCppStatic']
-    useNiJava = true
-}
-
-apply from: "${rootDir}/shared/nilibraries.gradle"
-
 apply from: "${rootDir}/shared/opencv.gradle"
 
-mainClassName = 'Main'
+deploy {
+    targets {
+        target('roborio') {
+            directory = '/home/admin'
+            maxChannels = 4
+            locations {
+                ssh {
+                    address = "172.22.11.2"
+                    user = 'admin'
+                    password = ''
+                    ipv6 = false
+                }
+            }
+        }
+    }
+    artifacts {
+        all {
+            targets << 'roborio'
+            predeploy << { ctx ->
+                ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
+            }
+            postdeploy << { ctx ->
+                ctx.execute("sync")
+                ctx.execute("ldconfig")
+            }
+        }
+
+        artifact('jre', JREArtifact) {
+            jreDependency = 'edu.wpi.first.jdk:roborio-2020:11.0.4u10-2'
+        }
+
+        javaArtifact('myRobotJava') {
+            jar = 'shadowJar'
+            postdeploy << { ctx ->
+                ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
+                ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
+            }
+        }
+
+        nativeArtifact('myRobotCpp') {
+            component = 'myRobotCpp'
+            targetPlatform = nativeUtils.wpi.platforms.roborio
+            libraryDirectory = '/usr/local/frc/third-party/lib'
+            buildType = 'debug'
+            postdeploy << { ctx ->
+                ctx.execute('chmod +x myRobotCpp')
+            }
+
+        }
+
+        nativeArtifact('myRobotCppStatic') {
+            component = 'myRobotCppStatic'
+            targetPlatform = nativeUtils.wpi.platforms.roborio
+            buildType = 'debug'
+
+            postdeploy << { ctx ->
+                ctx.execute('chmod +x myRobotCppStatic')
+            }
+        }
+    }
+}
+
+tasks.register('deployJava') {
+    try {
+        dependsOn tasks.named('deployJreRoborio')
+        dependsOn tasks.named('deployMyRobotJavaRoborio')
+        dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
+    } catch (ignored) {
+    }
+}
+
+tasks.register('deployShared') {
+    try {
+        dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
+        dependsOn tasks.named('deployMyRobotCppRoborio')
+    } catch (ignored) {
+    }
+}
+
+tasks.register('deployStatic') {
+    try {
+        dependsOn tasks.named('deployMyRobotCppStaticRoborio')
+    } catch (ignored) {
+    }
+}
+
+mainClassName = 'frc.robot.Main'
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -36,23 +125,25 @@ repositories {
 }
 
 dependencies {
-    compile project(':wpilibj')
-    compile project(':hal')
-    compile project(':wpiutil')
-    compile project(':ntcore')
-    compile project(':cscore')
-    compile project(':cameraserver')
+    implementation project(':wpilibj')
+    implementation project(':wpimath')
+    implementation project(':hal')
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':cameraserver')
+    implementation project(':wpilibOldCommands')
+    implementation project(':wpilibNewCommands')
 }
 
-jar {
-    manifest { attributes 'Robot-Class': 'MyRobot' }
-}
+def simProjects = [
+    'halsim_gui'
+]
 
 model {
     components {
         myRobotCpp(NativeExecutableSpec) {
             targetBuildTypes 'debug'
-            baseName = 'FRCUserProgram'
             sources {
                 cpp {
                     source {
@@ -66,17 +157,33 @@ model {
                 }
             }
             binaries.all { binary ->
-                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
-                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    project(':hal').addHalDependency(binary, 'shared')
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+                lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
+                project(':hal').addHalDependency(binary, 'shared')
+                project(':hal').addHalJniDependency(binary)
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                } else {
+                    def systemArch = getCurrentArch()
+                    if (binary.targetPlatform.name == systemArch) {
+                        simProjects.each {
+                            lib project: ":simulation:$it", library: it, linkage: 'shared'
+                        }
+                    }
+                }
             }
         }
         myRobotCppStatic(NativeExecutableSpec) {
             targetBuildTypes 'debug'
-            baseName = 'FRCUserProgram'
+            nativeUtils.excludeBinariesFromStrip(it)
             sources {
                 cpp {
                     source {
@@ -90,12 +197,18 @@ model {
                 }
             }
             binaries.all { binary ->
-                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'static'
-                    lib project: ':cscore', library: 'cscore', linkage: 'static'
-                    project(':hal').addHalDependency(binary, 'static')
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
+                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'static'
+                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
+                lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                lib project: ':cscore', library: 'cscore', linkage: 'static'
+                project(':hal').addHalDependency(binary, 'static')
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                }
             }
         }
     }
@@ -106,6 +219,7 @@ model {
             description = "Run the myRobotCpp executable"
             def found = false
             def systemArch = getCurrentArch()
+            def runTask = it
             c.each {
                 if (it in NativeExecutableSpec && it.name == "myRobotCpp") {
                     it.binaries.each {
@@ -118,6 +232,32 @@ model {
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
                                 run.environment 'LD_LIBRARY_PATH', filePath
+
+                                def installTask = it.tasks.install
+
+                                def doFirstTask = {
+                                    def extensions = '';
+                                    installTask.installDirectory.get().getAsFile().eachFileRecurse {
+                                        def name = it.name
+                                        if (!(name.endsWith('.dll') || name.endsWith('.so') || name.endsWith('.dylib'))) {
+                                            return
+                                        }
+                                        def file = it
+                                        simProjects.each {
+                                            if (name.startsWith(it) || name.startsWith("lib$it".toString())) {
+                                                extensions += file.absolutePath + File.pathSeparator
+                                            }
+                                        }
+                                    }
+                                    if (extensions != '') {
+                                        run.environment 'HALSIM_EXTENSIONS', extensions
+                                        runTask.environment 'HALSIM_EXTENSIONS', extensions
+                                    }
+                                }
+
+                                runTask.doFirst doFirstTask
+                                run.doFirst doFirstTask
+
                                 run.workingDir filePath
 
                                 found = true

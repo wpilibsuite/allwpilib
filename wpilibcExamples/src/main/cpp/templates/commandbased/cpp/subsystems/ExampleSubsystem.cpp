@@ -1,20 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/ExampleSubsystem.h"
 
-#include "RobotMap.h"
-
-ExampleSubsystem::ExampleSubsystem() : frc::Subsystem("ExampleSubsystem") {}
-
-void ExampleSubsystem::InitDefaultCommand() {
-  // Set the default command for a subsystem here.
-  // SetDefaultCommand(new MySpecialCommand());
+ExampleSubsystem::ExampleSubsystem() {
+  // Implementation of subsystem constructor goes here.
 }
 
-// Put methods for controlling this subsystem
-// here. Call these from Commands.
+void ExampleSubsystem::Periodic() {
+  // Implementation of subsystem periodic method goes here.
+}
+
+void ExampleSubsystem::SimulationPeriodic() {
+  // Implementation of subsystem simulation periodic method goes here.
+}

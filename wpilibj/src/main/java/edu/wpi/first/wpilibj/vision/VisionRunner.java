@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.vision;
 
@@ -80,7 +77,7 @@ public class VisionRunner<P extends VisionPipeline> {
   public void runOnce() {
     Long id = CameraServerSharedStore.getCameraServerShared().getRobotMainThreadId();
 
-    if (id != null && Thread.currentThread().getId() == id.longValue()) {
+    if (id != null && Thread.currentThread().getId() == id) {
       throw new IllegalStateException(
           "VisionRunner.runOnce() cannot be called from the main robot thread");
     }
@@ -113,7 +110,7 @@ public class VisionRunner<P extends VisionPipeline> {
   public void runForever() {
     Long id = CameraServerSharedStore.getCameraServerShared().getRobotMainThreadId();
 
-    if (id != null && Thread.currentThread().getId() == id.longValue()) {
+    if (id != null && Thread.currentThread().getId() == id) {
       throw new IllegalStateException(
           "VisionRunner.runForever() cannot be called from the main robot thread");
     }

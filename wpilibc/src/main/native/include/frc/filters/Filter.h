@@ -1,13 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <memory>
+
+#include <wpi/deprecated.h>
 
 #include "frc/PIDSource.h"
 
@@ -15,10 +14,14 @@ namespace frc {
 
 /**
  * Interface for filters
+ *
+ * @deprecated only used by the deprecated LinearDigitalFilter
  */
 class Filter : public PIDSource {
  public:
+  WPI_DEPRECATED("This class is no longer used.")
   explicit Filter(PIDSource& source);
+  WPI_DEPRECATED("This class is no longer used.")
   explicit Filter(std::shared_ptr<PIDSource> source);
   virtual ~Filter() = default;
 

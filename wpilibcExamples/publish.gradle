@@ -1,12 +1,5 @@
 apply plugin: 'maven-publish'
 
-def pubVersion
-if (project.hasProperty("publishVersion")) {
-    pubVersion = project.publishVersion
-} else {
-    pubVersion = WPILibVersion.version
-}
-
 def baseExamplesArtifactId = 'examples'
 def baseTemplatesArtifactId = 'templates'
 def baseCommandsArtifactId = 'commands'
@@ -19,8 +12,8 @@ def commandsZipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_commands_CLS'
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppExamplesZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = examplesZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = examplesZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -32,8 +25,8 @@ task cppExamplesZip(type: Zip) {
 }
 
 task cppTemplatesZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = templatesZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = templatesZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -45,8 +38,8 @@ task cppTemplatesZip(type: Zip) {
 }
 
 task cppCommandsZip(type: Zip) {
-    destinationDir = outputsFolder
-    baseName = commandsZipBaseName
+    destinationDirectory = outputsFolder
+    archiveBaseName = commandsZipBaseName
 
     from(licenseFile) {
         into '/'
@@ -72,7 +65,7 @@ publishing {
 
             artifactId = baseExamplesArtifactId
             groupId artifactGroupId
-            version pubVersion
+            version wpilibVersioning.version.get()
         }
 
         templates(MavenPublication) {
@@ -80,7 +73,7 @@ publishing {
 
             artifactId = baseTemplatesArtifactId
             groupId artifactGroupId
-            version pubVersion
+            version wpilibVersioning.version.get()
         }
 
         commands(MavenPublication) {
@@ -88,7 +81,7 @@ publishing {
 
             artifactId = baseCommandsArtifactId
             groupId artifactGroupId
-            version pubVersion
+            version wpilibVersioning.version.get()
         }
     }
 }

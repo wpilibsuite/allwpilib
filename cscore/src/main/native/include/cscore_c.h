@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_CSCORE_C_H_
 #define CSCORE_CSCORE_C_H_
@@ -228,7 +225,7 @@ struct CS_Event {
 };
 
 /**
- * USB camera infomation
+ * USB camera information
  */
 typedef struct CS_UsbCameraInfo {
   int dev;
@@ -236,6 +233,8 @@ typedef struct CS_UsbCameraInfo {
   char* name;
   int otherPathsCount;
   char** otherPaths;
+  int vendorId;
+  int productId;
 } CS_UsbCameraInfo;
 
 /**
@@ -336,6 +335,7 @@ void CS_SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
  * @defgroup cscore_usbcamera_cfunc UsbCamera Source Functions
  * @{
  */
+void CS_SetUsbCameraPath(CS_Source source, const char* path, CS_Status* status);
 char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);
 CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status);
 /** @} */
