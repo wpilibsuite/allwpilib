@@ -9,12 +9,14 @@
 #include "WSHalProviders.h"
 
 namespace wpilibws {
-class HALSimWSProviderPCM : public HALSimWSHalChanProvider {
+class HALSimWSProviderSolenoid : public HALSimWSHalProvider {
  public:
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
-  using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderPCM();
+  explicit HALSimWSProviderSolenoid(int32_t pcmChannel, int32_t solenoidChannel,
+                                    const std::string& key,
+                                    const std::string& type);
+  ~HALSimWSProviderSolenoid();
 
  protected:
   void RegisterCallbacks() override;
@@ -22,10 +24,10 @@ class HALSimWSProviderPCM : public HALSimWSHalChanProvider {
   void DoCancelCallbacks();
 
  private:
+  int32_t m_pcmIndex = 0;
+  int32_t m_solenoidIndex = 0;
+
   int32_t m_initCbKey = 0;
-  int32_t m_onCbKey = 0;
-  int32_t m_closedLoopCbKey = 0;
-  int32_t m_pressureSwitchCbKey = 0;
-  int32_t m_currentCbKey = 0;
+  int32_t m_outputCbKey = 0;
 };
 }  // namespace wpilibws

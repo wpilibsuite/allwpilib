@@ -58,7 +58,9 @@ void HALSimWSProviderAddressableLED::RegisterCallbacks() {
       this);
 }
 
-void HALSimWSProviderAddressableLED::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderAddressableLED::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderAddressableLED::DoCancelCallbacks() {
   HALSIM_CancelAddressableLEDInitializedCallback(m_channel, m_initCbKey);

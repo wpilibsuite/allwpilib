@@ -87,6 +87,7 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 | [``"Joystick"``][]      | Joystick data              | Joystick number           |
 | [``"PWM"``][]           | PWM output                 | Port index, e.g. "1", "2" |
 | [``"Relay"``][]         | Relay output               | Port index, e.g. "1", "2" |
+| [``"Solenoid"``][]      | Solenoid output            | Module +Port index, e.g. "0,1", "2,5" |
 
 #### Accelerometer ("Accel")
 

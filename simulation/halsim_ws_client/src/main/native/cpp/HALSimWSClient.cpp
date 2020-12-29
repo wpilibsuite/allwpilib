@@ -18,6 +18,7 @@
 #include <WSProvider_Relay.h>
 #include <WSProvider_RoboRIO.h>
 #include <WSProvider_SimDevice.h>
+#include <WSProvider_Solenoid.h>
 #include <WSProvider_dPWM.h>
 #include <wpi/EventLoopRunner.h>
 
@@ -47,12 +48,12 @@ bool HALSimWSClient::Initialize() {
     HALSimWSProviderEncoder::Initialize(registerFunc);
     HALSimWSProviderJoystick::Initialize(registerFunc);
     HALSimWSProviderPCM::Initialize(registerFunc);
-    HALSimWSProviderPCMSolenoid::Initialize(registerFunc);
     HALSimWSProviderPDP::Initialize(registerFunc);
     HALSimWSProviderPDPChannelCurrent::Initialize(registerFunc);
     HALSimWSProviderPWM::Initialize(registerFunc);
     HALSimWSProviderRelay::Initialize(registerFunc);
     HALSimWSProviderRoboRIO::Initialize(registerFunc);
+    HALSimWSProviderSolenoid::Initialize(registerFunc);
 
     simDevices.Initialize(loop);
 
