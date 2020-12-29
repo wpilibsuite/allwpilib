@@ -32,7 +32,8 @@ public class SwerveModule {
 
   private final ProfiledPIDController m_turningPIDController
       = new ProfiledPIDController(1, 0, 0,
-      new TrapezoidProfile.Constraints(kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
+          new TrapezoidProfile.Constraints(kModuleMaxAngularVelocity,
+              kModuleMaxAngularAcceleration));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);

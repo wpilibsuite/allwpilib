@@ -85,8 +85,8 @@ public class ShuffleboardTabTest {
     Sendable sendable = new InstantCommand("Command");
     String widgetType = "Command Widget";
     m_tab.add(sendable)
-       .withWidget(widgetType)
-       .withProperties(mapOf("foo", 1234, "bar", "baz"));
+        .withWidget(widgetType)
+        .withProperties(mapOf("foo", 1234, "bar", "baz"));
 
     m_instance.update();
     String meta = "/Shuffleboard/.metadata/Tab/Command";

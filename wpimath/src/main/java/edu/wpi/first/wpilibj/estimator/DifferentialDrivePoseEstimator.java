@@ -141,7 +141,7 @@ public class DifferentialDrivePoseEstimator {
 
     m_visionCorrect = (u, y) -> m_observer.correct(
         Nat.N3(), u, y,
-        (x, u_) -> new Matrix<>(x.getStorage().extractMatrix(0, 3, 0, 1)),
+        (x, u1) -> new Matrix<>(x.getStorage().extractMatrix(0, 3, 0, 1)),
         m_visionDiscreteR,
         AngleStatistics.angleMean(2),
         AngleStatistics.angleResidual(2),

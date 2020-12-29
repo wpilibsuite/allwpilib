@@ -51,12 +51,12 @@ public final class RuntimeLoader<T> {
   private String getLoadErrorMessage(UnsatisfiedLinkError ule) {
     StringBuilder msg = new StringBuilder(512);
     msg.append(m_libraryName)
-       .append(" could not be loaded from path or an embedded resource.\n"
-               + "\tattempted to load for platform ")
-       .append(RuntimeDetector.getPlatformPath())
-       .append("\nLast Load Error: \n")
-       .append(ule.getMessage())
-       .append('\n');
+        .append(" could not be loaded from path or an embedded resource.\n"
+                + "\tattempted to load for platform ")
+        .append(RuntimeDetector.getPlatformPath())
+        .append("\nLast Load Error: \n")
+        .append(ule.getMessage())
+        .append('\n');
     if (RuntimeDetector.isWindows()) {
       msg.append("A common cause of this error is missing the C++ runtime.\n"
                  + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");

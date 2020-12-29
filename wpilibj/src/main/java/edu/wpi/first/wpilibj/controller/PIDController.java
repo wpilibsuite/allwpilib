@@ -105,10 +105,10 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
    */
-  public void setPID(double Kp, double Ki, double Kd) {
-    m_kp = Kp;
-    m_ki = Ki;
-    m_kd = Kd;
+  public void setPID(double kp, double ki, double kd) {
+    m_kp = kp;
+    m_ki = ki;
+    m_kd = kd;
   }
 
   /**
@@ -116,8 +116,8 @@ public class PIDController implements Sendable, AutoCloseable {
    *
    * @param kp proportional coefficient
    */
-  public void setP(double Kp) {
-    m_kp = Kp;
+  public void setP(double kp) {
+    m_kp = kp;
   }
 
   /**
@@ -125,8 +125,8 @@ public class PIDController implements Sendable, AutoCloseable {
    *
    * @param ki integral coefficient
    */
-  public void setI(double Ki) {
-    m_ki = Ki;
+  public void setI(double ki) {
+    m_ki = ki;
   }
 
   /**
@@ -134,8 +134,8 @@ public class PIDController implements Sendable, AutoCloseable {
    *
    * @param kd differential coefficient
    */
-  public void setD(double Kd) {
-    m_kd = Kd;
+  public void setD(double kd) {
+    m_kd = kd;
   }
 
   /**

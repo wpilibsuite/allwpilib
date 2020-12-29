@@ -218,7 +218,7 @@ public final class TestBench {
     return pairs;
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static AnalogCrossConnectFixture getAnalogCrossConnectFixture() {
     return new AnalogCrossConnectFixture() {
       @Override
@@ -233,7 +233,7 @@ public final class TestBench {
     };
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
     return new RelayCrossConnectFixture() {
       @Override

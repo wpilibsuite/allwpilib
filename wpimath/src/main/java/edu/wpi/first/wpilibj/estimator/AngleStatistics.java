@@ -26,7 +26,6 @@ public final class AngleStatistics {
    * @param b A vector to subtract with.
    * @param angleStateIdx The row containing angles to be normalized.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
   public static <S extends Num> Matrix<S, N1> angleResidual(Matrix<S, N1> a, Matrix<S, N1> b,
                                                             int angleStateIdx) {
     Matrix<S, N1> ret = a.minus(b);
@@ -41,7 +40,6 @@ public final class AngleStatistics {
    *
    * @param angleStateIdx The row containing angles to be normalized.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
   public static <S extends Num> BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>>
       angleResidual(int angleStateIdx) {
     return (a, b) -> angleResidual(a, b, angleStateIdx);
@@ -54,7 +52,6 @@ public final class AngleStatistics {
    * @param b A vector to add with.
    * @param angleStateIdx The row containing angles to be normalized.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
   public static <S extends Num> Matrix<S, N1> angleAdd(Matrix<S, N1> a, Matrix<S, N1> b,
                                                        int angleStateIdx) {
     Matrix<S, N1> ret = a.plus(b);
@@ -69,7 +66,6 @@ public final class AngleStatistics {
    *
    * @param angleStateIdx The row containing angles to be normalized.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
   public static <S extends Num> BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>>
       angleAdd(int angleStateIdx) {
     return (a, b) -> angleAdd(a, b, angleStateIdx);
@@ -119,7 +115,7 @@ public final class AngleStatistics {
    *
    * @param angleStateIdx The row containing the angles.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
+  @SuppressWarnings("LambdaParameterName")
   public static <S extends Num> BiFunction<Matrix<S, ?>, Matrix<?, N1>, Matrix<S, N1>>
       angleMean(int angleStateIdx) {
     return (sigmas, Wm) -> angleMean(sigmas, Wm, angleStateIdx);

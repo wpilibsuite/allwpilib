@@ -88,7 +88,7 @@ public class CubicHermiteSpline extends Spline {
           -3.0, -2.0, +3.0, -1.0,
           +0.0, +1.0, +0.0, +0.0,
           +1.0, +0.0, +0.0, +0.0
-      });
+        });
     }
     return hermiteBasis;
   }

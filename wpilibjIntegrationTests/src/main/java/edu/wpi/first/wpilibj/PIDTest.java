@@ -56,7 +56,7 @@ public class PIDTest extends AbstractComsSetup {
   }
 
 
-  @SuppressWarnings({"ParameterName", "JavadocMethod"})
+  @SuppressWarnings({"ParameterName", "MissingJavadocMethod"})
   public PIDTest(Double p, Double i, Double d, MotorEncoderFixture<?> mef) {
     logger.fine("Constructor with: " + mef.getType());
     if (PIDTest.me != null && !PIDTest.me.equals(mef)) {

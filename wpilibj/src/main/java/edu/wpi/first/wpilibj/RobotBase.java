@@ -267,7 +267,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public abstract void endCompetition();
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static boolean getBooleanProperty(String name, boolean defaultValue) {
     String propVal = System.getProperty(name);
     if (propVal == null) {

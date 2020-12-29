@@ -89,7 +89,7 @@ public class QuinticHermiteSpline extends Spline {
           +00.0, +00.0, +00.5, +00.0, +00.0, +00.0,
           +00.0, +01.0, +00.0, +00.0, +00.0, +00.0,
           +01.0, +00.0, +00.0, +00.0, +00.0, +00.0
-      });
+        });
     }
     return hermiteBasis;
   }

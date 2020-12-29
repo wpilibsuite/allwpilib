@@ -117,8 +117,8 @@ public class SwerveDrivePoseEstimator {
 
     m_observer = new UnscentedKalmanFilter<>(
         Nat.N3(), Nat.N1(),
-        (x_, u) -> u,
-        (x, u_) -> x.extractRowVector(2),
+        (x, u) -> u,
+        (x, u) -> x.extractRowVector(2),
         stateStdDevs,
         localMeasurementStdDevs,
         AngleStatistics.angleMean(2),
@@ -136,7 +136,7 @@ public class SwerveDrivePoseEstimator {
 
     m_visionCorrect = (u, y) -> m_observer.correct(
         Nat.N3(), u, y,
-        (x, u_) -> x,
+        (x, u1) -> x,
         m_visionDiscreteR,
         AngleStatistics.angleMean(2),
         AngleStatistics.angleResidual(2),

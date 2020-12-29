@@ -54,7 +54,7 @@ public class Timer {
    */
   private final Object m_lock = new Object();
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public Timer() {
     reset();
   }
