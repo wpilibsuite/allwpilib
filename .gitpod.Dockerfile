@@ -6,4 +6,5 @@ FROM gitpod/workspace-full-vnc
 #
 # More information: https://www.gitpod.io/docs/config-docker/
 
-RUN  sudo apt update && sudo apt install -y libtinfo5
+RUN  sudo apt update && sudo apt install -y libtinfo5 mesa-common-dev
+
