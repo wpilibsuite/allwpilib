@@ -2976,17 +2976,6 @@ TEST_F(UnitMath, abs) {
   EXPECT_EQ(meter_t(10.0), abs(meter_t(10.0)));
 }
 
-TEST_F(UnitMath, normalize) {
-  EXPECT_EQ(NormalizeAngle(radian_t(5 * wpi::math::pi)),
-      radian_t(wpi::math::pi));
-  EXPECT_EQ(NormalizeAngle(radian_t(-5 * wpi::math::pi)),
-      radian_t(wpi::math::pi));
-  EXPECT_EQ(NormalizeAngle(radian_t(wpi::math::pi / 2)),
-      radian_t(wpi::math::pi / 2));
-  EXPECT_EQ(NormalizeAngle(radian_t(-wpi::math::pi / 2)),
-      radian_t(-wpi::math::pi / 2));
-}
-
 // Constexpr
 #if !defined(_MSC_VER) || _MSC_VER > 1800
 TEST_F(Constexpr, construction) {

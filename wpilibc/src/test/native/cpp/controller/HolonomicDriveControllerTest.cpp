@@ -6,6 +6,7 @@
 #include <units/time.h>
 #include <wpi/math>
 
+#include "frc/MathUtil.h"
 #include "frc/controller/HolonomicDriveController.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
@@ -43,6 +44,6 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
   auto& endPose = trajectory.States().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
-  EXPECT_NEAR_UNITS(units::math::NormalizeAngle(robotPose.Rotation().Radians()),
-                    0_rad, kAngularTolerance);
+  EXPECT_NEAR_UNITS(frc::AngleModulus(robotPose.Rotation().Radians()), 0_rad,
+                    kAngularTolerance);
 }

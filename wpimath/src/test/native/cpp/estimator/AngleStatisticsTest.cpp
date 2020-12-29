@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+#include <wpi/math>
+
 #include "Eigen/Core"
 #include "frc/estimator/AngleStatistics.h"
 
@@ -32,12 +34,4 @@ TEST(AngleStatisticsTest, TestAdd) {
   Eigen::Vector3d b(1, 359 * wpi::math::pi / 180, 1);
 
   EXPECT_TRUE(frc::AngleAdd<3>(a, b, 1).isApprox(Eigen::Vector3d(2, 0, 3)));
-}
-
-TEST(AngleStatisticsTest, TestNormalize) {
-  EXPECT_NEAR(frc::NormalizeAngle(-2000 * wpi::math::pi / 180),
-              160 * wpi::math::pi / 180, 1e-6);
-  EXPECT_NEAR(frc::NormalizeAngle(358 * wpi::math::pi / 180),
-              -2 * wpi::math::pi / 180, 1e-6);
-  EXPECT_NEAR(frc::NormalizeAngle(360 * wpi::math::pi / 180), 0, 1e-6);
 }

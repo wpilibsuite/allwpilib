@@ -11,7 +11,7 @@
 
 #include <units/time.h>
 
-#include "frc/controller/ControllerUtil.h"
+#include "frc/MathUtil.h"
 #include "frc/controller/PIDController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -253,10 +253,10 @@ class ProfiledPIDController
   double Calculate(Distance_t measurement) {
     if (m_controller.IsContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
-      auto goalMinDistance = frc::GetModulusError<Distance_t>(
-          m_goal.position, measurement, m_minimumInput, m_maximumInput);
-      auto setpointMinDistance = frc::GetModulusError<Distance_t>(
-          m_setpoint.position, measurement, m_minimumInput, m_maximumInput);
+      auto goalMinDistance = frc::InputModulus<Distance_t>(
+          m_goal.position - measurement, m_minimumInput, m_maximumInput);
+      auto setpointMinDistance = frc::InputModulus<Distance_t>(
+          m_setpoint.position - measurement, m_minimumInput, m_maximumInput);
 
       // Recompute the profile goal with the smallest error, thus giving the
       // shortest path. The goal may be outside the input range after this

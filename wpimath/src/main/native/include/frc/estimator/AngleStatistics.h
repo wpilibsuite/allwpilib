@@ -7,17 +7,9 @@
 #include <wpi/math>
 
 #include "Eigen/Core"
+#include "frc/MathUtil.h"
 
 namespace frc {
-inline double NormalizeAngle(double angle) {
-  static constexpr double tau = 2 * wpi::math::pi;
-
-  angle -= std::floor(angle / tau) * tau;
-  if (angle > wpi::math::pi) {
-    angle -= tau;
-  }
-  return angle;
-}
 
 /**
  * Subtracts a and b while normalizing the resulting value in the selected row
@@ -32,7 +24,8 @@ Eigen::Matrix<double, States, 1> AngleResidual(
     const Eigen::Matrix<double, States, 1>& a,
     const Eigen::Matrix<double, States, 1>& b, int angleStateIdx) {
   Eigen::Matrix<double, States, 1> ret = a - b;
-  ret[angleStateIdx] = NormalizeAngle(ret[angleStateIdx]);
+  ret[angleStateIdx] =
+      AngleModulus(units::radian_t{ret[angleStateIdx]}).to<double>();
   return ret;
 }
 
@@ -65,7 +58,8 @@ Eigen::Matrix<double, States, 1> AngleAdd(
     const Eigen::Matrix<double, States, 1>& a,
     const Eigen::Matrix<double, States, 1>& b, int angleStateIdx) {
   Eigen::Matrix<double, States, 1> ret = a + b;
-  ret[angleStateIdx] = NormalizeAngle(ret[angleStateIdx]);
+  ret[angleStateIdx] =
+      InputModulus(ret[angleStateIdx], -wpi::math::pi, wpi::math::pi);
   return ret;
 }
 
@@ -122,4 +116,5 @@ AngleMean(int angleStateIdx) {
     return AngleMean<CovDim, States>(sigmas, Wm, angleStateIdx);
   };
 }
+
 }  // namespace frc

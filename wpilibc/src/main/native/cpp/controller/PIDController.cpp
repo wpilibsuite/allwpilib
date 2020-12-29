@@ -9,7 +9,7 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/controller/ControllerUtil.h"
+#include "frc/MathUtil.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -69,8 +69,8 @@ double PIDController::GetSetpoint() const {
 bool PIDController::AtSetpoint() const {
   double positionError;
   if (m_continuous) {
-    positionError = frc::GetModulusError<double>(
-        m_setpoint, m_measurement, m_minimumInput, m_maximumInput);
+    positionError = frc::InputModulus(m_setpoint - m_measurement,
+                                      m_minimumInput, m_maximumInput);
   } else {
     positionError = m_setpoint - m_measurement;
   }
@@ -121,8 +121,8 @@ double PIDController::Calculate(double measurement) {
   m_prevError = m_positionError;
 
   if (m_continuous) {
-    m_positionError = frc::GetModulusError<double>(
-        m_setpoint, measurement, m_minimumInput, m_maximumInput);
+    m_positionError = frc::InputModulus(m_setpoint - measurement,
+                                        m_minimumInput, m_maximumInput);
   } else {
     m_positionError = m_setpoint - measurement;
   }

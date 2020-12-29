@@ -8,7 +8,7 @@ public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
-    System.out.println(MathUtil.normalizeAngle(-5.0));
+    System.out.println(MathUtil.angleModulus(-5.0));
   }
 
   private DevMain() {}
