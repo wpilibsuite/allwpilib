@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private Command m_teleopCommand;
 
   private RobotContainer m_robotContainer;
 
@@ -30,7 +29,6 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    m_teleopCommand = m_robotContainer.getTeleOpCommand();
   }
 
   /**
@@ -66,11 +64,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    // Kill teleop if running
-    if(m_teleopCommand != null) {
-      m_teleopCommand.cancel();
-    }
-
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -86,17 +79,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
+    // This makes sure that the autonomous stops running which will
+    // use the default command which is arcadeDrive. If you want the autonomous 
+    // to continue until interrupted by another command, remove
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
-    }
-
-    // schedule the autonomous command (example)
-    if (m_teleopCommand != null) {
-      m_teleopCommand.schedule();
     }
 
   }

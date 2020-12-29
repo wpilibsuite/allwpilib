@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 
-import edu.wpi.first.wpilibj.examples.romireference.commands.TeleopArcadeDrive;
+import edu.wpi.first.wpilibj.examples.romireference.commands.ArcadeDrive;
 import edu.wpi.first.wpilibj.examples.romireference.commands.AutonomousDistance;
 import edu.wpi.first.wpilibj.examples.romireference.commands.AutonomousTime;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
@@ -58,8 +58,9 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command is teleop
-    m_drivetrain.setDefaultCommand(getTeleOpCommand());
+    // Default command is arcade drive. This will run unless another command
+    // is scheduled over it.
+    m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
 
     // Example of how to use the onboard IO
     Button onboardButtonA = new Button(m_onboardIO::getButtonAPressed);
@@ -85,8 +86,8 @@ public class RobotContainer {
    *
    * @return the command to run in teleop
    */
-  public Command getTeleOpCommand() {
-    return new TeleopArcadeDrive(m_drivetrain,
+  public Command getArcadeDriveCommand() {
+    return new ArcadeDrive(m_drivetrain,
                                  () -> m_controller.getRawAxis(1),
                                  () -> -m_controller.getRawAxis(2));
   }
