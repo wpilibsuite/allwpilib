@@ -12,10 +12,11 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 
 import edu.wpi.first.wpilibj.examples.romireference.commands.TeleopArcadeDrive;
+import edu.wpi.first.wpilibj.examples.romireference.commands.AutonomousDistance;
+import edu.wpi.first.wpilibj.examples.romireference.commands.AutonomousTime;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.OnBoardIO;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.OnBoardIO.ChannelMode;
-
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -57,10 +58,6 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Also set default commands here
-    m_drivetrain.setDefaultCommand(new TeleopArcadeDrive(m_drivetrain,
-        () -> m_controller.getRawAxis(1),
-        () -> -m_controller.getRawAxis(2)));
 
     // Example of how to use the onboard IO
     Button onboardButtonA = new Button(m_onboardIO::getButtonAPressed);
@@ -76,7 +73,19 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return null;
+    // Change this to AutonomousTime to use a different
+    // command sequence
+    return new AutonomousDistance(m_drivetrain);
+  }
+
+    /**
+   * Use this to pass the teleop command to the main {@link Robot} class.
+   *
+   * @return the command to run in teleop
+   */
+  public Command getTeleOpCommand() {
+    return new TeleopArcadeDrive(m_drivetrain,
+                                 () -> m_controller.getRawAxis(1),
+                                 () -> -m_controller.getRawAxis(2));
   }
 }

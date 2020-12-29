@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class RomiDrivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;
-  private static final double kWheelDiameterInch = 2.75;
+  private static final double kWheelDiameterInch = 2.75591; // 70 mm
 
   // The Romi has the left and right motors set to
   // PWM channels 0 and 1 respectively
@@ -30,10 +30,9 @@ public class RomiDrivetrain extends SubsystemBase {
    * Creates a new RomiDrivetrain.
    */
   public RomiDrivetrain() {
-    // DifferentialDrive defaults to having the right side flipped
-    // We don't need to do this because the Romi has accounted for this
-    // in firmware/hardware
-    m_diffDrive.setRightSideInverted(false);
+    // Use inches as unit for encoder distances
+    m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch)/kCountsPerRevolution);
+    m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch)/kCountsPerRevolution);
     resetEncoders();
   }
 
@@ -46,20 +45,12 @@ public class RomiDrivetrain extends SubsystemBase {
     m_rightEncoder.reset();
   }
 
-  public int getLeftEncoderCount() {
-    return m_leftEncoder.get();
-  }
-
-  public int getRightEncoderCount() {
-    return m_rightEncoder.get();
-  }
-
   public double getLeftDistanceInch() {
-    return Math.PI * kWheelDiameterInch * (getLeftEncoderCount() / kCountsPerRevolution);
+    return m_leftEncoder.getDistance();
   }
 
   public double getRightDistanceInch() {
-    return Math.PI * kWheelDiameterInch * (getRightEncoderCount() / kCountsPerRevolution);
+    return m_rightEncoder.getDistance();
   }
 
   @Override
