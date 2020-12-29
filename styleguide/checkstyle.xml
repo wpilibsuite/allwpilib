@@ -35,10 +35,7 @@ module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
     <property name="max" value="100"/>
     <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
   </module>
-  <module name="NewlineAtEndOfFile">
-    <property name="lineSeparator"
-              value="system" />
-  </module>
+  <module name="NewlineAtEndOfFile" />
   <module name="SuppressWarningsFilter" />
   <module name="TreeWalker">
     <module name="SuppressionCommentFilter">
