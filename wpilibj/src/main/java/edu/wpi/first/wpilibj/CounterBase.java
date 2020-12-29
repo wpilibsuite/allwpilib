@@ -30,7 +30,6 @@ public interface CounterBase {
      */
     k4X(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     EncodingType(int value) {

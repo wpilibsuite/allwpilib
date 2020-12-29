@@ -19,7 +19,6 @@ public class SerialPort implements AutoCloseable {
   public enum Port {
     kOnboard(0), kMXP(1), kUSB(2), kUSB1(2), kUSB2(3);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Port(int value) {
@@ -33,7 +32,6 @@ public class SerialPort implements AutoCloseable {
   public enum Parity {
     kNone(0), kOdd(1), kEven(2), kMark(3), kSpace(4);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Parity(int value) {
@@ -47,7 +45,6 @@ public class SerialPort implements AutoCloseable {
   public enum StopBits {
     kOne(10), kOnePointFive(15), kTwo(20);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     StopBits(int value) {
@@ -61,7 +58,6 @@ public class SerialPort implements AutoCloseable {
   public enum FlowControl {
     kNone(0), kXonXoff(1), kRtsCts(2), kDtsDsr(4);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     FlowControl(int value) {
@@ -75,7 +71,6 @@ public class SerialPort implements AutoCloseable {
   public enum WriteBufferMode {
     kFlushOnAccess(1), kFlushWhenFull(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     WriteBufferMode(int value) {

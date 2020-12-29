@@ -49,7 +49,6 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
      */
     kExternalDirection(3);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Mode(int value) {

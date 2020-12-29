@@ -39,7 +39,6 @@ public abstract class GenericHID {
     kHIDFlight(23),
     kHID1stPerson(24);
 
-    @SuppressWarnings("MemberName")
     public final int value;
     @SuppressWarnings("PMD.UseConcurrentHashMap")
     private static final Map<Integer, HIDType> map = new HashMap<>();
@@ -65,7 +64,6 @@ public abstract class GenericHID {
   public enum Hand {
     kLeft(0), kRight(1);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Hand(int value) {

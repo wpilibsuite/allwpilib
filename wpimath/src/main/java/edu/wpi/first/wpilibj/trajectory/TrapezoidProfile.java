@@ -168,7 +168,6 @@ public class TrapezoidProfile {
    *
    * @param t The time since the beginning of the profile.
    */
-  @SuppressWarnings("ParameterName")
   public State calculate(double t) {
     State result = new State(m_initial.position, m_initial.velocity);
 
@@ -274,7 +273,6 @@ public class TrapezoidProfile {
    *
    * @param t The time since the beginning of the profile.
    */
-  @SuppressWarnings("ParameterName")
   public boolean isFinished(double t) {
     return t >= totalTime();
   }

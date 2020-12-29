@@ -69,7 +69,7 @@ public final class NumericalJacobian {
    * @param u         Input vector.
    * @return The numerical Jacobian with respect to x for f(x, u, ...).
    */
-  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
+  @SuppressWarnings({"LambdaParameterName", "MethodTypeParameterName"})
   public static <Rows extends Num, States extends Num, Inputs extends Num, Outputs extends Num>
       Matrix<Rows, States> numericalJacobianX(
           Nat<Rows> rows,
@@ -94,7 +94,7 @@ public final class NumericalJacobian {
    * @param u        Input vector.
    * @return the numerical Jacobian with respect to u for f(x, u).
    */
-  @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
+  @SuppressWarnings({"LambdaParameterName", "MethodTypeParameterName"})
   public static <Rows extends Num, States extends Num, Inputs extends Num> Matrix<Rows, Inputs>
       numericalJacobianU(
           Nat<Rows> rows,

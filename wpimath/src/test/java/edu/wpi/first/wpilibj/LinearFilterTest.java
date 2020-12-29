@@ -29,12 +29,10 @@ class LinearFilterTest {
   private static final double kHighPassExpectedOutput = 10.074717;
   private static final double kMovAvgExpectedOutput = -10.191644;
 
-  @SuppressWarnings("ParameterName")
   private static double getData(double t) {
     return 100.0 * Math.sin(2.0 * Math.PI * t) + 20.0 * Math.cos(50.0 * Math.PI * t);
   }
 
-  @SuppressWarnings("ParameterName")
   private static double getPulseData(double t) {
     if (Math.abs(t - 1.0) < 0.001) {
       return 1.0;

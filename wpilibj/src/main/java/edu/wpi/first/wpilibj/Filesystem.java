@@ -14,7 +14,7 @@ import java.io.File;
  * the RoboRIO path /home/lvuser in a simulation-compatible way.</p>
  */
 public final class Filesystem {
-  private Filesystem() { }
+  private Filesystem() {}
 
   /**
    * Obtains the current working path that the program was launched with.

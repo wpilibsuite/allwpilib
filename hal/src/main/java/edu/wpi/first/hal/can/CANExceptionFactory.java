@@ -14,7 +14,7 @@ public final class CANExceptionFactory {
   static final int ERR_CANSessionMux_NotAllowed = -44088;
   static final int ERR_CANSessionMux_NotInitialized = -44089;
 
-  @SuppressWarnings({"JavadocMethod", "PMD.CyclomaticComplexity"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.CyclomaticComplexity"})
   public static void checkStatus(int status, int messageID) throws CANInvalidBufferException,
       CANMessageNotAllowedException, CANNotInitializedException, UncleanStatusException {
     switch (status) {

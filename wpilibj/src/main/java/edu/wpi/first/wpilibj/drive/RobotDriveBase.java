@@ -23,7 +23,6 @@ public abstract class RobotDriveBase extends MotorSafety {
     kFrontLeft(0), kFrontRight(1), kRearLeft(2), kRearRight(3), kLeft(0),
     kRight(1), kBack(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     MotorType(int value) {

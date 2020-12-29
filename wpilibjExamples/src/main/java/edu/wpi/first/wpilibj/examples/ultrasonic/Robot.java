@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
   private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
   private final DifferentialDrive m_robotDrive
       = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
-      new PWMVictorSPX(kRightMotorPort));
+          new PWMVictorSPX(kRightMotorPort));
 
   /**
    * Tells the robot to drive to a set distance (in inches) from an object

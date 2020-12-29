@@ -24,7 +24,6 @@ public class I2C implements AutoCloseable {
   public enum Port {
     kOnboard(0), kMXP(1);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Port(int value) {

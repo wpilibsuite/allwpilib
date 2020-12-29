@@ -30,7 +30,6 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
   public enum MotorType {
     kFrontLeft(0), kFrontRight(1), kRearLeft(2), kRearRight(3);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     MotorType(int value) {
@@ -445,29 +444,24 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * @param gyroAngle The current angle reading from the gyro. Use this to implement field-oriented
    *                  controls.
    */
-  @SuppressWarnings("ParameterName")
   public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
     if (!kMecanumCartesian_Reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_MecanumCartesian,
           getNumMotors());
       kMecanumCartesian_Reported = true;
     }
-    @SuppressWarnings("LocalVariableName")
-    double xIn = x;
-    @SuppressWarnings("LocalVariableName")
-    double yIn = y;
     // Negate y for the joystick.
-    yIn = -yIn;
+    y = -y;
     // Compensate for gyro angle.
-    double[] rotated = rotateVector(xIn, yIn, gyroAngle);
-    xIn = rotated[0];
-    yIn = rotated[1];
+    double[] rotated = rotateVector(x, y, gyroAngle);
+    x = rotated[0];
+    y = rotated[1];
 
     double[] wheelSpeeds = new double[kMaxNumberOfMotors];
-    wheelSpeeds[MotorType.kFrontLeft.value] = xIn + yIn + rotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = -xIn + yIn - rotation;
-    wheelSpeeds[MotorType.kRearLeft.value] = -xIn + yIn + rotation;
-    wheelSpeeds[MotorType.kRearRight.value] = xIn + yIn - rotation;
+    wheelSpeeds[MotorType.kFrontLeft.value] = x + y + rotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = -x + y - rotation;
+    wheelSpeeds[MotorType.kRearLeft.value] = -x + y + rotation;
+    wheelSpeeds[MotorType.kRearRight.value] = x + y - rotation;
 
     normalize(wheelSpeeds);
     m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft.value] * m_maxOutput);
@@ -592,7 +586,6 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
   /**
    * Rotate a vector in Cartesian space.
    */
-  @SuppressWarnings("ParameterName")
   protected static double[] rotateVector(double x, double y, double angle) {
     double cosA = Math.cos(angle * (Math.PI / 180.0));
     double sinA = Math.sin(angle * (Math.PI / 180.0));

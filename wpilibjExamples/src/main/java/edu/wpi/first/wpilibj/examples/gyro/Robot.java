@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
 
   private final DifferentialDrive m_myRobot
       = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
-      new PWMVictorSPX(kRightMotorPort));
+          new PWMVictorSPX(kRightMotorPort));
   private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 

@@ -21,7 +21,6 @@ public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Port(int value) {

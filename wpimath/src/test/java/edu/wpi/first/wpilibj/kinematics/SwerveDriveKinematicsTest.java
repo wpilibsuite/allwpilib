@@ -203,7 +203,7 @@ class SwerveDriveKinematicsTest {
         new SwerveModuleState(23.43, Rotation2d.fromDegrees(-39.81)),
         new SwerveModuleState(54.08, Rotation2d.fromDegrees(-109.44)),
         new SwerveModuleState(54.08, Rotation2d.fromDegrees(-70.56))
-    };
+      };
     var stateTolerance = new SwerveModuleState(0.1, Rotation2d.fromDegrees(0.1));
 
     for (int i = 0; i < expectedStates.length; i++) {

@@ -18,7 +18,6 @@ public enum NetworkTableType {
   kStringArray(0x40),
   kRpc(0x80);
 
-  @SuppressWarnings("MemberName")
   private final int value;
 
   NetworkTableType(int value) {

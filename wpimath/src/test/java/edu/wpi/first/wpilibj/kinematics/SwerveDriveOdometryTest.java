@@ -33,7 +33,7 @@ class SwerveDriveOdometryTest {
         new SwerveModuleState(5, Rotation2d.fromDegrees(0)),
         new SwerveModuleState(5, Rotation2d.fromDegrees(0)),
         new SwerveModuleState(5, Rotation2d.fromDegrees(0))
-    };
+      };
 
     m_odometry.updateWithTime(0.0, new Rotation2d(),
         new SwerveModuleState(), new SwerveModuleState(),
@@ -60,7 +60,7 @@ class SwerveDriveOdometryTest {
         new SwerveModuleState(42.15, Rotation2d.fromDegrees(26.565)),
         new SwerveModuleState(18.85, Rotation2d.fromDegrees(-90)),
         new SwerveModuleState(42.15, Rotation2d.fromDegrees(-26.565))
-    };
+      };
     final var zero = new SwerveModuleState();
 
     m_odometry.updateWithTime(0.0, new Rotation2d(), zero, zero, zero, zero);

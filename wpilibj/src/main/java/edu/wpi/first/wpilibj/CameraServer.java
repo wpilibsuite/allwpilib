@@ -71,7 +71,7 @@ public final class CameraServer {
   private int m_nextPort;
   private String[] m_addresses;
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String makeSourceValue(int source) {
     switch (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))) {
       case kUsb:
@@ -93,12 +93,12 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String makeStreamValue(String address, int port) {
     return "mjpg:http://" + address + ":" + port + "/?action=stream";
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
   private synchronized String[] getSinkStreamValues(int sink) {
     // Ignore all but MjpegServer
     if (VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) != VideoSink.Kind.kMjpeg) {
@@ -128,7 +128,7 @@ public final class CameraServer {
     return values.toArray(new String[0]);
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
   private synchronized String[] getSourceStreamValues(int source) {
     // Ignore all but HttpCamera
     if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
@@ -163,7 +163,7 @@ public final class CameraServer {
     return values;
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
   private synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {
@@ -206,7 +206,7 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String pixelFormatToString(PixelFormat pixelFormat) {
     switch (pixelFormat) {
       case kMJPEG:
@@ -226,13 +226,13 @@ public final class CameraServer {
 
   /// Provide string description of video mode.
   /// The returned string is "{width}x{height} {format} {fps} fps".
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String videoModeToString(VideoMode mode) {
     return mode.width + "x" + mode.height + " " + pixelFormatToString(mode.pixelFormat)
         + " " + mode.fps + " fps";
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String[] getSourceModeValues(int sourceHandle) {
     VideoMode[] modes = CameraServerJNI.enumerateSourceVideoModes(sourceHandle);
     String[] modeStrings = new String[modes.length];
@@ -242,7 +242,7 @@ public final class CameraServer {
     return modeStrings;
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.CyclomaticComplexity"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.CyclomaticComplexity"})
   private static void putSourcePropertyValue(NetworkTable table, VideoEvent event, boolean isNew) {
     String name;
     String infoName;
@@ -295,7 +295,7 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable", "PMD.ExcessiveMethodLength",
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.UnusedLocalVariable", "PMD.ExcessiveMethodLength",
       "PMD.NPathComplexity"})
   private CameraServer() {
     m_defaultUsbDevice = new AtomicInteger();

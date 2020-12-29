@@ -19,16 +19,13 @@ public class PIDController implements Sendable, AutoCloseable {
   private static int instances;
 
   // Factor for "proportional" control
-  @SuppressWarnings("MemberName")
-  private double m_Kp;
+  private double m_kp;
 
   // Factor for "integral" control
-  @SuppressWarnings("MemberName")
-  private double m_Ki;
+  private double m_ki;
 
   // Factor for "derivative" control
-  @SuppressWarnings("MemberName")
-  private double m_Kd;
+  private double m_kd;
 
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
@@ -62,31 +59,29 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_measurement;
 
   /**
-   * Allocates a PIDController with the given constants for Kp, Ki, and Kd and a default period of
+   * Allocates a PIDController with the given constants for kp, ki, and kd and a default period of
    * 0.02 seconds.
    *
-   * @param Kp The proportional coefficient.
-   * @param Ki The integral coefficient.
-   * @param Kd The derivative coefficient.
+   * @param kp The proportional coefficient.
+   * @param ki The integral coefficient.
+   * @param kd The derivative coefficient.
    */
-  @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd) {
-    this(Kp, Ki, Kd, 0.02);
+  public PIDController(double kp, double ki, double kd) {
+    this(kp, ki, kd, 0.02);
   }
 
   /**
-   * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
+   * Allocates a PIDController with the given constants for kp, ki, and kd.
    *
-   * @param Kp     The proportional coefficient.
-   * @param Ki     The integral coefficient.
-   * @param Kd     The derivative coefficient.
+   * @param kp     The proportional coefficient.
+   * @param ki     The integral coefficient.
+   * @param kd     The derivative coefficient.
    * @param period The period between controller updates in seconds.
    */
-  @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd, double period) {
-    m_Kp = Kp;
-    m_Ki = Ki;
-    m_Kd = Kd;
+  public PIDController(double kp, double ki, double kd, double period) {
+    m_kp = kp;
+    m_ki = ki;
+    m_kd = kd;
 
     m_period = period;
 
@@ -106,45 +101,41 @@ public class PIDController implements Sendable, AutoCloseable {
    *
    * <p>Set the proportional, integral, and differential coefficients.
    *
-   * @param Kp The proportional coefficient.
-   * @param Ki The integral coefficient.
-   * @param Kd The derivative coefficient.
+   * @param kp The proportional coefficient.
+   * @param ki The integral coefficient.
+   * @param kd The derivative coefficient.
    */
-  @SuppressWarnings("ParameterName")
-  public void setPID(double Kp, double Ki, double Kd) {
-    m_Kp = Kp;
-    m_Ki = Ki;
-    m_Kd = Kd;
+  public void setPID(double kp, double ki, double kd) {
+    m_kp = kp;
+    m_ki = ki;
+    m_kd = kd;
   }
 
   /**
    * Sets the Proportional coefficient of the PID controller gain.
    *
-   * @param Kp proportional coefficient
+   * @param kp proportional coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setP(double Kp) {
-    m_Kp = Kp;
+  public void setP(double kp) {
+    m_kp = kp;
   }
 
   /**
    * Sets the Integral coefficient of the PID controller gain.
    *
-   * @param Ki integral coefficient
+   * @param ki integral coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setI(double Ki) {
-    m_Ki = Ki;
+  public void setI(double ki) {
+    m_ki = ki;
   }
 
   /**
    * Sets the Differential coefficient of the PID controller gain.
    *
-   * @param Kd differential coefficient
+   * @param kd differential coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setD(double Kd) {
-    m_Kd = Kd;
+  public void setD(double kd) {
+    m_kd = kd;
   }
 
   /**
@@ -153,7 +144,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return proportional coefficient
    */
   public double getP() {
-    return m_Kp;
+    return m_kp;
   }
 
   /**
@@ -162,7 +153,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return integral coefficient
    */
   public double getI() {
-    return m_Ki;
+    return m_ki;
   }
 
   /**
@@ -171,7 +162,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return differential coefficient
    */
   public double getD() {
-    return m_Kd;
+    return m_kd;
   }
 
   /**
@@ -333,12 +324,12 @@ public class PIDController implements Sendable, AutoCloseable {
 
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
-    if (m_Ki != 0) {
+    if (m_ki != 0) {
       m_totalError = MathUtil.clamp(m_totalError + m_positionError * m_period,
-          m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
+          m_minimumIntegral / m_ki, m_maximumIntegral / m_ki);
     }
 
-    return m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError;
+    return m_kp * m_positionError + m_ki * m_totalError + m_kd * m_velocityError;
   }
 
   /**
