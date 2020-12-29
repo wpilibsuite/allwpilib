@@ -159,6 +159,16 @@ class DifferentialDrivetrainSim {
   }
 
   /**
+   * Returns the currently drawn current for the right side.
+   */
+  units::ampere_t GetRightCurrentDraw() const;
+
+  /**
+   * Returns the currently drawn current for the left side.
+   */
+  units::ampere_t GetLeftCurrentDraw() const;
+
+  /**
    * Returns the currently drawn current.
    */
   units::ampere_t GetCurrentDraw() const;
