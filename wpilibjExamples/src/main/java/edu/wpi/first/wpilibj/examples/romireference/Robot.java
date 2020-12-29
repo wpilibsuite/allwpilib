@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     // This makes sure that the autonomous stops running which will
-    // use the default command which is arcadeDrive. If you want the autonomous 
+    // use the default command which is ArcadeDrive. If you want the autonomous
     // to continue until interrupted by another command, remove
     // this line or comment it out.
     if (m_autonomousCommand != null) {

@@ -20,7 +20,7 @@ public class DriveTime extends CommandBase {
      * Creates a new DriveTime.
      *
      * @param speed   The speed which the robot will drive. Negative is in reverse.
-     * @param time   How long to turn for.
+     * @param time   How much time to drive in seconds
      * @param drive   The drivetrain subsystem on which this command will run
     */
     public DriveTime(double speed, double time, Drivetrain drive) {
