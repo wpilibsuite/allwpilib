@@ -293,7 +293,9 @@ void MappedFile::Flush() {
 }
 
 void MappedFile::Unmap() {
-  if (!m_mapping) return;
+  if (!m_mapping) {
+    return;
+  }
 #ifdef _WIN32
   ::UnmapViewOfFile(m_mapping);
   ::CloseHandle(m_fileHandle);
@@ -306,7 +308,11 @@ void MappedFile::Unmap() {
 std::pair<uint64_t, wpi::ArrayRef<uint8_t>> DataLogImpl::ReadRaw(
     size_t n) const {
   auto raw = m_time.Read(kHeaderSize + n * m_recordSize, m_recordSize);
-  if (raw.size() < m_recordSize || raw.size() < kTimestampSize) return {0, {}};
+  if (raw.size() < m_recordSize || raw.size() < kTimestampSize) {
+    return {
+      0, {}
+    }
+  };
   uint64_t ts = wpi::support::endian::read64le(raw.data());
   if (m_fixedSize) {
     return {ts, raw.slice(kTimestampSize)};
@@ -327,8 +333,12 @@ std::pair<uint64_t, wpi::ArrayRef<uint8_t>> DataLogImpl::ReadRaw(
 
 void DataLogImpl::Flush() {
   WriteHeader();
-  if (m_time.map && !m_time.readOnly) m_time.map.Flush();
-  if (m_data.map && !m_data.readOnly) m_data.map.Flush();
+  if (m_time.map && !m_time.readOnly) {
+    m_time.map.Flush();
+  }
+  if (m_data.map && !m_data.readOnly) {
+    m_data.map.Flush();
+  }
 }
 
 DataLogImpl::DataLogImpl() {}
@@ -338,7 +348,9 @@ DataLogImpl::~DataLogImpl() { WriteHeader(); }
 bool DataLogImpl::AppendRaw(uint64_t timestamp, wpi::ArrayRef<uint8_t> data) {
   size_t size = data.size();
   uint8_t* out = AppendRawStart(timestamp, size);
-  if (!out) return false;
+  if (!out) {
+    return false;
+  }
   std::memcpy(out, data.data(), size);
   AppendRawFinish(size);
   return true;
@@ -346,14 +358,20 @@ bool DataLogImpl::AppendRaw(uint64_t timestamp, wpi::ArrayRef<uint8_t> data) {
 
 uint8_t* DataLogImpl::AppendRawStart(uint64_t timestamp, uint64_t size) {
   // check monotonic (if checking enabled)
-  if (m_checkMonotonic && timestamp <= m_lastTimestamp) return nullptr;
+  if (m_checkMonotonic && timestamp <= m_lastTimestamp) {
+    return nullptr;
+  }
 
   // check read-only
-  if (m_time.readOnly) return nullptr;
+  if (m_time.readOnly) {
+    return nullptr;
+  }
 
   std::error_code ec;
   size_t off = m_time.GetMappedOffset(m_time.writePos, m_recordSize, ec);
-  if (ec) return nullptr;
+  if (ec) {
+    return nullptr;
+  }
 
   // write timestamp
   uint8_t* timeBuf = m_time.map.data() + off;
@@ -374,7 +392,9 @@ uint8_t* DataLogImpl::AppendRawStart(uint64_t timestamp, uint64_t size) {
   }
 
   off = m_data.GetMappedOffset(m_data.writePos, size, ec);
-  if (ec) return nullptr;
+  if (ec) {
+    return nullptr;
+  }
   m_lastTimestamp = timestamp;
   return m_data.map.data() + off;
 }
@@ -432,11 +452,12 @@ wpi::Error DataLogImpl::Check(const wpi::Twine& dataType,
        ((recordSize != 0 && (!m_fixedSize || m_recordSize != recordSize)) ||
         (recordSize == 0 &&
          (m_fixedSize || (m_recordSize != kLargePointerRecordSize &&
-                          m_recordSize != kSmallPointerRecordSize))))))
+                          m_recordSize != kSmallPointerRecordSize)))))) {
     return wpi::errorCodeToError(
         std::make_error_code(std::errc::wrong_protocol_type));
-  else
+  } else {
     return wpi::Error::success();
+  }
 }
 
 wpi::Error DataLogImpl::DoOpen(const wpi::Twine& filename,
@@ -446,7 +467,9 @@ wpi::Error DataLogImpl::DoOpen(const wpi::Twine& filename,
                                CreationDisposition disp, const Config& config) {
   // open the time file
   std::error_code ec = m_time.Open(filename, disp, config.readOnly);
-  if (ec) return wpi::errorCodeToError(ec);
+  if (ec) {
+    return wpi::errorCodeToError(ec);
+  }
   m_time.fileSize = GetFileSize(m_time.fd);
 
   if (disp == CD_OpenExisting ||
@@ -488,21 +511,29 @@ wpi::Error DataLogImpl::DoOpen(const wpi::Twine& filename,
     // Read last timestamp
     size_t off = m_time.GetMappedOffset(m_time.writePos - m_recordSize,
                                         m_recordSize * 2, ec);
-    if (ec) return wpi::errorCodeToError(ec);
+    if (ec) {
+      return wpi::errorCodeToError(ec);
+    }
     m_lastTimestamp =
         wpi::support::endian::read64le(m_time.map.const_data() + off);
   } else {
     m_time.GetMappedOffset(m_time.writePos, m_recordSize, ec);
-    if (ec) return wpi::errorCodeToError(ec);
+    if (ec) {
+      return wpi::errorCodeToError(ec);
+    }
   }
 
   if (!m_fixedSize) {
     // open the data file
     ec = m_data.Open(filename + ".data", disp, config.readOnly);
-    if (ec) return wpi::errorCodeToError(ec);
+    if (ec) {
+      return wpi::errorCodeToError(ec);
+    }
     m_data.fileSize = GetFileSize(m_data.fd);
     m_data.GetMappedOffset(m_data.writePos, 1024, ec);
-    if (ec) return wpi::errorCodeToError(ec);
+    if (ec) {
+      return wpi::errorCodeToError(ec);
+    }
   }
 
   return wpi::Error::success();
@@ -518,9 +549,10 @@ wpi::Error DataLogImpl::ReadHeader() {
     return wpi::errorCodeToError(
         std::make_error_code(std::errc::wrong_protocol_type));
   }
-  if (!j.is_object())
+  if (!j.is_object()) {
     return wpi::errorCodeToError(
         std::make_error_code(std::errc::wrong_protocol_type));
+  }
   try {
     m_dataType = j.at("dataType").get<std::string>();
     m_dataLayout = j.at("dataLayout").get<std::string>();
@@ -537,7 +569,9 @@ wpi::Error DataLogImpl::ReadHeader() {
 }
 
 void DataLogImpl::WriteHeader() {
-  if (!m_time.map || m_time.readOnly) return;
+  if (!m_time.map || m_time.readOnly) {
+    return;
+  }
   wpi::json j = {{"dataType", m_dataType},
                  {"dataLayout", m_dataLayout},
                  {"recordSize", m_recordSize},
@@ -569,11 +603,14 @@ void DataLogImpl::FileInfo::Close() {
 #ifdef _WIN32
     _chsize_s(fd, writePos);
 #else
-    if (::ftruncate(fd, writePos) == -1)
+    if (::ftruncate(fd, writePos) == -1) {
       std::perror("could not truncate during close");
+    }
 #endif
   }
-  if (fd != -1) ::close(fd);
+  if (fd != -1) {
+    ::close(fd);
+  }
   fd = -1;
 }
 
@@ -582,33 +619,41 @@ size_t DataLogImpl::FileInfo::GetMappedOffset(uint64_t pos, size_t len,
   // TODO: handle smaller mapping window (instead of entire file)
 
   // easy case: already in mapped window
-  if (map && pos >= mapOffset && (pos + len - mapOffset) <= map.size())
+  if (map && pos >= mapOffset && (pos + len - mapOffset) <= map.size()) {
     return pos - mapOffset;
+  }
 
   if (!readOnly) {
     // round up to multiple of mapGrowSize
     uint64_t size = ((pos + len + mapGrowSize - 1) / mapGrowSize) * mapGrowSize;
-    if (size > fileSize) fileSize = size;
+    if (size > fileSize) {
+      fileSize = size;
+    }
 
     // scale up mapGrowSize until it gets to maxGrowSize
     if (mapGrowSize < maxGrowSize) {
       mapGrowSize *= 2;
-      if (mapGrowSize > maxGrowSize) mapGrowSize = maxGrowSize;
+      if (mapGrowSize > maxGrowSize) {
+        mapGrowSize = maxGrowSize;
+      }
     }
 
     // update file size
 #ifdef _WIN32
     _chsize_s(fd, fileSize);
 #else
-    if (::ftruncate(fd, fileSize) == -1)
+    if (::ftruncate(fd, fileSize) == -1) {
       std::perror("could not update file size");
+    }
 #endif
   }
 
   // update map
   map.Unmap();
   map = MappedFile(fd, fileSize, 0, readOnly, ec);
-  if (ec) return SIZE_MAX;
+  if (ec) {
+    return SIZE_MAX;
+  }
 
   return pos - mapOffset;
 }
@@ -617,14 +662,18 @@ wpi::ArrayRef<uint8_t> DataLogImpl::FileInfo::Read(uint64_t pos,
                                                    size_t len) const {
   std::error_code ec;
   size_t off = GetMappedOffset(pos, len, ec);
-  if (ec) return {};
+  if (ec) {
+    return {}
+  };
   return wpi::makeArrayRef(map.const_data() + off, len);
 }
 
 void DataLogImpl::FileInfo::Write(uint64_t pos, wpi::ArrayRef<uint8_t> data) {
   std::error_code ec;
   size_t off = GetMappedOffset(pos, data.size(), ec);
-  if (ec) return;
+  if (ec) {
+    return;
+  }
   std::memcpy(map.data() + off, data.data(), data.size());
 }
 
@@ -646,8 +695,9 @@ wpi::Expected<DataLog> DataLog::Open(const wpi::Twine& filename,
   DataLog log(new DataLogImpl, true);
 
   if (wpi::Error e = log.m_impl->DoOpen(filename, dataType, dataLayout,
-                                        recordSize, disp, config))
-    return wpi::Expected<DataLog>{std::move(e)};
+                                        recordSize, disp, config)) {
+    return wpi::Expected<DataLog> { std::move(e) }
+  };
   return wpi::Expected<DataLog>{std::move(log)};
 }
 
@@ -664,16 +714,24 @@ std::pair<uint64_t, double> DoubleLog::operator[](size_t n) const {
 
 bool BooleanArrayLog::Append(uint64_t timestamp, wpi::ArrayRef<bool> arr) {
   uint8_t* out = m_impl->AppendRawStart(timestamp, arr.size());
-  if (!out) return false;
-  for (bool value : arr) *out++ = value ? 1 : 0;
+  if (!out) {
+    return false;
+  }
+  for (bool value : arr) {
+    *out++ = value ? 1 : 0;
+  }
   m_impl->AppendRawFinish(arr.size());
   return true;
 }
 
 bool BooleanArrayLog::Append(uint64_t timestamp, wpi::ArrayRef<int> arr) {
   uint8_t* out = m_impl->AppendRawStart(timestamp, arr.size());
-  if (!out) return false;
-  for (int value : arr) *out++ = value ? 1 : 0;
+  if (!out) {
+    return false;
+  }
+  for (int value : arr) {
+    *out++ = value ? 1 : 0;
+  }
   m_impl->AppendRawFinish(arr.size());
   return true;
 }
@@ -683,7 +741,9 @@ std::pair<uint64_t, wpi::ArrayRef<bool>> BooleanArrayLog::Get(
   auto [ts, arr] = m_impl->ReadRaw(n);
   buf.clear();
   buf.reserve(arr.size());
-  for (uint8_t value : arr) buf.emplace_back(value != 0);
+  for (uint8_t value : arr) {
+    buf.emplace_back(value != 0);
+  }
   return {ts, wpi::makeArrayRef(buf.data(), buf.size())};
 }
 
@@ -692,7 +752,9 @@ std::pair<uint64_t, wpi::ArrayRef<int>> BooleanArrayLog::Get(
   auto [ts, arr] = m_impl->ReadRaw(n);
   buf.clear();
   buf.reserve(arr.size());
-  for (uint8_t value : arr) buf.emplace_back(value != 0 ? 1 : 0);
+  for (uint8_t value : arr) {
+    buf.emplace_back(value != 0 ? 1 : 0);
+  }
   return {ts, wpi::makeArrayRef(buf.data(), buf.size())};
 }
 
@@ -703,7 +765,9 @@ double DoubleArrayLogArrayProxy::operator[](size_t n) const {
 
 bool DoubleArrayLog::Append(uint64_t timestamp, wpi::ArrayRef<double> arr) {
   uint8_t* out = m_impl->AppendRawStart(timestamp, arr.size() * 8);
-  if (!out) return false;
+  if (!out) {
+    return false;
+  }
   for (double value : arr) {
     wpi::support::endian::write64le(out, wpi::DoubleToBits(value));
     out += 8;
@@ -717,9 +781,10 @@ std::pair<uint64_t, wpi::ArrayRef<double>> DoubleArrayLog::Get(
   auto [ts, arr] = m_impl->ReadRaw(n);
   buf.clear();
   buf.reserve(arr.size() / 8);
-  for (size_t i = 0; i < arr.size() / 8; ++i)
+  for (size_t i = 0; i < arr.size() / 8; ++i) {
     buf.emplace_back(
         wpi::BitsToDouble(wpi::support::endian::read64le(arr.data() + i * 8)));
+  }
   return {ts, wpi::makeArrayRef(buf.data(), buf.size())};
 }
 
@@ -736,10 +801,14 @@ bool StringArrayLog::Append(uint64_t timestamp,
   // calculate size
   uint32_t off = 4 + 8 * arr.size();
   uint32_t size = off;
-  for (auto&& value : arr) size += value.size() + 1;
+  for (auto&& value : arr) {
+    size += value.size() + 1;
+  }
 
   uint8_t* out = m_impl->AppendRawStart(timestamp, size);
-  if (!out) return false;
+  if (!out) {
+    return false;
+  }
 
   // number of strings
   wpi::support::endian::write32le(out, arr.size());
@@ -769,10 +838,14 @@ bool StringArrayLog::Append(uint64_t timestamp,
   // calculate size
   uint32_t off = 4 + 8 * arr.size();
   uint32_t size = off;
-  for (auto&& value : arr) size += value.size() + 1;
+  for (auto&& value : arr) {
+    size += value.size() + 1;
+  }
 
   uint8_t* out = m_impl->AppendRawStart(timestamp, size);
-  if (!out) return false;
+  if (!out) {
+    return false;
+  }
 
   // number of strings
   wpi::support::endian::write32le(out, arr.size());

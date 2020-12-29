@@ -174,7 +174,9 @@ class MappedFile {
   }
 
   MappedFile& operator=(MappedFile&& rhs) {
-    if (m_mapping) Unmap();
+    if (m_mapping) {
+      Unmap();
+    }
     m_size = rhs.m_size;
     m_mapping = rhs.m_mapping;
     rhs.m_mapping = nullptr;
@@ -491,7 +493,9 @@ class DataLogBase {
     rhs.m_impl = nullptr;
   }
   ~DataLogBase() {
-    if (m_owned) delete m_impl;
+    if (m_owned) {
+      delete m_impl;
+    }
   }
 
   explicit operator bool() const { return m_impl != nullptr; }
@@ -685,8 +689,9 @@ class DataLogStaticMixin {
     auto impl = datalog.GetImpl();
     if (wpi::Error e =
             impl->Check(Derived::kDataType, Derived::kDataLayout,
-                        Derived::kRecordSize, true, checkLayout, true))
-      return wpi::Expected<Derived>{std::move(e)};
+                        Derived::kRecordSize, true, checkLayout, true)) {
+      return wpi::Expected<Derived> { std::move(e) }
+    };
     return Derived(impl, false);
   }
 
@@ -717,8 +722,9 @@ class DataLogStaticMixin {
     Derived log(new DataLogImpl, true);
     if (wpi::Error e = log.GetImpl()->DoOpen(
             filename, Derived::kDataType, Derived::kDataLayout,
-            Derived::kRecordSize, disp, config))
-      return wpi::Expected<Derived>{std::move(e)};
+            Derived::kRecordSize, disp, config)) {
+      return wpi::Expected<Derived> { std::move(e) }
+    };
     return wpi::Expected<Derived>{std::move(log)};
 
   }

@@ -19,8 +19,9 @@ int main() {
       wpi::errs() << "log is not a double log\n";
       return EXIT_FAILURE;
     }
-    for (auto&& p : *log)
+    for (auto&& p : *log) {
       wpi::outs() << "TS=" << p.first << " Value=" << p.second << '\n';
+    }
 
     {
       auto it = log->find(600000);
@@ -53,8 +54,9 @@ int main() {
       wpi::errs() << "could not open log\n";
       return EXIT_FAILURE;
     }
-    for (auto&& p : *log)
+    for (auto&& p : *log) {
       wpi::outs() << "TS=" << p.first << " Value=" << p.second << '\n';
+    }
   }
   {
     auto log = wpi::log::DoubleArrayLog::Open("test-double-array.log",

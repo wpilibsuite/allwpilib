@@ -21,8 +21,9 @@ int main(int argc, char** argv) {
 
   int kNumRuns = 10;
 
-  if (argc == 2)
+  if (argc == 2) {
     kNumRuns = std::stoi(argv[1]);
+  }
 
   auto testVec = std::vector<std::pair<std::string, void (*)()>>();
 
@@ -30,10 +31,13 @@ int main(int argc, char** argv) {
     auto log =
         wpi::log::DoubleLog::Open("test.log", wpi::log::CD_CreateAlways);
 
-    if (!log)
+    if (!log) {
       throw std::runtime_error("Could not open log");
+    }
 
-    for (int i = 0; i < 50; ++i) log->Append(20000 * i, 1.3 * i);
+    for (int i = 0; i < 50; ++i) {
+      log->Append(20000 * i, 1.3 * i);
+    }
   }});
 
   testVec.push_back({"500k double append (test2.log)", []{
@@ -42,10 +46,13 @@ int main(int argc, char** argv) {
     auto log =
         wpi::log::DoubleLog::Open("test2.log", wpi::log::CD_CreateAlways);
 
-    if (!log)
+    if (!log) {
       throw std::runtime_error("Could not open log");
+    }
 
-    for (uint64_t i = 0; i < 500000; ++i) log->Append(20000 * i, 1.3 * i);
+    for (uint64_t i = 0; i < 500000; ++i) {
+      log->Append(20000 * i, 1.3 * i);
+    }
   }});
 
   /*
@@ -63,17 +70,21 @@ int main(int argc, char** argv) {
   testVec.push_back({"50 string append (test-string.log)", []{
     auto log = wpi::log::StringLog::Open("test-string.log",
                                          wpi::log::CD_CreateAlways);
-    if (!log)
+    if (!log) {
       throw std::runtime_error("Could not open log");
+    }
 
-    for (int i = 0; i < 50; ++i) log->Append(20000 * i, "hello");
+    for (int i = 0; i < 50; ++i) {
+      log->Append(20000 * i, "hello");
+    }
   }});
 
   testVec.push_back({"Double array append (test-double-array.log)", []{
     auto log = wpi::log::DoubleArrayLog::Open("test-double-array.log",
                                               wpi::log::CD_CreateAlways);
-    if (!log)
+    if (!log) {
       throw std::runtime_error("Could not open log");
+    }
 
     log->Append(20000, {1, 2, 3});
     log->Append(30000, {4, 5});
@@ -82,8 +93,9 @@ int main(int argc, char** argv) {
   testVec.push_back({"String array append (test-string-array.log)", []{
     auto log = wpi::log::StringArrayLog::Open("test-string-array.log",
                                               wpi::log::CD_CreateAlways);
-    if (!log)
+    if (!log) {
       throw std::runtime_error("Could not open log");
+    }
 
     log->Append(20000, {"Hello", "World"});
     log->Append(30000, {"This", "Is", "Fun"});
