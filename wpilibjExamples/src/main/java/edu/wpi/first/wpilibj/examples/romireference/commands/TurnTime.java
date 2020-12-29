@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package edu.wpi.first.wpilibj.examples.romireference.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 /*
  * Creates a new TurnTime command. This command will turn your robot for a 
@@ -23,13 +23,14 @@ public class TurnTime extends CommandBase {
    * Creates a new TurnTime.
    *
    * @param speed   The speed which the robot will turn. Negative is in reverse.
-   * @param duration_in_seconds   How long to turn for.
+   * @param time   How long to turn for.
    * @param drive   The drive subsystem on which this command will run
    */
-    public TurnTime(double speed, double duration_in_seconds, Drivetrain drive) {
+    public TurnTime(double speed, double time, Drivetrain drive) {
         m_rotational_speed = speed;
-        m_duration = duration_in_seconds * 1000;
+        m_duration = time * 1000;
         m_drive = drive;
+        addRequirements(drive);
     }
 
     // Called when the command is initially scheduled.
@@ -58,6 +59,3 @@ public class TurnTime extends CommandBase {
     }
 
 }
-
-
-

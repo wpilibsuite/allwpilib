@@ -26,7 +26,6 @@ public class TeleopArcadeDrive extends CommandBase {
     m_drivetrain = drivetrain;
     m_xaxisSpeedSupplier = xaxisSpeedSupplier;
     m_zaxisRotateSupplier = zaxisRotateSuppplier;
-
     addRequirements(drivetrain);
   }
 
@@ -51,4 +50,5 @@ public class TeleopArcadeDrive extends CommandBase {
   public boolean isFinished() {
     return false;
   }
+  
 }

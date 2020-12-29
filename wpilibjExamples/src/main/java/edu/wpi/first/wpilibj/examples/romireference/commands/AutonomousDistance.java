@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package edu.wpi.first.wpilibj.examples.romireference.commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 public class AutonomousDistance extends SequentialCommandGroup {
   /**

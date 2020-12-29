@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package edu.wpi.first.wpilibj.examples.romireference.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 /*
  * Creates a new TurnDegrees command. This command will turn your robot for a 
@@ -31,9 +31,7 @@ public class TurnDegrees extends CommandBase {
     m_degrees = degrees;
     m_speed = speed;
     m_drive = drive;
-    startingLeftDistance = 0.0;
-    startingRightDistance = 0.0;
-    addRequirements(m_drive);
+    addRequirements(drive);
   }
 
   // Called when the command is initially scheduled.
@@ -42,10 +40,6 @@ public class TurnDegrees extends CommandBase {
     // Set motors to stop, read encoder values for starting point
     m_drive.arcadeDrive(0, 0);
     m_drive.resetEncoders();
-    startingLeftDistance = 0.0;
-    startingRightDistance = 0.0;
-    //startingLeftDistance = m_drive.getLeftDistanceInch();
-    //startingRightDistance = m_drive.getRightDistanceInch();
   }
   
   // Called every time the scheduler runs while the command is scheduled.
@@ -68,14 +62,15 @@ public class TurnDegrees extends CommandBase {
        has a wheel placement diameter (149 mm) - width of the wheel (8 mm) = 141 mm or 5.551 inches. We then take 
        into consideration the width of the tires.
     */
-    double inch_per_deg = Math.PI * 5.551 / 360;
+    double inchPerDegree = Math.PI * 5.551 / 360;
     // Compare distance travelled from start to distance based on degree turn
-    return getAverageTurningDistance() >= (inch_per_deg * m_degrees);
+    return getAverageTurningDistance() >= (inchPerDegree * m_degrees);
   }
 
   private double getAverageTurningDistance() {
-    double leftDistance = Math.abs(m_drive.getLeftDistanceInch() - startingLeftDistance);
-    double rightDistance = Math.abs(m_drive.getRightDistanceInch() - startingRightDistance);
+    double leftDistance = Math.abs(m_drive.getLeftDistanceInch());
+    double rightDistance = Math.abs(m_drive.getRightDistanceInch());
     return (leftDistance + rightDistance) / 2.0; 
   }
+
 }

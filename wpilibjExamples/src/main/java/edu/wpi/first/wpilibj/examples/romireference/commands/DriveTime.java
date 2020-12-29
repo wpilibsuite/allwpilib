@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package edu.wpi.first.wpilibj.examples.romireference.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 /*
  * Creates a new DriveTime command. This command will drive your robot for a 
@@ -23,12 +23,12 @@ public class DriveTime extends CommandBase {
      * Creates a new DriveTime.
      *
      * @param speed   The speed which the robot will drive. Negative is in reverse.
-     * @param duration_in_seconds   How long to turn for.
+     * @param time   How long to turn for.
      * @param drive   The drivetrain subsystem on which this command will run
     */
-    public DriveTime(double speed, double duration_in_seconds, Drivetrain drive) {
+    public DriveTime(double speed, double time, Drivetrain drive) {
         m_speed = speed;
-        m_duration = duration_in_seconds * 1000;
+        m_duration = time * 1000;
         m_drive = drive;
         addRequirements(drive);
     }
@@ -59,6 +59,3 @@ public class DriveTime extends CommandBase {
     }
 
 }
-
-
-
