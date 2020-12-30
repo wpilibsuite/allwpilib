@@ -4,20 +4,15 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-/**
- * The main autonomous command to pickup and deliver the soda to the box.
- */
+/** The main autonomous command to pickup and deliver the soda to the box. */
 public class Autonomous extends SequentialCommandGroup {
-  /**
-   * Create a new autonomous command.
-   */
+  /** Create a new autonomous command. */
   public Autonomous(DriveTrain drive, Claw claw, Wrist wrist, Elevator elevator) {
     addCommands(
         new PrepareToPickup(claw, wrist, elevator),
@@ -27,10 +22,6 @@ public class Autonomous extends SequentialCommandGroup {
         new Place(claw, wrist, elevator),
         new SetDistanceToBox(0.60, drive),
         // new DriveStraight(-2), // Use Encoders if ultrasonic is broken
-        parallel(
-            new SetWristSetpoint(-45, wrist),
-            new CloseClaw(claw)
-        )
-    );
+        parallel(new SetWristSetpoint(-45, wrist), new CloseClaw(claw)));
   }
 }

@@ -12,9 +12,7 @@ import edu.wpi.first.hal.simulation.SimDeviceCallback;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.hal.simulation.SimValueCallback;
 
-/**
- * Class to control the simulation side of a SimDevice.
- */
+/** Class to control the simulation side of a SimDevice. */
 public class SimDeviceSim {
   private final int m_handle;
 
@@ -71,13 +69,17 @@ public class SimDeviceSim {
     return m_handle;
   }
 
-  public CallbackStore registerValueCreatedCallback(SimValueCallback callback, boolean initialNotify) {
+  public CallbackStore registerValueCreatedCallback(
+      SimValueCallback callback, boolean initialNotify) {
     int uid = SimDeviceDataJNI.registerSimValueCreatedCallback(m_handle, callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueCreatedCallback);
   }
 
-  public CallbackStore registerValueChangedCallback(SimValue value, SimValueCallback callback, boolean initialNotify) {
-    int uid = SimDeviceDataJNI.registerSimValueChangedCallback(value.getNativeHandle(), callback, initialNotify);
+  public CallbackStore registerValueChangedCallback(
+      SimValue value, SimValueCallback callback, boolean initialNotify) {
+    int uid =
+        SimDeviceDataJNI.registerSimValueChangedCallback(
+            value.getNativeHandle(), callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueChangedCallback);
   }
 
@@ -85,12 +87,14 @@ public class SimDeviceSim {
     return SimDeviceDataJNI.enumerateSimDevices(prefix);
   }
 
-  public static CallbackStore registerDeviceCreatedCallback(String prefix, SimDeviceCallback callback, boolean initialNotify) {
+  public static CallbackStore registerDeviceCreatedCallback(
+      String prefix, SimDeviceCallback callback, boolean initialNotify) {
     int uid = SimDeviceDataJNI.registerSimDeviceCreatedCallback(prefix, callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceCreatedCallback);
   }
 
-  public static CallbackStore registerDeviceFreedCallback(String prefix, SimDeviceCallback callback, boolean initialNotify) {
+  public static CallbackStore registerDeviceFreedCallback(
+      String prefix, SimDeviceCallback callback, boolean initialNotify) {
     int uid = SimDeviceDataJNI.registerSimDeviceFreedCallback(prefix, callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceFreedCallback);
   }

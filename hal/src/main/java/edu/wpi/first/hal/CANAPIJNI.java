@@ -12,15 +12,15 @@ public class CANAPIJNI extends JNIWrapper {
 
   public static native void writeCANPacket(int handle, byte[] data, int apiId);
 
-  public static native void writeCANPacketRepeating(int handle, byte[] data, int apiId,
-                                                    int repeatMs);
+  public static native void writeCANPacketRepeating(
+      int handle, byte[] data, int apiId, int repeatMs);
 
   public static native void writeCANRTRFrame(int handle, int length, int apiId);
 
   public static native int writeCANPacketNoThrow(int handle, byte[] data, int apiId);
 
-  public static native int writeCANPacketRepeatingNoThrow(int handle, byte[] data, int apiId,
-                                                         int repeatMs);
+  public static native int writeCANPacketRepeatingNoThrow(
+      int handle, byte[] data, int apiId, int repeatMs);
 
   public static native int writeCANRTRFrameNoThrow(int handle, int length, int apiId);
 
@@ -30,6 +30,6 @@ public class CANAPIJNI extends JNIWrapper {
 
   public static native boolean readCANPacketLatest(int handle, int apiId, CANData data);
 
-  public static native boolean readCANPacketTimeout(int handle, int apiId, int timeoutMs,
-                                                 CANData data);
+  public static native boolean readCANPacketTimeout(
+      int handle, int apiId, int timeoutMs, CANData data);
 }

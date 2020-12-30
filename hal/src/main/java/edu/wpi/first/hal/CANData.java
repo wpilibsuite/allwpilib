@@ -7,14 +7,14 @@ package edu.wpi.first.hal;
 public class CANData {
   @SuppressWarnings("MemberName")
   public final byte[] data = new byte[8];
+
   @SuppressWarnings("MemberName")
   public int length;
+
   @SuppressWarnings("MemberName")
   public long timestamp;
 
-  /**
-   * API used from JNI to set the data.
-   */
+  /** API used from JNI to set the data. */
   @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public byte[] setData(int length, long timestamp) {
     this.length = length;

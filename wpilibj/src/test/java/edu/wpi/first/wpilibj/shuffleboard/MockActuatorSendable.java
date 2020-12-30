@@ -8,9 +8,7 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-/**
- * A mock sendable that marks itself as an actuator.
- */
+/** A mock sendable that marks itself as an actuator. */
 public class MockActuatorSendable implements Sendable {
   public MockActuatorSendable(String name) {
     SendableRegistry.add(this, name);

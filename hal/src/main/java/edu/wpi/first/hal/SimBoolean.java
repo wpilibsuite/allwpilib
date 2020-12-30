@@ -4,9 +4,7 @@
 
 package edu.wpi.first.hal;
 
-/**
- * A wrapper around a simulator boolean value handle.
- */
+/** A wrapper around a simulator boolean value handle. */
 public class SimBoolean extends SimValue {
   /**
    * Wraps a simulated value handle as returned by SimDeviceJNI.createSimValueBoolean().

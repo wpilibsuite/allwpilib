@@ -23,7 +23,7 @@ public class WaitCommand extends TimedCommand {
   /**
    * Instantiates a {@link WaitCommand} with the given timeout.
    *
-   * @param name    the name of the command
+   * @param name the name of the command
    * @param timeout the time the command takes to run (seconds)
    */
   public WaitCommand(String name, double timeout) {

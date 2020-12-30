@@ -25,20 +25,24 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
   /**
    * Allocate a PID object with the given constants for P, I, D, and F.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
-   * @param Kf     the feed forward term
+   * @param Kp the proportional coefficient
+   * @param Ki the integral coefficient
+   * @param Kd the derivative coefficient
+   * @param Kf the feed forward term
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
-   * @param period the loop time for doing calculations in seconds.
-   *               This particularly affects calculations of
-   *               the integral and differential terms.
-   *               The default is 0.05 (50ms).
+   * @param period the loop time for doing calculations in seconds. This particularly affects
+   *     calculations of the integral and differential terms. The default is 0.05 (50ms).
    */
   @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
-                       PIDOutput output, double period) {
+  public PIDController(
+      double Kp,
+      double Ki,
+      double Kd,
+      double Kf,
+      PIDSource source,
+      PIDOutput output,
+      double period) {
     super(Kp, Ki, Kd, Kf, source, output);
     m_controlLoop.startPeriodic(period);
   }
@@ -46,28 +50,26 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
   /**
    * Allocate a PID object with the given constants for P, I, D and period.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param Kp the proportional coefficient
+   * @param Ki the integral coefficient
+   * @param Kd the derivative coefficient
    * @param source the PIDSource object that is used to get values
    * @param output the PIDOutput object that is set to the output percentage
-   * @param period the loop time for doing calculations in seconds.
-   *               This particularly affects calculations of
-   *               the integral and differential terms.
-   *               The default is 0.05 (50ms).
+   * @param period the loop time for doing calculations in seconds. This particularly affects
+   *     calculations of the integral and differential terms. The default is 0.05 (50ms).
    */
   @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output,
-                       double period) {
+  public PIDController(
+      double Kp, double Ki, double Kd, PIDSource source, PIDOutput output, double period) {
     this(Kp, Ki, Kd, 0.0, source, output, period);
   }
 
   /**
    * Allocate a PID object with the given constants for P, I, D, using a 50ms period.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param Kp the proportional coefficient
+   * @param Ki the integral coefficient
+   * @param Kd the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
    */
@@ -79,16 +81,16 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
   /**
    * Allocate a PID object with the given constants for P, I, D, using a 50ms period.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
-   * @param Kf     the feed forward term
+   * @param Kp the proportional coefficient
+   * @param Ki the integral coefficient
+   * @param Kd the derivative coefficient
+   * @param Kf the feed forward term
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
    */
   @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
-                       PIDOutput output) {
+  public PIDController(
+      double Kp, double Ki, double Kd, double Kf, PIDSource source, PIDOutput output) {
     this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
   }
 
@@ -105,9 +107,7 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
     }
   }
 
-  /**
-   * Begin running the PIDController.
-   */
+  /** Begin running the PIDController. */
   @Override
   public void enable() {
     m_thisMutex.lock();
@@ -118,9 +118,7 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
     }
   }
 
-  /**
-   * Stop running the PIDController, this sets the output to zero before stopping.
-   */
+  /** Stop running the PIDController, this sets the output to zero before stopping. */
   @Override
   public void disable() {
     // Ensures m_enabled check and pidWrite() call occur atomically
@@ -139,9 +137,7 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
     }
   }
 
-  /**
-   * Set the enabled state of the PIDController.
-   */
+  /** Set the enabled state of the PIDController. */
   public void setEnabled(boolean enable) {
     if (enable) {
       enable();
@@ -150,9 +146,7 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
     }
   }
 
-  /**
-   * Return true if PIDController is enabled.
-   */
+  /** Return true if PIDController is enabled. */
   public boolean isEnabled() {
     m_thisMutex.lock();
     try {
@@ -162,9 +156,7 @@ public class PIDController extends PIDBase implements Controller, AutoCloseable 
     }
   }
 
-  /**
-   * Reset the previous error, the integral term, and disable the controller.
-   */
+  /** Reset the previous error, the integral term, and disable the controller. */
   @Override
   public void reset() {
     disable();

@@ -8,9 +8,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-/**
- * A {@link Button} that uses a {@link NetworkTable} boolean field.
- */
+/** A {@link Button} that uses a {@link NetworkTable} boolean field. */
 public class NetworkButton extends Button {
   private final NetworkTableEntry m_entry;
 

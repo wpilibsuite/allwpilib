@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.Test;
 
 class ConditionalCommandTest extends CommandTestBase {
   @Test
@@ -52,8 +52,7 @@ class ConditionalCommandTest extends CommandTestBase {
           new ConditionalCommand(command1, command2, () -> true);
 
       scheduler.schedule(conditionalCommand);
-      scheduler.schedule(new InstantCommand(() -> {
-      }, system3));
+      scheduler.schedule(new InstantCommand(() -> {}, system3));
 
       assertFalse(scheduler.isScheduled(conditionalCommand));
 

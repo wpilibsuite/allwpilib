@@ -16,9 +16,7 @@ import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 
-/**
- * Represents a mecanum drive style drivetrain.
- */
+/** Represents a mecanum drive style drivetrain. */
 @SuppressWarnings("PMD.TooManyFields")
 public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
@@ -46,19 +44,17 @@ public class Drivetrain {
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
-  private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
-  );
+  private final MecanumDriveKinematics m_kinematics =
+      new MecanumDriveKinematics(
+          m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
-  private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
-      m_gyro.getRotation2d());
+  private final MecanumDriveOdometry m_odometry =
+      new MecanumDriveOdometry(m_kinematics, m_gyro.getRotation2d());
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
 
-  /**
-   * Constructs a MecanumDrive and resets the gyro.
-   */
+  /** Constructs a MecanumDrive and resets the gyro. */
   public Drivetrain() {
     m_gyro.reset();
   }
@@ -73,8 +69,7 @@ public class Drivetrain {
         m_frontLeftEncoder.getRate(),
         m_frontRightEncoder.getRate(),
         m_backLeftEncoder.getRate(),
-        m_backRightEncoder.getRate()
-    );
+        m_backRightEncoder.getRate());
   }
 
   /**
@@ -88,18 +83,18 @@ public class Drivetrain {
     final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeftMetersPerSecond);
     final double backRightFeedforward = m_feedforward.calculate(speeds.rearRightMetersPerSecond);
 
-    final double frontLeftOutput = m_frontLeftPIDController.calculate(
-        m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond
-    );
-    final double frontRightOutput = m_frontRightPIDController.calculate(
-        m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond
-    );
-    final double backLeftOutput = m_backLeftPIDController.calculate(
-        m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond
-    );
-    final double backRightOutput = m_backRightPIDController.calculate(
-        m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond
-    );
+    final double frontLeftOutput =
+        m_frontLeftPIDController.calculate(
+            m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond);
+    final double frontRightOutput =
+        m_frontRightPIDController.calculate(
+            m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond);
+    final double backLeftOutput =
+        m_backLeftPIDController.calculate(
+            m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond);
+    final double backRightOutput =
+        m_backRightPIDController.calculate(
+            m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond);
 
     m_frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
     m_frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
@@ -110,25 +105,23 @@ public class Drivetrain {
   /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed        Speed of the robot in the x direction (forward).
-   * @param ySpeed        Speed of the robot in the y direction (sideways).
-   * @param rot           Angular rate of the robot.
+   * @param xSpeed Speed of the robot in the x direction (forward).
+   * @param ySpeed Speed of the robot in the y direction (sideways).
+   * @param rot Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    var mecanumDriveWheelSpeeds = m_kinematics.toWheelSpeeds(
-        fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rot, m_gyro.getRotation2d()
-        ) : new ChassisSpeeds(xSpeed, ySpeed, rot)
-    );
+    var mecanumDriveWheelSpeeds =
+        m_kinematics.toWheelSpeeds(
+            fieldRelative
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+                : new ChassisSpeeds(xSpeed, ySpeed, rot));
     mecanumDriveWheelSpeeds.normalize(kMaxSpeed);
     setSpeeds(mecanumDriveWheelSpeeds);
   }
 
-  /**
-   * Updates the field relative position of the robot.
-   */
+  /** Updates the field relative position of the robot. */
   public void updateOdometry() {
     m_odometry.update(m_gyro.getRotation2d(), getCurrentState());
   }

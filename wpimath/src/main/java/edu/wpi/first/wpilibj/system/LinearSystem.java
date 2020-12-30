@@ -10,44 +10,38 @@ import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
 @SuppressWarnings("ClassTypeParameterName")
-public class LinearSystem<States extends Num, Inputs extends Num,
-        Outputs extends Num> {
+public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
 
-  /**
-   * Continuous system matrix.
-   */
+  /** Continuous system matrix. */
   @SuppressWarnings("MemberName")
   private final Matrix<States, States> m_A;
 
-  /**
-   * Continuous input matrix.
-   */
+  /** Continuous input matrix. */
   @SuppressWarnings("MemberName")
   private final Matrix<States, Inputs> m_B;
 
-  /**
-   * Output matrix.
-   */
+  /** Output matrix. */
   @SuppressWarnings("MemberName")
   private final Matrix<Outputs, States> m_C;
 
-  /**
-   * Feedthrough matrix.
-   */
+  /** Feedthrough matrix. */
   @SuppressWarnings("MemberName")
   private final Matrix<Outputs, Inputs> m_D;
 
   /**
    * Construct a new LinearSystem from the four system matrices.
    *
-   * @param a             The system matrix A.
-   * @param b             The input matrix B.
-   * @param c             The output matrix C.
-   * @param d             The feedthrough matrix D.
+   * @param a The system matrix A.
+   * @param b The input matrix B.
+   * @param c The output matrix C.
+   * @param d The feedthrough matrix D.
    */
   @SuppressWarnings("ParameterName")
-  public LinearSystem(Matrix<States, States> a, Matrix<States, Inputs> b,
-                      Matrix<Outputs, States> c, Matrix<Outputs, Inputs> d) {
+  public LinearSystem(
+      Matrix<States, States> a,
+      Matrix<States, Inputs> b,
+      Matrix<Outputs, States> c,
+      Matrix<Outputs, Inputs> d) {
 
     this.m_A = a;
     this.m_B = b;
@@ -138,17 +132,16 @@ public class LinearSystem<States extends Num, Inputs extends Num,
   /**
    * Computes the new x given the old x and the control input.
    *
-   * <p>This is used by state observers directly to run updates based on state
-   * estimate.
+   * <p>This is used by state observers directly to run updates based on state estimate.
    *
-   * @param x         The current state.
-   * @param clampedU  The control input.
+   * @param x The current state.
+   * @param clampedU The control input.
    * @param dtSeconds Timestep for model update.
    * @return the updated x.
    */
   @SuppressWarnings("ParameterName")
-  public Matrix<States, N1> calculateX(Matrix<States, N1> x, Matrix<Inputs, N1> clampedU,
-                                       double dtSeconds) {
+  public Matrix<States, N1> calculateX(
+      Matrix<States, N1> x, Matrix<Inputs, N1> clampedU, double dtSeconds) {
     var discABpair = Discretization.discretizeAB(m_A, m_B, dtSeconds);
 
     return (discABpair.getFirst().times(x)).plus(discABpair.getSecond().times(clampedU));
@@ -157,23 +150,21 @@ public class LinearSystem<States extends Num, Inputs extends Num,
   /**
    * Computes the new y given the control input.
    *
-   * <p>This is used by state observers directly to run updates based on state
-   * estimate.
+   * <p>This is used by state observers directly to run updates based on state estimate.
    *
    * @param x The current state.
    * @param clampedU The control input.
    * @return the updated output matrix Y.
    */
   @SuppressWarnings("ParameterName")
-  public Matrix<Outputs, N1> calculateY(
-          Matrix<States, N1> x,
-          Matrix<Inputs, N1> clampedU) {
+  public Matrix<Outputs, N1> calculateY(Matrix<States, N1> x, Matrix<Inputs, N1> clampedU) {
     return m_C.times(x).plus(m_D.times(clampedU));
   }
 
   @Override
   public String toString() {
-    return String.format("Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n", m_A.toString(),
-            m_B.toString(), m_C.toString(), m_D.toString());
+    return String.format(
+        "Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n",
+        m_A.toString(), m_B.toString(), m_C.toString(), m_D.toString());
   }
 }

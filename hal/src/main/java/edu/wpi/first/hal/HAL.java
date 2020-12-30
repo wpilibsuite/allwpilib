@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * JNI Wrapper for HAL<br>.
+ * JNI Wrapper for HAL<br>
+ * .
  */
 @SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
 public final class HAL extends JNIWrapper {
@@ -30,8 +31,8 @@ public final class HAL extends JNIWrapper {
   public static final List<Runnable> s_simPeriodicBefore = new ArrayList<>();
 
   /**
-   * Runs SimPeriodicBefore callbacks.  IterativeRobotBase calls this prior
-   * to the user's simulationPeriodic code.
+   * Runs SimPeriodicBefore callbacks. IterativeRobotBase calls this prior to the user's
+   * simulationPeriodic code.
    */
   public static void simPeriodicBefore() {
     simPeriodicBeforeNative();
@@ -47,8 +48,8 @@ public final class HAL extends JNIWrapper {
   public static final List<Runnable> s_simPeriodicAfter = new ArrayList<>();
 
   /**
-   * Runs SimPeriodicAfter callbacks.  IterativeRobotBase calls this after
-   * the user's simulationPeriodic code.
+   * Runs SimPeriodicAfter callbacks. IterativeRobotBase calls this after the user's
+   * simulationPeriodic code.
    */
   public static void simPeriodicAfter() {
     simPeriodicAfterNative();
@@ -83,13 +84,12 @@ public final class HAL extends JNIWrapper {
    * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
    * char*)</code>
    *
-   * @param resource       one of the values in the tResourceType above (max value 51). <br>
+   * @param resource one of the values in the tResourceType above (max value 51). <br>
    * @param instanceNumber an index that identifies the resource instance. <br>
-   * @param context        an optional additional context number for some cases (such as module
-   *                       number). Set to 0 to omit. <br>
-   * @param feature        a string to be included describing features in use on a specific
-   *                       resource. Setting the same resource more than once allows you to change
-   *                       the feature string.
+   * @param context an optional additional context number for some cases (such as module number).
+   *     Set to 0 to omit. <br>
+   * @param feature a string to be included describing features in use on a specific resource.
+   *     Setting the same resource more than once allows you to change the feature string.
    */
   public static native int report(int resource, int instanceNumber, int context, String feature);
 
@@ -98,8 +98,13 @@ public final class HAL extends JNIWrapper {
   @SuppressWarnings("MissingJavadocMethod")
   public static void getControlWord(ControlWord controlWord) {
     int word = nativeGetControlWord();
-    controlWord.update((word & 1) != 0, ((word >> 1) & 1) != 0, ((word >> 2) & 1) != 0,
-        ((word >> 3) & 1) != 0, ((word >> 4) & 1) != 0, ((word >> 5) & 1) != 0);
+    controlWord.update(
+        (word & 1) != 0,
+        ((word >> 1) & 1) != 0,
+        ((word >> 2) & 1) != 0,
+        ((word >> 3) & 1) != 0,
+        ((word >> 4) & 1) != 0,
+        ((word >> 5) & 1) != 0);
   }
 
   private static native int nativeGetAllianceStation();
@@ -142,8 +147,8 @@ public final class HAL extends JNIWrapper {
 
   public static native int getJoystickButtons(byte joystickNum, ByteBuffer count);
 
-  public static native int setJoystickOutputs(byte joystickNum, int outputs, short leftRumble,
-                                              short rightRumble);
+  public static native int setJoystickOutputs(
+      byte joystickNum, int outputs, short leftRumble, short rightRumble);
 
   public static native int getJoystickIsXbox(byte joystickNum);
 
@@ -161,9 +166,14 @@ public final class HAL extends JNIWrapper {
 
   public static native int getMatchInfo(MatchInfoData info);
 
-  public static native int sendError(boolean isError, int errorCode, boolean isLVCode,
-                                     String details, String location, String callStack,
-                                     boolean printMsg);
+  public static native int sendError(
+      boolean isError,
+      int errorCode,
+      boolean isLVCode,
+      String details,
+      String location,
+      String callStack,
+      boolean printMsg);
 
   public static native int sendConsoleLine(String line);
 
@@ -171,7 +181,5 @@ public final class HAL extends JNIWrapper {
 
   public static native int getPort(byte channel);
 
-  private HAL() {
-
-  }
+  private HAL() {}
 }

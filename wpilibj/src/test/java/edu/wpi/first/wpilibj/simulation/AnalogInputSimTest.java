@@ -4,12 +4,11 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.hal.HAL;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.AnalogInput;
+import org.junit.jupiter.api.Test;
 
 class AnalogInputSimTest {
   static class DoubleStore {

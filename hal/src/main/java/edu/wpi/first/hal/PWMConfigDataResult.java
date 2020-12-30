@@ -4,9 +4,7 @@
 
 package edu.wpi.first.hal;
 
-/**
- * Structure for holding the config data result for PWM.
- */
+/** Structure for holding the config data result for PWM. */
 public class PWMConfigDataResult {
   PWMConfigDataResult(int max, int deadbandMax, int center, int deadbandMin, int min) {
     this.max = max;
@@ -16,33 +14,23 @@ public class PWMConfigDataResult {
     this.min = min;
   }
 
-  /**
-   * The maximum PWM value.
-   */
+  /** The maximum PWM value. */
   @SuppressWarnings("MemberName")
   public int max;
 
-  /**
-   * The deadband maximum PWM value.
-   */
+  /** The deadband maximum PWM value. */
   @SuppressWarnings("MemberName")
   public int deadbandMax;
 
-  /**
-   * The center PWM value.
-   */
+  /** The center PWM value. */
   @SuppressWarnings("MemberName")
   public int center;
 
-  /**
-   * The deadband minimum PWM value.
-   */
+  /** The deadband minimum PWM value. */
   @SuppressWarnings("MemberName")
   public int deadbandMin;
 
-  /**
-   * The minimum PWM value.
-   */
+  /** The minimum PWM value. */
   @SuppressWarnings("MemberName")
   public int min;
 }

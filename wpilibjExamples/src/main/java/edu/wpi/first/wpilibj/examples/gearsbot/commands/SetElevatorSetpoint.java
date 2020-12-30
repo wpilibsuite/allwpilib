@@ -4,10 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
-
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * Move the elevator to a given location. This command finishes when it is within the tolerance, but

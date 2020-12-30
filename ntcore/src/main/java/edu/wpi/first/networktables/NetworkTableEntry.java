@@ -7,13 +7,9 @@ package edu.wpi.first.networktables;
 import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
-/**
- * NetworkTables Entry.
- */
+/** NetworkTables Entry. */
 public final class NetworkTableEntry {
-  /**
-   * Flag values (as returned by {@link #getFlags()}).
-   */
+  /** Flag values (as returned by {@link #getFlags()}). */
   public static final int kPersistent = 0x01;
 
   /**
@@ -109,8 +105,7 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value.
-   * Returns a value with type NetworkTableType.kUnassigned if the value
+   * Gets the entry's value. Returns a value with type NetworkTableType.kUnassigned if the value
    * does not exist.
    *
    * @return the entry's value
@@ -120,8 +115,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value as a boolean. If the entry does not exist or is of
-   * different type, it will return the default value.
+   * Gets the entry's value as a boolean. If the entry does not exist or is of different type, it
+   * will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
@@ -131,8 +126,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value as a double. If the entry does not exist or is of
-   * different type, it will return the default value.
+   * Gets the entry's value as a double. If the entry does not exist or is of different type, it
+   * will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
@@ -142,8 +137,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value as a double. If the entry does not exist or is of
-   * different type, it will return the default value.
+   * Gets the entry's value as a double. If the entry does not exist or is of different type, it
+   * will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
@@ -153,8 +148,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value as a string. If the entry does not exist or is of
-   * different type, it will return the default value.
+   * Gets the entry's value as a string. If the entry does not exist or is of different type, it
+   * will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
@@ -164,8 +159,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value as a raw value (byte array). If the entry does not
-   * exist or is of different type, it will return the default value.
+   * Gets the entry's value as a raw value (byte array). If the entry does not exist or is of
+   * different type, it will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
@@ -175,8 +170,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value as a boolean array. If the entry does not exist
-   * or is of different type, it will return the default value.
+   * Gets the entry's value as a boolean array. If the entry does not exist or is of different type,
+   * it will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
@@ -186,20 +181,20 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value as a boolean array. If the entry does not exist
-   * or is of different type, it will return the default value.
+   * Gets the entry's value as a boolean array. If the entry does not exist or is of different type,
+   * it will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
   public Boolean[] getBooleanArray(Boolean[] defaultValue) {
-    return NetworkTableValue.fromNative(NetworkTablesJNI.getBooleanArray(m_handle,
-        NetworkTableValue.toNative(defaultValue)));
+    return NetworkTableValue.fromNative(
+        NetworkTablesJNI.getBooleanArray(m_handle, NetworkTableValue.toNative(defaultValue)));
   }
 
   /**
-   * Gets the entry's value as a double array. If the entry does not exist
-   * or is of different type, it will return the default value.
+   * Gets the entry's value as a double array. If the entry does not exist or is of different type,
+   * it will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
@@ -209,32 +204,32 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Gets the entry's value as a double array. If the entry does not exist
-   * or is of different type, it will return the default value.
+   * Gets the entry's value as a double array. If the entry does not exist or is of different type,
+   * it will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
   public Double[] getDoubleArray(Double[] defaultValue) {
-    return NetworkTableValue.fromNative(NetworkTablesJNI.getDoubleArray(m_handle,
-        NetworkTableValue.toNative(defaultValue)));
+    return NetworkTableValue.fromNative(
+        NetworkTablesJNI.getDoubleArray(m_handle, NetworkTableValue.toNative(defaultValue)));
   }
 
   /**
-   * Gets the entry's value as a double array. If the entry does not exist
-   * or is of different type, it will return the default value.
+   * Gets the entry's value as a double array. If the entry does not exist or is of different type,
+   * it will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
   public Number[] getNumberArray(Number[] defaultValue) {
-    return NetworkTableValue.fromNative(NetworkTablesJNI.getDoubleArray(m_handle,
-        NetworkTableValue.toNative(defaultValue)));
+    return NetworkTableValue.fromNative(
+        NetworkTablesJNI.getDoubleArray(m_handle, NetworkTableValue.toNative(defaultValue)));
   }
 
   /**
-   * Gets the entry's value as a string array. If the entry does not exist
-   * or is of different type, it will return the default value.
+   * Gets the entry's value as a string array. If the entry does not exist or is of different type,
+   * it will return the default value.
    *
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
@@ -276,11 +271,10 @@ public final class NetworkTableEntry {
       Object otherValue = ((NetworkTableValue) defaultValue).getValue();
       switch (((NetworkTableValue) defaultValue).getType()) {
         case kBoolean:
-          return NetworkTablesJNI.setDefaultBoolean(m_handle, time,
-              (Boolean) otherValue);
+          return NetworkTablesJNI.setDefaultBoolean(m_handle, time, (Boolean) otherValue);
         case kDouble:
-          return NetworkTablesJNI.setDefaultDouble(m_handle, time,
-              ((Number) otherValue).doubleValue());
+          return NetworkTablesJNI.setDefaultDouble(
+              m_handle, time, ((Number) otherValue).doubleValue());
         case kString:
           return NetworkTablesJNI.setDefaultString(m_handle, time, (String) otherValue);
         case kRaw:
@@ -302,21 +296,21 @@ public final class NetworkTableEntry {
       return setDefaultNumber((Number) defaultValue);
     } else if (defaultValue instanceof String) {
       return setDefaultString((String) defaultValue);
-    } else if (defaultValue instanceof byte[])  {
+    } else if (defaultValue instanceof byte[]) {
       return setDefaultRaw((byte[]) defaultValue);
-    } else if (defaultValue instanceof boolean[])  {
+    } else if (defaultValue instanceof boolean[]) {
       return setDefaultBooleanArray((boolean[]) defaultValue);
-    } else if (defaultValue instanceof double[])  {
+    } else if (defaultValue instanceof double[]) {
       return setDefaultDoubleArray((double[]) defaultValue);
-    } else if (defaultValue instanceof Boolean[])  {
+    } else if (defaultValue instanceof Boolean[]) {
       return setDefaultBooleanArray((Boolean[]) defaultValue);
-    } else if (defaultValue instanceof Number[])  {
+    } else if (defaultValue instanceof Number[]) {
       return setDefaultNumberArray((Number[]) defaultValue);
-    } else if (defaultValue instanceof String[])  {
+    } else if (defaultValue instanceof String[]) {
       return setDefaultStringArray((String[]) defaultValue);
     } else {
-      throw new IllegalArgumentException("Value of type " + defaultValue.getClass().getName()
-        + " cannot be put into a table");
+      throw new IllegalArgumentException(
+          "Value of type " + defaultValue.getClass().getName() + " cannot be put into a table");
     }
   }
 
@@ -387,8 +381,8 @@ public final class NetworkTableEntry {
    * @return False if the entry exists with a different type
    */
   public boolean setDefaultBooleanArray(Boolean[] defaultValue) {
-    return NetworkTablesJNI.setDefaultBooleanArray(m_handle,
-        0, NetworkTableValue.toNative(defaultValue));
+    return NetworkTablesJNI.setDefaultBooleanArray(
+        m_handle, 0, NetworkTableValue.toNative(defaultValue));
   }
 
   /**
@@ -408,8 +402,8 @@ public final class NetworkTableEntry {
    * @return False if the entry exists with a different type
    */
   public boolean setDefaultNumberArray(Number[] defaultValue) {
-    return NetworkTablesJNI.setDefaultDoubleArray(m_handle,
-        0, NetworkTableValue.toNative(defaultValue));
+    return NetworkTablesJNI.setDefaultDoubleArray(
+        m_handle, 0, NetworkTableValue.toNative(defaultValue));
   }
 
   /**
@@ -435,11 +429,10 @@ public final class NetworkTableEntry {
       Object otherValue = ((NetworkTableValue) value).getValue();
       switch (((NetworkTableValue) value).getType()) {
         case kBoolean:
-          return NetworkTablesJNI.setBoolean(m_handle, time, (Boolean) otherValue,
-              false);
+          return NetworkTablesJNI.setBoolean(m_handle, time, (Boolean) otherValue, false);
         case kDouble:
-          return NetworkTablesJNI.setDouble(m_handle, time, ((Number) otherValue).doubleValue(),
-              false);
+          return NetworkTablesJNI.setDouble(
+              m_handle, time, ((Number) otherValue).doubleValue(), false);
         case kString:
           return NetworkTablesJNI.setString(m_handle, time, (String) otherValue, false);
         case kRaw:
@@ -474,8 +467,8 @@ public final class NetworkTableEntry {
     } else if (value instanceof String[]) {
       return setStringArray((String[]) value);
     } else {
-      throw new IllegalArgumentException("Value of type " + value.getClass().getName()
-        + " cannot be put into a table");
+      throw new IllegalArgumentException(
+          "Value of type " + value.getClass().getName() + " cannot be put into a table");
     }
   }
 
@@ -597,8 +590,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    * @throws IllegalArgumentException if the value is not a known type
@@ -653,14 +646,14 @@ public final class NetworkTableEntry {
     } else if (value instanceof String[]) {
       forceSetStringArray((String[]) value);
     } else {
-      throw new IllegalArgumentException("Value of type " + value.getClass().getName()
-        + " cannot be put into a table");
+      throw new IllegalArgumentException(
+          "Value of type " + value.getClass().getName() + " cannot be put into a table");
     }
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -669,8 +662,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -679,8 +672,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -689,8 +682,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -699,8 +692,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -709,8 +702,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -719,8 +712,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -729,8 +722,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -739,8 +732,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -749,8 +742,8 @@ public final class NetworkTableEntry {
   }
 
   /**
-   * Sets the entry's value.  If the value is of different type, the type is
-   * changed to match the new value.
+   * Sets the entry's value. If the value is of different type, the type is changed to match the new
+   * value.
    *
    * @param value the value to set
    */
@@ -776,16 +769,12 @@ public final class NetworkTableEntry {
     NetworkTablesJNI.setEntryFlags(m_handle, getFlags() & ~flags);
   }
 
-  /**
-   * Make value persistent through program restarts.
-   */
+  /** Make value persistent through program restarts. */
   public void setPersistent() {
     setFlags(kPersistent);
   }
 
-  /**
-   * Stop making value persistent through program restarts.
-   */
+  /** Stop making value persistent through program restarts. */
   public void clearPersistent() {
     clearFlags(kPersistent);
   }
@@ -799,31 +788,28 @@ public final class NetworkTableEntry {
     return (getFlags() & kPersistent) != 0;
   }
 
-  /**
-   * Deletes the entry.
-   */
+  /** Deletes the entry. */
   public void delete() {
     NetworkTablesJNI.deleteEntry(m_handle);
   }
 
   /**
-   * Create a callback-based RPC entry point.  Only valid to use on the server.
-   * The callback function will be called when the RPC is called.
-   * This function creates RPC version 0 definitions (raw data in and out).
+   * Create a callback-based RPC entry point. Only valid to use on the server. The callback function
+   * will be called when the RPC is called. This function creates RPC version 0 definitions (raw
+   * data in and out).
    *
-   * @param callback  callback function
+   * @param callback callback function
    */
   public void createRpc(Consumer<RpcAnswer> callback) {
     m_inst.createRpc(this, callback);
   }
 
   /**
-   * Call a RPC function.  May be used on either the client or server.
-   * This function is non-blocking.  Either {@link RpcCall#getResult()} or
-   * {@link RpcCall#cancelResult()} must be called on the return value to either
-   * get or ignore the result of the call.
+   * Call a RPC function. May be used on either the client or server. This function is non-blocking.
+   * Either {@link RpcCall#getResult()} or {@link RpcCall#cancelResult()} must be called on the
+   * return value to either get or ignore the result of the call.
    *
-   * @param params      parameter
+   * @param params parameter
    * @return RPC call object.
    */
   public RpcCall callRpc(byte[] params) {

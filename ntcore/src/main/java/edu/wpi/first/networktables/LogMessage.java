@@ -4,14 +4,11 @@
 
 package edu.wpi.first.networktables;
 
-/**
- * NetworkTables log message.
- */
+/** NetworkTables log message. */
 public final class LogMessage {
-  /**
-   * Logging levels.
-   */
+  /** Logging levels. */
   public static final int kCritical = 50;
+
   public static final int kError = 40;
   public static final int kWarning = 30;
   public static final int kInfo = 20;
@@ -21,38 +18,28 @@ public final class LogMessage {
   public static final int kDebug3 = 7;
   public static final int kDebug4 = 6;
 
-  /**
-   * The logger that generated the message.
-   */
+  /** The logger that generated the message. */
   @SuppressWarnings("MemberName")
   public final int logger;
 
-  /**
-   * Log level of the message.
-   */
+  /** Log level of the message. */
   @SuppressWarnings("MemberName")
   public final int level;
 
-  /**
-   * The filename of the source file that generated the message.
-   */
+  /** The filename of the source file that generated the message. */
   @SuppressWarnings("MemberName")
   public final String filename;
 
-  /**
-   * The line number in the source file that generated the message.
-   */
+  /** The line number in the source file that generated the message. */
   @SuppressWarnings("MemberName")
   public final int line;
 
-  /**
-   * The message.
-   */
+  /** The message. */
   @SuppressWarnings("MemberName")
   public final String message;
 
-  /** Constructor.
-   * This should generally only be used internally to NetworkTables.
+  /**
+   * Constructor. This should generally only be used internally to NetworkTables.
    *
    * @param inst Instance
    * @param logger Logger
@@ -61,8 +48,8 @@ public final class LogMessage {
    * @param line Line number
    * @param message Message
    */
-  public LogMessage(NetworkTableInstance inst, int logger, int level, String filename, int line,
-                    String message) {
+  public LogMessage(
+      NetworkTableInstance inst, int logger, int level, String filename, int line, String message) {
     this.m_inst = inst;
     this.logger = logger;
     this.level = level;

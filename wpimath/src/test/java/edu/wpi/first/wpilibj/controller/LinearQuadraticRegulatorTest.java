@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
-
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class LinearQuadraticRegulatorTest {
   public static LinearSystem<N2, N1, N1> elevatorPlant;
@@ -55,8 +53,7 @@ public class LinearQuadraticRegulatorTest {
     var rElms = VecBuilder.fill(12.0);
     var dt = 0.00505;
 
-    var controller = new LinearQuadraticRegulator<>(
-          elevatorPlant, qElms, rElms, dt);
+    var controller = new LinearQuadraticRegulator<>(elevatorPlant, qElms, rElms, dt);
 
     var k = controller.getK();
 
@@ -69,21 +66,15 @@ public class LinearQuadraticRegulatorTest {
 
     var dt = 0.020;
 
-    var plant = LinearSystemId.createElevatorSystem(
-          DCMotor.getVex775Pro(4),
-          8.0,
-          0.75 * 25.4 / 1000.0,
-          14.67);
+    var plant =
+        LinearSystemId.createElevatorSystem(
+            DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
 
-    var regulator = new LinearQuadraticRegulator<>(
-          plant,
-          VecBuilder.fill(0.1, 0.2),
-          VecBuilder.fill(12.0),
-          dt);
+    var regulator =
+        new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt);
 
     assertEquals(10.381, regulator.getK().get(0, 0), 1e-2);
     assertEquals(0.6929, regulator.getK().get(0, 1), 1e-2);
-
   }
 
   @Test
@@ -102,8 +93,7 @@ public class LinearQuadraticRegulatorTest {
     var rElms = VecBuilder.fill(12.0);
     var dt = 0.00505;
 
-    var controller = new LinearQuadraticRegulator<>(
-          plant, qElms, rElms, dt);
+    var controller = new LinearQuadraticRegulator<>(plant, qElms, rElms, dt);
 
     var k = controller.getK();
 
@@ -115,17 +105,12 @@ public class LinearQuadraticRegulatorTest {
   public void testLatencyCompensate() {
     var dt = 0.02;
 
-    var plant = LinearSystemId.createElevatorSystem(
-          DCMotor.getVex775Pro(4),
-          8.0,
-          0.75 * 25.4 / 1000.0,
-          14.67);
+    var plant =
+        LinearSystemId.createElevatorSystem(
+            DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
 
-    var regulator = new LinearQuadraticRegulator<>(
-          plant,
-          VecBuilder.fill(0.1, 0.2),
-          VecBuilder.fill(12.0),
-          dt);
+    var regulator =
+        new LinearQuadraticRegulator<>(plant, VecBuilder.fill(0.1, 0.2), VecBuilder.fill(12.0), dt);
 
     regulator.latencyCompensate(plant, dt, 0.01);
 

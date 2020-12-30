@@ -7,9 +7,7 @@ package edu.wpi.first.wpilibj.mockhardware;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Timer;
 
-/**
- * Emulates a quadrature encoder.
- */
+/** Emulates a quadrature encoder. */
 public class FakeEncoderSource implements AutoCloseable {
   private Thread m_task;
   private int m_count;
@@ -19,9 +17,7 @@ public class FakeEncoderSource implements AutoCloseable {
   private final DigitalOutput m_outputB;
   private final boolean m_allocatedOutputs;
 
-  /**
-   * Thread object that allows emulation of a quadrature encoder.
-   */
+  /** Thread object that allows emulation of a quadrature encoder. */
   private class QuadEncoderThread extends Thread {
     FakeEncoderSource m_encoder;
 
@@ -88,9 +84,7 @@ public class FakeEncoderSource implements AutoCloseable {
     initQuadEncoder();
   }
 
-  /**
-   * Frees the resource.
-   */
+  /** Frees the resource. */
   @Override
   public void close() {
     m_task = null;
@@ -100,9 +94,7 @@ public class FakeEncoderSource implements AutoCloseable {
     }
   }
 
-  /**
-   * Common initialization code.
-   */
+  /** Common initialization code. */
   private void initQuadEncoder() {
     m_milliSec = 1;
     m_forward = true;
@@ -111,16 +103,12 @@ public class FakeEncoderSource implements AutoCloseable {
     m_outputB.set(false);
   }
 
-  /**
-   * Starts the thread.
-   */
+  /** Starts the thread. */
   public void start() {
     m_task.start();
   }
 
-  /**
-   * Waits for thread to end.
-   */
+  /** Waits for thread to end. */
   public void complete() {
     try {
       m_task.join();
@@ -131,9 +119,7 @@ public class FakeEncoderSource implements AutoCloseable {
     Timer.delay(0.01);
   }
 
-  /**
-   * Runs and waits for thread to end before returning.
-   */
+  /** Runs and waits for thread to end before returning. */
   public void execute() {
     start();
     complete();

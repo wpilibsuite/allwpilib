@@ -4,6 +4,9 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -17,13 +20,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-/**
- * A helper class for Shuffleboard containers to handle common child operations.
- */
+/** A helper class for Shuffleboard containers to handle common child operations. */
 final class ContainerHelper {
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();
@@ -123,9 +120,8 @@ final class ContainerHelper {
     checkTitle(title);
   }
 
-  private <T> SuppliedValueWidget<T> addSupplied(String title,
-                                                 Supplier<T> supplier,
-                                                 BiConsumer<NetworkTableEntry, T> setter) {
+  private <T> SuppliedValueWidget<T> addSupplied(
+      String title, Supplier<T> supplier, BiConsumer<NetworkTableEntry, T> setter) {
     SuppliedValueWidget<T> widget = new SuppliedValueWidget<>(m_container, title, supplier, setter);
     m_components.add(widget);
     return widget;
@@ -144,5 +140,4 @@ final class ContainerHelper {
     }
     m_usedTitles.add(title);
   }
-
 }

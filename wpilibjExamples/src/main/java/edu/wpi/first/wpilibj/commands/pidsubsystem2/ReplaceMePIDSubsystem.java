@@ -8,9 +8,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 public class ReplaceMePIDSubsystem extends PIDSubsystem {
-  /**
-   * Creates a new ReplaceMePIDSubsystem.
-   */
+  /** Creates a new ReplaceMePIDSubsystem. */
   public ReplaceMePIDSubsystem() {
     super(
         // The PIDController used by the subsystem

@@ -7,10 +7,9 @@ package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
-
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
  * The wrist subsystem is like the elevator, but with a rotational joint instead of a linear joint.
@@ -22,9 +21,7 @@ public class Wrist extends PIDSubsystem {
   private static final double kP_real = 1;
   private static final double kP_simulation = 0.05;
 
-  /**
-   * Create a new wrist subsystem.
-   */
+  /** Create a new wrist subsystem. */
   public Wrist() {
     super(new PIDController(kP_real, 0, 0));
     if (Robot.isSimulation()) { // Check for simulation and update PID values
@@ -47,9 +44,7 @@ public class Wrist extends PIDSubsystem {
     addChild("Pot", m_pot);
   }
 
-  /**
-   * The log method puts interesting information to the SmartDashboard.
-   */
+  /** The log method puts interesting information to the SmartDashboard. */
   public void log() {
     SmartDashboard.putData("Wrist Angle", m_pot);
   }
@@ -62,17 +57,13 @@ public class Wrist extends PIDSubsystem {
     return m_pot.get();
   }
 
-  /**
-   * Use the motor as the PID output. This method is automatically called by the subsystem.
-   */
+  /** Use the motor as the PID output. This method is automatically called by the subsystem. */
   @Override
   public void useOutput(double output, double setpoint) {
     m_motor.set(output);
   }
 
-  /**
-   * Call log method every loop.
-   */
+  /** Call log method every loop. */
   @Override
   public void periodic() {
     log();

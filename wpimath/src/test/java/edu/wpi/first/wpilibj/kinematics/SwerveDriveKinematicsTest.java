@@ -4,13 +4,12 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class SwerveDriveKinematicsTest {
   private static final double kEpsilon = 1E-9;
@@ -37,8 +36,7 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(0.0, moduleStates[0].angle.getRadians(), kEpsilon),
         () -> assertEquals(0.0, moduleStates[1].angle.getRadians(), kEpsilon),
         () -> assertEquals(0.0, moduleStates[2].angle.getRadians(), kEpsilon),
-        () -> assertEquals(0.0, moduleStates[3].angle.getRadians(), kEpsilon)
-    );
+        () -> assertEquals(0.0, moduleStates[3].angle.getRadians(), kEpsilon));
   }
 
   @Test
@@ -49,8 +47,7 @@ class SwerveDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(5.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 
   @Test
@@ -67,8 +64,7 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(90.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(90.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(90.0, moduleStates[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(90.0, moduleStates[3].angle.getDegrees(), kEpsilon)
-    );
+        () -> assertEquals(90.0, moduleStates[3].angle.getDegrees(), kEpsilon));
   }
 
   @Test
@@ -79,8 +75,7 @@ class SwerveDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(5.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 
   @Test
@@ -104,8 +99,7 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(135.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(45.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(-135.0, moduleStates[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-45.0, moduleStates[3].angle.getDegrees(), kEpsilon)
-    );
+        () -> assertEquals(-45.0, moduleStates[3].angle.getDegrees(), kEpsilon));
   }
 
   @Test
@@ -120,8 +114,7 @@ class SwerveDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(2 * Math.PI, chassisSpeeds.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(2 * Math.PI, chassisSpeeds.omegaRadiansPerSecond, 0.1));
   }
 
   @Test
@@ -147,8 +140,7 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(0.0, moduleStates[0].angle.getDegrees(), kEpsilon),
         () -> assertEquals(0.0, moduleStates[1].angle.getDegrees(), kEpsilon),
         () -> assertEquals(-90.0, moduleStates[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-45.0, moduleStates[3].angle.getDegrees(), kEpsilon)
-    );
+        () -> assertEquals(-45.0, moduleStates[3].angle.getDegrees(), kEpsilon));
   }
 
   @Test
@@ -172,23 +164,27 @@ class SwerveDriveKinematicsTest {
     assertAll(
         () -> assertEquals(75.398, chassisSpeeds.vxMetersPerSecond, 0.1),
         () -> assertEquals(-75.398, chassisSpeeds.vyMetersPerSecond, 0.1),
-        () -> assertEquals(2 * Math.PI, chassisSpeeds.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(2 * Math.PI, chassisSpeeds.omegaRadiansPerSecond, 0.1));
   }
 
-  private void assertModuleState(SwerveModuleState expected, SwerveModuleState actual,
-                                 SwerveModuleState tolerance) {
+  private void assertModuleState(
+      SwerveModuleState expected, SwerveModuleState actual, SwerveModuleState tolerance) {
     assertAll(
-        () -> assertEquals(expected.speedMetersPerSecond, actual.speedMetersPerSecond,
-            tolerance.speedMetersPerSecond),
-        () -> assertEquals(expected.angle.getDegrees(), actual.angle.getDegrees(),
-            tolerance.angle.getDegrees())
-    );
+        () ->
+            assertEquals(
+                expected.speedMetersPerSecond,
+                actual.speedMetersPerSecond,
+                tolerance.speedMetersPerSecond),
+        () ->
+            assertEquals(
+                expected.angle.getDegrees(),
+                actual.angle.getDegrees(),
+                tolerance.angle.getDegrees()));
   }
 
   /**
-   * Test the rotation of the robot about a non-central point with
-   * both linear and angular velocities.
+   * Test the rotation of the robot about a non-central point with both linear and angular
+   * velocities.
    */
   @Test
   void testOffCenterCORRotationAndTranslationInverseKinematics() {
@@ -198,12 +194,13 @@ class SwerveDriveKinematicsTest {
 
     // By equation (13.14) from state-space guide, our wheels/angles will be as follows,
     // (+-1 degree or speed):
-    SwerveModuleState[] expectedStates = new SwerveModuleState[]{
-        new SwerveModuleState(23.43, Rotation2d.fromDegrees(-140.19)),
-        new SwerveModuleState(23.43, Rotation2d.fromDegrees(-39.81)),
-        new SwerveModuleState(54.08, Rotation2d.fromDegrees(-109.44)),
-        new SwerveModuleState(54.08, Rotation2d.fromDegrees(-70.56))
-      };
+    SwerveModuleState[] expectedStates =
+        new SwerveModuleState[] {
+          new SwerveModuleState(23.43, Rotation2d.fromDegrees(-140.19)),
+          new SwerveModuleState(23.43, Rotation2d.fromDegrees(-39.81)),
+          new SwerveModuleState(54.08, Rotation2d.fromDegrees(-109.44)),
+          new SwerveModuleState(54.08, Rotation2d.fromDegrees(-70.56))
+        };
     var stateTolerance = new SwerveModuleState(0.1, Rotation2d.fromDegrees(0.1));
 
     for (int i = 0; i < expectedStates.length; i++) {
@@ -232,8 +229,7 @@ class SwerveDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, 0.1),
         () -> assertEquals(-33.0, chassisSpeeds.vyMetersPerSecond, 0.1),
-        () -> assertEquals(1.5, chassisSpeeds.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(1.5, chassisSpeeds.omegaRadiansPerSecond, 0.1));
   }
 
   @Test
@@ -252,8 +248,6 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(5.0 * factor, arr[0].speedMetersPerSecond, kEpsilon),
         () -> assertEquals(6.0 * factor, arr[1].speedMetersPerSecond, kEpsilon),
         () -> assertEquals(4.0 * factor, arr[2].speedMetersPerSecond, kEpsilon),
-        () -> assertEquals(7.0 * factor, arr[3].speedMetersPerSecond, kEpsilon)
-    );
+        () -> assertEquals(7.0 * factor, arr[3].speedMetersPerSecond, kEpsilon));
   }
-
 }

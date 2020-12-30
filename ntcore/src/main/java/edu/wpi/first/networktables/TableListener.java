@@ -4,9 +4,7 @@
 
 package edu.wpi.first.networktables;
 
-/**
- * A listener that listens to new tables in a {@link NetworkTable}.
- */
+/** A listener that listens to new tables in a {@link NetworkTable}. */
 @FunctionalInterface
 public interface TableListener {
   /**

@@ -5,14 +5,12 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
  * Close the claw.
  *
- * <p>NOTE: It doesn't wait for the claw to close since there is no sensor to
- * detect that.
+ * <p>NOTE: It doesn't wait for the claw to close since there is no sensor to detect that.
  */
 public class CloseClaw extends InstantCommand {
   public CloseClaw() {

@@ -4,12 +4,11 @@
 
 package edu.wpi.first.wpilibj.drive;
 
-/**
- * This is a 2D vector struct that supports basic vector operations.
- */
+/** This is a 2D vector struct that supports basic vector operations. */
 public class Vector2d {
   @SuppressWarnings("MemberName")
   public double x;
+
   @SuppressWarnings("MemberName")
   public double y;
 
@@ -44,9 +43,7 @@ public class Vector2d {
     return x * vec.x + y * vec.y;
   }
 
-  /**
-   * Returns magnitude of vector.
-   */
+  /** Returns magnitude of vector. */
   public double magnitude() {
     return Math.sqrt(x * x + y * y);
   }

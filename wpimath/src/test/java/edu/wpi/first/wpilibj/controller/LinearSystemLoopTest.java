@@ -4,11 +4,8 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.estimator.KalmanFilter;
 import edu.wpi.first.wpilibj.system.LinearSystem;
@@ -21,35 +18,34 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import org.junit.jupiter.api.Test;
 
 public class LinearSystemLoopTest {
   public static final double kDt = 0.00505;
   private static final double kPositionStddev = 0.0001;
   private static final Random random = new Random();
 
-  LinearSystem<N2, N1, N1> m_plant = LinearSystemId.createElevatorSystem(DCMotor.getVex775Pro(2), 5,
-      0.0181864, 1.0);
+  LinearSystem<N2, N1, N1> m_plant =
+      LinearSystemId.createElevatorSystem(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
 
-  KalmanFilter<N2, N1, N1> m_observer = new KalmanFilter<>(Nat.N2(), Nat.N1(), m_plant,
-      VecBuilder.fill(0.05, 1.0),
-      VecBuilder.fill(0.0001), kDt);
+  KalmanFilter<N2, N1, N1> m_observer =
+      new KalmanFilter<>(
+          Nat.N2(), Nat.N1(), m_plant, VecBuilder.fill(0.05, 1.0), VecBuilder.fill(0.0001), kDt);
 
-  LinearQuadraticRegulator<N2, N1, N1> m_controller = new LinearQuadraticRegulator<>(
-      m_plant, VecBuilder.fill(0.02, 0.4), VecBuilder.fill(12.0),
-        0.00505);
+  LinearQuadraticRegulator<N2, N1, N1> m_controller =
+      new LinearQuadraticRegulator<>(
+          m_plant, VecBuilder.fill(0.02, 0.4), VecBuilder.fill(12.0), 0.00505);
 
   private final LinearSystemLoop<N2, N1, N1> m_loop =
       new LinearSystemLoop<>(m_plant, m_controller, m_observer, 12, 0.00505);
 
   @SuppressWarnings("LocalVariableName")
-  private static void updateTwoState(LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1>
-      loop, double noise) {
-    Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(
-          VecBuilder.fill(noise)
-    );
+  private static void updateTwoState(
+      LinearSystem<N2, N1, N1> plant, LinearSystemLoop<N2, N1, N1> loop, double noise) {
+    Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(VecBuilder.fill(noise));
 
     loop.correct(y);
     loop.predict(kDt);
@@ -67,10 +63,11 @@ public class LinearSystemLoopTest {
     TrapezoidProfile profile;
     TrapezoidProfile.State state;
     for (int i = 0; i < 1000; i++) {
-      profile = new TrapezoidProfile(
-            constraints, new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
-            new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0))
-      );
+      profile =
+          new TrapezoidProfile(
+              constraints,
+              new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1)),
+              new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
       state = profile.calculate(kDt);
       m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
 
@@ -82,24 +79,22 @@ public class LinearSystemLoopTest {
 
     assertEquals(2.0, m_loop.getXHat(0), 0.05);
     assertEquals(0.0, m_loop.getXHat(1), 0.5);
-
   }
 
   @Test
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public void testFlywheelEnabled() {
 
-    LinearSystem<N1, N1, N1> plant = LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2),
-          0.00289, 1.0);
-    KalmanFilter<N1, N1, N1> observer = new KalmanFilter<>(Nat.N1(), Nat.N1(), plant,
-          VecBuilder.fill(1.0),
-          VecBuilder.fill(kPositionStddev), kDt);
+    LinearSystem<N1, N1, N1> plant =
+        LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00289, 1.0);
+    KalmanFilter<N1, N1, N1> observer =
+        new KalmanFilter<>(
+            Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(kPositionStddev), kDt);
 
     var qElms = VecBuilder.fill(9.0);
     var rElms = VecBuilder.fill(12.0);
 
-    var controller = new LinearQuadraticRegulator<>(
-          plant, qElms, rElms, kDt);
+    var controller = new LinearQuadraticRegulator<>(plant, qElms, rElms, kDt);
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, kDt);
 
@@ -125,9 +120,10 @@ public class LinearSystemLoopTest {
 
       loop.setNextR(references);
 
-      Matrix<N1, N1> y = plant.calculateY(loop.getXHat(), loop.getU()).plus(
-            VecBuilder.fill(random.nextGaussian() * kPositionStddev)
-      );
+      Matrix<N1, N1> y =
+          plant
+              .calculateY(loop.getXHat(), loop.getU())
+              .plus(VecBuilder.fill(random.nextGaussian() * kPositionStddev));
 
       loop.correct(y);
       loop.predict(kDt);
@@ -158,5 +154,4 @@ public class LinearSystemLoopTest {
 
     assertEquals(0.0, loop.getError(0), 0.1);
   }
-
 }

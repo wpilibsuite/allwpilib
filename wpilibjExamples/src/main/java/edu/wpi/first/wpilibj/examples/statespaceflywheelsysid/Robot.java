@@ -20,8 +20,8 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
 /**
- * This is a sample program to demonstrate how to use a state-space controller
- * to control a flywheel.
+ * This is a sample program to demonstrate how to use a state-space controller to control a
+ * flywheel.
  */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
@@ -43,32 +43,31 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
-  private final LinearSystem<N1, N1, N1> m_flywheelPlant = LinearSystemId.identifyVelocitySystem(
-        kFlywheelKv, kFlywheelKa);
+  private final LinearSystem<N1, N1, N1> m_flywheelPlant =
+      LinearSystemId.identifyVelocitySystem(kFlywheelKv, kFlywheelKa);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
-  private final KalmanFilter<N1, N1, N1> m_observer = new KalmanFilter<>(
-        Nat.N1(), Nat.N1(),
-        m_flywheelPlant,
-        VecBuilder.fill(3.0), // How accurate we think our model is
-        VecBuilder.fill(0.01), // How accurate we think our encoder
-        // data is
-        0.020);
+  private final KalmanFilter<N1, N1, N1> m_observer =
+      new KalmanFilter<>(
+          Nat.N1(),
+          Nat.N1(),
+          m_flywheelPlant,
+          VecBuilder.fill(3.0), // How accurate we think our model is
+          VecBuilder.fill(0.01), // How accurate we think our encoder
+          // data is
+          0.020);
 
   // A LQR uses feedback to create voltage commands.
-  private final LinearQuadraticRegulator<N1, N1, N1> m_controller
-        = new LinearQuadraticRegulator<>(m_flywheelPlant,
-        VecBuilder.fill(8.0), // Velocity error tolerance
-        VecBuilder.fill(12.0), // Control effort (voltage) tolerance
-        0.020);
+  private final LinearQuadraticRegulator<N1, N1, N1> m_controller =
+      new LinearQuadraticRegulator<>(
+          m_flywheelPlant,
+          VecBuilder.fill(8.0), // Velocity error tolerance
+          VecBuilder.fill(12.0), // Control effort (voltage) tolerance
+          0.020);
 
   // The state-space loop combines a controller, observer, feedforward and plant for easy control.
-  private final LinearSystemLoop<N1, N1, N1> m_loop = new LinearSystemLoop<>(
-      m_flywheelPlant,
-        m_controller,
-        m_observer,
-        12.0,
-        0.020);
+  private final LinearSystemLoop<N1, N1, N1> m_loop =
+      new LinearSystemLoop<>(m_flywheelPlant, m_controller, m_observer, 12.0, 0.020);
 
   // An encoder set up to measure flywheel velocity in radians per second.
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -81,8 +80,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // We go 2 pi radians per 4096 clicks.
-    m_encoder.setDistancePerPulse(
-          2.0 * Math.PI / 4096.0);
+    m_encoder.setDistancePerPulse(2.0 * Math.PI / 4096.0);
   }
 
   @Override

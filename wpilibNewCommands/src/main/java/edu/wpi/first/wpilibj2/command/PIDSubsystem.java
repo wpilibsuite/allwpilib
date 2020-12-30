@@ -4,12 +4,12 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
-
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
+
 /**
- * A subsystem that uses a {@link PIDController} to control an output.  The controller is run
+ * A subsystem that uses a {@link PIDController} to control an output. The controller is run
  * synchronously from the subsystem's periodic() method.
  */
 public abstract class PIDSubsystem extends SubsystemBase {
@@ -31,7 +31,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
   }
 
   /**
-   * Creates a new PIDSubsystem.  Initial setpoint is zero.
+   * Creates a new PIDSubsystem. Initial setpoint is zero.
    *
    * @param controller the PIDController to use
    */
@@ -83,17 +83,13 @@ public abstract class PIDSubsystem extends SubsystemBase {
    */
   protected abstract double getMeasurement();
 
-  /**
-   * Enables the PID control.  Resets the controller.
-   */
+  /** Enables the PID control. Resets the controller. */
   public void enable() {
     m_enabled = true;
     m_controller.reset();
   }
 
-  /**
-   * Disables the PID control.  Sets output to zero.
-   */
+  /** Disables the PID control. Sets output to zero. */
   public void disable() {
     m_enabled = false;
     useOutput(0, 0);

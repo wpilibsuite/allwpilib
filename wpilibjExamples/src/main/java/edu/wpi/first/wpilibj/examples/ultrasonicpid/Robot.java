@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
- * This is a sample program to demonstrate the use of a PIDController with an
- * ultrasonic sensor to reach and maintain a set distance from an object.
+ * This is a sample program to demonstrate the use of a PIDController with an ultrasonic sensor to
+ * reach and maintain a set distance from an object.
  */
 public class Robot extends TimedRobot {
   // distance in inches the robot wants to stay from an object
@@ -39,9 +39,8 @@ public class Robot extends TimedRobot {
   private final MedianFilter m_filter = new MedianFilter(5);
 
   private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-  private final DifferentialDrive m_robotDrive
-      = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
-          new PWMVictorSPX(kRightMotorPort));
+  private final DifferentialDrive m_robotDrive =
+      new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort), new PWMVictorSPX(kRightMotorPort));
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
 
   @Override
@@ -54,8 +53,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // returned value is filtered with a rolling median filter, since ultrasonics
     // tend to be quite noisy and susceptible to sudden outliers
-    double pidOutput
-        = m_pidController.calculate(m_filter.calculate(m_ultrasonic.getVoltage()));
+    double pidOutput = m_pidController.calculate(m_filter.calculate(m_ultrasonic.getVoltage()));
 
     m_robotDrive.arcadeDrive(pidOutput, 0);
   }

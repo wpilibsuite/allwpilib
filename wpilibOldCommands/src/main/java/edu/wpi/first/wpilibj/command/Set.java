@@ -8,14 +8,11 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 @SuppressWarnings("all")
-/**
- * A set.
- */
+/** A set. */
 class Set {
   private Vector m_set = new Vector();
 
-  public Set() {
-  }
+  public Set() {}
 
   public void add(Object o) {
     if (m_set.contains(o)) {
@@ -32,7 +29,7 @@ class Set {
   }
 
   public void clear() {
-      m_set.clear();
+    m_set.clear();
   }
 
   public boolean contains(Object o) {

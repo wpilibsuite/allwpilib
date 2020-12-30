@@ -4,9 +4,7 @@
 
 package edu.wpi.cscore;
 
-/**
- * A source that represents a video camera.
- */
+/** A source that represents a video camera. */
 public class VideoCamera extends VideoSource {
   public static class WhiteBalance {
     public static final int kFixedIndoor = 3000;
@@ -20,58 +18,42 @@ public class VideoCamera extends VideoSource {
     super(handle);
   }
 
-  /**
-   * Set the brightness, as a percentage (0-100).
-   */
+  /** Set the brightness, as a percentage (0-100). */
   public synchronized void setBrightness(int brightness) {
     CameraServerJNI.setCameraBrightness(m_handle, brightness);
   }
 
-  /**
-   * Get the brightness, as a percentage (0-100).
-   */
+  /** Get the brightness, as a percentage (0-100). */
   public synchronized int getBrightness() {
     return CameraServerJNI.getCameraBrightness(m_handle);
   }
 
-  /**
-   * Set the white balance to auto.
-   */
+  /** Set the white balance to auto. */
   public synchronized void setWhiteBalanceAuto() {
     CameraServerJNI.setCameraWhiteBalanceAuto(m_handle);
   }
 
-  /**
-   * Set the white balance to hold current.
-   */
+  /** Set the white balance to hold current. */
   public synchronized void setWhiteBalanceHoldCurrent() {
     CameraServerJNI.setCameraWhiteBalanceHoldCurrent(m_handle);
   }
 
-  /**
-   * Set the white balance to manual, with specified color temperature.
-   */
+  /** Set the white balance to manual, with specified color temperature. */
   public synchronized void setWhiteBalanceManual(int value) {
     CameraServerJNI.setCameraWhiteBalanceManual(m_handle, value);
   }
 
-  /**
-   * Set the exposure to auto aperture.
-   */
+  /** Set the exposure to auto aperture. */
   public synchronized void setExposureAuto() {
     CameraServerJNI.setCameraExposureAuto(m_handle);
   }
 
-  /**
-   * Set the exposure to hold current.
-   */
+  /** Set the exposure to hold current. */
   public synchronized void setExposureHoldCurrent() {
     CameraServerJNI.setCameraExposureHoldCurrent(m_handle);
   }
 
-  /**
-   * Set the exposure to manual, as a percentage (0-100).
-   */
+  /** Set the exposure to manual, as a percentage (0-100). */
   public synchronized void setExposureManual(int value) {
     CameraServerJNI.setCameraExposureManual(m_handle, value);
   }

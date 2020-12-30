@@ -6,17 +6,12 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests the {@link Command} library.
- */
+/** Tests the {@link Command} library. */
 public class DefaultCommandTest extends AbstractCommandTest {
-  /**
-   * Testing of default commands where the interrupting command ends itself.
-   */
+  /** Testing of default commands where the interrupting command ends itself. */
   @Test
   void defaultCommandWhereTheInteruptingCommandEndsItselfTest() {
     final ASubsystem subsystem = new ASubsystem();
-
 
     final MockCommand defaultCommand = new MockCommand(subsystem);
 
@@ -58,10 +53,7 @@ public class DefaultCommandTest extends AbstractCommandTest {
     assertCommandState(anotherCommand, 1, 3, 3, 1, 0);
   }
 
-
-  /**
-   * Testing of default commands where the interrupting command is canceled.
-   */
+  /** Testing of default commands where the interrupting command is canceled. */
   @Test
   void defaultCommandsInterruptingCommandCanceledTest() {
     final ASubsystem subsystem = new ASubsystem();
@@ -104,5 +96,4 @@ public class DefaultCommandTest extends AbstractCommandTest {
     assertCommandState(defaultCommand, 2, 5, 5, 0, 1);
     assertCommandState(anotherCommand, 1, 2, 2, 0, 1);
   }
-
 }

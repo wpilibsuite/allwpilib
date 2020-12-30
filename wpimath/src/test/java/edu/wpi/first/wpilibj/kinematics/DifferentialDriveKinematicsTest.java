@@ -4,15 +4,15 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
+
 class DifferentialDriveKinematicsTest {
   private static final double kEpsilon = 1E-9;
-  private final DifferentialDriveKinematics m_kinematics
-      = new DifferentialDriveKinematics(0.381 * 2);
+  private final DifferentialDriveKinematics m_kinematics =
+      new DifferentialDriveKinematics(0.381 * 2);
 
   @Test
   void testInverseKinematicsForZeros() {
@@ -21,8 +21,7 @@ class DifferentialDriveKinematicsTest {
 
     assertAll(
         () -> assertEquals(0.0, wheelSpeeds.leftMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, wheelSpeeds.rightMetersPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.0, wheelSpeeds.rightMetersPerSecond, kEpsilon));
   }
 
   @Test
@@ -33,8 +32,7 @@ class DifferentialDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 
   @Test
@@ -44,8 +42,7 @@ class DifferentialDriveKinematicsTest {
 
     assertAll(
         () -> assertEquals(3.0, wheelSpeeds.leftMetersPerSecond, kEpsilon),
-        () -> assertEquals(3.0, wheelSpeeds.rightMetersPerSecond, kEpsilon)
-    );
+        () -> assertEquals(3.0, wheelSpeeds.rightMetersPerSecond, kEpsilon));
   }
 
   @Test
@@ -56,8 +53,7 @@ class DifferentialDriveKinematicsTest {
     assertAll(
         () -> assertEquals(3.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 
   @Test
@@ -67,8 +63,7 @@ class DifferentialDriveKinematicsTest {
 
     assertAll(
         () -> assertEquals(-0.381 * Math.PI, wheelSpeeds.leftMetersPerSecond, kEpsilon),
-        () -> assertEquals(+0.381 * Math.PI, wheelSpeeds.rightMetersPerSecond, kEpsilon)
-    );
+        () -> assertEquals(+0.381 * Math.PI, wheelSpeeds.rightMetersPerSecond, kEpsilon));
   }
 
   @Test
@@ -79,7 +74,6 @@ class DifferentialDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(-Math.PI, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(-Math.PI, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 }

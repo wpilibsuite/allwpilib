@@ -4,17 +4,16 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class ProfiledPIDControllerTest {
   @Test
   void testStartFromNonZeroPosition() {
-    ProfiledPIDController controller = new ProfiledPIDController(1.0, 0.0, 0.0,
-        new TrapezoidProfile.Constraints(1.0, 1.0));
+    ProfiledPIDController controller =
+        new ProfiledPIDController(1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1.0, 1.0));
 
     controller.reset(20);
 

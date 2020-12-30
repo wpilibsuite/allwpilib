@@ -8,23 +8,22 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj2.command.PIDSubsystem;
-
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 public class ShooterSubsystem extends PIDSubsystem {
   private final PWMVictorSPX m_shooterMotor = new PWMVictorSPX(ShooterConstants.kShooterMotorPort);
   private final PWMVictorSPX m_feederMotor = new PWMVictorSPX(ShooterConstants.kFeederMotorPort);
   private final Encoder m_shooterEncoder =
-      new Encoder(ShooterConstants.kEncoderPorts[0], ShooterConstants.kEncoderPorts[1],
-                  ShooterConstants.kEncoderReversed);
+      new Encoder(
+          ShooterConstants.kEncoderPorts[0],
+          ShooterConstants.kEncoderPorts[1],
+          ShooterConstants.kEncoderReversed);
   private final SimpleMotorFeedforward m_shooterFeedforward =
-      new SimpleMotorFeedforward(ShooterConstants.kSVolts,
-                                 ShooterConstants.kVVoltSecondsPerRotation);
+      new SimpleMotorFeedforward(
+          ShooterConstants.kSVolts, ShooterConstants.kVVoltSecondsPerRotation);
 
-  /**
-   * The shooter subsystem for the robot.
-   */
+  /** The shooter subsystem for the robot. */
   public ShooterSubsystem() {
     super(new PIDController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD));
     getController().setTolerance(ShooterConstants.kShooterToleranceRPS);

@@ -6,13 +6,9 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Ported from the old CrioTest Classes.
- */
+/** Ported from the old CrioTest Classes. */
 class CommandParallelGroupTest extends AbstractCommandTest {
-  /**
-   * Simple Parallel Command Group With 2 commands one command terminates first.
-   */
+  /** Simple Parallel Command Group With 2 commands one command terminates first. */
   @Test
   void parallelCommandGroupWithTwoCommandsTest() {
     final MockCommand command1 = new MockCommand();
@@ -49,5 +45,4 @@ class CommandParallelGroupTest extends AbstractCommandTest {
       assertCommandState(command2, 1, 5, 5, 1, 0);
     }
   }
-
 }

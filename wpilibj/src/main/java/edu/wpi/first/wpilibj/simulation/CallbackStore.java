@@ -72,7 +72,7 @@ public class CallbackStore implements AutoCloseable {
   protected void finalize() throws Throwable {
     try {
       if (m_cancelType >= 0) {
-        close();        // close open files
+        close(); // close open files
       }
     } finally {
       super.finalize();

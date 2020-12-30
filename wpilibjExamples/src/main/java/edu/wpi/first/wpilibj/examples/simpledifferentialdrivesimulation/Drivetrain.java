@@ -42,10 +42,10 @@ public class Drivetrain {
   private final PWMVictorSPX m_rightLeader = new PWMVictorSPX(3);
   private final PWMVictorSPX m_rightFollower = new PWMVictorSPX(4);
 
-  private final SpeedControllerGroup m_leftGroup
-      = new SpeedControllerGroup(m_leftLeader, m_leftFollower);
-  private final SpeedControllerGroup m_rightGroup
-      = new SpeedControllerGroup(m_rightLeader, m_rightFollower);
+  private final SpeedControllerGroup m_leftGroup =
+      new SpeedControllerGroup(m_leftLeader, m_leftFollower);
+  private final SpeedControllerGroup m_rightGroup =
+      new SpeedControllerGroup(m_rightLeader, m_rightFollower);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
@@ -55,10 +55,10 @@ public class Drivetrain {
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
-  private final DifferentialDriveKinematics m_kinematics
-      = new DifferentialDriveKinematics(kTrackWidth);
-  private final DifferentialDriveOdometry m_odometry
-      = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+  private final DifferentialDriveKinematics m_kinematics =
+      new DifferentialDriveKinematics(kTrackWidth);
+  private final DifferentialDriveOdometry m_odometry =
+      new DifferentialDriveOdometry(m_gyro.getRotation2d());
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
@@ -69,11 +69,11 @@ public class Drivetrain {
   private final EncoderSim m_leftEncoderSim = new EncoderSim(m_leftEncoder);
   private final EncoderSim m_rightEncoderSim = new EncoderSim(m_rightEncoder);
   private final Field2d m_fieldSim = new Field2d();
-  private final LinearSystem<N2, N2, N2> m_drivetrainSystem
-      = LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
-  private final DifferentialDrivetrainSim m_drivetrainSimulator
-      = new DifferentialDrivetrainSim(m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth,
-      kWheelRadius, null);
+  private final LinearSystem<N2, N2, N2> m_drivetrainSystem =
+      LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
+  private final DifferentialDrivetrainSim m_drivetrainSimulator =
+      new DifferentialDrivetrainSim(
+          m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
   public Drivetrain() {
     // Set the distance per pulse for the drive encoders. We can simply use the
@@ -92,10 +92,10 @@ public class Drivetrain {
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
     var leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
     var rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
-    double leftOutput = m_leftPIDController.calculate(m_leftEncoder.getRate(),
-        speeds.leftMetersPerSecond);
-    double rightOutput = m_rightPIDController.calculate(m_rightEncoder.getRate(),
-        speeds.rightMetersPerSecond);
+    double leftOutput =
+        m_leftPIDController.calculate(m_leftEncoder.getRate(), speeds.leftMetersPerSecond);
+    double rightOutput =
+        m_rightPIDController.calculate(m_rightEncoder.getRate(), speeds.rightMetersPerSecond);
 
     m_leftGroup.setVoltage(leftOutput + leftFeedforward);
     m_rightGroup.setVoltage(rightOutput + rightFeedforward);
@@ -106,8 +106,8 @@ public class Drivetrain {
   }
 
   public void updateOdometry() {
-    m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(),
-        m_rightEncoder.getDistance());
+    m_odometry.update(
+        m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
   }
 
   public void resetOdometry(Pose2d pose) {
@@ -126,7 +126,8 @@ public class Drivetrain {
     // simulation, and write the simulated positions and velocities to our
     // simulated encoder and gyro. We negate the right side so that positive
     // voltages make the right side move forward.
-    m_drivetrainSimulator.setInputs(m_leftLeader.get() * RobotController.getInputVoltage(),
+    m_drivetrainSimulator.setInputs(
+        m_leftLeader.get() * RobotController.getInputVoltage(),
         -m_rightLeader.get() * RobotController.getInputVoltage());
     m_drivetrainSimulator.update(0.02);
 

@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * state. Additionally, double solenoids take up two channels on your PCM whereas single solenoids
  * only take a single channel.
  */
-
 public class Robot extends TimedRobot {
   private final Joystick m_stick = new Joystick(0);
 

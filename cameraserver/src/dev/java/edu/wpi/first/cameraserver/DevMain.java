@@ -5,10 +5,7 @@
 package edu.wpi.first.cameraserver;
 
 public final class DevMain {
-  public static void main(String[] args) {
+  public static void main(String[] args) {}
 
-  }
-
-  private DevMain() {
-  }
+  private DevMain() {}
 }

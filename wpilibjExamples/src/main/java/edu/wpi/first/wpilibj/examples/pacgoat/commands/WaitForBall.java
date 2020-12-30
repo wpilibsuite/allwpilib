@@ -5,13 +5,11 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
- * Wait until the collector senses that it has the ball. This command does
- * nothing and is intended to be used in command groups to wait for this
- * condition.
+ * Wait until the collector senses that it has the ball. This command does nothing and is intended
+ * to be used in command groups to wait for this condition.
  */
 public class WaitForBall extends Command {
   public WaitForBall() {

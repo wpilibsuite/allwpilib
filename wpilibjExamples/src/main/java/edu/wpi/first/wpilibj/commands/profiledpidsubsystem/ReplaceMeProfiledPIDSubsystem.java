@@ -9,15 +9,16 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 
 public class ReplaceMeProfiledPIDSubsystem extends ProfiledPIDSubsystem {
-  /**
-   * Creates a new ReplaceMeProfiledPIDSubsystem.
-   */
+  /** Creates a new ReplaceMeProfiledPIDSubsystem. */
   public ReplaceMeProfiledPIDSubsystem() {
     super(
         // The ProfiledPIDController used by the subsystem
-        new ProfiledPIDController(0, 0, 0,
-                                  // The motion profile constraints
-                                  new TrapezoidProfile.Constraints(0, 0)));
+        new ProfiledPIDController(
+            0,
+            0,
+            0,
+            // The motion profile constraints
+            new TrapezoidProfile.Constraints(0, 0)));
   }
 
   @Override

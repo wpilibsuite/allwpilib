@@ -6,13 +6,9 @@ package edu.wpi.first.wpilibj.command;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Ported from the old CrioTest Classes.
- */
+/** Ported from the old CrioTest Classes. */
 class CommandSupersedeTest extends AbstractCommandTest {
-  /**
-   * Testing one command superseding another because of dependencies.
-   */
+  /** Testing one command superseding another because of dependencies. */
   @Test
   void oneCommandSupersedingAnotherBecauseOfDependenciesTest() {
     final ASubsystem subsystem = new ASubsystem();
@@ -64,11 +60,12 @@ class CommandSupersedeTest extends AbstractCommandTest {
   void commandFailingSupersedingBecauseFirstCanNotBeInterruptedTest() {
     final ASubsystem subsystem = new ASubsystem();
 
-    final MockCommand command1 = new MockCommand(subsystem) {
-      {
-        setInterruptible(false);
-      }
-    };
+    final MockCommand command1 =
+        new MockCommand(subsystem) {
+          {
+            setInterruptible(false);
+          }
+        };
 
     final MockCommand command2 = new MockCommand(subsystem);
 

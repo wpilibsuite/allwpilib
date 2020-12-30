@@ -4,17 +4,14 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Game field object on a Field2d.
- */
+/** Game field object on a Field2d. */
 public class FieldObject2d {
   /**
    * Package-local constructor.
@@ -60,8 +57,7 @@ public class FieldObject2d {
   }
 
   /**
-   * Set multiple poses from an list of Pose objects.
-   * The total number of poses is limited to 85.
+   * Set multiple poses from an list of Pose objects. The total number of poses is limited to 85.
    *
    * @param poses list of 2D poses
    */
@@ -74,8 +70,7 @@ public class FieldObject2d {
   }
 
   /**
-   * Set multiple poses from an list of Pose objects.
-   * The total number of poses is limited to 85.
+   * Set multiple poses from an list of Pose objects. The total number of poses is limited to 85.
    *
    * @param poses list of 2D poses
    */

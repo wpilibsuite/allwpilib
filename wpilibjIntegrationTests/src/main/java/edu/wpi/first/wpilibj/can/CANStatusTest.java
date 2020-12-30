@@ -4,10 +4,9 @@
 
 package edu.wpi.first.wpilibj.can;
 
-import org.junit.Test;
-
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
+import org.junit.Test;
 
 public class CANStatusTest {
   @Test

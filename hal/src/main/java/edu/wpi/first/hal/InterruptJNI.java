@@ -15,8 +15,8 @@ public class InterruptJNI extends JNIWrapper {
 
   public static native void cleanInterrupts(int interruptHandle);
 
-  public static native int waitForInterrupt(int interruptHandle, double timeout,
-                                            boolean ignorePrevious);
+  public static native int waitForInterrupt(
+      int interruptHandle, double timeout, boolean ignorePrevious);
 
   public static native void enableInterrupts(int interruptHandle);
 
@@ -26,15 +26,14 @@ public class InterruptJNI extends JNIWrapper {
 
   public static native long readInterruptFallingTimestamp(int interruptHandle);
 
-  public static native void requestInterrupts(int interruptHandle, int digitalSourceHandle,
-                                              int analogTriggerType);
+  public static native void requestInterrupts(
+      int interruptHandle, int digitalSourceHandle, int analogTriggerType);
 
-  public static native void attachInterruptHandler(int interruptHandle,
-                                                   InterruptJNIHandlerFunction handler,
-                                                   Object param);
+  public static native void attachInterruptHandler(
+      int interruptHandle, InterruptJNIHandlerFunction handler, Object param);
 
-  public static native void setInterruptUpSourceEdge(int interruptHandle, boolean risingEdge,
-                                                     boolean fallingEdge);
+  public static native void setInterruptUpSourceEdge(
+      int interruptHandle, boolean risingEdge, boolean fallingEdge);
 
   public static native void releaseWaitingInterrupt(int interruptHandle);
 }

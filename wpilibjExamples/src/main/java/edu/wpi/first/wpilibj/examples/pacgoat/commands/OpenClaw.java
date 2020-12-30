@@ -5,12 +5,9 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
-/**
- * Opens the claw.
- */
+/** Opens the claw. */
 public class OpenClaw extends Command {
   public OpenClaw() {
     requires(Robot.collector);

@@ -7,14 +7,13 @@ package edu.wpi.first.wpilibj2.command;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Class that holds scheduling state for a command.  Used internally by the
- * {@link CommandScheduler}.
+ * Class that holds scheduling state for a command. Used internally by the {@link CommandScheduler}.
  */
 class CommandState {
-  //The time since this command was initialized.
+  // The time since this command was initialized.
   private double m_startTime = -1;
 
-  //Whether or not it is interruptible.
+  // Whether or not it is interruptible.
   private final boolean m_interruptible;
 
   CommandState(boolean interruptible) {

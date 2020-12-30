@@ -6,12 +6,9 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifierDataJNI;
 
-/**
- * Class to control simulated notifiers.
- */
+/** Class to control simulated notifiers. */
 public final class NotifierSim {
-  private NotifierSim() {
-  }
+  private NotifierSim() {}
 
   /**
    * Gets the timeout of the next notifier.

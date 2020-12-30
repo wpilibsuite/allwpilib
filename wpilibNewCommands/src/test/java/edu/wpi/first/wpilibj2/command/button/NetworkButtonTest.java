@@ -4,16 +4,15 @@
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
-
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class NetworkButtonTest extends CommandTestBase {
   @BeforeEach
@@ -32,9 +31,7 @@ class NetworkButtonTest extends CommandTestBase {
     var scheduler = CommandScheduler.getInstance();
     var commandHolder = new MockCommandHolder(true);
     var command = commandHolder.getMock();
-    var entry = NetworkTableInstance.getDefault()
-        .getTable("TestTable")
-        .getEntry("Test");
+    var entry = NetworkTableInstance.getDefault().getTable("TestTable").getEntry("Test");
 
     var button = new NetworkButton("TestTable", "Test");
     entry.setBoolean(false);

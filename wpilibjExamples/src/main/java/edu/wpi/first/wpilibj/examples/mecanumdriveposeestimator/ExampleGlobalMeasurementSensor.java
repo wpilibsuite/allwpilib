@@ -10,9 +10,7 @@ import edu.wpi.first.wpilibj.math.StateSpaceUtil;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 
-/**
- * This dummy class represents a global measurement sensor, such as a computer vision solution.
- */
+/** This dummy class represents a global measurement sensor, such as a computer vision solution. */
 public final class ExampleGlobalMeasurementSensor {
   private ExampleGlobalMeasurementSensor() {
     // Utility class
@@ -24,11 +22,11 @@ public final class ExampleGlobalMeasurementSensor {
    * @param estimatedRobotPose The robot pose.
    */
   public static Pose2d getEstimatedGlobalPose(Pose2d estimatedRobotPose) {
-    var rand = StateSpaceUtil.makeWhiteNoiseVector(VecBuilder.fill(0.5, 0.5,
-        Units.degreesToRadians(30)));
-    return new Pose2d(estimatedRobotPose.getX() + rand.get(0, 0),
+    var rand =
+        StateSpaceUtil.makeWhiteNoiseVector(VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+    return new Pose2d(
+        estimatedRobotPose.getX() + rand.get(0, 0),
         estimatedRobotPose.getY() + rand.get(1, 0),
         estimatedRobotPose.getRotation().plus(new Rotation2d(rand.get(2, 0))));
   }
-
 }

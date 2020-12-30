@@ -9,9 +9,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpiutil.RuntimeDetector;
 
 public final class DevMain {
-  /**
-   * Main entry point.
-   */
+  /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
     System.out.println(RuntimeDetector.getPlatformPath());
@@ -19,6 +17,5 @@ public final class DevMain {
     System.out.println(HALUtil.getHALRuntimeType());
   }
 
-  private DevMain() {
-  }
+  private DevMain() {}
 }

@@ -10,15 +10,11 @@ import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AddressableLED;
 import java.util.NoSuchElementException;
 
-/**
- * Class to control a simulated addressable LED.
- */
+/** Class to control a simulated addressable LED. */
 public class AddressableLEDSim {
   private final int m_index;
 
-  /**
-   * Constructs for the first addressable LED.
-   */
+  /** Constructs for the first addressable LED. */
   public AddressableLEDSim() {
     m_index = 0;
   }
@@ -54,8 +50,8 @@ public class AddressableLEDSim {
   }
 
   /**
-   * Creates an AddressableLEDSim for a simulated index.
-   * The index is incremented for each simulated AddressableLED.
+   * Creates an AddressableLEDSim for a simulated index. The index is incremented for each simulated
+   * AddressableLED.
    *
    * @param index simulator index
    * @return Simulated object
@@ -68,9 +64,11 @@ public class AddressableLEDSim {
     int uid = AddressableLEDDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelInitializedCallback);
   }
+
   public boolean getInitialized() {
     return AddressableLEDDataJNI.getInitialized(m_index);
   }
+
   public void setInitialized(boolean initialized) {
     AddressableLEDDataJNI.setInitialized(m_index, initialized);
   }
@@ -79,9 +77,11 @@ public class AddressableLEDSim {
     int uid = AddressableLEDDataJNI.registerOutputPortCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelOutputPortCallback);
   }
+
   public int getOutputPort() {
     return AddressableLEDDataJNI.getOutputPort(m_index);
   }
+
   public void setOutputPort(int outputPort) {
     AddressableLEDDataJNI.setOutputPort(m_index, outputPort);
   }
@@ -90,9 +90,11 @@ public class AddressableLEDSim {
     int uid = AddressableLEDDataJNI.registerLengthCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelLengthCallback);
   }
+
   public int getLength() {
     return AddressableLEDDataJNI.getLength(m_index);
   }
+
   public void setLength(int length) {
     AddressableLEDDataJNI.setLength(m_index, length);
   }
@@ -101,9 +103,11 @@ public class AddressableLEDSim {
     int uid = AddressableLEDDataJNI.registerRunningCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelRunningCallback);
   }
+
   public boolean getRunning() {
     return AddressableLEDDataJNI.getRunning(m_index);
   }
+
   public void setRunning(boolean running) {
     AddressableLEDDataJNI.setRunning(m_index, running);
   }
@@ -112,9 +116,11 @@ public class AddressableLEDSim {
     int uid = AddressableLEDDataJNI.registerDataCallback(m_index, callback);
     return new CallbackStore(m_index, uid, AddressableLEDDataJNI::cancelDataCallback);
   }
+
   public byte[] getData() {
     return AddressableLEDDataJNI.getData(m_index);
   }
+
   public void setData(byte[] data) {
     AddressableLEDDataJNI.setData(m_index, data);
   }

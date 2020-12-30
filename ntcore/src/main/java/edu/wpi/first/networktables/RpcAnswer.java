@@ -4,9 +4,7 @@
 
 package edu.wpi.first.networktables;
 
-/**
- * NetworkTables Remote Procedure Call (Server Side).
- */
+/** NetworkTables Remote Procedure Call (Server Side). */
 public final class RpcAnswer {
   /** Entry handle. */
   @SuppressWarnings("MemberName")
@@ -28,8 +26,8 @@ public final class RpcAnswer {
   @SuppressWarnings("MemberName")
   public final ConnectionInfo conn;
 
-  /** Constructor.
-   * This should generally only be used internally to NetworkTables.
+  /**
+   * Constructor. This should generally only be used internally to NetworkTables.
    *
    * @param inst Instance
    * @param entry Entry handle
@@ -38,8 +36,13 @@ public final class RpcAnswer {
    * @param params Call raw parameters
    * @param conn Connection info
    */
-  public RpcAnswer(NetworkTableInstance inst, int entry, int call, String name, byte[] params,
-                   ConnectionInfo conn) {
+  public RpcAnswer(
+      NetworkTableInstance inst,
+      int entry,
+      int call,
+      String name,
+      byte[] params,
+      ConnectionInfo conn) {
     this.m_inst = inst;
     this.entry = entry;
     this.call = call;
@@ -73,8 +76,8 @@ public final class RpcAnswer {
   /**
    * Post RPC response (return value) for a polled RPC.
    *
-   * @param result  result raw data that will be provided to remote caller
-   * @return        true if the response was posted, otherwise false
+   * @param result result raw data that will be provided to remote caller
+   * @return true if the response was posted, otherwise false
    */
   public boolean postResponse(byte[] result) {
     boolean ret = NetworkTablesJNI.postRpcResponse(entry, call, result);

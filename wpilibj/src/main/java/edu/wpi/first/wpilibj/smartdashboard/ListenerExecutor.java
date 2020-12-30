@@ -28,9 +28,7 @@ class ListenerExecutor implements Executor {
     }
   }
 
-  /**
-   * Runs all posted tasks.  Called periodically from main thread.
-   */
+  /** Runs all posted tasks. Called periodically from main thread. */
   public void runListenerTasks() {
     // Locally copy tasks from internal list; minimizes blocking time
     Collection<Runnable> tasks = new ArrayList<>();

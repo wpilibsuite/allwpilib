@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.fixtures;
 
-
 /**
  * This is an example of how to use the {@link ITestFixture} interface to create test fixtures for a
  * test.

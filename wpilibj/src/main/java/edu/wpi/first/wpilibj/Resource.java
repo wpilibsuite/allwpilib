@@ -26,9 +26,7 @@ public final class Resource {
   private final int m_size;
   private final Resource m_nextResource;
 
-  /**
-   * Clears all allocated resources.
-   */
+  /** Clears all allocated resources. */
   public static void restartProgram() {
     for (Resource r = Resource.resourceList; r != null; r = r.m_nextResource) {
       for (int i = 0; i < r.m_size; i++) {
@@ -39,8 +37,8 @@ public final class Resource {
 
   /**
    * Allocate storage for a new instance of Resource. Allocate a bool array of values that will get
-   * initialized to indicate that no resources have been allocated yet. The indices of the
-   * resources are 0..size-1.
+   * initialized to indicate that no resources have been allocated yet. The indices of the resources
+   * are 0..size-1.
    *
    * @param size The number of blocks to allocate
    */
@@ -103,5 +101,4 @@ public final class Resource {
     }
     m_numAllocated[index] = false;
   }
-
 }

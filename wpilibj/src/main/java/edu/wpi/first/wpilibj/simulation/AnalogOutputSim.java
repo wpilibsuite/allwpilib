@@ -8,9 +8,7 @@ import edu.wpi.first.hal.simulation.AnalogOutDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AnalogOutput;
 
-/**
- * Class to control a simulated analog output.
- */
+/** Class to control a simulated analog output. */
 public class AnalogOutputSim {
   private final int m_index;
 
@@ -36,9 +34,11 @@ public class AnalogOutputSim {
     int uid = AnalogOutDataJNI.registerVoltageCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogOutDataJNI::cancelVoltageCallback);
   }
+
   public double getVoltage() {
     return AnalogOutDataJNI.getVoltage(m_index);
   }
+
   public void setVoltage(double voltage) {
     AnalogOutDataJNI.setVoltage(m_index, voltage);
   }
@@ -47,9 +47,11 @@ public class AnalogOutputSim {
     int uid = AnalogOutDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogOutDataJNI::cancelInitializedCallback);
   }
+
   public boolean getInitialized() {
     return AnalogOutDataJNI.getInitialized(m_index);
   }
+
   public void setInitialized(boolean initialized) {
     AnalogOutDataJNI.setInitialized(m_index, initialized);
   }

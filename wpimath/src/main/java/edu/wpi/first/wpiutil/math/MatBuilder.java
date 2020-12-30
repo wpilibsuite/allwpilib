@@ -5,7 +5,6 @@
 package edu.wpi.first.wpiutil.math;
 
 import java.util.Objects;
-
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -19,8 +18,8 @@ public class MatBuilder<R extends Num, C extends Num> {
   final Nat<C> m_cols;
 
   /**
-   * Fills the matrix with the given data, encoded in row major form.
-   * (The matrix is filled row by row, left to right with the given data).
+   * Fills the matrix with the given data, encoded in row major form. (The matrix is filled row by
+   * row, left to right with the given data).
    *
    * @param data The data to fill the matrix with.
    * @return The constructed matrix.
@@ -28,8 +27,14 @@ public class MatBuilder<R extends Num, C extends Num> {
   @SuppressWarnings("LineLength")
   public final Matrix<R, C> fill(double... data) {
     if (Objects.requireNonNull(data).length != this.m_rows.getNum() * this.m_cols.getNum()) {
-      throw new IllegalArgumentException("Invalid matrix data provided. Wanted " + this.m_rows.getNum()
-          + " x " + this.m_cols.getNum() + " matrix, but got " + data.length + " elements");
+      throw new IllegalArgumentException(
+          "Invalid matrix data provided. Wanted "
+              + this.m_rows.getNum()
+              + " x "
+              + this.m_cols.getNum()
+              + " matrix, but got "
+              + data.length
+              + " elements");
     } else {
       return new Matrix<>(new SimpleMatrix(this.m_rows.getNum(), this.m_cols.getNum(), true, data));
     }
@@ -37,6 +42,7 @@ public class MatBuilder<R extends Num, C extends Num> {
 
   /**
    * Creates a new {@link MatBuilder} with the given dimensions.
+   *
    * @param rows The number of rows of the matrix.
    * @param cols The number of columns of the matrix.
    */

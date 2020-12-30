@@ -4,24 +4,16 @@
 
 package edu.wpi.first.hal;
 
-/**
- * Structure for holding the values stored in an accumulator.
- */
+/** Structure for holding the values stored in an accumulator. */
 public class AccumulatorResult {
-  /**
-   * The total value accumulated.
-   */
+  /** The total value accumulated. */
   @SuppressWarnings("MemberName")
   public long value;
-  /**
-   * The number of sample value was accumulated over.
-   */
+  /** The number of sample value was accumulated over. */
   @SuppressWarnings("MemberName")
   public long count;
 
-  /**
-   * Set the value and count.
-   */
+  /** Set the value and count. */
   public void set(long value, long count) {
     this.value = value;
     this.count = count;

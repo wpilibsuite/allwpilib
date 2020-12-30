@@ -4,9 +4,7 @@
 
 package edu.wpi.first.wpilibj.command;
 
-/**
- * An element that is in a LinkedList.
- */
+/** An element that is in a LinkedList. */
 class LinkedListElement {
   private LinkedListElement m_next;
   private LinkedListElement m_previous;

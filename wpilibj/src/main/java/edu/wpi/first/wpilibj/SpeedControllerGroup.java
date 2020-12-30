@@ -4,14 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Arrays;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import java.util.Arrays;
 
-/**
- * Allows multiple {@link SpeedController} objects to be linked together.
- */
+/** Allows multiple {@link SpeedController} objects to be linked together. */
 public class SpeedControllerGroup implements SpeedController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final SpeedController[] m_speedControllers;
@@ -23,8 +20,8 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
    * @param speedControllers The SpeedControllers to add
    */
   @SuppressWarnings("PMD.AvoidArrayLoops")
-  public SpeedControllerGroup(SpeedController speedController,
-                              SpeedController... speedControllers) {
+  public SpeedControllerGroup(
+      SpeedController speedController, SpeedController... speedControllers) {
     m_speedControllers = new SpeedController[speedControllers.length + 1];
     m_speedControllers[0] = speedController;
     for (int i = 0; i < speedControllers.length; i++) {

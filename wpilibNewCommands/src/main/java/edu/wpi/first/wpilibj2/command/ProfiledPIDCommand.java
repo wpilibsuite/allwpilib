@@ -4,20 +4,18 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.State;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-
-import static edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.State;
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-
 /**
- * A command that controls an output with a {@link ProfiledPIDController}.  Runs forever by
- * default - to add
- * exit conditions and/or other behavior, subclass this class.  The controller calculation and
+ * A command that controls an output with a {@link ProfiledPIDController}. Runs forever by default -
+ * to add exit conditions and/or other behavior, subclass this class. The controller calculation and
  * output are performed synchronously in the command's execute() method.
  */
 public class ProfiledPIDCommand extends CommandBase {
@@ -27,18 +25,21 @@ public class ProfiledPIDCommand extends CommandBase {
   protected BiConsumer<Double, State> m_useOutput;
 
   /**
-   * Creates a new PIDCommand, which controls the given output with a ProfiledPIDController.
-   * Goal velocity is specified.
+   * Creates a new PIDCommand, which controls the given output with a ProfiledPIDController. Goal
+   * velocity is specified.
    *
-   * @param controller        the controller that controls the output.
+   * @param controller the controller that controls the output.
    * @param measurementSource the measurement of the process variable
-   * @param goalSource        the controller's goal
-   * @param useOutput         the controller's output
-   * @param requirements      the subsystems required by this command
+   * @param goalSource the controller's goal
+   * @param useOutput the controller's output
+   * @param requirements the subsystems required by this command
    */
-  public ProfiledPIDCommand(ProfiledPIDController controller, DoubleSupplier measurementSource,
-                            Supplier<State> goalSource, BiConsumer<Double, State> useOutput,
-                            Subsystem... requirements) {
+  public ProfiledPIDCommand(
+      ProfiledPIDController controller,
+      DoubleSupplier measurementSource,
+      Supplier<State> goalSource,
+      BiConsumer<Double, State> useOutput,
+      Subsystem... requirements) {
     requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
     requireNonNullParam(goalSource, "goalSource", "SynchronousPIDCommand");
@@ -52,18 +53,21 @@ public class ProfiledPIDCommand extends CommandBase {
   }
 
   /**
-   * Creates a new PIDCommand, which controls the given output with a ProfiledPIDController.
-   * Goal velocity is implicitly zero.
+   * Creates a new PIDCommand, which controls the given output with a ProfiledPIDController. Goal
+   * velocity is implicitly zero.
    *
-   * @param controller        the controller that controls the output.
+   * @param controller the controller that controls the output.
    * @param measurementSource the measurement of the process variable
-   * @param goalSource        the controller's goal
-   * @param useOutput         the controller's output
-   * @param requirements      the subsystems required by this command
+   * @param goalSource the controller's goal
+   * @param useOutput the controller's output
+   * @param requirements the subsystems required by this command
    */
-  public ProfiledPIDCommand(ProfiledPIDController controller, DoubleSupplier measurementSource,
-                            DoubleSupplier goalSource, BiConsumer<Double, State> useOutput,
-                            Subsystem... requirements) {
+  public ProfiledPIDCommand(
+      ProfiledPIDController controller,
+      DoubleSupplier measurementSource,
+      DoubleSupplier goalSource,
+      BiConsumer<Double, State> useOutput,
+      Subsystem... requirements) {
     requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
     requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
     requireNonNullParam(goalSource, "goalSource", "SynchronousPIDCommand");
@@ -80,15 +84,18 @@ public class ProfiledPIDCommand extends CommandBase {
    * Creates a new PIDCommand, which controls the given output with a ProfiledPIDController. Goal
    * velocity is specified.
    *
-   * @param controller        the controller that controls the output.
+   * @param controller the controller that controls the output.
    * @param measurementSource the measurement of the process variable
-   * @param goal              the controller's goal
-   * @param useOutput         the controller's output
-   * @param requirements      the subsystems required by this command
+   * @param goal the controller's goal
+   * @param useOutput the controller's output
+   * @param requirements the subsystems required by this command
    */
-  public ProfiledPIDCommand(ProfiledPIDController controller, DoubleSupplier measurementSource,
-                            State goal, BiConsumer<Double, State> useOutput,
-                            Subsystem... requirements) {
+  public ProfiledPIDCommand(
+      ProfiledPIDController controller,
+      DoubleSupplier measurementSource,
+      State goal,
+      BiConsumer<Double, State> useOutput,
+      Subsystem... requirements) {
     this(controller, measurementSource, () -> goal, useOutput, requirements);
   }
 
@@ -96,15 +103,18 @@ public class ProfiledPIDCommand extends CommandBase {
    * Creates a new PIDCommand, which controls the given output with a ProfiledPIDController. Goal
    * velocity is implicitly zero.
    *
-   * @param controller        the controller that controls the output.
+   * @param controller the controller that controls the output.
    * @param measurementSource the measurement of the process variable
-   * @param goal              the controller's goal
-   * @param useOutput         the controller's output
-   * @param requirements      the subsystems required by this command
+   * @param goal the controller's goal
+   * @param useOutput the controller's output
+   * @param requirements the subsystems required by this command
    */
-  public ProfiledPIDCommand(ProfiledPIDController controller, DoubleSupplier measurementSource,
-                            double goal, BiConsumer<Double, State> useOutput,
-                            Subsystem... requirements) {
+  public ProfiledPIDCommand(
+      ProfiledPIDController controller,
+      DoubleSupplier measurementSource,
+      double goal,
+      BiConsumer<Double, State> useOutput,
+      Subsystem... requirements) {
     this(controller, measurementSource, () -> goal, useOutput, requirements);
   }
 
@@ -115,8 +125,9 @@ public class ProfiledPIDCommand extends CommandBase {
 
   @Override
   public void execute() {
-    m_useOutput.accept(m_controller.calculate(m_measurement.getAsDouble(), m_goal.get()),
-                       m_controller.getSetpoint());
+    m_useOutput.accept(
+        m_controller.calculate(m_measurement.getAsDouble(), m_goal.get()),
+        m_controller.getSetpoint());
   }
 
   @Override

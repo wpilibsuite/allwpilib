@@ -4,20 +4,21 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.charset.StandardCharsets;
-
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SerialPortJNI;
+import java.nio.charset.StandardCharsets;
 
-/**
- * Driver for the serial ports (USB, MXP, Onboard) on the roboRIO.
- */
+/** Driver for the serial ports (USB, MXP, Onboard) on the roboRIO. */
 public class SerialPort implements AutoCloseable {
   private int m_portHandle;
 
   public enum Port {
-    kOnboard(0), kMXP(1), kUSB(2), kUSB1(2), kUSB2(3);
+    kOnboard(0),
+    kMXP(1),
+    kUSB(2),
+    kUSB1(2),
+    kUSB2(3);
 
     public final int value;
 
@@ -26,11 +27,13 @@ public class SerialPort implements AutoCloseable {
     }
   }
 
-  /**
-   * Represents the parity to use for serial communications.
-   */
+  /** Represents the parity to use for serial communications. */
   public enum Parity {
-    kNone(0), kOdd(1), kEven(2), kMark(3), kSpace(4);
+    kNone(0),
+    kOdd(1),
+    kEven(2),
+    kMark(3),
+    kSpace(4);
 
     public final int value;
 
@@ -39,11 +42,11 @@ public class SerialPort implements AutoCloseable {
     }
   }
 
-  /**
-   * Represents the number of stop bits to use for Serial Communication.
-   */
+  /** Represents the number of stop bits to use for Serial Communication. */
   public enum StopBits {
-    kOne(10), kOnePointFive(15), kTwo(20);
+    kOne(10),
+    kOnePointFive(15),
+    kTwo(20);
 
     public final int value;
 
@@ -52,11 +55,12 @@ public class SerialPort implements AutoCloseable {
     }
   }
 
-  /**
-   * Represents what type of flow control to use for serial communication.
-   */
+  /** Represents what type of flow control to use for serial communication. */
   public enum FlowControl {
-    kNone(0), kXonXoff(1), kRtsCts(2), kDtsDsr(4);
+    kNone(0),
+    kXonXoff(1),
+    kRtsCts(2),
+    kDtsDsr(4);
 
     public final int value;
 
@@ -65,11 +69,10 @@ public class SerialPort implements AutoCloseable {
     }
   }
 
-  /**
-   * Represents which type of buffer mode to use when writing to a serial port.
-   */
+  /** Represents which type of buffer mode to use when writing to a serial port. */
   public enum WriteBufferMode {
-    kFlushOnAccess(1), kFlushWhenFull(2);
+    kFlushOnAccess(1),
+    kFlushWhenFull(2);
 
     public final int value;
 
@@ -81,19 +84,24 @@ public class SerialPort implements AutoCloseable {
   /**
    * Create an instance of a Serial Port class.
    *
-   * <p>Prefer to use the constructor that doesn't take a port name, but in some
-   * cases the automatic detection might not work correctly.
+   * <p>Prefer to use the constructor that doesn't take a port name, but in some cases the automatic
+   * detection might not work correctly.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param port     The Serial port to use
+   * @param port The Serial port to use
    * @param portName The direct portName to use
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
-   * @param parity   Select the type of parity checking to use.
+   * @param parity Select the type of parity checking to use.
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.
-   * @deprecated     Will be removed for 2019
+   * @deprecated Will be removed for 2019
    */
-  public SerialPort(final int baudRate, String portName, Port port, final int dataBits,
-                    Parity parity, StopBits stopBits) {
+  public SerialPort(
+      final int baudRate,
+      String portName,
+      Port port,
+      final int dataBits,
+      Parity parity,
+      StopBits stopBits) {
     m_portHandle = SerialPortJNI.serialInitializePortDirect((byte) port.value, portName);
     SerialPortJNI.serialSetBaudRate(m_portHandle, baudRate);
     SerialPortJNI.serialSetDataBits(m_portHandle, (byte) dataBits);
@@ -118,13 +126,13 @@ public class SerialPort implements AutoCloseable {
    * Create an instance of a Serial Port class.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param port     The Serial port to use
+   * @param port The Serial port to use
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
-   * @param parity   Select the type of parity checking to use.
+   * @param parity Select the type of parity checking to use.
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.
    */
-  public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity,
-                    StopBits stopBits) {
+  public SerialPort(
+      final int baudRate, Port port, final int dataBits, Parity parity, StopBits stopBits) {
     m_portHandle = SerialPortJNI.serialInitializePort((byte) port.value);
     SerialPortJNI.serialSetBaudRate(m_portHandle, baudRate);
     SerialPortJNI.serialSetDataBits(m_portHandle, (byte) dataBits);
@@ -150,7 +158,7 @@ public class SerialPort implements AutoCloseable {
    *
    * @param baudRate The baud rate to configure the serial port.
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
-   * @param parity   Select the type of parity checking to use.
+   * @param parity Select the type of parity checking to use.
    */
   public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity) {
     this(baudRate, port, dataBits, parity, StopBits.kOne);
@@ -167,8 +175,7 @@ public class SerialPort implements AutoCloseable {
   }
 
   /**
-   * Create an instance of a Serial Port class. Defaults to 8 databits, no parity, and one stop
-   * bit.
+   * Create an instance of a Serial Port class. Defaults to 8 databits, no parity, and one stop bit.
    *
    * @param baudRate The baud rate to configure the serial port.
    */
@@ -218,9 +225,7 @@ public class SerialPort implements AutoCloseable {
     enableTermination('\n');
   }
 
-  /**
-   * Disable termination behavior.
-   */
+  /** Disable termination behavior. */
   public void disableTermination() {
     SerialPortJNI.serialDisableTermination(m_portHandle);
   }
@@ -275,7 +280,7 @@ public class SerialPort implements AutoCloseable {
    * Write raw bytes to the serial port.
    *
    * @param buffer The buffer of bytes to write.
-   * @param count  The maximum number of bytes to write.
+   * @param count The maximum number of bytes to write.
    * @return The number of bytes actually written into the port.
    */
   public int write(byte[] buffer, int count) {
@@ -336,11 +341,11 @@ public class SerialPort implements AutoCloseable {
   /**
    * Specify the flushing behavior of the output buffer.
    *
-   * <p>When set to kFlushOnAccess, data is synchronously written to the serial port after each
-   * call to either print() or write().
+   * <p>When set to kFlushOnAccess, data is synchronously written to the serial port after each call
+   * to either print() or write().
    *
-   * <p>When set to kFlushWhenFull, data will only be written to the serial port when the buffer
-   * is full or when flush() is called.
+   * <p>When set to kFlushWhenFull, data will only be written to the serial port when the buffer is
+   * full or when flush() is called.
    *
    * @param mode The write buffer mode.
    */

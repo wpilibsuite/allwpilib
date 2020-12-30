@@ -13,13 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
-/**
- * A network table that knows its subtable path.
- */
+/** A network table that knows its subtable path. */
 public final class NetworkTable {
-  /**
-   * The path separator for sub-tables and keys.
-   */
+  /** The path separator for sub-tables and keys. */
   public static final char PATH_SEPARATOR = '/';
 
   private final String m_path;
@@ -27,8 +23,8 @@ public final class NetworkTable {
   private final NetworkTableInstance m_inst;
 
   /**
-   * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar".
-   * If the key has a trailing slash, returns an empty string.
+   * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar". If the key has a trailing
+   * slash, returns an empty string.
    *
    * @param key key
    * @return base name
@@ -42,8 +38,8 @@ public final class NetworkTable {
   }
 
   /**
-   * Normalizes an network table key to contain no consecutive slashes and
-   * optionally start with a leading slash. For example:
+   * Normalizes an network table key to contain no consecutive slashes and optionally start with a
+   * leading slash. For example:
    *
    * <pre><code>
    * normalizeKey("/foo/bar", true)  == "/foo/bar"
@@ -52,9 +48,8 @@ public final class NetworkTable {
    * normalizeKey("foo//bar", false) == "foo/bar"
    * </code></pre>
    *
-   * @param key              the key to normalize
-   * @param withLeadingSlash whether or not the normalized key should begin
-   *                         with a leading slash
+   * @param key the key to normalize
+   * @param withLeadingSlash whether or not the normalized key should begin with a leading slash
    * @return normalized key
    */
   public static String normalizeKey(String key, boolean withLeadingSlash) {
@@ -74,10 +69,9 @@ public final class NetworkTable {
   }
 
   /**
-   * Normalizes a network table key to start with exactly one leading slash
-   * ("/") and contain no consecutive slashes. For example,
-   * {@code "//foo/bar/"} becomes {@code "/foo/bar/"} and
-   * {@code "///a/b/c"} becomes {@code "/a/b/c"}.
+   * Normalizes a network table key to start with exactly one leading slash ("/") and contain no
+   * consecutive slashes. For example, {@code "//foo/bar/"} becomes {@code "/foo/bar/"} and {@code
+   * "///a/b/c"} becomes {@code "/a/b/c"}.
    *
    * <p>This is equivalent to {@code normalizeKey(key, true)}
    *
@@ -89,9 +83,8 @@ public final class NetworkTable {
   }
 
   /**
-   * Gets a list of the names of all the super tables of a given key. For
-   * example, the key "/foo/bar/baz" has a hierarchy of "/", "/foo",
-   * "/foo/bar", and "/foo/bar/baz".
+   * Gets a list of the names of all the super tables of a given key. For example, the key
+   * "/foo/bar/baz" has a hierarchy of "/", "/foo", "/foo/bar", and "/foo/bar/baz".
    *
    * @param key the key
    * @return List of super tables
@@ -115,9 +108,7 @@ public final class NetworkTable {
     return hierarchy;
   }
 
-  /**
-   * Constructor.  Use NetworkTableInstance.getTable() or getSubTable() instead.
-   */
+  /** Constructor. Use NetworkTableInstance.getTable() or getSubTable() instead. */
   NetworkTable(NetworkTableInstance inst, String path) {
     m_path = path;
     m_pathWithSep = path + PATH_SEPARATOR;
@@ -158,52 +149,54 @@ public final class NetworkTable {
   /**
    * Listen to keys only within this table.
    *
-   * @param listener    listener to add
-   * @param flags       {@link EntryListenerFlags} bitmask
+   * @param listener listener to add
+   * @param flags {@link EntryListenerFlags} bitmask
    * @return Listener handle
    */
   public int addEntryListener(TableEntryListener listener, int flags) {
     final int prefixLen = m_path.length() + 1;
-    return m_inst.addEntryListener(m_pathWithSep, event -> {
-      String relativeKey = event.name.substring(prefixLen);
-      if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
-        // part of a sub table
-        return;
-      }
-      listener.valueChanged(this, relativeKey, event.getEntry(), event.value, event.flags);
-    }, flags);
+    return m_inst.addEntryListener(
+        m_pathWithSep,
+        event -> {
+          String relativeKey = event.name.substring(prefixLen);
+          if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
+            // part of a sub table
+            return;
+          }
+          listener.valueChanged(this, relativeKey, event.getEntry(), event.value, event.flags);
+        },
+        flags);
   }
 
   /**
    * Listen to a single key.
    *
-   * @param key         the key name
-   * @param listener    listener to add
-   * @param flags       {@link EntryListenerFlags} bitmask
+   * @param key the key name
+   * @param listener listener to add
+   * @param flags {@link EntryListenerFlags} bitmask
    * @return Listener handle
    */
   public int addEntryListener(String key, TableEntryListener listener, int flags) {
     final NetworkTableEntry entry = getEntry(key);
-    return m_inst.addEntryListener(entry,
-        event -> listener.valueChanged(this, key, entry, event.value, event.flags), flags);
+    return m_inst.addEntryListener(
+        entry, event -> listener.valueChanged(this, key, entry, event.value, event.flags), flags);
   }
 
   /**
    * Remove an entry listener.
    *
-   * @param listener    listener handle
+   * @param listener listener handle
    */
   public void removeEntryListener(int listener) {
     m_inst.removeEntryListener(listener);
   }
 
   /**
-   * Listen for sub-table creation.
-   * This calls the listener once for each newly created sub-table.
+   * Listen for sub-table creation. This calls the listener once for each newly created sub-table.
    * It immediately calls the listener for any existing sub-tables.
    *
-   * @param listener        listener to add
-   * @param localNotify     notify local changes as well as remote
+   * @param listener listener to add
+   * @param localNotify notify local changes as well as remote
    * @return Listener handle
    */
   public int addSubTableListener(TableListener listener, boolean localNotify) {
@@ -215,38 +208,41 @@ public final class NetworkTable {
     final int prefixLen = m_path.length() + 1;
     final NetworkTable parent = this;
 
-    return m_inst.addEntryListener(m_pathWithSep, new Consumer<>() {
-      final Set<String> m_notifiedTables = new HashSet<>();
+    return m_inst.addEntryListener(
+        m_pathWithSep,
+        new Consumer<>() {
+          final Set<String> m_notifiedTables = new HashSet<>();
 
-      @Override
-      public void accept(EntryNotification event) {
-        String relativeKey = event.name.substring(prefixLen);
-        int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
-        if (endSubTable == -1) {
-          return;
-        }
-        String subTableKey = relativeKey.substring(0, endSubTable);
-        if (m_notifiedTables.contains(subTableKey)) {
-          return;
-        }
-        m_notifiedTables.add(subTableKey);
-        listener.tableCreated(parent, subTableKey, parent.getSubTable(subTableKey));
-      }
-    }, flags);
+          @Override
+          public void accept(EntryNotification event) {
+            String relativeKey = event.name.substring(prefixLen);
+            int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
+            if (endSubTable == -1) {
+              return;
+            }
+            String subTableKey = relativeKey.substring(0, endSubTable);
+            if (m_notifiedTables.contains(subTableKey)) {
+              return;
+            }
+            m_notifiedTables.add(subTableKey);
+            listener.tableCreated(parent, subTableKey, parent.getSubTable(subTableKey));
+          }
+        },
+        flags);
   }
 
   /**
    * Remove a sub-table listener.
    *
-   * @param listener    listener handle
+   * @param listener listener handle
    */
   public void removeTableListener(int listener) {
     m_inst.removeEntryListener(listener);
   }
 
   /**
-   * Returns the table at the specified key. If there is no table at the
-   * specified key, it will create a new table
+   * Returns the table at the specified key. If there is no table at the specified key, it will
+   * create a new table
    *
    * @param key the name of the table relative to this one
    * @return a sub table relative to this one
@@ -273,8 +269,8 @@ public final class NetworkTable {
    *     its own
    */
   public boolean containsSubTable(String key) {
-    int[] handles = NetworkTablesJNI.getEntries(m_inst.getHandle(),
-        m_pathWithSep + key + PATH_SEPARATOR, 0);
+    int[] handles =
+        NetworkTablesJNI.getEntries(m_inst.getHandle(), m_pathWithSep + key + PATH_SEPARATOR, 0);
     return handles.length != 0;
   }
 
@@ -330,8 +326,7 @@ public final class NetworkTable {
   }
 
   /**
-   * Deletes the specified key in this table. The key can
-   * not be null.
+   * Deletes the specified key in this table. The key can not be null.
    *
    * @param key the key name
    */
@@ -371,18 +366,15 @@ public final class NetworkTable {
     return getEntry(key).getValue();
   }
 
-  /**
-   * Get the path of the NetworkTable.
-   */
+  /** Get the path of the NetworkTable. */
   public String getPath() {
     return m_path;
   }
 
   /**
-   * Save table values to a file.  The file format used is identical to
-   * that used for SavePersistent.
+   * Save table values to a file. The file format used is identical to that used for SavePersistent.
    *
-   * @param filename  filename
+   * @param filename filename
    * @throws PersistentException if error saving file
    */
   public void saveEntries(String filename) throws PersistentException {
@@ -390,10 +382,10 @@ public final class NetworkTable {
   }
 
   /**
-   * Load table values from a file.  The file format used is identical to
-   * that used for SavePersistent / LoadPersistent.
+   * Load table values from a file. The file format used is identical to that used for
+   * SavePersistent / LoadPersistent.
    *
-   * @param filename  filename
+   * @param filename filename
    * @return List of warnings (errors result in an exception instead)
    * @throws PersistentException if error saving file
    */

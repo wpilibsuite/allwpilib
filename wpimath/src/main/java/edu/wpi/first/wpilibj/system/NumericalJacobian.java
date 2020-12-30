@@ -4,13 +4,12 @@
 
 package edu.wpi.first.wpilibj.system;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public final class NumericalJacobian {
   private NumericalJacobian() {
@@ -22,23 +21,22 @@ public final class NumericalJacobian {
   /**
    * Computes the numerical Jacobian with respect to x for f(x).
    *
-   * @param <Rows>   Number of rows in the result of f(x).
+   * @param <Rows> Number of rows in the result of f(x).
    * @param <States> Num representing the number of rows in the output of f.
-   * @param <Cols>   Number of columns in the result of f(x).
-   * @param rows     Number of rows in the result of f(x).
-   * @param cols     Number of columns in the result of f(x).
-   * @param f        Vector-valued function from which to compute the Jacobian.
-   * @param x        Vector argument.
+   * @param <Cols> Number of columns in the result of f(x).
+   * @param rows Number of rows in the result of f(x).
+   * @param cols Number of columns in the result of f(x).
+   * @param f Vector-valued function from which to compute the Jacobian.
+   * @param x Vector argument.
    * @return The numerical Jacobian with respect to x for f(x, u, ...).
    */
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
-  public static <Rows extends Num, Cols extends Num, States extends Num> Matrix<Rows, Cols>
-      numericalJacobian(
+  public static <Rows extends Num, Cols extends Num, States extends Num>
+      Matrix<Rows, Cols> numericalJacobian(
           Nat<Rows> rows,
           Nat<Cols> cols,
           Function<Matrix<Cols, N1>, Matrix<States, N1>> f,
-          Matrix<Cols, N1> x
-  ) {
+          Matrix<Cols, N1> x) {
     var result = new Matrix<>(rows, cols);
 
     for (int i = 0; i < cols.getNum(); i++) {
@@ -58,15 +56,15 @@ public final class NumericalJacobian {
   /**
    * Returns numerical Jacobian with respect to x for f(x, u, ...).
    *
-   * @param <Rows>    Number of rows in the result of f(x, u).
-   * @param <States>  Number of rows in x.
-   * @param <Inputs>  Number of rows in the second input to f.
+   * @param <Rows> Number of rows in the result of f(x, u).
+   * @param <States> Number of rows in x.
+   * @param <Inputs> Number of rows in the second input to f.
    * @param <Outputs> Num representing the rows in the output of f.
-   * @param rows      Number of rows in the result of f(x, u).
-   * @param states    Number of rows in x.
-   * @param f         Vector-valued function from which to compute Jacobian.
-   * @param x         State vector.
-   * @param u         Input vector.
+   * @param rows Number of rows in the result of f(x, u).
+   * @param states Number of rows in x.
+   * @param f Vector-valued function from which to compute Jacobian.
+   * @param x State vector.
+   * @param u Input vector.
    * @return The numerical Jacobian with respect to x for f(x, u, ...).
    */
   @SuppressWarnings({"LambdaParameterName", "MethodTypeParameterName"})
@@ -76,8 +74,7 @@ public final class NumericalJacobian {
           Nat<States> states,
           BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> f,
           Matrix<States, N1> x,
-          Matrix<Inputs, N1> u
-  ) {
+          Matrix<Inputs, N1> u) {
     return numericalJacobian(rows, states, _x -> f.apply(_x, u), x);
   }
 
@@ -86,23 +83,22 @@ public final class NumericalJacobian {
    *
    * @param <States> The states of the system.
    * @param <Inputs> The inputs to the system.
-   * @param <Rows>   Number of rows in the result of f(x, u).
-   * @param rows     Number of rows in the result of f(x, u).
-   * @param inputs   Number of rows in u.
-   * @param f        Vector-valued function from which to compute the Jacobian.
-   * @param x        State vector.
-   * @param u        Input vector.
+   * @param <Rows> Number of rows in the result of f(x, u).
+   * @param rows Number of rows in the result of f(x, u).
+   * @param inputs Number of rows in u.
+   * @param f Vector-valued function from which to compute the Jacobian.
+   * @param x State vector.
+   * @param u Input vector.
    * @return the numerical Jacobian with respect to u for f(x, u).
    */
   @SuppressWarnings({"LambdaParameterName", "MethodTypeParameterName"})
-  public static <Rows extends Num, States extends Num, Inputs extends Num> Matrix<Rows, Inputs>
-      numericalJacobianU(
+  public static <Rows extends Num, States extends Num, Inputs extends Num>
+      Matrix<Rows, Inputs> numericalJacobianU(
           Nat<Rows> rows,
           Nat<Inputs> inputs,
           BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
           Matrix<States, N1> x,
-          Matrix<Inputs, N1> u
-  ) {
+          Matrix<Inputs, N1> u) {
     return numericalJacobian(rows, inputs, _u -> f.apply(x, _u), u);
   }
 }

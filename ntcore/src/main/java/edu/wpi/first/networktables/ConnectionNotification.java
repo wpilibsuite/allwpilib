@@ -4,38 +4,30 @@
 
 package edu.wpi.first.networktables;
 
-/**
- * NetworkTables Connection notification.
- */
+/** NetworkTables Connection notification. */
 public final class ConnectionNotification {
-  /**
-   *  Listener that was triggered.
-   */
+  /** Listener that was triggered. */
   @SuppressWarnings("MemberName")
   public final int listener;
 
-  /**
-   * True if event is due to connection being established.
-   */
+  /** True if event is due to connection being established. */
   @SuppressWarnings("MemberName")
   public final boolean connected;
 
-  /**
-   * Connection information.
-   */
+  /** Connection information. */
   @SuppressWarnings("MemberName")
   public final ConnectionInfo conn;
 
-  /** Constructor.
-   * This should generally only be used internally to NetworkTables.
+  /**
+   * Constructor. This should generally only be used internally to NetworkTables.
    *
    * @param inst Instance
    * @param listener Listener that was triggered
    * @param connected Connected if true
    * @param conn Connection information
    */
-  public ConnectionNotification(NetworkTableInstance inst, int listener, boolean connected,
-                                ConnectionInfo conn) {
+  public ConnectionNotification(
+      NetworkTableInstance inst, int listener, boolean connected, ConnectionInfo conn) {
     this.m_inst = inst;
     this.listener = listener;
     this.connected = connected;

@@ -11,9 +11,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
- * This is a sample program that uses mecanum drive with a gyro sensor to
- * maintain rotation vectorsin relation to the starting orientation of the robot
- * (field-oriented controls).
+ * This is a sample program that uses mecanum drive with a gyro sensor to maintain rotation
+ * vectorsin relation to the starting orientation of the robot (field-oriented controls).
  */
 public class Robot extends TimedRobot {
   // gyro calibration constant, may need to be adjusted;
@@ -48,12 +47,10 @@ public class Robot extends TimedRobot {
     m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
   }
 
-  /**
-   * Mecanum drive is used with the gyro angle as an input.
-   */
+  /** Mecanum drive is used with the gyro angle as an input. */
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.driveCartesian(m_joystick.getX(), m_joystick.getY(),
-        m_joystick.getZ(), m_gyro.getAngle());
+    m_robotDrive.driveCartesian(
+        m_joystick.getX(), m_joystick.getY(), m_joystick.getZ(), m_gyro.getAngle());
   }
 }

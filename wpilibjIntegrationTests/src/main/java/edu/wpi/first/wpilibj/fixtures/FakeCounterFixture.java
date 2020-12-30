@@ -4,15 +4,12 @@
 
 package edu.wpi.first.wpilibj.fixtures;
 
+import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.mockhardware.FakeCounterSource;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.Counter;
-import edu.wpi.first.wpilibj.mockhardware.FakeCounterSource;
-
-/**
- * A fixture that can test the {@link Counter} using a {@link DIOCrossConnectFixture}.
- */
+/** A fixture that can test the {@link Counter} using a {@link DIOCrossConnectFixture}. */
 public class FakeCounterFixture implements ITestFixture {
   private static final Logger logger = Logger.getLogger(FakeEncoderFixture.class.getName());
 
@@ -33,11 +30,10 @@ public class FakeCounterFixture implements ITestFixture {
     m_counter = new Counter(dio.getInput());
   }
 
-
   /**
    * Constructs a FakeCounterFixture using two port numbers.
    *
-   * @param input  the input port
+   * @param input the input port
    * @param output the output port
    */
   public FakeCounterFixture(int input, int output) {
@@ -65,7 +61,6 @@ public class FakeCounterFixture implements ITestFixture {
     return m_counter;
   }
 
-
   /*
    * (non-Javadoc)
    *
@@ -74,7 +69,6 @@ public class FakeCounterFixture implements ITestFixture {
   @Override
   public boolean setup() {
     return true;
-
   }
 
   /*
@@ -104,6 +98,4 @@ public class FakeCounterFixture implements ITestFixture {
     }
     return true;
   }
-
-
 }

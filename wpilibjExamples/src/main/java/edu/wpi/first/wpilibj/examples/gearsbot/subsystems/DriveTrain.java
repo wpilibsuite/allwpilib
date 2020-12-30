@@ -11,10 +11,9 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 public class DriveTrain extends SubsystemBase {
   /**
@@ -23,6 +22,7 @@ public class DriveTrain extends SubsystemBase {
    */
   private final SpeedController m_leftMotor =
       new SpeedControllerGroup(new PWMVictorSPX(0), new PWMVictorSPX(1));
+
   private final SpeedController m_rightMotor =
       new SpeedControllerGroup(new PWMVictorSPX(2), new PWMVictorSPX(3));
 
@@ -33,9 +33,7 @@ public class DriveTrain extends SubsystemBase {
   private final AnalogInput m_rangefinder = new AnalogInput(6);
   private final AnalogGyro m_gyro = new AnalogGyro(1);
 
-  /**
-   * Create a new drive train subsystem.
-   */
+  /** Create a new drive train subsystem. */
   public DriveTrain() {
     super();
 
@@ -61,9 +59,7 @@ public class DriveTrain extends SubsystemBase {
     addChild("Gyro", m_gyro);
   }
 
-  /**
-   * The log method puts interesting information to the SmartDashboard.
-   */
+  /** The log method puts interesting information to the SmartDashboard. */
   public void log() {
     SmartDashboard.putNumber("Left Distance", m_leftEncoder.getDistance());
     SmartDashboard.putNumber("Right Distance", m_rightEncoder.getDistance());
@@ -75,7 +71,7 @@ public class DriveTrain extends SubsystemBase {
   /**
    * Tank style driving for the DriveTrain.
    *
-   * @param left  Speed in range [-1,1]
+   * @param left Speed in range [-1,1]
    * @param right Speed in range [-1,1]
    */
   public void drive(double left, double right) {
@@ -91,9 +87,7 @@ public class DriveTrain extends SubsystemBase {
     return m_gyro.getAngle();
   }
 
-  /**
-   * Reset the robots sensors to the zero states.
-   */
+  /** Reset the robots sensors to the zero states. */
   public void reset() {
     m_gyro.reset();
     m_leftEncoder.reset();
@@ -119,9 +113,7 @@ public class DriveTrain extends SubsystemBase {
     return m_rangefinder.getAverageVoltage();
   }
 
-  /**
-   * Call log method every loop.
-   */
+  /** Call log method every loop. */
   @Override
   public void periodic() {
     log();

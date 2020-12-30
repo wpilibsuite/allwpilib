@@ -13,19 +13,19 @@ public class CounterJNI extends JNIWrapper {
 
   public static native void setCounterAverageSize(int counterHandle, int size);
 
-  public static native void setCounterUpSource(int counterHandle, int digitalSourceHandle,
-                                               int analogTriggerType);
+  public static native void setCounterUpSource(
+      int counterHandle, int digitalSourceHandle, int analogTriggerType);
 
-  public static native void setCounterUpSourceEdge(int counterHandle, boolean risingEdge,
-                                                   boolean fallingEdge);
+  public static native void setCounterUpSourceEdge(
+      int counterHandle, boolean risingEdge, boolean fallingEdge);
 
   public static native void clearCounterUpSource(int counterHandle);
 
-  public static native void setCounterDownSource(int counterHandle, int digitalSourceHandle,
-                                                 int analogTriggerType);
+  public static native void setCounterDownSource(
+      int counterHandle, int digitalSourceHandle, int analogTriggerType);
 
-  public static native void setCounterDownSourceEdge(int counterHandle, boolean risingEdge,
-                                                     boolean fallingEdge);
+  public static native void setCounterDownSourceEdge(
+      int counterHandle, boolean risingEdge, boolean fallingEdge);
 
   public static native void clearCounterDownSource(int counterHandle);
 
@@ -33,15 +33,13 @@ public class CounterJNI extends JNIWrapper {
 
   public static native void setCounterExternalDirectionMode(int counterHandle);
 
-  public static native void setCounterSemiPeriodMode(int counterHandle,
-                                                     boolean highSemiPeriod);
+  public static native void setCounterSemiPeriodMode(int counterHandle, boolean highSemiPeriod);
 
   public static native void setCounterPulseLengthMode(int counterHandle, double threshold);
 
   public static native int getCounterSamplesToAverage(int counterHandle);
 
-  public static native void setCounterSamplesToAverage(int counterHandle,
-                                                       int samplesToAverage);
+  public static native void setCounterSamplesToAverage(int counterHandle, int samplesToAverage);
 
   public static native void resetCounter(int counterHandle);
 
@@ -57,6 +55,5 @@ public class CounterJNI extends JNIWrapper {
 
   public static native boolean getCounterDirection(int counterHandle);
 
-  public static native void setCounterReverseDirection(int counterHandle,
-                                                       boolean reverseDirection);
+  public static native void setCounterReverseDirection(int counterHandle, boolean reverseDirection);
 }

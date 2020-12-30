@@ -9,13 +9,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 /**
  * Base class for all sensors. Stores most recent status information as well as containing utility
  * functions for checking channels and error processing.
+ *
  * @deprecated Use Sendable and SendableRegistry
  */
 @Deprecated(since = "2020", forRemoval = true)
 public abstract class SendableBase implements Sendable, AutoCloseable {
-  /**
-   * Creates an instance of the sensor base.
-   */
+  /** Creates an instance of the sensor base. */
   public SendableBase() {
     this(true);
   }

@@ -8,9 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
-/**
- * This is a demo program showing the use of GenericHID's rumble feature.
- */
+/** This is a demo program showing the use of GenericHID's rumble feature. */
 public class Robot extends TimedRobot {
   private final XboxController m_hid = new XboxController(0);
 

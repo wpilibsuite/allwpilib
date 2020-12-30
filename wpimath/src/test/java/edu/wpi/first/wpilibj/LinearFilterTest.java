@@ -4,19 +4,18 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Random;
-import java.util.function.DoubleFunction;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+
+import java.util.Random;
+import java.util.function.DoubleFunction;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class LinearFilterTest {
   private static final double kFilterStep = 0.005;
@@ -46,9 +45,7 @@ class LinearFilterTest {
     assertThrows(IllegalArgumentException.class, () -> LinearFilter.movingAverage(0));
   }
 
-  /**
-   * Test if the filter reduces the noise produced by a signal generator.
-   */
+  /** Test if the filter reduces the noise produced by a signal generator. */
   @ParameterizedTest
   @MethodSource("noiseFilterProvider")
   void noiseReduceTest(final LinearFilter filter) {
@@ -65,25 +62,25 @@ class LinearFilterTest {
       noiseGenError += Math.abs(noise - theory);
     }
 
-    assertTrue(noiseGenError > filterError,
-        "Filter should have reduced noise accumulation from " + noiseGenError
-            + " but failed. The filter error was " + filterError);
+    assertTrue(
+        noiseGenError > filterError,
+        "Filter should have reduced noise accumulation from "
+            + noiseGenError
+            + " but failed. The filter error was "
+            + filterError);
   }
 
   static Stream<LinearFilter> noiseFilterProvider() {
     return Stream.of(
         LinearFilter.singlePoleIIR(kSinglePoleIIRTimeConstant, kFilterStep),
-        LinearFilter.movingAverage(kMovAvgTaps)
-    );
+        LinearFilter.movingAverage(kMovAvgTaps));
   }
 
-  /**
-   * Test if the linear filters produce consistent output for a given data set.
-   */
+  /** Test if the linear filters produce consistent output for a given data set. */
   @ParameterizedTest
   @MethodSource("outputFilterProvider")
-  void outputTest(final LinearFilter filter, final DoubleFunction<Double> data,
-                  final double expectedOutput) {
+  void outputTest(
+      final LinearFilter filter, final DoubleFunction<Double> data, final double expectedOutput) {
     double filterOutput = 0.0;
     for (double t = 0.0; t < kFilterTime; t += kFilterStep) {
       filterOutput = filter.calculate(data.apply(t));
@@ -94,18 +91,21 @@ class LinearFilterTest {
 
   static Stream<Arguments> outputFilterProvider() {
     return Stream.of(
-        arguments(LinearFilter.singlePoleIIR(kSinglePoleIIRTimeConstant, kFilterStep),
+        arguments(
+            LinearFilter.singlePoleIIR(kSinglePoleIIRTimeConstant, kFilterStep),
             (DoubleFunction<Double>) LinearFilterTest::getData,
             kSinglePoleIIRExpectedOutput),
-        arguments(LinearFilter.highPass(kHighPassTimeConstant, kFilterStep),
+        arguments(
+            LinearFilter.highPass(kHighPassTimeConstant, kFilterStep),
             (DoubleFunction<Double>) LinearFilterTest::getData,
             kHighPassExpectedOutput),
-        arguments(LinearFilter.movingAverage(kMovAvgTaps),
+        arguments(
+            LinearFilter.movingAverage(kMovAvgTaps),
             (DoubleFunction<Double>) LinearFilterTest::getData,
             kMovAvgExpectedOutput),
-        arguments(LinearFilter.movingAverage(kMovAvgTaps),
+        arguments(
+            LinearFilter.movingAverage(kMovAvgTaps),
             (DoubleFunction<Double>) LinearFilterTest::getPulseData,
-            0.0)
-    );
+            0.0));
   }
 }

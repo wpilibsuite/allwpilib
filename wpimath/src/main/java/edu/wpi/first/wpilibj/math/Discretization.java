@@ -4,12 +4,11 @@
 
 package edu.wpi.first.wpilibj.math;
 
-import org.ejml.simple.SimpleMatrix;
-
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.Pair;
+import org.ejml.simple.SimpleMatrix;
 
 @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
 public final class Discretization {
@@ -20,8 +19,8 @@ public final class Discretization {
   /**
    * Discretizes the given continuous A matrix.
    *
-   * @param <States>       Num representing the number of states.
-   * @param contA     Continuous system matrix.
+   * @param <States> Num representing the number of states.
+   * @param contA Continuous system matrix.
    * @param dtSeconds Discretization timestep.
    * @return the discrete matrix system.
    */
@@ -33,26 +32,25 @@ public final class Discretization {
   /**
    * Discretizes the given continuous A and B matrices.
    *
-   * <p>Rather than solving a (States + Inputs) x (States + Inputs) matrix
-   * exponential like in DiscretizeAB(), we take advantage of the structure of the
-   * block matrix of A and B.
+   * <p>Rather than solving a (States + Inputs) x (States + Inputs) matrix exponential like in
+   * DiscretizeAB(), we take advantage of the structure of the block matrix of A and B.
    *
-   * <p>1) The exponential of A*t, which is only N x N, is relatively cheap.
-   * 2) The upper-right quarter of the (States + Inputs) x (States + Inputs)
-   * matrix, which we can approximate using a taylor series to several terms
-   * and still be substantially cheaper than taking the big exponential.
+   * <p>1) The exponential of A*t, which is only N x N, is relatively cheap. 2) The upper-right
+   * quarter of the (States + Inputs) x (States + Inputs) matrix, which we can approximate using a
+   * taylor series to several terms and still be substantially cheaper than taking the big
+   * exponential.
    *
-   * @param states    Nat representing the states of the system.
-   * @param contA     Continuous system matrix.
-   * @param contB     Continuous input matrix.
+   * @param states Nat representing the states of the system.
+   * @param contA Continuous system matrix.
+   * @param contB Continuous input matrix.
    * @param dtseconds Discretization timestep.
    */
-  public static <States extends Num, Inputs extends Num> Pair<Matrix<States, States>,
-      Matrix<States, Inputs>>
-      discretizeABTaylor(Nat<States> states,
-                         Matrix<States, States> contA,
-                         Matrix<States, Inputs> contB,
-                         double dtseconds) {
+  public static <States extends Num, Inputs extends Num>
+      Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeABTaylor(
+          Nat<States> states,
+          Matrix<States, States> contA,
+          Matrix<States, Inputs> contB,
+          double dtseconds) {
     Matrix<States, States> lastTerm = Matrix.eye(states);
     double lastCoeff = dtseconds;
 
@@ -76,28 +74,24 @@ public final class Discretization {
   /**
    * Discretizes the given continuous A and Q matrices.
    *
-   * <p>Rather than solving a 2N x 2N matrix exponential like in DiscretizeQ() (which
-   * is expensive), we take advantage of the structure of the block matrix of A
-   * and Q.
+   * <p>Rather than solving a 2N x 2N matrix exponential like in DiscretizeQ() (which is expensive),
+   * we take advantage of the structure of the block matrix of A and Q.
    *
-   * <p>The exponential of A*t, which is only N x N, is relatively cheap.
-   * 2) The upper-right quarter of the 2N x 2N matrix, which we can approximate
-   * using a taylor series to several terms and still be substantially cheaper
-   * than taking the big exponential.
+   * <p>The exponential of A*t, which is only N x N, is relatively cheap. 2) The upper-right quarter
+   * of the 2N x 2N matrix, which we can approximate using a taylor series to several terms and
+   * still be substantially cheaper than taking the big exponential.
    *
-   * @param <States>       Nat representing the number of states.
-   * @param contA     Continuous system matrix.
-   * @param contQ     Continuous process noise covariance matrix.
+   * @param <States> Nat representing the number of states.
+   * @param contA Continuous system matrix.
+   * @param contQ Continuous process noise covariance matrix.
    * @param dtSeconds Discretization timestep.
    * @return a pair representing the discrete system matrix and process noise covariance matrix.
    */
   @SuppressWarnings("LocalVariableName")
-  public static <States extends Num> Pair<Matrix<States, States>,
-            Matrix<States, States>> discretizeAQTaylor(Matrix<States, States> contA,
-                                                       Matrix<States, States> contQ,
-                                                       double dtSeconds) {
+  public static <States extends Num>
+      Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
+          Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
     Matrix<States, States> Q = (contQ.plus(contQ.transpose())).div(2.0);
-
 
     Matrix<States, States> lastTerm = Q.copy();
     double lastCoeff = dtSeconds;
@@ -126,11 +120,11 @@ public final class Discretization {
   }
 
   /**
-   * Returns a discretized version of the provided continuous measurement noise
-   * covariance matrix. Note that dt=0.0 divides R by zero.
+   * Returns a discretized version of the provided continuous measurement noise covariance matrix.
+   * Note that dt=0.0 divides R by zero.
    *
-   * @param <O>       Nat representing the number of outputs.
-   * @param R         Continuous measurement noise covariance matrix.
+   * @param <O> Nat representing the number of outputs.
+   * @param R Continuous measurement noise covariance matrix.
    * @param dtSeconds Discretization timestep.
    * @return Discretized version of the provided continuous measurement noise covariance matrix.
    */
@@ -141,19 +135,17 @@ public final class Discretization {
   /**
    * Discretizes the given continuous A and B matrices.
    *
-   * @param <States>       Nat representing the states of the system.
-   * @param <Inputs>       Nat representing the inputs to the system.
-   * @param contA     Continuous system matrix.
-   * @param contB     Continuous input matrix.
+   * @param <States> Nat representing the states of the system.
+   * @param <Inputs> Nat representing the inputs to the system.
+   * @param contA Continuous system matrix.
+   * @param contB Continuous input matrix.
    * @param dtSeconds Discretization timestep.
    * @return a Pair representing discA and diskB.
    */
   @SuppressWarnings("LocalVariableName")
-  public static <States extends Num, Inputs extends Num> Pair<Matrix<States, States>,
-            Matrix<States, Inputs>> discretizeAB(
-                                     Matrix<States, States> contA,
-                                     Matrix<States, Inputs> contB,
-                                     double dtSeconds) {
+  public static <States extends Num, Inputs extends Num>
+      Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeAB(
+          Matrix<States, States> contA, Matrix<States, Inputs> contB, double dtSeconds) {
     var scaledA = contA.times(dtSeconds);
     var scaledB = contB.times(dtSeconds);
 
@@ -163,10 +155,10 @@ public final class Discretization {
     Mcont.assignBlock(0, scaledA.getNumCols(), scaledB);
     var Mdisc = Mcont.exp();
 
-    var discA = new Matrix<States, States>(new SimpleMatrix(contB.getNumRows(),
-        contB.getNumRows()));
-    var discB = new Matrix<States, Inputs>(new SimpleMatrix(contB.getNumRows(),
-        contB.getNumCols()));
+    var discA =
+        new Matrix<States, States>(new SimpleMatrix(contB.getNumRows(), contB.getNumRows()));
+    var discB =
+        new Matrix<States, Inputs>(new SimpleMatrix(contB.getNumRows(), contB.getNumCols()));
 
     discA.extractFrom(0, 0, Mdisc);
     discB.extractFrom(0, contB.getNumRows(), Mdisc);

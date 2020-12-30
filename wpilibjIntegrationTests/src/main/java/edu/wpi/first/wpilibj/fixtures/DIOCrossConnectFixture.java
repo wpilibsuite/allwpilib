@@ -4,15 +4,12 @@
 
 package edu.wpi.first.wpilibj.fixtures;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
-
-/**
- * Connects a digital input to a digital output.
- */
+/** Connects a digital input to a digital output. */
 public class DIOCrossConnectFixture implements ITestFixture {
   private static final Logger logger = Logger.getLogger(DIOCrossConnectFixture.class.getName());
 
@@ -23,7 +20,7 @@ public class DIOCrossConnectFixture implements ITestFixture {
   /**
    * Constructs using two pre-allocated digital objects.
    *
-   * @param input  The input
+   * @param input The input
    * @param output The output.
    */
   public DIOCrossConnectFixture(DigitalInput input, DigitalOutput output) {
@@ -37,7 +34,7 @@ public class DIOCrossConnectFixture implements ITestFixture {
   /**
    * Constructs a {@link DIOCrossConnectFixture} using the ports of the digital objects.
    *
-   * @param input  The port of the {@link DigitalInput}
+   * @param input The port of the {@link DigitalInput}
    * @param output The port of the {@link DigitalOutput}
    */
   public DIOCrossConnectFixture(Integer input, Integer output) {
@@ -83,5 +80,4 @@ public class DIOCrossConnectFixture implements ITestFixture {
     }
     return true;
   }
-
 }

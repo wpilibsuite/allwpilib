@@ -4,24 +4,22 @@
 
 package edu.wpi.first.networktables;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class NetworkTableTest {
   private static Stream<Arguments> basenameKeyArguments() {
     return Stream.of(
         Arguments.of("simple", "simple"),
         Arguments.of("simple", "one/two/many/simple"),
-        Arguments.of("simple", "//////an/////awful/key////simple")
-    );
+        Arguments.of("simple", "//////an/////awful/key////simple"));
   }
 
   @ParameterizedTest
@@ -35,8 +33,7 @@ class NetworkTableTest {
         Arguments.of("/", "///"),
         Arguments.of("/no/normal/req", "/no/normal/req"),
         Arguments.of("/no/leading/slash", "no/leading/slash"),
-        Arguments.of("/what/an/awful/key/", "//////what////an/awful/////key///")
-    );
+        Arguments.of("/what/an/awful/key/", "//////what////an/awful/////key///"));
   }
 
   @ParameterizedTest
@@ -51,8 +48,7 @@ class NetworkTableTest {
         Arguments.of("a", "///a"),
         Arguments.of("leading/slash", "/leading/slash"),
         Arguments.of("no/leading/slash", "no/leading/slash"),
-        Arguments.of("what/an/awful/key/", "//////what////an/awful/////key///")
-    );
+        Arguments.of("what/an/awful/key/", "//////what////an/awful/////key///"));
   }
 
   @ParameterizedTest
@@ -66,8 +62,7 @@ class NetworkTableTest {
         Arguments.of(Collections.singletonList("/"), ""),
         Arguments.of(Collections.singletonList("/"), "/"),
         Arguments.of(Arrays.asList("/", "/foo", "/foo/bar", "/foo/bar/baz"), "/foo/bar/baz"),
-        Arguments.of(Arrays.asList("/", "/foo", "/foo/bar", "/foo/bar/"), "/foo/bar/")
-    );
+        Arguments.of(Arrays.asList("/", "/foo", "/foo/bar", "/foo/bar/"), "/foo/bar/"));
   }
 
   @ParameterizedTest

@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
- * This is a demo program showing the use of the DifferentialDrive class.
- * Runs the motors with tank steering and an Xbox controller.
+ * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with tank
+ * steering and an Xbox controller.
  */
 public class Robot extends TimedRobot {
   private final PWMVictorSPX m_leftMotor = new PWMVictorSPX(0);
@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
     // That means that the Y axis of the left stick moves the left side
     // of the robot forward and backward, and the Y axis of the right stick
     // moves the right side of the robot forward and backward.
-    m_robotDrive.tankDrive(m_driverController.getY(Hand.kLeft),
-        m_driverController.getY(Hand.kRight));
+    m_robotDrive.tankDrive(
+        m_driverController.getY(Hand.kLeft), m_driverController.getY(Hand.kRight));
   }
 }

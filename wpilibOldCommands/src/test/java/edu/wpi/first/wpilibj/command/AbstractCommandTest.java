@@ -4,15 +4,13 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import org.junit.jupiter.api.BeforeEach;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * The basic test for all {@link Command} tests.
- */
+import org.junit.jupiter.api.BeforeEach;
+
+/** The basic test for all {@link Command} tests. */
 public abstract class AbstractCommandTest {
   @BeforeEach
   void commandSetup() {
@@ -35,16 +33,14 @@ public abstract class AbstractCommandTest {
     }
   }
 
-
-  protected void assertCommandState(MockCommand command, int initialize, int execute,
-                                    int isFinished, int end, int interrupted) {
+  protected void assertCommandState(
+      MockCommand command, int initialize, int execute, int isFinished, int end, int interrupted) {
     assertAll(
         () -> assertEquals(initialize, command.getInitializeCount()),
         () -> assertEquals(execute, command.getExecuteCount()),
         () -> assertEquals(isFinished, command.getIsFinishedCount()),
         () -> assertEquals(end, command.getEndCount()),
-        () -> assertEquals(interrupted, command.getInterruptedCount())
-    );
+        () -> assertEquals(interrupted, command.getInterruptedCount()));
   }
 
   protected void sleep(int time) {

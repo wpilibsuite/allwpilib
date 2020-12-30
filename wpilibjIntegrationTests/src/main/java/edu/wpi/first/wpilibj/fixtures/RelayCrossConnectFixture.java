@@ -7,9 +7,7 @@ package edu.wpi.first.wpilibj.fixtures;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Relay;
 
-/**
- * A connection between a {@link Relay} and two {@link DigitalInput DigitalInputs}.
- */
+/** A connection between a {@link Relay} and two {@link DigitalInput DigitalInputs}. */
 public abstract class RelayCrossConnectFixture implements ITestFixture {
   private DigitalInput m_inputOne;
   private DigitalInput m_inputTwo;
@@ -17,7 +15,6 @@ public abstract class RelayCrossConnectFixture implements ITestFixture {
 
   private boolean m_initialized = false;
   private boolean m_freed = false;
-
 
   protected abstract Relay giveRelay();
 
@@ -86,8 +83,10 @@ public abstract class RelayCrossConnectFixture implements ITestFixture {
       m_inputTwo.close();
       m_freed = true;
     } else {
-      throw new RuntimeException("You attempted to free the "
-          + RelayCrossConnectFixture.class.getSimpleName() + " multiple times");
+      throw new RuntimeException(
+          "You attempted to free the "
+              + RelayCrossConnectFixture.class.getSimpleName()
+              + " multiple times");
     }
     return true;
   }

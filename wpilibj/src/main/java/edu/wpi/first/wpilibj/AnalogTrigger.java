@@ -12,14 +12,9 @@ import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-
-/**
- * Class for creating and configuring Analog Triggers.
- */
+/** Class for creating and configuring Analog Triggers. */
 public class AnalogTrigger implements Sendable, AutoCloseable {
-  /**
-   * Exceptions dealing with improper operation of the Analog trigger.
-   */
+  /** Exceptions dealing with improper operation of the Analog trigger. */
   @SuppressWarnings("serial")
   public static class AnalogTriggerException extends RuntimeException {
     /**
@@ -30,13 +25,11 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
     public AnalogTriggerException(String message) {
       super(message);
     }
-
   }
 
-  /**
-   * Where the analog trigger is attached.
-   */
+  /** Where the analog trigger is attached. */
   protected int m_port;
+
   protected AnalogInput m_analogInput;
   protected DutyCycle m_dutyCycle;
   protected boolean m_ownsAnalog;
@@ -159,8 +152,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
   }
 
   /**
-   * Return the index of the analog trigger. This is the FPGA index of this analog trigger
-   * instance.
+   * Return the index of the analog trigger. This is the FPGA index of this analog trigger instance.
    *
    * @return The index of the analog trigger.
    */

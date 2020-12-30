@@ -4,11 +4,9 @@
 
 package edu.wpi.first.wpilibj.command;
 
+import edu.wpi.first.wpilibj.buttons.InternalButton;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.buttons.InternalButton;
-
 
 /**
  * Test that covers the {@link edu.wpi.first.wpilibj.buttons.Button} with the {@link Command}
@@ -24,9 +22,7 @@ class ButtonTest extends AbstractCommandTest {
     m_button2 = new InternalButton();
   }
 
-  /**
-   * Simple Button Test.
-   */
+  /** Simple Button Test. */
   @Test
   void buttonTest() {
     final MockCommand command1 = new MockCommand();
@@ -109,5 +105,4 @@ class ButtonTest extends AbstractCommandTest {
     assertCommandState(command3, 1, 4, 4, 0, 1);
     assertCommandState(command4, 1, 3, 3, 0, 1);
   }
-
 }

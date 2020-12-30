@@ -4,9 +4,14 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import edu.wpi.first.wpilibj.fixtures.FakeCounterFixture;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.Collection;
 import java.util.logging.Logger;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -15,16 +20,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import edu.wpi.first.wpilibj.fixtures.FakeCounterFixture;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-import edu.wpi.first.wpilibj.test.TestBench;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-/**
- * Tests to see if the Counter is working properly.
- */
+/** Tests to see if the Counter is working properly. */
 @RunWith(Parameterized.class)
 public class CounterTest extends AbstractComsSetup {
   private static FakeCounterFixture counter = null;
@@ -41,7 +37,7 @@ public class CounterTest extends AbstractComsSetup {
   /**
    * Constructs a Counter Test with the given inputs.
    *
-   * @param input  The input Port
+   * @param input The input Port
    * @param output The output Port
    */
   public CounterTest(Integer input, Integer output) {
@@ -73,10 +69,8 @@ public class CounterTest extends AbstractComsSetup {
     return TestBench.getInstance().getDIOCrossConnectCollection();
   }
 
-
   @BeforeClass
-  public static void setUpBeforeClass() {
-  }
+  public static void setUpBeforeClass() {}
 
   @AfterClass
   public static void tearDownAfterClass() {
@@ -89,9 +83,7 @@ public class CounterTest extends AbstractComsSetup {
     counter.setup();
   }
 
-  /**
-   * Tests the default state of the counter immediately after reset.
-   */
+  /** Tests the default state of the counter immediately after reset. */
   @Test
   public void testDefault() {
     assertEquals("Counter did not reset to 0", 0, counter.getCounter().get());
@@ -105,8 +97,15 @@ public class CounterTest extends AbstractComsSetup {
 
     final int count = counter.getCounter().get();
 
-    assertTrue("Fake Counter, Input: " + m_input + ", Output: " + m_output + ", did not return "
-        + goal + " instead got: " + count, count == goal);
+    assertTrue(
+        "Fake Counter, Input: "
+            + m_input
+            + ", Output: "
+            + m_output
+            + ", did not return "
+            + goal
+            + " instead got: "
+            + count,
+        count == goal);
   }
-
 }

@@ -6,9 +6,7 @@ package edu.wpi.first.wpilibj.commands.subsystem;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
-/**
- * Add your docs here.
- */
+/** Add your docs here. */
 public class ReplaceMeSubsystem extends Subsystem {
   // Put methods for controlling this subsystem
   // here. Call these from Commands.

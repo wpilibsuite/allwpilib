@@ -10,9 +10,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-/**
- * Analog output class.
- */
+/** Analog output class. */
 public class AnalogOutput implements Sendable, AutoCloseable {
   private int m_port;
   private int m_channel;
@@ -41,9 +39,7 @@ public class AnalogOutput implements Sendable, AutoCloseable {
     m_channel = 0;
   }
 
-  /**
-   * Get the channel of this AnalogOutput.
-   */
+  /** Get the channel of this AnalogOutput. */
   public int getChannel() {
     return m_channel;
   }

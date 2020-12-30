@@ -6,9 +6,7 @@ package edu.wpi.first.networktables;
 
 import java.io.IOException;
 
-/**
- * An exception thrown when persistent load/save fails in a {@link NetworkTable}.
- */
+/** An exception thrown when persistent load/save fails in a {@link NetworkTable}. */
 public final class PersistentException extends IOException {
   public static final long serialVersionUID = 0;
 

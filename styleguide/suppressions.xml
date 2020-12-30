@@ -10,5 +10,5 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
   <suppress files=".*wpilibjIntegrationTests.*"
             checks="MissingJavadocMethod" />
   <suppress files=".*JNI.*"
-            checks="(LineLength|EmptyLineSeparator|ParameterName)" />
+            checks="(LineLength|EmptyLineSeparator|ParameterName|MissingJavadocMethod)" />
 </suppressions>

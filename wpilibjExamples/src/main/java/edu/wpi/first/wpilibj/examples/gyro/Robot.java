@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
- * This is a sample program to demonstrate how to use a gyro sensor to make a
- * robot drive straight. This program uses a joystick to drive forwards and
- * backwards while the gyro is used for direction keeping.
+ * This is a sample program to demonstrate how to use a gyro sensor to make a robot drive straight.
+ * This program uses a joystick to drive forwards and backwards while the gyro is used for direction
+ * keeping.
  */
 public class Robot extends TimedRobot {
   private static final double kAngleSetpoint = 0.0;
@@ -28,9 +28,8 @@ public class Robot extends TimedRobot {
   private static final int kGyroPort = 0;
   private static final int kJoystickPort = 0;
 
-  private final DifferentialDrive m_myRobot
-      = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
-          new PWMVictorSPX(kRightMotorPort));
+  private final DifferentialDrive m_myRobot =
+      new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort), new PWMVictorSPX(kRightMotorPort));
   private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
@@ -40,8 +39,8 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * The motor speed is set from the joystick while the RobotDrive turning
-   * value is assigned from the error between the setpoint and the gyro angle.
+   * The motor speed is set from the joystick while the RobotDrive turning value is assigned from
+   * the error between the setpoint and the gyro angle.
    */
   @Override
   public void teleopPeriodic() {

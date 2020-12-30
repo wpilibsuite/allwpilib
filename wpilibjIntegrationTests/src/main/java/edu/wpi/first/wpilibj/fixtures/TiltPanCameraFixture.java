@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.fixtures;
 
-import java.util.logging.Logger;
-
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
+import java.util.logging.Logger;
 
 /**
  * A class to represent the a physical Camera with two servos (tilt and pan) designed to test to see
@@ -24,7 +23,6 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
   private Servo m_pan;
   private boolean m_initialized = false;
 
-
   protected abstract AnalogGyro giveGyro();
 
   protected abstract AnalogGyro giveGyroParam(int center, double offset);
@@ -33,11 +31,8 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
 
   protected abstract Servo givePan();
 
-  /**
-   * Constructs the TiltPanCamera.
-   */
-  public TiltPanCameraFixture() {
-  }
+  /** Constructs the TiltPanCamera. */
+  public TiltPanCameraFixture() {}
 
   @Override
   public boolean setup() {
@@ -99,15 +94,14 @@ public abstract class TiltPanCameraFixture implements ITestFixture {
     m_tilt = null;
     m_pan.close();
     m_pan = null;
-    if (m_gyro != null) { //in case not freed during gyro tests
+    if (m_gyro != null) { // in case not freed during gyro tests
       m_gyro.close();
       m_gyro = null;
     }
-    if (m_gyroParam != null) { //in case gyro tests failed before getting to this point
+    if (m_gyroParam != null) { // in case gyro tests failed before getting to this point
       m_gyroParam.close();
       m_gyroParam = null;
     }
     return true;
   }
-
 }

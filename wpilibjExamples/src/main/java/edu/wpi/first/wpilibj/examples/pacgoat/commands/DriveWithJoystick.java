@@ -5,12 +5,11 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
- * This command allows PS3 joystick to drive the robot. It is always running
- * except when interrupted by another command.
+ * This command allows PS3 joystick to drive the robot. It is always running except when interrupted
+ * by another command.
  */
 public class DriveWithJoystick extends Command {
   public DriveWithJoystick() {

@@ -4,15 +4,15 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-
 import static edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+
 /**
- * A subsystem that uses a {@link ProfiledPIDController} to control an output.  The controller is
- * run synchronously from the subsystem's periodic() method.
+ * A subsystem that uses a {@link ProfiledPIDController} to control an output. The controller is run
+ * synchronously from the subsystem's periodic() method.
  */
 public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   protected final ProfiledPIDController m_controller;
@@ -26,14 +26,13 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    * @param controller the ProfiledPIDController to use
    * @param initialPosition the initial goal position of the controller
    */
-  public ProfiledPIDSubsystem(ProfiledPIDController controller,
-                              double initialPosition) {
+  public ProfiledPIDSubsystem(ProfiledPIDController controller, double initialPosition) {
     m_controller = requireNonNullParam(controller, "controller", "ProfiledPIDSubsystem");
     setGoal(initialPosition);
   }
 
   /**
-   * Creates a new ProfiledPIDSubsystem.  Initial goal position is zero.
+   * Creates a new ProfiledPIDSubsystem. Initial goal position is zero.
    *
    * @param controller the ProfiledPIDController to use
    */
@@ -62,7 +61,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets the goal state for the subsystem.  Goal velocity assumed to be zero.
+   * Sets the goal state for the subsystem. Goal velocity assumed to be zero.
    *
    * @param goal The goal position for the subsystem's motion profile.
    */
@@ -73,7 +72,7 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   /**
    * Uses the output from the ProfiledPIDController.
    *
-   * @param output   the output of the ProfiledPIDController
+   * @param output the output of the ProfiledPIDController
    * @param setpoint the setpoint state of the ProfiledPIDController, for feedforward
    */
   protected abstract void useOutput(double output, State setpoint);
@@ -85,17 +84,13 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
    */
   protected abstract double getMeasurement();
 
-  /**
-   * Enables the PID control.  Resets the controller.
-   */
+  /** Enables the PID control. Resets the controller. */
   public void enable() {
     m_enabled = true;
     m_controller.reset(getMeasurement());
   }
 
-  /**
-   * Disables the PID control.  Sets output to zero.
-   */
+  /** Disables the PID control. Sets output to zero. */
   public void disable() {
     m_enabled = false;
     useOutput(0, new State());

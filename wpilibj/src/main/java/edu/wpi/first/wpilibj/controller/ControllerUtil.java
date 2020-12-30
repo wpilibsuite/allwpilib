@@ -6,16 +6,15 @@ package edu.wpi.first.wpilibj.controller;
 
 public final class ControllerUtil {
   /**
-   * Returns modulus of error where error is the difference between the reference
-   * and a measurement.
+   * Returns modulus of error where error is the difference between the reference and a measurement.
    *
    * @param reference Reference input of a controller.
    * @param measurement The current measurement.
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
    */
-  public static double getModulusError(double reference, double measurement, double minimumInput,
-      double maximumInput) {
+  public static double getModulusError(
+      double reference, double measurement, double minimumInput, double maximumInput) {
     double error = reference - measurement;
     double modulus = maximumInput - minimumInput;
 
@@ -30,6 +29,5 @@ public final class ControllerUtil {
     return error;
   }
 
-  private ControllerUtil() {
-  }
+  private ControllerUtil() {}
 }
