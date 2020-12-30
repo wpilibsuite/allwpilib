@@ -580,7 +580,7 @@ static void EmitParentContextMenu(const std::string& path,
   if (openWarningPopup) {
     ImGui::OpenPopup("Value exists");
   }
-  if (ImGui::BeginPopupModal("Value exists", NULL,
+  if (ImGui::BeginPopupModal("Value exists", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("The provided name %s already exists in the tree!", nameBuffer);
     ImGui::Separator();
