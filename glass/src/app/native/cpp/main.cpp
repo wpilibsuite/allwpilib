@@ -16,6 +16,7 @@
 #include "glass/View.h"
 #include "glass/networktables/NetworkTables.h"
 #include "glass/networktables/NetworkTablesProvider.h"
+#include "glass/other/Log.h"
 #include "glass/other/Plot.h"
 
 namespace gui = wpi::gui;
@@ -35,8 +36,10 @@ static std::unique_ptr<glass::NetworkTablesProvider> gNtProvider;
 
 static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
 static std::unique_ptr<NetworkTablesSettings> gNetworkTablesSettings;
+static glass::LogData gNetworkTablesLog;
 static glass::Window* gNetworkTablesWindow;
 static glass::Window* gNetworkTablesSettingsWindow;
+static glass::Window* gNetworkTablesLogWindow;
 
 static void NtInitialize() {
   // update window title when connection status changes
@@ -61,6 +64,36 @@ static void NtInitialize() {
       }
     }
   });
+
+  // handle NetworkTables log messages
+  auto logPoller = nt::CreateLoggerPoller(inst);
+  nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
+  gui::AddEarlyExecute([logPoller] {
+    bool timedOut;
+    for (auto&& msg : nt::PollLogger(logPoller, 0, &timedOut)) {
+      const char* level = "";
+      if (msg.level >= NT_LOG_CRITICAL) {
+        level = "CRITICAL: ";
+      } else if (msg.level >= NT_LOG_ERROR) {
+        level = "ERROR: ";
+      } else if (msg.level >= NT_LOG_WARNING) {
+        level = "WARNING: ";
+      }
+      gNetworkTablesLog.Append(
+          wpi::Twine{level} + msg.message + wpi::Twine{" ("} + msg.filename +
+          wpi::Twine{':'} + wpi::Twine{msg.line} + wpi::Twine{")\n"});
+    }
+  });
+
+  gNetworkTablesLogWindow = gNtProvider->AddWindow(
+      "NetworkTables Log",
+      std::make_unique<glass::LogView>(&gNetworkTablesLog));
+  if (gNetworkTablesLogWindow) {
+    gNetworkTablesLogWindow->SetDefaultPos(250, 615);
+    gNetworkTablesLogWindow->SetDefaultSize(600, 130);
+    gNetworkTablesLogWindow->SetVisible(false);
+    gNetworkTablesLogWindow->DisableRenamePopup();
+  }
 
   // NetworkTables table window
   gNetworkTablesModel = std::make_unique<glass::NetworkTablesModel>();
@@ -131,6 +164,9 @@ int main() {
       }
       if (gNetworkTablesWindow) {
         gNetworkTablesWindow->DisplayMenuItem("NetworkTables View");
+      }
+      if (gNetworkTablesLogWindow) {
+        gNetworkTablesLogWindow->DisplayMenuItem("NetworkTables Log");
       }
       ImGui::Separator();
       gNtProvider->DisplayMenu();
