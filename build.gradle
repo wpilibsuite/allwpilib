@@ -136,7 +136,7 @@ spotless {
     java {
         target fileTree('.') {
             include '**/*.java'
-            exclude '**/manualTests/**', '**/multiCameraServer/**', '**/myRobot/**', '**/dev/**', '**/build*/**'
+            exclude '**/manualTests/**', '**/build*/**'
         }
         googleJavaFormat()
         removeUnusedImports()
