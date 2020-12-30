@@ -504,6 +504,95 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
   ImGui::PopID();
 }
 
+static void EmitParentContextMenu(const std::string& path,
+                                  NetworkTablesFlags flags) {
+  // Workaround https://github.com/ocornut/imgui/issues/331
+  bool openWarningPopup = false;
+  static char nameBuffer[kTextBufferSize];
+  if (ImGui::BeginPopupContextItem()) {
+    ImGui::Text("%s", path.c_str());
+    ImGui::Separator();
+
+    if (ImGui::BeginMenu("Add new...")) {
+      if (ImGui::IsWindowAppearing()) {
+        nameBuffer[0] = '\0';
+      }
+
+      ImGui::InputTextWithHint("New item name", "example", nameBuffer,
+                               kTextBufferSize);
+      std::string fullNewPath;
+      if (path == "/") {
+        fullNewPath = path + nameBuffer;
+      } else {
+        fullNewPath = (path + wpi::Twine('/') + nameBuffer).str();
+      }
+
+      ImGui::Text("Adding: %s", fullNewPath.c_str());
+      ImGui::Separator();
+      auto entry = nt::GetEntry(nt::GetDefaultInstance(), fullNewPath);
+      bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
+                      nameBuffer[0] != '\0') &&
+                     nt::GetEntryType(entry) == NT_Type::NT_UNASSIGNED;
+      if (ImGui::MenuItem("string", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeString(""))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("double", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeDouble(0.0))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("boolean", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeBoolean(false))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("string[]", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeStringArray({""}))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("double[]", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeDoubleArray({0.0}))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("boolean[]", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeBooleanArray({false}))) {
+          openWarningPopup = true;
+        }
+      }
+
+      ImGui::EndMenu();
+    }
+
+    ImGui::Separator();
+    if (ImGui::MenuItem("Remove All")) {
+      for (auto&& entry : nt::GetEntries(nt::GetDefaultInstance(), path, 0)) {
+        nt::DeleteEntry(entry);
+      }
+    }
+    ImGui::EndPopup();
+  }
+
+  // Workaround https://github.com/ocornut/imgui/issues/331
+  if (openWarningPopup) {
+    ImGui::OpenPopup("Value exists");
+  }
+  if (ImGui::BeginPopupModal("Value exists", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("The provided name %s already exists in the tree!", nameBuffer);
+    ImGui::Separator();
+
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SetItemDefaultFocus();
+    ImGui::EndPopup();
+  }
+}
+
 static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
                       NetworkTablesFlags flags) {
   if (entry.source) {
@@ -511,6 +600,14 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
     entry.source->EmitDrag();
   } else {
     ImGui::Text("%s", name);
+  }
+  if (ImGui::BeginPopupContextItem(entry.name.c_str())) {
+    ImGui::Text("%s", entry.name.c_str());
+    ImGui::Separator();
+    if (ImGui::MenuItem("Remove")) {
+      nt::DeleteEntry(entry.entry);
+    }
+    ImGui::EndPopup();
   }
   ImGui::NextColumn();
 
@@ -552,6 +649,7 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
     if (!node.children.empty()) {
       bool open =
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+      EmitParentContextMenu(node.path, flags);
       ImGui::NextColumn();
       ImGui::NextColumn();
       if (flags & NetworkTablesFlags_ShowFlags) {
@@ -615,6 +713,7 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
     ImGui::SetColumnWidth(-1, 0.5f * ImGui::GetWindowWidth());
   }
   ImGui::Text("Name");
+  EmitParentContextMenu("/", flags);
   ImGui::NextColumn();
   ImGui::Text("Value");
   ImGui::NextColumn();
@@ -652,22 +751,32 @@ void NetworkTablesView::Display() {
       "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
   auto pShowTimestamp = storage.GetBoolRef(
       "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
+  auto pCreateNoncanonicalKeys = storage.GetBoolRef(
+      "createNonCanonical",
+      m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
 
   if (ImGui::BeginPopupContextItem()) {
     ImGui::MenuItem("Tree View", "", pTreeView);
     ImGui::MenuItem("Show Connections", "", pShowConnections);
     ImGui::MenuItem("Show Flags", "", pShowFlags);
     ImGui::MenuItem("Show Timestamp", "", pShowTimestamp);
+    ImGui::Separator();
+    ImGui::MenuItem("Allow creation of non-canonical keys", "",
+                    pCreateNoncanonicalKeys);
 
     ImGui::EndPopup();
   }
 
   m_flags &=
       ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
-        NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp);
-  m_flags |= (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
-             (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
-             (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
-             (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0);
+        NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
+        NetworkTablesFlags_CreateNoncanonicalKeys);
+  m_flags |=
+      (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
+      (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
+      (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
+      (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
+      (*pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
+                                : 0);
   DisplayNetworkTables(m_model, m_flags);
 }
