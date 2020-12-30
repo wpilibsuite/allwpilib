@@ -110,7 +110,7 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
         std::min(it.value().size(), static_cast<wpi::json::size_type>(32));
     for (int i = 0; i < buttons.count; i++) {
       if (it.value()[i]) {
-        buttons.buttons |= 1 << (i - 1);
+        buttons.buttons |= 1 << i;
       }
     }
 
