@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * around the deadband or inability to saturate the controller in either direction, calibration is
  * recommended.
  *
- * <p>
- *
  * <ul>
  *   <li>2.004ms = full "forward"
  *   <li>1.520ms = the "high end" of the deadband range

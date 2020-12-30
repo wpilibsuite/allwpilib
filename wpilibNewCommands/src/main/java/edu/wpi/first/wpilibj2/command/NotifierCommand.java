@@ -5,12 +5,11 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.wpilibj.Notifier;
-import java.util.function.BooleanSupplier;
 
 /**
  * A command that starts a notifier to run the given runnable periodically in a separate thread. Has
  * no end condition as-is; either subclass it or use {@link Command#withTimeout(double)} or {@link
- * Command#withInterrupt(BooleanSupplier)} to give it one.
+ * Command#withInterrupt(java.util.function.BooleanSupplier)} to give it one.
  *
  * <p>WARNING: Do not use this class unless you are confident in your ability to make the executed
  * code thread-safe. If you do not know what "thread-safe" means, that is a good sign that you

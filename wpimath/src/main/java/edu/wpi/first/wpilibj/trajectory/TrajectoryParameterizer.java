@@ -281,7 +281,8 @@ public final class TrajectoryParameterizer {
             "The constraint's min acceleration "
                 + "was greater than its max acceleration.\n Offending Constraint: "
                 + constraint.getClass().getName()
-                + "\n If the offending constraint was packaged with WPILib, please file a bug report.");
+                + "\n If the offending constraint was packaged with WPILib, please file a bug"
+                + " report.");
       }
 
       state.minAccelerationMetersPerSecondSq =

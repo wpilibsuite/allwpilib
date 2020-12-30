@@ -6,13 +6,11 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
-import java.util.function.BooleanSupplier;
-
 /**
  * A command that runs a given runnable when it is initialized, and another runnable when it ends.
  * Useful for running and then stopping a motor, or extending and then retracting a solenoid. Has no
  * end condition as-is; either subclass it or use {@link Command#withTimeout(double)} or {@link
- * Command#withInterrupt(BooleanSupplier)} to give it one.
+ * Command#withInterrupt(java.util.function.BooleanSupplier)} to give it one.
  */
 public class StartEndCommand extends CommandBase {
   protected final Runnable m_onInit;

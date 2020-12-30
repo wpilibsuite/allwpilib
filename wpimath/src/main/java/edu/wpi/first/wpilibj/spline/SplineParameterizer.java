@@ -131,9 +131,9 @@ public final class SplineParameterizer {
       iterations++;
       if (iterations >= kMaxIterations) {
         throw new MalformedSplineException(
-            "Could not parameterize a malformed spline. "
-                + "This means that you probably had two or more adjacent waypoints that were very close "
-                + "together with headings in opposing directions.");
+            "Could not parameterize a malformed spline. This means that you probably had two or "
+                + " more adjacent waypoints that were very close together with headings in "
+                + "opposing directions.");
       }
     }
 

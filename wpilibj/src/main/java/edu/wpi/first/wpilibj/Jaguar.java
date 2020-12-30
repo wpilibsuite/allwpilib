@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * around the deadband or inability to saturate the controller in either direction, calibration is
  * recommended. The calibration procedure can be found in the Jaguar User Manual available from Vex.
  *
- * <p>
- *
  * <ul>
  *   <li>2.310ms = full "forward"
  *   <li>1.550ms = the "high end" of the deadband range

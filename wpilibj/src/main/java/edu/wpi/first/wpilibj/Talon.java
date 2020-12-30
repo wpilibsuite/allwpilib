@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * around the deadband or inability to saturate the controller in either direction, calibration is
  * recommended. The calibration procedure can be found in the Talon User Manual available from CTRE.
  *
- * <p>
- *
  * <ul>
  *   <li>2.037ms = full "forward"
  *   <li>1.539ms = the "high end" of the deadband range

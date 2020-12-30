@@ -5,14 +5,11 @@
 package edu.wpi.first.wpiutil;
 
 public final class DevMain {
-  /**
-   * Main entry point.
-   */
+  /** Main entry point. */
   public static void main(String[] args) {
     System.out.println("Hello World!");
     System.out.println(RuntimeDetector.getPlatformPath());
   }
 
-  private DevMain() {
-  }
+  private DevMain() {}
 }

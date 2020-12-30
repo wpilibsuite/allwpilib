@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * recommended. The calibration procedure can be found in the Victor SPX User Manual available from
  * CTRE.
  *
- * <p>
- *
  * <ul>
  *   <li>2.004ms = full "forward"
  *   <li>1.520ms = the "high end" of the deadband range
