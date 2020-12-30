@@ -4,14 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
+import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
-
-/*
- * Creates a new DriveTime command. This command will drive your robot for a
- * desired speed and time.
- */
 public class DriveTime extends CommandBase {
   private final double m_duration;
   private final double m_speed;
@@ -19,7 +14,8 @@ public class DriveTime extends CommandBase {
   private long m_startTime;
 
   /**
-   * Creates a new DriveTime.
+   * Creates a new DriveTime. This command will drive your robot for a
+   * desired speed and time.
    *
    * @param speed   The speed which the robot will drive. Negative is in reverse.
    * @param time   How much time to drive in seconds

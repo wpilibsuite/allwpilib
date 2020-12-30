@@ -4,21 +4,17 @@
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
+import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
-
-/*
- * Creates a new TurnDegrees command. This command will turn your robot for a
- * desired rotation (in degrees) and rotational speed.
- */
 public class TurnDegrees extends CommandBase {
   private final Drivetrain m_drive;
   private final double m_degrees;
   private final double m_speed;
 
   /**
-   * Creates a new TurnDegrees.
+   * Creates a new TurnDegrees. This command will turn your robot 
+   * for a desired rotation (in degrees) and rotational speed.
    *
    * @param speed   The speed which the robot will drive. Negative is in reverse.
    * @param degrees   Degrees to turn. Leverages encoders to compare distance.

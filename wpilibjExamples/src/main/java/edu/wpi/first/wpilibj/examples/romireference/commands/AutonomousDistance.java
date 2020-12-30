@@ -4,9 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class AutonomousDistance extends SequentialCommandGroup {
   /**

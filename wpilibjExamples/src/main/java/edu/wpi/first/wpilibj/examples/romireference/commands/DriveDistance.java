@@ -4,9 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class DriveDistance extends CommandBase {
   private final Drivetrain m_drive;
@@ -14,7 +13,8 @@ public class DriveDistance extends CommandBase {
   private final double m_speed;
 
   /**
-   * Creates a new DriveDistance.
+   * Creates a new DriveDistance. This command will drive your
+   * your robot for a desired distance at a desired speed.
    *
    * @param speed The speed at which the robot will drive
    * @param inches The number of inches the robot will drive
