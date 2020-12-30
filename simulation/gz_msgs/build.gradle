@@ -13,11 +13,9 @@ ext.skiplinuxraspbian = true
 apply from: "${rootDir}/shared/config.gradle"
 
 /* Use a sort of poor man's autoconf to find the protobuf development
-   files; on Debian, those are supplied by libprotobuf-dev.
-
-   This should get skipped on Windows.
-
-   TODO:  Add Windows support for the simulation code */
+ files; on Debian, those are supplied by libprotobuf-dev.
+ This should get skipped on Windows.
+ TODO:  Add Windows support for the simulation code */
 
 def protobuf_version = ""
 try {
@@ -41,14 +39,14 @@ tasks.whenTaskAdded { task ->
 }
 
 dependencies {
-      implementation "com.google.protobuf:protobuf-java:${protobuf_version}"
-      implementation "com.google.protobuf:protoc:${protobuf_version}"
+    implementation "com.google.protobuf:protobuf-java:${protobuf_version}"
+    implementation "com.google.protobuf:protoc:${protobuf_version}"
 }
 
 /* There is a nice gradle plugin for protobuf, and the protoc tool
-   is included; using it simplifies our build process.
-   The trick is that we have to use the same version as the system
-   copy of libprotobuf-dev */
+ is included; using it simplifies our build process.
+ The trick is that we have to use the same version as the system
+ copy of libprotobuf-dev */
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:${protobuf_version}"

@@ -29,10 +29,14 @@ model {
                                     // Get path to binary.
                                     exec {
                                         workingDir rootDir
-                                        def args = ["sh", "-c", "codesign --force --strict --deep " +
-                                                "--timestamp --options=runtime " +
-                                                "--verbose -s ${project.findProperty("developerID")} " +
-                                                "$project.buildDir/outputs/bundles/Glass.app/"]
+                                        def args = [
+                                            "sh",
+                                            "-c",
+                                            "codesign --force --strict --deep " +
+                                            "--timestamp --options=runtime " +
+                                            "--verbose -s ${project.findProperty("developerID")} " +
+                                            "$project.buildDir/outputs/bundles/Glass.app/"
+                                        ]
                                         commandLine args
                                     }
                                 }

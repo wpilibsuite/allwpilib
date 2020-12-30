@@ -28,7 +28,6 @@ if (!project.hasProperty('onlylinuxathena')) {
                 }
 
                 lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
-
             }
         }
     }
