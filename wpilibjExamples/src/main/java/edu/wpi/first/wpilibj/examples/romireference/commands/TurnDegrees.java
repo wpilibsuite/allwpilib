@@ -56,7 +56,7 @@ public class TurnDegrees extends CommandBase {
   public boolean isFinished() {
     /* Need to convert distance travelled to degrees. The Standard
        Romi Chassis found here, https://www.pololu.com/category/203/romi-chassis-kits,
-       has a wheel placement diameter (149 mm) - width of the wheel (8 mm) = 141 mm 
+       has a wheel placement diameter (149 mm) - width of the wheel (8 mm) = 141 mm
        or 5.551 inches. We then take into consideration the width of the tires.
     */
     double inchPerDegree = Math.PI * 5.551 / 360;
