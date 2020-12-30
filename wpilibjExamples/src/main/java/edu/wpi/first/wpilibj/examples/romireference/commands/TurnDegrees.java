@@ -13,7 +13,7 @@ public class TurnDegrees extends CommandBase {
   private final double m_speed;
 
   /**
-   * Creates a new TurnDegrees. This command will turn your robot 
+   * Creates a new TurnDegrees. This command will turn your robot
    * for a desired rotation (in degrees) and rotational speed.
    *
    * @param speed   The speed which the robot will drive. Negative is in reverse.
