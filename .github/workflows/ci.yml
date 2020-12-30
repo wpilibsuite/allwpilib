@@ -175,7 +175,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer
+        run: ./gradlew build -PbuildServer -PmakeSim
 
   wpiformat:
     name: "wpiformat"
