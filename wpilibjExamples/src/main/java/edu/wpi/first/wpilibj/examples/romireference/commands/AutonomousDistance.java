@@ -24,4 +24,3 @@ public class AutonomousDistance extends SequentialCommandGroup {
     );
   }
 }
-
