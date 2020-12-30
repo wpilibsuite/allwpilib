@@ -118,8 +118,12 @@ subprojects {
                     String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
                     exec {
                         workingDir rootDir
-                        def args = ["sh", "-c", "codesign --force --strict --timestamp --options=runtime " +
-                                    "--verbose -s ${project.findProperty("developerID")} ${path}"]
+                        def args = [
+                            "sh",
+                            "-c",
+                            "codesign --force --strict --timestamp --options=runtime " +
+                            "--verbose -s ${project.findProperty("developerID")} ${path}"
+                        ]
                         commandLine args
                     }
                 }
@@ -136,11 +140,50 @@ spotless {
     java {
         target fileTree('.') {
             include '**/*.java'
-            exclude '**/manualTests/**', '**/build*/**'
+            exclude '**/build/**', '**/buildcmake/**'
         }
         googleJavaFormat()
         removeUnusedImports()
         trimTrailingWhitespace()
+        endWithNewline()
+    }
+    groovyGradle {
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/buildcmake/**'
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format 'xml', {
+        target fileTree('.') {
+            include '**/*.xml'
+            exclude '**/build/**', '**/buildcmake/**'
+        }
+        eclipseWtp('xml')
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+    format 'yml', {
+        target fileTree('.') {
+            include '**/*.yml', '**/*.yaml'
+            exclude '**/build/**', '**/buildcmake/**'
+        }
+        prettier()
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/buildcmake/**'
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
         endWithNewline()
     }
 }
