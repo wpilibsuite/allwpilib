@@ -509,7 +509,7 @@ static void EmitParentContextMenu(const std::string& path,
   // Workaround https://github.com/ocornut/imgui/issues/331
   bool openWarningPopup = false;
   static char nameBuffer[kTextBufferSize];
-  if (ImGui::BeginPopupContextItem()) {
+  if (ImGui::BeginPopupContextItem(path.c_str())) {
     ImGui::Text("%s", path.c_str());
     ImGui::Separator();
 
