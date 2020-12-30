@@ -16,7 +16,7 @@ class LogData {
   friend void DisplayLog(LogData*, bool);
 
  public:
-  explicit LogData(size_t maxLines = 10000) : m_maxLines{maxLines} {}
+  explicit LogData(size_t maxLines = 10000);
 
   void Clear();
   void Append(const wpi::Twine& msg);

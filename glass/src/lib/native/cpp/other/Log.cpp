@@ -9,6 +9,8 @@
 
 using namespace glass;
 
+LogData::LogData(size_t maxLines) : m_maxLines{maxLines} {}
+
 void LogData::Clear() {
   m_buf.clear();
   m_lineOffsets.clear();
