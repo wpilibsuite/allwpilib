@@ -7,7 +7,6 @@
 #include <hal/Ports.h>
 #include <hal/simulation/PDPData.h>
 
-
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterPDP##halsim##Callback(                                  \
       m_channel,                                                         \
