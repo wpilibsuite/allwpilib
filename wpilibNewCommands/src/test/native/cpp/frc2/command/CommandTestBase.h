@@ -65,7 +65,7 @@ class CommandTestBase : public ::testing::Test {
           .WillRepeatedly(::testing::Return(m_requirements));
     }
 
-    MockCommand(const MockCommand& other) : Command{} {}
+    MockCommand(const MockCommand& other) : Command{other} {}
 
     void SetFinished(bool finished) {
       EXPECT_CALL(*this, IsFinished())
