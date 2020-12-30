@@ -166,6 +166,17 @@ jobs:
         run: ctest -C "Debug"
         working-directory: ${{ runner.workspace }}/build/
 
+  build-gazebo:
+    name: "Build - Gazebo"
+    runs-on: ubuntu-latest
+    container: wpilib/gazebo-ubuntu:18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build with Gradle
+        run: ./gradlew build -PbuildServer
+
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-latest
