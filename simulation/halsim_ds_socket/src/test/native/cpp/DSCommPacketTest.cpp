@@ -7,7 +7,7 @@
 
 class DSCommPacketTest : public ::testing::Test {
  public:
-  DSCommPacketTest() {}
+  DSCommPacketTest() = default;
 
   void SendJoysticks() { commPacket.SendJoysticks(); }
 
