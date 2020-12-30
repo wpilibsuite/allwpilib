@@ -427,9 +427,9 @@ static void* KeyboardJoystickReadOpen(ImGuiContext* ctx,
   if (num < 0 || num >= static_cast<int>(gKeyboardJoysticks.size())) {
     return nullptr;
   }
-  auto joy = gKeyboardJoysticks[num].get();
-  *joy = GlfwKeyboardJoystick(num, true);
-  return joy;
+  auto& joy = gKeyboardJoysticks[num];
+  joy = std::make_unique<GlfwKeyboardJoystick>(num, true);
+  return joy.get();
 }
 
 static void KeyboardJoystickReadLine(ImGuiContext* ctx,
@@ -690,6 +690,7 @@ void KeyboardJoystick::SettingsDisplay() {
         }
         *s_keyEdit = i;
         s_keyEdit = nullptr;
+        break;
       }
     }
   }
@@ -1235,7 +1236,6 @@ FMSSimModel::FMSSimModel() {
   m_enabled.SetDigital(true);
   m_test.SetDigital(true);
   m_autonomous.SetDigital(true);
-  Update();
 }
 
 void FMSSimModel::Update() {

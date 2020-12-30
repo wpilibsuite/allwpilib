@@ -18,9 +18,9 @@
 using namespace glass;
 
 void glass::DisplayGyro(GyroModel* m) {
-  static const auto kColorWhite = IM_COL32(255, 255, 255, 255);
-  static const auto kColorGray = IM_COL32(200, 200, 200, 255);
-  static const auto kColorPurple = IM_COL32(200, 200, 255, 255);
+  ImColor primaryColor = ImGui::GetStyle().Colors[ImGuiCol_Text];
+  ImColor disabledColor = ImGui::GetStyle().Colors[ImGuiCol_TextDisabled];
+  ImColor secondaryColor = ImGui::GetStyle().Colors[ImGuiCol_Header];
 
   auto angle = m->GetAngleData();
   if (!angle || !m->Exists()) {
@@ -50,7 +50,7 @@ void glass::DisplayGyro(GyroModel* m) {
   ImVec2 center = window + ImVec2(w / 2, h / 2 + ImGui::GetFontSize());
 
   // Add the primary circle.
-  draw->AddCircle(center, radius, kColorWhite, 100, 1.5);
+  draw->AddCircle(center, radius, primaryColor, 100, 1.5);
 
   // Draw the spokes at every 5 degrees and a "major" spoke every 45 degrees.
   for (int i = -175; i <= 180; i += 5) {
@@ -58,7 +58,7 @@ void glass::DisplayGyro(GyroModel* m) {
     ImVec2 direction(std::sin(radians), -std::cos(radians));
 
     bool major = i % 45 == 0;
-    auto color = major ? kColorWhite : kColorGray;
+    auto color = major ? primaryColor : disabledColor;
 
     draw->AddLine(center + (direction * radius),
                   center + (direction * radius * (major ? 1.07f : 1.03f)),
@@ -68,15 +68,15 @@ void glass::DisplayGyro(GyroModel* m) {
       std::snprintf(txt, sizeof(txt), "%d°", i);
       draw->AddText(
           center + (direction * radius * 1.25) - ImGui::CalcTextSize(txt) * 0.5,
-          kColorWhite, txt, nullptr);
+          primaryColor, txt, nullptr);
     }
   }
 
-  draw->AddCircleFilled(center, radius * 0.075, kColorPurple, 50);
+  draw->AddCircleFilled(center, radius * 0.075, secondaryColor, 50);
 
   double radians = value * 2 * wpi::math::pi / 360.0;
   draw->AddLine(
       center - ImVec2(1, 0),
       center + ImVec2(std::sin(radians), -std::cos(radians)) * radius * 0.95f,
-      kColorPurple, 3);
+      secondaryColor, 3);
 }
