@@ -46,7 +46,7 @@ public abstract class PWMSpeedController extends PWM implements SpeedController 
    */
   @Override
   public double get() {
-    return getSpeed();
+    return getSpeed() * (m_isInverted ? -1.0 : 1.0);
   }
 
   @Override

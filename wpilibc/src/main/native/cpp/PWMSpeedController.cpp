@@ -13,7 +13,7 @@ void PWMSpeedController::Set(double speed) {
 }
 
 double PWMSpeedController::Get() const {
-  return GetSpeed();
+  return GetSpeed() * (m_isInverted ? -1.0 : 1.0);
 }
 
 void PWMSpeedController::SetInverted(bool isInverted) {
