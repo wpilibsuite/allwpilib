@@ -13,8 +13,8 @@ public class DriveDistance extends CommandBase {
   private final double m_speed;
 
   /**
-   * Creates a new DriveDistance. This command will drive your
-   * your robot for a desired distance at a desired speed.
+   * Creates a new DriveDistance. This command will drive your your robot for a desired distance at
+   * a desired speed.
    *
    * @param speed The speed at which the robot will drive
    * @param inches The number of inches the robot will drive
@@ -52,5 +52,4 @@ public class DriveDistance extends CommandBase {
     // Compare distance travelled from start to desired distance
     return Math.abs(m_drive.getAverageDistanceInch()) >= m_distance;
   }
-
 }

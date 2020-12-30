@@ -14,13 +14,12 @@ public class DriveTime extends CommandBase {
   private long m_startTime;
 
   /**
-   * Creates a new DriveTime. This command will drive your robot for a
-   * desired speed and time.
+   * Creates a new DriveTime. This command will drive your robot for a desired speed and time.
    *
-   * @param speed   The speed which the robot will drive. Negative is in reverse.
-   * @param time   How much time to drive in seconds
-   * @param drive   The drivetrain subsystem on which this command will run
-  */
+   * @param speed The speed which the robot will drive. Negative is in reverse.
+   * @param time How much time to drive in seconds
+   * @param drive The drivetrain subsystem on which this command will run
+   */
   public DriveTime(double speed, double time, Drivetrain drive) {
     m_speed = speed;
     m_duration = time * 1000;
@@ -52,5 +51,4 @@ public class DriveTime extends CommandBase {
   public boolean isFinished() {
     return (System.currentTimeMillis() - m_startTime) >= m_duration;
   }
-
 }

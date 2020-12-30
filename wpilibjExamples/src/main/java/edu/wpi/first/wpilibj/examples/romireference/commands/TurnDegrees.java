@@ -13,12 +13,12 @@ public class TurnDegrees extends CommandBase {
   private final double m_speed;
 
   /**
-   * Creates a new TurnDegrees. This command will turn your robot
-   * for a desired rotation (in degrees) and rotational speed.
+   * Creates a new TurnDegrees. This command will turn your robot for a desired rotation (in
+   * degrees) and rotational speed.
    *
-   * @param speed   The speed which the robot will drive. Negative is in reverse.
-   * @param degrees   Degrees to turn. Leverages encoders to compare distance.
-   * @param drive   The drive subsystem on which this command will run
+   * @param speed The speed which the robot will drive. Negative is in reverse.
+   * @param degrees Degrees to turn. Leverages encoders to compare distance.
+   * @param drive The drive subsystem on which this command will run
    */
   public TurnDegrees(double speed, double degrees, Drivetrain drive) {
     m_degrees = degrees;
@@ -65,5 +65,4 @@ public class TurnDegrees extends CommandBase {
     double rightDistance = Math.abs(m_drive.getRightDistanceInch());
     return (leftDistance + rightDistance) / 2.0;
   }
-
 }
