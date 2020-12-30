@@ -76,7 +76,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
     ClientOptions() : handshakeTimeout{(uv::Timer::Time::max)()} {}
 
     /** Timeout for the handshake request. */
-    uv::Timer::Time handshakeTimeout;
+    uv::Timer::Time handshakeTimeout;  // NOLINT
 
     /** Additional headers to include in handshake. */
     ArrayRef<std::pair<StringRef, StringRef>> extraHeaders;

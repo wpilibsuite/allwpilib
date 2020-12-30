@@ -187,7 +187,7 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
  public:
   explicit operator bool() const { return this->m_elements != nullptr; }
 
-  operator ArrayRef<T>() const { return array(); }
+  operator ArrayRef<T>() const { return array(); }  // NOLINT
 
   ArrayRef<T> array() const {
     if (!this->m_elements) {

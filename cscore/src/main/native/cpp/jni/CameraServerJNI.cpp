@@ -184,7 +184,7 @@ class JCSGlobal {
       jvm->DetachCurrentThread();
     }
   }
-  operator T() { return m_obj; }
+  operator T() { return m_obj; }  // NOLINT
   T obj() { return m_obj; }
 
  private:

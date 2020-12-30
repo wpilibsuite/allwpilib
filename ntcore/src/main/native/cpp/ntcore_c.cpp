@@ -19,7 +19,7 @@ using namespace nt;
 
 static void ConvertToC(wpi::StringRef in, char** out) {
   *out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
-  std::memmove(*out, in.data(), in.size());
+  std::memmove(*out, in.data(), in.size());  // NOLINT
   (*out)[in.size()] = '\0';
 }
 
@@ -558,7 +558,7 @@ NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
 
   // create array and copy into it
   NT_Value** values = static_cast<NT_Value**>(
-      wpi::safe_malloc(values_v.size() * sizeof(NT_Value*)));
+      wpi::safe_malloc(values_v.size() * sizeof(NT_Value*)));  // NOLINT
   for (size_t i = 0; i < values_v.size(); ++i) {
     values[i] = static_cast<NT_Value*>(wpi::safe_malloc(sizeof(NT_Value)));
     ConvertToC(*values_v[i], values[i]);

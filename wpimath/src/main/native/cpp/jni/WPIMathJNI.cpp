@@ -117,7 +117,7 @@ Java_edu_wpi_first_math_WPIMathJNI_pow
 
   Eigen::Map<
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      Amat{arrayBody, rows, rows};
+      Amat{arrayBody, rows, rows};  // NOLINT
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Apow =
       Amat.pow(exponent);
 

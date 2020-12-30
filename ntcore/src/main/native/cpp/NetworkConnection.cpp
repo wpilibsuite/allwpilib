@@ -376,4 +376,4 @@ void NetworkConnection::PostOutgoing(bool keep_alive) {
     m_pending_update.resize(0);
   }
   m_last_post = now;
-}
+}  // NOLINT

@@ -155,7 +155,7 @@ class SimpleBufferPool {
 
  private:
   SmallVector<Buffer, DEPTH> m_pool;
-  size_t m_size;
+  size_t m_size;  // NOLINT
 };
 
 }  // namespace wpi::uv
