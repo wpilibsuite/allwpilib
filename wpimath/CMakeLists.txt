@@ -106,7 +106,7 @@ target_link_libraries(wpimath wpiutil)
 
 if (NOT USE_VCPKG_EIGEN)
     install(DIRECTORY src/main/native/eigeninclude/ DESTINATION "${include_dest}/wpimath")
-    target_include_directories(wpimath PUBLIC
+    target_include_directories(wpimath SYSTEM PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigeninclude>
                             $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 else()
