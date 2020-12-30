@@ -73,6 +73,7 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
   EXPECT_TRUE(HAL_kInvalidHandle != digitalIoHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());
+  HALSIM_CancelDIOInitializedCallback(INDEX_TO_TEST, callbackId);
 }
 
 }  // namespace hal
