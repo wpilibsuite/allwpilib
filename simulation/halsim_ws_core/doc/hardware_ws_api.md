@@ -238,6 +238,17 @@ PWMs may be used to control either speed controllers or servos.  Typically only 
 | ``"<fwd"``      | Boolean | True if forward direction is enabled                           |
 | ``"<rev"``      | Boolean | True if reverse direction is enabled                           |
 
+#### Solenoid Output ("Solenoid")
+
+[``"Solenoid"``]:#solenoid-output-solenoid
+
+Solenoids are used to control pneumatic pistons
+
+| Data Key        | Type    | Description                                     |
+| --------------- | ------- | ----------------------------------------------- |
+| ``"<init"``     | Boolean | If Solenoid is initialized in the robot program |
+| ``"<output"``   | Boolean | The state of the solenoid                       |
+
 ### CAN Messages
 
 CAN messages all use a device value of ``"DeviceType[Number]"``, where the DeviceType is the vendor-specific CAN device type (motor controller class) name and Number is the CAN device number (the user-visible number passed to the device constructor).

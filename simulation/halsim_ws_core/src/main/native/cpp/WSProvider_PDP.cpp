@@ -7,12 +7,6 @@
 #include <hal/Ports.h>
 #include <hal/simulation/PDPData.h>
 
-namespace {
-int32_t GetPdpChannelsToPublish() {
-  // TODO should we do all 64?
-  return 2;
-}
-}  // namespace
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterPDP##halsim##Callback(                                  \
@@ -35,7 +29,7 @@ int32_t GetPdpChannelsToPublish() {
 
 namespace wpilibws {
 void HALSimWSProviderPDP::Initialize(WSRegisterFunc webRegisterFunc) {
-  CreateProviders<HALSimWSProviderPDP>("PDP", GetPdpChannelsToPublish(),
+  CreateProviders<HALSimWSProviderPDP>("PDP", HAL_GetNumPDPModules(),
                                        webRegisterFunc);
 }
 
@@ -67,7 +61,7 @@ void HALSimWSProviderPDPChannelCurrent::Initialize(
     WSRegisterFunc webRegisterFunc) {
   std::string prefix = "PDP";
 
-  for (int32_t pdpIndex = 0; pdpIndex < GetPdpChannelsToPublish(); ++pdpIndex) {
+  for (int32_t pdpIndex = 0; pdpIndex < HAL_GetNumPDPModules(); ++pdpIndex) {
     for (int32_t currentIndex = 0; currentIndex < HAL_GetNumPDPChannels();
          ++currentIndex) {
       auto key =

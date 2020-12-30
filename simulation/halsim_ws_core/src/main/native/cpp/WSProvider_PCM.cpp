@@ -7,13 +7,6 @@
 #include <hal/Ports.h>
 #include <hal/simulation/PCMData.h>
 
-namespace {
-int32_t GetPcmChannelsToPublish() {
-  // TODO should we do all 64?
-  return 2;
-}
-}  // namespace
-
 #define REGISTER_PCM(halsim, jsonid, ctype, haltype)                     \
   HALSIM_RegisterPCM##halsim##Callback(                                  \
       m_channel,                                                         \
@@ -24,7 +17,7 @@ int32_t GetPcmChannelsToPublish() {
       this, true)
 namespace wpilibws {
 void HALSimWSProviderPCM::Initialize(WSRegisterFunc webRegisterFunc) {
-  CreateProviders<HALSimWSProviderPCM>("PCM", GetPcmChannelsToPublish(),
+  CreateProviders<HALSimWSProviderPCM>("PCM", HAL_GetNumPCMModules(),
                                        webRegisterFunc);
 }
 

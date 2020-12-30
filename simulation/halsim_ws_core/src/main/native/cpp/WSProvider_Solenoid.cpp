@@ -7,13 +7,6 @@
 #include <hal/Ports.h>
 #include <hal/simulation/PCMData.h>
 
-namespace {
-int32_t GetPcmChannelsToPublish() {
-  // TODO should we do all 64?
-  return 2;
-}
-}  // namespace
-
 #define REGISTER_SOLENOID(halsim, jsonid, ctype, haltype)                  \
   HALSIM_RegisterPCMSolenoid##halsim##Callback(                            \
       m_pcmIndex, m_solenoidIndex,                                         \
@@ -25,7 +18,7 @@ int32_t GetPcmChannelsToPublish() {
 
 namespace wpilibws {
 void HALSimWSProviderSolenoid::Initialize(WSRegisterFunc webRegisterFunc) {
-  for (int32_t pcmIndex = 0; pcmIndex < GetPcmChannelsToPublish(); ++pcmIndex) {
+  for (int32_t pcmIndex = 0; pcmIndex < HAL_GetNumPCMModules(); ++pcmIndex) {
     for (int32_t solenoidIndex = 0;
          solenoidIndex < HAL_GetNumSolenoidChannels(); ++solenoidIndex) {
       auto key =
