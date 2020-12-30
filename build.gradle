@@ -167,16 +167,6 @@ spotless {
         indentWithSpaces(2)
         endWithNewline()
     }
-    format 'yml', {
-        target fileTree('.') {
-            include '**/*.yml', '**/*.yaml'
-            exclude '**/build/**', '**/buildcmake/**'
-        }
-        prettier()
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
     format 'misc', {
         target fileTree('.') {
             include '**/*.md', '**/.gitignore'
