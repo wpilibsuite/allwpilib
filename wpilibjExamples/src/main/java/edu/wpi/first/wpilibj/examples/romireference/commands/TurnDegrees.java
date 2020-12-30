@@ -14,8 +14,6 @@ public class TurnDegrees extends CommandBase {
   private final Drivetrain m_drive;
   private final double m_degrees;
   private final double m_speed;
-  private double startingLeftDistance;
-  private double startingRightDistance;
 
    /**
    * Creates a new TurnDegrees.

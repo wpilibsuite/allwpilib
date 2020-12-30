@@ -4,13 +4,12 @@
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj.examples.romireference.Drivetrain;
+import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 public class DriveDistance extends CommandBase {
   private final Drivetrain m_drive;
   private final double m_distance;
   private final double m_speed;
-  private double startingDistance;
 
   /**
    * Creates a new DriveDistance.
