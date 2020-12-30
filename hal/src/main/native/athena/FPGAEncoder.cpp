@@ -27,16 +27,14 @@ static constexpr double DECODING_SCALING_FACTOR = 0.25;
 static LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder, kNumEncoders,
                              HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeFPGAEncoder() {
   static LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder, kNumEncoders,
                                HAL_HandleEnum::FPGAEncoder>
       feH;
   fpgaEncoderHandles = &feH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

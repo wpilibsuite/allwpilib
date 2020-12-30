@@ -231,8 +231,7 @@ static LimitedClassedHandleResource<HAL_EncoderHandle, Encoder,
                                     kNumEncoders + kNumCounters,
                                     HAL_HandleEnum::Encoder>* encoderHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeEncoder() {
   static LimitedClassedHandleResource<HAL_EncoderHandle, Encoder,
                                       kNumEncoders + kNumCounters,
@@ -240,8 +239,7 @@ void InitializeEncoder() {
       eH;
   encoderHandles = &eH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 namespace hal {
 bool GetEncoderBaseHandle(HAL_EncoderHandle handle,

@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <ostream>
+#include <utility>
 
 #include "Message.h"
 #include "TestPrinters.h"
@@ -18,7 +19,7 @@ class MessageMatcher
     : public ::testing::MatcherInterface<std::shared_ptr<Message>> {
  public:
   explicit MessageMatcher(std::shared_ptr<Message> goodmsg_)
-      : goodmsg(goodmsg_) {}
+      : goodmsg(std::move(goodmsg_)) {}
 
   bool MatchAndExplain(std::shared_ptr<Message> msg,
                        ::testing::MatchResultListener* listener) const override;

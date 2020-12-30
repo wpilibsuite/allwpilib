@@ -6,6 +6,7 @@
 #define WPIUTIL_WPI_LOGGER_H_
 
 #include <functional>
+#include <utility>
 
 #include "wpi/SmallString.h"
 #include "wpi/raw_ostream.h"
@@ -30,9 +31,9 @@ class Logger {
                                      unsigned int line, const char* msg)>;
 
   Logger() = default;
-  explicit Logger(const LogFunc& func) : m_func(func) {}
-  Logger(const LogFunc& func, unsigned int min_level)
-      : m_func(func), m_min_level(min_level) {}
+  explicit Logger(LogFunc func) : m_func(std::move(func)) {}
+  Logger(LogFunc func, unsigned int min_level)
+      : m_func(std::move(func)), m_min_level(min_level) {}
 
   void SetLogger(LogFunc func) { m_func = func; }
 

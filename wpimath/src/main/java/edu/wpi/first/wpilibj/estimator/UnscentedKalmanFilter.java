@@ -66,7 +66,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
    * @param measurementStdDevs Standard deviations of measurements.
    * @param nominalDtSeconds   Nominal discretization timestep.
    */
-  @SuppressWarnings("ParameterName")
+  @SuppressWarnings("LambdaParameterName")
   public UnscentedKalmanFilter(Nat<States> states, Nat<Outputs> outputs,
                                BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>,
                                    Matrix<States, N1>> f,
@@ -329,7 +329,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
    * @param h A vector-valued function of x and u that returns the measurement vector.
    * @param R Measurement noise covariance matrix.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
+  @SuppressWarnings({"ParameterName", "LambdaParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
         Nat<R> rows, Matrix<Inputs, N1> u,
         Matrix<R, N1> y,

@@ -70,15 +70,13 @@ enum DMAOffsetConstants {
 static hal::LimitedHandleResource<HAL_DMAHandle, DMA, 1, HAL_HandleEnum::DMA>*
     dmaHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDMA() {
   static hal::LimitedHandleResource<HAL_DMAHandle, DMA, 1, HAL_HandleEnum::DMA>
       dH;
   dmaHandles = &dH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

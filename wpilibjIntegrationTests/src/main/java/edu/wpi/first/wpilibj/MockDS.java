@@ -22,7 +22,7 @@ public class MockDS {
     data[5] = 0x00; // red 1 station
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public void start() {
     m_thread = new Thread(() -> {
       DatagramSocket socket;
@@ -65,7 +65,7 @@ public class MockDS {
     m_thread.start();
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public void stop() {
     if (m_thread == null) {
       return;

@@ -220,7 +220,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 RobotBase::RobotBase(RobotBase&&) noexcept
     : m_ds(DriverStation::GetInstance()) {}
 
-RobotBase::~RobotBase() {}
+RobotBase::~RobotBase() = default;
 
 RobotBase& RobotBase::operator=(RobotBase&&) noexcept {
   return *this;

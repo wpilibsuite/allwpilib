@@ -38,7 +38,7 @@ public class CANStatus {
   @SuppressWarnings("MemberName")
   public int transmitErrorCount;
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public void setStatus(double percentBusUtilization, int busOffCount, int txFullCount,
                         int receiveErrorCount, int transmitErrorCount) {
     this.percentBusUtilization = percentBusUtilization;

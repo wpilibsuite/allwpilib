@@ -25,8 +25,8 @@ class DigitalSource : public InterruptableSensorBase {
   DigitalSource(DigitalSource&&) = default;
   DigitalSource& operator=(DigitalSource&&) = default;
 
-  virtual HAL_Handle GetPortHandleForRouting() const = 0;
-  virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
+  HAL_Handle GetPortHandleForRouting() const override = 0;
+  AnalogTriggerType GetAnalogTriggerTypeForRouting() const override = 0;
   virtual bool IsAnalogTrigger() const = 0;
   virtual int GetChannel() const = 0;
 };

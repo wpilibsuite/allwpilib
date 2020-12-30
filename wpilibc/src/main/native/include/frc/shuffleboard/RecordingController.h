@@ -14,8 +14,7 @@
 
 #include "frc/shuffleboard/ShuffleboardEventImportance.h"
 
-namespace frc {
-namespace detail {
+namespace frc::detail {
 
 class RecordingController final {
  public:
@@ -36,5 +35,4 @@ class RecordingController final {
   std::shared_ptr<nt::NetworkTable> m_eventsTable;
 };
 
-}  // namespace detail
-}  // namespace frc
+}  // namespace frc::detail

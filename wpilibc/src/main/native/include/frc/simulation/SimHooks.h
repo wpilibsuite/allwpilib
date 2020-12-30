@@ -9,8 +9,7 @@
 #include <hal/HALBase.h>
 #include <units/time.h>
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 
 void SetRuntimeType(HAL_RuntimeType type);
 
@@ -32,5 +31,4 @@ void StepTiming(units::second_t delta);
 
 void StepTimingAsync(units::second_t delta);
 
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

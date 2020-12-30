@@ -41,7 +41,7 @@ class CommandGroup : public Command {
    */
   explicit CommandGroup(const wpi::Twine& name);
 
-  virtual ~CommandGroup() = default;
+  ~CommandGroup() override = default;
 
   CommandGroup(CommandGroup&&) = default;
   CommandGroup& operator=(CommandGroup&&) = default;
@@ -134,32 +134,32 @@ class CommandGroup : public Command {
   /**
    * Can be overridden by teams.
    */
-  virtual void Initialize();
+  void Initialize() override;
 
   /**
    * Can be overridden by teams.
    */
-  virtual void Execute();
+  void Execute() override;
 
   /**
    * Can be overridden by teams.
    */
-  virtual bool IsFinished();
+  bool IsFinished() override;
 
   /**
    * Can be overridden by teams.
    */
-  virtual void End();
+  void End() override;
 
   /**
    * Can be overridden by teams.
    */
-  virtual void Interrupted();
+  void Interrupted() override;
 
-  virtual void _Initialize();
-  virtual void _Execute();
-  virtual void _End();
-  virtual void _Interrupted();
+  void _Initialize() override;
+  void _Execute() override;
+  void _End() override;
+  void _Interrupted() override;
 
  private:
   void CancelConflicts(Command* command);

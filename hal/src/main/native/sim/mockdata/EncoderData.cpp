@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeEncoderData() {
   static EncoderData sed[kNumEncoders];
   ::hal::SimEncoderData = sed;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 EncoderData* hal::SimEncoderData;
 void EncoderData::ResetData() {

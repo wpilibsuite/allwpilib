@@ -21,16 +21,14 @@ struct Relay {
 static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
                              HAL_HandleEnum::Relay>* relayHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeRelay() {
   static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
                                HAL_HandleEnum::Relay>
       rH;
   relayHandles = &rH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,

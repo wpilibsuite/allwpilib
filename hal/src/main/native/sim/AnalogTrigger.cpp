@@ -28,8 +28,7 @@ static LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
                              kNumAnalogTriggers, HAL_HandleEnum::AnalogTrigger>*
     analogTriggerHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogTrigger() {
   static LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
                                kNumAnalogTriggers,
@@ -37,8 +36,7 @@ void InitializeAnalogTrigger() {
       atH;
   analogTriggerHandles = &atH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 int32_t hal::GetAnalogTriggerInputIndex(HAL_AnalogTriggerHandle handle,
                                         int32_t* status) {
@@ -130,12 +128,12 @@ void HAL_SetAnalogTriggerLimitsRaw(HAL_AnalogTriggerHandle analogTriggerHandle,
 
   double trigLower =
       GetAnalogValueToVoltage(trigger->analogHandle, lower, status);
-  if (status != 0) {
+  if (status != nullptr) {
     return;
   }
   double trigUpper =
       GetAnalogValueToVoltage(trigger->analogHandle, upper, status);
-  if (status != 0) {
+  if (status != nullptr) {
     return;
   }
 

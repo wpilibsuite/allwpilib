@@ -42,7 +42,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransaction
    jbyte size)
 {
   uint8_t* dataToSendPtr = nullptr;
-  if (dataToSend != 0) {
+  if (dataToSend != nullptr) {
     dataToSendPtr =
         reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataToSend));
   }
@@ -85,7 +85,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiWrite
   (JNIEnv* env, jclass, jint port, jobject dataToSend, jbyte size)
 {
   uint8_t* dataToSendPtr = nullptr;
-  if (dataToSend != 0) {
+  if (dataToSend != nullptr) {
     dataToSendPtr =
         reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataToSend));
   }

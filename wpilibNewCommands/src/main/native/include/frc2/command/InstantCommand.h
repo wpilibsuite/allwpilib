@@ -37,8 +37,8 @@ class InstantCommand : public CommandHelper<CommandBase, InstantCommand> {
    * @param toRun        the Runnable to run
    * @param requirements the subsystems required by this command
    */
-  InstantCommand(std::function<void()> toRun,
-                 wpi::ArrayRef<Subsystem*> requirements = {});
+  explicit InstantCommand(std::function<void()> toRun,
+                          wpi::ArrayRef<Subsystem*> requirements = {});
 
   InstantCommand(InstantCommand&& other) = default;
 

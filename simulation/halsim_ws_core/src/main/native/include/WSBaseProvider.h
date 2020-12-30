@@ -16,9 +16,8 @@ namespace wpilibws {
 
 class HALSimWSBaseProvider {
  public:
-  explicit HALSimWSBaseProvider(const std::string& key,
-                                const std::string& type = "");
-  virtual ~HALSimWSBaseProvider() {}
+  explicit HALSimWSBaseProvider(std::string key, std::string type = "");
+  virtual ~HALSimWSBaseProvider() = default;
 
   HALSimWSBaseProvider(const HALSimWSBaseProvider&) = delete;
   HALSimWSBaseProvider& operator=(const HALSimWSBaseProvider&) = delete;

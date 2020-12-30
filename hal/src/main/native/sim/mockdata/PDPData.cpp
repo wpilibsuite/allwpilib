@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePDPData() {
   static PDPData spd[kNumPDPModules];
   ::hal::SimPDPData = spd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 PDPData* hal::SimPDPData;
 void PDPData::ResetData() {

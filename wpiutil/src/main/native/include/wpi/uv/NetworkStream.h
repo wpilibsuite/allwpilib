@@ -13,8 +13,7 @@
 #include "wpi/Signal.h"
 #include "wpi/uv/Stream.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class NetworkStream;
 
@@ -147,7 +146,6 @@ class NetworkStreamImpl : public NetworkStream {
   NetworkStreamImpl() : NetworkStream{reinterpret_cast<uv_stream_t*>(new U)} {}
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_NETWORKSTREAM_H_

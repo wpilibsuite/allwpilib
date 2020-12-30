@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj;
 @Deprecated(since = "2020", forRemoval = true)
 @SuppressWarnings("SummaryJavadoc")
 public interface PIDInterface {
-  @SuppressWarnings("ParameterName")
   void setPID(double p, double i, double d);
 
   double getP();

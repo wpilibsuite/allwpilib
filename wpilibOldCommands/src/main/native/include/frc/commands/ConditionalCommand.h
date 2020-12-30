@@ -49,7 +49,7 @@ class ConditionalCommand : public Command {
   ConditionalCommand(const wpi::Twine& name, Command* onTrue,
                      Command* onFalse = nullptr);
 
-  virtual ~ConditionalCommand() = default;
+  ~ConditionalCommand() override = default;
 
   ConditionalCommand(ConditionalCommand&&) = default;
   ConditionalCommand& operator=(ConditionalCommand&&) = default;

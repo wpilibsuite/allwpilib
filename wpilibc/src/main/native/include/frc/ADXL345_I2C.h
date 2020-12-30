@@ -51,7 +51,7 @@ class ADXL345_I2C : public ErrorBase,
   ADXL345_I2C& operator=(ADXL345_I2C&&) = default;
 
   // Accelerometer interface
-  void SetRange(Range range) override;
+  void SetRange(Range range) final;
   double GetX() override;
   double GetY() override;
   double GetZ() override;

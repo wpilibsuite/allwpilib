@@ -29,7 +29,7 @@ class XboxController : public GenericHID {
    */
   explicit XboxController(int port);
 
-  virtual ~XboxController() = default;
+  ~XboxController() override = default;
 
   XboxController(XboxController&&) = default;
   XboxController& operator=(XboxController&&) = default;

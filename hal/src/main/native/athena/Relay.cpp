@@ -26,16 +26,14 @@ static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
 // Create a mutex to protect changes to the relay values
 static wpi::mutex digitalRelayMutex;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeRelay() {
   static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
                                HAL_HandleEnum::Relay>
       rH;
   relayHandles = &rH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

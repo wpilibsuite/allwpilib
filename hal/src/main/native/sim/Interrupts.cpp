@@ -69,8 +69,7 @@ static UnlimitedHandleResource<SynchronousWaitDataHandle, SynchronousWaitData,
                                HAL_HandleEnum::Vendor>*
     synchronousInterruptHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeInterrupts() {
   static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                                HAL_HandleEnum::Interrupt>
@@ -81,8 +80,7 @@ void InitializeInterrupts() {
       siH;
   synchronousInterruptHandles = &siH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,

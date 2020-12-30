@@ -87,7 +87,7 @@ class ADXRS450_Gyro : public GyroBase {
    * robot is first turned on while it's sitting at rest before the competition
    * starts.
    */
-  void Calibrate() override;
+  void Calibrate() final;
 
   /**
    * Get the SPI port number.

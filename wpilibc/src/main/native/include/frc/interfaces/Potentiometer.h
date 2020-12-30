@@ -14,7 +14,7 @@ namespace frc {
 class Potentiometer : public PIDSource {
  public:
   Potentiometer() = default;
-  virtual ~Potentiometer() = default;
+  ~Potentiometer() override = default;
 
   Potentiometer(Potentiometer&&) = default;
   Potentiometer& operator=(Potentiometer&&) = default;

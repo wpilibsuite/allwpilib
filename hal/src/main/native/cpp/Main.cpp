@@ -33,14 +33,12 @@ static void DefaultExit(void*) {
   mainObj->gExitCv.notify_all();
 }
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeMain() {
   static MainObj mO;
   mainObj = &mO;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

@@ -34,7 +34,7 @@ class Image {
   Image& operator=(const Image&) = delete;
 
   // Getters
-  operator wpi::StringRef() const { return str(); }
+  operator wpi::StringRef() const { return str(); }  // NOLINT
   wpi::StringRef str() const { return wpi::StringRef(data(), size()); }
   size_t capacity() const { return m_data.capacity(); }
   const char* data() const {

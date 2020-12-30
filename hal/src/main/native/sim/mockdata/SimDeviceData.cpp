@@ -10,14 +10,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSimDeviceData() {
   static SimDeviceData sdd;
   ::hal::SimSimDeviceData = &sdd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 SimDeviceData* hal::SimSimDeviceData;
 

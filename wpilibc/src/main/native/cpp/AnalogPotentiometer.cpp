@@ -4,6 +4,8 @@
 
 #include "frc/AnalogPotentiometer.h"
 
+#include <utility>
+
 #include "frc/Base.h"
 #include "frc/RobotController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -26,7 +28,9 @@ AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
 
 AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
                                          double fullRange, double offset)
-    : m_analog_input(input), m_fullRange(fullRange), m_offset(offset) {
+    : m_analog_input(std::move(input)),
+      m_fullRange(fullRange),
+      m_offset(offset) {
   SendableRegistry::GetInstance().AddLW(this, "AnalogPotentiometer",
                                         m_analog_input->GetChannel());
 }

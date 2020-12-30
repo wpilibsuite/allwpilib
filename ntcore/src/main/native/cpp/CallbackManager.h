@@ -51,10 +51,10 @@ template <typename Derived, typename TUserInfo,
 class CallbackThread : public wpi::SafeThread {
  public:
   typedef TUserInfo UserInfo;
-  typedef TNotifierData NotifierData;
-  typedef TListenerData ListenerData;
+  using NotifierData = TNotifierData;
+  using ListenerData = TListenerData;
 
-  ~CallbackThread() {
+  ~CallbackThread() override {
     // Wake up any blocked pollers
     for (size_t i = 0; i < m_pollers.size(); ++i) {
       if (auto poller = m_pollers[i]) {

@@ -6,9 +6,8 @@
 
 #include <wpi/SmallVector.h>
 
-namespace frc {
 /** WPILib FileSystem namespace */
-namespace filesystem {
+namespace frc::filesystem {
 
 /**
  * Obtains the current working path that the program was launched with.
@@ -37,5 +36,4 @@ void GetOperatingDirectory(wpi::SmallVectorImpl<char>& result);
  */
 void GetDeployDirectory(wpi::SmallVectorImpl<char>& result);
 
-}  // namespace filesystem
-}  // namespace frc
+}  // namespace frc::filesystem

@@ -432,7 +432,7 @@ class SmartDashboard : public ErrorBase,
   static void UpdateValues();
 
  private:
-  virtual ~SmartDashboard() = default;
+  ~SmartDashboard() override = default;
 
   static detail::ListenerExecutor listenerExecutor;
 };

@@ -41,16 +41,14 @@ IndexedHandleResource<HAL_SerialPortHandle, SerialPort, 4,
                       HAL_HandleEnum::SerialPort>* serialPortHandles;
 }  // namespace hal
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSerialPort() {
   static IndexedHandleResource<HAL_SerialPortHandle, SerialPort, 4,
                                HAL_HandleEnum::SerialPort>
       spH;
   serialPortHandles = &spH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 using namespace hal;
 

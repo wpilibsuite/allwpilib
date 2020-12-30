@@ -13,7 +13,7 @@ namespace cs {
 
 class UsbCameraBuffer {
  public:
-  UsbCameraBuffer() noexcept : m_data{nullptr}, m_length{0} {}
+  UsbCameraBuffer() noexcept = default;
   UsbCameraBuffer(UsbCameraBuffer&& other) noexcept : UsbCameraBuffer() {
     swap(*this, other);
   }
@@ -46,8 +46,8 @@ class UsbCameraBuffer {
     swap(first.m_length, second.m_length);
   }
 
-  void* m_data;
-  size_t m_length;
+  void* m_data{nullptr};
+  size_t m_length{0};
 };
 
 }  // namespace cs

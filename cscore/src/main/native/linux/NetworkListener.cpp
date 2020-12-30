@@ -34,7 +34,7 @@ class NetworkListener::Impl {
    public:
     Thread(wpi::Logger& logger, Notifier& notifier)
         : m_logger(logger), m_notifier(notifier) {}
-    void Main();
+    void Main() override;
 
     wpi::Logger& m_logger;
     Notifier& m_notifier;

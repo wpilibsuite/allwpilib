@@ -55,7 +55,7 @@ class ADXL362 : public ErrorBase,
   ADXL362& operator=(ADXL362&&) = default;
 
   // Accelerometer interface
-  void SetRange(Range range) override;
+  void SetRange(Range range) final;
   double GetX() override;
   double GetY() override;
   double GetZ() override;

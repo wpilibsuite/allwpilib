@@ -24,8 +24,7 @@ static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
                              kNumPCMModules * kNumSolenoidChannels,
                              HAL_HandleEnum::Solenoid>* solenoidHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSolenoid() {
   static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
                                kNumPCMModules * kNumSolenoidChannels,
@@ -33,8 +32,7 @@ void InitializeSolenoid() {
       sH;
   solenoidHandles = &sH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,

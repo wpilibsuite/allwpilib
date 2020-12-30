@@ -6,8 +6,7 @@
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Signal> Signal::Create(Loop& loop) {
   auto h = std::make_shared<Signal>(private_init{});
@@ -30,5 +29,4 @@ void Signal::Start(int signum) {
       signum);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

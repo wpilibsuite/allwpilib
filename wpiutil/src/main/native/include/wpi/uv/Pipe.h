@@ -14,8 +14,7 @@
 #include "wpi/Twine.h"
 #include "wpi/uv/NetworkStream.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 class PipeConnectReq;
@@ -203,7 +202,6 @@ class PipeConnectReq : public ConnectReq {
   }
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_PIPE_H_

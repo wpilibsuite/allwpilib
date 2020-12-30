@@ -25,16 +25,14 @@ struct Counter {
 static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                              HAL_HandleEnum::Counter>* counterHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeCounter() {
   static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                                HAL_HandleEnum::Counter>
       ch;
   counterHandles = &ch;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

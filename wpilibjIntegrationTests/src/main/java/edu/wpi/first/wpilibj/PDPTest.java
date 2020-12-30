@@ -50,7 +50,7 @@ public class PDPTest extends AbstractComsSetup {
   }
 
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public PDPTest(MotorEncoderFixture<?> mef, Double expectedCurrentDraw) {
     logger.fine("Constructor with: " + mef.getType());
     if (me != null && !me.equals(mef)) {

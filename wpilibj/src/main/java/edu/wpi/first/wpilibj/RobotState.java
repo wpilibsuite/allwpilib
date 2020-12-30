@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-@SuppressWarnings("JavadocMethod")
+@SuppressWarnings("MissingJavadocMethod")
 public final class RobotState {
   public static boolean isDisabled() {
     return DriverStation.getInstance().isDisabled();

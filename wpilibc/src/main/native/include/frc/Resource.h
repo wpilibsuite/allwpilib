@@ -28,7 +28,7 @@ namespace frc {
  */
 class Resource : public ErrorBase {
  public:
-  virtual ~Resource() = default;
+  ~Resource() override = default;
 
   /**
    * Factory method to create a Resource allocation-tracker *if* needed.

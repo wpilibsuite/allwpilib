@@ -46,7 +46,6 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
     kY((byte) 0x02),
     kZ((byte) 0x04);
 
-    @SuppressWarnings("MemberName")
     public final byte value;
 
     Axes(byte value) {

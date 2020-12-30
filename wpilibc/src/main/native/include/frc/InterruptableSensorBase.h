@@ -35,7 +35,7 @@ class InterruptableSensorBase : public ErrorBase {
   /**
    * Free the resources for an interrupt event.
    */
-  virtual ~InterruptableSensorBase();
+  ~InterruptableSensorBase() override;
 
   InterruptableSensorBase(InterruptableSensorBase&&) = default;
   InterruptableSensorBase& operator=(InterruptableSensorBase&&) = default;

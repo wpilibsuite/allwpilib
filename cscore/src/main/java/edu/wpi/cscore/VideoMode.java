@@ -11,7 +11,6 @@ public class VideoMode {
   public enum PixelFormat {
     kUnknown(0), kMJPEG(1), kYUYV(2), kRGB565(3), kBGR(4), kGray(5);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     PixelFormat(int value) {

@@ -12,7 +12,7 @@ class InternalButton : public Button {
  public:
   InternalButton() = default;
   explicit InternalButton(bool inverted);
-  virtual ~InternalButton() = default;
+  ~InternalButton() override = default;
 
   InternalButton(InternalButton&&) = default;
   InternalButton& operator=(InternalButton&&) = default;
@@ -20,7 +20,7 @@ class InternalButton : public Button {
   void SetInverted(bool inverted);
   void SetPressed(bool pressed);
 
-  virtual bool Get();
+  bool Get() override;
 
  private:
   bool m_pressed = false;

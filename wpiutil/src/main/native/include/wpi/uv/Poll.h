@@ -12,8 +12,7 @@
 #include "wpi/Signal.h"
 #include "wpi/uv/Handle.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 
@@ -117,7 +116,6 @@ class Poll final : public HandleImpl<Poll, uv_poll_t> {
   std::unique_ptr<ReuseData> m_reuseData;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_POLL_H_

@@ -22,7 +22,7 @@ class Telemetry::Thread : public wpi::SafeThread {
  public:
   explicit Thread(Notifier& notifier) : m_notifier(notifier) {}
 
-  void Main();
+  void Main() override;
 
   Notifier& m_notifier;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
@@ -43,7 +43,7 @@ int64_t Telemetry::Thread::GetValue(CS_Handle handle, CS_TelemetryKind kind,
   return it->getSecond();
 }
 
-Telemetry::~Telemetry() {}
+Telemetry::~Telemetry() = default;
 
 void Telemetry::Start() {
   m_owner.Start(m_notifier);

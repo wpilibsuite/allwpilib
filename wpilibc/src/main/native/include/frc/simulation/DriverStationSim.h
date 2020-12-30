@@ -11,8 +11,7 @@
 #include "frc/DriverStation.h"
 #include "frc/simulation/CallbackStore.h"
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 
 /**
  * Class to control a simulated driver station.
@@ -241,5 +240,4 @@ class DriverStationSim {
 
   static void ResetData();
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

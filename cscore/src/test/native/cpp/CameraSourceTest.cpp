@@ -9,7 +9,7 @@ namespace cs {
 
 class CameraSourceTest : public ::testing::Test {
  protected:
-  CameraSourceTest() {}
+  CameraSourceTest() = default;
 };
 
 TEST_F(CameraSourceTest, HTTPCamera) {

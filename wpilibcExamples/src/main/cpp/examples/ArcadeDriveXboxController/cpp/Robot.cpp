@@ -19,7 +19,7 @@ class Robot : public frc::TimedRobot {
   frc::XboxController m_driverController{0};
 
  public:
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     // Drive with split arcade style
     // That means that the Y axis of the left stick moves forward
     // and backward, and the X of the right stick turns left and right.

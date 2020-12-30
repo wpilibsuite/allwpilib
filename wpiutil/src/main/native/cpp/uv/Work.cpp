@@ -6,8 +6,7 @@
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 WorkReq::WorkReq() {
   error = [this](Error err) { GetLoop().error(err); };
@@ -48,5 +47,4 @@ void QueueWork(Loop& loop, std::function<void()> work,
   QueueWork(loop, req);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

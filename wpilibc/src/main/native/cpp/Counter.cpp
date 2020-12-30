@@ -20,7 +20,8 @@ using namespace frc;
 
 Counter::Counter(Mode mode) {
   int32_t status = 0;
-  m_counter = HAL_InitializeCounter((HAL_Counter_Mode)mode, &m_index, &status);
+  m_counter = HAL_InitializeCounter(static_cast<HAL_Counter_Mode>(mode),
+                                    &m_index, &status);
   wpi_setHALError(status);
 
   SetMaxPeriod(0.5);
@@ -129,10 +130,10 @@ void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
     CloneError(*m_upSource);
   } else {
     int32_t status = 0;
-    HAL_SetCounterUpSource(
-        m_counter, source->GetPortHandleForRouting(),
-        (HAL_AnalogTriggerType)source->GetAnalogTriggerTypeForRouting(),
-        &status);
+    HAL_SetCounterUpSource(m_counter, source->GetPortHandleForRouting(),
+                           static_cast<HAL_AnalogTriggerType>(
+                               source->GetAnalogTriggerTypeForRouting()),
+                           &status);
     wpi_setHALError(status);
   }
 }
@@ -208,10 +209,10 @@ void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {
     CloneError(*m_downSource);
   } else {
     int32_t status = 0;
-    HAL_SetCounterDownSource(
-        m_counter, source->GetPortHandleForRouting(),
-        (HAL_AnalogTriggerType)source->GetAnalogTriggerTypeForRouting(),
-        &status);
+    HAL_SetCounterDownSource(m_counter, source->GetPortHandleForRouting(),
+                             static_cast<HAL_AnalogTriggerType>(
+                                 source->GetAnalogTriggerTypeForRouting()),
+                             &status);
     wpi_setHALError(status);
   }
 }

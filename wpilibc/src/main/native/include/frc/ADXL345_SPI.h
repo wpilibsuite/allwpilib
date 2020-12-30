@@ -47,7 +47,7 @@ class ADXL345_SPI : public ErrorBase,
   ADXL345_SPI& operator=(ADXL345_SPI&&) = default;
 
   // Accelerometer interface
-  void SetRange(Range range) override;
+  void SetRange(Range range) final;
   double GetX() override;
   double GetY() override;
   double GetZ() override;

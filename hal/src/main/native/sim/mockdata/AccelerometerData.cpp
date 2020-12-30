@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAccelerometerData() {
   static AccelerometerData sad[1];
   ::hal::SimAccelerometerData = sad;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 AccelerometerData* hal::SimAccelerometerData;
 void AccelerometerData::ResetData() {

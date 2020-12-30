@@ -28,7 +28,7 @@ class IterativeRobot : public IterativeRobotBase {
       "Use TimedRobot instead. It's a drop-in replacement that provides more "
       "regular execution periods.")
   IterativeRobot();
-  virtual ~IterativeRobot() = default;
+  ~IterativeRobot() override = default;
 
   /**
    * Provide an alternate "main loop" via StartCompetition().

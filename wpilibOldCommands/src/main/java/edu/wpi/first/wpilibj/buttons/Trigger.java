@@ -37,7 +37,6 @@ public abstract class Trigger implements Sendable {
    *
    * @return whether get() return true or the internal table for SmartDashboard use is pressed.
    */
-  @SuppressWarnings("PMD.UselessParentheses")
   private boolean grab() {
     return get() || m_sendablePressed;
   }

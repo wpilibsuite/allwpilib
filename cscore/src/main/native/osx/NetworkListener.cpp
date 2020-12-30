@@ -10,7 +10,7 @@ class NetworkListener::Impl {};
 
 NetworkListener::NetworkListener(wpi::Logger& logger, Notifier& notifier) {}
 
-NetworkListener::~NetworkListener() {}
+NetworkListener::~NetworkListener() = default;
 
 void NetworkListener::Start() {}
 

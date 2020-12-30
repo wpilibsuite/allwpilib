@@ -6,8 +6,7 @@
 
 #include "gtest/gtest.h"  // NOLINT(build/include_order)
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 TEST(UvSimpleBufferPool, ConstructDefault) {
   SimpleBufferPool<> pool;
@@ -43,5 +42,4 @@ TEST(UvSimpleBufferPool, ClearRemaining) {
   ASSERT_EQ(pool.Remaining(), 0u);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

@@ -6,7 +6,9 @@ suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
   <suppress files=".*sim.*"
             checks="(LineLength|EmptyLineSeparator|ParameterName|ImportOrder|AbbreviationAsWordInName|JavadocMethod|NoFinalizer)" />
   <suppress files=".*test.*"
-            checks="JavadocMethod" />
+            checks="MissingJavadocMethod" />
+  <suppress files=".*wpilibjIntegrationTests.*"
+            checks="MissingJavadocMethod" />
   <suppress files=".*JNI.*"
             checks="(LineLength|EmptyLineSeparator|ParameterName)" />
 </suppressions>

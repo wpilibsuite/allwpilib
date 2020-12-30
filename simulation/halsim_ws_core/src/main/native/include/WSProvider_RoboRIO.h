@@ -15,7 +15,7 @@ class HALSimWSProviderRoboRIO : public HALSimWSHalProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalProvider::HALSimWSHalProvider;
-  ~HALSimWSProviderRoboRIO();
+  ~HALSimWSProviderRoboRIO() override;
 
   void OnNetValueChanged(const wpi::json& json) override;
 

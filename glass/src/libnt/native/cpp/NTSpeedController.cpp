@@ -18,7 +18,6 @@ NTSpeedControllerModel::NTSpeedControllerModel(NT_Inst instance,
       m_nameValue(path.rsplit('/').second) {
   m_nt.AddListener(m_value);
   m_nt.AddListener(m_name);
-  Update();
 }
 
 void NTSpeedControllerModel::SetPercent(double value) {

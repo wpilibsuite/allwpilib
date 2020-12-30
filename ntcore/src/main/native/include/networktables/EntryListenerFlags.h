@@ -7,10 +7,8 @@
 
 #include "ntcore_c.h"
 
-namespace nt {
-
 /** Entry listener flags */
-namespace EntryListenerFlags {
+namespace nt::EntryListenerFlags {
 
 /**
  * Flag values for use with entry listeners.
@@ -72,8 +70,6 @@ enum {
   kFlags = NT_NOTIFY_FLAGS
 };
 
-}  // namespace EntryListenerFlags
-
-}  // namespace nt
+}  // namespace nt::EntryListenerFlags
 
 #endif  // NTCORE_NETWORKTABLES_ENTRYLISTENERFLAGS_H_

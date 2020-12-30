@@ -41,7 +41,7 @@ public class MatchInfoData {
   /**
    * Called from JNI to set the structure data.
    */
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public void setData(String eventName, String gameSpecificMessage,
                       int matchNumber, int replayNumber, int matchType) {
     this.eventName = eventName;

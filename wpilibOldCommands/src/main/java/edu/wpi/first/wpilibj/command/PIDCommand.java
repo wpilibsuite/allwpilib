@@ -53,7 +53,6 @@ public abstract class PIDCommand extends Command {
    * @param i    the integral value
    * @param d    the derivative value
    */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(String name, double p, double i, double d) {
     super(name);
     m_controller = new PIDController(p, i, d, m_source, m_output);
@@ -69,7 +68,6 @@ public abstract class PIDCommand extends Command {
    * @param d      the derivative value
    * @param period the time (in seconds) between calculations
    */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(String name, double p, double i, double d, double period) {
     super(name);
     m_controller = new PIDController(p, i, d, m_source, m_output, period);
@@ -83,7 +81,6 @@ public abstract class PIDCommand extends Command {
    * @param i the integral value
    * @param d the derivative value
    */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(double p, double i, double d) {
     m_controller = new PIDController(p, i, d, m_source, m_output);
   }
@@ -98,7 +95,6 @@ public abstract class PIDCommand extends Command {
    * @param d      the derivative value
    * @param period the time (in seconds) between calculations
    */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(double p, double i, double d, double period) {
     m_controller = new PIDController(p, i, d, m_source, m_output, period);
   }
@@ -112,7 +108,6 @@ public abstract class PIDCommand extends Command {
    * @param d         the derivative value
    * @param subsystem the subsystem that this command requires
    */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(String name, double p, double i, double d, Subsystem subsystem) {
     super(name, subsystem);
     m_controller = new PIDController(p, i, d, m_source, m_output);
@@ -129,7 +124,6 @@ public abstract class PIDCommand extends Command {
    * @param period    the time (in seconds) between calculations
    * @param subsystem the subsystem that this command requires
    */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(String name, double p, double i, double d, double period,
                     Subsystem subsystem) {
     super(name, subsystem);
@@ -145,7 +139,6 @@ public abstract class PIDCommand extends Command {
    * @param d         the derivative value
    * @param subsystem the subsystem that this command requires
    */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(double p, double i, double d, Subsystem subsystem) {
     super(subsystem);
     m_controller = new PIDController(p, i, d, m_source, m_output);
@@ -162,7 +155,6 @@ public abstract class PIDCommand extends Command {
    * @param period    the time (in seconds) between calculations
    * @param subsystem the subsystem that this command requires
    */
-  @SuppressWarnings("ParameterName")
   public PIDCommand(double p, double i, double d, double period, Subsystem subsystem) {
     super(subsystem);
     m_controller = new PIDController(p, i, d, m_source, m_output, period);

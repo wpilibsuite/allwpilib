@@ -18,7 +18,7 @@ class POVButton : public Button {
    * @param povNumber The POV number (@see GenericHID#GetPOV)
    */
   POVButton(GenericHID& joystick, int angle, int povNumber = 0);
-  virtual ~POVButton() = default;
+  ~POVButton() override = default;
 
   POVButton(POVButton&&) = default;
   POVButton& operator=(POVButton&&) = default;

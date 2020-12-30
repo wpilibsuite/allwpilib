@@ -14,13 +14,13 @@ class WaitForChildren : public Command {
  public:
   explicit WaitForChildren(double timeout);
   WaitForChildren(const wpi::Twine& name, double timeout);
-  virtual ~WaitForChildren() = default;
+  ~WaitForChildren() override = default;
 
   WaitForChildren(WaitForChildren&&) = default;
   WaitForChildren& operator=(WaitForChildren&&) = default;
 
  protected:
-  virtual bool IsFinished();
+  bool IsFinished() override;
 };
 
 }  // namespace frc

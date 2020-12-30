@@ -75,11 +75,9 @@ enum Register {
   kReg_OffZ = 0x31
 };
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAccelerometer() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 namespace hal {
 

@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogOutData() {
   static AnalogOutData siod[kNumAnalogOutputs];
   ::hal::SimAnalogOutData = siod;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 AnalogOutData* hal::SimAnalogOutData;
 void AnalogOutData::ResetData() {

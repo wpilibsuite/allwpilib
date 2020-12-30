@@ -39,18 +39,17 @@ class NetworkConnection : public INetworkConnection {
       std::function<std::shared_ptr<Message>()> get_msg,
       std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs)>
       HandshakeFunc;
-  typedef std::function<void(std::shared_ptr<Message> msg,
-                             NetworkConnection* conn)>
-      ProcessIncomingFunc;
-  typedef std::vector<std::shared_ptr<Message>> Outgoing;
-  typedef wpi::ConcurrentQueue<Outgoing> OutgoingQueue;
+  using ProcessIncomingFunc =
+      std::function<void(std::shared_ptr<Message>, NetworkConnection*)>;
+  using Outgoing = std::vector<std::shared_ptr<Message>>;
+  using OutgoingQueue = wpi::ConcurrentQueue<Outgoing>;
 
   NetworkConnection(unsigned int uid,
                     std::unique_ptr<wpi::NetworkStream> stream,
                     IConnectionNotifier& notifier, wpi::Logger& logger,
                     HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type);
-  ~NetworkConnection();
+  ~NetworkConnection() override;
 
   // Set the input processor function.  This must be called before Start().
   void set_process_incoming(ProcessIncomingFunc func) {

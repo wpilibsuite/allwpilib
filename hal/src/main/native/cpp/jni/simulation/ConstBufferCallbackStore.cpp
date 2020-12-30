@@ -22,16 +22,14 @@ static hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
                                     hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 void InitializeConstBufferStore() {
   static hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
                                       hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 void ConstBufferCallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);
@@ -63,7 +61,8 @@ void ConstBufferCallbackStore::performCallback(const char* name,
                                          static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetConstBufferCallback(),
-                      MakeJString(env, name), toCallbackArr, (jint)length);
+                      MakeJString(env, name), toCallbackArr,
+                      static_cast<jint>(length));
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();

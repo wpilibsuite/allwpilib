@@ -95,7 +95,7 @@ public final class HAL extends JNIWrapper {
 
   public static native int nativeGetControlWord();
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static void getControlWord(ControlWord controlWord) {
     int word = nativeGetControlWord();
     controlWord.update((word & 1) != 0, ((word >> 1) & 1) != 0, ((word >> 2) & 1) != 0,
@@ -104,7 +104,7 @@ public final class HAL extends JNIWrapper {
 
   private static native int nativeGetAllianceStation();
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static AllianceStationID getAllianceStation() {
     switch (nativeGetAllianceStation()) {
       case 0:
@@ -124,13 +124,13 @@ public final class HAL extends JNIWrapper {
     }
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static native boolean isNewControlData();
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static native void releaseDSMutex();
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static native boolean waitForDSDataTimeout(double timeout);
 
   public static int kMaxJoystickAxes = 12;

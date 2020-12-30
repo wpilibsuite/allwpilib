@@ -29,7 +29,7 @@ ShuffleboardInstance::ShuffleboardInstance(nt::NetworkTableInstance ntInstance)
   HAL_Report(HALUsageReporting::kResourceType_Shuffleboard, 0);
 }
 
-ShuffleboardInstance::~ShuffleboardInstance() {}
+ShuffleboardInstance::~ShuffleboardInstance() = default;
 
 frc::ShuffleboardTab& ShuffleboardInstance::GetTab(wpi::StringRef title) {
   if (m_impl->tabs.find(title) == m_impl->tabs.end()) {

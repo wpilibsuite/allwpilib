@@ -34,8 +34,7 @@
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Prepare.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 TEST(UvAsync, Test) {
   std::atomic_int async_cb_called{0};
@@ -183,5 +182,4 @@ TEST(UvAsync, DataRef) {
   }
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

@@ -39,7 +39,7 @@ class Joystick : public GenericHID {
    */
   explicit Joystick(int port);
 
-  virtual ~Joystick() = default;
+  ~Joystick() override = default;
 
   Joystick(Joystick&&) = default;
   Joystick& operator=(Joystick&&) = default;

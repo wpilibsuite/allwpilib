@@ -31,7 +31,6 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     IndexingType(int value) {
@@ -42,12 +41,10 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   /**
    * The a source.
    */
-  @SuppressWarnings("MemberName")
   protected DigitalSource m_aSource; // the A phase of the quad encoder
   /**
    * The b source.
    */
-  @SuppressWarnings("MemberName")
   protected DigitalSource m_bSource; // the B phase of the quad encoder
   /**
    * The index source.

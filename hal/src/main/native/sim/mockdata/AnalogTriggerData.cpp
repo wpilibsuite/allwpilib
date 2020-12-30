@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogTriggerData() {
   static AnalogTriggerData satd[kNumAnalogTriggers];
   ::hal::SimAnalogTriggerData = satd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 AnalogTriggerData* hal::SimAnalogTriggerData;
 void AnalogTriggerData::ResetData() {

@@ -28,8 +28,7 @@ static jmethodID bufferCallbackCallback;
 static jmethodID constBufferCallbackCallback;
 static jmethodID spiReadAutoReceiveBufferCallbackCallback;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 jint SimOnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
@@ -131,8 +130,7 @@ jmethodID GetConstBufferCallback() {
 jmethodID GetSpiReadAutoReceiveBufferCallback() {
   return spiReadAutoReceiveBufferCallbackCallback;
 }
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 extern "C" {
 /*

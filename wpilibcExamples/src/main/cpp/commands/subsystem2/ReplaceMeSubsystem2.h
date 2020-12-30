@@ -13,7 +13,7 @@ class ReplaceMeSubsystem2 : public frc2::SubsystemBase {
   /**
    * Will be called periodically whenever the CommandScheduler runs.
    */
-  void Periodic();
+  void Periodic() override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

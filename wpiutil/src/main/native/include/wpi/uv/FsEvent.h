@@ -14,8 +14,7 @@
 #include "wpi/Twine.h"
 #include "wpi/uv/Handle.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 
@@ -75,7 +74,6 @@ class FsEvent final : public HandleImpl<FsEvent, uv_fs_event_t> {
   sig::Signal<const char*, int> fsEvent;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_FSEVENT_H_

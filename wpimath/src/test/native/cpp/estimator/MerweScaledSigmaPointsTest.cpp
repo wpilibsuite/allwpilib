@@ -7,8 +7,7 @@
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/MerweScaledSigmaPoints.h"
 
-namespace drake {
-namespace math {
+namespace drake::math {
 namespace {
 TEST(MerweScaledSigmaPointsTest, TestZeroMean) {
   frc::MerweScaledSigmaPoints<2> sigmaPoints;
@@ -34,5 +33,4 @@ TEST(MerweScaledSigmaPointsTest, TestNonzeroMean) {
           .norm() < 1e-3);
 }
 }  // namespace
-}  // namespace math
-}  // namespace drake
+}  // namespace drake::math

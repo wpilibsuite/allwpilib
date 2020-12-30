@@ -635,7 +635,7 @@ class NetworkTableEntry final {
 
  protected:
   /* Native handle */
-  NT_Entry m_handle;
+  NT_Entry m_handle{0};
 };
 
 }  // namespace nt

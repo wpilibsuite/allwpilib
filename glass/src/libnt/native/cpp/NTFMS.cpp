@@ -37,7 +37,6 @@ NTFMSModel::NTFMSModel(NT_Inst inst, wpi::StringRef path)
   m_enabled.SetDigital(true);
   m_test.SetDigital(true);
   m_autonomous.SetDigital(true);
-  Update();
 }
 
 wpi::StringRef NTFMSModel::GetGameSpecificMessage(

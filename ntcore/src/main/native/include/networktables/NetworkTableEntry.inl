@@ -11,7 +11,7 @@
 
 namespace nt {
 
-inline NetworkTableEntry::NetworkTableEntry() : m_handle{0} {}
+inline NetworkTableEntry::NetworkTableEntry() {}
 
 inline NetworkTableEntry::NetworkTableEntry(NT_Entry handle)
     : m_handle{handle} {}

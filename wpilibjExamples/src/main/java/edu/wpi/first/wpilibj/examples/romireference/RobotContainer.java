@@ -65,8 +65,8 @@ public class RobotContainer {
     // Example of how to use the onboard IO
     Button onboardButtonA = new Button(m_onboardIO::getButtonAPressed);
     onboardButtonA
-      .whenActive(new PrintCommand("Button A Pressed"))
-      .whenInactive(new PrintCommand("Button A Released"));
+        .whenActive(new PrintCommand("Button A Pressed"))
+        .whenInactive(new PrintCommand("Button A Released"));
   }
 
 

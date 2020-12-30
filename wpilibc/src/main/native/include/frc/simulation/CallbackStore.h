@@ -9,16 +9,15 @@
 #include <hal/Value.h>
 #include <wpi/StringRef.h>
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 
 using NotifyCallback = std::function<void(wpi::StringRef, const HAL_Value*)>;
 using ConstBufferCallback = std::function<void(
     wpi::StringRef, const unsigned char* buffer, unsigned int count)>;
-typedef void (*CancelCallbackFunc)(int32_t index, int32_t uid);
-typedef void (*CancelCallbackNoIndexFunc)(int32_t uid);
-typedef void (*CancelCallbackChannelFunc)(int32_t index, int32_t channel,
-                                          int32_t uid);
+using CancelCallbackFunc = void (*)(int32_t index, int32_t uid);
+using CancelCallbackNoIndexFunc = void (*)(int32_t uid);
+using CancelCallbackChannelFunc = void (*)(int32_t index, int32_t channel,
+                                           int32_t uid);
 
 void CallbackStoreThunk(const char* name, void* param, const HAL_Value* value);
 void ConstBufferCallbackStoreThunk(const char* name, void* param,
@@ -73,5 +72,4 @@ class CallbackStore {
   enum CancelType { Normal, Channel, NoIndex };
   CancelType cancelType;
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

@@ -65,7 +65,7 @@ class PIDBase : public PIDInterface,
   PIDBase(double p, double i, double d, double f, PIDSource& source,
           PIDOutput& output);
 
-  virtual ~PIDBase() = default;
+  ~PIDBase() override = default;
 
   /**
    * Return the current PID result.

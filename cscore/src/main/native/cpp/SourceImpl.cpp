@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <memory>
 
 #include <wpi/json.h>
 #include <wpi/timestamp.h>
@@ -423,7 +424,7 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
 
     // if nothing found, allocate a new buffer
     if (found < 0) {
-      image.reset(new Image{size});
+      image = std::make_unique<Image>(size);
     } else {
       image = std::move(m_imagesAvail[found]);
     }

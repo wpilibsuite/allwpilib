@@ -112,7 +112,6 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
     kRisingPulse(AnalogJNI.AnalogTriggerType.kRisingPulse),
     kFallingPulse(AnalogJNI.AnalogTriggerType.kFallingPulse);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     AnalogTriggerType(int value) {

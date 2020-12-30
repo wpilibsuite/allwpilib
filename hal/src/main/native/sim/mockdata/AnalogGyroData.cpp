@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogGyroData() {
   static AnalogGyroData agd[kNumAccumulators];
   ::hal::SimAnalogGyroData = agd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 AnalogGyroData* hal::SimAnalogGyroData;
 void AnalogGyroData::ResetData() {
