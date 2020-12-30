@@ -103,6 +103,8 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 13
+      - name: Install libclang-9
+        run: sudo apt update && sudo apt install -y libclang-cpp9 libclang1-9
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
