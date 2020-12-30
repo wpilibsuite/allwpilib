@@ -65,12 +65,11 @@ bool GetJpegSize(wpi::StringRef data, int* width, int* height) {
   }
 
   data = data.substr(2);  // Get to the first block
-  auto bytes = data.bytes_begin();
   for (;;) {
     if (data.size() < 4) {
       return false;  // EOF
     }
-    bytes = data.bytes_begin();
+    auto bytes = data.bytes_begin();
     if (bytes[0] != 0xff) {
       return false;  // not a tag
     }
@@ -104,12 +103,11 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
 
   // Search until SOS for DHT tag
   sdata = sdata.substr(2);  // Get to the first block
-  auto bytes = sdata.bytes_begin();
   for (;;) {
     if (sdata.size() < 4) {
       return false;  // EOF
     }
-    bytes = sdata.bytes_begin();
+    auto bytes = sdata.bytes_begin();
     if (bytes[0] != 0xff) {
       return false;  // not a tag
     }
