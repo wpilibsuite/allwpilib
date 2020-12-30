@@ -33,6 +33,7 @@ static void CopyStream(uv::Stream& in, std::weak_ptr<uv::Stream> outWeak) {
     buf2.len = len;
     auto out = outWeak.lock();
     if (!out) {
+      buf2.Deallocate();
       in.Close();
       return;
     }
