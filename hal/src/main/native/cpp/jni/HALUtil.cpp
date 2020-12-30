@@ -234,9 +234,10 @@ jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
                                   int32_t deadbandMinPwm, int32_t minPwm) {
   static jmethodID constructor =
       env->GetMethodID(pwmConfigDataResultCls, "<init>", "(IIIII)V");
-  return env->NewObject(pwmConfigDataResultCls, constructor, (jint)maxPwm,
-                        (jint)deadbandMaxPwm, (jint)centerPwm,
-                        (jint)deadbandMinPwm, (jint)minPwm);
+  return env->NewObject(
+      pwmConfigDataResultCls, constructor, static_cast<jint>(maxPwm),
+      static_cast<jint>(deadbandMaxPwm), static_cast<jint>(centerPwm),
+      static_cast<jint>(deadbandMinPwm), static_cast<jint>(minPwm));
 }
 
 void SetCanStatusObject(JNIEnv* env, jobject canStatus,
@@ -245,9 +246,11 @@ void SetCanStatusObject(JNIEnv* env, jobject canStatus,
                         uint32_t transmitErrorCount) {
   static jmethodID func =
       env->GetMethodID(canStatusCls, "setStatus", "(DIIII)V");
-  env->CallVoidMethod(canStatus, func, (jdouble)percentBusUtilization,
-                      (jint)busOffCount, (jint)txFullCount,
-                      (jint)receiveErrorCount, (jint)transmitErrorCount);
+  env->CallVoidMethod(
+      canStatus, func, static_cast<jdouble>(percentBusUtilization),
+      static_cast<jint>(busOffCount), static_cast<jint>(txFullCount),
+      static_cast<jint>(receiveErrorCount),
+      static_cast<jint>(transmitErrorCount));
 }
 
 void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
@@ -261,8 +264,9 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
       MakeJString(env, wpi::StringRef{reinterpret_cast<const char*>(
                                           matchInfo.gameSpecificMessage),
                                       matchInfo.gameSpecificMessageSize}),
-      (jint)matchInfo.matchNumber, (jint)matchInfo.replayNumber,
-      (jint)matchInfo.matchType);
+      static_cast<jint>(matchInfo.matchNumber),
+      static_cast<jint>(matchInfo.replayNumber),
+      static_cast<jint>(matchInfo.matchType));
 }
 
 void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
@@ -270,15 +274,16 @@ void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
   static jmethodID func =
       env->GetMethodID(accumulatorResultCls, "set", "(JJ)V");
 
-  env->CallVoidMethod(accumulatorResult, func, (jlong)value, (jlong)count);
+  env->CallVoidMethod(accumulatorResult, func, static_cast<jlong>(value),
+                      static_cast<jlong>(count));
 }
 
 jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
                             uint64_t timestamp) {
   static jmethodID func = env->GetMethodID(canDataCls, "setData", "(IJ)[B");
 
-  jbyteArray retVal = static_cast<jbyteArray>(
-      env->CallObjectMethod(canData, func, (jint)length, (jlong)timestamp));
+  jbyteArray retVal = static_cast<jbyteArray>(env->CallObjectMethod(
+      canData, func, static_cast<jint>(length), static_cast<jlong>(timestamp)));
   return retVal;
 }
 
@@ -306,8 +311,8 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
     default:
       break;
   }
-  return env->CallStaticObjectMethod(halValueCls, fromNative, (jint)value.type,
-                                     value1, value2);
+  return env->CallStaticObjectMethod(
+      halValueCls, fromNative, static_cast<jint>(value.type), value1, value2);
 }
 
 JavaVM* GetJVM() {

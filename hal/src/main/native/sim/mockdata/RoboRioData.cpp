@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeRoboRioData() {
   static RoboRioData srrd;
   ::hal::SimRoboRioData = &srrd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 RoboRioData* hal::SimRoboRioData;
 void RoboRioData::ResetData() {

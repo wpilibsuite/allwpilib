@@ -19,11 +19,9 @@ static constexpr HAL_CANManufacturer manufacturer =
 static constexpr HAL_CANDeviceType deviceType =
     HAL_CANDeviceType::HAL_CAN_Dev_kPowerDistribution;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePDP() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {

@@ -23,7 +23,6 @@ NTCommandSchedulerModel::NTCommandSchedulerModel(NT_Inst instance,
   m_nt.AddListener(m_commands);
   m_nt.AddListener(m_ids);
   m_nt.AddListener(m_cancel);
-  Update();
 }
 
 void NTCommandSchedulerModel::CancelCommand(size_t index) {

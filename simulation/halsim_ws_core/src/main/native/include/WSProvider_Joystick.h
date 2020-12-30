@@ -15,7 +15,7 @@ class HALSimWSProviderJoystick : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderJoystick();
+  ~HALSimWSProviderJoystick() override;
 
   void OnNetValueChanged(const wpi::json& json) override;
 

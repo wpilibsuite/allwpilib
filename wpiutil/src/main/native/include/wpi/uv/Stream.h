@@ -17,8 +17,7 @@
 #include "wpi/uv/Handle.h"
 #include "wpi/uv/Request.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Stream;
 
@@ -296,7 +295,6 @@ class StreamImpl : public Stream {
   StreamImpl() : Stream{reinterpret_cast<uv_stream_t*>(new U)} {}
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_STREAM_H_

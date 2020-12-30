@@ -15,7 +15,7 @@ class HALSimWSProviderAnalogIn : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderAnalogIn();
+  ~HALSimWSProviderAnalogIn() override;
 
   void OnNetValueChanged(const wpi::json& json) override;
 
@@ -41,7 +41,7 @@ class HALSimWSProviderAnalogOut : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderAnalogOut();
+  ~HALSimWSProviderAnalogOut() override;
 
  protected:
   void RegisterCallbacks() override;

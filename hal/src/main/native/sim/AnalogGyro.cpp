@@ -23,16 +23,14 @@ using namespace hal;
 static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
                              HAL_HandleEnum::AnalogGyro>* analogGyroHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogGyro() {
   static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
                                HAL_HandleEnum::AnalogGyro>
       agH;
   analogGyroHandles = &agH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,

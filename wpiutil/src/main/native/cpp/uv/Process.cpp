@@ -8,8 +8,7 @@
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Pipe.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
                                              ArrayRef<Option> options) {
@@ -131,5 +130,4 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
   return h;
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

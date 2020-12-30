@@ -4,7 +4,7 @@
 
 #include "ReplaceMeTrigger.h"
 
-ReplaceMeTrigger::ReplaceMeTrigger() {}
+ReplaceMeTrigger::ReplaceMeTrigger() = default;
 
 bool ReplaceMeTrigger::Get() {
   return false;

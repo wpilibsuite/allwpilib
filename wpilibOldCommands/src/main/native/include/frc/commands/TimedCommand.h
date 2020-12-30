@@ -49,7 +49,7 @@ class TimedCommand : public Command {
    */
   TimedCommand(double timeout, Subsystem& subsystem);
 
-  virtual ~TimedCommand() = default;
+  ~TimedCommand() override = default;
 
   TimedCommand(TimedCommand&&) = default;
   TimedCommand& operator=(TimedCommand&&) = default;

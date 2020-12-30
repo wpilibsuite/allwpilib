@@ -43,7 +43,7 @@ class TCPStream : public NetworkStream {
   friend class TCPAcceptor;
   friend class TCPConnector;
 
-  ~TCPStream();
+  ~TCPStream() override;
 
   size_t send(const char* buffer, size_t len, Error* err) override;
   size_t receive(char* buffer, size_t len, Error* err,

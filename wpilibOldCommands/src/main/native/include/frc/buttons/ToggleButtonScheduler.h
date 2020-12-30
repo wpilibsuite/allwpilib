@@ -14,12 +14,12 @@ class Command;
 class ToggleButtonScheduler : public ButtonScheduler {
  public:
   ToggleButtonScheduler(bool last, Trigger* button, Command* orders);
-  virtual ~ToggleButtonScheduler() = default;
+  ~ToggleButtonScheduler() override = default;
 
   ToggleButtonScheduler(ToggleButtonScheduler&&) = default;
   ToggleButtonScheduler& operator=(ToggleButtonScheduler&&) = default;
 
-  virtual void Execute();
+  void Execute() override;
 };
 
 }  // namespace frc

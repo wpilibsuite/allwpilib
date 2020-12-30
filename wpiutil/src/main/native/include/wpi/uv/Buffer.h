@@ -15,8 +15,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Data buffer.  Convenience wrapper around uv_buf_t.
@@ -47,8 +46,8 @@ class Buffer : public uv_buf_t {
   ArrayRef<char> data() const { return ArrayRef<char>{base, len}; }
   MutableArrayRef<char> data() { return MutableArrayRef<char>{base, len}; }
 
-  operator ArrayRef<char>() const { return data(); }
-  operator MutableArrayRef<char>() { return data(); }
+  operator ArrayRef<char>() const { return data(); }   // NOLINT
+  operator MutableArrayRef<char>() { return data(); }  // NOLINT
 
   static Buffer Allocate(size_t size) { return Buffer{new char[size], size}; }
 
@@ -159,7 +158,6 @@ class SimpleBufferPool {
   size_t m_size;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_BUFFER_H_

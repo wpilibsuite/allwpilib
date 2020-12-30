@@ -24,7 +24,7 @@ CvSourceImpl::CvSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
                            const VideoMode& mode)
     : ConfigurableSourceImpl{name, logger, notifier, telemetry, mode} {}
 
-CvSourceImpl::~CvSourceImpl() {}
+CvSourceImpl::~CvSourceImpl() = default;
 
 void CvSourceImpl::PutFrame(cv::Mat& image) {
   // We only support 8-bit images; convert if necessary.

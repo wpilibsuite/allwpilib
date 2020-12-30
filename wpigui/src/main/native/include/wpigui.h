@@ -266,7 +266,7 @@ class Texture {
         m_format{oth.m_format},
         m_width{oth.m_width},
         m_height{oth.m_height} {
-    oth.m_texture = 0;
+    oth.m_texture = 0;  // NOLINT
   }
 
   Texture& operator=(const Texture&) = delete;
@@ -275,7 +275,7 @@ class Texture {
       DeleteTexture(m_texture);
     }
     m_texture = oth.m_texture;
-    oth.m_texture = 0;
+    oth.m_texture = 0;  // NOLINT
     m_format = oth.m_format;
     m_width = oth.m_width;
     m_height = oth.m_height;
@@ -296,7 +296,7 @@ class Texture {
   /**
    * Implicit conversion to ImTextureID.
    */
-  operator ImTextureID() const { return m_texture; }
+  operator ImTextureID() const { return m_texture; }  // NOLINT
 
   /**
    * Gets the texture pixel format.

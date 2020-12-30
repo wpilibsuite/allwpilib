@@ -14,8 +14,7 @@
 #include "wpi/Twine.h"
 #include "wpi/uv/Request.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 
@@ -116,7 +115,6 @@ inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
   GetAddrInfo(*loop, callback, node, service, hints);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_GETADDRINFO_H_

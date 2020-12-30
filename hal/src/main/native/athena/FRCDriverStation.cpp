@@ -123,16 +123,14 @@ static wpi::mutex* newDSDataAvailableMutex;
 static wpi::condition_variable* newDSDataAvailableCond;
 static int newDSDataAvailableCounter{0};
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeFRCDriverStation() {
   static wpi::mutex newMutex;
   newDSDataAvailableMutex = &newMutex;
   static wpi::condition_variable newCond;
   newDSDataAvailableCond = &newCond;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

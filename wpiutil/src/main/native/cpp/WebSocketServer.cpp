@@ -4,6 +4,8 @@
 
 #include "wpi/WebSocketServer.h"
 
+#include <utility>
+
 #include "wpi/raw_uv_ostream.h"
 #include "wpi/uv/Buffer.h"
 #include "wpi/uv/Stream.h"
@@ -58,12 +60,11 @@ std::pair<bool, StringRef> WebSocketServerHelper::MatchProtocol(
 
 WebSocketServer::WebSocketServer(uv::Stream& stream,
                                  ArrayRef<StringRef> protocols,
-                                 const ServerOptions& options,
-                                 const private_init&)
+                                 ServerOptions options, const private_init&)
     : m_stream{stream},
       m_helper{m_req},
       m_protocols{protocols.begin(), protocols.end()},
-      m_options{options} {
+      m_options{std::move(options)} {
   // Header handling
   m_req.header.connect([this](StringRef name, StringRef value) {
     if (name.equals_lower("host")) {

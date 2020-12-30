@@ -6,11 +6,9 @@
 
 #include "HALInitializer.h"
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSerialPort() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,

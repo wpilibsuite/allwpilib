@@ -9,13 +9,11 @@
 
 typedef HAL_Handle SIM_JniHandle;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 JavaVM* GetJVM();
 
 jmethodID GetNotifyCallback();
 jmethodID GetBufferCallback();
 jmethodID GetConstBufferCallback();
 jmethodID GetSpiReadAutoReceiveBufferCallback();
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim

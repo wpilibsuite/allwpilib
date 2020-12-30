@@ -6,8 +6,7 @@
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Check> Check::Create(Loop& loop) {
   auto h = std::make_shared<Check>(private_init{});
@@ -27,5 +26,4 @@ void Check::Start() {
   });
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

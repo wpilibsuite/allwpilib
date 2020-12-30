@@ -23,7 +23,7 @@ class Filter : public PIDSource {
   explicit Filter(PIDSource& source);
   WPI_DEPRECATED("This class is no longer used.")
   explicit Filter(std::shared_ptr<PIDSource> source);
-  virtual ~Filter() = default;
+  ~Filter() override = default;
 
   Filter(Filter&&) = default;
   Filter& operator=(Filter&&) = default;

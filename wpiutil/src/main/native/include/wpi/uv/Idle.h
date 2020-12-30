@@ -12,8 +12,7 @@
 #include "wpi/Signal.h"
 #include "wpi/uv/Handle.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 
@@ -70,7 +69,6 @@ class Idle final : public HandleImpl<Idle, uv_idle_t> {
   sig::Signal<> idle;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_IDLE_H_

@@ -93,12 +93,12 @@ class Robot : public frc::TimedRobot {
   frc::TrapezoidProfile<units::radians>::State m_lastProfiledReference;
 
  public:
-  void RobotInit() {
+  void RobotInit() override {
     // We go 2 pi radians per 4096 clicks.
     m_encoder.SetDistancePerPulse(2.0 * wpi::math::pi / 4096.0);
   }
 
-  void TeleopInit() {
+  void TeleopInit() override {
     m_loop.Reset(
         frc::MakeMatrix<2, 1>(m_encoder.GetDistance(), m_encoder.GetRate()));
 
@@ -107,7 +107,7 @@ class Robot : public frc::TimedRobot {
         units::radians_per_second_t(m_encoder.GetRate())};
   }
 
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     // Sets the target position of our arm. This is similar to setting the
     // setpoint of a PID controller.
     frc::TrapezoidProfile<units::radians>::State goal;

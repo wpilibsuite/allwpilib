@@ -29,8 +29,7 @@
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 TEST(UvGetNameInfo, BasicIp4) {
   int getnameinfo_cbs = 0;
@@ -72,5 +71,4 @@ TEST(UvGetNameInfo, BasicIp6) {
   ASSERT_EQ(getnameinfo_cbs, 1);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

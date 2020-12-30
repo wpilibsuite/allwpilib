@@ -81,16 +81,16 @@ class Robot : public frc::TimedRobot {
   frc::XboxController m_joystick{kJoystickPort};
 
  public:
-  void RobotInit() {
+  void RobotInit() override {
     // We go 2 pi radians per 4096 clicks.
     m_encoder.SetDistancePerPulse(2.0 * wpi::math::pi / 4096.0);
   }
 
-  void TeleopInit() {
+  void TeleopInit() override {
     m_loop.Reset(frc::MakeMatrix<1, 1>(m_encoder.GetRate()));
   }
 
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     // Sets the target speed of our flywheel. This is similar to setting the
     // setpoint of a PID controller.
     if (m_joystick.GetBumper(frc::GenericHID::kRightHand)) {

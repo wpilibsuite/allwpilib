@@ -18,8 +18,7 @@
 #include "wpi/uv/Handle.h"
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Async handle.
@@ -165,7 +164,6 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
   std::weak_ptr<Loop> m_loop;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_ASYNC_H_

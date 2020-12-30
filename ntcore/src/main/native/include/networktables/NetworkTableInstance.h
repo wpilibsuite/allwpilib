@@ -562,7 +562,7 @@ class NetworkTableInstance final {
 
  private:
   /* Native handle */
-  NT_Inst m_handle;
+  NT_Inst m_handle{0};
 };
 
 }  // namespace nt

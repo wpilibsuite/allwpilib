@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSPIData() {
   static SPIData ssd[5];
   ::hal::SimSPIData = ssd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 SPIData* hal::SimSPIData;
 void SPIData::ResetData() {

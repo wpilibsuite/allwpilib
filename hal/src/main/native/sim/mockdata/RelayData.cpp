@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeRelayData() {
   static RelayData srd[kNumRelayHeaders];
   ::hal::SimRelayData = srd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 RelayData* hal::SimRelayData;
 void RelayData::ResetData() {

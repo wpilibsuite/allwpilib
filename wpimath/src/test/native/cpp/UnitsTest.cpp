@@ -93,66 +93,66 @@ namespace {
 
 class TypeTraits : public ::testing::Test {
  protected:
-  TypeTraits() {}
-  virtual ~TypeTraits() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  TypeTraits() = default;
+  ~TypeTraits() override = default;
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class UnitManipulators : public ::testing::Test {
  protected:
-  UnitManipulators() {}
-  virtual ~UnitManipulators() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  UnitManipulators() = default;
+  ~UnitManipulators() override = default;
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class UnitContainer : public ::testing::Test {
  protected:
-  UnitContainer() {}
-  virtual ~UnitContainer() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  UnitContainer() = default;
+  ~UnitContainer() override = default;
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class UnitConversion : public ::testing::Test {
  protected:
-  UnitConversion() {}
-  virtual ~UnitConversion() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  UnitConversion() = default;
+  ~UnitConversion() override = default;
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class UnitMath : public ::testing::Test {
  protected:
-  UnitMath() {}
-  virtual ~UnitMath() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  UnitMath() = default;
+  ~UnitMath() override = default;
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class CompileTimeArithmetic : public ::testing::Test {
  protected:
-  CompileTimeArithmetic() {}
-  virtual ~CompileTimeArithmetic() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  CompileTimeArithmetic() = default;
+  ~CompileTimeArithmetic() override = default;
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class Constexpr : public ::testing::Test {
  protected:
-  Constexpr() {}
-  virtual ~Constexpr() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  Constexpr() = default;
+  ~Constexpr() override = default;
+  void SetUp() override {}
+  void TearDown() override {}
 };
 
 class CaseStudies : public ::testing::Test {
  protected:
-  CaseStudies() {}
-  virtual ~CaseStudies() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
+  CaseStudies() = default;
+  ~CaseStudies() override = default;
+  void SetUp() override {}
+  void TearDown() override {}
 
   struct RightTriangle {
     using a = unit_value_t<meters, 3>;
@@ -3093,7 +3093,7 @@ TEST_F(CompileTimeArithmetic, unit_value_t) {
 }
 
 TEST_F(CompileTimeArithmetic, is_unit_value_t) {
-  typedef unit_value_t<meters, 3, 2> mRatio;
+  using mRatio = unit_value_t<meters, 3, 2>;
 
   EXPECT_TRUE((traits::is_unit_value_t<mRatio>::value));
   EXPECT_FALSE((traits::is_unit_value_t<meter_t>::value));
@@ -3105,7 +3105,7 @@ TEST_F(CompileTimeArithmetic, is_unit_value_t) {
 }
 
 TEST_F(CompileTimeArithmetic, is_unit_value_t_category) {
-  typedef unit_value_t<feet, 3, 2> mRatio;
+  using mRatio = unit_value_t<feet, 3, 2>;
   EXPECT_TRUE(
       (traits::is_unit_value_t_category<category::length_unit, mRatio>::value));
   EXPECT_FALSE(
@@ -3117,14 +3117,14 @@ TEST_F(CompileTimeArithmetic, is_unit_value_t_category) {
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_add) {
-  typedef unit_value_t<meters, 3, 2> mRatio;
+  using mRatio = unit_value_t<meters, 3, 2>;
 
   using sum = unit_value_add<mRatio, mRatio>;
   EXPECT_EQ(meter_t(3.0), sum::value());
   EXPECT_TRUE(
       (traits::is_unit_value_t_category<category::length_unit, sum>::value));
 
-  typedef unit_value_t<feet, 1> ftRatio;
+  using ftRatio = unit_value_t<feet, 1>;
 
   using sumf = unit_value_add<ftRatio, mRatio>;
   EXPECT_TRUE((
@@ -3134,8 +3134,8 @@ TEST_F(CompileTimeArithmetic, unit_value_add) {
   EXPECT_TRUE(
       (traits::is_unit_value_t_category<category::length_unit, sumf>::value));
 
-  typedef unit_value_t<celsius, 1> cRatio;
-  typedef unit_value_t<fahrenheit, 2> fRatio;
+  using cRatio = unit_value_t<celsius, 1>;
+  using fRatio = unit_value_t<fahrenheit, 2>;
 
   using sumc = unit_value_add<cRatio, fRatio>;
   EXPECT_TRUE((
@@ -3145,8 +3145,8 @@ TEST_F(CompileTimeArithmetic, unit_value_add) {
   EXPECT_TRUE((traits::is_unit_value_t_category<category::temperature_unit,
                                                 sumc>::value));
 
-  typedef unit_value_t<angle::radian, 1> rRatio;
-  typedef unit_value_t<angle::degree, 3> dRatio;
+  using rRatio = unit_value_t<angle::radian, 1>;
+  using dRatio = unit_value_t<angle::degree, 3>;
 
   using sumr = unit_value_add<rRatio, dRatio>;
   EXPECT_TRUE((
@@ -3158,14 +3158,14 @@ TEST_F(CompileTimeArithmetic, unit_value_add) {
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_subtract) {
-  typedef unit_value_t<meters, 3, 2> mRatio;
+  using mRatio = unit_value_t<meters, 3, 2>;
 
   using diff = unit_value_subtract<mRatio, mRatio>;
   EXPECT_EQ(meter_t(0), diff::value());
   EXPECT_TRUE(
       (traits::is_unit_value_t_category<category::length_unit, diff>::value));
 
-  typedef unit_value_t<feet, 1> ftRatio;
+  using ftRatio = unit_value_t<feet, 1>;
 
   using difff = unit_value_subtract<ftRatio, mRatio>;
   EXPECT_TRUE((std::is_same<
@@ -3175,8 +3175,8 @@ TEST_F(CompileTimeArithmetic, unit_value_subtract) {
   EXPECT_TRUE(
       (traits::is_unit_value_t_category<category::length_unit, difff>::value));
 
-  typedef unit_value_t<celsius, 1> cRatio;
-  typedef unit_value_t<fahrenheit, 2> fRatio;
+  using cRatio = unit_value_t<celsius, 1>;
+  using fRatio = unit_value_t<fahrenheit, 2>;
 
   using diffc = unit_value_subtract<cRatio, fRatio>;
   EXPECT_TRUE((std::is_same<
@@ -3186,8 +3186,8 @@ TEST_F(CompileTimeArithmetic, unit_value_subtract) {
   EXPECT_TRUE((traits::is_unit_value_t_category<category::temperature_unit,
                                                 diffc>::value));
 
-  typedef unit_value_t<angle::radian, 1> rRatio;
-  typedef unit_value_t<angle::degree, 3> dRatio;
+  using rRatio = unit_value_t<angle::radian, 1>;
+  using dRatio = unit_value_t<angle::degree, 3>;
 
   using diffr = unit_value_subtract<rRatio, dRatio>;
   EXPECT_TRUE((std::is_same<
@@ -3199,8 +3199,8 @@ TEST_F(CompileTimeArithmetic, unit_value_subtract) {
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_multiply) {
-  typedef unit_value_t<meters, 2> mRatio;
-  typedef unit_value_t<feet, 656168, 100000> ftRatio;  // 2 meter
+  using mRatio = unit_value_t<meters, 2>;
+  using ftRatio = unit_value_t<feet, 656168, 100000>;  // 2 meter
 
   using product = unit_value_multiply<mRatio, mRatio>;
   EXPECT_EQ(square_meter_t(4), product::value());
@@ -3233,7 +3233,7 @@ TEST_F(CompileTimeArithmetic, unit_value_multiply) {
   EXPECT_TRUE((
       traits::is_unit_value_t_category<category::area_unit, productF2>::value));
 
-  typedef unit_value_t<units::force::newton, 5> nRatio;
+  using nRatio = unit_value_t<units::force::newton, 5>;
 
   using productN = unit_value_multiply<nRatio, ftRatio>;
   EXPECT_FALSE(
@@ -3249,8 +3249,8 @@ TEST_F(CompileTimeArithmetic, unit_value_multiply) {
   EXPECT_TRUE((traits::is_unit_value_t_category<category::torque_unit,
                                                 productN>::value));
 
-  typedef unit_value_t<angle::radian, 11, 10> r1Ratio;
-  typedef unit_value_t<angle::radian, 22, 10> r2Ratio;
+  using r1Ratio = unit_value_t<angle::radian, 11, 10>;
+  using r2Ratio = unit_value_t<angle::radian, 22, 10>;
 
   using productR = unit_value_multiply<r1Ratio, r2Ratio>;
   EXPECT_TRUE((std::is_same<
@@ -3265,8 +3265,8 @@ TEST_F(CompileTimeArithmetic, unit_value_multiply) {
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_divide) {
-  typedef unit_value_t<meters, 2> mRatio;
-  typedef unit_value_t<feet, 656168, 100000> ftRatio;  // 2 meter
+  using mRatio = unit_value_t<meters, 2>;
+  using ftRatio = unit_value_t<feet, 656168, 100000>;  // 2 meter
 
   using product = unit_value_divide<mRatio, mRatio>;
   EXPECT_EQ(scalar_t(1), product::value());
@@ -3299,7 +3299,7 @@ TEST_F(CompileTimeArithmetic, unit_value_divide) {
   EXPECT_TRUE((traits::is_unit_value_t_category<category::scalar_unit,
                                                 productF2>::value));
 
-  typedef unit_value_t<seconds, 10> sRatio;
+  using sRatio = unit_value_t<seconds, 10>;
 
   using productMS = unit_value_divide<mRatio, sRatio>;
   EXPECT_TRUE(
@@ -3310,7 +3310,7 @@ TEST_F(CompileTimeArithmetic, unit_value_divide) {
   EXPECT_TRUE((traits::is_unit_value_t_category<category::velocity_unit,
                                                 productMS>::value));
 
-  typedef unit_value_t<angle::radian, 20> rRatio;
+  using rRatio = unit_value_t<angle::radian, 20>;
 
   using productRS = unit_value_divide<rRatio, sRatio>;
   EXPECT_TRUE(
@@ -3326,7 +3326,7 @@ TEST_F(CompileTimeArithmetic, unit_value_divide) {
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_power) {
-  typedef unit_value_t<meters, 2> mRatio;
+  using mRatio = unit_value_t<meters, 2>;
 
   using sq = unit_value_power<mRatio, 2>;
   EXPECT_TRUE((std::is_convertible<
@@ -3336,7 +3336,7 @@ TEST_F(CompileTimeArithmetic, unit_value_power) {
   EXPECT_TRUE(
       (traits::is_unit_value_t_category<category::area_unit, sq>::value));
 
-  typedef unit_value_t<angle::radian, 18, 10> rRatio;
+  using rRatio = unit_value_t<angle::radian, 18, 10>;
 
   using sqr = unit_value_power<rRatio, 2>;
   EXPECT_TRUE((std::is_convertible<
@@ -3350,7 +3350,7 @@ TEST_F(CompileTimeArithmetic, unit_value_power) {
 }
 
 TEST_F(CompileTimeArithmetic, unit_value_sqrt) {
-  typedef unit_value_t<square_meters, 10> mRatio;
+  using mRatio = unit_value_t<square_meters, 10>;
 
   using root = unit_value_sqrt<mRatio>;
   EXPECT_TRUE((std::is_convertible<
@@ -3360,7 +3360,7 @@ TEST_F(CompileTimeArithmetic, unit_value_sqrt) {
   EXPECT_TRUE(
       (traits::is_unit_value_t_category<category::length_unit, root>::value));
 
-  typedef unit_value_t<hectare, 51, 7> hRatio;
+  using hRatio = unit_value_t<hectare, 51, 7>;
 
   using rooth = unit_value_sqrt<hRatio, 100000000>;
   EXPECT_TRUE((std::is_convertible<
@@ -3372,7 +3372,7 @@ TEST_F(CompileTimeArithmetic, unit_value_sqrt) {
   EXPECT_TRUE(
       (traits::is_unit_value_t_category<category::length_unit, rooth>::value));
 
-  typedef unit_value_t<steradian, 18, 10> rRatio;
+  using rRatio = unit_value_t<steradian, 18, 10>;
 
   using rootr = unit_value_sqrt<rRatio>;
   EXPECT_TRUE((traits::is_angle_unit<decltype(rootr::value())>::value));

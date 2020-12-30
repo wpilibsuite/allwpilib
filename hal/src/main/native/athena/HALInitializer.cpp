@@ -6,11 +6,9 @@
 
 #include "hal/HALBase.h"
 
-namespace hal {
-namespace init {
+namespace hal::init {
 std::atomic_bool HAL_IsInitialized{false};
 void RunInitialize() {
   HAL_Initialize(500, 0);
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init

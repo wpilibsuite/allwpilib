@@ -6,8 +6,7 @@
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Poll> Poll::Create(Loop& loop, int fd) {
   auto h = std::make_shared<Poll>(private_init{});
@@ -93,5 +92,4 @@ void Poll::Start(int events) {
          });
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

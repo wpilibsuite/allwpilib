@@ -24,8 +24,7 @@ static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
                              kNumAddressableLEDs,
                              HAL_HandleEnum::AddressableLED>* ledHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAddressableLED() {
   static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
                                kNumAddressableLEDs,
@@ -33,8 +32,7 @@ void InitializeAddressableLED() {
       dcH;
   ledHandles = &dcH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_AddressableLEDHandle HAL_InitializeAddressableLED(

@@ -17,8 +17,7 @@
 #include "wpi/Signal.h"
 #include "wpi/uv/Error.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Handle;
 
@@ -248,7 +247,6 @@ class Loop final : public std::enable_shared_from_this<Loop> {
   std::atomic<std::thread::id> m_tid;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_LOOP_H_

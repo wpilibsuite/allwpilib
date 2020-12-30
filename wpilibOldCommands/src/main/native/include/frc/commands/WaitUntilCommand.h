@@ -24,7 +24,7 @@ class WaitUntilCommand : public Command {
 
   WaitUntilCommand(const wpi::Twine& name, double time);
 
-  virtual ~WaitUntilCommand() = default;
+  ~WaitUntilCommand() override = default;
 
   WaitUntilCommand(WaitUntilCommand&&) = default;
   WaitUntilCommand& operator=(WaitUntilCommand&&) = default;
@@ -33,7 +33,7 @@ class WaitUntilCommand : public Command {
   /**
    * Check if we've reached the actual finish time.
    */
-  virtual bool IsFinished();
+  bool IsFinished() override;
 
  private:
   double m_time;

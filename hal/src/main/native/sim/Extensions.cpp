@@ -40,11 +40,9 @@ static std::vector<std::pair<const char*, void*>> gExtensionRegistry;
 static std::vector<std::pair<void*, void (*)(void*, const char*, void*)>>
     gExtensionListeners;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeExtensions() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 static bool& GetShowNotFoundMessage() {
   static bool showMsg = true;

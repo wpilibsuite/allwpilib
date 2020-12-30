@@ -22,16 +22,14 @@ static hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
                                     hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 void InitializeStore() {
   static hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
                                       hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 void CallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);
@@ -57,8 +55,9 @@ void CallbackStore::performCallback(const char* name, const HAL_Value* value) {
   }
 
   env->CallVoidMethod(m_call, sim::GetNotifyCallback(), MakeJString(env, name),
-                      (jint)value->type, (jlong)value->data.v_long,
-                      (jdouble)value->data.v_double);
+                      static_cast<jint>(value->type),
+                      static_cast<jlong>(value->data.v_long),
+                      static_cast<jdouble>(value->data.v_double));
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();

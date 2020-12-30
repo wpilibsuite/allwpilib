@@ -147,7 +147,7 @@ void NTField2DModel::GroupModel::ObjectModel::SetPoseImpl(double x, double y,
     return;
   }
   auto origArr = value->GetDoubleArray();
-  if (origArr.size() < static_cast<size_t>((m_index + 1) * 3)) {
+  if (static_cast<int>(origArr.size()) < ((m_index + 1) * 3)) {
     return;
   }
 
@@ -184,7 +184,7 @@ NTField2DModel::NTField2DModel(NT_Inst inst, wpi::StringRef path)
                                NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE);
 }
 
-NTField2DModel::~NTField2DModel() {}
+NTField2DModel::~NTField2DModel() = default;
 
 void NTField2DModel::Update() {
   for (auto&& event : m_nt.PollListener()) {

@@ -28,7 +28,7 @@ class DriveTrain : public frc::Subsystem {
    * with
    * the joystick.
    */
-  void InitDefaultCommand();
+  void InitDefaultCommand() override;
 
   /**
    * @param leftAxis Left sides value

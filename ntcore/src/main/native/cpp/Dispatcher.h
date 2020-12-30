@@ -41,7 +41,7 @@ class DispatcherBase : public IDispatcher {
 
   DispatcherBase(IStorage& storage, IConnectionNotifier& notifier,
                  wpi::Logger& logger);
-  virtual ~DispatcherBase();
+  ~DispatcherBase() override;
 
   unsigned int GetNetworkMode() const;
   void StartLocal();

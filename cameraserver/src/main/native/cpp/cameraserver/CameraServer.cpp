@@ -37,7 +37,8 @@ struct CameraServer::Impl {
   wpi::StringMap<cs::VideoSink> m_sinks;
   wpi::DenseMap<CS_Sink, CS_Source> m_fixedSources;
   wpi::DenseMap<CS_Source, std::shared_ptr<nt::NetworkTable>> m_tables;
-  std::shared_ptr<nt::NetworkTable> m_publishTable;
+  std::shared_ptr<nt::NetworkTable> m_publishTable{
+      nt::NetworkTableInstance::GetDefault().GetTable(kPublishName)};
   cs::VideoListener m_videoListener;
   int m_tableListener;
   int m_nextPort;
@@ -300,10 +301,7 @@ static void PutSourcePropertyValue(nt::NetworkTable* table,
   }
 }
 
-CameraServer::Impl::Impl()
-    : m_publishTable{nt::NetworkTableInstance::GetDefault().GetTable(
-          kPublishName)},
-      m_nextPort(kBasePort) {
+CameraServer::Impl::Impl() : m_nextPort(kBasePort) {
   // We publish sources to NetworkTables using the following structure:
   // "/CameraPublisher/{Source.Name}/" - root
   // - "source" (string): Descriptive, prefixed with type (e.g. "usb:0")
@@ -493,7 +491,7 @@ CameraServer::Impl::Impl()
 
 CameraServer::CameraServer() : m_impl(new Impl) {}
 
-CameraServer::~CameraServer() {}
+CameraServer::~CameraServer() = default;
 
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
   cs::UsbCamera camera = StartAutomaticCapture(m_impl->m_defaultUsbDevice++);

@@ -19,7 +19,7 @@ class DsClient::Thread : public wpi::SafeThread {
   Thread(Dispatcher& dispatcher, wpi::Logger& logger, unsigned int port)
       : m_dispatcher(dispatcher), m_logger(logger), m_port(port) {}
 
-  void Main();
+  void Main() override;
 
   Dispatcher& m_dispatcher;
   wpi::Logger& m_logger;

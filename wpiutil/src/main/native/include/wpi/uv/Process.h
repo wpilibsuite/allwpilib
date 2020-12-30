@@ -17,8 +17,7 @@
 #include "wpi/Twine.h"
 #include "wpi/uv/Handle.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 class Pipe;
@@ -310,7 +309,6 @@ class Process final : public HandleImpl<Process, uv_process_t> {
   sig::Signal<int64_t, int> exited;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_PROCESS_H_

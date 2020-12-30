@@ -20,7 +20,7 @@ VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
 }
 
 // Located here and not in header due to cv::Mat forward declaration.
-VisionRunnerBase::~VisionRunnerBase() {}
+VisionRunnerBase::~VisionRunnerBase() = default;
 
 void VisionRunnerBase::RunOnce() {
   auto csShared = frc::GetCameraServerShared();

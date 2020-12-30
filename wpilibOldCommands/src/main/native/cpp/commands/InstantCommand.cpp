@@ -4,6 +4,8 @@
 
 #include "frc/commands/InstantCommand.h"
 
+#include <utility>
+
 using namespace frc;
 
 InstantCommand::InstantCommand(const wpi::Twine& name) : Command(name) {}
@@ -13,7 +15,8 @@ InstantCommand::InstantCommand(Subsystem& subsystem) : Command(subsystem) {}
 InstantCommand::InstantCommand(const wpi::Twine& name, Subsystem& subsystem)
     : Command(name, subsystem) {}
 
-InstantCommand::InstantCommand(std::function<void()> func) : m_func(func) {}
+InstantCommand::InstantCommand(std::function<void()> func)
+    : m_func(std::move(func)) {}
 
 InstantCommand::InstantCommand(Subsystem& subsystem, std::function<void()> func)
     : InstantCommand(subsystem) {

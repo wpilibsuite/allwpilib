@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDIOData() {
   static DIOData sdd[kNumDigitalChannels];
   ::hal::SimDIOData = sdd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 DIOData* hal::SimDIOData;
 void DIOData::ResetData() {

@@ -7,14 +7,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeI2CData() {
   static I2CData sid[2];
   ::hal::SimI2CData = sid;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 I2CData* hal::SimI2CData;
 

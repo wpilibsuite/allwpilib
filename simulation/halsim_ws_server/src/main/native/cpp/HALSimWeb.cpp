@@ -46,7 +46,7 @@ bool HALSimWeb::Initialize() {
   wpi::SmallString<64> tmp;
 
   const char* webroot_sys = std::getenv("HALSIMWS_SYSROOT");
-  if (webroot_sys != NULL) {
+  if (webroot_sys != nullptr) {
     wpi::StringRef tstr(webroot_sys);
     tmp.append(tstr);
   } else {
@@ -58,7 +58,7 @@ bool HALSimWeb::Initialize() {
 
   tmp.clear();
   const char* webroot_user = std::getenv("HALSIMWS_USERROOT");
-  if (webroot_user != NULL) {
+  if (webroot_user != nullptr) {
     wpi::StringRef tstr(webroot_user);
     tmp.append(tstr);
   } else {
@@ -69,14 +69,14 @@ bool HALSimWeb::Initialize() {
   m_webroot_user = wpi::Twine(tmp).str();
 
   const char* uri = std::getenv("HALSIMWS_URI");
-  if (uri != NULL) {
+  if (uri != nullptr) {
     m_uri = uri;
   } else {
     m_uri = "/wpilibws";
   }
 
   const char* port = std::getenv("HALSIMWS_PORT");
-  if (port != NULL) {
+  if (port != nullptr) {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {

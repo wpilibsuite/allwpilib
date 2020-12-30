@@ -83,7 +83,7 @@ class ParallelCommandGroup
   bool RunsWhenDisabled() const override;
 
  private:
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override;
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
 
   std::vector<std::pair<std::unique_ptr<Command>, bool>> m_commands;
   bool m_runWhenDisabled{true};

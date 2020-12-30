@@ -17,7 +17,6 @@ NTGyroModel::NTGyroModel(NT_Inst instance, wpi::StringRef path)
       m_nameValue(path.rsplit('/').second) {
   m_nt.AddListener(m_angle);
   m_nt.AddListener(m_name);
-  Update();
 }
 
 void NTGyroModel::Update() {

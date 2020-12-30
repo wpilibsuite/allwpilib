@@ -5,6 +5,7 @@
 #include "frc/SPI.h"
 
 #include <cstring>
+#include <memory>
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
@@ -282,10 +283,10 @@ void SPI::StartAutoRate(double period) {
 
 void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
   int32_t status = 0;
-  HAL_StartSPIAutoTrigger(
-      m_port, source.GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(), rising,
-      falling, &status);
+  HAL_StartSPIAutoTrigger(m_port, source.GetPortHandleForRouting(),
+                          static_cast<HAL_AnalogTriggerType>(
+                              source.GetAnalogTriggerTypeForRouting()),
+                          rising, falling, &status);
   wpi_setHALError(status);
 }
 
@@ -351,8 +352,9 @@ void SPI::InitAccumulator(units::second_t period, int cmd, int xferSize,
   SetAutoTransmitData(cmdBytes, xferSize - 4);
   StartAutoRate(period);
 
-  m_accum.reset(new Accumulator(m_port, xferSize, validMask, validValue,
-                                dataShift, dataSize, isSigned, bigEndian));
+  m_accum =
+      std::make_unique<Accumulator>(m_port, xferSize, validMask, validValue,
+                                    dataShift, dataSize, isSigned, bigEndian);
   m_accum->m_notifier.StartPeriodic(period * kAccumulateDepth / 2);
 }
 

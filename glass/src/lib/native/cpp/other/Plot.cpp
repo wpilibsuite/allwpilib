@@ -889,7 +889,7 @@ PlotProvider::PlotProvider(const wpi::Twine& iniName)
       m_plotSaver{iniName, this, false},
       m_seriesSaver{iniName + "Series", this, true} {}
 
-PlotProvider::~PlotProvider() {}
+PlotProvider::~PlotProvider() = default;
 
 void PlotProvider::GlobalInit() {
   WindowManager::GlobalInit();

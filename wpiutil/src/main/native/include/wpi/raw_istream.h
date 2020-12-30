@@ -158,7 +158,7 @@ class raw_fd_istream : public raw_istream {
                  size_t bufSize = 4096);
   raw_fd_istream(int fd, bool shouldClose, size_t bufSize = 4096);
   ~raw_fd_istream() override;
-  void close() override;
+  void close() final;
   size_t in_avail() const override;
 
  private:

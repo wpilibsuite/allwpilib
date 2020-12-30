@@ -48,8 +48,8 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
   template <class... Types,
             typename = std::enable_if_t<std::conjunction_v<
                 std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
-  SelectCommand(std::function<Key()> selector,
-                std::pair<Key, Types>... commands)
+  explicit SelectCommand(std::function<Key()> selector,
+                         std::pair<Key, Types>... commands)
       : m_selector{std::move(selector)} {
     std::vector<std::pair<Key, std::unique_ptr<Command>>> foo;
 
@@ -99,7 +99,8 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
    *
    * @param toRun a supplier providing the command to run
    */
-  explicit SelectCommand(std::function<Command*()> toRun) : m_toRun{toRun} {}
+  explicit SelectCommand(std::function<Command*()> toRun)
+      : m_toRun{std::move(toRun)} {}
 
   SelectCommand(SelectCommand&& other) = default;
 

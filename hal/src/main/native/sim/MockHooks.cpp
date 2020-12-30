@@ -20,13 +20,11 @@ static std::atomic<uint64_t> programStartTime{0};
 static std::atomic<uint64_t> programPauseTime{0};
 static std::atomic<uint64_t> programStepTime{0};
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeMockHooks() {
   wpi::SetNowImpl(GetFPGATime);
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 namespace hal {
 void RestartTiming() {

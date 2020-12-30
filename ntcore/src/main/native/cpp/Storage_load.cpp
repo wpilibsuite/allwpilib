@@ -4,6 +4,7 @@
 
 #include <cctype>
 #include <string>
+#include <utility>
 
 #include <wpi/Base64.h>
 #include <wpi/SmallString.h>
@@ -21,10 +22,10 @@ namespace {
 class LoadPersistentImpl {
  public:
   typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
-  typedef std::function<void(size_t line, const char* msg)> WarnFunc;
+  using WarnFunc = std::function<void(size_t, const char*)>;
 
   LoadPersistentImpl(wpi::raw_istream& is, WarnFunc warn)
-      : m_is(is), m_warn(warn) {}
+      : m_is(is), m_warn(std::move(warn)) {}
 
   bool Load(StringRef prefix, std::vector<Entry>* entries);
 

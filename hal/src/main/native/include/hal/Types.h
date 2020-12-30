@@ -96,7 +96,7 @@ class Handle {
     return *this;
   }
 
-  operator CType() const { return m_handle; }
+  operator CType() const { return m_handle; }  // NOLINT
 
  private:
   CType m_handle = CInvalid;

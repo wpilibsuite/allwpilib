@@ -53,7 +53,7 @@ class SimDeviceSimTest {
         assertEquals(
             1,
             callback2Counter.get(),
-            "Callback 2 called early or not initalized with existing devices");
+            "Callback 2 called early or not initialized with existing devices");
 
         SimDevice dev2 = SimDevice.create("testDC2");
         dev2.close();
@@ -118,7 +118,7 @@ class SimDeviceSimTest {
         assertEquals(
             1,
             callback2Counter.get(),
-            "Callback 2 called early or not initalized with existing devices");
+            "Callback 2 called early or not initialized with existing devices");
 
         dev1.createDouble("v2", false, 0);
 
@@ -159,7 +159,7 @@ class SimDeviceSimTest {
         assertEquals(
             1,
             callback2Counter.get(),
-            "Callback 2 called early or not initalized with existing devices");
+            "Callback 2 called early or not initialized with existing devices");
 
         val.set(true);
 

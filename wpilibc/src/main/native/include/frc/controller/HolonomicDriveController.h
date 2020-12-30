@@ -41,9 +41,8 @@ class HolonomicDriveController {
    * angle.
    */
   HolonomicDriveController(
-      const frc2::PIDController& xController,
-      const frc2::PIDController& yController,
-      const ProfiledPIDController<units::radian>& thetaController);
+      frc2::PIDController xController, frc2::PIDController yController,
+      ProfiledPIDController<units::radian> thetaController);
 
   /**
    * Returns true if the pose error is within tolerance of the reference.

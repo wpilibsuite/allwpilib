@@ -8,8 +8,7 @@
 
 #include "frc/simulation/CallbackStore.h"
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 class SPIAccelerometerSim {
  public:
   explicit SPIAccelerometerSim(int index);
@@ -54,5 +53,4 @@ class SPIAccelerometerSim {
  private:
   int m_index;
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

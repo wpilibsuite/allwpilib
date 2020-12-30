@@ -7,8 +7,7 @@
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/util.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 GetNameInfoReq::GetNameInfoReq() {
   error = [this](Error err) { GetLoop().error(err); };
@@ -90,5 +89,4 @@ void GetNameInfo6(Loop& loop,
   }
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

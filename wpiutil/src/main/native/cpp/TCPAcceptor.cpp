@@ -190,7 +190,7 @@ std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   socklen_t len = sizeof(address);
 #endif
   std::memset(&address, 0, sizeof(address));
-  int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
+  int sd = ::accept(m_lsd, reinterpret_cast<struct sockaddr*>(&address), &len);
   if (sd < 0) {
     if (!m_shutdown) {
       WPI_ERROR(m_logger, "accept() on port "

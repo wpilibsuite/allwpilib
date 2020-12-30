@@ -30,7 +30,7 @@ class EventLoopRunner::Thread : public SafeThread {
         });
   }
 
-  void Main() {
+  void Main() override {
     if (m_loop) {
       m_loop->Run();
     }

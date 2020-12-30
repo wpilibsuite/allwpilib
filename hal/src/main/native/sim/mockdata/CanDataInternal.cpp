@@ -6,14 +6,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeCanData() {
   static CanData scd;
   ::hal::SimCanData = &scd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 CanData* hal::SimCanData;
 

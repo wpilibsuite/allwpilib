@@ -9,11 +9,9 @@
 
 #include "hal/Errors.h"
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeThreads() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

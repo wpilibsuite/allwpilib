@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <ostream>
+#include <utility>
 
 #include "gmock/gmock.h"
 #include "networktables/NetworkTableValue.h"
@@ -16,7 +17,8 @@ namespace nt {
 class ValueMatcher
     : public ::testing::MatcherInterface<std::shared_ptr<Value>> {
  public:
-  explicit ValueMatcher(std::shared_ptr<Value> goodval_) : goodval(goodval_) {}
+  explicit ValueMatcher(std::shared_ptr<Value> goodval_)
+      : goodval(std::move(goodval_)) {}
 
   bool MatchAndExplain(std::shared_ptr<Value> msg,
                        ::testing::MatchResultListener* listener) const override;

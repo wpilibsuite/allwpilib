@@ -6,8 +6,7 @@
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Tty> Tty::Create(Loop& loop, uv_file fd, bool readable) {
   auto h = std::make_shared<Tty>(private_init{});
@@ -20,5 +19,4 @@ std::shared_ptr<Tty> Tty::Create(Loop& loop, uv_file fd, bool readable) {
   return h;
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

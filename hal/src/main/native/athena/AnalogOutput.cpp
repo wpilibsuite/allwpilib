@@ -25,16 +25,14 @@ static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
                              kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>*
     analogOutputHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogOutput() {
   static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
                                kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>
       aoH;
   analogOutputHandles = &aoH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

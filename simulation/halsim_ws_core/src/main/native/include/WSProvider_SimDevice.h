@@ -39,7 +39,7 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
     m_deviceId = deviceId;
   }
 
-  ~HALSimWSProviderSimDevice();
+  ~HALSimWSProviderSimDevice() override;
 
   void OnNetworkConnected(
       std::shared_ptr<HALSimBaseWebSocketConnection> ws) override;

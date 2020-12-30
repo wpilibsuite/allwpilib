@@ -22,8 +22,7 @@ static hal::UnlimitedHandleResource<
     SIM_JniHandle, SpiReadAutoReceiveBufferCallbackStore,
     hal::HAL_HandleEnum::SimulationJni>* callbackHandles;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 void InitializeSpiBufferStore() {
   static hal::UnlimitedHandleResource<SIM_JniHandle,
                                       SpiReadAutoReceiveBufferCallbackStore,
@@ -31,8 +30,7 @@ void InitializeSpiBufferStore() {
       cb;
   callbackHandles = &cb;
 }
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 void SpiReadAutoReceiveBufferCallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);
@@ -63,7 +61,7 @@ int32_t SpiReadAutoReceiveBufferCallbackStore::performCallback(
 
   jint ret = env->CallIntMethod(m_call, sim::GetBufferCallback(),
                                 MakeJString(env, name), toCallbackArr,
-                                (jint)numToRead);
+                                static_cast<jint>(numToRead));
 
   jint* fromCallbackArr = reinterpret_cast<jint*>(
       env->GetPrimitiveArrayCritical(toCallbackArr, nullptr));

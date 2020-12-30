@@ -226,7 +226,7 @@ class Preferences : public ErrorBase {
 
  protected:
   Preferences();
-  virtual ~Preferences() = default;
+  ~Preferences() override = default;
 
   Preferences(Preferences&&) = default;
   Preferences& operator=(Preferences&&) = default;

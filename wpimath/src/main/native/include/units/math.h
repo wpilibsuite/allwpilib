@@ -34,7 +34,6 @@
 #include "units/base.h"
 #include "units/dimensionless.h"
 
-namespace units {
 //----------------------------------
 // UNIT-ENABLED CMATH FUNCTIONS
 //----------------------------------
@@ -45,7 +44,7 @@ namespace units {
  *          rounding functions, etc.
  * @sa See `unit_t` for more information on unit type containers.
  */
-namespace math {
+namespace units::math {
 //----------------------------------
 // TRIGONOMETRIC FUNCTIONS
 //----------------------------------
@@ -772,5 +771,4 @@ constexpr units::radian_t NormalizeAngle(units::radian_t theta) {
 
   return theta;
 }
-}  // namespace math
-}  // namespace units
+}  // namespace units::math

@@ -19,7 +19,7 @@ class ProviderContainer {
   using ProviderPtr = std::shared_ptr<HALSimWSBaseProvider>;
   using IterFn = std::function<void(ProviderPtr)>;
 
-  ProviderContainer() {}
+  ProviderContainer() = default;
 
   ProviderContainer(const ProviderContainer&) = delete;
   ProviderContainer& operator=(const ProviderContainer&) = delete;

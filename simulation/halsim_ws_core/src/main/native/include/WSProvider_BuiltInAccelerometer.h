@@ -13,7 +13,7 @@ class HALSimWSProviderBuiltInAccelerometer : public HALSimWSHalProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalProvider::HALSimWSHalProvider;
-  ~HALSimWSProviderBuiltInAccelerometer();
+  ~HALSimWSProviderBuiltInAccelerometer() override;
 
   void OnNetValueChanged(const wpi::json& json) override;
 

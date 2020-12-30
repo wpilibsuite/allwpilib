@@ -95,7 +95,9 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_ShowConnections = 1 << 2,
   NetworkTablesFlags_ShowFlags = 1 << 3,
   NetworkTablesFlags_ShowTimestamp = 1 << 4,
-  NetworkTablesFlags_Default = 0x1D  // all except readonly
+  NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 5,
+  NetworkTablesFlags_Default = 1 & ~NetworkTablesFlags_ReadOnly &
+                               ~NetworkTablesFlags_CreateNoncanonicalKeys
 };
 
 void DisplayNetworkTables(

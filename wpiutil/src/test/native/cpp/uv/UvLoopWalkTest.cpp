@@ -29,8 +29,7 @@
 
 #include "wpi/uv/Timer.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 TEST(UvLoop, Walk) {
   int seen_timer_handle = 0;
@@ -67,5 +66,4 @@ TEST(UvLoop, Walk) {
   ASSERT_EQ(seen_timer_handle, 0);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

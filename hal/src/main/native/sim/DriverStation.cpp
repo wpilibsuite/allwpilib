@@ -31,14 +31,12 @@ static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDriverStation() {
   static wpi::condition_variable nddaC;
   newDSDataAvailableCond = &nddaC;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 using namespace hal;
 

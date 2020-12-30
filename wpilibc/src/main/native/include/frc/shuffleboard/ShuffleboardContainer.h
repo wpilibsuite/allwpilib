@@ -45,7 +45,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue,
 
   ShuffleboardContainer(ShuffleboardContainer&& rhs) = default;
 
-  virtual ~ShuffleboardContainer() = default;
+  ~ShuffleboardContainer() override = default;
 
   /**
    * Gets the components that are direct children of this container.

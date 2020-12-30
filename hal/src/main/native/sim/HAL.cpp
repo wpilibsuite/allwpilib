@@ -57,8 +57,7 @@ static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 static SimPeriodicCallbackRegistry gSimPeriodicBefore;
 static SimPeriodicCallbackRegistry gSimPeriodicAfter;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeHAL() {
   InitializeAccelerometerData();
   InitializeAddressableLEDData();
@@ -116,8 +115,7 @@ void InitializeHAL() {
   InitializeSPI();
   InitializeThreads();
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

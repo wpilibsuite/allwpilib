@@ -41,7 +41,7 @@ class DifferentialDrivetrainSim {
    * starting point.
    */
   DifferentialDrivetrainSim(
-      const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
+      LinearSystem<2, 2, 2> plant, units::meter_t trackWidth,
       DCMotor driveMotor, double gearingRatio, units::meter_t wheelRadius,
       const std::array<double, 7>& measurementStdDevs = {});
 
@@ -157,6 +157,16 @@ class DifferentialDrivetrainSim {
   units::meters_per_second_t GetLeftVelocity() const {
     return units::meters_per_second_t{GetOutput(State::kLeftVelocity)};
   }
+
+  /**
+   * Returns the currently drawn current for the right side.
+   */
+  units::ampere_t GetRightCurrentDraw() const;
+
+  /**
+   * Returns the currently drawn current for the left side.
+   */
+  units::ampere_t GetLeftCurrentDraw() const;
 
   /**
    * Returns the currently drawn current.

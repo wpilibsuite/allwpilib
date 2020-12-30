@@ -39,7 +39,7 @@ class SourceImpl : public PropertyContainer {
  public:
   SourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
              Telemetry& telemetry);
-  virtual ~SourceImpl();
+  ~SourceImpl() override;
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
 
