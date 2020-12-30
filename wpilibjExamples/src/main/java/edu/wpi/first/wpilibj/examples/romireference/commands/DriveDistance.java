@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 public class DriveDistance extends CommandBase {
@@ -25,7 +27,7 @@ public class DriveDistance extends CommandBase {
     addRequirements(drive);
   }
 
-   // Called when the command is initially scheduled.
+  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     m_drive.arcadeDrive(0, 0);

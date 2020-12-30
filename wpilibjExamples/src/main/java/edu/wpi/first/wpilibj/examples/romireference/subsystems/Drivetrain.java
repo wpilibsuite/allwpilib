@@ -31,8 +31,8 @@ public class Drivetrain extends SubsystemBase {
    */
   public Drivetrain() {
     // Use inches as unit for encoder distances
-    m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch)/kCountsPerRevolution);
-    m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch)/kCountsPerRevolution);
+    m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
+    m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     resetEncoders();
   }
 
@@ -62,7 +62,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getAverageDistanceInch() {
-    return (getLeftDistanceInch() + getRightDistanceInch())/2.0;
+    return (getLeftDistanceInch() + getRightDistanceInch()) / 2.0;
   }
 
   @Override

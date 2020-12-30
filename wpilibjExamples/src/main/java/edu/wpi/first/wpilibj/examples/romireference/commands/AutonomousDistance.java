@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
+
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 public class AutonomousDistance extends SequentialCommandGroup {
@@ -15,10 +17,11 @@ public class AutonomousDistance extends SequentialCommandGroup {
    */
   public AutonomousDistance(Drivetrain drivetrain) {
     addCommands(
-      new DriveDistance(-0.5, 10, drivetrain),
-      new TurnDegrees(-0.5, 180, drivetrain),
-      new DriveDistance(-0.5, 10, drivetrain),
-      new TurnDegrees(0.5, 180, drivetrain)
+        new DriveDistance(-0.5, 10, drivetrain),
+        new TurnDegrees(-0.5, 180, drivetrain),
+        new DriveDistance(-0.5, 10, drivetrain),
+        new TurnDegrees(0.5, 180, drivetrain)
     );
   }
 }
+

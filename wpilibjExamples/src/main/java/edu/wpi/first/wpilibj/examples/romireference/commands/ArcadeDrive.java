@@ -5,7 +5,9 @@
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
 import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 
 public class ArcadeDrive extends CommandBase {
@@ -16,9 +18,9 @@ public class ArcadeDrive extends CommandBase {
   /**
    * Creates a new ArcadeDrive.
    *
-   * @param drive   The drivetrain subsystem on which this command will run
-   * @param xSpeedSupplier Lambda supplier of forward/backward speed
-   * @param zRotateSupplie Lambda supplier of rotational speed
+   * @param drivetrain   The drivetrain subsystem on which this command will run
+   * @param xaxisSpeedSupplier Lambda supplier of forward/backward speed
+   * @param zaxisRotateSuppplier Lambda supplier of rotational speed
    */
   public ArcadeDrive(Drivetrain drivetrain, Supplier<Double> xaxisSpeedSupplier,
       Supplier<Double> zaxisRotateSuppplier) {
