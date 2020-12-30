@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
- * This is a demo program showing the use of the RobotDrive class, specifically
- * it contains the code necessary to operate a robot with tank drive.
+ * This is a demo program showing the use of the RobotDrive class, specifically it contains the code
+ * necessary to operate a robot with tank drive.
  */
 public class Robot extends TimedRobot {
   private DifferentialDrive m_myRobot;

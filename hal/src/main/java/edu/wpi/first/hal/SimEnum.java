@@ -4,9 +4,7 @@
 
 package edu.wpi.first.hal;
 
-/**
- * A wrapper around a simulator enum value handle.
- */
+/** A wrapper around a simulator enum value handle. */
 public class SimEnum extends SimValue {
   /**
    * Wraps a simulated value handle as returned by SimDeviceJNI.createSimValueEnum().

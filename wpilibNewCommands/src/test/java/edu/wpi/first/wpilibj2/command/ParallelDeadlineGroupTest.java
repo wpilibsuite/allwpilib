@@ -4,14 +4,14 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import org.junit.jupiter.api.Test;
 
 class ParallelDeadlineGroupTest extends CommandTestBase {
   @Test
@@ -83,7 +83,6 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
     }
   }
 
-
   @Test
   void parallelDeadlineRequirementTest() {
     Subsystem system1 = new TestSubsystem();
@@ -120,7 +119,7 @@ class ParallelDeadlineGroupTest extends CommandTestBase {
     MockCommandHolder command2Holder = new MockCommandHolder(true, system2, system3);
     Command command2 = command2Holder.getMock();
 
-    assertThrows(IllegalArgumentException.class,
-        () -> new ParallelDeadlineGroup(command1, command2));
+    assertThrows(
+        IllegalArgumentException.class, () -> new ParallelDeadlineGroup(command1, command2));
   }
 }

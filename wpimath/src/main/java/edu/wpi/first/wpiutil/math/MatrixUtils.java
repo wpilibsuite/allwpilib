@@ -4,11 +4,9 @@
 
 package edu.wpi.first.wpiutil.math;
 
-import java.util.Objects;
-
-import org.ejml.simple.SimpleMatrix;
-
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import java.util.Objects;
+import org.ejml.simple.SimpleMatrix;
 
 @Deprecated
 public final class MatrixUtils {
@@ -28,7 +26,8 @@ public final class MatrixUtils {
   @SuppressWarnings("LineLength")
   public static <R extends Num, C extends Num> Matrix<R, C> zeros(Nat<R> rows, Nat<C> cols) {
     return new Matrix<>(
-        new SimpleMatrix(Objects.requireNonNull(rows).getNum(), Objects.requireNonNull(cols).getNum()));
+        new SimpleMatrix(
+            Objects.requireNonNull(rows).getNum(), Objects.requireNonNull(cols).getNum()));
   }
 
   /**
@@ -54,8 +53,8 @@ public final class MatrixUtils {
   }
 
   /**
-   * Entrypoint to the MatBuilder class for creation
-   * of custom matrices with the given dimensions and contents.
+   * Entrypoint to the MatBuilder class for creation of custom matrices with the given dimensions
+   * and contents.
    *
    * @param rows The number of rows of the desired matrix.
    * @param cols The number of columns of the desired matrix.
@@ -68,8 +67,8 @@ public final class MatrixUtils {
   }
 
   /**
-   * Entrypoint to the VecBuilder class for creation
-   * of custom vectors with the given size and contents.
+   * Entrypoint to the VecBuilder class for creation of custom vectors with the given size and
+   * contents.
    *
    * @param dim The dimension of the vector.
    * @param <D> The dimension of the vector as a generic.

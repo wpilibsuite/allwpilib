@@ -21,9 +21,11 @@ public class SPISim {
     int uid = SPIDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, SPIDataJNI::cancelInitializedCallback);
   }
+
   public boolean getInitialized() {
     return SPIDataJNI.getInitialized(m_index);
   }
+
   public void setInitialized(boolean initialized) {
     SPIDataJNI.setInitialized(m_index, initialized);
   }
@@ -38,7 +40,8 @@ public class SPISim {
     return new CallbackStore(m_index, uid, SPIDataJNI::cancelWriteCallback);
   }
 
-  public CallbackStore registerReadAutoReceiveBufferCallback(SpiReadAutoReceiveBufferCallback callback) {
+  public CallbackStore registerReadAutoReceiveBufferCallback(
+      SpiReadAutoReceiveBufferCallback callback) {
     int uid = SPIDataJNI.registerReadAutoReceiveBufferCallback(m_index, callback);
     return new CallbackStore(m_index, uid, SPIDataJNI::cancelReadAutoReceiveBufferCallback);
   }

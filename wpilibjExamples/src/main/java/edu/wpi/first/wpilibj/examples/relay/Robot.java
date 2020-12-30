@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * compressor. This program uses two buttons on a joystick and each button corresponds to one
  * output; pressing the button sets the output to 12V and releasing sets it to 0V.
  */
-
 public class Robot extends TimedRobot {
   private final Joystick m_stick = new Joystick(0);
   private final Relay m_relay = new Relay(0);

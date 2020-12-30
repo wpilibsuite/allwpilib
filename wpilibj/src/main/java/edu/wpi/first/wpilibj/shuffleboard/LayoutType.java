@@ -11,8 +11,6 @@ package edu.wpi.first.wpilibj.shuffleboard;
  * @see BuiltInWidgets the built-in widget types
  */
 public interface LayoutType {
-  /**
-   * Gets the string type of the layout as defined by that layout in Shuffleboard.
-   */
+  /** Gets the string type of the layout as defined by that layout in Shuffleboard. */
   String getLayoutName();
 }

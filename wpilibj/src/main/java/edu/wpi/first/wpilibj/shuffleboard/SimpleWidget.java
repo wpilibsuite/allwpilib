@@ -7,9 +7,7 @@ package edu.wpi.first.wpilibj.shuffleboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 
-/**
- * A Shuffleboard widget that handles a single data point such as a number or string.
- */
+/** A Shuffleboard widget that handles a single data point such as a number or string. */
 public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
   private NetworkTableEntry m_entry;
 
@@ -17,9 +15,7 @@ public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
     super(parent, title);
   }
 
-  /**
-   * Gets the NetworkTable entry that contains the data for this widget.
-   */
+  /** Gets the NetworkTable entry that contains the data for this widget. */
   public NetworkTableEntry getEntry() {
     if (m_entry == null) {
       forceGenerate();
@@ -43,5 +39,4 @@ public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
     ShuffleboardTab tab = (ShuffleboardTab) parent;
     tab.getRoot().update();
   }
-
 }

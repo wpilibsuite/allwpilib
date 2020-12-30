@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static java.util.Objects.requireNonNull;
 
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -13,40 +13,29 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-import static java.util.Objects.requireNonNull;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Class for counting the number of ticks on a digital input channel.
  *
  * <p>This is a general purpose class for counting repetitive events. It can return the number of
- * counts, the period of the most recent cycle, and detect when the signal being counted has
- * stopped by supplying a maximum cycle time.
+ * counts, the period of the most recent cycle, and detect when the signal being counted has stopped
+ * by supplying a maximum cycle time.
  *
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
 public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable {
-  /**
-   * Mode determines how and what the counter counts.
-   */
+  /** Mode determines how and what the counter counts. */
   public enum Mode {
-    /**
-     * mode: two pulse.
-     */
+    /** mode: two pulse. */
     kTwoPulse(0),
-    /**
-     * mode: semi period.
-     */
+    /** mode: semi period. */
     kSemiperiod(1),
-    /**
-     * mode: pulse length.
-     */
+    /** mode: pulse length. */
     kPulseLength(2),
-    /**
-     * mode: external direction.
-     */
+    /** mode: external direction. */
     kExternalDirection(3);
 
     public final int value;
@@ -65,9 +54,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
   private PIDSourceType m_pidSource;
   private double m_distancePerPulse; // distance of travel for each tick
 
-  /**
-   * Create an instance of a counter with the given mode.
-   */
+  /** Create an instance of a counter with the given mode. */
   public Counter(final Mode mode) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
@@ -131,12 +118,15 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * <p>The counter will start counting immediately.
    *
    * @param encodingType which edges to count
-   * @param upSource     first source to count
-   * @param downSource   second source for direction
-   * @param inverted     true to invert the count
+   * @param upSource first source to count
+   * @param downSource second source for direction
+   * @param inverted true to invert the count
    */
-  public Counter(EncodingType encodingType, DigitalSource upSource, DigitalSource downSource,
-                 boolean inverted) {
+  public Counter(
+      EncodingType encodingType,
+      DigitalSource upSource,
+      DigitalSource downSource,
+      boolean inverted) {
     this(Mode.kExternalDirection);
 
     requireNonNullParam(encodingType, "encodingType", "Counter");
@@ -225,15 +215,15 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
       m_allocatedUpSource = false;
     }
     m_upSource = source;
-    CounterJNI.setCounterUpSource(m_counter, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting());
+    CounterJNI.setCounterUpSource(
+        m_counter, source.getPortHandleForRouting(), source.getAnalogTriggerTypeForRouting());
   }
 
   /**
    * Set the up counting source to be an analog trigger.
    *
    * @param analogTrigger The analog trigger object that is used for the Up Source
-   * @param triggerType   The analog trigger output that will trigger the counter.
+   * @param triggerType The analog trigger output that will trigger the counter.
    */
   public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
     requireNonNullParam(analogTrigger, "analogTrigger", "setUpSource");
@@ -247,7 +237,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * Set the edge sensitivity on an up counting source. Set the up source to either detect rising
    * edges or falling edges.
    *
-   * @param risingEdge  true to count rising edge
+   * @param risingEdge true to count rising edge
    * @param fallingEdge true to count falling edge
    */
   public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
@@ -257,9 +247,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
     CounterJNI.setCounterUpSourceEdge(m_counter, risingEdge, fallingEdge);
   }
 
-  /**
-   * Disable the up counting source to the counter.
-   */
+  /** Disable the up counting source to the counter. */
   public void clearUpSource() {
     if (m_upSource != null && m_allocatedUpSource) {
       m_upSource.close();
@@ -294,8 +282,8 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
       m_downSource.close();
       m_allocatedDownSource = false;
     }
-    CounterJNI.setCounterDownSource(m_counter, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting());
+    CounterJNI.setCounterDownSource(
+        m_counter, source.getPortHandleForRouting(), source.getAnalogTriggerTypeForRouting());
     m_downSource = source;
   }
 
@@ -303,7 +291,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * Set the down counting source to be an analog trigger.
    *
    * @param analogTrigger The analog trigger object that is used for the Down Source
-   * @param triggerType   The analog trigger output that will trigger the counter.
+   * @param triggerType The analog trigger output that will trigger the counter.
    */
   public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
     requireNonNullParam(analogTrigger, "analogTrigger", "setDownSource");
@@ -317,7 +305,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * Set the edge sensitivity on a down counting source. Set the down source to either detect rising
    * edges or falling edges.
    *
-   * @param risingEdge  true to count the rising edge
+   * @param risingEdge true to count the rising edge
    * @param fallingEdge true to count the falling edge
    */
   public void setDownSourceEdge(boolean risingEdge, boolean fallingEdge) {
@@ -326,9 +314,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
     CounterJNI.setCounterDownSourceEdge(m_counter, risingEdge, fallingEdge);
   }
 
-  /**
-   * Disable the down counting source to the counter.
-   */
+  /** Disable the down counting source to the counter. */
   public void clearDownSource() {
     if (m_downSource != null && m_allocatedDownSource) {
       m_downSource.close();
@@ -369,7 +355,7 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    * is most useful for direction sensitive gear tooth sensors.
    *
    * @param threshold The pulse length beyond which the counter counts the opposite direction. Units
-   *                  are seconds.
+   *     are seconds.
    */
   public void setPulseLengthMode(double threshold) {
     CounterJNI.setCounterPulseLengthMode(m_counter, threshold);

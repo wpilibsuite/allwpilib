@@ -5,12 +5,11 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
- * Wait until the pneumatics are fully pressurized. This command does nothing
- * and is intended to be used in command groups to wait for this condition.
+ * Wait until the pneumatics are fully pressurized. This command does nothing and is intended to be
+ * used in command groups to wait for this condition.
  */
 public class WaitForPressure extends Command {
   public WaitForPressure() {

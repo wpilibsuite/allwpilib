@@ -4,18 +4,18 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.Map;
-import java.util.function.Supplier;
-
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 /**
  * Runs one of a selection of commands, either using a selector and a key to command mapping, or a
- * supplier that returns the command directly at runtime.  Does not actually schedule the selected
+ * supplier that returns the command directly at runtime. Does not actually schedule the selected
  * command - rather, the command is run through this command; this ensures that the command will
- * behave as expected if used as part of a CommandGroup.  Requires the requirements of all included
- * commands, again to ensure proper functioning when used in a CommandGroup.  If this is undesired,
+ * behave as expected if used as part of a CommandGroup. Requires the requirements of all included
+ * commands, again to ensure proper functioning when used in a CommandGroup. If this is undesired,
  * consider using {@link ScheduleCommand}.
  *
  * <p>As this command contains multiple component commands within it, it is technically a command
@@ -39,7 +39,7 @@ public class SelectCommand extends CommandBase {
   public SelectCommand(Map<Object, Command> commands, Supplier<Object> selector) {
     requireUngrouped(commands.values());
 
-    CommandGroupBase.registerGroupedCommands(commands.values().toArray(new Command[]{}));
+    CommandGroupBase.registerGroupedCommands(commands.values().toArray(new Command[] {}));
 
     m_commands = requireNonNullParam(commands, "commands", "SelectCommand");
     m_selector = requireNonNullParam(selector, "selector", "SelectCommand");
@@ -66,8 +66,9 @@ public class SelectCommand extends CommandBase {
   public void initialize() {
     if (m_selector != null) {
       if (!m_commands.keySet().contains(m_selector.get())) {
-        m_selectedCommand = new PrintCommand(
-            "SelectCommand selector value does not correspond to" + " any command!");
+        m_selectedCommand =
+            new PrintCommand(
+                "SelectCommand selector value does not correspond to" + " any command!");
         return;
       }
       m_selectedCommand = m_commands.get(m_selector.get());

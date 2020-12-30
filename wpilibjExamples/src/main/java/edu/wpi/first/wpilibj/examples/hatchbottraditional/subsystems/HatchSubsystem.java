@@ -4,32 +4,27 @@
 
 package edu.wpi.first.wpilibj.examples.hatchbottraditional.subsystems;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.HatchConstants;
-
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
 
-/**
- * A hatch mechanism actuated by a single {@link DoubleSolenoid}.
- */
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.HatchConstants;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+/** A hatch mechanism actuated by a single {@link DoubleSolenoid}. */
 public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid m_hatchSolenoid =
-      new DoubleSolenoid(HatchConstants.kHatchSolenoidModule, HatchConstants.kHatchSolenoidPorts[0],
-                         HatchConstants.kHatchSolenoidPorts[1]);
+      new DoubleSolenoid(
+          HatchConstants.kHatchSolenoidModule,
+          HatchConstants.kHatchSolenoidPorts[0],
+          HatchConstants.kHatchSolenoidPorts[1]);
 
-  /**
-   * Grabs the hatch.
-   */
+  /** Grabs the hatch. */
   public void grabHatch() {
     m_hatchSolenoid.set(kForward);
   }
 
-  /**
-   * Releases the hatch.
-   */
+  /** Releases the hatch. */
   public void releaseHatch() {
     m_hatchSolenoid.set(kReverse);
   }

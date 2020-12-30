@@ -6,24 +6,17 @@ package edu.wpi.first.hal;
 
 public class AnalogJNI extends JNIWrapper {
   /**
-   * <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:58</i><br> enum values
+   * <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:58</i><br>
+   * enum values
    */
   public interface AnalogTriggerType {
-    /**
-     * <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:54</i>
-     */
+    /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:54</i> */
     int kInWindow = 0;
-    /**
-     * <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:55</i>
-     */
+    /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:55</i> */
     int kState = 1;
-    /**
-     * <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:56</i>
-     */
+    /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:56</i> */
     int kRisingPulse = 2;
-    /**
-     * <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:57</i>
-     */
+    /** <i>native declaration : AthenaJava\target\native\include\HAL\Analog.h:57</i> */
     int kFallingPulse = 3;
   }
 
@@ -95,20 +88,20 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native void cleanAnalogTrigger(int analogTriggerHandle);
 
-  public static native void setAnalogTriggerLimitsRaw(int analogTriggerHandle, int lower,
-                                                      int upper);
+  public static native void setAnalogTriggerLimitsRaw(
+      int analogTriggerHandle, int lower, int upper);
 
-  public static native void setAnalogTriggerLimitsDutyCycle(int analogTriggerHandle, double lower,
-                                                            double higher);
+  public static native void setAnalogTriggerLimitsDutyCycle(
+      int analogTriggerHandle, double lower, double higher);
 
-  public static native void setAnalogTriggerLimitsVoltage(int analogTriggerHandle,
-                                                          double lower, double upper);
+  public static native void setAnalogTriggerLimitsVoltage(
+      int analogTriggerHandle, double lower, double upper);
 
-  public static native void setAnalogTriggerAveraged(int analogTriggerHandle,
-                                                     boolean useAveragedValue);
+  public static native void setAnalogTriggerAveraged(
+      int analogTriggerHandle, boolean useAveragedValue);
 
-  public static native void setAnalogTriggerFiltered(int analogTriggerHandle,
-                                                     boolean useFilteredValue);
+  public static native void setAnalogTriggerFiltered(
+      int analogTriggerHandle, boolean useFilteredValue);
 
   public static native boolean getAnalogTriggerInWindow(int analogTriggerHandle);
 

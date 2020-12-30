@@ -4,21 +4,17 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
+import java.util.logging.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-/**
- * Tests that the {@link TiltPanCameraFixture}.
- */
+/** Tests that the {@link TiltPanCameraFixture}. */
 public class GyroTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
 
@@ -89,7 +85,6 @@ public class GyroTest extends AbstractComsSetup {
     assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 10);
   }
 
-
   protected void testDeviationOverTime(AnalogGyro gyro) {
     // Make sure that the test isn't influenced by any previous motions.
     Timer.delay(0.5);
@@ -122,5 +117,4 @@ public class GyroTest extends AbstractComsSetup {
   private String errorMessage(double difference, double target) {
     return "Gyro angle skewed " + difference + " deg away from target " + target;
   }
-
 }

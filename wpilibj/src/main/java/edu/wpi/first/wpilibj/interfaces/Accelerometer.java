@@ -4,19 +4,20 @@
 
 package edu.wpi.first.wpilibj.interfaces;
 
-/**
- * Interface for 3-axis accelerometers.
- */
+/** Interface for 3-axis accelerometers. */
 public interface Accelerometer {
   enum Range {
-    k2G, k4G, k8G, k16G
+    k2G,
+    k4G,
+    k8G,
+    k16G
   }
 
   /**
    * Common interface for setting the measuring range of an accelerometer.
    *
    * @param range The maximum acceleration, positive or negative, that the accelerometer will
-   *              measure. Not all accelerometers support all ranges.
+   *     measure. Not all accelerometers support all ranges.
    */
   void setRange(Range range);
 

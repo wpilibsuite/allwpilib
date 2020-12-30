@@ -5,14 +5,14 @@
 package edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
- * This is a sample program to demonstrate the use of state-space classes in robot simulation.
- * This robot has a flywheel, elevator, arm and differential drivetrain, and interfaces with
- * the sim GUI's {@link edu.wpi.first.wpilibj.simulation.Field2d} class.
+ * This is a sample program to demonstrate the use of state-space classes in robot simulation. This
+ * robot has a flywheel, elevator, arm and differential drivetrain, and interfaces with the sim
+ * GUI's {@link edu.wpi.first.wpilibj.simulation.Field2d} class.
  */
 public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;

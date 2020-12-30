@@ -4,17 +4,16 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ShuffleboardInstanceTest {
   private NetworkTableInstance m_ntInstance;
@@ -33,32 +32,42 @@ public class ShuffleboardInstanceTest {
 
   @Test
   void testPathFluent() {
-    NetworkTableEntry entry = m_shuffleboardInstance.getTab("Tab Title")
-                                                  .getLayout("Layout Title", "List Layout")
-                                                  .add("Data", "string")
-                                                  .withWidget("Text View")
-                                                  .getEntry();
+    NetworkTableEntry entry =
+        m_shuffleboardInstance
+            .getTab("Tab Title")
+            .getLayout("Layout Title", "List Layout")
+            .add("Data", "string")
+            .withWidget("Text View")
+            .getEntry();
 
     assertAll(
         () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
-        () -> assertEquals("/Shuffleboard/Tab Title/Layout Title/Data", entry.getName(),
-                           "Entry path generated incorrectly"));
+        () ->
+            assertEquals(
+                "/Shuffleboard/Tab Title/Layout Title/Data",
+                entry.getName(),
+                "Entry path generated incorrectly"));
   }
 
   @Test
   void testNestedLayoutsFluent() {
-    NetworkTableEntry entry = m_shuffleboardInstance.getTab("Tab")
-                                                  .getLayout("First", "List")
-                                                  .getLayout("Second", "List")
-                                                  .getLayout("Third", "List")
-                                                  .getLayout("Fourth", "List")
-                                                  .add("Value", "string")
-                                                  .getEntry();
+    NetworkTableEntry entry =
+        m_shuffleboardInstance
+            .getTab("Tab")
+            .getLayout("First", "List")
+            .getLayout("Second", "List")
+            .getLayout("Third", "List")
+            .getLayout("Fourth", "List")
+            .add("Value", "string")
+            .getEntry();
 
     assertAll(
         () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
-        () -> assertEquals("/Shuffleboard/Tab/First/Second/Third/Fourth/Value", entry.getName(),
-                           "Entry path generated incorrectly"));
+        () ->
+            assertEquals(
+                "/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
+                entry.getName(),
+                "Entry path generated incorrectly"));
   }
 
   @Test
@@ -73,26 +82,29 @@ public class ShuffleboardInstanceTest {
 
     assertAll(
         () -> assertEquals("string", entry.getString(null), "Wrong entry value"),
-        () -> assertEquals("/Shuffleboard/Tab/First/Second/Third/Fourth/Value", entry.getName(),
-                           "Entry path generated incorrectly"));
+        () ->
+            assertEquals(
+                "/Shuffleboard/Tab/First/Second/Third/Fourth/Value",
+                entry.getName(),
+                "Entry path generated incorrectly"));
   }
 
   @Test
   void testLayoutTypeIsSet() {
     String layoutType = "Type";
-    m_shuffleboardInstance.getTab("Tab")
-                          .getLayout("Title", layoutType);
+    m_shuffleboardInstance.getTab("Tab").getLayout("Title", layoutType);
     m_shuffleboardInstance.update();
-    NetworkTableEntry entry = m_ntInstance.getEntry(
-        "/Shuffleboard/.metadata/Tab/Title/PreferredComponent");
+    NetworkTableEntry entry =
+        m_ntInstance.getEntry("/Shuffleboard/.metadata/Tab/Title/PreferredComponent");
     assertEquals(layoutType, entry.getString("Not Set"), "Layout type not set");
   }
 
   @Test
   void testNestedActuatorWidgetsAreDisabled() {
-    m_shuffleboardInstance.getTab("Tab")
-                          .getLayout("Title", "Layout")
-                          .add(new MockActuatorSendable("Actuator"));
+    m_shuffleboardInstance
+        .getTab("Tab")
+        .getLayout("Title", "Layout")
+        .add(new MockActuatorSendable("Actuator"));
     NetworkTableEntry controllableEntry =
         m_ntInstance.getEntry("/Shuffleboard/Tab/Title/Actuator/.controllable");
 
@@ -108,5 +120,4 @@ public class ShuffleboardInstanceTest {
     controllable = controllableEntry.getValue().getBoolean();
     assertFalse(controllable, "The nested actuator widget should have been disabled");
   }
-
 }

@@ -22,23 +22,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  * <p>robotInit() -- provide for initialization at robot power-on
  *
- * <p>init() functions -- each of the following functions is called once when the
- * appropriate mode is entered:
- *   - disabledInit()   -- called each and every time disabled is entered from
- *                         another mode
- *   - autonomousInit() -- called each and every time autonomous is entered from
- *                         another mode
- *   - teleopInit()     -- called each and every time teleop is entered from
- *                         another mode
- *   - testInit()       -- called each and every time test is entered from
- *                         another mode
+ * <p>init() functions -- each of the following functions is called once when the appropriate mode
+ * is entered: - disabledInit() -- called each and every time disabled is entered from another mode
+ * - autonomousInit() -- called each and every time autonomous is entered from another mode -
+ * teleopInit() -- called each and every time teleop is entered from another mode - testInit() --
+ * called each and every time test is entered from another mode
  *
- * <p>periodic() functions -- each of these functions is called on an interval:
- *   - robotPeriodic()
- *   - disabledPeriodic()
- *   - autonomousPeriodic()
- *   - teleopPeriodic()
- *   - testPeriodic()
+ * <p>periodic() functions -- each of these functions is called on an interval: - robotPeriodic() -
+ * disabledPeriodic() - autonomousPeriodic() - teleopPeriodic() - testPeriodic()
  */
 public abstract class IterativeRobotBase extends RobotBase {
   protected double m_period;
@@ -65,9 +56,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
   }
 
-  /**
-   * Provide an alternate "main loop" via startCompetition().
-   */
+  /** Provide an alternate "main loop" via startCompetition(). */
   @Override
   public abstract void startCompetition();
 
@@ -90,10 +79,9 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Robot-wide simulation initialization code should go here.
    *
-   * <p>Users should override this method for default Robot-wide simulation
-   * related initialization which will be called when the robot is first
-   * started. It will be called exactly one time after RobotInit is called
-   * only when the robot is in simulation.
+   * <p>Users should override this method for default Robot-wide simulation related initialization
+   * which will be called when the robot is first started. It will be called exactly one time after
+   * RobotInit is called only when the robot is in simulation.
    */
   public void simulationInit() {
     System.out.println("Default simulationInit() method... Override me!");
@@ -144,9 +132,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_rpFirstRun = true;
 
-  /**
-   * Periodic code for all robot modes should go here.
-   */
+  /** Periodic code for all robot modes should go here. */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
       System.out.println("Default robotPeriodic() method... Override me!");
@@ -170,9 +156,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_dpFirstRun = true;
 
-  /**
-   * Periodic code for disabled mode should go here.
-   */
+  /** Periodic code for disabled mode should go here. */
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
       System.out.println("Default disabledPeriodic() method... Override me!");
@@ -182,9 +166,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_apFirstRun = true;
 
-  /**
-   * Periodic code for autonomous mode should go here.
-   */
+  /** Periodic code for autonomous mode should go here. */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
       System.out.println("Default autonomousPeriodic() method... Override me!");
@@ -194,9 +176,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tpFirstRun = true;
 
-  /**
-   * Periodic code for teleop mode should go here.
-   */
+  /** Periodic code for teleop mode should go here. */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
       System.out.println("Default teleopPeriodic() method... Override me!");
@@ -206,9 +186,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tmpFirstRun = true;
 
-  /**
-   * Periodic code for test mode should go here.
-   */
+  /** Periodic code for test mode should go here. */
   @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testPeriodic() {
     if (m_tmpFirstRun) {
@@ -218,8 +196,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /**
-   * Enables or disables flushing NetworkTables every loop iteration.
-   * By default, this is disabled.
+   * Enables or disables flushing NetworkTables every loop iteration. By default, this is disabled.
    *
    * @param enabled True to enable, false to disable
    */

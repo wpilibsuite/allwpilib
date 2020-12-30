@@ -14,9 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
 
-  /**
-   * Constructor.
-   */
+  /** Constructor. */
   public SubsystemBase() {
     String name = this.getClass().getSimpleName();
     name = name.substring(name.lastIndexOf('.') + 1);
@@ -65,8 +63,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
   }
 
   /**
-   * Associates a {@link Sendable} with this Subsystem.
-   * Also update the child's name.
+   * Associates a {@link Sendable} with this Subsystem. Also update the child's name.
    *
    * @param name name to give child
    * @param child sendable
@@ -80,10 +77,14 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
     builder.setSmartDashboardType("Subsystem");
 
     builder.addBooleanProperty(".hasDefault", () -> getDefaultCommand() != null, null);
-    builder.addStringProperty(".default",
-        () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none", null);
+    builder.addStringProperty(
+        ".default",
+        () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none",
+        null);
     builder.addBooleanProperty(".hasCommand", () -> getCurrentCommand() != null, null);
-    builder.addStringProperty(".command",
-        () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none", null);
+    builder.addStringProperty(
+        ".command",
+        () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none",
+        null);
   }
 }

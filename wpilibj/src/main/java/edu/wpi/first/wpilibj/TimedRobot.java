@@ -4,12 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.PriorityQueue;
-
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
+import java.util.PriorityQueue;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.
@@ -28,20 +27,20 @@ public class TimedRobot extends IterativeRobotBase {
     /**
      * Construct a callback container.
      *
-     * @param func             The callback to run.
-     * @param startTimeSeconds The common starting point for all callback
-     *                         scheduling in seconds.
-     * @param periodSeconds    The period at which to run the callback in
-     *                         seconds.
-     * @param offsetSeconds    The offset from the common starting time in
-     *                         seconds.
+     * @param func The callback to run.
+     * @param startTimeSeconds The common starting point for all callback scheduling in seconds.
+     * @param periodSeconds The period at which to run the callback in seconds.
+     * @param offsetSeconds The offset from the common starting time in seconds.
      */
     Callback(Runnable func, double startTimeSeconds, double periodSeconds, double offsetSeconds) {
       this.func = func;
       this.period = periodSeconds;
-      this.expirationTime = startTimeSeconds + offsetSeconds
-        + Math.floor((Timer.getFPGATimestamp() - startTimeSeconds)
-            / this.period) * this.period + this.period;
+      this.expirationTime =
+          startTimeSeconds
+              + offsetSeconds
+              + Math.floor((Timer.getFPGATimestamp() - startTimeSeconds) / this.period)
+                  * this.period
+              + this.period;
     }
 
     @Override
@@ -62,9 +61,7 @@ public class TimedRobot extends IterativeRobotBase {
 
   private final PriorityQueue<Callback> m_callbacks = new PriorityQueue<>();
 
-  /**
-   * Constructor for TimedRobot.
-   */
+  /** Constructor for TimedRobot. */
   protected TimedRobot() {
     this(kDefaultPeriod);
   }
@@ -90,9 +87,7 @@ public class TimedRobot extends IterativeRobotBase {
     NotifierJNI.cleanNotifier(m_notifier);
   }
 
-  /**
-   * Provide an alternate "main loop" via startCompetition().
-   */
+  /** Provide an alternate "main loop" via startCompetition(). */
   @Override
   @SuppressWarnings("UnsafeFinalization")
   public void startCompetition() {
@@ -136,17 +131,13 @@ public class TimedRobot extends IterativeRobotBase {
     }
   }
 
-  /**
-   * Ends the main loop in startCompetition().
-   */
+  /** Ends the main loop in startCompetition(). */
   @Override
   public void endCompetition() {
     NotifierJNI.stopNotifier(m_notifier);
   }
 
-  /**
-   * Get time period between calls to Periodic() functions.
-   */
+  /** Get time period between calls to Periodic() functions. */
   public double getPeriod() {
     return m_period;
   }
@@ -157,7 +148,7 @@ public class TimedRobot extends IterativeRobotBase {
    * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
    * synchronously. Interactions between them are thread-safe.
    *
-   * @param callback      The callback to run.
+   * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
    */
   public void addPeriodic(Runnable callback, double periodSeconds) {
@@ -170,11 +161,10 @@ public class TimedRobot extends IterativeRobotBase {
    * <p>This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback run
    * synchronously. Interactions between them are thread-safe.
    *
-   * @param callback      The callback to run.
+   * @param callback The callback to run.
    * @param periodSeconds The period at which to run the callback in seconds.
-   * @param offsetSeconds The offset from the common starting time in seconds.
-   *                      This is useful for scheduling a callback in a
-   *                      different timeslot relative to TimedRobot.
+   * @param offsetSeconds The offset from the common starting time in seconds. This is useful for
+   *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
   public void addPeriodic(Runnable callback, double periodSeconds, double offsetSeconds) {
     m_callbacks.add(new Callback(callback, m_startTime, periodSeconds, offsetSeconds));

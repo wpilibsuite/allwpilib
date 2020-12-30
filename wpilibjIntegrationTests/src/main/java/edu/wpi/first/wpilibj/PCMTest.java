@@ -4,23 +4,18 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-/**
- * Test that covers the {@link Compressor}.
- */
-
+/** Test that covers the {@link Compressor}. */
 public class PCMTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PCMTest.class.getName());
   /*
@@ -73,9 +68,7 @@ public class PCMTest extends AbstractComsSetup {
     fakePressureSwitch.set(false);
   }
 
-  /**
-   * Test if the compressor turns on and off when the pressure switch is toggled.
-   */
+  /** Test if the compressor turns on and off when the pressure switch is toggled. */
   @Test
   public void testPressureSwitch() throws Exception {
     final double range = 0.5;
@@ -85,19 +78,23 @@ public class PCMTest extends AbstractComsSetup {
     // Turn on the compressor
     fakePressureSwitch.set(true);
     Timer.delay(kCompressorDelayTime);
-    assertEquals("Compressor did not turn on when the pressure switch turned on.",
-        kCompressorOnVoltage, fakeCompressor.getVoltage(), range);
+    assertEquals(
+        "Compressor did not turn on when the pressure switch turned on.",
+        kCompressorOnVoltage,
+        fakeCompressor.getVoltage(),
+        range);
 
     // Turn off the compressor
     fakePressureSwitch.set(false);
     Timer.delay(kCompressorDelayTime);
-    assertEquals("Compressor did not turn off when the pressure switch turned off.",
-        kCompressorOffVoltage, fakeCompressor.getVoltage(), range);
+    assertEquals(
+        "Compressor did not turn off when the pressure switch turned off.",
+        kCompressorOffVoltage,
+        fakeCompressor.getVoltage(),
+        range);
   }
 
-  /**
-   * Test if the correct solenoids turn on and off when they should.
-   */
+  /** Test if the correct solenoids turn on and off when they should. */
   @Test
   public void testSolenoid() throws Exception {
     reset();
@@ -162,22 +159,20 @@ public class PCMTest extends AbstractComsSetup {
     Timer.delay(kSolenoidDelayTime);
     assertFalse("Solenoid #1 did not turn on", fakeSolenoid1.get());
     assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report Forward", solenoid.get() == DoubleSolenoid.Value
-        .kForward);
+    assertTrue(
+        "DoubleSolenoid did not report Forward", solenoid.get() == DoubleSolenoid.Value.kForward);
 
     solenoid.set(DoubleSolenoid.Value.kReverse);
     Timer.delay(kSolenoidDelayTime);
     assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
     assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report Reverse", solenoid.get() == DoubleSolenoid.Value
-        .kReverse);
+    assertTrue(
+        "DoubleSolenoid did not report Reverse", solenoid.get() == DoubleSolenoid.Value.kReverse);
 
     solenoid.close();
   }
 
-  /**
-   * Test if the correct solenoids turn on and off when they should.
-   */
+  /** Test if the correct solenoids turn on and off when they should. */
   @Test
   public void testOneShot() throws Exception {
     reset();

@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import org.junit.jupiter.api.Test;
 
 class Rotation2dTest {
   private static final double kEpsilon = 1E-9;
@@ -20,8 +20,7 @@ class Rotation2dTest {
 
     assertAll(
         () -> assertEquals(one.getDegrees(), 60.0, kEpsilon),
-        () -> assertEquals(two.getDegrees(), 45.0, kEpsilon)
-    );
+        () -> assertEquals(two.getDegrees(), 45.0, kEpsilon));
   }
 
   @Test
@@ -31,8 +30,7 @@ class Rotation2dTest {
 
     assertAll(
         () -> assertEquals(one.getRadians(), Math.PI / 4, kEpsilon),
-        () -> assertEquals(two.getRadians(), Math.PI / 6, kEpsilon)
-    );
+        () -> assertEquals(two.getRadians(), Math.PI / 6, kEpsilon));
   }
 
   @Test
@@ -42,8 +40,7 @@ class Rotation2dTest {
 
     assertAll(
         () -> assertEquals(rotated.getRadians(), Math.PI / 2.0, kEpsilon),
-        () -> assertEquals(rotated.getDegrees(), 90.0, kEpsilon)
-    );
+        () -> assertEquals(rotated.getDegrees(), 90.0, kEpsilon));
   }
 
   @Test

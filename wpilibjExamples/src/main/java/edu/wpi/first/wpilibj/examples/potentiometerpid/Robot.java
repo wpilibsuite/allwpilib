@@ -12,9 +12,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
 
 /**
- * This is a sample program to demonstrate how to use a soft potentiometer and a
- * PID controller to reach and maintain position setpoints on an elevator
- * mechanism.
+ * This is a sample program to demonstrate how to use a soft potentiometer and a PID controller to
+ * reach and maintain position setpoints on an elevator mechanism.
  */
 public class Robot extends TimedRobot {
   private static final int kPotChannel = 1;
@@ -52,8 +51,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Run the PID Controller
-    double pidOut
-        = m_pidController.calculate(m_potentiometer.getAverageVoltage());
+    double pidOut = m_pidController.calculate(m_potentiometer.getAverageVoltage());
     m_elevatorMotor.set(pidOut);
 
     // when the button is pressed once, the selected elevator setpoint

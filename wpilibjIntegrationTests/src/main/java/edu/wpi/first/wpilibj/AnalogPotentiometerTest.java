@@ -4,22 +4,18 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
+import java.util.logging.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-/**
- * Tests the {@link AnalogPotentiometer}.
- */
+/** Tests the {@link AnalogPotentiometer}. */
 public class AnalogPotentiometerTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(AnalogPotentiometerTest.class.getName());
   private AnalogCrossConnectFixture m_analogIO;
@@ -33,7 +29,6 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
     m_analogIO = TestBench.getAnalogCrossConnectFixture();
     m_potSource = new FakePotentiometerSource(m_analogIO.getOutput(), 360);
     m_pot = new AnalogPotentiometer(m_analogIO.getInput(), 360.0, 0);
-
   }
 
   @After
@@ -62,6 +57,4 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
       assertEquals(i, m_pot.get(), DOUBLE_COMPARISON_DELTA);
     }
   }
-
-
 }

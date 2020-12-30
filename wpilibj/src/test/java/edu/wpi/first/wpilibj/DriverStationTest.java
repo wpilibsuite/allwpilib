@@ -4,16 +4,14 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class DriverStationTest {
   @ParameterizedTest
@@ -30,13 +28,12 @@ class DriverStationTest {
 
   static Stream<Arguments> isConnectedProvider() {
     return Stream.of(
-      arguments(0, 0, 0, false),
-      arguments(1, 0, 0, true),
-      arguments(0, 1, 0, true),
-      arguments(0, 0, 1, true),
-      arguments(1, 1, 1, true),
-      arguments(4, 10, 1, true)
-    );
+        arguments(0, 0, 0, false),
+        arguments(1, 0, 0, true),
+        arguments(0, 1, 0, true),
+        arguments(0, 0, 1, true),
+        arguments(1, 1, 1, true),
+        arguments(4, 10, 1, true));
   }
 
   @MethodSource("connectionWarningProvider")
@@ -45,16 +42,14 @@ class DriverStationTest {
     DriverStationSim.notifyNewData();
 
     DriverStation.getInstance().silenceJoystickConnectionWarning(silence);
-    assertEquals(expected,
-        DriverStation.getInstance().isJoystickConnectionWarningSilenced());
+    assertEquals(expected, DriverStation.getInstance().isJoystickConnectionWarningSilenced());
   }
 
   static Stream<Arguments> connectionWarningProvider() {
     return Stream.of(
-      arguments(false, true, true),
-      arguments(false, false, false),
-      arguments(true, true, false),
-      arguments(true, false, false)
-    );
+        arguments(false, true, true),
+        arguments(false, false, false),
+        arguments(true, true, false),
+        arguments(true, false, false));
   }
 }

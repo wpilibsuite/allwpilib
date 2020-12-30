@@ -4,43 +4,32 @@
 
 package edu.wpi.first.networktables;
 
-/**
- * NetworkTables Entry notification.
- */
+/** NetworkTables Entry notification. */
 public final class EntryNotification {
-  /**
-   * Listener that was triggered.
-   */
+  /** Listener that was triggered. */
   @SuppressWarnings("MemberName")
   public final int listener;
 
-  /**
-   * Entry handle.
-   */
+  /** Entry handle. */
   @SuppressWarnings("MemberName")
   public final int entry;
 
-  /**
-   * Entry name.
-   */
+  /** Entry name. */
   @SuppressWarnings("MemberName")
   public final String name;
 
-  /**
-   * The new value.
-   */
+  /** The new value. */
   @SuppressWarnings("MemberName")
   public final NetworkTableValue value;
 
   /**
-   * Update flags.  For example, {@link EntryListenerFlags#kNew} if the key did
-   * not previously exist.
+   * Update flags. For example, {@link EntryListenerFlags#kNew} if the key did not previously exist.
    */
   @SuppressWarnings("MemberName")
   public final int flags;
 
-  /** Constructor.
-   * This should generally only be used internally to NetworkTables.
+  /**
+   * Constructor. This should generally only be used internally to NetworkTables.
    *
    * @param inst Instance
    * @param listener Listener that was triggered
@@ -49,8 +38,13 @@ public final class EntryNotification {
    * @param value The new value
    * @param flags Update flags
    */
-  public EntryNotification(NetworkTableInstance inst, int listener, int entry, String name,
-                           NetworkTableValue value, int flags) {
+  public EntryNotification(
+      NetworkTableInstance inst,
+      int listener,
+      int entry,
+      String name,
+      NetworkTableValue value,
+      int flags) {
     this.m_inst = inst;
     this.listener = listener;
     this.entry = entry;

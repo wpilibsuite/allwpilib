@@ -29,7 +29,7 @@ public abstract class Button extends Trigger {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * {@link Command#start()} will be called repeatedly while the button is held, and will be
+   * <p>{@link Command#start()} will be called repeatedly while the button is held, and will be
    * canceled when the button is released.
    *
    * @param command the command to start

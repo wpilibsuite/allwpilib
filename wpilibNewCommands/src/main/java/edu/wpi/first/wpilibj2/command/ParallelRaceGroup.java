@@ -20,8 +20,8 @@ public class ParallelRaceGroup extends CommandGroupBase {
   private boolean m_finished = true;
 
   /**
-   * Creates a new ParallelCommandRace.  The given commands will be executed simultaneously, and
-   * will "race to the finish" - the first command to finish ends the entire command, with all other
+   * Creates a new ParallelCommandRace. The given commands will be executed simultaneously, and will
+   * "race to the finish" - the first command to finish ends the entire command, with all other
    * commands being interrupted.
    *
    * @param commands the commands to include in this group.
@@ -43,8 +43,8 @@ public class ParallelRaceGroup extends CommandGroupBase {
 
     for (Command command : commands) {
       if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
-        throw new IllegalArgumentException("Multiple commands in a parallel group cannot"
-            + " require the same subsystems");
+        throw new IllegalArgumentException(
+            "Multiple commands in a parallel group cannot" + " require the same subsystems");
       }
       m_commands.add(command);
       m_requirements.addAll(command.getRequirements());

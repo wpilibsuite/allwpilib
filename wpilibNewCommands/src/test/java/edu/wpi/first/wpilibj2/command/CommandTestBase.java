@@ -4,19 +4,15 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Basic setup for all {@link Command tests}."
- */
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+
+/** Basic setup for all {@link Command tests}." */
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class CommandTestBase {
   @BeforeEach
@@ -44,8 +40,7 @@ public abstract class CommandTestBase {
     }
   }
 
-  public class TestSubsystem extends SubsystemBase {
-  }
+  public class TestSubsystem extends SubsystemBase {}
 
   public class MockCommandHolder {
     private final Command m_mockCommand = mock(Command.class);
@@ -63,7 +58,6 @@ public abstract class CommandTestBase {
     public void setFinished(boolean finished) {
       when(m_mockCommand.isFinished()).thenReturn(finished);
     }
-
   }
 
   public class Counter {

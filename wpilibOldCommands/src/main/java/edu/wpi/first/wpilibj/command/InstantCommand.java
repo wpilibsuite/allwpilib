@@ -7,14 +7,13 @@ package edu.wpi.first.wpilibj.command;
 /**
  * This command will execute once, then finish immediately afterward.
  *
- * <p>Subclassing {@link InstantCommand} is shorthand for returning true from
- * {@link Command isFinished}.
+ * <p>Subclassing {@link InstantCommand} is shorthand for returning true from {@link Command
+ * isFinished}.
  */
 public class InstantCommand extends Command {
   private Runnable m_func;
 
-  public InstantCommand() {
-  }
+  public InstantCommand() {}
 
   /**
    * Creates a new {@link InstantCommand InstantCommand} with the given name.
@@ -37,7 +36,7 @@ public class InstantCommand extends Command {
   /**
    * Creates a new {@link InstantCommand InstantCommand} with the given name and requirement.
    *
-   * @param name      the name for this command
+   * @param name the name for this command
    * @param subsystem the subsystem this command requires
    */
   public InstantCommand(String name, Subsystem subsystem) {
@@ -68,7 +67,7 @@ public class InstantCommand extends Command {
    * Creates a new {@link InstantCommand InstantCommand}.
    *
    * @param requirement the subsystem this command requires
-   * @param func        the function to run when {@link Command#initialize() initialize()} is run
+   * @param func the function to run when {@link Command#initialize() initialize()} is run
    */
   public InstantCommand(Subsystem requirement, Runnable func) {
     super(requirement);
@@ -78,9 +77,9 @@ public class InstantCommand extends Command {
   /**
    * Creates a new {@link InstantCommand InstantCommand}.
    *
-   * @param name        the name for this command
+   * @param name the name for this command
    * @param requirement the subsystem this command requires
-   * @param func        the function to run when {@link Command#initialize() initialize()} is run
+   * @param func the function to run when {@link Command#initialize() initialize()} is run
    */
   public InstantCommand(String name, Subsystem requirement, Runnable func) {
     super(name, requirement);

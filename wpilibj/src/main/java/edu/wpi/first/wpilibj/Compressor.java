@@ -26,7 +26,7 @@ public class Compressor implements Sendable, AutoCloseable {
   private byte m_module;
 
   /**
-   * Makes a new instance of the compressor using the provided CAN device ID.  Use this constructor
+   * Makes a new instance of the compressor using the provided CAN device ID. Use this constructor
    * when you have more than one PCM.
    *
    * @param module The PCM CAN device ID (0 - 62 inclusive)
@@ -133,8 +133,7 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * If PCM sticky fault is set : Compressor is disabled due to compressor current being too
-   * high.
+   * If PCM sticky fault is set : Compressor is disabled due to compressor current being too high.
    *
    * @return true if PCM sticky fault is set.
    */
@@ -184,8 +183,8 @@ public class Compressor implements Sendable, AutoCloseable {
    * Clear ALL sticky faults inside PCM that Compressor is wired to.
    *
    * <p>If a sticky fault is set, then it will be persistently cleared. The compressor might
-   * momentarily disable while the flags are being cleared. Doo not call this method too
-   * frequently, otherwise normal compressor functionality may be prevented.
+   * momentarily disable while the flags are being cleared. Doo not call this method too frequently,
+   * otherwise normal compressor functionality may be prevented.
    *
    * <p>If no sticky faults are set then this call will have no effect.
    */
@@ -205,13 +204,16 @@ public class Compressor implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty("Enabled", this::enabled, value -> {
-      if (value) {
-        start();
-      } else {
-        stop();
-      }
-    });
+    builder.addBooleanProperty(
+        "Enabled",
+        this::enabled,
+        value -> {
+          if (value) {
+            start();
+          } else {
+            stop();
+          }
+        });
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
   }
 }

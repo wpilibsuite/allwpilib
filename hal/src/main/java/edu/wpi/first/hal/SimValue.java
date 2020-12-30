@@ -4,9 +4,7 @@
 
 package edu.wpi.first.hal;
 
-/**
- * A wrapper around a simulator value handle.
- */
+/** A wrapper around a simulator value handle. */
 public class SimValue {
   /**
    * Wraps a simulated value handle as returned by SimDeviceJNI.createSimValue().

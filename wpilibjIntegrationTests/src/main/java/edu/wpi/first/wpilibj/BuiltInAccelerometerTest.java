@@ -4,20 +4,18 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.Assert.assertEquals;
+
+import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
-import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class BuiltInAccelerometerTest extends AbstractComsSetup {
@@ -38,13 +36,13 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
     Timer.delay(1.0);
   }
 
-  /**
-   * Test with all valid ranges to make sure unpacking is always done correctly.
-   */
+  /** Test with all valid ranges to make sure unpacking is always done correctly. */
   @Parameters
   public static Collection<Accelerometer.Range[]> generateData() {
-    return Arrays.asList(new Accelerometer.Range[][]{{Accelerometer.Range.k2G},
-        {Accelerometer.Range.k4G}, {Accelerometer.Range.k8G}});
+    return Arrays.asList(
+        new Accelerometer.Range[][] {
+          {Accelerometer.Range.k2G}, {Accelerometer.Range.k4G}, {Accelerometer.Range.k8G}
+        });
   }
 
   @Override
@@ -62,5 +60,4 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
     assertEquals(1.0, m_accelerometer.getY(), kAccelerationTolerance);
     assertEquals(0.0, m_accelerometer.getZ(), kAccelerationTolerance);
   }
-
 }

@@ -10,15 +10,15 @@ public abstract class ImageSource extends VideoSource {
   }
 
   /**
-   * Signal sinks that an error has occurred.  This should be called instead
-   * of NotifyFrame when an error occurs.
+   * Signal sinks that an error has occurred. This should be called instead of NotifyFrame when an
+   * error occurs.
    */
   public void notifyError(String msg) {
     CameraServerJNI.notifySourceError(m_handle, msg);
   }
 
   /**
-   * Set source connection status.  Defaults to true.
+   * Set source connection status. Defaults to true.
    *
    * @param connected True for connected, false for disconnected
    */
@@ -47,22 +47,17 @@ public abstract class ImageSource extends VideoSource {
    * @param value Current value
    * @return Property
    */
-  public VideoProperty createProperty(String name,
-                                      VideoProperty.Kind kind,
-                                      int minimum,
-                                      int maximum,
-                                      int step,
-                                      int defaultValue,
-                                      int value) {
+  public VideoProperty createProperty(
+      String name,
+      VideoProperty.Kind kind,
+      int minimum,
+      int maximum,
+      int step,
+      int defaultValue,
+      int value) {
     return new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle,
-            name,
-            kind.getValue(),
-            minimum,
-            maximum,
-            step,
-            defaultValue,
-            value));
+        CameraServerJNI.createSourceProperty(
+            m_handle, name, kind.getValue(), minimum, maximum, step, defaultValue, value));
   }
 
   /**
@@ -76,14 +71,11 @@ public abstract class ImageSource extends VideoSource {
    * @param value Current value
    * @return Property
    */
-  public VideoProperty createIntegerProperty(String name,
-                                             int minimum,
-                                             int maximum,
-                                             int step,
-                                             int defaultValue,
-                                             int value) {
+  public VideoProperty createIntegerProperty(
+      String name, int minimum, int maximum, int step, int defaultValue, int value) {
     return new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle,
+        CameraServerJNI.createSourceProperty(
+            m_handle,
             name,
             VideoProperty.Kind.kInteger.getValue(),
             minimum,
@@ -103,7 +95,8 @@ public abstract class ImageSource extends VideoSource {
    */
   public VideoProperty createBooleanProperty(String name, boolean defaultValue, boolean value) {
     return new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle,
+        CameraServerJNI.createSourceProperty(
+            m_handle,
             name,
             VideoProperty.Kind.kBoolean.getValue(),
             0,
@@ -121,15 +114,10 @@ public abstract class ImageSource extends VideoSource {
    * @return Property
    */
   public VideoProperty createStringProperty(String name, String value) {
-    VideoProperty prop = new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle,
-            name,
-            VideoProperty.Kind.kString.getValue(),
-            0,
-            0,
-            0,
-            0,
-            0));
+    VideoProperty prop =
+        new VideoProperty(
+            CameraServerJNI.createSourceProperty(
+                m_handle, name, VideoProperty.Kind.kString.getValue(), 0, 0, 0, 0, 0));
     prop.setString(value);
     return prop;
   }

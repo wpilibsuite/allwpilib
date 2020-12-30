@@ -13,9 +13,7 @@ package edu.wpi.first.wpilibj;
  */
 @Deprecated(since = "2020", forRemoval = true)
 public interface Controller {
-  /**
-   * Allows the control loop to run.
-   */
+  /** Allows the control loop to run. */
   void enable();
 
   /**

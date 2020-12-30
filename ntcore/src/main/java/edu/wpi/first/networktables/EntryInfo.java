@@ -4,9 +4,7 @@
 
 package edu.wpi.first.networktables;
 
-/**
- * NetworkTables Entry information.
- */
+/** NetworkTables Entry information. */
 public final class EntryInfo {
   /** Entry handle. */
   @SuppressWarnings("MemberName")
@@ -28,8 +26,8 @@ public final class EntryInfo {
   @SuppressWarnings("MemberName")
   public final long last_change;
 
-  /** Constructor.
-   * This should generally only be used internally to NetworkTables.
+  /**
+   * Constructor. This should generally only be used internally to NetworkTables.
    *
    * @param inst Instance
    * @param entry Entry handle
@@ -38,8 +36,8 @@ public final class EntryInfo {
    * @param flags Flags
    * @param lastChange Timestamp of last change
    */
-  public EntryInfo(NetworkTableInstance inst, int entry, String name, int type, int flags,
-                   long lastChange) {
+  public EntryInfo(
+      NetworkTableInstance inst, int entry, String name, int type, int flags, long lastChange) {
     this.m_inst = inst;
     this.entry = entry;
     this.name = name;

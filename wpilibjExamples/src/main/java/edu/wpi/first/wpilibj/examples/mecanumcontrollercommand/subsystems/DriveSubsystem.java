@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveMotorVoltages;
@@ -15,43 +16,42 @@ import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
-
 public class DriveSubsystem extends SubsystemBase {
   private final PWMVictorSPX m_frontLeft = new PWMVictorSPX(DriveConstants.kFrontLeftMotorPort);
   private final PWMVictorSPX m_rearLeft = new PWMVictorSPX(DriveConstants.kRearLeftMotorPort);
   private final PWMVictorSPX m_frontRight = new PWMVictorSPX(DriveConstants.kFrontRightMotorPort);
   private final PWMVictorSPX m_rearRight = new PWMVictorSPX(DriveConstants.kRearRightMotorPort);
 
-  private final MecanumDrive m_drive = new MecanumDrive(
-      m_frontLeft,
-      m_rearLeft,
-      m_frontRight,
-      m_rearRight);
+  private final MecanumDrive m_drive =
+      new MecanumDrive(m_frontLeft, m_rearLeft, m_frontRight, m_rearRight);
 
   // The front-left-side drive encoder
   private final Encoder m_frontLeftEncoder =
-      new Encoder(DriveConstants.kFrontLeftEncoderPorts[0],
-                  DriveConstants.kFrontLeftEncoderPorts[1],
-                  DriveConstants.kFrontLeftEncoderReversed);
+      new Encoder(
+          DriveConstants.kFrontLeftEncoderPorts[0],
+          DriveConstants.kFrontLeftEncoderPorts[1],
+          DriveConstants.kFrontLeftEncoderReversed);
 
   // The rear-left-side drive encoder
   private final Encoder m_rearLeftEncoder =
-      new Encoder(DriveConstants.kRearLeftEncoderPorts[0],
-                  DriveConstants.kRearLeftEncoderPorts[1],
-                  DriveConstants.kRearLeftEncoderReversed);
+      new Encoder(
+          DriveConstants.kRearLeftEncoderPorts[0],
+          DriveConstants.kRearLeftEncoderPorts[1],
+          DriveConstants.kRearLeftEncoderReversed);
 
   // The front-right--side drive encoder
   private final Encoder m_frontRightEncoder =
-      new Encoder(DriveConstants.kFrontRightEncoderPorts[0],
-                  DriveConstants.kFrontRightEncoderPorts[1],
-                  DriveConstants.kFrontRightEncoderReversed);
+      new Encoder(
+          DriveConstants.kFrontRightEncoderPorts[0],
+          DriveConstants.kFrontRightEncoderPorts[1],
+          DriveConstants.kFrontRightEncoderReversed);
 
   // The rear-right-side drive encoder
   private final Encoder m_rearRightEncoder =
-      new Encoder(DriveConstants.kRearRightEncoderPorts[0],
-                  DriveConstants.kRearRightEncoderPorts[1],
-                  DriveConstants.kRearRightEncoderReversed);
+      new Encoder(
+          DriveConstants.kRearRightEncoderPorts[0],
+          DriveConstants.kRearRightEncoderPorts[1],
+          DriveConstants.kRearRightEncoderReversed);
 
   // The gyro sensor
   private final Gyro m_gyro = new ADXRS450_Gyro();
@@ -60,9 +60,7 @@ public class DriveSubsystem extends SubsystemBase {
   MecanumDriveOdometry m_odometry =
       new MecanumDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
 
-  /**
-   * Creates a new DriveSubsystem.
-   */
+  /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Sets the distance per pulse for the encoders
     m_frontLeftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
@@ -74,12 +72,13 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(m_gyro.getRotation2d(),
-                      new MecanumDriveWheelSpeeds(
-                          m_frontLeftEncoder.getRate(),
-                          m_rearLeftEncoder.getRate(),
-                          m_frontRightEncoder.getRate(),
-                          m_rearRightEncoder.getRate()));
+    m_odometry.update(
+        m_gyro.getRotation2d(),
+        new MecanumDriveWheelSpeeds(
+            m_frontLeftEncoder.getRate(),
+            m_rearLeftEncoder.getRate(),
+            m_frontRightEncoder.getRate(),
+            m_rearRightEncoder.getRate()));
   }
 
   /**
@@ -104,9 +103,9 @@ public class DriveSubsystem extends SubsystemBase {
    * Drives the robot at given x, y and theta speeds. Speeds range from [-1, 1] and the linear
    * speeds have no effect on the angular speed.
    *
-   * @param xSpeed        Speed of the robot in the x direction (forward/backwards).
-   * @param ySpeed        Speed of the robot in the y direction (sideways).
-   * @param rot           Angular rate of the robot.
+   * @param xSpeed Speed of the robot in the x direction (forward/backwards).
+   * @param ySpeed Speed of the robot in the y direction (sideways).
+   * @param rot Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   @SuppressWarnings("ParameterName")
@@ -116,12 +115,9 @@ public class DriveSubsystem extends SubsystemBase {
     } else {
       m_drive.driveCartesian(ySpeed, xSpeed, rot);
     }
-
   }
 
-  /**
-   * Sets the front left drive SpeedController to a voltage.
-   */
+  /** Sets the front left drive SpeedController to a voltage. */
   public void setDriveSpeedControllersVolts(MecanumDriveMotorVoltages volts) {
     m_frontLeft.setVoltage(volts.frontLeftVoltage);
     m_rearLeft.setVoltage(volts.rearLeftVoltage);
@@ -129,10 +125,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setVoltage(volts.rearRightVoltage);
   }
 
-
-  /**
-   * Resets the drive encoders to currently read a position of 0.
-   */
+  /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
     m_frontLeftEncoder.reset();
     m_rearLeftEncoder.reset();
@@ -145,7 +138,6 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the front left drive encoder
    */
-
   public Encoder getFrontLeftEncoder() {
     return m_frontLeftEncoder;
   }
@@ -155,7 +147,6 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the rear left drive encoder
    */
-
   public Encoder getRearLeftEncoder() {
     return m_rearLeftEncoder;
   }
@@ -165,7 +156,6 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the front right drive encoder
    */
-
   public Encoder getFrontRightEncoder() {
     return m_frontRightEncoder;
   }
@@ -175,7 +165,6 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the rear right encoder
    */
-
   public Encoder getRearRightEncoder() {
     return m_rearRightEncoder;
   }
@@ -185,14 +174,13 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the current wheel speeds in a MecanumDriveWheelSpeeds object.
    */
-
   public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
-    return new MecanumDriveWheelSpeeds(m_frontLeftEncoder.getRate(),
-                                       m_rearLeftEncoder.getRate(),
-                                       m_frontRightEncoder.getRate(),
-                                       m_rearRightEncoder.getRate());
+    return new MecanumDriveWheelSpeeds(
+        m_frontLeftEncoder.getRate(),
+        m_rearLeftEncoder.getRate(),
+        m_frontRightEncoder.getRate(),
+        m_rearRightEncoder.getRate());
   }
-
 
   /**
    * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
@@ -203,9 +191,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_drive.setMaxOutput(maxOutput);
   }
 
-  /**
-   * Zeroes the heading of the robot.
-   */
+  /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
   }

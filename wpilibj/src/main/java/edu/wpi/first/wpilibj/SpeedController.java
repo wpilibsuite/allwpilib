@@ -4,9 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-/**
- * Interface for speed controlling devices.
- */
+/** Interface for speed controlling devices. */
 public interface SpeedController extends PIDOutput {
   /**
    * Common interface for setting the speed of a speed controller.
@@ -16,10 +14,10 @@ public interface SpeedController extends PIDOutput {
   void set(double speed);
 
   /**
-   * Sets the voltage output of the SpeedController.  Compensates for the current bus
-   * voltage to ensure that the desired voltage is output even if the battery voltage is below
-   * 12V - highly useful when the voltage outputs are "meaningful" (e.g. they come from a
-   * feedforward calculation).
+   * Sets the voltage output of the SpeedController. Compensates for the current bus voltage to
+   * ensure that the desired voltage is output even if the battery voltage is below 12V - highly
+   * useful when the voltage outputs are "meaningful" (e.g. they come from a feedforward
+   * calculation).
    *
    * <p>NOTE: This function *must* be called regularly in order for voltage compensation to work
    * properly - unlike the ordinary set function, it is not "set it and forget it."
@@ -51,9 +49,7 @@ public interface SpeedController extends PIDOutput {
    */
   boolean getInverted();
 
-  /**
-   * Disable the speed controller.
-   */
+  /** Disable the speed controller. */
   void disable();
 
   /**

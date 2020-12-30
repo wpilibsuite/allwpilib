@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import org.junit.jupiter.api.Test;
-
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.networktables.NetworkTablesJNI;
+import org.junit.jupiter.api.Test;
 
 class JNITest {
   @Test

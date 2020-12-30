@@ -4,9 +4,7 @@
 
 package edu.wpi.first.wpiutil.math;
 
-/**
- * A number expressed as a java class.
- */
+/** A number expressed as a java class. */
 public abstract class Num {
   /**
    * The number this is backing.

@@ -28,9 +28,7 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
     SendableRegistry.addLW(this, "BuiltInAccel", 0);
   }
 
-  /**
-   * Constructor. The accelerometer will measure +/-8 g-forces
-   */
+  /** Constructor. The accelerometer will measure +/-8 g-forces */
   public BuiltInAccelerometer() {
     this(Range.k8G);
   }
@@ -57,7 +55,6 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
       case k16G:
       default:
         throw new IllegalArgumentException(range + " range not supported (use k2G, k4G, or k8G)");
-
     }
 
     AccelerometerJNI.setAccelerometerActive(true);

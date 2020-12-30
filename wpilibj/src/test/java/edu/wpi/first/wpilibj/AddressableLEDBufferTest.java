@@ -4,20 +4,18 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class AddressableLEDBufferTest {
   @ParameterizedTest
@@ -29,8 +27,7 @@ class AddressableLEDBufferTest {
     assertAll(
         () -> assertEquals((byte) r, buffer.m_buffer[2], "R value didn't match"),
         () -> assertEquals((byte) g, buffer.m_buffer[1], "G value didn't match"),
-        () -> assertEquals((byte) b, buffer.m_buffer[0], "B value didn't match")
-    );
+        () -> assertEquals((byte) b, buffer.m_buffer[0], "B value didn't match"));
   }
 
   static Stream<Arguments> hsvToRgbProvider() {
@@ -51,7 +48,7 @@ class AddressableLEDBufferTest {
         arguments(150, 255, 128, 128, 0, 127), // Purple (ish)
         arguments(90, 255, 128, 0, 127, 128), // Teal (ish)
         arguments(120, 255, 128, 0, 0, 128) // Navy
-    );
+        );
   }
 
   @Test

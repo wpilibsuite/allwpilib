@@ -4,13 +4,12 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.AccelerometerJNI;
 import edu.wpi.first.hal.HAL;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 class AccelerometerSimTest {
   static class TriggeredStore {
@@ -26,10 +25,13 @@ class AccelerometerSimTest {
 
     TriggeredStore store = new TriggeredStore();
 
-    try (CallbackStore cb = sim.registerActiveCallback((s, v) -> {
-      store.m_wasTriggered = true;
-      store.m_setValue = v.getBoolean();
-    }, false)) {
+    try (CallbackStore cb =
+        sim.registerActiveCallback(
+            (s, v) -> {
+              store.m_wasTriggered = true;
+              store.m_setValue = v.getBoolean();
+            },
+            false)) {
       assertFalse(store.m_wasTriggered);
       AccelerometerJNI.setAccelerometerActive(true);
       assertTrue(store.m_wasTriggered);

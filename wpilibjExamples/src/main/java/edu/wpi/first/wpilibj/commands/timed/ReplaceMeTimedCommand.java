@@ -6,13 +6,9 @@ package edu.wpi.first.wpilibj.commands.timed;
 
 import edu.wpi.first.wpilibj.command.TimedCommand;
 
-/**
- * Add your docs here.
- */
+/** Add your docs here. */
 public class ReplaceMeTimedCommand extends TimedCommand {
-  /**
-   * Add your docs here.
-   */
+  /** Add your docs here. */
   public ReplaceMeTimedCommand(double timeout) {
     super(timeout);
     // Use requires() here to declare subsystem dependencies
@@ -21,22 +17,18 @@ public class ReplaceMeTimedCommand extends TimedCommand {
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
-  }
+  protected void initialize() {}
 
   // Called repeatedly when this Command is scheduled to run
   @Override
-  protected void execute() {
-  }
+  protected void execute() {}
 
   // Called once after timeout
   @Override
-  protected void end() {
-  }
+  protected void end() {}
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
-  protected void interrupted() {
-  }
+  protected void interrupted() {}
 }

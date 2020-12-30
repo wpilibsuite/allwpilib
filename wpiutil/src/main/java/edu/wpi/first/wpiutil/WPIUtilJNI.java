@@ -26,7 +26,9 @@ public final class WPIUtilJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader = new RuntimeLoader<>("wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
+        loader =
+            new RuntimeLoader<>(
+                "wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
@@ -36,14 +38,14 @@ public final class WPIUtilJNI {
     }
   }
 
-  /**
-   * Force load the library.
-   */
+  /** Force load the library. */
   public static synchronized void forceLoad() throws IOException {
     if (libraryLoaded) {
       return;
     }
-    loader = new RuntimeLoader<>("wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
+    loader =
+        new RuntimeLoader<>(
+            "wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
     loader.loadLibrary();
     libraryLoaded = true;
   }
@@ -51,5 +53,6 @@ public final class WPIUtilJNI {
   public static native long now();
 
   public static native void addPortForwarder(int port, String remoteHost, int remotePort);
+
   public static native void removePortForwarder(int port);
 }

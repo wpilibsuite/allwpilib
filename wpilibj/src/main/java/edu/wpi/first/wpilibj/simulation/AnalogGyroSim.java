@@ -8,9 +8,7 @@ import edu.wpi.first.hal.simulation.AnalogGyroDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AnalogGyro;
 
-/**
- * Class to control a simulated analog gyro.
- */
+/** Class to control a simulated analog gyro. */
 public class AnalogGyroSim {
   private final int m_index;
 
@@ -36,9 +34,11 @@ public class AnalogGyroSim {
     int uid = AnalogGyroDataJNI.registerAngleCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogGyroDataJNI::cancelAngleCallback);
   }
+
   public double getAngle() {
     return AnalogGyroDataJNI.getAngle(m_index);
   }
+
   public void setAngle(double angle) {
     AnalogGyroDataJNI.setAngle(m_index, angle);
   }
@@ -47,9 +47,11 @@ public class AnalogGyroSim {
     int uid = AnalogGyroDataJNI.registerRateCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogGyroDataJNI::cancelRateCallback);
   }
+
   public double getRate() {
     return AnalogGyroDataJNI.getRate(m_index);
   }
+
   public void setRate(double rate) {
     AnalogGyroDataJNI.setRate(m_index, rate);
   }
@@ -58,9 +60,11 @@ public class AnalogGyroSim {
     int uid = AnalogGyroDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogGyroDataJNI::cancelInitializedCallback);
   }
+
   public boolean getInitialized() {
     return AnalogGyroDataJNI.getInitialized(m_index);
   }
+
   public void setInitialized(boolean initialized) {
     AnalogGyroDataJNI.setInitialized(m_index, initialized);
   }

@@ -4,12 +4,6 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
-
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -20,17 +14,19 @@ import edu.wpi.first.wpilibj.spline.Spline;
 import edu.wpi.first.wpilibj.spline.SplineHelper;
 import edu.wpi.first.wpilibj.spline.SplineParameterizer;
 import edu.wpi.first.wpilibj.spline.SplineParameterizer.MalformedSplineException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public final class TrajectoryGenerator {
   private static final Trajectory kDoNothingTrajectory =
       new Trajectory(Arrays.asList(new Trajectory.State()));
   private static BiConsumer<String, StackTraceElement[]> errorFunc;
 
-  /**
-   * Private constructor because this is a utility class.
-   */
-  private TrajectoryGenerator() {
-  }
+  /** Private constructor because this is a utility class. */
+  private TrajectoryGenerator() {}
 
   private static void reportError(String error, StackTraceElement[] stackTrace) {
     if (errorFunc != null) {
@@ -51,22 +47,21 @@ public final class TrajectoryGenerator {
 
   /**
    * Generates a trajectory from the given control vectors and config. This method uses clamped
-   * cubic splines -- a method in which the exterior control vectors and interior waypoints
-   * are provided. The headings are automatically determined at the interior points to
-   * ensure continuous curvature.
+   * cubic splines -- a method in which the exterior control vectors and interior waypoints are
+   * provided. The headings are automatically determined at the interior points to ensure continuous
+   * curvature.
    *
-   * @param initial           The initial control vector.
+   * @param initial The initial control vector.
    * @param interiorWaypoints The interior waypoints.
-   * @param end               The ending control vector.
-   * @param config            The configuration for the trajectory.
+   * @param end The ending control vector.
+   * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
   public static Trajectory generateTrajectory(
       Spline.ControlVector initial,
       List<Translation2d> interiorWaypoints,
       Spline.ControlVector end,
-      TrajectoryConfig config
-  ) {
+      TrajectoryConfig config) {
     final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
 
     // Clone the control vectors.
@@ -84,8 +79,10 @@ public final class TrajectoryGenerator {
     // Get the spline points
     List<PoseWithCurvature> points;
     try {
-      points = splinePointsFromSplines(SplineHelper.getCubicSplinesFromControlVectors(newInitial,
-          interiorWaypoints.toArray(new Translation2d[0]), newEnd));
+      points =
+          splinePointsFromSplines(
+              SplineHelper.getCubicSplinesFromControlVectors(
+                  newInitial, interiorWaypoints.toArray(new Translation2d[0]), newEnd));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
       return kDoNothingTrajectory;
@@ -100,49 +97,50 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(points, config.getConstraints(),
-        config.getStartVelocity(), config.getEndVelocity(), config.getMaxVelocity(),
-        config.getMaxAcceleration(), config.isReversed());
+    return TrajectoryParameterizer.timeParameterizeTrajectory(
+        points,
+        config.getConstraints(),
+        config.getStartVelocity(),
+        config.getEndVelocity(),
+        config.getMaxVelocity(),
+        config.getMaxAcceleration(),
+        config.isReversed());
   }
 
   /**
-   * Generates a trajectory from the given waypoints and config. This method uses clamped
-   * cubic splines -- a method in which the initial pose, final pose, and interior waypoints
-   * are provided.  The headings are automatically determined at the interior points to
-   * ensure continuous curvature.
+   * Generates a trajectory from the given waypoints and config. This method uses clamped cubic
+   * splines -- a method in which the initial pose, final pose, and interior waypoints are provided.
+   * The headings are automatically determined at the interior points to ensure continuous
+   * curvature.
    *
-   * @param start             The starting pose.
+   * @param start The starting pose.
    * @param interiorWaypoints The interior waypoints.
-   * @param end               The ending pose.
-   * @param config            The configuration for the trajectory.
+   * @param end The ending pose.
+   * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
   public static Trajectory generateTrajectory(
-      Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end,
-      TrajectoryConfig config
-  ) {
-    var controlVectors = SplineHelper.getCubicControlVectorsFromWaypoints(
-        start, interiorWaypoints.toArray(new Translation2d[0]), end
-    );
+      Pose2d start, List<Translation2d> interiorWaypoints, Pose2d end, TrajectoryConfig config) {
+    var controlVectors =
+        SplineHelper.getCubicControlVectorsFromWaypoints(
+            start, interiorWaypoints.toArray(new Translation2d[0]), end);
 
     // Return the generated trajectory.
     return generateTrajectory(controlVectors[0], interiorWaypoints, controlVectors[1], config);
   }
 
   /**
-   * Generates a trajectory from the given quintic control vectors and config. This method
-   * uses quintic hermite splines -- therefore, all points must be represented by control
-   * vectors. Continuous curvature is guaranteed in this method.
+   * Generates a trajectory from the given quintic control vectors and config. This method uses
+   * quintic hermite splines -- therefore, all points must be represented by control vectors.
+   * Continuous curvature is guaranteed in this method.
    *
    * @param controlVectors List of quintic control vectors.
-   * @param config         The configuration for the trajectory.
+   * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static Trajectory generateTrajectory(
-      ControlVectorList controlVectors,
-      TrajectoryConfig config
-  ) {
+      ControlVectorList controlVectors, TrajectoryConfig config) {
     final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));
     final var newControlVectors = new ArrayList<Spline.ControlVector>(controlVectors.size());
 
@@ -159,9 +157,10 @@ public final class TrajectoryGenerator {
     // Get the spline points
     List<PoseWithCurvature> points;
     try {
-      points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromControlVectors(
-          newControlVectors.toArray(new Spline.ControlVector[]{})
-      ));
+      points =
+          splinePointsFromSplines(
+              SplineHelper.getQuinticSplinesFromControlVectors(
+                  newControlVectors.toArray(new Spline.ControlVector[] {})));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
       return kDoNothingTrajectory;
@@ -176,19 +175,23 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(points, config.getConstraints(),
-        config.getStartVelocity(), config.getEndVelocity(), config.getMaxVelocity(),
-        config.getMaxAcceleration(), config.isReversed());
-
+    return TrajectoryParameterizer.timeParameterizeTrajectory(
+        points,
+        config.getConstraints(),
+        config.getStartVelocity(),
+        config.getEndVelocity(),
+        config.getMaxVelocity(),
+        config.getMaxAcceleration(),
+        config.isReversed());
   }
 
   /**
-   * Generates a trajectory from the given waypoints and config. This method
-   * uses quintic hermite splines -- therefore, all points must be represented by Pose2d
-   * objects. Continuous curvature is guaranteed in this method.
+   * Generates a trajectory from the given waypoints and config. This method uses quintic hermite
+   * splines -- therefore, all points must be represented by Pose2d objects. Continuous curvature is
+   * guaranteed in this method.
    *
    * @param waypoints List of waypoints..
-   * @param config    The configuration for the trajectory.
+   * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
   @SuppressWarnings("LocalVariableName")
@@ -222,22 +225,25 @@ public final class TrajectoryGenerator {
     }
 
     // Generate and return trajectory.
-    return TrajectoryParameterizer.timeParameterizeTrajectory(points, config.getConstraints(),
-        config.getStartVelocity(), config.getEndVelocity(), config.getMaxVelocity(),
-        config.getMaxAcceleration(), config.isReversed());
+    return TrajectoryParameterizer.timeParameterizeTrajectory(
+        points,
+        config.getConstraints(),
+        config.getStartVelocity(),
+        config.getEndVelocity(),
+        config.getMaxVelocity(),
+        config.getMaxAcceleration(),
+        config.isReversed());
   }
 
   /**
-   * Generate spline points from a vector of splines by parameterizing the
-   * splines.
+   * Generate spline points from a vector of splines by parameterizing the splines.
    *
    * @param splines The splines to parameterize.
    * @return The spline points for use in time parameterization of a trajectory.
    * @throws MalformedSplineException When the spline is malformed (e.g. has close adjacent points
-   *                                  with approximately opposing headings)
+   *     with approximately opposing headings)
    */
-  public static List<PoseWithCurvature> splinePointsFromSplines(
-      Spline[] splines) {
+  public static List<PoseWithCurvature> splinePointsFromSplines(Spline[] splines) {
     // Create the vector of spline points.
     var splinePoints = new ArrayList<PoseWithCurvature>();
 

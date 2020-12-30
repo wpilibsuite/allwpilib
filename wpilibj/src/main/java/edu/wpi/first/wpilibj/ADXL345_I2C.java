@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -17,10 +14,10 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-/**
- * ADXL345 I2C Accelerometer.
- */
+/** ADXL345 I2C Accelerometer. */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
 public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
   private static final byte kAddress = 0x1D;
@@ -44,9 +41,7 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
     kY((byte) 0x02),
     kZ((byte) 0x04);
 
-    /**
-     * The integer value representing this enumeration.
-     */
+    /** The integer value representing this enumeration. */
     @SuppressWarnings("MemberName")
     public final byte value;
 
@@ -73,7 +68,7 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
   /**
    * Constructs the ADXL345 Accelerometer with I2C address 0x1D.
    *
-   * @param port  The I2C port the accelerometer is attached to
+   * @param port The I2C port the accelerometer is attached to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
   public ADXL345_I2C(I2C.Port port, Range range) {
@@ -83,8 +78,8 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
   /**
    * Constructs the ADXL345 Accelerometer over I2C.
    *
-   * @param port          The I2C port the accelerometer is attached to
-   * @param range         The range (+ or -) that the accelerometer will measure.
+   * @param port The I2C port the accelerometer is attached to
+   * @param range The range (+ or -) that the accelerometer will measure.
    * @param deviceAddress I2C address of the accelerometer (0x1D or 0x53)
    */
   public ADXL345_I2C(I2C.Port port, Range range, int deviceAddress) {
@@ -93,8 +88,13 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
     // simulation
     m_simDevice = SimDevice.create("Accel:ADXL345_I2C", port.value, deviceAddress);
     if (m_simDevice != null) {
-      m_simRange = m_simDevice.createEnumDouble("range", SimDevice.Direction.kOutput,
-          new String[] {"2G", "4G", "8G", "16G"}, new double[] {2.0, 4.0, 8.0, 16.0}, 0);
+      m_simRange =
+          m_simDevice.createEnumDouble(
+              "range",
+              SimDevice.Direction.kOutput,
+              new String[] {"2G", "4G", "8G", "16G"},
+              new double[] {2.0, 4.0, 8.0, 16.0},
+              0);
       m_simX = m_simDevice.createDouble("x", SimDevice.Direction.kInput, 0.0);
       m_simY = m_simDevice.createDouble("y", SimDevice.Direction.kInput, 0.0);
       m_simZ = m_simDevice.createDouble("z", SimDevice.Direction.kInput, 0.0);
@@ -220,11 +220,12 @@ public class ADXL345_I2C implements Accelerometer, Sendable, AutoCloseable {
     NetworkTableEntry entryX = builder.getEntry("X");
     NetworkTableEntry entryY = builder.getEntry("Y");
     NetworkTableEntry entryZ = builder.getEntry("Z");
-    builder.setUpdateTable(() -> {
-      AllAxes data = getAccelerations();
-      entryX.setDouble(data.XAxis);
-      entryY.setDouble(data.YAxis);
-      entryZ.setDouble(data.ZAxis);
-    });
+    builder.setUpdateTable(
+        () -> {
+          AllAxes data = getAccelerations();
+          entryX.setDouble(data.XAxis);
+          entryY.setDouble(data.YAxis);
+          entryZ.setDouble(data.ZAxis);
+        });
   }
 }

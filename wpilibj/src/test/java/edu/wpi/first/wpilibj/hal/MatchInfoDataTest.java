@@ -4,15 +4,14 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class MatchInfoDataTest {
   @Test
@@ -29,7 +28,6 @@ class MatchInfoDataTest {
         () -> assertEquals(matchType.ordinal(), outMatchInfo.matchType),
         () -> assertEquals(174, outMatchInfo.matchNumber),
         () -> assertEquals(191, outMatchInfo.replayNumber),
-        () -> assertEquals("Game Message", outMatchInfo.gameSpecificMessage)
-    );
+        () -> assertEquals("Game Message", outMatchInfo.gameSpecificMessage));
   }
 }

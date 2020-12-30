@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpiutil;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,12 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public final class CombinedRuntimeLoader {
-  private CombinedRuntimeLoader() {
-  }
+  private CombinedRuntimeLoader() {}
 
   private static String extractionDirectory;
 
@@ -35,32 +33,34 @@ public final class CombinedRuntimeLoader {
 
   private static String getLoadErrorMessage(String libraryName, UnsatisfiedLinkError ule) {
     StringBuilder msg = new StringBuilder(512);
-    msg.append(libraryName).append(" could not be loaded from path\n"
-        + "\tattempted to load for platform ")
+    msg.append(libraryName)
+        .append(" could not be loaded from path\n" + "\tattempted to load for platform ")
         .append(RuntimeDetector.getPlatformPath())
         .append("\nLast Load Error: \n")
         .append(ule.getMessage())
         .append('\n');
     if (RuntimeDetector.isWindows()) {
-      msg.append("A common cause of this error is missing the C++ runtime.\n"
-          + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
+      msg.append(
+          "A common cause of this error is missing the C++ runtime.\n"
+              + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
     }
     return msg.toString();
   }
 
   /**
    * Extract a list of native libraries.
-   * @param <T>             The class where the resources would be located
-   * @param clazz           The actual class object
-   * @param resourceName    The resource name on the classpath to use for file lookup
-   * @return                List of all libraries that were extracted
-   * @throws IOException    Thrown if resource not found or file could not be extracted
+   *
+   * @param <T> The class where the resources would be located
+   * @param clazz The actual class object
+   * @param resourceName The resource name on the classpath to use for file lookup
+   * @return List of all libraries that were extracted
+   * @throws IOException Thrown if resource not found or file could not be extracted
    */
   @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.UnnecessaryCastRule"})
   public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
-    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-    };
+    TypeReference<HashMap<String, Object>> typeRef =
+        new TypeReference<HashMap<String, Object>>() {};
     ObjectMapper mapper = new ObjectMapper();
     Map<String, Object> map;
     try (var stream = clazz.getResourceAsStream(resourceName)) {
@@ -116,6 +116,7 @@ public final class CombinedRuntimeLoader {
 
   /**
    * Load a single library from a list of extracted files.
+   *
    * @param libraryName The library name to load
    * @param extractedFiles The extracted files to search
    * @throws IOException If library was not found
@@ -150,8 +151,8 @@ public final class CombinedRuntimeLoader {
   /**
    * Load a list of native libraries out of a single directory.
    *
-   * @param <T>             The class where the resources would be located
-   * @param clazz           The actual class object
+   * @param <T> The class where the resources would be located
+   * @param clazz The actual class object
    * @param librariesToLoad List of libraries to load
    * @throws IOException Throws an IOException if not found
    */

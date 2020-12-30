@@ -9,29 +9,33 @@ import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DriverStation;
 
-/**
- * Class to control a simulated driver station.
- */
+/** Class to control a simulated driver station. */
 @SuppressWarnings({"PMD.UseUtilityClass", "PMD.GodClass", "PMD.ExcessivePublicCount"})
 public class DriverStationSim {
-  public static CallbackStore registerEnabledCallback(NotifyCallback callback, boolean initialNotify) {
+  public static CallbackStore registerEnabledCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerEnabledCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelEnabledCallback);
   }
+
   public static boolean getEnabled() {
     return DriverStationDataJNI.getEnabled();
   }
+
   public static void setEnabled(boolean enabled) {
     DriverStationDataJNI.setEnabled(enabled);
   }
 
-  public static CallbackStore registerAutonomousCallback(NotifyCallback callback, boolean initialNotify) {
+  public static CallbackStore registerAutonomousCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerAutonomousCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelAutonomousCallback);
   }
+
   public static boolean getAutonomous() {
     return DriverStationDataJNI.getAutonomous();
   }
+
   public static void setAutonomous(boolean autonomous) {
     DriverStationDataJNI.setAutonomous(autonomous);
   }
@@ -40,50 +44,63 @@ public class DriverStationSim {
     int uid = DriverStationDataJNI.registerTestCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelTestCallback);
   }
+
   public static boolean getTest() {
     return DriverStationDataJNI.getTest();
   }
+
   public static void setTest(boolean test) {
     DriverStationDataJNI.setTest(test);
   }
 
-  public static CallbackStore registerEStopCallback(NotifyCallback callback, boolean initialNotify) {
+  public static CallbackStore registerEStopCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerEStopCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelEStopCallback);
   }
+
   public static boolean getEStop() {
     return DriverStationDataJNI.getEStop();
   }
+
   public static void setEStop(boolean eStop) {
     DriverStationDataJNI.setEStop(eStop);
   }
 
-  public static CallbackStore registerFmsAttachedCallback(NotifyCallback callback, boolean initialNotify) {
+  public static CallbackStore registerFmsAttachedCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerFmsAttachedCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelFmsAttachedCallback);
   }
+
   public static boolean getFmsAttached() {
     return DriverStationDataJNI.getFmsAttached();
   }
+
   public static void setFmsAttached(boolean fmsAttached) {
     DriverStationDataJNI.setFmsAttached(fmsAttached);
   }
 
-  public static CallbackStore registerDsAttachedCallback(NotifyCallback callback, boolean initialNotify) {
+  public static CallbackStore registerDsAttachedCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerDsAttachedCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelDsAttachedCallback);
   }
+
   public static boolean getDsAttached() {
     return DriverStationDataJNI.getDsAttached();
   }
+
   public static void setDsAttached(boolean dsAttached) {
     DriverStationDataJNI.setDsAttached(dsAttached);
   }
 
-  public static CallbackStore registerAllianceStationIdCallback(NotifyCallback callback, boolean initialNotify) {
+  public static CallbackStore registerAllianceStationIdCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerAllianceStationIdCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelAllianceStationIdCallback);
   }
+
   public static AllianceStationID getAllianceStationId() {
     switch (DriverStationDataJNI.getAllianceStationId()) {
       case 0:
@@ -102,6 +119,7 @@ public class DriverStationSim {
         return null;
     }
   }
+
   public static void setAllianceStationId(AllianceStationID allianceStationId) {
     int allianceStation;
     switch (allianceStationId) {
@@ -129,21 +147,21 @@ public class DriverStationSim {
     DriverStationDataJNI.setAllianceStationId(allianceStation);
   }
 
-  public static CallbackStore registerMatchTimeCallback(NotifyCallback callback, boolean initialNotify) {
+  public static CallbackStore registerMatchTimeCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerMatchTimeCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelMatchTimeCallback);
   }
+
   public static double getMatchTime() {
     return DriverStationDataJNI.getMatchTime();
   }
+
   public static void setMatchTime(double matchTime) {
     DriverStationDataJNI.setMatchTime(matchTime);
   }
 
-  /**
-   * Updates DriverStation data so that new values are visible to the user
-   * program.
-   */
+  /** Updates DriverStation data so that new values are visible to the user program. */
   public static void notifyNewData() {
     DriverStationDataJNI.notifyNewData();
     DriverStation.getInstance().waitForData();
@@ -191,7 +209,7 @@ public class DriverStationSim {
   /**
    * Sets the state of one joystick button. Button indexes begin at 1.
    *
-   * @param stick  The joystick number
+   * @param stick The joystick number
    * @param button The button index, beginning at 1
    * @param state The state of the joystick button
    */
@@ -203,7 +221,7 @@ public class DriverStationSim {
    * Gets the value of the axis on a joystick.
    *
    * @param stick The joystick number
-   * @param axis  The analog axis number
+   * @param axis The analog axis number
    * @param value The value of the axis on the joystick
    */
   public static void setJoystickAxis(int stick, int axis, double value) {

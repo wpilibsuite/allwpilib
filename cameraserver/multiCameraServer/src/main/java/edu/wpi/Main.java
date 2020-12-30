@@ -4,49 +4,47 @@
 
 package edu.wpi;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
-   JSON format:
-   {
-       "team": <team number>,
-       "ntmode": <"client" or "server", "client" if unspecified>
-       "cameras": [
-           {
-               "name": <camera name>
-               "path": <path, e.g. "/dev/video0">
-               "pixel format": <"MJPEG", "YUYV", etc>   // optional
-               "width": <video mode width>              // optional
-               "height": <video mode height>            // optional
-               "fps": <video mode fps>                  // optional
-               "brightness": <percentage brightness>    // optional
-               "white balance": <"auto", "hold", value> // optional
-               "exposure": <"auto", "hold", value>      // optional
-               "properties": [                          // optional
-                   {
-                       "name": <property name>
-                       "value": <property value>
-                   }
-               ]
-           }
-       ]
-   }
- */
+  JSON format:
+  {
+      "team": <team number>,
+      "ntmode": <"client" or "server", "client" if unspecified>
+      "cameras": [
+          {
+              "name": <camera name>
+              "path": <path, e.g. "/dev/video0">
+              "pixel format": <"MJPEG", "YUYV", etc>   // optional
+              "width": <video mode width>              // optional
+              "height": <video mode height>            // optional
+              "fps": <video mode fps>                  // optional
+              "brightness": <percentage brightness>    // optional
+              "white balance": <"auto", "hold", value> // optional
+              "exposure": <"auto", "hold", value>      // optional
+              "properties": [                          // optional
+                  {
+                      "name": <property name>
+                      "value": <property value>
+                  }
+              ]
+          }
+      ]
+  }
+*/
 
 public final class Main {
   private static String configFile = "/boot/frc.json";
@@ -62,19 +60,14 @@ public final class Main {
   public static boolean server;
   public static List<CameraConfig> cameras = new ArrayList<>();
 
-  private Main() {
-  }
+  private Main() {}
 
-  /**
-   * Report parse error.
-   */
+  /** Report parse error. */
   public static void parseError(String str) {
     System.err.println("config error in '" + configFile + "': " + str);
   }
 
-  /**
-   * Read single camera configuration.
-   */
+  /** Read single camera configuration. */
   public static boolean readCameraConfig(JsonObject config) {
     CameraConfig cam = new CameraConfig();
 
@@ -100,9 +93,7 @@ public final class Main {
     return true;
   }
 
-  /**
-   * Read configuration file.
-   */
+  /** Read configuration file. */
   @SuppressWarnings("PMD.CyclomaticComplexity")
   public static boolean readConfig() {
     // parse file
@@ -157,22 +148,17 @@ public final class Main {
     return true;
   }
 
-  /**
-   * Start running the camera.
-   */
+  /** Start running the camera. */
   public static void startCamera(CameraConfig config) {
     System.out.println("Starting camera '" + config.name + "' on " + config.path);
-    VideoSource camera = CameraServer.getInstance().startAutomaticCapture(
-        config.name, config.path);
+    VideoSource camera = CameraServer.getInstance().startAutomaticCapture(config.name, config.path);
 
     Gson gson = new GsonBuilder().create();
 
     camera.setConfigJson(gson.toJson(config.config));
   }
 
-  /**
-   * Main.
-   */
+  /** Main. */
   public static void main(String... args) {
     if (args.length > 0) {
       configFile = args[0];
@@ -199,7 +185,7 @@ public final class Main {
     }
 
     // loop forever
-    for (;;) {
+    for (; ; ) {
       try {
         Thread.sleep(10000);
       } catch (InterruptedException ex) {

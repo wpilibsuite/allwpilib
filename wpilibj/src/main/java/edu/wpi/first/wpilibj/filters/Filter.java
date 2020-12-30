@@ -40,9 +40,7 @@ public abstract class Filter implements PIDSource {
    */
   public abstract double get();
 
-  /**
-   * Reset the filter state.
-   */
+  /** Reset the filter state. */
   public abstract void reset();
 
   /**

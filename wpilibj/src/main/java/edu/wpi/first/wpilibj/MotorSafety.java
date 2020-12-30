@@ -8,8 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * This base class runs a watchdog timer and calls the subclass's StopMotor()
- * function if the timeout expires.
+ * This base class runs a watchdog timer and calls the subclass's StopMotor() function if the
+ * timeout expires.
  *
  * <p>The subclass should call feed() whenever the motor value is updated.
  */
@@ -23,9 +23,7 @@ public abstract class MotorSafety {
   private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
   private static final Object m_listMutex = new Object();
 
-  /**
-   * MotorSafety constructor.
-   */
+  /** MotorSafety constructor. */
   public MotorSafety() {
     synchronized (m_listMutex) {
       m_instanceList.add(this);

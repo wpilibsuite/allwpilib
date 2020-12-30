@@ -10,12 +10,11 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
- * This sample program shows how to control a motor using a joystick. In the
- * operator control part of the program, the joystick is read and the value is
- * written to the motor.
+ * This sample program shows how to control a motor using a joystick. In the operator control part
+ * of the program, the joystick is read and the value is written to the motor.
  *
- * <p>Joystick analog values range from -1 to 1 and speed controller inputs also
- * range from -1 to 1 making it easy to work together.
+ * <p>Joystick analog values range from -1 to 1 and speed controller inputs also range from -1 to 1
+ * making it easy to work together.
  */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;

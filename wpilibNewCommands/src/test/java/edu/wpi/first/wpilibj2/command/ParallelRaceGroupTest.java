@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,6 +13,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.Test;
 
 class ParallelRaceGroupTest extends CommandTestBase {
   @Test
@@ -88,7 +88,6 @@ class ParallelRaceGroupTest extends CommandTestBase {
       assertDoesNotThrow(() -> scheduler.cancel(group));
     }
   }
-
 
   @Test
   void parallelRaceRequirementTest() {
@@ -202,5 +201,4 @@ class ParallelRaceGroupTest extends CommandTestBase {
       assertFalse(scheduler.isScheduled(group));
     }
   }
-
 }

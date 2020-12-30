@@ -11,9 +11,7 @@ import edu.wpi.first.wpilibj2.command.PIDCommand;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ReplaceMePIDCommand extends PIDCommand {
-  /**
-   * Creates a new ReplaceMePIDCommand.
-   */
+  /** Creates a new ReplaceMePIDCommand. */
   public ReplaceMePIDCommand() {
     super(
         // The controller that the command will use

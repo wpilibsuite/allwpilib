@@ -8,9 +8,7 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
-/**
- * Class to control a simulated analog encoder.
- */
+/** Class to control a simulated analog encoder. */
 public class AnalogEncoderSim {
   private final SimDouble m_simPosition;
 
@@ -20,7 +18,8 @@ public class AnalogEncoderSim {
    * @param encoder AnalogEncoder to simulate
    */
   public AnalogEncoderSim(AnalogEncoder encoder) {
-    SimDeviceSim wrappedSimDevice = new SimDeviceSim("AnalogEncoder" + "[" + encoder.getChannel() + "]");
+    SimDeviceSim wrappedSimDevice =
+        new SimDeviceSim("AnalogEncoder" + "[" + encoder.getChannel() + "]");
     m_simPosition = wrappedSimDevice.getDouble("Position");
   }
 
@@ -42,16 +41,12 @@ public class AnalogEncoderSim {
     m_simPosition.set(turns);
   }
 
-  /**
-   * Get the simulated position.
-   */
+  /** Get the simulated position. */
   public double getTurns() {
     return m_simPosition.get();
   }
 
-  /**
-   * Get the position as a {@link Rotation2d}.
-   */
+  /** Get the position as a {@link Rotation2d}. */
   public Rotation2d getPosition() {
     return Rotation2d.fromDegrees(getTurns() * 360.0);
   }

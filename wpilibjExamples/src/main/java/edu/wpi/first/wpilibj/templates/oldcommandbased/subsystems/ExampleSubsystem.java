@@ -6,13 +6,10 @@ package edu.wpi.first.wpilibj.templates.oldcommandbased.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
-/**
- * An example subsystem. You can replace with me with your own subsystem.
- */
+/** An example subsystem. You can replace with me with your own subsystem. */
 public class ExampleSubsystem extends Subsystem {
   // Put methods for controlling this subsystem
   // here. Call these from Commands.
-
 
   @Override
   protected void initDefaultCommand() {

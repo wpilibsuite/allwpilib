@@ -4,9 +4,8 @@
 
 package edu.wpi.first.wpiutil.math;
 
-import org.ejml.simple.SimpleMatrix;
-
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * A shape-safe wrapper over Efficient Java Matrix Library (EJML) matrices.
@@ -20,20 +19,19 @@ public class Vector<R extends Num> extends Matrix<R, N1> {
   /**
    * Constructs an empty zero vector of the given dimensions.
    *
-   * @param rows    The number of rows of the vector.
+   * @param rows The number of rows of the vector.
    */
   public Vector(Nat<R> rows) {
     super(rows, Nat.N1());
   }
 
   /**
-   * Constructs a new {@link Vector} with the given storage.
-   * Caller should make sure that the provided generic bounds match
-   * the shape of the provided {@link Vector}.
+   * Constructs a new {@link Vector} with the given storage. Caller should make sure that the
+   * provided generic bounds match the shape of the provided {@link Vector}.
    *
-   * <p>NOTE:It is not recommended to use this constructor unless the
-   * {@link SimpleMatrix} API is absolutely necessary due to the desired
-   * function not being accessible through the {@link Vector} wrapper.
+   * <p>NOTE:It is not recommended to use this constructor unless the {@link SimpleMatrix} API is
+   * absolutely necessary due to the desired function not being accessible through the {@link
+   * Vector} wrapper.
    *
    * @param storage The {@link SimpleMatrix} to back this vector.
    */

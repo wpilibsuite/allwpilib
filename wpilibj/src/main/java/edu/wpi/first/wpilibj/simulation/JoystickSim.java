@@ -6,9 +6,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.wpilibj.Joystick;
 
-/**
- * Class to control a simulated joystick.
- */
+/** Class to control a simulated joystick. */
 public class JoystickSim extends GenericHIDSim {
   private Joystick m_joystick;
 
@@ -53,8 +51,7 @@ public class JoystickSim extends GenericHIDSim {
 
   public void setTwist(double value) {
     setRawAxis(
-        m_joystick != null ? m_joystick.getTwistChannel() : Joystick.kDefaultTwistChannel,
-        value);
+        m_joystick != null ? m_joystick.getTwistChannel() : Joystick.kDefaultTwistChannel, value);
   }
 
   public void setThrottle(double value) {

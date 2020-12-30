@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Utility class for handling Robot drive based on a definition of the motor configuration. The
@@ -18,17 +18,18 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * function (intended for hand created drive code, such as autonomous) or with the Tank/Arcade
  * functions intended to be used for Operator Control driving.
  *
- * @deprecated Use {@link edu.wpi.first.wpilibj.drive.DifferentialDrive}
- *             or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
+ * @deprecated Use {@link edu.wpi.first.wpilibj.drive.DifferentialDrive} or {@link
+ *     edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
  */
 @Deprecated
 @SuppressWarnings("PMD.GodClass")
 public class RobotDrive extends MotorSafety implements AutoCloseable {
-  /**
-   * The location of a motor on the robot for the purpose of driving.
-   */
+  /** The location of a motor on the robot for the purpose of driving. */
   public enum MotorType {
-    kFrontLeft(0), kFrontRight(1), kRearLeft(2), kRearRight(3);
+    kFrontLeft(0),
+    kFrontRight(1),
+    kRearLeft(2),
+    kRearRight(3);
 
     public final int value;
 
@@ -59,7 +60,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * a two wheel drive system where the left and right motor pwm channels are specified in the call.
    * This call assumes Talons for controlling the motors.
    *
-   * @param leftMotorChannel  The PWM channel number that drives the left motor.
+   * @param leftMotorChannel The PWM channel number that drives the left motor.
    * @param rightMotorChannel The PWM channel number that drives the right motor.
    */
   public RobotDrive(final int leftMotorChannel, final int rightMotorChannel) {
@@ -79,13 +80,16 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * a four wheel drive system where all four motor pwm channels are specified in the call. This
    * call assumes Talons for controlling the motors.
    *
-   * @param frontLeftMotor  Front left motor channel number
-   * @param rearLeftMotor   Rear Left motor channel number
+   * @param frontLeftMotor Front left motor channel number
+   * @param rearLeftMotor Rear Left motor channel number
    * @param frontRightMotor Front right motor channel number
-   * @param rearRightMotor  Rear Right motor channel number
+   * @param rearRightMotor Rear Right motor channel number
    */
-  public RobotDrive(final int frontLeftMotor, final int rearLeftMotor, final int frontRightMotor,
-                    final int rearRightMotor) {
+  public RobotDrive(
+      final int frontLeftMotor,
+      final int rearLeftMotor,
+      final int frontRightMotor,
+      final int rearRightMotor) {
     m_sensitivity = kDefaultSensitivity;
     m_maxOutput = kDefaultMaxOutput;
     m_rearLeftMotor = new Talon(rearLeftMotor);
@@ -103,7 +107,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * subclasses of the SpeedController objects, for example, versions with ramping or reshaping of
    * the curve to suit motor bias or dead-band elimination.
    *
-   * @param leftMotor  The left SpeedController object used to drive the robot.
+   * @param leftMotor The left SpeedController object used to drive the robot.
    * @param rightMotor the right SpeedController object used to drive the robot.
    */
   public RobotDrive(SpeedController leftMotor, SpeedController rightMotor) {
@@ -125,13 +129,16 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * Constructor for RobotDrive with 4 motors specified as SpeedController objects. Speed controller
    * input version of RobotDrive (see previous comments).
    *
-   * @param frontLeftMotor  The front left SpeedController object used to drive the robot
-   * @param rearLeftMotor   The back left SpeedController object used to drive the robot.
+   * @param frontLeftMotor The front left SpeedController object used to drive the robot
+   * @param rearLeftMotor The back left SpeedController object used to drive the robot.
    * @param frontRightMotor The front right SpeedController object used to drive the robot.
-   * @param rearRightMotor  The back right SpeedController object used to drive the robot.
+   * @param rearRightMotor The back right SpeedController object used to drive the robot.
    */
-  public RobotDrive(SpeedController frontLeftMotor, SpeedController rearLeftMotor,
-                    SpeedController frontRightMotor, SpeedController rearRightMotor) {
+  public RobotDrive(
+      SpeedController frontLeftMotor,
+      SpeedController rearLeftMotor,
+      SpeedController frontRightMotor,
+      SpeedController rearRightMotor) {
     m_frontLeftMotor = requireNonNullParam(frontLeftMotor, "frontLeftMotor", "RobotDrive");
     m_rearLeftMotor = requireNonNullParam(rearLeftMotor, "rearLeftMotor", "RobotDrive");
     m_frontRightMotor = requireNonNullParam(frontRightMotor, "frontRightMotor", "RobotDrive");
@@ -154,19 +161,20 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * <p>This function will most likely be used in an autonomous routine.
    *
    * @param outputMagnitude The speed setting for the outside wheel in a turn, forward or backwards,
-   *                        +1 to -1.
-   * @param curve           The rate of turn, constant for different forward speeds. Set {@literal
-   *                        curve < 0 for left turn or curve > 0 for right turn.} Set curve =
-   *                        e^(-r/w) to get a turn radius r for wheelbase w of your robot.
-   *                        Conversely, turn radius r = -ln(curve)*w for a given value of curve and
-   *                        wheelbase w.
+   *     +1 to -1.
+   * @param curve The rate of turn, constant for different forward speeds. Set {@literal curve < 0
+   *     for left turn or curve > 0 for right turn.} Set curve = e^(-r/w) to get a turn radius r for
+   *     wheelbase w of your robot. Conversely, turn radius r = -ln(curve)*w for a given value of
+   *     curve and wheelbase w.
    */
   public void drive(double outputMagnitude, double curve) {
     final double leftOutput;
     final double rightOutput;
 
     if (!kArcadeRatioCurve_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_ArcadeRatioCurve,
+      HAL.report(
+          tResourceType.kResourceType_RobotDrive,
+          tInstances.kRobotDrive_ArcadeRatioCurve,
           getNumMotors());
       kArcadeRatioCurve_Reported = true;
     }
@@ -198,7 +206,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * inputs. The Y-axis will be selected from each Joystick object. The calculated values will be
    * squared to decrease sensitivity at low speeds.
    *
-   * @param leftStick  The joystick to control the left side of the robot.
+   * @param leftStick The joystick to control the left side of the robot.
    * @param rightStick The joystick to control the right side of the robot.
    */
   public void tankDrive(GenericHID leftStick, GenericHID rightStick) {
@@ -212,8 +220,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * Provide tank steering using the stored robot configuration. drive the robot using two joystick
    * inputs. The Y-axis will be selected from each Joystick object.
    *
-   * @param leftStick     The joystick to control the left side of the robot.
-   * @param rightStick    The joystick to control the right side of the robot.
+   * @param leftStick The joystick to control the left side of the robot.
+   * @param rightStick The joystick to control the right side of the robot.
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
   public void tankDrive(GenericHID leftStick, GenericHID rightStick, boolean squaredInputs) {
@@ -228,13 +236,13 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * axis to be used on each Joystick object for the left and right sides of the robot. The
    * calculated values will be squared to decrease sensitivity at low speeds.
    *
-   * @param leftStick  The Joystick object to use for the left side of the robot.
-   * @param leftAxis   The axis to select on the left side Joystick object.
+   * @param leftStick The Joystick object to use for the left side of the robot.
+   * @param leftAxis The axis to select on the left side Joystick object.
    * @param rightStick The Joystick object to use for the right side of the robot.
-   * @param rightAxis  The axis to select on the right side Joystick object.
+   * @param rightAxis The axis to select on the right side Joystick object.
    */
-  public void tankDrive(GenericHID leftStick, final int leftAxis, GenericHID rightStick,
-                        final int rightAxis) {
+  public void tankDrive(
+      GenericHID leftStick, final int leftAxis, GenericHID rightStick, final int rightAxis) {
     requireNonNullParam(leftStick, "leftStick", "tankDrive");
     requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
@@ -245,14 +253,18 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * Provide tank steering using the stored robot configuration. This function lets you pick the
    * axis to be used on each Joystick object for the left and right sides of the robot.
    *
-   * @param leftStick     The Joystick object to use for the left side of the robot.
-   * @param leftAxis      The axis to select on the left side Joystick object.
-   * @param rightStick    The Joystick object to use for the right side of the robot.
-   * @param rightAxis     The axis to select on the right side Joystick object.
+   * @param leftStick The Joystick object to use for the left side of the robot.
+   * @param leftAxis The axis to select on the left side Joystick object.
+   * @param rightStick The Joystick object to use for the right side of the robot.
+   * @param rightAxis The axis to select on the right side Joystick object.
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
-  public void tankDrive(GenericHID leftStick, final int leftAxis, GenericHID rightStick,
-                        final int rightAxis, boolean squaredInputs) {
+  public void tankDrive(
+      GenericHID leftStick,
+      final int leftAxis,
+      GenericHID rightStick,
+      final int rightAxis,
+      boolean squaredInputs) {
     requireNonNullParam(leftStick, "leftStick", "tankDrive");
     requireNonNullParam(rightStick, "rightStick", "tankDrive");
 
@@ -263,14 +275,14 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * Provide tank steering using the stored robot configuration. This function lets you directly
    * provide joystick values from any source.
    *
-   * @param leftValue     The value of the left stick.
-   * @param rightValue    The value of the right stick.
+   * @param leftValue The value of the left stick.
+   * @param rightValue The value of the right stick.
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
   public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
     if (!kTank_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_Tank,
-          getNumMotors());
+      HAL.report(
+          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_Tank, getNumMotors());
       kTank_Reported = true;
     }
 
@@ -291,7 +303,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * provide joystick values from any source. The calculated values will be squared to decrease
    * sensitivity at low speeds.
    *
-   * @param leftValue  The value of the left stick.
+   * @param leftValue The value of the left stick.
    * @param rightValue The value of the right stick.
    */
   public void tankDrive(double leftValue, double rightValue) {
@@ -303,9 +315,8 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * axis for the move value and the X axis for the rotate value. (Should add more information here
    * regarding the way that arcade drive works.)
    *
-   * @param stick         The joystick to use for Arcade single-stick driving. The Y-axis will be
-   *                      selected for forwards/backwards and the X-axis will be selected for
-   *                      rotation rate.
+   * @param stick The joystick to use for Arcade single-stick driving. The Y-axis will be selected
+   *     for forwards/backwards and the X-axis will be selected for rotation rate.
    * @param squaredInputs If true, the sensitivity will be decreased for small values
    */
   public void arcadeDrive(GenericHID stick, boolean squaredInputs) {
@@ -320,7 +331,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * sensitivity at low speeds.
    *
    * @param stick The joystick to use for Arcade single-stick driving. The Y-axis will be selected
-   *              for forwards/backwards and the X-axis will be selected for rotation rate.
+   *     for forwards/backwards and the X-axis will be selected for rotation rate.
    */
   public void arcadeDrive(GenericHID stick) {
     arcadeDrive(stick, true);
@@ -330,16 +341,20 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * Arcade drive implements single stick driving. Given two joystick instances and two axis,
    * compute the values to send to either two or four motors.
    *
-   * @param moveStick     The Joystick object that represents the forward/backward direction
-   * @param moveAxis      The axis on the moveStick object to use for forwards/backwards (typically
-   *                      Y_AXIS)
-   * @param rotateStick   The Joystick object that represents the rotation value
-   * @param rotateAxis    The axis on the rotation object to use for the rotate right/left
-   *                      (typically X_AXIS)
+   * @param moveStick The Joystick object that represents the forward/backward direction
+   * @param moveAxis The axis on the moveStick object to use for forwards/backwards (typically
+   *     Y_AXIS)
+   * @param rotateStick The Joystick object that represents the rotation value
+   * @param rotateAxis The axis on the rotation object to use for the rotate right/left (typically
+   *     X_AXIS)
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
-  public void arcadeDrive(GenericHID moveStick, final int moveAxis, GenericHID rotateStick,
-                          final int rotateAxis, boolean squaredInputs) {
+  public void arcadeDrive(
+      GenericHID moveStick,
+      final int moveAxis,
+      GenericHID rotateStick,
+      final int rotateAxis,
+      boolean squaredInputs) {
     double moveValue = moveStick.getRawAxis(moveAxis);
     double rotateValue = rotateStick.getRawAxis(rotateAxis);
 
@@ -348,33 +363,35 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
 
   /**
    * Arcade drive implements single stick driving. Given two joystick instances and two axis,
-   * compute the values to send to either two or four motors. The calculated values will be
-   * squared to decrease sensitivity at low speeds.
+   * compute the values to send to either two or four motors. The calculated values will be squared
+   * to decrease sensitivity at low speeds.
    *
-   * @param moveStick   The Joystick object that represents the forward/backward direction
-   * @param moveAxis    The axis on the moveStick object to use for forwards/backwards (typically
-   *                    Y_AXIS)
+   * @param moveStick The Joystick object that represents the forward/backward direction
+   * @param moveAxis The axis on the moveStick object to use for forwards/backwards (typically
+   *     Y_AXIS)
    * @param rotateStick The Joystick object that represents the rotation value
-   * @param rotateAxis  The axis on the rotation object to use for the rotate right/left (typically
-   *                    X_AXIS)
+   * @param rotateAxis The axis on the rotation object to use for the rotate right/left (typically
+   *     X_AXIS)
    */
-  public void arcadeDrive(GenericHID moveStick, final int moveAxis, GenericHID rotateStick,
-                          final int rotateAxis) {
+  public void arcadeDrive(
+      GenericHID moveStick, final int moveAxis, GenericHID rotateStick, final int rotateAxis) {
     arcadeDrive(moveStick, moveAxis, rotateStick, rotateAxis, true);
   }
 
   /**
-   * Arcade drive implements single stick driving. This function lets you directly provide
-   * joystick values from any source.
+   * Arcade drive implements single stick driving. This function lets you directly provide joystick
+   * values from any source.
    *
-   * @param moveValue     The value to use for forwards/backwards
-   * @param rotateValue   The value to use for the rotate right/left
+   * @param moveValue The value to use for forwards/backwards
+   * @param rotateValue The value to use for the rotate right/left
    * @param squaredInputs If set, decreases the sensitivity at low speeds
    */
   public void arcadeDrive(double moveValue, double rotateValue, boolean squaredInputs) {
     // local variables to hold the computed PWM values for the motors
     if (!kArcadeStandard_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_ArcadeStandard,
+      HAL.report(
+          tResourceType.kResourceType_RobotDrive,
+          tInstances.kRobotDrive_ArcadeStandard,
           getNumMotors());
       kArcadeStandard_Reported = true;
     }
@@ -416,11 +433,11 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
   }
 
   /**
-   * Arcade drive implements single stick driving. This function lets you directly provide
-   * joystick values from any source. The calculated values will be squared to decrease
-   * sensitivity at low speeds.
+   * Arcade drive implements single stick driving. This function lets you directly provide joystick
+   * values from any source. The calculated values will be squared to decrease sensitivity at low
+   * speeds.
    *
-   * @param moveValue   The value to use for forwards/backwards
+   * @param moveValue The value to use for forwards/backwards
    * @param rotateValue The value to use for the rotate right/left
    */
   public void arcadeDrive(double moveValue, double rotateValue) {
@@ -436,17 +453,19 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    *
    * <p>This is designed to be directly driven by joystick axes.
    *
-   * @param x         The speed that the robot should drive in the X direction. [-1.0..1.0]
-   * @param y         The speed that the robot should drive in the Y direction. This input is
-   *                  inverted to match the forward == -1.0 that joysticks produce. [-1.0..1.0]
-   * @param rotation  The rate of rotation for the robot that is completely independent of the
-   *                  translation. [-1.0..1.0]
+   * @param x The speed that the robot should drive in the X direction. [-1.0..1.0]
+   * @param y The speed that the robot should drive in the Y direction. This input is inverted to
+   *     match the forward == -1.0 that joysticks produce. [-1.0..1.0]
+   * @param rotation The rate of rotation for the robot that is completely independent of the
+   *     translation. [-1.0..1.0]
    * @param gyroAngle The current angle reading from the gyro. Use this to implement field-oriented
-   *                  controls.
+   *     controls.
    */
   public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
     if (!kMecanumCartesian_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_MecanumCartesian,
+      HAL.report(
+          tResourceType.kResourceType_RobotDrive,
+          tInstances.kRobotDrive_MecanumCartesian,
           getNumMotors());
       kMecanumCartesian_Reported = true;
     }
@@ -480,14 +499,16 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * top, the roller axles should form an X across the robot.
    *
    * @param magnitude The speed that the robot should drive in a given direction. [-1.0..1.0]
-   * @param direction The angle the robot should drive in degrees. The direction and magnitude
-   *                  are independent of the rotation rate. [-180.0..180.0]
-   * @param rotation  The rate of rotation for the robot that is completely independent of the
-   *                  magnitude or direction. [-1.0..1.0]
+   * @param direction The angle the robot should drive in degrees. The direction and magnitude are
+   *     independent of the rotation rate. [-180.0..180.0]
+   * @param rotation The rate of rotation for the robot that is completely independent of the
+   *     magnitude or direction. [-1.0..1.0]
    */
   public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
     if (!kMecanumPolar_Reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive_MecanumPolar,
+      HAL.report(
+          tResourceType.kResourceType_RobotDrive,
+          tInstances.kRobotDrive_MecanumPolar,
           getNumMotors());
       kMecanumPolar_Reported = true;
     }
@@ -521,9 +542,9 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    *
    * @param magnitude The speed that the robot should drive in a given direction. [-1.0..1.0]
    * @param direction The direction the robot should drive. The direction and maginitude are
-   *                  independent of the rotation rate.
-   * @param rotation  The rate of rotation for the robot that is completely independent of the
-   *                  magnitute or direction. [-1.0..1.0]
+   *     independent of the rotation rate.
+   * @param rotation The rate of rotation for the robot that is completely independent of the
+   *     magnitute or direction. [-1.0..1.0]
    */
   void holonomicDrive(double magnitude, double direction, double rotation) {
     mecanumDrive_Polar(magnitude, direction, rotation);
@@ -531,10 +552,10 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
 
   /**
    * Set the speed of the right and left motors. This is used once an appropriate drive setup
-   * function is called such as twoWheelDrive(). The motors are set to "leftSpeed" and
-   * "rightSpeed" and includes flipping the direction of one side for opposing motors.
+   * function is called such as twoWheelDrive(). The motors are set to "leftSpeed" and "rightSpeed"
+   * and includes flipping the direction of one side for opposing motors.
    *
-   * @param leftOutput  The speed to send to the left side of the robot.
+   * @param leftOutput The speed to send to the left side of the robot.
    * @param rightOutput The speed to send to the right side of the robot.
    */
   public void setLeftRightMotorOutputs(double leftOutput, double rightOutput) {
@@ -552,9 +573,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
     feed();
   }
 
-  /**
-   * Limit motor values to the -1.0 to +1.0 range.
-   */
+  /** Limit motor values to the -1.0 to +1.0 range. */
   protected static double limit(double number) {
     if (number > 1.0) {
       return 1.0;
@@ -565,9 +584,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
     return number;
   }
 
-  /**
-   * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
-   */
+  /** Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0. */
   protected static void normalize(double[] wheelSpeeds) {
     double maxMagnitude = Math.abs(wheelSpeeds[0]);
     for (int i = 1; i < kMaxNumberOfMotors; i++) {
@@ -583,9 +600,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
     }
   }
 
-  /**
-   * Rotate a vector in Cartesian space.
-   */
+  /** Rotate a vector in Cartesian space. */
   protected static double[] rotateVector(double x, double y, double angle) {
     double cosA = Math.cos(angle * (Math.PI / 180.0));
     double sinA = Math.sin(angle * (Math.PI / 180.0));
@@ -600,7 +615,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
    * drive code would normally run it. Motors that are direct drive would be inverted, the drive
    * code assumes that the motors are geared with one reversal.
    *
-   * @param motor      The motor index to invert.
+   * @param motor The motor index to invert.
    * @param isInverted True if the motor should be inverted when operated.
    */
   public void setInvertedMotor(MotorType motor, boolean isInverted) {
@@ -643,9 +658,7 @@ public class RobotDrive extends MotorSafety implements AutoCloseable {
     m_maxOutput = maxOutput;
   }
 
-  /**
-   * Free the speed controllers if they were allocated locally.
-   */
+  /** Free the speed controllers if they were allocated locally. */
   @Override
   public void close() {
     if (m_allocatedSpeedControllers) {

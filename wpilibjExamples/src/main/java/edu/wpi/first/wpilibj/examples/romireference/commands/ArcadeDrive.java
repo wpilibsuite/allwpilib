@@ -4,11 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.romireference.commands;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.function.Supplier;
 
 public class ArcadeDrive extends CommandBase {
   private final Drivetrain m_drivetrain;
@@ -32,8 +30,7 @@ public class ArcadeDrive extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -43,8 +40,7 @@ public class ArcadeDrive extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

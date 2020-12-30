@@ -24,8 +24,7 @@ public class ExampleSmartMotorController implements SpeedController {
    * @param port The port for the controller.
    */
   @SuppressWarnings("PMD.UnusedFormalParameter")
-  public ExampleSmartMotorController(int port) {
-  }
+  public ExampleSmartMotorController(int port) {}
 
   /**
    * Example method for setting the PID gains of the smart controller.
@@ -34,8 +33,7 @@ public class ExampleSmartMotorController implements SpeedController {
    * @param ki The integral gain.
    * @param kd The derivative gain.
    */
-  public void setPID(double kp, double ki, double kd) {
-  }
+  public void setPID(double kp, double ki, double kd) {}
 
   /**
    * Example method for setting the setpoint of the smart controller in PID mode.
@@ -44,16 +42,14 @@ public class ExampleSmartMotorController implements SpeedController {
    * @param setpoint The controller setpoint.
    * @param arbFeedforward An arbitrary feedforward output (from -1 to 1).
    */
-  public void setSetpoint(PIDMode mode, double setpoint, double arbFeedforward) {
-  }
+  public void setSetpoint(PIDMode mode, double setpoint, double arbFeedforward) {}
 
   /**
    * Places this motor controller in follower mode.
    *
    * @param leader The leader to follow.
    */
-  public void follow(ExampleSmartMotorController leader) {
-  }
+  public void follow(ExampleSmartMotorController leader) {}
 
   /**
    * Returns the encoder distance.
@@ -73,15 +69,11 @@ public class ExampleSmartMotorController implements SpeedController {
     return 0;
   }
 
-  /**
-   * Resets the encoder to zero distance.
-   */
-  public void resetEncoder() {
-  }
+  /** Resets the encoder to zero distance. */
+  public void resetEncoder() {}
 
   @Override
-  public void set(double speed) {
-  }
+  public void set(double speed) {}
 
   @Override
   public double get() {
@@ -89,9 +81,7 @@ public class ExampleSmartMotorController implements SpeedController {
   }
 
   @Override
-  public void setInverted(boolean isInverted) {
-
-  }
+  public void setInverted(boolean isInverted) {}
 
   @Override
   public boolean getInverted() {
@@ -99,14 +89,11 @@ public class ExampleSmartMotorController implements SpeedController {
   }
 
   @Override
-  public void disable() {
-  }
+  public void disable() {}
 
   @Override
-  public void stopMotor() {
-  }
+  public void stopMotor() {}
 
   @Override
-  public void pidWrite(double output) {
-  }
+  public void pidWrite(double output) {}
 }

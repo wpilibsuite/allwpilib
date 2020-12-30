@@ -11,10 +11,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
- * This is a sample program demonstrating how to use an ultrasonic sensor and
- * proportional control to maintain a set distance from an object.
+ * This is a sample program demonstrating how to use an ultrasonic sensor and proportional control
+ * to maintain a set distance from an object.
  */
-
 public class Robot extends TimedRobot {
   // distance in inches the robot wants to stay from an object
   private static final double kHoldDistance = 12.0;
@@ -33,13 +32,12 @@ public class Robot extends TimedRobot {
   private final MedianFilter m_filter = new MedianFilter(10);
 
   private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-  private final DifferentialDrive m_robotDrive
-      = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
-          new PWMVictorSPX(kRightMotorPort));
+  private final DifferentialDrive m_robotDrive =
+      new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort), new PWMVictorSPX(kRightMotorPort));
 
   /**
-   * Tells the robot to drive to a set distance (in inches) from an object
-   * using proportional control.
+   * Tells the robot to drive to a set distance (in inches) from an object using proportional
+   * control.
    */
   @Override
   public void teleopPeriodic() {

@@ -4,18 +4,17 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import org.junit.jupiter.api.Test;
+
 class DifferentialDriveOdometryTest {
   private static final double kEpsilon = 1E-9;
-  private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(
-      new Rotation2d());
+  private final DifferentialDriveOdometry m_odometry =
+      new DifferentialDriveOdometry(new Rotation2d());
 
   @Test
   void testOdometryWithEncoderDistances() {
@@ -25,7 +24,6 @@ class DifferentialDriveOdometryTest {
     assertAll(
         () -> assertEquals(pose.getX(), 5.0, kEpsilon),
         () -> assertEquals(pose.getY(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getRotation().getDegrees(), 90.0, kEpsilon)
-    );
+        () -> assertEquals(pose.getRotation().getDegrees(), 90.0, kEpsilon));
   }
 }

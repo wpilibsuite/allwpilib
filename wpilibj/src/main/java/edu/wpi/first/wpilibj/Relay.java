@@ -4,8 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.Arrays;
-import java.util.Optional;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -13,17 +12,17 @@ import edu.wpi.first.hal.RelayJNI;
 import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Class for VEX Robotics Spike style relay outputs. Relays are intended to be connected to Spikes
  * or similar relays. The relay channels controls a pair of channels that are either both off, one
- * on, the other on, or both on. This translates into two Spike outputs at 0v, one at 12v and one
- * at 0v, one at 0v and the other at 12v, or two Spike outputs at 12V. This allows off, full
- * forward, or full reverse control of motors without variable speed. It also allows the two
- * channels (forward and reverse) to be used independently for something that does not care about
- * voltage polarity (like a solenoid).
+ * on, the other on, or both on. This translates into two Spike outputs at 0v, one at 12v and one at
+ * 0v, one at 0v and the other at 12v, or two Spike outputs at 12V. This allows off, full forward,
+ * or full reverse control of motors without variable speed. It also allows the two channels
+ * (forward and reverse) to be used independently for something that does not care about voltage
+ * polarity (like a solenoid).
  */
 public class Relay extends MotorSafety implements Sendable, AutoCloseable {
   /**
@@ -42,9 +41,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
     }
   }
 
-  /**
-   * The state to drive a Relay to.
-   */
+  /** The state to drive a Relay to. */
   public enum Value {
     kOff("Off"),
     kOn("On"),
@@ -66,22 +63,13 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
     }
   }
 
-  /**
-   * The Direction(s) that a relay is configured to operate in.
-   */
+  /** The Direction(s) that a relay is configured to operate in. */
   public enum Direction {
-    /**
-     * direction: both directions are valid.
-     */
-
+    /** direction: both directions are valid. */
     kBoth,
-    /**
-     * direction: Only forward is valid.
-     */
+    /** direction: Only forward is valid. */
     kForward,
-    /**
-     * direction: only reverse is valid.
-     */
+    /** direction: only reverse is valid. */
     kReverse
   }
 
@@ -196,8 +184,8 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
         break;
       case kForward:
         if (m_direction == Direction.kReverse) {
-          throw new InvalidValueException("A relay configured for reverse cannot be set to "
-              + "forward");
+          throw new InvalidValueException(
+              "A relay configured for reverse cannot be set to " + "forward");
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
           RelayJNI.setRelay(m_forwardHandle, true);
@@ -208,8 +196,8 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
         break;
       case kReverse:
         if (m_direction == Direction.kForward) {
-          throw new InvalidValueException("A relay configured for forward cannot be set to "
-              + "reverse");
+          throw new InvalidValueException(
+              "A relay configured for forward cannot be set to " + "reverse");
         }
         if (m_direction == Direction.kBoth) {
           RelayJNI.setRelay(m_forwardHandle, false);
@@ -307,7 +295,9 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("Relay");
     builder.setActuator(true);
     builder.setSafeState(() -> set(Value.kOff));
-    builder.addStringProperty("Value", () -> get().getPrettyValue(),
+    builder.addStringProperty(
+        "Value",
+        () -> get().getPrettyValue(),
         value -> set(Value.getValueOf(value).orElse(Value.kOff)));
   }
 }

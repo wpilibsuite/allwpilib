@@ -13,13 +13,12 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
 
 /**
- * The DriveTrain subsystem controls the robot's chassis and reads in
- * information about it's speed and position.
+ * The DriveTrain subsystem controls the robot's chassis and reads in information about it's speed
+ * and position.
  */
 public class DriveTrain extends Subsystem {
   // Subsystem devices
@@ -27,18 +26,16 @@ public class DriveTrain extends Subsystem {
   private final SpeedController m_frontRightCIM = new Victor(2);
   private final SpeedController m_rearLeftCIM = new Victor(3);
   private final SpeedController m_rearRightCIM = new Victor(4);
-  private final SpeedControllerGroup m_leftCIMs = new SpeedControllerGroup(
-      m_frontLeftCIM, m_rearLeftCIM);
-  private final SpeedControllerGroup m_rightCIMs = new SpeedControllerGroup(
-      m_frontRightCIM, m_rearRightCIM);
+  private final SpeedControllerGroup m_leftCIMs =
+      new SpeedControllerGroup(m_frontLeftCIM, m_rearLeftCIM);
+  private final SpeedControllerGroup m_rightCIMs =
+      new SpeedControllerGroup(m_frontRightCIM, m_rearRightCIM);
   private final DifferentialDrive m_drive;
   private final Encoder m_rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
   private final Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
-  /**
-   * Create a new drive train subsystem.
-   */
+  /** Create a new drive train subsystem. */
   public DriveTrain() {
     // Configure drive motors
     addChild("Front Left CIM", (Victor) m_frontLeftCIM);
@@ -59,10 +56,8 @@ public class DriveTrain extends Subsystem {
       m_leftEncoder.setDistancePerPulse(0.0785398);
     } else {
       // Circumference = diameter in feet * pi. 360 tick simulated encoders.
-      m_rightEncoder.setDistancePerPulse(
-          (4.0/* in */ * Math.PI) / (360.0 * 12.0/* in/ft */));
-      m_leftEncoder.setDistancePerPulse(
-          (4.0/* in */ * Math.PI) / (360.0 * 12.0/* in/ft */));
+      m_rightEncoder.setDistancePerPulse((4.0 /* in */ * Math.PI) / (360.0 * 12.0 /* in/ft */));
+      m_leftEncoder.setDistancePerPulse((4.0 /* in */ * Math.PI) / (360.0 * 12.0 /* in/ft */));
     }
 
     addChild("Right Encoder", m_rightEncoder);
@@ -75,10 +70,7 @@ public class DriveTrain extends Subsystem {
     addChild("Gyro", m_gyro);
   }
 
-  /**
-   * When other commands aren't using the drivetrain, allow tank drive with
-   * the joystick.
-   */
+  /** When other commands aren't using the drivetrain, allow tank drive with the joystick. */
   @Override
   public void initDefaultCommand() {
     setDefaultCommand(new DriveWithJoystick());
@@ -103,32 +95,22 @@ public class DriveTrain extends Subsystem {
     m_drive.tankDrive(leftAxis, rightAxis);
   }
 
-  /**
-   * Stop the drivetrain from moving.
-   */
+  /** Stop the drivetrain from moving. */
   public void stop() {
     m_drive.tankDrive(0, 0);
   }
 
-  /**
-   * The encoder getting the distance and speed of left side of the
-   * drivetrain.
-   */
+  /** The encoder getting the distance and speed of left side of the drivetrain. */
   public Encoder getLeftEncoder() {
     return m_leftEncoder;
   }
 
-  /**
-   * The encoder getting the distance and speed of right side of the
-   * drivetrain.
-   */
+  /** The encoder getting the distance and speed of right side of the drivetrain. */
   public Encoder getRightEncoder() {
     return m_rightEncoder;
   }
 
-  /**
-   * The current angle of the drivetrain as measured by the Gyro.
-   */
+  /** The current angle of the drivetrain as measured by the Gyro. */
   public double getAngle() {
     return m_gyro.getAngle();
   }

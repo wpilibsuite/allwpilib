@@ -4,14 +4,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import edu.wpi.first.hal.DigitalGlitchFilterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Class to enable glitch filtering on a set of digital inputs. This class will manage adding and
@@ -19,9 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * that an input must remain high or low before it is classified as high or low.
  */
 public class DigitalGlitchFilter implements Sendable, AutoCloseable {
-  /**
-   * Configures the Digital Glitch Filter to its default settings.
-   */
+  /** Configures the Digital Glitch Filter to its default settings. */
   public DigitalGlitchFilter() {
     synchronized (m_mutex) {
       int index = 0;
@@ -31,8 +28,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
       if (index != m_filterAllocated.length) {
         m_channelIndex = index;
         m_filterAllocated[index] = true;
-        HAL.report(tResourceType.kResourceType_DigitalGlitchFilter,
-            m_channelIndex + 1, 0);
+        HAL.report(tResourceType.kResourceType_DigitalGlitchFilter, m_channelIndex + 1, 0);
         SendableRegistry.addLW(this, "DigitalGlitchFilter", index);
       }
     }
@@ -59,8 +55,8 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
 
       int selected = DigitalGlitchFilterJNI.getFilterSelect(input.getPortHandleForRouting());
       if (selected != channelIndex) {
-        throw new IllegalStateException("DigitalGlitchFilterJNI.setFilterSelect("
-            + channelIndex + ") failed -> " + selected);
+        throw new IllegalStateException(
+            "DigitalGlitchFilterJNI.setFilterSelect(" + channelIndex + ") failed -> " + selected);
       }
     }
   }
@@ -140,8 +136,7 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
    * @param nanoseconds The number of nanoseconds.
    */
   public void setPeriodNanoSeconds(long nanoseconds) {
-    int fpgaCycles = (int) (nanoseconds * SensorUtil.kSystemClockTicksPerMicrosecond / 4
-        / 1000);
+    int fpgaCycles = (int) (nanoseconds * SensorUtil.kSystemClockTicksPerMicrosecond / 4 / 1000);
     setPeriodCycles(fpgaCycles);
   }
 
@@ -164,14 +159,12 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   public long getPeriodNanoSeconds() {
     int fpgaCycles = getPeriodCycles();
 
-    return (long) fpgaCycles * 1000L
-        / (long) (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
+    return (long) fpgaCycles * 1000L / (long) (SensorUtil.kSystemClockTicksPerMicrosecond / 4);
   }
 
   @Override
   @SuppressWarnings("PMD.UnusedFormalParameter")
-  public void initSendable(SendableBuilder builder) {
-  }
+  public void initSendable(SendableBuilder builder) {}
 
   private int m_channelIndex = -1;
   private static final Lock m_mutex = new ReentrantLock(true);

@@ -5,9 +5,13 @@
 package edu.wpi.first.hal;
 
 public class EncoderJNI extends JNIWrapper {
-  public static native int initializeEncoder(int digitalSourceHandleA, int analogTriggerTypeA,
-                                             int digitalSourceHandleB, int analogTriggerTypeB,
-                                             boolean reverseDirection, int encodingType);
+  public static native int initializeEncoder(
+      int digitalSourceHandleA,
+      int analogTriggerTypeA,
+      int digitalSourceHandleB,
+      int analogTriggerTypeB,
+      boolean reverseDirection,
+      int encodingType);
 
   public static native void freeEncoder(int encoderHandle);
 
@@ -37,16 +41,14 @@ public class EncoderJNI extends JNIWrapper {
 
   public static native void setEncoderDistancePerPulse(int encoderHandle, double distancePerPulse);
 
-  public static native void setEncoderReverseDirection(int encoderHandle,
-                                                       boolean reverseDirection);
+  public static native void setEncoderReverseDirection(int encoderHandle, boolean reverseDirection);
 
-  public static native void setEncoderSamplesToAverage(int encoderHandle,
-                                                       int samplesToAverage);
+  public static native void setEncoderSamplesToAverage(int encoderHandle, int samplesToAverage);
 
   public static native int getEncoderSamplesToAverage(int encoderHandle);
 
-  public static native void setEncoderIndexSource(int encoderHandle, int digitalSourceHandle,
-                                                  int analogTriggerType, int indexingType);
+  public static native void setEncoderIndexSource(
+      int encoderHandle, int digitalSourceHandle, int analogTriggerType, int indexingType);
 
   @SuppressWarnings("AbbreviationAsWordInName")
   public static native int getEncoderFPGAIndex(int encoderHandle);

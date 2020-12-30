@@ -46,7 +46,9 @@ public class Robot extends TimedRobot {
     m_setpoint = profile.calculate(kDt);
 
     // Send setpoint to offboard controller PID
-    m_motor.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition, m_setpoint.position,
-                        m_feedforward.calculate(m_setpoint.velocity) / 12.0);
+    m_motor.setSetpoint(
+        ExampleSmartMotorController.PIDMode.kPosition,
+        m_setpoint.position,
+        m_feedforward.calculate(m_setpoint.velocity) / 12.0);
   }
 }

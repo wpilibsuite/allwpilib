@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * A Shuffleboard widget whose value is provided by user code.
@@ -22,15 +21,16 @@ public final class SuppliedValueWidget<T> extends ShuffleboardWidget<SuppliedVal
   /**
    * Package-private constructor for use by the Shuffleboard API.
    *
-   * @param parent   the parent container for the widget
-   * @param title    the title of the widget
+   * @param parent the parent container for the widget
+   * @param title the title of the widget
    * @param supplier the supplier for values to place in the NetworkTable entry
-   * @param setter   the function for placing values in the NetworkTable entry
+   * @param setter the function for placing values in the NetworkTable entry
    */
-  SuppliedValueWidget(ShuffleboardContainer parent,
-                      String title,
-                      Supplier<T> supplier,
-                      BiConsumer<NetworkTableEntry, T> setter) {
+  SuppliedValueWidget(
+      ShuffleboardContainer parent,
+      String title,
+      Supplier<T> supplier,
+      BiConsumer<NetworkTableEntry, T> setter) {
     super(parent, title);
     this.m_supplier = supplier;
     this.m_setter = setter;

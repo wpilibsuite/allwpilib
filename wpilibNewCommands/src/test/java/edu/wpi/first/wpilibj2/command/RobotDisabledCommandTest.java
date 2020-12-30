@@ -4,13 +4,12 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-
 import static edu.wpi.first.wpilibj2.command.CommandGroupBase.parallel;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 class RobotDisabledCommandTest extends CommandTestBase {
   @Test

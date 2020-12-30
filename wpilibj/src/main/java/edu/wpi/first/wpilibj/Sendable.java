@@ -7,10 +7,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-
-/**
- * The base interface for objects that can be sent over the network through network tables.
- */
+/** The base interface for objects that can be sent over the network through network tables. */
 public interface Sendable {
   /**
    * Gets the name of this {@link Sendable} object.
@@ -50,7 +47,7 @@ public interface Sendable {
    * Sets the name of the sensor with a channel number.
    *
    * @param moduleType A string that defines the module name in the label for the value
-   * @param channel    The channel number the device is plugged into
+   * @param channel The channel number the device is plugged into
    * @deprecated Use SendableRegistry.setName()
    */
   @Deprecated(since = "2020", forRemoval = true)
@@ -61,9 +58,9 @@ public interface Sendable {
   /**
    * Sets the name of the sensor with a module and channel number.
    *
-   * @param moduleType   A string that defines the module name in the label for the value
+   * @param moduleType A string that defines the module name in the label for the value
    * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually PWM)
+   * @param channel The channel number the device is plugged into (usually PWM)
    * @deprecated Use SendableRegistry.setName()
    */
   @Deprecated(since = "2020", forRemoval = true)

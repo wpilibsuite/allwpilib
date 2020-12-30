@@ -9,9 +9,7 @@ import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DutyCycle;
 import java.util.NoSuchElementException;
 
-/**
- * Class to control a simulated duty cycle digital input.
- */
+/** Class to control a simulated duty cycle digital input. */
 public class DutyCycleSim {
   private final int m_index;
 
@@ -44,8 +42,8 @@ public class DutyCycleSim {
   }
 
   /**
-   * Creates a DutyCycleSim for a simulated index.
-   * The index is incremented for each simulated DutyCycle.
+   * Creates a DutyCycleSim for a simulated index. The index is incremented for each simulated
+   * DutyCycle.
    *
    * @param index simulator index
    * @return Simulated object
@@ -58,9 +56,11 @@ public class DutyCycleSim {
     int uid = DutyCycleDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DutyCycleDataJNI::cancelInitializedCallback);
   }
+
   public boolean getInitialized() {
     return DutyCycleDataJNI.getInitialized(m_index);
   }
+
   public void setInitialized(boolean initialized) {
     DutyCycleDataJNI.setInitialized(m_index, initialized);
   }
@@ -69,9 +69,11 @@ public class DutyCycleSim {
     int uid = DutyCycleDataJNI.registerFrequencyCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DutyCycleDataJNI::cancelFrequencyCallback);
   }
+
   public int getFrequency() {
     return DutyCycleDataJNI.getFrequency(m_index);
   }
+
   public void setFrequency(int frequency) {
     DutyCycleDataJNI.setFrequency(m_index, frequency);
   }
@@ -80,9 +82,11 @@ public class DutyCycleSim {
     int uid = DutyCycleDataJNI.registerOutputCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DutyCycleDataJNI::cancelOutputCallback);
   }
+
   public double getOutput() {
     return DutyCycleDataJNI.getOutput(m_index);
   }
+
   public void setOutput(double output) {
     DutyCycleDataJNI.setOutput(m_index, output);
   }

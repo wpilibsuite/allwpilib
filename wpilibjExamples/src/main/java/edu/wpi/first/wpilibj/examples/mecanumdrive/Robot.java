@@ -9,10 +9,7 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
-/**
- * This is a demo program showing how to use Mecanum control with the RobotDrive
- * class.
- */
+/** This is a demo program showing how to use Mecanum control with the RobotDrive class. */
 public class Robot extends TimedRobot {
   private static final int kFrontLeftChannel = 2;
   private static final int kRearLeftChannel = 3;
@@ -45,7 +42,6 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Use the joystick X axis for lateral movement, Y axis for forward
     // movement, and Z axis for rotation.
-    m_robotDrive.driveCartesian(m_stick.getX(), m_stick.getY(),
-        m_stick.getZ(), 0.0);
+    m_robotDrive.driveCartesian(m_stick.getX(), m_stick.getY(), m_stick.getZ(), 0.0);
   }
 }

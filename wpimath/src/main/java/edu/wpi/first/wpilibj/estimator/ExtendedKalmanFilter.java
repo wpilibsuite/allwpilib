@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj.estimator;
 
-import java.util.function.BiFunction;
-
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.wpilibj.math.Discretization;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
@@ -15,6 +13,7 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import java.util.function.BiFunction;
 
 /**
  * Kalman filters combine predictions from a model and measurements to give an estimate of the true
@@ -27,48 +26,50 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  */
 @SuppressWarnings("ClassTypeParameterName")
 public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
-      implements KalmanTypeFilter<States, Inputs, Outputs> {
+    implements KalmanTypeFilter<States, Inputs, Outputs> {
   private final Nat<States> m_states;
   private final Nat<Outputs> m_outputs;
 
   @SuppressWarnings("MemberName")
   private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> m_f;
+
   @SuppressWarnings("MemberName")
   private final BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> m_h;
+
   private final Matrix<States, States> m_contQ;
   private final Matrix<States, States> m_initP;
   private final Matrix<Outputs, Outputs> m_contR;
+
   @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
+
   @SuppressWarnings("MemberName")
   private Matrix<States, States> m_P;
+
   private double m_dtSeconds;
 
   /**
    * Constructs an extended Kalman filter.
    *
-   * @param states             a Nat representing the number of states.
-   * @param inputs             a Nat representing the number of inputs.
-   * @param outputs            a Nat representing the number of outputs.
-   * @param f                  A vector-valued function of x and u that returns
-   *                           the derivative of the state vector.
-   * @param h                  A vector-valued function of x and u that returns
-   *                           the measurement vector.
-   * @param stateStdDevs       Standard deviations of model states.
+   * @param states a Nat representing the number of states.
+   * @param inputs a Nat representing the number of inputs.
+   * @param outputs a Nat representing the number of outputs.
+   * @param f A vector-valued function of x and u that returns the derivative of the state vector.
+   * @param h A vector-valued function of x and u that returns the measurement vector.
+   * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param dtSeconds          Nominal discretization timestep.
+   * @param dtSeconds Nominal discretization timestep.
    */
   @SuppressWarnings("ParameterName")
   public ExtendedKalmanFilter(
-        Nat<States> states,
-        Nat<Inputs> inputs,
-        Nat<Outputs> outputs,
-        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
-        Matrix<States, N1> stateStdDevs,
-        Matrix<Outputs, N1> measurementStdDevs,
-        double dtSeconds
-  ) {
+      Nat<States> states,
+      Nat<Inputs> inputs,
+      Nat<Outputs> outputs,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
+      Matrix<States, N1> stateStdDevs,
+      Matrix<Outputs, N1> measurementStdDevs,
+      double dtSeconds) {
     m_states = states;
     m_outputs = outputs;
 
@@ -81,10 +82,12 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     reset();
 
-    final var contA = NumericalJacobian
-          .numericalJacobianX(states, states, f, m_xHat, new Matrix<>(inputs, Nat.N1()));
-    final var C = NumericalJacobian
-          .numericalJacobianX(outputs, states, h, m_xHat, new Matrix<>(inputs, Nat.N1()));
+    final var contA =
+        NumericalJacobian.numericalJacobianX(
+            states, states, f, m_xHat, new Matrix<>(inputs, Nat.N1()));
+    final var C =
+        NumericalJacobian.numericalJacobianX(
+            outputs, states, h, m_xHat, new Matrix<>(inputs, Nat.N1()));
 
     final var discPair = Discretization.discretizeAQTaylor(contA, m_contQ, dtSeconds);
     final var discA = discPair.getFirst();
@@ -95,8 +98,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     // IsStabilizable(A^T, C^T) will tell us if the system is observable.
     boolean isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
     if (isObservable && outputs.getNum() <= states.getNum()) {
-      m_initP = Drake.discreteAlgebraicRiccatiEquation(
-            discA.transpose(), C.transpose(), discQ, discR) ;
+      m_initP =
+          Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR);
     } else {
       m_initP = new Matrix<>(states, states);
     }
@@ -168,11 +171,10 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     m_xHat = xHat;
   }
 
-
   /**
    * Set an element of the initial state estimate x-hat.
    *
-   * @param row   Row of x-hat.
+   * @param row Row of x-hat.
    * @param value Value for element of x-hat.
    */
   @Override
@@ -189,7 +191,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
   /**
    * Project the model into the future with a new control input u.
    *
-   * @param u         New control input from controller.
+   * @param u New control input from controller.
    * @param dtSeconds Timestep for prediction.
    */
   @SuppressWarnings("ParameterName")
@@ -201,16 +203,15 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
   /**
    * Project the model into the future with a new control input u.
    *
-   * @param u         New control input from controller.
-   * @param f         The function used to linearlize the model.
+   * @param u New control input from controller.
+   * @param f The function used to linearlize the model.
    * @param dtSeconds Timestep for prediction.
    */
   @SuppressWarnings("ParameterName")
   public void predict(
-      Matrix<Inputs, N1> u, BiFunction<Matrix<States, N1>,
-        Matrix<Inputs, N1>, Matrix<States, N1>> f,
-      double dtSeconds
-  ) {
+      Matrix<Inputs, N1> u,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      double dtSeconds) {
     // Find continuous A
     final var contA = NumericalJacobian.numericalJacobianX(m_states, m_states, f, m_xHat, u);
 
@@ -239,25 +240,24 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
-   * <p>This is useful for when the measurements available during a timestep's
-   * Correct() call vary. The h(x, u) passed to the constructor is used if one is
-   * not provided (the two-argument version of this function).
+   * <p>This is useful for when the measurements available during a timestep's Correct() call vary.
+   * The h(x, u) passed to the constructor is used if one is not provided (the two-argument version
+   * of this function).
    *
-   * @param <Rows>  Number of rows in the result of f(x, u).
+   * @param <Rows> Number of rows in the result of f(x, u).
    * @param rows Number of rows in the result of f(x, u).
-   * @param u    Same control input used in the predict step.
-   * @param y    Measurement vector.
-   * @param h    A vector-valued function of x and u that returns the measurement
-   *             vector.
-   * @param R    Discrete measurement noise covariance matrix.
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param h A vector-valued function of x and u that returns the measurement vector.
+   * @param R Discrete measurement noise covariance matrix.
    */
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public <Rows extends Num> void correct(
-        Nat<Rows> rows, Matrix<Inputs, N1> u,
-        Matrix<Rows, N1> y,
-        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Rows, N1>> h,
-        Matrix<Rows, Rows> R
-  ) {
+      Nat<Rows> rows,
+      Matrix<Inputs, N1> u,
+      Matrix<Rows, N1> y,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Rows, N1>> h,
+      Matrix<Rows, Rows> R) {
     final var C = NumericalJacobian.numericalJacobianX(rows, m_states, h, m_xHat, u);
     final var discR = Discretization.discretizeR(R, m_dtSeconds);
 

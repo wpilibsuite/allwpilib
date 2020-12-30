@@ -4,26 +4,23 @@
 
 package edu.wpi.first.wpilibj.kinematics;
 
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import org.junit.jupiter.api.Test;
 
 class ChassisSpeedsTest {
   private static final double kEpsilon = 1E-9;
 
   @Test
   void testFieldRelativeConstruction() {
-    final var chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        1.0, 0.0, 0.5, Rotation2d.fromDegrees(-90.0)
-    );
+    final var chassisSpeeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(1.0, 0.0, 0.5, Rotation2d.fromDegrees(-90.0));
 
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(1.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.5, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 }

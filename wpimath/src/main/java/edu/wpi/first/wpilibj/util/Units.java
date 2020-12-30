@@ -4,17 +4,13 @@
 
 package edu.wpi.first.wpilibj.util;
 
-/**
- * Utility class that converts between commonly used units in FRC.
- */
+/** Utility class that converts between commonly used units in FRC. */
 public final class Units {
   private static final double kInchesPerFoot = 12.0;
   private static final double kMetersPerInch = 0.0254;
   private static final double kSecondsPerMinute = 60;
 
-  /**
-   * Utility class, so constructor is private.
-   */
+  /** Utility class, so constructor is private. */
   private Units() {
     throw new UnsupportedOperationException("This is a utility class!");
   }

@@ -4,17 +4,13 @@
 
 package edu.wpi.first.wpilibj.geometry;
 
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 
-/**
- * A rotation in a 2d coordinate frame represented a point on the unit circle
- * (cosine and sine).
- */
+/** A rotation in a 2d coordinate frame represented a point on the unit circle (cosine and sine). */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d {
@@ -22,9 +18,7 @@ public class Rotation2d {
   private final double m_cos;
   private final double m_sin;
 
-  /**
-   * Constructs a Rotation2d with a default angle of 0 degrees.
-   */
+  /** Constructs a Rotation2d with a default angle of 0 degrees. */
   public Rotation2d() {
     m_value = 0.0;
     m_cos = 1.0;
@@ -32,8 +26,7 @@ public class Rotation2d {
   }
 
   /**
-   * Constructs a Rotation2d with the given radian value.
-   * The x and y don't have to be normalized.
+   * Constructs a Rotation2d with the given radian value. The x and y don't have to be normalized.
    *
    * @param value The value of the angle in radians.
    */
@@ -45,8 +38,7 @@ public class Rotation2d {
   }
 
   /**
-   * Constructs a Rotation2d with the given x and y (cosine and sine)
-   * components.
+   * Constructs a Rotation2d with the given x and y (cosine and sine) components.
    *
    * @param x The x component or cosine of the rotation.
    * @param y The y component or sine of the rotation.
@@ -74,11 +66,9 @@ public class Rotation2d {
   }
 
   /**
-   * Adds two rotations together, with the result being bounded between -pi and
-   * pi.
+   * Adds two rotations together, with the result being bounded between -pi and pi.
    *
-   * <p>For example, Rotation2d.fromDegrees(30) + Rotation2d.fromDegrees(60) =
-   * Rotation2d{-pi/2}
+   * <p>For example, Rotation2d.fromDegrees(30) + Rotation2d.fromDegrees(60) = Rotation2d{-pi/2}
    *
    * @param other The rotation to add.
    * @return The sum of the two rotations.
@@ -88,11 +78,9 @@ public class Rotation2d {
   }
 
   /**
-   * Subtracts the new rotation from the current rotation and returns the new
-   * rotation.
+   * Subtracts the new rotation from the current rotation and returns the new rotation.
    *
-   * <p>For example, Rotation2d.fromDegrees(10) - Rotation2d.fromDegrees(100) =
-   * Rotation2d{-pi/2}
+   * <p>For example, Rotation2d.fromDegrees(10) - Rotation2d.fromDegrees(100) = Rotation2d{-pi/2}
    *
    * @param other The rotation to subtract.
    * @return The difference between the two rotations.
@@ -102,8 +90,8 @@ public class Rotation2d {
   }
 
   /**
-   * Takes the inverse of the current rotation. This is simply the negative of
-   * the current angular value.
+   * Takes the inverse of the current rotation. This is simply the negative of the current angular
+   * value.
    *
    * @return The inverse of the current rotation.
    */
@@ -124,19 +112,15 @@ public class Rotation2d {
   /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
-   * <p>The matrix multiplication is as follows:
-   * [cos_new]   [other.cos, -other.sin][cos]
-   * [sin_new] = [other.sin,  other.cos][sin]
-   * value_new = atan2(cos_new, sin_new)
+   * <p>The matrix multiplication is as follows: [cos_new] [other.cos, -other.sin][cos] [sin_new] =
+   * [other.sin, other.cos][sin] value_new = atan2(cos_new, sin_new)
    *
    * @param other The rotation to rotate by.
    * @return The new rotated Rotation2d.
    */
   public Rotation2d rotateBy(Rotation2d other) {
     return new Rotation2d(
-        m_cos * other.m_cos - m_sin * other.m_sin,
-        m_cos * other.m_sin + m_sin * other.m_cos
-    );
+        m_cos * other.m_cos - m_sin * other.m_sin, m_cos * other.m_sin + m_sin * other.m_cos);
   }
 
   /**

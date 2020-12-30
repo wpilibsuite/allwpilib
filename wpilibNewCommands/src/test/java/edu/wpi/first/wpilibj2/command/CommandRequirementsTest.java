@@ -4,12 +4,12 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.Test;
 
 class CommandRequirementsTest extends CommandTestBase {
   @Test
@@ -63,13 +63,12 @@ class CommandRequirementsTest extends CommandTestBase {
       Subsystem system = new TestSubsystem();
 
       Command missingRequirement = new WaitUntilCommand(() -> false);
-      Command ends = new InstantCommand(() -> {
-      }, system);
+      Command ends = new InstantCommand(() -> {}, system);
 
-      assertThrows(IllegalArgumentException.class,
+      assertThrows(
+          IllegalArgumentException.class,
           () -> scheduler.setDefaultCommand(system, missingRequirement));
-      assertThrows(IllegalArgumentException.class,
-          () -> scheduler.setDefaultCommand(system, ends));
+      assertThrows(IllegalArgumentException.class, () -> scheduler.setDefaultCommand(system, ends));
     }
   }
 }

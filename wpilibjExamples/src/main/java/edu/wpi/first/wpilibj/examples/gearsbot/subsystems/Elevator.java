@@ -7,10 +7,9 @@ package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
-
-import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in it's current state PID
@@ -25,9 +24,7 @@ public class Elevator extends PIDSubsystem {
   private static final double kP_simulation = 18;
   private static final double kI_simulation = 0.2;
 
-  /**
-   * Create a new elevator subsystem.
-   */
+  /** Create a new elevator subsystem. */
   public Elevator() {
     super(new PIDController(kP_real, kI_real, 0));
     if (Robot.isSimulation()) { // Check for simulation and update PID values
@@ -50,9 +47,7 @@ public class Elevator extends PIDSubsystem {
     addChild("Pot", m_pot);
   }
 
-  /**
-   * The log method puts interesting information to the SmartDashboard.
-   */
+  /** The log method puts interesting information to the SmartDashboard. */
   public void log() {
     SmartDashboard.putData("Elevator Pot", m_pot);
   }
@@ -65,17 +60,13 @@ public class Elevator extends PIDSubsystem {
     return m_pot.get();
   }
 
-  /**
-   * Use the motor as the PID output. This method is automatically called by the subsystem.
-   */
+  /** Use the motor as the PID output. This method is automatically called by the subsystem. */
   @Override
   public void useOutput(double output, double setpoint) {
     m_motor.set(output);
   }
 
-  /**
-   * Call log method every loop.
-   */
+  /** Call log method every loop. */
   @Override
   public void periodic() {
     log();

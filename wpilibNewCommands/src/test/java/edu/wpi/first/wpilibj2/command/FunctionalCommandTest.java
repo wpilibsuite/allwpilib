@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 class FunctionalCommandTest extends CommandTestBase {
   @Test
@@ -19,8 +19,11 @@ class FunctionalCommandTest extends CommandTestBase {
       ConditionHolder cond4 = new ConditionHolder();
 
       FunctionalCommand command =
-          new FunctionalCommand(() -> cond1.setCondition(true), () -> cond2.setCondition(true),
-              interrupted -> cond3.setCondition(true), cond4::getCondition);
+          new FunctionalCommand(
+              () -> cond1.setCondition(true),
+              () -> cond2.setCondition(true),
+              interrupted -> cond3.setCondition(true),
+              cond4::getCondition);
 
       scheduler.schedule(command);
       scheduler.run();

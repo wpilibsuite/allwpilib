@@ -4,17 +4,15 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
+import static org.junit.Assert.assertTrue;
 
+import edu.wpi.first.wpilibj.fixtures.SampleFixture;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import edu.wpi.first.wpilibj.fixtures.SampleFixture;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Sample test for a sample PID controller. This demonstrates the general pattern of how to create a
@@ -59,5 +57,4 @@ public class SampleTest extends AbstractComsSetup {
     Timer.delay(0.5);
     assertTrue(true);
   }
-
 }

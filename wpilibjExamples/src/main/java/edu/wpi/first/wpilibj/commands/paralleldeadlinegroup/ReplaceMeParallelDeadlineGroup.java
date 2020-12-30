@@ -11,9 +11,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ReplaceMeParallelDeadlineGroup extends ParallelDeadlineGroup {
-  /**
-   * Creates a new ReplaceMeParallelDeadlineGroup.
-   */
+  /** Creates a new ReplaceMeParallelDeadlineGroup. */
   public ReplaceMeParallelDeadlineGroup() {
     // Add the deadline command in the super() call. Add other commands using
     // addCommands().

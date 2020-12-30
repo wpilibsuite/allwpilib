@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.test;
 
+import edu.wpi.first.wpilibj.WpiLibJTestSuite;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,18 +14,14 @@ import java.util.Objects;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
+import junit.framework.JUnit4TestAdapter;
+import junit.runner.Version;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.Failure;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-import junit.framework.JUnit4TestAdapter;
-import junit.runner.Version;
-
-import edu.wpi.first.wpilibj.WpiLibJTestSuite;
 
 /**
  * The WPILibJ Integeration Test Suite collects all of the tests to be run by junit. In order for a
@@ -50,9 +47,8 @@ public class TestSuite extends AbstractTestSuite {
   }
 
   private static final Logger WPILIBJ_ROOT_LOGGER = Logger.getLogger("edu.wpi.first.wpilibj");
-  private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER = Logger
-      .getLogger("edu.wpi.first.wpilibj.command");
-
+  private static final Logger WPILIBJ_COMMAND_ROOT_LOGGER =
+      Logger.getLogger("edu.wpi.first.wpilibj.command");
 
   private static final Class<?> QUICK_TEST = QuickTest.class;
   private static final String QUICK_TEST_FLAG = "--quick";
@@ -63,9 +59,7 @@ public class TestSuite extends AbstractTestSuite {
 
   private static TestSuite instance = null;
 
-  /**
-   * Get the singleton instance of the test suite.
-   */
+  /** Get the singleton instance of the test suite. */
   public static TestSuite getInstance() {
     if (instance == null) {
       instance = new TestSuite();
@@ -73,32 +67,41 @@ public class TestSuite extends AbstractTestSuite {
     return instance;
   }
 
-  /**
-   * This has to be public so that the JUnit4.
-   */
-  public TestSuite() {
-  }
+  /** This has to be public so that the JUnit4. */
+  public TestSuite() {}
 
-  /**
-   * Displays a help message for the user when they use the --help flag at runtime.
-   */
+  /** Displays a help message for the user when they use the --help flag at runtime. */
   protected static void displayHelp() {
     StringBuilder helpMessage = new StringBuilder("Test Parameters help: \n");
-    helpMessage.append("\t" + QUICK_TEST_FLAG
-        + " will cause the quick test to be run. Ignores other flags except for "
-        + METHOD_REPEAT_FILTER + "\n");
-    helpMessage.append("\t" + CLASS_NAME_FILTER
-        + " will use the supplied regex text to search for suite/test class names "
-        + "matching the regex and run them.\n");
-    helpMessage.append("\t" + METHOD_NAME_FILTER
-        + " will use the supplied regex text to search for test methods (excluding methods "
-        + "with the @Ignore annotation) and run only those methods. Can be paired with "
-        + METHOD_REPEAT_FILTER + " to " + "repeat the selected tests multiple times.\n");
-    helpMessage.append("\t" + METHOD_REPEAT_FILTER + " will repeat the tests selected with either "
-        + QUICK_TEST_FLAG + " or " + CLASS_NAME_FILTER
-        + " and run them the given number of times.\n");
-    helpMessage
-        .append("[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This "
+    helpMessage.append(
+        "\t"
+            + QUICK_TEST_FLAG
+            + " will cause the quick test to be run. Ignores other flags except for "
+            + METHOD_REPEAT_FILTER
+            + "\n");
+    helpMessage.append(
+        "\t"
+            + CLASS_NAME_FILTER
+            + " will use the supplied regex text to search for suite/test class names "
+            + "matching the regex and run them.\n");
+    helpMessage.append(
+        "\t"
+            + METHOD_NAME_FILTER
+            + " will use the supplied regex text to search for test methods (excluding methods "
+            + "with the @Ignore annotation) and run only those methods. Can be paired with "
+            + METHOD_REPEAT_FILTER
+            + " to "
+            + "repeat the selected tests multiple times.\n");
+    helpMessage.append(
+        "\t"
+            + METHOD_REPEAT_FILTER
+            + " will repeat the tests selected with either "
+            + QUICK_TEST_FLAG
+            + " or "
+            + CLASS_NAME_FILTER
+            + " and run them the given number of times.\n");
+    helpMessage.append(
+        "[NOTE] All regex uses the syntax defined by java.util.regex.Pattern. This "
             + "documentation can be found at "
             + "http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html\n");
     helpMessage.append("\n");
@@ -118,12 +121,12 @@ public class TestSuite extends AbstractTestSuite {
       invalidMessage.append(a + " ");
     }
     invalidMessage.append("\n");
-    invalidMessage
-        .append("For details on proper usage of the runtime flags please run again with the "
-            + HELP_FLAG + " flag.\n\n");
+    invalidMessage.append(
+        "For details on proper usage of the runtime flags please run again with the "
+            + HELP_FLAG
+            + " flag.\n\n");
 
     TestBench.out().println(invalidMessage);
-
   }
 
   /**
@@ -143,7 +146,6 @@ public class TestSuite extends AbstractTestSuite {
     }
     TestBench.out().println(loadedTestsMessage);
   }
-
 
   /**
    * Parses the arguments passed at runtime and runs the appropriate tests based upon these
@@ -176,8 +178,8 @@ public class TestSuite extends AbstractTestSuite {
         try {
           repeatCount = Integer.parseInt(new String(s).replace(METHOD_REPEAT_FILTER, ""));
         } catch (NumberFormatException ex) {
-          displayInvalidUsage("The argument passed to the repeat rule was not a valid integer.",
-              args);
+          displayInvalidUsage(
+              "The argument passed to the repeat rule was not a valid integer.", args);
         }
       }
       if (Pattern.matches(CLASS_NAME_FILTER + ".*", s)) {
@@ -185,7 +187,6 @@ public class TestSuite extends AbstractTestSuite {
         classRegex = s.replace(CLASS_NAME_FILTER, "");
       }
     }
-
 
     ArrayList<String> argsParsed = new ArrayList<String>(Arrays.asList(args));
     if (argsParsed.contains(HELP_FLAG)) {
@@ -200,8 +201,8 @@ public class TestSuite extends AbstractTestSuite {
     }
 
     /**
-     * Stores the data from multiple {@link Result}s in one class that can be
-     * returned to display the results.
+     * Stores the data from multiple {@link Result}s in one class that can be returned to display
+     * the results.
      */
     class MultipleResult extends Result {
       private static final long serialVersionUID = 1L;
@@ -252,8 +253,8 @@ public class TestSuite extends AbstractTestSuite {
     if (methodFilter) {
       List<ClassMethodPair> pairs = (new TestSuite()).getMethodMatching(methodRegex);
       if (pairs.size() == 0) {
-        displayInvalidUsage("None of the arguments passed to the method name filter matched.",
-            args);
+        displayInvalidUsage(
+            "None of the arguments passed to the method name filter matched.", args);
         return null;
       }
       // Print out the list of tests before we run them
@@ -267,7 +268,6 @@ public class TestSuite extends AbstractTestSuite {
         }
         TestBench.out().println("\t" + p.m_methodName);
       }
-
 
       // The test results will be saved here
       MultipleResult results = new MultipleResult();
@@ -320,9 +320,17 @@ public class TestSuite extends AbstractTestSuite {
       TestBench.out().println();
       TestBench.out().println("FAILURES!!!");
       // Print the test statistics
-      TestBench.out().println(
-          "Tests run: " + result.getRunCount() + ", Failures: " + result.getFailureCount()
-              + ", Ignored: " + result.getIgnoreCount() + ", In " + result.getRunTime() + "ms");
+      TestBench.out()
+          .println(
+              "Tests run: "
+                  + result.getRunCount()
+                  + ", Failures: "
+                  + result.getFailureCount()
+                  + ", Ignored: "
+                  + result.getIgnoreCount()
+                  + ", In "
+                  + result.getRunTime()
+                  + "ms");
 
       // Prints out a list of test that failed
       TestBench.out().println("Failure List (short):");
@@ -337,9 +345,15 @@ public class TestSuite extends AbstractTestSuite {
       }
     } else {
       TestBench.out().println("SUCCESS!");
-      TestBench.out().println(
-          "Tests run: " + result.getRunCount() + ", Ignored: " + result.getIgnoreCount() + ", In "
-              + result.getRunTime() + "ms");
+      TestBench.out()
+          .println(
+              "Tests run: "
+                  + result.getRunCount()
+                  + ", Ignored: "
+                  + result.getIgnoreCount()
+                  + ", In "
+                  + result.getRunTime()
+                  + "ms");
     }
     TestBench.out().println();
   }
@@ -352,7 +366,6 @@ public class TestSuite extends AbstractTestSuite {
   public static junit.framework.Test suite() {
     return new JUnit4TestAdapter(TestSuite.class);
   }
-
 
   /**
    * The method called at runtime.

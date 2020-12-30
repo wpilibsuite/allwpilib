@@ -4,12 +4,10 @@
 
 package edu.wpi.cscore;
 
+import edu.wpi.first.wpiutil.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.opencv.core.Core;
-
-import edu.wpi.first.wpiutil.RuntimeLoader;
 
 public class CameraServerCvJNI {
   static boolean libraryLoaded = false;
@@ -33,7 +31,8 @@ public class CameraServerCvJNI {
     if (Helper.getExtractOnStaticLoad()) {
       try {
         CameraServerJNI.forceLoad();
-        loader = new RuntimeLoader<>(opencvName, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
+        loader =
+            new RuntimeLoader<>(opencvName, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
         loader.loadLibraryHashed();
       } catch (IOException ex) {
         ex.printStackTrace();
@@ -43,27 +42,29 @@ public class CameraServerCvJNI {
     }
   }
 
-  /**
-   * Force load the library.
-   */
+  /** Force load the library. */
   public static synchronized void forceLoad() throws IOException {
     if (libraryLoaded) {
       return;
     }
     CameraServerJNI.forceLoad();
-    loader = new RuntimeLoader<>(Core.NATIVE_LIBRARY_NAME, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
+    loader =
+        new RuntimeLoader<>(
+            Core.NATIVE_LIBRARY_NAME, RuntimeLoader.getDefaultExtractionRoot(), Core.class);
     loader.loadLibrary();
     libraryLoaded = true;
   }
 
-  public static native int createCvSource(String name, int pixelFormat, int width, int height, int fps);
+  public static native int createCvSource(
+      String name, int pixelFormat, int width, int height, int fps);
 
   public static native void putSourceFrame(int source, long imageNativeObj);
 
   public static native int createCvSink(String name);
-  //public static native int createCvSinkCallback(String name,
+  // public static native int createCvSinkCallback(String name,
   //                            void (*processFrame)(long time));
 
   public static native long grabSinkFrame(int sink, long imageNativeObj);
+
   public static native long grabSinkFrameTimeout(int sink, long imageNativeObj, double timeout);
 }
