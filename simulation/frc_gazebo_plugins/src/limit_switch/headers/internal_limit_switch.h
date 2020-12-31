@@ -18,7 +18,7 @@ class InternalLimitSwitch : public Switch {
   InternalLimitSwitch(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Returns true when the switch is triggered.
-  virtual bool Get();
+  bool Get() override;
 
  private:
   gazebo::physics::JointPtr joint;

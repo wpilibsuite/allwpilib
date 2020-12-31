@@ -19,7 +19,7 @@ class ExternalLimitSwitch : public Switch {
   explicit ExternalLimitSwitch(sdf::ElementPtr sdf);
 
   /// \brief Returns true when the switch is triggered.
-  virtual bool Get();
+  bool Get() override;
 
  private:
   gazebo::sensors::ContactSensorPtr sensor;
