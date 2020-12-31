@@ -108,7 +108,7 @@ typedef enum {
  * Represents the resulting status of a function call through its return value.
  * 0 is success, negative values are errors, and positive values are warnings.
  */
-using NiFpga_Status = int32_t;
+typedef int32_t NiFpga_Status;  // NOLINT
 
 /**
  * No errors or warnings.
