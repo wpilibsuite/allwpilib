@@ -11,66 +11,85 @@
 
 OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2) {
   if (dio1 == ChannelMode::INPUT) {
-    m_buttonB = frc::DigitalInput(1);
+    m_buttonB = new frc::DigitalInput(1);
   } else {
-    m_greenLed = frc::DigitalOutput(1);
+    m_greenLed = new frc::DigitalOutput(1);
   }
   if (dio2 == ChannelMode::INPUT) {
-    m_buttonC = frc::DigitalInput(2);
-    m_redLed = frc::DigitalOutput(2);
+    m_buttonC = new frc::DigitalInput(2);
+    m_redLed = new frc::DigitalOutput(2);
   }
 }
 
-bool OnBoardIO::GetButtonAPressed() { return m_buttonA.Get(); }
+OnBoardIO::~OnBoardIO() {
+  if (m_buttonB) {
+    delete m_buttonB;
+  }
+  if (m_greenLed) {
+    delete m_greenLed;
+  }
+  if (m_buttonC) {
+    delete m_buttonC;
+  }
+  if (m_redLed) {
+    delete m_redLed;
+  }
+}
+
+bool OnBoardIO::GetButtonAPressed() {
+  return m_buttonA.Get();
+}
 
 bool OnBoardIO::GetButtonBPressed() {
-  if (m_buttonB != nullptr) {
-    return m_buttonB.Get();
+  if (m_buttonB) {
+    return m_buttonB->Get();
   }
 
-  double currentTime = frc2::Timer::GetFPGATimestamp().to<double>();
+  auto currentTime = frc2::Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     frc::DriverStation::ReportError("Button B was not configured");
-    m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
+    m_nextMessageTime = currentTime + kMessageInterval;
   }
   return false;
 }
 
 bool OnBoardIO::GetButtonCPressed() {
-  if (m_buttonC != nullptr) {
-    return m_buttonC.Get();
+  if (m_buttonC) {
+    return m_buttonC->Get();
   }
 
-  double currentTime = frc2::Timer::GetFPGATimestamp().to<double>();
+  auto currentTime = frc2::Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     frc::DriverStation::ReportError("Button C was not configured");
-    m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
+    m_nextMessageTime = currentTime + kMessageInterval;
   }
   return false;
 }
 
 void OnBoardIO::SetGreenLed(bool value) {
-  if (m_greenLed != nullptr) {
-    m_greenLed.Set(value);
+  if (m_greenLed) {
+    m_greenLed->Set(value);
   } else {
-    double currentTime = frc2::Timer::GetFPGATimestamp().to<double>();
+    auto currentTime = frc2::Timer::GetFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
       frc::DriverStation::ReportError("Green LED was not configured");
-      m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
+      m_nextMessageTime = currentTime + kMessageInterval;
     }
   }
 }
 
 void OnBoardIO::SetRedLed(bool value) {
-  if (m_redLed != nullptr) {
-    m_redLed.Set(value);
+  if (m_redLed) {
+    m_redLed->Set(value);
   } else {
-    double currentTime = frc2::Timer::GetFPGATimestamp().to<double>();
+    auto currentTime = frc2::Timer::GetFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
       frc::DriverStation::ReportError("Red LED was not configured");
-      m_nextMessageTime = currentTime + MESSAGE_INTERVAL;
+      m_nextMessageTime = currentTime + kMessageInterval;
     }
   }
 }
 
-void OnBoardIO::SetYellowLed(bool value) { m_yellowLed.Set(value); }
+void OnBoardIO::SetYellowLed(bool value) {
+  m_yellowLed.Set(value);
+}

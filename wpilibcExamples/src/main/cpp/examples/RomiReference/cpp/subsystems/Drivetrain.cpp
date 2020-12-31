@@ -4,7 +4,8 @@
 
 #include "subsystems/Drivetrain.h"
 
-#include <wpi/math.h>
+#include <wpi/math>
+
 #include "Constants.h"
 
 using namespace DriveConstants;
@@ -13,13 +14,16 @@ using namespace DriveConstants;
 // PWM channels 0 and 1 respectively
 // The Romi has onboard encoders that are hardcoded
 // to use DIO pins 4/5 and 6/7 for the left and right
-Drivetrain::Drivetrain()
-    : m_left{0}, m_right{1}, m_leftEncoder{4, 5}, m_rightEncoder{6, 7} {
+Drivetrain::Drivetrain() {
+  m_leftEncoder.SetDistancePerPulse(
+      wpi::math::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
+  m_rightEncoder.SetDistancePerPulse(
+      wpi::math::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
   ResetEncoders();
 }
 
 void Drivetrain::Periodic() {
-  // Implementation of subsystem periodic method goes here.
+  // This method will be called once per scheduler run.
 }
 
 void Drivetrain::ArcadeDrive(double xaxisSpeed, double zaxisRotate) {
@@ -31,16 +35,22 @@ void Drivetrain::ResetEncoders() {
   m_rightEncoder.Reset();
 }
 
-int Drivetrain::GetLeftEncoderCount() { return m_leftEncoder.Get(); }
+int Drivetrain::GetLeftEncoderCount() {
+  return m_leftEncoder.Get();
+}
 
-int Drivetrain::GetRightEncoderCount() { return m_rightEncoder.Get(); }
+int Drivetrain::GetRightEncoderCount() {
+  return m_rightEncoder.Get();
+}
 
 units::meter_t Drivetrain::GetLeftDistance() {
-  return wpi::math::pi * kWheelDiameterInch *
-         (GetLeftEncoderCount() / kCountsPerRevolution);
+  return units::meter_t(m_leftEncoder.GetDistance());
 }
 
 units::meter_t Drivetrain::GetRightDistance() {
-  return wpi::math::pi * kWheelDiameterInch *
-         (GetRightEncoderCount() / kCountsPerRevolution);
+  return units::meter_t(m_rightEncoder.GetDistance());
+}
+
+units::meter_t Drivetrain::GetAverageDistance() {
+  return (GetLeftDistance() + GetRightDistance()) / 2.0;
 }

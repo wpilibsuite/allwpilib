@@ -22,9 +22,10 @@ class OnBoardIO : public frc2::SubsystemBase {
  public:
   enum ChannelMode { INPUT, OUTPUT };
   OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);
+  ~OnBoardIO();
 
-  static constexpr double MESSAGE_INTERVAL = 1.0;
-  double m_nextMessageTime = 0.0;
+  static constexpr auto kMessageInterval = 1_s;
+  units::second_t m_nextMessageTime = 0_s;
 
   /**
    * Gets if the A button is pressed.
@@ -61,10 +62,10 @@ class OnBoardIO : public frc2::SubsystemBase {
   frc::DigitalOutput m_yellowLed{3};
 
   // DIO 1
-  frc::DigitalInput m_buttonB;
-  frc::DigitalOutput m_greenLed;
+  frc::DigitalInput* m_buttonB = nullptr;
+  frc::DigitalOutput* m_greenLed = nullptr;
 
   // DIO 2
-  frc::DigitalInput m_buttonC;
-  frc::DigitalOutput m_redLed;
+  frc::DigitalInput* m_buttonC = nullptr;
+  frc::DigitalOutput* m_redLed = nullptr;
 };

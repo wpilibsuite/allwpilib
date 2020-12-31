@@ -5,9 +5,13 @@
 #pragma once
 
 #include <frc/Joystick.h>
+#include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/button/Button.h>
 
 #include "Constants.h"
+#include "commands/AutonomousDistance.h"
+#include "commands/AutonomousTime.h"
 #include "subsystems/Drivetrain.h"
 #include "subsystems/OnBoardIO.h"
 
@@ -33,17 +37,25 @@ class RobotContainer {
   // Your subsystem configuration should take the overlays into account
  public:
   RobotContainer();
-
   frc2::Command* GetAutonomousCommand();
 
  private:
   // Assumes a gamepad plugged into channnel 0
   frc::Joystick m_controller{0};
+  frc::SendableChooser<frc2::Command*> m_chooser;
 
   // The robot's subsystems
   Drivetrain m_drive;
   OnBoardIO m_onboardIO{OnBoardIO::ChannelMode::INPUT,
-						OnBoardIO::ChannelMode::INPUT};
+                        OnBoardIO::ChannelMode::INPUT};
+
+  // Example button
+  frc2::Button m_onboardButtonA{
+      [this] { return m_onboardIO.GetButtonAPressed(); }};
+
+  // Autonomous commands.
+  AutonomousDistance m_autoDistance{&m_drive};
+  AutonomousTime m_autoTime{&m_drive};
 
   void ConfigureButtonBindings();
 };

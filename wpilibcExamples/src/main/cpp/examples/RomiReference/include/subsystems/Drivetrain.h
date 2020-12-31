@@ -5,13 +5,16 @@
 #pragma once
 
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/Spark.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
 
 class Drivetrain : public frc2::SubsystemBase {
  public:
+  static constexpr double kCountsPerRevolution = 1440.0;
+  static constexpr units::meter_t kWheelDiameter = 70_mm;
+
   Drivetrain();
 
   /**
@@ -60,16 +63,19 @@ class Drivetrain : public frc2::SubsystemBase {
    */
   units::meter_t GetRightDistance();
 
+  /**
+   * Returns the average distance traveled by the left and right encoders.
+   *
+   * @return The average distance traveled by the left and right encoders.
+   */
+  units::meter_t GetAverageDistance();
+
  private:
-  frc::PWMVictorSPX m_left;
-  frc::PWMVictorSPX m_right;
+  frc::Spark m_leftMotor{0};
+  frc::Spark m_rightMotor{1};
 
-  // Set up the differential drive controller
-  frc::DifferentialDrive m_drive{m_left, m_right};
+  frc::Encoder m_leftEncoder{4, 5};
+  frc::Encoder m_rightEncoder{6, 7};
 
-  // The left-side drive encoder
-  frc::Encoder m_leftEncoder;
-
-  // The right-side drive encoder
-  frc::Encoder m_rightEncoder;
+  frc::DifferentialDrive m_drive{m_leftMotor, m_rightMotor};
 };
