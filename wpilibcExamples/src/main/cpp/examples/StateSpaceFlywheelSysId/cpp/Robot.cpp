@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/DriverStation.h>
 #include <frc/Encoder.h>
@@ -85,16 +82,16 @@ class Robot : public frc::TimedRobot {
   frc::XboxController m_joystick{kJoystickPort};
 
  public:
-  void RobotInit() {
+  void RobotInit() override {
     // We go 2 pi radians per 4096 clicks.
     m_encoder.SetDistancePerPulse(2.0 * wpi::math::pi / 4096.0);
   }
 
-  void TeleopInit() {
+  void TeleopInit() override {
     m_loop.Reset(frc::MakeMatrix<1, 1>(m_encoder.GetRate()));
   }
 
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     // Sets the target speed of our flywheel. This is similar to setting the
     // setpoint of a PID controller.
     if (m_joystick.GetBumper(frc::GenericHID::kRightHand)) {
@@ -120,5 +117,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

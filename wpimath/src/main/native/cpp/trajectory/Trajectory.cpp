@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/trajectory/Trajectory.h"
 
@@ -34,7 +31,9 @@ Trajectory::State Trajectory::State::Interpolate(State endValue,
   const auto deltaT = newT - t;
 
   // If delta time is negative, flip the order of interpolation.
-  if (deltaT < 0_s) return endValue.Interpolate(*this, 1.0 - i);
+  if (deltaT < 0_s) {
+    return endValue.Interpolate(*this, 1.0 - i);
+  }
 
   // Check whether the robot is reversing at this stage.
   const auto reversing =
@@ -68,8 +67,12 @@ Trajectory::Trajectory(const std::vector<State>& states) : m_states(states) {
 }
 
 Trajectory::State Trajectory::Sample(units::second_t t) const {
-  if (t <= m_states.front().t) return m_states.front();
-  if (t >= m_totalTime) return m_states.back();
+  if (t <= m_states.front().t) {
+    return m_states.front();
+  }
+  if (t >= m_totalTime) {
+    return m_states.back();
+  }
 
   // Use binary search to get the element with a timestamp no less than the
   // requested timestamp. This starts at 1 because we use the previous state

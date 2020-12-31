@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/RamseteCommand.h"
+
+#include <utility>
 
 using namespace frc2;
 using namespace units;
@@ -19,15 +18,15 @@ RamseteCommand::RamseteCommand(
     frc2::PIDController leftController, frc2::PIDController rightController,
     std::function<void(volt_t, volt_t)> output,
     std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_controller(controller),
       m_feedforward(feedforward),
       m_kinematics(kinematics),
-      m_speeds(wheelSpeeds),
+      m_speeds(std::move(wheelSpeeds)),
       m_leftController(std::make_unique<frc2::PIDController>(leftController)),
       m_rightController(std::make_unique<frc2::PIDController>(rightController)),
-      m_outputVolts(output),
+      m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
 }
@@ -41,15 +40,15 @@ RamseteCommand::RamseteCommand(
     frc2::PIDController leftController, frc2::PIDController rightController,
     std::function<void(volt_t, volt_t)> output,
     wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_controller(controller),
       m_feedforward(feedforward),
       m_kinematics(kinematics),
-      m_speeds(wheelSpeeds),
+      m_speeds(std::move(wheelSpeeds)),
       m_leftController(std::make_unique<frc2::PIDController>(leftController)),
       m_rightController(std::make_unique<frc2::PIDController>(rightController)),
-      m_outputVolts(output),
+      m_outputVolts(std::move(output)),
       m_usePID(true) {
   AddRequirements(requirements);
 }
@@ -61,11 +60,11 @@ RamseteCommand::RamseteCommand(
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
     std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_controller(controller),
       m_kinematics(kinematics),
-      m_outputVel(output),
+      m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
 }
@@ -77,11 +76,11 @@ RamseteCommand::RamseteCommand(
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
     wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_controller(controller),
       m_kinematics(kinematics),
-      m_outputVel(output),
+      m_outputVel(std::move(output)),
       m_usePID(false) {
   AddRequirements(requirements);
 }
@@ -105,10 +104,11 @@ void RamseteCommand::Execute() {
   auto dt = curTime - m_prevTime;
 
   if (m_prevTime < 0_s) {
-    if (m_usePID)
+    if (m_usePID) {
       m_outputVolts(0_V, 0_V);
-    else
+    } else {
       m_outputVel(0_mps, 0_mps);
+    }
 
     m_prevTime = curTime;
     return;
@@ -144,7 +144,9 @@ void RamseteCommand::Execute() {
   m_prevTime = curTime;
 }
 
-void RamseteCommand::End(bool interrupted) { m_timer.Stop(); }
+void RamseteCommand::End(bool interrupted) {
+  m_timer.Stop();
+}
 
 bool RamseteCommand::IsFinished() {
   return m_timer.HasElapsed(m_trajectory.TotalTime());

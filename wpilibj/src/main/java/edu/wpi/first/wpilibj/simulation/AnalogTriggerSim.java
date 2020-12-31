@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.simulation;
 
@@ -12,9 +9,7 @@ import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AnalogTrigger;
 import java.util.NoSuchElementException;
 
-/**
- * Class to control a simulated analog trigger.
- */
+/** Class to control a simulated analog trigger. */
 public class AnalogTriggerSim {
   private final int m_index;
 
@@ -47,8 +42,8 @@ public class AnalogTriggerSim {
   }
 
   /**
-   * Creates an AnalogTriggerSim for a simulated index.
-   * The index is incremented for each simulated AnalogTrigger.
+   * Creates an AnalogTriggerSim for a simulated index. The index is incremented for each simulated
+   * AnalogTrigger.
    *
    * @param index simulator index
    * @return Simulated object
@@ -61,31 +56,41 @@ public class AnalogTriggerSim {
     int uid = AnalogTriggerDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogTriggerDataJNI::cancelInitializedCallback);
   }
+
   public boolean getInitialized() {
     return AnalogTriggerDataJNI.getInitialized(m_index);
   }
+
   public void setInitialized(boolean initialized) {
     AnalogTriggerDataJNI.setInitialized(m_index, initialized);
   }
 
-  public CallbackStore registerTriggerLowerBoundCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = AnalogTriggerDataJNI.registerTriggerLowerBoundCallback(m_index, callback, initialNotify);
+  public CallbackStore registerTriggerLowerBoundCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid =
+        AnalogTriggerDataJNI.registerTriggerLowerBoundCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogTriggerDataJNI::cancelTriggerLowerBoundCallback);
   }
+
   public double getTriggerLowerBound() {
     return AnalogTriggerDataJNI.getTriggerLowerBound(m_index);
   }
+
   public void setTriggerLowerBound(double triggerLowerBound) {
     AnalogTriggerDataJNI.setTriggerLowerBound(m_index, triggerLowerBound);
   }
 
-  public CallbackStore registerTriggerUpperBoundCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = AnalogTriggerDataJNI.registerTriggerUpperBoundCallback(m_index, callback, initialNotify);
+  public CallbackStore registerTriggerUpperBoundCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid =
+        AnalogTriggerDataJNI.registerTriggerUpperBoundCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogTriggerDataJNI::cancelTriggerUpperBoundCallback);
   }
+
   public double getTriggerUpperBound() {
     return AnalogTriggerDataJNI.getTriggerUpperBound(m_index);
   }
+
   public void setTriggerUpperBound(double triggerUpperBound) {
     AnalogTriggerDataJNI.setTriggerUpperBound(m_index, triggerUpperBound);
   }

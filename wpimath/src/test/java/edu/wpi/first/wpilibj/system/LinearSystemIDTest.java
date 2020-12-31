@@ -1,53 +1,54 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.system;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 class LinearSystemIDTest {
   @Test
   public void testDrivetrainVelocitySystem() {
-    var model = LinearSystemId.createDrivetrainVelocitySystem(
-            DCMotor.getNEO(4), 70, 0.05, 0.4, 6.0, 6
-    );
-    assertTrue(model.getA().isEqual(Matrix.mat(Nat.N2(),
-            Nat.N2()).fill(-10.14132, 3.06598, 3.06598, -10.14132), 0.001));
+    var model =
+        LinearSystemId.createDrivetrainVelocitySystem(DCMotor.getNEO(4), 70, 0.05, 0.4, 6.0, 6);
+    assertTrue(
+        model
+            .getA()
+            .isEqual(
+                Matrix.mat(Nat.N2(), Nat.N2()).fill(-10.14132, 3.06598, 3.06598, -10.14132),
+                0.001));
 
-    assertTrue(model.getB().isEqual(Matrix.mat(Nat.N2(),
-            Nat.N2()).fill(4.2590, -1.28762, -1.2876, 4.2590), 0.001));
+    assertTrue(
+        model
+            .getB()
+            .isEqual(
+                Matrix.mat(Nat.N2(), Nat.N2()).fill(4.2590, -1.28762, -1.2876, 4.2590), 0.001));
 
-    assertTrue(model.getC().isEqual(Matrix.mat(Nat.N2(),
-            Nat.N2()).fill(1.0, 0.0, 0.0, 1.0), 0.001));
+    assertTrue(
+        model.getC().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(1.0, 0.0, 0.0, 1.0), 0.001));
 
-    assertTrue(model.getD().isEqual(Matrix.mat(Nat.N2(),
-            Nat.N2()).fill(0.0, 0.0, 0.0, 0.0), 0.001));
+    assertTrue(
+        model.getD().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0.0, 0.0, 0.0, 0.0), 0.001));
   }
 
   @Test
   public void testElevatorSystem() {
 
     var model = LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), 5, 0.05, 12);
-    assertTrue(model.getA().isEqual(Matrix.mat(Nat.N2(),
-            Nat.N2()).fill(0, 1, 0, -99.05473), 0.001));
+    assertTrue(
+        model.getA().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -99.05473), 0.001));
 
     assertTrue(model.getB().isEqual(VecBuilder.fill(0, 20.8), 0.001));
 
-    assertTrue(model.getC().isEqual(Matrix.mat(Nat.N1(),
-            Nat.N2()).fill(1, 0), 0.001));
+    assertTrue(model.getC().isEqual(Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0), 0.001));
 
     assertTrue(model.getD().isEqual(VecBuilder.fill(0), 0.001));
   }

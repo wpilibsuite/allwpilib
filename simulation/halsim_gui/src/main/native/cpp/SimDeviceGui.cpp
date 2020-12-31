@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "SimDeviceGui.h"
 
@@ -27,8 +24,10 @@ class SimValueSource : public glass::DataSource {
       : DataSource(wpi::Twine{device} + wpi::Twine{'-'} + name),
         m_callback{HALSIM_RegisterSimValueChangedCallback(
             handle, this, CallbackFunc, true)} {}
-  ~SimValueSource() {
-    if (m_callback != 0) HALSIM_CancelSimValueChangedCallback(m_callback);
+  ~SimValueSource() override {
+    if (m_callback != 0) {
+      HALSIM_CancelSimValueChangedCallback(m_callback);
+    }
   }
 
  private:
@@ -139,7 +138,9 @@ static void DisplaySimDevice(const char* name, void* data,
                              HAL_SimDeviceHandle handle) {
   // only show "Foo" portion of "Accel:Foo"
   auto [type, id] = wpi::StringRef{name}.split(':');
-  if (id.empty()) id = type;
+  if (id.empty()) {
+    id = type;
+  }
   if (glass::BeginDevice(id.data())) {
     HALSIM_EnumerateSimValues(handle, data, DisplaySimValue);
     glass::EndDevice();

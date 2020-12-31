@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/DataSource.h"
 
@@ -17,7 +14,9 @@ DataSource::DataSource(const wpi::Twine& id) : m_id{id.str()} {
   auto it = gContext->sources.try_emplace(m_id, this);
   auto& srcName = it.first->getValue();
   m_name = srcName.name.get();
-  if (!srcName.source) srcName.source = this;
+  if (!srcName.source) {
+    srcName.source = this;
+  }
   sourceCreated(m_id.c_str(), this);
 }
 
@@ -29,18 +28,30 @@ DataSource::DataSource(const wpi::Twine& id, int index, int index2)
                  wpi::Twine(index2) + wpi::Twine(']')} {}
 
 DataSource::~DataSource() {
-  if (!gContext) return;
+  if (!gContext) {
+    return;
+  }
   auto it = gContext->sources.find(m_id);
-  if (it == gContext->sources.end()) return;
+  if (it == gContext->sources.end()) {
+    return;
+  }
   auto& srcName = it->getValue();
-  if (srcName.source == this) srcName.source = nullptr;
+  if (srcName.source == this) {
+    srcName.source = nullptr;
+  }
 }
 
-void DataSource::SetName(const wpi::Twine& name) { m_name->SetName(name); }
+void DataSource::SetName(const wpi::Twine& name) {
+  m_name->SetName(name);
+}
 
-const char* DataSource::GetName() const { return m_name->GetName(); }
+const char* DataSource::GetName() const {
+  return m_name->GetName();
+}
 
-void DataSource::PushEditNameId(int index) { m_name->PushEditNameId(index); }
+void DataSource::PushEditNameId(int index) {
+  m_name->PushEditNameId(index);
+}
 
 void DataSource::PushEditNameId(const char* name) {
   m_name->PushEditNameId(name);
@@ -137,6 +148,8 @@ void DataSource::EmitDrag(ImGuiDragDropFlags flags) const {
 
 DataSource* DataSource::Find(wpi::StringRef id) {
   auto it = gContext->sources.find(id);
-  if (it == gContext->sources.end()) return nullptr;
+  if (it == gContext->sources.end()) {
+    return nullptr;
+  }
   return it->getValue().source;
 }

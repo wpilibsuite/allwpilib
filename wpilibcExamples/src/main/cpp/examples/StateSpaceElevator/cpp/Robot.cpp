@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
@@ -93,13 +90,13 @@ class Robot : public frc::TimedRobot {
   frc::TrapezoidProfile<units::meters>::State m_lastProfiledReference;
 
  public:
-  void RobotInit() {
+  void RobotInit() override {
     // Circumference = pi * d, so distance per click = pi * d / counts
     m_encoder.SetDistancePerPulse(2.0 * wpi::math::pi *
                                   kDrumRadius.to<double>() / 4096.0);
   }
 
-  void TeleopInit() {
+  void TeleopInit() override {
     // Reset our loop to make sure it's in a known state.
     m_loop.Reset(
         frc::MakeMatrix<2, 1>(m_encoder.GetDistance(), m_encoder.GetRate()));
@@ -108,7 +105,7 @@ class Robot : public frc::TimedRobot {
                                units::meters_per_second_t(m_encoder.GetRate())};
   }
 
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     // Sets the target height of our elevator. This is similar to setting the
     // setpoint of a PID controller.
     frc::TrapezoidProfile<units::meters>::State goal;
@@ -143,5 +140,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/PDPSim.h"
 
@@ -64,7 +61,9 @@ std::unique_ptr<CallbackStore> PDPSim::RegisterVoltageCallback(
   return store;
 }
 
-double PDPSim::GetVoltage() const { return HALSIM_GetPDPVoltage(m_index); }
+double PDPSim::GetVoltage() const {
+  return HALSIM_GetPDPVoltage(m_index);
+}
 
 void PDPSim::SetVoltage(double voltage) {
   HALSIM_SetPDPVoltage(m_index, voltage);
@@ -95,4 +94,6 @@ void PDPSim::SetAllCurrents(const double* currents) {
   HALSIM_SetPDPAllCurrents(m_index, currents);
 }
 
-void PDPSim::ResetData() { HALSIM_ResetPDPData(m_index); }
+void PDPSim::ResetData() {
+  HALSIM_ResetPDPData(m_index);
+}

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/hardware/DIO.h"
 
@@ -62,11 +59,12 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
     }
   } else {
     const char* name = model->GetName();
-    if (name[0] != '\0')
+    if (name[0] != '\0') {
       info.GetLabel(label, sizeof(label), name);
-    else
+    } else {
       info.GetLabel(label, sizeof(label), model->IsInput() ? " In" : "Out",
                     index);
+    }
     if (auto simDevice = model->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {
@@ -90,8 +88,12 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
     }
   }
   if (info.PopupEditName(index)) {
-    if (dpwmData) dpwmData->SetName(info.GetName());
-    if (dutyCycleData) dutyCycleData->SetName(info.GetName());
+    if (dpwmData) {
+      dpwmData->SetName(info.GetName());
+    }
+    if (dutyCycleData) {
+      dutyCycleData->SetName(info.GetName());
+    }
   }
 }
 
@@ -113,6 +115,7 @@ void glass::DisplayDIOs(DIOsModel* model, bool outputsEnabled,
     ImGui::PopID();
   });
   ImGui::PopItemWidth();
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

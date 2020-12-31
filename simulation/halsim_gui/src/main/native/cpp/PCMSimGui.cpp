@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "PCMSimGui.h"
 
@@ -155,7 +152,9 @@ void PCMSimModel::Update() {
 
 void PCMSimModel::ForEachSolenoid(
     wpi::function_ref<void(glass::SolenoidModel& model, int index)> func) {
-  if (m_solenoidInitCount == 0) return;
+  if (m_solenoidInitCount == 0) {
+    return;
+  }
   int32_t numSolenoids = m_solenoids.size();
   for (int32_t i = 0; i < numSolenoids; ++i) {
     if (auto model = m_solenoids[i].get()) {
@@ -194,8 +193,9 @@ static bool PCMsAnyInitialized() {
   static const int32_t num = HAL_GetNumPCMModules();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetPCMCompressorInitialized(i) ||
-        HALSIM_GetPCMAnySolenoidInitialized(i))
+        HALSIM_GetPCMAnySolenoidInitialized(i)) {
       return true;
+    }
   }
   return false;
 }
@@ -210,8 +210,9 @@ void PCMSimGui::Initialize() {
         bool any = false;
         static_cast<PCMsSimModel*>(model)->ForEachPCM(
             [&](glass::PCMModel& pcm, int) {
-              if (static_cast<PCMSimModel*>(&pcm)->GetNumSolenoids() > 0)
+              if (static_cast<PCMSimModel*>(&pcm)->GetNumSolenoids() > 0) {
                 any = true;
+              }
             });
         return any;
       },

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Encoder.h"
 
@@ -34,8 +31,7 @@ static LimitedHandleResource<HAL_EncoderHandle, Encoder,
 static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
                              HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeEncoder() {
   static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
                                HAL_HandleEnum::FPGAEncoder>
@@ -47,8 +43,7 @@ void InitializeEncoder() {
       eH;
   encoderHandles = &eH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(
@@ -96,7 +91,9 @@ HAL_EncoderHandle HAL_InitializeEncoder(
 void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
   auto encoder = encoderHandles->Get(encoderHandle);
   encoderHandles->Free(encoderHandle);
-  if (encoder == nullptr) return;
+  if (encoder == nullptr) {
+    return;
+  }
   if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::FPGAEncoder)) {
     fpgaEncoderHandles->Free(encoder->nativeHandle);
   } else if (isHandleType(encoder->nativeHandle, HAL_HandleEnum::Counter)) {
@@ -108,7 +105,9 @@ void HAL_FreeEncoder(HAL_EncoderHandle encoderHandle, int32_t* status) {
 void HAL_SetEncoderSimDevice(HAL_EncoderHandle handle,
                              HAL_SimDeviceHandle device) {
   auto encoder = encoderHandles->Get(handle);
-  if (encoder == nullptr) return;
+  if (encoder == nullptr) {
+    return;
+  }
   SimEncoderData[encoder->index].simDevice = device;
 }
 

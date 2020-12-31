@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.spline;
 
@@ -14,22 +11,20 @@ public class CubicHermiteSpline extends Spline {
   private final SimpleMatrix m_coefficients;
 
   /**
-   * Constructs a cubic hermite spline with the specified control vectors. Each
-   * control vector contains info about the location of the point and its first
-   * derivative.
+   * Constructs a cubic hermite spline with the specified control vectors. Each control vector
+   * contains info about the location of the point and its first derivative.
    *
-   * @param xInitialControlVector The control vector for the initial point in
-   *                              the x dimension.
-   * @param xFinalControlVector   The control vector for the final point in
-   *                              the x dimension.
-   * @param yInitialControlVector The control vector for the initial point in
-   *                              the y dimension.
-   * @param yFinalControlVector   The control vector for the final point in
-   *                              the y dimension.
+   * @param xInitialControlVector The control vector for the initial point in the x dimension.
+   * @param xFinalControlVector The control vector for the final point in the x dimension.
+   * @param yInitialControlVector The control vector for the initial point in the y dimension.
+   * @param yFinalControlVector The control vector for the final point in the y dimension.
    */
   @SuppressWarnings("ParameterName")
-  public CubicHermiteSpline(double[] xInitialControlVector, double[] xFinalControlVector,
-                            double[] yInitialControlVector, double[] yFinalControlVector) {
+  public CubicHermiteSpline(
+      double[] xInitialControlVector,
+      double[] xFinalControlVector,
+      double[] yInitialControlVector,
+      double[] yFinalControlVector) {
     super(3);
 
     // Populate the coefficients for the actual spline equations.
@@ -66,7 +61,6 @@ public class CubicHermiteSpline extends Spline {
       m_coefficients.set(4, i, m_coefficients.get(2, i) * (2 - i));
       m_coefficients.set(5, i, m_coefficients.get(3, i) * (2 - i));
     }
-
   }
 
   /**
@@ -86,30 +80,38 @@ public class CubicHermiteSpline extends Spline {
    */
   private SimpleMatrix makeHermiteBasis() {
     if (hermiteBasis == null) {
-      hermiteBasis = new SimpleMatrix(4, 4, true, new double[]{
-          +2.0, +1.0, -2.0, +1.0,
-          -3.0, -2.0, +3.0, -1.0,
-          +0.0, +1.0, +0.0, +0.0,
-          +1.0, +0.0, +0.0, +0.0
-      });
+      hermiteBasis =
+          new SimpleMatrix(
+              4,
+              4,
+              true,
+              new double[] {
+                +2.0, +1.0, -2.0, +1.0, -3.0, -2.0, +3.0, -1.0, +0.0, +1.0, +0.0, +0.0, +1.0, +0.0,
+                +0.0, +0.0
+              });
     }
     return hermiteBasis;
   }
 
   /**
-   * Returns the control vector for each dimension as a matrix from the
-   * user-provided arrays in the constructor.
+   * Returns the control vector for each dimension as a matrix from the user-provided arrays in the
+   * constructor.
    *
    * @param initialVector The control vector for the initial point.
-   * @param finalVector   The control vector for the final point.
+   * @param finalVector The control vector for the final point.
    * @return The control vector matrix for a dimension.
    */
   private SimpleMatrix getControlVectorFromArrays(double[] initialVector, double[] finalVector) {
     if (initialVector.length != 2 || finalVector.length != 2) {
       throw new IllegalArgumentException("Size of vectors must be 2");
     }
-    return new SimpleMatrix(4, 1, true, new double[]{
-        initialVector[0], initialVector[1],
-        finalVector[0], finalVector[1]});
+    return new SimpleMatrix(
+        4,
+        1,
+        true,
+        new double[] {
+          initialVector[0], initialVector[1],
+          finalVector[0], finalVector[1]
+        });
   }
 }

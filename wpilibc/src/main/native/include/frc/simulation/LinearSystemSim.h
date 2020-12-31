@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -13,6 +10,7 @@
 #include <units/current.h>
 #include <units/time.h>
 
+#include "frc/RobotController.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/LinearSystem.h"
 
@@ -38,8 +36,9 @@ class LinearSystemSim {
    * @param system             The system to simulate.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  LinearSystemSim(const LinearSystem<States, Inputs, Outputs>& system,
-                  const std::array<double, Outputs>& measurementStdDevs = {})
+  explicit LinearSystemSim(
+      const LinearSystem<States, Inputs, Outputs>& system,
+      const std::array<double, Outputs>& measurementStdDevs = {})
       : m_plant(system), m_measurementStdDevs(measurementStdDevs) {
     m_x = Eigen::Matrix<double, States, 1>::Zero();
     m_y = Eigen::Matrix<double, Outputs, 1>::Zero();
@@ -85,7 +84,9 @@ class LinearSystemSim {
    *
    * @param u The system inputs.
    */
-  void SetInput(const Eigen::Matrix<double, Inputs, 1>& u) { m_u = u; }
+  void SetInput(const Eigen::Matrix<double, Inputs, 1>& u) {
+    m_u = ClampInput(u);
+  }
 
   /*
    * Sets the system inputs.
@@ -93,7 +94,10 @@ class LinearSystemSim {
    * @param row   The row in the input matrix to set.
    * @param value The value to set the row to.
    */
-  void SetInput(int row, double value) { m_u(row, 0) = value; }
+  void SetInput(int row, double value) {
+    m_u(row, 0) = value;
+    ClampInput(m_u);
+  }
 
   /**
    * Sets the system state.
@@ -124,6 +128,19 @@ class LinearSystemSim {
       const Eigen::Matrix<double, States, 1>& currentXhat,
       const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
     return m_plant.CalculateX(currentXhat, u, dt);
+  }
+
+  /**
+   * Clamp the input vector such that no element exceeds the given voltage. If
+   * any does, the relative magnitudes of the input will be maintained.
+   *
+   * @param u          The input vector.
+   * @return The normalized input.
+   */
+  Eigen::Matrix<double, Inputs, 1> ClampInput(
+      Eigen::Matrix<double, Inputs, 1> u) {
+    return frc::NormalizeInputVector<Inputs>(
+        u, frc::RobotController::GetInputVoltage());
   }
 
   LinearSystem<States, Inputs, Outputs> m_plant;

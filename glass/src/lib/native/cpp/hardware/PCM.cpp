@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/hardware/PCM.h"
 
@@ -26,16 +23,22 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
   wpi::SmallVector<int, 16> channels;
   model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
     if (auto data = solenoid.GetOutputData()) {
-      if (j >= static_cast<int>(channels.size())) channels.resize(j + 1);
+      if (j >= static_cast<int>(channels.size())) {
+        channels.resize(j + 1);
+      }
       channels[j] = (outputsEnabled && data->GetValue()) ? 1 : -1;
     }
   });
 
-  if (channels.empty()) return false;
+  if (channels.empty()) {
+    return false;
+  }
 
   // show nonexistent channels as empty
   for (auto&& ch : channels) {
-    if (ch == 0) ch = -2;
+    if (ch == 0) {
+      ch = -2;
+    }
   }
 
   // build header label
@@ -84,17 +87,22 @@ void glass::DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
   bool hasAny = false;
   model->ForEachPCM([&](PCMModel& pcm, int i) {
     PushID(i);
-    if (DisplayPCMSolenoids(&pcm, i, outputsEnabled)) hasAny = true;
+    if (DisplayPCMSolenoids(&pcm, i, outputsEnabled)) {
+      hasAny = true;
+    }
     PopID();
   });
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }
 
 void glass::DisplayCompressorDevice(PCMModel* model, int index,
                                     bool outputsEnabled) {
   auto compressor = model->GetCompressor();
-  if (!compressor || !compressor->Exists()) return;
+  if (!compressor || !compressor->Exists()) {
+    return;
+  }
   DisplayCompressorDevice(compressor, index, outputsEnabled);
 }
 

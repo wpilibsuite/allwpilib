@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.simulation;
 
@@ -17,11 +14,11 @@ public class Mechanism2D {
   private static final Map<String, SimDouble> m_createdItems = new HashMap<String, SimDouble>();
 
   /**
-     * Set/Create the angle of a ligament.
-     *
-     * @param ligamentPath json path to the ligament
-     * @param angle        to set the ligament
-     */
+   * Set/Create the angle of a ligament.
+   *
+   * @param ligamentPath json path to the ligament
+   * @param angle to set the ligament
+   */
   public void setLigamentAngle(String ligamentPath, float angle) {
     ligamentPath = ligamentPath + "/angle";
     if (m_device != null) {
@@ -36,7 +33,7 @@ public class Mechanism2D {
    * Set/Create the length of a ligament.
    *
    * @param ligamentPath json path to the ligament
-   * @param length       to set the ligament
+   * @param length to set the ligament
    */
   public void setLigamentLength(String ligamentPath, float length) {
     ligamentPath = ligamentPath + "/length";

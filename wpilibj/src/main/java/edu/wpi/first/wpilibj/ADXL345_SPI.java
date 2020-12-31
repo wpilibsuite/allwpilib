@@ -1,14 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -20,10 +14,10 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-/**
- * ADXL345 SPI Accelerometer.
- */
+/** ADXL345 SPI Accelerometer. */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
 public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
   private static final int kPowerCtlRegister = 0x2D;
@@ -50,10 +44,7 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     kY((byte) 0x02),
     kZ((byte) 0x04);
 
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
+    /** The integer value representing this enumeration. */
     public final byte value;
 
     Axes(byte value) {
@@ -79,7 +70,7 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
   /**
    * Constructor.
    *
-   * @param port  The SPI port that the accelerometer is connected to
+   * @param port The SPI port that the accelerometer is connected to
    * @param range The range (+ or -) that the accelerometer will measure.
    */
   public ADXL345_SPI(SPI.Port port, Range range) {
@@ -87,8 +78,13 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     // simulation
     m_simDevice = SimDevice.create("Accel:ADXL345_SPI", port.value);
     if (m_simDevice != null) {
-      m_simRange = m_simDevice.createEnumDouble("range", SimDevice.Direction.kOutput,
-          new String[] {"2G", "4G", "8G", "16G"}, new double[] {2.0, 4.0, 8.0, 16.0}, 0);
+      m_simRange =
+          m_simDevice.createEnumDouble(
+              "range",
+              SimDevice.Direction.kOutput,
+              new String[] {"2G", "4G", "8G", "16G"},
+              new double[] {2.0, 4.0, 8.0, 16.0},
+              0);
       m_simX = m_simDevice.createDouble("x", SimDevice.Direction.kInput, 0.0);
       m_simY = m_simDevice.createDouble("y", SimDevice.Direction.kInput, 0.0);
       m_simZ = m_simDevice.createDouble("z", SimDevice.Direction.kInput, 0.0);
@@ -155,7 +151,7 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     }
 
     // Specify the data format to read
-    byte[] commands = new byte[]{kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};
+    byte[] commands = new byte[] {kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};
     m_spi.write(commands, commands.length);
 
     if (m_simRange != null) {
@@ -195,8 +191,8 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
       return m_simZ.get();
     }
     ByteBuffer transferBuffer = ByteBuffer.allocate(3);
-    transferBuffer.put(0,
-        (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
+    transferBuffer.put(
+        0, (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
     m_spi.transaction(transferBuffer, transferBuffer, 3);
     // Sensor is little endian
     transferBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -238,11 +234,12 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     NetworkTableEntry entryX = builder.getEntry("X");
     NetworkTableEntry entryY = builder.getEntry("Y");
     NetworkTableEntry entryZ = builder.getEntry("Z");
-    builder.setUpdateTable(() -> {
-      AllAxes data = getAccelerations();
-      entryX.setDouble(data.XAxis);
-      entryY.setDouble(data.YAxis);
-      entryZ.setDouble(data.ZAxis);
-    });
+    builder.setUpdateTable(
+        () -> {
+          AllAxes data = getAccelerations();
+          entryX.setDouble(data.XAxis);
+          entryY.setDouble(data.YAxis);
+          entryZ.setDouble(data.ZAxis);
+        });
   }
 }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/hardware/AnalogOutput.h"
 
@@ -16,12 +13,16 @@ using namespace glass;
 void glass::DisplayAnalogOutputsDevice(AnalogOutputsModel* model) {
   int count = 0;
   model->ForEachAnalogOutput([&](auto&, int) { ++count; });
-  if (count == 0) return;
+  if (count == 0) {
+    return;
+  }
 
   if (BeginDevice("Analog Outputs")) {
     model->ForEachAnalogOutput([&](auto& analogOut, int i) {
       auto analogOutData = analogOut.GetVoltageData();
-      if (!analogOutData) return;
+      if (!analogOutData) {
+        return;
+      }
       PushID(i);
 
       // build label
@@ -37,7 +38,9 @@ void glass::DisplayAnalogOutputsDevice(AnalogOutputsModel* model) {
       DeviceDouble(label, true, &value, analogOutData);
 
       if (PopupEditName("name", name)) {
-        if (analogOutData) analogOutData->SetName(name->c_str());
+        if (analogOutData) {
+          analogOutData->SetName(name->c_str());
+        }
       }
       PopID();
     });

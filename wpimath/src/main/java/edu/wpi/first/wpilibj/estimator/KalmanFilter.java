@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.estimator;
 
@@ -24,51 +21,46 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  *
  * <p>Kalman filters use a K gain matrix to determine whether to trust the model or measurements
  * more. Kalman filter theory uses statistics to compute an optimal K gain which minimizes the sum
- * of squares error in the state estimate. This K gain is used to correct the state estimate by
- * some amount of the difference between the actual measurements and the measurements predicted by
- * the model.
+ * of squares error in the state estimate. This K gain is used to correct the state estimate by some
+ * amount of the difference between the actual measurements and the measurements predicted by the
+ * model.
  *
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
  * theory".
  */
 @SuppressWarnings("ClassTypeParameterName")
-public class KalmanFilter<States extends Num, Inputs extends Num,
-      Outputs extends Num> {
+public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final Nat<States> m_states;
 
   private final LinearSystem<States, Inputs, Outputs> m_plant;
 
-  /**
-   * The steady-state Kalman gain matrix.
-   */
+  /** The steady-state Kalman gain matrix. */
   @SuppressWarnings("MemberName")
   private final Matrix<States, Outputs> m_K;
 
-  /**
-   * The state estimate.
-   */
+  /** The state estimate. */
   @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
 
   /**
    * Constructs a state-space observer with the given plant.
    *
-   * @param states             A Nat representing the states of the system.
-   * @param outputs            A Nat representing the outputs of the system.
-   * @param plant              The plant used for the prediction step.
-   * @param stateStdDevs       Standard deviations of model states.
+   * @param states A Nat representing the states of the system.
+   * @param outputs A Nat representing the outputs of the system.
+   * @param plant The plant used for the prediction step.
+   * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param dtSeconds          Nominal discretization timestep.
+   * @param dtSeconds Nominal discretization timestep.
    */
   @SuppressWarnings("LocalVariableName")
   public KalmanFilter(
-      Nat<States> states, Nat<Outputs> outputs,
+      Nat<States> states,
+      Nat<Outputs> outputs,
       LinearSystem<States, Inputs, Outputs> plant,
       Matrix<States, N1> stateStdDevs,
       Matrix<Outputs, N1> measurementStdDevs,
-      double dtSeconds
-  ) {
+      double dtSeconds) {
     this.m_states = states;
 
     this.m_plant = plant;
@@ -87,14 +79,16 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
     // isStabilizable(A^T, C^T) will tell us if the system is observable.
     var isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
     if (!isObservable) {
-      MathSharedStore.reportError("The system passed to the Kalman filter is not observable!",
+      MathSharedStore.reportError(
+          "The system passed to the Kalman filter is not observable!",
           Thread.currentThread().getStackTrace());
       throw new IllegalArgumentException(
-        "The system passed to the Kalman filter is not observable!");
+          "The system passed to the Kalman filter is not observable!");
     }
 
-    var P = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(
-          discA.transpose(), C.transpose(), discQ, discR));
+    var P =
+        new Matrix<>(
+            Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR));
 
     var S = C.times(P).times(C.transpose()).plus(discR);
 
@@ -110,8 +104,9 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
     //
     // K^T = S^T.solve(CP^T)
     // K = (S^T.solve(CP^T))^T
-    m_K = new Matrix<>(S.transpose().getStorage()
-          .solve((C.times(P.transpose())).getStorage()).transpose());
+    m_K =
+        new Matrix<>(
+            S.transpose().getStorage().solve((C.times(P.transpose())).getStorage()).transpose());
 
     reset();
   }
@@ -152,7 +147,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
   /**
    * Set an element of the initial state estimate x-hat.
    *
-   * @param row   Row of x-hat.
+   * @param row Row of x-hat.
    * @param value Value for element of x-hat.
    */
   public void setXhat(int row, double value) {
@@ -181,7 +176,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
   /**
    * Project the model into the future with a new control input u.
    *
-   * @param u         New control input from controller.
+   * @param u New control input from controller.
    * @param dtSeconds Timestep for prediction.
    */
   @SuppressWarnings("ParameterName")

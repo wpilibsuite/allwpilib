@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "I2CDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeI2CData() {
   static I2CData sid[2];
   ::hal::SimI2CData = sid;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 I2CData* hal::SimI2CData;
 
@@ -37,7 +32,9 @@ void I2CData::Read(int32_t deviceAddress, uint8_t* buffer, int32_t count) {
 }
 
 extern "C" {
-void HALSIM_ResetI2CData(int32_t index) { SimI2CData[index].ResetData(); }
+void HALSIM_ResetI2CData(int32_t index) {
+  SimI2CData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, I2C##CAPINAME, SimI2CData, \

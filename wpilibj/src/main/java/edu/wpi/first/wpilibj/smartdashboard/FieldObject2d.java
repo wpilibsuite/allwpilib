@@ -1,23 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.smartdashboard;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Game field object on a Field2d.
- */
+/** Game field object on a Field2d. */
 public class FieldObject2d {
   /**
    * Package-local constructor.
@@ -63,8 +57,7 @@ public class FieldObject2d {
   }
 
   /**
-   * Set multiple poses from an list of Pose objects.
-   * The total number of poses is limited to 85.
+   * Set multiple poses from an list of Pose objects. The total number of poses is limited to 85.
    *
    * @param poses list of 2D poses
    */
@@ -77,8 +70,7 @@ public class FieldObject2d {
   }
 
   /**
-   * Set multiple poses from an list of Pose objects.
-   * The total number of poses is limited to 85.
+   * Set multiple poses from an list of Pose objects. The total number of poses is limited to 85.
    *
    * @param poses list of 2D poses
    */

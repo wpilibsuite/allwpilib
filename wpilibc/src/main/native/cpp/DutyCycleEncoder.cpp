@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/DutyCycleEncoder.h"
 
@@ -79,7 +76,9 @@ void DutyCycleEncoder::Init() {
 }
 
 units::turn_t DutyCycleEncoder::Get() const {
-  if (m_simPosition) return units::turn_t{m_simPosition.Get()};
+  if (m_simPosition) {
+    return units::turn_t{m_simPosition.Get()};
+  }
 
   // As the values are not atomic, keep trying until we get 2 reads of the same
   // value If we don't within 10 attempts, error
@@ -119,12 +118,16 @@ int DutyCycleEncoder::GetFrequency() const {
 }
 
 void DutyCycleEncoder::Reset() {
-  if (m_counter) m_counter->Reset();
+  if (m_counter) {
+    m_counter->Reset();
+  }
   m_positionOffset = m_dutyCycle->GetOutput();
 }
 
 bool DutyCycleEncoder::IsConnected() const {
-  if (m_simIsConnected) return m_simIsConnected.Get();
+  if (m_simIsConnected) {
+    return m_simIsConnected.Get();
+  }
   return GetFrequency() > m_frequencyThreshold;
 }
 

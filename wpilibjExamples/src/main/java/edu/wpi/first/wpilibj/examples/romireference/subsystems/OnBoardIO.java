@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.romireference.subsystems;
 
@@ -14,14 +11,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
- * This class represents the onboard IO of the Romi
- * reference robot. This includes the pushbuttons and
- * LEDs.
+ * This class represents the onboard IO of the Romi reference robot. This includes the pushbuttons
+ * and LEDs.
  *
- * <p>DIO 0 - Button A (input only)
- * DIO 1 - Button B (input) or Green LED (output)
- * DIO 2 - Button C (input) or Red LED (output)
- * DIO 3 - Yellow LED (output only)
+ * <p>DIO 0 - Button A (input only) DIO 1 - Button B (input) or Green LED (output) DIO 2 - Button C
+ * (input) or Red LED (output) DIO 3 - Yellow LED (output only)
  */
 public class OnBoardIO extends SubsystemBase {
   private final DigitalInput m_buttonA = new DigitalInput(0);
@@ -63,16 +57,12 @@ public class OnBoardIO extends SubsystemBase {
     }
   }
 
-  /**
-   * Gets if the A button is pressed.
-   */
+  /** Gets if the A button is pressed. */
   public boolean getButtonAPressed() {
     return m_buttonA.get();
   }
 
-  /**
-   * Gets if the B button is pressed.
-   */
+  /** Gets if the B button is pressed. */
   public boolean getButtonBPressed() {
     if (m_buttonB != null) {
       return m_buttonB.get();
@@ -86,9 +76,7 @@ public class OnBoardIO extends SubsystemBase {
     return false;
   }
 
-  /**
-   * Gets if the C button is pressed.
-   */
+  /** Gets if the C button is pressed. */
   public boolean getButtonCPressed() {
     if (m_buttonC != null) {
       return m_buttonC.get();
@@ -102,9 +90,7 @@ public class OnBoardIO extends SubsystemBase {
     return false;
   }
 
-  /**
-   * Sets the green LED.
-   */
+  /** Sets the green LED. */
   public void setGreenLed(boolean value) {
     if (m_greenLed != null) {
       m_greenLed.set(value);
@@ -117,9 +103,7 @@ public class OnBoardIO extends SubsystemBase {
     }
   }
 
-  /**
-   * Sets the red LED.
-   */
+  /** Sets the red LED. */
   public void setRedLed(boolean value) {
     if (m_redLed != null) {
       m_redLed.set(value);
@@ -132,9 +116,7 @@ public class OnBoardIO extends SubsystemBase {
     }
   }
 
-  /**
-   * Sets the yellow LED.
-   */
+  /** Sets the yellow LED. */
   public void setYellowLed(boolean value) {
     m_yellowLed.set(value);
   }

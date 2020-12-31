@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 // Copyright (c) 2016 Nic Holthaus
 //
@@ -46,13 +43,7 @@
 #include "units/time.h"
 #include "units/velocity.h"
 
-namespace units {
-/**
- * @brief namespace for physical constants like PI and Avogadro's Number.
- * @sa See unit_t for more information on unit type containers.
- */
-#if !defined(DISABLE_PREDEFINED_UNITS)
-namespace constants {
+namespace units::constants {
 /**
  * @name Unit Containers
  * @anchor constantContainers
@@ -108,6 +99,4 @@ static constexpr const unit_t<
           (15 * math::cpow<3>(h) * math::cpow<2>(c) *
            math::cpow<4>(N_A)));  ///< Stefan-Boltzmann constant.
 /** @} */
-}  // namespace constants
-#endif
-}  // namespace units
+}  // namespace units::constants

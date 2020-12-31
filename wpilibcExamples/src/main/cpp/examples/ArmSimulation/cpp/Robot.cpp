@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
@@ -66,9 +63,11 @@ class Robot : public frc::TimedRobot {
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
  public:
-  void RobotInit() { m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse); }
+  void RobotInit() override {
+    m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);
+  }
 
-  void SimulationPeriodic() {
+  void SimulationPeriodic() override {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
     m_armSim.SetInput(frc::MakeMatrix<1, 1>(
@@ -85,7 +84,7 @@ class Robot : public frc::TimedRobot {
         frc::sim::BatterySim::Calculate({m_armSim.GetCurrentDraw()}));
   }
 
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 30in.
       double pidOutput =
@@ -97,12 +96,14 @@ class Robot : public frc::TimedRobot {
     }
   }
 
-  void DisabledInit() {
+  void DisabledInit() override {
     // This just makes sure that our simulation code knows that the motor's off.
     m_motor.Set(0.0);
   }
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

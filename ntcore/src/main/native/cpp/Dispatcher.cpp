@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "Dispatcher.h"
 
@@ -41,14 +38,16 @@ void Dispatcher::SetServer(const char* server_name, unsigned int port) {
 void Dispatcher::SetServer(
     ArrayRef<std::pair<StringRef, unsigned int>> servers) {
   wpi::SmallVector<std::pair<std::string, int>, 16> servers_copy;
-  for (const auto& server : servers)
+  for (const auto& server : servers) {
     servers_copy.emplace_back(std::string{server.first.trim()},
                               static_cast<int>(server.second));
+  }
 
   SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
     wpi::SmallVector<std::pair<const char*, int>, 16> servers_copy2;
-    for (const auto& server : servers_copy)
+    for (const auto& server : servers_copy) {
       servers_copy2.emplace_back(server.first.c_str(), server.second);
+    }
     return wpi::TCPConnector::connect_parallel(servers_copy2, m_logger, 1);
   });
 }
@@ -103,7 +102,9 @@ void Dispatcher::SetServerOverride(const char* server_name, unsigned int port) {
   });
 }
 
-void Dispatcher::ClearServerOverride() { ClearConnectorOverride(); }
+void Dispatcher::ClearServerOverride() {
+  ClearConnectorOverride();
+}
 
 DispatcherBase::DispatcherBase(IStorage& storage, IConnectionNotifier& notifier,
                                wpi::Logger& logger)
@@ -112,14 +113,20 @@ DispatcherBase::DispatcherBase(IStorage& storage, IConnectionNotifier& notifier,
   m_update_rate = 100;
 }
 
-DispatcherBase::~DispatcherBase() { Stop(); }
+DispatcherBase::~DispatcherBase() {
+  Stop();
+}
 
-unsigned int DispatcherBase::GetNetworkMode() const { return m_networkMode; }
+unsigned int DispatcherBase::GetNetworkMode() const {
+  return m_networkMode;
+}
 
 void DispatcherBase::StartLocal() {
   {
     std::scoped_lock lock(m_user_mutex);
-    if (m_active) return;
+    if (m_active) {
+      return;
+    }
     m_active = true;
   }
   m_networkMode = NT_NET_MODE_LOCAL;
@@ -131,7 +138,9 @@ void DispatcherBase::StartServer(
     std::unique_ptr<wpi::NetworkAcceptor> acceptor) {
   {
     std::scoped_lock lock(m_user_mutex);
-    if (m_active) return;
+    if (m_active) {
+      return;
+    }
     m_active = true;
   }
   m_networkMode = NT_NET_MODE_SERVER | NT_NET_MODE_STARTING;
@@ -163,7 +172,9 @@ void DispatcherBase::StartServer(
 void DispatcherBase::StartClient() {
   {
     std::scoped_lock lock(m_user_mutex);
-    if (m_active) return;
+    if (m_active) {
+      return;
+    }
     m_active = true;
   }
   m_networkMode = NT_NET_MODE_CLIENT | NT_NET_MODE_STARTING;
@@ -187,11 +198,17 @@ void DispatcherBase::Stop() {
   ClientReconnect();
 
   // wake up server thread by shutting down the socket
-  if (m_server_acceptor) m_server_acceptor->shutdown();
+  if (m_server_acceptor) {
+    m_server_acceptor->shutdown();
+  }
 
   // join threads, with timeout
-  if (m_dispatch_thread.joinable()) m_dispatch_thread.join();
-  if (m_clientserver_thread.joinable()) m_clientserver_thread.join();
+  if (m_dispatch_thread.joinable()) {
+    m_dispatch_thread.join();
+  }
+  if (m_clientserver_thread.joinable()) {
+    m_clientserver_thread.join();
+  }
 
   std::vector<std::shared_ptr<INetworkConnection>> conns;
   {
@@ -205,10 +222,11 @@ void DispatcherBase::Stop() {
 
 void DispatcherBase::SetUpdateRate(double interval) {
   // don't allow update rates faster than 5 ms or slower than 1 second
-  if (interval < 0.005)
+  if (interval < 0.005) {
     interval = 0.005;
-  else if (interval > 1.0)
+  } else if (interval > 1.0) {
     interval = 1.0;
+  }
   m_update_rate = static_cast<unsigned int>(interval * 1000);
 }
 
@@ -222,7 +240,9 @@ void DispatcherBase::Flush() {
   {
     std::scoped_lock lock(m_flush_mutex);
     // don't allow flushes more often than every 5 ms
-    if ((now - m_last_flush) < 5000) return;
+    if ((now - m_last_flush) < 5000) {
+      return;
+    }
     m_last_flush = now;
     m_do_flush = true;
   }
@@ -231,11 +251,15 @@ void DispatcherBase::Flush() {
 
 std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
   std::vector<ConnectionInfo> conns;
-  if (!m_active) return conns;
+  if (!m_active) {
+    return conns;
+  }
 
   std::scoped_lock lock(m_user_mutex);
   for (auto& conn : m_connections) {
-    if (conn->state() != NetworkConnection::kActive) continue;
+    if (conn->state() != NetworkConnection::kActive) {
+      continue;
+    }
     conns.emplace_back(conn->info());
   }
 
@@ -243,13 +267,19 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
 }
 
 bool DispatcherBase::IsConnected() const {
-  if (!m_active) return false;
+  if (!m_active) {
+    return false;
+  }
 
-  if (m_networkMode == NT_NET_MODE_LOCAL) return true;
+  if (m_networkMode == NT_NET_MODE_LOCAL) {
+    return true;
+  }
 
   std::scoped_lock lock(m_user_mutex);
   for (auto& conn : m_connections) {
-    if (conn->state() == NetworkConnection::kActive) return true;
+    if (conn->state() == NetworkConnection::kActive) {
+      return true;
+    }
   }
 
   return false;
@@ -263,7 +293,9 @@ unsigned int DispatcherBase::AddListener(
   // perform immediate notifications
   if (immediate_notify) {
     for (auto& conn : m_connections) {
-      if (conn->state() != NetworkConnection::kActive) continue;
+      if (conn->state() != NetworkConnection::kActive) {
+        continue;
+      }
       m_notifier.NotifyConnection(true, conn->info(), uid);
     }
   }
@@ -277,7 +309,9 @@ unsigned int DispatcherBase::AddPolledListener(unsigned int poller_uid,
   // perform immediate notifications
   if (immediate_notify) {
     for (auto& conn : m_connections) {
-      if (conn->state() != NetworkConnection::kActive) continue;
+      if (conn->state() != NetworkConnection::kActive) {
+        continue;
+      }
       m_notifier.NotifyConnection(true, conn->info(), uid);
     }
   }
@@ -310,7 +344,9 @@ void DispatcherBase::DispatchThreadMain() {
   while (m_active) {
     // handle loop taking too long
     auto start = std::chrono::steady_clock::now();
-    if (start > timeout_time) timeout_time = start;
+    if (start > timeout_time) {
+      timeout_time = start;
+    }
 
     // wait for periodic or when flushed
     timeout_time += std::chrono::milliseconds(m_update_rate);
@@ -319,16 +355,22 @@ void DispatcherBase::DispatchThreadMain() {
                           [&] { return !m_active || m_do_flush; });
     m_do_flush = false;
     flush_lock.unlock();
-    if (!m_active) break;  // in case we were woken up to terminate
+    if (!m_active) {
+      break;  // in case we were woken up to terminate
+    }
 
     // perform periodic persistent save
     if ((m_networkMode & NT_NET_MODE_SERVER) != 0 &&
         !m_persist_filename.empty() && start > next_save_time) {
       next_save_time += save_delta_time;
       // handle loop taking too long
-      if (start > next_save_time) next_save_time = start + save_delta_time;
+      if (start > next_save_time) {
+        next_save_time = start + save_delta_time;
+      }
       const char* err = m_storage.SavePersistent(m_persist_filename, true);
-      if (err) WARNING("periodic persistent save: " << err);
+      if (err) {
+        WARNING("periodic persistent save: " << err);
+      }
     }
 
     {
@@ -343,13 +385,15 @@ void DispatcherBase::DispatchThreadMain() {
       for (auto& conn : m_connections) {
         // post outgoing messages if connection is active
         // only send keep-alives on client
-        if (conn->state() == NetworkConnection::kActive)
+        if (conn->state() == NetworkConnection::kActive) {
           conn->PostOutgoing((m_networkMode & NT_NET_MODE_CLIENT) != 0);
+        }
 
         // if client, reconnect if connection died
         if ((m_networkMode & NT_NET_MODE_CLIENT) != 0 &&
-            conn->state() == NetworkConnection::kDead)
+            conn->state() == NetworkConnection::kDead) {
           reconnect = true;
+        }
       }
       // reconnect if we disconnected (and a reconnect is not in progress)
       if (reconnect && !m_do_reconnect) {
@@ -365,12 +409,17 @@ void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
                                    INetworkConnection* except) {
   std::scoped_lock user_lock(m_user_mutex);
   for (auto& conn : m_connections) {
-    if (conn.get() == except) continue;
-    if (only && conn.get() != only) continue;
+    if (conn.get() == except) {
+      continue;
+    }
+    if (only && conn.get() != only) {
+      continue;
+    }
     auto state = conn->state();
     if (state != NetworkConnection::kSynchronized &&
-        state != NetworkConnection::kActive)
+        state != NetworkConnection::kActive) {
       continue;
+    }
     conn->QueueOutgoing(msg);
   }
 }
@@ -415,7 +464,9 @@ void DispatcherBase::ServerThreadMain() {
           break;
         }
       }
-      if (!placed) m_connections.emplace_back(conn);
+      if (!placed) {
+        m_connections.emplace_back(conn);
+      }
       conn->Start();
     }
   }
@@ -499,16 +550,22 @@ bool DispatcherBase::ClientHandshake(
   }
 
   if (msg->Is(Message::kProtoUnsup)) {
-    if (msg->id() == 0x0200) ClientReconnect(0x0200);
+    if (msg->id() == 0x0200) {
+      ClientReconnect(0x0200);
+    }
     return false;
   }
 
   bool new_server = true;
   if (conn.proto_rev() >= 0x0300) {
     // should be server hello; if not, disconnect.
-    if (!msg->Is(Message::kServerHello)) return false;
+    if (!msg->Is(Message::kServerHello)) {
+      return false;
+    }
     conn.set_remote_id(msg->str());
-    if ((msg->flags() & 1) != 0) new_server = false;
+    if ((msg->flags() & 1) != 0) {
+      new_server = false;
+    }
     // get the next message
     msg = get_msg();
   }
@@ -523,7 +580,9 @@ bool DispatcherBase::ClientHandshake(
     }
     DEBUG4("received init str=" << msg->str() << " id=" << msg->id()
                                 << " seq_num=" << msg->seq_num_uid());
-    if (msg->Is(Message::kServerHelloDone)) break;
+    if (msg->Is(Message::kServerHelloDone)) {
+      break;
+    }
     // shouldn't receive a keep alive, but handle gracefully
     if (msg->Is(Message::kKeepAlive)) {
       msg = get_msg();
@@ -546,10 +605,13 @@ bool DispatcherBase::ClientHandshake(
 
   m_storage.ApplyInitialAssignments(conn, incoming, new_server, &outgoing);
 
-  if (conn.proto_rev() >= 0x0300)
+  if (conn.proto_rev() >= 0x0300) {
     outgoing.emplace_back(Message::ClientHelloDone());
+  }
 
-  if (!outgoing.empty()) send_msgs(outgoing);
+  if (!outgoing.empty()) {
+    send_msgs(outgoing);
+  }
 
   INFO("client: CONNECTED to server " << conn.stream().getPeerIP() << " port "
                                       << conn.stream().getPeerPort());
@@ -578,7 +640,9 @@ bool DispatcherBase::ServerHandshake(
     return false;
   }
 
-  if (proto_rev >= 0x0300) conn.set_remote_id(msg->str());
+  if (proto_rev >= 0x0300) {
+    conn.set_remote_id(msg->str());
+  }
 
   // Set the proto version to the client requested version
   DEBUG0("server: client protocol " << proto_rev);
@@ -617,7 +681,9 @@ bool DispatcherBase::ServerHandshake(
         DEBUG0("server: disconnected waiting for initial entries");
         return false;
       }
-      if (msg->Is(Message::kClientHelloDone)) break;
+      if (msg->Is(Message::kClientHelloDone)) {
+        break;
+      }
       // shouldn't receive a keep alive, but handle gracefully
       if (msg->Is(Message::kKeepAlive)) {
         msg = get_msg();
@@ -634,8 +700,9 @@ bool DispatcherBase::ServerHandshake(
       // get the next message (blocks)
       msg = get_msg();
     }
-    for (auto& msg : incoming)
+    for (auto& msg : incoming) {
       m_storage.ProcessIncoming(msg, &conn, std::weak_ptr<NetworkConnection>());
+    }
   }
 
   INFO("server: client CONNECTED: " << conn.stream().getPeerIP() << " port "
@@ -644,7 +711,9 @@ bool DispatcherBase::ServerHandshake(
 }
 
 void DispatcherBase::ClientReconnect(unsigned int proto_rev) {
-  if ((m_networkMode & NT_NET_MODE_SERVER) != 0) return;
+  if ((m_networkMode & NT_NET_MODE_SERVER) != 0) {
+    return;
+  }
   {
     std::scoped_lock lock(m_user_mutex);
     m_reconnect_proto_rev = proto_rev;

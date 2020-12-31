@@ -1,19 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.simulation;
-
-import edu.wpi.first.wpilibj.AnalogOutput;
-import edu.wpi.first.hal.HAL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.AnalogOutput;
 import org.junit.jupiter.api.Test;
 
 class AnalogOutputSimTest {
@@ -33,7 +29,6 @@ class AnalogOutputSimTest {
   void setCallbackTest() {
     HAL.initialize(500, 0);
 
-
     try (AnalogOutput output = new AnalogOutput(0)) {
       output.setVoltage(0.5);
 
@@ -41,11 +36,14 @@ class AnalogOutputSimTest {
 
       DoubleStore store = new DoubleStore();
 
-      try (CallbackStore cb = outputSim.registerVoltageCallback((name, value) -> {
-        store.m_wasTriggered = true;
-        store.m_wasCorrectType = true;
-        store.m_setValue = value.getDouble();
-      }, false)) {
+      try (CallbackStore cb =
+          outputSim.registerVoltageCallback(
+              (name, value) -> {
+                store.m_wasTriggered = true;
+                store.m_wasCorrectType = true;
+                store.m_setValue = value.getDouble();
+              },
+              false)) {
         assertFalse(store.m_wasTriggered);
 
         for (double i = 0.1; i < 5.0; i += 0.1) {

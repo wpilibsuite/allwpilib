@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -36,17 +33,25 @@ class SimUnnamedCallbackRegistry {
 
  public:
   void Cancel(int32_t uid) {
-    if (m_callbacks) m_callbacks->erase(uid - 1);
+    if (m_callbacks) {
+      m_callbacks->erase(uid - 1);
+    }
   }
 
   void Reset() {
-    if (m_callbacks) m_callbacks->clear();
+    if (m_callbacks) {
+      m_callbacks->clear();
+    }
   }
 
   int32_t Register(CallbackFunction callback, void* param) {
     // Must return -1 on a null callback for error handling
-    if (callback == nullptr) return -1;
-    if (!m_callbacks) m_callbacks = std::make_unique<CallbackVector>();
+    if (callback == nullptr) {
+      return -1;
+    }
+    if (!m_callbacks) {
+      m_callbacks = std::make_unique<CallbackVector>();
+    }
     return m_callbacks->emplace_back(param,
                                      reinterpret_cast<RawFunctor>(callback)) +
            1;
@@ -87,17 +92,25 @@ class SimPrefixCallbackRegistry {
 
  public:
   void Cancel(int32_t uid) {
-    if (m_callbacks) m_callbacks->erase(uid - 1);
+    if (m_callbacks) {
+      m_callbacks->erase(uid - 1);
+    }
   }
 
   void Reset() {
-    if (m_callbacks) m_callbacks->clear();
+    if (m_callbacks) {
+      m_callbacks->clear();
+    }
   }
 
   int32_t Register(const char* prefix, void* param, CallbackFunction callback) {
     // Must return -1 on a null callback for error handling
-    if (callback == nullptr) return -1;
-    if (!m_callbacks) m_callbacks = std::make_unique<CallbackVector>();
+    if (callback == nullptr) {
+      return -1;
+    }
+    if (!m_callbacks) {
+      m_callbacks = std::make_unique<CallbackVector>();
+    }
     return m_callbacks->emplace_back(prefix, param, callback) + 1;
   }
 

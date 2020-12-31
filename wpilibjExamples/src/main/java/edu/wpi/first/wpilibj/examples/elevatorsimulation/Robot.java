@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.elevatorsimulation;
 
@@ -13,17 +10,15 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 
-/**
- * This is a sample program to demonstrate the use of elevator simulation with existing code.
- */
+/** This is a sample program to demonstrate the use of elevator simulation with existing code. */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
   private static final int kEncoderAChannel = 0;
@@ -40,7 +35,8 @@ public class Robot extends TimedRobot {
 
   // distance per pulse = (distance per revolution) / (pulses per revolution)
   //  = (Pi * D) / ppr
-  private static final double kElevatorEncoderDistPerPulse = 2.0 * Math.PI * kElevatorDrumRadius / 4096;
+  private static final double kElevatorEncoderDistPerPulse =
+      2.0 * Math.PI * kElevatorDrumRadius / 4096;
 
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
@@ -51,13 +47,15 @@ public class Robot extends TimedRobot {
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   // Simulation classes help us simulate what's going on, including gravity.
-  private final ElevatorSim m_elevatorSim = new ElevatorSim(m_elevatorGearbox,
-      kElevatorGearing,
-      kCarriageMass,
-      kElevatorDrumRadius,
-      kMinElevatorHeight,
-      kMaxElevatorHeight,
-      VecBuilder.fill(0.01));
+  private final ElevatorSim m_elevatorSim =
+      new ElevatorSim(
+          m_elevatorGearbox,
+          kElevatorGearing,
+          kCarriageMass,
+          kElevatorDrumRadius,
+          kMinElevatorHeight,
+          kMaxElevatorHeight,
+          VecBuilder.fill(0.01));
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   @Override
@@ -77,7 +75,8 @@ public class Robot extends TimedRobot {
     // Finally, we set our simulated encoder's readings and simulated battery voltage
     m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
     // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
   }
 
   @Override

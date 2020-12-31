@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -14,8 +11,7 @@
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 
 /**
  * Class to control the simulation side of a SimDevice.
@@ -49,7 +45,7 @@ class SimDeviceSim {
         });
   }
 
-  operator HAL_SimDeviceHandle() const { return m_handle; }
+  operator HAL_SimDeviceHandle() const { return m_handle; }  // NOLINT
 
   template <typename F>
   static void EnumerateDevices(const char* prefix, F callback) {
@@ -65,5 +61,4 @@ class SimDeviceSim {
  private:
   HAL_SimDeviceHandle m_handle;
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

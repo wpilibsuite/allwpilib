@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.swervesdriveposeestimator;
 
@@ -17,9 +14,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 
-/**
- * Represents a swerve drive style drivetrain.
- */
+/** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
@@ -36,20 +31,20 @@ public class Drivetrain {
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
-  private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-      m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation
-  );
+  private final SwerveDriveKinematics m_kinematics =
+      new SwerveDriveKinematics(
+          m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
   /* Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings. The numbers used
-     below are robot specific, and should be tuned. */
-  private final SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
-      m_gyro.getRotation2d(),
-      new Pose2d(),
-      m_kinematics,
-      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-      VecBuilder.fill(Units.degreesToRadians(0.01)),
-      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30))
-  );
+  below are robot specific, and should be tuned. */
+  private final SwerveDrivePoseEstimator m_poseEstimator =
+      new SwerveDrivePoseEstimator(
+          m_gyro.getRotation2d(),
+          new Pose2d(),
+          m_kinematics,
+          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+          VecBuilder.fill(Units.degreesToRadians(0.01)),
+          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   public Drivetrain() {
     m_gyro.reset();
@@ -58,18 +53,18 @@ public class Drivetrain {
   /**
    * Method to drive the robot using joystick info.
    *
-   * @param xSpeed        Speed of the robot in the x direction (forward).
-   * @param ySpeed        Speed of the robot in the y direction (sideways).
-   * @param rot           Angular rate of the robot.
+   * @param xSpeed Speed of the robot in the x direction (forward).
+   * @param ySpeed Speed of the robot in the y direction (sideways).
+   * @param rot Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    var swerveModuleStates = m_kinematics.toSwerveModuleStates(
-        fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-            : new ChassisSpeeds(xSpeed, ySpeed, rot)
-    );
+    var swerveModuleStates =
+        m_kinematics.toSwerveModuleStates(
+            fieldRelative
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+                : new ChassisSpeeds(xSpeed, ySpeed, rot));
     SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, kMaxSpeed);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
@@ -77,23 +72,20 @@ public class Drivetrain {
     m_backRight.setDesiredState(swerveModuleStates[3]);
   }
 
-  /**
-   * Updates the field relative position of the robot.
-   */
+  /** Updates the field relative position of the robot. */
   public void updateOdometry() {
     m_poseEstimator.update(
         m_gyro.getRotation2d(),
         m_frontLeft.getState(),
         m_frontRight.getState(),
         m_backLeft.getState(),
-        m_backRight.getState()
-    );
+        m_backRight.getState());
 
     // Also apply vision measurements. We use 0.3 seconds in the past as an example -- on
     // a real robot, this must be calculated based either on latency or timestamps.
     m_poseEstimator.addVisionMeasurement(
         ExampleGlobalMeasurementSensor.getEstimatedGlobalPose(
-          m_poseEstimator.getEstimatedPosition()),
+            m_poseEstimator.getEstimatedPosition()),
         Timer.getFPGATimestamp() - 0.3);
   }
 }

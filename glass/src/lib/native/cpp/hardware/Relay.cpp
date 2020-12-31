@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/hardware/Relay.h"
 
@@ -26,20 +23,29 @@ void glass::DisplayRelay(RelayModel* model, int index, bool outputsEnabled) {
   bool forward = false;
   bool reverse = false;
   if (outputsEnabled) {
-    if (forwardData) forward = forwardData->GetValue();
-    if (reverseData) reverse = reverseData->GetValue();
+    if (forwardData) {
+      forward = forwardData->GetValue();
+    }
+    if (reverseData) {
+      reverse = reverseData->GetValue();
+    }
   }
 
   std::string* name = GetStorage().GetStringRef("name");
   ImGui::PushID("name");
-  if (!name->empty())
+  if (!name->empty()) {
     ImGui::Text("%s [%d]", name->c_str(), index);
-  else
+  } else {
     ImGui::Text("Relay[%d]", index);
+  }
   ImGui::PopID();
   if (PopupEditName("name", name)) {
-    if (forwardData) forwardData->SetName(name->c_str());
-    if (reverseData) reverseData->SetName(name->c_str());
+    if (forwardData) {
+      forwardData->SetName(name->c_str());
+    }
+    if (reverseData) {
+      reverseData->SetName(name->c_str());
+    }
   }
   ImGui::SameLine();
 
@@ -60,15 +66,17 @@ void glass::DisplayRelays(RelaysModel* model, bool outputsEnabled,
   model->ForEachRelay([&](RelayModel& relay, int i) {
     hasAny = true;
 
-    if (!first)
+    if (!first) {
       ImGui::Separator();
-    else
+    } else {
       first = false;
+    }
 
     PushID(i);
     DisplayRelay(&relay, i, outputsEnabled);
     PopID();
   });
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

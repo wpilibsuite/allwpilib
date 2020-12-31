@@ -1,18 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.kinematics;
 
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import org.junit.jupiter.api.Test;
 
 class MecanumDriveKinematicsTest {
   private static final double kEpsilon = 1E-9;
@@ -40,8 +36,7 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(3.536, moduleStates.frontLeftMetersPerSecond, 0.1),
         () -> assertEquals(3.536, moduleStates.frontRightMetersPerSecond, 0.1),
         () -> assertEquals(3.536, moduleStates.rearLeftMetersPerSecond, 0.1),
-        () -> assertEquals(3.536, moduleStates.rearRightMetersPerSecond, 0.1)
-    );
+        () -> assertEquals(3.536, moduleStates.rearRightMetersPerSecond, 0.1));
   }
 
   @Test
@@ -58,8 +53,7 @@ class MecanumDriveKinematicsTest {
     assertAll(
         () -> assertEquals(5, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(0, moduleStates.vyMetersPerSecond, 0.1),
-        () -> assertEquals(0, moduleStates.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(0, moduleStates.omegaRadiansPerSecond, 0.1));
   }
 
   @Test
@@ -77,8 +71,7 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(-2.828427, moduleStates.frontLeftMetersPerSecond, 0.1),
         () -> assertEquals(2.828427, moduleStates.frontRightMetersPerSecond, 0.1),
         () -> assertEquals(2.828427, moduleStates.rearLeftMetersPerSecond, 0.1),
-        () -> assertEquals(-2.828427, moduleStates.rearRightMetersPerSecond, 0.1)
-    );
+        () -> assertEquals(-2.828427, moduleStates.rearRightMetersPerSecond, 0.1));
   }
 
   @Test
@@ -95,8 +88,7 @@ class MecanumDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(4, moduleStates.vyMetersPerSecond, 0.1),
-        () -> assertEquals(0, moduleStates.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(0, moduleStates.omegaRadiansPerSecond, 0.1));
   }
 
   @Test
@@ -114,8 +106,7 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(-106.629191, moduleStates.frontLeftMetersPerSecond, 0.1),
         () -> assertEquals(106.629191, moduleStates.frontRightMetersPerSecond, 0.1),
         () -> assertEquals(-106.629191, moduleStates.rearLeftMetersPerSecond, 0.1),
-        () -> assertEquals(106.629191, moduleStates.rearRightMetersPerSecond, 0.1)
-    );
+        () -> assertEquals(106.629191, moduleStates.rearRightMetersPerSecond, 0.1));
   }
 
   @Test
@@ -131,8 +122,7 @@ class MecanumDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(0, moduleStates.vyMetersPerSecond, 0.1),
-        () -> assertEquals(2 * Math.PI, moduleStates.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(2 * Math.PI, moduleStates.omegaRadiansPerSecond, 0.1));
   }
 
   @Test
@@ -150,8 +140,7 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(-17.677670, moduleStates.frontLeftMetersPerSecond, 0.1),
         () -> assertEquals(20.506097, moduleStates.frontRightMetersPerSecond, 0.1),
         () -> assertEquals(-13.435, moduleStates.rearLeftMetersPerSecond, 0.1),
-        () -> assertEquals(16.26, moduleStates.rearRightMetersPerSecond, 0.1)
-    );
+        () -> assertEquals(16.26, moduleStates.rearRightMetersPerSecond, 0.1));
   }
 
   @Test
@@ -167,8 +156,7 @@ class MecanumDriveKinematicsTest {
     assertAll(
         () -> assertEquals(2, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(3, moduleStates.vyMetersPerSecond, 0.1),
-        () -> assertEquals(1, moduleStates.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(1, moduleStates.omegaRadiansPerSecond, 0.1));
   }
 
   @Test
@@ -186,8 +174,7 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(0, moduleStates.frontLeftMetersPerSecond, 0.1),
         () -> assertEquals(16.971, moduleStates.frontRightMetersPerSecond, 0.1),
         () -> assertEquals(-16.971, moduleStates.rearLeftMetersPerSecond, 0.1),
-        () -> assertEquals(33.941, moduleStates.rearRightMetersPerSecond, 0.1)
-    );
+        () -> assertEquals(33.941, moduleStates.rearRightMetersPerSecond, 0.1));
   }
 
   @Test
@@ -203,8 +190,7 @@ class MecanumDriveKinematicsTest {
     assertAll(
         () -> assertEquals(12, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(-12, moduleStates.vyMetersPerSecond, 0.1),
-        () -> assertEquals(1, moduleStates.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(1, moduleStates.omegaRadiansPerSecond, 0.1));
   }
 
   @Test
@@ -222,8 +208,7 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(2.12, moduleStates.frontLeftMetersPerSecond, 0.1),
         () -> assertEquals(21.92, moduleStates.frontRightMetersPerSecond, 0.1),
         () -> assertEquals(-12.02, moduleStates.rearLeftMetersPerSecond, 0.1),
-        () -> assertEquals(36.06, moduleStates.rearRightMetersPerSecond, 0.1)
-    );
+        () -> assertEquals(36.06, moduleStates.rearRightMetersPerSecond, 0.1));
   }
 
   @Test
@@ -240,8 +225,7 @@ class MecanumDriveKinematicsTest {
     assertAll(
         () -> assertEquals(17, moduleStates.vxMetersPerSecond, 0.1),
         () -> assertEquals(-10, moduleStates.vyMetersPerSecond, 0.1),
-        () -> assertEquals(1, moduleStates.omegaRadiansPerSecond, 0.1)
-    );
+        () -> assertEquals(1, moduleStates.omegaRadiansPerSecond, 0.1));
   }
 
   @Test
@@ -255,8 +239,6 @@ class MecanumDriveKinematicsTest {
         () -> assertEquals(5.0 * factor, wheelSpeeds.frontLeftMetersPerSecond, kEpsilon),
         () -> assertEquals(6.0 * factor, wheelSpeeds.frontRightMetersPerSecond, kEpsilon),
         () -> assertEquals(4.0 * factor, wheelSpeeds.rearLeftMetersPerSecond, kEpsilon),
-        () -> assertEquals(7.0 * factor, wheelSpeeds.rearRightMetersPerSecond, kEpsilon)
-    );
+        () -> assertEquals(7.0 * factor, wheelSpeeds.rearRightMetersPerSecond, kEpsilon));
   }
-
 }

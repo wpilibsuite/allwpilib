@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.statespaceflywheel;
 
@@ -24,8 +21,8 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 
 /**
- * This is a sample program to demonstrate how to use a state-space controller
- * to control a flywheel.
+ * This is a sample program to demonstrate how to use a state-space controller to control a
+ * flywheel.
  */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
@@ -45,39 +42,37 @@ public class Robot extends TimedRobot {
   // States: [velocity], in radians per second.
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
-  private final LinearSystem<N1, N1, N1> m_flywheelPlant = LinearSystemId.createFlywheelSystem(
-        DCMotor.getNEO(2),
-        kFlywheelMomentOfInertia,
-        kFlywheelGearing);
+  private final LinearSystem<N1, N1, N1> m_flywheelPlant =
+      LinearSystemId.createFlywheelSystem(
+          DCMotor.getNEO(2), kFlywheelMomentOfInertia, kFlywheelGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
-  private final KalmanFilter<N1, N1, N1> m_observer = new KalmanFilter<>(
-        Nat.N1(), Nat.N1(),
-        m_flywheelPlant,
-        VecBuilder.fill(3.0), // How accurate we think our model is
-        VecBuilder.fill(0.01), // How accurate we think our encoder
-        // data is
-        0.020);
+  private final KalmanFilter<N1, N1, N1> m_observer =
+      new KalmanFilter<>(
+          Nat.N1(),
+          Nat.N1(),
+          m_flywheelPlant,
+          VecBuilder.fill(3.0), // How accurate we think our model is
+          VecBuilder.fill(0.01), // How accurate we think our encoder
+          // data is
+          0.020);
 
   // A LQR uses feedback to create voltage commands.
-  private final LinearQuadraticRegulator<N1, N1, N1> m_controller
-        = new LinearQuadraticRegulator<>(m_flywheelPlant,
-        VecBuilder.fill(8.0), // qelms. Velocity error tolerance, in radians per second. Decrease
-        // this to more heavily penalize state excursion, or make the controller behave more
-        // aggressively.
-        VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
-        // heavily penalize control effort, or make the controller less aggressive. 12 is a good
-        // starting point because that is the (approximate) maximum voltage of a battery.
-        0.020); // Nominal time between loops. 0.020 for TimedRobot, but can be
+  private final LinearQuadraticRegulator<N1, N1, N1> m_controller =
+      new LinearQuadraticRegulator<>(
+          m_flywheelPlant,
+          VecBuilder.fill(8.0), // qelms. Velocity error tolerance, in radians per second. Decrease
+          // this to more heavily penalize state excursion, or make the controller behave more
+          // aggressively.
+          VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
+          // heavily penalize control effort, or make the controller less aggressive. 12 is a good
+          // starting point because that is the (approximate) maximum voltage of a battery.
+          0.020); // Nominal time between loops. 0.020 for TimedRobot, but can be
   // lower if using notifiers.
 
   // The state-space loop combines a controller, observer, feedforward and plant for easy control.
-  private final LinearSystemLoop<N1, N1, N1> m_loop = new LinearSystemLoop<>(
-      m_flywheelPlant,
-        m_controller,
-        m_observer,
-        12.0,
-        0.020);
+  private final LinearSystemLoop<N1, N1, N1> m_loop =
+      new LinearSystemLoop<>(m_flywheelPlant, m_controller, m_observer, 12.0, 0.020);
 
   // An encoder set up to measure flywheel velocity in radians per second.
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -90,8 +85,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // We go 2 pi radians per 4096 clicks.
-    m_encoder.setDistancePerPulse(
-          2.0 * Math.PI / 4096.0);
+    m_encoder.setDistancePerPulse(2.0 * Math.PI / 4096.0);
   }
 
   @Override

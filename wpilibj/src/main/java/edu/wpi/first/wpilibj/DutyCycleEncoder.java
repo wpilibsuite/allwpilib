@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -15,9 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
- * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with
- * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
- * Encoder.
+ * Class for supporting duty cycle/PWM encoders, such as the US Digital MA3 with PWM Output, the
+ * CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag Encoder.
  */
 public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private final DutyCycle m_dutyCycle;
@@ -73,8 +69,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
     if (m_simDevice != null) {
       m_simPosition = m_simDevice.createDouble("position", SimDevice.Direction.kInput, 0.0);
-      m_simDistancePerRotation = m_simDevice.createDouble("distance_per_rot",
-          SimDevice.Direction.kOutput, 1.0);
+      m_simDistancePerRotation =
+          m_simDevice.createDouble("distance_per_rot", SimDevice.Direction.kOutput, 1.0);
       m_simIsConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
     } else {
       m_counter = new Counter();
@@ -122,9 +118,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Get the offset of position relative to the last reset.
    *
-   * <p>getPositionInRotation() - getPositionOffset() will give an encoder absolute
-   * position relative to the last reset. This could potentially be negative,
-   * which needs to be accounted for.
+   * <p>getPositionInRotation() - getPositionOffset() will give an encoder absolute position
+   * relative to the last reset. This could potentially be negative, which needs to be accounted
+   * for.
    *
    * @return the position offset
    */
@@ -133,11 +129,10 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Set the distance per rotation of the encoder. This sets the multiplier used
-   * to determine the distance driven based on the rotation value from the
-   * encoder. Set this value based on the how far the mechanism travels in 1
-   * rotation of the encoder, and factor in gearing reductions following the
-   * encoder shaft. This distance can be in any units you like, linear or angular.
+   * Set the distance per rotation of the encoder. This sets the multiplier used to determine the
+   * distance driven based on the rotation value from the encoder. Set this value based on the how
+   * far the mechanism travels in 1 rotation of the encoder, and factor in gearing reductions
+   * following the encoder shaft. This distance can be in any units you like, linear or angular.
    *
    * @param distancePerRotation the distance per rotation of the encoder
    */
@@ -148,16 +143,15 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Get the distance per rotation for this encoder.
    *
-   * @return The scale factor that will be used to convert rotation to useful
-   *         units.
+   * @return The scale factor that will be used to convert rotation to useful units.
    */
   public double getDistancePerRotation() {
     return m_distancePerRotation;
   }
 
   /**
-   * Get the distance the sensor has driven since the last reset as scaled by the
-   * value from {@link #setDistancePerRotation(double)}.
+   * Get the distance the sensor has driven since the last reset as scaled by the value from {@link
+   * #setDistancePerRotation(double)}.
    *
    * @return The distance driven since the last reset
    */
@@ -174,9 +168,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     return m_dutyCycle.getFrequency();
   }
 
-  /**
-   * Reset the Encoder distance to zero.
-   */
+  /** Reset the Encoder distance to zero. */
   public void reset() {
     if (m_counter != null) {
       m_counter.reset();
@@ -187,9 +179,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   /**
    * Get if the sensor is connected
    *
-   * <p>This uses the duty cycle frequency to determine if the sensor is connected.
-   * By default, a value of 100 Hz is used as the threshold, and this value can be
-   * changed with {@link #setConnectedFrequencyThreshold(int)}.
+   * <p>This uses the duty cycle frequency to determine if the sensor is connected. By default, a
+   * value of 100 Hz is used as the threshold, and this value can be changed with {@link
+   * #setConnectedFrequencyThreshold(int)}.
    *
    * @return true if the sensor is connected
    */
@@ -201,8 +193,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
-   * Change the frequency threshold for detecting connection used by
-   * {@link #isConnected()}.
+   * Change the frequency threshold for detecting connection used by {@link #isConnected()}.
    *
    * @param frequency the minimum frequency in Hz.
    */

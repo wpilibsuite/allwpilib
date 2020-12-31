@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/commands/Command.h"
 
@@ -34,8 +31,9 @@ Command::Command(Subsystem& subsystem) : Command("", -1.0) {
 
 Command::Command(const wpi::Twine& name, double timeout) {
   // We use -1.0 to indicate no timeout.
-  if (timeout < 0.0 && timeout != -1.0)
+  if (timeout < 0.0 && timeout != -1.0) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
+  }
 
   m_timeout = timeout;
 
@@ -64,37 +62,45 @@ Command::Command(const wpi::Twine& name, double timeout, Subsystem& subsystem)
 }
 
 double Command::TimeSinceInitialized() const {
-  if (m_startTime < 0.0)
+  if (m_startTime < 0.0) {
     return 0.0;
-  else
+  } else {
     return Timer::GetFPGATimestamp() - m_startTime;
+  }
 }
 
 void Command::Requires(Subsystem* subsystem) {
-  if (!AssertUnlocked("Can not add new requirement to command")) return;
+  if (!AssertUnlocked("Can not add new requirement to command")) {
+    return;
+  }
 
-  if (subsystem != nullptr)
+  if (subsystem != nullptr) {
     m_requirements.insert(subsystem);
-  else
+  } else {
     wpi_setWPIErrorWithContext(NullParameter, "subsystem");
+  }
 }
 
 void Command::Start() {
   LockChanges();
-  if (m_parent != nullptr)
+  if (m_parent != nullptr) {
     wpi_setWPIErrorWithContext(
         CommandIllegalUse,
         "Can not start a command that is part of a command group");
+  }
 
   m_completed = false;
   Scheduler::GetInstance()->AddCommand(this);
 }
 
 bool Command::Run() {
-  if (!m_runWhenDisabled && m_parent == nullptr && RobotState::IsDisabled())
+  if (!m_runWhenDisabled && m_parent == nullptr && RobotState::IsDisabled()) {
     Cancel();
+  }
 
-  if (IsCanceled()) return false;
+  if (IsCanceled()) {
+    return false;
+  }
 
   if (!m_initialized) {
     m_initialized = true;
@@ -108,23 +114,34 @@ bool Command::Run() {
 }
 
 void Command::Cancel() {
-  if (m_parent != nullptr)
+  if (m_parent != nullptr) {
     wpi_setWPIErrorWithContext(
         CommandIllegalUse,
         "Can not cancel a command that is part of a command group");
+  }
 
   _Cancel();
 }
 
-bool Command::IsRunning() const { return m_running; }
+bool Command::IsRunning() const {
+  return m_running;
+}
 
-bool Command::IsInitialized() const { return m_initialized; }
+bool Command::IsInitialized() const {
+  return m_initialized;
+}
 
-bool Command::IsCompleted() const { return m_completed; }
+bool Command::IsCompleted() const {
+  return m_completed;
+}
 
-bool Command::IsCanceled() const { return m_canceled; }
+bool Command::IsCanceled() const {
+  return m_canceled;
+}
 
-bool Command::IsInterruptible() const { return m_interruptible; }
+bool Command::IsInterruptible() const {
+  return m_interruptible;
+}
 
 void Command::SetInterruptible(bool interruptible) {
   m_interruptible = interruptible;
@@ -138,19 +155,28 @@ const Command::SubsystemSet& Command::GetRequirements() const {
   return m_requirements;
 }
 
-CommandGroup* Command::GetGroup() const { return m_parent; }
+CommandGroup* Command::GetGroup() const {
+  return m_parent;
+}
 
-void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
+void Command::SetRunWhenDisabled(bool run) {
+  m_runWhenDisabled = run;
+}
 
-bool Command::WillRunWhenDisabled() const { return m_runWhenDisabled; }
+bool Command::WillRunWhenDisabled() const {
+  return m_runWhenDisabled;
+}
 
-int Command::GetID() const { return m_commandID; }
+int Command::GetID() const {
+  return m_commandID;
+}
 
 void Command::SetTimeout(double timeout) {
-  if (timeout < 0.0)
+  if (timeout < 0.0) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
-  else
+  } else {
     m_timeout = timeout;
+  }
 }
 
 bool Command::IsTimedOut() const {
@@ -180,9 +206,13 @@ void Command::SetParent(CommandGroup* parent) {
   }
 }
 
-bool Command::IsParented() const { return m_parent != nullptr; }
+bool Command::IsParented() const {
+  return m_parent != nullptr;
+}
 
-void Command::ClearRequirements() { m_requirements.clear(); }
+void Command::ClearRequirements() {
+  m_requirements.clear();
+}
 
 void Command::Initialize() {}
 
@@ -190,21 +220,33 @@ void Command::Execute() {}
 
 void Command::End() {}
 
-void Command::Interrupted() { End(); }
+void Command::Interrupted() {
+  End();
+}
 
-void Command::_Initialize() { m_completed = false; }
+void Command::_Initialize() {
+  m_completed = false;
+}
 
-void Command::_Interrupted() { m_completed = true; }
+void Command::_Interrupted() {
+  m_completed = true;
+}
 
 void Command::_Execute() {}
 
-void Command::_End() { m_completed = true; }
-
-void Command::_Cancel() {
-  if (IsRunning()) m_canceled = true;
+void Command::_End() {
+  m_completed = true;
 }
 
-void Command::LockChanges() { m_locked = true; }
+void Command::_Cancel() {
+  if (IsRunning()) {
+    m_canceled = true;
+  }
+}
+
+void Command::LockChanges() {
+  m_locked = true;
+}
 
 void Command::Removed() {
   if (m_initialized) {
@@ -228,7 +270,9 @@ void Command::StartRunning() {
   m_completed = false;
 }
 
-void Command::StartTiming() { m_startTime = Timer::GetFPGATimestamp(); }
+void Command::StartTiming() {
+  m_startTime = Timer::GetFPGATimestamp();
+}
 
 std::string Command::GetName() const {
   return SendableRegistry::GetInstance().GetName(this);
@@ -255,9 +299,13 @@ void Command::InitSendable(SendableBuilder& builder) {
       "running", [=]() { return IsRunning(); },
       [=](bool value) {
         if (value) {
-          if (!IsRunning()) Start();
+          if (!IsRunning()) {
+            Start();
+          }
         } else {
-          if (IsRunning()) Cancel();
+          if (IsRunning()) {
+            Cancel();
+          }
         }
       });
   builder.AddBooleanProperty(

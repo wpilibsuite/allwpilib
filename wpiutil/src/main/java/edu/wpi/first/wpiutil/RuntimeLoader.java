@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpiutil;
 
@@ -23,9 +20,7 @@ import java.util.Scanner;
 public final class RuntimeLoader<T> {
   private static String defaultExtractionRoot;
 
-  /**
-   * Gets the default extration root location (~/.wpilib/nativecache).
-   */
+  /** Gets the default extration root location (~/.wpilib/nativecache). */
   public static synchronized String getDefaultExtractionRoot() {
     if (defaultExtractionRoot != null) {
       return defaultExtractionRoot;
@@ -42,8 +37,8 @@ public final class RuntimeLoader<T> {
   /**
    * Creates a new library loader.
    *
-   * <p>Resources loaded on disk from extractionRoot, and from classpath from the
-   * passed in class. Library name is the passed in name.
+   * <p>Resources loaded on disk from extractionRoot, and from classpath from the passed in class.
+   * Library name is the passed in name.
    */
   public RuntimeLoader(String libraryName, String extractionRoot, Class<T> cls) {
     m_libraryName = libraryName;
@@ -54,22 +49,22 @@ public final class RuntimeLoader<T> {
   private String getLoadErrorMessage(UnsatisfiedLinkError ule) {
     StringBuilder msg = new StringBuilder(512);
     msg.append(m_libraryName)
-       .append(" could not be loaded from path or an embedded resource.\n"
-               + "\tattempted to load for platform ")
-       .append(RuntimeDetector.getPlatformPath())
-       .append("\nLast Load Error: \n")
-       .append(ule.getMessage())
-       .append('\n');
+        .append(
+            " could not be loaded from path or an embedded resource.\n"
+                + "\tattempted to load for platform ")
+        .append(RuntimeDetector.getPlatformPath())
+        .append("\nLast Load Error: \n")
+        .append(ule.getMessage())
+        .append('\n');
     if (RuntimeDetector.isWindows()) {
-      msg.append("A common cause of this error is missing the C++ runtime.\n"
-                 + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
+      msg.append(
+          "A common cause of this error is missing the C++ runtime.\n"
+              + "Download the latest at https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads\n");
     }
     return msg.toString();
   }
 
-  /**
-   * Loads a native library.
-   */
+  /** Loads a native library. */
   @SuppressWarnings("PMD.PreserveStackTrace")
   public void loadLibrary() throws IOException {
     try {
@@ -111,11 +106,14 @@ public final class RuntimeLoader<T> {
     }
   }
 
-  /**
-   * Load a native library by directly hashing the file.
-   */
-  @SuppressWarnings({"PMD.NPathComplexity", "PMD.PreserveStackTrace", "PMD.EmptyWhileStmt",
-                     "PMD.AvoidThrowingRawExceptionTypes", "PMD.CyclomaticComplexity"})
+  /** Load a native library by directly hashing the file. */
+  @SuppressWarnings({
+    "PMD.NPathComplexity",
+    "PMD.PreserveStackTrace",
+    "PMD.EmptyWhileStmt",
+    "PMD.AvoidThrowingRawExceptionTypes",
+    "PMD.CyclomaticComplexity"
+  })
   public void loadLibraryHashed() throws IOException {
     try {
       // First, try loading path

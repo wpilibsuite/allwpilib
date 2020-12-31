@@ -77,7 +77,6 @@ deploy {
             postdeploy << { ctx ->
                 ctx.execute('chmod +x myRobotCpp')
             }
-
         }
 
         nativeArtifact('myRobotCppStatic') {
@@ -136,9 +135,7 @@ dependencies {
     implementation project(':wpilibNewCommands')
 }
 
-def simProjects = [
-    'halsim_gui'
-]
+def simProjects = ['halsim_gui']
 
 model {
     components {

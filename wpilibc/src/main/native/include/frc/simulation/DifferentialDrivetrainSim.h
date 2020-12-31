@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -44,7 +41,7 @@ class DifferentialDrivetrainSim {
    * starting point.
    */
   DifferentialDrivetrainSim(
-      const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
+      LinearSystem<2, 2, 2> plant, units::meter_t trackWidth,
       DCMotor driveMotor, double gearingRatio, units::meter_t wheelRadius,
       const std::array<double, 7>& measurementStdDevs = {});
 
@@ -74,6 +71,16 @@ class DifferentialDrivetrainSim {
       units::kilogram_t mass, units::meter_t wheelRadius,
       units::meter_t trackWidth,
       const std::array<double, 7>& measurementStdDevs = {});
+
+  /**
+   * Clamp the input vector such that no element exceeds the given voltage. If
+   * any does, the relative magnitudes of the input will be maintained.
+   *
+   * @param u          The input vector.
+   * @param maxVoltage The maximum voltage.
+   * @return The normalized input.
+   */
+  Eigen::Matrix<double, 2, 1> ClampInput(Eigen::Matrix<double, 2, 1> u);
 
   /**
    * Sets the applied voltage to the drivetrain. Note that positive voltage must
@@ -150,6 +157,16 @@ class DifferentialDrivetrainSim {
   units::meters_per_second_t GetLeftVelocity() const {
     return units::meters_per_second_t{GetOutput(State::kLeftVelocity)};
   }
+
+  /**
+   * Returns the currently drawn current for the right side.
+   */
+  units::ampere_t GetRightCurrentDraw() const;
+
+  /**
+   * Returns the currently drawn current for the left side.
+   */
+  units::ampere_t GetLeftCurrentDraw() const;
 
   /**
    * Returns the currently drawn current.

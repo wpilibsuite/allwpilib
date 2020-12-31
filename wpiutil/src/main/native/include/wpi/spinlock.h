@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -30,8 +27,11 @@ class spinlock {
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
   void lock() {
-    for (unsigned int i = 1; !try_lock(); ++i)
-      if ((i & 0xff) == 0) std::this_thread::yield();
+    for (unsigned int i = 1; !try_lock(); ++i) {
+      if ((i & 0xff) == 0) {
+        std::this_thread::yield();
+      }
+    }
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
@@ -58,8 +58,9 @@ class recursive_spinlock1 {
                             std::memory_order_release);
     } else {
       if (owner_thread_id.load(std::memory_order_acquire) !=
-          std::this_thread::get_id())
+          std::this_thread::get_id()) {
         return false;
+      }
     }
     ++recursive_counter;
     return true;
@@ -67,8 +68,11 @@ class recursive_spinlock1 {
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
   void lock() {
-    for (unsigned int i = 1; !try_lock(); ++i)
-      if ((i & 0xffff) == 0) std::this_thread::yield();
+    for (unsigned int i = 1; !try_lock(); ++i) {
+      if ((i & 0xffff) == 0) {
+        std::this_thread::yield();
+      }
+    }
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
@@ -100,7 +104,9 @@ class recursive_spinlock2 {
     auto us = std::this_thread::get_id();
     if (!owner_thread_id.compare_exchange_weak(owner, us,
                                                std::memory_order_acquire)) {
-      if (owner != us) return false;
+      if (owner != us) {
+        return false;
+      }
     }
     ++recursive_counter;
     return true;
@@ -108,8 +114,11 @@ class recursive_spinlock2 {
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
   void lock() {
-    for (unsigned int i = 1; !try_lock(); ++i)
-      if ((i & 0xffff) == 0) std::this_thread::yield();
+    for (unsigned int i = 1; !try_lock(); ++i) {
+      if ((i & 0xffff) == 0) {
+        std::this_thread::yield();
+      }
+    }
   }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE
@@ -118,8 +127,9 @@ class recursive_spinlock2 {
            std::this_thread::get_id());
     assert(recursive_counter > 0);
 
-    if (--recursive_counter == 0)
+    if (--recursive_counter == 0) {
       owner_thread_id.store(std::thread::id{}, std::memory_order_release);
+    }
   }
 };
 

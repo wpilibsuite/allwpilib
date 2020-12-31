@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/networktables/NTField2D.h"
 
@@ -27,7 +24,9 @@ class NTField2DModel::GroupModel : public FieldObjectGroupModel {
   void NTUpdate(const nt::Value& value);
 
   void Update() override {
-    if (auto value = nt::GetEntryValue(m_entry)) NTUpdate(*value);
+    if (auto value = nt::GetEntryValue(m_entry)) {
+      NTUpdate(*value);
+    }
   }
   bool Exists() override { return nt::GetEntryType(m_entry) != NT_UNASSIGNED; }
   bool IsReadOnly() override { return false; }
@@ -99,12 +98,14 @@ void NTField2DModel::GroupModel::NTUpdate(const nt::Value& value) {
   m_count = arr.size() / 3;
   if (m_count > m_objects.size()) {
     m_objects.reserve(m_count);
-    for (size_t i = m_objects.size(); i < m_count; ++i)
+    for (size_t i = m_objects.size(); i < m_count; ++i) {
       m_objects.emplace_back(std::make_unique<ObjectModel>(m_name, m_entry, i));
+    }
   }
   if (m_count < m_objects.size()) {
-    for (size_t i = m_count; i < m_objects.size(); ++i)
+    for (size_t i = m_count; i < m_objects.size(); ++i) {
       m_objects[i]->SetExists(false);
+    }
   }
 
   for (size_t i = 0; i < m_count; ++i) {
@@ -142,19 +143,31 @@ void NTField2DModel::GroupModel::ObjectModel::SetPoseImpl(double x, double y,
                                                           bool setRot) {
   // get from NT, validate type and size
   auto value = nt::GetEntryValue(m_entry);
-  if (!value || !value->IsDoubleArray()) return;
+  if (!value || !value->IsDoubleArray()) {
+    return;
+  }
   auto origArr = value->GetDoubleArray();
-  if (origArr.size() < static_cast<size_t>((m_index + 1) * 3)) return;
+  if (static_cast<int>(origArr.size()) < ((m_index + 1) * 3)) {
+    return;
+  }
 
   // copy existing array
   wpi::SmallVector<double, 8> arr;
   arr.reserve(origArr.size());
-  for (auto&& elem : origArr) arr.emplace_back(elem);
+  for (auto&& elem : origArr) {
+    arr.emplace_back(elem);
+  }
 
   // update value
-  if (setX) arr[m_index * 3 + 0] = x;
-  if (setY) arr[m_index * 3 + 1] = y;
-  if (setRot) arr[m_index * 3 + 2] = rot;
+  if (setX) {
+    arr[m_index * 3 + 0] = x;
+  }
+  if (setY) {
+    arr[m_index * 3 + 1] = y;
+  }
+  if (setRot) {
+    arr[m_index * 3 + 2] = rot;
+  }
 
   // set back to NT
   nt::SetEntryValue(m_entry, nt::Value::MakeDoubleArray(arr));
@@ -171,7 +184,7 @@ NTField2DModel::NTField2DModel(NT_Inst inst, wpi::StringRef path)
                                NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE);
 }
 
-NTField2DModel::~NTField2DModel() {}
+NTField2DModel::~NTField2DModel() = default;
 
 void NTField2DModel::Update() {
   for (auto&& event : m_nt.PollListener()) {
@@ -197,19 +210,24 @@ void NTField2DModel::Update() {
     // handle create/delete
     if (wpi::StringRef{event.name}.startswith(m_path)) {
       auto name = wpi::StringRef{event.name}.drop_front(m_path.size());
-      if (name.empty() || name[0] == '.') continue;
+      if (name.empty() || name[0] == '.') {
+        continue;
+      }
       auto it = std::lower_bound(m_groups.begin(), m_groups.end(), name,
                                  [](const auto& e, wpi::StringRef name) {
                                    return e->GetName() < name;
                                  });
       bool match = (it != m_groups.end() && (*it)->GetName() == name);
       if (event.flags & NT_NOTIFY_DELETE) {
-        if (match) m_groups.erase(it);
+        if (match) {
+          m_groups.erase(it);
+        }
         continue;
       } else if (event.flags & NT_NOTIFY_NEW) {
-        if (!match)
+        if (!match) {
           it = m_groups.emplace(
               it, std::make_unique<GroupModel>(event.name, event.entry));
+        }
       } else if (!match) {
         continue;
       }
@@ -224,13 +242,16 @@ bool NTField2DModel::Exists() {
   return m_nt.IsConnected() && nt::GetEntryType(m_name) != NT_UNASSIGNED;
 }
 
-bool NTField2DModel::IsReadOnly() { return false; }
+bool NTField2DModel::IsReadOnly() {
+  return false;
+}
 
 void NTField2DModel::ForEachFieldObjectGroup(
     wpi::function_ref<void(FieldObjectGroupModel& model, wpi::StringRef name)>
         func) {
   for (auto&& group : m_groups) {
-    if (group->Exists())
+    if (group->Exists()) {
       func(*group, wpi::StringRef{group->GetName()}.drop_front(m_path.size()));
+    }
   }
 }

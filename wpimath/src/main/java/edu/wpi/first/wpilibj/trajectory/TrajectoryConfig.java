@@ -1,14 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.trajectory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
@@ -17,14 +11,16 @@ import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsCo
 import edu.wpi.first.wpilibj.trajectory.constraint.MecanumDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents the configuration for generating a trajectory. This class stores the start velocity,
  * end velocity, max velocity, max acceleration, custom constraints, and the reversed flag.
  *
  * <p>The class must be constructed with a max velocity and max acceleration. The other parameters
- * (start velocity, end velocity, constraints, reversed) have been defaulted to reasonable
- * values (0, 0, {}, false). These values can be changed via the setXXX methods.
+ * (start velocity, end velocity, constraints, reversed) have been defaulted to reasonable values
+ * (0, 0, {}, false). These values can be changed via the setXXX methods.
  */
 public class TrajectoryConfig {
   private final double m_maxVelocity;
@@ -37,11 +33,11 @@ public class TrajectoryConfig {
   /**
    * Constructs the trajectory configuration class.
    *
-   * @param maxVelocityMetersPerSecond       The max velocity for the trajectory.
+   * @param maxVelocityMetersPerSecond The max velocity for the trajectory.
    * @param maxAccelerationMetersPerSecondSq The max acceleration for the trajectory.
    */
-  public TrajectoryConfig(double maxVelocityMetersPerSecond,
-                          double maxAccelerationMetersPerSecondSq) {
+  public TrajectoryConfig(
+      double maxVelocityMetersPerSecond, double maxAccelerationMetersPerSecondSq) {
     m_maxVelocity = maxVelocityMetersPerSecond;
     m_maxAcceleration = maxAccelerationMetersPerSecondSq;
     m_constraints = new ArrayList<>();
@@ -60,6 +56,7 @@ public class TrajectoryConfig {
 
   /**
    * Adds all user-defined constraints from a list to the trajectory.
+   *
    * @param constraints List of user-defined constraints.
    * @return Instance of the current config object.
    */
@@ -69,8 +66,8 @@ public class TrajectoryConfig {
   }
 
   /**
-   * Adds a differential drive kinematics constraint to ensure that
-   * no wheel velocity of a differential drive goes above the max velocity.
+   * Adds a differential drive kinematics constraint to ensure that no wheel velocity of a
+   * differential drive goes above the max velocity.
    *
    * @param kinematics The differential drive kinematics.
    * @return Instance of the current config object.
@@ -81,34 +78,34 @@ public class TrajectoryConfig {
   }
 
   /**
-  * Adds a mecanum drive kinematics constraint to ensure that
-  * no wheel velocity of a mecanum drive goes above the max velocity.
-  *
-  * @param kinematics The mecanum drive kinematics.
-  * @return Instance of the current config object.
-  */
+   * Adds a mecanum drive kinematics constraint to ensure that no wheel velocity of a mecanum drive
+   * goes above the max velocity.
+   *
+   * @param kinematics The mecanum drive kinematics.
+   * @return Instance of the current config object.
+   */
   public TrajectoryConfig setKinematics(MecanumDriveKinematics kinematics) {
     addConstraint(new MecanumDriveKinematicsConstraint(kinematics, m_maxVelocity));
     return this;
   }
 
   /**
-  * Adds a swerve drive kinematics constraint to ensure that
-  * no wheel velocity of a swerve drive goes above the max velocity.
-  *
-  * @param kinematics The swerve drive kinematics.
-  * @return Instance of the current config object.
-  */
+   * Adds a swerve drive kinematics constraint to ensure that no wheel velocity of a swerve drive
+   * goes above the max velocity.
+   *
+   * @param kinematics The swerve drive kinematics.
+   * @return Instance of the current config object.
+   */
   public TrajectoryConfig setKinematics(SwerveDriveKinematics kinematics) {
     addConstraint(new SwerveDriveKinematicsConstraint(kinematics, m_maxVelocity));
     return this;
   }
 
   /**
-  * Returns the starting velocity of the trajectory.
-  *
-  * @return The starting velocity of the trajectory.
-  */
+   * Returns the starting velocity of the trajectory.
+   *
+   * @return The starting velocity of the trajectory.
+   */
   public double getStartVelocity() {
     return m_startVelocity;
   }

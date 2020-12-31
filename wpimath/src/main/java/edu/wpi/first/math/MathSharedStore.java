@@ -1,39 +1,30 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.math;
 
 public final class MathSharedStore {
   private static MathShared mathShared;
 
-  private MathSharedStore() {
-  }
+  private MathSharedStore() {}
 
-  /**
-   * get the MathShared object.
-   */
+  /** get the MathShared object. */
   public static synchronized MathShared getMathShared() {
     if (mathShared == null) {
-      mathShared = new MathShared() {
-        @Override
-        public void reportError(String error, StackTraceElement[] stackTrace) {
-        }
+      mathShared =
+          new MathShared() {
+            @Override
+            public void reportError(String error, StackTraceElement[] stackTrace) {}
 
-        @Override
-        public void reportUsage(MathUsageId id, int count) {
-        }
-      };
+            @Override
+            public void reportUsage(MathUsageId id, int count) {}
+          };
     }
     return mathShared;
   }
 
-  /**
-   * set the MathShared object.
-   */
+  /** set the MathShared object. */
   public static synchronized void setMathShared(MathShared shared) {
     mathShared = shared;
   }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/simulation/SimDeviceData.h"  // NOLINT(build/include_order)
 
@@ -13,38 +10,44 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSimDeviceData() {
   static SimDeviceData sdd;
   ::hal::SimSimDeviceData = &sdd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 SimDeviceData* hal::SimSimDeviceData;
 
 SimDeviceData::Device* SimDeviceData::LookupDevice(HAL_SimDeviceHandle handle) {
-  if (handle <= 0) return nullptr;
-  --handle;
-  if (static_cast<uint32_t>(handle) >= m_devices.size() || !m_devices[handle])
+  if (handle <= 0) {
     return nullptr;
+  }
+  --handle;
+  if (static_cast<uint32_t>(handle) >= m_devices.size() || !m_devices[handle]) {
+    return nullptr;
+  }
   return m_devices[handle].get();
 }
 
 SimDeviceData::Value* SimDeviceData::LookupValue(HAL_SimValueHandle handle) {
-  if (handle <= 0) return nullptr;
+  if (handle <= 0) {
+    return nullptr;
+  }
 
   // look up device
   Device* deviceImpl = LookupDevice(handle >> 16);
-  if (!deviceImpl) return nullptr;
+  if (!deviceImpl) {
+    return nullptr;
+  }
 
   // look up value
   handle &= 0xffff;
   --handle;
   if (static_cast<uint32_t>(handle) >= deviceImpl->values.size() ||
-      !deviceImpl->values[handle])
+      !deviceImpl->values[handle]) {
     return nullptr;
+  }
 
   return deviceImpl->values[handle].get();
 }
@@ -68,7 +71,9 @@ void SimDeviceData::SetDeviceEnabled(const char* prefix, bool enabled) {
 bool SimDeviceData::IsDeviceEnabled(const char* name) {
   std::scoped_lock lock(m_mutex);
   for (const auto& elem : m_prefixEnabled) {
-    if (wpi::StringRef{name}.startswith(elem.first)) return elem.second;
+    if (wpi::StringRef{name}.startswith(elem.first)) {
+      return elem.second;
+    }
   }
   return true;
 }
@@ -79,17 +84,23 @@ HAL_SimDeviceHandle SimDeviceData::CreateDevice(const char* name) {
   // don't create if disabled
   for (const auto& elem : m_prefixEnabled) {
     if (wpi::StringRef{name}.startswith(elem.first)) {
-      if (elem.second) break;  // enabled
-      return 0;                // disabled
+      if (elem.second) {
+        break;  // enabled
+      }
+      return 0;  // disabled
     }
   }
 
   // check for duplicates and don't overwrite them
-  if (m_deviceMap.count(name) > 0) return 0;
+  if (m_deviceMap.count(name) > 0) {
+    return 0;
+  }
 
   // don't allow more than 4096 devices (limit driven by 12-bit allocation in
   // value changed callback uid)
-  if (m_devices.size() >= 4095) return 0;
+  if (m_devices.size() >= 4095) {
+    return 0;
+  }
 
   // create and save
   auto deviceImpl = std::make_shared<Device>(name);
@@ -108,9 +119,13 @@ void SimDeviceData::FreeDevice(HAL_SimDeviceHandle handle) {
   --handle;
 
   // see if it exists
-  if (handle < 0 || static_cast<uint32_t>(handle) >= m_devices.size()) return;
+  if (handle < 0 || static_cast<uint32_t>(handle) >= m_devices.size()) {
+    return;
+  }
   auto deviceImpl = std::move(m_devices[handle]);
-  if (!deviceImpl) return;
+  if (!deviceImpl) {
+    return;
+  }
 
   // remove from map
   m_deviceMap.erase(deviceImpl->name);
@@ -130,15 +145,21 @@ HAL_SimValueHandle SimDeviceData::CreateValue(
 
   // look up device
   Device* deviceImpl = LookupDevice(device);
-  if (!deviceImpl) return 0;
+  if (!deviceImpl) {
+    return 0;
+  }
 
   // check for duplicates and don't overwrite them
   auto it = deviceImpl->valueMap.find(name);
-  if (it != deviceImpl->valueMap.end()) return 0;
+  if (it != deviceImpl->valueMap.end()) {
+    return 0;
+  }
 
   // don't allow more than 4096 values per device (limit driven by 12-bit
   // allocation in value changed callback uid)
-  if (deviceImpl->values.size() >= 4095) return 0;
+  if (deviceImpl->values.size() >= 4095) {
+    return 0;
+  }
 
   // create and save; encode device into handle
   auto valueImplPtr = std::make_unique<Value>(name, direction, initialValue);
@@ -188,7 +209,9 @@ void SimDeviceData::SetValue(HAL_SimValueHandle handle,
                              const HAL_Value& value) {
   std::scoped_lock lock(m_mutex);
   Value* valueImpl = LookupValue(handle);
-  if (!valueImpl) return;
+  if (!valueImpl) {
+    return;
+  }
 
   valueImpl->value = value;
 
@@ -208,8 +231,9 @@ int32_t SimDeviceData::RegisterDeviceCreatedCallback(
   // initial notifications
   if (initialNotify) {
     for (auto&& device : m_devices) {
-      if (wpi::StringRef{device->name}.startswith(prefix))
+      if (wpi::StringRef{device->name}.startswith(prefix)) {
         callback(device->name.c_str(), param, device->handle);
+      }
     }
   }
 
@@ -217,7 +241,9 @@ int32_t SimDeviceData::RegisterDeviceCreatedCallback(
 }
 
 void SimDeviceData::CancelDeviceCreatedCallback(int32_t uid) {
-  if (uid <= 0) return;
+  if (uid <= 0) {
+    return;
+  }
   std::scoped_lock lock(m_mutex);
   m_deviceCreated.Cancel(uid);
 }
@@ -229,7 +255,9 @@ int32_t SimDeviceData::RegisterDeviceFreedCallback(
 }
 
 void SimDeviceData::CancelDeviceFreedCallback(int32_t uid) {
-  if (uid <= 0) return;
+  if (uid <= 0) {
+    return;
+  }
   std::scoped_lock lock(m_mutex);
   m_deviceFreed.Cancel(uid);
 }
@@ -237,11 +265,14 @@ void SimDeviceData::CancelDeviceFreedCallback(int32_t uid) {
 HAL_SimDeviceHandle SimDeviceData::GetDeviceHandle(const char* name) {
   std::scoped_lock lock(m_mutex);
   auto it = m_deviceMap.find(name);
-  if (it == m_deviceMap.end()) return 0;
-  if (auto deviceImpl = it->getValue().lock())
-    return deviceImpl->handle;
-  else
+  if (it == m_deviceMap.end()) {
     return 0;
+  }
+  if (auto deviceImpl = it->getValue().lock()) {
+    return deviceImpl->handle;
+  } else {
+    return 0;
+  }
 }
 
 const char* SimDeviceData::GetDeviceName(HAL_SimDeviceHandle handle) {
@@ -249,7 +280,9 @@ const char* SimDeviceData::GetDeviceName(HAL_SimDeviceHandle handle) {
 
   // look up device
   Device* deviceImpl = LookupDevice(handle);
-  if (!deviceImpl) return nullptr;
+  if (!deviceImpl) {
+    return nullptr;
+  }
 
   return deviceImpl->name.c_str();
 }
@@ -258,8 +291,9 @@ void SimDeviceData::EnumerateDevices(const char* prefix, void* param,
                                      HALSIM_SimDeviceCallback callback) {
   std::scoped_lock lock(m_mutex);
   for (auto&& device : m_devices) {
-    if (wpi::StringRef{device->name}.startswith(prefix))
+    if (wpi::StringRef{device->name}.startswith(prefix)) {
       callback(device->name.c_str(), param, device->handle);
+    }
   }
 }
 
@@ -268,16 +302,19 @@ int32_t SimDeviceData::RegisterValueCreatedCallback(
     bool initialNotify) {
   std::scoped_lock lock(m_mutex);
   Device* deviceImpl = LookupDevice(device);
-  if (!deviceImpl) return -1;
+  if (!deviceImpl) {
+    return -1;
+  }
 
   // register callback
   int32_t index = deviceImpl->valueCreated.Register(callback, param);
 
   // initial notifications
   if (initialNotify) {
-    for (auto&& value : deviceImpl->values)
+    for (auto&& value : deviceImpl->values) {
       callback(value->name.c_str(), param, value->handle, value->direction,
                &value->value);
+    }
   }
 
   // encode device into uid
@@ -285,10 +322,14 @@ int32_t SimDeviceData::RegisterValueCreatedCallback(
 }
 
 void SimDeviceData::CancelValueCreatedCallback(int32_t uid) {
-  if (uid <= 0) return;
+  if (uid <= 0) {
+    return;
+  }
   std::scoped_lock lock(m_mutex);
   Device* deviceImpl = LookupDevice(uid >> 16);
-  if (!deviceImpl) return;
+  if (!deviceImpl) {
+    return;
+  }
   deviceImpl->valueCreated.Cancel(uid & 0xffff);
 }
 
@@ -297,15 +338,18 @@ int32_t SimDeviceData::RegisterValueChangedCallback(
     bool initialNotify) {
   std::scoped_lock lock(m_mutex);
   Value* valueImpl = LookupValue(handle);
-  if (!valueImpl) return -1;
+  if (!valueImpl) {
+    return -1;
+  }
 
   // register callback
   int32_t index = valueImpl->changed.Register(callback, param);
 
   // initial notification
-  if (initialNotify)
+  if (initialNotify) {
     callback(valueImpl->name.c_str(), param, valueImpl->handle,
              valueImpl->direction, &valueImpl->value);
+  }
 
   // encode device and value into uid
   return (((handle >> 16) & 0xfff) << 19) | ((handle & 0xfff) << 7) |
@@ -313,10 +357,14 @@ int32_t SimDeviceData::RegisterValueChangedCallback(
 }
 
 void SimDeviceData::CancelValueChangedCallback(int32_t uid) {
-  if (uid <= 0) return;
+  if (uid <= 0) {
+    return;
+  }
   std::scoped_lock lock(m_mutex);
   Value* valueImpl = LookupValue(((uid >> 19) << 16) | ((uid >> 7) & 0xfff));
-  if (!valueImpl) return;
+  if (!valueImpl) {
+    return;
+  }
   valueImpl->changed.Cancel(uid & 0x7f);
 }
 
@@ -324,12 +372,18 @@ HAL_SimValueHandle SimDeviceData::GetValueHandle(HAL_SimDeviceHandle device,
                                                  const char* name) {
   std::scoped_lock lock(m_mutex);
   Device* deviceImpl = LookupDevice(device);
-  if (!deviceImpl) return 0;
+  if (!deviceImpl) {
+    return 0;
+  }
 
   // lookup value
   auto it = deviceImpl->valueMap.find(name);
-  if (it == deviceImpl->valueMap.end()) return 0;
-  if (!it->getValue()) return 0;
+  if (it == deviceImpl->valueMap.end()) {
+    return 0;
+  }
+  if (!it->getValue()) {
+    return 0;
+  }
   return it->getValue()->handle;
 }
 
@@ -337,11 +391,14 @@ void SimDeviceData::EnumerateValues(HAL_SimDeviceHandle device, void* param,
                                     HALSIM_SimValueCallback callback) {
   std::scoped_lock lock(m_mutex);
   Device* deviceImpl = LookupDevice(device);
-  if (!deviceImpl) return;
+  if (!deviceImpl) {
+    return;
+  }
 
-  for (auto&& value : deviceImpl->values)
+  for (auto&& value : deviceImpl->values) {
     callback(value->name.c_str(), param, value->handle, value->direction,
              &value->value);
+  }
 }
 
 const char** SimDeviceData::GetValueEnumOptions(HAL_SimValueHandle handle,
@@ -350,7 +407,9 @@ const char** SimDeviceData::GetValueEnumOptions(HAL_SimValueHandle handle,
 
   std::scoped_lock lock(m_mutex);
   Value* valueImpl = LookupValue(handle);
-  if (!valueImpl) return nullptr;
+  if (!valueImpl) {
+    return nullptr;
+  }
 
   // get list of options (safe to return as they never change)
   auto& options = valueImpl->cstrEnumOptions;
@@ -364,7 +423,9 @@ const double* SimDeviceData::GetValueEnumDoubleValues(HAL_SimValueHandle handle,
 
   std::scoped_lock lock(m_mutex);
   Value* valueImpl = LookupValue(handle);
-  if (!valueImpl) return nullptr;
+  if (!valueImpl) {
+    return nullptr;
+  }
 
   // get list of option values (safe to return as they never change)
   auto& optionValues = valueImpl->enumOptionValues;
@@ -421,7 +482,9 @@ const char* HALSIM_GetSimDeviceName(HAL_SimDeviceHandle handle) {
 }
 
 HAL_SimDeviceHandle HALSIM_GetSimValueDeviceHandle(HAL_SimValueHandle handle) {
-  if (handle <= 0) return 0;
+  if (handle <= 0) {
+    return 0;
+  }
   return handle >> 16;
 }
 
@@ -474,6 +537,8 @@ const double* HALSIM_GetSimValueEnumDoubleValues(HAL_SimValueHandle handle,
   return SimSimDeviceData->GetValueEnumDoubleValues(handle, numOptions);
 }
 
-void HALSIM_ResetSimDeviceData(void) { SimSimDeviceData->ResetData(); }
+void HALSIM_ResetSimDeviceData(void) {
+  SimSimDeviceData->ResetData();
+}
 
 }  // extern "C"

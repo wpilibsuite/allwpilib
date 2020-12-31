@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -76,7 +73,9 @@ void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,
   wpi::mutex& dioMutex = detail::UnsafeGetDIOMutex();
   tDIO* dSys = detail::UnsafeGetDigialSystem();
   auto mask = detail::ComputeDigitalMask(handle, status);
-  if (status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   std::scoped_lock lock(dioMutex);
 
   tDIO::tOutputEnable enableOE = dSys->readOutputEnable(status);

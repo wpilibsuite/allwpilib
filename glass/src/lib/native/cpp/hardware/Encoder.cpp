@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/hardware/Encoder.h"
 
@@ -85,7 +82,9 @@ void glass::DisplayEncoder(EncoderModel* model) {
     model->SetName(name->c_str());
   }
 
-  if (!open) return;
+  if (!open) {
+    return;
+  }
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
   // distance per pulse
@@ -97,7 +96,9 @@ void glass::DisplayEncoder(EncoderModel* model) {
   // count
   if (auto countData = model->GetCountData()) {
     int value = countData->GetValue();
-    if (ImGui::InputInt("##input", &value)) model->SetCount(value);
+    if (ImGui::InputInt("##input", &value)) {
+      model->SetCount(value);
+    }
     ImGui::SameLine();
     if (ImGui::Button("Reset")) {
       model->SetCount(0);
@@ -160,6 +161,7 @@ void glass::DisplayEncoders(EncodersModel* model, wpi::StringRef noneMsg) {
     DisplayEncoder(&encoder);
     PopID();
   });
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

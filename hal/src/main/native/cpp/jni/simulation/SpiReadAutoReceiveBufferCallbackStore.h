@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -18,8 +15,7 @@
 #include "hal/simulation/NotifyListener.h"
 #include "hal/simulation/SPIData.h"
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 class SpiReadAutoReceiveBufferCallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
@@ -36,14 +32,13 @@ class SpiReadAutoReceiveBufferCallbackStore {
 
 void InitializeSpiBufferStore();
 
-typedef int32_t (*RegisterSpiBufferCallbackFunc)(
+using RegisterSpiBufferCallbackFunc = int32_t (*)(
     int32_t index, HAL_SpiReadAutoReceiveBufferCallback callback, void* param);
-typedef void (*FreeSpiBufferCallbackFunc)(int32_t index, int32_t uid);
+using FreeSpiBufferCallbackFunc = void (*)(int32_t index, int32_t uid);
 
 SIM_JniHandle AllocateSpiBufferCallback(
     JNIEnv* env, jint index, jobject callback,
     RegisterSpiBufferCallbackFunc createCallback);
 void FreeSpiBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                            FreeSpiBufferCallbackFunc freeCallback);
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim

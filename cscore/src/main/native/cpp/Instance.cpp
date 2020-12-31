@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "Instance.h"
 
@@ -25,14 +22,15 @@ static void def_log_func(unsigned int level, const char* file,
   }
 
   wpi::StringRef levelmsg;
-  if (level >= 50)
+  if (level >= 50) {
     levelmsg = "CRITICAL: ";
-  else if (level >= 40)
+  } else if (level >= 40) {
     levelmsg = "ERROR: ";
-  else if (level >= 30)
+  } else if (level >= 30) {
     levelmsg = "WARNING: ";
-  else
+  } else {
     return;
+  }
   oss << "CS: " << levelmsg << msg << " (" << wpi::sys::path::filename(file)
       << ':' << line << ")\n";
   wpi::errs() << oss.str();
@@ -42,7 +40,7 @@ Instance::Instance() : telemetry(notifier), networkListener(logger, notifier) {
   SetDefaultLogger();
 }
 
-Instance::~Instance() {}
+Instance::~Instance() = default;
 
 Instance& Instance::GetInstance() {
   static Instance* inst = new Instance;
@@ -58,7 +56,9 @@ void Instance::Shutdown() {
   notifier.Stop();
 }
 
-void Instance::SetDefaultLogger() { logger.SetLogger(def_log_func); }
+void Instance::SetDefaultLogger() {
+  logger.SetLogger(def_log_func);
+}
 
 std::pair<CS_Source, std::shared_ptr<SourceData>> Instance::FindSource(
     const SourceImpl& source) {
@@ -87,11 +87,13 @@ CS_Sink Instance::CreateSink(CS_SinkKind kind, std::shared_ptr<SinkImpl> sink) {
 }
 
 void Instance::DestroySource(CS_Source handle) {
-  if (auto data = m_sources.Free(handle))
+  if (auto data = m_sources.Free(handle)) {
     notifier.NotifySource(data->source->GetName(), handle, CS_SOURCE_DESTROYED);
+  }
 }
 
 void Instance::DestroySink(CS_Sink handle) {
-  if (auto data = m_sinks.Free(handle))
+  if (auto data = m_sinks.Free(handle)) {
     notifier.NotifySink(data->sink->GetName(), handle, CS_SINK_DESTROYED);
+  }
 }

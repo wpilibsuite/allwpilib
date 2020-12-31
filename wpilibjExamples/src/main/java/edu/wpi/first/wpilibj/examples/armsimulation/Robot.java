@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.armsimulation;
 
@@ -13,17 +10,15 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 
-/**
- * This is a sample program to demonstrate the use of elevator simulation with existing code.
- */
+/** This is a sample program to demonstrate the use of elevator simulation with existing code. */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
   private static final int kEncoderAChannel = 0;
@@ -52,16 +47,18 @@ public class Robot extends TimedRobot {
   private static final double m_armLength = Units.inchesToMeters(30);
   // This arm sim represents an arm that can travel from -180 degrees (rotated straight backwards)
   // to 0 degrees (rotated straight forwards).
-  private final SingleJointedArmSim m_armSim = new SingleJointedArmSim(m_armGearbox,
-      m_armReduction,
-      SingleJointedArmSim.estimateMOI(m_armLength, m_armMass),
-      m_armLength,
-      Units.degreesToRadians(-180),
-      Units.degreesToRadians(0),
-      m_armMass,
-      true,
-      VecBuilder.fill(Units.degreesToRadians(0.5)) // Add noise with a std-dev of 0.5 degrees
-      );
+  private final SingleJointedArmSim m_armSim =
+      new SingleJointedArmSim(
+          m_armGearbox,
+          m_armReduction,
+          SingleJointedArmSim.estimateMOI(m_armLength, m_armMass),
+          m_armLength,
+          Units.degreesToRadians(-180),
+          Units.degreesToRadians(0),
+          m_armMass,
+          true,
+          VecBuilder.fill(Units.degreesToRadians(0.5)) // Add noise with a std-dev of 0.5 degrees
+          );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
   @Override
@@ -81,7 +78,8 @@ public class Robot extends TimedRobot {
     // Finally, we set our simulated encoder's readings and simulated battery voltage
     m_encoderSim.setDistance(m_armSim.getAngleRads());
     // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps()));
   }
 
   @Override

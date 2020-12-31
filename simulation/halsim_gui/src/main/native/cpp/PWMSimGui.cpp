@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "PWMSimGui.h"
 
@@ -80,8 +77,9 @@ void PWMsSimModel::Update() {
   for (int32_t i = 0; i < numLED; ++i) {
     if (HALSIM_GetAddressableLEDInitialized(i)) {
       int32_t channel = HALSIM_GetAddressableLEDOutputPort(i);
-      if (channel >= 0 && channel < numPWM && m_sources[channel])
+      if (channel >= 0 && channel < numPWM && m_sources[channel]) {
         m_sources[channel]->SetAddressableLED(i);
+      }
     }
   }
 }
@@ -99,7 +97,9 @@ void PWMsSimModel::ForEachPWM(
 static bool PWMsAnyInitialized() {
   static const int32_t num = HAL_GetNumPWMChannels();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetPWMInitialized(i)) return true;
+    if (HALSIM_GetPWMInitialized(i)) {
+      return true;
+    }
   }
   return false;
 }

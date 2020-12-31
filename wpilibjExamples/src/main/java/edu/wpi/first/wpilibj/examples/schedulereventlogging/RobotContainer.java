@@ -1,14 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.schedulereventlogging;
 
+import static edu.wpi.first.wpilibj.XboxController.Button;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.examples.schedulereventlogging.Constants.OIConstants;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,15 +18,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import edu.wpi.first.wpilibj.examples.schedulereventlogging.Constants.OIConstants;
-
-import static edu.wpi.first.wpilibj.XboxController.Button;
-
 /**
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // The driver's controller
@@ -38,9 +34,7 @@ public class RobotContainer {
   private final CommandBase m_instantCommand2 = new InstantCommand();
   private final CommandBase m_waitCommand = new WaitCommand(5);
 
-  /**
-   * The container for the robot.  Contains subsystems, OI devices, and commands.
-   */
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Set names of commands
     m_instantCommand1.setName("Instant Command 1");
@@ -48,22 +42,31 @@ public class RobotContainer {
     m_waitCommand.setName("Wait 5 Seconds Command");
 
     // Set the scheduler to log Shuffleboard events for command initialize, interrupt, finish
-    CommandScheduler.getInstance().onCommandInitialize(command -> Shuffleboard.addEventMarker(
-        "Command initialized", command.getName(), EventImportance.kNormal));
-    CommandScheduler.getInstance().onCommandInterrupt(command -> Shuffleboard.addEventMarker(
-        "Command interrupted", command.getName(), EventImportance.kNormal));
-    CommandScheduler.getInstance().onCommandFinish(command -> Shuffleboard.addEventMarker(
-        "Command finished", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandInitialize(
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command initialized", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandInterrupt(
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command interrupted", command.getName(), EventImportance.kNormal));
+    CommandScheduler.getInstance()
+        .onCommandFinish(
+            command ->
+                Shuffleboard.addEventMarker(
+                    "Command finished", command.getName(), EventImportance.kNormal));
 
     // Configure the button bindings
     configureButtonBindings();
   }
 
   /**
-   * Use this method to define your button->command mappings.  Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Run instant command 1 when the 'A' button is pressed

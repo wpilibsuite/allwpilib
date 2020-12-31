@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -144,7 +141,9 @@ void PushID(const char* str_id);
 void PushID(const char* str_id_begin, const char* str_id_end);
 
 // push string into the ID stack (will hash string).
-inline void PushID(wpi::StringRef str) { PushID(str.begin(), str.end()); }
+inline void PushID(wpi::StringRef str) {
+  PushID(str.begin(), str.end());
+}
 
 // push integer into the ID stack (will hash integer).
 void PushID(int int_id);

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -44,7 +41,7 @@ class CommandGroup : public Command {
    */
   explicit CommandGroup(const wpi::Twine& name);
 
-  virtual ~CommandGroup() = default;
+  ~CommandGroup() override = default;
 
   CommandGroup(CommandGroup&&) = default;
   CommandGroup& operator=(CommandGroup&&) = default;
@@ -137,32 +134,32 @@ class CommandGroup : public Command {
   /**
    * Can be overridden by teams.
    */
-  virtual void Initialize();
+  void Initialize() override;
 
   /**
    * Can be overridden by teams.
    */
-  virtual void Execute();
+  void Execute() override;
 
   /**
    * Can be overridden by teams.
    */
-  virtual bool IsFinished();
+  bool IsFinished() override;
 
   /**
    * Can be overridden by teams.
    */
-  virtual void End();
+  void End() override;
 
   /**
    * Can be overridden by teams.
    */
-  virtual void Interrupted();
+  void Interrupted() override;
 
-  virtual void _Initialize();
-  virtual void _Execute();
-  virtual void _End();
-  virtual void _Interrupted();
+  void _Initialize() override;
+  void _Execute() override;
+  void _End() override;
+  void _Interrupted() override;
 
  private:
   void CancelConflicts(Command* command);

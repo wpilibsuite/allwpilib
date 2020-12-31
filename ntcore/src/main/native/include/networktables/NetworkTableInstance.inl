@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INL_
 #define NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INL_
@@ -13,7 +10,7 @@
 
 namespace nt {
 
-inline NetworkTableInstance::NetworkTableInstance() noexcept : m_handle{0} {}
+inline NetworkTableInstance::NetworkTableInstance() noexcept {}
 
 inline NetworkTableInstance::NetworkTableInstance(NT_Inst handle) noexcept
     : m_handle{handle} {}
@@ -27,10 +24,13 @@ inline NetworkTableInstance NetworkTableInstance::Create() {
 }
 
 inline void NetworkTableInstance::Destroy(NetworkTableInstance inst) {
-  if (inst.m_handle != 0) DestroyInstance(inst.m_handle);
+  if (inst.m_handle != 0)
+    DestroyInstance(inst.m_handle);
 }
 
-inline NT_Inst NetworkTableInstance::GetHandle() const { return m_handle; }
+inline NT_Inst NetworkTableInstance::GetHandle() const {
+  return m_handle;
+}
 
 inline NetworkTableEntry NetworkTableInstance::GetEntry(const Twine& name) {
   return NetworkTableEntry{::nt::GetEntry(m_handle, name)};
@@ -84,9 +84,13 @@ inline unsigned int NetworkTableInstance::GetNetworkMode() const {
   return ::nt::GetNetworkMode(m_handle);
 }
 
-inline void NetworkTableInstance::StartLocal() { ::nt::StartLocal(m_handle); }
+inline void NetworkTableInstance::StartLocal() {
+  ::nt::StartLocal(m_handle);
+}
 
-inline void NetworkTableInstance::StopLocal() { ::nt::StopLocal(m_handle); }
+inline void NetworkTableInstance::StopLocal() {
+  ::nt::StopLocal(m_handle);
+}
 
 inline void NetworkTableInstance::StartServer(const Twine& persist_filename,
                                               const char* listen_address,
@@ -94,9 +98,13 @@ inline void NetworkTableInstance::StartServer(const Twine& persist_filename,
   ::nt::StartServer(m_handle, persist_filename, listen_address, port);
 }
 
-inline void NetworkTableInstance::StopServer() { ::nt::StopServer(m_handle); }
+inline void NetworkTableInstance::StopServer() {
+  ::nt::StopServer(m_handle);
+}
 
-inline void NetworkTableInstance::StartClient() { ::nt::StartClient(m_handle); }
+inline void NetworkTableInstance::StartClient() {
+  ::nt::StartClient(m_handle);
+}
 
 inline void NetworkTableInstance::StartClient(const char* server_name,
                                               unsigned int port) {
@@ -113,7 +121,9 @@ inline void NetworkTableInstance::StartClientTeam(unsigned int team,
   ::nt::StartClientTeam(m_handle, team, port);
 }
 
-inline void NetworkTableInstance::StopClient() { ::nt::StopClient(m_handle); }
+inline void NetworkTableInstance::StopClient() {
+  ::nt::StopClient(m_handle);
+}
 
 inline void NetworkTableInstance::SetServer(const char* server_name,
                                             unsigned int port) {
@@ -142,7 +152,9 @@ inline void NetworkTableInstance::SetUpdateRate(double interval) {
   ::nt::SetUpdateRate(m_handle, interval);
 }
 
-inline void NetworkTableInstance::Flush() const { ::nt::Flush(m_handle); }
+inline void NetworkTableInstance::Flush() const {
+  ::nt::Flush(m_handle);
+}
 
 inline std::vector<ConnectionInfo> NetworkTableInstance::GetConnections()
     const {

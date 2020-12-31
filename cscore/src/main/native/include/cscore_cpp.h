@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_CSCORE_CPP_H_
 #define CSCORE_CSCORE_CPP_H_
@@ -127,10 +124,11 @@ struct RawEvent {
   RawEvent(const wpi::Twine& name_, CS_Handle handle_, RawEvent::Kind kind_)
       : kind{kind_}, name{name_.str()} {
     if (kind_ == kSinkCreated || kind_ == kSinkDestroyed ||
-        kind_ == kSinkEnabled || kind_ == kSinkDisabled)
+        kind_ == kSinkEnabled || kind_ == kSinkDisabled) {
       sinkHandle = handle_;
-    else
+    } else {
       sourceHandle = handle_;
+    }
   }
   RawEvent(const wpi::Twine& name_, CS_Source source_, const VideoMode& mode_)
       : kind{kSourceVideoModeChanged},

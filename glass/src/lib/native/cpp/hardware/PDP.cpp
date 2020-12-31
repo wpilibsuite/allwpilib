@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/hardware/PDP.h"
 
@@ -27,8 +24,9 @@ static float DisplayChannel(PDPModel& pdp, int channel) {
     leftInfo.GetLabel(name, sizeof(name), "", channel);
     double val = currentData->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-    if (currentData->InputDouble(name, &val, 0, 0, "%.3f"))
+    if (currentData->InputDouble(name, &val, 0, 0, "%.3f")) {
       pdp.SetCurrent(channel, val);
+    }
     width = ImGui::GetItemRectSize().x;
     leftInfo.PopupEditName(channel);
     ImGui::PopID();
@@ -72,7 +70,9 @@ void glass::DisplayPDP(PDPModel* model, int index) {
 
       float width =
           (std::max)(leftWidth, rightWidth) * 2 + ImGui::GetFontSize() * 4;
-      if (width > maxWidth) maxWidth = width;
+      if (width > maxWidth) {
+        maxWidth = width;
+      }
     }
     ImGui::Columns(1);
     ImGui::Dummy(ImVec2(maxWidth, 0));
@@ -87,6 +87,7 @@ void glass::DisplayPDPs(PDPsModel* model, wpi::StringRef noneMsg) {
     DisplayPDP(&pdp, i);
     PopID();
   });
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

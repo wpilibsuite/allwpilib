@@ -1,23 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
-
-
 /**
- * Drive until the robot is the given distance away from the box. Uses a local
- * PID controller to run a simple PID loop that is only enabled while this
- * command is running. The input is the averaged values of the left and right
- * encoders.
+ * Drive until the robot is the given distance away from the box. Uses a local PID controller to run
+ * a simple PID loop that is only enabled while this command is running. The input is the averaged
+ * values of the left and right encoders.
  */
 public class SetDistanceToBox extends PIDCommand {
   private final DriveTrain m_drivetrain;
@@ -28,8 +22,10 @@ public class SetDistanceToBox extends PIDCommand {
    * @param distance The distance away from the box to drive to
    */
   public SetDistanceToBox(double distance, DriveTrain drivetrain) {
-    super(new PIDController(-2, 0, 0),
-        drivetrain::getDistanceToObstacle, distance,
+    super(
+        new PIDController(-2, 0, 0),
+        drivetrain::getDistanceToObstacle,
+        distance,
         d -> drivetrain.drive(d, d));
 
     m_drivetrain = drivetrain;

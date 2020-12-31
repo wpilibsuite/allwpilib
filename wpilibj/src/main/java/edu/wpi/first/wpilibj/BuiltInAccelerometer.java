@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -31,9 +28,7 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
     SendableRegistry.addLW(this, "BuiltInAccel", 0);
   }
 
-  /**
-   * Constructor. The accelerometer will measure +/-8 g-forces
-   */
+  /** Constructor. The accelerometer will measure +/-8 g-forces */
   public BuiltInAccelerometer() {
     this(Range.k8G);
   }
@@ -60,7 +55,6 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
       case k16G:
       default:
         throw new IllegalArgumentException(range + " range not supported (use k2G, k4G, or k8G)");
-
     }
 
     AccelerometerJNI.setAccelerometerActive(true);

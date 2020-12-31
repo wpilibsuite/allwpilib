@@ -1,17 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.mockhardware;
 
 import edu.wpi.first.wpilibj.AnalogOutput;
 
-/**
- * A fake source to provide output to a {@link edu.wpi.first.wpilibj.interfaces.Potentiometer}.
- */
+/** A fake source to provide output to a {@link edu.wpi.first.wpilibj.interfaces.Potentiometer}. */
 public class FakePotentiometerSource implements AutoCloseable {
   private AnalogOutput m_output;
   private boolean m_initOutput;
@@ -22,7 +17,7 @@ public class FakePotentiometerSource implements AutoCloseable {
   /**
    * Constructs the fake source.
    *
-   * @param output             The analog port to output the signal on
+   * @param output The analog port to output the signal on
    * @param defaultPotMaxAngle The default maximum angle the pot supports.
    */
   public FakePotentiometerSource(AnalogOutput output, double defaultPotMaxAngle) {
@@ -80,9 +75,7 @@ public class FakePotentiometerSource implements AutoCloseable {
     return voltage * (m_potMaxAngle / m_potMaxVoltage);
   }
 
-  /**
-   * Frees the resouce.
-   */
+  /** Frees the resouce. */
   @Override
   public void close() {
     if (m_initOutput) {

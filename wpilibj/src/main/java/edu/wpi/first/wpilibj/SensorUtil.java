@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -21,55 +18,35 @@ import edu.wpi.first.hal.SolenoidJNI;
  * channels and error processing.
  */
 public final class SensorUtil {
-  /**
-   * Ticks per microsecond.
-   */
-  public static final int kSystemClockTicksPerMicrosecond
-      = ConstantsJNI.getSystemClockTicksPerMicrosecond();
+  /** Ticks per microsecond. */
+  public static final int kSystemClockTicksPerMicrosecond =
+      ConstantsJNI.getSystemClockTicksPerMicrosecond();
 
-  /**
-   * Number of digital channels per roboRIO.
-   */
+  /** Number of digital channels per roboRIO. */
   public static final int kDigitalChannels = PortsJNI.getNumDigitalChannels();
 
-  /**
-   * Number of analog input channels per roboRIO.
-   */
+  /** Number of analog input channels per roboRIO. */
   public static final int kAnalogInputChannels = PortsJNI.getNumAnalogInputs();
 
-  /**
-   * Number of analog output channels per roboRIO.
-   */
+  /** Number of analog output channels per roboRIO. */
   public static final int kAnalogOutputChannels = PortsJNI.getNumAnalogOutputs();
 
-  /**
-   * Number of solenoid channels per module.
-   */
+  /** Number of solenoid channels per module. */
   public static final int kSolenoidChannels = PortsJNI.getNumSolenoidChannels();
 
-  /**
-   * Number of PWM channels per roboRIO.
-   */
+  /** Number of PWM channels per roboRIO. */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
 
-  /**
-   * Number of relay channels per roboRIO.
-   */
+  /** Number of relay channels per roboRIO. */
   public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
 
-  /**
-   * Number of power distribution channels per PDP.
-   */
+  /** Number of power distribution channels per PDP. */
   public static final int kPDPChannels = PortsJNI.getNumPDPChannels();
 
-  /**
-   * Number of power distribution modules per PDP.
-   */
+  /** Number of power distribution modules per PDP. */
   public static final int kPDPModules = PortsJNI.getNumPDPModules();
 
-  /**
-   * Number of PCM Modules.
-   */
+  /** Number of PCM Modules. */
   public static final int kPCMModules = PortsJNI.getNumPCMModules();
 
   /**
@@ -81,9 +58,9 @@ public final class SensorUtil {
     if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested solenoid module is out of range. Minimum: 0, Maximum: ")
-        .append(kPCMModules)
-        .append(", Requested: ")
-        .append(moduleNumber);
+          .append(kPCMModules)
+          .append(", Requested: ")
+          .append(moduleNumber);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -98,9 +75,9 @@ public final class SensorUtil {
     if (!DIOJNI.checkDIOChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested DIO channel is out of range. Minimum: 0, Maximum: ")
-        .append(kDigitalChannels)
-        .append(", Requested: ")
-        .append(channel);
+          .append(kDigitalChannels)
+          .append(", Requested: ")
+          .append(channel);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -115,9 +92,9 @@ public final class SensorUtil {
     if (!RelayJNI.checkRelayChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested relay channel is out of range. Minimum: 0, Maximum: ")
-        .append(kRelayChannels)
-        .append(", Requested: ")
-        .append(channel);
+          .append(kRelayChannels)
+          .append(", Requested: ")
+          .append(channel);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -132,9 +109,9 @@ public final class SensorUtil {
     if (!PWMJNI.checkPWMChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested PWM channel is out of range. Minimum: 0, Maximum: ")
-        .append(kPwmChannels)
-        .append(", Requested: ")
-        .append(channel);
+          .append(kPwmChannels)
+          .append(", Requested: ")
+          .append(channel);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -149,9 +126,9 @@ public final class SensorUtil {
     if (!AnalogJNI.checkAnalogInputChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested analog input channel is out of range. Minimum: 0, Maximum: ")
-        .append(kAnalogInputChannels)
-        .append(", Requested: ")
-        .append(channel);
+          .append(kAnalogInputChannels)
+          .append(", Requested: ")
+          .append(channel);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -166,9 +143,9 @@ public final class SensorUtil {
     if (!AnalogJNI.checkAnalogOutputChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested analog output channel is out of range. Minimum: 0, Maximum: ")
-        .append(kAnalogOutputChannels)
-        .append(", Requested: ")
-        .append(channel);
+          .append(kAnalogOutputChannels)
+          .append(", Requested: ")
+          .append(channel);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -182,9 +159,9 @@ public final class SensorUtil {
     if (!SolenoidJNI.checkSolenoidChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested solenoid channel is out of range. Minimum: 0, Maximum: ")
-        .append(kSolenoidChannels)
-        .append(", Requested: ")
-        .append(channel);
+          .append(kSolenoidChannels)
+          .append(", Requested: ")
+          .append(channel);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -199,9 +176,9 @@ public final class SensorUtil {
     if (!PDPJNI.checkPDPChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested PDP channel is out of range. Minimum: 0, Maximum: ")
-        .append(kPDPChannels)
-        .append(", Requested: ")
-        .append(channel);
+          .append(kPDPChannels)
+          .append(", Requested: ")
+          .append(channel);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -215,9 +192,9 @@ public final class SensorUtil {
     if (!PDPJNI.checkPDPModule(module)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested PDP module is out of range. Minimum: 0, Maximum: ")
-        .append(kPDPModules)
-        .append(", Requested: ")
-        .append(module);
+          .append(kPDPModules)
+          .append(", Requested: ")
+          .append(module);
       throw new IllegalArgumentException(buf.toString());
     }
   }
@@ -231,6 +208,5 @@ public final class SensorUtil {
     return 0;
   }
 
-  private SensorUtil() {
-  }
+  private SensorUtil() {}
 }

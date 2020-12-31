@@ -1,77 +1,72 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
-
 public interface SendableBuilder {
   /**
    * Get the network table.
+   *
    * @return The network table
    */
   NetworkTable getTable();
 
   /**
-   * Set the string representation of the named data type that will be used
-   * by the smart dashboard for this sendable.
+   * Set the string representation of the named data type that will be used by the smart dashboard
+   * for this sendable.
    *
-   * @param type    data type
+   * @param type data type
    */
   void setSmartDashboardType(String type);
 
   /**
-   * Set a flag indicating if this sendable should be treated as an actuator.
-   * By default this flag is false.
+   * Set a flag indicating if this sendable should be treated as an actuator. By default this flag
+   * is false.
    *
-   * @param value   true if actuator, false if not
+   * @param value true if actuator, false if not
    */
   void setActuator(boolean value);
 
   /**
-   * Set the function that should be called to set the Sendable into a safe
-   * state.  This is called when entering and exiting Live Window mode.
+   * Set the function that should be called to set the Sendable into a safe state. This is called
+   * when entering and exiting Live Window mode.
    *
-   * @param func    function
+   * @param func function
    */
   void setSafeState(Runnable func);
 
   /**
-   * Set the function that should be called to update the network table
-   * for things other than properties.  Note this function is not passed
-   * the network table object; instead it should use the entry handles
-   * returned by getEntry().
+   * Set the function that should be called to update the network table for things other than
+   * properties. Note this function is not passed the network table object; instead it should use
+   * the entry handles returned by getEntry().
    *
-   * @param func    function
+   * @param func function
    */
   void setUpdateTable(Runnable func);
 
   /**
-   * Add a property without getters or setters.  This can be used to get
-   * entry handles for the function called by setUpdateTable().
+   * Add a property without getters or setters. This can be used to get entry handles for the
+   * function called by setUpdateTable().
    *
-   * @param key   property name
+   * @param key property name
    * @return Network table entry
    */
   NetworkTableEntry getEntry(String key);
 
   /**
-   * Represents an operation that accepts a single boolean-valued argument and
-   * returns no result. This is the primitive type specialization of Consumer
-   * for boolean. Unlike most other functional interfaces, BooleanConsumer is
-   * expected to operate via side-effects.
+   * Represents an operation that accepts a single boolean-valued argument and returns no result.
+   * This is the primitive type specialization of Consumer for boolean. Unlike most other functional
+   * interfaces, BooleanConsumer is expected to operate via side-effects.
    *
    * <p>This is a functional interface whose functional method is accept(boolean).
    */
@@ -79,6 +74,7 @@ public interface SendableBuilder {
   interface BooleanConsumer {
     /**
      * Performs the operation on the given value.
+     *
      * @param value the value
      */
     void accept(boolean value);
@@ -87,73 +83,73 @@ public interface SendableBuilder {
   /**
    * Add a boolean property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter);
 
   /**
    * Add a double property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter);
 
   /**
    * Add a string property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter);
 
   /**
    * Add a boolean array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addBooleanArrayProperty(String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
 
   /**
    * Add a double array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addDoubleArrayProperty(String key, Supplier<double[]> getter, Consumer<double[]> setter);
 
   /**
    * Add a string array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addStringArrayProperty(String key, Supplier<String[]> getter, Consumer<String[]> setter);
 
   /**
    * Add a raw property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter);
 
   /**
    * Add a NetworkTableValue property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
-  void addValueProperty(String key, Supplier<NetworkTableValue> getter,
-                        Consumer<NetworkTableValue> setter);
+  void addValueProperty(
+      String key, Supplier<NetworkTableValue> getter, Consumer<NetworkTableValue> setter);
 }

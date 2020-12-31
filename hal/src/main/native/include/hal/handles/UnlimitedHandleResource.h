@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -74,7 +71,9 @@ THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
       return static_cast<THandle>(createHandle(i, enumValue, m_version));
     }
   }
-  if (i >= INT16_MAX) return HAL_kInvalidHandle;
+  if (i >= INT16_MAX) {
+    return HAL_kInvalidHandle;
+  }
 
   m_structures.push_back(structure);
   return static_cast<THandle>(
@@ -86,8 +85,9 @@ std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
   int16_t index = GetIndex(handle);
   std::scoped_lock lock(m_handleMutex);
-  if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
+  if (index < 0 || index >= static_cast<int16_t>(m_structures.size())) {
     return nullptr;
+  }
   return m_structures[index];
 }
 
@@ -96,8 +96,9 @@ std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(THandle handle) {
   int16_t index = GetIndex(handle);
   std::scoped_lock lock(m_handleMutex);
-  if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
+  if (index < 0 || index >= static_cast<int16_t>(m_structures.size())) {
     return nullptr;
+  }
   return std::move(m_structures[index]);
 }
 

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/smartdashboard/Field2d.h"
 
@@ -53,12 +50,16 @@ FieldObject2d* Field2d::GetObject(const wpi::Twine& name) {
   std::scoped_lock lock(m_mutex);
   std::string nameStr = name.str();
   for (auto&& obj : m_objects) {
-    if (obj->m_name == nameStr) return obj.get();
+    if (obj->m_name == nameStr) {
+      return obj.get();
+    }
   }
   m_objects.emplace_back(std::make_unique<FieldObject2d>(
       std::move(nameStr), FieldObject2d::private_init{}));
   auto obj = m_objects.back().get();
-  if (m_table) obj->m_entry = m_table->GetEntry(obj->m_name);
+  if (m_table) {
+    obj->m_entry = m_table->GetEntry(obj->m_name);
+  }
   return obj;
 }
 

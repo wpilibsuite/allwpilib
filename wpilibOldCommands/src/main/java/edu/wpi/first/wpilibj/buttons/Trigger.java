@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.buttons;
 
@@ -15,8 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 /**
  * This class provides an easy way to link commands to inputs.
  *
- * <p>It is very easy to link a button to a command. For instance, you could link the trigger
- * button of a joystick to a "score" command.
+ * <p>It is very easy to link a button to a command. For instance, you could link the trigger button
+ * of a joystick to a "score" command.
  *
  * <p>It is encouraged that teams write a subclass of Trigger if they want to have something unusual
  * (for instance, if they want to react to the user holding a button while the robot is reading a
@@ -40,7 +37,6 @@ public abstract class Trigger implements Sendable {
    *
    * @return whether get() return true or the internal table for SmartDashboard use is pressed.
    */
-  @SuppressWarnings("PMD.UselessParentheses")
   private boolean grab() {
     return get() || m_sendablePressed;
   }
@@ -70,7 +66,7 @@ public abstract class Trigger implements Sendable {
   /**
    * Constantly starts the given command while the button is held.
    *
-   * {@link Command#start()} will be called repeatedly while the trigger is active, and will be
+   * <p>{@link Command#start()} will be called repeatedly while the trigger is active, and will be
    * canceled when the trigger becomes inactive.
    *
    * @param command the command to start

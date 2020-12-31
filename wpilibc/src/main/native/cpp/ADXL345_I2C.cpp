@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/ADXL345_I2C.h"
 
@@ -41,16 +38,28 @@ void ADXL345_I2C::SetRange(Range range) {
               kDataFormat_FullRes | static_cast<uint8_t>(range));
 }
 
-double ADXL345_I2C::GetX() { return GetAcceleration(kAxis_X); }
+double ADXL345_I2C::GetX() {
+  return GetAcceleration(kAxis_X);
+}
 
-double ADXL345_I2C::GetY() { return GetAcceleration(kAxis_Y); }
+double ADXL345_I2C::GetY() {
+  return GetAcceleration(kAxis_Y);
+}
 
-double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
+double ADXL345_I2C::GetZ() {
+  return GetAcceleration(kAxis_Z);
+}
 
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
-  if (axis == kAxis_X && m_simX) return m_simX.Get();
-  if (axis == kAxis_Y && m_simY) return m_simY.Get();
-  if (axis == kAxis_Z && m_simZ) return m_simZ.Get();
+  if (axis == kAxis_X && m_simX) {
+    return m_simX.Get();
+  }
+  if (axis == kAxis_Y && m_simY) {
+    return m_simY.Get();
+  }
+  if (axis == kAxis_Z && m_simZ) {
+    return m_simZ.Get();
+  }
   int16_t rawAccel = 0;
   m_i2c.Read(kDataRegister + static_cast<int>(axis), sizeof(rawAccel),
              reinterpret_cast<uint8_t*>(&rawAccel));

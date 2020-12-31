@@ -1,18 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.ArrayList;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.ResourceLock;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Timer;
@@ -28,9 +21,11 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.ArrayList;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 class MecanumControllerCommandTest {
   @BeforeEach
@@ -52,8 +47,8 @@ class MecanumControllerCommandTest {
   private double m_frontRightSpeed;
   private double m_rearRightSpeed;
 
-  private final ProfiledPIDController m_rotController = new ProfiledPIDController(1, 0, 0,
-      new TrapezoidProfile.Constraints(3 * Math.PI, Math.PI));
+  private final ProfiledPIDController m_rotController =
+      new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(3 * Math.PI, Math.PI));
 
   private static final double kxTolerance = 1 / 12.0;
   private static final double kyTolerance = 1 / 12.0;
@@ -62,14 +57,16 @@ class MecanumControllerCommandTest {
   private static final double kWheelBase = 0.5;
   private static final double kTrackWidth = 0.5;
 
-  private final MecanumDriveKinematics m_kinematics = new MecanumDriveKinematics(
-      new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-      new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-      new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-      new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+  private final MecanumDriveKinematics m_kinematics =
+      new MecanumDriveKinematics(
+          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-  private final MecanumDriveOdometry m_odometry = new MecanumDriveOdometry(m_kinematics,
-      new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));
+  private final MecanumDriveOdometry m_odometry =
+      new MecanumDriveOdometry(
+          m_kinematics, new Rotation2d(0), new Pose2d(0, 0, new Rotation2d(0)));
 
   public void setWheelSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
     this.m_frontLeftSpeed = wheelSpeeds.frontLeftMetersPerSecond;
@@ -79,8 +76,8 @@ class MecanumControllerCommandTest {
   }
 
   public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
-    return new MecanumDriveWheelSpeeds(m_frontLeftSpeed,
-      m_frontRightSpeed, m_rearLeftSpeed, m_rearRightSpeed);
+    return new MecanumDriveWheelSpeeds(
+        m_frontLeftSpeed, m_frontRightSpeed, m_rearLeftSpeed, m_rearRightSpeed);
   }
 
   public Pose2d getRobotPose() {
@@ -102,15 +99,17 @@ class MecanumControllerCommandTest {
 
     final var endState = trajectory.sample(trajectory.getTotalTimeSeconds());
 
-    final var command = new MecanumControllerCommand(trajectory,
-        this::getRobotPose,
-        m_kinematics,
-        new PIDController(0.6, 0, 0),
-        new PIDController(0.6, 0, 0),
-        m_rotController,
-        8.8,
-        this::setWheelSpeeds,
-        subsystem);
+    final var command =
+        new MecanumControllerCommand(
+            trajectory,
+            this::getRobotPose,
+            m_kinematics,
+            new PIDController(0.6, 0, 0),
+            new PIDController(0.6, 0, 0),
+            m_rotController,
+            8.8,
+            this::setWheelSpeeds,
+            subsystem);
 
     m_timer.reset();
     m_timer.start();
@@ -125,12 +124,12 @@ class MecanumControllerCommandTest {
     command.end(true);
 
     assertAll(
-        () -> assertEquals(endState.poseMeters.getX(),
-          getRobotPose().getX(), kxTolerance),
-        () -> assertEquals(endState.poseMeters.getY(),
-          getRobotPose().getY(), kyTolerance),
-        () -> assertEquals(endState.poseMeters.getRotation().getRadians(),
-          getRobotPose().getRotation().getRadians(), kAngularTolerance)
-    );
+        () -> assertEquals(endState.poseMeters.getX(), getRobotPose().getX(), kxTolerance),
+        () -> assertEquals(endState.poseMeters.getY(), getRobotPose().getY(), kyTolerance),
+        () ->
+            assertEquals(
+                endState.poseMeters.getRotation().getRadians(),
+                getRobotPose().getRotation().getRadians(),
+                kAngularTolerance));
   }
 }

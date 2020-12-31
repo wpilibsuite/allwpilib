@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_UV_ASYNC_H_
 #define WPIUTIL_WPI_UV_ASYNC_H_
@@ -21,8 +18,7 @@
 #include "wpi/uv/Handle.h"
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Async handle.
@@ -43,10 +39,11 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
   Async(const std::shared_ptr<Loop>& loop, const private_init&)
       : m_loop{loop} {}
   ~Async() noexcept override {
-    if (auto loop = m_loop.lock())
+    if (auto loop = m_loop.lock()) {
       this->Close();
-    else
+    } else {
       this->ForceClosed();
+    }
   }
 
   /**
@@ -69,7 +66,9 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
         uv_async_init(loop->GetRaw(), h->GetRaw(), [](uv_async_t* handle) {
           auto& h = *static_cast<Async*>(handle->data);
           std::scoped_lock lock(h.m_mutex);
-          for (auto&& v : h.m_data) std::apply(h.wakeup, v);
+          for (auto&& v : h.m_data) {
+            std::apply(h.wakeup, v);
+          }
           h.m_data.clear();
         });
     if (err < 0) {
@@ -99,7 +98,9 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
       std::scoped_lock lock(m_mutex);
       m_data.emplace_back(std::forward_as_tuple(std::forward<U>(u)...));
     }
-    if (loop) this->Invoke(&uv_async_send, this->GetRaw());
+    if (loop) {
+      this->Invoke(&uv_async_send, this->GetRaw());
+    }
   }
 
   /**
@@ -149,7 +150,9 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
    * An async event will be emitted on the loop thread.
    */
   void Send() {
-    if (auto loop = m_loop.lock()) Invoke(&uv_async_send, GetRaw());
+    if (auto loop = m_loop.lock()) {
+      Invoke(&uv_async_send, GetRaw());
+    }
   }
 
   /**
@@ -161,7 +164,6 @@ class Async<> final : public HandleImpl<Async<>, uv_async_t> {
   std::weak_ptr<Loop> m_loop;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_ASYNC_H_

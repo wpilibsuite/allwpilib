@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Relay.h"
 
@@ -29,16 +26,14 @@ static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
 // Create a mutex to protect changes to the relay values
 static wpi::mutex digitalRelayMutex;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeRelay() {
   static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
                                HAL_HandleEnum::Relay>
       rH;
   relayHandles = &rH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
@@ -47,7 +42,9 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
   hal::init::CheckInit();
   initializeDigital(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0) {
+    return HAL_kInvalidHandle;
+  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -55,12 +52,15 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
     return HAL_kInvalidHandle;
   }
 
-  if (!fwd) channel += kNumRelayHeaders;  // add 4 to reverse channels
+  if (!fwd) {
+    channel += kNumRelayHeaders;  // add 4 to reverse channels
+  }
 
   auto handle = relayHandles->Allocate(channel, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   auto port = relayHandles->Get(handle);
   if (port == nullptr) {  // would only occur on thread issue.
@@ -108,7 +108,9 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
     relays = relaySystem->readValue_Reverse(status);
   }
 
-  if (*status != 0) return;  // bad status read
+  if (*status != 0) {
+    return;  // bad status read
+  }
 
   if (on) {
     relays |= 1 << port->channel;

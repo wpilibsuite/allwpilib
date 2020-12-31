@@ -56,7 +56,6 @@ model {
                 cpp.lib library:  "${component.name}", linkage: "static"
             }
         }
-
     }
 
     /* TODO:  Finish writing the test case */
@@ -97,7 +96,7 @@ model {
             //    project(':gmock').addGmockToLinker(it)
             //}
             //else {
-                buildable = false
+            buildable = false
             //}
         }
     }

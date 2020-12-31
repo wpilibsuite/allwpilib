@@ -1,19 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command.button;
 
-import edu.wpi.first.wpilibj.GenericHID;
-
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
-/**
- * A {@link Button} that gets its state from a {@link GenericHID}.
- */
+import edu.wpi.first.wpilibj.GenericHID;
+
+/** A {@link Button} that gets its state from a {@link GenericHID}. */
 public class JoystickButton extends Button {
   private final GenericHID m_joystick;
   private final int m_buttonNumber;
@@ -21,8 +16,7 @@ public class JoystickButton extends Button {
   /**
    * Creates a joystick button for triggering commands.
    *
-   * @param joystick     The GenericHID object that has the button (e.g. Joystick, KinectStick,
-   *                     etc)
+   * @param joystick The GenericHID object that has the button (e.g. Joystick, KinectStick, etc)
    * @param buttonNumber The button number (see {@link GenericHID#getRawButton(int) }
    */
   public JoystickButton(GenericHID joystick, int buttonNumber) {

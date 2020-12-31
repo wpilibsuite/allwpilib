@@ -1,25 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.ResourceLock;
-
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.SimHooks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 class WatchdogTest {
   @BeforeEach
@@ -38,9 +33,12 @@ class WatchdogTest {
   void enableDisableTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    try (Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    })) {
+    try (Watchdog watchdog =
+        new Watchdog(
+            0.4,
+            () -> {
+              watchdogCounter.addAndGet(1);
+            })) {
       // Run 1
       watchdog.enable();
       SimHooks.stepTiming(0.2);
@@ -54,8 +52,8 @@ class WatchdogTest {
       SimHooks.stepTiming(0.4);
       watchdog.disable();
 
-      assertEquals(1, watchdogCounter.get(),
-          "Watchdog either didn't trigger or triggered more than once");
+      assertEquals(
+          1, watchdogCounter.get(), "Watchdog either didn't trigger or triggered more than once");
 
       // Run 3
       watchdogCounter.set(0);
@@ -63,8 +61,8 @@ class WatchdogTest {
       SimHooks.stepTiming(1.0);
       watchdog.disable();
 
-      assertEquals(1, watchdogCounter.get(),
-          "Watchdog either didn't trigger or triggered more than once");
+      assertEquals(
+          1, watchdogCounter.get(), "Watchdog either didn't trigger or triggered more than once");
     }
   }
 
@@ -73,9 +71,12 @@ class WatchdogTest {
   void resetTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    try (Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    })) {
+    try (Watchdog watchdog =
+        new Watchdog(
+            0.4,
+            () -> {
+              watchdogCounter.addAndGet(1);
+            })) {
       watchdog.enable();
       SimHooks.stepTiming(0.2);
       watchdog.reset();
@@ -91,9 +92,12 @@ class WatchdogTest {
   void setTimeoutTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    try (Watchdog watchdog = new Watchdog(1.0, () -> {
-      watchdogCounter.addAndGet(1);
-    })) {
+    try (Watchdog watchdog =
+        new Watchdog(
+            1.0,
+            () -> {
+              watchdogCounter.addAndGet(1);
+            })) {
       watchdog.enable();
       SimHooks.stepTiming(0.2);
       watchdog.setTimeout(0.2);
@@ -104,16 +108,15 @@ class WatchdogTest {
       SimHooks.stepTiming(0.3);
       watchdog.disable();
 
-      assertEquals(1, watchdogCounter.get(),
-          "Watchdog either didn't trigger or triggered more than once");
+      assertEquals(
+          1, watchdogCounter.get(), "Watchdog either didn't trigger or triggered more than once");
     }
   }
 
   @Test
   @ResourceLock("timing")
   void isExpiredTest() {
-    try (Watchdog watchdog = new Watchdog(0.2, () -> {
-    })) {
+    try (Watchdog watchdog = new Watchdog(0.2, () -> {})) {
       assertFalse(watchdog.isExpired());
       watchdog.enable();
 
@@ -134,9 +137,12 @@ class WatchdogTest {
   void epochsTest() {
     final AtomicInteger watchdogCounter = new AtomicInteger(0);
 
-    try (Watchdog watchdog = new Watchdog(0.4, () -> {
-      watchdogCounter.addAndGet(1);
-    })) {
+    try (Watchdog watchdog =
+        new Watchdog(
+            0.4,
+            () -> {
+              watchdogCounter.addAndGet(1);
+            })) {
       // Run 1
       watchdog.enable();
       watchdog.addEpoch("Epoch 1");
@@ -167,12 +173,18 @@ class WatchdogTest {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);
 
-    try (Watchdog watchdog1 = new Watchdog(0.2, () -> {
-      watchdogCounter1.addAndGet(1);
-    });
-        Watchdog watchdog2 = new Watchdog(0.6, () -> {
-          watchdogCounter2.addAndGet(1);
-        })) {
+    try (Watchdog watchdog1 =
+            new Watchdog(
+                0.2,
+                () -> {
+                  watchdogCounter1.addAndGet(1);
+                });
+        Watchdog watchdog2 =
+            new Watchdog(
+                0.6,
+                () -> {
+                  watchdogCounter2.addAndGet(1);
+                })) {
       watchdog2.enable();
       SimHooks.stepTiming(0.25);
       assertEquals(0, watchdogCounter1.get(), "Watchdog triggered early");
@@ -184,8 +196,8 @@ class WatchdogTest {
       watchdog1.disable();
       watchdog2.disable();
 
-      assertEquals(1, watchdogCounter1.get(),
-          "Watchdog either didn't trigger or triggered more than once");
+      assertEquals(
+          1, watchdogCounter1.get(), "Watchdog either didn't trigger or triggered more than once");
       assertEquals(0, watchdogCounter2.get(), "Watchdog triggered early");
     }
   }

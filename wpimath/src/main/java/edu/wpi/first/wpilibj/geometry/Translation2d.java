@@ -1,26 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.geometry;
-
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 
 /**
- * Represents a translation in 2d space.
- * This object can be used to represent a point or a vector.
+ * Represents a translation in 2d space. This object can be used to represent a point or a vector.
  *
- * <p>This assumes that you are using conventional mathematical axes.
- * When the robot is placed on the origin, facing toward the X direction,
- * moving forward increases the X, whereas moving to the left increases the Y.
+ * <p>This assumes that you are using conventional mathematical axes. When the robot is placed on
+ * the origin, facing toward the X direction, moving forward increases the X, whereas moving to the
+ * left increases the Y.
  */
 @SuppressWarnings({"ParameterName", "MemberName"})
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,33 +24,31 @@ public class Translation2d {
   private final double m_x;
   private final double m_y;
 
-  /**
-   * Constructs a Translation2d with X and Y components equal to zero.
-   */
+  /** Constructs a Translation2d with X and Y components equal to zero. */
   public Translation2d() {
     this(0.0, 0.0);
   }
 
   /**
-   * Constructs a Translation2d with the X and Y components equal to the
-   * provided values.
+   * Constructs a Translation2d with the X and Y components equal to the provided values.
    *
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
   @JsonCreator
-  public Translation2d(@JsonProperty(required = true, value = "x") double x,
-                       @JsonProperty(required = true, value = "y") double y) {
+  public Translation2d(
+      @JsonProperty(required = true, value = "x") double x,
+      @JsonProperty(required = true, value = "y") double y) {
     m_x = x;
     m_y = y;
   }
 
   /**
-   * Constructs a Translation2d with the provided distance and angle. This is
-   * essentially converting from polar coordinates to Cartesian coordinates.
+   * Constructs a Translation2d with the provided distance and angle. This is essentially converting
+   * from polar coordinates to Cartesian coordinates.
    *
    * @param distance The distance from the origin to the end of the translation.
-   * @param angle    The angle between the x-axis and the translation vector.
+   * @param angle The angle between the x-axis and the translation vector.
    */
   public Translation2d(double distance, Rotation2d angle) {
     m_x = distance * angle.getCos();
@@ -65,8 +58,8 @@ public class Translation2d {
   /**
    * Calculates the distance between two translations in 2d space.
    *
-   * <p>This function uses the pythagorean theorem to calculate the distance.
-   * distance = sqrt((x2 - x1)^2 + (y2 - y1)^2)
+   * <p>This function uses the pythagorean theorem to calculate the distance. distance = sqrt((x2 -
+   * x1)^2 + (y2 - y1)^2)
    *
    * @param other The translation to compute the distance to.
    * @return The distance between the two translations.
@@ -107,30 +100,24 @@ public class Translation2d {
   /**
    * Applies a rotation to the translation in 2d space.
    *
-   * <p>This multiplies the translation vector by a counterclockwise rotation
-   * matrix of the given angle.
-   * [x_new]   [other.cos, -other.sin][x]
-   * [y_new] = [other.sin,  other.cos][y]
+   * <p>This multiplies the translation vector by a counterclockwise rotation matrix of the given
+   * angle. [x_new] [other.cos, -other.sin][x] [y_new] = [other.sin, other.cos][y]
    *
-   * <p>For example, rotating a Translation2d of {2, 0} by 90 degrees will return a
-   * Translation2d of {0, 2}.
+   * <p>For example, rotating a Translation2d of {2, 0} by 90 degrees will return a Translation2d of
+   * {0, 2}.
    *
    * @param other The rotation to rotate the translation by.
    * @return The new rotated translation.
    */
   public Translation2d rotateBy(Rotation2d other) {
     return new Translation2d(
-            m_x * other.getCos() - m_y * other.getSin(),
-            m_x * other.getSin() + m_y * other.getCos()
-    );
+        m_x * other.getCos() - m_y * other.getSin(), m_x * other.getSin() + m_y * other.getCos());
   }
 
   /**
-   * Adds two translations in 2d space and returns the sum. This is similar to
-   * vector addition.
+   * Adds two translations in 2d space and returns the sum. This is similar to vector addition.
    *
-   * <p>For example, Translation2d{1.0, 2.5} + Translation2d{2.0, 5.5} =
-   * Translation2d{3.0, 8.0}
+   * <p>For example, Translation2d{1.0, 2.5} + Translation2d{2.0, 5.5} = Translation2d{3.0, 8.0}
    *
    * @param other The translation to add.
    * @return The sum of the translations.
@@ -140,11 +127,9 @@ public class Translation2d {
   }
 
   /**
-   * Subtracts the other translation from the other translation and returns the
-   * difference.
+   * Subtracts the other translation from the other translation and returns the difference.
    *
-   * <p>For example, Translation2d{5.0, 4.0} - Translation2d{1.0, 2.0} =
-   * Translation2d{4.0, 2.0}
+   * <p>For example, Translation2d{5.0, 4.0} - Translation2d{1.0, 2.0} = Translation2d{4.0, 2.0}
    *
    * @param other The translation to subtract.
    * @return The difference between the two translations.
@@ -154,9 +139,8 @@ public class Translation2d {
   }
 
   /**
-   * Returns the inverse of the current translation. This is equivalent to
-   * rotating by 180 degrees, flipping the point over both axes, or simply
-   * negating both components of the translation.
+   * Returns the inverse of the current translation. This is equivalent to rotating by 180 degrees,
+   * flipping the point over both axes, or simply negating both components of the translation.
    *
    * @return The inverse of the current translation.
    */

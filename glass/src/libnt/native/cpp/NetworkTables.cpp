@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/networktables/NetworkTables.h"
+
+#include <networktables/NetworkTableValue.h>
 
 #include <cinttypes>
 #include <cstdio>
@@ -15,7 +14,6 @@
 #include <vector>
 
 #include <imgui.h>
-#include <networktables/NetworkTableValue.h>
 #include <ntcore_cpp.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/Format.h>
@@ -34,12 +32,15 @@ static std::string BooleanArrayToString(wpi::ArrayRef<int> in) {
   os << '[';
   bool first = true;
   for (auto v : in) {
-    if (!first) os << ',';
+    if (!first) {
+      os << ',';
+    }
     first = false;
-    if (v)
+    if (v) {
       os << "true";
-    else
+    } else {
       os << "false";
+    }
   }
   os << ']';
   return rv;
@@ -51,7 +52,9 @@ static std::string DoubleArrayToString(wpi::ArrayRef<double> in) {
   os << '[';
   bool first = true;
   for (auto v : in) {
-    if (!first) os << ',';
+    if (!first) {
+      os << ',';
+    }
     first = false;
     os << wpi::format("%.6f", v);
   }
@@ -65,7 +68,9 @@ static std::string StringArrayToString(wpi::ArrayRef<std::string> in) {
   os << '[';
   bool first = true;
   for (auto&& v : in) {
-    if (!first) os << ',';
+    if (!first) {
+      os << ',';
+    }
     first = false;
     os << '"';
     os.write_escaped(v);
@@ -101,14 +106,16 @@ NetworkTablesModel::Entry::Entry(nt::EntryNotification&& event)
 void NetworkTablesModel::Entry::UpdateValue() {
   switch (value->type()) {
     case NT_BOOLEAN:
-      if (!source)
+      if (!source) {
         source = std::make_unique<DataSource>(wpi::Twine{"NT:"} + name);
+      }
       source->SetValue(value->GetBoolean() ? 1 : 0);
       source->SetDigital(true);
       break;
     case NT_DOUBLE:
-      if (!source)
+      if (!source) {
         source = std::make_unique<DataSource>(wpi::Twine{"NT:"} + name);
+      }
       source->SetValue(value->GetDouble());
       source->SetDigital(false);
       break;
@@ -136,14 +143,19 @@ void NetworkTablesModel::Update() {
         entry = std::make_unique<Entry>(std::move(event));
         m_sortedEntries.emplace_back(entry.get());
         updateTree = true;
+        continue;
       }
     }
-    if (!entry) continue;
+    if (!entry) {
+      continue;
+    }
     if (event.flags & NT_NOTIFY_DELETE) {
       auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
                           entry.get());
       // will be removed completely below
-      if (it != m_sortedEntries.end()) *it = nullptr;
+      if (it != m_sortedEntries.end()) {
+        *it = nullptr;
+      }
       m_entries.erase(event.entry);
       updateTree = true;
       continue;
@@ -158,7 +170,9 @@ void NetworkTablesModel::Update() {
   }
 
   // shortcut common case (updates)
-  if (!updateTree) return;
+  if (!updateTree) {
+    return;
+  }
 
   // remove deleted entries
   m_sortedEntries.erase(
@@ -175,6 +189,11 @@ void NetworkTablesModel::Update() {
   for (auto& entry : m_sortedEntries) {
     parts.clear();
     wpi::StringRef{entry->name}.split(parts, '/', -1, false);
+
+    // ignore a raw "/" key
+    if (parts.empty()) {
+      continue;
+    }
 
     // get to leaf
     auto nodes = &m_root;
@@ -206,15 +225,22 @@ void NetworkTablesModel::Update() {
   }
 }
 
-bool NetworkTablesModel::Exists() { return nt::IsConnected(m_inst); }
+bool NetworkTablesModel::Exists() {
+  return nt::IsConnected(m_inst);
+}
 
 static std::shared_ptr<nt::Value> StringToBooleanArray(wpi::StringRef in) {
   in = in.trim();
-  if (in.empty())
+  if (in.empty()) {
     return nt::NetworkTableValue::MakeBooleanArray(
         std::initializer_list<bool>{});
-  if (in.front() == '[') in = in.drop_front();
-  if (in.back() == ']') in = in.drop_back();
+  }
+  if (in.front() == '[') {
+    in = in.drop_front();
+  }
+  if (in.back() == ']') {
+    in = in.drop_back();
+  }
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -239,11 +265,16 @@ static std::shared_ptr<nt::Value> StringToBooleanArray(wpi::StringRef in) {
 
 static std::shared_ptr<nt::Value> StringToDoubleArray(wpi::StringRef in) {
   in = in.trim();
-  if (in.empty())
+  if (in.empty()) {
     return nt::NetworkTableValue::MakeBooleanArray(
         std::initializer_list<bool>{});
-  if (in.front() == '[') in = in.drop_front();
-  if (in.back() == ']') in = in.drop_back();
+  }
+  if (in.front() == '[') {
+    in = in.drop_front();
+  }
+  if (in.back() == ']') {
+    in = in.drop_back();
+  }
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -267,12 +298,13 @@ static std::shared_ptr<nt::Value> StringToDoubleArray(wpi::StringRef in) {
 }
 
 static int fromxdigit(char ch) {
-  if (ch >= 'a' && ch <= 'f')
+  if (ch >= 'a' && ch <= 'f') {
     return (ch - 'a' + 10);
-  else if (ch >= 'A' && ch <= 'F')
+  } else if (ch >= 'A' && ch <= 'F') {
     return (ch - 'A' + 10);
-  else
+  } else {
     return ch - '0';
+  }
 }
 
 static wpi::StringRef UnescapeString(wpi::StringRef source,
@@ -315,11 +347,16 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
 
 static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
   in = in.trim();
-  if (in.empty())
+  if (in.empty()) {
     return nt::NetworkTableValue::MakeStringArray(
         std::initializer_list<std::string>{});
-  if (in.front() == '[') in = in.drop_front();
-  if (in.back() == ']') in = in.drop_back();
+  }
+  if (in.front() == '[') {
+    in = in.drop_front();
+  }
+  if (in.back() == ']') {
+    in = in.drop_back();
+  }
   in = in.trim();
 
   wpi::SmallVector<wpi::StringRef, 16> inSplit;
@@ -329,7 +366,9 @@ static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
   in.split(inSplit, ',', -1, false);
   for (auto val : inSplit) {
     val = val.trim();
-    if (val.empty()) continue;
+    if (val.empty()) {
+      continue;
+    }
     if (val.front() != '"' || val.back() != '"') {
       wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
                   << "'\n";
@@ -343,7 +382,9 @@ static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
 
 static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry) {
   auto& val = entry.value;
-  if (!val) return;
+  if (!val) {
+    return;
+  }
 
   switch (val->type()) {
     case NT_BOOLEAN:
@@ -390,37 +431,43 @@ static char* GetTextBuffer(wpi::StringRef in) {
 
 static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
   auto& val = entry.value;
-  if (!val) return;
+  if (!val) {
+    return;
+  }
 
   ImGui::PushID(entry.name.c_str());
   switch (val->type()) {
     case NT_BOOLEAN: {
       static const char* boolOptions[] = {"false", "true"};
       int v = val->GetBoolean() ? 1 : 0;
-      if (ImGui::Combo("boolean", &v, boolOptions, 2))
+      if (ImGui::Combo("boolean", &v, boolOptions, 2)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeBoolean(v));
+      }
       break;
     }
     case NT_DOUBLE: {
       double v = val->GetDouble();
       if (ImGui::InputDouble("double", &v, 0, 0, "%.6f",
-                             ImGuiInputTextFlags_EnterReturnsTrue))
+                             ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeDouble(v));
+      }
       break;
     }
     case NT_STRING: {
       char* v = GetTextBuffer(val->GetString());
       if (ImGui::InputText("string", v, kTextBufferSize,
-                           ImGuiInputTextFlags_EnterReturnsTrue))
+                           ImGuiInputTextFlags_EnterReturnsTrue)) {
         nt::SetEntryValue(entry.entry, nt::NetworkTableValue::MakeString(v));
+      }
       break;
     }
     case NT_BOOLEAN_ARRAY: {
       char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText("boolean[]", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (auto outv = StringToBooleanArray(v))
+        if (auto outv = StringToBooleanArray(v)) {
           nt::SetEntryValue(entry.entry, std::move(outv));
+        }
       }
       break;
     }
@@ -428,8 +475,9 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
       char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText("double[]", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (auto outv = StringToDoubleArray(v))
+        if (auto outv = StringToDoubleArray(v)) {
           nt::SetEntryValue(entry.entry, std::move(outv));
+        }
       }
       break;
     }
@@ -437,8 +485,9 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
       char* v = GetTextBuffer(entry.valueStr);
       if (ImGui::InputText("string[]", v, kTextBufferSize,
                            ImGuiInputTextFlags_EnterReturnsTrue)) {
-        if (auto outv = StringToStringArray(v))
+        if (auto outv = StringToStringArray(v)) {
           nt::SetEntryValue(entry.entry, std::move(outv));
+        }
       }
       break;
     }
@@ -455,6 +504,95 @@ static void EmitEntryValueEditable(NetworkTablesModel::Entry& entry) {
   ImGui::PopID();
 }
 
+static void EmitParentContextMenu(const std::string& path,
+                                  NetworkTablesFlags flags) {
+  // Workaround https://github.com/ocornut/imgui/issues/331
+  bool openWarningPopup = false;
+  static char nameBuffer[kTextBufferSize];
+  if (ImGui::BeginPopupContextItem()) {
+    ImGui::Text("%s", path.c_str());
+    ImGui::Separator();
+
+    if (ImGui::BeginMenu("Add new...")) {
+      if (ImGui::IsWindowAppearing()) {
+        nameBuffer[0] = '\0';
+      }
+
+      ImGui::InputTextWithHint("New item name", "example", nameBuffer,
+                               kTextBufferSize);
+      std::string fullNewPath;
+      if (path == "/") {
+        fullNewPath = path + nameBuffer;
+      } else {
+        fullNewPath = (path + wpi::Twine('/') + nameBuffer).str();
+      }
+
+      ImGui::Text("Adding: %s", fullNewPath.c_str());
+      ImGui::Separator();
+      auto entry = nt::GetEntry(nt::GetDefaultInstance(), fullNewPath);
+      bool enabled = (flags & NetworkTablesFlags_CreateNoncanonicalKeys ||
+                      nameBuffer[0] != '\0') &&
+                     nt::GetEntryType(entry) == NT_Type::NT_UNASSIGNED;
+      if (ImGui::MenuItem("string", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeString(""))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("double", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeDouble(0.0))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("boolean", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeBoolean(false))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("string[]", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeStringArray({""}))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("double[]", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeDoubleArray({0.0}))) {
+          openWarningPopup = true;
+        }
+      }
+      if (ImGui::MenuItem("boolean[]", nullptr, false, enabled)) {
+        if (!nt::SetEntryValue(entry, nt::Value::MakeBooleanArray({false}))) {
+          openWarningPopup = true;
+        }
+      }
+
+      ImGui::EndMenu();
+    }
+
+    ImGui::Separator();
+    if (ImGui::MenuItem("Remove All")) {
+      for (auto&& entry : nt::GetEntries(nt::GetDefaultInstance(), path, 0)) {
+        nt::DeleteEntry(entry);
+      }
+    }
+    ImGui::EndPopup();
+  }
+
+  // Workaround https://github.com/ocornut/imgui/issues/331
+  if (openWarningPopup) {
+    ImGui::OpenPopup("Value exists");
+  }
+  if (ImGui::BeginPopupModal("Value exists", nullptr,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("The provided name %s already exists in the tree!", nameBuffer);
+    ImGui::Separator();
+
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SetItemDefaultFocus();
+    ImGui::EndPopup();
+  }
+}
+
 static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
                       NetworkTablesFlags flags) {
   if (entry.source) {
@@ -463,28 +601,39 @@ static void EmitEntry(NetworkTablesModel::Entry& entry, const char* name,
   } else {
     ImGui::Text("%s", name);
   }
+  if (ImGui::BeginPopupContextItem(entry.name.c_str())) {
+    ImGui::Text("%s", entry.name.c_str());
+    ImGui::Separator();
+    if (ImGui::MenuItem("Remove")) {
+      nt::DeleteEntry(entry.entry);
+    }
+    ImGui::EndPopup();
+  }
   ImGui::NextColumn();
 
-  if (flags & NetworkTablesFlags_ReadOnly)
+  if (flags & NetworkTablesFlags_ReadOnly) {
     EmitEntryValueReadonly(entry);
-  else
+  } else {
     EmitEntryValueEditable(entry);
+  }
   ImGui::NextColumn();
 
   if (flags & NetworkTablesFlags_ShowFlags) {
-    if ((entry.flags & NT_PERSISTENT) != 0)
+    if ((entry.flags & NT_PERSISTENT) != 0) {
       ImGui::Text("Persistent");
-    else if (entry.flags != 0)
+    } else if (entry.flags != 0) {
       ImGui::Text("%02x", entry.flags);
+    }
     ImGui::NextColumn();
   }
 
   if (flags & NetworkTablesFlags_ShowTimestamp) {
-    if (entry.value)
+    if (entry.value) {
       ImGui::Text("%f", (entry.value->last_change() * 1.0e-6) -
                             (GetZeroTime() * 1.0e-6));
-    else
+    } else {
       ImGui::TextUnformatted("");
+    }
     ImGui::NextColumn();
   }
   ImGui::Separator();
@@ -500,10 +649,15 @@ static void EmitTree(const std::vector<NetworkTablesModel::TreeNode>& tree,
     if (!node.children.empty()) {
       bool open =
           TreeNodeEx(node.name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+      EmitParentContextMenu(node.path, flags);
       ImGui::NextColumn();
       ImGui::NextColumn();
-      if (flags & NetworkTablesFlags_ShowFlags) ImGui::NextColumn();
-      if (flags & NetworkTablesFlags_ShowTimestamp) ImGui::NextColumn();
+      if (flags & NetworkTablesFlags_ShowFlags) {
+        ImGui::NextColumn();
+      }
+      if (flags & NetworkTablesFlags_ShowTimestamp) {
+        ImGui::NextColumn();
+      }
       ImGui::Separator();
       if (open) {
         EmitTree(node.children, flags);
@@ -545,7 +699,9 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
       ImGui::Columns();
     }
 
-    if (!CollapsingHeader("Values", ImGuiTreeNodeFlags_DefaultOpen)) return;
+    if (!CollapsingHeader("Values", ImGuiTreeNodeFlags_DefaultOpen)) {
+      return;
+    }
   }
 
   const bool showFlags = (flags & NetworkTablesFlags_ShowFlags);
@@ -553,13 +709,18 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
 
   static bool first = true;
   ImGui::Columns(2 + (showFlags ? 1 : 0) + (showTimestamp ? 1 : 0), "values");
-  if (first) ImGui::SetColumnWidth(-1, 0.5f * ImGui::GetWindowWidth());
+  if (first) {
+    ImGui::SetColumnWidth(-1, 0.5f * ImGui::GetWindowWidth());
+  }
   ImGui::Text("Name");
+  EmitParentContextMenu("/", flags);
   ImGui::NextColumn();
   ImGui::Text("Value");
   ImGui::NextColumn();
   if (showFlags) {
-    if (first) ImGui::SetColumnWidth(-1, 12 * ImGui::GetFontSize());
+    if (first) {
+      ImGui::SetColumnWidth(-1, 12 * ImGui::GetFontSize());
+    }
     ImGui::Text("Flags");
     ImGui::NextColumn();
   }
@@ -581,31 +742,41 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
 }
 
 void NetworkTablesView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
-    auto& storage = GetStorage();
-    auto pTreeView = storage.GetBoolRef(
-        "tree", m_defaultFlags & NetworkTablesFlags_TreeView);
-    auto pShowConnections = storage.GetBoolRef(
-        "connections", m_defaultFlags & NetworkTablesFlags_ShowConnections);
-    auto pShowFlags = storage.GetBoolRef(
-        "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
-    auto pShowTimestamp = storage.GetBoolRef(
-        "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
+  auto& storage = GetStorage();
+  auto pTreeView =
+      storage.GetBoolRef("tree", m_defaultFlags & NetworkTablesFlags_TreeView);
+  auto pShowConnections = storage.GetBoolRef(
+      "connections", m_defaultFlags & NetworkTablesFlags_ShowConnections);
+  auto pShowFlags = storage.GetBoolRef(
+      "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
+  auto pShowTimestamp = storage.GetBoolRef(
+      "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
+  auto pCreateNoncanonicalKeys = storage.GetBoolRef(
+      "createNonCanonical",
+      m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
 
+  if (ImGui::BeginPopupContextItem()) {
     ImGui::MenuItem("Tree View", "", pTreeView);
     ImGui::MenuItem("Show Connections", "", pShowConnections);
     ImGui::MenuItem("Show Flags", "", pShowFlags);
     ImGui::MenuItem("Show Timestamp", "", pShowTimestamp);
+    ImGui::Separator();
+    ImGui::MenuItem("Allow creation of non-canonical keys", "",
+                    pCreateNoncanonicalKeys);
 
-    m_flags &=
-        ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
-          NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp);
-    m_flags |= (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
-               (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
-               (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
-               (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0);
     ImGui::EndPopup();
   }
 
+  m_flags &=
+      ~(NetworkTablesFlags_TreeView | NetworkTablesFlags_ShowConnections |
+        NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
+        NetworkTablesFlags_CreateNoncanonicalKeys);
+  m_flags |=
+      (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
+      (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
+      (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
+      (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
+      (*pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
+                                : 0);
   DisplayNetworkTables(m_model, m_flags);
 }

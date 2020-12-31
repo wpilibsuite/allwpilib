@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.relay;
 
@@ -18,7 +15,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * compressor. This program uses two buttons on a joystick and each button corresponds to one
  * output; pressing the button sets the output to 12V and releasing sets it to 0V.
  */
-
 public class Robot extends TimedRobot {
   private final Joystick m_stick = new Joystick(0);
   private final Relay m_relay = new Relay(0);

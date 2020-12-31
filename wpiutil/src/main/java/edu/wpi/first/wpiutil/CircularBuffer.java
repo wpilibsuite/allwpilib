@@ -1,15 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpiutil;
 
-/**
- * This is a simple circular buffer so we don't need to "bucket brigade" copy old values.
- */
+/** This is a simple circular buffer so we don't need to "bucket brigade" copy old values. */
 public class CircularBuffer {
   private double[] m_data;
 
@@ -117,10 +112,7 @@ public class CircularBuffer {
     return temp;
   }
 
-
-  /**
-   * Pop value at back of buffer.
-   */
+  /** Pop value at back of buffer. */
   public double removeLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
@@ -146,9 +138,7 @@ public class CircularBuffer {
     m_front = 0;
   }
 
-  /**
-   * Sets internal buffer contents to zero.
-   */
+  /** Sets internal buffer contents to zero. */
   public void clear() {
     for (int i = 0; i < m_data.length; i++) {
       m_data[i] = 0.0;
@@ -166,16 +156,12 @@ public class CircularBuffer {
     return m_data[(m_front + index) % m_data.length];
   }
 
-  /**
-   * Increment an index modulo the length of the m_data buffer.
-   */
+  /** Increment an index modulo the length of the m_data buffer. */
   private int moduloInc(int index) {
     return (index + 1) % m_data.length;
   }
 
-  /**
-   * Decrement an index modulo the length of the m_data buffer.
-   */
+  /** Decrement an index modulo the length of the m_data buffer. */
   private int moduloDec(int index) {
     if (index == 0) {
       return m_data.length - 1;

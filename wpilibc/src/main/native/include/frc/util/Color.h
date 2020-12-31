@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -809,7 +806,9 @@ inline bool operator==(const Color& c1, const Color& c2) {
   return c1.red == c2.red && c1.green == c2.green && c1.blue == c2.blue;
 }
 
-inline bool operator!=(const Color& c1, const Color& c2) { return !(c1 == c2); }
+inline bool operator!=(const Color& c1, const Color& c2) {
+  return !(c1 == c2);
+}
 
 /*
  * FIRST Colors

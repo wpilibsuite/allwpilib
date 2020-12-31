@@ -1,17 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/networktables/NTCommandScheduler.h"
 #include "glass/networktables/NTCommandSelector.h"
+#include "glass/networktables/NTDifferentialDrive.h"
 #include "glass/networktables/NTDigitalInput.h"
 #include "glass/networktables/NTDigitalOutput.h"
 #include "glass/networktables/NTFMS.h"
 #include "glass/networktables/NTField2D.h"
 #include "glass/networktables/NTGyro.h"
+#include "glass/networktables/NTMecanumDrive.h"
 #include "glass/networktables/NTPIDController.h"
 #include "glass/networktables/NTSpeedController.h"
 #include "glass/networktables/NTStringChooser.h"
@@ -41,6 +40,17 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         return MakeFunctionView([=] {
           DisplayCommandSelector(static_cast<NTCommandSelectorModel*>(model));
+        });
+      });
+  provider.Register(
+      NTDifferentialDriveModel::kType,
+      [](NT_Inst inst, const char* path) {
+        return std::make_unique<NTDifferentialDriveModel>(inst, path);
+      },
+      [](Window* win, Model* model, const char*) {
+        win->SetDefaultSize(300, 350);
+        return MakeFunctionView([=] {
+          DisplayDrive(static_cast<NTDifferentialDriveModel*>(model));
         });
       });
   provider.Register(
@@ -96,6 +106,16 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         win->SetDefaultSize(320, 380);
         return MakeFunctionView(
             [=] { DisplayGyro(static_cast<NTGyroModel*>(model)); });
+      });
+  provider.Register(
+      NTMecanumDriveModel::kType,
+      [](NT_Inst inst, const char* path) {
+        return std::make_unique<NTMecanumDriveModel>(inst, path);
+      },
+      [](Window* win, Model* model, const char*) {
+        win->SetDefaultSize(300, 350);
+        return MakeFunctionView(
+            [=] { DisplayDrive(static_cast<NTMecanumDriveModel*>(model)); });
       });
   provider.Register(
       NTPIDControllerModel::kType,

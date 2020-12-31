@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
 
     description = "A different kind of dashboard"
@@ -8,24 +10,52 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     apply plugin: 'visual-studio'
     apply plugin: 'edu.wpi.first.NativeUtils'
 
+    if (OperatingSystem.current().isWindows()) {
+        apply plugin: 'windows-resources'
+    }
+
     ext {
         nativeName = 'glass'
     }
 
+    apply from: "${rootDir}/shared/resources.gradle"
     apply from: "${rootDir}/shared/config.gradle"
 
+    def generateTask = createGenerateResourcesTask('app', 'GLASS', 'glass', project)
+
     project(':').libraryBuild.dependsOn build
+    tasks.withType(CppCompile) {
+        dependsOn generateTask
+    }
 
     nativeUtils.exportsConfigs {
         glass {
-            x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                                '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
-            x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                                '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                                '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                                '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+            x86ExcludeSymbols = [
+                '_CT??_R0?AV_System_error',
+                '_CT??_R0?AVexception',
+                '_CT??_R0?AVfailure',
+                '_CT??_R0?AVruntime_error',
+                '_CT??_R0?AVsystem_error',
+                '_CTA5?AVfailure',
+                '_TI5?AVfailure',
+                '_CT??_R0?AVout_of_range',
+                '_CTA3?AVout_of_range',
+                '_TI3?AVout_of_range',
+                '_CT??_R0?AVbad_cast'
+            ]
+            x64ExcludeSymbols = [
+                '_CT??_R0?AV_System_error',
+                '_CT??_R0?AVexception',
+                '_CT??_R0?AVfailure',
+                '_CT??_R0?AVruntime_error',
+                '_CT??_R0?AVsystem_error',
+                '_CTA5?AVfailure',
+                '_TI5?AVfailure',
+                '_CT??_R0?AVout_of_range',
+                '_CTA3?AVout_of_range',
+                '_TI3?AVout_of_range',
+                '_CT??_R0?AVbad_cast'
+            ]
         }
     }
 
@@ -35,7 +65,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                 sources {
                     cpp {
                         source {
-                            srcDirs = ['src/lib/native/cpp']
+                            srcDirs 'src/lib/native/cpp'
                             include '**/*.cpp'
                         }
                         exportedHeaders {
@@ -96,11 +126,18 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                 sources {
                     cpp {
                         source {
-                            srcDirs 'src/app/native/cpp'
+                            srcDirs 'src/app/native/cpp', "$buildDir/generated/app/cpp"
                             include '**/*.cpp'
                         }
                         exportedHeaders {
                             srcDirs 'src/app/native/include'
+                        }
+                    }
+                    if (OperatingSystem.current().isWindows()) {
+                        rc {
+                            source {
+                                srcDirs 'src/app/native/win'
+                            }
                         }
                     }
                 }

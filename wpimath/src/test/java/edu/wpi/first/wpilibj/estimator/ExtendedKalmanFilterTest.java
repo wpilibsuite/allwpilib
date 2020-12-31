@@ -1,17 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.estimator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -28,9 +22,10 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 import edu.wpi.first.wpiutil.math.numbers.N5;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("ParameterName")
 public class ExtendedKalmanFilterTest {
@@ -44,8 +39,9 @@ public class ExtendedKalmanFilterTest {
     final var J = 5.6; // Robot moment of inertia
 
     final var C1 =
-          -Math.pow(gr, 2) * motors.m_KtNMPerAmp / (
-                motors.m_KvRadPerSecPerVolt * motors.m_rOhms * r * r);
+        -Math.pow(gr, 2)
+            * motors.m_KtNMPerAmp
+            / (motors.m_KvRadPerSecPerVolt * motors.m_rOhms * r * r);
     final var C2 = gr * motors.m_KtNMPerAmp / (motors.m_rOhms * r);
     final var k1 = 1.0 / m + rb * rb / J;
     final var k2 = 1.0 / m - rb * rb / J;
@@ -70,13 +66,7 @@ public class ExtendedKalmanFilterTest {
   }
 
   public static Matrix<N5, N1> getGlobalMeasurementModel(Matrix<N5, N1> x, Matrix<N2, N1> u) {
-    return VecBuilder.fill(
-          x.get(0, 0),
-          x.get(1, 0),
-          x.get(2, 0),
-          x.get(3, 0),
-          x.get(4, 0)
-    );
+    return VecBuilder.fill(x.get(0, 0), x.get(1, 0), x.get(2, 0), x.get(3, 0), x.get(4, 0));
   }
 
   @SuppressWarnings("LocalVariableName")
@@ -84,49 +74,59 @@ public class ExtendedKalmanFilterTest {
   public void testInit() {
     double dtSeconds = 0.00505;
 
-    assertDoesNotThrow(() -> {
-      ExtendedKalmanFilter<N5, N2, N3> observer =
-            new ExtendedKalmanFilter<>(Nat.N5(), Nat.N2(), Nat.N3(),
+    assertDoesNotThrow(
+        () -> {
+          ExtendedKalmanFilter<N5, N2, N3> observer =
+              new ExtendedKalmanFilter<>(
+                  Nat.N5(),
+                  Nat.N2(),
+                  Nat.N3(),
                   ExtendedKalmanFilterTest::getDynamics,
                   ExtendedKalmanFilterTest::getLocalMeasurementModel,
                   VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
-                  VecBuilder.fill(0.0001, 0.01, 0.01), dtSeconds);
+                  VecBuilder.fill(0.0001, 0.01, 0.01),
+                  dtSeconds);
 
-      Matrix<N2, N1> u = VecBuilder.fill(12.0, 12.0);
-      observer.predict(u, dtSeconds);
+          Matrix<N2, N1> u = VecBuilder.fill(12.0, 12.0);
+          observer.predict(u, dtSeconds);
 
-      var localY = getLocalMeasurementModel(observer.getXhat(), u);
-      observer.correct(u, localY);
+          var localY = getLocalMeasurementModel(observer.getXhat(), u);
+          observer.correct(u, localY);
 
-      var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
-      var R = StateSpaceUtil.makeCostMatrix(
-            VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
-      observer.correct(Nat.N5(),
-            u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
-    });
-
+          var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
+          var R = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+          observer.correct(
+              Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
+        });
   }
 
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops",
-      "PMD.ExcessiveMethodLength"})
+  @SuppressWarnings({
+    "LocalVariableName",
+    "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.ExcessiveMethodLength"
+  })
   @Test
   public void testConvergence() {
     double dtSeconds = 0.00505;
     double rbMeters = 0.8382 / 2.0; // Robot radius
 
     ExtendedKalmanFilter<N5, N2, N3> observer =
-          new ExtendedKalmanFilter<>(Nat.N5(), Nat.N2(), Nat.N3(),
-                ExtendedKalmanFilterTest::getDynamics,
-                ExtendedKalmanFilterTest::getLocalMeasurementModel,
-                VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
-                VecBuilder.fill(0.001, 0.01, 0.01), dtSeconds);
+        new ExtendedKalmanFilter<>(
+            Nat.N5(),
+            Nat.N2(),
+            Nat.N3(),
+            ExtendedKalmanFilterTest::getDynamics,
+            ExtendedKalmanFilterTest::getLocalMeasurementModel,
+            VecBuilder.fill(0.5, 0.5, 10.0, 1.0, 1.0),
+            VecBuilder.fill(0.001, 0.01, 0.01),
+            dtSeconds);
 
-    List<Pose2d> waypoints = Arrays.asList(new Pose2d(2.75, 22.521, new Rotation2d()),
-          new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
-    var trajectory = TrajectoryGenerator.generateTrajectory(
-          waypoints,
-          new TrajectoryConfig(8.8, 0.1)
-    );
+    List<Pose2d> waypoints =
+        Arrays.asList(
+            new Pose2d(2.75, 22.521, new Rotation2d()),
+            new Pose2d(24.73, 19.68, Rotation2d.fromDegrees(5.846)));
+    var trajectory =
+        TrajectoryGenerator.generateTrajectory(waypoints, new TrajectoryConfig(8.8, 0.1));
 
     Matrix<N5, N1> r = new Matrix<>(Nat.N5(), Nat.N1());
 
@@ -139,14 +139,21 @@ public class ExtendedKalmanFilterTest {
     List<Double> observerXs = new ArrayList<>();
     List<Double> observerYs = new ArrayList<>();
 
-    var B = NumericalJacobian.numericalJacobianU(Nat.N5(), Nat.N2(),
-          ExtendedKalmanFilterTest::getDynamics, new Matrix<>(Nat.N5(), Nat.N1()), u);
+    var B =
+        NumericalJacobian.numericalJacobianU(
+            Nat.N5(),
+            Nat.N2(),
+            ExtendedKalmanFilterTest::getDynamics,
+            new Matrix<>(Nat.N5(), Nat.N1()),
+            u);
 
-    observer.setXhat(VecBuilder.fill(
-          trajectory.getInitialPose().getTranslation().getX(),
-          trajectory.getInitialPose().getTranslation().getY(),
-          trajectory.getInitialPose().getRotation().getRadians(),
-          0.0, 0.0));
+    observer.setXhat(
+        VecBuilder.fill(
+            trajectory.getInitialPose().getTranslation().getX(),
+            trajectory.getInitialPose().getTranslation().getY(),
+            trajectory.getInitialPose().getRotation().getRadians(),
+            0.0,
+            0.0));
 
     var groundTruthX = observer.getXhat();
 
@@ -162,19 +169,17 @@ public class ExtendedKalmanFilterTest {
       nextR.set(3, 0, vl);
       nextR.set(4, 0, vr);
 
-      var localY =
-            getLocalMeasurementModel(groundTruthX, u);
+      var localY = getLocalMeasurementModel(groundTruthX, u);
       var whiteNoiseStdDevs = VecBuilder.fill(0.0001, 0.5, 0.5);
-      observer.correct(u,
-            localY.plus(StateSpaceUtil.makeWhiteNoiseVector(whiteNoiseStdDevs)));
+      observer.correct(u, localY.plus(StateSpaceUtil.makeWhiteNoiseVector(whiteNoiseStdDevs)));
 
       Matrix<N5, N1> rdot = nextR.minus(r).div(dtSeconds);
       u = new Matrix<>(B.solve(rdot.minus(getDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
 
       observer.predict(u, dtSeconds);
 
-      groundTruthX = RungeKutta.rungeKutta(ExtendedKalmanFilterTest::getDynamics,
-            groundTruthX, u, dtSeconds);
+      groundTruthX =
+          RungeKutta.rungeKutta(ExtendedKalmanFilterTest::getDynamics, groundTruthX, u, dtSeconds);
 
       r = nextR;
 
@@ -189,8 +194,7 @@ public class ExtendedKalmanFilterTest {
     observer.correct(u, localY);
 
     var globalY = getGlobalMeasurementModel(observer.getXhat(), u);
-    var R = StateSpaceUtil.makeCostMatrix(
-          VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
+    var R = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
 
     //    var chartBuilder = new XYChartBuilder();

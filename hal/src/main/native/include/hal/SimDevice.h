@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -309,7 +306,7 @@ class SimValue {
    *
    * @param handle simulated value handle
    */
-  /*implicit*/ SimValue(HAL_SimValueHandle val)  // NOLINT(runtime/explicit)
+  /*implicit*/ SimValue(HAL_SimValueHandle val)  // NOLINT
       : m_handle(val) {}
 
   /**
@@ -325,7 +322,7 @@ class SimValue {
    *
    * @return internal handle
    */
-  operator HAL_SimValueHandle() const { return m_handle; }
+  operator HAL_SimValueHandle() const { return m_handle; }  // NOLINT
 
   /**
    * Gets the simulated value.
@@ -361,7 +358,7 @@ class SimDouble : public SimValue {
    *
    * @param handle simulated value handle
    */
-  /*implicit*/ SimDouble(HAL_SimValueHandle val)  // NOLINT(runtime/explicit)
+  /*implicit*/ SimDouble(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
 
   /**
@@ -395,7 +392,7 @@ class SimEnum : public SimValue {
    *
    * @param handle simulated value handle
    */
-  /*implicit*/ SimEnum(HAL_SimValueHandle val)  // NOLINT(runtime/explicit)
+  /*implicit*/ SimEnum(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
 
   /**
@@ -429,7 +426,7 @@ class SimBoolean : public SimValue {
    *
    * @param handle simulated value handle
    */
-  /*implicit*/ SimBoolean(HAL_SimValueHandle val)  // NOLINT(runtime/explicit)
+  /*implicit*/ SimBoolean(HAL_SimValueHandle val)  // NOLINT
       : SimValue(val) {}
 
   /**
@@ -516,7 +513,9 @@ class SimDevice {
   SimDevice(const char* name, int index, int channel);
 
   ~SimDevice() {
-    if (m_handle != HAL_kInvalidHandle) HAL_FreeSimDevice(m_handle);
+    if (m_handle != HAL_kInvalidHandle) {
+      HAL_FreeSimDevice(m_handle);
+    }
   }
 
   SimDevice(const SimDevice&) = delete;
@@ -545,7 +544,7 @@ class SimDevice {
    *
    * @return internal handle
    */
-  operator HAL_SimDeviceHandle() const { return m_handle; }
+  operator HAL_SimDeviceHandle() const { return m_handle; }  // NOLINT
 
   /**
    * Creates a value on the simulated device.
@@ -642,7 +641,9 @@ class SimDevice {
                            std::initializer_list<const char*> options,
                            std::initializer_list<double> optionValues,
                            int32_t initialValue) {
-    if (options.size() != optionValues.size()) return {};
+    if (options.size() != optionValues.size()) {
+      return {};
+    }
     return HAL_CreateSimValueEnumDouble(
         m_handle, name, direction, options.size(),
         const_cast<const char**>(options.begin()), optionValues.begin(),
@@ -669,7 +670,9 @@ class SimDevice {
                            wpi::ArrayRef<const char*> options,
                            wpi::ArrayRef<double> optionValues,
                            int32_t initialValue) {
-    if (options.size() != optionValues.size()) return {};
+    if (options.size() != optionValues.size()) {
+      return {};
+    }
     return HAL_CreateSimValueEnumDouble(
         m_handle, name, direction, options.size(),
         const_cast<const char**>(options.data()), optionValues.data(),

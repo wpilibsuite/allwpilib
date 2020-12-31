@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <d3d11.h>
 
@@ -104,7 +101,9 @@ static void CleanupDeviceD3D() {
 
 namespace wpi {
 
-void gui::PlatformCreateContext() { gPlatformContext = new PlatformContext; }
+void gui::PlatformCreateContext() {
+  gPlatformContext = new PlatformContext;
+}
 
 void gui::PlatformDestroyContext() {
   CleanupDeviceD3D();
@@ -176,7 +175,9 @@ static inline DXGI_FORMAT DXPixelFormat(PixelFormat format) {
 
 ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
                                const unsigned char* data) {
-  if (!gPlatformValid) return nullptr;
+  if (!gPlatformValid) {
+    return nullptr;
+  }
 
   // Create texture
   D3D11_TEXTURE2D_DESC desc;
@@ -215,7 +216,9 @@ ImTextureID gui::CreateTexture(PixelFormat format, int width, int height,
 
 void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
                         const unsigned char* data) {
-  if (!texture) return;
+  if (!texture) {
+    return;
+  }
 
   D3D11_BOX box;
   box.front = 0;
@@ -237,8 +240,11 @@ void gui::UpdateTexture(ImTextureID texture, PixelFormat, int width, int height,
 }
 
 void gui::DeleteTexture(ImTextureID texture) {
-  if (!gPlatformValid) return;
-  if (texture) static_cast<ID3D11ShaderResourceView*>(texture)->Release();
+  if (!gPlatformValid) {
+    return;
+  }
+  if (texture)
+    static_cast<ID3D11ShaderResourceView*>(texture)->Release();
 }
 
 }  // namespace wpi

@@ -1,23 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
-
-import org.junit.Test;
-
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
 import static org.junit.Assert.assertEquals;
 
-/**
- * Tests for checking our constant and port values.
- */
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.logging.Logger;
+import org.junit.Test;
+
+/** Tests for checking our constant and port values. */
 public class ConstantsPortsTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(ConstantsPortsTest.class.getName());
 
@@ -26,73 +19,55 @@ public class ConstantsPortsTest extends AbstractComsSetup {
     return logger;
   }
 
-  /**
-   * kDigitalChannels.
-   */
+  /** kDigitalChannels. */
   @Test
   public void testDigitalChannels() {
     assertEquals(31, SensorUtil.kDigitalChannels);
   }
 
-  /**
-   * kAnalogInputChannels.
-   */
+  /** kAnalogInputChannels. */
   @Test
   public void testAnalogInputChannels() {
     assertEquals(8, SensorUtil.kAnalogInputChannels);
   }
 
-  /**
-   * kAnalogOutputChannels.
-   */
+  /** kAnalogOutputChannels. */
   @Test
   public void testAnalogOutputChannels() {
     assertEquals(2, SensorUtil.kAnalogOutputChannels);
   }
 
-  /**
-   * kSolenoidChannels.
-   */
+  /** kSolenoidChannels. */
   @Test
   public void testSolenoidChannels() {
     assertEquals(8, SensorUtil.kSolenoidChannels);
   }
 
-  /**
-   * kPwmChannels.
-   */
+  /** kPwmChannels. */
   @Test
   public void testPwmChannels() {
     assertEquals(20, SensorUtil.kPwmChannels);
   }
 
-  /**
-   * kRelayChannels.
-   */
+  /** kRelayChannels. */
   @Test
   public void testRelayChannels() {
     assertEquals(4, SensorUtil.kRelayChannels);
   }
 
-  /**
-   * kPDPChannels.
-   */
+  /** kPDPChannels. */
   @Test
   public void testPDPChannels() {
     assertEquals(16, SensorUtil.kPDPChannels);
   }
 
-  /**
-   * kPDPModules.
-   */
+  /** kPDPModules. */
   @Test
   public void testPDPModules() {
     assertEquals(63, SensorUtil.kPDPModules);
   }
 
-  /**
-   * kPCMModules.
-   */
+  /** kPCMModules. */
   @Test
   public void testPCMModules() {
     assertEquals(63, SensorUtil.kPCMModules);

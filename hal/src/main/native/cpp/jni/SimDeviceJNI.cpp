@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -96,11 +93,15 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnum
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(options, i))};
-    if (!elem) return 0;
+    if (!elem) {
+      return 0;
+    }
     arr.push_back(JStringRef{env, elem}.str());
   }
   wpi::SmallVector<const char*, 8> carr;
-  for (auto&& val : arr) carr.push_back(val.c_str());
+  for (auto&& val : arr) {
+    carr.push_back(val.c_str());
+  }
   return HAL_CreateSimValueEnum(device, JStringRef{env, name}.c_str(),
                                 direction, len, carr.data(), initialValue);
 }
@@ -117,18 +118,24 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnumDouble
 {
   size_t len = env->GetArrayLength(options);
   size_t len2 = env->GetArrayLength(optionValues);
-  if (len != len2) return 0;
+  if (len != len2) {
+    return 0;
+  }
   std::vector<std::string> arr;
   arr.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(options, i))};
-    if (!elem) return 0;
+    if (!elem) {
+      return 0;
+    }
     arr.push_back(JStringRef{env, elem}.str());
   }
 
   wpi::SmallVector<const char*, 8> carr;
-  for (auto&& val : arr) carr.push_back(val.c_str());
+  for (auto&& val : arr) {
+    carr.push_back(val.c_str());
+  }
   return HAL_CreateSimValueEnumDouble(
       device, JStringRef{env, name}.c_str(), direction, len, carr.data(),
       JDoubleArrayRef{env, optionValues}.array().data(), initialValue);

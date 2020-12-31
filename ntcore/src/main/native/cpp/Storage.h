@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_STORAGE_H_
 #define NTCORE_STORAGE_H_
@@ -50,7 +47,7 @@ class Storage : public IStorage {
   Storage(const Storage&) = delete;
   Storage& operator=(const Storage&) = delete;
 
-  ~Storage();
+  ~Storage() override;
 
   // Accessors required by Dispatcher.  An interface is used for
   // generation of outgoing messages to break a dependency loop between
@@ -193,11 +190,11 @@ class Storage : public IStorage {
   };
 
   typedef wpi::StringMap<Entry*> EntriesMap;
-  typedef std::vector<Entry*> IdMap;
-  typedef std::vector<std::unique_ptr<Entry>> LocalMap;
-  typedef std::pair<unsigned int, unsigned int> RpcIdPair;
-  typedef wpi::DenseMap<RpcIdPair, std::string> RpcResultMap;
-  typedef wpi::SmallSet<RpcIdPair, 12> RpcBlockingCallSet;
+  using IdMap = std::vector<Entry*>;
+  using LocalMap = std::vector<std::unique_ptr<Entry>>;
+  using RpcIdPair = std::pair<unsigned int, unsigned int>;
+  using RpcResultMap = wpi::DenseMap<RpcIdPair, std::string>;
+  using RpcBlockingCallSet = wpi::SmallSet<RpcIdPair, 12>;
 
   mutable wpi::mutex m_mutex;
   EntriesMap m_entries;

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/support/IniSaverInfo.h"
 
@@ -78,7 +75,9 @@ void NameInfo::GetLabel(char* buf, size_t size, const char* defaultName,
 }
 
 bool NameInfo::ReadIni(wpi::StringRef name, wpi::StringRef value) {
-  if (name != "name") return false;
+  if (name != "name") {
+    return false;
+  }
   size_t len = (std::min)(value.size(), sizeof(m_name) - 1);
   std::memcpy(m_name, value.data(), len);
   m_name[len] = '\0';
@@ -142,9 +141,13 @@ bool NameInfo::InputTextName(const char* label_id, ImGuiInputTextFlags flags) {
 }
 
 bool OpenInfo::ReadIni(wpi::StringRef name, wpi::StringRef value) {
-  if (name != "open") return false;
+  if (name != "open") {
+    return false;
+  }
   int num;
-  if (value.getAsInteger(10, num)) return true;
+  if (value.getAsInteger(10, num)) {
+    return true;
+  }
   m_open = num;
   return true;
 }
@@ -154,8 +157,12 @@ void OpenInfo::WriteIni(ImGuiTextBuffer* out) {
 }
 
 bool NameOpenInfo::ReadIni(wpi::StringRef name, wpi::StringRef value) {
-  if (NameInfo::ReadIni(name, value)) return true;
-  if (OpenInfo::ReadIni(name, value)) return true;
+  if (NameInfo::ReadIni(name, value)) {
+    return true;
+  }
+  if (OpenInfo::ReadIni(name, value)) {
+    return true;
+  }
   return false;
 }
 

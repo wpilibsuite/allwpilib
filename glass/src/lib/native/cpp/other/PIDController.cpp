@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/other/PIDController.h"
 
@@ -26,7 +23,9 @@ void glass::DisplayPIDController(PIDControllerModel* m) {
     auto createTuningParameter = [](const char* name, double* v,
                                     std::function<void(double)> callback) {
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-      if (ImGui::InputDouble(name, v, 0.0, 0.0, "%.3f")) callback(*v);
+      if (ImGui::InputDouble(name, v, 0.0, 0.0, "%.3f")) {
+        callback(*v);
+      }
     };
 
     if (auto p = m->GetPData()) {

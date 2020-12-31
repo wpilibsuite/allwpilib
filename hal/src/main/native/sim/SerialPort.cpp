@@ -1,19 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/SerialPort.h"
 
 #include "HALInitializer.h"
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSerialPort() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
@@ -29,7 +24,9 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
   return HAL_kInvalidHandle;
 }
 
-int HAL_GetSerialFD(HAL_SerialPortHandle handle, int32_t* status) { return -1; }
+int HAL_GetSerialFD(HAL_SerialPortHandle handle, int32_t* status) {
+  return -1;
+}
 
 void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud,
                            int32_t* status) {}

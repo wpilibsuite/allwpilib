@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.tables.*;
@@ -21,13 +18,19 @@ public class Server {
     NetworkTable.setPort(10000);
     NetworkTable.setServerMode();
     NetworkTable nt = NetworkTable.getTable("");
-    try { Thread.sleep(1000); } catch (InterruptedException e) {}
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+    }
     nt.putNumber("foo", 0.5);
     nt.setFlags("foo", NetworkTable.PERSISTENT);
     nt.putNumber("foo2", 0.5);
     nt.putNumber("foo2", 0.7);
     nt.putNumber("foo2", 0.6);
     nt.putNumber("foo2", 0.5);
-    try { Thread.sleep(10000); } catch (InterruptedException e) {}
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+    }
   }
 }

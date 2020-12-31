@@ -1,20 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.estimator;
-
-
-import java.util.function.BiFunction;
-
-import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import java.util.function.BiFunction;
+import org.ejml.simple.SimpleMatrix;
 
 public final class AngleStatistics {
   private AngleStatistics() {
@@ -29,9 +23,8 @@ public final class AngleStatistics {
    * @param b A vector to subtract with.
    * @param angleStateIdx The row containing angles to be normalized.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
-  public static <S extends Num> Matrix<S, N1> angleResidual(Matrix<S, N1> a, Matrix<S, N1> b,
-                                                            int angleStateIdx) {
+  public static <S extends Num> Matrix<S, N1> angleResidual(
+      Matrix<S, N1> a, Matrix<S, N1> b, int angleStateIdx) {
     Matrix<S, N1> ret = a.minus(b);
     ret.set(angleStateIdx, 0, normalizeAngle(ret.get(angleStateIdx, 0)));
 
@@ -44,9 +37,8 @@ public final class AngleStatistics {
    *
    * @param angleStateIdx The row containing angles to be normalized.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
-  public static <S extends Num> BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>>
-      angleResidual(int angleStateIdx) {
+  public static <S extends Num>
+      BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>> angleResidual(int angleStateIdx) {
     return (a, b) -> angleResidual(a, b, angleStateIdx);
   }
 
@@ -57,9 +49,8 @@ public final class AngleStatistics {
    * @param b A vector to add with.
    * @param angleStateIdx The row containing angles to be normalized.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
-  public static <S extends Num> Matrix<S, N1> angleAdd(Matrix<S, N1> a, Matrix<S, N1> b,
-                                                       int angleStateIdx) {
+  public static <S extends Num> Matrix<S, N1> angleAdd(
+      Matrix<S, N1> a, Matrix<S, N1> b, int angleStateIdx) {
     Matrix<S, N1> ret = a.plus(b);
     ret.set(angleStateIdx, 0, normalizeAngle(ret.get(angleStateIdx, 0)));
 
@@ -72,9 +63,8 @@ public final class AngleStatistics {
    *
    * @param angleStateIdx The row containing angles to be normalized.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
-  public static <S extends Num> BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>>
-      angleAdd(int angleStateIdx) {
+  public static <S extends Num> BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>> angleAdd(
+      int angleStateIdx) {
     return (a, b) -> angleAdd(a, b, angleStateIdx);
   }
 
@@ -97,8 +87,8 @@ public final class AngleStatistics {
    * @param angleStateIdx The row containing the angles.
    */
   @SuppressWarnings("checkstyle:ParameterName")
-  public static <S extends Num> Matrix<S, N1> angleMean(Matrix<S, ?> sigmas, Matrix<?, N1> Wm,
-                                                        int angleStateIdx) {
+  public static <S extends Num> Matrix<S, N1> angleMean(
+      Matrix<S, ?> sigmas, Matrix<?, N1> Wm, int angleStateIdx) {
     double[] angleSigmas = sigmas.extractRowVector(angleStateIdx).getData();
     Matrix<N1, ?> sinAngleSigmas = new Matrix<>(new SimpleMatrix(1, sigmas.getNumCols()));
     Matrix<N1, ?> cosAngleSigmas = new Matrix<>(new SimpleMatrix(1, sigmas.getNumCols()));
@@ -122,9 +112,9 @@ public final class AngleStatistics {
    *
    * @param angleStateIdx The row containing the angles.
    */
-  @SuppressWarnings("checkstyle:ParameterName")
-  public static <S extends Num> BiFunction<Matrix<S, ?>, Matrix<?, N1>, Matrix<S, N1>>
-      angleMean(int angleStateIdx) {
+  @SuppressWarnings("LambdaParameterName")
+  public static <S extends Num> BiFunction<Matrix<S, ?>, Matrix<?, N1>, Matrix<S, N1>> angleMean(
+      int angleStateIdx) {
     return (sigmas, Wm) -> angleMean(sigmas, Wm, angleStateIdx);
   }
 }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/ADXL345_SPI.h"
 
@@ -52,19 +49,33 @@ void ADXL345_SPI::SetRange(Range range) {
   commands[1] = kDataFormat_FullRes | static_cast<uint8_t>(range & 0x03);
   m_spi.Transaction(commands, commands, 2);
 
-  if (m_simRange) m_simRange.Set(range);
+  if (m_simRange) {
+    m_simRange.Set(range);
+  }
 }
 
-double ADXL345_SPI::GetX() { return GetAcceleration(kAxis_X); }
+double ADXL345_SPI::GetX() {
+  return GetAcceleration(kAxis_X);
+}
 
-double ADXL345_SPI::GetY() { return GetAcceleration(kAxis_Y); }
+double ADXL345_SPI::GetY() {
+  return GetAcceleration(kAxis_Y);
+}
 
-double ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
+double ADXL345_SPI::GetZ() {
+  return GetAcceleration(kAxis_Z);
+}
 
 double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
-  if (axis == kAxis_X && m_simX) return m_simX.Get();
-  if (axis == kAxis_Y && m_simY) return m_simY.Get();
-  if (axis == kAxis_Z && m_simZ) return m_simZ.Get();
+  if (axis == kAxis_X && m_simX) {
+    return m_simX.Get();
+  }
+  if (axis == kAxis_Y && m_simY) {
+    return m_simY.Get();
+  }
+  if (axis == kAxis_Z && m_simZ) {
+    return m_simZ.Get();
+  }
   uint8_t buffer[3];
   uint8_t command[3] = {0, 0, 0};
   command[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister) +

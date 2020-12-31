@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_Encoder.h"
 
@@ -26,7 +23,9 @@ void HALSimWSProviderEncoder::Initialize(WSRegisterFunc webRegisterFunc) {
                                            webRegisterFunc);
 }
 
-HALSimWSProviderEncoder::~HALSimWSProviderEncoder() { DoCancelCallbacks(); }
+HALSimWSProviderEncoder::~HALSimWSProviderEncoder() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderEncoder::RegisterCallbacks() {
   // Special case for initialization since we will need to send
@@ -75,7 +74,9 @@ void HALSimWSProviderEncoder::RegisterCallbacks() {
   m_samplesCbKey = REGISTER(SamplesToAverage, "<samples_to_avg", int32_t, int);
 }
 
-void HALSimWSProviderEncoder::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderEncoder::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderEncoder::DoCancelCallbacks() {
   HALSIM_CancelEncoderInitializedCallback(m_channel, m_initCbKey);

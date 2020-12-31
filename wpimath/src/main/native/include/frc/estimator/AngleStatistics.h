@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -12,15 +9,15 @@
 #include "Eigen/Core"
 
 namespace frc {
-namespace {
-double NormalizeAngle(double angle) {
+inline double NormalizeAngle(double angle) {
   static constexpr double tau = 2 * wpi::math::pi;
 
   angle -= std::floor(angle / tau) * tau;
-  if (angle > wpi::math::pi) angle -= tau;
+  if (angle > wpi::math::pi) {
+    angle -= tau;
+  }
   return angle;
 }
-}  // namespace
 
 /**
  * Subtracts a and b while normalizing the resulting value in the selected row

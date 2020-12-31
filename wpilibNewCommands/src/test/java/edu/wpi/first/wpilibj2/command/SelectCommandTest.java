@@ -1,20 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
-
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 class SelectCommandTest extends CommandTestBase {
   @Test
@@ -29,10 +25,11 @@ class SelectCommandTest extends CommandTestBase {
       Command command3 = command3Holder.getMock();
 
       SelectCommand selectCommand =
-          new SelectCommand(Map.ofEntries(
-              Map.entry("one", command1),
-              Map.entry("two", command2),
-              Map.entry("three", command3)),
+          new SelectCommand(
+              Map.ofEntries(
+                  Map.entry("one", command1),
+                  Map.entry("two", command2),
+                  Map.entry("three", command3)),
               () -> "one");
 
       scheduler.schedule(selectCommand);
@@ -64,16 +61,16 @@ class SelectCommandTest extends CommandTestBase {
       Command command3 = command3Holder.getMock();
 
       SelectCommand selectCommand =
-          new SelectCommand(Map.ofEntries(
-              Map.entry("one", command1),
-              Map.entry("two", command2),
-              Map.entry("three", command3)),
+          new SelectCommand(
+              Map.ofEntries(
+                  Map.entry("one", command1),
+                  Map.entry("two", command2),
+                  Map.entry("three", command3)),
               () -> "four");
 
       assertDoesNotThrow(() -> scheduler.schedule(selectCommand));
     }
   }
-
 
   @Test
   void selectCommandRequirementTest() {
@@ -90,13 +87,16 @@ class SelectCommandTest extends CommandTestBase {
       MockCommandHolder command3Holder = new MockCommandHolder(true, system3, system4);
       Command command3 = command3Holder.getMock();
 
-      SelectCommand selectCommand = new SelectCommand(
-          Map.ofEntries(Map.entry("one", command1), Map.entry("two", command2),
-              Map.entry("three", command3)), () -> "one");
+      SelectCommand selectCommand =
+          new SelectCommand(
+              Map.ofEntries(
+                  Map.entry("one", command1),
+                  Map.entry("two", command2),
+                  Map.entry("three", command3)),
+              () -> "one");
 
       scheduler.schedule(selectCommand);
-      scheduler.schedule(new InstantCommand(() -> {
-      }, system3));
+      scheduler.schedule(new InstantCommand(() -> {}, system3));
 
       assertFalse(scheduler.isScheduled(selectCommand));
 

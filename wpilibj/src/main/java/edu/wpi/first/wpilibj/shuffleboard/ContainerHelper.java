@@ -1,12 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -20,13 +20,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
-/**
- * A helper class for Shuffleboard containers to handle common child operations.
- */
+/** A helper class for Shuffleboard containers to handle common child operations. */
 final class ContainerHelper {
   private final ShuffleboardContainer m_container;
   private final Set<String> m_usedTitles = new HashSet<>();
@@ -126,9 +120,8 @@ final class ContainerHelper {
     checkTitle(title);
   }
 
-  private <T> SuppliedValueWidget<T> addSupplied(String title,
-                                                 Supplier<T> supplier,
-                                                 BiConsumer<NetworkTableEntry, T> setter) {
+  private <T> SuppliedValueWidget<T> addSupplied(
+      String title, Supplier<T> supplier, BiConsumer<NetworkTableEntry, T> setter) {
     SuppliedValueWidget<T> widget = new SuppliedValueWidget<>(m_container, title, supplier, setter);
     m_components.add(widget);
     return widget;
@@ -147,5 +140,4 @@ final class ContainerHelper {
     }
     m_usedTitles.add(title);
   }
-
 }

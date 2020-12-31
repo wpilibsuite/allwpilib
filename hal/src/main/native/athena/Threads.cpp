@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Threads.h"
 
@@ -12,11 +9,9 @@
 
 #include "hal/Errors.h"
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeThreads() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
@@ -69,11 +64,12 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
   int policy;
   pthread_getschedparam(*reinterpret_cast<const pthread_t*>(handle), &policy,
                         &sch);
-  if (scheduler == SCHED_FIFO || scheduler == SCHED_RR)
+  if (scheduler == SCHED_FIFO || scheduler == SCHED_RR) {
     sch.sched_priority = priority;
-  else
+  } else {
     // Only need to set 0 priority for non RT thread
     sch.sched_priority = 0;
+  }
   if (pthread_setschedparam(*reinterpret_cast<const pthread_t*>(handle),
                             scheduler, &sch)) {
     *status = HAL_THREAD_PRIORITY_ERROR;

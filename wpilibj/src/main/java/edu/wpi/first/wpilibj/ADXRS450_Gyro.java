@@ -1,14 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -17,6 +11,8 @@ import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
@@ -52,9 +48,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
   private SimDouble m_simAngle;
   private SimDouble m_simRate;
 
-  /**
-   * Constructor.  Uses the onboard CS0.
-   */
+  /** Constructor. Uses the onboard CS0. */
   public ADXRS450_Gyro() {
     this(SPI.Port.kOnboardCS0);
   }
@@ -87,13 +81,12 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
       if ((readRegister(kPIDRegister) & 0xff00) != 0x5200) {
         m_spi.close();
         m_spi = null;
-        DriverStation.reportError("could not find ADXRS450 gyro on SPI port " + port.value,
-            false);
+        DriverStation.reportError("could not find ADXRS450 gyro on SPI port " + port.value, false);
         return;
       }
 
-      m_spi.initAccumulator(kSamplePeriod, 0x20000000, 4, 0x0c00000e, 0x04000000, 10, 16,
-          true, true);
+      m_spi.initAccumulator(
+          kSamplePeriod, 0x20000000, 4, 0x0c00000e, 0x04000000, 10, 16, true, true);
 
       calibrate();
     }
@@ -164,7 +157,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     m_spi.read(false, buf, 4);
 
     if ((buf.get(0) & 0xe0) == 0) {
-      return 0;  // error, return 0
+      return 0; // error, return 0
     }
     return (buf.getInt(0) >> 5) & 0xffff;
   }
@@ -182,9 +175,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     }
   }
 
-  /**
-   * Delete (free) the spi port used for the gyro and stop accumulating.
-   */
+  /** Delete (free) the spi port used for the gyro and stop accumulating. */
   @Override
   public void close() {
     SendableRegistry.remove(this);

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -11,8 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * This base class runs a watchdog timer and calls the subclass's StopMotor()
- * function if the timeout expires.
+ * This base class runs a watchdog timer and calls the subclass's StopMotor() function if the
+ * timeout expires.
  *
  * <p>The subclass should call feed() whenever the motor value is updated.
  */
@@ -26,9 +23,7 @@ public abstract class MotorSafety {
   private static final Set<MotorSafety> m_instanceList = new LinkedHashSet<>();
   private static final Object m_listMutex = new Object();
 
-  /**
-   * MotorSafety constructor.
-   */
+  /** MotorSafety constructor. */
   public MotorSafety() {
     synchronized (m_listMutex) {
       m_instanceList.add(this);

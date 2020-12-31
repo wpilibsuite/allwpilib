@@ -1,15 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.estimator;
-
-import java.util.function.BiFunction;
-
-import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpilibj.math.Discretization;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
@@ -20,6 +13,8 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.Pair;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import java.util.function.BiFunction;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the
@@ -32,8 +27,8 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
  * the UKF works with nonlinear systems.
  */
 @SuppressWarnings({"MemberName", "ClassTypeParameterName", "PMD.TooManyFields"})
-public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
-      Outputs extends Num> implements KalmanTypeFilter<States, Inputs, Outputs> {
+public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
+    implements KalmanTypeFilter<States, Inputs, Outputs> {
 
   private final Nat<States> m_states;
   private final Nat<Outputs> m_outputs;
@@ -59,36 +54,36 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   /**
    * Constructs an Unscented Kalman Filter.
    *
-   * @param states             A Nat representing the number of states.
-   * @param outputs            A Nat representing the number of outputs.
-   * @param f                  A vector-valued function of x and u that returns
-   *                           the derivative of the state vector.
-   * @param h                  A vector-valued function of x and u that returns
-   *                           the measurement vector.
-   * @param stateStdDevs       Standard deviations of model states.
+   * @param states A Nat representing the number of states.
+   * @param outputs A Nat representing the number of outputs.
+   * @param f A vector-valued function of x and u that returns the derivative of the state vector.
+   * @param h A vector-valued function of x and u that returns the measurement vector.
+   * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param nominalDtSeconds   Nominal discretization timestep.
+   * @param nominalDtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings("ParameterName")
-  public UnscentedKalmanFilter(Nat<States> states, Nat<Outputs> outputs,
-                               BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>,
-                                   Matrix<States, N1>> f,
-                               BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>,
-                                   Matrix<Outputs, N1>> h,
-                               Matrix<States, N1> stateStdDevs,
-                               Matrix<Outputs, N1> measurementStdDevs,
-                               double nominalDtSeconds) {
+  @SuppressWarnings("LambdaParameterName")
+  public UnscentedKalmanFilter(
+      Nat<States> states,
+      Nat<Outputs> outputs,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
+      Matrix<States, N1> stateStdDevs,
+      Matrix<Outputs, N1> measurementStdDevs,
+      double nominalDtSeconds) {
     this(
-        states, outputs,
-        f, h,
-        stateStdDevs, measurementStdDevs,
+        states,
+        outputs,
+        f,
+        h,
+        stateStdDevs,
+        measurementStdDevs,
         (sigmas, Wm) -> sigmas.times(Matrix.changeBoundsUnchecked(Wm)),
         (sigmas, Wm) -> sigmas.times(Matrix.changeBoundsUnchecked(Wm)),
         Matrix::minus,
         Matrix::minus,
         Matrix::plus,
-        nominalDtSeconds
-    );
+        nominalDtSeconds);
   }
 
   /**
@@ -96,39 +91,37 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
    * custom functions for arithmetic can be useful if you have angles in the state or measurements,
    * because they allow you to correctly account for the modular nature of angle arithmetic.
    *
-   * @param states             A Nat representing the number of states.
-   * @param outputs            A Nat representing the number of outputs.
-   * @param f                  A vector-valued function of x and u that returns
-   *                           the derivative of the state vector.
-   * @param h                  A vector-valued function of x and u that returns
-   *                           the measurement vector.
-   * @param stateStdDevs       Standard deviations of model states.
+   * @param states A Nat representing the number of states.
+   * @param outputs A Nat representing the number of outputs.
+   * @param f A vector-valued function of x and u that returns the derivative of the state vector.
+   * @param h A vector-valued function of x and u that returns the measurement vector.
+   * @param stateStdDevs Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
-   * @param meanFuncX          A function that computes the mean of 2 * States + 1 state vectors
-   *                           using a given set of weights.
-   * @param meanFuncY          A function that computes the mean of 2 * States + 1 measurement
-   *                           vectors using a given set of weights.
-   * @param residualFuncX      A function that computes the residual of two state vectors (i.e. it
-   *                           subtracts them.)
-   * @param residualFuncY      A function that computes the residual of two measurement vectors
-   *                           (i.e. it subtracts them.)
-   * @param addFuncX           A function that adds two state vectors.
-   * @param nominalDtSeconds   Nominal discretization timestep.
+   * @param meanFuncX A function that computes the mean of 2 * States + 1 state vectors using a
+   *     given set of weights.
+   * @param meanFuncY A function that computes the mean of 2 * States + 1 measurement vectors using
+   *     a given set of weights.
+   * @param residualFuncX A function that computes the residual of two state vectors (i.e. it
+   *     subtracts them.)
+   * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
+   *     subtracts them.)
+   * @param addFuncX A function that adds two state vectors.
+   * @param nominalDtSeconds Nominal discretization timestep.
    */
   @SuppressWarnings({"ParameterName", "PMD.ExcessiveParameterList"})
   public UnscentedKalmanFilter(
-          Nat<States> states, Nat<Outputs> outputs,
-          BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-          BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
-          Matrix<States, N1> stateStdDevs,
-          Matrix<Outputs, N1> measurementStdDevs,
-          BiFunction<Matrix<States, ?>, Matrix<?, N1>, Matrix<States, N1>> meanFuncX,
-          BiFunction<Matrix<Outputs, ?>, Matrix<?, N1>, Matrix<Outputs, N1>> meanFuncY,
-          BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX,
-          BiFunction<Matrix<Outputs, N1>, Matrix<Outputs, N1>, Matrix<Outputs, N1>> residualFuncY,
-          BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX,
-          double nominalDtSeconds
-  ) {
+      Nat<States> states,
+      Nat<Outputs> outputs,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
+      Matrix<States, N1> stateStdDevs,
+      Matrix<Outputs, N1> measurementStdDevs,
+      BiFunction<Matrix<States, ?>, Matrix<?, N1>, Matrix<States, N1>> meanFuncX,
+      BiFunction<Matrix<Outputs, ?>, Matrix<?, N1>, Matrix<Outputs, N1>> meanFuncY,
+      BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX,
+      BiFunction<Matrix<Outputs, N1>, Matrix<Outputs, N1>, Matrix<Outputs, N1>> residualFuncY,
+      BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX,
+      double nominalDtSeconds) {
     this.m_states = states;
     this.m_outputs = outputs;
 
@@ -152,25 +145,30 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   }
 
   @SuppressWarnings({"ParameterName", "LocalVariableName", "PMD.CyclomaticComplexity"})
-  static <S extends Num, C extends Num>
-       Pair<Matrix<C, N1>, Matrix<C, C>> unscentedTransform(
-        Nat<S> s, Nat<C> dim, Matrix<C, ?> sigmas, Matrix<?, N1> Wm, Matrix<?, N1> Wc,
-        BiFunction<Matrix<C, ?>, Matrix<?, N1>, Matrix<C, N1>> meanFunc,
-        BiFunction<Matrix<C, N1>, Matrix<C, N1>, Matrix<C, N1>> residualFunc
-  ) {
+  static <S extends Num, C extends Num> Pair<Matrix<C, N1>, Matrix<C, C>> unscentedTransform(
+      Nat<S> s,
+      Nat<C> dim,
+      Matrix<C, ?> sigmas,
+      Matrix<?, N1> Wm,
+      Matrix<?, N1> Wc,
+      BiFunction<Matrix<C, ?>, Matrix<?, N1>, Matrix<C, N1>> meanFunc,
+      BiFunction<Matrix<C, N1>, Matrix<C, N1>, Matrix<C, N1>> residualFunc) {
     if (sigmas.getNumRows() != dim.getNum() || sigmas.getNumCols() != 2 * s.getNum() + 1) {
-      throw new IllegalArgumentException("Sigmas must be covDim by 2 * states + 1! Got "
-            + sigmas.getNumRows() + " by " + sigmas.getNumCols());
+      throw new IllegalArgumentException(
+          "Sigmas must be covDim by 2 * states + 1! Got "
+              + sigmas.getNumRows()
+              + " by "
+              + sigmas.getNumCols());
     }
 
-    if (Wm.getNumRows() != 2 * s.getNum() + 1 || Wm.getNumCols() != 1 ) {
-      throw new IllegalArgumentException("Wm must be 2 * states + 1 by 1! Got "
-            + Wm.getNumRows() + " by " + Wm.getNumCols());
+    if (Wm.getNumRows() != 2 * s.getNum() + 1 || Wm.getNumCols() != 1) {
+      throw new IllegalArgumentException(
+          "Wm must be 2 * states + 1 by 1! Got " + Wm.getNumRows() + " by " + Wm.getNumCols());
     }
 
     if (Wc.getNumRows() != 2 * s.getNum() + 1 || Wc.getNumCols() != 1) {
-      throw new IllegalArgumentException("Wc must be 2 * states + 1 by 1! Got "
-            + Wc.getNumRows() + " by " + Wc.getNumCols());
+      throw new IllegalArgumentException(
+          "Wc must be 2 * states + 1 by 1! Got " + Wc.getNumRows() + " by " + Wc.getNumCols());
     }
 
     // New mean is usually just the sum of the sigmas * weight:
@@ -184,8 +182,9 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
       // y[:, i] = sigmas[:, i] - x
       y.setColumn(i, residualFunc.apply(sigmas.extractColumnVector(i), x));
     }
-    Matrix<C, C> P = y.times(Matrix.changeBoundsUnchecked(Wc.diag()))
-          .times(Matrix.changeBoundsUnchecked(y.transpose()));
+    Matrix<C, C> P =
+        y.times(Matrix.changeBoundsUnchecked(Wc.diag()))
+            .times(Matrix.changeBoundsUnchecked(y.transpose()));
 
     return new Pair<>(x, P);
   }
@@ -243,7 +242,6 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
     return m_xHat.get(row, 0);
   }
 
-
   /**
    * Set initial state estimate x-hat.
    *
@@ -258,7 +256,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   /**
    * Set an element of the initial state estimate x-hat.
    *
-   * @param row   Row of x-hat.
+   * @param row Row of x-hat.
    * @param value Value for element of x-hat.
    */
   @Override
@@ -266,9 +264,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
     m_xHat.set(row, 0, value);
   }
 
-  /**
-   * Resets the observer.
-   */
+  /** Resets the observer. */
   @Override
   public void reset() {
     m_xHat = new Matrix<>(m_states, Nat.N1());
@@ -279,7 +275,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   /**
    * Project the model into the future with a new control input u.
    *
-   * @param u         New control input from controller.
+   * @param u New control input from controller.
    * @param dtSeconds Timestep for prediction.
    */
   @SuppressWarnings({"LocalVariableName", "ParameterName"})
@@ -288,8 +284,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
     // Discretize Q before projecting mean and covariance forward
     Matrix<States, States> contA =
         NumericalJacobian.numericalJacobianX(m_states, m_states, m_f, m_xHat, u);
-    var discQ =
-        Discretization.discretizeAQTaylor(contA, m_contQ, dtSeconds).getSecond();
+    var discQ = Discretization.discretizeAQTaylor(contA, m_contQ, dtSeconds).getSecond();
 
     var sigmas = m_pts.sigmaPoints(m_xHat, m_P);
 
@@ -299,8 +294,15 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
       m_sigmasF.setColumn(i, RungeKutta.rungeKutta(m_f, x, u, dtSeconds));
     }
 
-    var ret = unscentedTransform(m_states, m_states,
-          m_sigmasF, m_pts.getWm(), m_pts.getWc(), m_meanFuncX, m_residualFuncX);
+    var ret =
+        unscentedTransform(
+            m_states,
+            m_states,
+            m_sigmasF,
+            m_pts.getWm(),
+            m_pts.getWc(),
+            m_meanFuncX,
+            m_residualFuncX);
 
     m_xHat = ret.getFirst();
     m_P = ret.getSecond().plus(discQ);
@@ -316,28 +318,29 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   @SuppressWarnings("ParameterName")
   @Override
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
-    correct(m_outputs, u, y, m_h, m_contR,
-            m_meanFuncY, m_residualFuncY, m_residualFuncX, m_addFuncX);
+    correct(
+        m_outputs, u, y, m_h, m_contR, m_meanFuncY, m_residualFuncY, m_residualFuncX, m_addFuncX);
   }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
-   * <p>This is useful for when the measurements available during a timestep's
-   * Correct() call vary. The h(x, u) passed to the constructor is used if one
-   * is not provided (the two-argument version of this function).
+   * <p>This is useful for when the measurements available during a timestep's Correct() call vary.
+   * The h(x, u) passed to the constructor is used if one is not provided (the two-argument version
+   * of this function).
    *
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
    * @param R Measurement noise covariance matrix.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
+  @SuppressWarnings({"ParameterName", "LambdaParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
-        Nat<R> rows, Matrix<Inputs, N1> u,
-        Matrix<R, N1> y,
-        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<R, N1>> h,
-        Matrix<R, R> R) {
+      Nat<R> rows,
+      Matrix<Inputs, N1> u,
+      Matrix<R, N1> y,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<R, N1>> h,
+      Matrix<R, R> R) {
     BiFunction<Matrix<R, ?>, Matrix<?, N1>, Matrix<R, N1>> meanFuncY =
         (sigmas, Wm) -> sigmas.times(Matrix.changeBoundsUnchecked(Wm));
     BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX =
@@ -350,50 +353,47 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
-   * <p>This is useful for when the measurements available during a timestep's
-   * Correct() call vary. The h(x, u) passed to the constructor is used if one
-   * is not provided (the two-argument version of this function).
+   * <p>This is useful for when the measurements available during a timestep's Correct() call vary.
+   * The h(x, u) passed to the constructor is used if one is not provided (the two-argument version
+   * of this function).
    *
-   * @param u             Same control input used in the predict step.
-   * @param y             Measurement vector.
-   * @param h             A vector-valued function of x and u that returns the
-   *                      measurement vector.
-   * @param R             Measurement noise covariance matrix.
-   * @param meanFuncY     A function that computes the mean of 2 * States + 1 measurement vectors
-   *                      using a given set of weights.
+   * @param u Same control input used in the predict step.
+   * @param y Measurement vector.
+   * @param h A vector-valued function of x and u that returns the measurement vector.
+   * @param R Measurement noise covariance matrix.
+   * @param meanFuncY A function that computes the mean of 2 * States + 1 measurement vectors using
+   *     a given set of weights.
    * @param residualFuncX A function that computes the residual of two state vectors (i.e. it
-   *                      subtracts them.)
+   *     subtracts them.)
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
-   *                      subtracts them.)
-   * @param addFuncX      A function that adds two state vectors.
+   *     subtracts them.)
+   * @param addFuncX A function that adds two state vectors.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
-        Nat<R> rows, Matrix<Inputs, N1> u,
-        Matrix<R, N1> y,
-        BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<R, N1>> h,
-        Matrix<R, R> R,
-        BiFunction<Matrix<R, ?>, Matrix<?, N1>, Matrix<R, N1>> meanFuncY,
-        BiFunction<Matrix<R, N1>, Matrix<R, N1>, Matrix<R, N1>> residualFuncY,
-        BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX,
-        BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX) {
+      Nat<R> rows,
+      Matrix<Inputs, N1> u,
+      Matrix<R, N1> y,
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<R, N1>> h,
+      Matrix<R, R> R,
+      BiFunction<Matrix<R, ?>, Matrix<?, N1>, Matrix<R, N1>> meanFuncY,
+      BiFunction<Matrix<R, N1>, Matrix<R, N1>, Matrix<R, N1>> residualFuncY,
+      BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> residualFuncX,
+      BiFunction<Matrix<States, N1>, Matrix<States, N1>, Matrix<States, N1>> addFuncX) {
     final var discR = Discretization.discretizeR(R, m_dtSeconds);
 
     // Transform sigma points into measurement space
-    Matrix<R, ?> sigmasH = new Matrix<>(new SimpleMatrix(
-          rows.getNum(), 2 * m_states.getNum() + 1));
+    Matrix<R, ?> sigmasH = new Matrix<>(new SimpleMatrix(rows.getNum(), 2 * m_states.getNum() + 1));
     var sigmas = m_pts.sigmaPoints(m_xHat, m_P);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
-      Matrix<R, N1> hRet = h.apply(
-            sigmas.extractColumnVector(i),
-            u
-      );
+      Matrix<R, N1> hRet = h.apply(sigmas.extractColumnVector(i), u);
       sigmasH.setColumn(i, hRet);
     }
 
     // Mean and covariance of prediction passed through unscented transform
-    var transRet = unscentedTransform(m_states, rows,
-            sigmasH, m_pts.getWm(), m_pts.getWc(), meanFuncY, residualFuncY);
+    var transRet =
+        unscentedTransform(
+            m_states, rows, sigmasH, m_pts.getWm(), m_pts.getWc(), meanFuncY, residualFuncY);
     var yHat = transRet.getFirst();
     var Py = transRet.getSecond().plus(discR);
 
@@ -412,9 +412,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
     // P_y^T K^T = P_{xy}^T
     // K^T = P_y^T.solve(P_{xy}^T)
     // K = (P_y^T.solve(P_{xy}^T)^T
-    Matrix<States, R> K = new Matrix<>(
-          Py.transpose().solve(Pxy.transpose()).transpose()
-    );
+    Matrix<States, R> K = new Matrix<>(Py.transpose().solve(Pxy.transpose()).transpose());
 
     // xHat + K * (y - yHat)
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, yHat)));

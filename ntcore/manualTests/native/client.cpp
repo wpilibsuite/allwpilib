@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
 #include <climits>
@@ -26,8 +23,9 @@ int main() {
 
   auto foo = nt::GetEntry(inst, "/foo");
   auto foo_val = nt::GetEntryValue(foo);
-  if (foo_val && foo_val->IsDouble())
+  if (foo_val && foo_val->IsDouble()) {
     std::printf("Got foo: %g\n", foo_val->GetDouble());
+  }
 
   auto bar = nt::GetEntry(inst, "/bar");
   nt::SetEntryValue(bar, nt::Value::MakeBoolean(false));

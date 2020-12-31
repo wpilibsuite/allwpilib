@@ -1,27 +1,22 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.test;
 
-import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 
+import edu.wpi.first.wpilibj.test.AbstractTestSuite.ClassMethodPair;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-import edu.wpi.first.wpilibj.test.AbstractTestSuite.ClassMethodPair;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Yes, this is the test system testing itself. Functionally, this is making sure that all tests get
@@ -31,10 +26,16 @@ import static org.junit.Assert.assertEquals;
 public class AbstractTestSuiteTest {
   @Ignore("Prevents ANT from trying to run these as tests")
   @RunWith(Suite.class)
-  @SuiteClasses({FirstSampleTest.class, SecondSampleTest.class, ThirdSampleTest.class,
-      FourthSampleTest.class, UnusualTest.class, ExampleSubSuite.class, EmptySuite.class})
-  class TestForAbstractTestSuite extends AbstractTestSuite {
-  }
+  @SuiteClasses({
+    FirstSampleTest.class,
+    SecondSampleTest.class,
+    ThirdSampleTest.class,
+    FourthSampleTest.class,
+    UnusualTest.class,
+    ExampleSubSuite.class,
+    EmptySuite.class
+  })
+  class TestForAbstractTestSuite extends AbstractTestSuite {}
 
   TestForAbstractTestSuite m_testSuite;
 
@@ -82,10 +83,11 @@ public class AbstractTestSuiteTest {
     List<Class<?>> collectedTests = m_testSuite.getSuiteOrTestMatchingRegex(".*Test.*");
     // then
     assertEquals(7, collectedTests.size());
-    assertThat(collectedTests, hasItems(FirstSubSuiteTest.class,
-        SecondSubSuiteTest.class, UnusualTest.class));
-    assertThat(collectedTests,
-        not(hasItems(new Class<?>[]{ExampleSubSuite.class, EmptySuite.class})));
+    assertThat(
+        collectedTests,
+        hasItems(FirstSubSuiteTest.class, SecondSubSuiteTest.class, UnusualTest.class));
+    assertThat(
+        collectedTests, not(hasItems(new Class<?>[] {ExampleSubSuite.class, EmptySuite.class})));
   }
 
   @Test
@@ -96,31 +98,23 @@ public class AbstractTestSuiteTest {
     assertEquals(1, pairs.size());
     assertEquals(FirstSubSuiteTest.class, pairs.get(0).m_methodClass);
     assertEquals(FirstSubSuiteTest.METHODNAME, pairs.get(0).m_methodName);
-
   }
-
 }
 
 @SuppressWarnings("OneTopLevelClass")
-class FirstSampleTest {
-}
+class FirstSampleTest {}
 
 @SuppressWarnings("OneTopLevelClass")
-class SecondSampleTest {
-}
+class SecondSampleTest {}
 
 @SuppressWarnings("OneTopLevelClass")
-class ThirdSampleTest {
-}
+class ThirdSampleTest {}
 
 @SuppressWarnings("OneTopLevelClass")
-class FourthSampleTest {
-}
+class FourthSampleTest {}
 
 @SuppressWarnings("OneTopLevelClass")
-class UnusualTest {
-} // This is a member of both suites
-
+class UnusualTest {} // This is a member of both suites
 
 @Ignore("Prevents ANT from trying to run these as tests")
 @SuppressWarnings("OneTopLevelClass")
@@ -129,26 +123,20 @@ class FirstSubSuiteTest {
 
   @Test
   @SuppressWarnings("MethodName")
-  public void aTestMethod() {
-  }
+  public void aTestMethod() {}
 }
 
 @SuppressWarnings("OneTopLevelClass")
-class SecondSubSuiteTest {
-}
-
+class SecondSubSuiteTest {}
 
 @RunWith(Suite.class)
 @SuiteClasses({FirstSubSuiteTest.class, SecondSubSuiteTest.class, UnusualTest.class})
 @Ignore("Prevents ANT from trying to run these as tests")
 @SuppressWarnings("OneTopLevelClass")
-class ExampleSubSuite extends AbstractTestSuite {
-}
-
+class ExampleSubSuite extends AbstractTestSuite {}
 
 @Ignore("Prevents ANT from trying to run these as tests")
 @RunWith(Suite.class)
 @SuiteClasses({})
 @SuppressWarnings("OneTopLevelClass")
-class EmptySuite extends AbstractTestSuite {
-}
+class EmptySuite extends AbstractTestSuite {}

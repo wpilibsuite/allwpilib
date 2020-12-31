@@ -11,6 +11,7 @@ plugins {
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '1.1.1' apply false
     id 'com.github.johnrengelman.shadow' version '5.2.0' apply false
+    id 'com.diffplug.gradle.spotless' version '4.5.0'
 }
 
 if (project.hasProperty('buildServer')) {
@@ -117,8 +118,12 @@ subprojects {
                     String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
                     exec {
                         workingDir rootDir
-                        def args = ["sh", "-c", "codesign --force --strict --timestamp --options=runtime " +
-                                    "--verbose -s ${project.findProperty("developerID")} ${path}"]
+                        def args = [
+                            "sh",
+                            "-c",
+                            "codesign --force --strict --timestamp --options=runtime " +
+                            "--verbose -s ${project.findProperty("developerID")} ${path}"
+                        ]
                         commandLine args
                     }
                 }
@@ -129,6 +134,48 @@ subprojects {
 
 ext.getCurrentArch = {
     return NativePlatforms.desktop
+}
+
+spotless {
+    java {
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    groovyGradle {
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format 'xml', {
+        target fileTree('.') {
+            include '**/*.xml'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        eclipseWtp('xml')
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
 }
 
 wrapper {

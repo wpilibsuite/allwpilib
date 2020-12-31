@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "PCMDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePCMData() {
   static PCMData spd[kNumPCMModules];
   ::hal::SimPCMData = spd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 PCMData* hal::SimPCMData;
 void PCMData::ResetData() {
@@ -34,7 +29,9 @@ void PCMData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetPCMData(int32_t index) { SimPCMData[index].ResetData(); }
+void HALSIM_ResetPCMData(int32_t index) {
+  SimPCMData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PCM##CAPINAME, SimPCMData, \

@@ -1,21 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.estimator;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
 
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O extends Num> {
   private static final int kMaxPastObserverStates = 300;
@@ -29,19 +25,19 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
   /**
    * Add past observer states to the observer snapshots list.
    *
-   * @param observer         The observer.
-   * @param u                The input at the timestamp.
-   * @param localY           The local output at the timestamp
+   * @param observer The observer.
+   * @param u The input at the timestamp.
+   * @param localY The local output at the timestamp
    * @param timestampSeconds The timesnap of the state.
    */
   @SuppressWarnings("ParameterName")
   public void addObserverState(
-          KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u, Matrix<O, N1> localY,
-          double timestampSeconds
-  ) {
-    m_pastObserverSnapshots.add(Map.entry(
-            timestampSeconds, new ObserverSnapshot(observer, u, localY)
-    ));
+      KalmanTypeFilter<S, I, O> observer,
+      Matrix<I, N1> u,
+      Matrix<O, N1> localY,
+      double timestampSeconds) {
+    m_pastObserverSnapshots.add(
+        Map.entry(timestampSeconds, new ObserverSnapshot(observer, u, localY)));
 
     if (m_pastObserverSnapshots.size() > kMaxPastObserverStates) {
       m_pastObserverSnapshots.remove(0);
@@ -51,23 +47,22 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
   /**
    * Add past global measurements (such as from vision)to the estimator.
    *
-   * @param <R>                               The rows in the global measurement vector.
-   * @param rows                              The rows in the global measurement vector.
-   * @param observer                          The observer to apply the past global measurement.
-   * @param nominalDtSeconds                  The nominal timestep.
-   * @param globalMeasurement                 The measurement.
-   * @param globalMeasurementCorrect          The function take calls correct() on the observer.
+   * @param <R> The rows in the global measurement vector.
+   * @param rows The rows in the global measurement vector.
+   * @param observer The observer to apply the past global measurement.
+   * @param nominalDtSeconds The nominal timestep.
+   * @param globalMeasurement The measurement.
+   * @param globalMeasurementCorrect The function take calls correct() on the observer.
    * @param globalMeasurementTimestampSeconds The timestamp of the measurement.
    */
   @SuppressWarnings({"ParameterName", "PMD.AvoidInstantiatingObjectsInLoops"})
   public <R extends Num> void applyPastGlobalMeasurement(
-          Nat<R> rows,
-          KalmanTypeFilter<S, I, O> observer,
-          double nominalDtSeconds,
-          Matrix<R, N1> globalMeasurement,
-          BiConsumer<Matrix<I, N1>, Matrix<R, N1>> globalMeasurementCorrect,
-          double globalMeasurementTimestampSeconds
-  ) {
+      Nat<R> rows,
+      KalmanTypeFilter<S, I, O> observer,
+      double nominalDtSeconds,
+      Matrix<R, N1> globalMeasurement,
+      BiConsumer<Matrix<I, N1>, Matrix<R, N1>> globalMeasurementCorrect,
+      double globalMeasurementTimestampSeconds) {
     if (m_pastObserverSnapshots.isEmpty()) {
       // State map was empty, which means that we got a past measurement right at startup. The only
       // thing we can really do is ignore the measurement.
@@ -99,12 +94,13 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
     double timestamp = globalMeasurementTimestampSeconds;
     int indexOfClosestEntry =
         Math.abs(timestamp - m_pastObserverSnapshots.get(index - 1).getKey())
-            <= Math.abs(timestamp - m_pastObserverSnapshots.get(Math.min(index, maxIdx)).getKey())
+                <= Math.abs(
+                    timestamp - m_pastObserverSnapshots.get(Math.min(index, maxIdx)).getKey())
             ? index - 1
             : index;
 
     double lastTimestamp =
-            m_pastObserverSnapshots.get(indexOfClosestEntry).getKey() - nominalDtSeconds;
+        m_pastObserverSnapshots.get(indexOfClosestEntry).getKey() - nominalDtSeconds;
 
     // We will now go back in time to the state of the system at the time when
     // the measurement was captured. We will reset the observer to that state,
@@ -132,14 +128,14 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
       }
       lastTimestamp = key;
 
-      m_pastObserverSnapshots.set(i, Map.entry(key,
-              new ObserverSnapshot(observer, snapshot.inputs, snapshot.localMeasurements)));
+      m_pastObserverSnapshots.set(
+          i,
+          Map.entry(
+              key, new ObserverSnapshot(observer, snapshot.inputs, snapshot.localMeasurements)));
     }
   }
 
-  /**
-   * This class contains all the information about our observer at a given time.
-   */
+  /** This class contains all the information about our observer at a given time. */
   @SuppressWarnings("MemberName")
   public class ObserverSnapshot {
     public final Matrix<S, N1> xHat;
@@ -149,8 +145,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
 
     @SuppressWarnings("ParameterName")
     private ObserverSnapshot(
-            KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u, Matrix<O, N1> localY
-    ) {
+        KalmanTypeFilter<S, I, O> observer, Matrix<I, N1> u, Matrix<O, N1> localY) {
       this.xHat = observer.getXhat();
       this.errorCovariances = observer.getP();
 

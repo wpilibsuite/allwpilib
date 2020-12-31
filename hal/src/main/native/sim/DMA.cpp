@@ -1,14 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DMA.h"
 
 extern "C" {
-HAL_DMAHandle HAL_InitializeDMA(int32_t* status) { return HAL_kInvalidHandle; }
+HAL_DMAHandle HAL_InitializeDMA(int32_t* status) {
+  return HAL_kInvalidHandle;
+}
 void HAL_FreeDMA(HAL_DMAHandle handle) {}
 
 void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status) {}
@@ -50,7 +49,9 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {}
 void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status) {}
 
-void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) { return nullptr; }
+void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) {
+  return nullptr;
+}
 
 enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                                          HAL_DMASample* dmaSample,

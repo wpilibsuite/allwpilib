@@ -1,13 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.simpledifferentialdrivesimulation;
-
-import java.util.List;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
@@ -21,6 +16,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import java.util.List;
 
 public class Robot extends TimedRobot {
   private final XboxController m_controller = new XboxController(0);
@@ -37,10 +33,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_trajectory = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(2, 2, new Rotation2d()), List.of(), new Pose2d(6, 4, new Rotation2d()),
-        new TrajectoryConfig(2, 2)
-    );
+    // Flush NetworkTables every loop. This ensures that robot pose and other values
+    // are sent during every iteration.
+    setNetworkTablesFlushEnabled(true);
+
+    m_trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            new Pose2d(2, 2, new Rotation2d()),
+            List.of(),
+            new Pose2d(6, 4, new Rotation2d()),
+            new TrajectoryConfig(2, 2));
   }
 
   @Override
@@ -68,15 +70,16 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    double xSpeed = -m_speedLimiter.calculate(m_controller.getY(GenericHID.Hand.kLeft))
-        * Drivetrain.kMaxSpeed;
+    double xSpeed =
+        -m_speedLimiter.calculate(m_controller.getY(GenericHID.Hand.kLeft)) * Drivetrain.kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    double rot = -m_rotLimiter.calculate(m_controller.getX(GenericHID.Hand.kRight))
-        * Drivetrain.kMaxAngularSpeed;
+    double rot =
+        -m_rotLimiter.calculate(m_controller.getX(GenericHID.Hand.kRight))
+            * Drivetrain.kMaxAngularSpeed;
     m_drive.drive(xSpeed, rot);
   }
 

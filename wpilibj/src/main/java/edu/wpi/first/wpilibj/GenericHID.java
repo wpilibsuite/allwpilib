@@ -1,26 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.HAL;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.hal.HAL;
-
-/**
- * GenericHID Interface.
- */
+/** GenericHID Interface. */
 public abstract class GenericHID {
-  /**
-   * Represents a rumble output on the JoyStick.
-   */
+  /** Represents a rumble output on the JoyStick. */
   public enum RumbleType {
-    kLeftRumble, kRightRumble
+    kLeftRumble,
+    kRightRumble
   }
 
   public enum HIDType {
@@ -42,8 +35,8 @@ public abstract class GenericHID {
     kHIDFlight(23),
     kHID1stPerson(24);
 
-    @SuppressWarnings("MemberName")
     public final int value;
+
     @SuppressWarnings("PMD.UseConcurrentHashMap")
     private static final Map<Integer, HIDType> map = new HashMap<>();
 
@@ -62,13 +55,11 @@ public abstract class GenericHID {
     }
   }
 
-  /**
-   * Which hand the Human Interface Device is associated with.
-   */
+  /** Which hand the Human Interface Device is associated with. */
   public enum Hand {
-    kLeft(0), kRight(1);
+    kLeft(0),
+    kRight(1);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Hand(int value) {
@@ -127,8 +118,8 @@ public abstract class GenericHID {
    * <p>The buttons are returned in a single 16 bit value with one bit representing the state of
    * each button. The appropriate button is returned as a boolean value.
    *
-   * <p>This method returns true if the button is being held down at the time
-   * that this method is being called.
+   * <p>This method returns true if the button is being held down at the time that this method is
+   * being called.
    *
    * @param button The button number to be read (starting at 1)
    * @return The state of the button.
@@ -138,12 +129,11 @@ public abstract class GenericHID {
   }
 
   /**
-   * Whether the button was pressed since the last check. Button indexes begin at
-   * 1.
+   * Whether the button was pressed since the last check. Button indexes begin at 1.
    *
-   * <p>This method returns true if the button went from not pressed to held down
-   * since the last time this method was called. This is useful if you only
-   * want to call a function once when you press the button.
+   * <p>This method returns true if the button went from not pressed to held down since the last
+   * time this method was called. This is useful if you only want to call a function once when you
+   * press the button.
    *
    * @param button The button index, beginning at 1.
    * @return Whether the button was pressed since the last check.
@@ -153,12 +143,11 @@ public abstract class GenericHID {
   }
 
   /**
-   * Whether the button was released since the last check. Button indexes begin at
-   * 1.
+   * Whether the button was released since the last check. Button indexes begin at 1.
    *
-   * <p>This method returns true if the button went from held down to not pressed
-   * since the last time this method was called. This is useful if you only
-   * want to call a function once when you release the button.
+   * <p>This method returns true if the button went from held down to not pressed since the last
+   * time this method was called. This is useful if you only want to call a function once when you
+   * release the button.
    *
    * @param button The button index, beginning at 1.
    * @return Whether the button was released since the last check.
@@ -203,16 +192,12 @@ public abstract class GenericHID {
     return m_ds.getStickAxisCount(m_port);
   }
 
-  /**
-   * For the current HID, return the number of POVs.
-   */
+  /** For the current HID, return the number of POVs. */
   public int getPOVCount() {
     return m_ds.getStickPOVCount(m_port);
   }
 
-  /**
-   * For the current HID, return the number of buttons.
-   */
+  /** For the current HID, return the number of buttons. */
   public int getButtonCount() {
     return m_ds.getStickButtonCount(m_port);
   }
@@ -266,7 +251,7 @@ public abstract class GenericHID {
    * Set a single HID output value for the HID.
    *
    * @param outputNumber The index of the output to set (1-32)
-   * @param value        The value to set the output to
+   * @param value The value to set the output to
    */
   public void setOutput(int outputNumber, boolean value) {
     m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
@@ -287,7 +272,7 @@ public abstract class GenericHID {
    * Set the rumble output for the HID. The DS currently supports 2 rumble values, left rumble and
    * right rumble.
    *
-   * @param type  Which rumble value to set
+   * @param type Which rumble value to set
    * @param value The normalized value (0 to 1) to set the rumble to
    */
   public void setRumble(RumbleType type, double value) {

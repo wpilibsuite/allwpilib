@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -20,9 +17,11 @@ void Provider<Functions>::GlobalInit() {
 template <typename Functions>
 void Provider<Functions>::ShowDefault(wpi::StringRef name) {
   auto win = GetWindow(name);
-  if (win) return;
+  if (win)
+    return;
   auto it = FindViewEntry(name);
-  if (it == m_viewEntries.end() || (*it)->name != name) return;
+  if (it == m_viewEntries.end() || (*it)->name != name)
+    return;
   this->Show(it->get(), (*it)->window);
 }
 
@@ -39,7 +38,8 @@ void Provider<Functions>::RegisterModel(wpi::StringRef name, ExistsFunc exists,
                                         CreateModelFunc createModel) {
   auto it = FindModelEntry(name);
   // ignore if exists
-  if (it != m_modelEntries.end() && (*it)->name == name) return;
+  if (it != m_modelEntries.end() && (*it)->name == name)
+    return;
   // insert in sorted location
   m_modelEntries.emplace(
       it, MakeModelEntry(name, std::move(exists), std::move(createModel)));
@@ -52,11 +52,13 @@ void Provider<Functions>::RegisterView(wpi::StringRef name,
                                        CreateViewFunc createView) {
   // find model; if model doesn't exist, ignore
   auto modelIt = FindModelEntry(modelName);
-  if (modelIt == m_modelEntries.end() || (*modelIt)->name != modelName) return;
+  if (modelIt == m_modelEntries.end() || (*modelIt)->name != modelName)
+    return;
 
   auto viewIt = FindViewEntry(name);
   // ignore if exists
-  if (viewIt != m_viewEntries.end() && (*viewIt)->name == name) return;
+  if (viewIt != m_viewEntries.end() && (*viewIt)->name == name)
+    return;
   // insert in sorted location
   m_viewEntries.emplace(viewIt,
                         MakeViewEntry(name, modelIt->get(), std::move(exists),
@@ -67,7 +69,8 @@ template <typename Functions>
 void Provider<Functions>::Update() {
   // update entries
   for (auto&& entry : m_modelEntries) {
-    if (entry->model) entry->model->Update();
+    if (entry->model)
+      entry->model->Update();
   }
 }
 

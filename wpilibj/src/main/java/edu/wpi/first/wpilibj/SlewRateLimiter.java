@@ -1,19 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
- * A class that limits the rate of change of an input value.  Useful for implementing voltage,
- * setpoint, and/or output ramps.  A slew-rate limit is most appropriate when the quantity being
- * controlled is a velocity or a voltage; when controlling a position, consider using a
- * {@link edu.wpi.first.wpilibj.trajectory.TrapezoidProfile} instead.
+ * A class that limits the rate of change of an input value. Useful for implementing voltage,
+ * setpoint, and/or output ramps. A slew-rate limit is most appropriate when the quantity being
+ * controlled is a velocity or a voltage; when controlling a position, consider using a {@link
+ * edu.wpi.first.wpilibj.trajectory.TrapezoidProfile} instead.
  */
 public class SlewRateLimiter {
   private final double m_rateLimit;
@@ -50,9 +47,8 @@ public class SlewRateLimiter {
   public double calculate(double input) {
     double currentTime = Timer.getFPGATimestamp();
     double elapsedTime = currentTime - m_prevTime;
-    m_prevVal += MathUtil.clamp(input - m_prevVal,
-                                -m_rateLimit * elapsedTime,
-                                m_rateLimit * elapsedTime);
+    m_prevVal +=
+        MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
     m_prevTime = currentTime;
     return m_prevVal;
   }

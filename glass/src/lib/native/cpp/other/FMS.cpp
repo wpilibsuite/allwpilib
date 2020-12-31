@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/other/FMS.h"
 
@@ -18,19 +15,25 @@ static const char* stations[] = {"Red 1",  "Red 2",  "Red 3",
                                  "Blue 1", "Blue 2", "Blue 3"};
 
 void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
-  if (!model->Exists() || model->IsReadOnly()) return DisplayFMSReadOnly(model);
+  if (!model->Exists() || model->IsReadOnly()) {
+    return DisplayFMSReadOnly(model);
+  }
 
   // FMS Attached
   if (auto data = model->GetFmsAttachedData()) {
     bool val = data->GetValue();
-    if (ImGui::Checkbox("FMS Attached", &val)) model->SetFmsAttached(val);
+    if (ImGui::Checkbox("FMS Attached", &val)) {
+      model->SetFmsAttached(val);
+    }
     data->EmitDrag();
   }
 
   // DS Attached
   if (auto data = model->GetDsAttachedData()) {
     bool val = data->GetValue();
-    if (ImGui::Checkbox("DS Attached", &val)) model->SetDsAttached(val);
+    if (ImGui::Checkbox("DS Attached", &val)) {
+      model->SetDsAttached(val);
+    }
     data->EmitDrag();
   }
 
@@ -38,15 +41,17 @@ void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
   if (auto data = model->GetAllianceStationIdData()) {
     int val = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-    if (ImGui::Combo("Alliance Station", &val, stations, 6))
+    if (ImGui::Combo("Alliance Station", &val, stations, 6)) {
       model->SetAllianceStationId(val);
+    }
     data->EmitDrag();
   }
 
   // Match Time
   if (auto data = model->GetMatchTimeData()) {
-    if (matchTimeEnabled)
+    if (matchTimeEnabled) {
       ImGui::Checkbox("Match Time Enabled", matchTimeEnabled);
+    }
 
     double val = data->GetValue();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
@@ -77,7 +82,9 @@ void glass::DisplayFMS(FMSModel* model, bool* matchTimeEnabled) {
 
 void glass::DisplayFMSReadOnly(FMSModel* model) {
   bool exists = model->Exists();
-  if (!exists) ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+  if (!exists) {
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+  }
 
   if (auto data = model->GetEStopData()) {
     ImGui::Selectable("E-Stopped: ");
@@ -126,15 +133,18 @@ void glass::DisplayFMSReadOnly(FMSModel* model) {
     ImGui::Selectable("Match Time: ");
     data->EmitDrag();
     ImGui::SameLine();
-    if (exists)
+    if (exists) {
       ImGui::Text("%.1f", data->GetValue());
-    else
+    } else {
       ImGui::TextUnformatted("?");
+    }
   }
 
   wpi::SmallString<64> gameSpecificMessage;
   model->GetGameSpecificMessage(gameSpecificMessage);
   ImGui::Text("Game Specific: %s", exists ? gameSpecificMessage.c_str() : "?");
 
-  if (!exists) ImGui::PopStyleColor();
+  if (!exists) {
+    ImGui::PopStyleColor();
+  }
 }

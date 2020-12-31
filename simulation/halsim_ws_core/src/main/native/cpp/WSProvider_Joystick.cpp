@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_Joystick.h"
 
@@ -21,7 +18,9 @@ void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
                                             webregisterFunc);
 }
 
-HALSimWSProviderJoystick::~HALSimWSProviderJoystick() { DoCancelCallbacks(); }
+HALSimWSProviderJoystick::~HALSimWSProviderJoystick() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderJoystick::RegisterCallbacks() {
   m_dsNewDataCbKey = HALSIM_RegisterDriverStationNewDataCallback(
@@ -76,7 +75,9 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
       this, true);
 }
 
-void HALSimWSProviderJoystick::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderJoystick::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderJoystick::DoCancelCallbacks() {
   HALSIM_CancelDriverStationNewDataCallback(m_dsNewDataCbKey);
@@ -86,13 +87,16 @@ void HALSimWSProviderJoystick::DoCancelCallbacks() {
 
 void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
   // ignore if DS connected
-  if (gDSSocketConnected && *gDSSocketConnected) return;
+  if (gDSSocketConnected && *gDSSocketConnected) {
+    return;
+  }
 
   wpi::json::const_iterator it;
   if ((it = json.find(">axes")) != json.end()) {
     HAL_JoystickAxes axes{};
     axes.count =
-        std::min(it.value().size(), (wpi::json::size_type)HAL_kMaxJoystickAxes);
+        std::min(it.value().size(),
+                 static_cast<wpi::json::size_type>(HAL_kMaxJoystickAxes));
     for (int i = 0; i < axes.count; i++) {
       axes.axes[i] = it.value()[i];
     }
@@ -102,10 +106,11 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
 
   if ((it = json.find(">buttons")) != json.end()) {
     HAL_JoystickButtons buttons{};
-    buttons.count = std::min(it.value().size(), (wpi::json::size_type)32);
+    buttons.count =
+        std::min(it.value().size(), static_cast<wpi::json::size_type>(32));
     for (int i = 0; i < buttons.count; i++) {
       if (it.value()[i]) {
-        buttons.buttons |= 1 << (i - 1);
+        buttons.buttons |= 1 << i;
       }
     }
 
@@ -115,7 +120,8 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
   if ((it = json.find(">povs")) != json.end()) {
     HAL_JoystickPOVs povs{};
     povs.count =
-        std::min(it.value().size(), (wpi::json::size_type)HAL_kMaxJoystickPOVs);
+        std::min(it.value().size(),
+                 static_cast<wpi::json::size_type>(HAL_kMaxJoystickPOVs));
     for (int i = 0; i < povs.count; i++) {
       povs.povs[i] = it.value()[i];
     }

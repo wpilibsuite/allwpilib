@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -24,13 +21,14 @@ public class Joystick extends GenericHID {
   public static final byte kDefaultTwistChannel = 2;
   public static final byte kDefaultThrottleChannel = 3;
 
-  /**
-   * Represents an analog axis on a joystick.
-   */
+  /** Represents an analog axis on a joystick. */
   public enum AxisType {
-    kX(0), kY(1), kZ(2), kTwist(3), kThrottle(4);
+    kX(0),
+    kY(1),
+    kZ(2),
+    kTwist(3),
+    kThrottle(4);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     AxisType(int value) {
@@ -38,13 +36,11 @@ public class Joystick extends GenericHID {
     }
   }
 
-  /**
-   * Represents a digital button on a joystick.
-   */
+  /** Represents a digital button on a joystick. */
   public enum ButtonType {
-    kTrigger(1), kTop(2);
+    kTrigger(1),
+    kTop(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     ButtonType(int value) {
@@ -52,13 +48,11 @@ public class Joystick extends GenericHID {
     }
   }
 
-  /**
-   * Represents a digital button on a joystick.
-   */
+  /** Represents a digital button on a joystick. */
   private enum Button {
-    kTrigger(1), kTop(2);
+    kTrigger(1),
+    kTop(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Button(int value) {
@@ -66,13 +60,15 @@ public class Joystick extends GenericHID {
     }
   }
 
-  /**
-   * Represents an analog axis on a joystick.
-   */
+  /** Represents an analog axis on a joystick. */
   private enum Axis {
-    kX(0), kY(1), kZ(2), kTwist(3), kThrottle(4), kNumAxes(5);
+    kX(0),
+    kY(1),
+    kZ(2),
+    kTwist(3),
+    kThrottle(4),
+    kNumAxes(5);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Axis(int value) {
@@ -83,8 +79,7 @@ public class Joystick extends GenericHID {
   private final byte[] m_axes = new byte[Axis.kNumAxes.value];
 
   /**
-   * Construct an instance of a joystick. The joystick index is the USB port on the drivers
-   * station.
+   * Construct an instance of a joystick. The joystick index is the USB port on the drivers station.
    *
    * @param port The port on the Driver Station that the joystick is plugged into.
    */

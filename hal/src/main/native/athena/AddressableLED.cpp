@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AddressableLED.h"
 
@@ -35,8 +32,7 @@ static LimitedHandleResource<
     HAL_AddressableLEDHandle, AddressableLED, kNumAddressableLEDs,
     HAL_HandleEnum::AddressableLED>* addressableLEDHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAddressableLED() {
   static LimitedHandleResource<HAL_AddressableLEDHandle, AddressableLED,
                                kNumAddressableLEDs,
@@ -44,8 +40,7 @@ void InitializeAddressableLED() {
       alH;
   addressableLEDHandles = &alH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

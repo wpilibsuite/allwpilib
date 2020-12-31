@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Solenoid.h"
 
@@ -27,8 +24,7 @@ static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
                              kNumPCMModules * kNumSolenoidChannels,
                              HAL_HandleEnum::Solenoid>* solenoidHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeSolenoid() {
   static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
                                kNumPCMModules * kNumSolenoidChannels,
@@ -36,8 +32,7 @@ void InitializeSolenoid() {
       sH;
   solenoidHandles = &sH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
@@ -81,7 +76,9 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
 }
 void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle) {
   auto port = solenoidHandles->Get(solenoidPortHandle);
-  if (port == nullptr) return;
+  if (port == nullptr) {
+    return;
+  }
   solenoidHandles->Free(solenoidPortHandle);
   HALSIM_SetPCMSolenoidInitialized(port->module, port->channel, false);
   int count = 0;

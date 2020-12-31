@@ -1,24 +1,24 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/DifferentialDrivetrainSim.h"
 
 #include <frc/system/plant/LinearSystemId.h>
 
+#include <utility>
+
+#include "frc/RobotController.h"
 #include "frc/system/RungeKutta.h"
 
 using namespace frc;
 using namespace frc::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    const LinearSystem<2, 2, 2>& plant, units::meter_t trackWidth,
-    DCMotor driveMotor, double gearRatio, units::meter_t wheelRadius,
+    LinearSystem<2, 2, 2> plant, units::meter_t trackWidth, DCMotor driveMotor,
+    double gearRatio, units::meter_t wheelRadius,
     const std::array<double, 7>& measurementStdDevs)
-    : m_plant(plant),
+    : m_plant(std::move(plant)),
       m_rb(trackWidth / 2.0),
       m_wheelRadius(wheelRadius),
       m_motor(driveMotor),
@@ -39,9 +39,16 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
               driveMotor, mass, wheelRadius, trackWidth / 2.0, J, gearing),
           trackWidth, driveMotor, gearing, wheelRadius, measurementStdDevs) {}
 
+Eigen::Matrix<double, 2, 1> DifferentialDrivetrainSim::ClampInput(
+    Eigen::Matrix<double, 2, 1> u) {
+  return frc::NormalizeInputVector<2>(u,
+                                      frc::RobotController::GetInputVoltage());
+}
+
 void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,
                                           units::volt_t rightVoltage) {
   m_u << leftVoltage.to<double>(), rightVoltage.to<double>();
+  m_u = ClampInput(m_u);
 }
 
 void DifferentialDrivetrainSim::SetGearing(double newGearing) {
@@ -83,7 +90,7 @@ Pose2d DifferentialDrivetrainSim::GetPose() const {
                 units::meter_t(GetOutput(State::kY)), GetHeading());
 }
 
-units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
+units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
   auto loadIleft =
       m_motor.Current(units::radians_per_second_t(m_x(State::kLeftVelocity) *
                                                   m_currentGearing /
@@ -91,6 +98,10 @@ units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
                       units::volt_t(m_u(0))) *
       wpi::sgn(m_u(0));
 
+  return loadIleft;
+}
+
+units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
   auto loadIRight =
       m_motor.Current(units::radians_per_second_t(m_x(State::kRightVelocity) *
                                                   m_currentGearing /
@@ -98,7 +109,10 @@ units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
                       units::volt_t(m_u(1))) *
       wpi::sgn(m_u(1));
 
-  return loadIleft + loadIRight;
+  return loadIRight;
+}
+units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
+  return GetLeftCurrentDraw() + GetRightCurrentDraw();
 }
 
 void DifferentialDrivetrainSim::SetState(

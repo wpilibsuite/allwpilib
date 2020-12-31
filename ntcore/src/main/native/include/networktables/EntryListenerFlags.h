@@ -1,19 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_NETWORKTABLES_ENTRYLISTENERFLAGS_H_
 #define NTCORE_NETWORKTABLES_ENTRYLISTENERFLAGS_H_
 
 #include "ntcore_c.h"
 
-namespace nt {
-
 /** Entry listener flags */
-namespace EntryListenerFlags {
+namespace nt::EntryListenerFlags {
 
 /**
  * Flag values for use with entry listeners.
@@ -75,8 +70,6 @@ enum {
   kFlags = NT_NOTIFY_FLAGS
 };
 
-}  // namespace EntryListenerFlags
-
-}  // namespace nt
+}  // namespace nt::EntryListenerFlags
 
 #endif  // NTCORE_NETWORKTABLES_ENTRYLISTENERFLAGS_H_

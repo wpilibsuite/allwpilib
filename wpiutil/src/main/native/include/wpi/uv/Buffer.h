@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_UV_BUFFER_H_
 #define WPIUTIL_WPI_UV_BUFFER_H_
@@ -18,8 +15,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 /**
  * Data buffer.  Convenience wrapper around uv_buf_t.
@@ -30,13 +26,13 @@ class Buffer : public uv_buf_t {
     base = nullptr;
     len = 0;
   }
-  /*implicit*/ Buffer(const uv_buf_t& oth) {  // NOLINT(runtime/explicit)
+  /*implicit*/ Buffer(const uv_buf_t& oth) {  // NOLINT
     base = oth.base;
     len = oth.len;
   }
-  /*implicit*/ Buffer(StringRef str)  // NOLINT(runtime/explicit)
+  /*implicit*/ Buffer(StringRef str)  // NOLINT
       : Buffer{str.data(), str.size()} {}
-  /*implicit*/ Buffer(ArrayRef<uint8_t> arr)  // NOLINT(runtime/explicit)
+  /*implicit*/ Buffer(ArrayRef<uint8_t> arr)  // NOLINT
       : Buffer{reinterpret_cast<const char*>(arr.data()), arr.size()} {}
   Buffer(char* base_, size_t len_) {
     base = base_;
@@ -50,8 +46,8 @@ class Buffer : public uv_buf_t {
   ArrayRef<char> data() const { return ArrayRef<char>{base, len}; }
   MutableArrayRef<char> data() { return MutableArrayRef<char>{base, len}; }
 
-  operator ArrayRef<char>() const { return data(); }
-  operator MutableArrayRef<char>() { return data(); }
+  operator ArrayRef<char>() const { return data(); }   // NOLINT
+  operator MutableArrayRef<char>() { return data(); }  // NOLINT
 
   static Buffer Allocate(size_t size) { return Buffer{new char[size], size}; }
 
@@ -116,7 +112,9 @@ class SimpleBufferPool {
    * Allocate a buffer.
    */
   Buffer Allocate() {
-    if (m_pool.empty()) return Buffer::Allocate(m_size);
+    if (m_pool.empty()) {
+      return Buffer::Allocate(m_size);
+    }
     auto buf = m_pool.back();
     m_pool.pop_back();
     buf.len = m_size;
@@ -134,14 +132,18 @@ class SimpleBufferPool {
    * allocated with the same size as the buffer pool allocation size.
    */
   void Release(MutableArrayRef<Buffer> bufs) {
-    for (auto& buf : bufs) m_pool.emplace_back(buf.Move());
+    for (auto& buf : bufs) {
+      m_pool.emplace_back(buf.Move());
+    }
   }
 
   /**
    * Clear the pool, releasing all buffers.
    */
   void Clear() {
-    for (auto& buf : m_pool) buf.Deallocate();
+    for (auto& buf : m_pool) {
+      buf.Deallocate();
+    }
     m_pool.clear();
   }
 
@@ -156,7 +158,6 @@ class SimpleBufferPool {
   size_t m_size;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_BUFFER_H_

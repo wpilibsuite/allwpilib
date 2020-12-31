@@ -1,24 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.trajectory.constraint;
+
+import static edu.wpi.first.wpiutil.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
-import static edu.wpi.first.wpiutil.ErrorMessages.requireNonNullParam;
-
 /**
  * A class that enforces constraints on differential drive voltage expenditure based on the motor
- * dynamics and the drive kinematics.  Ensures that the acceleration of any wheel of the robot
- * while following the trajectory is never higher than what can be achieved with the given
- * maximum voltage.
+ * dynamics and the drive kinematics. Ensures that the acceleration of any wheel of the robot while
+ * following the trajectory is never higher than what can be achieved with the given maximum
+ * voltage.
  */
 public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint {
   private final SimpleMotorFeedforward m_feedforward;
@@ -29,40 +26,41 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
    * Creates a new DifferentialDriveVoltageConstraint.
    *
    * @param feedforward A feedforward component describing the behavior of the drive.
-   * @param kinematics  A kinematics component describing the drive geometry.
-   * @param maxVoltage  The maximum voltage available to the motors while following the path.
-   *                    Should be somewhat less than the nominal battery voltage (12V) to account
-   *                    for "voltage sag" due to current draw.
+   * @param kinematics A kinematics component describing the drive geometry.
+   * @param maxVoltage The maximum voltage available to the motors while following the path. Should
+   *     be somewhat less than the nominal battery voltage (12V) to account for "voltage sag" due to
+   *     current draw.
    */
-  public DifferentialDriveVoltageConstraint(SimpleMotorFeedforward feedforward,
-                                            DifferentialDriveKinematics kinematics,
-                                            double maxVoltage) {
-    m_feedforward = requireNonNullParam(feedforward, "feedforward",
-                                        "DifferentialDriveVoltageConstraint");
-    m_kinematics = requireNonNullParam(kinematics, "kinematics",
-                                       "DifferentialDriveVoltageConstraint");
+  public DifferentialDriveVoltageConstraint(
+      SimpleMotorFeedforward feedforward,
+      DifferentialDriveKinematics kinematics,
+      double maxVoltage) {
+    m_feedforward =
+        requireNonNullParam(feedforward, "feedforward", "DifferentialDriveVoltageConstraint");
+    m_kinematics =
+        requireNonNullParam(kinematics, "kinematics", "DifferentialDriveVoltageConstraint");
     m_maxVoltage = maxVoltage;
   }
 
   @Override
-  public double getMaxVelocityMetersPerSecond(Pose2d poseMeters, double curvatureRadPerMeter,
-                                              double velocityMetersPerSecond) {
+  public double getMaxVelocityMetersPerSecond(
+      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
     return Double.POSITIVE_INFINITY;
   }
 
   @Override
-  public MinMax getMinMaxAccelerationMetersPerSecondSq(Pose2d poseMeters,
-                                                       double curvatureRadPerMeter,
-                                                       double velocityMetersPerSecond) {
+  public MinMax getMinMaxAccelerationMetersPerSecondSq(
+      Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
 
-    var wheelSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(velocityMetersPerSecond, 0,
-                                                                   velocityMetersPerSecond
-                                                                       * curvatureRadPerMeter));
+    var wheelSpeeds =
+        m_kinematics.toWheelSpeeds(
+            new ChassisSpeeds(
+                velocityMetersPerSecond, 0, velocityMetersPerSecond * curvatureRadPerMeter));
 
-    double maxWheelSpeed = Math.max(wheelSpeeds.leftMetersPerSecond,
-                                    wheelSpeeds.rightMetersPerSecond);
-    double minWheelSpeed = Math.min(wheelSpeeds.leftMetersPerSecond,
-                                    wheelSpeeds.rightMetersPerSecond);
+    double maxWheelSpeed =
+        Math.max(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
+    double minWheelSpeed =
+        Math.min(wheelSpeeds.leftMetersPerSecond, wheelSpeeds.rightMetersPerSecond);
 
     // Calculate maximum/minimum possible accelerations from motor dynamics
     // and max/min wheel speeds
@@ -100,12 +98,18 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
     } else {
       maxChassisAcceleration =
           maxWheelAcceleration
-              / (1 + m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter)
-              * Math.signum(velocityMetersPerSecond) / 2);
+              / (1
+                  + m_kinematics.trackWidthMeters
+                      * Math.abs(curvatureRadPerMeter)
+                      * Math.signum(velocityMetersPerSecond)
+                      / 2);
       minChassisAcceleration =
           minWheelAcceleration
-              / (1 - m_kinematics.trackWidthMeters * Math.abs(curvatureRadPerMeter)
-              * Math.signum(velocityMetersPerSecond) / 2);
+              / (1
+                  - m_kinematics.trackWidthMeters
+                      * Math.abs(curvatureRadPerMeter)
+                      * Math.signum(velocityMetersPerSecond)
+                      / 2);
     }
 
     // When turning about a point inside of the wheelbase (i.e. radius less than half

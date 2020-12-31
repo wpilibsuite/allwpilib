@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -86,7 +83,7 @@ template <typename CType, int32_t CInvalid = HAL_kInvalidHandle>
 class Handle {
  public:
   Handle() = default;
-  /*implicit*/ Handle(CType val) : m_handle(val) {}  // NOLINT(runtime/explicit)
+  /*implicit*/ Handle(CType val) : m_handle(val) {}  // NOLINT
 
   Handle(const Handle&) = delete;
   Handle& operator=(const Handle&) = delete;
@@ -99,7 +96,7 @@ class Handle {
     return *this;
   }
 
-  operator CType() const { return m_handle; }
+  operator CType() const { return m_handle; }  // NOLINT
 
  private:
   CType m_handle = CInvalid;

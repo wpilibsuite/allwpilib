@@ -10,6 +10,8 @@
 	<string>Glass</string>
 	<key>CFBundleIdentifier</key>
 	<string>edu.wpi.first.tools.Glass</string>
+	<key>CFBundleIconFile</key>
+	<string>glass.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSupportedPlatforms</key>

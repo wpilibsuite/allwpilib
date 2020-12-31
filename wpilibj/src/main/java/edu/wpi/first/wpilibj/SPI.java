@@ -1,30 +1,27 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 
 import edu.wpi.first.hal.AccumulatorResult;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SPIJNI;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 
-/**
- * Represents a SPI bus port.
- */
+/** Represents a SPI bus port. */
 @SuppressWarnings("PMD.CyclomaticComplexity")
 public class SPI implements AutoCloseable {
   public enum Port {
-    kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
+    kOnboardCS0(0),
+    kOnboardCS1(1),
+    kOnboardCS2(2),
+    kOnboardCS3(3),
+    kMXP(4);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     Port(int value) {
@@ -126,6 +123,7 @@ public class SPI implements AutoCloseable {
   /**
    * Configure that the data is stable on the falling edge and the data changes on the rising edge.
    * Note this gets reversed is setClockActiveLow is set.
+   *
    * @deprecated use {@link #setSampleDataOnTrailingEdge()} in most cases.
    */
   @Deprecated
@@ -137,6 +135,7 @@ public class SPI implements AutoCloseable {
   /**
    * Configure that the data is stable on the rising edge and the data changes on the falling edge.
    * Note this gets reversed is setClockActiveLow is set.
+   *
    * @deprecated use {@link #setSampleDataOnLeadingEdge()} in most cases.
    */
   @Deprecated
@@ -145,18 +144,12 @@ public class SPI implements AutoCloseable {
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
-
-
-  /**
-   * Configure the chip select line to be active high.
-   */
+  /** Configure the chip select line to be active high. */
   public final void setChipSelectActiveHigh() {
     SPIJNI.spiSetChipSelectActiveHigh(m_port);
   }
 
-  /**
-   * Configure the chip select line to be active low.
-   */
+  /** Configure the chip select line to be active low. */
   public final void setChipSelectActiveLow() {
     SPIJNI.spiSetChipSelectActiveLow(m_port);
   }
@@ -204,8 +197,8 @@ public class SPI implements AutoCloseable {
    * <p>If the receive FIFO is empty, there is no active transfer, and initiate is false, errors.
    *
    * @param initiate If true, this function pushes "0" into the transmit buffer and initiates a
-   *                 transfer. If false, this function assumes that data is already in the receive
-   *                 FIFO from a previous write.
+   *     transfer. If false, this function assumes that data is already in the receive FIFO from a
+   *     previous write.
    */
   public int read(boolean initiate, byte[] dataReceived, int size) {
     if (dataReceived.length < size) {
@@ -221,11 +214,11 @@ public class SPI implements AutoCloseable {
    *
    * <p>If the receive FIFO is empty, there is no active transfer, and initiate is false, errors.
    *
-   * @param initiate     If true, this function pushes "0" into the transmit buffer and initiates
-   *                     a transfer. If false, this function assumes that data is already in the
-   *                     receive FIFO from a previous write.
+   * @param initiate If true, this function pushes "0" into the transmit buffer and initiates a
+   *     transfer. If false, this function assumes that data is already in the receive FIFO from a
+   *     previous write.
    * @param dataReceived The buffer to be filled with the received data.
-   * @param size         The length of the transaction, in bytes
+   * @param size The length of the transaction, in bytes
    */
   @SuppressWarnings("ByteBufferBackingArray")
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
@@ -244,9 +237,9 @@ public class SPI implements AutoCloseable {
   /**
    * Perform a simultaneous read/write transaction with the device.
    *
-   * @param dataToSend   The data to be written out to the device
+   * @param dataToSend The data to be written out to the device
    * @param dataReceived Buffer to receive data from the device
-   * @param size         The length of the transaction, in bytes
+   * @param size The length of the transaction, in bytes
    */
   public int transaction(byte[] dataToSend, byte[] dataReceived, int size) {
     if (dataToSend.length < size) {
@@ -261,9 +254,9 @@ public class SPI implements AutoCloseable {
   /**
    * Perform a simultaneous read/write transaction with the device.
    *
-   * @param dataToSend   The data to be written out to the device.
+   * @param dataToSend The data to be written out to the device.
    * @param dataReceived Buffer to receive data from the device.
-   * @param size         The length of the transaction, in bytes
+   * @param size The length of the transaction, in bytes
    */
   @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
@@ -288,8 +281,8 @@ public class SPI implements AutoCloseable {
   /**
    * Initialize automatic SPI transfer engine.
    *
-   * <p>Only a single engine is available, and use of it blocks use of all other
-   * chip select usage on the same physical SPI port while it is running.
+   * <p>Only a single engine is available, and use of it blocks use of all other chip select usage
+   * on the same physical SPI port while it is running.
    *
    * @param bufferSize buffer size in bytes
    */
@@ -297,9 +290,7 @@ public class SPI implements AutoCloseable {
     SPIJNI.spiInitAuto(m_port, bufferSize);
   }
 
-  /**
-   * Frees the automatic SPI transfer engine.
-   */
+  /** Frees the automatic SPI transfer engine. */
   public void freeAuto() {
     SPIJNI.spiFreeAuto(m_port);
   }
@@ -307,8 +298,7 @@ public class SPI implements AutoCloseable {
   /**
    * Set the data to be transmitted by the engine.
    *
-   * <p>Up to 16 bytes are configurable, and may be followed by up to 127 zero
-   * bytes.
+   * <p>Up to 16 bytes are configurable, and may be followed by up to 127 zero bytes.
    *
    * @param dataToSend data to send (maximum 16 bytes)
    * @param zeroSize number of zeros to send after the data
@@ -320,8 +310,8 @@ public class SPI implements AutoCloseable {
   /**
    * Start running the automatic SPI transfer engine at a periodic rate.
    *
-   * <p>{@link #initAuto(int)} and {@link #setAutoTransmitData(byte[], int)} must
-   * be called before calling this function.
+   * <p>{@link #initAuto(int)} and {@link #setAutoTransmitData(byte[], int)} must be called before
+   * calling this function.
    *
    * @param period period between transfers, in seconds (us resolution)
    */
@@ -332,28 +322,28 @@ public class SPI implements AutoCloseable {
   /**
    * Start running the automatic SPI transfer engine when a trigger occurs.
    *
-   * <p>{@link #initAuto(int)} and {@link #setAutoTransmitData(byte[], int)} must
-   * be called before calling this function.
+   * <p>{@link #initAuto(int)} and {@link #setAutoTransmitData(byte[], int)} must be called before
+   * calling this function.
    *
    * @param source digital source for the trigger (may be an analog trigger)
    * @param rising trigger on the rising edge
    * @param falling trigger on the falling edge
    */
   public void startAutoTrigger(DigitalSource source, boolean rising, boolean falling) {
-    SPIJNI.spiStartAutoTrigger(m_port, source.getPortHandleForRouting(),
-                               source.getAnalogTriggerTypeForRouting(), rising, falling);
+    SPIJNI.spiStartAutoTrigger(
+        m_port,
+        source.getPortHandleForRouting(),
+        source.getAnalogTriggerTypeForRouting(),
+        rising,
+        falling);
   }
 
-  /**
-   * Stop running the automatic SPI transfer engine.
-   */
+  /** Stop running the automatic SPI transfer engine. */
   public void stopAuto() {
     SPIJNI.spiStopAuto(m_port);
   }
 
-  /**
-   * Force the engine to make a single transfer.
-   */
+  /** Force the engine to make a single transfer. */
   public void forceAutoRead() {
     SPIJNI.spiForceAutoRead(m_port);
   }
@@ -361,16 +351,15 @@ public class SPI implements AutoCloseable {
   /**
    * Read data that has been transferred by the automatic SPI transfer engine.
    *
-   * <p>Transfers may be made a byte at a time, so it's necessary for the caller
-   * to handle cases where an entire transfer has not been completed.
+   * <p>Transfers may be made a byte at a time, so it's necessary for the caller to handle cases
+   * where an entire transfer has not been completed.
    *
-   * <p>Each received data sequence consists of a timestamp followed by the
-   * received data bytes, one byte per word (in the least significant byte).
-   * The length of each received data sequence is the same as the combined
-   * size of the data and zeroSize set in setAutoTransmitData().
+   * <p>Each received data sequence consists of a timestamp followed by the received data bytes, one
+   * byte per word (in the least significant byte). The length of each received data sequence is the
+   * same as the combined size of the data and zeroSize set in setAutoTransmitData().
    *
-   * <p>Blocks until numToRead words have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many words are available.
+   * <p>Blocks until numToRead words have been read or timeout expires. May be called with
+   * numToRead=0 to retrieve how many words are available.
    *
    * @param buffer buffer where read words are stored
    * @param numToRead number of words to read
@@ -382,8 +371,8 @@ public class SPI implements AutoCloseable {
       throw new IllegalArgumentException("must be a direct buffer");
     }
     if (buffer.capacity() < numToRead * 4) {
-      throw new IllegalArgumentException("buffer is too small, must be at least "
-          + (numToRead * 4));
+      throw new IllegalArgumentException(
+          "buffer is too small, must be at least " + (numToRead * 4));
     }
     return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeout);
   }
@@ -391,16 +380,15 @@ public class SPI implements AutoCloseable {
   /**
    * Read data that has been transferred by the automatic SPI transfer engine.
    *
-   * <p>Transfers may be made a byte at a time, so it's necessary for the caller
-   * to handle cases where an entire transfer has not been completed.
+   * <p>Transfers may be made a byte at a time, so it's necessary for the caller to handle cases
+   * where an entire transfer has not been completed.
    *
-   * <p>Each received data sequence consists of a timestamp followed by the
-   * received data bytes, one byte per word (in the least significant byte).
-   * The length of each received data sequence is the same as the combined
-   * size of the data and zeroSize set in setAutoTransmitData().
+   * <p>Each received data sequence consists of a timestamp followed by the received data bytes, one
+   * byte per word (in the least significant byte). The length of each received data sequence is the
+   * same as the combined size of the data and zeroSize set in setAutoTransmitData().
    *
-   * <p>Blocks until numToRead words have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many words are available.
+   * <p>Blocks until numToRead words have been read or timeout expires. May be called with
+   * numToRead=0 to retrieve how many words are available.
    *
    * @param buffer array where read words are stored
    * @param numToRead number of words to read
@@ -415,8 +403,8 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Get the number of bytes dropped by the automatic SPI transfer engine due
-   * to the receive buffer being full.
+   * Get the number of bytes dropped by the automatic SPI transfer engine due to the receive buffer
+   * being full.
    *
    * @return Number of bytes dropped
    */
@@ -439,13 +427,21 @@ public class SPI implements AutoCloseable {
 
   @SuppressWarnings("PMD.TooManyFields")
   private static class Accumulator implements AutoCloseable {
-    Accumulator(int port, int xferSize, int validMask, int validValue, int dataShift,
-                int dataSize, boolean isSigned, boolean bigEndian) {
+    Accumulator(
+        int port,
+        int xferSize,
+        int validMask,
+        int validValue,
+        int dataShift,
+        int dataSize,
+        boolean isSigned,
+        boolean bigEndian) {
       m_notifier = new Notifier(this::update);
-      m_buf = ByteBuffer.allocateDirect((xferSize + 1) * kAccumulateDepth * 4)
-          .order(ByteOrder.nativeOrder());
+      m_buf =
+          ByteBuffer.allocateDirect((xferSize + 1) * kAccumulateDepth * 4)
+              .order(ByteOrder.nativeOrder());
       m_intBuf = m_buf.asIntBuffer();
-      m_xferSize = xferSize + 1;  // +1 for timestamp
+      m_xferSize = xferSize + 1; // +1 for timestamp
       m_validMask = validMask;
       m_validValue = validValue;
       m_dataShift = dataShift;
@@ -478,12 +474,12 @@ public class SPI implements AutoCloseable {
 
     final int m_validMask;
     final int m_validValue;
-    final int m_dataMax;        // one more than max data value
-    final int m_dataMsbMask;    // data field MSB mask (for signed)
-    final int m_dataShift;      // data field shift right amount, in bits
-    final int m_xferSize;       // SPI transfer size, in bytes
-    final boolean m_isSigned;   // is data field signed?
-    final boolean m_bigEndian;  // is response big endian?
+    final int m_dataMax; // one more than max data value
+    final int m_dataMsbMask; // data field MSB mask (for signed)
+    final int m_dataShift; // data field shift right amount, in bits
+    final int m_xferSize; // SPI transfer size, in bytes
+    final boolean m_isSigned; // is data field signed?
+    final boolean m_bigEndian; // is response big endian?
     final int m_port;
 
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
@@ -503,7 +499,7 @@ public class SPI implements AutoCloseable {
             done = false;
           }
           if (numToRead == 0) {
-            return;  // no samples
+            return; // no samples
           }
 
           // read buffered data
@@ -546,11 +542,12 @@ public class SPI implements AutoCloseable {
                 if (m_count != 0) {
                   // timestamps use the 1us FPGA clock; also handle rollover
                   if (timestamp >= m_lastTimestamp) {
-                    m_integratedValue += dataNoCenter * (timestamp - m_lastTimestamp)
-                        * 1e-6 - m_integratedCenter;
+                    m_integratedValue +=
+                        dataNoCenter * (timestamp - m_lastTimestamp) * 1e-6 - m_integratedCenter;
                   } else {
-                    m_integratedValue += dataNoCenter * ((1L << 32) - m_lastTimestamp + timestamp)
-                        * 1e-6 - m_integratedCenter;
+                    m_integratedValue +=
+                        dataNoCenter * ((1L << 32) - m_lastTimestamp + timestamp) * 1e-6
+                            - m_integratedCenter;
                   }
                 }
               }
@@ -572,20 +569,26 @@ public class SPI implements AutoCloseable {
   /**
    * Initialize the accumulator.
    *
-   * @param period     Time between reads
-   * @param cmd        SPI command to send to request data
-   * @param xferSize   SPI transfer size, in bytes
-   * @param validMask  Mask to apply to received data for validity checking
+   * @param period Time between reads
+   * @param cmd SPI command to send to request data
+   * @param xferSize SPI transfer size, in bytes
+   * @param validMask Mask to apply to received data for validity checking
    * @param validValue After validMask is applied, required matching value for validity checking
-   * @param dataShift  Bit shift to apply to received data to get actual data value
-   * @param dataSize   Size (in bits) of data field
-   * @param isSigned   Is data field signed?
-   * @param bigEndian  Is device big endian?
+   * @param dataShift Bit shift to apply to received data to get actual data value
+   * @param dataSize Size (in bits) of data field
+   * @param isSigned Is data field signed?
+   * @param bigEndian Is device big endian?
    */
-  public void initAccumulator(double period, int cmd, int xferSize,
-                              int validMask, int validValue,
-                              int dataShift, int dataSize,
-                              boolean isSigned, boolean bigEndian) {
+  public void initAccumulator(
+      double period,
+      int cmd,
+      int xferSize,
+      int validMask,
+      int validValue,
+      int dataShift,
+      int dataSize,
+      boolean isSigned,
+      boolean bigEndian) {
     initAuto(xferSize * 2048);
     byte[] cmdBytes = new byte[] {0, 0, 0, 0};
     if (bigEndian) {
@@ -605,14 +608,13 @@ public class SPI implements AutoCloseable {
     setAutoTransmitData(cmdBytes, xferSize - 4);
     startAutoRate(period);
 
-    m_accum = new Accumulator(m_port, xferSize, validMask, validValue, dataShift, dataSize,
-                              isSigned, bigEndian);
+    m_accum =
+        new Accumulator(
+            m_port, xferSize, validMask, validValue, dataShift, dataSize, isSigned, bigEndian);
     m_accum.m_notifier.startPeriodic(period * 1024);
   }
 
-  /**
-   * Frees the accumulator.
-   */
+  /** Frees the accumulator. */
   public void freeAccumulator() {
     if (m_accum != null) {
       m_accum.close();
@@ -621,9 +623,7 @@ public class SPI implements AutoCloseable {
     freeAuto();
   }
 
-  /**
-   * Resets the accumulator to zero.
-   */
+  /** Resets the accumulator to zero. */
   public void resetAccumulator() {
     if (m_accum == null) {
       return;
@@ -653,9 +653,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  /**
-   * Set the accumulator's deadband.
-   */
+  /** Set the accumulator's deadband. */
   public void setAccumulatorDeadband(int deadband) {
     if (m_accum == null) {
       return;
@@ -665,9 +663,7 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  /**
-   * Read the last value read by the accumulator engine.
-   */
+  /** Read the last value read by the accumulator engine. */
   public int getAccumulatorLastValue() {
     if (m_accum == null) {
       return 0;
@@ -754,9 +750,9 @@ public class SPI implements AutoCloseable {
   /**
    * Set the center value of the accumulator integrator.
    *
-   * <p>The center value is subtracted from each value*dt before it is added to the
-   * integrated value. This is used for the center value of devices like gyros
-   * and accelerometers to take the device offset into account when integrating.
+   * <p>The center value is subtracted from each value*dt before it is added to the integrated
+   * value. This is used for the center value of devices like gyros and accelerometers to take the
+   * device offset into account when integrating.
    */
   public void setAccumulatorIntegratedCenter(double center) {
     if (m_accum == null) {
@@ -768,8 +764,7 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Read the integrated value.  This is the sum of (each value * time between
-   * values).
+   * Read the integrated value. This is the sum of (each value * time between values).
    *
    * @return The integrated value accumulated since the last Reset().
    */
@@ -784,11 +779,10 @@ public class SPI implements AutoCloseable {
   }
 
   /**
-   * Read the average of the integrated value.  This is the sum of (each value
-   * times the time between values), divided by the count.
+   * Read the average of the integrated value. This is the sum of (each value times the time between
+   * values), divided by the count.
    *
-   * @return The average of the integrated value accumulated since the last
-   *         Reset().
+   * @return The average of the integrated value accumulated since the last Reset().
    */
   public double getAccumulatorIntegratedAverage() {
     if (m_accum == null) {

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/uv/Process.h"
 
@@ -11,8 +8,7 @@
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Pipe.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
                                              ArrayRef<Option> options) {
@@ -68,28 +64,36 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
         break;
       case Option::kStdioIgnore: {
         size_t index = o.m_data.stdio.index;
-        if (index >= stdioBuf.size()) stdioBuf.resize(index + 1);
+        if (index >= stdioBuf.size()) {
+          stdioBuf.resize(index + 1);
+        }
         stdioBuf[index].flags = UV_IGNORE;
         stdioBuf[index].data.fd = 0;
         break;
       }
       case Option::kStdioInheritFd: {
         size_t index = o.m_data.stdio.index;
-        if (index >= stdioBuf.size()) stdioBuf.resize(index + 1);
+        if (index >= stdioBuf.size()) {
+          stdioBuf.resize(index + 1);
+        }
         stdioBuf[index].flags = UV_INHERIT_FD;
         stdioBuf[index].data.fd = o.m_data.stdio.fd;
         break;
       }
       case Option::kStdioInheritPipe: {
         size_t index = o.m_data.stdio.index;
-        if (index >= stdioBuf.size()) stdioBuf.resize(index + 1);
+        if (index >= stdioBuf.size()) {
+          stdioBuf.resize(index + 1);
+        }
         stdioBuf[index].flags = UV_INHERIT_STREAM;
         stdioBuf[index].data.stream = o.m_data.stdio.pipe->GetRawStream();
         break;
       }
       case Option::kStdioCreatePipe: {
         size_t index = o.m_data.stdio.index;
-        if (index >= stdioBuf.size()) stdioBuf.resize(index + 1);
+        if (index >= stdioBuf.size()) {
+          stdioBuf.resize(index + 1);
+        }
         stdioBuf[index].flags =
             static_cast<uv_stdio_flags>(UV_CREATE_PIPE | o.m_data.stdio.flags);
         stdioBuf[index].data.stream = o.m_data.stdio.pipe->GetRawStream();
@@ -100,7 +104,9 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
     }
   }
 
-  if (argsBuf.empty()) argsBuf.push_back(const_cast<char*>(coptions.file));
+  if (argsBuf.empty()) {
+    argsBuf.push_back(const_cast<char*>(coptions.file));
+  }
   argsBuf.push_back(nullptr);
   coptions.args = argsBuf.data();
 
@@ -124,5 +130,4 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
   return h;
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -45,7 +42,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiTransaction
    jbyte size)
 {
   uint8_t* dataToSendPtr = nullptr;
-  if (dataToSend != 0) {
+  if (dataToSend != nullptr) {
     dataToSendPtr =
         reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataToSend));
   }
@@ -88,7 +85,7 @@ Java_edu_wpi_first_hal_SPIJNI_spiWrite
   (JNIEnv* env, jclass, jint port, jobject dataToSend, jbyte size)
 {
   uint8_t* dataToSendPtr = nullptr;
-  if (dataToSend != 0) {
+  if (dataToSend != nullptr) {
     dataToSendPtr =
         reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(dataToSend));
   }
@@ -370,7 +367,9 @@ Java_edu_wpi_first_hal_SPIJNI_spiReadAutoReceivedData__I_3IID
   jint retval =
       HAL_ReadSPIAutoReceivedData(static_cast<HAL_SPIPort>(port),
                                   recvBuf.data(), numToRead, timeout, &status);
-  if (!CheckStatus(env, status)) return retval;
+  if (!CheckStatus(env, status)) {
+    return retval;
+  }
   if (numToRead > 0) {
     env->SetIntArrayRegion(buffer, 0, numToRead,
                            reinterpret_cast<const jint*>(recvBuf.data()));

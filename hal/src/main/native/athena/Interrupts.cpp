@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Interrupts.h"
 
@@ -27,11 +24,13 @@ namespace {
 // Safe thread to allow callbacks to run on their own thread
 class InterruptThread : public wpi::SafeThread {
  public:
-  void Main() {
+  void Main() override {
     std::unique_lock lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });
-      if (!m_active) break;
+      if (!m_active) {
+        break;
+      }
       m_notify = false;
       HAL_InterruptHandlerFunction handler = m_handler;
       uint32_t mask = m_mask;
@@ -52,14 +51,16 @@ class InterruptThreadOwner : public wpi::SafeThreadOwner<InterruptThread> {
  public:
   void SetFunc(HAL_InterruptHandlerFunction handler, void* param) {
     auto thr = GetThread();
-    if (!thr) return;
+    if (!thr)
+      return;
     thr->m_handler = handler;
     thr->m_param = param;
   }
 
   void Notify(uint32_t mask) {
     auto thr = GetThread();
-    if (!thr) return;
+    if (!thr)
+      return;
     thr->m_mask = mask;
     thr->m_notify = true;
     thr->m_cond.notify_one();
@@ -82,16 +83,14 @@ static void threadedInterruptHandler(uint32_t mask, void* param) {
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                              HAL_HandleEnum::Interrupt>* interruptHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeInterrupts() {
   static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                                HAL_HandleEnum::Interrupt>
       iH;
   interruptHandles = &iH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

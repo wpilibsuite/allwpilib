@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/networktables/NTSpeedController.h"
 
@@ -21,7 +18,6 @@ NTSpeedControllerModel::NTSpeedControllerModel(NT_Inst instance,
       m_nameValue(path.rsplit('/').second) {
   m_nt.AddListener(m_value);
   m_nt.AddListener(m_name);
-  Update();
 }
 
 void NTSpeedControllerModel::SetPercent(double value) {
@@ -31,11 +27,13 @@ void NTSpeedControllerModel::SetPercent(double value) {
 void NTSpeedControllerModel::Update() {
   for (auto&& event : m_nt.PollListener()) {
     if (event.entry == m_value) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_valueData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_name) {
-      if (event.value && event.value->IsString())
+      if (event.value && event.value->IsString()) {
         m_nameValue = event.value->GetString();
+      }
     }
   }
 }

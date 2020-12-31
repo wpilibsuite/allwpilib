@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_IMAGE_H_
 #define CSCORE_IMAGE_H_
@@ -37,7 +34,7 @@ class Image {
   Image& operator=(const Image&) = delete;
 
   // Getters
-  operator wpi::StringRef() const { return str(); }
+  operator wpi::StringRef() const { return str(); }  // NOLINT
   wpi::StringRef str() const { return wpi::StringRef(data(), size()); }
   size_t capacity() const { return m_data.capacity(); }
   const char* data() const {

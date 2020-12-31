@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/hardware/AnalogInput.h"
 
@@ -16,7 +13,9 @@ using namespace glass;
 
 void glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
   auto voltageData = model->GetVoltageData();
-  if (!voltageData) return;
+  if (!voltageData) {
+    return;
+  }
 
   // build label
   std::string* name = GetStorage().GetStringRef("name");
@@ -37,11 +36,15 @@ void glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
     ImGui::PopStyleColor();
   } else {
     float val = voltageData->GetValue();
-    if (voltageData->SliderFloat(label, &val, 0.0, 5.0)) model->SetVoltage(val);
+    if (voltageData->SliderFloat(label, &val, 0.0, 5.0)) {
+      model->SetVoltage(val);
+    }
   }
 
   // context menu to change name
-  if (PopupEditName("name", name)) voltageData->SetName(name->c_str());
+  if (PopupEditName("name", name)) {
+    voltageData->SetName(name->c_str());
+  }
 }
 
 void glass::DisplayAnalogInputs(AnalogInputsModel* model,
@@ -61,6 +64,7 @@ void glass::DisplayAnalogInputs(AnalogInputsModel* model,
     PopID();
     hasAny = true;
   });
-  if (!hasAny && !noneMsg.empty())
+  if (!hasAny && !noneMsg.empty()) {
     ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+  }
 }

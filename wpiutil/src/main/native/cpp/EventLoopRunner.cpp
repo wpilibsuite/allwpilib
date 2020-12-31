@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/EventLoopRunner.h"
 
@@ -21,7 +18,9 @@ class EventLoopRunner::Thread : public SafeThread {
 
   Thread() : m_loop(uv::Loop::Create()) {
     // set up async handles
-    if (!m_loop) return;
+    if (!m_loop) {
+      return;
+    }
 
     // run function
     m_doExec = UvExecFunc::Create(
@@ -31,8 +30,10 @@ class EventLoopRunner::Thread : public SafeThread {
         });
   }
 
-  void Main() {
-    if (m_loop) m_loop->Run();
+  void Main() override {
+    if (m_loop) {
+      m_loop->Run();
+    }
   }
 
   // the loop
@@ -42,9 +43,13 @@ class EventLoopRunner::Thread : public SafeThread {
   std::weak_ptr<UvExecFunc> m_doExec;
 };
 
-EventLoopRunner::EventLoopRunner() { m_owner.Start(); }
+EventLoopRunner::EventLoopRunner() {
+  m_owner.Start();
+}
 
-EventLoopRunner::~EventLoopRunner() { Stop(); }
+EventLoopRunner::~EventLoopRunner() {
+  Stop();
+}
 
 void EventLoopRunner::Stop() {
   ExecAsync([](uv::Loop& loop) {
@@ -72,10 +77,14 @@ void EventLoopRunner::ExecSync(LoopFunc func) {
       f = doExec->Call(func);
     }
   }
-  if (f.valid()) f.wait();
+  if (f.valid()) {
+    f.wait();
+  }
 }
 
 std::shared_ptr<uv::Loop> EventLoopRunner::GetLoop() {
-  if (auto thr = m_owner.GetThread()) return thr->m_loop;
+  if (auto thr = m_owner.GetThread()) {
+    return thr->m_loop;
+  }
   return nullptr;
 }

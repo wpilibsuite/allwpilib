@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/trajectory/TrajectoryGenerator.h"
 
@@ -22,10 +19,11 @@ const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
 std::function<void(const char*)> TrajectoryGenerator::s_errorFunc;
 
 void TrajectoryGenerator::ReportError(const char* error) {
-  if (s_errorFunc)
+  if (s_errorFunc) {
     s_errorFunc(error);
-  else
+  } else {
     wpi::errs() << "TrajectoryGenerator error: " << error << "\n";
+  }
 }
 
 Trajectory TrajectoryGenerator::GenerateTrajectory(
@@ -115,8 +113,11 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
     const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config) {
   auto newWaypoints = waypoints;
   const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
-  if (config.IsReversed())
-    for (auto& waypoint : newWaypoints) waypoint += flip;
+  if (config.IsReversed()) {
+    for (auto& waypoint : newWaypoints) {
+      waypoint += flip;
+    }
+  }
 
   std::vector<SplineParameterizer::PoseWithCurvature> points;
   try {

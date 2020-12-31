@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.gyro;
 
@@ -14,9 +11,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
- * This is a sample program to demonstrate how to use a gyro sensor to make a
- * robot drive straight. This program uses a joystick to drive forwards and
- * backwards while the gyro is used for direction keeping.
+ * This is a sample program to demonstrate how to use a gyro sensor to make a robot drive straight.
+ * This program uses a joystick to drive forwards and backwards while the gyro is used for direction
+ * keeping.
  */
 public class Robot extends TimedRobot {
   private static final double kAngleSetpoint = 0.0;
@@ -31,9 +28,8 @@ public class Robot extends TimedRobot {
   private static final int kGyroPort = 0;
   private static final int kJoystickPort = 0;
 
-  private final DifferentialDrive m_myRobot
-      = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
-      new PWMVictorSPX(kRightMotorPort));
+  private final DifferentialDrive m_myRobot =
+      new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort), new PWMVictorSPX(kRightMotorPort));
   private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
@@ -43,8 +39,8 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * The motor speed is set from the joystick while the RobotDrive turning
-   * value is assigned from the error between the setpoint and the gyro angle.
+   * The motor speed is set from the joystick while the RobotDrive turning value is assigned from
+   * the error between the setpoint and the gyro angle.
    */
   @Override
   public void teleopPeriodic() {

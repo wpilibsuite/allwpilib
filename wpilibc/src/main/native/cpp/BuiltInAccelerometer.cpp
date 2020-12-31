@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/BuiltInAccelerometer.h"
 
@@ -31,15 +28,21 @@ void BuiltInAccelerometer::SetRange(Range range) {
   }
 
   HAL_SetAccelerometerActive(false);
-  HAL_SetAccelerometerRange((HAL_AccelerometerRange)range);
+  HAL_SetAccelerometerRange(static_cast<HAL_AccelerometerRange>(range));
   HAL_SetAccelerometerActive(true);
 }
 
-double BuiltInAccelerometer::GetX() { return HAL_GetAccelerometerX(); }
+double BuiltInAccelerometer::GetX() {
+  return HAL_GetAccelerometerX();
+}
 
-double BuiltInAccelerometer::GetY() { return HAL_GetAccelerometerY(); }
+double BuiltInAccelerometer::GetY() {
+  return HAL_GetAccelerometerY();
+}
 
-double BuiltInAccelerometer::GetZ() { return HAL_GetAccelerometerZ(); }
+double BuiltInAccelerometer::GetZ() {
+  return HAL_GetAccelerometerZ();
+}
 
 void BuiltInAccelerometer::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");

@@ -1,18 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
-/**
- * Buffer storage for Addressable LEDs.
- */
+/** Buffer storage for Addressable LEDs. */
 public class AddressableLEDBuffer {
   byte[] m_buffer;
 
@@ -29,9 +24,9 @@ public class AddressableLEDBuffer {
    * Sets a specific led in the buffer.
    *
    * @param index the index to write
-   * @param r     the r value [0-255]
-   * @param g     the g value [0-255]
-   * @param b     the b value [0-255]
+   * @param r the r value [0-255]
+   * @param g the g value [0-255]
+   * @param b the b value [0-255]
    */
   @SuppressWarnings("ParameterName")
   public void setRGB(int index, int r, int g, int b) {
@@ -45,9 +40,9 @@ public class AddressableLEDBuffer {
    * Sets a specific led in the buffer.
    *
    * @param index the index to write
-   * @param h     the h value [0-180]
-   * @param s     the s value [0-255]
-   * @param v     the v value [0-255]
+   * @param h the h value [0-180]
+   * @param s the s value [0-255]
+   * @param v the v value [0-255]
    */
   @SuppressWarnings("ParameterName")
   public void setHSV(final int index, final int h, final int s, final int v) {
@@ -92,10 +87,7 @@ public class AddressableLEDBuffer {
    * @param color The color of the LED
    */
   public void setLED(int index, Color color) {
-    setRGB(index,
-        (int) (color.red * 255),
-        (int) (color.green * 255),
-        (int) (color.blue * 255));
+    setRGB(index, (int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
   }
 
   /**
@@ -124,8 +116,8 @@ public class AddressableLEDBuffer {
    * @return the LED color at the specified index
    */
   public Color8Bit getLED8Bit(int index) {
-    return new Color8Bit(m_buffer[index * 4 + 2] & 0xFF, m_buffer[index * 4 + 1] & 0xFF,
-                         m_buffer[index * 4] & 0xFF);
+    return new Color8Bit(
+        m_buffer[index * 4 + 2] & 0xFF, m_buffer[index * 4 + 1] & 0xFF, m_buffer[index * 4] & 0xFF);
   }
 
   /**
@@ -135,9 +127,9 @@ public class AddressableLEDBuffer {
    * @return the LED color at the specified index
    */
   public Color getLED(int index) {
-    return new Color((m_buffer[index * 4 + 2] & 0xFF) / 255.0,
-                     (m_buffer[index * 4 + 1] & 0xFF) / 255.0,
-                     (m_buffer[index * 4] & 0xFF) / 255.0);
+    return new Color(
+        (m_buffer[index * 4 + 2] & 0xFF) / 255.0,
+        (m_buffer[index * 4 + 1] & 0xFF) / 255.0,
+        (m_buffer[index * 4] & 0xFF) / 255.0);
   }
-
 }

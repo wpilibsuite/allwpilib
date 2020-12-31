@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+
+#include <utility>
 
 #include <frc/controller/PIDController.h>
 #include <frc/controller/RamseteController.h>
@@ -36,9 +35,13 @@ RobotContainer::RobotContainer() {
       {&m_drive}));
 }
 
-void RobotContainer::ZeroAllOutputs() { m_drive.TankDriveVolts(0_V, 0_V); }
+void RobotContainer::ZeroAllOutputs() {
+  m_drive.TankDriveVolts(0_V, 0_V);
+}
 
-const DriveSubsystem& RobotContainer::GetRobotDrive() const { return m_drive; }
+const DriveSubsystem& RobotContainer::GetRobotDrive() const {
+  return m_drive;
+}
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here

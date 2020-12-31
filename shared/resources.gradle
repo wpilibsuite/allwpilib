@@ -13,7 +13,7 @@ ext.createGenerateResourcesTask = { name, prefix, namespace, project ->
             generatedOutputDir.mkdirs()
             inputDir.eachFile { inputFile ->
                 if (inputFile.name.startsWith('.')) return
-                def fileBytes = inputFile.bytes
+                    def fileBytes = inputFile.bytes
                 def outputFile = file("$generatedOutputDir/${inputFile.name}.cpp")
                 def funcName = "GetResource_" + inputFile.name.replaceAll('[^a-zA-Z0-9]', '_')
                 outputFile.withWriter { out ->

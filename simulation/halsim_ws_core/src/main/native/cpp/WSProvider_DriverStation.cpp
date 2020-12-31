@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_DriverStation.h"
 
@@ -95,7 +92,9 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
   m_matchTimeCbKey = REGISTER(MatchTime, ">match_time", double, double);
 }
 
-void HALSimWSProviderDriverStation::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderDriverStation::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   HALSIM_CancelDriverStationEnabledCallback(m_enabledCbKey);
@@ -121,7 +120,9 @@ void HALSimWSProviderDriverStation::DoCancelCallbacks() {
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
   // ignore if DS connected
-  if (gDSSocketConnected && *gDSSocketConnected) return;
+  if (gDSSocketConnected && *gDSSocketConnected) {
+    return;
+  }
 
   wpi::json::const_iterator it;
   if ((it = json.find(">enabled")) != json.end()) {

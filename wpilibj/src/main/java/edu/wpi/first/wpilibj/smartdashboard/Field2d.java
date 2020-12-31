@@ -1,42 +1,34 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.smartdashboard;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 2D representation of game field for dashboards.
  *
- * <p>An object's pose is the location shown on the dashboard view.  Note that
- * for the robot, this may or may not match the internal odometry.  For example,
- * the robot is shown at a particular starting location, the pose in this
- * class would represent the actual location on the field, but the robot's
- * internal state might have a 0,0,0 pose (unless it's initialized to
- * something different).
+ * <p>An object's pose is the location shown on the dashboard view. Note that for the robot, this
+ * may or may not match the internal odometry. For example, the robot is shown at a particular
+ * starting location, the pose in this class would represent the actual location on the field, but
+ * the robot's internal state might have a 0,0,0 pose (unless it's initialized to something
+ * different).
  *
- * <p>As the user is able to edit the pose, code performing updates should get
- * the robot pose, transform it as appropriate (e.g. based on wheel odometry),
- * and set the new pose.
+ * <p>As the user is able to edit the pose, code performing updates should get the robot pose,
+ * transform it as appropriate (e.g. based on wheel odometry), and set the new pose.
  *
- * <p>This class provides methods to set the robot pose, but other objects can
- * also be shown by using the getObject() function.  Other objects can
- * also have multiple poses (which will show the object at multiple locations).
+ * <p>This class provides methods to set the robot pose, but other objects can also be shown by
+ * using the getObject() function. Other objects can also have multiple poses (which will show the
+ * object at multiple locations).
  */
 public class Field2d implements Sendable {
-  /**
-   * Constructor.
-   */
+  /** Constructor. */
   public Field2d() {
     FieldObject2d obj = new FieldObject2d("Robot");
     obj.setPose(new Pose2d());

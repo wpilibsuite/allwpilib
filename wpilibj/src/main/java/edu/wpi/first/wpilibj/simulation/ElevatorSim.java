@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.simulation;
 
@@ -16,9 +13,7 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 
-/**
- * Represents a simulated elevator mechanism.
- */
+/** Represents a simulated elevator mechanism. */
 public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   // Gearbox for the elevator.
   private final DCMotor m_gearbox;
@@ -38,32 +33,42 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant            The linear system that represents the elevator.
-   * @param gearbox          The type of and number of motors in the elevator gearbox.
-   * @param gearing          The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param plant The linear system that represents the elevator.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
    * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
-   * @param minHeightMeters  The min allowable height of the elevator.
-   * @param maxHeightMeters  The max allowable height of the elevator.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
    */
-  public ElevatorSim(LinearSystem<N2, N1, N1> plant, DCMotor gearbox, double gearing,
-                     double drumRadiusMeters, double minHeightMeters, double maxHeightMeters) {
+  public ElevatorSim(
+      LinearSystem<N2, N1, N1> plant,
+      DCMotor gearbox,
+      double gearing,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters) {
     this(plant, gearbox, gearing, drumRadiusMeters, minHeightMeters, maxHeightMeters, null);
   }
 
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param plant              The linear system that represents the elevator.
-   * @param gearbox            The type of and number of motors in the elevator gearbox.
-   * @param gearing            The gearing of the elevator (numbers greater than 1 represent reductions).
-   * @param drumRadiusMeters   The radius of the drum that the elevator spool is wrapped around.
-   * @param minHeightMeters    The min allowable height of the elevator.
-   * @param maxHeightMeters    The max allowable height of the elevator.
+   * @param plant The linear system that represents the elevator.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  public ElevatorSim(LinearSystem<N2, N1, N1> plant, DCMotor gearbox, double gearing,
-                     double drumRadiusMeters, double minHeightMeters, double maxHeightMeters,
-                     Matrix<N1, N1> measurementStdDevs) {
+  public ElevatorSim(
+      LinearSystem<N2, N1, N1> plant,
+      DCMotor gearbox,
+      double gearing,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters,
+      Matrix<N1, N1> measurementStdDevs) {
     super(plant, measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
@@ -75,34 +80,45 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param gearbox          The type of and number of motors in the elevator gearbox.
-   * @param gearing          The gearing of the elevator (numbers greater than 1 represent reductions).
-   * @param carriageMassKg   The mass of the elevator carriage.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param carriageMassKg The mass of the elevator carriage.
    * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
-   * @param minHeightMeters  The min allowable height of the elevator.
-   * @param maxHeightMeters  The max allowable height of the elevator.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
    */
-  public ElevatorSim(DCMotor gearbox, double gearing, double carriageMassKg,
-                     double drumRadiusMeters, double minHeightMeters, double maxHeightMeters) {
-    this(gearbox, gearing, carriageMassKg, drumRadiusMeters, minHeightMeters, maxHeightMeters,
-        null);
+  public ElevatorSim(
+      DCMotor gearbox,
+      double gearing,
+      double carriageMassKg,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters) {
+    this(
+        gearbox, gearing, carriageMassKg, drumRadiusMeters, minHeightMeters, maxHeightMeters, null);
   }
 
   /**
    * Creates a simulated elevator mechanism.
    *
-   * @param gearbox            The type of and number of motors in the elevator gearbox.
-   * @param gearing            The gearing of the elevator (numbers greater than 1 represent reductions).
-   * @param carriageMassKg     The mass of the elevator carriage.
-   * @param drumRadiusMeters   The radius of the drum that the elevator spool is wrapped around.
-   * @param minHeightMeters    The min allowable height of the elevator.
-   * @param maxHeightMeters    The max allowable height of the elevator.
+   * @param gearbox The type of and number of motors in the elevator gearbox.
+   * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
+   * @param carriageMassKg The mass of the elevator carriage.
+   * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
+   * @param minHeightMeters The min allowable height of the elevator.
+   * @param maxHeightMeters The max allowable height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements.
    */
-  public ElevatorSim(DCMotor gearbox, double gearing, double carriageMassKg,
-                     double drumRadiusMeters, double minHeightMeters, double maxHeightMeters,
-                     Matrix<N1, N1> measurementStdDevs) {
-    super(LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
+  public ElevatorSim(
+      DCMotor gearbox,
+      double gearing,
+      double carriageMassKg,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters,
+      Matrix<N1, N1> measurementStdDevs) {
+    super(
+        LinearSystemId.createElevatorSystem(gearbox, carriageMassKg, drumRadiusMeters, gearing),
         measurementStdDevs);
     m_gearbox = gearbox;
     m_gearing = gearing;
@@ -162,7 +178,8 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
     // v = r w, so w = v/r
     double motorVelocityRadPerSec = getVelocityMetersPerSecond() / m_drumRadius * m_gearing;
     var appliedVoltage = m_u.get(0, 0);
-    return m_gearbox.getCurrent(motorVelocityRadPerSec, appliedVoltage) * Math.signum(appliedVoltage);
+    return m_gearbox.getCurrent(motorVelocityRadPerSec, appliedVoltage)
+        * Math.signum(appliedVoltage);
   }
 
   /**
@@ -178,16 +195,21 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * Updates the state of the elevator.
    *
    * @param currentXhat The current state estimate.
-   * @param u           The system inputs (voltage).
-   * @param dtSeconds   The time difference between controller updates.
+   * @param u The system inputs (voltage).
+   * @param dtSeconds The time difference between controller updates.
    */
   @Override
-  protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat,
-                                   Matrix<N1, N1> u, double dtSeconds) {
+  protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.
-    var updatedXhat = RungeKutta.rungeKutta(
-        (x, u_) -> (m_plant.getA().times(x)).plus(m_plant.getB().times(u_))
-            .plus(VecBuilder.fill(0, -9.8)), currentXhat, u, dtSeconds);
+    var updatedXhat =
+        RungeKutta.rungeKutta(
+            (x, u_) ->
+                (m_plant.getA().times(x))
+                    .plus(m_plant.getB().times(u_))
+                    .plus(VecBuilder.fill(0, -9.8)),
+            currentXhat,
+            u,
+            dtSeconds);
 
     // We check for collisions after updating x-hat.
     if (hasHitLowerLimit(updatedXhat)) {

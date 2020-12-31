@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "SimulatorJNI.h"
 
@@ -31,61 +28,80 @@ static jmethodID bufferCallbackCallback;
 static jmethodID constBufferCallbackCallback;
 static jmethodID spiReadAutoReceiveBufferCallbackCallback;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 jint SimOnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
+  }
 
   notifyCallbackCls =
       JClass(env, "edu/wpi/first/hal/simulation/NotifyCallback");
-  if (!notifyCallbackCls) return JNI_ERR;
+  if (!notifyCallbackCls) {
+    return JNI_ERR;
+  }
 
   notifyCallbackCallback = env->GetMethodID(notifyCallbackCls, "callbackNative",
                                             "(Ljava/lang/String;IJD)V");
-  if (!notifyCallbackCallback) return JNI_ERR;
+  if (!notifyCallbackCallback) {
+    return JNI_ERR;
+  }
 
   bufferCallbackCls =
       JClass(env, "edu/wpi/first/hal/simulation/BufferCallback");
-  if (!bufferCallbackCls) return JNI_ERR;
+  if (!bufferCallbackCls) {
+    return JNI_ERR;
+  }
 
   bufferCallbackCallback = env->GetMethodID(bufferCallbackCls, "callback",
                                             "(Ljava/lang/String;[BI)V");
-  if (!bufferCallbackCallback) return JNI_ERR;
+  if (!bufferCallbackCallback) {
+    return JNI_ERR;
+  }
 
   constBufferCallbackCls =
       JClass(env, "edu/wpi/first/hal/simulation/ConstBufferCallback");
-  if (!constBufferCallbackCls) return JNI_ERR;
+  if (!constBufferCallbackCls) {
+    return JNI_ERR;
+  }
 
   constBufferCallbackCallback = env->GetMethodID(
       constBufferCallbackCls, "callback", "(Ljava/lang/String;[BI)V");
-  if (!constBufferCallbackCallback) return JNI_ERR;
+  if (!constBufferCallbackCallback) {
+    return JNI_ERR;
+  }
 
   spiReadAutoReceiveBufferCallbackCls = JClass(
       env, "edu/wpi/first/hal/simulation/SpiReadAutoReceiveBufferCallback");
-  if (!spiReadAutoReceiveBufferCallbackCls) return JNI_ERR;
+  if (!spiReadAutoReceiveBufferCallbackCls) {
+    return JNI_ERR;
+  }
 
   spiReadAutoReceiveBufferCallbackCallback =
       env->GetMethodID(spiReadAutoReceiveBufferCallbackCls, "callback",
                        "(Ljava/lang/String;[II)I");
-  if (!spiReadAutoReceiveBufferCallbackCallback) return JNI_ERR;
+  if (!spiReadAutoReceiveBufferCallbackCallback) {
+    return JNI_ERR;
+  }
 
   InitializeStore();
   InitializeBufferStore();
   InitializeConstBufferStore();
   InitializeSpiBufferStore();
-  if (!InitializeSimDeviceDataJNI(env)) return JNI_ERR;
+  if (!InitializeSimDeviceDataJNI(env)) {
+    return JNI_ERR;
+  }
 
   return JNI_VERSION_1_6;
 }
 
 void SimOnUnload(JavaVM* vm, void* reserved) {
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
+  }
 
   notifyCallbackCls.free(env);
   bufferCallbackCls.free(env);
@@ -95,19 +111,26 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   jvm = nullptr;
 }
 
-JavaVM* GetJVM() { return jvm; }
+JavaVM* GetJVM() {
+  return jvm;
+}
 
-jmethodID GetNotifyCallback() { return notifyCallbackCallback; }
+jmethodID GetNotifyCallback() {
+  return notifyCallbackCallback;
+}
 
-jmethodID GetBufferCallback() { return bufferCallbackCallback; }
+jmethodID GetBufferCallback() {
+  return bufferCallbackCallback;
+}
 
-jmethodID GetConstBufferCallback() { return constBufferCallbackCallback; }
+jmethodID GetConstBufferCallback() {
+  return constBufferCallbackCallback;
+}
 
 jmethodID GetSpiReadAutoReceiveBufferCallback() {
   return spiReadAutoReceiveBufferCallbackCallback;
 }
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 extern "C" {
 /*

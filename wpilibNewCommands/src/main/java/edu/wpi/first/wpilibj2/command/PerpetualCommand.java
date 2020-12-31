@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
@@ -11,7 +8,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.registerGroupedCom
 import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
 
 /**
- * A command that runs another command in perpetuity, ignoring that command's end conditions.  While
+ * A command that runs another command in perpetuity, ignoring that command's end conditions. While
  * this class does not extend {@link CommandGroupBase}, it is still considered a CommandGroup, as it
  * allows one to compose another command within it; the command instances that are passed to it
  * cannot be added to any other groups, or scheduled individually.
@@ -22,8 +19,8 @@ public class PerpetualCommand extends CommandBase {
   protected final Command m_command;
 
   /**
-   * Creates a new PerpetualCommand.  Will run another command in perpetuity, ignoring that
-   * command's end conditions, unless this command itself is interrupted.
+   * Creates a new PerpetualCommand. Will run another command in perpetuity, ignoring that command's
+   * end conditions, unless this command itself is interrupted.
    *
    * @param command the command to run perpetually
    */

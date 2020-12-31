@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/networktables/NTPIDController.h"
 
@@ -30,7 +27,6 @@ NTPIDControllerModel::NTPIDControllerModel(NT_Inst instance,
   m_nt.AddListener(m_i);
   m_nt.AddListener(m_d);
   m_nt.AddListener(m_setpoint);
-  Update();
 }
 
 void NTPIDControllerModel::SetP(double value) {
@@ -52,20 +48,25 @@ void NTPIDControllerModel::SetSetpoint(double value) {
 void NTPIDControllerModel::Update() {
   for (auto&& event : m_nt.PollListener()) {
     if (event.entry == m_name) {
-      if (event.value && event.value->IsString())
+      if (event.value && event.value->IsString()) {
         m_nameValue = event.value->GetString();
+      }
     } else if (event.entry == m_p) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_pData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_i) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_iData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_d) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_dData.SetValue(event.value->GetDouble());
+      }
     } else if (event.entry == m_setpoint) {
-      if (event.value && event.value->IsDouble())
+      if (event.value && event.value->IsDouble()) {
         m_setpointData.SetValue(event.value->GetDouble());
+      }
     }
   }
 }

@@ -1,17 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CameraServerJNI;
@@ -32,10 +23,15 @@ import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Singleton class for creating and keeping camera servers.
- * Also publishes camera information to NetworkTables.
+ * Singleton class for creating and keeping camera servers. Also publishes camera information to
+ * NetworkTables.
  *
  * @deprecated Replaced with edu.wpi.first.cameraserver.CameraServer
  */
@@ -43,19 +39,14 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public final class CameraServer {
   public static final int kBasePort = 1181;
 
-  @Deprecated
-  public static final int kSize640x480 = 0;
-  @Deprecated
-  public static final int kSize320x240 = 1;
-  @Deprecated
-  public static final int kSize160x120 = 2;
+  @Deprecated public static final int kSize640x480 = 0;
+  @Deprecated public static final int kSize320x240 = 1;
+  @Deprecated public static final int kSize160x120 = 2;
 
   private static final String kPublishName = "/CameraPublisher";
   private static CameraServer server;
 
-  /**
-   * Get the CameraServer instance.
-   */
+  /** Get the CameraServer instance. */
   public static synchronized CameraServer getInstance() {
     if (server == null) {
       server = new CameraServer();
@@ -67,26 +58,27 @@ public final class CameraServer {
   private String m_primarySourceName;
   private final Map<String, VideoSource> m_sources;
   private final Map<String, VideoSink> m_sinks;
-  private final Map<Integer, NetworkTable> m_tables;  // indexed by source handle
+  private final Map<Integer, NetworkTable> m_tables; // indexed by source handle
   private final NetworkTable m_publishTable;
-  private final VideoListener m_videoListener; //NOPMD
-  private final int m_tableListener; //NOPMD
+  private final VideoListener m_videoListener; // NOPMD
+  private final int m_tableListener; // NOPMD
   private int m_nextPort;
   private String[] m_addresses;
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String makeSourceValue(int source) {
     switch (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))) {
       case kUsb:
         return "usb:" + CameraServerJNI.getUsbCameraPath(source);
-      case kHttp: {
-        String[] urls = CameraServerJNI.getHttpCameraUrls(source);
-        if (urls.length > 0) {
-          return "ip:" + urls[0];
-        } else {
-          return "ip:";
+      case kHttp:
+        {
+          String[] urls = CameraServerJNI.getHttpCameraUrls(source);
+          if (urls.length > 0) {
+            return "ip:" + urls[0];
+          } else {
+            return "ip:";
+          }
         }
-      }
       case kCv:
         // FIXME: Should be "cv:", but LabVIEW dashboard requires "usb:".
         // https://github.com/wpilibsuite/allwpilib/issues/407
@@ -96,12 +88,12 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String makeStreamValue(String address, int port) {
     return "mjpg:http://" + address + ":" + port + "/?action=stream";
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
   private synchronized String[] getSinkStreamValues(int sink) {
     // Ignore all but MjpegServer
     if (VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) != VideoSink.Kind.kMjpeg) {
@@ -122,7 +114,7 @@ public final class CameraServer {
       values.add(makeStreamValue(CameraServerJNI.getHostname() + ".local", port));
       for (String addr : m_addresses) {
         if ("127.0.0.1".equals(addr)) {
-          continue;  // ignore localhost
+          continue; // ignore localhost
         }
         values.add(makeStreamValue(addr, port));
       }
@@ -131,11 +123,11 @@ public final class CameraServer {
     return values.toArray(new String[0]);
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
   private synchronized String[] getSourceStreamValues(int source) {
     // Ignore all but HttpCamera
     if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
-            != VideoSource.Kind.kHttp) {
+        != VideoSource.Kind.kHttp) {
       return new String[0];
     }
 
@@ -153,7 +145,7 @@ public final class CameraServer {
         int sinkSource = CameraServerJNI.getSinkSource(sink);
         if (source == sinkSource
             && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink))
-            == VideoSink.Kind.kMjpeg) {
+                == VideoSink.Kind.kMjpeg) {
           // Add USB-only passthrough
           String[] finalValues = Arrays.copyOf(values, values.length + 1);
           int port = CameraServerJNI.getMjpegServerPort(sink);
@@ -166,7 +158,7 @@ public final class CameraServer {
     return values;
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
   private synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {
@@ -209,7 +201,7 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String pixelFormatToString(PixelFormat pixelFormat) {
     switch (pixelFormat) {
       case kMJPEG:
@@ -229,13 +221,19 @@ public final class CameraServer {
 
   /// Provide string description of video mode.
   /// The returned string is "{width}x{height} {format} {fps} fps".
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String videoModeToString(VideoMode mode) {
-    return mode.width + "x" + mode.height + " " + pixelFormatToString(mode.pixelFormat)
-        + " " + mode.fps + " fps";
+    return mode.width
+        + "x"
+        + mode.height
+        + " "
+        + pixelFormatToString(mode.pixelFormat)
+        + " "
+        + mode.fps
+        + " fps";
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   private static String[] getSourceModeValues(int sourceHandle) {
     VideoMode[] modes = CameraServerJNI.enumerateSourceVideoModes(sourceHandle);
     String[] modeStrings = new String[modes.length];
@@ -245,7 +243,7 @@ public final class CameraServer {
     return modeStrings;
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.CyclomaticComplexity"})
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.CyclomaticComplexity"})
   private static void putSourcePropertyValue(NetworkTable table, VideoEvent event, boolean isNew) {
     String name;
     String infoName;
@@ -271,14 +269,18 @@ public final class CameraServer {
         case kEnum:
           if (isNew) {
             entry.setDefaultDouble(event.value);
-            table.getEntry(infoName + "/min").setDouble(
-                CameraServerJNI.getPropertyMin(event.propertyHandle));
-            table.getEntry(infoName + "/max").setDouble(
-                CameraServerJNI.getPropertyMax(event.propertyHandle));
-            table.getEntry(infoName + "/step").setDouble(
-                CameraServerJNI.getPropertyStep(event.propertyHandle));
-            table.getEntry(infoName + "/default").setDouble(
-                CameraServerJNI.getPropertyDefault(event.propertyHandle));
+            table
+                .getEntry(infoName + "/min")
+                .setDouble(CameraServerJNI.getPropertyMin(event.propertyHandle));
+            table
+                .getEntry(infoName + "/max")
+                .setDouble(CameraServerJNI.getPropertyMax(event.propertyHandle));
+            table
+                .getEntry(infoName + "/step")
+                .setDouble(CameraServerJNI.getPropertyStep(event.propertyHandle));
+            table
+                .getEntry(infoName + "/default")
+                .setDouble(CameraServerJNI.getPropertyDefault(event.propertyHandle));
           } else {
             entry.setDouble(event.value);
           }
@@ -298,8 +300,12 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable", "PMD.ExcessiveMethodLength",
-      "PMD.NPathComplexity"})
+  @SuppressWarnings({
+    "MissingJavadocMethod",
+    "PMD.UnusedLocalVariable",
+    "PMD.ExcessiveMethodLength",
+    "PMD.NPathComplexity"
+  })
   private CameraServer() {
     m_defaultUsbDevice = new AtomicInteger();
     m_sources = new Hashtable<>();
@@ -321,176 +327,204 @@ public final class CameraServer {
     // - "PropertyInfo/{Property}" - Property supporting information
 
     // Listener for video events
-    m_videoListener = new VideoListener(event -> {
-      switch (event.kind) {
-        case kSourceCreated: {
-          // Create subtable for the camera
-          NetworkTable table = m_publishTable.getSubTable(event.name);
-          m_tables.put(event.sourceHandle, table);
-          table.getEntry("source").setString(makeSourceValue(event.sourceHandle));
-          table.getEntry("description").setString(
-              CameraServerJNI.getSourceDescription(event.sourceHandle));
-          table.getEntry("connected").setBoolean(
-              CameraServerJNI.isSourceConnected(event.sourceHandle));
-          table.getEntry("streams").setStringArray(getSourceStreamValues(event.sourceHandle));
-          try {
-            VideoMode mode = CameraServerJNI.getSourceVideoMode(event.sourceHandle);
-            table.getEntry("mode").setDefaultString(videoModeToString(mode));
-            table.getEntry("modes").setStringArray(getSourceModeValues(event.sourceHandle));
-          } catch (VideoException ignored) {
-            // Do nothing. Let the other event handlers update this if there is an error.
-          }
-          break;
-        }
-        case kSourceDestroyed: {
-          NetworkTable table = m_tables.get(event.sourceHandle);
-          if (table != null) {
-            table.getEntry("source").setString("");
-            table.getEntry("streams").setStringArray(new String[0]);
-            table.getEntry("modes").setStringArray(new String[0]);
-          }
-          break;
-        }
-        case kSourceConnected: {
-          NetworkTable table = m_tables.get(event.sourceHandle);
-          if (table != null) {
-            // update the description too (as it may have changed)
-            table.getEntry("description").setString(
-                CameraServerJNI.getSourceDescription(event.sourceHandle));
-            table.getEntry("connected").setBoolean(true);
-          }
-          break;
-        }
-        case kSourceDisconnected: {
-          NetworkTable table = m_tables.get(event.sourceHandle);
-          if (table != null) {
-            table.getEntry("connected").setBoolean(false);
-          }
-          break;
-        }
-        case kSourceVideoModesUpdated: {
-          NetworkTable table = m_tables.get(event.sourceHandle);
-          if (table != null) {
-            table.getEntry("modes").setStringArray(getSourceModeValues(event.sourceHandle));
-          }
-          break;
-        }
-        case kSourceVideoModeChanged: {
-          NetworkTable table = m_tables.get(event.sourceHandle);
-          if (table != null) {
-            table.getEntry("mode").setString(videoModeToString(event.mode));
-          }
-          break;
-        }
-        case kSourcePropertyCreated: {
-          NetworkTable table = m_tables.get(event.sourceHandle);
-          if (table != null) {
-            putSourcePropertyValue(table, event, true);
-          }
-          break;
-        }
-        case kSourcePropertyValueUpdated: {
-          NetworkTable table = m_tables.get(event.sourceHandle);
-          if (table != null) {
-            putSourcePropertyValue(table, event, false);
-          }
-          break;
-        }
-        case kSourcePropertyChoicesUpdated: {
-          NetworkTable table = m_tables.get(event.sourceHandle);
-          if (table != null) {
-            try {
-              String[] choices = CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
-              table.getEntry("PropertyInfo/" + event.name + "/choices").setStringArray(choices);
-            } catch (VideoException ignored) {
-              // ignore
-            }
-          }
-          break;
-        }
-        case kSinkSourceChanged:
-        case kSinkCreated:
-        case kSinkDestroyed:
-        case kNetworkInterfacesChanged: {
-          m_addresses = CameraServerJNI.getNetworkInterfaces();
-          updateStreamValues();
-          break;
-        }
-        default:
-          break;
-      }
-    }, 0x4fff, true);
+    m_videoListener =
+        new VideoListener(
+            event -> {
+              switch (event.kind) {
+                case kSourceCreated:
+                  {
+                    // Create subtable for the camera
+                    NetworkTable table = m_publishTable.getSubTable(event.name);
+                    m_tables.put(event.sourceHandle, table);
+                    table.getEntry("source").setString(makeSourceValue(event.sourceHandle));
+                    table
+                        .getEntry("description")
+                        .setString(CameraServerJNI.getSourceDescription(event.sourceHandle));
+                    table
+                        .getEntry("connected")
+                        .setBoolean(CameraServerJNI.isSourceConnected(event.sourceHandle));
+                    table
+                        .getEntry("streams")
+                        .setStringArray(getSourceStreamValues(event.sourceHandle));
+                    try {
+                      VideoMode mode = CameraServerJNI.getSourceVideoMode(event.sourceHandle);
+                      table.getEntry("mode").setDefaultString(videoModeToString(mode));
+                      table
+                          .getEntry("modes")
+                          .setStringArray(getSourceModeValues(event.sourceHandle));
+                    } catch (VideoException ignored) {
+                      // Do nothing. Let the other event handlers update this if there is an error.
+                    }
+                    break;
+                  }
+                case kSourceDestroyed:
+                  {
+                    NetworkTable table = m_tables.get(event.sourceHandle);
+                    if (table != null) {
+                      table.getEntry("source").setString("");
+                      table.getEntry("streams").setStringArray(new String[0]);
+                      table.getEntry("modes").setStringArray(new String[0]);
+                    }
+                    break;
+                  }
+                case kSourceConnected:
+                  {
+                    NetworkTable table = m_tables.get(event.sourceHandle);
+                    if (table != null) {
+                      // update the description too (as it may have changed)
+                      table
+                          .getEntry("description")
+                          .setString(CameraServerJNI.getSourceDescription(event.sourceHandle));
+                      table.getEntry("connected").setBoolean(true);
+                    }
+                    break;
+                  }
+                case kSourceDisconnected:
+                  {
+                    NetworkTable table = m_tables.get(event.sourceHandle);
+                    if (table != null) {
+                      table.getEntry("connected").setBoolean(false);
+                    }
+                    break;
+                  }
+                case kSourceVideoModesUpdated:
+                  {
+                    NetworkTable table = m_tables.get(event.sourceHandle);
+                    if (table != null) {
+                      table
+                          .getEntry("modes")
+                          .setStringArray(getSourceModeValues(event.sourceHandle));
+                    }
+                    break;
+                  }
+                case kSourceVideoModeChanged:
+                  {
+                    NetworkTable table = m_tables.get(event.sourceHandle);
+                    if (table != null) {
+                      table.getEntry("mode").setString(videoModeToString(event.mode));
+                    }
+                    break;
+                  }
+                case kSourcePropertyCreated:
+                  {
+                    NetworkTable table = m_tables.get(event.sourceHandle);
+                    if (table != null) {
+                      putSourcePropertyValue(table, event, true);
+                    }
+                    break;
+                  }
+                case kSourcePropertyValueUpdated:
+                  {
+                    NetworkTable table = m_tables.get(event.sourceHandle);
+                    if (table != null) {
+                      putSourcePropertyValue(table, event, false);
+                    }
+                    break;
+                  }
+                case kSourcePropertyChoicesUpdated:
+                  {
+                    NetworkTable table = m_tables.get(event.sourceHandle);
+                    if (table != null) {
+                      try {
+                        String[] choices =
+                            CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
+                        table
+                            .getEntry("PropertyInfo/" + event.name + "/choices")
+                            .setStringArray(choices);
+                      } catch (VideoException ignored) {
+                        // ignore
+                      }
+                    }
+                    break;
+                  }
+                case kSinkSourceChanged:
+                case kSinkCreated:
+                case kSinkDestroyed:
+                case kNetworkInterfacesChanged:
+                  {
+                    m_addresses = CameraServerJNI.getNetworkInterfaces();
+                    updateStreamValues();
+                    break;
+                  }
+                default:
+                  break;
+              }
+            },
+            0x4fff,
+            true);
 
     // Listener for NetworkTable events
     // We don't currently support changing settings via NT due to
     // synchronization issues, so just update to current setting if someone
     // else tries to change it.
-    m_tableListener = NetworkTableInstance.getDefault().addEntryListener(kPublishName + "/",
-      event -> {
-        String relativeKey = event.name.substring(kPublishName.length() + 1);
+    m_tableListener =
+        NetworkTableInstance.getDefault()
+            .addEntryListener(
+                kPublishName + "/",
+                event -> {
+                  String relativeKey = event.name.substring(kPublishName.length() + 1);
 
-        // get source (sourceName/...)
-        int subKeyIndex = relativeKey.indexOf('/');
-        if (subKeyIndex == -1) {
-          return;
-        }
-        String sourceName = relativeKey.substring(0, subKeyIndex);
-        VideoSource source = m_sources.get(sourceName);
-        if (source == null) {
-          return;
-        }
+                  // get source (sourceName/...)
+                  int subKeyIndex = relativeKey.indexOf('/');
+                  if (subKeyIndex == -1) {
+                    return;
+                  }
+                  String sourceName = relativeKey.substring(0, subKeyIndex);
+                  VideoSource source = m_sources.get(sourceName);
+                  if (source == null) {
+                    return;
+                  }
 
-        // get subkey
-        relativeKey = relativeKey.substring(subKeyIndex + 1);
+                  // get subkey
+                  relativeKey = relativeKey.substring(subKeyIndex + 1);
 
-        // handle standard names
-        String propName;
-        if ("mode".equals(relativeKey)) {
-          // reset to current mode
-          event.getEntry().setString(videoModeToString(source.getVideoMode()));
-          return;
-        } else if (relativeKey.startsWith("Property/")) {
-          propName = relativeKey.substring(9);
-        } else if (relativeKey.startsWith("RawProperty/")) {
-          propName = relativeKey.substring(12);
-        } else {
-          return;  // ignore
-        }
+                  // handle standard names
+                  String propName;
+                  if ("mode".equals(relativeKey)) {
+                    // reset to current mode
+                    event.getEntry().setString(videoModeToString(source.getVideoMode()));
+                    return;
+                  } else if (relativeKey.startsWith("Property/")) {
+                    propName = relativeKey.substring(9);
+                  } else if (relativeKey.startsWith("RawProperty/")) {
+                    propName = relativeKey.substring(12);
+                  } else {
+                    return; // ignore
+                  }
 
-        // everything else is a property
-        VideoProperty property = source.getProperty(propName);
-        switch (property.getKind()) {
-          case kNone:
-            return;
-          case kBoolean:
-            // reset to current setting
-            event.getEntry().setBoolean(property.get() != 0);
-            return;
-          case kInteger:
-          case kEnum:
-            // reset to current setting
-            event.getEntry().setDouble(property.get());
-            return;
-          case kString:
-            // reset to current setting
-            event.getEntry().setString(property.getString());
-            return;
-          default:
-            return;
-        }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate);
+                  // everything else is a property
+                  VideoProperty property = source.getProperty(propName);
+                  switch (property.getKind()) {
+                    case kNone:
+                      return;
+                    case kBoolean:
+                      // reset to current setting
+                      event.getEntry().setBoolean(property.get() != 0);
+                      return;
+                    case kInteger:
+                    case kEnum:
+                      // reset to current setting
+                      event.getEntry().setDouble(property.get());
+                      return;
+                    case kString:
+                      // reset to current setting
+                      event.getEntry().setString(property.getString());
+                      return;
+                    default:
+                      return;
+                  }
+                },
+                EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate);
   }
 
   /**
    * Start automatically capturing images to send to the dashboard.
    *
-   * <p>You should call this method to see a camera feed on the dashboard.
-   * If you also want to perform vision processing on the roboRIO, use
-   * getVideo() to get access to the camera images.
+   * <p>You should call this method to see a camera feed on the dashboard. If you also want to
+   * perform vision processing on the roboRIO, use getVideo() to get access to the camera images.
    *
-   * <p>The first time this overload is called, it calls
-   * {@link #startAutomaticCapture(int)} with device 0, creating a camera
-   * named "USB Camera 0".  Subsequent calls increment the device number
+   * <p>The first time this overload is called, it calls {@link #startAutomaticCapture(int)} with
+   * device 0, creating a camera named "USB Camera 0". Subsequent calls increment the device number
    * (e.g. 1, 2, etc).
    */
   public UsbCamera startAutomaticCapture() {
@@ -502,8 +536,8 @@ public final class CameraServer {
   /**
    * Start automatically capturing images to send to the dashboard.
    *
-   * <p>This overload calls {@link #startAutomaticCapture(String, int)} with
-   * a name of "USB Camera {dev}".
+   * <p>This overload calls {@link #startAutomaticCapture(String, int)} with a name of "USB Camera
+   * {dev}".
    *
    * @param dev The device number of the camera interface
    */
@@ -541,8 +575,7 @@ public final class CameraServer {
   }
 
   /**
-   * Start automatically capturing images to send to the dashboard from
-   * an existing camera.
+   * Start automatically capturing images to send to the dashboard from an existing camera.
    *
    * @param camera Camera
    */
@@ -555,8 +588,7 @@ public final class CameraServer {
   /**
    * Adds an Axis IP camera.
    *
-   * <p>This overload calls {@link #addAxisCamera(String, String)} with
-   * name "Axis Camera".
+   * <p>This overload calls {@link #addAxisCamera(String, String)} with name "Axis Camera".
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
@@ -567,8 +599,7 @@ public final class CameraServer {
   /**
    * Adds an Axis IP camera.
    *
-   * <p>This overload calls {@link #addAxisCamera(String, String[])} with
-   * name "Axis Camera".
+   * <p>This overload calls {@link #addAxisCamera(String, String[])} with name "Axis Camera".
    *
    * @param hosts Array of Camera host IPs/DNS names
    */
@@ -605,11 +636,11 @@ public final class CameraServer {
   }
 
   /**
-   * Get OpenCV access to the primary camera feed.  This allows you to
-   * get images from the camera for image processing on the roboRIO.
+   * Get OpenCV access to the primary camera feed. This allows you to get images from the camera for
+   * image processing on the roboRIO.
    *
-   * <p>This is only valid to call after a camera feed has been added
-   * with startAutomaticCapture() or addServer().
+   * <p>This is only valid to call after a camera feed has been added with startAutomaticCapture()
+   * or addServer().
    */
   public CvSink getVideo() {
     VideoSource source;
@@ -626,8 +657,8 @@ public final class CameraServer {
   }
 
   /**
-   * Get OpenCV access to the specified camera.  This allows you to get
-   * images from the camera for image processing on the roboRIO.
+   * Get OpenCV access to the specified camera. This allows you to get images from the camera for
+   * image processing on the roboRIO.
    *
    * @param camera Camera (e.g. as returned by startAutomaticCapture).
    */
@@ -652,8 +683,8 @@ public final class CameraServer {
   }
 
   /**
-   * Get OpenCV access to the specified camera.  This allows you to get
-   * images from the camera for image processing on the roboRIO.
+   * Get OpenCV access to the specified camera. This allows you to get images from the camera for
+   * image processing on the roboRIO.
    *
    * @param name Camera name
    */
@@ -669,8 +700,8 @@ public final class CameraServer {
   }
 
   /**
-   * Create a MJPEG stream with OpenCV input. This can be called to pass custom
-   * annotated images to the dashboard.
+   * Create a MJPEG stream with OpenCV input. This can be called to pass custom annotated images to
+   * the dashboard.
    *
    * @param name Name to give the stream
    * @param width Width of the image being sent
@@ -732,8 +763,8 @@ public final class CameraServer {
   /**
    * Get server for the primary camera feed.
    *
-   * <p>This is only valid to call after a camera feed has been added
-   * with startAutomaticCapture() or addServer().
+   * <p>This is only valid to call after a camera feed has been added with startAutomaticCapture()
+   * or addServer().
    */
   public VideoSink getServer() {
     synchronized (this) {

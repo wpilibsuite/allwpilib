@@ -1,49 +1,35 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.networktables;
 
-/**
- * NetworkTables Entry notification.
- */
+/** NetworkTables Entry notification. */
 public final class EntryNotification {
-  /**
-   * Listener that was triggered.
-   */
+  /** Listener that was triggered. */
   @SuppressWarnings("MemberName")
   public final int listener;
 
-  /**
-   * Entry handle.
-   */
+  /** Entry handle. */
   @SuppressWarnings("MemberName")
   public final int entry;
 
-  /**
-   * Entry name.
-   */
+  /** Entry name. */
   @SuppressWarnings("MemberName")
   public final String name;
 
-  /**
-   * The new value.
-   */
+  /** The new value. */
   @SuppressWarnings("MemberName")
   public final NetworkTableValue value;
 
   /**
-   * Update flags.  For example, {@link EntryListenerFlags#kNew} if the key did
-   * not previously exist.
+   * Update flags. For example, {@link EntryListenerFlags#kNew} if the key did not previously exist.
    */
   @SuppressWarnings("MemberName")
   public final int flags;
 
-  /** Constructor.
-   * This should generally only be used internally to NetworkTables.
+  /**
+   * Constructor. This should generally only be used internally to NetworkTables.
    *
    * @param inst Instance
    * @param listener Listener that was triggered
@@ -52,8 +38,13 @@ public final class EntryNotification {
    * @param value The new value
    * @param flags Update flags
    */
-  public EntryNotification(NetworkTableInstance inst, int listener, int entry, String name,
-                           NetworkTableValue value, int flags) {
+  public EntryNotification(
+      NetworkTableInstance inst,
+      int listener,
+      int entry,
+      String name,
+      NetworkTableValue value,
+      int flags) {
     this.m_inst = inst;
     this.listener = listener;
     this.entry = entry;

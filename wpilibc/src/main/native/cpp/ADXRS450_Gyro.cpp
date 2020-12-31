@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/ADXRS450_Gyro.h"
 
@@ -82,7 +79,9 @@ static inline int BytesToIntBE(uint8_t* buf) {
 
 uint16_t ADXRS450_Gyro::ReadRegister(int reg) {
   int cmd = 0x80000000 | static_cast<int>(reg) << 17;
-  if (!CalcParity(cmd)) cmd |= 1u;
+  if (!CalcParity(cmd)) {
+    cmd |= 1u;
+  }
 
   // big endian
   uint8_t buf[4] = {static_cast<uint8_t>((cmd >> 24) & 0xff),
@@ -92,24 +91,34 @@ uint16_t ADXRS450_Gyro::ReadRegister(int reg) {
 
   m_spi.Write(buf, 4);
   m_spi.Read(false, buf, 4);
-  if ((buf[0] & 0xe0) == 0) return 0;  // error, return 0
+  if ((buf[0] & 0xe0) == 0) {
+    return 0;  // error, return 0
+  }
   return static_cast<uint16_t>((BytesToIntBE(buf) >> 5) & 0xffff);
 }
 
 double ADXRS450_Gyro::GetAngle() const {
-  if (m_simAngle) return m_simAngle.Get();
+  if (m_simAngle) {
+    return m_simAngle.Get();
+  }
   return m_spi.GetAccumulatorIntegratedValue() * kDegreePerSecondPerLSB;
 }
 
 double ADXRS450_Gyro::GetRate() const {
-  if (m_simRate) return m_simRate.Get();
+  if (m_simRate) {
+    return m_simRate.Get();
+  }
   return static_cast<double>(m_spi.GetAccumulatorLastValue()) *
          kDegreePerSecondPerLSB;
 }
 
 void ADXRS450_Gyro::Reset() {
-  if (m_simAngle) m_simAngle.Set(0.0);
-  if (m_simRate) m_simRate.Set(0.0);
+  if (m_simAngle) {
+    m_simAngle.Set(0.0);
+  }
+  if (m_simRate) {
+    m_simRate.Set(0.0);
+  }
   m_spi.ResetAccumulator();
 }
 
@@ -125,4 +134,6 @@ void ADXRS450_Gyro::Calibrate() {
   m_spi.ResetAccumulator();
 }
 
-int ADXRS450_Gyro::GetPort() const { return m_port; }
+int ADXRS450_Gyro::GetPort() const {
+  return m_port;
+}

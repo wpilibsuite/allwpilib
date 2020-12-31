@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -17,8 +14,7 @@
 #include "hal/handles/UnlimitedHandleResource.h"
 #include "hal/simulation/NotifyListener.h"
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 class ConstBufferCallbackStore {
  public:
   void create(JNIEnv* env, jobject obj);
@@ -35,14 +31,13 @@ class ConstBufferCallbackStore {
 
 void InitializeConstBufferStore();
 
-typedef int32_t (*RegisterConstBufferCallbackFunc)(
-    int32_t index, HAL_ConstBufferCallback callback, void* param);
-typedef void (*FreeConstBufferCallbackFunc)(int32_t index, int32_t uid);
+using RegisterConstBufferCallbackFunc =
+    int32_t (*)(int32_t index, HAL_ConstBufferCallback callback, void* param);
+using FreeConstBufferCallbackFunc = void (*)(int32_t index, int32_t uid);
 
 SIM_JniHandle AllocateConstBufferCallback(
     JNIEnv* env, jint index, jobject callback,
     RegisterConstBufferCallbackFunc createCallback);
 void FreeConstBufferCallback(JNIEnv* env, SIM_JniHandle handle, jint index,
                              FreeConstBufferCallbackFunc freeCallback);
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim

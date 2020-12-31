@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "glass/hardware/LEDDisplay.h"
 
@@ -45,7 +42,9 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
     ImGui::Combo("Start", start, options, 4);
   }
   ImGui::Checkbox("Serpentine", serpentine);
-  if (*numColumns < 1) *numColumns = 1;
+  if (*numColumns < 1) {
+    *numColumns = 1;
+  }
   ImGui::PopItemWidth();
 
   // show as LED indicators
@@ -54,13 +53,17 @@ void glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
     storage.SetData(std::make_shared<IndicatorData>());
     iData = storage.GetData<IndicatorData>();
   }
-  if (length > static_cast<int>(iData->values.size()))
+  if (length > static_cast<int>(iData->values.size())) {
     iData->values.resize(length);
-  if (length > static_cast<int>(iData->colors.size()))
+  }
+  if (length > static_cast<int>(iData->colors.size())) {
     iData->colors.resize(length);
+  }
   if (!running) {
     iData->colors[0] = IM_COL32(128, 128, 128, 255);
-    for (int j = 0; j < length; ++j) iData->values[j] = -1;
+    for (int j = 0; j < length; ++j) {
+      iData->values[j] = -1;
+    }
   } else {
     for (int j = 0; j < length; ++j) {
       iData->values[j] = j + 1;
@@ -82,10 +85,14 @@ void glass::DisplayLEDDisplays(LEDDisplaysModel* model) {
 
   model->ForEachLEDDisplay([&](LEDDisplayModel& display, int i) {
     hasAny = true;
-    if (model->GetNumLEDDisplays() > 1) ImGui::Text("LEDs[%d]", i);
+    if (model->GetNumLEDDisplays() > 1) {
+      ImGui::Text("LEDs[%d]", i);
+    }
     PushID(i);
     DisplayLEDDisplay(&display, i);
     PopID();
   });
-  if (!hasAny) ImGui::Text("No addressable LEDs");
+  if (!hasAny) {
+    ImGui::Text("No addressable LEDs");
+  }
 }
