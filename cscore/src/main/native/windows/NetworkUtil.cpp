@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <uv.h>
+#include <ws2tcpip.h>
 
 #include "cscore_cpp.h"
 
