@@ -11,28 +11,13 @@
 
 OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2) {
   if (dio1 == ChannelMode::INPUT) {
-    m_buttonB = new frc::DigitalInput(1);
+    m_buttonB = std::make_unique<frc::DigitalInput>(1);
   } else {
-    m_greenLed = new frc::DigitalOutput(1);
+    m_greenLed = std::make_unique<frc::DigitalOutput>(1);
   }
   if (dio2 == ChannelMode::INPUT) {
-    m_buttonC = new frc::DigitalInput(2);
-    m_redLed = new frc::DigitalOutput(2);
-  }
-}
-
-OnBoardIO::~OnBoardIO() {
-  if (m_buttonB) {
-    delete m_buttonB;
-  }
-  if (m_greenLed) {
-    delete m_greenLed;
-  }
-  if (m_buttonC) {
-    delete m_buttonC;
-  }
-  if (m_redLed) {
-    delete m_redLed;
+    m_buttonC = std::make_unique<frc::DigitalInput>(2);
+    m_redLed = std::make_unique<frc::DigitalOutput>(2);
   }
 }
 

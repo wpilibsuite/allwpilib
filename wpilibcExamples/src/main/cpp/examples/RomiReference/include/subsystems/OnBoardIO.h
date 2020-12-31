@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <frc/DigitalInput.h>
 #include <frc/DigitalOutput.h>
 #include <frc2/command/SubsystemBase.h>
@@ -22,7 +24,6 @@ class OnBoardIO : public frc2::SubsystemBase {
  public:
   enum ChannelMode { INPUT, OUTPUT };
   OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);
-  ~OnBoardIO();
 
   static constexpr auto kMessageInterval = 1_s;
   units::second_t m_nextMessageTime = 0_s;
@@ -62,10 +63,10 @@ class OnBoardIO : public frc2::SubsystemBase {
   frc::DigitalOutput m_yellowLed{3};
 
   // DIO 1
-  frc::DigitalInput* m_buttonB = nullptr;
-  frc::DigitalOutput* m_greenLed = nullptr;
+  std::unique_ptr<frc::DigitalInput> m_buttonB;
+  std::unique_ptr<frc::DigitalOutput> m_greenLed;
 
   // DIO 2
-  frc::DigitalInput* m_buttonC = nullptr;
-  frc::DigitalOutput* m_redLed = nullptr;
+  std::unique_ptr<frc::DigitalInput> m_buttonC;
+  std::unique_ptr<frc::DigitalOutput> m_redLed;
 };
