@@ -9,9 +9,10 @@ import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.wpilibj.examples.romireference.Constants.*;
-
 public class Drivetrain extends SubsystemBase {
+  private static final double kCountsPerRevolution = 1440.0;
+  private static final double kWheelDiameterInch = 2.75;
+
   // The Romi has the left and right motors set to
   // PWM channels 0 and 1 respectively
   private final Spark m_leftMotor = new Spark(0);
@@ -27,58 +28,34 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
+    // DifferentialDrive defaults to having the right side flipped
+    // We don't need to do this because the Romi has accounted for this
+    // in firmware/hardware
+    m_diffDrive.setRightSideInverted(false);
     resetEncoders();
   }
 
-  /**
-   * Drives the robot using arcade controls.
-   *
-   * @param xaxisSpeed the commanded forward movement
-   * @param zaxisRotate the commanded rotation
-   */
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
     m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
   }
 
-  /**
-   * Resets the drive encoders to currently read a position of 0.
-   */
   public void resetEncoders() {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
   }
 
-  /**
-   * Gets the left drive encoder count.
-   *
-   * @return the left drive encoder count
-   */
   public int getLeftEncoderCount() {
     return m_leftEncoder.get();
   }
 
-  /**
-   * Gets the right drive encoder count.
-   *
-   * @return the right drive encoder count
-   */
   public int getRightEncoderCount() {
     return m_rightEncoder.get();
   }
 
-  /**
-  * Gets the left distance driven.
-  *
-  * @return the left-side distance driven, in inches
-  */
   public double getLeftDistanceInch() {
     return Math.PI * kWheelDiameterInch * (getLeftEncoderCount() / kCountsPerRevolution);
   }
-  /**
-  * Gets the right distance driven.
-  *
-  * @return the right-side distance driven, in inches
-  */
+
   public double getRightDistanceInch() {
     return Math.PI * kWheelDiameterInch * (getRightEncoderCount() / kCountsPerRevolution);
   }
