@@ -14,10 +14,11 @@
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardComponent.inc"
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
-#include "frc/shuffleboard/ShuffleboardContainer.h"
 #include "frc/shuffleboard/ShuffleboardWidget.h"
 
 namespace frc {
+class ShuffleboardContainer;
+
 template <typename T>
 class SuppliedValueWidget : public ShuffleboardWidget<SuppliedValueWidget<T> > {
  public:
