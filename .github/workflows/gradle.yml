@@ -1,4 +1,4 @@
-name: CI
+name: Gradle
 
 on: [pull_request, push]
 
