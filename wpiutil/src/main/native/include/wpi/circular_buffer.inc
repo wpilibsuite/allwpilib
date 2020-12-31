@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+#include "wpi/circular_buffer.h"
+
 namespace wpi {
 
 template <class T>

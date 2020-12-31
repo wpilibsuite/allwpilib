@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "frc/trajectory/TrapezoidProfile.h"
 #include "units/math.h"
 
 namespace frc {

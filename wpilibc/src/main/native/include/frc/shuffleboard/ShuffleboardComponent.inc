@@ -7,6 +7,8 @@
 #include <memory>
 #include <string>
 
+#include "frc/shuffleboard/ShuffleboardComponent.h"
+
 namespace frc {
 
 template <typename Derived>

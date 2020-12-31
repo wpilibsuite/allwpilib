@@ -6,6 +6,7 @@
 
 #include <algorithm>
 
+#include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/math.h"
 
 namespace frc {

@@ -6,13 +6,16 @@
 
 #include <wpi/StringRef.h>
 
+#include "glass/support/IniSaver.h"
+
 namespace glass {
 
 template <typename Info>
 void* IniSaver<Info>::IniReadOpen(const char* name) {
   int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num))
+  if (wpi::StringRef{name}.getAsInteger(10, num)) {
     return nullptr;
+  }
   return &m_map[num];
 }
 

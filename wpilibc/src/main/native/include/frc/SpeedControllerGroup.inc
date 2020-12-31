@@ -7,6 +7,8 @@
 #include <functional>
 #include <vector>
 
+#include "frc/SpeedControllerGroup.h"
+
 namespace frc {
 
 template <class... SpeedControllers>

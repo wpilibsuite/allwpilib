@@ -8,6 +8,8 @@
 #include <utility>
 #include <vector>
 
+#include "networktables/NetworkTableInstance.h"
+
 namespace nt {
 
 inline NetworkTableInstance::NetworkTableInstance() noexcept {}
@@ -24,8 +26,9 @@ inline NetworkTableInstance NetworkTableInstance::Create() {
 }
 
 inline void NetworkTableInstance::Destroy(NetworkTableInstance inst) {
-  if (inst.m_handle != 0)
+  if (inst.m_handle != 0) {
     DestroyInstance(inst.m_handle);
+  }
 }
 
 inline NT_Inst NetworkTableInstance::GetHandle() const {
@@ -39,8 +42,9 @@ inline NetworkTableEntry NetworkTableInstance::GetEntry(const Twine& name) {
 inline std::vector<NetworkTableEntry> NetworkTableInstance::GetEntries(
     const Twine& prefix, unsigned int types) {
   std::vector<NetworkTableEntry> entries;
-  for (auto entry : ::nt::GetEntries(m_handle, prefix, types))
+  for (auto entry : ::nt::GetEntries(m_handle, prefix, types)) {
     entries.emplace_back(entry);
+  }
   return entries;
 }
 
