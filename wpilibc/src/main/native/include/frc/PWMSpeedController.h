@@ -28,7 +28,9 @@ class PWMSpeedController : public PWM, public SpeedController {
   void Set(double value) override;
 
   /**
-   * Get the recently set value of the PWM.
+   * Get the recently set value of the PWM. This value is affected by the
+   * inversion property. If you want the value that is sent directly to the
+   * SpeedController, use {@link PWM#getSpeed()} instead.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
    */
