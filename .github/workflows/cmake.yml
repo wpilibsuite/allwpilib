@@ -1,0 +1,59 @@
+name: CMake
+
+on: [pull_request, push]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: Linux
+            container: wpilib/roborio-cross-ubuntu:2020-18.04
+            flags: ""
+          - os: macos-latest
+            name: macOS
+            container: ""
+            flags: "-DWITH_JAVA=OFF"
+    name: "Build - ${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: |
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            brew install opencv
+          fi
+      - name: configure
+        run: mkdir build && cd build && cmake ${{ matrix.flags }} ..
+      - name: build
+        working-directory: build
+        run: make -j3
+      - name: test
+        working-directory: build
+        run: make test
+
+  build-vcpkg:
+    name: "Build - Windows"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare vcpkg
+        uses: lukka/run-vcpkg@v4
+        with:
+          vcpkgArguments: opencv
+          vcpkgDirectory: ${{ runner.workspace }}/vcpkg/
+          vcpkgGitCommitId: 544f8e4593764f78faa94bac2adb81cca5232943
+          vcpkgTriplet: x64-windows
+      - name: Configure & Build
+        uses: lukka/run-cmake@v3
+        with:
+          buildDirectory: ${{ runner.workspace }}/build/
+          cmakeAppendedArgs: -DWITH_JAVA=OFF
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          useVcpkgToolchainFile: true
+      - name: Run Tests
+        run: ctest -C "Debug"
+        working-directory: ${{ runner.workspace }}/build/
