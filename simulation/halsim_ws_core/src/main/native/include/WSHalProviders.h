@@ -16,11 +16,11 @@
 
 namespace wpilibws {
 
-typedef void (*HALCbRegisterIndexedFunc)(int32_t index,
-                                         HAL_NotifyCallback callback,
+using HALCbRegisterIndexedFunc = void (*)(int32_t index,
+                                          HAL_NotifyCallback callback,
+                                          void* param, HAL_Bool initialNotify);
+using HALCbRegisterSingleFunc = void (*)(HAL_NotifyCallback callback,
                                          void* param, HAL_Bool initialNotify);
-typedef void (*HALCbRegisterSingleFunc)(HAL_NotifyCallback callback,
-                                        void* param, HAL_Bool initialNotify);
 
 // provider generates diffs based on values
 class HALSimWSHalProvider : public HALSimWSBaseProvider {
