@@ -7,10 +7,14 @@ package edu.wpi.first.wpilibj.examples.romireference;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.examples.romireference.commands.TeleopArcadeDrive;
+import edu.wpi.first.wpilibj.examples.romireference.commands.ArcadeDrive;
+import edu.wpi.first.wpilibj.examples.romireference.commands.AutonomousDistance;
+import edu.wpi.first.wpilibj.examples.romireference.commands.AutonomousTime;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.OnBoardIO;
 import edu.wpi.first.wpilibj.examples.romireference.subsystems.OnBoardIO.ChannelMode;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
@@ -28,6 +32,9 @@ public class RobotContainer {
 
   // Assumes a gamepad plugged into channnel 0
   private final Joystick m_controller = new Joystick(0);
+
+  // Create SmartDashboard chooser for autonomous routines
+  private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the hardware "overlay"
   // that is specified when launching the wpilib-ws server on the Romi raspberry pi.
@@ -53,16 +60,20 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Also set default commands here
-    m_drivetrain.setDefaultCommand(
-        new TeleopArcadeDrive(
-            m_drivetrain, () -> m_controller.getRawAxis(1), () -> -m_controller.getRawAxis(2)));
+    // Default command is arcade drive. This will run unless another command
+    // is scheduled over it.
+    m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
 
     // Example of how to use the onboard IO
     Button onboardButtonA = new Button(m_onboardIO::getButtonAPressed);
     onboardButtonA
         .whenActive(new PrintCommand("Button A Pressed"))
         .whenInactive(new PrintCommand("Button A Released"));
+
+    // Setup SmartDashboard options
+    m_chooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
+    m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
+    SmartDashboard.putData(m_chooser);
   }
 
   /**
@@ -71,7 +82,16 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return null;
+    return m_chooser.getSelected();
+  }
+
+  /**
+   * Use this to pass the teleop command to the main {@link Robot} class.
+   *
+   * @return the command to run in teleop
+   */
+  public Command getArcadeDriveCommand() {
+    return new ArcadeDrive(
+        m_drivetrain, () -> m_controller.getRawAxis(1), () -> -m_controller.getRawAxis(2));
   }
 }
