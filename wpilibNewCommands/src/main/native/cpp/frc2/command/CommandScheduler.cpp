@@ -84,6 +84,8 @@ CommandScheduler::~CommandScheduler() {
   auto scheduler = frc::LiveWindow::GetInstance();
   scheduler->enabled = nullptr;
   scheduler->disabled = nullptr;
+
+  std::unique_ptr<Impl>().swap(m_impl);
 }
 
 CommandScheduler& CommandScheduler::GetInstance() {
@@ -312,6 +314,10 @@ Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
 }
 
 void CommandScheduler::Cancel(Command* command) {
+  if (!m_impl) {
+    return;
+  }
+
   if (m_impl->inRunLoop) {
     m_impl->toCancel.emplace_back(command);
     return;
