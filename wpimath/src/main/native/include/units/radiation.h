@@ -35,6 +35,7 @@
 #include "units/base.h"
 #include "units/energy.h"
 #include "units/frequency.h"
+#include "units/mass.h"
 
 namespace units {
 /**
