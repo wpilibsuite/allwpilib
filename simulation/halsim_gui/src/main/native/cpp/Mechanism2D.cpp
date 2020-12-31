@@ -328,20 +328,30 @@ static void DisplayAssembly2D() {
 }
 
 // Radio button test bool
-bool radioTest = 0;
+bool radioTest = false;
+bool dummyWindowCheckbox = false;
+static bool initDummyWindow = true;
 
-static void dummyWindow() {}
+static void dummyWindow() {
+  ImGui::Checkbox("dummyWindowCheckbox", &dummyWindowCheckbox);
+}
+
 
 static void MainMechanism2D() {
-//    ImGui::Checkbox("one", &radioTest);
-//  if (radioTest) {
-    if (auto win = HALSimGui::manager.AddWindow("dummyWindowTwo", dummyWindow)) {
-      win->SetVisibility(glass::Window::kHide);
-      win->SetDefaultPos(200, 200);
-      win->SetDefaultSize(600, 600);
-      win->SetPadding(0, 0);
+    ImGui::Checkbox("one", &radioTest);
+  if (radioTest && initDummyWindow) {
+      if (auto win =
+              HALSimGui::manager.AddWindow("dummyWindowTwo", dummyWindow)) {
+        win->SetDefaultPos(200, 200);
+        win->SetDefaultSize(600, 600);
+        win->SetPadding(0, 0);
+        initDummyWindow = false;
+      }
     }
-//  }
+//    if(!radioTest && !initDummyWindow){
+//      HALSimGui::manager.RemoveWindow("dummyWindowdummyWindowTwo");
+//      initMechanism2D = true;
+//    }
 }
 
 void Mechanism2D::Initialize() {
