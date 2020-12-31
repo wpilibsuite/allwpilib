@@ -159,8 +159,8 @@ inline void RawCvSource::PutFrame(cv::Mat& image) {
   rawFrame.data = reinterpret_cast<char*>(image.data);
   rawFrame.width = image.cols;
   rawFrame.height = image.rows;
-  rawFrame.totalData = image.total() * image.channels;
-  rawFrame.pixelFormat = image.channels == 3 ? CS_PIXFMT_BGR : CS_PIXFMT_GRAY;
+  rawFrame.totalData = image.total() * image.channels();
+  rawFrame.pixelFormat = image.channels() == 3 ? CS_PIXFMT_BGR : CS_PIXFMT_GRAY;
   PutSourceFrame(m_handle, rawFrame, &m_status);
 }
 
