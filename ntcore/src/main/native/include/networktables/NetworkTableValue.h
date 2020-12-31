@@ -288,7 +288,7 @@ class Value final {
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
   static std::shared_ptr<Value> MakeString(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_STRING, time, private_init());
-    val->m_string = std::move(value);
+    val->m_string = std::forward<T>(value);
     val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
     val->m_val.data.v_string.len = val->m_string.size();
     return val;
@@ -322,7 +322,7 @@ class Value final {
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
   static std::shared_ptr<Value> MakeRaw(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RAW, time, private_init());
-    val->m_string = std::move(value);
+    val->m_string = std::forward<T>(value);
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
     val->m_val.data.v_raw.len = val->m_string.size();
     return val;
@@ -355,7 +355,7 @@ class Value final {
   template <typename T>
   static std::shared_ptr<Value> MakeRpc(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RPC, time, private_init());
-    val->m_string = std::move(value);
+    val->m_string = std::forward<T>(value);
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
     val->m_val.data.v_raw.len = val->m_string.size();
     return val;
