@@ -6,6 +6,7 @@
 
 #include <wpi/MathExtras.h>
 
+#include "units/time.h"
 #include "units/voltage.h"
 
 namespace frc {
