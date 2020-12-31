@@ -231,7 +231,7 @@ jobs:
           github.ref == 'refs/heads/master'
         run: cd combiner && ./gradlew publish -Pallwpilib
         env:
-          RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
+          RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Combine (Release)
@@ -240,7 +240,7 @@ jobs:
           startsWith(github.ref, 'refs/tags/v')
         run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish
         env:
-          RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
+          RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v2

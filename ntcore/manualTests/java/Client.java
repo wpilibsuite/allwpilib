@@ -18,10 +18,13 @@ public class Client {
     NetworkTable.setPort(10000);
     NetworkTable.setClientMode();
     NetworkTable nt = NetworkTable.getTable("");
-    try { Thread.sleep(2000); } catch (InterruptedException e) {}
+    try {
+      Thread.sleep(2000);
+    } catch (InterruptedException e) {
+    }
     try {
       System.out.println("Got foo: " + nt.getNumber("foo"));
-    } catch(TableKeyNotDefinedException ex) {
+    } catch (TableKeyNotDefinedException ex) {
     }
     nt.putBoolean("bar", false);
     nt.setFlags("bar", NetworkTable.PERSISTENT);
@@ -38,6 +41,9 @@ public class Client {
     strs[0] = "Hello";
     strs[1] = "World";
     nt.putStringArray("strarray", strs);
-    try { Thread.sleep(10000); } catch (InterruptedException e) {}
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+    }
   }
 }

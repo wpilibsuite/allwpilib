@@ -18,13 +18,19 @@ public class Server {
     NetworkTable.setPort(10000);
     NetworkTable.setServerMode();
     NetworkTable nt = NetworkTable.getTable("");
-    try { Thread.sleep(1000); } catch (InterruptedException e) {}
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+    }
     nt.putNumber("foo", 0.5);
     nt.setFlags("foo", NetworkTable.PERSISTENT);
     nt.putNumber("foo2", 0.5);
     nt.putNumber("foo2", 0.7);
     nt.putNumber("foo2", 0.6);
     nt.putNumber("foo2", 0.5);
-    try { Thread.sleep(10000); } catch (InterruptedException e) {}
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+    }
   }
 }

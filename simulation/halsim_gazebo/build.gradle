@@ -35,7 +35,6 @@ def gz_msgs_project = project(":simulation:gz_msgs")
 if (!gz_msgs_project.hasProperty('skip_gz_msgs') && !project.hasProperty('skip_frc_plugins')) {
 
     apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
-
 }
 
 model {

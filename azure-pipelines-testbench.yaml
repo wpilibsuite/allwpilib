@@ -4,88 +4,88 @@ trigger:
   batch: true
   branches:
     include:
-    - master
+      - master
 
 stages:
-- stage: Build
-  jobs:
-  - job: IntegrationTests
-    displayName: Integration Tests
-    pool:
-      vmImage: 'Ubuntu 16.04'
+  - stage: Build
+    jobs:
+      - job: IntegrationTests
+        displayName: Integration Tests
+        pool:
+          vmImage: "Ubuntu 16.04"
 
-    container:
-      image:  wpilib/roborio-cross-ubuntu:2021-18.04
+        container:
+          image: wpilib/roborio-cross-ubuntu:2021-18.04
 
-    timeoutInMinutes: 0
+        timeoutInMinutes: 0
 
-    steps:
-    - task: Gradle@2
-      condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
-      inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx3072m'
-        publishJUnitResults: false
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput'
-        options: '-Ponlylinuxathena -PbuildServer'
+        steps:
+          - task: Gradle@2
+            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+            inputs:
+              workingDirectory: ""
+              gradleWrapperFile: "gradlew"
+              gradleOptions: "-Xmx3072m"
+              publishJUnitResults: false
+              testResultsFiles: "**/TEST-*.xml"
+              tasks: "copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput"
+              options: "-Ponlylinuxathena -PbuildServer"
 
-    - task: PublishPipelineArtifact@0
-      inputs:
-        artifactName: 'Integration Tests'
-        targetPath: 'build/integrationTestFiles'
+          - task: PublishPipelineArtifact@0
+            inputs:
+              artifactName: "Integration Tests"
+              targetPath: "build/integrationTestFiles"
 
-- stage: TestBench
-  displayName: Test Bench
-  jobs:
-  - job: Cpp
-    displayName: C++
-    pool: RoboRioConnections
-    timeoutInMinutes: 30
-    workspace:
-      clean: all
-    steps:
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Integration Tests'
-        targetPath: 'build/integrationTestFiles'
+  - stage: TestBench
+    displayName: Test Bench
+    jobs:
+      - job: Cpp
+        displayName: C++
+        pool: RoboRioConnections
+        timeoutInMinutes: 30
+        workspace:
+          clean: all
+        steps:
+          - task: DownloadPipelineArtifact@0
+            inputs:
+              artifactName: "Integration Tests"
+              targetPath: "build/integrationTestFiles"
 
-    - task: ShellScript@2
-      displayName: Run C++ Tests
-      inputs:
-        scriptPath: test-scripts/deploy-and-run-test-on-robot.sh
-        args: 'cpp -A "--gtest_output=xml:/home/admin/testResults/cppreport.xml"'
+          - task: ShellScript@2
+            displayName: Run C++ Tests
+            inputs:
+              scriptPath: test-scripts/deploy-and-run-test-on-robot.sh
+              args: 'cpp -A "--gtest_output=xml:/home/admin/testResults/cppreport.xml"'
 
-    - task: PublishTestResults@2
-      displayName: Publish C++ Test Results
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '*.xml'
-        testRunTitle: 'C++ Test Report'
-        searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
+          - task: PublishTestResults@2
+            displayName: Publish C++ Test Results
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "*.xml"
+              testRunTitle: "C++ Test Report"
+              searchFolder: "$(System.DefaultWorkingDirectory)/test-reports"
 
-  - job: Java
-    pool: RoboRioConnections
-    timeoutInMinutes: 30
-    workspace:
-      clean: all
-    steps:
-    - task: DownloadPipelineArtifact@0
-      inputs:
-        artifactName: 'Integration Tests'
-        targetPath: 'build/integrationTestFiles'
+      - job: Java
+        pool: RoboRioConnections
+        timeoutInMinutes: 30
+        workspace:
+          clean: all
+        steps:
+          - task: DownloadPipelineArtifact@0
+            inputs:
+              artifactName: "Integration Tests"
+              targetPath: "build/integrationTestFiles"
 
-    - task: ShellScript@2
-      displayName: Run Java Tests
-      inputs:
-        scriptPath: test-scripts/deploy-and-run-test-on-robot.sh
-        args: 'java'
+          - task: ShellScript@2
+            displayName: Run Java Tests
+            inputs:
+              scriptPath: test-scripts/deploy-and-run-test-on-robot.sh
+              args: "java"
 
-    - task: PublishTestResults@2
-      displayName: Publish Java Test Results
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '*.xml'
-        testRunTitle: 'Java Test Report'
-        searchFolder: '$(System.DefaultWorkingDirectory)/test-reports'
+          - task: PublishTestResults@2
+            displayName: Publish Java Test Results
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "*.xml"
+              testRunTitle: "Java Test Report"
+              searchFolder: "$(System.DefaultWorkingDirectory)/test-reports"

@@ -17,22 +17,22 @@ ext.templatesMap = [:]
 
 File examplesTree = file("$projectDir/src/main/cpp/examples")
 examplesTree.list(new FilenameFilter() {
-    @Override
-    public boolean accept(File current, String name) {
-        return new File(current, name).isDirectory();
-    }
-}).each {
-    examplesMap.put(it, [])
-}
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        }).each {
+            examplesMap.put(it, [])
+        }
 File templatesTree = file("$projectDir/src/main/cpp/templates")
 templatesTree.list(new FilenameFilter() {
-    @Override
-    public boolean accept(File current, String name) {
-        return new File(current, name).isDirectory();
-    }
-}).each {
-    templatesMap.put(it, [])
-}
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        }).each {
+            templatesMap.put(it, [])
+        }
 
 nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
     cppCompiler.args.remove('-Wno-error=deprecated-declarations')
