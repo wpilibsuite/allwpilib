@@ -21,12 +21,12 @@ template <typename T>
 constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
   T modulus = maximumInput - minimumInput;
 
-  // Wrap input above maximum input
-  int numMax = (input + maximumInput) / modulus;
+  // Wrap input if it's above the maximum input
+  int numMax = (input - minimumInput) / modulus;
   input -= numMax * modulus;
 
-  // Wrap input below minimum input
-  int numMin = (input + minimumInput) / modulus;
+  // Wrap input if it's below the minimum input
+  int numMin = (input - maximumInput) / modulus;
   input -= numMin * modulus;
 
   return input;

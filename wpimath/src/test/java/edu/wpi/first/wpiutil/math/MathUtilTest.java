@@ -23,12 +23,19 @@ class MathUtilTest {
     assertEquals(20.0, MathUtil.inputModulus(-170.0 - (170.0 + 360.0), -180.0, 180.0));
 
     // Test range start at zero
-    assertEquals(-20.0, MathUtil.inputModulus(170.0 - 190.0, 0.0, 360.0));
-    assertEquals(-20.0, MathUtil.inputModulus(170.0 + 360.0 - 190.0, 0.0, 360.0));
-    assertEquals(-20.0, MathUtil.inputModulus(170.0 - (190.0 + 360), 0.0, 360.0));
+    assertEquals(340.0, MathUtil.inputModulus(170.0 - 190.0, 0.0, 360.0));
+    assertEquals(340.0, MathUtil.inputModulus(170.0 + 360.0 - 190.0, 0.0, 360.0));
+    assertEquals(340.0, MathUtil.inputModulus(170.0 - (190.0 + 360), 0.0, 360.0));
 
     // Test asymmetric range that doesn't start at zero
     assertEquals(-20.0, MathUtil.inputModulus(170.0 - (-170.0), -170.0, 190.0));
+
+    // Test range with both positive endpoints
+    assertEquals(2.0, MathUtil.inputModulus(0.0, 1.0, 3.0));
+    assertEquals(3.0, MathUtil.inputModulus(1.0, 1.0, 3.0));
+    assertEquals(2.0, MathUtil.inputModulus(2.0, 1.0, 3.0));
+    assertEquals(3.0, MathUtil.inputModulus(3.0, 1.0, 3.0));
+    assertEquals(2.0, MathUtil.inputModulus(4.0, 1.0, 3.0));
   }
 
   @Test

@@ -26,13 +26,20 @@ TEST(MathUtilTest, InputModulus) {
                   frc::InputModulus(-170.0 - (170.0 + 360.0), -180.0, 180.0));
 
   // Test range starting at zero
-  EXPECT_FLOAT_EQ(-20.0, frc::InputModulus(170.0 - 190.0, 0.0, 360.0));
-  EXPECT_FLOAT_EQ(-20.0, frc::InputModulus(170.0 + 360.0 - 190.0, 0.0, 360.0));
-  EXPECT_FLOAT_EQ(-20.0,
+  EXPECT_FLOAT_EQ(340.0, frc::InputModulus(170.0 - 190.0, 0.0, 360.0));
+  EXPECT_FLOAT_EQ(340.0, frc::InputModulus(170.0 + 360.0 - 190.0, 0.0, 360.0));
+  EXPECT_FLOAT_EQ(340.0,
                   frc::InputModulus(170.0 - (190.0 + 360.0), 0.0, 360.0));
 
   // Test asymmetric range that doesn't start at zero
   EXPECT_FLOAT_EQ(-20.0, frc::InputModulus(170.0 - (-170.0), -170.0, 190.0));
+
+  // Test range with both positive endpoints
+  EXPECT_FLOAT_EQ(2.0, frc::InputModulus(0.0, 1.0, 3.0));
+  EXPECT_FLOAT_EQ(3.0, frc::InputModulus(1.0, 1.0, 3.0));
+  EXPECT_FLOAT_EQ(2.0, frc::InputModulus(2.0, 1.0, 3.0));
+  EXPECT_FLOAT_EQ(3.0, frc::InputModulus(3.0, 1.0, 3.0));
+  EXPECT_FLOAT_EQ(2.0, frc::InputModulus(4.0, 1.0, 3.0));
 
   // Test all supported types
   EXPECT_FLOAT_EQ(-20.0,
