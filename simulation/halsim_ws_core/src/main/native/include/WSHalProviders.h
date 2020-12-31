@@ -61,6 +61,6 @@ template <typename T>
 void CreateSingleProvider(const std::string& key,
                           WSRegisterFunc webRegisterFunc);
 
-#include "WSHalProviders.inl"
-
 }  // namespace wpilibws
+
+#include "WSHalProviders.inl"
