@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 typedef enum {
   CTR_OKAY,       // No Error - Function executed as expected
   CTR_RxTimeout,  // CAN frame has not been received within specified period of
