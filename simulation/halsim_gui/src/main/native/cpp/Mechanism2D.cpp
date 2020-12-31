@@ -386,6 +386,7 @@ void Mechanism2D::Initialize() {
 /*
  * V2 goals
  *  - Add multi window support
+ *  - Add to network tables
  *  - Add debug mode
  *    - button to print everything
  *    -
