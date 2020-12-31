@@ -8,6 +8,10 @@
 #include <string>
 #include <utility>
 
+#include "WSHalProviders.h"
+
+namespace wpilibws {
+
 template <typename T>
 void CreateProviders(const std::string& prefix, int numChannels,
                      WSRegisterFunc webRegisterFunc) {
@@ -24,3 +28,5 @@ void CreateSingleProvider(const std::string& key,
   auto ptr = std::make_unique<T>(key, key);
   webRegisterFunc(key, std::move(ptr));
 }
+
+}  // namespace wpilibws

@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "glass/Provider.h"
+
 namespace glass {
 
 template <typename Functions>
@@ -17,11 +19,13 @@ void Provider<Functions>::GlobalInit() {
 template <typename Functions>
 void Provider<Functions>::ShowDefault(wpi::StringRef name) {
   auto win = GetWindow(name);
-  if (win)
+  if (win) {
     return;
+  }
   auto it = FindViewEntry(name);
-  if (it == m_viewEntries.end() || (*it)->name != name)
+  if (it == m_viewEntries.end() || (*it)->name != name) {
     return;
+  }
   this->Show(it->get(), (*it)->window);
 }
 
@@ -38,8 +42,9 @@ void Provider<Functions>::RegisterModel(wpi::StringRef name, ExistsFunc exists,
                                         CreateModelFunc createModel) {
   auto it = FindModelEntry(name);
   // ignore if exists
-  if (it != m_modelEntries.end() && (*it)->name == name)
+  if (it != m_modelEntries.end() && (*it)->name == name) {
     return;
+  }
   // insert in sorted location
   m_modelEntries.emplace(
       it, MakeModelEntry(name, std::move(exists), std::move(createModel)));
@@ -52,13 +57,15 @@ void Provider<Functions>::RegisterView(wpi::StringRef name,
                                        CreateViewFunc createView) {
   // find model; if model doesn't exist, ignore
   auto modelIt = FindModelEntry(modelName);
-  if (modelIt == m_modelEntries.end() || (*modelIt)->name != modelName)
+  if (modelIt == m_modelEntries.end() || (*modelIt)->name != modelName) {
     return;
+  }
 
   auto viewIt = FindViewEntry(name);
   // ignore if exists
-  if (viewIt != m_viewEntries.end() && (*viewIt)->name == name)
+  if (viewIt != m_viewEntries.end() && (*viewIt)->name == name) {
     return;
+  }
   // insert in sorted location
   m_viewEntries.emplace(viewIt,
                         MakeViewEntry(name, modelIt->get(), std::move(exists),
@@ -69,8 +76,9 @@ template <typename Functions>
 void Provider<Functions>::Update() {
   // update entries
   for (auto&& entry : m_modelEntries) {
-    if (entry->model)
+    if (entry->model) {
       entry->model->Update();
+    }
   }
 }
 

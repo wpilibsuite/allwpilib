@@ -6,6 +6,8 @@
 
 #include <wpi/StringRef.h>
 
+#include "glass/support/IniSaverString.h"
+
 namespace glass {
 
 template <typename Info>

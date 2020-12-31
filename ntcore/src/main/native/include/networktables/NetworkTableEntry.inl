@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include "networktables/NetworkTableEntry.h"
+
 namespace nt {
 
 inline NetworkTableEntry::NetworkTableEntry() {}
@@ -50,37 +52,42 @@ inline std::shared_ptr<Value> NetworkTableEntry::GetValue() const {
 
 inline bool NetworkTableEntry::GetBoolean(bool defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_BOOLEAN)
+  if (!value || value->type() != NT_BOOLEAN) {
     return defaultValue;
+  }
   return value->GetBoolean();
 }
 
 inline double NetworkTableEntry::GetDouble(double defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_DOUBLE)
+  if (!value || value->type() != NT_DOUBLE) {
     return defaultValue;
+  }
   return value->GetDouble();
 }
 
 inline std::string NetworkTableEntry::GetString(StringRef defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_STRING)
+  if (!value || value->type() != NT_STRING) {
     return defaultValue;
+  }
   return value->GetString();
 }
 
 inline std::string NetworkTableEntry::GetRaw(StringRef defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_RAW)
+  if (!value || value->type() != NT_RAW) {
     return defaultValue;
+  }
   return value->GetString();
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
     ArrayRef<int> defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_BOOLEAN_ARRAY)
+  if (!value || value->type() != NT_BOOLEAN_ARRAY) {
     return defaultValue;
+  }
   return value->GetBooleanArray();
 }
 
@@ -93,8 +100,9 @@ inline std::vector<int> NetworkTableEntry::GetBooleanArray(
 inline std::vector<double> NetworkTableEntry::GetDoubleArray(
     ArrayRef<double> defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_DOUBLE_ARRAY)
+  if (!value || value->type() != NT_DOUBLE_ARRAY) {
     return defaultValue;
+  }
   return value->GetDoubleArray();
 }
 
@@ -107,8 +115,9 @@ inline std::vector<double> NetworkTableEntry::GetDoubleArray(
 inline std::vector<std::string> NetworkTableEntry::GetStringArray(
     ArrayRef<std::string> defaultValue) const {
   auto value = GetEntryValue(m_handle);
-  if (!value || value->type() != NT_STRING_ARRAY)
+  if (!value || value->type() != NT_STRING_ARRAY) {
     return defaultValue;
+  }
   return value->GetStringArray();
 }
 

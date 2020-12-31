@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include "wpi/HttpWebSocketServerConnection.h"
+
 namespace wpi {
 
 template <typename Derived>
@@ -22,8 +24,9 @@ HttpWebSocketServerConnection<Derived>::HttpWebSocketServerConnection(
     StringRef protocol = m_helper.MatchProtocol(protocols).second;
 
     // Check that the upgrade is valid
-    if (!IsValidWsUpgrade(protocol))
+    if (!IsValidWsUpgrade(protocol)) {
       return;
+    }
 
     // Disconnect HttpServerConnection header reader
     m_dataConn.disconnect();

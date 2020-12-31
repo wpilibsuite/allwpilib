@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "frc/kinematics/SwerveDriveOdometry.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {

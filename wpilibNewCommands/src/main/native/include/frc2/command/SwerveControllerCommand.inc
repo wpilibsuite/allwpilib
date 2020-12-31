@@ -5,6 +5,9 @@
 #pragma once
 
 #include <memory>
+#include <utility>
+
+#include "frc2/command/SwerveControllerCommand.h"
 
 namespace frc2 {
 
@@ -17,11 +20,11 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     std::function<frc::Rotation2d()> desiredRotation,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
-      m_desiredRotation(desiredRotation),
+      m_desiredRotation(std::move(desiredRotation)),
       m_outputStates(output) {
   this->AddRequirements(requirements);
 }
@@ -34,8 +37,8 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     std::initializer_list<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
       m_outputStates(output) {
@@ -54,11 +57,11 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     std::function<frc::Rotation2d()> desiredRotation,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
-      m_desiredRotation(desiredRotation),
+      m_desiredRotation(std::move(desiredRotation)),
       m_outputStates(output) {
   this->AddRequirements(requirements);
 }
@@ -71,8 +74,8 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
     frc::ProfiledPIDController<units::radians> thetaController,
     std::function<void(std::array<frc::SwerveModuleState, NumModules>)> output,
     wpi::ArrayRef<Subsystem*> requirements)
-    : m_trajectory(trajectory),
-      m_pose(pose),
+    : m_trajectory(std::move(trajectory)),
+      m_pose(std::move(pose)),
       m_kinematics(kinematics),
       m_controller(xController, yController, thetaController),
       m_outputStates(output) {

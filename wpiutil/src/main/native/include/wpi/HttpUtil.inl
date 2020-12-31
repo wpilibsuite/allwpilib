@@ -7,6 +7,8 @@
 
 #include <utility>
 
+#include "wpi/HttpUtil.h"
+
 namespace wpi {
 
 inline HttpPathRef HttpPath::drop_front(size_t n) const {
@@ -17,10 +19,12 @@ template <typename T>
 HttpRequest::HttpRequest(const HttpLocation& loc, const T& extraParams)
     : host{loc.host}, port{loc.port} {
   StringMap<StringRef> params;
-  for (const auto& p : loc.params)
+  for (const auto& p : loc.params) {
     params.insert(std::make_pair(GetFirst(p), GetSecond(p)));
-  for (const auto& p : extraParams)
+  }
+  for (const auto& p : extraParams) {
     params.insert(std::make_pair(GetFirst(p), GetSecond(p)));
+  }
   SetPath(loc.path, params);
   SetAuth(loc);
 }

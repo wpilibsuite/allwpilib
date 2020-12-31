@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "vision/VisionRunner.h"
+
 namespace frc {
 
 /**

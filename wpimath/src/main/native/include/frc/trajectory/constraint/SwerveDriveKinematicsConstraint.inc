@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
 #include "units/math.h"
 
 namespace frc {
