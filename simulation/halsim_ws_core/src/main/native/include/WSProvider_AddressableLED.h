@@ -12,7 +12,7 @@ class HALSimWSProviderAddressableLED : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderAddressableLED();
+  ~HALSimWSProviderAddressableLED() override;
 
  protected:
   void RegisterCallbacks() override;

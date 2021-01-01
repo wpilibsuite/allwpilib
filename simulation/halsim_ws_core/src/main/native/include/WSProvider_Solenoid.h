@@ -16,7 +16,7 @@ class HALSimWSProviderSolenoid : public HALSimWSHalProvider {
   explicit HALSimWSProviderSolenoid(int32_t pcmChannel, int32_t solenoidChannel,
                                     const std::string& key,
                                     const std::string& type);
-  ~HALSimWSProviderSolenoid();
+  ~HALSimWSProviderSolenoid() override;
 
  protected:
   void RegisterCallbacks() override;

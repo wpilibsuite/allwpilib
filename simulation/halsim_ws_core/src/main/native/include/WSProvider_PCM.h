@@ -14,7 +14,7 @@ class HALSimWSProviderPCM : public HALSimWSHalChanProvider {
   static void Initialize(WSRegisterFunc webRegisterFunc);
 
   using HALSimWSHalChanProvider::HALSimWSHalChanProvider;
-  ~HALSimWSProviderPCM();
+  ~HALSimWSProviderPCM() override;
 
  protected:
   void RegisterCallbacks() override;
