@@ -146,7 +146,7 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
       B{nativeB, states, inputs};
 
-  bool isStabilizable = check_stabilizable(A, B);
+  bool isStabilizable = check_stabilizable(A, B);  // NOLINT
 
   env->ReleaseDoubleArrayElements(aSrc, nativeA, 0);
   env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);
