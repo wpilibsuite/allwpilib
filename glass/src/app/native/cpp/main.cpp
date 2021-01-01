@@ -21,6 +21,8 @@
 
 namespace gui = wpi::gui;
 
+const char* GetWPILibVersion();
+
 namespace glass {
 wpi::StringRef GetResource_glass_16_png();
 wpi::StringRef GetResource_glass_32_png();
@@ -181,7 +183,29 @@ int main() {
       gPlotProvider->DisplayMenu();
       ImGui::EndMenu();
     }
+
+    bool about = false;
+    if (ImGui::BeginMenu("Info")) {
+      if (ImGui::MenuItem("About")) {
+        about = true;
+      }
+      ImGui::EndMenu();
+    }
     ImGui::EndMainMenuBar();
+
+    if (about) {
+      ImGui::OpenPopup("About");
+      about = false;
+    }
+    if (ImGui::BeginPopupModal("About")) {
+      ImGui::Text("Glass: A different kind of dashboard");
+      ImGui::Separator();
+      ImGui::Text("v%s", GetWPILibVersion());
+      if (ImGui::Button("Close")) {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
   });
 
   gui::Initialize("Glass - DISCONNECTED", 1024, 768);

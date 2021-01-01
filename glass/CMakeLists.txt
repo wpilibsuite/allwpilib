@@ -50,9 +50,10 @@ install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 # glass application
 #
 
+configure_file(src/app/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 GENERATE_RESOURCES(src/app/native/resources generated/app/cpp GLASS glass glass_resources_src)
 
-file(GLOB glass_src src/app/native/cpp/*.cpp)
+file(GLOB glass_src src/app/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 
 if (WIN32)
     set(glass_rc src/app/native/win/glass.rc)

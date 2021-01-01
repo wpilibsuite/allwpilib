@@ -21,11 +21,50 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     apply from: "${rootDir}/shared/resources.gradle"
     apply from: "${rootDir}/shared/config.gradle"
 
+    def wpilibVersionFileInput = file("src/app/generate/WPILibVersion.cpp.in")
+    def wpilibVersionFileOutput = file("$buildDir/generated/app/cpp/WPILibVersion.cpp")
+
+    task generateCppVersion() {
+        description = 'Generates the wpilib version class'
+        group = 'WPILib'
+
+        outputs.file wpilibVersionFileOutput
+        inputs.file wpilibVersionFileInput
+
+        if (wpilibVersioning.releaseMode) {
+            outputs.upToDateWhen { false }
+        }
+
+        // We follow a simple set of checks to determine whether we should generate a new version file:
+        // 1. If the release type is not development, we generate a new version file
+        // 2. If there is no generated version number, we generate a new version file
+        // 3. If there is a generated build number, and the release type is development, then we will
+        //    only generate if the publish task is run.
+        doLast {
+            def version = wpilibVersioning.version.get()
+            println "Writing version ${version} to $wpilibVersionFileOutput"
+
+            if (wpilibVersionFileOutput.exists()) {
+                wpilibVersionFileOutput.delete()
+            }
+            def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
+            wpilibVersionFileOutput.write(read)
+        }
+    }
+
+    gradle.taskGraph.addTaskExecutionGraphListener { graph ->
+        def willPublish = graph.hasTask(publish)
+        if (willPublish) {
+            generateCppVersion.outputs.upToDateWhen { false }
+        }
+    }
+
     def generateTask = createGenerateResourcesTask('app', 'GLASS', 'glass', project)
 
     project(':').libraryBuild.dependsOn build
     tasks.withType(CppCompile) {
         dependsOn generateTask
+        dependsOn generateCppVersion
     }
 
     nativeUtils.exportsConfigs {
