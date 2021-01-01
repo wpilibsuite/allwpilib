@@ -544,6 +544,17 @@
     "commandversion": 2
   },
   {
+    "name": "RomiReference",
+    "description": "An example command-based robot program that can be used with the Romi reference robot design.",
+    "tags": [
+      "Drivetrain",
+      "Romi"
+    ],
+    "foldername": "RomiReference",
+    "gradlebase": "cppromi",
+    "commandversion": 2
+  },
+  {
     "name": "StateSpaceFlywheel",
     "description": "An example state-space controller for a flywheel.",
     "tags": [
