@@ -11,13 +11,13 @@ namespace wpi::uv {
 TEST(UvSimpleBufferPool, ConstructDefault) {
   SimpleBufferPool<> pool;
   auto buf1 = pool.Allocate();
-  ASSERT_EQ(buf1.len, 4096u);
+  ASSERT_EQ(buf1.len, 4096u);  // NOLINT
 }
 
 TEST(UvSimpleBufferPool, ConstructSize) {
   SimpleBufferPool<4> pool{8192};
   auto buf1 = pool.Allocate();
-  ASSERT_EQ(buf1.len, 8192u);
+  ASSERT_EQ(buf1.len, 8192u);  // NOLINT
 }
 
 TEST(UvSimpleBufferPool, ReleaseReuse) {

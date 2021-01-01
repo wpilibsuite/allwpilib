@@ -21,7 +21,7 @@ class HALSimWSProviderAnalogIn : public HALSimWSHalChanProvider {
 
  protected:
   void RegisterCallbacks() override;
-  void CancelCallbacks() override;
+  void CancelCallbacks() final;
   void DoCancelCallbacks();
 
  private:
@@ -45,7 +45,7 @@ class HALSimWSProviderAnalogOut : public HALSimWSHalChanProvider {
 
  protected:
   void RegisterCallbacks() override;
-  void CancelCallbacks() override;
+  void CancelCallbacks() final;
   void DoCancelCallbacks();
 
  private:

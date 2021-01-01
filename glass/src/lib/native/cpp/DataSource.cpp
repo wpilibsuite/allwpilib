@@ -139,7 +139,7 @@ bool DataSource::InputInt(const char* label, int* v, int step, int step_fast,
 void DataSource::EmitDrag(ImGuiDragDropFlags flags) const {
   if (ImGui::BeginDragDropSource(flags)) {
     auto self = this;
-    ImGui::SetDragDropPayload("DataSource", &self, sizeof(self));
+    ImGui::SetDragDropPayload("DataSource", &self, sizeof(self));  // NOLINT
     const char* name = GetName();
     ImGui::TextUnformatted(name[0] == '\0' ? m_id.c_str() : name);
     ImGui::EndDragDropSource();

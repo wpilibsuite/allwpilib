@@ -155,7 +155,7 @@ void SerialHelper::CoiteratedSort(
       }
     }
   }
-  vec = sortedVec;
+  vec.swap(sortedVec);
 }
 
 void SerialHelper::QueryHubPaths(int32_t* status) {

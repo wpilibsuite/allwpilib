@@ -121,7 +121,7 @@ class LinearPlantInversionFeedforward {
    */
   Eigen::Matrix<double, Inputs, 1> Calculate(
       const Eigen::Matrix<double, States, 1>& nextR) {
-    return Calculate(m_r, nextR);
+    return Calculate(m_r, nextR);  // NOLINT
   }
 
   /**

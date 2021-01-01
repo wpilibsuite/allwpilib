@@ -1295,7 +1295,7 @@ static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
   // drag and drop sources are the low level joysticks
   if (ImGui::BeginDragDropSource()) {
     SystemJoystick* joyPtr = &joy;
-    ImGui::SetDragDropPayload("Joystick", &joyPtr, sizeof(joyPtr));
+    ImGui::SetDragDropPayload("Joystick", &joyPtr, sizeof(joyPtr));  // NOLINT
     ImGui::Text("%d: %s", i, joy.GetName());
     ImGui::EndDragDropSource();
   }
@@ -1325,7 +1325,8 @@ static void DisplayJoysticks() {
     if (!disableDS && joy.sys) {
       ImGui::Selectable(label, false);
       if (ImGui::BeginDragDropSource()) {
-        ImGui::SetDragDropPayload("Joystick", &joy.sys, sizeof(joy.sys));
+        ImGui::SetDragDropPayload("Joystick", &joy.sys,
+                                  sizeof(joy.sys));  // NOLINT
         ImGui::Text("%d: %s", joy.sys->GetIndex(), joy.sys->GetName());
         ImGui::EndDragDropSource();
       }
@@ -1335,7 +1336,7 @@ static void DisplayJoysticks() {
     if (!disableDS && ImGui::BeginDragDropTarget()) {
       if (const ImGuiPayload* payload =
               ImGui::AcceptDragDropPayload("Joystick")) {
-        IM_ASSERT(payload->DataSize == sizeof(SystemJoystick*));
+        IM_ASSERT(payload->DataSize == sizeof(SystemJoystick*));  // NOLINT
         SystemJoystick* payload_sys =
             *static_cast<SystemJoystick* const*>(payload->Data);
         // clear it from the other joysticks

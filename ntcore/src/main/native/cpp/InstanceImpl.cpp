@@ -15,7 +15,8 @@ using namespace std::placeholders;
 
 InstanceImpl::InstanceImpl(int inst)
     : logger_impl(inst),
-      logger(std::bind(&LoggerImpl::Log, &logger_impl, _1, _2, _3, _4)),
+      logger(
+          std::bind(&LoggerImpl::Log, &logger_impl, _1, _2, _3, _4)),  // NOLINT
       connection_notifier(inst),
       entry_notifier(inst, logger),
       rpc_server(inst, logger),

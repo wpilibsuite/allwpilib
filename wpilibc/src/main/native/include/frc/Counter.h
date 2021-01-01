@@ -382,7 +382,7 @@ class Counter : public ErrorBase,
    * @param maxPeriod The maximum period where the counted device is considered
    *                  moving in seconds.
    */
-  void SetMaxPeriod(double maxPeriod) override;
+  void SetMaxPeriod(double maxPeriod) final;
 
   /**
    * Select whether you want to continue updating the event timer output when

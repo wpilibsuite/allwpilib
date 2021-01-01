@@ -73,5 +73,6 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
   EXPECT_TRUE(HAL_kInvalidHandle != analogOutHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogOutCallbackName.c_str());
+  HALSIM_CancelAnalogOutInitializedCallback(INDEX_TO_TEST, callbackId);
 }
 }  // namespace hal

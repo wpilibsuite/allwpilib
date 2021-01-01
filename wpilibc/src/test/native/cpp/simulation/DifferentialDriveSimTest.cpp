@@ -43,6 +43,7 @@ TEST(DifferentialDriveSim, Convergence) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       frc::Pose2d(), {}, frc::Pose2d(2_m, 2_m, 0_rad), config);
 
+  // NOLINTNEXTLINE
   for (double t = 0; t < trajectory.TotalTime().to<double>(); t += 0.02) {
     auto state = trajectory.Sample(20_ms);
     auto ramseteOut = ramsete.Calculate(sim.GetPose(), state);

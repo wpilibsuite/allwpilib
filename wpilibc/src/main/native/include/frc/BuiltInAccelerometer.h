@@ -41,7 +41,7 @@ class BuiltInAccelerometer : public ErrorBase,
    *              accelerometer will measure. Not all accelerometers support all
    *              ranges.
    */
-  void SetRange(Range range) override;
+  void SetRange(Range range) final;
 
   /**
    * @return The acceleration of the roboRIO along the X axis in g-forces

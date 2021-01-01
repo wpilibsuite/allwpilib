@@ -13,7 +13,7 @@ int SocketErrno();
 
 std::string SocketStrerror(int code);
 
-static inline std::string SocketStrerror() {
+inline std::string SocketStrerror() {
   return SocketStrerror(SocketErrno());
 }
 

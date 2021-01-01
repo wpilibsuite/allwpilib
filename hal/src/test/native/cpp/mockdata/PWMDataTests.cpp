@@ -71,5 +71,6 @@ TEST(PWMSimTests, TestPwmInitialization) {
   EXPECT_TRUE(HAL_kInvalidHandle != pwmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());
+  HALSIM_CancelPWMInitializedCallback(INDEX_TO_TEST, callbackId);
 }
 }  // namespace hal

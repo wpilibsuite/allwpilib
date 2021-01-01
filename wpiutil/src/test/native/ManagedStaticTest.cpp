@@ -20,6 +20,7 @@ TEST(ManagedStaticTest, LazyDoesNotInitialize) {
   {
     refCount = 0;
     wpi::ManagedStatic<StaticTestClass> managedStatic;
+    (void)managedStatic;
     ASSERT_EQ(refCount, 0);
   }
   ASSERT_EQ(refCount, 0);
@@ -43,7 +44,7 @@ TEST(ManagedStaticTest, EagerInit) {
   {
     refCount = 0;
     StaticTestClass* test = new StaticTestClass{};
-    ASSERT_EQ(refCount, 1);
+    ASSERT_EQ(refCount, 1);  // NOLINT
     wpi::ManagedStatic<StaticTestClass> managedStatic(
         test, [](void* val) { delete static_cast<StaticTestClass*>(val); });
     ASSERT_EQ(refCount, 1);

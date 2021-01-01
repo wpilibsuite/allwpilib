@@ -23,11 +23,8 @@
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
 
-/** WPILib C++ utilities (wpiutil) namespace */
-namespace wpi {
-
 /** Java Native Interface (JNI) utility functions */
-namespace java {
+namespace wpi::java {
 
 // Gets a Java stack trace.  Also provides the last function
 // in the stack trace not starting with excludeFuncPrefix (useful for e.g.
@@ -89,7 +86,7 @@ class JGlobal {
 
   explicit operator bool() const { return m_cls; }
 
-  operator T() const { return m_cls; }
+  operator T() const { return m_cls; }  // NOLINT
 
  protected:
   T m_cls = nullptr;
@@ -117,7 +114,7 @@ class JLocal {
       m_env->DeleteLocalRef(m_obj);
     }
   }
-  operator T() { return m_obj; }
+  operator T() { return m_obj; }  // NOLINT
   T obj() { return m_obj; }
 
  private:
@@ -151,7 +148,7 @@ class JStringRef {
     m_str.pop_back();
   }
 
-  operator StringRef() const { return m_str; }
+  operator StringRef() const { return m_str; }  // NOLINT
   StringRef str() const { return m_str; }
   const char* c_str() const { return m_str.data(); }
   size_t size() const { return m_str.size(); }
@@ -187,7 +184,7 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
  public:
   explicit operator bool() const { return this->m_elements != nullptr; }
 
-  operator ArrayRef<T>() const { return array(); }
+  operator ArrayRef<T>() const { return array(); }  // NOLINT
 
   ArrayRef<T> array() const {
     if (!this->m_elements) {
@@ -501,7 +498,7 @@ inline jobjectArray MakeJStringArray(JNIEnv* env, ArrayRef<std::string> arr) {
 template <typename T>
 class JCallbackThread : public SafeThread {
  public:
-  void Main();
+  void Main() override;
 
   std::queue<T> m_queue;
   jobject m_func = nullptr;
@@ -710,7 +707,6 @@ struct JExceptionInit {
   JException* cls;
 };
 
-}  // namespace java
-}  // namespace wpi
+}  // namespace wpi::java
 
 #endif  // WPIUTIL_WPI_JNI_UTIL_H_

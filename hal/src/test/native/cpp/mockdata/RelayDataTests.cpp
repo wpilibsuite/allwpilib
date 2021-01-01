@@ -71,6 +71,7 @@ TEST(RelaySimTests, TestRelayInitialization) {
   EXPECT_TRUE(HAL_kInvalidHandle != pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("InitializedForward", gTestRelayCallbackName.c_str());
+  HALSIM_CancelRelayInitializedForwardCallback(INDEX_TO_TEST, callbackId);
 }
 
 }  // namespace hal

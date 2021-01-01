@@ -448,10 +448,10 @@ void DispatcherBase::ServerThreadMain() {
     using namespace std::placeholders;
     auto conn = std::make_shared<NetworkConnection>(
         ++m_connections_uid, std::move(stream), m_notifier, m_logger,
-        std::bind(&Dispatcher::ServerHandshake, this, _1, _2, _3),
-        std::bind(&IStorage::GetMessageEntryType, &m_storage, _1));
+        std::bind(&Dispatcher::ServerHandshake, this, _1, _2, _3),   // NOLINT
+        std::bind(&IStorage::GetMessageEntryType, &m_storage, _1));  // NOLINT
     conn->set_process_incoming(
-        std::bind(&IStorage::ProcessIncoming, &m_storage, _1, _2,
+        std::bind(&IStorage::ProcessIncoming, &m_storage, _1, _2,  // NOLINT
                   std::weak_ptr<NetworkConnection>(conn)));
     {
       std::scoped_lock lock(m_user_mutex);
@@ -507,10 +507,10 @@ void DispatcherBase::ClientThreadMain() {
     using namespace std::placeholders;
     auto conn = std::make_shared<NetworkConnection>(
         ++m_connections_uid, std::move(stream), m_notifier, m_logger,
-        std::bind(&Dispatcher::ClientHandshake, this, _1, _2, _3),
-        std::bind(&IStorage::GetMessageEntryType, &m_storage, _1));
+        std::bind(&Dispatcher::ClientHandshake, this, _1, _2, _3),   // NOLINT
+        std::bind(&IStorage::GetMessageEntryType, &m_storage, _1));  // NOLINT
     conn->set_process_incoming(
-        std::bind(&IStorage::ProcessIncoming, &m_storage, _1, _2,
+        std::bind(&IStorage::ProcessIncoming, &m_storage, _1, _2,  // NOLINT
                   std::weak_ptr<NetworkConnection>(conn)));
     m_connections.resize(0);  // disconnect any current
     m_connections.emplace_back(conn);

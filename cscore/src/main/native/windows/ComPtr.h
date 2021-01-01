@@ -30,18 +30,18 @@ class ComPtr {
   }
 
   template <typename T>
-  ComPtr(const ComPtr<T>& other) noexcept : m_ptr(other.m_ptr) {
+  ComPtr(const ComPtr<T>& other) noexcept : m_ptr(other.m_ptr) {  // NOLINT
     InternalAddRef();
   }
 
   template <typename T>
-  ComPtr(ComPtr<T>&& other) noexcept : m_ptr(other.m_ptr) {
+  ComPtr(ComPtr<T>&& other) noexcept : m_ptr(other.m_ptr) {  // NOLINT
     other.m_ptr = nullptr;
   }
 
   ~ComPtr() noexcept { InternalRelease(); }
 
-  ComPtr& operator=(const ComPtr& other) noexcept {
+  ComPtr& operator=(const ComPtr& other) noexcept {  // NOLINT
     InternalCopy(other.m_ptr);
     return *this;
   }
