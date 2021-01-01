@@ -1,4 +1,4 @@
-name: CI
+name: Gradle
 
 on: [pull_request, push]
 
@@ -110,95 +110,6 @@ jobs:
         with:
           name: Documentation
           path: docs/build/outputs
-
-  build-cmake:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            name: Linux
-            container: wpilib/roborio-cross-ubuntu:2020-18.04
-            flags: ""
-          - os: macos-latest
-            name: macOS
-            container: ""
-            flags: "-DWITH_JAVA=OFF"
-    name: "Build - CMake ${{ matrix.name }}"
-    runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Dependencies
-        run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            brew install opencv
-          fi
-      - name: configure
-        run: mkdir build && cd build && cmake ${{ matrix.flags }} ..
-      - name: build
-        working-directory: build
-        run: make -j3
-      - name: test
-        working-directory: build
-        run: make test
-
-  build-cmake-vcpkg:
-    name: "Build - CMake Windows"
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Prepare vcpkg
-        uses: lukka/run-vcpkg@v4
-        with:
-          vcpkgArguments: opencv
-          vcpkgDirectory: ${{ runner.workspace }}/vcpkg/
-          vcpkgGitCommitId: 544f8e4593764f78faa94bac2adb81cca5232943
-          vcpkgTriplet: x64-windows
-      - name: Configure & Build
-        uses: lukka/run-cmake@v3
-        with:
-          buildDirectory: ${{ runner.workspace }}/build/
-          cmakeAppendedArgs: -DWITH_JAVA=OFF
-          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-          useVcpkgToolchainFile: true
-      - name: Run Tests
-        run: ctest -C "Debug"
-        working-directory: ${{ runner.workspace }}/build/
-
-  build-gazebo:
-    name: "Build - Gazebo"
-    runs-on: ubuntu-latest
-    container: wpilib/gazebo-ubuntu:18.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PmakeSim
-
-  wpiformat:
-    name: "wpiformat"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Fetch all history and metadata
-        run: |
-          git fetch --prune --unshallow
-          git checkout -b pr
-          git branch -f master origin/master
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install clang-format
-        run: sudo apt-get update -q && sudo apt-get install clang-format-10
-      - name: Install wpiformat
-        run: pip3 install wpiformat
-      - name: Run
-        run: wpiformat -clang 10
-      - name: Check Output
-        run: git --no-pager diff --exit-code HEAD
 
   combine:
     name: Combine
