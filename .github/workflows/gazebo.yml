@@ -12,4 +12,4 @@ jobs:
         with:
           fetch-depth: 0
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PmakeSim
+        run: ./gradlew build -PbuildServer -PmakeSim -Dorg.gradle.jvmargs=-Xmx2g
