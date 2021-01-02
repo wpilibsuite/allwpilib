@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.estimator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpiutil.math.Matrix;
@@ -41,12 +40,5 @@ public class AngleStatisticsTest {
     var first = VecBuilder.fill(1, Math.toRadians(1), 2);
     var second = VecBuilder.fill(1, Math.toRadians(359), 1);
     assertTrue(AngleStatistics.angleAdd(first, second, 1).isEqual(VecBuilder.fill(2, 0, 3), 1e-6));
-  }
-
-  @Test
-  public void testNormalize() {
-    assertEquals(AngleStatistics.normalizeAngle(Math.toRadians(-2000)), Math.toRadians(160), 1e-6);
-    assertEquals(AngleStatistics.normalizeAngle(Math.toRadians(358)), Math.toRadians(-2), 1e-6);
-    assertEquals(AngleStatistics.normalizeAngle(Math.toRadians(360)), 0, 1e-6);
   }
 }

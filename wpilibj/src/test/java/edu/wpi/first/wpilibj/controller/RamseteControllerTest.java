@@ -55,7 +55,7 @@ class RamseteControllerTest {
         () ->
             assertEquals(
                 0.0,
-                MathUtil.normalizeAngle(
+                MathUtil.angleModulus(
                     endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
                 kAngularTolerance));
   }

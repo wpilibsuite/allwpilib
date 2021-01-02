@@ -69,7 +69,7 @@ class HolonomicDriveControllerTest {
         () ->
             assertEquals(
                 0.0,
-                MathUtil.normalizeAngle(finalRobotPose.getRotation().getRadians()),
+                MathUtil.angleModulus(finalRobotPose.getRotation().getRadians()),
                 kAngularTolerance));
   }
 }

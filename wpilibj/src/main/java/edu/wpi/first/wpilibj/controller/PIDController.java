@@ -201,7 +201,7 @@ public class PIDController implements Sendable, AutoCloseable {
     double positionError;
     if (m_continuous) {
       positionError =
-          ControllerUtil.getModulusError(m_setpoint, m_measurement, m_minimumInput, m_maximumInput);
+          MathUtil.inputModulus(m_setpoint - m_measurement, m_minimumInput, m_maximumInput);
     } else {
       positionError = m_setpoint - m_measurement;
     }
@@ -308,7 +308,7 @@ public class PIDController implements Sendable, AutoCloseable {
 
     if (m_continuous) {
       m_positionError =
-          ControllerUtil.getModulusError(m_setpoint, measurement, m_minimumInput, m_maximumInput);
+          MathUtil.inputModulus(m_setpoint - measurement, m_minimumInput, m_maximumInput);
     } else {
       m_positionError = m_setpoint - measurement;
     }

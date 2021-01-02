@@ -32,22 +32,32 @@ public final class MathUtil {
   }
 
   /**
-   * Constrains theta to within the range (-pi, pi].
+   * Returns modulus of input.
    *
-   * @param theta The angle to normalize.
-   * @return The normalized angle.
+   * @param input Input value to wrap.
+   * @param minimumInput The minimum value expected from the input.
+   * @param maximumInput The maximum value expected from the input.
    */
-  @SuppressWarnings("LocalVariableName")
-  public static double normalizeAngle(double theta) {
-    // Constraint theta to within (-3pi, pi)
-    int nPiPos = (int) ((theta + Math.PI) / 2.0 / Math.PI);
-    theta -= nPiPos * 2.0 * Math.PI;
+  public static double inputModulus(double input, double minimumInput, double maximumInput) {
+    double modulus = maximumInput - minimumInput;
 
-    // Cut off the bottom half of the above range to constrain within
-    // (-pi, pi]
-    int nPiNeg = (int) ((theta - Math.PI) / 2.0 / Math.PI);
-    theta -= nPiNeg * 2.0 * Math.PI;
+    // Wrap input if it's above the maximum input
+    int numMax = (int) ((input - minimumInput) / modulus);
+    input -= numMax * modulus;
 
-    return theta;
+    // Wrap input if it's below the minimum input
+    int numMin = (int) ((input - maximumInput) / modulus);
+    input -= numMin * modulus;
+
+    return input;
+  }
+
+  /**
+   * Wraps an angle to the range -pi to pi radians.
+   *
+   * @param angleRadians Angle to wrap in radians.
+   */
+  public static double angleModulus(double angleRadians) {
+    return inputModulus(angleRadians, -Math.PI, Math.PI);
   }
 }

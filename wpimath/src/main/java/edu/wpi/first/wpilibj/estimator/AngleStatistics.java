@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.estimator;
 
+import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -26,7 +27,7 @@ public final class AngleStatistics {
   public static <S extends Num> Matrix<S, N1> angleResidual(
       Matrix<S, N1> a, Matrix<S, N1> b, int angleStateIdx) {
     Matrix<S, N1> ret = a.minus(b);
-    ret.set(angleStateIdx, 0, normalizeAngle(ret.get(angleStateIdx, 0)));
+    ret.set(angleStateIdx, 0, MathUtil.angleModulus(ret.get(angleStateIdx, 0)));
 
     return ret;
   }
@@ -52,7 +53,7 @@ public final class AngleStatistics {
   public static <S extends Num> Matrix<S, N1> angleAdd(
       Matrix<S, N1> a, Matrix<S, N1> b, int angleStateIdx) {
     Matrix<S, N1> ret = a.plus(b);
-    ret.set(angleStateIdx, 0, normalizeAngle(ret.get(angleStateIdx, 0)));
+    ret.set(angleStateIdx, 0, MathUtil.angleModulus(ret.get(angleStateIdx, 0)));
 
     return ret;
   }
@@ -66,16 +67,6 @@ public final class AngleStatistics {
   public static <S extends Num> BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>> angleAdd(
       int angleStateIdx) {
     return (a, b) -> angleAdd(a, b, angleStateIdx);
-  }
-
-  static double normalizeAngle(double angle) {
-    final double tau = 2 * Math.PI;
-
-    angle -= Math.floor(angle / tau) * tau;
-    if (angle > Math.PI) {
-      angle -= tau;
-    }
-    return angle;
   }
 
   /**
