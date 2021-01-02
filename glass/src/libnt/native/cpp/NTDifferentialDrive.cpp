@@ -16,12 +16,14 @@ NTDifferentialDriveModel::NTDifferentialDriveModel(NT_Inst instance,
                                                    wpi::StringRef path)
     : m_nt(instance),
       m_name(m_nt.GetEntry(path + "/.name")),
+      m_controllable(m_nt.GetEntry(path + "/.controllable")),
       m_lPercent(m_nt.GetEntry(path + "/Left Motor Speed")),
       m_rPercent(m_nt.GetEntry(path + "/Right Motor Speed")),
       m_nameValue(path.rsplit('/').second),
       m_lPercentData("NTDiffDriveL:" + path),
       m_rPercentData("NTDiffDriveR:" + path) {
   m_nt.AddListener(m_name);
+  m_nt.AddListener(m_controllable);
   m_nt.AddListener(m_lPercent);
   m_nt.AddListener(m_rPercent);
 
@@ -44,6 +46,9 @@ void NTDifferentialDriveModel::Update() {
     } else if (event.entry == m_rPercent && event.value &&
                event.value->IsDouble()) {
       m_rPercentData.SetValue(event.value->GetDouble());
+    } else if (event.entry == m_controllable && event.value &&
+               event.value->IsBoolean()) {
+      m_controllableValue = event.value->GetBoolean();
     }
   }
 

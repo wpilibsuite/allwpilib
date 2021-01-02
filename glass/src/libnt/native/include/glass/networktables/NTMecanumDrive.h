@@ -33,17 +33,19 @@ class NTMecanumDriveModel : public DriveModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return false; }
+  bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
   NetworkTablesHelper m_nt;
   NT_Entry m_name;
+  NT_Entry m_controllable;
   NT_Entry m_flPercent;
   NT_Entry m_frPercent;
   NT_Entry m_rlPercent;
   NT_Entry m_rrPercent;
 
   std::string m_nameValue;
+  bool m_controllableValue = false;
   DataSource m_flPercentData;
   DataSource m_frPercentData;
   DataSource m_rlPercentData;

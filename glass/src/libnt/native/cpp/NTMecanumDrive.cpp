@@ -15,6 +15,7 @@ NTMecanumDriveModel::NTMecanumDriveModel(wpi::StringRef path)
 NTMecanumDriveModel::NTMecanumDriveModel(NT_Inst instance, wpi::StringRef path)
     : m_nt(instance),
       m_name(m_nt.GetEntry(path + "/.name")),
+      m_controllable(m_nt.GetEntry(path + "/.controllable")),
       m_flPercent(m_nt.GetEntry(path + "/Front Left Motor Speed")),
       m_frPercent(m_nt.GetEntry(path + "/Front Right Motor Speed")),
       m_rlPercent(m_nt.GetEntry(path + "/Rear Left Motor Speed")),
@@ -25,6 +26,7 @@ NTMecanumDriveModel::NTMecanumDriveModel(NT_Inst instance, wpi::StringRef path)
       m_rlPercentData("NTMcnmDriveRL:" + path),
       m_rrPercentData("NTMcnmDriveRR:" + path) {
   m_nt.AddListener(m_name);
+  m_nt.AddListener(m_controllable);
   m_nt.AddListener(m_flPercent);
   m_nt.AddListener(m_frPercent);
   m_nt.AddListener(m_rlPercent);
@@ -63,6 +65,9 @@ void NTMecanumDriveModel::Update() {
     } else if (event.entry == m_rrPercent && event.value &&
                event.value->IsDouble()) {
       m_rrPercentData.SetValue(event.value->GetDouble());
+    } else if (event.entry == m_controllable && event.value &&
+               event.value->IsBoolean()) {
+      m_controllableValue = event.value->GetBoolean();
     }
   }
 

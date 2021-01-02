@@ -20,10 +20,12 @@ void glass::DisplayPIDController(PIDControllerModel* m) {
   }
 
   if (m->Exists()) {
-    auto createTuningParameter = [](const char* name, double* v,
-                                    std::function<void(double)> callback) {
+    auto flag = m->IsReadOnly() ? ImGuiInputTextFlags_ReadOnly
+                                : ImGuiInputTextFlags_None;
+    auto createTuningParameter = [flag](const char* name, double* v,
+                                        std::function<void(double)> callback) {
       ImGui::SetNextItemWidth(ImGui::GetFontSize() * 4);
-      if (ImGui::InputDouble(name, v, 0.0, 0.0, "%.3f")) {
+      if (ImGui::InputDouble(name, v, 0.0, 0.0, "%.3f", flag)) {
         callback(*v);
       }
     };

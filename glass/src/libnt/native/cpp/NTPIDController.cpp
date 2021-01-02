@@ -13,6 +13,7 @@ NTPIDControllerModel::NTPIDControllerModel(NT_Inst instance,
                                            wpi::StringRef path)
     : m_nt(instance),
       m_name(m_nt.GetEntry(path + "/.name")),
+      m_controllable(m_nt.GetEntry(path + "/.controllable")),
       m_p(m_nt.GetEntry(path + "/p")),
       m_i(m_nt.GetEntry(path + "/i")),
       m_d(m_nt.GetEntry(path + "/d")),
@@ -23,6 +24,7 @@ NTPIDControllerModel::NTPIDControllerModel(NT_Inst instance,
       m_setpointData("NTPIDCtrlStpt:" + path),
       m_nameValue(path.rsplit('/').second) {
   m_nt.AddListener(m_name);
+  m_nt.AddListener(m_controllable);
   m_nt.AddListener(m_p);
   m_nt.AddListener(m_i);
   m_nt.AddListener(m_d);
@@ -66,6 +68,10 @@ void NTPIDControllerModel::Update() {
     } else if (event.entry == m_setpoint) {
       if (event.value && event.value->IsDouble()) {
         m_setpointData.SetValue(event.value->GetDouble());
+      }
+    } else if (event.entry == m_controllable) {
+      if (event.value && event.value->IsBoolean()) {
+        m_controllableValue = event.value->GetBoolean();
       }
     }
   }
