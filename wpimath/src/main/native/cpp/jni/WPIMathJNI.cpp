@@ -4,6 +4,8 @@
 
 #include <jni.h>
 
+#include <exception>
+
 #include <wpi/jni_util.h>
 
 #include "Eigen/Core"
@@ -71,15 +73,22 @@ Java_edu_wpi_first_math_WPIMathJNI_discreteAlgebraicRiccatiEquation
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
       Rmat{nativeR, inputs, inputs};
 
-  Eigen::MatrixXd result =
-      drake::math::DiscreteAlgebraicRiccatiEquation(Amat, Bmat, Qmat, Rmat);
+  try {
+    Eigen::MatrixXd result =
+        drake::math::DiscreteAlgebraicRiccatiEquation(Amat, Bmat, Qmat, Rmat);
 
-  env->ReleaseDoubleArrayElements(A, nativeA, 0);
-  env->ReleaseDoubleArrayElements(B, nativeB, 0);
-  env->ReleaseDoubleArrayElements(Q, nativeQ, 0);
-  env->ReleaseDoubleArrayElements(R, nativeR, 0);
+    env->ReleaseDoubleArrayElements(A, nativeA, 0);
+    env->ReleaseDoubleArrayElements(B, nativeB, 0);
+    env->ReleaseDoubleArrayElements(Q, nativeQ, 0);
+    env->ReleaseDoubleArrayElements(R, nativeR, 0);
 
-  env->SetDoubleArrayRegion(S, 0, states * states, result.data());
+    env->SetDoubleArrayRegion(S, 0, states * states, result.data());
+  } catch (const std::runtime_error& e) {
+    jclass cls = env->FindClass("java/lang/RuntimeException");
+    if (cls) {
+      env->ThrowNew(cls, e.what());
+    }
+  }
 }
 
 /*
