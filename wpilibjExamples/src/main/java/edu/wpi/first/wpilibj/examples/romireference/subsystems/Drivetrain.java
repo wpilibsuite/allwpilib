@@ -73,6 +73,7 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * The acceleration in the X-axis.
+   *
    * @return The acceleration of the Romi along the X-axis in Gs
    */
   public double getAccelX() {
@@ -81,6 +82,7 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * The acceleration in the Y-axis.
+   *
    * @return The acceleration of the Romi along the Y-axis in Gs
    */
   public double getAccelY() {
@@ -89,6 +91,7 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * The acceleration in the Z-axis.
+   *
    * @return The acceleration of the Romi along the Z-axis in Gs
    */
   public double getAccelZ() {
@@ -97,6 +100,7 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * Current angle of the Romi around the X-axis.
+   *
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleX() {
@@ -105,6 +109,7 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * Current angle of the Romi around the Y-axis.
+   *
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleY() {
@@ -113,15 +118,14 @@ public class Drivetrain extends SubsystemBase {
 
   /**
    * Current angle of the Romi around the Z-axis.
+   *
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleZ() {
     return m_gyro.getAngleZ();
   }
 
-  /**
-   * Reset the gyro.
-   */
+  /** Reset the gyro. */
   public void resetGyro() {
     m_gyro.reset();
   }
