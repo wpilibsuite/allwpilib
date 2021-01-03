@@ -4,11 +4,14 @@
 
 #pragma once
 
+#include <frc/BuiltInAccelerometer.h>
 #include <frc/Encoder.h>
 #include <frc/Spark.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
+
+#include "sensors/RomiGyro.h"
 
 class Drivetrain : public frc2::SubsystemBase {
  public:
@@ -70,6 +73,41 @@ class Drivetrain : public frc2::SubsystemBase {
    */
   units::meter_t GetAverageDistance();
 
+  /**
+   * Returns the acceleration along the X-axis, in Gs.
+   */
+  double GetAccelX();
+
+  /**
+   * Returns the acceleration along the Y-axis, in Gs.
+   */
+  double GetAccelY();
+
+  /**
+   * Returns the acceleration along the Z-axis, in Gs.
+   */
+  double GetAccelZ();
+
+  /**
+   * Returns the current angle of the Romi around the X-axis, in degrees.
+   */
+  double GetGyroAngleX();
+
+  /**
+   * Returns the current angle of the Romi around the Y-axis, in degrees.
+   */
+  double GetGyroAngleY();
+
+  /**
+   * Returns the current angle of the Romi around the Z-axis, in degrees.
+   */
+  double GetGyroAngleZ();
+
+  /**
+   * Reset the gyro.
+   */
+  void ResetGyro();
+
  private:
   frc::Spark m_leftMotor{0};
   frc::Spark m_rightMotor{1};
@@ -78,4 +116,7 @@ class Drivetrain : public frc2::SubsystemBase {
   frc::Encoder m_rightEncoder{6, 7};
 
   frc::DifferentialDrive m_drive{m_leftMotor, m_rightMotor};
+
+  RomiGyro m_gyro;
+  frc::BuiltInAccelerometer m_accelerometer;
 };

@@ -54,3 +54,31 @@ units::meter_t Drivetrain::GetRightDistance() {
 units::meter_t Drivetrain::GetAverageDistance() {
   return (GetLeftDistance() + GetRightDistance()) / 2.0;
 }
+
+double Drivetrain::GetAccelX() {
+  return m_accelerometer.GetX();
+}
+
+double Drivetrain::GetAccelY() {
+  return m_accelerometer.GetY();
+}
+
+double Drivetrain::GetAccelZ() {
+  return m_accelerometer.GetZ();
+}
+
+double Drivetrain::GetGyroAngleX() {
+  return m_gyro.GetAngleX();
+}
+
+double Drivetrain::GetGyroAngleY() {
+  return m_gyro.GetAngleY();
+}
+
+double Drivetrain::GetGyroAngleZ() {
+  return m_gyro.GetAngleZ();
+}
+
+void Drivetrain::ResetGyro() {
+  m_gyro.Reset();
+}
