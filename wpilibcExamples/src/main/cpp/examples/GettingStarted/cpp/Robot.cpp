@@ -39,6 +39,8 @@ class Robot : public frc::TimedRobot {
     m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
   }
 
+  void TestInit() override {}
+
   void TestPeriodic() override {}
 
  private:

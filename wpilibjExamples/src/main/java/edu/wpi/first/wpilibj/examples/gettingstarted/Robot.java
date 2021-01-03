@@ -57,6 +57,10 @@ public class Robot extends TimedRobot {
     m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
   }
 
+  /** This function is called once each time the robot enters test mode. */
+  @Override
+  public void testInit() {}
+
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
