@@ -48,7 +48,7 @@ bool ElevatorSim::HasHitUpperLimit(const Eigen::Matrix<double, 2, 1>& x) const {
 }
 
 units::meter_t ElevatorSim::GetPosition() const {
-  return units::meter_t{m_x(0)};
+  return units::meter_t{m_y(0)};
 }
 
 units::meters_per_second_t ElevatorSim::GetVelocity() const {
