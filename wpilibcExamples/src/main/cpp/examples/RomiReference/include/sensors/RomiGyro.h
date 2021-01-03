@@ -54,7 +54,7 @@ class RomiGyro {
   hal::SimDouble m_simAngleY;
   hal::SimDouble m_simAngleZ;
 
-  double m_angleXOffset;
-  double m_angleYOffset;
-  double m_angleZOffset;
+  double m_angleXOffset = 0;
+  double m_angleYOffset = 0;
+  double m_angleZOffset = 0;
 };
