@@ -6,6 +6,7 @@
 
 #include "Eigen/Core"
 #include "units/time.h"
+#include <frc/StateSpaceUtil.h>
 
 namespace frc {
 
@@ -61,6 +62,139 @@ T RungeKuttaTimeVarying(F&& f, T x, units::second_t t, units::second_t dt) {
   T k4 = f(t + dt, x + k3);
 
   return x + dt.to<double>() / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+}
+
+
+/**
+ * Performs adaptive RKF45 integration of dx/dt = f(x, u) for dt, as described in
+ * https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
+ *
+ * @param f        The function to integrate. It must take two arguments x and 
+ *                 u.
+ * @param x        The initial value of x.
+ * @param u        The value u held constant over the integration period.
+ * @param dt       The time over which to integrate.
+ * @param maxError The maximum acceptable truncation error. Usually a small
+ *                 number like 1e-6.
+ */
+template <typename F, int States, int Inputs>
+Eigen::Matrix<double, States, 1> RungeKuttaAdaptive(F&& f, Eigen::Matrix<double, States, 1> x, Eigen::Matrix<double, Inputs, 1> u, units::second_t dt, double maxError = 1e-6) {
+  double dtElapsed = 0;
+  double previousH = dt.to<double>();
+  double dtSeconds = dt.to<double>();
+
+  // Loop until we've gotten to our desired dt
+  while (dtElapsed < dtSeconds) {
+    // RKF45 will give us an updated x and a dt back.
+    // We use the new dt (h) as the initial dt for our next loop
+    // previousH is changed by-reference
+    Eigen::Matrix<double, States, 1> ret = RungeKuttaAdaptiveImpl(f, x, u, previousH, maxError, dtSeconds - dtElapsed);
+    x = ret;
+  }
+  return x;
+}
+
+template <typename F, int States, int Inputs>
+Eigen::Matrix<double, States, 1> RungeKuttaAdaptiveImpl(F&& f, Eigen::Matrix<double, States, 1> x, Eigen::Matrix<double, Inputs, 1> u, double& initialH, double maxTruncationError, double dtRemaining) {
+
+    double truncationErr;
+    double h = initialH;
+    Eigen::Matrix<double, States, 1> newX;
+
+
+  static double ch [] = {47 / 450.0, 0, 12 / 25.0, 32 / 225.0, 1 / 30.0, 6 / 25.0};
+  static double ct [] = {-1 / 150.0, 0, 3 / 100.0, -16 / 75.0, -1 / 20.0, 6 / 25.0};
+  static Eigen::Matrix<double, 6, 5> Bs =
+      frc::MakeMatrix<6,5>(
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              2 / 9.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              1 / 12.0,
+              1 / 4.0,
+              0.0,
+              0.0,
+              0.0,
+              69 / 128.0,
+              -243 / 128.0,
+              135 / 64.0,
+              0.0,
+              0.0,
+              -17 / 12.0,
+              27 / 4.0,
+              -27 / 5.0,
+              16 / 15.0,
+              0.0,
+              65 / 432.0,
+              -5 / 16.0,
+              13 / 16.0,
+              4 / 27.0,
+              5 / 144.0);
+
+    do {
+      // only allow us to advance up to the dt remaining
+      h = std::min(h, dtRemaining);
+
+      // Notice how the derivative in the Wikipedia notation is dy/dx.
+      // That means their y is our x and their x is our t
+      Eigen::Matrix<double, States, 1> k1 = f(x, u) * h;
+      Eigen::Matrix<double, States, 1> k2 = f(x + (k1 * Bs(1, 0)), u)* h;
+      Eigen::Matrix<double, States, 1> k3 =
+          f(x + (k1 * (Bs(2, 0))) + (k2 * (Bs(2, 1))), u) * h;
+      Eigen::Matrix<double, States, 1> k4 =
+          f(
+                  x + (k1 * (Bs(3, 0)))
+                       + (k2 * (Bs(3, 1)))
+                       + (k3 * (Bs(3, 2))),
+                  u)
+ * h;
+      Eigen::Matrix<double, States, 1> k5 =
+          f(
+                  x + (k1 * (Bs(4, 0)))
+                       + (k2 * (Bs(4, 1)))
+                       + (k3 * (Bs(4, 2)))
+                       + (k4 * (Bs(4, 3))),
+                  u)
+              * h;
+      Eigen::Matrix<double, States, 1> k6 =
+          f(
+                  x + (k1 * (Bs(5, 0)))
+                       + (k2 * (Bs(5, 1)))
+                       + (k3 * (Bs(5, 2)))
+                       + (k4 * (Bs(5, 3)))
+                       + (k5 * (Bs(5, 4))),
+                  u)
+              * h;
+
+      newX =
+          x + (k1 * (ch[0]))
+               + (k2 * (ch[1]))
+             + (k3 * (ch[2]))
+               + (k4 * (ch[3]))
+               + (k5 * (ch[4]))
+               + (k6 * (ch[5]));
+
+      truncationErr =
+          k1 * (ct[0])
+               + (k2 * (ct[1]))
+               + (k3 * (ct[2]))
+               + (k4 * (ct[3]))
+               + (k5 * (ct[4]))
+               + (k6 * (ct[5]))
+              .norm();
+
+      double hNew = 0.9 * h * std::pow(maxTruncationError / truncationErr, 1 / 5.);
+      h = hNew;
+    } while (truncationErr > maxTruncationError);
+
+    // Return the new x. Dt is changed by reference
+    return newX;
 }
 
 }  // namespace frc

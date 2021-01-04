@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.math.Discretization;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
+import edu.wpi.first.wpilibj.system.NumericalIntegration;
 import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
@@ -216,7 +217,8 @@ public class UnscentedKalmanFilterTest {
       r = nextR;
       observer.predict(u, dtSeconds);
       trueXhat =
-          RungeKutta.rungeKutta(UnscentedKalmanFilterTest::getDynamics, trueXhat, u, dtSeconds);
+          NumericalIntegration.rungeKutta(
+              UnscentedKalmanFilterTest::getDynamics, trueXhat, u, dtSeconds);
     }
 
     var localY = getLocalMeasurementModel(trueXhat, u);

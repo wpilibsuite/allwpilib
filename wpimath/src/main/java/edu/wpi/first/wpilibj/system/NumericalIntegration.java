@@ -110,6 +110,27 @@ public final class NumericalIntegration {
 
   /**
    * Performs adaptive RKF45 integration of dx/dt = f(x, u) for dt, as described in
+   * https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method. By default, the max
+   * error is 1e-6.
+   *
+   * @param <States> A Num representing the states of the system to integrate.
+   * @param <Inputs> A Num representing the inputs of the system to integrate.
+   * @param f The function to integrate. It must take two arguments x and u.
+   * @param x The initial value of x.
+   * @param u The value u held constant over the integration period.
+   * @param dtSeconds The time over which to integrate.
+   * @return the integration of dx/dt = f(x, u) for dt.
+   */
+  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKuttaAdaptive(
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      Matrix<States, N1> x,
+      Matrix<Inputs, N1> u,
+      double dtSeconds) {
+    return rungeKuttaAdaptive(f, x, u, dtSeconds, 1e-6);
+  }
+
+  /**
+   * Performs adaptive RKF45 integration of dx/dt = f(x, u) for dt, as described in
    * https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
    *
    * @param <States> A Num representing the states of the system to integrate.

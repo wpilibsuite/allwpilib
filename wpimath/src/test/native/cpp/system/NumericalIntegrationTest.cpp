@@ -38,6 +38,21 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
+// Tests that integrating dx/dt = e^x works with RKF45
+TEST(NumericalIntegrationTest, ExponentialAdaptive) {
+  Eigen::Matrix<double, 1, 1> y0;
+  y0(0) = 0.0;
+
+  Eigen::Matrix<double, 1, 1> y1 = frc::RungeKuttaAdaptive<>(
+      [](Eigen::Matrix<double, 1, 1> x) {
+        Eigen::Matrix<double, 1, 1> y;
+        y(0) = std::exp(x(0));
+        return y;
+      },
+      y0, 0.1_s);
+  EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
+}
+
 namespace {
 Eigen::Matrix<double, 1, 1> RungeKuttaTimeVaryingSolution(double t) {
   return (Eigen::Matrix<double, 1, 1>()

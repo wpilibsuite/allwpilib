@@ -82,7 +82,7 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
   // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
   // std::cos(theta)]]
 
-  auto updatedXhat = RungeKutta(
+  auto updatedXhat = RungeKuttaAdaptive<>(
       [&](const auto& x, const auto& u) -> Eigen::Matrix<double, 2, 1> {
         Eigen::Matrix<double, 2, 1> xdot = m_plant.A() * x + m_plant.B() * u;
 
