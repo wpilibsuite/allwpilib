@@ -109,7 +109,8 @@ public final class NumericalIntegration {
   }
 
   /**
-   * Performs adaptive RKF45 integration of dx/dt = f(x, u) for dt.
+   * Performs adaptive RKF45 integration of dx/dt = f(x, u) for dt, as described in
+   * https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
    *
    * @param <States> A Num representing the states of the system to integrate.
    * @param <Inputs> A Num representing the inputs of the system to integrate.
@@ -141,8 +142,8 @@ public final class NumericalIntegration {
     return x;
   }
 
-  static final double[] ch = {47 / 450., 0, 12 / 25., 32 / 225., 1 / 30., 6 / 25.};
-  static final double[] ct = {-1 / 150., 0, 3 / 100., -16 / 75., -1 / 20., 6 / 25.};
+  static final double[] ch = {47 / 450.0, 0, 12 / 25.0, 32 / 225.0, 1 / 30.0, 6 / 25.0};
+  static final double[] ct = {-1 / 150.0, 0, 3 / 100.0, -16 / 75.0, -1 / 20.0, 6 / 25.0};
   static final Matrix<N6, N5> Bs =
       Matrix.mat(Nat.N6(), Nat.N5())
           .fill(
@@ -151,31 +152,31 @@ public final class NumericalIntegration {
               0,
               0,
               0,
-              2 / 9.,
+              2 / 9.0,
               0,
               0,
               0,
               0,
-              1 / 12.,
-              1 / 4.,
+              1 / 12.0,
+              1 / 4.0,
               0,
               0,
               0,
-              69 / 128.,
-              -243 / 128.,
-              135 / 64.,
+              69 / 128.0,
+              -243 / 128.0,
+              135 / 64.0,
               0,
               0,
-              -17 / 12.,
-              27 / 4.,
-              -27 / 5.,
-              16 / 15.,
+              -17 / 12.0,
+              27 / 4.0,
+              -27 / 5.0,
+              16 / 15.0,
               0,
-              65 / 432.,
-              -5 / 16.,
-              13 / 16.,
-              4 / 27.,
-              5 / 144.);
+              65 / 432.0,
+              -5 / 16.0,
+              13 / 16.0,
+              4 / 27.0,
+              5 / 144.0);
 
   /**
    * Implements one loop of RKF45. This takes an initial state, dt guess, and max truncation error,
