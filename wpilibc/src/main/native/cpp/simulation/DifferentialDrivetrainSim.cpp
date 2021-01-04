@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "frc/RobotController.h"
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 
 using namespace frc;
 using namespace frc::sim;

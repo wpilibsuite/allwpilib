@@ -13,7 +13,7 @@
 #include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/system/NumericalJacobian.h"
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "units/moment_of_inertia.h"

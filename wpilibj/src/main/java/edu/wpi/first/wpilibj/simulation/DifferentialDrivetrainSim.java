@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
 import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.RungeKutta;
+import edu.wpi.first.wpilibj.system.NumericalIntegration;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.util.Units;
@@ -151,7 +151,7 @@ public class DifferentialDrivetrainSim {
   public void update(double dtSeconds) {
 
     // Update state estimate with RK4
-    m_x = RungeKutta.rungeKutta(this::getDynamics, m_x, m_u, dtSeconds);
+    m_x = NumericalIntegration.rungeKutta(this::getDynamics, m_x, m_u, dtSeconds);
     m_y = m_x;
     if (m_measurementStdDevs != null) {
       m_y = m_y.plus(StateSpaceUtil.makeWhiteNoiseVector(m_measurementStdDevs));

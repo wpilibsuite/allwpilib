@@ -8,7 +8,7 @@
 
 #include "Eigen/Core"
 #include "frc/StateSpaceUtil.h"
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 
 TEST(StateSpaceUtilTest, MakeMatrix) {
   // Column vector

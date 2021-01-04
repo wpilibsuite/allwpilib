@@ -7,7 +7,7 @@
 #include <wpi/MathExtras.h>
 
 #include "frc/StateSpaceUtil.h"
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 
 using namespace frc;

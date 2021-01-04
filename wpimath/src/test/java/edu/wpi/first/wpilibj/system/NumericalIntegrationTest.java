@@ -12,7 +12,7 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.junit.jupiter.api.Test;
 
-public class RungeKuttaTest {
+public class NumericalIntegrationTest {
   @Test
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public void testExponential() {

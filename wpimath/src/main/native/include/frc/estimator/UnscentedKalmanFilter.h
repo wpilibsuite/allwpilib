@@ -14,7 +14,7 @@
 #include "frc/estimator/UnscentedTransform.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalJacobian.h"
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 #include "units/time.h"
 
 namespace frc {
