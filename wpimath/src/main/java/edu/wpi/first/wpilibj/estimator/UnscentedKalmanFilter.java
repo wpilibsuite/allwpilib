@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj.estimator;
 
 import edu.wpi.first.wpilibj.math.Discretization;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
-import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpilibj.system.NumericalIntegration;
+import edu.wpi.first.wpilibj.system.NumericalJacobian;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;

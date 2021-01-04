@@ -76,7 +76,8 @@ class DifferentialDrivetrainSimTest {
       sim.update(0.020);
 
       // Update our ground truth
-      groundTruthX = NumericalIntegration.rungeKutta(sim::getDynamics, groundTruthX, voltages, 0.020);
+      groundTruthX =
+          NumericalIntegration.rungeKutta(sim::getDynamics, groundTruthX, voltages, 0.020);
     }
 
     assertEquals(
