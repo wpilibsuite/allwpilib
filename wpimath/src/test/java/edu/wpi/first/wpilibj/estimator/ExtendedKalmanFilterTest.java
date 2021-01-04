@@ -39,10 +39,8 @@ public class ExtendedKalmanFilterTest {
     final var J = 5.6; // Robot moment of inertia
 
     final var C1 =
-        -Math.pow(gr, 2)
-            * motors.m_KtNMPerAmp
-            / (motors.m_KvRadPerSecPerVolt * motors.m_rOhms * r * r);
-    final var C2 = gr * motors.m_KtNMPerAmp / (motors.m_rOhms * r);
+        -Math.pow(gr, 2) * motors.KtNMPerAmp / (motors.KvRadPerSecPerVolt * motors.rOhms * r * r);
+    final var C2 = gr * motors.KtNMPerAmp / (motors.rOhms * r);
     final var k1 = 1.0 / m + rb * rb / J;
     final var k2 = 1.0 / m - rb * rb / J;
 

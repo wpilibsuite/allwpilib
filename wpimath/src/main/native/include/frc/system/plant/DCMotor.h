@@ -55,12 +55,12 @@ class DCMotor {
                     units::radians_per_second_t freeSpeed, int numMotors = 1)
       : nominalVoltage(nominalVoltage),
         stallTorque(stallTorque * numMotors),
-        stallCurrent(stallCurrent),
-        freeCurrent(freeCurrent),
+        stallCurrent(stallCurrent * numMotors),
+        freeCurrent(freeCurrent * numMotors),
         freeSpeed(freeSpeed),
-        R(nominalVoltage / stallCurrent),
-        Kv(freeSpeed / (nominalVoltage - R * freeCurrent)),
-        Kt(stallTorque * numMotors / stallCurrent) {}
+        R(nominalVoltage / this->stallCurrent),
+        Kv(freeSpeed / (nominalVoltage - R * this->freeCurrent)),
+        Kt(this->stallTorque / this->stallCurrent) {}
 
   /**
    * Returns current drawn by motor with given speed and input voltage.

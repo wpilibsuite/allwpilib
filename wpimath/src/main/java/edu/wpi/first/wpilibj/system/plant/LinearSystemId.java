@@ -35,13 +35,13 @@ public final class LinearSystemId {
                 1,
                 0,
                 -Math.pow(G, 2)
-                    * motor.m_KtNMPerAmp
-                    / (motor.m_rOhms
+                    * motor.KtNMPerAmp
+                    / (motor.rOhms
                         * radiusMeters
                         * radiusMeters
                         * massKg
-                        * motor.m_KvRadPerSecPerVolt)),
-        VecBuilder.fill(0, G * motor.m_KtNMPerAmp / (motor.m_rOhms * radiusMeters * massKg)),
+                        * motor.KvRadPerSecPerVolt)),
+        VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * radiusMeters * massKg)),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -61,9 +61,9 @@ public final class LinearSystemId {
         VecBuilder.fill(
             -G
                 * G
-                * motor.m_KtNMPerAmp
-                / (motor.m_KvRadPerSecPerVolt * motor.m_rOhms * jKgMetersSquared)),
-        VecBuilder.fill(G * motor.m_KtNMPerAmp / (motor.m_rOhms * jKgMetersSquared)),
+                * motor.KtNMPerAmp
+                / (motor.KvRadPerSecPerVolt * motor.rOhms * jKgMetersSquared)),
+        VecBuilder.fill(G * motor.KtNMPerAmp / (motor.rOhms * jKgMetersSquared)),
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
@@ -89,10 +89,8 @@ public final class LinearSystemId {
       double JKgMetersSquared,
       double G) {
     var C1 =
-        -(G * G)
-            * motor.m_KtNMPerAmp
-            / (motor.m_KvRadPerSecPerVolt * motor.m_rOhms * rMeters * rMeters);
-    var C2 = G * motor.m_KtNMPerAmp / (motor.m_rOhms * rMeters);
+        -(G * G) * motor.KtNMPerAmp / (motor.KvRadPerSecPerVolt * motor.rOhms * rMeters * rMeters);
+    var C2 = G * motor.KtNMPerAmp / (motor.rOhms * rMeters);
 
     final double C3 = 1 / massKg + rbMeters * rbMeters / JKgMetersSquared;
     final double C4 = 1 / massKg - rbMeters * rbMeters / JKgMetersSquared;
@@ -123,9 +121,9 @@ public final class LinearSystemId {
                 1,
                 0,
                 -Math.pow(G, 2)
-                    * motor.m_KtNMPerAmp
-                    / (motor.m_KvRadPerSecPerVolt * motor.m_rOhms * jKgSquaredMeters)),
-        VecBuilder.fill(0, G * motor.m_KtNMPerAmp / (motor.m_rOhms * jKgSquaredMeters)),
+                    * motor.KtNMPerAmp
+                    / (motor.KvRadPerSecPerVolt * motor.rOhms * jKgSquaredMeters)),
+        VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * jKgSquaredMeters)),
         Matrix.mat(Nat.N1(), Nat.N2()).fill(1, 0),
         new Matrix<>(Nat.N1(), Nat.N1()));
   }
