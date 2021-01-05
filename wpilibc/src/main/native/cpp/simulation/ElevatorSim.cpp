@@ -77,7 +77,7 @@ void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
 Eigen::Matrix<double, 2, 1> ElevatorSim::UpdateX(
     const Eigen::Matrix<double, 2, 1>& currentXhat,
     const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) {
-  auto updatedXhat = RungeKutta(
+  auto updatedXhat = RungeKuttaAdaptive(
       [&](const Eigen::Matrix<double, 2, 1>& x,
           const Eigen::Matrix<double, 1, 1>& u_)
           -> Eigen::Matrix<double, 2, 1> {

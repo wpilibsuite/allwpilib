@@ -12,8 +12,8 @@
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
-#include "frc/system/NumericalJacobian.h"
 #include "frc/system/NumericalIntegration.h"
+#include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
 
 namespace frc {

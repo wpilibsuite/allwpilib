@@ -46,10 +46,10 @@ TEST(NumericalIntegrationTest, ExponentialWithUAdaptive) {
   Eigen::Matrix<double, 1, 1> y1 = frc::RungeKuttaAdaptive(
       [](Eigen::Matrix<double, 1, 1> x, Eigen::Matrix<double, 1, 1> u) {
         Eigen::Matrix<double, 1, 1> y;
-        y(0) = std::exp(u(0) * x(0));
+        y(0) = std::exp(x(0));
         return y;
       },
-      y0, (Eigen::Matrix<double, 1, 1>() << 1.0).finished(), 0.1_s);
+      y0, (Eigen::Matrix<double, 1, 1>() << 0.0).finished(), 0.1_s);
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 

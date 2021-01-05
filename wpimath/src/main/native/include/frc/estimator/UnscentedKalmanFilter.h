@@ -13,8 +13,8 @@
 #include "frc/estimator/MerweScaledSigmaPoints.h"
 #include "frc/estimator/UnscentedTransform.h"
 #include "frc/system/Discretization.h"
-#include "frc/system/NumericalJacobian.h"
 #include "frc/system/NumericalIntegration.h"
+#include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
 
 namespace frc {
