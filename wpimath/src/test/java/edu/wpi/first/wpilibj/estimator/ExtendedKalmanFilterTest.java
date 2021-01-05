@@ -179,7 +179,7 @@ public class ExtendedKalmanFilterTest {
       observer.predict(u, dtSeconds);
 
       groundTruthX =
-          NumericalIntegration.rungeKutta(
+          NumericalIntegration.rk4(
               ExtendedKalmanFilterTest::getDynamics, groundTruthX, u, dtSeconds);
 
       r = nextR;

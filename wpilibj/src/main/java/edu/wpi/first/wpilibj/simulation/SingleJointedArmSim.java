@@ -263,7 +263,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
     // cos(theta)]]
     Matrix<N2, N1> updatedXhat =
-        NumericalIntegration.rungeKuttaAdaptive(
+        NumericalIntegration.rkf45(
             (Matrix<N2, N1> x, Matrix<N1, N1> u_) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(u_));
               if (m_simulateGravity) {

@@ -149,7 +149,7 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, States, States> discQ;
     DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
 
-    m_xHat = RungeKutta(m_f, m_xHat, u, dt);
+    m_xHat = RK4(m_f, m_xHat, u, dt);
     m_P = discA * m_P * discA.transpose() + discQ;
   }
 

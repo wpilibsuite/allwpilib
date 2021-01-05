@@ -291,7 +291,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     for (int i = 0; i < m_pts.getNumSigmas(); ++i) {
       Matrix<States, N1> x = sigmas.extractColumnVector(i);
 
-      m_sigmasF.setColumn(i, NumericalIntegration.rungeKutta(m_f, x, u, dtSeconds));
+      m_sigmasF.setColumn(i, NumericalIntegration.rk4(m_f, x, u, dtSeconds));
     }
 
     var ret =

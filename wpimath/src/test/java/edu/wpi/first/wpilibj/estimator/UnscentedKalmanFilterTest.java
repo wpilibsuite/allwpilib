@@ -217,8 +217,7 @@ public class UnscentedKalmanFilterTest {
       r = nextR;
       observer.predict(u, dtSeconds);
       trueXhat =
-          NumericalIntegration.rungeKutta(
-              UnscentedKalmanFilterTest::getDynamics, trueXhat, u, dtSeconds);
+          NumericalIntegration.rk4(UnscentedKalmanFilterTest::getDynamics, trueXhat, u, dtSeconds);
     }
 
     var localY = getLocalMeasurementModel(trueXhat, u);

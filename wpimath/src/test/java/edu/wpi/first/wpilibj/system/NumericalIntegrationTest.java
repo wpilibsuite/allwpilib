@@ -21,7 +21,7 @@ public class NumericalIntegrationTest {
 
     //noinspection SuspiciousNameCombination
     var y1 =
-        NumericalIntegration.rungeKutta(
+        NumericalIntegration.rk4(
             (Matrix<N1, N1> x) -> {
               var y = new Matrix<>(Nat.N1(), Nat.N1());
               y.set(0, 0, Math.exp(x.get(0, 0)));
@@ -41,7 +41,7 @@ public class NumericalIntegrationTest {
 
     //noinspection SuspiciousNameCombination
     var y1 =
-        NumericalIntegration.rungeKuttaAdaptive(
+        NumericalIntegration.rkf45(
             (x, u) -> {
               var y = new Matrix<>(Nat.N1(), Nat.N1());
               y.set(0, 0, Math.exp(x.get(0, 0)));

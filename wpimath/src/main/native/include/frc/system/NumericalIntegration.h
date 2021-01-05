@@ -21,7 +21,7 @@ namespace frc {
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T>
-T RungeKutta(F&& f, T x, units::second_t dt) {
+T RK4(F&& f, T x, units::second_t dt) {
   const auto halfDt = 0.5 * dt;
   T k1 = f(x);
   T k2 = f(x + k1 * halfDt.to<double>());
@@ -39,7 +39,7 @@ T RungeKutta(F&& f, T x, units::second_t dt) {
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T, typename U>
-T RungeKutta(F&& f, T x, U u, units::second_t dt) {
+T RK4(F&& f, T x, U u, units::second_t dt) {
   const auto halfDt = 0.5 * dt;
   T k1 = f(x, u);
   T k2 = f(x + k1 * halfDt.to<double>(), u);
@@ -68,7 +68,7 @@ T RungeKuttaTimeVarying(F&& f, T x, units::second_t t, units::second_t dt) {
 }
 
 template <typename F, typename T, typename U>
-T RungeKuttaAdaptiveImpl(F&& f, T x, U u, double& initialH,
+T RKF45Impl(F&& f, T x, U u, double& initialH,
                          double maxTruncationError, double dtRemaining) {
   double truncationErr;
   double h = initialH;
@@ -133,7 +133,7 @@ T RungeKuttaAdaptiveImpl(F&& f, T x, U u, double& initialH,
  *                 number like 1e-6.
  */
 template <typename F, typename T, typename U>
-T RungeKuttaAdaptive(F&& f, T x, U u, units::second_t dt,
+T RKF45(F&& f, T x, U u, units::second_t dt,
                      double maxError = 1e-6) {
   double dtElapsed = 0;
   double dtSeconds = dt.to<double>();
@@ -144,7 +144,7 @@ T RungeKuttaAdaptive(F&& f, T x, U u, units::second_t dt,
     // RKF45 will give us an updated x and a dt back.
     // We use the new dt (h) as the initial dt for our next loop
     // previousH is changed by-reference
-    T ret = RungeKuttaAdaptiveImpl(f, x, u, previousH, maxError,
+    T ret = RKF45Impl(f, x, u, previousH, maxError,
                                    dtSeconds - dtElapsed);
     dtElapsed += previousH;
     x = ret;

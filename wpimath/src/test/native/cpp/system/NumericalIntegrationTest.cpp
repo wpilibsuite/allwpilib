@@ -13,7 +13,7 @@ TEST(NumericalIntegrationTest, Exponential) {
   Eigen::Matrix<double, 1, 1> y0;
   y0(0) = 0.0;
 
-  Eigen::Matrix<double, 1, 1> y1 = frc::RungeKutta(
+  Eigen::Matrix<double, 1, 1> y1 = frc::RK4(
       [](Eigen::Matrix<double, 1, 1> x) {
         Eigen::Matrix<double, 1, 1> y;
         y(0) = std::exp(x(0));
@@ -28,7 +28,7 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
   Eigen::Matrix<double, 1, 1> y0;
   y0(0) = 0.0;
 
-  Eigen::Matrix<double, 1, 1> y1 = frc::RungeKutta(
+  Eigen::Matrix<double, 1, 1> y1 = frc::RK4(
       [](Eigen::Matrix<double, 1, 1> x, Eigen::Matrix<double, 1, 1> u) {
         Eigen::Matrix<double, 1, 1> y;
         y(0) = std::exp(u(0) * x(0));
@@ -43,7 +43,7 @@ TEST(NumericalIntegrationTest, ExponentialWithUAdaptive) {
   Eigen::Matrix<double, 1, 1> y0;
   y0(0) = 0.0;
 
-  Eigen::Matrix<double, 1, 1> y1 = frc::RungeKuttaAdaptive(
+  Eigen::Matrix<double, 1, 1> y1 = frc::RKF45(
       [](Eigen::Matrix<double, 1, 1> x, Eigen::Matrix<double, 1, 1> u) {
         Eigen::Matrix<double, 1, 1> y;
         y(0) = std::exp(x(0));

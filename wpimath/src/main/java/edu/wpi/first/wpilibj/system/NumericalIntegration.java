@@ -29,7 +29,7 @@ public final class NumericalIntegration {
    * @return the integration of dx/dt = f(x) for dt.
    */
   @SuppressWarnings("ParameterName")
-  public static double rungeKutta(DoubleFunction<Double> f, double x, double dtSeconds) {
+  public static double rk4(DoubleFunction<Double> f, double x, double dtSeconds) {
     final var halfDt = 0.5 * dtSeconds;
     final var k1 = f.apply(x);
     final var k2 = f.apply(x + k1 * halfDt);
@@ -48,7 +48,7 @@ public final class NumericalIntegration {
    * @return The result of Runge Kutta integration (4th order).
    */
   @SuppressWarnings("ParameterName")
-  public static double rungeKutta(
+  public static double rk4(
       BiFunction<Double, Double, Double> f, double x, Double u, double dtSeconds) {
     final var halfDt = 0.5 * dtSeconds;
     final var k1 = f.apply(x, u);
@@ -70,7 +70,7 @@ public final class NumericalIntegration {
    * @return the integration of dx/dt = f(x, u) for dt.
    */
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
-  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKutta(
+  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rk4(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
@@ -94,7 +94,7 @@ public final class NumericalIntegration {
    * @return 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
    */
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
-  public static <States extends Num> Matrix<States, N1> rungeKutta(
+  public static <States extends Num> Matrix<States, N1> rk4(
       Function<Matrix<States, N1>, Matrix<States, N1>> f, Matrix<States, N1> x, double dtSeconds) {
 
     final var halfDt = 0.5 * dtSeconds;
@@ -119,12 +119,12 @@ public final class NumericalIntegration {
    * @return the integration of dx/dt = f(x, u) for dt.
    */
   @SuppressWarnings("MethodTypeParameterName")
-  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKuttaAdaptive(
+  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkf45(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
       double dtSeconds) {
-    return rungeKuttaAdaptive(f, x, u, dtSeconds, 1e-6);
+    return rkf45(f, x, u, dtSeconds, 1e-6);
   }
 
   /**
@@ -141,7 +141,7 @@ public final class NumericalIntegration {
    * @return the integration of dx/dt = f(x, u) for dt.
    */
   @SuppressWarnings("MethodTypeParameterName")
-  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKuttaAdaptive(
+  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkf45(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
@@ -154,7 +154,7 @@ public final class NumericalIntegration {
     while (dtElapsed < dtSeconds) {
       // RKF45 will give us an updated x and a dt back.
       // We use the new dt (h) as the initial dt for our next loop
-      var ret = rungeKuttaAdaptiveImpl(f, x, u, previousH, maxError, dtSeconds - dtElapsed);
+      var ret = rkf45Impl(f, x, u, previousH, maxError, dtSeconds - dtElapsed);
       dtElapsed += ret.getSecond();
       previousH = ret.getSecond();
       x = ret.getFirst();
@@ -217,7 +217,7 @@ public final class NumericalIntegration {
    */
   @SuppressWarnings("MethodTypeParameterName")
   private static <States extends Num, Inputs extends Num>
-      Pair<Matrix<States, N1>, Double> rungeKuttaAdaptiveImpl(
+      Pair<Matrix<States, N1>, Double> rkf45Impl(
           BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
           Matrix<States, N1> x,
           Matrix<Inputs, N1> u,

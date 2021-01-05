@@ -154,7 +154,7 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
     observer.Predict(u, dt);
 
     r = nextR;
-    trueXhat = frc::RungeKutta(Dynamics, trueXhat, u, dt);
+    trueXhat = frc::RK4(Dynamics, trueXhat, u, dt);
   }
 
   auto localY = LocalMeasurementModel(trueXhat, u);
