@@ -79,7 +79,7 @@ inline std::string NetworkTableEntry::GetRaw(StringRef defaultValue) const {
   if (!value || value->type() != NT_RAW) {
     return defaultValue;
   }
-  return value->GetString();
+  return value->GetRaw();
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
