@@ -13,7 +13,7 @@ package edu.wpi.first.hal;
  * <p>Vendors: This class should be used from inside the device class to define the
  * properties/fields of the device. Use {@link #create} to get a SimDevice object, then use {@link
  * #createDouble(String, Direction, double)} or similar to define the device's fields. See {@link
- * edu.wpi.first.wpilibj.Encoder} for an example implementation.
+ * edu.wpi.first.wpilibj.ADXRS450_Gyro} for an example implementation.
  */
 public class SimDevice implements AutoCloseable {
   public enum Direction {
