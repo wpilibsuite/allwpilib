@@ -146,6 +146,7 @@ T RungeKuttaAdaptive(F&& f, T x, U u, units::second_t dt,
     // previousH is changed by-reference
     T ret = RungeKuttaAdaptiveImpl(f, x, u, previousH, maxError,
                                    dtSeconds - dtElapsed);
+    dtElapsed += previousH;
     x = ret;
   }
   return x;

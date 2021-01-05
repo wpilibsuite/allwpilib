@@ -33,7 +33,6 @@ public class NumericalIntegrationTest {
     assertEquals(Math.exp(0.1) - Math.exp(0.0), y1.get(0, 0), 1e-3);
   }
 
-
   @Test
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public void testExponentialAdaptive() {
