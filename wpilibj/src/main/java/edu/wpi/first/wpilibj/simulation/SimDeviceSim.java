@@ -148,7 +148,7 @@ public class SimDeviceSim {
   }
 
   /**
-   * Register a callback to be run every time a new {@link SimDevice} is created.
+   * Register a callback to be run every time a new {@link edu.wpi.first.hal.SimDevice} is created.
    *
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
@@ -161,7 +161,8 @@ public class SimDeviceSim {
   }
 
   /**
-   * Register a callback to be run every time a {@link SimDevice} is freed/destroyed.
+   * Register a callback to be run every time a {@link edu.wpi.first.hal.SimDevice} is
+   * freed/destroyed.
    *
    * @param callback the callback
    * @return the {@link CallbackStore} object associated with this callback
