@@ -29,6 +29,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Register a callback to be run when this accelerometer activates.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -40,6 +41,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Check whether the accelerometer is active.
+   *
    * @return true if active
    */
   public boolean getActive() {
@@ -48,6 +50,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Define whether this accelerometer is active.
+   *
    * @param active the new state
    */
   public void setActive(boolean active) {
@@ -56,6 +59,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Register a callback to be run whenever the range changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -67,6 +71,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Check the range of this accelerometer.
+   *
    * @return the accelerometer range
    */
   public int getRange() {
@@ -75,6 +80,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Change the range of this accelerometer.
+   *
    * @param range the new accelerometer range
    */
   public void setRange(int range) {
@@ -83,6 +89,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Register a callback to be run whenever the X axis value changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -94,6 +101,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Measure the X axis value.
+   *
    * @return the X axis measurement
    */
   public double getX() {
@@ -102,6 +110,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Change the X axis value of the accelerometer.
+   *
    * @param x the new reading of the X axis
    */
   @SuppressWarnings("ParameterName")
@@ -111,6 +120,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Register a callback to be run whenever the Y axis value changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -122,6 +132,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Measure the Y axis value.
+   *
    * @return the Y axis measurement
    */
   public double getY() {
@@ -130,6 +141,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Change the Y axis value of the accelerometer.
+   *
    * @param y the new reading of the Y axis
    */
   @SuppressWarnings("ParameterName")
@@ -139,6 +151,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Register a callback to be run whenever the Z axis value changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -150,6 +163,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Measure the Z axis value.
+   *
    * @return the Z axis measurement
    */
   public double getZ() {
@@ -158,6 +172,7 @@ public class BuiltInAccelerometerSim {
 
   /**
    * Change the Z axis value of the accelerometer.
+   *
    * @param z the new reading of the Z axis
    */
   @SuppressWarnings("ParameterName")
@@ -165,9 +180,7 @@ public class BuiltInAccelerometerSim {
     AccelerometerDataJNI.setZ(m_index, z);
   }
 
-  /**
-   * Reset all simulation data of this object.
-   */
+  /** Reset all simulation data of this object. */
   public void resetData() {
     AccelerometerDataJNI.resetData(m_index);
   }

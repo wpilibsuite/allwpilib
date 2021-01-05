@@ -8,21 +8,21 @@ import static edu.wpi.first.wpilibj.XboxController.Button;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.subsystems.DriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,8 +35,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
   // The driver's controller
-  XboxController m_driverController =
-      new XboxController(OIConstants.kDriverControllerPort);
+  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -121,8 +120,7 @@ public class RobotContainer {
         new RamseteCommand(
             exampleTrajectory,
             m_robotDrive::getPose,
-            new RamseteController(
-                AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
             new SimpleMotorFeedforward(
                 DriveConstants.ksVolts,
                 DriveConstants.kvVoltSecondsPerMeter,

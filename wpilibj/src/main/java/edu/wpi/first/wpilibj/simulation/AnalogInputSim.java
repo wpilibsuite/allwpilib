@@ -32,6 +32,7 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on whether the analog input is initialized.
+   *
    * @param callback the callback that will be called whenever the analog input is initialized
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -43,6 +44,7 @@ public class AnalogInputSim {
 
   /**
    * Check if this analog input has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -51,6 +53,7 @@ public class AnalogInputSim {
 
   /**
    * Change whether this analog input has been initialized.
+   *
    * @param initialized the new value
    */
   public void setInitialized(boolean initialized) {
@@ -59,18 +62,19 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on the number of average bits.
+   *
    * @param callback the callback that will be called whenever the number of average bits is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
    */
-  public CallbackStore registerAverageBitsCallback(NotifyCallback callback,
-                                                   boolean initialNotify) {
+  public CallbackStore registerAverageBitsCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogInDataJNI.registerAverageBitsCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogInDataJNI::cancelAverageBitsCallback);
   }
 
   /**
    * Get the number of average bits.
+   *
    * @return the number of average bits
    */
   public int getAverageBits() {
@@ -79,6 +83,7 @@ public class AnalogInputSim {
 
   /**
    * Change the number of average bits.
+   *
    * @param averageBits the new value
    */
   public void setAverageBits(int averageBits) {
@@ -87,6 +92,7 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on the amount of oversampling bits.
+   *
    * @param callback the callback that will be called whenever the oversampling bits are changed.
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -99,6 +105,7 @@ public class AnalogInputSim {
 
   /**
    * Get the amount of oversampling bits.
+   *
    * @return the amount of oversampling bits
    */
   public int getOversampleBits() {
@@ -107,6 +114,7 @@ public class AnalogInputSim {
 
   /**
    * Change the amount of oversampling bits.
+   *
    * @param oversampleBits the new value
    */
   public void setOversampleBits(int oversampleBits) {
@@ -115,6 +123,7 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on the voltage.
+   *
    * @param callback the callback that will be called whenever the voltage is changed.
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -126,6 +135,7 @@ public class AnalogInputSim {
 
   /**
    * Get the voltage.
+   *
    * @return the voltage
    */
   public double getVoltage() {
@@ -134,6 +144,7 @@ public class AnalogInputSim {
 
   /**
    * Change the voltage.
+   *
    * @param voltage the new value
    */
   public void setVoltage(double voltage) {
@@ -142,6 +153,7 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on whether the accumulator is initialized.
+   *
    * @param callback the callback that will be called whenever the accumulator is initialized
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -155,6 +167,7 @@ public class AnalogInputSim {
 
   /**
    * Check if the accumulator has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getAccumulatorInitialized() {
@@ -163,6 +176,7 @@ public class AnalogInputSim {
 
   /**
    * Change whether the accumulator has been initialized.
+   *
    * @param accumulatorInitialized the new value
    */
   public void setAccumulatorInitialized(boolean accumulatorInitialized) {
@@ -171,6 +185,7 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on the accumulator value.
+   *
    * @param callback the callback that will be called whenever the accumulator value is changed.
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -183,6 +198,7 @@ public class AnalogInputSim {
 
   /**
    * Get the accumulator value.
+   *
    * @return the accumulator value
    */
   public long getAccumulatorValue() {
@@ -191,6 +207,7 @@ public class AnalogInputSim {
 
   /**
    * Change the accumulator value.
+   *
    * @param accumulatorValue the new value
    */
   public void setAccumulatorValue(long accumulatorValue) {
@@ -199,6 +216,7 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on the accumulator count.
+   *
    * @param callback the callback that will be called whenever the accumulator count is changed.
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -211,13 +229,16 @@ public class AnalogInputSim {
 
   /**
    * Get the accumulator count.
-   * @return the accumulator count.   */
+   *
+   * @return the accumulator count.
+   */
   public long getAccumulatorCount() {
     return AnalogInDataJNI.getAccumulatorCount(m_index);
   }
 
   /**
    * Change the accumulator count.
+   *
    * @param accumulatorCount the new count.
    */
   public void setAccumulatorCount(long accumulatorCount) {
@@ -226,6 +247,7 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on the accumulator center.
+   *
    * @param callback the callback that will be called whenever the accumulator center is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -238,6 +260,7 @@ public class AnalogInputSim {
 
   /**
    * Get the accumulator center.
+   *
    * @return the accumulator center
    */
   public int getAccumulatorCenter() {
@@ -246,6 +269,7 @@ public class AnalogInputSim {
 
   /**
    * Change the accumulator center.
+   *
    * @param accumulatorCenter the new center
    */
   public void setAccumulatorCenter(int accumulatorCenter) {
@@ -254,6 +278,7 @@ public class AnalogInputSim {
 
   /**
    * Register a callback on the accumulator deadband.
+   *
    * @param callback the callback that will be called whenever the accumulator deadband is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -266,6 +291,7 @@ public class AnalogInputSim {
 
   /**
    * Get the accumulator deadband.
+   *
    * @return the accumulator deadband
    */
   public int getAccumulatorDeadband() {
@@ -274,15 +300,14 @@ public class AnalogInputSim {
 
   /**
    * Change the accumulator deadband.
+   *
    * @param accumulatorDeadband the new deadband
    */
   public void setAccumulatorDeadband(int accumulatorDeadband) {
     AnalogInDataJNI.setAccumulatorDeadband(m_index, accumulatorDeadband);
   }
 
-  /**
-   * Reset all simulation data for this object.
-   */
+  /** Reset all simulation data for this object. */
   public void resetData() {
     AnalogInDataJNI.resetData(m_index);
   }

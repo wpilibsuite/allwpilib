@@ -7,14 +7,13 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.SPIAccelerometerDataJNI;
 
-/**
- * A class to control a simulated accelerometer over SPI.
- */
+/** A class to control a simulated accelerometer over SPI. */
 public class SPIAccelerometerSim {
   private final int m_index;
 
   /**
    * Construct a new simulation object.
+   *
    * @param index the HAL index of the accelerometer
    */
   public SPIAccelerometerSim(int index) {
@@ -23,6 +22,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Register a callback to be run when this accelerometer activates.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -34,6 +34,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Check whether the accelerometer is active.
+   *
    * @return true if active
    */
   public boolean getActive() {
@@ -42,6 +43,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Define whether this accelerometer is active.
+   *
    * @param active the new state
    */
   public void setActive(boolean active) {
@@ -50,6 +52,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Register a callback to be run whenever the range changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -61,6 +64,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Check the range of this accelerometer.
+   *
    * @return the accelerometer range
    */
   public int getRange() {
@@ -69,6 +73,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Change the range of this accelerometer.
+   *
    * @param range the new accelerometer range
    */
   public void setRange(int range) {
@@ -77,6 +82,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Register a callback to be run whenever the X axis value changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -88,6 +94,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Measure the X axis value.
+   *
    * @return the X axis measurement
    */
   public double getX() {
@@ -96,6 +103,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Change the X axis value of the accelerometer.
+   *
    * @param x the new reading of the X axis
    */
   @SuppressWarnings("ParameterName")
@@ -105,6 +113,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Register a callback to be run whenever the Y axis value changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -116,6 +125,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Measure the Y axis value.
+   *
    * @return the Y axis measurement
    */
   public double getY() {
@@ -124,6 +134,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Change the Y axis value of the accelerometer.
+   *
    * @param y the new reading of the Y axis
    */
   @SuppressWarnings("ParameterName")
@@ -133,6 +144,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Register a callback to be run whenever the Z axis value changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -144,6 +156,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Measure the Z axis value.
+   *
    * @return the Z axis measurement
    */
   public double getZ() {
@@ -152,6 +165,7 @@ public class SPIAccelerometerSim {
 
   /**
    * Change the Z axis value of the accelerometer.
+   *
    * @param z the new reading of the Z axis
    */
   @SuppressWarnings("ParameterName")
@@ -159,9 +173,7 @@ public class SPIAccelerometerSim {
     SPIAccelerometerDataJNI.setZ(m_index, z);
   }
 
-  /**
-   * Reset all simulation data of this object.
-   */
+  /** Reset all simulation data of this object. */
   public void resetData() {
     SPIAccelerometerDataJNI.resetData(m_index);
   }

@@ -60,8 +60,8 @@ public class DifferentialDrivetrainSim {
    * Create a SimDrivetrain.
    *
    * @param driveMotor A {@link DCMotor} representing the left side of the drivetrain.
-   * @param gearing The gearing ratio between motor and wheel, as output over input. This
-   *     must be the same ratio as the ratio used to identify or create the drivetrainPlant.
+   * @param gearing The gearing ratio between motor and wheel, as output over input. This must be
+   *     the same ratio as the ratio used to identify or create the drivetrainPlant.
    * @param jKgMetersSquared The moment of inertia of the drivetrain about its center.
    * @param massKg The mass of the drivebase.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
@@ -150,6 +150,7 @@ public class DifferentialDrivetrainSim {
 
   /**
    * Update the drivetrain states with the current time difference.
+   *
    * @param dtSeconds the time difference
    */
   @SuppressWarnings("LocalVariableName")
@@ -170,6 +171,7 @@ public class DifferentialDrivetrainSim {
 
   /**
    * Get one of the drivetrain states.
+   *
    * @param state the state to get
    * @return the state
    */
@@ -233,6 +235,7 @@ public class DifferentialDrivetrainSim {
 
   /**
    * Get the current draw of the drivetrain.
+   *
    * @return the current draw, in amps
    */
   public double getLeftCurrentDrawAmps() {
@@ -260,6 +263,7 @@ public class DifferentialDrivetrainSim {
 
   /**
    * Get the drivetrain gearing.
+   *
    * @return the gearing ration
    */
   public double getCurrentGearing() {
@@ -345,10 +349,7 @@ public class DifferentialDrivetrainSim {
     return StateSpaceUtil.normalizeInputVector(u, RobotController.getBatteryVoltage());
   }
 
-  /**
-   * Represents the different states of the drivetrain.
-   *
-   */
+  /** Represents the different states of the drivetrain. */
   enum State {
     kX(0),
     kY(1),
@@ -387,9 +388,7 @@ public class DifferentialDrivetrainSim {
     }
   }
 
-  /**
-   * Represents common motor layouts of the kit drivetrain.
-   */
+  /** Represents common motor layouts of the kit drivetrain. */
   public enum KitbotMotor {
     kSingleCIMPerSide(DCMotor.getCIM(1)),
     kDualCIMPerSide(DCMotor.getCIM(2)),
@@ -405,9 +404,7 @@ public class DifferentialDrivetrainSim {
     }
   }
 
-  /**
-   * Represents common wheel sizes of the kit drivetrain.
-   */
+  /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
     SixInch(Units.inchesToMeters(6)),
     EightInch(Units.inchesToMeters(8)),

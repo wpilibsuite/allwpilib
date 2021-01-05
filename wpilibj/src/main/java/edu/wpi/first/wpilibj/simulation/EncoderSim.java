@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import java.util.NoSuchElementException;
-
 import edu.wpi.first.hal.simulation.EncoderDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.Encoder;
+import java.util.NoSuchElementException;
 
 /** Class to control a simulated encoder. */
 public class EncoderSim {
@@ -56,6 +55,7 @@ public class EncoderSim {
 
   /**
    * Register a callback on the Initialized property of the encoder.
+   *
    * @param callback the callback that will be called whenever the Initialized property is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -67,6 +67,7 @@ public class EncoderSim {
 
   /**
    * Read the Initialized value of the encoder.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -75,6 +76,7 @@ public class EncoderSim {
 
   /**
    * Change the Initialized value of the encoder.
+   *
    * @param initialized the new value
    */
   public void setInitialized(boolean initialized) {
@@ -83,6 +85,7 @@ public class EncoderSim {
 
   /**
    * Register a callback on the count property of the encoder.
+   *
    * @param callback the callback that will be called whenever the count property is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -94,6 +97,7 @@ public class EncoderSim {
 
   /**
    * Read the count of the encoder.
+   *
    * @return the count
    */
   public int getCount() {
@@ -102,6 +106,7 @@ public class EncoderSim {
 
   /**
    * Change the count of the encoder.
+   *
    * @param count the new count
    */
   public void setCount(int count) {
@@ -110,6 +115,7 @@ public class EncoderSim {
 
   /**
    * Register a callback on the period of the encoder.
+   *
    * @param callback the callback that will be called whenever the period is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -121,6 +127,7 @@ public class EncoderSim {
 
   /**
    * Read the period of the encoder.
+   *
    * @return the encoder period
    */
   public double getPeriod() {
@@ -129,6 +136,7 @@ public class EncoderSim {
 
   /**
    * Change the encoder period.
+   *
    * @param period the new period
    */
   public void setPeriod(double period) {
@@ -137,6 +145,7 @@ public class EncoderSim {
 
   /**
    * Register a callback to be called whenever the encoder is reset.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -148,6 +157,7 @@ public class EncoderSim {
 
   /**
    * Check if the encoder has been reset.
+   *
    * @return true if reset
    */
   public boolean getReset() {
@@ -156,6 +166,7 @@ public class EncoderSim {
 
   /**
    * Change the reset property of the encoder.
+   *
    * @param reset the new value
    */
   public void setReset(boolean reset) {
@@ -164,6 +175,7 @@ public class EncoderSim {
 
   /**
    * Register a callback to be run whenever the max period of the encoder is changed.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -175,6 +187,7 @@ public class EncoderSim {
 
   /**
    * Get the max period of the encoder.
+   *
    * @return the max period of the encoder
    */
   public double getMaxPeriod() {
@@ -183,6 +196,7 @@ public class EncoderSim {
 
   /**
    * Change the max period of the encoder.
+   *
    * @param maxPeriod the new value
    */
   public void setMaxPeriod(double maxPeriod) {
@@ -191,6 +205,7 @@ public class EncoderSim {
 
   /**
    * Register a callback on the direction of the encoder.
+   *
    * @param callback the callback that will be called whenever the direction is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -202,6 +217,7 @@ public class EncoderSim {
 
   /**
    * Get the direction of the encoder.
+   *
    * @return the direction of the encoder
    */
   public boolean getDirection() {
@@ -210,6 +226,7 @@ public class EncoderSim {
 
   /**
    * Set the direction of the encoder.
+   *
    * @param direction the new direction
    */
   public void setDirection(boolean direction) {
@@ -218,6 +235,7 @@ public class EncoderSim {
 
   /**
    * Register a callback on the reverse direction.
+   *
    * @param callback the callback that will be called whenever the reverse direction is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -230,6 +248,7 @@ public class EncoderSim {
 
   /**
    * Get the reverse direction of the encoder.
+   *
    * @return the reverse direction of the encoder
    */
   public boolean getReverseDirection() {
@@ -238,6 +257,7 @@ public class EncoderSim {
 
   /**
    * Set the reverse direction.
+   *
    * @param reverseDirection the new value
    */
   public void setReverseDirection(boolean reverseDirection) {
@@ -246,6 +266,7 @@ public class EncoderSim {
 
   /**
    * Register a callback on the samples-to-average value of this encoder.
+   *
    * @param callback the callback that will be called whenever the samples-to-average is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -258,6 +279,7 @@ public class EncoderSim {
 
   /**
    * Get the samples-to-average value.
+   *
    * @return the samples-to-average value
    */
   public int getSamplesToAverage() {
@@ -266,6 +288,7 @@ public class EncoderSim {
 
   /**
    * Set the axis count of this device.
+   *
    * @param samplesToAverage the new value
    */
   public void setSamplesToAverage(int samplesToAverage) {
@@ -274,6 +297,7 @@ public class EncoderSim {
 
   /**
    * Change the encoder distance.
+   *
    * @param distance the new distance
    */
   public void setDistance(double distance) {
@@ -282,6 +306,7 @@ public class EncoderSim {
 
   /**
    * Read the distance of the encoder.
+   *
    * @return the encoder distance
    */
   public double getDistance() {
@@ -290,6 +315,7 @@ public class EncoderSim {
 
   /**
    * Change the rate of the encoder.
+   *
    * @param rate the new rate
    */
   public void setRate(double rate) {
@@ -298,15 +324,14 @@ public class EncoderSim {
 
   /**
    * Get the rate of the encoder.
+   *
    * @return the rate of change
    */
   public double getRate() {
     return EncoderDataJNI.getRate(m_index);
   }
 
-  /**
-   * Resets all simulation data for this encoder.
-   */
+  /** Resets all simulation data for this encoder. */
   public void resetData() {
     EncoderDataJNI.resetData(m_index);
   }

@@ -39,6 +39,7 @@ public class JoystickSim extends GenericHIDSim {
 
   /**
    * Set the X value of the joystick.
+   *
    * @param value the new X value
    */
   public void setX(double value) {
@@ -47,6 +48,7 @@ public class JoystickSim extends GenericHIDSim {
 
   /**
    * Set the Y value of the joystick.
+   *
    * @param value the new Y value
    */
   public void setY(double value) {
@@ -55,6 +57,7 @@ public class JoystickSim extends GenericHIDSim {
 
   /**
    * Set the Z value of the joystick.
+   *
    * @param value the new Z value
    */
   public void setZ(double value) {
@@ -63,6 +66,7 @@ public class JoystickSim extends GenericHIDSim {
 
   /**
    * Set the twist value of the joystick.
+   *
    * @param value the new twist value
    */
   public void setTwist(double value) {
@@ -72,6 +76,7 @@ public class JoystickSim extends GenericHIDSim {
 
   /**
    * Set the throttle value of the joystick.
+   *
    * @param value the new throttle value
    */
   public void setThrottle(double value) {
@@ -82,6 +87,7 @@ public class JoystickSim extends GenericHIDSim {
 
   /**
    * Set the trigger value of the joystick.
+   *
    * @param state the new value
    */
   public void setTrigger(boolean state) {
@@ -90,6 +96,7 @@ public class JoystickSim extends GenericHIDSim {
 
   /**
    * Set the top state of the joystick.
+   *
    * @param state the new state
    */
   public void setTop(boolean state) {

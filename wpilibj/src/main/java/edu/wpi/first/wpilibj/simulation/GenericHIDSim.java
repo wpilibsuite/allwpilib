@@ -35,6 +35,7 @@ public class GenericHIDSim {
 
   /**
    * Set the value of a given button.
+   *
    * @param button the button to set
    * @param value the new value
    */
@@ -44,6 +45,7 @@ public class GenericHIDSim {
 
   /**
    * Set the value of a given axis.
+   *
    * @param axis the axis to set
    * @param value the new value
    */
@@ -53,6 +55,7 @@ public class GenericHIDSim {
 
   /**
    * Set the value of a given POV.
+   *
    * @param pov the POV to set
    * @param value the new value
    */
@@ -62,6 +65,7 @@ public class GenericHIDSim {
 
   /**
    * Set the value of the default POV (port 0).
+   *
    * @param value the new value
    */
   public void setPOV(int value) {
@@ -70,6 +74,7 @@ public class GenericHIDSim {
 
   /**
    * Set the axis count of this device.
+   *
    * @param count the new axis count
    */
   public void setAxisCount(int count) {
@@ -78,6 +83,7 @@ public class GenericHIDSim {
 
   /**
    * Set the POV count of this device.
+   *
    * @param count the new POV count
    */
   public void setPOVCount(int count) {
@@ -86,6 +92,7 @@ public class GenericHIDSim {
 
   /**
    * Set the button count of this device.
+   *
    * @param count the new button count
    */
   public void setButtonCount(int count) {
@@ -94,6 +101,7 @@ public class GenericHIDSim {
 
   /**
    * Set the type of this device.
+   *
    * @param type the new device type
    */
   public void setType(GenericHID.HIDType type) {
@@ -102,6 +110,7 @@ public class GenericHIDSim {
 
   /**
    * Set the name of this device.
+   *
    * @param name the new device name
    */
   public void setName(String name) {
@@ -110,6 +119,7 @@ public class GenericHIDSim {
 
   /**
    * Set the type of an axis.
+   *
    * @param axis the axis
    * @param type the type
    */
@@ -119,6 +129,7 @@ public class GenericHIDSim {
 
   /**
    * Read the output of a button.
+   *
    * @param outputNumber the button number
    * @return the value of the button (true = pressed)
    */
@@ -129,6 +140,7 @@ public class GenericHIDSim {
 
   /**
    * Get the encoded 16-bit integer that passes button values.
+   *
    * @return the button values
    */
   public long getOutputs() {
@@ -137,6 +149,7 @@ public class GenericHIDSim {
 
   /**
    * Get the joystick rumble.
+   *
    * @param type the rumble to read
    * @return the rumble value
    */

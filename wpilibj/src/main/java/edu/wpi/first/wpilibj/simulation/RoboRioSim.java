@@ -12,19 +12,21 @@ import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 public class RoboRioSim {
   /**
    * Register a callback to be run when the FPGA button state changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
    */
   @SuppressWarnings("AbbreviationAsWordInName")
-  public static CallbackStore registerFPGAButtonCallback(NotifyCallback callback,
-                                                         boolean initialNotify) {
+  public static CallbackStore registerFPGAButtonCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = RoboRioDataJNI.registerFPGAButtonCallback(callback, initialNotify);
     return new CallbackStore(uid, RoboRioDataJNI::cancelFPGAButtonCallback);
   }
 
   /**
    * Query the state of the FPGA button.
+   *
    * @return the FPGA button state
    */
   @SuppressWarnings("AbbreviationAsWordInName")
@@ -34,6 +36,7 @@ public class RoboRioSim {
 
   /**
    * Define the state of the FPGA button.
+   *
    * @param fpgaButton the new state
    */
   @SuppressWarnings("AbbreviationAsWordInName")
@@ -43,6 +46,7 @@ public class RoboRioSim {
 
   /**
    * Register a callback to be run whenever the Vin voltage changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -55,6 +59,7 @@ public class RoboRioSim {
 
   /**
    * Measure the Vin voltage.
+   *
    * @return the Vin voltage
    */
   public static double getVInVoltage() {
@@ -63,6 +68,7 @@ public class RoboRioSim {
 
   /**
    * Define teh Vin voltage.
+   *
    * @param vInVoltage the new voltage
    */
   @SuppressWarnings("ParameterName")
@@ -72,6 +78,7 @@ public class RoboRioSim {
 
   /**
    * Register a callback to be run whenever the Vin current changes.
+   *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -259,9 +266,7 @@ public class RoboRioSim {
     RoboRioDataJNI.setUserFaults3V3(userFaults3V3);
   }
 
-  /**
-   * Reset all simulation data.
-   */
+  /** Reset all simulation data. */
   public static void resetData() {
     RoboRioDataJNI.resetData();
   }

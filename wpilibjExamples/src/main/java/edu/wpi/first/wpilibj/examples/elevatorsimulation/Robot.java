@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
   // distance per pulse = (distance per revolution) / (pulses per revolution)
   //  = (Pi * D) / ppr
   private static final double kElevatorEncoderDistPerPulse =
-          2.0 * Math.PI * kElevatorDrumRadius / 4096;
+      2.0 * Math.PI * kElevatorDrumRadius / 4096;
 
   private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
     m_encoderSim.setDistance(m_elevatorSim.getPositionMeters());
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
-            BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+        BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
   }
 
   @Override

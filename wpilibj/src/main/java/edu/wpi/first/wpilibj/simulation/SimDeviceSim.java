@@ -27,6 +27,7 @@ public class SimDeviceSim {
 
   /**
    * Get the property object with the given name.
+   *
    * @param name the property name
    * @return the value
    */
@@ -40,6 +41,7 @@ public class SimDeviceSim {
 
   /**
    * Get the property object with the given name.
+   *
    * @param name the property name
    * @return the value
    */
@@ -53,6 +55,7 @@ public class SimDeviceSim {
 
   /**
    * Get the property object with the given name.
+   *
    * @param name the property name
    * @return the value
    */
@@ -66,6 +69,7 @@ public class SimDeviceSim {
 
   /**
    * Get the property object with the given name.
+   *
    * @param name the property name
    * @return the value
    */
@@ -79,6 +83,7 @@ public class SimDeviceSim {
 
   /**
    * Get all options for the given enum.
+   *
    * @param val the enum
    * @return names of the different values for that enum
    */
@@ -88,6 +93,7 @@ public class SimDeviceSim {
 
   /**
    * Get all data of this object.
+   *
    * @return all data and fields of this object
    */
   public SimDeviceDataJNI.SimValueInfo[] enumerateValues() {
@@ -96,6 +102,7 @@ public class SimDeviceSim {
 
   /**
    * Get the native handle of this object.
+   *
    * @return the handle used to refer to this object through JNI
    */
   public int getNativeHandle() {
@@ -104,6 +111,7 @@ public class SimDeviceSim {
 
   /**
    * Register a callback to be run every time a new value is added to this device.
+   *
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -116,6 +124,7 @@ public class SimDeviceSim {
 
   /**
    * Register a callback to be run every time a value is changed on this device.
+   *
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -130,6 +139,7 @@ public class SimDeviceSim {
 
   /**
    * Get all sim devices with the given prefix.
+   *
    * @param prefix the prefix to filter sim devices
    * @return all sim devices
    */
@@ -139,6 +149,7 @@ public class SimDeviceSim {
 
   /**
    * Register a callback to be run every time a new {@link SimDevice} is created.
+   *
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -151,6 +162,7 @@ public class SimDeviceSim {
 
   /**
    * Register a callback to be run every time a {@link SimDevice} is freed/destroyed.
+   *
    * @param callback the callback
    * @return the {@link CallbackStore} object associated with this callback
    */
@@ -160,9 +172,7 @@ public class SimDeviceSim {
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimDeviceFreedCallback);
   }
 
-  /**
-   * Reset all SimDevice data.
-   */
+  /** Reset all SimDevice data. */
   public static void resetData() {
     SimDeviceDataJNI.resetSimDeviceData();
   }

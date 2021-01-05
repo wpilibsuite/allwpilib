@@ -8,7 +8,8 @@ import edu.wpi.first.hal.JNIWrapper;
 
 public class RoboRioDataJNI extends JNIWrapper {
   @SuppressWarnings("AbbreviationAsWordInName")
-  public static native int registerFPGAButtonCallback(NotifyCallback callback, boolean initialNotify);
+  public static native int registerFPGAButtonCallback(
+      NotifyCallback callback, boolean initialNotify);
 
   @SuppressWarnings("AbbreviationAsWordInName")
   public static native void cancelFPGAButtonCallback(int uid);

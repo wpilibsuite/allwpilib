@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import java.util.NoSuchElementException;
-
 import edu.wpi.first.hal.simulation.DigitalPWMDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import java.util.NoSuchElementException;
 
 /**
  * Class to control a simulated digital PWM output.
@@ -60,6 +59,7 @@ public class DigitalPWMSim {
 
   /**
    * Register a callback to be run when this PWM output is initialized.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -71,6 +71,7 @@ public class DigitalPWMSim {
 
   /**
    * Check whether this PWM output has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -79,6 +80,7 @@ public class DigitalPWMSim {
 
   /**
    * Define whether this PWM output has been initialized.
+   *
    * @param initialized whether this object is initialized
    */
   public void setInitialized(boolean initialized) {
@@ -87,6 +89,7 @@ public class DigitalPWMSim {
 
   /**
    * Register a callback to be run whenever the duty cycle value changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -98,6 +101,7 @@ public class DigitalPWMSim {
 
   /**
    * Read the duty cycle value.
+   *
    * @return the duty cycle value of this PWM output
    */
   public double getDutyCycle() {
@@ -106,6 +110,7 @@ public class DigitalPWMSim {
 
   /**
    * Set the duty cycle value of this PWM output.
+   *
    * @param dutyCycle the new value
    */
   public void setDutyCycle(double dutyCycle) {
@@ -114,6 +119,7 @@ public class DigitalPWMSim {
 
   /**
    * Register a callback to be run whenever the pin changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -125,6 +131,7 @@ public class DigitalPWMSim {
 
   /**
    * Check the pin number.
+   *
    * @return the pin number
    */
   public int getPin() {
@@ -133,15 +140,14 @@ public class DigitalPWMSim {
 
   /**
    * Change the pin number.
+   *
    * @param pin the new pin number
    */
   public void setPin(int pin) {
     DigitalPWMDataJNI.setPin(m_index, pin);
   }
 
-  /**
-   * Reset all simulation data.
-   */
+  /** Reset all simulation data. */
   public void resetData() {
     DigitalPWMDataJNI.resetData(m_index);
   }

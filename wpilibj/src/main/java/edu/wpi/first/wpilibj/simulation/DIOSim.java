@@ -42,6 +42,7 @@ public class DIOSim {
 
   /**
    * Register a callback to be run when this DIO is initialized.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -53,6 +54,7 @@ public class DIOSim {
 
   /**
    * Check whether this DIO has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -61,6 +63,7 @@ public class DIOSim {
 
   /**
    * Define whether this DIO has been initialized.
+   *
    * @param initialized whether this object is initialized
    */
   public void setInitialized(boolean initialized) {
@@ -69,6 +72,7 @@ public class DIOSim {
 
   /**
    * Register a callback to be run whenever the DIO value changes.
+   *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -80,6 +84,7 @@ public class DIOSim {
 
   /**
    * Read the value of the DIO port.
+   *
    * @return the DIO value
    */
   public boolean getValue() {
@@ -88,6 +93,7 @@ public class DIOSim {
 
   /**
    * Change the DIO value.
+   *
    * @param value the new value
    */
   public void setValue(boolean value) {
@@ -96,6 +102,7 @@ public class DIOSim {
 
   /**
    * Register a callback to be run whenever the pulse length changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -107,6 +114,7 @@ public class DIOSim {
 
   /**
    * Read the pulse length.
+   *
    * @return the pulse length of this DIO port
    */
   public double getPulseLength() {
@@ -115,6 +123,7 @@ public class DIOSim {
 
   /**
    * Change the pulse length of this DIO port.
+   *
    * @param pulseLength the new pulse length
    */
   public void setPulseLength(double pulseLength) {
@@ -123,6 +132,7 @@ public class DIOSim {
 
   /**
    * Register a callback to be run whenever this DIO changes to be an input.
+   *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -134,6 +144,7 @@ public class DIOSim {
 
   /**
    * Check whether this DIO port is currently an Input.
+   *
    * @return true if Input
    */
   public boolean getIsInput() {
@@ -142,6 +153,7 @@ public class DIOSim {
 
   /**
    * Define whether this DIO port is an Input.
+   *
    * @param isInput whether this DIO should be an Input
    */
   public void setIsInput(boolean isInput) {
@@ -150,6 +162,7 @@ public class DIOSim {
 
   /**
    * Register a callback to be run whenever the filter index changes.
+   *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -161,6 +174,7 @@ public class DIOSim {
 
   /**
    * Read the filter index.
+   *
    * @return the filter index of this DIO port
    */
   public int getFilterIndex() {
@@ -169,15 +183,14 @@ public class DIOSim {
 
   /**
    * Change the filter index of this DIO port.
+   *
    * @param filterIndex the new filter index
    */
   public void setFilterIndex(int filterIndex) {
     DIODataJNI.setFilterIndex(m_index, filterIndex);
   }
 
-  /**
-   * Reset all simulation data of this object.
-   */
+  /** Reset all simulation data of this object. */
   public void resetData() {
     DIODataJNI.resetData(m_index);
   }

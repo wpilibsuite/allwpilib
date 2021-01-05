@@ -99,8 +99,7 @@ class DifferentialDrivetrainSimTest {
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
-            plant, motor, 1, kinematics.trackWidthMeters,
-            Units.inchesToMeters(2), null);
+            plant, motor, 1, kinematics.trackWidthMeters, Units.inchesToMeters(2), null);
 
     sim.setInputs(-12, -12);
     for (int i = 0; i < 10; i++) {

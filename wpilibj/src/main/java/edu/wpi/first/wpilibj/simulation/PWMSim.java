@@ -108,9 +108,7 @@ public class PWMSim {
     PWMDataJNI.setZeroLatch(m_index, zeroLatch);
   }
 
-  /**
-   * Reset all simulation data.
-   */
+  /** Reset all simulation data. */
   public void resetData() {
     PWMDataJNI.resetData(m_index);
   }

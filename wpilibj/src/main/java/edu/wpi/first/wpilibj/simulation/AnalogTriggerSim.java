@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import java.util.NoSuchElementException;
-
 import edu.wpi.first.hal.simulation.AnalogTriggerDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.AnalogTrigger;
+import java.util.NoSuchElementException;
 
 /** Class to control a simulated analog trigger. */
 public class AnalogTriggerSim {
@@ -55,6 +54,7 @@ public class AnalogTriggerSim {
 
   /**
    * Register a callback on whether the analog trigger is initialized.
+   *
    * @param callback the callback that will be called whenever the analog trigger is initialized
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -66,6 +66,7 @@ public class AnalogTriggerSim {
 
   /**
    * Check if this analog trigger has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -74,6 +75,7 @@ public class AnalogTriggerSim {
 
   /**
    * Change whether this analog trigger has been initialized.
+   *
    * @param initialized the new value
    */
   public void setInitialized(boolean initialized) {
@@ -82,6 +84,7 @@ public class AnalogTriggerSim {
 
   /**
    * Register a callback on the lower bound.
+   *
    * @param callback the callback that will be called whenever the lower bound is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -95,6 +98,7 @@ public class AnalogTriggerSim {
 
   /**
    * Get the lower bound.
+   *
    * @return the lower bound
    */
   public double getTriggerLowerBound() {
@@ -103,6 +107,7 @@ public class AnalogTriggerSim {
 
   /**
    * Change the lower bound.
+   *
    * @param triggerLowerBound the new lower bound
    */
   public void setTriggerLowerBound(double triggerLowerBound) {
@@ -111,6 +116,7 @@ public class AnalogTriggerSim {
 
   /**
    * Register a callback on the upper bound.
+   *
    * @param callback the callback that will be called whenever the upper bound is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -124,6 +130,7 @@ public class AnalogTriggerSim {
 
   /**
    * Get the upper bound.
+   *
    * @return the upper bound
    */
   public double getTriggerUpperBound() {
@@ -132,15 +139,14 @@ public class AnalogTriggerSim {
 
   /**
    * Change the upper bound.
+   *
    * @param triggerUpperBound the new upper bound
    */
   public void setTriggerUpperBound(double triggerUpperBound) {
     AnalogTriggerDataJNI.setTriggerUpperBound(m_index, triggerUpperBound);
   }
 
-  /**
-   * Reset all simulation data for this object.
-   */
+  /** Reset all simulation data for this object. */
   public void resetData() {
     AnalogTriggerDataJNI.resetData(m_index);
   }

@@ -32,6 +32,7 @@ public class AnalogOutputSim {
 
   /**
    * Register a callback to be run whenever the voltage changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -43,6 +44,7 @@ public class AnalogOutputSim {
 
   /**
    * Read the analog output voltage.
+   *
    * @return the voltage on this analog output
    */
   public double getVoltage() {
@@ -51,6 +53,7 @@ public class AnalogOutputSim {
 
   /**
    * Set the analog output voltage.
+   *
    * @param voltage the new voltage on this analog output
    */
   public void setVoltage(double voltage) {
@@ -59,6 +62,7 @@ public class AnalogOutputSim {
 
   /**
    * Register a callback to be run when this analog output is initialized.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -70,6 +74,7 @@ public class AnalogOutputSim {
 
   /**
    * Check whether this analog output has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -78,15 +83,14 @@ public class AnalogOutputSim {
 
   /**
    * Define whether this analog output has been initialized.
+   *
    * @param initialized whether this object is initialized
    */
   public void setInitialized(boolean initialized) {
     AnalogOutDataJNI.setInitialized(m_index, initialized);
   }
 
-  /**
-   * Reset all simulation data on this object.
-   */
+  /** Reset all simulation data on this object. */
   public void resetData() {
     AnalogOutDataJNI.resetData(m_index);
   }

@@ -4,9 +4,7 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-/**
- * A utility class to simulate the robot battery.
- */
+/** A utility class to simulate the robot battery. */
 public final class BatterySim {
   private BatterySim() {
     // Utility class

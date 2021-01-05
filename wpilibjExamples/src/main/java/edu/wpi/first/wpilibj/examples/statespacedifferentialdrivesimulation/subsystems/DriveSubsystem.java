@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -22,8 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
-
-import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.Constants.DriveConstants;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
@@ -247,7 +246,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Math.IEEEremainder(m_gyro.getAngle(), 360)
-        * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return Math.IEEEremainder(m_gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }

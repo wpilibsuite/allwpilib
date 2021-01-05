@@ -59,9 +59,10 @@ public final class Constants {
     public static final double kaVoltSecondsSquaredPerRadian = 0.3;
 
     public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
-          LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter,
-                  kaVoltSecondsSquaredPerMeter, kvVoltSecondsPerRadian,
-
+        LinearSystemId.identifyDrivetrainSystem(
+            kvVoltSecondsPerMeter,
+            kaVoltSecondsSquaredPerMeter,
+            kvVoltSecondsPerRadian,
             kaVoltSecondsSquaredPerRadian);
 
     // Example values only -- use what's on your physical robot!

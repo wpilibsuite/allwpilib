@@ -84,9 +84,7 @@ public class RelaySim {
     RelayDataJNI.setReverse(m_index, reverse);
   }
 
-  /**
-   * Reset all simulation data.
-   */
+  /** Reset all simulation data. */
   public void resetData() {
     RelayDataJNI.resetData(m_index);
   }

@@ -4,27 +4,19 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-/**
- * Manages simulation callbacks; each object is associated with a callback.
- */
+/** Manages simulation callbacks; each object is associated with a callback. */
 public class CallbackStore implements AutoCloseable {
-  /**
-   * <b>Note: This interface is for simulation classes only. It should not be used by teams!</b>
-   */
+  /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   interface CancelCallbackFunc {
     void cancel(int index, int uid);
   }
 
-  /**
-   * <b>Note: This interface is for simulation classes only. It should not be used by teams!</b>
-   */
+  /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   interface CancelCallbackChannelFunc {
     void cancel(int index, int channel, int uid);
   }
 
-  /**
-   * <b>Note: This interface is for simulation classes only. It should not be used by teams!</b>
-   */
+  /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   interface CancelCallbackNoIndexFunc {
     void cancel(int uid);
   }
@@ -70,9 +62,7 @@ public class CallbackStore implements AutoCloseable {
   private static final int kNoIndexCancel = 2;
   private int m_cancelType;
 
-  /**
-   * Cancel the callback associated with this object.
-   */
+  /** Cancel the callback associated with this object. */
   @Override
   public void close() {
     switch (m_cancelType) {

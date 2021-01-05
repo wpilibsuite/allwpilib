@@ -37,6 +37,7 @@ public class PDPSim {
 
   /**
    * Register a callback to be run when the PDP is initialized.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -48,6 +49,7 @@ public class PDPSim {
 
   /**
    * Check whether the PDP has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -56,6 +58,7 @@ public class PDPSim {
 
   /**
    * Define whether the PDP has been initialized.
+   *
    * @param initialized whether this object is initialized
    */
   public void setInitialized(boolean initialized) {
@@ -64,6 +67,7 @@ public class PDPSim {
 
   /**
    * Register a callback to be run whenever the PDP temperature changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -75,6 +79,7 @@ public class PDPSim {
 
   /**
    * Check the temperature of the PDP.
+   *
    * @return the PDP temperature
    */
   public double getTemperature() {
@@ -83,6 +88,7 @@ public class PDPSim {
 
   /**
    * Define the PDP temperature.
+   *
    * @param temperature the new PDP temperature
    */
   public void setTemperature(double temperature) {
@@ -91,6 +97,7 @@ public class PDPSim {
 
   /**
    * Register a callback to be run whenever the PDP voltage changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -102,6 +109,7 @@ public class PDPSim {
 
   /**
    * Check the PDP voltage.
+   *
    * @return the PDP voltage.
    */
   public double getVoltage() {
@@ -110,6 +118,7 @@ public class PDPSim {
 
   /**
    * Set the PDP voltage.
+   *
    * @param voltage the new PDP voltage
    */
   public void setVoltage(double voltage) {
@@ -118,6 +127,7 @@ public class PDPSim {
 
   /**
    * Register a callback to be run whenever the current of a specific channel changes.
+   *
    * @param channel the channel
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
@@ -131,6 +141,7 @@ public class PDPSim {
 
   /**
    * Read the current in one of the PDP channels.
+   *
    * @param channel the channel to check
    * @return the current in the given channel
    */
@@ -140,6 +151,7 @@ public class PDPSim {
 
   /**
    * Change the current in the given channel.
+   *
    * @param channel the channel to edit
    * @param current the new current for the channel
    */
@@ -147,9 +159,7 @@ public class PDPSim {
     PDPDataJNI.setCurrent(m_index, channel, current);
   }
 
-  /**
-   * Reset all PDP simulation data.
-   */
+  /** Reset all PDP simulation data. */
   public void resetData() {
     PDPDataJNI.resetData(m_index);
   }

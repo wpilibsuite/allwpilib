@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class DriverStationSim {
   /**
    * Register a callback on whether the DS is enabled.
+   *
    * @param callback the callback that will be called whenever the enabled state is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -26,6 +27,7 @@ public class DriverStationSim {
 
   /**
    * Check if the DS is enabled.
+   *
    * @return true if enabled
    */
   public static boolean getEnabled() {
@@ -34,6 +36,7 @@ public class DriverStationSim {
 
   /**
    * Change whether the DS is enabled.
+   *
    * @param enabled the new value
    */
   public static void setEnabled(boolean enabled) {
@@ -42,6 +45,7 @@ public class DriverStationSim {
 
   /**
    * Register a callback on whether the DS is in autonomous mode.
+   *
    * @param callback the callback that will be called on autonomous mode entrance/exit
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -54,6 +58,7 @@ public class DriverStationSim {
 
   /**
    * Check if the DS is in autonomous.
+   *
    * @return true if autonomous
    */
   public static boolean getAutonomous() {
@@ -62,6 +67,7 @@ public class DriverStationSim {
 
   /**
    * Change whether the DS is in autonomous.
+   *
    * @param autonomous the new value
    */
   public static void setAutonomous(boolean autonomous) {
@@ -70,6 +76,7 @@ public class DriverStationSim {
 
   /**
    * Register a callback on whether the DS is in test mode.
+   *
    * @param callback the callback that will be called whenever the test mode is entered or left
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -81,6 +88,7 @@ public class DriverStationSim {
 
   /**
    * Check if the DS is in test.
+   *
    * @return true if test
    */
   public static boolean getTest() {
@@ -89,6 +97,7 @@ public class DriverStationSim {
 
   /**
    * Change whether the DS is in test.
+   *
    * @param test the new value
    */
   public static void setTest(boolean test) {
@@ -97,6 +106,7 @@ public class DriverStationSim {
 
   /**
    * Register a callback on the eStop state.
+   *
    * @param callback the callback that will be called whenever the eStop state changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -109,6 +119,7 @@ public class DriverStationSim {
 
   /**
    * Check if eStop has been activated.
+   *
    * @return true if eStopped
    */
   public static boolean getEStop() {
@@ -117,6 +128,7 @@ public class DriverStationSim {
 
   /**
    * Set whether eStop is active.
+   *
    * @param eStop true to activate
    */
   @SuppressWarnings("ParameterName")
@@ -126,6 +138,7 @@ public class DriverStationSim {
 
   /**
    * Register a callback on whether the FMS is connected.
+   *
    * @param callback the callback that will be called whenever the FMS connection changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -138,6 +151,7 @@ public class DriverStationSim {
 
   /**
    * Check if the FMS is connected.
+   *
    * @return true if FMS is connected
    */
   public static boolean getFmsAttached() {
@@ -146,6 +160,7 @@ public class DriverStationSim {
 
   /**
    * Change whether the FMS is connected.
+   *
    * @param fmsAttached the new value
    */
   public static void setFmsAttached(boolean fmsAttached) {
@@ -154,6 +169,7 @@ public class DriverStationSim {
 
   /**
    * Register a callback on whether the DS is connected.
+   *
    * @param callback the callback that will be called whenever the DS connection changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -166,6 +182,7 @@ public class DriverStationSim {
 
   /**
    * Check if the DS is attached.
+   *
    * @return true if attached
    */
   public static boolean getDsAttached() {
@@ -174,6 +191,7 @@ public class DriverStationSim {
 
   /**
    * Change whether the DS is attached.
+   *
    * @param dsAttached the new value
    */
   public static void setDsAttached(boolean dsAttached) {
@@ -182,6 +200,7 @@ public class DriverStationSim {
 
   /**
    * Register a callback on the alliance station ID.
+   *
    * @param callback the callback that will be called whenever the alliance station changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -194,6 +213,7 @@ public class DriverStationSim {
 
   /**
    * Get the alliance station ID (color + number).
+   *
    * @return the alliance station color and number
    */
   public static AllianceStationID getAllianceStationId() {
@@ -217,6 +237,7 @@ public class DriverStationSim {
 
   /**
    * Change the alliance station.
+   *
    * @param allianceStationId the new alliance station
    */
   public static void setAllianceStationId(AllianceStationID allianceStationId) {
@@ -248,6 +269,7 @@ public class DriverStationSim {
 
   /**
    * Register a callback on match time.
+   *
    * @param callback the callback that will be called whenever match time changes
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback
@@ -260,6 +282,7 @@ public class DriverStationSim {
 
   /**
    * Get the current value of the match timer.
+   *
    * @return the current match time
    */
   public static double getMatchTime() {
@@ -268,6 +291,7 @@ public class DriverStationSim {
 
   /**
    * Sets the match timer.
+   *
    * @param matchTime the new match time
    */
   public static void setMatchTime(double matchTime) {
@@ -495,9 +519,7 @@ public class DriverStationSim {
     DriverStationDataJNI.setReplayNumber(replayNumber);
   }
 
-  /**
-   * Reset all simulation data for the Driver Station.
-   */
+  /** Reset all simulation data for the Driver Station. */
   public static void resetData() {
     DriverStationDataJNI.resetData();
   }

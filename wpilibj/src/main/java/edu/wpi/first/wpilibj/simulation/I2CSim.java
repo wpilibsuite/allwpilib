@@ -9,14 +9,13 @@ import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.hal.simulation.I2CDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 
-/**
- * A class to control a simulated I2C device.
- */
+/** A class to control a simulated I2C device. */
 public class I2CSim {
   private final int m_index;
 
   /**
    * Construct a new I2C simulation object.
+   *
    * @param index the HAL index of the I2C object
    */
   public I2CSim(int index) {
@@ -25,6 +24,7 @@ public class I2CSim {
 
   /**
    * Register a callback to be run when this I2C device is initialized.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -36,6 +36,7 @@ public class I2CSim {
 
   /**
    * Check whether this I2C device has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -44,6 +45,7 @@ public class I2CSim {
 
   /**
    * Define whether this I2C device has been initialized.
+   *
    * @param initialized whether this device is initialized
    */
   public void setInitialized(boolean initialized) {
@@ -52,6 +54,7 @@ public class I2CSim {
 
   /**
    * Register a callback to be run whenever a `read` operation is done.
+   *
    * @param callback the callback that is run on `read` operations
    * @return the {@link CallbackStore} object associated with this callback
    */
@@ -62,6 +65,7 @@ public class I2CSim {
 
   /**
    * Register a callback to be run whenever a `write` operation is done.
+   *
    * @param callback the callback that is run on `write` operations
    * @return the {@link CallbackStore} object associated with this callback
    */
@@ -70,9 +74,7 @@ public class I2CSim {
     return new CallbackStore(m_index, uid, I2CDataJNI::cancelWriteCallback);
   }
 
-  /**
-   * Reset all I2C simulation data.
-   */
+  /** Reset all I2C simulation data. */
   public void resetData() {
     I2CDataJNI.resetData(m_index);
   }

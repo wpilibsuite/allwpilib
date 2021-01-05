@@ -33,6 +33,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the X value of the joystick.
+   *
    * @param hand the joystick hand
    * @param value the new value
    */
@@ -46,6 +47,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the Y value of the joystick.
+   *
    * @param hand the joystick hand
    * @param value the new value
    */
@@ -59,6 +61,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of a trigger axis on the joystick.
+   *
    * @param hand the joystick hand
    * @param value the new value
    */
@@ -72,6 +75,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of a bumper on the joystick.
+   *
    * @param hand the joystick hand
    * @param state the new value
    */
@@ -85,6 +89,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of a button on the joystick.
+   *
    * @param hand the joystick hand
    * @param state the new value
    */
@@ -98,6 +103,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of the A button.
+   *
    * @param state the new value
    */
   public void setAButton(boolean state) {
@@ -106,6 +112,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of the B button.
+   *
    * @param state the new value
    */
   public void setBButton(boolean state) {
@@ -114,6 +121,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of the X button.
+   *
    * @param state the new value
    */
   public void setXButton(boolean state) {
@@ -122,6 +130,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of the Y button.
+   *
    * @param state the new value
    */
   public void setYButton(boolean state) {
@@ -130,6 +139,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of the Back button.
+   *
    * @param state the new value
    */
   public void setBackButton(boolean state) {
@@ -138,6 +148,7 @@ public class XboxControllerSim extends GenericHIDSim {
 
   /**
    * Change the value of the Start button.
+   *
    * @param state the new value
    */
   public void setStartButton(boolean state) {

@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import java.util.NoSuchElementException;
-
 import edu.wpi.first.hal.simulation.DutyCycleDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DutyCycle;
+import java.util.NoSuchElementException;
 
 /** Class to control a simulated duty cycle digital input. */
 public class DutyCycleSim {
@@ -55,6 +54,7 @@ public class DutyCycleSim {
 
   /**
    * Register a callback to be run when this duty cycle input is initialized.
+   *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -66,6 +66,7 @@ public class DutyCycleSim {
 
   /**
    * Check whether this duty cycle input has been initialized.
+   *
    * @return true if initialized
    */
   public boolean getInitialized() {
@@ -74,6 +75,7 @@ public class DutyCycleSim {
 
   /**
    * Define whether this duty cycle input has been initialized.
+   *
    * @param initialized whether this object is initialized
    */
   public void setInitialized(boolean initialized) {
@@ -82,6 +84,7 @@ public class DutyCycleSim {
 
   /**
    * Register a callback to be run whenever the frequency changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -93,6 +96,7 @@ public class DutyCycleSim {
 
   /**
    * Measure the frequency.
+   *
    * @return the duty cycle frequency
    */
   public int getFrequency() {
@@ -101,6 +105,7 @@ public class DutyCycleSim {
 
   /**
    * Change the duty cycle frequency.
+   *
    * @param frequency the new frequency
    */
   public void setFrequency(int frequency) {
@@ -109,6 +114,7 @@ public class DutyCycleSim {
 
   /**
    * Register a callback to be run whenever the output changes.
+   *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
    * @return the {@link CallbackStore} object associated with this callback
@@ -120,6 +126,7 @@ public class DutyCycleSim {
 
   /**
    * Measure the output from this duty cycle port.
+   *
    * @return the output value
    */
   public double getOutput() {
@@ -128,6 +135,7 @@ public class DutyCycleSim {
 
   /**
    * Change the duty cycle output.
+   *
    * @param output the new output value
    */
   public void setOutput(double output) {
