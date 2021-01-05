@@ -68,10 +68,9 @@ T RungeKuttaTimeVarying(F&& f, T x, units::second_t t, units::second_t dt) {
 }
 
 template <typename F, typename T, typename U>
-T RKF45Impl(F&& f, T x, U u, double& initialH, double maxTruncationError,
+T RKF45Impl(F&& f, T x, U u, double& h, double maxTruncationError,
             double dtRemaining) {
   double truncationErr;
-  double h = initialH;
   T newX;
 
   static double ch[] = {47 / 450.0, 0,        12 / 25.0,
@@ -111,9 +110,7 @@ T RKF45Impl(F&& f, T x, U u, double& initialH, double maxTruncationError,
                      (k4 * (ct[3])) + (k5 * (ct[4])) + (k6 * (ct[5])))
                         .norm();
 
-    double hNew =
-        0.9 * h * std::pow(maxTruncationError / truncationErr, 1 / 5.);
-    h = hNew;
+    h = 0.9 * h * std::pow(maxTruncationError / truncationErr, 1 / 5.);
   } while (truncationErr > maxTruncationError);
 
   // Return the new x. Dt is changed by reference
