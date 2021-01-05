@@ -6,6 +6,8 @@
 
 #include <frc/StateSpaceUtil.h>
 
+#include <algorithm>
+
 #include "Eigen/Core"
 #include "units/time.h"
 
@@ -90,26 +92,24 @@ T RungeKuttaAdaptiveImpl(F&& f, T x, U u, double& initialH,
     // That means their y is our x and their x is our t
     T k1 = f(x, u) * h;
     T k2 = f(x + (k1 * Bs(1, 0)), u) * h;
-    T k3 =
-        f(x + (k1 * (Bs(2, 0))) + (k2 * (Bs(2, 1))), u) * h;
+    T k3 = f(x + (k1 * (Bs(2, 0))) + (k2 * (Bs(2, 1))), u) * h;
     T k4 =
         f(x + (k1 * (Bs(3, 0))) + (k2 * (Bs(3, 1))) + (k3 * (Bs(3, 2))), u) * h;
-    T k5 =
-        f(x + (k1 * (Bs(4, 0))) + (k2 * (Bs(4, 1))) + (k3 * (Bs(4, 2))) +
-              (k4 * (Bs(4, 3))),
-          u) *
-        h;
-    T k6 =
-        f(x + (k1 * (Bs(5, 0))) + (k2 * (Bs(5, 1))) + (k3 * (Bs(5, 2))) +
-              (k4 * (Bs(5, 3))) + (k5 * (Bs(5, 4))),
-          u) *
-        h;
+    T k5 = f(x + (k1 * (Bs(4, 0))) + (k2 * (Bs(4, 1))) + (k3 * (Bs(4, 2))) +
+                 (k4 * (Bs(4, 3))),
+             u) *
+           h;
+    T k6 = f(x + (k1 * (Bs(5, 0))) + (k2 * (Bs(5, 1))) + (k3 * (Bs(5, 2))) +
+                 (k4 * (Bs(5, 3))) + (k5 * (Bs(5, 4))),
+             u) *
+           h;
 
     newX = x + (k1 * (ch[0])) + (k2 * (ch[1])) + (k3 * (ch[2])) +
            (k4 * (ch[3])) + (k5 * (ch[4])) + (k6 * (ch[5]));
 
     truncationErr = (k1 * (ct[0]) + (k2 * (ct[1])) + (k3 * (ct[2])) +
-                    (k4 * (ct[3])) + (k5 * (ct[4])) + (k6 * (ct[5]))).norm();
+                     (k4 * (ct[3])) + (k5 * (ct[4])) + (k6 * (ct[5])))
+                        .norm();
 
     double hNew =
         0.9 * h * std::pow(maxTruncationError / truncationErr, 1 / 5.);
@@ -144,8 +144,8 @@ T RungeKuttaAdaptive(F&& f, T x, U u, units::second_t dt,
     // RKF45 will give us an updated x and a dt back.
     // We use the new dt (h) as the initial dt for our next loop
     // previousH is changed by-reference
-    T ret = RungeKuttaAdaptiveImpl(
-        f, x, u, previousH, maxError, dtSeconds - dtElapsed);
+    T ret = RungeKuttaAdaptiveImpl(f, x, u, previousH, maxError,
+                                   dtSeconds - dtElapsed);
     x = ret;
   }
   return x;
