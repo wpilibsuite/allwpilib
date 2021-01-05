@@ -234,9 +234,9 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Get the current draw of the drivetrain.
+   * Get the current draw of the left side of the drivetrain.
    *
-   * @return the current draw, in amps
+   * @return the drivetrain's left side current draw, in amps
    */
   public double getLeftCurrentDrawAmps() {
     var loadIleft =
@@ -247,6 +247,11 @@ public class DifferentialDrivetrainSim {
     return loadIleft;
   }
 
+  /**
+   * Get the current draw of the right side of the drivetrain.
+   *
+   * @return the drivetrain's right side current draw, in amps
+   */
   public double getRightCurrentDrawAmps() {
     var loadIright =
         m_motor.getCurrent(
@@ -257,6 +262,11 @@ public class DifferentialDrivetrainSim {
     return loadIright;
   }
 
+  /**
+   * Get the current draw of the drivetrain.
+   *
+   * @return the current draw, in amps
+   */
   public double getCurrentDrawAmps() {
     return getLeftCurrentDrawAmps() + getRightCurrentDrawAmps();
   }

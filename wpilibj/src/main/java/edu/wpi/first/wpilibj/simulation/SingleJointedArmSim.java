@@ -254,7 +254,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @param dtSeconds The time difference between controller updates.
    */
   @Override
-  @SuppressWarnings("ParameterName")
+  @SuppressWarnings({"ParameterName", "LambdaParameterName"})
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Horizontal case:
     // Torque = F * r = I * alpha

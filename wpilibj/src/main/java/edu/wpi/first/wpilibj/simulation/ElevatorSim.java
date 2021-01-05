@@ -200,7 +200,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
    * @param u The system inputs (voltage).
    * @param dtSeconds The time difference between controller updates.
    */
-  @SuppressWarnings("ParameterName")
+  @SuppressWarnings({"ParameterName", "LambdaParameterName"})
   @Override
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.
