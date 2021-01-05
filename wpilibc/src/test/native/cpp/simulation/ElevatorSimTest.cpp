@@ -16,6 +16,7 @@
 #include "frc/system/plant/DCMotor.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "gtest/gtest.h"
+#include "frc/system/NumericalIntegration.h"
 
 TEST(ElevatorSim, StateSpaceSim) {
   frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg,
@@ -63,4 +64,29 @@ TEST(ElevatorSim, MinMax) {
     auto height = sim.GetPosition();
     EXPECT_TRUE(height < 1.05_m);
   }
+}
+
+TEST(ElevatorSim, Stability) {
+  static constexpr double kElevatorGearing = 100.0;
+  static constexpr units::meter_t kElevatorDrumRadius = 0.5_in;
+  static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
+  static constexpr units::meter_t kMinElevatorHeight = 0_in;
+  static constexpr units::meter_t kMaxElevatorHeight = 50_in;
+  frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
+
+  frc::LinearSystem<2, 1, 1> system = frc::LinearSystemId::ElevatorSystem(m_elevatorGearbox, kCarriageMass, kElevatorDrumRadius, kElevatorGearing);
+
+  Eigen::Matrix<double, 2, 1> x0 = frc::MakeMatrix<2, 1>(0.0, 0.0);
+  Eigen::Matrix<double, 1, 1> u0 = frc::MakeMatrix<1, 1>(12.0);
+
+  Eigen::Matrix<double, 2, 1> x1 = frc::MakeMatrix<2, 1>(0.0, 0.0);
+  for(size_t i = 0; i < 50; i++) {
+   x1 = frc::RKF45(
+      [&](Eigen::Matrix<double, 2, 1> x, Eigen::Matrix<double, 1, 1> u) {
+        return system.A() * x + system.B() * u;
+      },
+      x1, u0, 0.020_s);
+  }
+  
+  EXPECT_NEAR(x1(0), system.CalculateX(x0, u0, 1_s)(0), 0.05);
 }
