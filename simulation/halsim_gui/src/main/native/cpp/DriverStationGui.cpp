@@ -146,12 +146,7 @@ class GlfwKeyboardJoystick : public KeyboardJoystick {
  public:
   explicit GlfwKeyboardJoystick(int index, bool noDefaults = false);
 
-  const char* GetKeyName(int key) const override {
-    if (key < 0) {
-      return "(None)";
-    }
-    return glfwGetKeyName(key, 0);
-  }
+  const char* GetKeyName(int key) const override;
 };
 
 struct RobotJoystick {
@@ -274,7 +269,7 @@ class FMSSimModel : public glass::FMSModel {
 // system joysticks
 static std::vector<std::unique_ptr<SystemJoystick>> gGlfwJoysticks;
 static int gNumGlfwJoysticks = 0;
-static std::vector<std::unique_ptr<KeyboardJoystick>> gKeyboardJoysticks;
+static std::vector<std::unique_ptr<GlfwKeyboardJoystick>> gKeyboardJoysticks;
 
 // robot joysticks
 static RobotJoystick gRobotJoysticks[HAL_kMaxJoysticks];
@@ -427,9 +422,9 @@ static void* KeyboardJoystickReadOpen(ImGuiContext* ctx,
   if (num < 0 || num >= static_cast<int>(gKeyboardJoysticks.size())) {
     return nullptr;
   }
-  auto& joy = gKeyboardJoysticks[num];
-  joy = std::make_unique<GlfwKeyboardJoystick>(num, true);
-  return joy.get();
+  auto joy = gKeyboardJoysticks[num].get();
+  *joy = GlfwKeyboardJoystick(num, true);
+  return joy;
 }
 
 static void KeyboardJoystickReadLine(ImGuiContext* ctx,
@@ -1086,6 +1081,40 @@ GlfwKeyboardJoystick::GlfwKeyboardJoystick(int index, bool noDefaults)
     m_buttonKey[4] = GLFW_KEY_END;
     m_buttonKey[5] = GLFW_KEY_PAGE_DOWN;
   }
+}
+
+const char* GlfwKeyboardJoystick::GetKeyName(int key) const {
+  if (key < 0) {
+    return "(None)";
+  }
+  const char* name = glfwGetKeyName(key, 0);
+  if (name) {
+    return name;
+  }
+  // glfwGetKeyName sometimes doesn't have these keys
+  switch (key) {
+    case GLFW_KEY_RIGHT:
+      return "Right";
+    case GLFW_KEY_LEFT:
+      return "Left";
+    case GLFW_KEY_DOWN:
+      return "Down";
+    case GLFW_KEY_UP:
+      return "Up";
+    case GLFW_KEY_INSERT:
+      return "Insert";
+    case GLFW_KEY_HOME:
+      return "Home";
+    case GLFW_KEY_PAGE_UP:
+      return "PgUp";
+    case GLFW_KEY_DELETE:
+      return "Delete";
+    case GLFW_KEY_END:
+      return "End";
+    case GLFW_KEY_PAGE_DOWN:
+      return "PgDn";
+  }
+  return "(Unknown)";
 }
 
 void RobotJoystick::Update() {
