@@ -70,8 +70,6 @@ TEST(ElevatorSim, Stability) {
   static constexpr double kElevatorGearing = 100.0;
   static constexpr units::meter_t kElevatorDrumRadius = 0.5_in;
   static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
-  static constexpr units::meter_t kMinElevatorHeight = 0_in;
-  static constexpr units::meter_t kMaxElevatorHeight = 50_in;
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
 
   frc::LinearSystem<2, 1, 1> system = frc::LinearSystemId::ElevatorSystem(
