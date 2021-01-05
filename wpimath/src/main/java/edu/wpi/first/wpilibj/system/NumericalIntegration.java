@@ -118,6 +118,7 @@ public final class NumericalIntegration {
    * @param dtSeconds The time over which to integrate.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
+  @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKuttaAdaptive(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
@@ -139,6 +140,7 @@ public final class NumericalIntegration {
    * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
+  @SuppressWarnings("MethodTypeParameterName")
   public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKuttaAdaptive(
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       Matrix<States, N1> x,
@@ -213,6 +215,7 @@ public final class NumericalIntegration {
    * @param dtRemaining How much time is left to integrate over. Used to clamp h.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
+  @SuppressWarnings("MethodTypeParameterName")
   private static <States extends Num, Inputs extends Num>
       Pair<Matrix<States, N1>, Double> rungeKuttaAdaptiveImpl(
           BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
@@ -278,8 +281,7 @@ public final class NumericalIntegration {
               .plus(k6.times(ct[5]))
               .normF();
 
-      var hNew = 0.9 * h * Math.pow(maxTruncationError / truncationErr, 1 / 5.);
-      h = hNew;
+      h = 0.9 * h * Math.pow(maxTruncationError / truncationErr, 1 / 5.0);
     } while (truncationErr > maxTruncationError);
 
     // Return the new x, and the timestep
