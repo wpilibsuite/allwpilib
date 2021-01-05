@@ -68,8 +68,8 @@ T RungeKuttaTimeVarying(F&& f, T x, units::second_t t, units::second_t dt) {
 }
 
 template <typename F, typename T, typename U>
-T RKF45Impl(F&& f, T x, U u, double& initialH,
-                         double maxTruncationError, double dtRemaining) {
+T RKF45Impl(F&& f, T x, U u, double& initialH, double maxTruncationError,
+            double dtRemaining) {
   double truncationErr;
   double h = initialH;
   T newX;
@@ -133,8 +133,7 @@ T RKF45Impl(F&& f, T x, U u, double& initialH,
  *                 number like 1e-6.
  */
 template <typename F, typename T, typename U>
-T RKF45(F&& f, T x, U u, units::second_t dt,
-                     double maxError = 1e-6) {
+T RKF45(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   double dtElapsed = 0;
   double dtSeconds = dt.to<double>();
   double previousH = dt.to<double>();
@@ -144,8 +143,7 @@ T RKF45(F&& f, T x, U u, units::second_t dt,
     // RKF45 will give us an updated x and a dt back.
     // We use the new dt (h) as the initial dt for our next loop
     // previousH is changed by-reference
-    T ret = RKF45Impl(f, x, u, previousH, maxError,
-                                   dtSeconds - dtElapsed);
+    T ret = RKF45Impl(f, x, u, previousH, maxError, dtSeconds - dtElapsed);
     dtElapsed += previousH;
     x = ret;
   }
