@@ -89,5 +89,5 @@ TEST(ElevatorSim, Stability) {
         x1, u0, 0.020_s);
   }
 
-  EXPECT_NEAR(x1(0), system.CalculateX(x0, u0, 1_s)(0), 0.05);
+  EXPECT_NEAR(x1(0), system.CalculateX(x0, u0, 1_s)(0), 0.1);
 }
