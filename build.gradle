@@ -11,7 +11,7 @@ plugins {
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '1.1.1' apply false
     id 'com.github.johnrengelman.shadow' version '5.2.0' apply false
-    id 'com.diffplug.gradle.spotless' version '4.5.0'
+    id 'com.diffplug.spotless' version '5.5.0'
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -135,6 +135,7 @@ spotless {
             include '**/*.java'
             exclude '**/build/**', '**/build-*/**'
         }
+        toggleOffOn()
         googleJavaFormat()
         removeUnusedImports()
         trimTrailingWhitespace()
