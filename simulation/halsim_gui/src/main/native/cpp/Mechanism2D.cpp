@@ -389,5 +389,5 @@ void Mechanism2D::Initialize() {
  *  - Add to network tables
  *  - Add debug mode
  *    - button to print everything
- *    -
+ *  - Use network tables instead of Json
  */
