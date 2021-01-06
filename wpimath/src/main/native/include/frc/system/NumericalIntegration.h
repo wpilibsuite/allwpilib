@@ -135,9 +135,6 @@ T RKF45(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   double dtSeconds = dt.to<double>();
   double previousH = dt.to<double>();
 
-  wpi::outs() << "Starting from a state of " << x(0) << " with input " << u(0)
-              << " over dt " << dtSeconds << "\n";
-
   // Loop until we've gotten to our desired dt
   while (dtElapsed < dtSeconds) {
     // RKF45 will give us an updated x and a dt back.
