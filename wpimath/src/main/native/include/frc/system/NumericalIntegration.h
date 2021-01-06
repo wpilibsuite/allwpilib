@@ -10,6 +10,7 @@
 
 #include "Eigen/Core"
 #include "units/time.h"
+#include <wpi/raw_ostream.h>
 
 namespace frc {
 
@@ -135,6 +136,8 @@ T RKF45(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   double dtSeconds = dt.to<double>();
   double previousH = dt.to<double>();
 
+  wpi::outs() << "Starting from a state of " << x << " with input " << u " over dt " << dt << "\n";
+
   // Loop until we've gotten to our desired dt
   while (dtElapsed < dtSeconds) {
     // RKF45 will give us an updated x and a dt back.
@@ -143,6 +146,9 @@ T RKF45(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
     T ret = RKF45Impl(f, x, u, previousH, maxError, dtSeconds - dtElapsed);
     dtElapsed += previousH;
     x = ret;
+
+    wpi::outs() << "Updated x: " << x << " with adaptive dt of " << previousH << " . Time elapsed so far: " << dtElapsed << " of " << dtSeconds << "\n";
+    wpi::outs() << "At this timestep, x-dot was " << f(x, u) << "\n"; 
   }
   return x;
 }
