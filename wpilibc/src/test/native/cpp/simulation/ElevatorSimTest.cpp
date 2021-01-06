@@ -82,7 +82,8 @@ TEST(ElevatorSim, Stability) {
   for (size_t i = 0; i < 50; i++) {
     x1 = frc::RKF45(
         [&](Eigen::Matrix<double, 2, 1> x, Eigen::Matrix<double, 1, 1> u) {
-          return system.A() * x + system.B() * u;
+          Eigen::Matrix<double, 2, 1> ret = system.A() * x + system.B() * u;
+          return ret;
         },
         x1, u0, 0.020_s);
   }
