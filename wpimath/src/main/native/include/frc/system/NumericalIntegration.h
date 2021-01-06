@@ -8,8 +8,6 @@
 
 #include <algorithm>
 
-#include <wpi/raw_ostream.h>
-
 #include "Eigen/Core"
 #include "units/time.h"
 
@@ -148,11 +146,6 @@ T RKF45(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
     T ret = RKF45Impl(f, x, u, previousH, maxError, dtSeconds - dtElapsed);
     dtElapsed += previousH;
     x = ret;
-
-    wpi::outs() << "Updated x: " << x(0) << " with adaptive dt of " << previousH
-                << " . Time elapsed so far: " << dtElapsed << " of "
-                << dtSeconds << "\n";
-    wpi::outs() << "At this timestep, x-dot was " << f(x, u)(0);
   }
   return x;
 }
