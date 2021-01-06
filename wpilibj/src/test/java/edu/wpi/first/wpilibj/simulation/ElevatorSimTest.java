@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import org.junit.jupiter.api.Test;
 
@@ -86,5 +87,21 @@ public class ElevatorSimTest {
       var height = sim.getPositionMeters();
       assertTrue(height <= 1.05);
     }
+  }
+
+  @Test
+  public void testStability() {
+    var sim = new ElevatorSim(DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10);
+
+    sim.setState(VecBuilder.fill(0, 0));
+    sim.setInput(12);
+    for (int i = 0; i < 50; i++) {
+      sim.update(0.02);
+    }
+
+    assertEquals(
+        sim.m_plant.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
+        sim.getPositionMeters(),
+        0.1);
   }
 }
