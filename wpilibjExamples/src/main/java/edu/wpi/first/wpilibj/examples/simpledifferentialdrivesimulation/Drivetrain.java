@@ -75,6 +75,9 @@ public class Drivetrain {
       new DifferentialDrivetrainSim(
           m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
+  /**
+   * Subsystem constructor.
+   */
   public Drivetrain() {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -89,6 +92,9 @@ public class Drivetrain {
     SmartDashboard.putData("Field", m_fieldSim);
   }
 
+  /**
+   * Sets speeds to the drivetrain motors.
+   */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
     var leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
     var rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
@@ -101,15 +107,23 @@ public class Drivetrain {
     m_rightGroup.setVoltage(rightOutput + rightFeedforward);
   }
 
+  /**
+   * Controls the robot using arcade drive.
+   * @param xSpeed the speed for the x axis
+   * @param rot the rotation
+   */
+  @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double rot) {
     setSpeeds(m_kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0, rot)));
   }
 
+  /** Update robot odometry. */
   public void updateOdometry() {
     m_odometry.update(
         m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
   }
 
+  /** Resets robot odometry. */
   public void resetOdometry(Pose2d pose) {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
@@ -117,10 +131,15 @@ public class Drivetrain {
     m_odometry.resetPosition(pose, m_gyro.getRotation2d());
   }
 
+  /** Check the current robot pose. */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
   }
 
+  /**
+   * Update our simulation.
+   * This should be run every robot loop in simulation.
+   */
   public void simulationPeriodic() {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated positions and velocities to our
@@ -138,6 +157,7 @@ public class Drivetrain {
     m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
   }
 
+  /** Update odometry - this should be run every robot loop. */
   public void periodic() {
     updateOdometry();
     m_fieldSim.setRobotPose(m_odometry.getPoseMeters());

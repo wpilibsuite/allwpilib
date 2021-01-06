@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.Constants.*;
 import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -123,15 +122,15 @@ public class RobotContainer {
         new RamseteCommand(
             exampleTrajectory,
             m_robotDrive::getPose,
-            new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+            new RamseteController(Constants.AutoConstants.kRamseteB, Constants.AutoConstants.kRamseteZeta),
             new SimpleMotorFeedforward(
-                DriveConstants.ksVolts,
-                DriveConstants.kvVoltSecondsPerMeter,
-                DriveConstants.kaVoltSecondsSquaredPerMeter),
-            DriveConstants.kDriveKinematics,
+                Constants.DriveConstants.ksVolts,
+                Constants.DriveConstants.kvVoltSecondsPerMeter,
+                Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
+            Constants.DriveConstants.kDriveKinematics,
             m_robotDrive::getWheelSpeeds,
-            new PIDController(DriveConstants.kPDriveVel, 0, 0),
-            new PIDController(DriveConstants.kPDriveVel, 0, 0),
+            new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0),
+            new PIDController(Constants.DriveConstants.kPDriveVel, 0, 0),
             // RamseteCommand passes volts to the callback
             m_robotDrive::tankDriveVolts,
             m_robotDrive);
