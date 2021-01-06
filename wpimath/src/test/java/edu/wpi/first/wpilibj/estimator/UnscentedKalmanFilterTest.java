@@ -43,9 +43,9 @@ public class UnscentedKalmanFilterTest {
 
     var C1 =
         -Math.pow(gHigh, 2)
-            * motors.m_KtNMPerAmp
-            / (motors.m_KvRadPerSecPerVolt * motors.m_rOhms * r * r);
-    var C2 = gHigh * motors.m_KtNMPerAmp / (motors.m_rOhms * r);
+            * motors.KtNMPerAmp
+            / (motors.KvRadPerSecPerVolt * motors.rOhms * r * r);
+    var C2 = gHigh * motors.KtNMPerAmp / (motors.rOhms * r);
 
     var c = x.get(2, 0);
     var s = x.get(3, 0);
