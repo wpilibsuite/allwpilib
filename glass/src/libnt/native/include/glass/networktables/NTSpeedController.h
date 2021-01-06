@@ -29,14 +29,16 @@ class NTSpeedControllerModel : public SpeedControllerModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return false; }
+  bool IsReadOnly() override { return !m_controllableValue; }
 
  private:
   NetworkTablesHelper m_nt;
   NT_Entry m_value;
   NT_Entry m_name;
+  NT_Entry m_controllable;
 
   DataSource m_valueData;
   std::string m_nameValue;
+  bool m_controllableValue = false;
 };
 }  // namespace glass

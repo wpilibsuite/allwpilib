@@ -106,6 +106,12 @@ void glass::DisplayDrive(DriveModel* m) {
     drawArrow(arrowPos, a2 + adder);
   }
 
+  // Set the buttons and sliders to read-only if the model is read-only.
+  if (m->IsReadOnly()) {
+    ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(210, 210, 210, 255));
+  }
+
   // Add sliders for the wheel percentages.
   ImGui::SetCursorPosY(y2 - pos.y + ImGui::GetFontSize() * 0.5);
   for (auto&& wheel : wheels) {
@@ -123,5 +129,10 @@ void glass::DisplayDrive(DriveModel* m) {
         wheel.setter(value);
       }
     }
+  }
+
+  if (m->IsReadOnly()) {
+    ImGui::PopStyleColor();
+    ImGui::PopItemFlag();
   }
 }
