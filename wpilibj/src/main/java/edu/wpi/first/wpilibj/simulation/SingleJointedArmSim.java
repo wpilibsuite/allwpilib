@@ -199,7 +199,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
    * @return The current arm angle.
    */
   public double getAngleRads() {
-    return m_x.get(0, 0);
+    return m_y.get(0, 0);
   }
 
   /**

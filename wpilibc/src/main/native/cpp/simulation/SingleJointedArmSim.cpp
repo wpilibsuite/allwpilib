@@ -50,7 +50,7 @@ bool SingleJointedArmSim::HasHitUpperLimit(
 }
 
 units::radian_t SingleJointedArmSim::GetAngle() const {
-  return units::radian_t{m_x(0)};
+  return units::radian_t{m_y(0)};
 }
 
 units::radians_per_second_t SingleJointedArmSim::GetVelocity() const {
