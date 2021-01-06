@@ -75,9 +75,7 @@ public class Drivetrain {
       new DifferentialDrivetrainSim(
           m_drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
-  /**
-   * Subsystem constructor.
-   */
+  /** Subsystem constructor. */
   public Drivetrain() {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -92,9 +90,7 @@ public class Drivetrain {
     SmartDashboard.putData("Field", m_fieldSim);
   }
 
-  /**
-   * Sets speeds to the drivetrain motors.
-   */
+  /** Sets speeds to the drivetrain motors. */
   public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
     var leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
     var rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
@@ -109,6 +105,7 @@ public class Drivetrain {
 
   /**
    * Controls the robot using arcade drive.
+   *
    * @param xSpeed the speed for the x axis
    * @param rot the rotation
    */
@@ -136,10 +133,7 @@ public class Drivetrain {
     return m_odometry.getPoseMeters();
   }
 
-  /**
-   * Update our simulation.
-   * This should be run every robot loop in simulation.
-   */
+  /** Update our simulation. This should be run every robot loop in simulation. */
   public void simulationPeriodic() {
     // To update our simulation, we set motor voltage inputs, update the
     // simulation, and write the simulated positions and velocities to our
