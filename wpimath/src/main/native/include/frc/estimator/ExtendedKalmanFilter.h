@@ -12,8 +12,8 @@
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
-#include "frc/system/RungeKutta.h"
 #include "units/time.h"
 
 namespace frc {
@@ -149,7 +149,7 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, States, States> discQ;
     DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
 
-    m_xHat = RungeKutta(m_f, m_xHat, u, dt);
+    m_xHat = RK4(m_f, m_xHat, u, dt);
     m_P = discA * m_P * discA.transpose() + discQ;
   }
 

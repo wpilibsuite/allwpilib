@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.wpilibj.system.RungeKutta;
+import edu.wpi.first.wpilibj.system.NumericalIntegration;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
@@ -76,7 +76,7 @@ class DifferentialDrivetrainSimTest {
       sim.update(0.020);
 
       // Update our ground truth
-      groundTruthX = RungeKutta.rungeKutta(sim::getDynamics, groundTruthX, voltages, 0.020);
+      groundTruthX = NumericalIntegration.rk4(sim::getDynamics, groundTruthX, voltages, 0.020);
     }
 
     assertEquals(

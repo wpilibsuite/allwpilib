@@ -7,8 +7,8 @@ package edu.wpi.first.wpilibj.estimator;
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.wpilibj.math.Discretization;
 import edu.wpi.first.wpilibj.math.StateSpaceUtil;
+import edu.wpi.first.wpilibj.system.NumericalIntegration;
 import edu.wpi.first.wpilibj.system.NumericalJacobian;
-import edu.wpi.first.wpilibj.system.RungeKutta;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
@@ -220,7 +220,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     final var discA = discPair.getFirst();
     final var discQ = discPair.getSecond();
 
-    m_xHat = RungeKutta.rungeKutta(f, m_xHat, u, dtSeconds);
+    m_xHat = NumericalIntegration.rk4(f, m_xHat, u, dtSeconds);
     m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
     m_dtSeconds = dtSeconds;
   }

@@ -13,8 +13,8 @@
 #include "frc/estimator/MerweScaledSigmaPoints.h"
 #include "frc/estimator/UnscentedTransform.h"
 #include "frc/system/Discretization.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
-#include "frc/system/RungeKutta.h"
 #include "units/time.h"
 
 namespace frc {
@@ -216,7 +216,7 @@ class UnscentedKalmanFilter {
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
       Eigen::Matrix<double, States, 1> x =
           sigmas.template block<States, 1>(0, i);
-      m_sigmasF.template block<States, 1>(0, i) = RungeKutta(m_f, x, u, dt);
+      m_sigmasF.template block<States, 1>(0, i) = RK4(m_f, x, u, dt);
     }
 
     auto ret = UnscentedTransform<States, States>(

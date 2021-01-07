@@ -12,8 +12,8 @@
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
-#include "frc/system/RungeKutta.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "units/moment_of_inertia.h"
@@ -154,7 +154,7 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
     observer.Predict(u, dt);
 
     r = nextR;
-    trueXhat = frc::RungeKutta(Dynamics, trueXhat, u, dt);
+    trueXhat = frc::RK4(Dynamics, trueXhat, u, dt);
   }
 
   auto localY = LocalMeasurementModel(trueXhat, u);

@@ -7,7 +7,7 @@
 #include <wpi/MathExtras.h>
 
 #include "frc/StateSpaceUtil.h"
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 
 using namespace frc;
@@ -77,7 +77,7 @@ void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
 Eigen::Matrix<double, 2, 1> ElevatorSim::UpdateX(
     const Eigen::Matrix<double, 2, 1>& currentXhat,
     const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) {
-  auto updatedXhat = RungeKutta(
+  auto updatedXhat = RKF45(
       [&](const Eigen::Matrix<double, 2, 1>& x,
           const Eigen::Matrix<double, 1, 1>& u_)
           -> Eigen::Matrix<double, 2, 1> {

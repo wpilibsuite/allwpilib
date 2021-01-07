@@ -9,7 +9,7 @@
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
 #include "frc/system/Discretization.h"
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,

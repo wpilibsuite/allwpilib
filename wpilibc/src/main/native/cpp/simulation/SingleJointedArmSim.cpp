@@ -9,7 +9,7 @@
 #include <units/voltage.h>
 #include <wpi/MathExtras.h>
 
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 
 using namespace frc;
@@ -82,7 +82,7 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
   // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
   // std::cos(theta)]]
 
-  auto updatedXhat = RungeKutta(
+  Eigen::Matrix<double, 2, 1> updatedXhat = RKF45(
       [&](const auto& x, const auto& u) -> Eigen::Matrix<double, 2, 1> {
         Eigen::Matrix<double, 2, 1> xdot = m_plant.A() * x + m_plant.B() * u;
 

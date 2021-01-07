@@ -10,7 +10,7 @@
 #include "frc/controller/RamseteController.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/simulation/DifferentialDrivetrainSim.h"
-#include "frc/system/RungeKutta.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
@@ -57,7 +57,7 @@ TEST(DifferentialDriveSim, Convergence) {
     sim.Update(20_ms);
 
     // Update ground truth.
-    groundTruthX = frc::RungeKutta(
+    groundTruthX = frc::RK4(
         [&sim](const auto& x, const auto& u) -> Eigen::Matrix<double, 7, 1> {
           return sim.Dynamics(x, u);
         },
