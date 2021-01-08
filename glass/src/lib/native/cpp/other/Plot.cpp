@@ -119,7 +119,7 @@ class Plot {
   std::string m_name;
   bool m_visible = true;
   bool m_showPause = true;
-  unsigned int m_plotFlags = ImPlotFlags_Default;
+  unsigned int m_plotFlags = ImPlotFlags_None;
   bool m_lockPrevX = false;
   bool m_paused = false;
   float m_viewTime = 10;
@@ -348,13 +348,13 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   if (IsDigital()) {
     ImPlot::PushStyleVar(ImPlotStyleVar_DigitalBitHeight, m_digitalBitHeight);
     ImPlot::PushStyleVar(ImPlotStyleVar_DigitalBitGap, m_digitalBitGap);
-    ImPlot::PlotDigital(label, getter, &getterData, size + 1);
+    ImPlot::PlotDigitalG(label, getter, &getterData, size + 1);
     ImPlot::PopStyleVar();
     ImPlot::PopStyleVar();
   } else {
     ImPlot::SetPlotYAxis(m_yAxis);
     ImPlot::SetNextMarkerStyle(m_marker - 1);
-    ImPlot::PlotLine(label, getter, &getterData, size + 1);
+    ImPlot::PlotLineG(label, getter, &getterData, size + 1);
   }
 
   // DND source for PlotSeries
@@ -492,9 +492,9 @@ bool Plot::ReadIni(wpi::StringRef name, wpi::StringRef value) {
       return true;
     }
     if (num == 0) {
-      m_plotFlags &= ~ImPlotFlags_Legend;
+      m_plotFlags |= ImPlotFlags_NoLegend;
     } else {
-      m_plotFlags |= ImPlotFlags_Legend;
+      m_plotFlags &= ~ImPlotFlags_NoLegend;
     }
     return true;
   } else if (name == "yaxis2") {
@@ -580,7 +580,7 @@ void Plot::WriteIni(ImGuiTextBuffer* out) {
       "name=%s\nvisible=%d\nshowPause=%d\nlockPrevX=%d\nlegend=%d\n"
       "yaxis2=%d\nyaxis3=%d\nviewTime=%d\nheight=%d\n",
       m_name.c_str(), m_visible ? 1 : 0, m_showPause ? 1 : 0,
-      m_lockPrevX ? 1 : 0, (m_plotFlags & ImPlotFlags_Legend) ? 1 : 0,
+      m_lockPrevX ? 1 : 0, (m_plotFlags & ImPlotFlags_NoLegend) ? 0 : 1,
       (m_plotFlags & ImPlotFlags_YAxis2) ? 1 : 0,
       (m_plotFlags & ImPlotFlags_YAxis3) ? 1 : 0,
       static_cast<int>(m_viewTime * 1000), m_height);
@@ -658,9 +658,9 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
         (paused || m_paused) ? ImGuiCond_Once : ImGuiCond_Always);
   }
 
-  ImPlotAxisFlags yFlags[3] = {ImPlotAxisFlags_Default,
-                               ImPlotAxisFlags_Auxiliary,
-                               ImPlotAxisFlags_Auxiliary};
+  ImPlotAxisFlags yFlags[3] = {ImPlotAxisFlags_None,
+                               ImPlotAxisFlags_NoGridLines,
+                               ImPlotAxisFlags_NoGridLines};
   for (int i = 0; i < 3; ++i) {
     ImPlot::SetNextPlotLimitsY(
         m_axisRange[i].min, m_axisRange[i].max,
@@ -675,8 +675,8 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   }
 
   if (ImPlot::BeginPlot(label, nullptr, nullptr, ImVec2(-1, m_height),
-                        m_plotFlags, ImPlotAxisFlags_Default, yFlags[0],
-                        yFlags[1], yFlags[2])) {
+                        m_plotFlags, ImPlotAxisFlags_None, yFlags[0], yFlags[1],
+                        yFlags[2])) {
     for (size_t j = 0; j < m_series.size(); ++j) {
       ImGui::PushID(j);
       switch (m_series[j]->EmitPlot(view, now, j, i)) {
@@ -733,7 +733,7 @@ void Plot::EmitSettings(size_t i) {
   ImGui::InputText("##editname", &m_name);
   ImGui::Checkbox("Visible", &m_visible);
   ImGui::Checkbox("Show Pause Button", &m_showPause);
-  ImGui::CheckboxFlags("Show Legend", &m_plotFlags, ImPlotFlags_Legend);
+  ImGui::CheckboxFlags("Hide Legend", &m_plotFlags, ImPlotFlags_NoLegend);
   if (i != 0) {
     ImGui::Checkbox("Lock X-axis to previous plot", &m_lockPrevX);
   }
