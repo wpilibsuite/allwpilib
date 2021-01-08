@@ -165,10 +165,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
   @Override
   public void reset() {
     if (m_simAngle != null) {
-      m_simAngle.set(0.0);
-    }
-    if (m_simRate != null) {
-      m_simRate.set(0.0);
+      m_simAngle.reset();
     }
     if (m_spi != null) {
       m_spi.resetAccumulator();

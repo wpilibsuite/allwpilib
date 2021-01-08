@@ -220,6 +220,47 @@ void SimDeviceData::SetValue(HAL_SimValueHandle handle,
                      valueImpl->direction, &value);
 }
 
+void SimDeviceData::ResetValue(HAL_SimValueHandle handle) {
+  std::scoped_lock lock(m_mutex);
+  Value* valueImpl = LookupValue(handle);
+  if (!valueImpl) {
+    return;
+  }
+
+  // don't notify reset if we aren't going to actually reset anything
+  switch (valueImpl->value.type) {
+    case HAL_INT:
+    case HAL_LONG:
+    case HAL_DOUBLE:
+      break;
+    default:
+      return;
+  }
+
+  // notify reset callbacks (done here so they're called with the old value)
+  valueImpl->reset(valueImpl->name.c_str(), valueImpl->handle,
+                   valueImpl->direction, &valueImpl->value);
+
+  // set user-facing value to 0
+  switch (valueImpl->value.type) {
+    case HAL_INT:
+      valueImpl->value.data.v_int = 0;
+      break;
+    case HAL_LONG:
+      valueImpl->value.data.v_long = 0;
+      break;
+    case HAL_DOUBLE:
+      valueImpl->value.data.v_double = 0;
+      break;
+    default:
+      return;
+  }
+
+  // notify changed callbacks
+  valueImpl->changed(valueImpl->name.c_str(), valueImpl->handle,
+                     valueImpl->direction, &valueImpl->value);
+}
+
 int32_t SimDeviceData::RegisterDeviceCreatedCallback(
     const char* prefix, void* param, HALSIM_SimDeviceCallback callback,
     bool initialNotify) {
@@ -366,6 +407,35 @@ void SimDeviceData::CancelValueChangedCallback(int32_t uid) {
     return;
   }
   valueImpl->changed.Cancel(uid & 0x7f);
+}
+
+int32_t SimDeviceData::RegisterValueResetCallback(
+    HAL_SimValueHandle handle, void* param, HALSIM_SimValueCallback callback,
+    bool initialNotify) {
+  std::scoped_lock lock(m_mutex);
+  Value* valueImpl = LookupValue(handle);
+  if (!valueImpl) {
+    return -1;
+  }
+
+  // register callback
+  int32_t index = valueImpl->reset.Register(callback, param);
+
+  // encode device and value into uid
+  return (((handle >> 16) & 0xfff) << 19) | ((handle & 0xfff) << 7) |
+         (index & 0x7f);
+}
+
+void SimDeviceData::CancelValueResetCallback(int32_t uid) {
+  if (uid <= 0) {
+    return;
+  }
+  std::scoped_lock lock(m_mutex);
+  Value* valueImpl = LookupValue(((uid >> 19) << 16) | ((uid >> 7) & 0xfff));
+  if (!valueImpl) {
+    return;
+  }
+  valueImpl->reset.Cancel(uid & 0x7f);
 }
 
 HAL_SimValueHandle SimDeviceData::GetValueHandle(HAL_SimDeviceHandle device,
@@ -515,6 +585,18 @@ int32_t HALSIM_RegisterSimValueChangedCallback(HAL_SimValueHandle handle,
 
 void HALSIM_CancelSimValueChangedCallback(int32_t uid) {
   SimSimDeviceData->CancelValueChangedCallback(uid);
+}
+
+int32_t HALSIM_RegisterSimValueResetCallback(HAL_SimValueHandle handle,
+                                             void* param,
+                                             HALSIM_SimValueCallback callback,
+                                             HAL_Bool initialNotify) {
+  return SimSimDeviceData->RegisterValueResetCallback(handle, param, callback,
+                                                      initialNotify);
+}
+
+void HALSIM_CancelSimValueResetCallback(int32_t uid) {
+  SimSimDeviceData->CancelValueResetCallback(uid);
 }
 
 HAL_SimValueHandle HALSIM_GetSimValueHandle(HAL_SimDeviceHandle device,

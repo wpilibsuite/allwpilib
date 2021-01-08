@@ -602,6 +602,32 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_cancelSimValueChangedCallback
 
 /*
  * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Method:    registerSimValueResetCallback
+ * Signature: (ILjava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueResetCallback
+  (JNIEnv* env, jclass, jint handle, jobject callback, jboolean initialNotify)
+{
+  return AllocateValueCallback(env, static_cast<HAL_SimValueHandle>(handle),
+                               callback, true, initialNotify,
+                               &HALSIM_RegisterSimValueResetCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
+ * Method:    cancelSimValueResetCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_cancelSimValueResetCallback
+  (JNIEnv* env, jclass, jint uid)
+{
+  FreeValueCallback(env, uid, &HALSIM_CancelSimValueResetCallback);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
  * Method:    getSimValueHandle
  * Signature: (ILjava/lang/String;)I
  */

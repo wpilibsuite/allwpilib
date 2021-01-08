@@ -71,6 +71,7 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
           break;
         case HAL_DOUBLE:
           value.data.v_double = it.value();
+          value.data.v_double -= vd->second->doubleOffset;
           break;
         case HAL_ENUM: {
           if (it->is_string()) {
@@ -97,9 +98,11 @@ void HALSimWSProviderSimDevice::OnNetValueChanged(const wpi::json& json) {
         }
         case HAL_INT:
           value.data.v_int = it.value();
+          value.data.v_int -= vd->second->intOffset;
           break;
         case HAL_LONG:
           value.data.v_long = it.value();
+          value.data.v_long -= vd->second->intOffset;
           break;
         default:
           break;
@@ -186,7 +189,8 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
         ProcessHalCallback({{valueData->key, value->data.v_boolean}});
         break;
       case HAL_DOUBLE:
-        ProcessHalCallback({{valueData->key, value->data.v_double}});
+        ProcessHalCallback(
+            {{valueData->key, value->data.v_double + valueData->doubleOffset}});
         break;
       case HAL_ENUM: {
         int v = value->data.v_enum;
@@ -198,14 +202,43 @@ void HALSimWSProviderSimDevice::OnValueChanged(SimDeviceValueData* valueData,
         break;
       }
       case HAL_INT:
-        ProcessHalCallback({{valueData->key, value->data.v_int}});
+        ProcessHalCallback(
+            {{valueData->key, value->data.v_int + valueData->intOffset}});
         break;
       case HAL_LONG:
-        ProcessHalCallback({{valueData->key, value->data.v_long}});
+        ProcessHalCallback(
+            {{valueData->key, value->data.v_long + valueData->intOffset}});
         break;
       default:
         break;
     }
+  }
+}
+
+void HALSimWSProviderSimDevice::OnValueResetStatic(
+    const char* name, void* param, HAL_SimValueHandle handle, int32_t direction,
+    const struct HAL_Value* value) {
+  auto valueData = (reinterpret_cast<SimDeviceValueData*>(param));
+  valueData->device->OnValueReset(valueData, value);
+}
+
+void HALSimWSProviderSimDevice::OnValueReset(SimDeviceValueData* valueData,
+                                             const struct HAL_Value* value) {
+  switch (value->type) {
+    case HAL_BOOLEAN:
+    case HAL_ENUM:
+      break;
+    case HAL_DOUBLE:
+      valueData->doubleOffset += value->data.v_double;
+      break;
+    case HAL_INT:
+      valueData->intOffset += value->data.v_int;
+      break;
+    case HAL_LONG:
+      valueData->intOffset += value->data.v_long;
+      break;
+    default:
+      break;
   }
 }
 

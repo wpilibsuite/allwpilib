@@ -13,6 +13,7 @@ import edu.wpi.first.hal.SimValue;
 import edu.wpi.first.hal.simulation.SimDeviceCallback;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.hal.simulation.SimValueCallback;
+import edu.wpi.first.hal.simulation.SimValueCallback2;
 
 /** Class to control the simulation side of a SimDevice. */
 public class SimDeviceSim {
@@ -167,6 +168,38 @@ public class SimDeviceSim {
         SimDeviceDataJNI.registerSimValueChangedCallback(
             value.getNativeHandle(), callback, initialNotify);
     return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueChangedCallback);
+  }
+
+  /**
+   * Register a callback to be run every time a value is changed on this device.
+   *
+   * @param callback the callback
+   * @param initialNotify should the callback be run with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public CallbackStore registerValueChangedCallback2(
+      SimValue value, SimValueCallback2 callback, boolean initialNotify) {
+    int uid =
+        SimDeviceDataJNI.registerSimValueChangedCallback2(
+            value.getNativeHandle(), callback, initialNotify);
+    return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueChangedCallback);
+  }
+
+  /**
+   * Register a callback for SimDouble.reset() and similar functions. The callback is called with
+   * the old value.
+   *
+   * @param value simulated value
+   * @param callback callback
+   * @param initialNotify ignored (present for consistency)
+   */
+  public CallbackStore registerValueResetCallback(
+      SimValue value, SimValueCallback2 callback, boolean initialNotify) {
+    int uid =
+        SimDeviceDataJNI.registerSimValueResetCallback(
+            value.getNativeHandle(), callback, initialNotify);
+    return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueResetCallback);
   }
 
   /**

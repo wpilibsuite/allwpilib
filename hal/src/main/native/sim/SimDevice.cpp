@@ -61,6 +61,10 @@ void HAL_SetSimValue(HAL_SimValueHandle handle, const struct HAL_Value* value) {
   SimSimDeviceData->SetValue(handle, *value);
 }
 
+void HAL_ResetSimValue(HAL_SimValueHandle handle) {
+  SimSimDeviceData->ResetValue(handle);
+}
+
 hal::SimDevice::SimDevice(const char* name, int index) {
   wpi::SmallString<128> fullname;
   wpi::raw_svector_ostream os(fullname);

@@ -40,6 +40,8 @@ void HAL_GetSimValue(HAL_SimValueHandle handle, struct HAL_Value* value) {
 void HAL_SetSimValue(HAL_SimValueHandle handle, const struct HAL_Value* value) {
 }
 
+void HAL_ResetSimValue(HAL_SimValueHandle handle) {}
+
 hal::SimDevice::SimDevice(const char* name, int index) {}
 
 hal::SimDevice::SimDevice(const char* name, int index, int channel) {}
