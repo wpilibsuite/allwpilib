@@ -131,6 +131,7 @@ class Plot {
     bool lockMax = false;
     bool apply = false;
   };
+  std::string m_axisLabel[3];
   PlotRange m_axisRange[3];
   ImPlotRange m_xaxisRange;  // read from plot, used for lockPrevX
 };
@@ -570,6 +571,9 @@ bool Plot::ReadIni(wpi::StringRef name, wpi::StringRef value) {
       }
       m_axisRange[yAxis].lockMax = num != 0;
       return true;
+    } else if (yName == "label") {
+      m_axisLabel[yAxis] = value;
+      return true;
     }
   }
   return false;
@@ -585,11 +589,13 @@ void Plot::WriteIni(ImGuiTextBuffer* out) {
       (m_plotFlags & ImPlotFlags_YAxis3) ? 1 : 0,
       static_cast<int>(m_viewTime * 1000), m_height);
   for (int i = 0; i < 3; ++i) {
-    out->appendf("y%d_min=%d\ny%d_max=%d\ny%d_lockMin=%d\ny%d_lockMax=%d\n", i,
-                 static_cast<int>(m_axisRange[i].min * 1000), i,
-                 static_cast<int>(m_axisRange[i].max * 1000), i,
-                 m_axisRange[i].lockMin ? 1 : 0, i,
-                 m_axisRange[i].lockMax ? 1 : 0);
+    out->appendf(
+        "y%d_min=%d\ny%d_max=%d\ny%d_lockMin=%d\ny%d_lockMax=%d\n"
+        "y%d_label=%s\n",
+        i, static_cast<int>(m_axisRange[i].min * 1000), i,
+        static_cast<int>(m_axisRange[i].max * 1000), i,
+        m_axisRange[i].lockMin ? 1 : 0, i, m_axisRange[i].lockMax ? 1 : 0, i,
+        m_axisLabel[i].c_str());
   }
 }
 
@@ -674,9 +680,13 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
     }
   }
 
-  if (ImPlot::BeginPlot(label, nullptr, nullptr, ImVec2(-1, m_height),
-                        m_plotFlags, ImPlotAxisFlags_None, yFlags[0], yFlags[1],
-                        yFlags[2])) {
+  if (ImPlot::BeginPlot(
+          label, nullptr,
+          m_axisLabel[0].empty() ? nullptr : m_axisLabel[0].c_str(),
+          ImVec2(-1, m_height), m_plotFlags, ImPlotAxisFlags_None, yFlags[0],
+          yFlags[1], yFlags[2],
+          m_axisLabel[1].empty() ? nullptr : m_axisLabel[1].c_str(),
+          m_axisLabel[2].empty() ? nullptr : m_axisLabel[2].c_str())) {
     for (size_t j = 0; j < m_series.size(); ++j) {
       ImGui::PushID(j);
       switch (m_series[j]->EmitPlot(view, now, j, i)) {
@@ -708,6 +718,8 @@ void Plot::EmitSettingsLimits(int axis) {
   ImGui::Indent();
   ImGui::PushID(axis);
 
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+  ImGui::InputText("Label", &m_axisLabel[axis]);
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 3.5);
   ImGui::InputDouble("Min", &m_axisRange[axis].min, 0, 0, "%.3f");
   ImGui::SameLine();
