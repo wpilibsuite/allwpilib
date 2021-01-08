@@ -160,7 +160,7 @@ bool DeleteButton(ImGuiID id, const ImVec2& pos) {
 bool HeaderDeleteButton(const char* label) {
   ImGuiWindow* window = ImGui::GetCurrentWindow();
   ImGuiContext& g = *GImGui;
-  ImGuiItemHoveredDataBackup last_item_backup;
+  ImGuiLastItemDataBackup last_item_backup;
   ImGuiID id = window->GetID(label);
   float button_size = g.FontSize;
   float button_x = ImMax(window->DC.LastItemRect.Min.x,
