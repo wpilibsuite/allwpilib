@@ -50,10 +50,9 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
   }
 
   /**
-   * Minimize the change in heading the desired swerve module state would
-   * require by potentially reversing the direction the wheel spins. If this is
-   * used with the PIDController class's continuous input functionality, the
-   * furthest a wheel will ever rotate is 90 degrees.
+   * Minimize the change in heading the desired swerve module state would require by potentially
+   * reversing the direction the wheel spins. If this is used with the PIDController class's
+   * continuous input functionality, the furthest a wheel will ever rotate is 90 degrees.
    *
    * @param desiredState The desired state.
    * @param currentAngle The current module angle.
