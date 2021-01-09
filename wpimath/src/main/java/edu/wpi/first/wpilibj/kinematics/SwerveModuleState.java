@@ -62,7 +62,7 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
     var delta = desiredState.angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
       return new SwerveModuleState(
-          desiredState.speedMetersPerSecond * -1.0,
+          -desiredState.speedMetersPerSecond,
           desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
     }
     return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
