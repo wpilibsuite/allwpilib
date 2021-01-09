@@ -92,8 +92,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param initialValue initial value
    * @return simulated value handle
    */
-  public static int createSimValueInt(
-      int device, String name, int direction, int initialValue) {
+  public static int createSimValueInt(int device, String name, int direction, int initialValue) {
     return createSimValueNative(device, name, direction, HALValue.kInt, initialValue, 0.0);
   }
 
@@ -108,8 +107,7 @@ public class SimDeviceJNI extends JNIWrapper {
    * @param initialValue initial value
    * @return simulated value handle
    */
-  public static int createSimValueLong(
-      int device, String name, int direction, long initialValue) {
+  public static int createSimValueLong(int device, String name, int direction, long initialValue) {
     return createSimValueNative(device, name, direction, HALValue.kLong, initialValue, 0.0);
   }
 
