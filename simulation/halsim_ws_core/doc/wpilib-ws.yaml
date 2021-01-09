@@ -55,10 +55,10 @@ components:
           const: Accel
         device:
           type: string
-          description: Device Identifier (usually channel)
+          description: Arbitrary device name
         data:
           type: object
-          description: "Accelerometer Data (type: Accel, device: channel number)"
+          description: "Accelerometer Data (type: Accelerometer, device: channel number)"
           properties:
             <init:
               type: boolean
@@ -168,7 +168,7 @@ components:
           const: DriverStation
         device:
           type: string
-          description: Device Identifier (usually channel)
+          description: Should be left blank
         data:
           type: object
           description: "Driver Station Data (type: DriverStation)"
@@ -216,7 +216,7 @@ components:
           const: DutyCycle
         device:
           type: string
-          description: Device Identifier (usually channel)
+          description: Arbitrary device name
         data:
           type: object
           description: "Duty Cycle Input Data (type: DutyCycle, device: channel number)"
@@ -276,7 +276,7 @@ components:
           const: Gyro
         device:
           type: string
-          description: Device Identifier (usually channel)
+          description: Arbitrary device name
         data:
           type: object
           description: "Gyro Data (type: Gyro, device: channel number)"
@@ -453,7 +453,7 @@ components:
           const: RoboRIO
         device:
           type: string
-          description: Device Identifier (usually channel)
+          description: Should be left blank
         data:
           type: object
           description: "RoboRIO Data (type: RoboRIO)"
