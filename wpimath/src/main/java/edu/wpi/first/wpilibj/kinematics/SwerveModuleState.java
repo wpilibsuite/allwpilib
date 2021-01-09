@@ -48,4 +48,23 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
     return String.format(
         "SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speedMetersPerSecond, angle);
   }
+
+  /**
+   * Optimize a desired state by deciding weather to reverse the direction the wheel spins in order
+   * to minimize travel time. This means that the furthest a wheel will ever rotate is 90 degrees,
+   * if used in conjunction with the PIDController class' continuous input functionality.
+   *
+   * @param desiredState The desired state.
+   * @param currentAngle The current module angle.
+   */
+  public static SwerveModuleState optimize(
+      SwerveModuleState desiredState, Rotation2d currentAngle) {
+    var delta = desiredState.angle.minus(currentAngle);
+    if (Math.abs(delta.getDegrees()) > 90.0) {
+      return new SwerveModuleState(
+          desiredState.speedMetersPerSecond * -1.0,
+          desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+    }
+    return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+  }
 }
