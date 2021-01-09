@@ -45,7 +45,8 @@ public class DIOSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerInitializedCallback(m_index, callback, initialNotify);
@@ -75,7 +76,8 @@ public class DIOSim {
    *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerValueCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerValueCallback(m_index, callback, initialNotify);
@@ -105,7 +107,8 @@ public class DIOSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerPulseLengthCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerPulseLengthCallback(m_index, callback, initialNotify);
@@ -135,7 +138,8 @@ public class DIOSim {
    *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerIsInputCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerIsInputCallback(m_index, callback, initialNotify);
@@ -165,7 +169,8 @@ public class DIOSim {
    *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerFilterIndexCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DIODataJNI.registerFilterIndexCallback(m_index, callback, initialNotify);

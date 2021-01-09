@@ -62,7 +62,8 @@ public class DigitalPWMSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DigitalPWMDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
@@ -92,7 +93,8 @@ public class DigitalPWMSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerDutyCycleCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DigitalPWMDataJNI.registerDutyCycleCallback(m_index, callback, initialNotify);
@@ -122,7 +124,8 @@ public class DigitalPWMSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerPinCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DigitalPWMDataJNI.registerPinCallback(m_index, callback, initialNotify);

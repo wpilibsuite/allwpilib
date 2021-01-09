@@ -42,7 +42,8 @@ public class PCMSim {
    * @param channel the channel to monitor
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerSolenoidInitializedCallback(
       int channel, NotifyCallback callback, boolean initialNotify) {
@@ -77,7 +78,8 @@ public class PCMSim {
    * @param channel the channel to monitor
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerSolenoidOutputCallback(
       int channel, NotifyCallback callback, boolean initialNotify) {
@@ -110,7 +112,8 @@ public class PCMSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerCompressorInitializedCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -141,7 +144,8 @@ public class PCMSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerCompressorOnCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -172,7 +176,8 @@ public class PCMSim {
    *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerClosedLoopEnabledCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -203,7 +208,8 @@ public class PCMSim {
    *
    * @param callback the callback
    * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerPressureSwitchCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -234,7 +240,8 @@ public class PCMSim {
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerCompressorCurrentCallback(
       NotifyCallback callback, boolean initialNotify) {

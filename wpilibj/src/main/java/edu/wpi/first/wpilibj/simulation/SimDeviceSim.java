@@ -114,7 +114,8 @@ public class SimDeviceSim {
    *
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerValueCreatedCallback(
       SimValueCallback callback, boolean initialNotify) {
@@ -127,7 +128,8 @@ public class SimDeviceSim {
    *
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerValueChangedCallback(
       SimValue value, SimValueCallback callback, boolean initialNotify) {
@@ -152,7 +154,8 @@ public class SimDeviceSim {
    *
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerDeviceCreatedCallback(
       String prefix, SimDeviceCallback callback, boolean initialNotify) {
@@ -165,7 +168,8 @@ public class SimDeviceSim {
    * freed/destroyed.
    *
    * @param callback the callback
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerDeviceFreedCallback(
       String prefix, SimDeviceCallback callback, boolean initialNotify) {

@@ -17,7 +17,8 @@ public class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the enabled state is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerEnabledCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -48,7 +49,8 @@ public class DriverStationSim {
    *
    * @param callback the callback that will be called on autonomous mode entrance/exit
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerAutonomousCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -79,7 +81,8 @@ public class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the test mode is entered or left
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerTestCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerTestCallback(callback, initialNotify);
@@ -109,7 +112,8 @@ public class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the eStop state changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerEStopCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -141,7 +145,8 @@ public class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the FMS connection changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerFmsAttachedCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -172,7 +177,8 @@ public class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the DS connection changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerDsAttachedCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -203,7 +209,8 @@ public class DriverStationSim {
    *
    * @param callback the callback that will be called whenever the alliance station changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerAllianceStationIdCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -272,7 +279,8 @@ public class DriverStationSim {
    *
    * @param callback the callback that will be called whenever match time changes
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public static CallbackStore registerMatchTimeCallback(
       NotifyCallback callback, boolean initialNotify) {

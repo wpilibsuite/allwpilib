@@ -58,7 +58,8 @@ public class EncoderSim {
    *
    * @param callback the callback that will be called whenever the Initialized property is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = EncoderDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
@@ -88,7 +89,8 @@ public class EncoderSim {
    *
    * @param callback the callback that will be called whenever the count property is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerCountCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = EncoderDataJNI.registerCountCallback(m_index, callback, initialNotify);
@@ -118,7 +120,8 @@ public class EncoderSim {
    *
    * @param callback the callback that will be called whenever the period is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerPeriodCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = EncoderDataJNI.registerPeriodCallback(m_index, callback, initialNotify);
@@ -148,7 +151,8 @@ public class EncoderSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerResetCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = EncoderDataJNI.registerResetCallback(m_index, callback, initialNotify);
@@ -178,7 +182,8 @@ public class EncoderSim {
    *
    * @param callback the callback
    * @param initialNotify whether to run the callback on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerMaxPeriodCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = EncoderDataJNI.registerMaxPeriodCallback(m_index, callback, initialNotify);
@@ -208,7 +213,8 @@ public class EncoderSim {
    *
    * @param callback the callback that will be called whenever the direction is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerDirectionCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = EncoderDataJNI.registerDirectionCallback(m_index, callback, initialNotify);
@@ -238,7 +244,8 @@ public class EncoderSim {
    *
    * @param callback the callback that will be called whenever the reverse direction is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerReverseDirectionCallback(
       NotifyCallback callback, boolean initialNotify) {
@@ -269,7 +276,8 @@ public class EncoderSim {
    *
    * @param callback the callback that will be called whenever the samples-to-average is changed
    * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerSamplesToAverageCallback(
       NotifyCallback callback, boolean initialNotify) {
