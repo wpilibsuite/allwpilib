@@ -5,7 +5,7 @@ info:
   description: |
     API to route WPILib HAL calls over WebSockets.
   license:
-    name: MIT
+    name: WPILib BSD
 
 channels:
   wpilibws:
