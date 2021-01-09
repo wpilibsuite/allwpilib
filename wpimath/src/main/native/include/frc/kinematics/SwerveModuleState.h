@@ -37,7 +37,7 @@ struct SwerveModuleState {
                                     const Rotation2d& currentAngle) {
     auto delta = desiredState.angle - currentAngle;
     if (units::math::abs(delta.Degrees()) > 90_deg) {
-      return {desiredState.speed * -1.0,
+      return {-desiredState.speed,
               desiredState.angle + Rotation2d{180_deg}};
     }
     return {desiredState.speed, desiredState.angle};
