@@ -29,7 +29,7 @@ struct SwerveModuleState {
    * wheel spins in order to minimize travel time. This means that the furthest
    * a wheel will ever rotate is 90 degrees, if used in conjunction with the
    * PIDController class' continuous input functionality.
-   * 
+   *
    * @param desiredState The desired state.
    * @param currentAngle The current module angle.
    */
