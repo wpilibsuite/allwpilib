@@ -25,6 +25,17 @@ components:
       title: WPILib WebSocket Message
       summary: Message envelope. Note that the "data" field contains a diff of the current state of a particular device. E.g. If only the "value" changes for a DIO device, then only the "<>value" field will be sent.
       contentType: application/json
+      examples:
+      - payload:
+          type: PWM
+          device: "1"
+          data:
+            "<speed": 0.5
+      - payload:
+          type: DIO
+          device: "3"
+          data:
+            "<init": true
       payload:
         type: object
         oneOf:
