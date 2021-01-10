@@ -64,7 +64,8 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
       return new SwerveModuleState(
           -desiredState.speedMetersPerSecond,
           desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+    } else {
+      return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
     }
-    return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
   }
 }

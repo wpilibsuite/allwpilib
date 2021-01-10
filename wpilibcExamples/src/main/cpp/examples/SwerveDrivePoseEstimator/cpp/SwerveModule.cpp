@@ -35,8 +35,8 @@ frc::SwerveModuleState SwerveModule::GetState() const {
 void SwerveModule::SetDesiredState(
     const frc::SwerveModuleState& referenceState) {
   // Optimize the reference state to avoid spinning further than 90 degrees
-  auto state = frc::SwerveModuleState::Optimize(
-      referenceState, frc::Rotation2d{units::radian_t(m_turningEncoder.Get())});
+  const auto state = frc::SwerveModuleState::Optimize(
+      referenceState, units::radian_t(m_turningEncoder.Get()));
 
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
