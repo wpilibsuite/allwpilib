@@ -79,7 +79,7 @@ public class SwerveModule {
   /**
    * Sets the desired state for the module.
    *
-   * @param state Desired state with speed and angle.
+   * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
