@@ -267,6 +267,6 @@ void RoboRioSim::SetUserFaults3V3(int userFaults3V3) {
   HALSIM_SetRoboRioUserFaults3V3(userFaults3V3);
 }
 
-void ResetData() {
+void RoboRioSim::ResetData() {
   HALSIM_ResetRoboRioData();
 }
