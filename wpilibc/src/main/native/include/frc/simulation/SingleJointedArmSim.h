@@ -63,20 +63,34 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
                       const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
+   * Returns whether the arm would hit the lower limit.
+   *
+   * @param armAngle The arm height.
+   * @return Whether the arm would hit the lower limit.
+   */
+  bool WouldHitLowerLimit(units::radian_t armAngle) const;
+
+  /**
+   * Returns whether the arm would hit the upper limit.
+   *
+   * @param armAngle The arm height.
+   * @return Whether the arm would hit the upper limit.
+   */
+  bool WouldHitUpperLimit(units::radian_t armAngle) const;
+
+  /**
    * Returns whether the arm has hit the lower limit.
    *
-   * @param x The current arm state.
    * @return Whether the arm has hit the lower limit.
    */
-  bool HasHitLowerLimit(const Eigen::Matrix<double, 2, 1>& x) const;
+  bool HasHitLowerLimit() const;
 
   /**
    * Returns whether the arm has hit the upper limit.
    *
-   * @param x The current arm state.
    * @return Whether the arm has hit the upper limit.
    */
-  bool HasHitUpperLimit(const Eigen::Matrix<double, 2, 1>& x) const;
+  bool HasHitUpperLimit() const;
 
   /**
    * Returns the current arm angle.
@@ -100,7 +114,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
   units::ampere_t GetCurrentDraw() const override;
 
   /**
-   * Sets the input voltage for the elevator.
+   * Sets the input voltage for the arm.
    *
    * @param voltage The input voltage.
    */

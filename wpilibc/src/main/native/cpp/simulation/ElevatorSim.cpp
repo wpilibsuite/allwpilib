@@ -39,12 +39,20 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
       m_maxHeight(maxHeight),
       m_gearing(gearing) {}
 
-bool ElevatorSim::HasHitLowerLimit(const Eigen::Matrix<double, 2, 1>& x) const {
-  return x(0) < m_minHeight.to<double>();
+bool ElevatorSim::WouldHitLowerLimit(units::meter_t elevatorHeight) const {
+  return elevatorHeight < m_minHeight;
 }
 
-bool ElevatorSim::HasHitUpperLimit(const Eigen::Matrix<double, 2, 1>& x) const {
-  return x(0) > m_maxHeight.to<double>();
+bool ElevatorSim::WouldHitUpperLimit(units::meter_t elevatorHeight) const {
+  return elevatorHeight > m_maxHeight;
+}
+
+bool ElevatorSim::HasHitLowerLimit() const {
+  return WouldHitLowerLimit(units::meter_t(m_y(0)));
+}
+
+bool ElevatorSim::HasHitUpperLimit() const {
+  return WouldHitUpperLimit(units::meter_t(m_y(0)));
 }
 
 units::meter_t ElevatorSim::GetPosition() const {
@@ -85,10 +93,10 @@ Eigen::Matrix<double, 2, 1> ElevatorSim::UpdateX(
       },
       currentXhat, u, dt);
   // Check for collision after updating x-hat.
-  if (HasHitLowerLimit(updatedXhat)) {
+  if (WouldHitLowerLimit(units::meter_t(updatedXhat(0)))) {
     return MakeMatrix<2, 1>(m_minHeight.to<double>(), 0.0);
   }
-  if (HasHitUpperLimit(updatedXhat)) {
+  if (WouldHitUpperLimit(units::meter_t(updatedXhat(0)))) {
     return MakeMatrix<2, 1>(m_maxHeight.to<double>(), 0.0);
   }
   return updatedXhat;

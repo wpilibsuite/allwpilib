@@ -174,25 +174,41 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   }
 
   /**
+   * Returns whether the arm would hit the lower limit.
+   *
+   * @param currentAngleRads The current arm height.
+   * @return Whether the arm would hit the lower limit.
+   */
+  public boolean wouldHitLowerLimit(double currentAngleRads) {
+    return currentAngleRads < this.m_minAngle;
+  }
+
+  /**
+   * Returns whether the arm would hit the upper limit.
+   *
+   * @param currentAngleRads The current arm height.
+   * @return Whether the arm would hit the upper limit.
+   */
+  public boolean wouldHitUpperLimit(double currentAngleRads) {
+    return currentAngleRads > this.m_maxAngle;
+  }
+
+  /**
    * Returns whether the arm has hit the lower limit.
    *
-   * @param x The current arm state.
    * @return Whether the arm has hit the lower limit.
    */
-  @SuppressWarnings("ParameterName")
-  public boolean hasHitLowerLimit(Matrix<N2, N1> x) {
-    return x.get(0, 0) < this.m_minAngle;
+  public boolean hasHitLowerLimit() {
+    return wouldHitLowerLimit(getAngleRads());
   }
 
   /**
    * Returns whether the arm has hit the upper limit.
    *
-   * @param x The current arm state.
    * @return Whether the arm has hit the upper limit.
    */
-  @SuppressWarnings("ParameterName")
-  public boolean hasHitUpperLimit(Matrix<N2, N1> x) {
-    return x.get(0, 0) > this.m_maxAngle;
+  public boolean hasHitUpperLimit() {
+    return wouldHitUpperLimit(getAngleRads());
   }
 
   /**
@@ -227,7 +243,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
   }
 
   /**
-   * Sets the input voltage for the elevator.
+   * Sets the input voltage for the arm.
    *
    * @param volts The input voltage.
    */
@@ -288,10 +304,10 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
             dtSeconds);
 
     // We check for collision after updating xhat
-    if (hasHitLowerLimit(updatedXhat)) {
+    if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {
       return VecBuilder.fill(m_minAngle, 0);
     }
-    if (hasHitUpperLimit(updatedXhat)) {
+    if (wouldHitUpperLimit(updatedXhat.get(0, 0))) {
       return VecBuilder.fill(m_maxAngle, 0);
     }
     return updatedXhat;

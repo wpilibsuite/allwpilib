@@ -58,20 +58,34 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
+   * Returns whether the elevator would hit the lower limit.
+   *
+   * @param elevatorHeight The elevator height.
+   * @return Whether the elevator would hit the lower limit.
+   */
+  bool WouldHitLowerLimit(units::meter_t elevatorHeight) const;
+
+  /**
+   * Returns whether the elevator would hit the upper limit.
+   *
+   * @param elevatorHeight The elevator height.
+   * @return Whether the elevator would hit the upper limit.
+   */
+  bool WouldHitUpperLimit(units::meter_t elevatorHeight) const;
+
+  /**
    * Returns whether the elevator has hit the lower limit.
    *
-   * @param x The current elevator state.
    * @return Whether the elevator has hit the lower limit.
    */
-  bool HasHitLowerLimit(const Eigen::Matrix<double, 2, 1>& x) const;
+  bool HasHitLowerLimit() const;
 
   /**
    * Returns whether the elevator has hit the upper limit.
    *
-   * @param x The current elevator state.
    * @return Whether the elevator has hit the upper limit.
    */
-  bool HasHitUpperLimit(const Eigen::Matrix<double, 2, 1>& x) const;
+  bool HasHitUpperLimit() const;
 
   /**
    * Returns the position of the elevator.
