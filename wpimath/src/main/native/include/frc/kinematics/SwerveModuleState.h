@@ -38,8 +38,9 @@ struct SwerveModuleState {
     auto delta = desiredState.angle - currentAngle;
     if (units::math::abs(delta.Degrees()) > 90_deg) {
       return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
+    } else {
+      return {desiredState.speed, desiredState.angle};
     }
-    return {desiredState.speed, desiredState.angle};
   }
 };
 }  // namespace frc
