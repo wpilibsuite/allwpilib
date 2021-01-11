@@ -5,6 +5,8 @@
 #pragma once
 
 #include "frc/geometry/Rotation2d.h"
+#include "units/angle.h"
+#include "units/math.h"
 #include "units/velocity.h"
 
 namespace frc {
@@ -21,5 +23,24 @@ struct SwerveModuleState {
    * Angle of the module.
    */
   Rotation2d angle;
+
+  /**
+   * Minimize the change in heading the desired swerve module state would
+   * require by potentially reversing the direction the wheel spins. If this is
+   * used with the PIDController class's continuous input functionality, the
+   * furthest a wheel will ever rotate is 90 degrees.
+   *
+   * @param desiredState The desired state.
+   * @param currentAngle The current module angle.
+   */
+  static SwerveModuleState Optimize(const SwerveModuleState& desiredState,
+                                    const Rotation2d& currentAngle) {
+    auto delta = desiredState.angle - currentAngle;
+    if (units::math::abs(delta.Degrees()) > 90_deg) {
+      return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
+    } else {
+      return {desiredState.speed, desiredState.angle};
+    }
+  }
 };
 }  // namespace frc
