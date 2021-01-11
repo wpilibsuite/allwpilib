@@ -17,7 +17,8 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of an elevator system.
+   * Create a state-space model of an elevator system. The states of the system are [position,
+   * velocity]^T, inputs are [voltage], and outputs are [position].
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param massKg The mass of the elevator carriage, in kilograms.
@@ -47,7 +48,8 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a flywheel system.
+   * Create a state-space model of a flywheel system. The states of the system are [angular
+   * velocity], inputs are [voltage], and outputs are [angular velocity].
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param jKgMetersSquared The moment of inertia J of the flywheel.
@@ -103,11 +105,12 @@ public final class LinearSystemId {
   }
 
   /**
-   * Create a state-space model of a single jointed arm system.
+   * Create a state-space model of a single jointed arm system. The states of the system are [angle,
+   * angular velocity], inputs are [voltage], and outputs are [angle].
    *
    * @param motor The motor (or gearbox) attached to the arm.
    * @param jKgSquaredMeters The moment of inertia J of the arm.
-   * @param G the gearing between the motor and arm, in output over input. Most of the time this
+   * @param G The gearing between the motor and arm, in output over input. Most of the time this
    *     will be greater than 1.
    * @return A LinearSystem representing the given characterized constants.
    */
@@ -130,7 +133,8 @@ public final class LinearSystemId {
 
   /**
    * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2). These
-   * constants cam be found using frc-characterization.
+   * constants cam be found using frc-characterization. The states of the system are [velocity],
+   * inputs are [voltage], and outputs are [velocity].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
    * {@link edu.wpi.first.wpilibj.util.Units} class for converting between unit types.
@@ -152,7 +156,8 @@ public final class LinearSystemId {
 
   /**
    * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2). These
-   * constants cam be found using frc-characterization.
+   * constants cam be found using frc-characterization. The states of the system are [position,
+   * velocity]^T, inputs are [voltage], and outputs are [position].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
    * {@link edu.wpi.first.wpilibj.util.Units} class for converting between unit types.
@@ -175,7 +180,9 @@ public final class LinearSystemId {
   /**
    * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
    * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(radian/sec) and
-   * volts/(radian/sec^2)) cases. This can be found using frc-characterization.
+   * volts/(radian/sec^2)) cases. This can be found using frc-characterization. The states of the
+   * system are [left velocity, right velocity]^T, inputs are [left voltage, right voltage]^T, and
+   * outputs are [left velocity, right velocity]^T.
    *
    * @param kVLinear The linear velocity gain, volts per (meter per second).
    * @param kALinear The linear acceleration gain, volts per (meter per second squared).
