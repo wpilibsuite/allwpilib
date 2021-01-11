@@ -44,27 +44,81 @@ class DutyCycleSim {
    */
   static DutyCycleSim CreateForIndex(int index);
 
-  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  /**
+   * Register a callback to be run when this duty cycle input is initialized.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to run the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check whether this duty cycle input has been initialized.
+   *
+   * @return true if initialized
+   */
   bool GetInitialized() const;
 
+  /**
+   * Define whether this duty cycle input has been initialized.
+   *
+   * @param initialized whether this object is initialized
+   */
   void SetInitialized(bool initialized);
 
-  std::unique_ptr<CallbackStore> RegisterFrequencyCallback(
+  /**
+   * Register a callback to be run whenever the frequency changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterFrequencyCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Measure the frequency.
+   *
+   * @return the duty cycle frequency
+   */
   int GetFrequency() const;
 
+  /**
+   * Change the duty cycle frequency.
+   *
+   * @param frequency the new frequency
+   */
   void SetFrequency(int count);
 
-  std::unique_ptr<CallbackStore> RegisterOutputCallback(NotifyCallback callback,
-                                                        bool initialNotify);
+  /**
+   * Register a callback to be run whenever the output changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterOutputCallback(
+      NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Measure the output from this duty cycle port.
+   *
+   * @return the output value
+   */
   double GetOutput() const;
 
+  /**
+   * Change the duty cycle output.
+   *
+   * @param output the new output value
+   */
   void SetOutput(double period);
 
+  /**
+   * Reset all simulation data for the duty cycle output.
+   */
   void ResetData();
 
  private:

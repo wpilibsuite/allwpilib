@@ -24,6 +24,9 @@ void ConstBufferCallbackStoreThunk(const char* name, void* param,
                                    const unsigned char* buffer,
                                    unsigned int count);
 
+/**
+ * Manages simulation callbacks; each object is associated with a callback.
+ */
 class CallbackStore {
  public:
   CallbackStore(int32_t i, NotifyCallback cb, CancelCallbackNoIndexFunc ccf);

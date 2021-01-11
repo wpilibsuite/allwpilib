@@ -20,6 +20,14 @@ hal::SimValue SimDeviceSim::GetValue(const char* name) const {
   return HALSIM_GetSimValueHandle(m_handle, name);
 }
 
+hal::SimInt SimDeviceSim::GetInt(const char* name) const {
+  return HALSIM_GetSimValueHandle(m_handle, name);
+}
+
+hal::SimLong SimDeviceSim::GetLong(const char* name) const {
+  return HALSIM_GetSimValueHandle(m_handle, name);
+}
+
 hal::SimDouble SimDeviceSim::GetDouble(const char* name) const {
   return HALSIM_GetSimValueHandle(m_handle, name);
 }

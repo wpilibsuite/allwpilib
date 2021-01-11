@@ -41,41 +41,132 @@ class DIOSim {
    */
   explicit DIOSim(int channel);
 
-  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  /**
+   * Register a callback to be run when this DIO is initialized.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to run the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check whether this DIO has been initialized.
+   *
+   * @return true if initialized
+   */
   bool GetInitialized() const;
 
+  /**
+   * Define whether this DIO has been initialized.
+   *
+   * @param initialized whether this object is initialized
+   */
   void SetInitialized(bool initialized);
 
-  std::unique_ptr<CallbackStore> RegisterValueCallback(NotifyCallback callback,
-                                                       bool initialNotify);
+  /**
+   * Register a callback to be run whenever the DIO value changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the
+   *                      initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterValueCallback(
+      NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Read the value of the DIO port.
+   *
+   * @return the DIO value
+   */
   bool GetValue() const;
 
+  /**
+   * Change the DIO value.
+   *
+   * @param value the new value
+   */
   void SetValue(bool value);
 
-  std::unique_ptr<CallbackStore> RegisterPulseLengthCallback(
+  /**
+   * Register a callback to be run whenever the pulse length changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterPulseLengthCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Read the pulse length.
+   *
+   * @return the pulse length of this DIO port
+   */
   double GetPulseLength() const;
 
+  /**
+   * Change the pulse length of this DIO port.
+   *
+   * @param pulseLength the new pulse length
+   */
   void SetPulseLength(double pulseLength);
 
-  std::unique_ptr<CallbackStore> RegisterIsInputCallback(
+  /**
+   * Register a callback to be run whenever this DIO changes to be an input.
+   *
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the
+   *                      initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterIsInputCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check whether this DIO port is currently an Input.
+   *
+   * @return true if Input
+   */
   bool GetIsInput() const;
 
+  /**
+   * Define whether this DIO port is an Input.
+   *
+   * @param isInput whether this DIO should be an Input
+   */
   void SetIsInput(bool isInput);
 
-  std::unique_ptr<CallbackStore> RegisterFilterIndexCallback(
+  /**
+   * Register a callback to be run whenever the filter index changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the
+   *                      initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterFilterIndexCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Read the filter index.
+   *
+   * @return the filter index of this DIO port
+   */
   int GetFilterIndex() const;
 
+  /**
+   * Change the filter index of this DIO port.
+   *
+   * @param filterIndex the new filter index
+   */
   void SetFilterIndex(int filterIndex);
 
+  /**
+   * Reset all simulation data of this object.
+   */
   void ResetData();
 
  private:

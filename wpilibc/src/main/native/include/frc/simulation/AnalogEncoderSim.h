@@ -28,7 +28,7 @@ class AnalogEncoderSim {
   explicit AnalogEncoderSim(const AnalogEncoder& encoder);
 
   /**
-   * Set the position using an {@link Rotation2d}.
+   * Set the position using an Rotation2d.
    *
    * @param angle The angle.
    */
@@ -47,7 +47,7 @@ class AnalogEncoderSim {
   units::turn_t GetTurns();
 
   /**
-   * Get the position as a {@link Rotation2d}.
+   * Get the position as a Rotation2d.
    */
   Rotation2d GetPosition();
 
