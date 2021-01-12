@@ -7,13 +7,17 @@ package edu.wpi.first.hal.simulation;
 import edu.wpi.first.hal.JNIWrapper;
 
 public class RoboRioDataJNI extends JNIWrapper {
+  @SuppressWarnings("AbbreviationAsWordInName")
   public static native int registerFPGAButtonCallback(
       NotifyCallback callback, boolean initialNotify);
 
+  @SuppressWarnings("AbbreviationAsWordInName")
   public static native void cancelFPGAButtonCallback(int uid);
 
+  @SuppressWarnings("AbbreviationAsWordInName")
   public static native boolean getFPGAButton();
 
+  @SuppressWarnings("AbbreviationAsWordInName")
   public static native void setFPGAButton(boolean fPGAButton);
 
   public static native int registerVInVoltageCallback(

@@ -3,8 +3,6 @@
 suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
 "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
-  <suppress files=".*sim.*"
-    checks="(LineLength|EmptyLineSeparator|ParameterName|ImportOrder|AbbreviationAsWordInName|JavadocMethod|NoFinalizer)" />
   <suppress files=".*test.*" checks="MissingJavadocMethod" />
   <suppress files=".*wpilibjIntegrationTests.*"
     checks="MissingJavadocMethod" />

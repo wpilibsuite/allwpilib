@@ -18,60 +18,205 @@ namespace frc::sim {
  */
 class DriverStationSim {
  public:
-  static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
+  /**
+   * Register a callback on whether the DS is enabled.
+   *
+   * @param callback the callback that will be called whenever the enabled
+   *                 state is changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterEnabledCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check if the DS is enabled.
+   *
+   * @return true if enabled
+   */
   static bool GetEnabled();
 
+  /**
+   * Change whether the DS is enabled.
+   *
+   * @param enabled the new value
+   */
   static void SetEnabled(bool enabled);
 
-  static std::unique_ptr<CallbackStore> RegisterAutonomousCallback(
-      NotifyCallback callback, bool initialNotify);
+  /**
+   * Register a callback on whether the DS is in autonomous mode.
+   *
+   * @param callback the callback that will be called on autonomous mode
+   *                 entrance/exit
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore>
+  RegisterAutonomousCallback(NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check if the DS is in autonomous.
+   *
+   * @return true if autonomous
+   */
   static bool GetAutonomous();
 
+  /**
+   * Change whether the DS is in autonomous.
+   *
+   * @param autonomous the new value
+   */
   static void SetAutonomous(bool autonomous);
 
-  static std::unique_ptr<CallbackStore> RegisterTestCallback(
+  /**
+   * Register a callback on whether the DS is in test mode.
+   *
+   * @param callback the callback that will be called whenever the test mode
+   *                 is entered or left
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterTestCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check if the DS is in test.
+   *
+   * @return true if test
+   */
   static bool GetTest();
 
+  /**
+   * Change whether the DS is in test.
+   *
+   * @param test the new value
+   */
   static void SetTest(bool test);
 
-  static std::unique_ptr<CallbackStore> RegisterEStopCallback(
+  /**
+   * Register a callback on the eStop state.
+   *
+   * @param callback the callback that will be called whenever the eStop state
+   *                 changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterEStopCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check if eStop has been activated.
+   *
+   * @return true if eStopped
+   */
   static bool GetEStop();
 
+  /**
+   * Set whether eStop is active.
+   *
+   * @param eStop true to activate
+   */
   static void SetEStop(bool eStop);
 
-  static std::unique_ptr<CallbackStore> RegisterFmsAttachedCallback(
-      NotifyCallback callback, bool initialNotify);
+  /**
+   * Register a callback on whether the FMS is connected.
+   *
+   * @param callback the callback that will be called whenever the FMS
+   *                 connection changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore>
+  RegisterFmsAttachedCallback(NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check if the FMS is connected.
+   *
+   * @return true if FMS is connected
+   */
   static bool GetFmsAttached();
 
+  /**
+   * Change whether the FMS is connected.
+   *
+   * @param fmsAttached the new value
+   */
   static void SetFmsAttached(bool fmsAttached);
 
-  static std::unique_ptr<CallbackStore> RegisterDsAttachedCallback(
-      NotifyCallback callback, bool initialNotify);
+  /**
+   * Register a callback on whether the DS is connected.
+   *
+   * @param callback the callback that will be called whenever the DS
+   *                 connection changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore>
+  RegisterDsAttachedCallback(NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check if the DS is attached.
+   *
+   * @return true if attached
+   */
   static bool GetDsAttached();
 
+  /**
+   * Change whether the DS is attached.
+   *
+   * @param dsAttached the new value
+   */
   static void SetDsAttached(bool dsAttached);
 
-  static std::unique_ptr<CallbackStore> RegisterAllianceStationIdCallback(
-      NotifyCallback callback, bool initialNotify);
+  /**
+   * Register a callback on the alliance station ID.
+   *
+   * @param callback the callback that will be called whenever the alliance
+   *                 station changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore>
+  RegisterAllianceStationIdCallback(NotifyCallback callback,
+                                    bool initialNotify);
 
+  /**
+   * Get the alliance station ID (color + number).
+   *
+   * @return the alliance station color and number
+   */
   static HAL_AllianceStationID GetAllianceStationId();
 
+  /**
+   * Change the alliance station.
+   *
+   * @param allianceStationId the new alliance station
+   */
   static void SetAllianceStationId(HAL_AllianceStationID allianceStationId);
 
-  static std::unique_ptr<CallbackStore> RegisterMatchTimeCallback(
+  /**
+   * Register a callback on match time.
+   *
+   * @param callback the callback that will be called whenever match time
+   *                 changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore> RegisterMatchTimeCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Get the current value of the match timer.
+   *
+   * @return the current match time
+   */
   static double GetMatchTime();
 
+  /**
+   * Sets the match timer.
+   *
+   * @param matchTime the new match time
+   */
   static void SetMatchTime(double matchTime);
 
   /**
@@ -238,6 +383,9 @@ class DriverStationSim {
    */
   static void SetReplayNumber(int replayNumber);
 
+  /**
+   * Reset all simulation data for the Driver Station.
+   */
   static void ResetData();
 };
 }  // namespace frc::sim

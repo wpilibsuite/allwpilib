@@ -115,6 +115,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    *
    * @param u The system inputs.
    */
+  @SuppressWarnings("ParameterName")
   public void setInput(Matrix<Inputs, N1> u) {
     this.m_u = clampInput(u);
   }
@@ -135,6 +136,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    *
    * @param u An array of doubles that represent the inputs of the system.
    */
+  @SuppressWarnings("ParameterName")
   public void setInput(double... u) {
     if (u.length != m_u.getNumRows()) {
       throw new MatrixDimensionException(
@@ -170,6 +172,7 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * @param dtSeconds The time difference between controller updates.
    * @return The new state.
    */
+  @SuppressWarnings("ParameterName")
   protected Matrix<States, N1> updateX(
       Matrix<States, N1> currentXhat, Matrix<Inputs, N1> u, double dtSeconds) {
     return m_plant.calculateX(currentXhat, u, dtSeconds);

@@ -60,8 +60,8 @@ public class DifferentialDrivetrainSim {
    * Create a SimDrivetrain.
    *
    * @param driveMotor A {@link DCMotor} representing the left side of the drivetrain.
-   * @param gearing The gearing on the drive between motor and wheel, as output over input. This
-   *     must be the same ratio as the ratio used to identify or create the drivetrainPlant.
+   * @param gearing The gearing ratio between motor and wheel, as output over input. This must be
+   *     the same ratio as the ratio used to identify or create the drivetrainPlant.
    * @param jKgMetersSquared The moment of inertia of the drivetrain about its center.
    * @param massKg The mass of the drivebase.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
@@ -72,6 +72,7 @@ public class DifferentialDrivetrainSim {
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
    */
+  @SuppressWarnings("ParameterName")
   public DifferentialDrivetrainSim(
       DCMotor driveMotor,
       double gearing,
@@ -147,6 +148,11 @@ public class DifferentialDrivetrainSim {
     m_u = clampInput(VecBuilder.fill(leftVoltageVolts, rightVoltageVolts));
   }
 
+  /**
+   * Update the drivetrain states with the current time difference.
+   *
+   * @param dtSeconds the time difference
+   */
   @SuppressWarnings("LocalVariableName")
   public void update(double dtSeconds) {
 
@@ -163,6 +169,12 @@ public class DifferentialDrivetrainSim {
     return m_x;
   }
 
+  /**
+   * Get one of the drivetrain states.
+   *
+   * @param state the state to get
+   * @return the state
+   */
   double getState(State state) {
     return m_x.get(state.value, 0);
   }
@@ -221,6 +233,11 @@ public class DifferentialDrivetrainSim {
     return getOutput(State.kLeftVelocity);
   }
 
+  /**
+   * Get the current draw of the left side of the drivetrain.
+   *
+   * @return the drivetrain's left side current draw, in amps
+   */
   public double getLeftCurrentDrawAmps() {
     var loadIleft =
         m_motor.getCurrent(
@@ -230,6 +247,11 @@ public class DifferentialDrivetrainSim {
     return loadIleft;
   }
 
+  /**
+   * Get the current draw of the right side of the drivetrain.
+   *
+   * @return the drivetrain's right side current draw, in amps
+   */
   public double getRightCurrentDrawAmps() {
     var loadIright =
         m_motor.getCurrent(
@@ -240,10 +262,20 @@ public class DifferentialDrivetrainSim {
     return loadIright;
   }
 
+  /**
+   * Get the current draw of the drivetrain.
+   *
+   * @return the current draw, in amps
+   */
   public double getCurrentDrawAmps() {
     return getLeftCurrentDrawAmps() + getRightCurrentDrawAmps();
   }
 
+  /**
+   * Get the drivetrain gearing.
+   *
+   * @return the gearing ration
+   */
   public double getCurrentGearing() {
     return m_currentGearing;
   }
@@ -279,7 +311,7 @@ public class DifferentialDrivetrainSim {
     m_x.set(State.kRightPosition.value, 0, 0);
   }
 
-  @SuppressWarnings({"DuplicatedCode", "LocalVariableName"})
+  @SuppressWarnings({"DuplicatedCode", "LocalVariableName", "ParameterName"})
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
 
     // Because G can be factored out of B, we can divide by the old ratio and multiply
@@ -327,6 +359,7 @@ public class DifferentialDrivetrainSim {
     return StateSpaceUtil.normalizeInputVector(u, RobotController.getBatteryVoltage());
   }
 
+  /** Represents the different states of the drivetrain. */
   enum State {
     kX(0),
     kY(1),
@@ -339,6 +372,7 @@ public class DifferentialDrivetrainSim {
     @SuppressWarnings("MemberName")
     public final int value;
 
+    @SuppressWarnings("ParameterName")
     State(int i) {
       this.value = i;
     }
@@ -358,11 +392,13 @@ public class DifferentialDrivetrainSim {
     @SuppressWarnings("MemberName")
     public final double value;
 
+    @SuppressWarnings("ParameterName")
     KitbotGearing(double i) {
       this.value = i;
     }
   }
 
+  /** Represents common motor layouts of the kit drivetrain. */
   public enum KitbotMotor {
     kSingleCIMPerSide(DCMotor.getCIM(1)),
     kDualCIMPerSide(DCMotor.getCIM(2)),
@@ -372,11 +408,13 @@ public class DifferentialDrivetrainSim {
     @SuppressWarnings("MemberName")
     public final DCMotor value;
 
+    @SuppressWarnings("ParameterName")
     KitbotMotor(DCMotor i) {
       this.value = i;
     }
   }
 
+  /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
     SixInch(Units.inchesToMeters(6)),
     EightInch(Units.inchesToMeters(8)),
@@ -385,6 +423,7 @@ public class DifferentialDrivetrainSim {
     @SuppressWarnings("MemberName")
     public final double value;
 
+    @SuppressWarnings("ParameterName")
     KitbotWheelSize(double i) {
       this.value = i;
     }
@@ -430,6 +469,7 @@ public class DifferentialDrivetrainSim {
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
    */
+  @SuppressWarnings("ParameterName")
   public static DifferentialDrivetrainSim createKitbotSim(
       KitbotMotor motor,
       KitbotGearing gearing,

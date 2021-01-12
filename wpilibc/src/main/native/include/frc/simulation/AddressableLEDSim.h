@@ -52,39 +52,130 @@ class AddressableLEDSim {
    */
   static AddressableLEDSim CreateForIndex(int index);
 
-  std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+  /**
+   * Register a callback on the Initialized property.
+   *
+   * @param callback the callback that will be called whenever the Initialized
+   *                 property is changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object storing this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Check if initialized.
+   *
+   * @return true if initialized
+   */
   bool GetInitialized() const;
 
+  /**
+   * Change the Initialized value of the LED strip.
+   *
+   * @param initialized the new value
+   */
   void SetInitialized(bool initialized);
 
-  std::unique_ptr<CallbackStore> RegisterOutputPortCallback(
+  /**
+   * Register a callback on the output port.
+   *
+   * @param callback the callback that will be called whenever the output port
+   *                 is changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterOutputPortCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Get the output port.
+   *
+   * @return the output port
+   */
   int GetOutputPort() const;
 
+  /**
+   * Change the output port.
+   *
+   * @param outputPort the new output port
+   */
   void SetOutputPort(int outputPort);
 
-  std::unique_ptr<CallbackStore> RegisterLengthCallback(NotifyCallback callback,
-                                                        bool initialNotify);
-
-  int GetLength() const;
-
-  void SetLength(int length);
-
-  std::unique_ptr<CallbackStore> RegisterRunningCallback(
+  /**
+   * Register a callback on the length.
+   *
+   * @param callback the callback that will be called whenever the length is
+   *                 changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterLengthCallback(
       NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Get the length of the LED strip.
+   *
+   * @return the length
+   */
+  int GetLength() const;
+
+  /**
+   * Change the length of the LED strip.
+   *
+   * @param length the new value
+   */
+  void SetLength(int length);
+
+  /**
+   * Register a callback on whether the LEDs are running.
+   *
+   * @param callback the callback that will be called whenever the LED state is
+   *                 changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterRunningCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Check if the LEDs are running.
+   *
+   * @return true if they are
+   */
   int GetRunning() const;
 
+  /**
+   * Change whether the LEDs are active.
+   *
+   * @param running the new value
+   */
   void SetRunning(bool running);
 
-  std::unique_ptr<CallbackStore> RegisterDataCallback(NotifyCallback callback,
-                                                      bool initialNotify);
+  /**
+   * Register a callback on the LED data.
+   *
+   * @param callback the callback that will be called whenever the LED data is
+   *                 changed
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterDataCallback(
+      NotifyCallback callback, bool initialNotify);
 
+  /**
+   * Get the LED data.
+   *
+   * @param data output parameter to fill with LED data
+   * @return the length of the LED data
+   */
   int GetData(struct HAL_AddressableLEDData* data) const;
 
+  /**
+   * Change the LED data.
+   *
+   * @param data the new data
+   * @param length the length of the LED data
+   */
   void SetData(struct HAL_AddressableLEDData* data, int length);
 
  private:

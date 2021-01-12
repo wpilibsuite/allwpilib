@@ -31,18 +31,53 @@ class JoystickSim : public GenericHIDSim {
    */
   explicit JoystickSim(int port);
 
+  /**
+   * Set the X value of the joystick.
+   *
+   * @param value the new X value
+   */
   void SetX(double value);
 
+  /**
+   * Set the Y value of the joystick.
+   *
+   * @param value the new Y value
+   */
   void SetY(double value);
 
+  /**
+   * Set the Z value of the joystick.
+   *
+   * @param value the new Z value
+   */
   void SetZ(double value);
 
+  /**
+   * Set the twist value of the joystick.
+   *
+   * @param value the new twist value
+   */
   void SetTwist(double value);
 
+  /**
+   * Set the throttle value of the joystick.
+   *
+   * @param value the new throttle value
+   */
   void SetThrottle(double value);
 
+  /**
+   * Set the trigger value of the joystick.
+   *
+   * @param state the new value
+   */
   void SetTrigger(bool state);
 
+  /**
+   * Set the top state of the joystick.
+   *
+   * @param state the new state
+   */
   void SetTop(bool state);
 
  private:

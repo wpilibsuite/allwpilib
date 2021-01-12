@@ -8,7 +8,7 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 
 /** Class to control a simulated ADXRS450 gyroscope. */
-@SuppressWarnings("TypeName")
+@SuppressWarnings({"TypeName", "AbbreviationAsWordInName"})
 public class ADXRS450_GyroSim {
   private final SimDouble m_simAngle;
   private final SimDouble m_simRate;

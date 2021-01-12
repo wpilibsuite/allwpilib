@@ -52,19 +52,45 @@ public class AnalogTriggerSim {
     return new AnalogTriggerSim(index);
   }
 
+  /**
+   * Register a callback on whether the analog trigger is initialized.
+   *
+   * @param callback the callback that will be called whenever the analog trigger is initialized
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = AnalogTriggerDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, AnalogTriggerDataJNI::cancelInitializedCallback);
   }
 
+  /**
+   * Check if this analog trigger has been initialized.
+   *
+   * @return true if initialized
+   */
   public boolean getInitialized() {
     return AnalogTriggerDataJNI.getInitialized(m_index);
   }
 
+  /**
+   * Change whether this analog trigger has been initialized.
+   *
+   * @param initialized the new value
+   */
   public void setInitialized(boolean initialized) {
     AnalogTriggerDataJNI.setInitialized(m_index, initialized);
   }
 
+  /**
+   * Register a callback on the lower bound.
+   *
+   * @param callback the callback that will be called whenever the lower bound is changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
   public CallbackStore registerTriggerLowerBoundCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid =
@@ -72,14 +98,32 @@ public class AnalogTriggerSim {
     return new CallbackStore(m_index, uid, AnalogTriggerDataJNI::cancelTriggerLowerBoundCallback);
   }
 
+  /**
+   * Get the lower bound.
+   *
+   * @return the lower bound
+   */
   public double getTriggerLowerBound() {
     return AnalogTriggerDataJNI.getTriggerLowerBound(m_index);
   }
 
+  /**
+   * Change the lower bound.
+   *
+   * @param triggerLowerBound the new lower bound
+   */
   public void setTriggerLowerBound(double triggerLowerBound) {
     AnalogTriggerDataJNI.setTriggerLowerBound(m_index, triggerLowerBound);
   }
 
+  /**
+   * Register a callback on the upper bound.
+   *
+   * @param callback the callback that will be called whenever the upper bound is changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
   public CallbackStore registerTriggerUpperBoundCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid =
@@ -87,14 +131,25 @@ public class AnalogTriggerSim {
     return new CallbackStore(m_index, uid, AnalogTriggerDataJNI::cancelTriggerUpperBoundCallback);
   }
 
+  /**
+   * Get the upper bound.
+   *
+   * @return the upper bound
+   */
   public double getTriggerUpperBound() {
     return AnalogTriggerDataJNI.getTriggerUpperBound(m_index);
   }
 
+  /**
+   * Change the upper bound.
+   *
+   * @param triggerUpperBound the new upper bound
+   */
   public void setTriggerUpperBound(double triggerUpperBound) {
     AnalogTriggerDataJNI.setTriggerUpperBound(m_index, triggerUpperBound);
   }
 
+  /** Reset all simulation data for this object. */
   public void resetData() {
     AnalogTriggerDataJNI.resetData(m_index);
   }
