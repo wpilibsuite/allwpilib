@@ -1,8 +1,8 @@
 # WPILib Project
 
 ![CI](https://github.com/wpilibsuite/allwpilib/workflows/CI/badge.svg)
-[![C++ Documentation](https://img.shields.io/badge/documentation-c%2B%2B-blue)](https://first.wpi.edu/FRC/roborio/release/docs/cpp/)
-[![Java Documentation](https://img.shields.io/badge/documentation-java-orange)](https://first.wpi.edu/FRC/roborio/release/docs/java/)
+[![C++ Documentation](https://img.shields.io/badge/documentation-c%2B%2B-blue)](https://first.wpi.edu/wpilib/allwpilib/docs/release/cpp/)
+[![Java Documentation](https://img.shields.io/badge/documentation-java-orange)](https://first.wpi.edu/wpilib/allwpilib/docs/release/java/)
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 
