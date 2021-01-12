@@ -105,6 +105,12 @@ class SimDeviceSim {
    */
   operator HAL_SimDeviceHandle() const { return m_handle; }  // NOLINT
 
+  /**
+   * Get all sim devices with the given prefix.
+   *
+   * @param prefix the prefix to filter sim devices
+   * @param callback callback function to call for each sim device
+   */
   template <typename F>
   static void EnumerateDevices(const char* prefix, F callback) {
     return HALSIM_EnumerateSimDevices(

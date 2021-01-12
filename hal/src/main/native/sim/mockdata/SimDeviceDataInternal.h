@@ -150,6 +150,7 @@ class SimDeviceData {
     std::vector<const char*> cstrEnumOptions;
     std::vector<double> enumOptionValues;
     impl::SimUnnamedCallbackRegistry<HALSIM_SimValueCallback> changed;
+    impl::SimUnnamedCallbackRegistry<HALSIM_SimValueCallback> reset;
   };
 
   struct Device {
@@ -188,6 +189,7 @@ class SimDeviceData {
                                  const HAL_Value& initialValue);
   HAL_Value GetValue(HAL_SimValueHandle handle);
   void SetValue(HAL_SimValueHandle handle, const HAL_Value& value);
+  void ResetValue(HAL_SimValueHandle handle);
 
   int32_t RegisterDeviceCreatedCallback(const char* prefix, void* param,
                                         HALSIM_SimDeviceCallback callback,
@@ -217,6 +219,12 @@ class SimDeviceData {
                                        bool initialNotify);
 
   void CancelValueChangedCallback(int32_t uid);
+
+  int32_t RegisterValueResetCallback(HAL_SimValueHandle handle, void* param,
+                                     HALSIM_SimValueCallback callback,
+                                     bool initialNotify);
+
+  void CancelValueResetCallback(int32_t uid);
 
   HAL_SimValueHandle GetValueHandle(HAL_SimDeviceHandle device,
                                     const char* name);

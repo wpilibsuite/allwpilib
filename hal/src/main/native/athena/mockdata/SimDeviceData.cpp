@@ -63,6 +63,15 @@ int32_t HALSIM_RegisterSimValueChangedCallback(HAL_SimValueHandle handle,
 
 void HALSIM_CancelSimValueChangedCallback(int32_t uid) {}
 
+int32_t HALSIM_RegisterSimValueResetCallback(HAL_SimValueHandle handle,
+                                             void* param,
+                                             HALSIM_SimValueCallback callback,
+                                             HAL_Bool initialNotify) {
+  return 0;
+}
+
+void HALSIM_CancelSimValueResetCallback(int32_t uid) {}
+
 HAL_SimValueHandle HALSIM_GetSimValueHandle(HAL_SimDeviceHandle device,
                                             const char* name) {
   return 0;

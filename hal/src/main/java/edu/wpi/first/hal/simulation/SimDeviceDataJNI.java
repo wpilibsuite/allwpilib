@@ -60,6 +60,19 @@ public class SimDeviceDataJNI extends JNIWrapper {
 
   public static native void cancelSimValueChangedCallback(int uid);
 
+  /**
+   * Register a callback for SimDeviceJNI.resetSimValue(). The callback is called with the old
+   * value.
+   *
+   * @param handle simulated value handle
+   * @param callback callback
+   * @param initialNotify ignored (present for consistency)
+   */
+  public static native int registerSimValueResetCallback(
+      int handle, SimValueCallback2 callback, boolean initialNotify);
+
+  public static native void cancelSimValueResetCallback(int uid);
+
   public static native int getSimValueHandle(int device, String name);
 
   public static class SimValueInfo {

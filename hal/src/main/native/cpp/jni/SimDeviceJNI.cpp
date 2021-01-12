@@ -225,4 +225,16 @@ Java_edu_wpi_first_hal_SimDeviceJNI_setSimValueNative
   HAL_SetSimValue(handle, ValueFromJava(type, value1, value2));
 }
 
+/*
+ * Class:     edu_wpi_first_hal_SimDeviceJNI
+ * Method:    resetSimValue
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_SimDeviceJNI_resetSimValue
+  (JNIEnv*, jclass, jint handle)
+{
+  HAL_ResetSimValue(handle);
+}
+
 }  // extern "C"

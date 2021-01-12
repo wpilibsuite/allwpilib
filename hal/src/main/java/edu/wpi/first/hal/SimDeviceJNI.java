@@ -352,4 +352,13 @@ public class SimDeviceJNI extends JNIWrapper {
   public static void setSimValueBoolean(int handle, boolean value) {
     setSimValueNative(handle, HALValue.kBoolean, value ? 1 : 0, 0.0);
   }
+
+  /**
+   * Resets a simulated double or integral value to 0. Has no effect on other value types. Use this
+   * instead of Set(0) for resetting incremental sensor values like encoder counts or gyro
+   * accumulated angle to ensure correct behavior in a distributed system (e.g. WebSockets).
+   *
+   * @param handle simulated value handle
+   */
+  public static native void resetSimValue(int handle);
 }

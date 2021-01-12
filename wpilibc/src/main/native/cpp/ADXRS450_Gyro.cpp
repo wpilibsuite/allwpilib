@@ -114,10 +114,7 @@ double ADXRS450_Gyro::GetRate() const {
 
 void ADXRS450_Gyro::Reset() {
   if (m_simAngle) {
-    m_simAngle.Set(0.0);
-  }
-  if (m_simRate) {
-    m_simRate.Set(0.0);
+    m_simAngle.Reset();
   }
   m_spi.ResetAccumulator();
 }

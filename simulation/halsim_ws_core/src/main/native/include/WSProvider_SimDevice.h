@@ -28,6 +28,8 @@ struct SimDeviceValueData {
   std::vector<std::string> options;
   std::vector<double> optionValues;
   HAL_Type valueType;
+  double doubleOffset = 0;
+  int64_t intOffset = 0;
 };
 
 class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
@@ -62,6 +64,12 @@ class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
                                    const struct HAL_Value* value);
   void OnValueChanged(SimDeviceValueData* valueData,
                       const struct HAL_Value* value);
+
+  static void OnValueResetStatic(const char* name, void* param,
+                                 HAL_SimValueHandle handle, int32_t direction,
+                                 const struct HAL_Value* value);
+  void OnValueReset(SimDeviceValueData* valueData,
+                    const struct HAL_Value* value);
 
   void CancelCallbacks();
 
