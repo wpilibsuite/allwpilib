@@ -8,6 +8,7 @@
 #include <glass/support/ExtraGuiWidgets.h>
 #include <glass/support/IniSaverInfo.h>
 
+#include <algorithm>
 #include <atomic>
 #include <cstring>
 #include <memory>
@@ -122,6 +123,7 @@ class KeyboardJoystick : public SystemJoystick {
     int decKey = -1;
     float keyRate = 0.05f;
     float decayRate = 0.05f;
+    float maxAbsValue = 1.0f;
   };
   AxisConfig m_axisConfig[HAL_kMaxJoystickAxes];
 
@@ -712,6 +714,12 @@ void KeyboardJoystick::SettingsDisplay() {
         EditKey("Decrease", &m_axisConfig[i].decKey);
         ImGui::InputFloat("Key Rate", &m_axisConfig[i].keyRate);
         ImGui::InputFloat("Decay Rate", &m_axisConfig[i].decayRate);
+
+        float maxAbsValue = m_axisConfig[i].maxAbsValue;
+        if (ImGui::InputFloat("Max Absolute Value", &maxAbsValue)) {
+          m_axisConfig[i].maxAbsValue = std::clamp(maxAbsValue, -1.0f, 1.0f);
+        }
+
         ImGui::TreePop();
       }
     }
@@ -786,8 +794,8 @@ void KeyboardJoystick::Update() {
     // increase/decrease while key held down (to saturation); decay back to 0
     if (config.incKey >= 0 && io.KeysDown[config.incKey]) {
       axisValue += config.keyRate;
-      if (axisValue > 1.0) {
-        axisValue = 1.0;
+      if (axisValue > config.maxAbsValue) {
+        axisValue = config.maxAbsValue;
       }
     } else if (axisValue > 0) {
       if (axisValue < config.decayRate) {
@@ -799,8 +807,8 @@ void KeyboardJoystick::Update() {
 
     if (config.decKey >= 0 && io.KeysDown[config.decKey]) {
       axisValue -= config.keyRate;
-      if (axisValue < -1.0) {
-        axisValue = -1.0;
+      if (axisValue < -config.maxAbsValue) {
+        axisValue = -config.maxAbsValue;
       }
     } else if (axisValue < 0) {
       if (axisValue > -config.decayRate) {
@@ -937,6 +945,8 @@ void KeyboardJoystick::ReadIni(wpi::StringRef name, wpi::StringRef value) {
       std::sscanf(value.data(), "%f", &m_axisConfig[index].keyRate);
     } else if (name == "decayRate") {
       std::sscanf(value.data(), "%f", &m_axisConfig[index].decayRate);
+    } else if (name == "maxAbsValue") {
+      std::sscanf(value.data(), "%f", &m_axisConfig[index].maxAbsValue);
     }
   } else if (name.startswith("button")) {
     name = name.drop_front(6);
@@ -1010,8 +1020,9 @@ void KeyboardJoystick::WriteIni(ImGuiTextBuffer* out_buf) const {
     auto& c = m_axisConfig[i];
     out_buf->appendf(
         "axis%dincKey=%d\naxis%ddecKey=%d\naxis%dkeyRate=%f\n"
-        "axis%ddecayRate=%f\n",
-        i, c.incKey, i, c.decKey, i, c.keyRate, i, c.decayRate);
+        "axis%ddecayRate=%f\naxis%dmaxAbsValue=%f\n",
+        i, c.incKey, i, c.decKey, i, c.keyRate, i, c.decayRate, i,
+        c.maxAbsValue);
   }
   for (int i = 0; i < m_data.buttons.count; ++i) {
     out_buf->appendf("button%d=%d\n", i, m_buttonKey[i]);
