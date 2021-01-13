@@ -64,6 +64,5 @@ public class Robot extends TimedRobot {
       m_pidController.setSetpoint(kSetPoints[m_index]);
     }
     m_previousButtonValue = currentButtonValue;
-
   }
 }
