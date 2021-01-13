@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
   private SpeedController m_elevatorMotor;
   private Joystick m_joystick;
 
-  private int m_index = 0;
+  private int m_index;
   private boolean m_previousButtonValue;
 
   @Override
