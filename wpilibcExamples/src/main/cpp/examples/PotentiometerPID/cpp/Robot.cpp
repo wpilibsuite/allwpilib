@@ -17,6 +17,10 @@
  */
 class Robot : public frc::TimedRobot {
  public:
+  void RobotInit() override {
+    m_pidController.SetSetpoint(kSetPoints[m_index]);
+  }
+
   void TeleopPeriodic() override {
     // When the button is pressed once, the selected elevator setpoint is
     // incremented.
@@ -24,10 +28,10 @@ class Robot : public frc::TimedRobot {
     if (currentButtonValue && !m_previousButtonValue) {
       // Index of the elevator setpoint wraps around
       m_index = (m_index + 1) % (sizeof(kSetPoints) / 8);
+      m_pidController.SetSetpoint(kSetPoints[m_index]);
     }
     m_previousButtonValue = currentButtonValue;
 
-    m_pidController.SetSetpoint(kSetPoints[m_index]);
     double output =
         m_pidController.Calculate(m_potentiometer.GetAverageVoltage());
     m_elevatorMotor.Set(output);
