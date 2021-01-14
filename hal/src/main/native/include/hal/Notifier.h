@@ -89,8 +89,8 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
  */
 #ifdef __cplusplus
 [[nodiscard]]
-#elif defined(__GNUC__) && !defined(__llvm__)
-[[gnu::warn_unused_result]]
+#elif defined(__GNUC__) || defined(__llvm__)
+__attribute__((warn_unused_result))
 #endif
 uint64_t
 HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle, int32_t* status);
