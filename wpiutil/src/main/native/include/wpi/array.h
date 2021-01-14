@@ -6,6 +6,7 @@
 
 #include <array>
 #include <cstddef>
+#include <tuple>
 #include <utility>
 
 namespace wpi {
@@ -84,17 +85,9 @@ constexpr const T&& get(const wpi::array<T, N>&& arr) noexcept {
 
 // Enables structured bindings
 namespace std {  // NOLINT
-// tuple_size
-template <typename T>
-struct tuple_size;
-
 // Partial specialization for wpi::array
 template <typename T, size_t N>
 struct tuple_size<wpi::array<T, N>> : public integral_constant<size_t, N> {};
-
-// tuple_element
-template <size_t I, typename T>
-struct tuple_element;
 
 // Partial specialization for wpi::array
 template <size_t I, typename T, size_t N>
