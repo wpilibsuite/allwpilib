@@ -46,6 +46,7 @@ public class Robot extends TimedRobot {
     m_joystick = new Joystick(kJoystickChannel);
 
     m_pidController = new PIDController(kP, kI, kD);
+    m_pidController.setSetpoint(kSetPoints[m_index]);
   }
 
   @Override
@@ -60,9 +61,8 @@ public class Robot extends TimedRobot {
     if (currentButtonValue && !m_previousButtonValue) {
       // index of the elevator setpoint wraps around.
       m_index = (m_index + 1) % kSetPoints.length;
+      m_pidController.setSetpoint(kSetPoints[m_index]);
     }
     m_previousButtonValue = currentButtonValue;
-
-    m_pidController.setSetpoint(kSetPoints[m_index]);
   }
 }
