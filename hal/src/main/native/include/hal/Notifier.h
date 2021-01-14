@@ -88,11 +88,12 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
  * @return               the FPGA time the notifier returned
  */
 #ifdef __cplusplus
-[[nodiscard]] uint64_t HAL_WaitForNotifierAlarm(
-#else
-uint64_t HAL_WaitForNotifierAlarm(
-#endif  // __cplusplus
-    HAL_NotifierHandle notifierHandle, int32_t* status);
+[[nodiscard]]
+#elif defined(__GNUC__) && !defined(__llvm__)
+[[gnu::warn_unused_result]]
+#endif
+uint64_t
+HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle, int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
