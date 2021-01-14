@@ -12,6 +12,8 @@
 #define WPI_NODISCARD [[nodiscard]]
 #elif defined(__GNUC__) || defined(__llvm__)
 #define WPI_NODISCARD __attribute__((warn_unused_result))
+#elif _MSC_VER
+#define WPI_NODISCARD _Check_return_
 #endif
 
 #endif
