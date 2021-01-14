@@ -168,7 +168,7 @@ TEST_F(SwerveDriveKinematicsTest, NormalizeTest) {
   SwerveModuleState state3{4.0_mps, Rotation2d()};
   SwerveModuleState state4{7.0_mps, Rotation2d()};
 
-  std::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
+  wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
   SwerveDriveKinematics<4>::NormalizeWheelSpeeds(&arr, 5.5_mps);
 
   double kFactor = 5.5 / 7.0;
