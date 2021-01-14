@@ -128,25 +128,41 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   }
 
   /**
+   * Returns whether the elevator would hit the lower limit.
+   *
+   * @param elevatorHeightMeters The elevator height.
+   * @return Whether the elevator would hit the lower limit.
+   */
+  public boolean wouldHitLowerLimit(double elevatorHeightMeters) {
+    return elevatorHeightMeters < this.m_minHeight;
+  }
+
+  /**
+   * Returns whether the elevator would hit the upper limit.
+   *
+   * @param elevatorHeightMeters The elevator height.
+   * @return Whether the elevator would hit the upper limit.
+   */
+  public boolean wouldHitUpperLimit(double elevatorHeightMeters) {
+    return elevatorHeightMeters > this.m_maxHeight;
+  }
+
+  /**
    * Returns whether the elevator has hit the lower limit.
    *
-   * @param x The current elevator state.
    * @return Whether the elevator has hit the lower limit.
    */
-  @SuppressWarnings("ParameterName")
-  public boolean hasHitLowerLimit(Matrix<N2, N1> x) {
-    return x.get(0, 0) < this.m_minHeight;
+  public boolean hasHitLowerLimit() {
+    return wouldHitLowerLimit(getPositionMeters());
   }
 
   /**
    * Returns whether the elevator has hit the upper limit.
    *
-   * @param x The current elevator state.
    * @return Whether the elevator has hit the upper limit.
    */
-  @SuppressWarnings("ParameterName")
-  public boolean hasHitUpperLimit(Matrix<N2, N1> x) {
-    return x.get(0, 0) > this.m_maxHeight;
+  public boolean hasHitUpperLimit() {
+    return wouldHitUpperLimit(getPositionMeters());
   }
 
   /**
@@ -215,10 +231,10 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
             dtSeconds);
 
     // We check for collisions after updating x-hat.
-    if (hasHitLowerLimit(updatedXhat)) {
+    if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {
       return VecBuilder.fill(m_minHeight, 0);
     }
-    if (hasHitUpperLimit(updatedXhat)) {
+    if (wouldHitUpperLimit(updatedXhat.get(0, 0))) {
       return VecBuilder.fill(m_maxHeight, 0);
     }
     return updatedXhat;

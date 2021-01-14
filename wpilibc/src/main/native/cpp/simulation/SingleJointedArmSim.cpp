@@ -39,14 +39,20 @@ SingleJointedArmSim::SingleJointedArmSim(
           gearbox, gearing, armLength, minAngle, maxAngle, mass,
           simulateGravity, measurementStdDevs) {}
 
-bool SingleJointedArmSim::HasHitLowerLimit(
-    const Eigen::Matrix<double, 2, 1>& x) const {
-  return x(0) < m_minAngle.to<double>();
+bool SingleJointedArmSim::WouldHitLowerLimit(units::radian_t armAngle) const {
+  return armAngle < m_minAngle;
 }
 
-bool SingleJointedArmSim::HasHitUpperLimit(
-    const Eigen::Matrix<double, 2, 1>& x) const {
-  return x(0) > m_maxAngle.to<double>();
+bool SingleJointedArmSim::WouldHitUpperLimit(units::radian_t armAngle) const {
+  return armAngle > m_maxAngle;
+}
+
+bool SingleJointedArmSim::HasHitLowerLimit() const {
+  return WouldHitLowerLimit(units::radian_t(m_y(0)));
+}
+
+bool SingleJointedArmSim::HasHitUpperLimit() const {
+  return WouldHitUpperLimit(units::radian_t(m_y(0)));
 }
 
 units::radian_t SingleJointedArmSim::GetAngle() const {
@@ -96,9 +102,9 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
       currentXhat, u, dt);
 
   // Check for collisions.
-  if (HasHitLowerLimit(updatedXhat)) {
+  if (WouldHitLowerLimit(units::radian_t(updatedXhat(0)))) {
     return MakeMatrix<2, 1>(m_minAngle.to<double>(), 0.0);
-  } else if (HasHitUpperLimit(updatedXhat)) {
+  } else if (WouldHitUpperLimit(units::radian_t(updatedXhat(0)))) {
     return MakeMatrix<2, 1>(m_maxAngle.to<double>(), 0.0);
   }
   return updatedXhat;
