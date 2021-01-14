@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <wpi/nodiscard.h>
+
 #include "hal/Types.h"
 
 /**
@@ -87,13 +89,9 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
  * @param notifierHandle the notifier handle
  * @return               the FPGA time the notifier returned
  */
-#ifdef __cplusplus
-[[nodiscard]]
-#elif defined(__GNUC__) || defined(__llvm__)
-__attribute__((warn_unused_result))
-#endif
-uint64_t
-HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle, int32_t* status);
+WPI_NODISCARD
+uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
+                                  int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
