@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <array>
 #include <functional>
+
+#include <wpi/array.h>
 
 #include "Eigen/Core"
 #include "Eigen/src/Cholesky/LDLT.h"
@@ -40,8 +41,8 @@ class ExtendedKalmanFilter {
                            const Eigen::Matrix<double, States, 1>&,
                            const Eigen::Matrix<double, Inputs, 1>&)>
                            h,
-                       const std::array<double, States>& stateStdDevs,
-                       const std::array<double, Outputs>& measurementStdDevs,
+                       const wpi::array<double, States>& stateStdDevs,
+                       const wpi::array<double, Outputs>& measurementStdDevs,
                        units::second_t dt)
       : m_f(f), m_h(h) {
     m_contQ = MakeCovMatrix(stateStdDevs);

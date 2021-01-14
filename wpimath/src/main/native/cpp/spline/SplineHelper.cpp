@@ -13,10 +13,10 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
     const Spline<3>::ControlVector& end) {
   std::vector<CubicHermiteSpline> splines;
 
-  std::array<double, 2> xInitial = start.x;
-  std::array<double, 2> yInitial = start.y;
-  std::array<double, 2> xFinal = end.x;
-  std::array<double, 2> yFinal = end.y;
+  wpi::array<double, 2> xInitial = start.x;
+  wpi::array<double, 2> yInitial = start.y;
+  wpi::array<double, 2> xFinal = end.x;
+  wpi::array<double, 2> yFinal = end.y;
 
   if (waypoints.size() > 1) {
     waypoints.emplace(waypoints.begin(),
@@ -102,9 +102,9 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
     const double yDeriv =
         (3 * (yFinal[0] - yInitial[0]) - yFinal[1] - yInitial[1]) / 4.0;
 
-    std::array<double, 2> midXControlVector{waypoints[0].X().to<double>(),
+    wpi::array<double, 2> midXControlVector{waypoints[0].X().to<double>(),
                                             xDeriv};
-    std::array<double, 2> midYControlVector{waypoints[0].Y().to<double>(),
+    wpi::array<double, 2> midYControlVector{waypoints[0].Y().to<double>(),
                                             yDeriv};
 
     splines.emplace_back(xInitial, midXControlVector, yInitial,
@@ -134,7 +134,7 @@ SplineHelper::QuinticSplinesFromControlVectors(
   return splines;
 }
 
-std::array<Spline<3>::ControlVector, 2>
+wpi::array<Spline<3>::ControlVector, 2>
 SplineHelper::CubicControlVectorsFromWaypoints(
     const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
     const Pose2d& end) {

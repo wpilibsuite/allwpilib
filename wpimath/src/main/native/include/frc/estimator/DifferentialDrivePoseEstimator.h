@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <array>
+#include <wpi/array.h>
 
 #include "Eigen/Core"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
@@ -74,9 +74,9 @@ class DifferentialDrivePoseEstimator {
    */
   DifferentialDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
-      const std::array<double, 5>& stateStdDevs,
-      const std::array<double, 3>& localMeasurementStdDevs,
-      const std::array<double, 3>& visionMeasurementStdDevs,
+      const wpi::array<double, 5>& stateStdDevs,
+      const wpi::array<double, 3>& localMeasurementStdDevs,
+      const wpi::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s);
 
   /**
@@ -92,7 +92,7 @@ class DifferentialDrivePoseEstimator {
    *                                 radians.
    */
   void SetVisionMeasurementStdDevs(
-      const std::array<double, 3>& visionMeasurementStdDevs);
+      const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
    * Resets the robot's position on the field.
@@ -183,7 +183,7 @@ class DifferentialDrivePoseEstimator {
   Rotation2d m_previousAngle;
 
   template <int Dim>
-  static std::array<double, Dim> StdDevMatrixToArray(
+  static wpi::array<double, Dim> StdDevMatrixToArray(
       const Eigen::Matrix<double, Dim, 1>& stdDevs);
 
   static Eigen::Matrix<double, 5, 1> F(const Eigen::Matrix<double, 5, 1>& x,

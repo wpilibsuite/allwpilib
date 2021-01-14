@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <array>
+#include <wpi/array.h>
 
 #include "Eigen/Core"
 #include "Eigen/src/Cholesky/LLT.h"
@@ -44,8 +44,8 @@ class LinearQuadraticRegulatorImpl {
   template <int Outputs>
   LinearQuadraticRegulatorImpl(
       const LinearSystem<States, Inputs, Outputs>& plant,
-      const std::array<double, States>& Qelems,
-      const std::array<double, Inputs>& Relems, units::second_t dt)
+      const wpi::array<double, States>& Qelems,
+      const wpi::array<double, Inputs>& Relems, units::second_t dt)
       : LinearQuadraticRegulatorImpl(plant.A(), plant.B(), Qelems, Relems, dt) {
   }
 
@@ -60,8 +60,8 @@ class LinearQuadraticRegulatorImpl {
    */
   LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
                                const Eigen::Matrix<double, States, Inputs>& B,
-                               const std::array<double, States>& Qelems,
-                               const std::array<double, Inputs>& Relems,
+                               const wpi::array<double, States>& Qelems,
+                               const wpi::array<double, Inputs>& Relems,
                                units::second_t dt)
       : LinearQuadraticRegulatorImpl(A, B, MakeCostMatrix(Qelems),
                                      MakeCostMatrix(Relems), dt) {}
@@ -226,8 +226,8 @@ class LinearQuadraticRegulator
    */
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
-                           const std::array<double, States>& Qelems,
-                           const std::array<double, Inputs>& Relems,
+                           const wpi::array<double, States>& Qelems,
+                           const wpi::array<double, Inputs>& Relems,
                            units::second_t dt)
       : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
@@ -242,8 +242,8 @@ class LinearQuadraticRegulator
    */
   LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
                            const Eigen::Matrix<double, States, Inputs>& B,
-                           const std::array<double, States>& Qelems,
-                           const std::array<double, Inputs>& Relems,
+                           const wpi::array<double, States>& Qelems,
+                           const wpi::array<double, Inputs>& Relems,
                            units::second_t dt)
       : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
                                  MakeCostMatrix(Relems), dt) {}
@@ -276,15 +276,15 @@ class LinearQuadraticRegulator<1, 1>
  public:
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<1, 1, Outputs>& plant,
-                           const std::array<double, 1>& Qelems,
-                           const std::array<double, 1>& Relems,
+                           const wpi::array<double, 1>& Qelems,
+                           const wpi::array<double, 1>& Relems,
                            units::second_t dt)
       : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
                            const Eigen::Matrix<double, 1, 1>& B,
-                           const std::array<double, 1>& Qelems,
-                           const std::array<double, 1>& Relems,
+                           const wpi::array<double, 1>& Qelems,
+                           const wpi::array<double, 1>& Relems,
                            units::second_t dt);
 
   LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
@@ -305,15 +305,15 @@ class LinearQuadraticRegulator<2, 1>
  public:
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<2, 1, Outputs>& plant,
-                           const std::array<double, 2>& Qelems,
-                           const std::array<double, 1>& Relems,
+                           const wpi::array<double, 2>& Qelems,
+                           const wpi::array<double, 1>& Relems,
                            units::second_t dt)
       : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
                            const Eigen::Matrix<double, 2, 1>& B,
-                           const std::array<double, 2>& Qelems,
-                           const std::array<double, 1>& Relems,
+                           const wpi::array<double, 2>& Qelems,
+                           const wpi::array<double, 1>& Relems,
                            units::second_t dt);
 
   LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,

@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include <array>
 #include <utility>
 #include <vector>
+
+#include <wpi/array.h>
 
 #include "frc/spline/CubicHermiteSpline.h"
 #include "frc/spline/QuinticHermiteSpline.h"
@@ -27,7 +28,7 @@ class SplineHelper {
    * @param end               The ending pose.
    * @return 2 cubic control vectors.
    */
-  static std::array<Spline<3>::ControlVector, 2>
+  static wpi::array<Spline<3>::ControlVector, 2>
   CubicControlVectorsFromWaypoints(
       const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
       const Pose2d& end);
