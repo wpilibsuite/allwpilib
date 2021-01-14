@@ -82,7 +82,8 @@ constexpr const T&& get(const wpi::array<T, N>&& arr) noexcept {
   return std::move(std::get<I>(arr));
 }
 
-namespace std {
+// Enables structured bindings
+namespace std {  // NOLINT
 // tuple_size
 template <typename T>
 struct tuple_size;
