@@ -65,7 +65,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 }
 
 void DriveSubsystem::SetModuleStates(
-    std::array<frc::SwerveModuleState, 4> desiredStates) {
+    wpi::array<frc::SwerveModuleState, 4> desiredStates) {
   kDriveKinematics.NormalizeWheelSpeeds(&desiredStates,
                                         AutoConstants::kMaxSpeed);
   m_frontLeft.SetDesiredState(desiredStates[0]);

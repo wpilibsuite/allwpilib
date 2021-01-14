@@ -32,6 +32,21 @@ class array : public std::array<T, N> {
   array& operator=(const array<T, N>&) = default;
   array(array<T, N>&&) = default;
   array& operator=(array<T, N>&&) = default;
+
+  array(const std::array<T, N>& rhs) {
+    *static_cast<std::array<T, N>*>(this) = rhs;
+  }
+  array& operator=(const std::array<T, N>& rhs) {
+    *static_cast<std::array<T, N>*>(this) = rhs;
+    return *this;
+  }
+  array(std::array<T, N>&& rhs) {
+    *static_cast<std::array<T, N>*>(this) = rhs;
+  }
+  array& operator=(std::array<T, N>&& rhs) {
+    *static_cast<std::array<T, N>*>(this) = rhs;
+    return *this;
+  }
 };
 
 template <typename T, typename... Ts>

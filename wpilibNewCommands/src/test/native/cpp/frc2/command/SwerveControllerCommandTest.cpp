@@ -31,7 +31,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
   frc2::Timer m_timer;
   frc::Rotation2d m_angle{0_rad};
 
-  std::array<frc::SwerveModuleState, 4> m_moduleStates{
+  wpi::array<frc::SwerveModuleState, 4> m_moduleStates{
       frc::SwerveModuleState{}, frc::SwerveModuleState{},
       frc::SwerveModuleState{}, frc::SwerveModuleState{}};
 
@@ -60,7 +60,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
 
   void TearDown() override { frc::sim::ResumeTiming(); }
 
-  std::array<frc::SwerveModuleState, 4> getCurrentWheelSpeeds() {
+  wpi::array<frc::SwerveModuleState, 4> getCurrentWheelSpeeds() {
     return m_moduleStates;
   }
 
