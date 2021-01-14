@@ -33,16 +33,19 @@ class array : public std::array<T, N> {
   array(array<T, N>&&) = default;
   array& operator=(array<T, N>&&) = default;
 
-  array(const std::array<T, N>& rhs) {
+  array(const std::array<T, N>& rhs) {  // NOLINT
     *static_cast<std::array<T, N>*>(this) = rhs;
   }
+
   array& operator=(const std::array<T, N>& rhs) {
     *static_cast<std::array<T, N>*>(this) = rhs;
     return *this;
   }
-  array(std::array<T, N>&& rhs) {
+
+  array(std::array<T, N>&& rhs) {  // NOLINT
     *static_cast<std::array<T, N>*>(this) = rhs;
   }
+
   array& operator=(std::array<T, N>&& rhs) {
     *static_cast<std::array<T, N>*>(this) = rhs;
     return *this;
