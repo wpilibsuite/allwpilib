@@ -38,8 +38,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
 
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix =
       m_inverseKinematics * chassisSpeedsVector;
-  wpi::array<SwerveModuleState, NumModules> moduleStates{
-      wpi::array<SwerveModuleState, NumModules>::empty_array};
+  wpi::array<SwerveModuleState, NumModules> moduleStates{wpi::empty_array};
 
   for (size_t i = 0; i < NumModules; i++) {
     units::meters_per_second_t x =

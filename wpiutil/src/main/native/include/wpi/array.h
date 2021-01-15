@@ -11,6 +11,9 @@
 
 namespace wpi {
 
+struct empty_array_t {};
+constexpr empty_array_t empty_array;
+
 /**
  * This class is a wrapper around std::array that does compile time size
  * checking.
@@ -21,9 +24,6 @@ namespace wpi {
 template <typename T, size_t N>
 class array : public std::array<T, N> {
  public:
-  struct empty_array_t {};
-  static constexpr empty_array_t empty_array = empty_array_t{};
-
   explicit array(empty_array_t) {}
 
   template <typename... Ts>
