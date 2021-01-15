@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <wpi/nodiscard.h>
+
 #include "hal/Types.h"
 
 /**
@@ -80,11 +82,14 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
  * Waits for the next alarm for the specific notifier.
  *
  * This is a blocking call until either the time elapses or HAL_StopNotifier
- * gets called.
+ * gets called. If the latter occurs, this function will return zero and any
+ * loops using this function should exit. Failing to do so can lead to
+ * use-after-frees.
  *
  * @param notifierHandle the notifier handle
  * @return               the FPGA time the notifier returned
  */
+WPI_NODISCARD
 uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
                                   int32_t* status);
 
