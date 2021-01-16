@@ -1,0 +1,61 @@
+name: Verify Doc Includes
+
+on: [pull_request]
+
+jobs:
+  check-doc-links:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkout master
+      run: |
+        git fetch origin master --depth=1
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Remove unchanged files
+      run: |
+        git ls-files -v | sort | uniq -u | grep "^h" | xargs rm -rf
+    - name: Clone frc-docs
+      run: |
+        git clone https://github.com/wpilibsuite/frc-docs.git --depth=1
+    - name: Verify doc includes
+      run: |
+        python test-scripts/check-doc-links.py
+    - name: Check file existence
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "output.md"
+    - name: Cancelling
+      if: steps.check_files.outputs.files_exists == 'false'
+      uses: andymckay/cancel-action@0.2
+    - name: Find Comment
+      uses: peter-evans/find-comment@v1
+      id: fc
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: frc-docs literalinclude report
+    - id: get-comment-body
+      run: |
+        body=$(cat output.md)
+        body="${body//'%'/'%25'}"
+        body="${body//$'\n'/'%0A'}"
+        body="${body//$'\r'/'%0D'}" 
+        echo ::set-output name=body::$body
+    - name: Create comment
+      if: ${{ steps.fc.outputs.comment-id == 0 }}
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          ${{ steps.get-comment-body.outputs.body }}
+    - name: Update comment
+      if: ${{ steps.fc.outputs.comment-id != 0 }}
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        edit-mode: replace
+        body: |
+          ${{ steps.get-comment-body.outputs.body }}
