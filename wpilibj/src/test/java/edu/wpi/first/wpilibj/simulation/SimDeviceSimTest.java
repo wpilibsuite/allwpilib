@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDevice.Direction;
+import edu.wpi.first.hal.SimValue;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +19,7 @@ class SimDeviceSimTest {
   @Test
   void testBasic() {
     try (SimDevice dev = SimDevice.create("test")) {
-      SimBoolean devBool = dev.createBoolean("bool", false, false);
+      SimBoolean devBool = dev.createBoolean("bool", Direction.kBidir, false);
 
       SimDeviceSim sim = new SimDeviceSim("test");
       SimBoolean simBool = sim.getBoolean("bool");
@@ -100,7 +102,7 @@ class SimDeviceSimTest {
     AtomicInteger callback2Counter = new AtomicInteger(0);
 
     try (SimDevice dev1 = SimDevice.create("testVM1")) {
-      dev1.createBoolean("v1", false, false);
+      dev1.createBoolean("v1", Direction.kBidir, false);
       SimDeviceSim sim = new SimDeviceSim("testVM1");
       try (CallbackStore callback1 =
               sim.registerValueCreatedCallback(
@@ -120,13 +122,13 @@ class SimDeviceSimTest {
             callback2Counter.get(),
             "Callback 2 called early or not initialized with existing devices");
 
-        dev1.createDouble("v2", false, 0);
+        dev1.createDouble("v2", Direction.kBidir, 0);
 
         assertEquals(
             1, callback1Counter.get(), "Callback 1 called either more than once or not at all");
         assertEquals(2, callback2Counter.get(), "Callback 2 called either more or less than twice");
       }
-      dev1.createBoolean("v3", false, false);
+      dev1.createBoolean("v3", Direction.kBidir, false);
 
       assertEquals(1, callback1Counter.get(), "Callback 1 called after closure");
       assertEquals(2, callback2Counter.get(), "Callback 2 called after closure");
@@ -138,19 +140,20 @@ class SimDeviceSimTest {
     AtomicInteger callback1Counter = new AtomicInteger(0);
     AtomicInteger callback2Counter = new AtomicInteger(0);
 
-    try (SimDevice dev1 = SimDevice.create("testVC1")) {
-      SimBoolean val = dev1.createBoolean("v1", false, false);
+    try (SimDevice dev1 = SimDevice.create("testVM1")) {
+      SimBoolean val = dev1.createBoolean("v1", Direction.kBidir, false);
       SimDeviceSim sim = new SimDeviceSim("testVM1");
+      SimValue simVal = sim.getValue("v1");
       try (CallbackStore callback1 =
               sim.registerValueChangedCallback(
-                  val,
+                  simVal,
                   (name, handle, readonly, value) -> {
                     callback1Counter.addAndGet(1);
                   },
                   false);
           CallbackStore callback2 =
               sim.registerValueChangedCallback(
-                  val,
+                  simVal,
                   (name, handle, readonly, value) -> {
                     callback2Counter.addAndGet(1);
                   },
