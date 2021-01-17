@@ -119,6 +119,10 @@ class FieldInfo {
   std::unique_ptr<pfd::open_file> m_fileOpener;
   float* m_pWidth;
   float* m_pHeight;
+  int* m_pTop;
+  int* m_pLeft;
+  int* m_pBottom;
+  int* m_pRight;
 
   void Reset();
   void LoadImage();
@@ -135,10 +139,6 @@ class FieldInfo {
   gui::Texture m_texture;
   int m_imageWidth;
   int m_imageHeight;
-  int* m_pTop;
-  int* m_pLeft;
-  int* m_pBottom;
-  int* m_pRight;
 };
 
 }  // namespace
@@ -532,12 +532,12 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
     if (ImGui::Button("Reset image")) {
       field->Reset();
     }
-    ImGui::InputFloat("Field Width", field->m_pWidth);
-    ImGui::InputFloat("Field Height", field->m_pHeight);
-    // ImGui::InputInt("Field Top", field->m_pTop);
-    // ImGui::InputInt("Field Left", field->m_pLeft);
-    // ImGui::InputInt("Field Right", field->m_pRight);
-    // ImGui::InputInt("Field Bottom", field->m_pBottom);
+    ImGui::InputFloat("Width", field->m_pWidth);
+    ImGui::InputFloat("Height", field->m_pHeight);
+    ImGui::InputInt("Top (pixels)", field->m_pTop);
+    ImGui::InputInt("Left (pixels)", field->m_pLeft);
+    ImGui::InputInt("Right (pixels)", field->m_pRight);
+    ImGui::InputInt("Bottom (pixels)", field->m_pBottom);
     ImGui::PopID();
   }
 
