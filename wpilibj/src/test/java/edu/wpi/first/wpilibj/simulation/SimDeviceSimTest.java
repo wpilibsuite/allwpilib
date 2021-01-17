@@ -10,9 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.hal.SimValue;
 import edu.wpi.first.hal.SimDevice.Direction;
-
+import edu.wpi.first.hal.SimValue;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
