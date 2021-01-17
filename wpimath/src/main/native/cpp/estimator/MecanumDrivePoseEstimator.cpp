@@ -14,9 +14,9 @@ using namespace frc;
 frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     const Rotation2d& gyroAngle, const Pose2d& initialPose,
     MecanumDriveKinematics kinematics,
-    const std::array<double, 3>& stateStdDevs,
-    const std::array<double, 1>& localMeasurementStdDevs,
-    const std::array<double, 3>& visionMeasurementStdDevs,
+    const wpi::array<double, 3>& stateStdDevs,
+    const wpi::array<double, 1>& localMeasurementStdDevs,
+    const wpi::array<double, 3>& visionMeasurementStdDevs,
     units::second_t nominalDt)
     : m_observer([](const Eigen::Matrix<double, 3, 1>& x,
                     const Eigen::Matrix<double, 3, 1>& u) { return u; },
@@ -51,7 +51,7 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
 }
 
 void frc::MecanumDrivePoseEstimator::SetVisionMeasurementStdDevs(
-    const std::array<double, 3>& visionMeasurmentStdDevs) {
+    const wpi::array<double, 3>& visionMeasurmentStdDevs) {
   // Create R (covariances) for vision measurements.
   Eigen::Matrix<double, 3, 3> visionContR =
       frc::MakeCovMatrix(visionMeasurmentStdDevs);

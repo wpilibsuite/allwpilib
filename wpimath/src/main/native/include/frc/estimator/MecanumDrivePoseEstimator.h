@@ -6,6 +6,8 @@
 
 #include <functional>
 
+#include <wpi/array.h>
+
 #include "Eigen/Core"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
@@ -71,9 +73,9 @@ class MecanumDrivePoseEstimator {
   MecanumDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
       MecanumDriveKinematics kinematics,
-      const std::array<double, 3>& stateStdDevs,
-      const std::array<double, 1>& localMeasurementStdDevs,
-      const std::array<double, 3>& visionMeasurementStdDevs,
+      const wpi::array<double, 3>& stateStdDevs,
+      const wpi::array<double, 1>& localMeasurementStdDevs,
+      const wpi::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s);
 
   /**
@@ -89,7 +91,7 @@ class MecanumDrivePoseEstimator {
    *                                 radians.
    */
   void SetVisionMeasurementStdDevs(
-      const std::array<double, 3>& visionMeasurementStdDevs);
+      const wpi::array<double, 3>& visionMeasurementStdDevs);
 
   /**
    * Resets the robot's position on the field.
@@ -177,9 +179,9 @@ class MecanumDrivePoseEstimator {
   Rotation2d m_previousAngle;
 
   template <int Dim>
-  static std::array<double, Dim> StdDevMatrixToArray(
+  static wpi::array<double, Dim> StdDevMatrixToArray(
       const Eigen::Matrix<double, Dim, 1>& vector) {
-    std::array<double, Dim> array;
+    wpi::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);
     }

@@ -13,9 +13,9 @@ using namespace frc;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     const Rotation2d& gyroAngle, const Pose2d& initialPose,
-    const std::array<double, 5>& stateStdDevs,
-    const std::array<double, 3>& localMeasurementStdDevs,
-    const std::array<double, 3>& visionMeasurmentStdDevs,
+    const wpi::array<double, 5>& stateStdDevs,
+    const wpi::array<double, 3>& localMeasurementStdDevs,
+    const wpi::array<double, 3>& visionMeasurmentStdDevs,
     units::second_t nominalDt)
     : m_observer(
           &DifferentialDrivePoseEstimator::F,
@@ -46,7 +46,7 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
 }
 
 void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
-    const std::array<double, 3>& visionMeasurmentStdDevs) {
+    const wpi::array<double, 3>& visionMeasurmentStdDevs) {
   // Create R (covariances) for vision measurements.
   Eigen::Matrix<double, 3, 3> visionContR =
       frc::MakeCovMatrix(visionMeasurmentStdDevs);
@@ -126,9 +126,9 @@ Eigen::Matrix<double, 5, 1> DifferentialDrivePoseEstimator::F(
 }
 
 template <int Dim>
-std::array<double, Dim> DifferentialDrivePoseEstimator::StdDevMatrixToArray(
+wpi::array<double, Dim> DifferentialDrivePoseEstimator::StdDevMatrixToArray(
     const Eigen::Matrix<double, Dim, 1>& stdDevs) {
-  std::array<double, Dim> array;
+  wpi::array<double, Dim> array;
   for (size_t i = 0; i < Dim; ++i) {
     array[i] = stdDevs(i);
   }

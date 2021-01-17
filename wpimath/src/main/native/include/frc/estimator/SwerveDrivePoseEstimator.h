@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <array>
 #include <limits>
 
+#include <wpi/array.h>
 #include <wpi/timestamp.h>
 
 #include "Eigen/Core"
@@ -77,9 +77,9 @@ class SwerveDrivePoseEstimator {
   SwerveDrivePoseEstimator(
       const Rotation2d& gyroAngle, const Pose2d& initialPose,
       SwerveDriveKinematics<NumModules>& kinematics,
-      const std::array<double, 3>& stateStdDevs,
-      const std::array<double, 1>& localMeasurementStdDevs,
-      const std::array<double, 3>& visionMeasurementStdDevs,
+      const wpi::array<double, 3>& stateStdDevs,
+      const wpi::array<double, 1>& localMeasurementStdDevs,
+      const wpi::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s)
       : m_observer([](const Eigen::Matrix<double, 3, 1>& x,
                       const Eigen::Matrix<double, 3, 1>& u) { return u; },
@@ -158,7 +158,7 @@ class SwerveDrivePoseEstimator {
    *                                 radians.
    */
   void SetVisionMeasurementStdDevs(
-      const std::array<double, 3>& visionMeasurementStdDevs) {
+      const wpi::array<double, 3>& visionMeasurementStdDevs) {
     // Create R (covariances) for vision measurements.
     Eigen::Matrix<double, 3, 3> visionContR =
         frc::MakeCovMatrix(visionMeasurementStdDevs);
@@ -266,9 +266,9 @@ class SwerveDrivePoseEstimator {
   Rotation2d m_previousAngle;
 
   template <int Dim>
-  static std::array<double, Dim> StdDevMatrixToArray(
+  static wpi::array<double, Dim> StdDevMatrixToArray(
       const Eigen::Matrix<double, Dim, 1>& vector) {
-    std::array<double, Dim> array;
+    wpi::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);
     }

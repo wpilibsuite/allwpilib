@@ -7,10 +7,10 @@
 using namespace frc;
 
 CubicHermiteSpline::CubicHermiteSpline(
-    std::array<double, 2> xInitialControlVector,
-    std::array<double, 2> xFinalControlVector,
-    std::array<double, 2> yInitialControlVector,
-    std::array<double, 2> yFinalControlVector) {
+    wpi::array<double, 2> xInitialControlVector,
+    wpi::array<double, 2> xFinalControlVector,
+    wpi::array<double, 2> yInitialControlVector,
+    wpi::array<double, 2> yFinalControlVector) {
   const auto hermite = MakeHermiteBasis();
   const auto x =
       ControlVectorFromArrays(xInitialControlVector, xFinalControlVector);

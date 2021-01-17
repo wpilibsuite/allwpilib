@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include <array>
 #include <utility>
 #include <vector>
+
+#include <wpi/array.h>
 
 #include "Eigen/Core"
 #include "frc/geometry/Pose2d.h"
@@ -43,8 +44,8 @@ class Spline {
    * dimension.
    */
   struct ControlVector {
-    std::array<double, (Degree + 1) / 2> x;
-    std::array<double, (Degree + 1) / 2> y;
+    wpi::array<double, (Degree + 1) / 2> x;
+    wpi::array<double, (Degree + 1) / 2> y;
   };
 
   /**

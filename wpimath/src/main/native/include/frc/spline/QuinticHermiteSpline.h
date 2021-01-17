@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <array>
+#include <wpi/array.h>
 
 #include "Eigen/Core"
 #include "frc/spline/Spline.h"
@@ -29,10 +29,10 @@ class QuinticHermiteSpline : public Spline<5> {
    * @param yFinalControlVector The control vector for the final point in
    * the y dimension.
    */
-  QuinticHermiteSpline(std::array<double, 3> xInitialControlVector,
-                       std::array<double, 3> xFinalControlVector,
-                       std::array<double, 3> yInitialControlVector,
-                       std::array<double, 3> yFinalControlVector);
+  QuinticHermiteSpline(wpi::array<double, 3> xInitialControlVector,
+                       wpi::array<double, 3> xFinalControlVector,
+                       wpi::array<double, 3> yInitialControlVector,
+                       wpi::array<double, 3> yFinalControlVector);
 
  protected:
   /**
@@ -74,7 +74,7 @@ class QuinticHermiteSpline : public Spline<5> {
    * @return The control vector matrix for a dimension.
    */
   static Eigen::Matrix<double, 6, 1> ControlVectorFromArrays(
-      std::array<double, 3> initialVector, std::array<double, 3> finalVector) {
+      wpi::array<double, 3> initialVector, wpi::array<double, 3> finalVector) {
     return (Eigen::Matrix<double, 6, 1>() << initialVector[0], initialVector[1],
             initialVector[2], finalVector[0], finalVector[1], finalVector[2])
         .finished();
