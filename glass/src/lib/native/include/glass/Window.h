@@ -23,7 +23,7 @@ namespace glass {
 class Window {
  public:
   Window() = default;
-  explicit Window(wpi::StringRef id) : m_id{id} {}
+  explicit Window(wpi::StringRef id) : m_id{id}, m_defaultName{id} {}
 
   wpi::StringRef GetId() const { return m_id; }
 
@@ -44,6 +44,7 @@ class Window {
   void SetFlags(ImGuiWindowFlags flags) { m_flags = flags; }
 
   void SetName(const wpi::Twine& name) { m_name = name.str(); }
+  void SetDefaultName(const wpi::Twine& name) { m_defaultName = name.str(); }
 
   /**
    * Normally windows provide a right-click popup menu on the title bar to
@@ -115,6 +116,7 @@ class Window {
  private:
   std::string m_id;
   std::string m_name;
+  std::string m_defaultName;
   std::unique_ptr<View> m_view;
   ImGuiWindowFlags m_flags = 0;
   bool m_visible = true;
