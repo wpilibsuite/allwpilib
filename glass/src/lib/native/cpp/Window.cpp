@@ -50,7 +50,8 @@ void Window::Display() {
 
   char label[128];
   std::snprintf(label, sizeof(label), "%s###%s",
-                m_name.empty() ? m_id.c_str() : m_name.c_str(), m_id.c_str());
+                m_name.empty() ? m_defaultName.c_str() : m_name.c_str(),
+                m_id.c_str());
 
   if (Begin(label, &m_visible, m_flags)) {
     if (m_renamePopupEnabled) {

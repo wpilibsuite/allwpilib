@@ -153,6 +153,10 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
   if (!window) {
     return;
   }
+  if (wpi::StringRef{entry->name}.startswith("/SmartDashboard/")) {
+    window->SetDefaultName(wpi::StringRef{entry->name}.drop_front(16) +
+                           " (SmartDashboard)");
+  }
   entry->window = window;
 
   // create view
