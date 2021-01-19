@@ -32,8 +32,8 @@ int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
     return sch.sched_priority;
   } else {
     *isRealTime = false;
-    // 0 is the only suppored priority for non-realtime, so scale to 1
-    return 1;
+    // 0 is the only supported priority for non-real-time
+    return 0;
   }
 }
 

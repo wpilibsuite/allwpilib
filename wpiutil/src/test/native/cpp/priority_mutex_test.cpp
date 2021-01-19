@@ -55,7 +55,7 @@ void SetProcessorAffinity(int32_t core_id) {
 
 void SetThreadRealtimePriorityOrDie(int32_t priority) {
   struct sched_param param;
-  // Set realtime priority for this thread
+  // Set real-time priority for this thread
   param.sched_priority = priority + sched_get_priority_min(SCHED_RR);
   ASSERT_EQ(pthread_setschedparam(pthread_self(), SCHED_RR, &param), 0)
       << ": Failed to set scheduler priority.";
