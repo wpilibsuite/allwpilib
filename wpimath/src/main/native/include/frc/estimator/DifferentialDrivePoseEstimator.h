@@ -101,8 +101,8 @@ class DifferentialDrivePoseEstimator {
    * gyroscope angle does not need to be reset here on the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
-   *@param pose The estimated pose of the robot on the field.
-   *@param gyroAngle The current gyro angle.
+   * @param pose The estimated pose of the robot on the field.
+   * @param gyroAngle The current gyro angle.
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle);
 
