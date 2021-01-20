@@ -28,7 +28,7 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(DefaultDrive(
       &m_drive,
-      [this] { return m_driverController.GetY(frc::GenericHID::kLeftHand); },
+      [this] { return -m_driverController.GetY(frc::GenericHID::kLeftHand); },
       [this] { return m_driverController.GetX(frc::GenericHID::kRightHand); }));
 }
 

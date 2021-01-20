@@ -23,8 +23,8 @@ RobotContainer::RobotContainer()
   frc::SmartDashboard::PutData(&m_claw);
 
   m_drivetrain.SetDefaultCommand(TankDrive(
-      [this] { return m_joy.GetY(frc::GenericHID::JoystickHand::kLeftHand); },
-      [this] { return m_joy.GetY(frc::GenericHID::JoystickHand::kRightHand); },
+      [this] { return -m_joy.GetY(frc::GenericHID::JoystickHand::kLeftHand); },
+      [this] { return -m_joy.GetY(frc::GenericHID::JoystickHand::kRightHand); },
       &m_drivetrain));
 
   // Configure the button bindings

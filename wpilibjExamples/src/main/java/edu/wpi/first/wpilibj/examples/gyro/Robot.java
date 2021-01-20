@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double turningValue = (kAngleSetpoint - m_gyro.getAngle()) * kP;
     // Invert the direction of the turn if we are going backwards
-    turningValue = Math.copySign(turningValue, m_joystick.getY());
-    m_myRobot.arcadeDrive(m_joystick.getY(), turningValue);
+    turningValue = Math.copySign(turningValue, -m_joystick.getY());
+    m_myRobot.arcadeDrive(-m_joystick.getY(), turningValue);
   }
 }

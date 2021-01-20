@@ -16,7 +16,7 @@
  */
 class Robot : public frc::TimedRobot {
  public:
-  void TeleopPeriodic() override { m_motor.Set(m_stick.GetY()); }
+  void TeleopPeriodic() override { m_motor.Set(-m_stick.GetY()); }
 
  private:
   frc::Joystick m_stick{0};

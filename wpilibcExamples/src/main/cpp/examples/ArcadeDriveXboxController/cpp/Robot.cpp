@@ -24,7 +24,7 @@ class Robot : public frc::TimedRobot {
     // That means that the Y axis of the left stick moves forward
     // and backward, and the X of the right stick turns left and right.
     m_robotDrive.ArcadeDrive(
-        m_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand),
+        -m_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand),
         m_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand));
   }
 };

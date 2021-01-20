@@ -26,6 +26,6 @@ public class Robot extends TimedRobot {
     // That means that the Y axis of the left stick moves forward
     // and backward, and the X of the right stick turns left and right.
     m_robotDrive.arcadeDrive(
-        m_driverController.getY(Hand.kLeft), m_driverController.getX(Hand.kRight));
+        -m_driverController.getY(Hand.kLeft), m_driverController.getX(Hand.kRight));
   }
 }

@@ -63,7 +63,7 @@ public class RobotContainer {
     // Assign default commands
     m_drivetrain.setDefaultCommand(
         new TankDrive(
-            () -> m_joystick.getY(Hand.kLeft), () -> m_joystick.getY(Hand.kRight), m_drivetrain));
+            () -> -m_joystick.getY(Hand.kLeft), () -> -m_joystick.getY(Hand.kRight), m_drivetrain));
 
     // Show what command your subsystem is running on the SmartDashboard
     SmartDashboard.putData(m_drivetrain);

@@ -27,8 +27,8 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {
     double turningValue = (kAngleSetpoint - m_gyro.GetAngle()) * kP;
     // Invert the direction of the turn if we are going backwards
-    turningValue = std::copysign(turningValue, m_joystick.GetY());
-    m_robotDrive.ArcadeDrive(m_joystick.GetY(), turningValue);
+    turningValue = std::copysign(turningValue, -m_joystick.GetY());
+    m_robotDrive.ArcadeDrive(-m_joystick.GetY(), turningValue);
   }
 
  private:

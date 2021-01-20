@@ -22,8 +22,8 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {
     // Drive with tank style
     m_robotDrive.TankDrive(
-        m_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand),
-        m_driverController.GetY(frc::GenericHID::JoystickHand::kRightHand));
+        -m_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand),
+        -m_driverController.GetY(frc::GenericHID::JoystickHand::kRightHand));
   }
 };
 

@@ -52,6 +52,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    m_motor.set(m_joystick.getY());
+    m_motor.set(-m_joystick.getY());
   }
 }
