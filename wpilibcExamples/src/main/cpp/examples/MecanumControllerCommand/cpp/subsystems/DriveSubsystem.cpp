@@ -48,8 +48,8 @@ void DriveSubsystem::Periodic() {
 }
 
 void DriveSubsystem::Drive(double xSpeed, double ySpeed, double rot,
-                           bool feildRelative) {
-  if (feildRelative) {
+                           bool fieldRelative) {
+  if (fieldRelative) {
     m_drive.DriveCartesian(ySpeed, xSpeed, rot, -m_gyro.GetAngle());
   } else {
     m_drive.DriveCartesian(ySpeed, xSpeed, rot);
