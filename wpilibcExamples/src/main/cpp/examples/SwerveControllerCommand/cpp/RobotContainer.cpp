@@ -32,11 +32,11 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.Drive(units::meters_per_second_t(
+        m_drive.Drive(-units::meters_per_second_t(
                           m_driverController.GetY(frc::GenericHID::kLeftHand)),
-                      units::meters_per_second_t(
+                      -units::meters_per_second_t(
                           m_driverController.GetY(frc::GenericHID::kRightHand)),
-                      units::radians_per_second_t(
+                      -units::radians_per_second_t(
                           m_driverController.GetX(frc::GenericHID::kLeftHand)),
                       false);
       },
