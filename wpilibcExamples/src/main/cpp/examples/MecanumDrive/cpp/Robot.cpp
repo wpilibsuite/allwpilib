@@ -24,7 +24,8 @@ class Robot : public frc::TimedRobot {
     /* Use the joystick X axis for lateral movement, Y axis for forward
      * movement, and Z axis for rotation.
      */
-    m_robotDrive.DriveCartesian(m_stick.GetX(), m_stick.GetY(), m_stick.GetZ());
+    m_robotDrive.DriveCartesian(-m_stick.GetX(), -m_stick.GetY(),
+                                m_stick.GetZ());
   }
 
  private:
