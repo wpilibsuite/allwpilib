@@ -141,6 +141,42 @@ public class SimDevice implements AutoCloseable {
   }
 
   /**
+   * Creates an int value on the simulated device.
+   *
+   * <p>Returns null if not in simulation.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param initialValue initial value
+   * @return simulated double value object
+   */
+  public SimInt createInt(String name, Direction direction, int initialValue) {
+    int handle = SimDeviceJNI.createSimValueInt(m_handle, name, direction.m_value, initialValue);
+    if (handle <= 0) {
+      return null;
+    }
+    return new SimInt(handle);
+  }
+
+  /**
+   * Creates a long value on the simulated device.
+   *
+   * <p>Returns null if not in simulation.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param initialValue initial value
+   * @return simulated double value object
+   */
+  public SimLong createLong(String name, Direction direction, long initialValue) {
+    int handle = SimDeviceJNI.createSimValueLong(m_handle, name, direction.m_value, initialValue);
+    if (handle <= 0) {
+      return null;
+    }
+    return new SimLong(handle);
+  }
+
+  /**
    * Creates a double value on the simulated device.
    *
    * <p>Returns null if not in simulation.

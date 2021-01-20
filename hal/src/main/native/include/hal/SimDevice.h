@@ -95,6 +95,46 @@ inline HAL_SimValueHandle HAL_CreateSimValue(HAL_SimDeviceHandle device,
 #endif
 
 /**
+ * Creates an int value on a simulated device.
+ *
+ * Returns 0 if not in simulation; this can be used to avoid calls
+ * to Set/Get functions.
+ *
+ * @param device simulated device handle
+ * @param name value name
+ * @param direction input/output/bidir (from perspective of user code)
+ * @param initialValue initial value
+ * @return simulated value handle
+ */
+inline HAL_SimValueHandle HAL_CreateSimValueInt(HAL_SimDeviceHandle device,
+                                                const char* name,
+                                                int32_t direction,
+                                                int32_t initialValue) {
+  struct HAL_Value v = HAL_MakeInt(initialValue);
+  return HAL_CreateSimValue(device, name, direction, &v);
+}
+
+/**
+ * Creates a long value on a simulated device.
+ *
+ * Returns 0 if not in simulation; this can be used to avoid calls
+ * to Set/Get functions.
+ *
+ * @param device simulated device handle
+ * @param name value name
+ * @param direction input/output/bidir (from perspective of user code)
+ * @param initialValue initial value
+ * @return simulated value handle
+ */
+inline HAL_SimValueHandle HAL_CreateSimValueLong(HAL_SimDeviceHandle device,
+                                                 const char* name,
+                                                 int32_t direction,
+                                                 int64_t initialValue) {
+  struct HAL_Value v = HAL_MakeLong(initialValue);
+  return HAL_CreateSimValue(device, name, direction, &v);
+}
+
+/**
  * Creates a double value on a simulated device.
  *
  * Returns 0 if not in simulation; this can be used to avoid calls
@@ -706,6 +746,37 @@ class SimDevice {
   SimValue CreateValue(const char* name, int32_t direction,
                        const HAL_Value& initialValue) {
     return HAL_CreateSimValue(m_handle, name, direction, &initialValue);
+  }
+
+  /**
+   * Creates an int value on the simulated device.
+   *
+   * If not in simulation, results in an "empty" object that evaluates to false
+   * in a boolean context.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param initialValue initial value
+   * @return simulated double value object
+   */
+  SimInt CreateInt(const char* name, int32_t direction, int32_t initialValue) {
+    return HAL_CreateSimValueInt(m_handle, name, direction, initialValue);
+  }
+
+  /**
+   * Creates a long value on the simulated device.
+   *
+   * If not in simulation, results in an "empty" object that evaluates to false
+   * in a boolean context.
+   *
+   * @param name value name
+   * @param direction input/output/bidir (from perspective of user code)
+   * @param initialValue initial value
+   * @return simulated double value object
+   */
+  SimLong CreateLong(const char* name, int32_t direction,
+                     int64_t initialValue) {
+    return HAL_CreateSimValueLong(m_handle, name, direction, initialValue);
   }
 
   /**
