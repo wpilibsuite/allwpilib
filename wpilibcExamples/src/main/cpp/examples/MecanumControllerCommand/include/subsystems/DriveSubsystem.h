@@ -39,7 +39,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to
    *                      the field.
    */
-  void Drive(double xSpeed, double ySpeed, double rot, bool feildRelative);
+  void Drive(double xSpeed, double ySpeed, double rot, bool fieldRelative);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
