@@ -41,9 +41,8 @@ namespace frc {
  *
  * <strong> u = [[vx, vy, omega]]^T </strong> in the field-coordinate system.
  *
- * <strong> y = [[x, y, std::theta]]^T </strong> in field
- * coords from vision, or <strong> y = [[theta]]^T
- * </strong> from the gyro.
+ * <strong> y = [[x, y, theta]]^T </strong> in field coords from vision,
+ * or <strong> y = [[theta]]^T </strong> from the gyro.
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator {
