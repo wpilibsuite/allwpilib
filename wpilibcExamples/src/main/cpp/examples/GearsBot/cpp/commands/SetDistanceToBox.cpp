@@ -11,7 +11,7 @@
 SetDistanceToBox::SetDistanceToBox(double distance, DriveTrain* drivetrain)
     : frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox>(
           frc2::PIDController(-2, 0, 0),
-          [drivetrain]() { return drivetrain->GetDistanceToObstacle(); },
+          [drivetrain] { return drivetrain->GetDistanceToObstacle(); },
           distance,
           [drivetrain](double output) { drivetrain->Drive(output, output); },
           {drivetrain}),
