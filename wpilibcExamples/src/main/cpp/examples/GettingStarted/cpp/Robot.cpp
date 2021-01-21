@@ -25,7 +25,7 @@ class Robot : public frc::TimedRobot {
     // Drive for 2 seconds
     if (m_timer.Get() < 2.0) {
       // Drive forwards half speed
-      m_robotDrive.ArcadeDrive(-0.5, 0.0);
+      m_robotDrive.ArcadeDrive(0.5, 0.0);
     } else {
       // Stop robot
       m_robotDrive.ArcadeDrive(0.0, 0.0);
