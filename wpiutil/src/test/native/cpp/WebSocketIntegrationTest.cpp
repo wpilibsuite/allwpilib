@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/WebSocketServer.h"  // NOLINT(build/include_order)
 
@@ -32,8 +29,9 @@ TEST_F(WebSocketIntegrationTest, Open) {
     auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName);
     ws->closed.connect([&](uint16_t code, StringRef reason) {
       Finish();
-      if (code != 1005 && code != 1006)
+      if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
+      }
     });
     ws->open.connect([&, s = ws.get()](StringRef) {
       ++gotClientOpen;
@@ -65,8 +63,9 @@ TEST_F(WebSocketIntegrationTest, Protocol) {
         WebSocket::CreateClient(*clientPipe, "/test", pipeName, {"proto1"});
     ws->closed.connect([&](uint16_t code, StringRef reason) {
       Finish();
-      if (code != 1005 && code != 1006)
+      if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
+      }
     });
     ws->open.connect([&, s = ws.get()](StringRef protocol) {
       ++gotClientOpen;
@@ -97,8 +96,9 @@ TEST_F(WebSocketIntegrationTest, ServerSendBinary) {
     auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName);
     ws->closed.connect([&](uint16_t code, StringRef reason) {
       Finish();
-      if (code != 1005 && code != 1006)
+      if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
+      }
     });
     ws->binary.connect([&](ArrayRef<uint8_t> data, bool) {
       ++gotData;
@@ -131,8 +131,9 @@ TEST_F(WebSocketIntegrationTest, ClientSendText) {
     auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName);
     ws->closed.connect([&](uint16_t code, StringRef reason) {
       Finish();
-      if (code != 1005 && code != 1006)
+      if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
+      }
     });
     ws->open.connect([&, s = ws.get()](StringRef) {
       s->SendText(uv::Buffer{"hello"}, [&](auto, uv::Error) {});

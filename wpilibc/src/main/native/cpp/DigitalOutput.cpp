@@ -1,14 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/DigitalOutput.h"
 
 #include <limits>
-#include <utility>
 
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>
@@ -46,7 +42,9 @@ DigitalOutput::DigitalOutput(int channel) {
 }
 
 DigitalOutput::~DigitalOutput() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   // Disable the PWM in case it was running.
   DisablePWM();
 
@@ -54,7 +52,9 @@ DigitalOutput::~DigitalOutput() {
 }
 
 void DigitalOutput::Set(bool value) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
 
   int32_t status = 0;
   HAL_SetDIO(m_handle, value, &status);
@@ -62,7 +62,9 @@ void DigitalOutput::Set(bool value) {
 }
 
 bool DigitalOutput::Get() const {
-  if (StatusIsFatal()) return false;
+  if (StatusIsFatal()) {
+    return false;
+  }
 
   int32_t status = 0;
   bool val = HAL_GetDIO(m_handle, &status);
@@ -70,18 +72,26 @@ bool DigitalOutput::Get() const {
   return val;
 }
 
-HAL_Handle DigitalOutput::GetPortHandleForRouting() const { return m_handle; }
-
-AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
-  return (AnalogTriggerType)0;
+HAL_Handle DigitalOutput::GetPortHandleForRouting() const {
+  return m_handle;
 }
 
-bool DigitalOutput::IsAnalogTrigger() const { return false; }
+AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
+  return static_cast<AnalogTriggerType>(0);
+}
 
-int DigitalOutput::GetChannel() const { return m_channel; }
+bool DigitalOutput::IsAnalogTrigger() const {
+  return false;
+}
+
+int DigitalOutput::GetChannel() const {
+  return m_channel;
+}
 
 void DigitalOutput::Pulse(double length) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
 
   int32_t status = 0;
   HAL_Pulse(m_handle, length, &status);
@@ -89,7 +99,9 @@ void DigitalOutput::Pulse(double length) {
 }
 
 bool DigitalOutput::IsPulsing() const {
-  if (StatusIsFatal()) return false;
+  if (StatusIsFatal()) {
+    return false;
+  }
 
   int32_t status = 0;
   bool value = HAL_IsPulsing(m_handle, &status);
@@ -98,7 +110,9 @@ bool DigitalOutput::IsPulsing() const {
 }
 
 void DigitalOutput::SetPWMRate(double rate) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
 
   int32_t status = 0;
   HAL_SetDigitalPWMRate(rate, &status);
@@ -106,26 +120,38 @@ void DigitalOutput::SetPWMRate(double rate) {
 }
 
 void DigitalOutput::EnablePWM(double initialDutyCycle) {
-  if (m_pwmGenerator != HAL_kInvalidHandle) return;
+  if (m_pwmGenerator != HAL_kInvalidHandle) {
+    return;
+  }
 
   int32_t status = 0;
 
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   m_pwmGenerator = HAL_AllocateDigitalPWM(&status);
   wpi_setHALError(status);
 
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, initialDutyCycle, &status);
   wpi_setHALError(status);
 
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, m_channel, &status);
   wpi_setHALError(status);
 }
 
 void DigitalOutput::DisablePWM() {
-  if (StatusIsFatal()) return;
-  if (m_pwmGenerator == HAL_kInvalidHandle) return;
+  if (StatusIsFatal()) {
+    return;
+  }
+  if (m_pwmGenerator == HAL_kInvalidHandle) {
+    return;
+  }
 
   int32_t status = 0;
 
@@ -141,7 +167,9 @@ void DigitalOutput::DisablePWM() {
 }
 
 void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
 
   int32_t status = 0;
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);

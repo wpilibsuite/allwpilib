@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/CallbackStore.h"
+
+#include <utility>
 
 using namespace frc;
 using namespace frc::sim;
@@ -24,31 +23,35 @@ void frc::sim::ConstBufferCallbackStoreThunk(const char* name, void* param,
 
 CallbackStore::CallbackStore(int32_t i, NotifyCallback cb,
                              CancelCallbackNoIndexFunc ccf)
-    : index(i), callback(cb), cancelType(NoIndex) {
+    : index(i), callback(std::move(cb)), cancelType(NoIndex) {
   this->ccnif = ccf;
 }
 
 CallbackStore::CallbackStore(int32_t i, int32_t u, NotifyCallback cb,
                              CancelCallbackFunc ccf)
-    : index(i), uid(u), callback(cb), cancelType(Normal) {
+    : index(i), uid(u), callback(std::move(cb)), cancelType(Normal) {
   this->ccf = ccf;
 }
 
 CallbackStore::CallbackStore(int32_t i, int32_t c, int32_t u, NotifyCallback cb,
                              CancelCallbackChannelFunc ccf)
-    : index(i), channel(c), uid(u), callback(cb), cancelType(Channel) {
+    : index(i),
+      channel(c),
+      uid(u),
+      callback(std::move(cb)),
+      cancelType(Channel) {
   this->cccf = ccf;
 }
 
 CallbackStore::CallbackStore(int32_t i, ConstBufferCallback cb,
                              CancelCallbackNoIndexFunc ccf)
-    : index(i), constBufferCallback(cb), cancelType(NoIndex) {
+    : index(i), constBufferCallback(std::move(cb)), cancelType(NoIndex) {
   this->ccnif = ccf;
 }
 
 CallbackStore::CallbackStore(int32_t i, int32_t u, ConstBufferCallback cb,
                              CancelCallbackFunc ccf)
-    : index(i), uid(u), constBufferCallback(cb), cancelType(Normal) {
+    : index(i), uid(u), constBufferCallback(std::move(cb)), cancelType(Normal) {
   this->ccf = ccf;
 }
 
@@ -58,7 +61,7 @@ CallbackStore::CallbackStore(int32_t i, int32_t c, int32_t u,
     : index(i),
       channel(c),
       uid(u),
-      constBufferCallback(cb),
+      constBufferCallback(std::move(cb)),
       cancelType(Channel) {
   this->cccf = ccf;
 }
@@ -77,4 +80,6 @@ CallbackStore::~CallbackStore() {
   }
 }
 
-void CallbackStore::SetUid(int32_t uid) { this->uid = uid; }
+void CallbackStore::SetUid(int32_t uid) {
+  this->uid = uid;
+}

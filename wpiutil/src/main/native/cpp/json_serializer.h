@@ -36,6 +36,7 @@ SOFTWARE.
 #include <clocale> // lconv, localeconv
 #include <cmath>  // labs, isfinite, isnan, signbit, ldexp
 #include <locale> // locale
+#include <type_traits>
 
 #include "wpi/raw_ostream.h"
 
@@ -99,6 +100,18 @@ class json::serializer
     */
     void dump_escaped(StringRef s, const bool ensure_ascii);
 
+    template <typename NumberType,
+              detail::enable_if_t<std::is_same_v<NumberType, uint64_t>, int> = 0>
+    bool is_negative_integer(NumberType x) {
+      return false;
+    }
+
+    template <typename NumberType,
+              detail::enable_if_t<std::is_same_v<NumberType, int64_t>, int> = 0>
+    bool is_negative_integer(NumberType x) {
+      return x < 0;
+    }
+
     /*!
     @brief dump an integer
 
@@ -121,7 +134,7 @@ class json::serializer
             return;
         }
 
-        const bool is_negative = (x <= 0) and (x != 0);  // see issue #755
+        const bool is_negative = is_negative_integer(x);  // see issue #755
         std::size_t i = 0;
 
         while (x != 0)

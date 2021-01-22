@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "PDPDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePDPData() {
   static PDPData spd[kNumPDPModules];
   ::hal::SimPDPData = spd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 PDPData* hal::SimPDPData;
 void PDPData::ResetData() {
@@ -30,7 +25,9 @@ void PDPData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetPDPData(int32_t index) { SimPDPData[index].ResetData(); }
+void HALSIM_ResetPDPData(int32_t index) {
+  SimPDPData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PDP##CAPINAME, SimPDPData, \

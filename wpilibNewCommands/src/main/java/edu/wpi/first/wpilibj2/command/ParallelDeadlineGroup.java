@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
@@ -12,23 +9,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A CommandGroup that runs a set of commands in parallel, ending only when a specific command
- * (the "deadline") ends, interrupting all other commands that are still running at that point.
+ * A CommandGroup that runs a set of commands in parallel, ending only when a specific command (the
+ * "deadline") ends, interrupting all other commands that are still running at that point.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  */
 public class ParallelDeadlineGroup extends CommandGroupBase {
-  //maps commands in this group to whether they are still running
+  // maps commands in this group to whether they are still running
   private final Map<Command, Boolean> m_commands = new HashMap<>();
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
   private Command m_deadline;
 
   /**
-   * Creates a new ParallelDeadlineGroup.  The given commands (including the deadline) will be
-   * executed simultaneously.  The CommandGroup will finish when the deadline finishes,
-   * interrupting all other still-running commands.  If the CommandGroup is interrupted, only
-   * the commands still running will be interrupted.
+   * Creates a new ParallelDeadlineGroup. The given commands (including the deadline) will be
+   * executed simultaneously. The CommandGroup will finish when the deadline finishes, interrupting
+   * all other still-running commands. If the CommandGroup is interrupted, only the commands still
+   * running will be interrupted.
    *
    * @param deadline the command that determines when the group ends
    * @param commands the commands to be executed
@@ -42,8 +39,8 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   }
 
   /**
-   * Sets the deadline to the given command.  The deadline is added to the group if it is not
-   * already contained.
+   * Sets the deadline to the given command. The deadline is added to the group if it is not already
+   * contained.
    *
    * @param deadline the command that determines when the group ends
    */
@@ -67,8 +64,8 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
 
     for (Command command : commands) {
       if (!Collections.disjoint(command.getRequirements(), m_requirements)) {
-        throw new IllegalArgumentException("Multiple commands in a parallel group cannot"
-            + "require the same subsystems");
+        throw new IllegalArgumentException(
+            "Multiple commands in a parallel group cannot" + "require the same subsystems");
       }
       m_commands.put(command, false);
       m_requirements.addAll(command.getRequirements());

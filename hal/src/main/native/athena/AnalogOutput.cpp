@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AnalogOutput.h"
 
@@ -28,16 +25,14 @@ static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
                              kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>*
     analogOutputHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogOutput() {
   static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
                                kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>
       aoH;
   analogOutputHandles = &aoH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
@@ -46,7 +41,9 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
   hal::init::CheckInit();
   initializeAnalog(status);
 
-  if (*status != 0) return HAL_kInvalidHandle;
+  if (*status != 0) {
+    return HAL_kInvalidHandle;
+  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
@@ -57,8 +54,9 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
   HAL_AnalogOutputHandle handle =
       analogOutputHandles->Allocate(channel, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   auto port = analogOutputHandles->Get(handle);
   if (port == nullptr) {  // would only error on thread issue
@@ -85,10 +83,11 @@ void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
 
   uint16_t rawValue = static_cast<uint16_t>(voltage / 5.0 * 0x1000);
 
-  if (voltage < 0.0)
+  if (voltage < 0.0) {
     rawValue = 0;
-  else if (voltage > 5.0)
+  } else if (voltage > 5.0) {
     rawValue = 0x1000;
+  }
 
   analogOutputSystem->writeMXP(port->channel, rawValue, status);
 }

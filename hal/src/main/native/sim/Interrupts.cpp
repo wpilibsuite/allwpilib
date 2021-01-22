@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Interrupts.h"
 
@@ -72,8 +69,7 @@ static UnlimitedHandleResource<SynchronousWaitDataHandle, SynchronousWaitData,
                                HAL_HandleEnum::Vendor>*
     synchronousInterruptHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeInterrupts() {
   static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                                HAL_HandleEnum::Interrupt>
@@ -84,8 +80,7 @@ void InitializeInterrupts() {
       siH;
   synchronousInterruptHandles = &siH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
@@ -128,18 +123,30 @@ static void ProcessInterruptDigitalSynchronous(const char* name, void* param,
   SynchronousWaitDataHandle handle =
       static_cast<SynchronousWaitDataHandle>(handleTmp);
   auto interruptData = synchronousInterruptHandles->Get(handle);
-  if (interruptData == nullptr) return;
+  if (interruptData == nullptr) {
+    return;
+  }
   auto interrupt = interruptHandles->Get(interruptData->interruptHandle);
-  if (interrupt == nullptr) return;
+  if (interrupt == nullptr) {
+    return;
+  }
   // Have a valid interrupt
-  if (value->type != HAL_Type::HAL_BOOLEAN) return;
+  if (value->type != HAL_Type::HAL_BOOLEAN) {
+    return;
+  }
   bool retVal = value->data.v_boolean;
   // If no change in interrupt, return;
-  if (retVal == interrupt->previousState) return;
+  if (retVal == interrupt->previousState) {
+    return;
+  }
   // If its a falling change, and we dont fire on falling return
-  if (interrupt->previousState && !interrupt->fireOnDown) return;
+  if (interrupt->previousState && !interrupt->fireOnDown) {
+    return;
+  }
   // If its a rising change, and we dont fire on rising return.
-  if (!interrupt->previousState && !interrupt->fireOnUp) return;
+  if (!interrupt->previousState && !interrupt->fireOnUp) {
+    return;
+  }
 
   interruptData->waitPredicate = true;
 
@@ -161,11 +168,17 @@ static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
   SynchronousWaitDataHandle handle =
       static_cast<SynchronousWaitDataHandle>(handleTmp);
   auto interruptData = synchronousInterruptHandles->Get(handle);
-  if (interruptData == nullptr) return;
+  if (interruptData == nullptr) {
+    return;
+  }
   auto interrupt = interruptHandles->Get(interruptData->interruptHandle);
-  if (interrupt == nullptr) return;
+  if (interrupt == nullptr) {
+    return;
+  }
   // Have a valid interrupt
-  if (value->type != HAL_Type::HAL_DOUBLE) return;
+  if (value->type != HAL_Type::HAL_DOUBLE) {
+    return;
+  }
   int32_t status = 0;
   bool retVal = GetAnalogTriggerValue(interrupt->portHandle,
                                       interrupt->trigType, &status);
@@ -176,11 +189,17 @@ static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
     interruptData->waitCond.notify_all();
   }
   // If no change in interrupt, return;
-  if (retVal == interrupt->previousState) return;
+  if (retVal == interrupt->previousState) {
+    return;
+  }
   // If its a falling change, and we dont fire on falling return
-  if (interrupt->previousState && !interrupt->fireOnDown) return;
+  if (interrupt->previousState && !interrupt->fireOnDown) {
+    return;
+  }
   // If its a rising change, and we dont fire on rising return.
-  if (!interrupt->previousState && !interrupt->fireOnUp) return;
+  if (!interrupt->previousState && !interrupt->fireOnUp) {
+    return;
+  }
 
   interruptData->waitPredicate = true;
 
@@ -207,7 +226,9 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 
   int32_t digitalIndex = GetDigitalInputChannel(interrupt->portHandle, &status);
 
-  if (status != 0) return WaitResult::Timeout;
+  if (status != 0) {
+    return WaitResult::Timeout;
+  }
 
   interrupt->previousState = SimDIOData[digitalIndex].value;
 
@@ -238,7 +259,9 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
   (void)synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
-  if (timedOut) return WaitResult::Timeout;
+  if (timedOut) {
+    return WaitResult::Timeout;
+  }
   // True => false, Falling
   if (interrupt->previousState) {
     // Set our return value and our timestamps
@@ -268,12 +291,16 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
   interrupt->previousState = GetAnalogTriggerValue(
       interrupt->portHandle, interrupt->trigType, &status);
 
-  if (status != 0) return WaitResult::Timeout;
+  if (status != 0) {
+    return WaitResult::Timeout;
+  }
 
   int32_t analogIndex =
       GetAnalogTriggerInputIndex(interrupt->portHandle, &status);
 
-  if (status != 0) return WaitResult::Timeout;
+  if (status != 0) {
+    return WaitResult::Timeout;
+  }
 
   int32_t uid = SimAnalogInData[analogIndex].voltage.RegisterCallback(
       &ProcessInterruptAnalogSynchronous,
@@ -302,7 +329,9 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
   (void)synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
-  if (timedOut) return WaitResult::Timeout;
+  if (timedOut) {
+    return WaitResult::Timeout;
+  }
   // True => false, Falling
   if (interrupt->previousState) {
     // Set our return value and our timestamps
@@ -345,28 +374,40 @@ static void ProcessInterruptDigitalAsynchronous(const char* name, void* param,
   uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   HAL_InterruptHandle handle = static_cast<HAL_InterruptHandle>(handleTmp);
   auto interrupt = interruptHandles->Get(handle);
-  if (interrupt == nullptr) return;
+  if (interrupt == nullptr) {
+    return;
+  }
   // Have a valid interrupt
-  if (value->type != HAL_Type::HAL_BOOLEAN) return;
+  if (value->type != HAL_Type::HAL_BOOLEAN) {
+    return;
+  }
   bool retVal = value->data.v_boolean;
   // If no change in interrupt, return;
-  if (retVal == interrupt->previousState) return;
+  if (retVal == interrupt->previousState) {
+    return;
+  }
   int32_t mask = 0;
   if (interrupt->previousState) {
     interrupt->previousState = retVal;
     interrupt->fallingTimestamp = hal::GetFPGATime();
     mask = 1 << (8 + interrupt->index);
-    if (!interrupt->fireOnDown) return;
+    if (!interrupt->fireOnDown) {
+      return;
+    }
   } else {
     interrupt->previousState = retVal;
     interrupt->risingTimestamp = hal::GetFPGATime();
     mask = 1 << (interrupt->index);
-    if (!interrupt->fireOnUp) return;
+    if (!interrupt->fireOnUp) {
+      return;
+    }
   }
 
   // run callback
   auto callback = interrupt->callbackFunction;
-  if (callback == nullptr) return;
+  if (callback == nullptr) {
+    return;
+  }
   callback(mask, interrupt->callbackParam);
 }
 
@@ -377,31 +418,45 @@ static void ProcessInterruptAnalogAsynchronous(const char* name, void* param,
   uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   HAL_InterruptHandle handle = static_cast<HAL_InterruptHandle>(handleTmp);
   auto interrupt = interruptHandles->Get(handle);
-  if (interrupt == nullptr) return;
+  if (interrupt == nullptr) {
+    return;
+  }
   // Have a valid interrupt
-  if (value->type != HAL_Type::HAL_DOUBLE) return;
+  if (value->type != HAL_Type::HAL_DOUBLE) {
+    return;
+  }
   int32_t status = 0;
   bool retVal = GetAnalogTriggerValue(interrupt->portHandle,
                                       interrupt->trigType, &status);
-  if (status != 0) return;
+  if (status != 0) {
+    return;
+  }
   // If no change in interrupt, return;
-  if (retVal == interrupt->previousState) return;
+  if (retVal == interrupt->previousState) {
+    return;
+  }
   int mask = 0;
   if (interrupt->previousState) {
     interrupt->previousState = retVal;
     interrupt->fallingTimestamp = hal::GetFPGATime();
-    if (!interrupt->fireOnDown) return;
+    if (!interrupt->fireOnDown) {
+      return;
+    }
     mask = 1 << (8 + interrupt->index);
   } else {
     interrupt->previousState = retVal;
     interrupt->risingTimestamp = hal::GetFPGATime();
-    if (!interrupt->fireOnUp) return;
+    if (!interrupt->fireOnUp) {
+      return;
+    }
     mask = 1 << (interrupt->index);
   }
 
   // run callback
   auto callback = interrupt->callbackFunction;
-  if (callback == nullptr) return;
+  if (callback == nullptr) {
+    return;
+  }
   callback(mask, interrupt->callbackParam);
 }
 
@@ -409,7 +464,9 @@ static void EnableInterruptsDigital(HAL_InterruptHandle handle,
                                     Interrupt* interrupt) {
   int32_t status = 0;
   int32_t digitalIndex = GetDigitalInputChannel(interrupt->portHandle, &status);
-  if (status != 0) return;
+  if (status != 0) {
+    return;
+  }
 
   interrupt->previousState = SimDIOData[digitalIndex].value;
 
@@ -424,12 +481,16 @@ static void EnableInterruptsAnalog(HAL_InterruptHandle handle,
   int32_t status = 0;
   int32_t analogIndex =
       GetAnalogTriggerInputIndex(interrupt->portHandle, &status);
-  if (status != 0) return;
+  if (status != 0) {
+    return;
+  }
 
   status = 0;
   interrupt->previousState = GetAnalogTriggerValue(
       interrupt->portHandle, interrupt->trigType, &status);
-  if (status != 0) return;
+  if (status != 0) {
+    return;
+  }
 
   int32_t uid = SimAnalogInData[analogIndex].voltage.RegisterCallback(
       &ProcessInterruptAnalogAsynchronous,
@@ -472,20 +533,26 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
   }
 
   // No need to disable if we are already disabled
-  if (interrupt->callbackId < 0) return;
+  if (interrupt->callbackId < 0) {
+    return;
+  }
 
   if (interrupt->isAnalog) {
     // Do analog
     int32_t status = 0;
     int32_t analogIndex =
         GetAnalogTriggerInputIndex(interrupt->portHandle, &status);
-    if (status != 0) return;
+    if (status != 0) {
+      return;
+    }
     SimAnalogInData[analogIndex].voltage.CancelCallback(interrupt->callbackId);
   } else {
     int32_t status = 0;
     int32_t digitalIndex =
         GetDigitalInputChannel(interrupt->portHandle, &status);
-    if (status != 0) return;
+    if (status != 0) {
+      return;
+    }
     SimDIOData[digitalIndex].value.CancelCallback(interrupt->callbackId);
   }
   interrupt->callbackId = -1;

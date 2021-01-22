@@ -1,0 +1,146 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+
+    apply plugin: 'cpp'
+    if (OperatingSystem.current().isMacOsX()) {
+        apply plugin: 'objective-cpp'
+    }
+    apply plugin: 'visual-studio'
+    apply plugin: 'edu.wpi.first.NativeUtils'
+
+    ext {
+        nativeName = 'wpigui'
+    }
+
+    apply from: "${rootDir}/shared/config.gradle"
+
+    nativeUtils.exportsConfigs {
+        wpigui {
+            x86ExcludeSymbols = [
+                '_CT??_R0?AV_System_error',
+                '_CT??_R0?AVexception',
+                '_CT??_R0?AVfailure',
+                '_CT??_R0?AVruntime_error',
+                '_CT??_R0?AVsystem_error',
+                '_CTA5?AVfailure',
+                '_TI5?AVfailure',
+                '_CT??_R0?AVout_of_range',
+                '_CTA3?AVout_of_range',
+                '_TI3?AVout_of_range',
+                '_CT??_R0?AVbad_cast'
+            ]
+            x64ExcludeSymbols = [
+                '_CT??_R0?AV_System_error',
+                '_CT??_R0?AVexception',
+                '_CT??_R0?AVfailure',
+                '_CT??_R0?AVruntime_error',
+                '_CT??_R0?AVsystem_error',
+                '_CTA5?AVfailure',
+                '_TI5?AVfailure',
+                '_CT??_R0?AVout_of_range',
+                '_CTA3?AVout_of_range',
+                '_TI3?AVout_of_range',
+                '_CT??_R0?AVbad_cast'
+            ]
+        }
+    }
+
+    model {
+        components {
+            "${nativeName}"(NativeLibrarySpec) {
+                sources {
+                    cpp {
+                        source {
+                            srcDirs "src/main/native/cpp"
+                            include '*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/main/native/include'
+                        }
+                    }
+                }
+                binaries.all {
+                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                    if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                        it.buildable = false
+                        return
+                    }
+                    if (it.targetPlatform.operatingSystem.isWindows()) {
+                        it.sources {
+                            wpiguiWindowsCpp(CppSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/directx11'
+                                    include '*.cpp'
+                                }
+                            }
+                        }
+                    } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                        it.sources {
+                            wpiguiMacObjectiveCpp(ObjectiveCppSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/metal'
+                                    include '*.mm'
+                                }
+                            }
+                        }
+                    } else {
+                        it.sources {
+                            wpiguiUnixCpp(CppSourceSet) {
+                                source {
+                                    srcDirs 'src/main/native/opengl3'
+                                    include '*.cpp'
+                                }
+                            }
+                        }
+                    }
+                    it.sources.each {
+                        it.exportedHeaders {
+                            srcDirs 'src/main/native/include'
+                        }
+                    }
+                }
+            }
+            // By default, a development executable will be generated. This is to help the case of
+            // testing specific functionality of the library.
+            "${nativeName}Dev"(NativeExecutableSpec) {
+                targetBuildTypes 'debug'
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/dev/native/cpp'
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/dev/native/include'
+                        }
+                    }
+                }
+                binaries.all {
+                    lib library: 'wpigui'
+                    nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                }
+            }
+        }
+        binaries {
+            all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                    it.buildable = false
+                    return
+                }
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                } else {
+                    it.linker.args << '-lX11'
+                }
+            }
+            withType(SharedLibraryBinarySpec) {
+                buildable = false
+            }
+        }
+    }
+
+    apply from: 'publish.gradle'
+}

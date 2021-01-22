@@ -1,25 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.command;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests the {@link Command} library.
- */
+/** Tests the {@link Command} library. */
 public class DefaultCommandTest extends AbstractCommandTest {
-  /**
-   * Testing of default commands where the interrupting command ends itself.
-   */
+  /** Testing of default commands where the interrupting command ends itself. */
   @Test
   void defaultCommandWhereTheInteruptingCommandEndsItselfTest() {
     final ASubsystem subsystem = new ASubsystem();
-
 
     final MockCommand defaultCommand = new MockCommand(subsystem);
 
@@ -61,10 +53,7 @@ public class DefaultCommandTest extends AbstractCommandTest {
     assertCommandState(anotherCommand, 1, 3, 3, 1, 0);
   }
 
-
-  /**
-   * Testing of default commands where the interrupting command is canceled.
-   */
+  /** Testing of default commands where the interrupting command is canceled. */
   @Test
   void defaultCommandsInterruptingCommandCanceledTest() {
     final ASubsystem subsystem = new ASubsystem();
@@ -107,5 +96,4 @@ public class DefaultCommandTest extends AbstractCommandTest {
     assertCommandState(defaultCommand, 2, 5, 5, 0, 1);
     assertCommandState(anotherCommand, 1, 2, 2, 0, 1);
   }
-
 }

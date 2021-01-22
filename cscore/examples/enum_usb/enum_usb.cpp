@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
@@ -19,8 +16,9 @@ int main() {
                 << ")\n";
     if (!caminfo.otherPaths.empty()) {
       wpi::outs() << "Other device paths:\n";
-      for (auto&& path : caminfo.otherPaths)
+      for (auto&& path : caminfo.otherPaths) {
         wpi::outs() << "  " << path << '\n';
+      }
     }
 
     cs::UsbCamera camera{"usbcam", caminfo.dev};
@@ -48,7 +46,9 @@ int main() {
                       << "value=" << prop.Get();
           auto choices = prop.GetChoices();
           for (size_t i = 0; i < choices.size(); ++i) {
-            if (choices[i].empty()) continue;
+            if (choices[i].empty()) {
+              continue;
+            }
             wpi::outs() << "\n    " << i << ": " << choices[i];
           }
           break;

@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "AnalogTriggerDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogTriggerData() {
   static AnalogTriggerData satd[kNumAnalogTriggers];
   ::hal::SimAnalogTriggerData = satd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 AnalogTriggerData* hal::SimAnalogTriggerData;
 void AnalogTriggerData::ResetData() {
@@ -32,8 +27,9 @@ extern "C" {
 int32_t HALSIM_FindAnalogTriggerForChannel(int32_t channel) {
   for (int i = 0; i < kNumAnalogTriggers; ++i) {
     if (SimAnalogTriggerData[i].initialized &&
-        SimAnalogTriggerData[i].inputPort == channel)
+        SimAnalogTriggerData[i].inputPort == channel) {
       return i;
+    }
   }
   return -1;
 }

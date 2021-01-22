@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -31,7 +28,7 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
     return m_value;
   }
 
-  LLVM_ATTRIBUTE_ALWAYS_INLINE operator T() const { return Get(); }
+  LLVM_ATTRIBUTE_ALWAYS_INLINE operator T() const { return Get(); }  // NOLINT
 
   void Reset(T value) {
     std::scoped_lock lock(m_mutex);
@@ -46,14 +43,16 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
                              HAL_Bool initialNotify, const char* name) {
     std::unique_lock lock(m_mutex);
     int32_t newUid = DoRegister(reinterpret_cast<RawFunctor>(callback), param);
-    if (newUid == -1) return -1;
+    if (newUid == -1) {
+      return -1;
+    }
     if (initialNotify) {
       // We know that the callback is not null because of earlier null check
       HAL_Value value = MakeValue(m_value);
       lock.unlock();
       callback(name, param, &value);
     }
-    return newUid + 1;
+    return newUid;
   }
 
   void DoSet(T value, const char* name) {
@@ -62,9 +61,10 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
       m_value = value;
       if (m_callbacks) {
         HAL_Value halValue = MakeValue(value);
-        for (auto&& cb : *m_callbacks)
+        for (auto&& cb : *m_callbacks) {
           reinterpret_cast<HAL_NotifyCallback>(cb.callback)(name, cb.param,
                                                             &halValue);
+        }
       }
     }
   }

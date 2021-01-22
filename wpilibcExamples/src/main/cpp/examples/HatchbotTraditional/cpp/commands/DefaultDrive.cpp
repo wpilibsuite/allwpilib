@@ -1,16 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "commands/DefaultDrive.h"
+
+#include <utility>
 
 DefaultDrive::DefaultDrive(DriveSubsystem* subsystem,
                            std::function<double()> forward,
                            std::function<double()> rotation)
-    : m_drive{subsystem}, m_forward{forward}, m_rotation{rotation} {
+    : m_drive{subsystem},
+      m_forward{std::move(forward)},
+      m_rotation{std::move(rotation)} {
   AddRequirements({subsystem});
 }
 

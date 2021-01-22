@@ -1,23 +1,26 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_Joystick.h"
+
+#include <atomic>
 
 #include <hal/Ports.h>
 #include <hal/simulation/DriverStationData.h>
 
 namespace wpilibws {
 
+extern std::atomic<bool>* gDSSocketConnected;
+
 void HALSimWSProviderJoystick::Initialize(WSRegisterFunc webregisterFunc) {
   CreateProviders<HALSimWSProviderJoystick>("Joystick", HAL_kMaxJoysticks,
                                             webregisterFunc);
 }
 
-HALSimWSProviderJoystick::~HALSimWSProviderJoystick() { CancelCallbacks(); }
+HALSimWSProviderJoystick::~HALSimWSProviderJoystick() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderJoystick::RegisterCallbacks() {
   m_dsNewDataCbKey = HALSIM_RegisterDriverStationNewDataCallback(
@@ -53,9 +56,19 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
           buttonsValues.push_back(((buttons.buttons >> i) & 0x1) == 1);
         }
 
+        // Rumble data
+        int64_t outputs = 0;
+        int32_t leftRumble = 0;
+        int32_t rightRumble = 0;
+        HALSIM_GetJoystickOutputs(provider->GetChannel(), &outputs, &leftRumble,
+                                  &rightRumble);
+
         payload[">axes"] = axesValues;
         payload[">povs"] = povsValues;
         payload[">buttons"] = buttonsValues;
+        payload["<outputs"] = outputs;
+        payload["<rumble_left"] = leftRumble;
+        payload["<rumble_right"] = rightRumble;
 
         provider->ProcessHalCallback(payload);
       },
@@ -63,17 +76,27 @@ void HALSimWSProviderJoystick::RegisterCallbacks() {
 }
 
 void HALSimWSProviderJoystick::CancelCallbacks() {
+  DoCancelCallbacks();
+}
+
+void HALSimWSProviderJoystick::DoCancelCallbacks() {
   HALSIM_CancelDriverStationNewDataCallback(m_dsNewDataCbKey);
 
   m_dsNewDataCbKey = 0;
 }
 
 void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
+  // ignore if DS connected
+  if (gDSSocketConnected && *gDSSocketConnected) {
+    return;
+  }
+
   wpi::json::const_iterator it;
   if ((it = json.find(">axes")) != json.end()) {
     HAL_JoystickAxes axes{};
     axes.count =
-        std::min(it.value().size(), (wpi::json::size_type)HAL_kMaxJoystickAxes);
+        std::min(it.value().size(),
+                 static_cast<wpi::json::size_type>(HAL_kMaxJoystickAxes));
     for (int i = 0; i < axes.count; i++) {
       axes.axes[i] = it.value()[i];
     }
@@ -83,10 +106,11 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
 
   if ((it = json.find(">buttons")) != json.end()) {
     HAL_JoystickButtons buttons{};
-    buttons.count = std::min(it.value().size(), (wpi::json::size_type)32);
+    buttons.count =
+        std::min(it.value().size(), static_cast<wpi::json::size_type>(32));
     for (int i = 0; i < buttons.count; i++) {
       if (it.value()[i]) {
-        buttons.buttons |= 1 << (i - 1);
+        buttons.buttons |= 1 << i;
       }
     }
 
@@ -96,7 +120,8 @@ void HALSimWSProviderJoystick::OnNetValueChanged(const wpi::json& json) {
   if ((it = json.find(">povs")) != json.end()) {
     HAL_JoystickPOVs povs{};
     povs.count =
-        std::min(it.value().size(), (wpi::json::size_type)HAL_kMaxJoystickPOVs);
+        std::min(it.value().size(),
+                 static_cast<wpi::json::size_type>(HAL_kMaxJoystickPOVs));
     for (int i = 0; i < povs.count; i++) {
       povs.povs[i] = it.value()[i];
     }

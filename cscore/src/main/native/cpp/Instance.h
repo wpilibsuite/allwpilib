@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_INSTANCE_H_
 #define CSCORE_INSTANCE_H_
@@ -26,7 +23,7 @@ namespace cs {
 
 struct SourceData {
   SourceData(CS_SourceKind kind_, std::shared_ptr<SourceImpl> source_)
-      : kind{kind_}, refCount{0}, source{source_} {}
+      : kind{kind_}, refCount{0}, source{std::move(source_)} {}
 
   CS_SourceKind kind;
   std::atomic_int refCount;
@@ -35,7 +32,7 @@ struct SourceData {
 
 struct SinkData {
   explicit SinkData(CS_SinkKind kind_, std::shared_ptr<SinkImpl> sink_)
-      : kind{kind_}, refCount{0}, sourceHandle{0}, sink{sink_} {}
+      : kind{kind_}, refCount{0}, sourceHandle{0}, sink{std::move(sink_)} {}
 
   CS_SinkKind kind;
   std::atomic_int refCount;
@@ -101,7 +98,9 @@ class Instance {
       CS_Source source, wpi::SmallVectorImpl<CS_Sink>& vec) {
     vec.clear();
     m_sinks.ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
-      if (source == data.sourceHandle.load()) vec.push_back(sinkHandle);
+      if (source == data.sourceHandle.load()) {
+        vec.push_back(sinkHandle);
+      }
     });
     return vec;
   }

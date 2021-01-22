@@ -1,20 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.kinematics;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class SwerveDriveOdometryTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -25,29 +21,32 @@ class SwerveDriveOdometryTest {
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(m_fl, m_fr, m_bl, m_br);
 
-  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(m_kinematics,
-      new Rotation2d());
+  private final SwerveDriveOdometry m_odometry =
+      new SwerveDriveOdometry(m_kinematics, new Rotation2d());
 
   @Test
   void testTwoIterations() {
     // 5 units/sec  in the x axis (forward)
     final SwerveModuleState[] wheelSpeeds = {
-        new SwerveModuleState(5, Rotation2d.fromDegrees(0)),
-        new SwerveModuleState(5, Rotation2d.fromDegrees(0)),
-        new SwerveModuleState(5, Rotation2d.fromDegrees(0)),
-        new SwerveModuleState(5, Rotation2d.fromDegrees(0))
+      new SwerveModuleState(5, Rotation2d.fromDegrees(0)),
+      new SwerveModuleState(5, Rotation2d.fromDegrees(0)),
+      new SwerveModuleState(5, Rotation2d.fromDegrees(0)),
+      new SwerveModuleState(5, Rotation2d.fromDegrees(0))
     };
 
-    m_odometry.updateWithTime(0.0, new Rotation2d(),
-        new SwerveModuleState(), new SwerveModuleState(),
-        new SwerveModuleState(), new SwerveModuleState());
+    m_odometry.updateWithTime(
+        0.0,
+        new Rotation2d(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState());
     var pose = m_odometry.updateWithTime(0.10, new Rotation2d(), wheelSpeeds);
 
     assertAll(
         () -> assertEquals(5.0 / 10.0, pose.getX(), 0.01),
         () -> assertEquals(0, pose.getY(), 0.01),
-        () -> assertEquals(0.0, pose.getRotation().getDegrees(), 0.01)
-    );
+        () -> assertEquals(0.0, pose.getRotation().getDegrees(), 0.01));
   }
 
   @Test
@@ -59,10 +58,10 @@ class SwerveDriveOdometryTest {
     //        Module 3: speed 42.14888838624436 angle -26.565051177077986
 
     final SwerveModuleState[] wheelSpeeds = {
-        new SwerveModuleState(18.85, Rotation2d.fromDegrees(90.0)),
-        new SwerveModuleState(42.15, Rotation2d.fromDegrees(26.565)),
-        new SwerveModuleState(18.85, Rotation2d.fromDegrees(-90)),
-        new SwerveModuleState(42.15, Rotation2d.fromDegrees(-26.565))
+      new SwerveModuleState(18.85, Rotation2d.fromDegrees(90.0)),
+      new SwerveModuleState(42.15, Rotation2d.fromDegrees(26.565)),
+      new SwerveModuleState(18.85, Rotation2d.fromDegrees(-90)),
+      new SwerveModuleState(42.15, Rotation2d.fromDegrees(-26.565))
     };
     final var zero = new SwerveModuleState();
 
@@ -72,8 +71,7 @@ class SwerveDriveOdometryTest {
     assertAll(
         () -> assertEquals(12.0, pose.getX(), 0.01),
         () -> assertEquals(12.0, pose.getY(), 0.01),
-        () -> assertEquals(90.0, pose.getRotation().getDegrees(), 0.01)
-    );
+        () -> assertEquals(90.0, pose.getRotation().getDegrees(), 0.01));
   }
 
   @Test
@@ -89,8 +87,6 @@ class SwerveDriveOdometryTest {
     assertAll(
         () -> assertEquals(1.0, pose.getX(), 0.1),
         () -> assertEquals(0.00, pose.getY(), 0.1),
-        () -> assertEquals(0.00, pose.getRotation().getRadians(), 0.1)
-    );
+        () -> assertEquals(0.00, pose.getRotation().getRadians(), 0.1));
   }
-
 }

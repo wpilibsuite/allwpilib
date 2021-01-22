@@ -36,17 +36,18 @@ CoreUI                wpiutil/src/main/native/resources/coreui-*
 Feather Icons         wpiutil/src/main/native/resources/feather-*
 jQuery                wpiutil/src/main/native/resources/jquery-*
 popper.js             wpiutil/src/main/native/resources/popper-*
-units                 wpiutil/src/main/native/include/units/
-Eigen                 wpiutil/src/main/native/eigeninclude/
+units                 wpimath/src/main/native/include/units/
+Eigen                 wpimath/src/main/native/eigeninclude/
+                      wpimath/src/main/native/include/unsupported/
 StackWalker           wpiutil/src/main/native/windows/StackWalker.*
 Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineParameterizer.java
                       wpilibj/src/main/java/edu/wpi/first/wpilibj/trajectory/TrajectoryParameterizer.java
                       wpilibc/src/main/native/include/spline/SplineParameterizer.h
                       wpilibc/src/main/native/include/trajectory/TrajectoryParameterizer.h
                       wpilibc/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
-Portable File Dialogs simulation/halsim_gui/src/main/native/include/portable-file-dialogs.h
-Drake                 wpiutil/src/main/native/cpp/drake/drake_assert_and_throw.cpp
-                      wpiutil/src/main/native/cpp/drake/discrete_algebraic_riccati_equation.cpp
+Portable File Dialogs wpigui/src/main/native/include/portable-file-dialogs.h
+Drake                 wpimath/src/main/native/cpp/drake/common/drake_assert_and_throw.cpp
+                      wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
 
 
 ==============================================================================
@@ -844,3 +845,14 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=====================
+Portable File Dialogs
+=====================
+Copyright © 2018—2020 Sam Hocevar <sam@hocevar.net>
+
+This library is free software. It comes without any warranty, to
+the extent permitted by applicable law. You can redistribute it
+and/or modify it under the terms of the Do What the **** You Want
+to Public License, Version 2, as published by the WTFPL Task Force.
+See http://www.wtfpl.net/ for more details.

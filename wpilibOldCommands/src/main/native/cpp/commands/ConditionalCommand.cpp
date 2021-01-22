@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/commands/ConditionalCommand.h"
 
@@ -13,12 +10,14 @@ using namespace frc;
 
 static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
   if (onTrue != nullptr) {
-    for (auto requirement : onTrue->GetRequirements())
+    for (auto requirement : onTrue->GetRequirements()) {
       command.Requires(requirement);
+    }
   }
   if (onFalse != nullptr) {
-    for (auto requirement : onFalse->GetRequirements())
+    for (auto requirement : onFalse->GetRequirements()) {
       command.Requires(requirement);
+    }
   }
 }
 
@@ -46,7 +45,7 @@ void ConditionalCommand::_Initialize() {
   }
 
   if (m_chosenCommand != nullptr) {
-    // This is a hack to make cancelling the chosen command inside a
+    // This is a hack to make canceling the chosen command inside a
     // CommandGroup work properly
     m_chosenCommand->ClearRequirements();
 

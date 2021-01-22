@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -59,7 +56,7 @@ template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
 THandle IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     int16_t index, int32_t* status) {
-  // don't aquire the lock if we can fail early.
+  // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
@@ -84,7 +81,7 @@ IndexedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
     return nullptr;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
-  // return structure. Null will propogate correctly, so no need to manually
+  // return structure. Null will propagate correctly, so no need to manually
   // check.
   return m_structures[index];
 }
@@ -95,7 +92,9 @@ void IndexedHandleResource<THandle, TStruct, size, enumValue>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = GetIndex(handle);
-  if (index < 0 || index >= size) return;
+  if (index < 0 || index >= size) {
+    return;
+  }
   // lock and deallocated handle
   std::scoped_lock lock(m_handleMutexes[index]);
   m_structures[index].reset();

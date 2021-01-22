@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal.can;
 
@@ -17,9 +14,10 @@ public final class CANExceptionFactory {
   static final int ERR_CANSessionMux_NotAllowed = -44088;
   static final int ERR_CANSessionMux_NotInitialized = -44089;
 
-  @SuppressWarnings({"JavadocMethod", "PMD.CyclomaticComplexity"})
-  public static void checkStatus(int status, int messageID) throws CANInvalidBufferException,
-      CANMessageNotAllowedException, CANNotInitializedException, UncleanStatusException {
+  @SuppressWarnings({"MissingJavadocMethod", "PMD.CyclomaticComplexity"})
+  public static void checkStatus(int status, int messageID)
+      throws CANInvalidBufferException, CANMessageNotAllowedException, CANNotInitializedException,
+          UncleanStatusException {
     switch (status) {
       case NIRioStatus.kRioStatusSuccess:
         // Everything is ok... don't throw.
@@ -41,7 +39,5 @@ public final class CANExceptionFactory {
     }
   }
 
-  private CANExceptionFactory() {
-
-  }
+  private CANExceptionFactory() {}
 }

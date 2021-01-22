@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/smartdashboard/SmartDashboard.h"
 
@@ -43,7 +40,9 @@ Singleton& Singleton::GetInstance() {
   return instance;
 }
 
-void SmartDashboard::init() { Singleton::GetInstance(); }
+void SmartDashboard::init() {
+  Singleton::GetInstance();
+}
 
 bool SmartDashboard::ContainsKey(wpi::StringRef key) {
   return Singleton::GetInstance().table->ContainsKey(key);
@@ -109,7 +108,9 @@ void SmartDashboard::PutData(Sendable* value) {
     return;
   }
   auto name = SendableRegistry::GetInstance().GetName(value);
-  if (!name.empty()) PutData(name, value);
+  if (!name.empty()) {
+    PutData(name, value);
+  }
 }
 
 Sendable* SmartDashboard::GetData(wpi::StringRef key) {
@@ -257,7 +258,9 @@ void SmartDashboard::PostListenerTask(std::function<void()> task) {
 void SmartDashboard::UpdateValues() {
   auto& registry = SendableRegistry::GetInstance();
   auto& inst = Singleton::GetInstance();
-  std::scoped_lock lock(inst.tablesToDataMutex);
-  for (auto& i : inst.tablesToData) registry.Update(i.getValue());
   listenerExecutor.RunListenerTasks();
+  std::scoped_lock lock(inst.tablesToDataMutex);
+  for (auto& i : inst.tablesToData) {
+    registry.Update(i.getValue());
+  }
 }

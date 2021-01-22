@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/SafeThread.h"
 
@@ -12,7 +9,9 @@ using namespace wpi;
 detail::SafeThreadProxyBase::SafeThreadProxyBase(
     std::shared_ptr<SafeThread> thr)
     : m_thread(std::move(thr)) {
-  if (!m_thread) return;
+  if (!m_thread) {
+    return;
+  }
   m_lock = std::unique_lock<wpi::mutex>(m_thread->m_mutex);
   if (!m_thread->m_active) {
     m_lock.unlock();
@@ -22,15 +21,18 @@ detail::SafeThreadProxyBase::SafeThreadProxyBase(
 }
 
 detail::SafeThreadOwnerBase::~SafeThreadOwnerBase() {
-  if (m_joinAtExit)
+  if (m_joinAtExit) {
     Join();
-  else
+  } else {
     Stop();
+  }
 }
 
 void detail::SafeThreadOwnerBase::Start(std::shared_ptr<SafeThread> thr) {
   std::scoped_lock lock(m_mutex);
-  if (auto thr = m_thread.lock()) return;
+  if (auto thr = m_thread.lock()) {
+    return;
+  }
   m_stdThread = std::thread([=] { thr->Main(); });
   thr->m_threadId = m_stdThread.get_id();
   m_thread = thr;
@@ -43,7 +45,9 @@ void detail::SafeThreadOwnerBase::Stop() {
     thr->m_cond.notify_all();
     m_thread.reset();
   }
-  if (m_stdThread.joinable()) m_stdThread.detach();
+  if (m_stdThread.joinable()) {
+    m_stdThread.detach();
+  }
 }
 
 void detail::SafeThreadOwnerBase::Join() {
@@ -62,7 +66,9 @@ void detail::SafeThreadOwnerBase::Join() {
 
 void detail::swap(SafeThreadOwnerBase& lhs, SafeThreadOwnerBase& rhs) noexcept {
   using std::swap;
-  if (&lhs == &rhs) return;
+  if (&lhs == &rhs) {
+    return;
+  }
   std::scoped_lock lock(lhs.m_mutex, rhs.m_mutex);
   std::swap(lhs.m_stdThread, rhs.m_stdThread);
   std::swap(lhs.m_thread, rhs.m_thread);

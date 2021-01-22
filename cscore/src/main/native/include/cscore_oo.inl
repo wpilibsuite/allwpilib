@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_CSCORE_OO_INL_
 #define CSCORE_CSCORE_OO_INL_
@@ -11,6 +8,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "cscore_oo.h"
 
 namespace cs {
 
@@ -72,15 +71,16 @@ inline std::vector<std::string> VideoProperty::GetChoices() const {
 
 inline VideoProperty::VideoProperty(CS_Property handle) : m_handle(handle) {
   m_status = 0;
-  if (handle == 0)
+  if (handle == 0) {
     m_kind = kNone;
-  else
+  } else {
     m_kind =
         static_cast<Kind>(static_cast<int>(GetPropertyKind(handle, &m_status)));
+  }
 }
 
 inline VideoProperty::VideoProperty(CS_Property handle, Kind kind)
-    : m_status(0), m_handle(handle), m_kind(kind) {}
+    : m_handle(handle), m_kind(kind) {}
 
 inline VideoSource::VideoSource(const VideoSource& source)
     : m_handle(source.m_handle == 0 ? 0
@@ -97,7 +97,9 @@ inline VideoSource& VideoSource::operator=(VideoSource other) noexcept {
 
 inline VideoSource::~VideoSource() {
   m_status = 0;
-  if (m_handle != 0) ReleaseSource(m_handle, &m_status);
+  if (m_handle != 0) {
+    ReleaseSource(m_handle, &m_status);
+  }
 }
 
 inline VideoSource::Kind VideoSource::GetKind() const {
@@ -312,7 +314,9 @@ inline HttpCamera::HttpCamera(const wpi::Twine& name,
                               HttpCameraKind kind) {
   std::vector<std::string> vec;
   vec.reserve(urls.size());
-  for (const auto& url : urls) vec.emplace_back(url);
+  for (const auto& url : urls) {
+    vec.emplace_back(url);
+  }
   m_handle = CreateHttpCamera(
       name, vec, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
@@ -333,7 +337,9 @@ template <typename T>
 inline void HttpCamera::SetUrls(std::initializer_list<T> urls) {
   std::vector<std::string> vec;
   vec.reserve(urls.size());
-  for (const auto& url : urls) vec.emplace_back(url);
+  for (const auto& url : urls) {
+    vec.emplace_back(url);
+  }
   m_status = 0;
   ::cs::SetHttpCameraUrls(m_handle, vec, &m_status);
 }
@@ -351,8 +357,9 @@ inline std::vector<std::string> AxisCamera::HostToUrl(
     wpi::ArrayRef<std::string> hosts) {
   std::vector<std::string> rv;
   rv.reserve(hosts.size());
-  for (const auto& host : hosts)
+  for (const auto& host : hosts) {
     rv.emplace_back(HostToUrl(wpi::StringRef{host}));
+  }
   return rv;
 }
 
@@ -361,8 +368,9 @@ inline std::vector<std::string> AxisCamera::HostToUrl(
     std::initializer_list<T> hosts) {
   std::vector<std::string> rv;
   rv.reserve(hosts.size());
-  for (const auto& host : hosts)
+  for (const auto& host : hosts) {
     rv.emplace_back(HostToUrl(wpi::StringRef{host}));
+  }
   return rv;
 }
 
@@ -460,7 +468,9 @@ inline void ImageSource::SetEnumPropertyChoices(
     const VideoProperty& property, std::initializer_list<T> choices) {
   std::vector<std::string> vec;
   vec.reserve(choices.size());
-  for (const auto& choice : choices) vec.emplace_back(choice);
+  for (const auto& choice : choices) {
+    vec.emplace_back(choice);
+  }
   m_status = 0;
   SetSourceEnumPropertyChoices(m_handle, property.m_handle, vec, &m_status);
 }
@@ -479,7 +489,9 @@ inline VideoSink& VideoSink::operator=(VideoSink other) noexcept {
 
 inline VideoSink::~VideoSink() {
   m_status = 0;
-  if (m_handle != 0) ReleaseSink(m_handle, &m_status);
+  if (m_handle != 0) {
+    ReleaseSink(m_handle, &m_status);
+  }
 }
 
 inline VideoSink::Kind VideoSink::GetKind() const {
@@ -504,10 +516,11 @@ inline VideoProperty VideoSink::GetProperty(const wpi::Twine& name) {
 
 inline void VideoSink::SetSource(VideoSource source) {
   m_status = 0;
-  if (!source)
+  if (!source) {
     SetSinkSource(m_handle, 0, &m_status);
-  else
+  } else {
     SetSinkSource(m_handle, source.m_handle, &m_status);
+  }
 }
 
 inline VideoSource VideoSink::GetSource() const {
@@ -628,7 +641,9 @@ inline VideoListener& VideoListener::operator=(VideoListener&& other) noexcept {
 
 inline VideoListener::~VideoListener() {
   CS_Status status = 0;
-  if (m_handle != 0) RemoveListener(m_handle, &status);
+  if (m_handle != 0) {
+    RemoveListener(m_handle, &status);
+  }
 }
 
 }  // namespace cs

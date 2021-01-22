@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -28,8 +25,8 @@ class DigitalSource : public InterruptableSensorBase {
   DigitalSource(DigitalSource&&) = default;
   DigitalSource& operator=(DigitalSource&&) = default;
 
-  virtual HAL_Handle GetPortHandleForRouting() const = 0;
-  virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
+  HAL_Handle GetPortHandleForRouting() const override = 0;
+  AnalogTriggerType GetAnalogTriggerTypeForRouting() const override = 0;
   virtual bool IsAnalogTrigger() const = 0;
   virtual int GetChannel() const = 0;
 };

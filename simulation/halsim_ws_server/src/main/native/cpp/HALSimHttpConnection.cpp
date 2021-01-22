@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "HALSimHttpConnection.h"
 
@@ -19,15 +16,12 @@
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Request.h>
 
-#include "HALSimWSServer.h"
-
 namespace uv = wpi::uv;
 
-namespace wpilibws {
+using namespace wpilibws;
 
 bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
-  auto hws = HALSimWeb::GetInstance();
-  if (m_request.GetUrl() != hws->GetServerUri()) {
+  if (m_request.GetUrl() != m_server->GetServerUri()) {
     MySendError(404, "invalid websocket address");
     return false;
   }
@@ -39,21 +33,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
   m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
     conn.disconnect();  // one-shot
 
-    m_buffers = std::make_unique<BufferPool>();
-    m_exec =
-        UvExecFunc::Create(m_stream.GetLoop(), [](auto out, LoopFunc func) {
-          func();
-          out.set_value();
-        });
-
-    auto hws = HALSimWeb::GetInstance();
-    if (!hws) {
-      Log(503);
-      m_websocket->Fail(503, "HALSimWeb unavailable");
-      return;
-    }
-
-    if (!hws->RegisterWebsocket(shared_from_this())) {
+    if (!m_server->RegisterWebsocket(shared_from_this())) {
       Log(409);
       m_websocket->Fail(409, "Only a single simulation websocket is allowed");
       return;
@@ -66,8 +46,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 
   // parse incoming JSON, dispatch to parent
   m_websocket->text.connect([this](wpi::StringRef msg, bool) {
-    auto hws = HALSimWeb::GetInstance();
-    if (!m_isWsConnected || !hws) {
+    if (!m_isWsConnected) {
       return;
     }
 
@@ -80,7 +59,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
       m_websocket->Fail(400, err);
       return;
     }
-    hws->OnNetValueChanged(j);
+    m_server->OnNetValueChanged(j);
   });
 
   m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
@@ -89,10 +68,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
       wpi::errs() << "HALWebSim: websocket disconnected\n";
       m_isWsConnected = false;
 
-      auto hws = HALSimWeb::GetInstance();
-      if (hws) {
-        hws->CloseWebsocket(shared_from_this());
-      }
+      m_server->CloseWebsocket(shared_from_this());
     }
   });
 }
@@ -102,82 +78,25 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
   wpi::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
                            std::lock_guard lock(m_buffers_mutex);
-                           return m_buffers->Allocate();
+                           return m_buffers.Allocate();
                          }};
   os << msg;
 
   // call the websocket send function on the uv loop
-  m_exec->Call([this, sendBufs]() mutable {
-    m_websocket->SendText(sendBufs, [this](auto bufs, wpi::uv::Error err) {
-      {
-        std::lock_guard lock(m_buffers_mutex);
-        m_buffers->Release(bufs);
-      }
+  m_server->GetExec().Send([self = shared_from_this(), sendBufs] {
+    self->m_websocket->SendText(sendBufs,
+                                [self](auto bufs, wpi::uv::Error err) {
+                                  {
+                                    std::lock_guard lock(self->m_buffers_mutex);
+                                    self->m_buffers.Release(bufs);
+                                  }
 
-      if (err) {
-        wpi::errs() << err.str() << "\n";
-        wpi::errs().flush();
-      }
-    });
+                                  if (err) {
+                                    wpi::errs() << err.str() << "\n";
+                                    wpi::errs().flush();
+                                  }
+                                });
   });
-}
-
-class SendfileReq : public uv::RequestImpl<SendfileReq, uv_fs_t> {
- public:
-  SendfileReq(uv_file out, uv_file in, int64_t inOffset, size_t len)
-      : m_out(out), m_in(in), m_inOffset(inOffset), m_len(len) {
-    error = [this](uv::Error err) { GetLoop().error(err); };
-  }
-
-  uv::Loop& GetLoop() const {
-    return *static_cast<uv::Loop*>(GetRaw()->loop->data);
-  }
-
-  int Send(uv::Loop& loop) {
-    int err = uv_fs_sendfile(loop.GetRaw(), GetRaw(), m_out, m_in, m_inOffset,
-                             m_len, [](uv_fs_t* req) {
-                               auto& h = *static_cast<SendfileReq*>(req->data);
-                               if (req->result < 0) {
-                                 h.ReportError(req->result);
-                                 h.complete();
-                                 h.Release();
-                                 return;
-                               }
-
-                               h.m_inOffset += req->result;
-                               h.m_len -= req->result;
-                               if (h.m_len == 0) {
-                                 // done
-                                 h.complete();
-                                 h.Release();  // this is always a one-shot
-                                 return;
-                               }
-
-                               // need to send more
-                               h.Send(h.GetLoop());
-                             });
-    if (err < 0) {
-      ReportError(err);
-      complete();
-    }
-    return err;
-  }
-
-  wpi::sig::Signal<> complete;
-
- private:
-  uv_file m_out;
-  uv_file m_in;
-  int64_t m_inOffset;
-  size_t m_len;
-};
-
-void Sendfile(uv::Loop& loop, uv_file out, uv_file in, int64_t inOffset,
-              size_t len, std::function<void()> complete) {
-  auto req = std::make_shared<SendfileReq>(out, in, inOffset, len);
-  if (complete) req->complete.connect(complete);
-  int err = req->Send(loop);
-  if (err >= 0) req->Keep();
 }
 
 void HALSimHttpConnection::SendFileResponse(int code,
@@ -250,7 +169,9 @@ void HALSimHttpConnection::ProcessRequest() {
   }
 
   wpi::StringRef path;
-  if (url.HasPath()) path = url.GetPath();
+  if (url.HasPath()) {
+    path = url.GetPath();
+  }
 
   if (m_request.GetMethod() == wpi::HTTP_GET && path.startswith("/") &&
       !path.contains("..")) {
@@ -262,10 +183,12 @@ void HALSimHttpConnection::ProcessRequest() {
       std::string prefix = (wpi::sys::path::get_separator() + "user" +
                             wpi::sys::path::get_separator())
                                .str();
-      wpi::sys::path::replace_path_prefix(nativePath, prefix, m_webroot_user);
+      wpi::sys::path::replace_path_prefix(nativePath, prefix,
+                                          m_server->GetWebrootUser());
     } else {
-      wpi::sys::path::replace_path_prefix(
-          nativePath, wpi::sys::path::get_separator(), m_webroot_sys);
+      wpi::sys::path::replace_path_prefix(nativePath,
+                                          wpi::sys::path::get_separator(),
+                                          m_server->GetWebrootSys());
     }
 
     if (wpi::sys::fs::is_directory(nativePath)) {
@@ -295,5 +218,3 @@ void HALSimHttpConnection::Log(int code) {
               << m_request.GetMajor() << "." << m_request.GetMinor() << " "
               << code << "\n";
 }
-
-}  // namespace wpilibws

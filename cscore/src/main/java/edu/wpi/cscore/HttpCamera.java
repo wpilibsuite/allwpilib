@@ -1,20 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.cscore;
 
-/**
- * A source that represents a MJPEG-over-HTTP (IP) camera.
- */
+/** A source that represents a MJPEG-over-HTTP (IP) camera. */
 public class HttpCamera extends VideoCamera {
   public enum HttpCameraKind {
-    kUnknown(0), kMJPGStreamer(1), kCSCore(2), kAxis(3);
+    kUnknown(0),
+    kMJPGStreamer(1),
+    kCSCore(2),
+    kAxis(3);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     HttpCameraKind(int value) {
@@ -34,10 +31,14 @@ public class HttpCamera extends VideoCamera {
    */
   public static HttpCameraKind getHttpCameraKindFromInt(int kind) {
     switch (kind) {
-      case 1: return HttpCameraKind.kMJPGStreamer;
-      case 2: return HttpCameraKind.kCSCore;
-      case 3: return HttpCameraKind.kAxis;
-      default: return HttpCameraKind.kUnknown;
+      case 1:
+        return HttpCameraKind.kMJPGStreamer;
+      case 2:
+        return HttpCameraKind.kCSCore;
+      case 3:
+        return HttpCameraKind.kAxis;
+      default:
+        return HttpCameraKind.kUnknown;
     }
   }
 
@@ -86,23 +87,18 @@ public class HttpCamera extends VideoCamera {
   /**
    * Get the kind of HTTP camera.
    *
-   * <p>Autodetection can result in returning a different value than the camera
-   * was created with.
+   * <p>Autodetection can result in returning a different value than the camera was created with.
    */
   public HttpCameraKind getHttpCameraKind() {
     return getHttpCameraKindFromInt(CameraServerJNI.getHttpCameraKind(m_handle));
   }
 
-  /**
-   * Change the URLs used to connect to the camera.
-   */
+  /** Change the URLs used to connect to the camera. */
   public void setUrls(String[] urls) {
     CameraServerJNI.setHttpCameraUrls(m_handle, urls);
   }
 
-  /**
-   * Get the URLs used to connect to the camera.
-   */
+  /** Get the URLs used to connect to the camera. */
   public String[] getUrls() {
     return CameraServerJNI.getHttpCameraUrls(m_handle);
   }

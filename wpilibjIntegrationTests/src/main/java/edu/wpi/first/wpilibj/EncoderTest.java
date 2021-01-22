@@ -1,15 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.Assert.assertTrue;
+
+import edu.wpi.first.wpilibj.fixtures.FakeEncoderFixture;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.Collection;
 import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,16 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import edu.wpi.first.wpilibj.fixtures.FakeEncoderFixture;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-import edu.wpi.first.wpilibj.test.TestBench;
-
-import static org.junit.Assert.assertTrue;
-
-
-/**
- * Test to see if the FPGA properly recognizes a mock Encoder input.
- */
+/** Test to see if the FPGA properly recognizes a mock Encoder input. */
 @RunWith(Parameterized.class)
 public class EncoderTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(EncoderTest.class.getName());
@@ -45,8 +37,8 @@ public class EncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Test data generator. This method is called the the JUnit parametrized test runner and returns
-   * a Collection of Arrays. For each Array in the Collection, each array element corresponds to a
+   * Test data generator. This method is called the the JUnit parametrized test runner and returns a
+   * Collection of Arrays. For each Array in the Collection, each array element corresponds to a
    * parameter in the constructor.
    */
   @Parameters
@@ -57,11 +49,11 @@ public class EncoderTest extends AbstractComsSetup {
   /**
    * Constructs a parametrized Encoder Test.
    *
-   * @param inputA  The port number for inputA
+   * @param inputA The port number for inputA
    * @param outputA The port number for outputA
-   * @param inputB  The port number for inputB
+   * @param inputB The port number for inputB
    * @param outputB The port number for outputB
-   * @param flip    whether or not these set of values require the encoder to be reversed (0 or 1)
+   * @param flip whether or not these set of values require the encoder to be reversed (0 or 1)
    */
   public EncoderTest(int inputA, int outputA, int inputB, int outputB, int flip) {
     m_inputA = inputA;
@@ -84,9 +76,7 @@ public class EncoderTest extends AbstractComsSetup {
     encoder = null;
   }
 
-  /**
-   * Sets up the test and verifies that the test was reset to the default state.
-   */
+  /** Sets up the test and verifies that the test was reset to the default state. */
   @Before
   public void setUp() {
     encoder.setup();
@@ -98,18 +88,14 @@ public class EncoderTest extends AbstractComsSetup {
     encoder.reset();
   }
 
-  /**
-   * Tests to see if Encoders initialize to zero.
-   */
+  /** Tests to see if Encoders initialize to zero. */
   @Test
   public void testDefaultState() {
     int value = encoder.getEncoder().get();
     assertTrue(errorMessage(0, value), value == 0);
   }
 
-  /**
-   * Tests to see if Encoders can count up successfully.
-   */
+  /** Tests to see if Encoders can count up successfully. */
   @Test
   public void testCountUp() {
     int goal = 100;
@@ -118,12 +104,9 @@ public class EncoderTest extends AbstractComsSetup {
     encoder.getFakeEncoderSource().execute();
     int value = encoder.getEncoder().get();
     assertTrue(errorMessage(goal, value), value == goal);
-
   }
 
-  /**
-   * Tests to see if Encoders can count down successfully.
-   */
+  /** Tests to see if Encoders can count down successfully. */
   @Test
   public void testCountDown() {
     int goal = -100;
@@ -132,18 +115,27 @@ public class EncoderTest extends AbstractComsSetup {
     encoder.getFakeEncoderSource().execute();
     int value = encoder.getEncoder().get();
     assertTrue(errorMessage(goal, value), value == goal);
-
   }
 
   /**
    * Creates a simple message with the error that was encountered for the Encoders.
    *
-   * @param goal      The goal that was trying to be reached
+   * @param goal The goal that was trying to be reached
    * @param trueValue The actual value that was reached by the test
    * @return A fully constructed message with data about where and why the the test failed.
    */
   private String errorMessage(int goal, int trueValue) {
-    return "Encoder ({In,Out}): {" + m_inputA + ", " + m_outputA + "},{" + m_inputB + ", "
-        + m_outputB + "} Returned: " + trueValue + ", Wanted: " + goal;
+    return "Encoder ({In,Out}): {"
+        + m_inputA
+        + ", "
+        + m_outputA
+        + "},{"
+        + m_inputB
+        + ", "
+        + m_outputB
+        + "} Returned: "
+        + trueValue
+        + ", Wanted: "
+        + goal;
   }
 }

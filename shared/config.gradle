@@ -5,15 +5,16 @@ nativeUtils.withRoboRIO()
 nativeUtils.withRaspbian()
 nativeUtils.withBionic()
 nativeUtils {
-  wpi {
-    configureDependencies {
-      wpiVersion = "-1"
-      niLibVersion = "2020.10.1"
-      opencvVersion = "3.4.7-3"
-      googleTestVersion = "1.9.0-4-437e100-1"
-      imguiVersion = "1.76-2"
+    wpi {
+        configureDependencies {
+            wpiVersion = "-1"
+            niLibVersion = "2020.10.1"
+            opencvVersion = "3.4.7-5"
+            googleTestVersion = "1.9.0-5-437e100-1"
+            imguiVersion = "1.79-1"
+            wpimathVersion = "-1"
+        }
     }
-  }
 }
 
 nativeUtils.wpi.addWarnings()
@@ -21,10 +22,11 @@ nativeUtils.wpi.addWarningsAsErrors()
 nativeUtils.wpi.addReleaseSymbolGeneration()
 
 nativeUtils.setSinglePrintPerPlatform()
+nativeUtils.enableSourceLink()
 
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) return
-    it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
+        it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
     if (it.name == 'osxx86-64') {
         it.linker.args << "-headerpad_max_install_names"
     }
@@ -39,6 +41,19 @@ model {
     binaries {
         withType(NativeBinarySpec).all {
             nativeUtils.usePlatformArguments(it)
+        }
+    }
+}
+
+apply plugin: DisableBuildingGTest
+
+if (project.hasProperty('buildServer')) {
+    tasks.withType(org.gradle.nativeplatform.test.tasks.RunTestExecutable) {
+        def exeFile = file(it.executable)
+        def folder = exeFile.parentFile
+
+        it.doLast {
+            folder.deleteDir()
         }
     }
 }
@@ -84,7 +99,7 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
         if (it in NativeLibrarySpec && stringNames.contains(it.name)) {
             it.binaries.each {
                 if (!it.buildable) return
-                def target = nativeUtils.getPublishClassifier(it)
+                    def target = nativeUtils.getPublishClassifier(it)
                 if (configMap.containsKey(target)) {
                     configMap.get(target).add(it)
                 } else {
@@ -145,6 +160,14 @@ ext.includeStandardZipFormat = { task, value ->
             } else  if (binary instanceof StaticLibraryBinarySpec) {
                 task.dependsOn binary.tasks.createStaticLib
                 task.from(binary.staticLibraryFile) {
+                    into nativeUtils.getPlatformPath(binary) + '/static'
+                }
+                def pdbDir = binary.staticLibraryFile.parentFile
+                task.from(pdbDir) {
+                    include '*.pdb'
+                    into nativeUtils.getPlatformPath(binary) + '/static'
+                }
+                task.from(new File(pdbDir, "SourceLink.json")) {
                     into nativeUtils.getPlatformPath(binary) + '/static'
                 }
             }

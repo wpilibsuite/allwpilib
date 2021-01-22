@@ -82,20 +82,20 @@ namespace wpi {
 
     /// Construct a string ref from a cstring.
     LLVM_ATTRIBUTE_ALWAYS_INLINE
-    /*implicit*/ StringRef(const char *Str)
+    /*implicit*/ StringRef(const char *Str) noexcept
         : Data(Str), Length(Str ? ::strlen(Str) : 0) {}
 
     /// Construct a string ref from a pointer and length.
     LLVM_ATTRIBUTE_ALWAYS_INLINE
-    /*implicit*/ constexpr StringRef(const char *data, size_t length)
+    /*implicit*/ constexpr StringRef(const char *data, size_t length) noexcept
         : Data(data), Length(length) {}
 
     /// Construct a string ref from an std::string.
     LLVM_ATTRIBUTE_ALWAYS_INLINE
-    /*implicit*/ StringRef(const std::string &Str)
+    /*implicit*/ StringRef(const std::string &Str) noexcept
       : Data(Str.data()), Length(Str.length()) {}
 
-    static StringRef withNullAsEmpty(const char *data) {
+    static StringRef withNullAsEmpty(const char *data) noexcept {
       return StringRef(data ? data : "");
     }
 

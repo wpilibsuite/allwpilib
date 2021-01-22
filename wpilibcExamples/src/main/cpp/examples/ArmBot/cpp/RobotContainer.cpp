@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
 
@@ -32,17 +29,34 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
   frc2::JoystickButton(&m_driverController, 1)
-      .WhenPressed([this] { m_arm.SetGoal(2_rad); }, {&m_arm});
+      .WhenPressed(
+          [this] {
+            m_arm.SetGoal(2_rad);
+            m_arm.Enable();
+          },
+          {&m_arm});
 
   // Move the arm to neutral position when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, 1)
-      .WhenPressed([this] { m_arm.SetGoal(ArmConstants::kArmOffset); },
-                   {&m_arm});
+  frc2::JoystickButton(&m_driverController, 2)
+      .WhenPressed(
+          [this] {
+            m_arm.SetGoal(ArmConstants::kArmOffset);
+            m_arm.Enable();
+          },
+          {&m_arm});
+
+  // Disable the arm controller when Y is pressed.
+  frc2::JoystickButton(&m_driverController, 4)
+      .WhenPressed([this] { m_arm.Disable(); }, {&m_arm});
 
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController, 6)
       .WhenPressed([this] { m_drive.SetMaxOutput(.5); })
       .WhenReleased([this] { m_drive.SetMaxOutput(1); });
+}
+
+void RobotContainer::DisablePIDSubsystems() {
+  m_arm.Disable();
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

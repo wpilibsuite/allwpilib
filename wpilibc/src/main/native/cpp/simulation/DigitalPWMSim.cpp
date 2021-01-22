@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/DigitalPWMSim.h"
 
@@ -23,7 +20,9 @@ DigitalPWMSim::DigitalPWMSim(const DigitalOutput& digitalOutput)
 
 DigitalPWMSim DigitalPWMSim::CreateForChannel(int channel) {
   int index = HALSIM_FindDigitalPWMForChannel(channel);
-  if (index < 0) throw std::out_of_range("no digital PWM found for channel");
+  if (index < 0) {
+    throw std::out_of_range("no digital PWM found for channel");
+  }
   return DigitalPWMSim{index};
 }
 
@@ -74,8 +73,14 @@ std::unique_ptr<CallbackStore> DigitalPWMSim::RegisterPinCallback(
   return store;
 }
 
-int DigitalPWMSim::GetPin() const { return HALSIM_GetDigitalPWMPin(m_index); }
+int DigitalPWMSim::GetPin() const {
+  return HALSIM_GetDigitalPWMPin(m_index);
+}
 
-void DigitalPWMSim::SetPin(int pin) { HALSIM_SetDigitalPWMPin(m_index, pin); }
+void DigitalPWMSim::SetPin(int pin) {
+  HALSIM_SetDigitalPWMPin(m_index, pin);
+}
 
-void DigitalPWMSim::ResetData() { HALSIM_ResetDigitalPWMData(m_index); }
+void DigitalPWMSim::ResetData() {
+  HALSIM_ResetDigitalPWMData(m_index);
+}

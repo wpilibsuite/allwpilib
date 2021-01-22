@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/RelaySim.h"
 
@@ -64,7 +61,9 @@ std::unique_ptr<CallbackStore> RelaySim::RegisterForwardCallback(
   return store;
 }
 
-bool RelaySim::GetForward() const { return HALSIM_GetRelayForward(m_index); }
+bool RelaySim::GetForward() const {
+  return HALSIM_GetRelayForward(m_index);
+}
 
 void RelaySim::SetForward(bool forward) {
   HALSIM_SetRelayForward(m_index, forward);
@@ -79,10 +78,14 @@ std::unique_ptr<CallbackStore> RelaySim::RegisterReverseCallback(
   return store;
 }
 
-bool RelaySim::GetReverse() const { return HALSIM_GetRelayReverse(m_index); }
+bool RelaySim::GetReverse() const {
+  return HALSIM_GetRelayReverse(m_index);
+}
 
 void RelaySim::SetReverse(bool reverse) {
   HALSIM_SetRelayReverse(m_index, reverse);
 }
 
-void RelaySim::ResetData() { HALSIM_ResetRelayData(m_index); }
+void RelaySim::ResetData() {
+  HALSIM_ResetRelayData(m_index);
+}

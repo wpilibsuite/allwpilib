@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_FUTURE_H_
 #define WPIUTIL_WPI_FUTURE_H_
@@ -290,14 +287,16 @@ class future final {
   future(const future&) = delete;
 
   template <typename R>
-  future(future<R>&& oth) noexcept
+  future(future<R>&& oth) noexcept  // NOLINT
       : future(oth.then([](R&& val) -> T { return val; })) {}
 
   /**
    * Ignores the result of the future if it has not been retrieved.
    */
   ~future() {
-    if (m_promises) m_promises->IgnoreResult(m_request);
+    if (m_promises) {
+      m_promises->IgnoreResult(m_request);
+    }
   }
 
   future& operator=(future&& oth) noexcept {
@@ -316,10 +315,11 @@ class future final {
    * @return The value provided by the corresponding promise.set_value().
    */
   T get() {
-    if (m_promises)
+    if (m_promises) {
       return m_promises->GetResult(m_request);
-    else
+    } else {
       return T();
+    }
   }
 
   template <typename R, typename F>
@@ -358,7 +358,9 @@ class future final {
    * If the value has already been provided, returns immediately.
    */
   void wait() const {
-    if (m_promises) m_promises->WaitResult(m_request);
+    if (m_promises) {
+      m_promises->WaitResult(m_request);
+    }
   }
 
   /**
@@ -419,7 +421,9 @@ class future<void> final {
    * Ignores the result of the future if it has not been retrieved.
    */
   ~future() {
-    if (m_promises) m_promises->IgnoreResult(m_request);
+    if (m_promises) {
+      m_promises->IgnoreResult(m_request);
+    }
   }
 
   future& operator=(future&& oth) noexcept {
@@ -436,7 +440,9 @@ class future<void> final {
    * Can only be called once.  The future will be marked invalid after the call.
    */
   void get() {
-    if (m_promises) m_promises->GetResult(m_request);
+    if (m_promises) {
+      m_promises->GetResult(m_request);
+    }
   }
 
   template <typename R, typename F>
@@ -474,7 +480,9 @@ class future<void> final {
    * If the value has already been provided, returns immediately.
    */
   void wait() const {
-    if (m_promises) m_promises->WaitResult(m_request);
+    if (m_promises) {
+      m_promises->WaitResult(m_request);
+    }
   }
 
   /**
@@ -540,7 +548,9 @@ class promise final {
    * Sets the promised value to a default-constructed T if not already set.
    */
   ~promise() {
-    if (m_promises) m_promises->SetValue(m_request, T());
+    if (m_promises) {
+      m_promises->SetValue(m_request, T());
+    }
   }
 
   promise& operator=(promise&& oth) noexcept {
@@ -575,7 +585,9 @@ class promise final {
    * @param value The value to provide to the waiting future
    */
   void set_value(const T& value) {
-    if (m_promises) m_promises->SetValue(m_request, value);
+    if (m_promises) {
+      m_promises->SetValue(m_request, value);
+    }
     m_promises = nullptr;
   }
 
@@ -586,7 +598,9 @@ class promise final {
    * @param value The value to provide to the waiting future
    */
   void set_value(T&& value) {
-    if (m_promises) m_promises->SetValue(m_request, std::move(value));
+    if (m_promises) {
+      m_promises->SetValue(m_request, std::move(value));
+    }
     m_promises = nullptr;
   }
 
@@ -625,7 +639,9 @@ class promise<void> final {
    * Sets the promised value if not already set.
    */
   ~promise() {
-    if (m_promises) m_promises->SetValue(m_request);
+    if (m_promises) {
+      m_promises->SetValue(m_request);
+    }
   }
 
   promise& operator=(promise&& oth) noexcept {
@@ -660,7 +676,9 @@ class promise<void> final {
    * Only effective once (subsequent calls will be ignored).
    */
   void set_value() {
-    if (m_promises) m_promises->SetValue(m_request);
+    if (m_promises) {
+      m_promises->SetValue(m_request);
+    }
     m_promises = nullptr;
   }
 
@@ -710,7 +728,9 @@ inline promise<T> PromiseFactory<T>::CreatePromise(uint64_t request) {
 template <typename T>
 void PromiseFactory<T>::SetValue(uint64_t request, const T& value) {
   std::unique_lock lock(GetResultMutex());
-  if (!EraseRequest(request)) return;
+  if (!EraseRequest(request)) {
+    return;
+  }
   auto it = std::find_if(m_thens.begin(), m_thens.end(),
                          [=](const auto& x) { return x.request == request; });
   if (it != m_thens.end()) {
@@ -729,7 +749,9 @@ void PromiseFactory<T>::SetValue(uint64_t request, const T& value) {
 template <typename T>
 void PromiseFactory<T>::SetValue(uint64_t request, T&& value) {
   std::unique_lock lock(GetResultMutex());
-  if (!EraseRequest(request)) return;
+  if (!EraseRequest(request)) {
+    return;
+  }
   auto it = std::find_if(m_thens.begin(), m_thens.end(),
                          [=](const auto& x) { return x.request == request; });
   if (it != m_thens.end()) {
@@ -796,7 +818,9 @@ void PromiseFactory<T>::WaitResult(uint64_t request) {
     // Did we get a response to *our* request?
     auto it = std::find_if(m_results.begin(), m_results.end(),
                            [=](const auto& r) { return r.first == request; });
-    if (it != m_results.end()) return;
+    if (it != m_results.end()) {
+      return;
+    }
     // No, keep waiting for a response
     Wait(lock);
   }
@@ -813,10 +837,16 @@ bool PromiseFactory<T>::WaitResultUntil(
     // Did we get a response to *our* request?
     auto it = std::find_if(m_results.begin(), m_results.end(),
                            [=](const auto& r) { return r.first == request; });
-    if (it != m_results.end()) return true;
-    if (timeout) break;
+    if (it != m_results.end()) {
+      return true;
+    }
+    if (timeout) {
+      break;
+    }
     // No, keep waiting for a response
-    if (!WaitUntil(lock, timeout_time)) timeout = true;
+    if (!WaitUntil(lock, timeout_time)) {
+      timeout = true;
+    }
   }
   return false;
 }
@@ -845,10 +875,16 @@ bool PromiseFactory<void>::WaitResultUntil(
     // Did we get a response to *our* request?
     auto it = std::find_if(m_results.begin(), m_results.end(),
                            [=](const auto& r) { return r == request; });
-    if (it != m_results.end()) return true;
-    if (timeout) break;
+    if (it != m_results.end()) {
+      return true;
+    }
+    if (timeout) {
+      break;
+    }
     // No, keep waiting for a response
-    if (!WaitUntil(lock, timeout_time)) timeout = true;
+    if (!WaitUntil(lock, timeout_time)) {
+      timeout = true;
+    }
   }
   return false;
 }

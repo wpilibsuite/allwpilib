@@ -45,10 +45,10 @@ class TCPAcceptor : public NetworkAcceptor {
 
  public:
   TCPAcceptor(int port, const char* address, Logger& logger);
-  ~TCPAcceptor();
+  ~TCPAcceptor() override;
 
   int start() override;
-  void shutdown() override;
+  void shutdown() final;
   std::unique_ptr<NetworkStream> accept() override;
 };
 

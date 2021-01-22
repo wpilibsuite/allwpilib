@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
 
@@ -43,15 +40,13 @@ class StateSpace : public testing::Test {
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, kDt};
   KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, kDt};
-  LinearPlantInversionFeedforward<2, 1> feedforward{plant, kDt};
-  LinearSystemLoop<2, 1, 1> loop{plant, controller, feedforward, observer,
-                                 12_V};
+  LinearSystemLoop<2, 1, 1> loop{plant, controller, observer, 12_V, kDt};
 };
 
-void Update(LinearSystemLoop<2, 1, 1>& loop, double noise) {
-  Eigen::Matrix<double, 1, 1> y =
-      loop.Plant().CalculateY(loop.Xhat(), loop.U()) +
-      Eigen::Matrix<double, 1, 1>(noise);
+void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,
+            double noise) {
+  Eigen::Matrix<double, 1, 1> y = plant.CalculateY(loop.Xhat(), loop.U()) +
+                                  Eigen::Matrix<double, 1, 1>(noise);
   loop.Correct(y);
   loop.Predict(kDt);
 }
@@ -65,7 +60,7 @@ TEST_F(StateSpace, CorrectPredictLoop) {
   loop.SetNextR(references);
 
   for (int i = 0; i < 1000; i++) {
-    Update(loop, dist(generator));
+    Update(plant, loop, dist(generator));
     EXPECT_PRED_FORMAT2(testing::DoubleLE, -12.0, loop.U(0));
     EXPECT_PRED_FORMAT2(testing::DoubleLE, loop.U(0), 12.0);
   }

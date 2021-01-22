@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <array>
 
@@ -20,6 +17,10 @@
  */
 class Robot : public frc::TimedRobot {
  public:
+  void RobotInit() override {
+    m_pidController.SetSetpoint(kSetPoints[m_index]);
+  }
+
   void TeleopPeriodic() override {
     // When the button is pressed once, the selected elevator setpoint is
     // incremented.
@@ -27,10 +28,10 @@ class Robot : public frc::TimedRobot {
     if (currentButtonValue && !m_previousButtonValue) {
       // Index of the elevator setpoint wraps around
       m_index = (m_index + 1) % (sizeof(kSetPoints) / 8);
+      m_pidController.SetSetpoint(kSetPoints[m_index]);
     }
     m_previousButtonValue = currentButtonValue;
 
-    m_pidController.SetSetpoint(kSetPoints[m_index]);
     double output =
         m_pidController.Calculate(m_potentiometer.GetAverageVoltage());
     m_elevatorMotor.Set(output);
@@ -69,5 +70,7 @@ class Robot : public frc::TimedRobot {
 constexpr std::array<double, 3> Robot::kSetPoints;
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

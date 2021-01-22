@@ -1,21 +1,23 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <array>
+#include <wpi/array.h>
 
 #include "Eigen/Core"
-#include "Eigen/QR"
+#include "Eigen/src/Cholesky/LLT.h"
+#include "Eigen/src/Eigenvalues/ComplexSchur.h"
+#include "Eigen/src/LU/Determinant.h"
+#include "Eigen/src/LU/InverseImpl.h"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
+#include "unsupported/Eigen/src/MatrixFunctions/MatrixPower.h"
+#include "unsupported/Eigen/src/MatrixFunctions/MatrixSquareRoot.h"
 
 namespace frc {
 namespace detail {
@@ -42,29 +44,10 @@ class LinearQuadraticRegulatorImpl {
   template <int Outputs>
   LinearQuadraticRegulatorImpl(
       const LinearSystem<States, Inputs, Outputs>& plant,
-      const std::array<double, States>& Qelems,
-      const std::array<double, Inputs>& Relems, units::second_t dt)
-      : LinearQuadraticRegulatorImpl(plant.A(), plant.B(), Qelems, 1.0, Relems,
-                                     dt) {}
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param plant  The plant being controlled.
-   * @param Qelems The maximum desired error tolerance for each state.
-   * @param rho    A weighting factor that balances control effort and state
-   * excursion. Greater values penalize state excursion more heavily. 1 is a
-   * good starting value.
-   * @param Relems The maximum desired control effort for each input.
-   * @param dt     Discretization timestep.
-   */
-  template <int Outputs>
-  LinearQuadraticRegulatorImpl(
-      const LinearSystem<States, Inputs, Outputs>& plant,
-      const std::array<double, States>& Qelems, const double rho,
-      const std::array<double, Inputs>& Relems, units::second_t dt)
-      : LinearQuadraticRegulatorImpl(plant.A(), plant.B(), Qelems, rho, Relems,
-                                     dt) {}
+      const wpi::array<double, States>& Qelems,
+      const wpi::array<double, Inputs>& Relems, units::second_t dt)
+      : LinearQuadraticRegulatorImpl(plant.A(), plant.B(), Qelems, Relems, dt) {
+  }
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -72,38 +55,15 @@ class LinearQuadraticRegulatorImpl {
    * @param A      Continuous system matrix of the plant being controlled.
    * @param B      Continuous input matrix of the plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
-   * @param rho    A weighting factor that balances control effort and state
-   * excursion. Greater values penalize state excursion more heavily. 1 is a
-   * good starting value.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
    */
   LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
                                const Eigen::Matrix<double, States, Inputs>& B,
-                               const std::array<double, States>& Qelems,
-                               const std::array<double, Inputs>& Relems,
+                               const wpi::array<double, States>& Qelems,
+                               const wpi::array<double, Inputs>& Relems,
                                units::second_t dt)
-      : LinearQuadraticRegulatorImpl(A, B, Qelems, 1.0, Relems, dt) {}
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param A      Continuous system matrix of the plant being controlled.
-   * @param B      Continuous input matrix of the plant being controlled.
-   * @param Qelems The maximum desired error tolerance for each state.
-   * @param rho    A weighting factor that balances control effort and state
-   * excursion. Greater values penalize state excursion more heavily. 1 is a
-   * good starting value.
-   * @param Relems The maximum desired control effort for each input.
-   * @param dt     Discretization timestep.
-   */
-  LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
-                               const Eigen::Matrix<double, States, Inputs>& B,
-                               const std::array<double, States>& Qelems,
-                               const double rho,
-                               const std::array<double, Inputs>& Relems,
-                               units::second_t dt)
-      : LinearQuadraticRegulatorImpl(A, B, MakeCostMatrix(Qelems) * rho,
+      : LinearQuadraticRegulatorImpl(A, B, MakeCostMatrix(Qelems),
                                      MakeCostMatrix(Relems), dt) {}
 
   /**
@@ -214,6 +174,31 @@ class LinearQuadraticRegulatorImpl {
     return Calculate(x);
   }
 
+  /**
+   * Adjusts LQR controller gain to compensate for a pure time delay in the
+   * input.
+   *
+   * Linear-Quadratic regulator controller gains tend to be aggressive. If
+   * sensor measurements are time-delayed too long, the LQR may be unstable.
+   * However, if we know the amount of delay, we can compute the control based
+   * on where the system will be after the time delay.
+   *
+   * See https://file.tavsys.net/control/controls-engineering-in-frc.pdf
+   * appendix C.4 for a derivation.
+   *
+   * @param plant      The plant being controlled.
+   * @param dt         Discretization timestep.
+   * @param inputDelay Input time delay.
+   */
+  template <int Outputs>
+  void LatencyCompensate(const LinearSystem<States, Inputs, Outputs>& plant,
+                         units::second_t dt, units::second_t inputDelay) {
+    Eigen::Matrix<double, States, States> discA;
+    Eigen::Matrix<double, States, Inputs> discB;
+    DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);
+    m_K = m_K * (discA - discB * m_K).pow(inputDelay / dt);
+  }
+
  private:
   // Current reference
   Eigen::Matrix<double, States, 1> m_r;
@@ -234,38 +219,17 @@ class LinearQuadraticRegulator
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param system The plant being controlled.
+   * @param plant  The plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
    */
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
-                           const std::array<double, States>& Qelems,
-                           const std::array<double, Inputs>& Relems,
+                           const wpi::array<double, States>& Qelems,
+                           const wpi::array<double, Inputs>& Relems,
                            units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, 1.0, Relems,
-                                 dt) {}
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param system The plant being controlled.
-   * @param Qelems The maximum desired error tolerance for each state.
-   * @param rho    A weighting factor that balances control effort and state
-   * excursion. Greater values penalize state excursion more heavily. 1 is a
-   * good starting value.
-   * @param Relems The maximum desired control effort for each input.
-   * @param dt     Discretization timestep.
-   */
-  template <int Outputs>
-  LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
-                           const std::array<double, States>& Qelems,
-                           const double rho,
-                           const std::array<double, Inputs>& Relems,
-                           units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, rho, Relems,
-                                 dt) {}
+      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -273,39 +237,16 @@ class LinearQuadraticRegulator
    * @param A      Continuous system matrix of the plant being controlled.
    * @param B      Continuous input matrix of the plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
-   * @param rho    A weighting factor that balances control effort and state
-   * excursion. Greater values penalize state excursion more heavily. 1 is a
-   * good starting value.
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
    */
   LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
                            const Eigen::Matrix<double, States, Inputs>& B,
-                           const std::array<double, States>& Qelems,
-                           const std::array<double, Inputs>& Relems,
+                           const wpi::array<double, States>& Qelems,
+                           const wpi::array<double, Inputs>& Relems,
                            units::second_t dt)
-      : LinearQuadraticRegulator(A, B, Qelems, 1.0, Relems, dt) {}
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param A      Continuous system matrix of the plant being controlled.
-   * @param B      Continuous input matrix of the plant being controlled.
-   * @param Qelems The maximum desired error tolerance for each state.
-   * @param rho    A weighting factor that balances control effort and state
-   * excursion. Greater values penalize state excursion more heavily. 1 is a
-   * good starting value.
-   * @param Relems The maximum desired control effort for each input.
-   * @param dt     Discretization timestep.
-   */
-  LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
-                           const Eigen::Matrix<double, States, Inputs>& B,
-                           const std::array<double, States>& Qelems,
-                           const double rho,
-                           const std::array<double, Inputs>& Relems,
-                           units::second_t dt)
-      : detail::LinearQuadraticRegulatorImpl<States, Inputs>{
-            A, B, Qelems, rho, Relems, dt} {}
+      : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
+                                 MakeCostMatrix(Relems), dt) {}
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -335,32 +276,15 @@ class LinearQuadraticRegulator<1, 1>
  public:
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<1, 1, Outputs>& plant,
-                           const std::array<double, 1>& Qelems,
-                           const std::array<double, 1>& Relems,
+                           const wpi::array<double, 1>& Qelems,
+                           const wpi::array<double, 1>& Relems,
                            units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, 1.0, Relems,
-                                 dt) {}
-
-  template <int Outputs>
-  LinearQuadraticRegulator(const LinearSystem<1, 1, Outputs>& plant,
-                           const std::array<double, 1>& Qelems,
-                           const double rho,
-                           const std::array<double, 1>& Relems,
-                           units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, rho, Relems,
-                                 dt) {}
+      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
                            const Eigen::Matrix<double, 1, 1>& B,
-                           const std::array<double, 1>& Qelems,
-                           const std::array<double, 1>& Relems,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
-                           const Eigen::Matrix<double, 1, 1>& B,
-                           const std::array<double, 1>& Qelems,
-                           const double rho,
-                           const std::array<double, 1>& Relems,
+                           const wpi::array<double, 1>& Qelems,
+                           const wpi::array<double, 1>& Relems,
                            units::second_t dt);
 
   LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
@@ -381,32 +305,15 @@ class LinearQuadraticRegulator<2, 1>
  public:
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<2, 1, Outputs>& plant,
-                           const std::array<double, 2>& Qelems,
-                           const std::array<double, 1>& Relems,
+                           const wpi::array<double, 2>& Qelems,
+                           const wpi::array<double, 1>& Relems,
                            units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, 1.0, Relems,
-                                 dt) {}
-
-  template <int Outputs>
-  LinearQuadraticRegulator(const LinearSystem<2, 1, Outputs>& plant,
-                           const std::array<double, 2>& Qelems,
-                           const double rho,
-                           const std::array<double, 1>& Relems,
-                           units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, rho, Relems,
-                                 dt) {}
+      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
                            const Eigen::Matrix<double, 2, 1>& B,
-                           const std::array<double, 2>& Qelems,
-                           const std::array<double, 1>& Relems,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
-                           const Eigen::Matrix<double, 2, 1>& B,
-                           const std::array<double, 2>& Qelems,
-                           const double rho,
-                           const std::array<double, 1>& Relems,
+                           const wpi::array<double, 2>& Qelems,
+                           const wpi::array<double, 1>& Relems,
                            units::second_t dt);
 
   LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,

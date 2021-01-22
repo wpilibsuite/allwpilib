@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.trajectory;
 
-import java.util.Collections;
-
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj.util.Units;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Collections;
+import org.junit.jupiter.api.Test;
 
 class DifferentialDriveKinematicsConstraintTest {
   @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
@@ -27,8 +22,8 @@ class DifferentialDriveKinematicsConstraintTest {
     var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(27));
     var constraint = new DifferentialDriveKinematicsConstraint(kinematics, maxVelocity);
 
-    Trajectory trajectory = TrajectoryGeneratorTest.getTrajectory(
-        Collections.singletonList(constraint));
+    Trajectory trajectory =
+        TrajectoryGeneratorTest.getTrajectory(Collections.singletonList(constraint));
 
     var duration = trajectory.getTotalTimeSeconds();
     var t = 0.0;
@@ -36,18 +31,18 @@ class DifferentialDriveKinematicsConstraintTest {
 
     while (t < duration) {
       var point = trajectory.sample(t);
-      var chassisSpeeds = new ChassisSpeeds(
-          point.velocityMetersPerSecond, 0,
-          point.velocityMetersPerSecond * point.curvatureRadPerMeter
-      );
+      var chassisSpeeds =
+          new ChassisSpeeds(
+              point.velocityMetersPerSecond,
+              0,
+              point.velocityMetersPerSecond * point.curvatureRadPerMeter);
 
       var wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
 
       t += dt;
       assertAll(
           () -> assertTrue(wheelSpeeds.leftMetersPerSecond <= maxVelocity + 0.05),
-          () -> assertTrue(wheelSpeeds.rightMetersPerSecond <= maxVelocity + 0.05)
-      );
+          () -> assertTrue(wheelSpeeds.rightMetersPerSecond <= maxVelocity + 0.05));
     }
   }
 }

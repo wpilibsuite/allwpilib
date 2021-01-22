@@ -1,0 +1,58 @@
+name: Documentation
+
+on: [push, workflow_dispatch]
+
+env:
+  BASE_PATH: allwpilib/docs
+
+jobs:
+  publish:
+    name: "Documentation - Publish"
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'wpilibsuite' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      - name: Set environment variables (Development)
+        run: |
+          echo "TARGET_FOLDER=$BASE_PATH/development" >> $GITHUB_ENV
+        if: github.ref == 'refs/heads/master'
+      - name: Set environment variables (Tag)
+        run: |
+          echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+          echo "TARGET_FOLDER=$BASE_PATH/beta" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Set environment variables (Release)
+        run: |
+          echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
+          echo "TARGET_FOLDER=$BASE_PATH/release" >> $GITHUB_ENV
+        if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta')
+      - name: Build with Gradle
+        run: ./gradlew docs:generateJavaDocs docs:doxygen -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+      - name: Install SSH Client 🔑
+        uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.GH_DEPLOY_KEY }}
+      - name: Deploy Java 🚀
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          SSH: true
+          REPOSITORY_NAME: wpilibsuite/wpilibsuite.github.io
+          BRANCH: main
+          CLEAN: true
+          FOLDER: docs/build/docs/javadoc
+          TARGET_FOLDER: ${{ env.TARGET_FOLDER }}/java
+      - name: Deploy C++ 🚀
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          SSH: true
+          REPOSITORY_NAME: wpilibsuite/wpilibsuite.github.io
+          BRANCH: main
+          CLEAN: true
+          FOLDER: docs/build/docs/doxygen/html
+          TARGET_FOLDER: ${{ env.TARGET_FOLDER }}/cpp

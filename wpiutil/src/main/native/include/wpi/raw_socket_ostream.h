@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_RAW_SOCKET_OSTREAM_H_
 #define WPIUTIL_WPI_RAW_SOCKET_OSTREAM_H_
@@ -18,7 +15,7 @@ class raw_socket_ostream : public raw_ostream {
  public:
   raw_socket_ostream(NetworkStream& stream, bool shouldClose)
       : m_stream(stream), m_shouldClose(shouldClose) {}
-  ~raw_socket_ostream();
+  ~raw_socket_ostream() override;
 
   void close();
 

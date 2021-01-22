@@ -1,32 +1,26 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.estimator;
-
-import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import org.ejml.simple.SimpleMatrix;
 
 /**
- * Generates sigma points and weights according to Van der Merwe's 2004
- * dissertation[1] for the UnscentedKalmanFilter class.
+ * Generates sigma points and weights according to Van der Merwe's 2004 dissertation[1] for the
+ * UnscentedKalmanFilter class.
  *
- * <p>It parametrizes the sigma points using alpha, beta, kappa terms, and is the
- * version seen in most publications. Unless you know better, this should be
- * your default choice.
+ * <p>It parametrizes the sigma points using alpha, beta, kappa terms, and is the version seen in
+ * most publications. Unless you know better, this should be your default choice.
  *
- * <p>States is the dimensionality of the state. 2*States+1 weights will be
- * generated.
+ * <p>States is the dimensionality of the state. 2*States+1 weights will be generated.
  *
- * <p>[1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic
- * Inference in Dynamic State-Space Models" (Doctoral dissertation)
+ * <p>[1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic Inference in Dynamic
+ * State-Space Models" (Doctoral dissertation)
  */
 public class MerweScaledSigmaPoints<S extends Num> {
 
@@ -40,11 +34,11 @@ public class MerweScaledSigmaPoints<S extends Num> {
    * Constructs a generator for Van der Merwe scaled sigma points.
    *
    * @param states an instance of Num that represents the number of states.
-   * @param alpha  Determines the spread of the sigma points around the mean.
-   *               Usually a small positive value (1e-3).
-   * @param beta   Incorporates prior knowledge of the distribution of the mean.
-   *               For Gaussian distributions, beta = 2 is optimal.
-   * @param kappa  Secondary scaling parameter usually set to 0 or 3 - States.
+   * @param alpha Determines the spread of the sigma points around the mean. Usually a small
+   *     positive value (1e-3).
+   * @param beta Incorporates prior knowledge of the distribution of the mean. For Gaussian
+   *     distributions, beta = 2 is optimal.
+   * @param kappa Secondary scaling parameter usually set to 0 or 3 - States.
    */
   public MerweScaledSigmaPoints(Nat<S> states, double alpha, double beta, int kappa) {
     this.m_states = states;
@@ -74,27 +68,24 @@ public class MerweScaledSigmaPoints<S extends Num> {
   }
 
   /**
-   * Computes the sigma points for an unscented Kalman filter given the mean
-   * (x) and covariance(P) of the filter.
+   * Computes the sigma points for an unscented Kalman filter given the mean (x) and covariance(P)
+   * of the filter.
    *
    * @param x An array of the means.
    * @param P Covariance of the filter.
-   * @return Two dimensional array of sigma points. Each column contains all of
-   *         the sigmas for one dimension in the problem space. Ordered by
-   *         Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
+   * @return Two dimensional array of sigma points. Each column contains all of the sigmas for one
+   *     dimension in the problem space. Ordered by Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
    */
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
-  public Matrix<S, ?> sigmaPoints(
-          Matrix<S, N1> x,
-          Matrix<S, S> P) {
+  public Matrix<S, ?> sigmaPoints(Matrix<S, N1> x, Matrix<S, S> P) {
     double lambda = Math.pow(m_alpha, 2) * (m_states.getNum() + m_kappa) - m_states.getNum();
 
     var intermediate = P.times(lambda + m_states.getNum());
     var U = intermediate.lltDecompose(true); // Lower triangular
 
     // 2 * states + 1 by states
-    Matrix<S, ?> sigmas = new Matrix<>(
-        new SimpleMatrix(m_states.getNum(), 2 * m_states.getNum() + 1));
+    Matrix<S, ?> sigmas =
+        new Matrix<>(new SimpleMatrix(m_states.getNum(), 2 * m_states.getNum() + 1));
     sigmas.setColumn(0, x);
     for (int k = 0; k < m_states.getNum(); k++) {
       var xPlusU = x.plus(U.extractColumnVector(k));

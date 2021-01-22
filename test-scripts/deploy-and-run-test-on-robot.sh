@@ -22,7 +22,7 @@ A script designed to run the integration tests.
 This script should only be run on the computer connected to the roboRIO.
 Where:
     -h    Show this help text.
-    -A    Disable language recomended arguments.
+    -A    Disable language recommended arguments.
     arg   Additional arguments to be passed to test."
 
 

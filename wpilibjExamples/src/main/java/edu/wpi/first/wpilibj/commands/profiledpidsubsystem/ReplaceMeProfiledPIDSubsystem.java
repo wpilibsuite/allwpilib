@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.commands.profiledpidsubsystem;
 
@@ -12,15 +9,16 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 
 public class ReplaceMeProfiledPIDSubsystem extends ProfiledPIDSubsystem {
-  /**
-   * Creates a new ReplaceMeProfiledPIDSubsystem.
-   */
+  /** Creates a new ReplaceMeProfiledPIDSubsystem. */
   public ReplaceMeProfiledPIDSubsystem() {
     super(
         // The ProfiledPIDController used by the subsystem
-        new ProfiledPIDController(0, 0, 0,
-                                  // The motion profile constraints
-                                  new TrapezoidProfile.Constraints(0, 0)));
+        new ProfiledPIDController(
+            0,
+            0,
+            0,
+            // The motion profile constraints
+            new TrapezoidProfile.Constraints(0, 0)));
   }
 
   @Override

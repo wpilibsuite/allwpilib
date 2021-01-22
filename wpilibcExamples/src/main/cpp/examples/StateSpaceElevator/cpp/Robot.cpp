@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
@@ -67,10 +64,6 @@ class Robot : public frc::TimedRobot {
       // Decrease this to more heavily penalize state excursion, or make the
       // controller behave more aggressively.
       {0.0254, 0.254},
-      // rho balances Q and R. Increasing this will penalize state excursion
-      // more heavily, while decreasing this will penalize control effort more
-      // heavily.
-      1.0,
       // relms. Control effort (voltage) tolerance. Decrease this to more
       // heavily penalize control effort, or make the controller less
       // aggressive. 12 is a good starting point because that is the
@@ -80,15 +73,10 @@ class Robot : public frc::TimedRobot {
       // using notifiers.
       20_ms};
 
-  // Plant-inversion feedforward calculates the voltages necessary to reach our
-  // reference.
-  frc::LinearPlantInversionFeedforward<2, 1> m_feedforward{m_elevatorPlant,
-                                                           20_ms};
-
   // The state-space loop combines a controller, observer, feedforward and plant
   // for easy control.
   frc::LinearSystemLoop<2, 1, 1> m_loop{m_elevatorPlant, m_controller,
-                                        m_feedforward, m_observer, 12_V};
+                                        m_observer, 12_V, 20_ms};
 
   // An encoder set up to measure elevator height in meters.
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
@@ -102,13 +90,13 @@ class Robot : public frc::TimedRobot {
   frc::TrapezoidProfile<units::meters>::State m_lastProfiledReference;
 
  public:
-  void RobotInit() {
+  void RobotInit() override {
     // Circumference = pi * d, so distance per click = pi * d / counts
     m_encoder.SetDistancePerPulse(2.0 * wpi::math::pi *
                                   kDrumRadius.to<double>() / 4096.0);
   }
 
-  void TeleopInit() {
+  void TeleopInit() override {
     // Reset our loop to make sure it's in a known state.
     m_loop.Reset(
         frc::MakeMatrix<2, 1>(m_encoder.GetDistance(), m_encoder.GetRate()));
@@ -117,7 +105,7 @@ class Robot : public frc::TimedRobot {
                                units::meters_per_second_t(m_encoder.GetRate())};
   }
 
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     // Sets the target height of our elevator. This is similar to setting the
     // setpoint of a PID controller.
     frc::TrapezoidProfile<units::meters>::State goal;
@@ -152,5 +140,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

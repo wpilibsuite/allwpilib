@@ -1,22 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -30,19 +16,27 @@ import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
- * The scheduler responsible for running {@link Command}s.  A Command-based robot should call {@link
+ * The scheduler responsible for running {@link Command}s. A Command-based robot should call {@link
  * CommandScheduler#run()} on the singleton instance in its periodic block in order to run commands
- * synchronously from the main loop.  Subsystems should be registered with the scheduler using
- * {@link CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link
- * Subsystem#periodic()} methods to be called and for their default commands to be scheduled.
+ * synchronously from the main loop. Subsystems should be registered with the scheduler using {@link
+ * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
+ * methods to be called and for their default commands to be scheduled.
  */
-@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods", "PMD.TooManyFields"})
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyFields"})
 public final class CommandScheduler implements Sendable, AutoCloseable {
-  /**
-   * The Singleton Instance.
-   */
+  /** The Singleton Instance. */
   private static CommandScheduler instance;
 
   /**
@@ -57,24 +51,24 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return instance;
   }
 
-  //A map from commands to their scheduling state.  Also used as a set of the currently-running
-  //commands.
+  // A map from commands to their scheduling state.  Also used as a set of the currently-running
+  // commands.
   private final Map<Command, CommandState> m_scheduledCommands = new LinkedHashMap<>();
 
-  //A map from required subsystems to their requiring commands.  Also used as a set of the
-  //currently-required subsystems.
+  // A map from required subsystems to their requiring commands.  Also used as a set of the
+  // currently-required subsystems.
   private final Map<Subsystem, Command> m_requirements = new LinkedHashMap<>();
 
-  //A map from subsystems registered with the scheduler to their default commands.  Also used
-  //as a list of currently-registered subsystems.
+  // A map from subsystems registered with the scheduler to their default commands.  Also used
+  // as a list of currently-registered subsystems.
   private final Map<Subsystem, Command> m_subsystems = new LinkedHashMap<>();
 
-  //The set of currently-registered buttons that will be polled every iteration.
+  // The set of currently-registered buttons that will be polled every iteration.
   private final Collection<Runnable> m_buttons = new LinkedHashSet<>();
 
   private boolean m_disabled;
 
-  //Lists of user-supplied actions to be executed on scheduling events for every command.
+  // Lists of user-supplied actions to be executed on scheduling events for every command.
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
   private final List<Consumer<Command>> m_executeActions = new ArrayList<>();
   private final List<Consumer<Command>> m_interruptActions = new ArrayList<>();
@@ -86,22 +80,24 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   private final Map<Command, Boolean> m_toSchedule = new LinkedHashMap<>();
   private final List<Command> m_toCancel = new ArrayList<>();
 
-  private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> { });
+  private final Watchdog m_watchdog = new Watchdog(TimedRobot.kDefaultPeriod, () -> {});
 
   CommandScheduler() {
     HAL.report(tResourceType.kResourceType_Command, tInstances.kCommand2_Scheduler);
     SendableRegistry.addLW(this, "Scheduler");
-    LiveWindow.setEnabledListener(() -> {
-      disable();
-      cancelAll();
-    });
-    LiveWindow.setDisabledListener(() -> {
-      enable();
-    });
+    LiveWindow.setEnabledListener(
+        () -> {
+          disable();
+          cancelAll();
+        });
+    LiveWindow.setDisabledListener(
+        () -> {
+          enable();
+        });
   }
 
   /**
-   * Changes the period of the loop overrun watchdog.  This should be be kept in sync with the
+   * Changes the period of the loop overrun watchdog. This should be be kept in sync with the
    * TimedRobot period.
    *
    * @param period Period in seconds.
@@ -126,9 +122,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_buttons.add(button);
   }
 
-  /**
-   * Removes all button bindings from the scheduler.
-   */
+  /** Removes all button bindings from the scheduler. */
   public void clearButtons() {
     m_buttons.clear();
   }
@@ -136,9 +130,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   /**
    * Initializes a given command, adds its requirements to the list, and performs the init actions.
    *
-   * @param command       The command to initialize
+   * @param command The command to initialize
    * @param interruptible Whether the command is interruptible
-   * @param requirements  The command requirements
+   * @param requirements The command requirements
    */
   private void initCommand(Command command, boolean interruptible, Set<Subsystem> requirements) {
     CommandState scheduledCommand = new CommandState(interruptible);
@@ -155,13 +149,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Schedules a command for execution.  Does nothing if the command is already scheduled. If a
+   * Schedules a command for execution. Does nothing if the command is already scheduled. If a
    * command's requirements are not available, it will only be started if all the commands currently
-   * using those requirements have been scheduled as interruptible.  If this is the case, they will
+   * using those requirements have been scheduled as interruptible. If this is the case, they will
    * be interrupted and the command will be scheduled.
    *
    * @param interruptible whether this command can be interrupted
-   * @param command       the command to schedule
+   * @param command the command to schedule
    */
   @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   private void schedule(boolean interruptible, Command command) {
@@ -175,21 +169,22 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
           "A command that is part of a command group cannot be independently scheduled");
     }
 
-    //Do nothing if the scheduler is disabled, the robot is disabled and the command doesn't
-    //run when disabled, or the command is already scheduled.
-    if (m_disabled || (RobotState.isDisabled() && !command.runsWhenDisabled())
+    // Do nothing if the scheduler is disabled, the robot is disabled and the command doesn't
+    // run when disabled, or the command is already scheduled.
+    if (m_disabled
+        || (RobotState.isDisabled() && !command.runsWhenDisabled())
         || m_scheduledCommands.containsKey(command)) {
       return;
     }
 
     Set<Subsystem> requirements = command.getRequirements();
 
-    //Schedule the command if the requirements are not currently in-use.
+    // Schedule the command if the requirements are not currently in-use.
     if (Collections.disjoint(m_requirements.keySet(), requirements)) {
       initCommand(command, interruptible, requirements);
     } else {
-      //Else check if the requirements that are in use have all have interruptible commands,
-      //and if so, interrupt those commands and schedule the new command.
+      // Else check if the requirements that are in use have all have interruptible commands,
+      // and if so, interrupt those commands and schedule the new command.
       for (Subsystem requirement : requirements) {
         if (m_requirements.containsKey(requirement)
             && !m_scheduledCommands.get(m_requirements.get(requirement)).isInterruptible()) {
@@ -206,13 +201,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Schedules multiple commands for execution.  Does nothing if the command is already scheduled.
-   * If a command's requirements are not available, it will only be started if all the commands
-   * currently using those requirements have been scheduled as interruptible.  If this is the case,
+   * Schedules multiple commands for execution. Does nothing if the command is already scheduled. If
+   * a command's requirements are not available, it will only be started if all the commands
+   * currently using those requirements have been scheduled as interruptible. If this is the case,
    * they will be interrupted and the command will be scheduled.
    *
    * @param interruptible whether the commands should be interruptible
-   * @param commands      the commands to schedule
+   * @param commands the commands to schedule
    */
   public void schedule(boolean interruptible, Command... commands) {
     for (Command command : commands) {
@@ -221,7 +216,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Schedules multiple commands for execution, with interruptible defaulted to true.  Does nothing
+   * Schedules multiple commands for execution, with interruptible defaulted to true. Does nothing
    * if the command is already scheduled.
    *
    * @param commands the commands to schedule
@@ -231,7 +226,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Runs a single iteration of the scheduler.  The execution occurs in the following order:
+   * Runs a single iteration of the scheduler. The execution occurs in the following order:
    *
    * <p>Subsystem periodic methods are called.
    *
@@ -251,7 +246,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     }
     m_watchdog.reset();
 
-    //Run the periodic method of all registered subsystems.
+    // Run the periodic method of all registered subsystems.
     for (Subsystem subsystem : m_subsystems.keySet()) {
       subsystem.periodic();
       if (RobotBase.isSimulation()) {
@@ -260,16 +255,16 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       m_watchdog.addEpoch(subsystem.getClass().getSimpleName() + ".periodic()");
     }
 
-    //Poll buttons for new commands to add.
+    // Poll buttons for new commands to add.
     for (Runnable button : m_buttons) {
       button.run();
     }
     m_watchdog.addEpoch("buttons.run()");
 
     m_inRunLoop = true;
-    //Run scheduled commands, remove finished commands.
+    // Run scheduled commands, remove finished commands.
     for (Iterator<Command> iterator = m_scheduledCommands.keySet().iterator();
-         iterator.hasNext(); ) {
+        iterator.hasNext(); ) {
       Command command = iterator.next();
 
       if (!command.runsWhenDisabled() && RobotState.isDisabled()) {
@@ -301,7 +296,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     }
     m_inRunLoop = false;
 
-    //Schedule/cancel commands from queues populated during loop
+    // Schedule/cancel commands from queues populated during loop
     for (Map.Entry<Command, Boolean> commandInterruptible : m_toSchedule.entrySet()) {
       schedule(commandInterruptible.getValue(), commandInterruptible.getKey());
     }
@@ -313,7 +308,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     m_toSchedule.clear();
     m_toCancel.clear();
 
-    //Add default commands for un-required registered subsystems.
+    // Add default commands for un-required registered subsystems.
     for (Map.Entry<Subsystem, Command> subsystemCommand : m_subsystems.entrySet()) {
       if (!m_requirements.containsKey(subsystemCommand.getKey())
           && subsystemCommand.getValue() != null) {
@@ -329,10 +324,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Registers subsystems with the scheduler.  This must be called for the subsystem's periodic
-   * block to run when the scheduler is run, and for the subsystem's default command to be
-   * scheduled.  It is recommended to call this from the constructor of your subsystem
-   * implementations.
+   * Registers subsystems with the scheduler. This must be called for the subsystem's periodic block
+   * to run when the scheduler is run, and for the subsystem's default command to be scheduled. It
+   * is recommended to call this from the constructor of your subsystem implementations.
    *
    * @param subsystems the subsystem to register
    */
@@ -343,7 +337,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Un-registers subsystems with the scheduler.  The subsystem will no longer have its periodic
+   * Un-registers subsystems with the scheduler. The subsystem will no longer have its periodic
    * block called, and will not have its default command scheduled.
    *
    * @param subsystems the subsystem to un-register
@@ -353,13 +347,13 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets the default command for a subsystem.  Registers that subsystem if it is not already
-   * registered.  Default commands will run whenever there is no other command currently scheduled
-   * that requires the subsystem.  Default commands should be written to never end (i.e. their
-   * {@link Command#isFinished()} method should return false), as they would simply be re-scheduled
-   * if they do.  Default commands must also require their subsystem.
+   * Sets the default command for a subsystem. Registers that subsystem if it is not already
+   * registered. Default commands will run whenever there is no other command currently scheduled
+   * that requires the subsystem. Default commands should be written to never end (i.e. their {@link
+   * Command#isFinished()} method should return false), as they would simply be re-scheduled if they
+   * do. Default commands must also require their subsystem.
    *
-   * @param subsystem      the subsystem whose default command will be set
+   * @param subsystem the subsystem whose default command will be set
    * @param defaultCommand the default command to associate with the subsystem
    */
   public void setDefaultCommand(Subsystem subsystem, Command defaultCommand) {
@@ -375,7 +369,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the default command associated with this subsystem.  Null if this subsystem has no default
+   * Gets the default command associated with this subsystem. Null if this subsystem has no default
    * command associated with it.
    *
    * @param subsystem the subsystem to inquire about
@@ -386,9 +380,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method
-   * of the canceled command with {@code true},
-   * indicating they were canceled (as opposed to finishing normally).
+   * Cancels commands. The scheduler will only call {@link Command#end(boolean)} method of the
+   * canceled command with {@code true}, indicating they were canceled (as opposed to finishing
+   * normally).
    *
    * <p>Commands will be canceled even if they are not scheduled as interruptible.
    *
@@ -415,9 +409,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     }
   }
 
-  /**
-   * Cancels all commands that are currently scheduled.
-   */
+  /** Cancels all commands that are currently scheduled. */
   public void cancelAll() {
     for (Command command : m_scheduledCommands.keySet().toArray(new Command[0])) {
       cancel(command);
@@ -425,7 +417,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns the time since a given command was scheduled.  Note that this only works on commands
+   * Returns the time since a given command was scheduled. Note that this only works on commands
    * that are directly scheduled by the scheduler; it will not work on commands inside of
    * commandgroups, as the scheduler does not see them.
    *
@@ -442,9 +434,9 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Whether the given commands are running.  Note that this only works on commands that are
-   * directly scheduled by the scheduler; it will not work on commands inside of CommandGroups, as
-   * the scheduler does not see them.
+   * Whether the given commands are running. Note that this only works on commands that are directly
+   * scheduled by the scheduler; it will not work on commands inside of CommandGroups, as the
+   * scheduler does not see them.
    *
    * @param commands the command to query
    * @return whether the command is currently scheduled
@@ -454,7 +446,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   /**
-   * Returns the command currently requiring a given subsystem.  Null if no command is currently
+   * Returns the command currently requiring a given subsystem. Null if no command is currently
    * requiring the subsystem
    *
    * @param subsystem the subsystem to be inquired about
@@ -464,16 +456,12 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return m_requirements.get(subsystem);
   }
 
-  /**
-   * Disables the command scheduler.
-   */
+  /** Disables the command scheduler. */
   public void disable() {
     m_disabled = true;
   }
 
-  /**
-   * Enables the command scheduler.
-   */
+  /** Enables the command scheduler. */
   public void enable() {
     m_disabled = false;
   }
@@ -520,34 +508,33 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     final NetworkTableEntry namesEntry = builder.getEntry("Names");
     final NetworkTableEntry idsEntry = builder.getEntry("Ids");
     final NetworkTableEntry cancelEntry = builder.getEntry("Cancel");
-    builder.setUpdateTable(() -> {
+    builder.setUpdateTable(
+        () -> {
+          if (namesEntry == null || idsEntry == null || cancelEntry == null) {
+            return;
+          }
 
-      if (namesEntry == null || idsEntry == null || cancelEntry == null) {
-        return;
-      }
+          Map<Double, Command> ids = new LinkedHashMap<>();
 
-      Map<Double, Command> ids = new LinkedHashMap<>();
+          for (Command command : m_scheduledCommands.keySet()) {
+            ids.put((double) command.hashCode(), command);
+          }
 
+          double[] toCancel = cancelEntry.getDoubleArray(new double[0]);
+          if (toCancel.length > 0) {
+            for (double hash : toCancel) {
+              cancel(ids.get(hash));
+              ids.remove(hash);
+            }
+            cancelEntry.setDoubleArray(new double[0]);
+          }
 
-      for (Command command : m_scheduledCommands.keySet()) {
-        ids.put((double) command.hashCode(), command);
-      }
+          List<String> names = new ArrayList<>();
 
-      double[] toCancel = cancelEntry.getDoubleArray(new double[0]);
-      if (toCancel.length > 0) {
-        for (double hash : toCancel) {
-          cancel(ids.get(hash));
-          ids.remove(hash);
-        }
-        cancelEntry.setDoubleArray(new double[0]);
-      }
+          ids.values().forEach(command -> names.add(command.getName()));
 
-      List<String> names = new ArrayList<>();
-
-      ids.values().forEach(command -> names.add(command.getName()));
-
-      namesEntry.setStringArray(names.toArray(new String[0]));
-      idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
-    });
+          namesEntry.setStringArray(names.toArray(new String[0]));
+          idsEntry.setNumberArray(ids.keySet().toArray(new Double[0]));
+        });
   }
 }

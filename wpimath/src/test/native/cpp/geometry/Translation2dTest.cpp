@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
 
@@ -87,4 +84,14 @@ TEST(Translation2dTest, Inequality) {
   const Translation2d one{9_m, 5.5_m};
   const Translation2d two{9_m, 5.7_m};
   EXPECT_TRUE(one != two);
+}
+
+TEST(Translation2dTest, PolarConstructor) {
+  Translation2d one{std::sqrt(2) * 1_m, Rotation2d(45_deg)};
+  EXPECT_NEAR(one.X().to<double>(), 1.0, kEpsilon);
+  EXPECT_NEAR(one.Y().to<double>(), 1.0, kEpsilon);
+
+  Translation2d two{2_m, Rotation2d(60_deg)};
+  EXPECT_NEAR(two.X().to<double>(), 1.0, kEpsilon);
+  EXPECT_NEAR(two.Y().to<double>(), std::sqrt(3.0), kEpsilon);
 }

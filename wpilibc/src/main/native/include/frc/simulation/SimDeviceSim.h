@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -14,8 +11,7 @@
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 
-namespace frc {
-namespace sim {
+namespace frc::sim {
 
 /**
  * Class to control the simulation side of a SimDevice.
@@ -29,28 +25,92 @@ class SimDeviceSim {
    */
   explicit SimDeviceSim(const char* name);
 
+  /**
+   * Get the property object with the given name.
+   *
+   * @param name the property name
+   * @return the property object
+   */
   hal::SimValue GetValue(const char* name) const;
 
+  /**
+   * Get the property object with the given name.
+   *
+   * @param name the property name
+   * @return the property object
+   */
+  hal::SimInt GetInt(const char* name) const;
+
+  /**
+   * Get the property object with the given name.
+   *
+   * @param name the property name
+   * @return the property object
+   */
+  hal::SimLong GetLong(const char* name) const;
+
+  /**
+   * Get the property object with the given name.
+   *
+   * @param name the property name
+   * @return the property object
+   */
   hal::SimDouble GetDouble(const char* name) const;
 
+  /**
+   * Get the property object with the given name.
+   *
+   * @param name the property name
+   * @return the property object
+   */
   hal::SimEnum GetEnum(const char* name) const;
 
+  /**
+   * Get the property object with the given name.
+   *
+   * @param name the property name
+   * @return the property object
+   */
   hal::SimBoolean GetBoolean(const char* name) const;
 
+  /**
+   * Get all options for the given enum.
+   *
+   * @param val the enum
+   * @return names of the different values for that enum
+   */
   static std::vector<std::string> GetEnumOptions(hal::SimEnum val);
 
+  /**
+   * Get all properties.
+   *
+   * @param callback callback called for each property (SimValue).  Signature
+   *                 of the callback must be const char*, HAL_SimValueHandle,
+   *                 int, const HAL_Value*
+   */
   template <typename F>
   void EnumerateValues(F callback) const {
     return HALSIM_EnumerateSimValues(
         m_handle, &callback,
         [](const char* name, void* param, HAL_SimValueHandle handle,
-           HAL_Bool readonly, const struct HAL_Value* value) {
-          std::invoke(*static_cast<F*>(param), name, handle, readonly, value);
+           int direction, const struct HAL_Value* value) {
+          std::invoke(*static_cast<F*>(param), name, handle, direction, value);
         });
   }
 
-  operator HAL_SimDeviceHandle() const { return m_handle; }
+  /**
+   * Get the raw handle of this object.
+   *
+   * @return the handle used to refer to this object
+   */
+  operator HAL_SimDeviceHandle() const { return m_handle; }  // NOLINT
 
+  /**
+   * Get all sim devices with the given prefix.
+   *
+   * @param prefix the prefix to filter sim devices
+   * @param callback callback function to call for each sim device
+   */
   template <typename F>
   static void EnumerateDevices(const char* prefix, F callback) {
     return HALSIM_EnumerateSimDevices(
@@ -60,10 +120,12 @@ class SimDeviceSim {
         });
   }
 
+  /**
+   * Reset all SimDevice data.
+   */
   static void ResetData();
 
  private:
   HAL_SimDeviceHandle m_handle;
 };
-}  // namespace sim
-}  // namespace frc
+}  // namespace frc::sim

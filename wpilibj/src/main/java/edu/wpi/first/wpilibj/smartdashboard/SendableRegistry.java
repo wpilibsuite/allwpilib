@@ -1,12 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Sendable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,16 +15,10 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Sendable;
-
-
 /**
- * The SendableRegistry class is the public interface for registering sensors
- * and actuators for use on dashboards and LiveWindow.
+ * The SendableRegistry class is the public interface for registering sensors and actuators for use
+ * on dashboards and LiveWindow.
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public class SendableRegistry {
   private static class Component {
     Component() {}
@@ -84,10 +78,9 @@ public class SendableRegistry {
   /**
    * Adds an object to the registry.
    *
-   * @param sendable     object to add
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
-   * @param channel      The channel number the device is plugged into
+   * @param sendable object to add
+   * @param moduleType A string that defines the module name in the label for the value
+   * @param channel The channel number the device is plugged into
    */
   public static synchronized void add(Sendable sendable, String moduleType, int channel) {
     Component comp = getOrAdd(sendable);
@@ -97,14 +90,13 @@ public class SendableRegistry {
   /**
    * Adds an object to the registry.
    *
-   * @param sendable     object to add
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
+   * @param sendable object to add
+   * @param moduleType A string that defines the module name in the label for the value
    * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into
+   * @param channel The channel number the device is plugged into
    */
-  public static synchronized void add(Sendable sendable, String moduleType, int moduleNumber,
-      int channel) {
+  public static synchronized void add(
+      Sendable sendable, String moduleType, int moduleNumber, int channel) {
     Component comp = getOrAdd(sendable);
     comp.setName(moduleType, moduleNumber, channel);
   }
@@ -137,10 +129,9 @@ public class SendableRegistry {
   /**
    * Adds an object to the registry and LiveWindow.
    *
-   * @param sendable     object to add
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
-   * @param channel      The channel number the device is plugged into
+   * @param sendable object to add
+   * @param moduleType A string that defines the module name in the label for the value
+   * @param channel The channel number the device is plugged into
    */
   public static synchronized void addLW(Sendable sendable, String moduleType, int channel) {
     Component comp = getOrAdd(sendable);
@@ -151,14 +142,13 @@ public class SendableRegistry {
   /**
    * Adds an object to the registry and LiveWindow.
    *
-   * @param sendable     object to add
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
+   * @param sendable object to add
+   * @param moduleType A string that defines the module name in the label for the value
    * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into
+   * @param channel The channel number the device is plugged into
    */
-  public static synchronized void addLW(Sendable sendable, String moduleType, int moduleNumber,
-      int channel) {
+  public static synchronized void addLW(
+      Sendable sendable, String moduleType, int moduleNumber, int channel) {
     Component comp = getOrAdd(sendable);
     comp.m_liveWindow = true;
     comp.setName(moduleType, moduleNumber, channel);
@@ -179,8 +169,8 @@ public class SendableRegistry {
   }
 
   /**
-   * Adds a child object to an object.  Adds the child object to the registry
-   * if it's not already present.
+   * Adds a child object to an object. Adds the child object to the registry if it's not already
+   * present.
    *
    * @param parent parent object
    * @param child child object
@@ -244,10 +234,9 @@ public class SendableRegistry {
   /**
    * Sets the name of an object with a channel number.
    *
-   * @param sendable   object
-   * @param moduleType A string that defines the module name in the label for
-   *                   the value
-   * @param channel    The channel number the device is plugged into
+   * @param sendable object
+   * @param moduleType A string that defines the module name in the label for the value
+   * @param channel The channel number the device is plugged into
    */
   public static synchronized void setName(Sendable sendable, String moduleType, int channel) {
     Component comp = components.get(sendable);
@@ -259,14 +248,13 @@ public class SendableRegistry {
   /**
    * Sets the name of an object with a module and channel number.
    *
-   * @param sendable     object
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
+   * @param sendable object
+   * @param moduleType A string that defines the module name in the label for the value
    * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into
+   * @param channel The channel number the device is plugged into
    */
-  public static synchronized void setName(Sendable sendable, String moduleType, int moduleNumber,
-      int channel) {
+  public static synchronized void setName(
+      Sendable sendable, String moduleType, int moduleNumber, int channel) {
     Component comp = components.get(sendable);
     if (comp != null) {
       comp.setName(moduleType, moduleNumber, channel);
@@ -415,43 +403,29 @@ public class SendableRegistry {
     }
   }
 
-  /**
-   * Data passed to foreachLiveWindow() callback function.
-   */
+  /** Data passed to foreachLiveWindow() callback function. */
   public static class CallbackData {
-    /**
-     * Sendable object.
-     */
+    /** Sendable object. */
     @SuppressWarnings("MemberName")
     public Sendable sendable;
 
-    /**
-     * Name.
-     */
+    /** Name. */
     @SuppressWarnings("MemberName")
     public String name;
 
-    /**
-     * Subsystem.
-     */
+    /** Subsystem. */
     @SuppressWarnings("MemberName")
     public String subsystem;
 
-    /**
-     * Parent sendable object.
-     */
+    /** Parent sendable object. */
     @SuppressWarnings("MemberName")
     public Sendable parent;
 
-    /**
-     * Data stored in object with setData().  Update this to change the data.
-     */
+    /** Data stored in object with setData(). Update this to change the data. */
     @SuppressWarnings("MemberName")
     public Object data;
 
-    /**
-     * Sendable builder for the sendable.
-     */
+    /** Sendable builder for the sendable. */
     @SuppressWarnings("MemberName")
     public SendableBuilderImpl builder;
   }
@@ -461,17 +435,19 @@ public class SendableRegistry {
   private static List<Component> foreachComponents = new ArrayList<>();
 
   /**
-   * Iterates over LiveWindow-enabled objects in the registry.
-   * It is *not* safe to call other SendableRegistry functions from the
-   * callback.
+   * Iterates over LiveWindow-enabled objects in the registry. It is *not* safe to call other
+   * SendableRegistry functions from the callback.
    *
    * @param dataHandle data handle to get data object passed to callback
    * @param callback function to call for each object
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-                     "PMD.AvoidCatchingThrowable"})
-  public static synchronized void foreachLiveWindow(int dataHandle,
-      Consumer<CallbackData> callback) {
+  @SuppressWarnings({
+    "PMD.CyclomaticComplexity",
+    "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.AvoidCatchingThrowable"
+  })
+  public static synchronized void foreachLiveWindow(
+      int dataHandle, Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();
     foreachComponents.clear();
     foreachComponents.addAll(components.values());
@@ -502,8 +478,11 @@ public class SendableRegistry {
             throwable = cause;
           }
           DriverStation.reportError(
-              "Unhandled exception calling LiveWindow for " + comp.m_name + ": "
-                  + throwable.toString(), false);
+              "Unhandled exception calling LiveWindow for "
+                  + comp.m_name
+                  + ": "
+                  + throwable.toString(),
+              false);
           comp.m_liveWindow = false;
         }
         if (cbdata.data != null) {

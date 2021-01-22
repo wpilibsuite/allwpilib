@@ -1,13 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/SPI.h"
 
 #include <cstring>
+#include <memory>
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
@@ -79,7 +77,9 @@ void SPI::Accumulator::Update() {
     // get amount of data available
     int32_t numToRead =
         HAL_ReadSPIAutoReceivedData(m_port, m_buf, 0, 0, &status);
-    if (status != 0) return;  // error reading
+    if (status != 0) {
+      return;  // error reading
+    }
 
     // only get whole responses; +1 is for timestamp
     numToRead -= numToRead % m_xferSize;
@@ -87,11 +87,15 @@ void SPI::Accumulator::Update() {
       numToRead = m_xferSize * kAccumulateDepth;
       done = false;
     }
-    if (numToRead == 0) return;  // no samples
+    if (numToRead == 0) {
+      return;  // no samples
+    }
 
     // read buffered data
     HAL_ReadSPIAutoReceivedData(m_port, m_buf, numToRead, 0, &status);
-    if (status != 0) return;  // error reading
+    if (status != 0) {
+      return;  // error reading
+    }
 
     // loop over all responses
     for (int32_t off = 0; off < numToRead; off += m_xferSize) {
@@ -118,7 +122,9 @@ void SPI::Accumulator::Update() {
         int32_t data = static_cast<int32_t>(resp >> m_dataShift);
         data &= m_dataMax - 1;
         // 2s complement conversion if signed MSB is set
-        if (m_isSigned && (data & m_dataMsbMask) != 0) data -= m_dataMax;
+        if (m_isSigned && (data & m_dataMsbMask) != 0) {
+          data -= m_dataMax;
+        }
         // center offset
         int32_t dataNoCenter = data;
         data -= m_center;
@@ -127,18 +133,19 @@ void SPI::Accumulator::Update() {
           m_value += data;
           if (m_count != 0) {
             // timestamps use the 1us FPGA clock; also handle rollover
-            if (timestamp >= m_lastTimestamp)
+            if (timestamp >= m_lastTimestamp) {
               m_integratedValue +=
                   dataNoCenter *
                       static_cast<int32_t>(timestamp - m_lastTimestamp) * 1e-6 -
                   m_integratedCenter;
-            else
+            } else {
               m_integratedValue +=
                   dataNoCenter *
                       static_cast<int32_t>((1ULL << 32) - m_lastTimestamp +
                                            timestamp) *
                       1e-6 -
                   m_integratedCenter;
+            }
           }
         }
         ++m_count;
@@ -161,9 +168,13 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
              static_cast<uint8_t>(port) + 1);
 }
 
-SPI::~SPI() { HAL_CloseSPI(m_port); }
+SPI::~SPI() {
+  HAL_CloseSPI(m_port);
+}
 
-void SPI::SetClockRate(int hz) { HAL_SetSPISpeed(m_port, hz); }
+void SPI::SetClockRate(int hz) {
+  HAL_SetSPISpeed(m_port, hz);
+}
 
 void SPI::SetMSBFirst() {
   m_msbFirst = true;
@@ -272,10 +283,10 @@ void SPI::StartAutoRate(double period) {
 
 void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
   int32_t status = 0;
-  HAL_StartSPIAutoTrigger(
-      m_port, source.GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(), rising,
-      falling, &status);
+  HAL_StartSPIAutoTrigger(m_port, source.GetPortHandleForRouting(),
+                          static_cast<HAL_AnalogTriggerType>(
+                              source.GetAnalogTriggerTypeForRouting()),
+                          rising, falling, &status);
   wpi_setHALError(status);
 }
 
@@ -341,8 +352,9 @@ void SPI::InitAccumulator(units::second_t period, int cmd, int xferSize,
   SetAutoTransmitData(cmdBytes, xferSize - 4);
   StartAutoRate(period);
 
-  m_accum.reset(new Accumulator(m_port, xferSize, validMask, validValue,
-                                dataShift, dataSize, isSigned, bigEndian));
+  m_accum =
+      std::make_unique<Accumulator>(m_port, xferSize, validMask, validValue,
+                                    dataShift, dataSize, isSigned, bigEndian);
   m_accum->m_notifier.StartPeriodic(period * kAccumulateDepth / 2);
 }
 
@@ -359,7 +371,9 @@ void SPI::FreeAccumulator() {
 }
 
 void SPI::ResetAccumulator() {
-  if (!m_accum) return;
+  if (!m_accum) {
+    return;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_value = 0;
   m_accum->m_count = 0;
@@ -369,43 +383,57 @@ void SPI::ResetAccumulator() {
 }
 
 void SPI::SetAccumulatorCenter(int center) {
-  if (!m_accum) return;
+  if (!m_accum) {
+    return;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_center = center;
 }
 
 void SPI::SetAccumulatorDeadband(int deadband) {
-  if (!m_accum) return;
+  if (!m_accum) {
+    return;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_deadband = deadband;
 }
 
 int SPI::GetAccumulatorLastValue() const {
-  if (!m_accum) return 0;
+  if (!m_accum) {
+    return 0;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_lastValue;
 }
 
 int64_t SPI::GetAccumulatorValue() const {
-  if (!m_accum) return 0;
+  if (!m_accum) {
+    return 0;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_value;
 }
 
 int64_t SPI::GetAccumulatorCount() const {
-  if (!m_accum) return 0;
+  if (!m_accum) {
+    return 0;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_count;
 }
 
 double SPI::GetAccumulatorAverage() const {
-  if (!m_accum) return 0;
+  if (!m_accum) {
+    return 0;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
-  if (m_accum->m_count == 0) return 0.0;
+  if (m_accum->m_count == 0) {
+    return 0.0;
+  }
   return static_cast<double>(m_accum->m_value) / m_accum->m_count;
 }
 
@@ -422,23 +450,31 @@ void SPI::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
 }
 
 void SPI::SetAccumulatorIntegratedCenter(double center) {
-  if (!m_accum) return;
+  if (!m_accum) {
+    return;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->m_integratedCenter = center;
 }
 
 double SPI::GetAccumulatorIntegratedValue() const {
-  if (!m_accum) return 0;
+  if (!m_accum) {
+    return 0;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
   return m_accum->m_integratedValue;
 }
 
 double SPI::GetAccumulatorIntegratedAverage() const {
-  if (!m_accum) return 0;
+  if (!m_accum) {
+    return 0;
+  }
   std::scoped_lock lock(m_accum->m_mutex);
   m_accum->Update();
-  if (m_accum->m_count <= 1) return 0.0;
+  if (m_accum->m_count <= 1) {
+    return 0.0;
+  }
   // count-1 due to not integrating the first value received
   return m_accum->m_integratedValue / (m_accum->m_count - 1);
 }

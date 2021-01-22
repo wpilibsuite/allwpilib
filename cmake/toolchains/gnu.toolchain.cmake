@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 
 # load settings in case of "try compile"
-set(TOOLCHAIN_CONFIG_FILE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/toolchain.config.cmake")
+set(TOOLCHAIN_CONFIG_FILE "${WPILIB_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/toolchain.config.cmake")
 get_property(__IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
 if(__IN_TRY_COMPILE)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/../toolchain.config.cmake" OPTIONAL) # CMAKE_BINARY_DIR is different
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../toolchain.config.cmake" OPTIONAL) # WPILIB_BINARY_DIR is different
   macro(toolchain_save_config)
     # nothing
   endmacro()

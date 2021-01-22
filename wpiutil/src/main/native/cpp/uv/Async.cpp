@@ -1,22 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/uv/Async.h"
 
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 Async<>::~Async() noexcept {
-  if (auto loop = m_loop.lock())
+  if (auto loop = m_loop.lock()) {
     Close();
-  else
+  } else {
     ForceClosed();
+  }
 }
 
 std::shared_ptr<Async<>> Async<>::Create(const std::shared_ptr<Loop>& loop) {
@@ -33,5 +30,4 @@ std::shared_ptr<Async<>> Async<>::Create(const std::shared_ptr<Loop>& loop) {
   return h;
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

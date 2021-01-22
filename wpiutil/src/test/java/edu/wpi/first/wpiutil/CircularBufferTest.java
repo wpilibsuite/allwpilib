@@ -1,23 +1,23 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpiutil;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
+
 class CircularBufferTest {
-  private final double[] m_values = {751.848, 766.366, 342.657, 234.252, 716.126,
-      132.344, 445.697, 22.727, 421.125, 799.913};
-  private final double[] m_addFirstOut = {799.913, 421.125, 22.727, 445.697, 132.344,
-      716.126, 234.252, 342.657};
-  private final double[] m_addLastOut = {342.657, 234.252, 716.126, 132.344, 445.697,
-      22.727, 421.125, 799.913};
+  private final double[] m_values = {
+    751.848, 766.366, 342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913
+  };
+  private final double[] m_addFirstOut = {
+    799.913, 421.125, 22.727, 445.697, 132.344, 716.126, 234.252, 342.657
+  };
+  private final double[] m_addLastOut = {
+    342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913
+  };
 
   @Test
   void addFirstTest() {

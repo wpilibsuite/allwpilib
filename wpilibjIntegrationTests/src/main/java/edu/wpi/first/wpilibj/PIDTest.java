@@ -1,17 +1,24 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,23 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-import edu.wpi.first.wpilibj.test.TestBench;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-
-/**
- * Test that covers the {@link PIDController}.
- */
-
+/** Test that covers the {@link PIDController}. */
 @RunWith(Parameterized.class)
 public class PIDTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
@@ -58,8 +49,7 @@ public class PIDTest extends AbstractComsSetup {
     return logger;
   }
 
-
-  @SuppressWarnings({"ParameterName", "JavadocMethod"})
+  @SuppressWarnings({"ParameterName", "MissingJavadocMethod"})
   public PIDTest(Double p, Double i, Double d, MotorEncoderFixture<?> mef) {
     logger.fine("Constructor with: " + mef.getType());
     if (PIDTest.me != null && !PIDTest.me.equals(mef)) {
@@ -71,7 +61,6 @@ public class PIDTest extends AbstractComsSetup {
     this.k_d = d;
   }
 
-
   @Parameters
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
@@ -80,16 +69,19 @@ public class PIDTest extends AbstractComsSetup {
     double ki = 0.0005;
     double kd = 0.0;
     for (int i = 0; i < 1; i++) {
-      data.addAll(Arrays.asList(new Object[][]{{kp, ki, kd, TestBench.getInstance().getTalonPair()},
-          {kp, ki, kd, TestBench.getInstance().getVictorPair()},
-          {kp, ki, kd, TestBench.getInstance().getJaguarPair()}}));
+      data.addAll(
+          Arrays.asList(
+              new Object[][] {
+                {kp, ki, kd, TestBench.getInstance().getTalonPair()},
+                {kp, ki, kd, TestBench.getInstance().getVictorPair()},
+                {kp, ki, kd, TestBench.getInstance().getJaguarPair()}
+              }));
     }
     return data;
   }
 
   @BeforeClass
-  public static void setUpBeforeClass() {
-  }
+  public static void setUpBeforeClass() {}
 
   @AfterClass
   public static void tearDownAfterClass() {
@@ -130,8 +122,11 @@ public class PIDTest extends AbstractComsSetup {
     setupIntegratorRange();
     double reference = 2500.0;
     m_controller.setSetpoint(reference);
-    assertEquals("PID.getPositionError() did not start at " + reference,
-        reference, m_controller.getPositionError(), 0);
+    assertEquals(
+        "PID.getPositionError() did not start at " + reference,
+        reference,
+        m_controller.getPositionError(),
+        0);
     m_builder.updateTable();
     assertEquals(k_p, m_table.getEntry("Kp").getDouble(9999999), 0);
     assertEquals(k_i, m_table.getEntry("Ki").getDouble(9999999), 0);
@@ -156,24 +151,34 @@ public class PIDTest extends AbstractComsSetup {
     double reference = 1000.0;
     assertEquals(pidData() + "did not start at 0", 0, me.getMotor().get(), 0);
     m_controller.setSetpoint(reference);
-    assertEquals(pidData() + "did not have an error of " + reference, reference,
-        m_controller.getPositionError(), 0);
-    Notifier pidRunner = new Notifier(
-        () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
+    assertEquals(
+        pidData() + "did not have an error of " + reference,
+        reference,
+        m_controller.getPositionError(),
+        0);
+    Notifier pidRunner =
+        new Notifier(
+            () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
     pidRunner.startPeriodic(m_controller.getPeriod());
     Timer.delay(5);
     pidRunner.stop();
-    assertTrue(pidData() + "Was not on Target. Controller Error: "
-        + m_controller.getPositionError(), m_controller.atSetpoint());
+    assertTrue(
+        pidData() + "Was not on Target. Controller Error: " + m_controller.getPositionError(),
+        m_controller.atSetpoint());
 
     pidRunner.close();
   }
 
   private String pidData() {
-    return me.getType() + " PID {P:" + m_controller.getP() + " I:" + m_controller.getI() + " D:"
-        + m_controller.getD() + "} ";
+    return me.getType()
+        + " PID {P:"
+        + m_controller.getP()
+        + " I:"
+        + m_controller.getI()
+        + " D:"
+        + m_controller.getD()
+        + "} ";
   }
-
 
   @Test(expected = RuntimeException.class)
   public void testOnTargetNoToleranceSet() {

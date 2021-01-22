@@ -1,21 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.fixtures;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
-
-/**
- * Connects a digital input to a digital output.
- */
+/** Connects a digital input to a digital output. */
 public class DIOCrossConnectFixture implements ITestFixture {
   private static final Logger logger = Logger.getLogger(DIOCrossConnectFixture.class.getName());
 
@@ -26,7 +20,7 @@ public class DIOCrossConnectFixture implements ITestFixture {
   /**
    * Constructs using two pre-allocated digital objects.
    *
-   * @param input  The input
+   * @param input The input
    * @param output The output.
    */
   public DIOCrossConnectFixture(DigitalInput input, DigitalOutput output) {
@@ -40,7 +34,7 @@ public class DIOCrossConnectFixture implements ITestFixture {
   /**
    * Constructs a {@link DIOCrossConnectFixture} using the ports of the digital objects.
    *
-   * @param input  The port of the {@link DigitalInput}
+   * @param input The port of the {@link DigitalInput}
    * @param output The port of the {@link DigitalOutput}
    */
   public DIOCrossConnectFixture(Integer input, Integer output) {
@@ -78,7 +72,7 @@ public class DIOCrossConnectFixture implements ITestFixture {
 
   @Override
   public boolean teardown() {
-    logger.log(Level.FINE, "Begining teardown");
+    logger.log(Level.FINE, "Beginning teardown");
     if (m_allocated) {
       m_input.close();
       m_output.close();
@@ -86,5 +80,4 @@ public class DIOCrossConnectFixture implements ITestFixture {
     }
     return true;
   }
-
 }

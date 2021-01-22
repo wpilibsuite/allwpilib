@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -46,7 +43,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
-             bool feildRelative);
+             bool fieldRelative);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -56,7 +53,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Sets the drive SpeedControllers to a power from -1 to 1.
    */
-  void SetModuleStates(std::array<frc::SwerveModuleState, 4> desiredStates);
+  void SetModuleStates(wpi::array<frc::SwerveModuleState, 4> desiredStates);
 
   /**
    * Returns the heading of the robot.

@@ -1,20 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
-
-import org.junit.Test;
-
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
 import static org.junit.Assert.assertEquals;
 
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.logging.Logger;
+import org.junit.Test;
 
 public class TimerTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(TimerTest.class.getName());
@@ -38,8 +32,10 @@ public class TimerTest extends AbstractComsSetup {
 
     // Then
     long offset = difference - TIMER_RUNTIME;
-    assertEquals("Timer.delay ran " + offset + " microseconds too long", TIMER_RUNTIME, difference,
+    assertEquals(
+        "Timer.delay ran " + offset + " microseconds too long",
+        TIMER_RUNTIME,
+        difference,
         TIMER_TOLERANCE);
   }
-
 }

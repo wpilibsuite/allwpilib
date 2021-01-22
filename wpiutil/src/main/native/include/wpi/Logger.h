@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_LOGGER_H_
 #define WPIUTIL_WPI_LOGGER_H_
 
 #include <functional>
+#include <utility>
 
 #include "wpi/SmallString.h"
 #include "wpi/raw_ostream.h"
@@ -33,9 +31,9 @@ class Logger {
                                      unsigned int line, const char* msg)>;
 
   Logger() = default;
-  explicit Logger(const LogFunc& func) : m_func(func) {}
-  Logger(const LogFunc& func, unsigned int min_level)
-      : m_func(func), m_min_level(min_level) {}
+  explicit Logger(LogFunc func) : m_func(std::move(func)) {}
+  Logger(LogFunc func, unsigned int min_level)
+      : m_func(std::move(func)), m_min_level(min_level) {}
 
   void SetLogger(LogFunc func) { m_func = func; }
 
@@ -44,7 +42,9 @@ class Logger {
 
   void Log(unsigned int level, const char* file, unsigned int line,
            const char* msg) {
-    if (!m_func || level < m_min_level) return;
+    if (!m_func || level < m_min_level) {
+      return;
+    }
     m_func(level, file, line, msg);
   }
 

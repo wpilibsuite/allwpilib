@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "CvSourceImpl.h"
 
@@ -27,15 +24,16 @@ CvSourceImpl::CvSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
                            const VideoMode& mode)
     : ConfigurableSourceImpl{name, logger, notifier, telemetry, mode} {}
 
-CvSourceImpl::~CvSourceImpl() {}
+CvSourceImpl::~CvSourceImpl() = default;
 
 void CvSourceImpl::PutFrame(cv::Mat& image) {
   // We only support 8-bit images; convert if necessary.
   cv::Mat finalImage;
-  if (image.depth() == CV_8U)
+  if (image.depth() == CV_8U) {
     finalImage = image;
-  else
+  } else {
     image.convertTo(finalImage, CV_8U);
+  }
 
   std::unique_ptr<Image> dest;
   switch (image.channels()) {
@@ -227,7 +225,9 @@ void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                      CS_Status* status) {
   wpi::SmallVector<std::string, 8> vec;
   vec.reserve(count);
-  for (int i = 0; i < count; ++i) vec.push_back(choices[i]);
+  for (int i = 0; i < count; ++i) {
+    vec.push_back(choices[i]);
+  }
   return cs::SetSourceEnumPropertyChoices(source, property, vec, status);
 }
 

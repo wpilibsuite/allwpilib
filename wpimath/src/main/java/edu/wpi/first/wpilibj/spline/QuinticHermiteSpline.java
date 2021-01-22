@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.spline;
 
@@ -14,22 +11,20 @@ public class QuinticHermiteSpline extends Spline {
   private final SimpleMatrix m_coefficients;
 
   /**
-   * Constructs a quintic hermite spline with the specified control vectors.
-   * Each control vector contains into about the location of the point, its
-   * first derivative, and its second derivative.
+   * Constructs a quintic hermite spline with the specified control vectors. Each control vector
+   * contains into about the location of the point, its first derivative, and its second derivative.
    *
-   * @param xInitialControlVector The control vector for the initial point in
-   *                              the x dimension.
-   * @param xFinalControlVector   The control vector for the final point in
-   *                              the x dimension.
-   * @param yInitialControlVector The control vector for the initial point in
-   *                              the y dimension.
-   * @param yFinalControlVector   The control vector for the final point in
-   *                              the y dimension.
+   * @param xInitialControlVector The control vector for the initial point in the x dimension.
+   * @param xFinalControlVector The control vector for the final point in the x dimension.
+   * @param yInitialControlVector The control vector for the initial point in the y dimension.
+   * @param yFinalControlVector The control vector for the final point in the y dimension.
    */
   @SuppressWarnings("ParameterName")
-  public QuinticHermiteSpline(double[] xInitialControlVector, double[] xFinalControlVector,
-                              double[] yInitialControlVector, double[] yFinalControlVector) {
+  public QuinticHermiteSpline(
+      double[] xInitialControlVector,
+      double[] xFinalControlVector,
+      double[] yInitialControlVector,
+      double[] yFinalControlVector) {
     super(5);
 
     // Populate the coefficients for the actual spline equations.
@@ -85,32 +80,39 @@ public class QuinticHermiteSpline extends Spline {
    */
   private SimpleMatrix makeHermiteBasis() {
     if (hermiteBasis == null) {
-      hermiteBasis = new SimpleMatrix(6, 6, true, new double[]{
-          -06.0, -03.0, -00.5, +06.0, -03.0, +00.5,
-          +15.0, +08.0, +01.5, -15.0, +07.0, +01.0,
-          -10.0, -06.0, -01.5, +10.0, -04.0, +00.5,
-          +00.0, +00.0, +00.5, +00.0, +00.0, +00.0,
-          +00.0, +01.0, +00.0, +00.0, +00.0, +00.0,
-          +01.0, +00.0, +00.0, +00.0, +00.0, +00.0
-      });
+      hermiteBasis =
+          new SimpleMatrix(
+              6,
+              6,
+              true,
+              new double[] {
+                -06.0, -03.0, -00.5, +06.0, -03.0, +00.5, +15.0, +08.0, +01.5, -15.0, +07.0, +01.0,
+                -10.0, -06.0, -01.5, +10.0, -04.0, +00.5, +00.0, +00.0, +00.5, +00.0, +00.0, +00.0,
+                +00.0, +01.0, +00.0, +00.0, +00.0, +00.0, +01.0, +00.0, +00.0, +00.0, +00.0, +00.0
+              });
     }
     return hermiteBasis;
   }
 
   /**
-   * Returns the control vector for each dimension as a matrix from the
-   * user-provided arrays in the constructor.
+   * Returns the control vector for each dimension as a matrix from the user-provided arrays in the
+   * constructor.
    *
    * @param initialVector The control vector for the initial point.
-   * @param finalVector   The control vector for the final point.
+   * @param finalVector The control vector for the final point.
    * @return The control vector matrix for a dimension.
    */
   private SimpleMatrix getControlVectorFromArrays(double[] initialVector, double[] finalVector) {
     if (initialVector.length != 3 || finalVector.length != 3) {
       throw new IllegalArgumentException("Size of vectors must be 3");
     }
-    return new SimpleMatrix(6, 1, true, new double[]{
-        initialVector[0], initialVector[1], initialVector[2],
-        finalVector[0], finalVector[1], finalVector[2]});
+    return new SimpleMatrix(
+        6,
+        1,
+        true,
+        new double[] {
+          initialVector[0], initialVector[1], initialVector[2],
+          finalVector[0], finalVector[1], finalVector[2]
+        });
   }
 }

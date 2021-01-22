@@ -1,7 +1,7 @@
 /*
    TCPStream.h
 
-   TCPStream class interface. TCPStream provides methods to trasnfer
+   TCPStream class interface. TCPStream provides methods to transfer
    data between peers over a TCP/IP connection.
 
    ------------------------------------------
@@ -43,12 +43,12 @@ class TCPStream : public NetworkStream {
   friend class TCPAcceptor;
   friend class TCPConnector;
 
-  ~TCPStream();
+  ~TCPStream() override;
 
   size_t send(const char* buffer, size_t len, Error* err) override;
   size_t receive(char* buffer, size_t len, Error* err,
                  int timeout = 0) override;
-  void close() override;
+  void close() final;
 
   StringRef getPeerIP() const override;
   int getPeerPort() const override;

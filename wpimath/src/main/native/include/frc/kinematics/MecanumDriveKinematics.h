@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -24,7 +21,7 @@ namespace frc {
  * individual wheel speeds) uses the relative locations of the wheels with
  * respect to the center of rotation. The center of rotation for inverse
  * kinematics is also variable. This means that you can set your set your center
- * of rotation in a corner of the robot to perform special evasion manuevers.
+ * of rotation in a corner of the robot to perform special evasion maneuvers.
  *
  * Forward kinematics (converting an array of wheel speeds into the overall
  * chassis motion) is performs the exact opposite of what inverse kinematics
@@ -78,7 +75,7 @@ class MecanumDriveKinematics {
    * operations, the center of rotation is usually the same as the physical
    * center of the robot; therefore, the argument is defaulted to that use case.
    * However, if you wish to change the center of rotation for evasive
-   * manuevers, vision alignment, or for any other use case, you can do so.
+   * maneuvers, vision alignment, or for any other use case, you can do so.
    *
    * @param chassisSpeeds The desired chassis speed.
    * @param centerOfRotation The center of rotation. For example, if you set the

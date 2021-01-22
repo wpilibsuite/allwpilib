@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "Mechanism2D.h"
 
@@ -16,13 +13,13 @@
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
+#include <portable-file-dialogs.h>
 #include <wpi/json.h>
 #include <wpi/math>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
 #include "HALSimGui.h"
-#include "portable-file-dialogs.h"
 
 using namespace halsimgui;
 
@@ -101,7 +98,9 @@ void WriteIni(ImGuiTextBuffer* out) {
 static void* Mechanism2DReadOpen(ImGuiContext* ctx,
                                  ImGuiSettingsHandler* handler,
                                  const char* name) {
-  if (name == wpi::StringRef{"Mechanism2D"}) return &mechanism2DInfo;
+  if (name == wpi::StringRef{"Mechanism2D"}) {
+    return &mechanism2DInfo;
+  }
   return nullptr;
 }
 
@@ -112,7 +111,9 @@ static void Mechanism2DReadLine(ImGuiContext* ctx,
   auto [name, value] = line.split('=');
   name = name.trim();
   value = value.trim();
-  if (entry == &mechanism2DInfo) ReadIni(name, value);
+  if (entry == &mechanism2DInfo) {
+    ReadIni(name, value);
+  }
 }
 
 static void Mechanism2DWriteAll(ImGuiContext* ctx,
@@ -169,20 +170,28 @@ static void buildDrawList(float startXLocation, float startYLocation,
     minSize = ImGui::GetWindowHeight() > ImGui::GetWindowWidth()
                   ? ImGui::GetWindowWidth()
                   : ImGui::GetWindowHeight();
-    if (devHandle == 0) devHandle = HALSIM_GetSimDeviceHandle("Mechanism2D");
+    if (devHandle == 0) {
+      devHandle = HALSIM_GetSimDeviceHandle("Mechanism2D");
+    }
     // Get the length
-    if (!lengthHandle)
+    if (!lengthHandle) {
       lengthHandle = HALSIM_GetSimValueHandle(
           devHandle, (bodyConfig.name + "/length").c_str());
-    if (lengthHandle) length = lengthHandle.Get();
+    }
+    if (lengthHandle) {
+      length = lengthHandle.Get();
+    }
     if (length <= 0) {
       length = bodyConfig.length;
     }
     // Get the angle
-    if (!angleHandle)
+    if (!angleHandle) {
       angleHandle = HALSIM_GetSimValueHandle(
           devHandle, (bodyConfig.name + "/angle").c_str());
-    if (angleHandle) angle = angleHandle.Get();
+    }
+    if (angleHandle) {
+      angle = angleHandle.Get();
+    }
     // Calculate the next angle to go to
     float angleToGoTo = angle + bodyConfig.angle + previousAngle;
     // Draw the first line and get the ending coordinates
@@ -276,17 +285,15 @@ static void readJson(std::string jFile) {
   }
 }
 
-static void OptionMenuLocateJson() {
-  if (ImGui::BeginMenu("Mechanism2D")) {
+static void DisplayAssembly2D() {
+  if (ImGui::BeginPopupContextItem()) {
     if (ImGui::MenuItem("Load Json")) {
       m_fileOpener = std::make_unique<pfd::open_file>(
           "Choose Mechanism2D json", "", std::vector<std::string>{"*.json"});
     }
-    ImGui::EndMenu();
+    ImGui::EndPopup();
   }
-}
 
-static void DisplayAssembly2D() {
   GetJsonFileLocation();
   if (!mechanism2DInfo.jsonLocation.empty()) {
     // Only read the json file if it changed
@@ -313,9 +320,11 @@ void Mechanism2D::Initialize() {
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
   buildColorTable();
-  HALSimGui::AddWindow("Mechanism 2D", DisplayAssembly2D);
-  HALSimGui::AddOptionMenu(OptionMenuLocateJson);
-  HALSimGui::SetDefaultWindowPos("Mechanism 2D", 200, 200);
-  HALSimGui::SetDefaultWindowSize("Mechanism 2D", 600, 600);
-  HALSimGui::SetWindowPadding("Mechanism 2D", 0, 0);
+  if (auto win =
+          HALSimGui::manager.AddWindow("Mechanism 2D", DisplayAssembly2D)) {
+    win->SetVisibility(glass::Window::kHide);
+    win->SetDefaultPos(200, 200);
+    win->SetDefaultSize(600, 600);
+    win->SetPadding(0, 0);
+  }
 }

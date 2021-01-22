@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "commands/DriveStraight.h"
 
@@ -14,8 +11,8 @@
 DriveStraight::DriveStraight(double distance, DriveTrain* drivetrain)
     : frc2::CommandHelper<frc2::PIDCommand, DriveStraight>(
           frc2::PIDController(4, 0, 0),
-          [this]() { return m_drivetrain->GetDistance(); }, distance,
-          [this](double output) { m_drivetrain->Drive(output, output); },
+          [drivetrain] { return drivetrain->GetDistance(); }, distance,
+          [drivetrain](double output) { drivetrain->Drive(output, output); },
           {drivetrain}),
       m_drivetrain(drivetrain) {
   m_controller.SetTolerance(0.01);
@@ -28,4 +25,6 @@ void DriveStraight::Initialize() {
   frc2::PIDCommand::Initialize();
 }
 
-bool DriveStraight::IsFinished() { return m_controller.AtSetpoint(); }
+bool DriveStraight::IsFinished() {
+  return m_controller.AtSetpoint();
+}

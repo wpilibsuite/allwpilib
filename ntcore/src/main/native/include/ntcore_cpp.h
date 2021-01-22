@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_NTCORE_CPP_H_
 #define NTCORE_NTCORE_CPP_H_
@@ -107,7 +104,7 @@ struct ConnectionInfo {
 struct RpcParamDef {
   RpcParamDef() = default;
   RpcParamDef(StringRef name_, std::shared_ptr<Value> def_value_)
-      : name(name_), def_value(def_value_) {}
+      : name(name_), def_value(std::move(def_value_)) {}
 
   std::string name;
   std::shared_ptr<Value> def_value;
@@ -133,16 +130,20 @@ struct RpcDefinition {
 /** NetworkTables Remote Procedure Call (Server Side) */
 class RpcAnswer {
  public:
-  RpcAnswer() : entry(0), call(0) {}
+  RpcAnswer() = default;
   RpcAnswer(NT_Entry entry_, NT_RpcCall call_, StringRef name_,
-            StringRef params_, const ConnectionInfo& conn_)
-      : entry(entry_), call(call_), name(name_), params(params_), conn(conn_) {}
+            StringRef params_, ConnectionInfo conn_)
+      : entry(entry_),
+        call(call_),
+        name(name_),
+        params(params_),
+        conn(std::move(conn_)) {}
 
   /** Entry handle. */
-  NT_Entry entry;
+  NT_Entry entry{0};
 
   /** Call handle. */
-  mutable NT_RpcCall call;
+  mutable NT_RpcCall call{0};
 
   /** Entry name. */
   std::string name;
@@ -179,21 +180,21 @@ class RpcAnswer {
 /** NetworkTables Entry Notification */
 class EntryNotification {
  public:
-  EntryNotification() : listener(0), entry(0), flags(0) {}
+  EntryNotification() = default;
   EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
                     StringRef name_, std::shared_ptr<Value> value_,
                     unsigned int flags_)
       : listener(listener_),
         entry(entry_),
         name(name_),
-        value(value_),
+        value(std::move(value_)),
         flags(flags_) {}
 
   /** Listener that was triggered. */
-  NT_EntryListener listener;
+  NT_EntryListener listener{0};
 
   /** Entry handle. */
-  NT_Entry entry;
+  NT_Entry entry{0};
 
   /** Entry name. */
   std::string name;
@@ -205,7 +206,7 @@ class EntryNotification {
    * Update flags.  For example, NT_NOTIFY_NEW if the key did not previously
    * exist.
    */
-  unsigned int flags;
+  unsigned int flags{0};
 
   friend void swap(EntryNotification& first, EntryNotification& second) {
     using std::swap;
@@ -220,13 +221,13 @@ class EntryNotification {
 /** NetworkTables Connection Notification */
 class ConnectionNotification {
  public:
-  ConnectionNotification() : listener(0), connected(false) {}
+  ConnectionNotification() = default;
   ConnectionNotification(NT_ConnectionListener listener_, bool connected_,
-                         const ConnectionInfo& conn_)
-      : listener(listener_), connected(connected_), conn(conn_) {}
+                         ConnectionInfo conn_)
+      : listener(listener_), connected(connected_), conn(std::move(conn_)) {}
 
   /** Listener that was triggered. */
-  NT_ConnectionListener listener;
+  NT_ConnectionListener listener{0};
 
   /** True if event is due to connection being established. */
   bool connected = false;
@@ -246,7 +247,7 @@ class ConnectionNotification {
 /** NetworkTables log message. */
 class LogMessage {
  public:
-  LogMessage() : logger(0), level(0), filename(""), line(0) {}
+  LogMessage() = default;
   LogMessage(NT_Logger logger_, unsigned int level_, const char* filename_,
              unsigned int line_, StringRef message_)
       : logger(logger_),
@@ -256,16 +257,16 @@ class LogMessage {
         message(message_) {}
 
   /** The logger that generated the message. */
-  NT_Logger logger;
+  NT_Logger logger{0};
 
   /** Log level of the message.  See NT_LogLevel. */
-  unsigned int level;
+  unsigned int level{0};
 
   /** The filename of the source file that generated the message. */
-  const char* filename;
+  const char* filename{""};
 
   /** The line number in the source file that generated the message. */
-  unsigned int line;
+  unsigned int line{0};
 
   /** The message. */
   std::string message;
@@ -780,9 +781,8 @@ bool WaitForEntryListenerQueue(NT_Inst inst, double timeout);
  * @param connected       true if event is due to connection being established
  * @param conn            connection info
  */
-typedef std::function<void(NT_ConnectionListener conn_listener, bool connected,
-                           const ConnectionInfo& conn)>
-    ConnectionListenerCallback;
+using ConnectionListenerCallback =
+    std::function<void(NT_ConnectionListener, bool, const ConnectionInfo&)>;
 
 /**
  * Add a connection listener.
@@ -1484,9 +1484,8 @@ uint64_t Now();
  * @param line    origin source line number
  * @param msg     message
  */
-typedef std::function<void(unsigned int level, const char* file,
-                           unsigned int line, const char* msg)>
-    LogFunc;
+using LogFunc =
+    std::function<void(unsigned int, const char*, unsigned int, const char*)>;
 
 /**
  * Set logger callback function.  By default, log messages are sent to stderr;

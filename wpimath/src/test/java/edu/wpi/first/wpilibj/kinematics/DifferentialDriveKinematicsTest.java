@@ -1,21 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.kinematics;
-
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.Test;
+
 class DifferentialDriveKinematicsTest {
   private static final double kEpsilon = 1E-9;
-  private final DifferentialDriveKinematics m_kinematics
-      = new DifferentialDriveKinematics(0.381 * 2);
+  private final DifferentialDriveKinematics m_kinematics =
+      new DifferentialDriveKinematics(0.381 * 2);
 
   @Test
   void testInverseKinematicsForZeros() {
@@ -24,8 +21,7 @@ class DifferentialDriveKinematicsTest {
 
     assertAll(
         () -> assertEquals(0.0, wheelSpeeds.leftMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, wheelSpeeds.rightMetersPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.0, wheelSpeeds.rightMetersPerSecond, kEpsilon));
   }
 
   @Test
@@ -36,8 +32,7 @@ class DifferentialDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 
   @Test
@@ -47,8 +42,7 @@ class DifferentialDriveKinematicsTest {
 
     assertAll(
         () -> assertEquals(3.0, wheelSpeeds.leftMetersPerSecond, kEpsilon),
-        () -> assertEquals(3.0, wheelSpeeds.rightMetersPerSecond, kEpsilon)
-    );
+        () -> assertEquals(3.0, wheelSpeeds.rightMetersPerSecond, kEpsilon));
   }
 
   @Test
@@ -59,8 +53,7 @@ class DifferentialDriveKinematicsTest {
     assertAll(
         () -> assertEquals(3.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(0.0, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 
   @Test
@@ -70,8 +63,7 @@ class DifferentialDriveKinematicsTest {
 
     assertAll(
         () -> assertEquals(-0.381 * Math.PI, wheelSpeeds.leftMetersPerSecond, kEpsilon),
-        () -> assertEquals(+0.381 * Math.PI, wheelSpeeds.rightMetersPerSecond, kEpsilon)
-    );
+        () -> assertEquals(+0.381 * Math.PI, wheelSpeeds.rightMetersPerSecond, kEpsilon));
   }
 
   @Test
@@ -82,7 +74,6 @@ class DifferentialDriveKinematicsTest {
     assertAll(
         () -> assertEquals(0.0, chassisSpeeds.vxMetersPerSecond, kEpsilon),
         () -> assertEquals(0.0, chassisSpeeds.vyMetersPerSecond, kEpsilon),
-        () -> assertEquals(-Math.PI, chassisSpeeds.omegaRadiansPerSecond, kEpsilon)
-    );
+        () -> assertEquals(-Math.PI, chassisSpeeds.omegaRadiansPerSecond, kEpsilon));
   }
 }

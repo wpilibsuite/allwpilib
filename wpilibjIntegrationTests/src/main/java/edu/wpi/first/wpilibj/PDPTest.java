@@ -1,16 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import edu.wpi.first.hal.can.CANMessageNotFoundException;
+import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -19,19 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import edu.wpi.first.hal.can.CANMessageNotFoundException;
-import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-import edu.wpi.first.wpilibj.test.TestBench;
-
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-/**
- * Test that covers the {@link PowerDistributionPanel}.
- */
+/** Test that covers the {@link PowerDistributionPanel}. */
 @RunWith(Parameterized.class)
 public class PDPTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PDPTest.class.getName());
@@ -52,8 +45,7 @@ public class PDPTest extends AbstractComsSetup {
     me = null;
   }
 
-
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public PDPTest(MotorEncoderFixture<?> mef, Double expectedCurrentDraw) {
     logger.fine("Constructor with: " + mef.getType());
     if (me != null && !me.equals(mef)) {
@@ -68,8 +60,7 @@ public class PDPTest extends AbstractComsSetup {
   @Parameters(name = "{index}: {0}, Expected Stopped Current Draw: {1}")
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
-    return Arrays.asList(new Object[][]{
-        {TestBench.getInstance().getTalonPair(), 0.0}});
+    return Arrays.asList(new Object[][] {{TestBench.getInstance().getTalonPair(), 0.0}});
   }
 
   @After
@@ -77,22 +68,20 @@ public class PDPTest extends AbstractComsSetup {
     me.reset();
   }
 
-
-  /**
-   * Test if the current changes when the motor is driven using a talon.
-   */
+  /** Test if the current changes when the motor is driven using a talon. */
   @Test
   public void checkStoppedCurrentForSpeedController() throws CANMessageNotFoundException {
     Timer.delay(0.25);
 
     /* The Current should be 0 */
-    assertEquals("The low current was not within the expected range.", m_expectedStoppedCurrentDraw,
-        pdp.getCurrent(me.getPDPChannel()), 0.001);
+    assertEquals(
+        "The low current was not within the expected range.",
+        m_expectedStoppedCurrentDraw,
+        pdp.getCurrent(me.getPDPChannel()),
+        0.001);
   }
 
-  /**
-   * Test if the current changes when the motor is driven using a talon.
-   */
+  /** Test if the current changes when the motor is driven using a talon. */
   @Test
   public void checkRunningCurrentForSpeedController() throws CANMessageNotFoundException {
     /* Set the motor to full forward */
@@ -100,8 +89,10 @@ public class PDPTest extends AbstractComsSetup {
     Timer.delay(2);
 
     /* The current should now be greater than the low current */
-    assertThat("The driven current is not greater than the resting current.",
-        pdp.getCurrent(me.getPDPChannel()), is(greaterThan(m_expectedStoppedCurrentDraw)));
+    assertThat(
+        "The driven current is not greater than the resting current.",
+        pdp.getCurrent(me.getPDPChannel()),
+        is(greaterThan(m_expectedStoppedCurrentDraw)));
   }
 
   @Override

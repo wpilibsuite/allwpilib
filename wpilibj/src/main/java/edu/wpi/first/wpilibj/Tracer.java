@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -12,12 +9,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * A class for keeping track of how much time it takes for different parts of code to execute.
- * This is done with epochs, that are added by calls to {@link #addEpoch(String)},
- * and can be printed with a call to {@link #printEpochs()}.
+ * A class for keeping track of how much time it takes for different parts of code to execute. This
+ * is done with epochs, that are added by calls to {@link #addEpoch(String)}, and can be printed
+ * with a call to {@link #printEpochs()}.
  *
- * <p>Epochs are a way to partition the time elapsed so that when overruns occur, one can
- * determine which parts of an operation consumed the most time.
+ * <p>Epochs are a way to partition the time elapsed so that when overruns occur, one can determine
+ * which parts of an operation consumed the most time.
  */
 public class Tracer {
   private static final long kMinPrintPeriod = 1000000; // microseconds
@@ -28,24 +25,18 @@ public class Tracer {
   @SuppressWarnings("PMD.UseConcurrentHashMap")
   private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
 
-  /**
-   * Tracer constructor.
-   */
+  /** Tracer constructor. */
   public Tracer() {
     resetTimer();
   }
 
-  /**
-   * Clears all epochs.
-   */
+  /** Clears all epochs. */
   public void clearEpochs() {
     m_epochs.clear();
     resetTimer();
   }
 
-  /**
-   * Restarts the epoch timer.
-   */
+  /** Restarts the epoch timer. */
   public void resetTimer() {
     m_startTime = RobotController.getFPGATime();
   }
@@ -56,8 +47,8 @@ public class Tracer {
    * <p>Epochs are a way to partition the time elapsed so that when overruns occur, one can
    * determine which parts of an operation consumed the most time.
    *
-   * <p>This should be called immediately after execution has finished,
-   * with a call to this method or {@link #resetTimer()} before execution.
+   * <p>This should be called immediately after execution has finished, with a call to this method
+   * or {@link #resetTimer()} before execution.
    *
    * @param epochName The name to associate with the epoch.
    */
@@ -67,9 +58,7 @@ public class Tracer {
     m_startTime = currentTime;
   }
 
-  /**
-   * Prints list of epochs added so far and their times to the DriverStation.
-   */
+  /** Prints list of epochs added so far and their times to the DriverStation. */
   public void printEpochs() {
     printEpochs(out -> DriverStation.reportWarning(out, false));
   }
@@ -86,9 +75,10 @@ public class Tracer {
     if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;
-      m_epochs.forEach((key, value) -> {
-        sb.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6));
-      });
+      m_epochs.forEach(
+          (key, value) -> {
+            sb.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6));
+          });
       if (sb.length() > 0) {
         output.accept(sb.toString());
       }

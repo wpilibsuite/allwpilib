@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/simulation/DriverStationData.h"
 
@@ -94,6 +91,13 @@ void HALSIM_SetJoystickAxisCount(int32_t stick, int32_t count) {}
 void HALSIM_SetJoystickPOVCount(int32_t stick, int32_t count) {}
 
 void HALSIM_SetJoystickButtonCount(int32_t stick, int32_t count) {}
+
+void HALSIM_GetJoystickCounts(int32_t stick, int32_t* axisCount,
+                              int32_t* buttonCount, int32_t* povCount) {
+  *axisCount = 0;
+  *buttonCount = 0;
+  *povCount = 0;
+}
 
 void HALSIM_SetJoystickIsXbox(int32_t stick, HAL_Bool isXbox) {}
 

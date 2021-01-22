@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -26,12 +23,14 @@ class AnalogEncoderSim {
   /**
    * Constructs from an AnalogEncoder object.
    *
-   * @param analogInput AnalogEncoder to simulate
+   * @param encoder AnalogEncoder to simulate
    */
-  explicit AnalogEncoderSim(const AnalogEncoder& analogEncoder);
+  explicit AnalogEncoderSim(const AnalogEncoder& encoder);
 
   /**
-   * Set the position using an {@link Rotation2d}.
+   * Set the position using an Rotation2d.
+   *
+   * @param angle The angle.
    */
   void SetPosition(Rotation2d angle);
 
@@ -48,7 +47,7 @@ class AnalogEncoderSim {
   units::turn_t GetTurns();
 
   /**
-   * Get the position as a {@link Rotation2d}.
+   * Get the position as a Rotation2d.
    */
   Rotation2d GetPosition();
 

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_dPWM.h"
 
@@ -26,7 +23,9 @@ void HALSimWSProviderDigitalPWM::Initialize(WSRegisterFunc webRegisterFunc) {
       "dPWM", HAL_GetNumDigitalPWMOutputs(), webRegisterFunc);
 }
 
-HALSimWSProviderDigitalPWM::~HALSimWSProviderDigitalPWM() { CancelCallbacks(); }
+HALSimWSProviderDigitalPWM::~HALSimWSProviderDigitalPWM() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
@@ -35,6 +34,10 @@ void HALSimWSProviderDigitalPWM::RegisterCallbacks() {
 }
 
 void HALSimWSProviderDigitalPWM::CancelCallbacks() {
+  DoCancelCallbacks();
+}
+
+void HALSimWSProviderDigitalPWM::DoCancelCallbacks() {
   HALSIM_CancelDigitalPWMInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelDigitalPWMDutyCycleCallback(m_channel, m_dutyCycleCbKey);
   HALSIM_CancelDigitalPWMPinCallback(m_channel, m_pinCbKey);

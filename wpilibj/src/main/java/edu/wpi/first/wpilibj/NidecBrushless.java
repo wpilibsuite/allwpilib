@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -12,11 +9,9 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-/**
- * Nidec Brushless Motor.
- */
-public class NidecBrushless extends MotorSafety implements SpeedController, Sendable,
-    AutoCloseable {
+/** Nidec Brushless Motor. */
+public class NidecBrushless extends MotorSafety
+    implements SpeedController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final DigitalOutput m_dio;
   private final PWM m_pwm;
@@ -26,10 +21,10 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
   /**
    * Constructor.
    *
-   * @param pwmChannel The PWM channel that the Nidec Brushless controller is attached to.
-   *                   0-9 are on-board, 10-19 are on the MXP port
-   * @param dioChannel The DIO channel that the Nidec Brushless controller is attached to.
-   *                   0-9 are on-board, 10-25 are on the MXP port
+   * @param pwmChannel The PWM channel that the Nidec Brushless controller is attached to. 0-9 are
+   *     on-board, 10-19 are on the MXP port
+   * @param dioChannel The DIO channel that the Nidec Brushless controller is attached to. 0-9 are
+   *     on-board, 10-25 are on the MXP port
    */
   public NidecBrushless(final int pwmChannel, final int dioChannel) {
     setSafetyEnabled(false);
@@ -119,10 +114,7 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
     return "Nidec " + getChannel();
   }
 
-  /**
-   * Disable the motor.  The enable() function must be called to re-enable
-   * the motor.
-   */
+  /** Disable the motor. The enable() function must be called to re-enable the motor. */
   @Override
   public void disable() {
     m_disabled = true;
@@ -131,8 +123,8 @@ public class NidecBrushless extends MotorSafety implements SpeedController, Send
   }
 
   /**
-   * Re-enable the motor after disable() has been called.  The set()
-   * function must be called to set a new motor speed.
+   * Re-enable the motor after disable() has been called. The set() function must be called to set a
+   * new motor speed.
    */
   public void enable() {
     m_disabled = false;

@@ -1,24 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
- * Drive over the line and then shoot the ball. If the hot goal is not detected,
- * it will wait briefly.
+ * Drive over the line and then shoot the ball. If the hot goal is not detected, it will wait
+ * briefly.
  */
 public class DriveAndShootAutonomous extends CommandGroup {
-  /**
-   * Create a new drive and shoot autonomous.
-   */
+  /** Create a new drive and shoot autonomous. */
   public DriveAndShootAutonomous() {
     addSequential(new CloseClaw());
     addSequential(new WaitForPressure(), 2);

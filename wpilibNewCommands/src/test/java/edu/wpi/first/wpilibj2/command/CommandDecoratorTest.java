@@ -1,22 +1,23 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
-
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.Timer;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+
 class CommandDecoratorTest extends CommandTestBase {
   @Test
+  @ResourceLock("timing")
   void withTimeoutTest() {
+    HAL.initialize(500, 0);
+    SimHooks.pauseTiming();
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Command command1 = new WaitCommand(10);
 
@@ -28,10 +29,12 @@ class CommandDecoratorTest extends CommandTestBase {
       assertFalse(scheduler.isScheduled(command1));
       assertTrue(scheduler.isScheduled(timeout));
 
-      Timer.delay(3);
+      SimHooks.stepTiming(3);
       scheduler.run();
 
       assertFalse(scheduler.isScheduled(timeout));
+    } finally {
+      SimHooks.resumeTiming();
     }
   }
 

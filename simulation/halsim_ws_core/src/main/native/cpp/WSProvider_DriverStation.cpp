@@ -1,15 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_DriverStation.h"
 
 #include <algorithm>
+#include <atomic>
 
 #include <hal/DriverStation.h>
+#include <hal/Extensions.h>
 #include <hal/Ports.h>
 #include <hal/simulation/DriverStationData.h>
 #include <wpi/raw_ostream.h>
@@ -25,13 +24,25 @@
 
 namespace wpilibws {
 
+std::atomic<bool>* gDSSocketConnected{nullptr};
+
 void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
+  static bool registered = false;
+  if (!registered) {
+    registered = true;
+    HAL_RegisterExtensionListener(
+        nullptr, [](void*, const char* name, void* data) {
+          if (wpi::StringRef{name} == "ds_socket") {
+            gDSSocketConnected = static_cast<std::atomic<bool>*>(data);
+          }
+        });
+  }
   CreateSingleProvider<HALSimWSProviderDriverStation>("DriverStation",
                                                       webRegisterFunc);
 }
 
 HALSimWSProviderDriverStation::~HALSimWSProviderDriverStation() {
-  CancelCallbacks();
+  DoCancelCallbacks();
 }
 
 void HALSimWSProviderDriverStation::RegisterCallbacks() {
@@ -78,10 +89,14 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
       },
       this, true);
 
-  m_matchTimeCbKey = REGISTER(MatchTime, "<match_time", double, double);
+  m_matchTimeCbKey = REGISTER(MatchTime, ">match_time", double, double);
 }
 
 void HALSimWSProviderDriverStation::CancelCallbacks() {
+  DoCancelCallbacks();
+}
+
+void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   HALSIM_CancelDriverStationEnabledCallback(m_enabledCbKey);
   HALSIM_CancelDriverStationAutonomousCallback(m_autonomousCbKey);
   HALSIM_CancelDriverStationTestCallback(m_testCbKey);
@@ -104,6 +119,11 @@ void HALSimWSProviderDriverStation::CancelCallbacks() {
 }
 
 void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
+  // ignore if DS connected
+  if (gDSSocketConnected && *gDSSocketConnected) {
+    return;
+  }
+
   wpi::json::const_iterator it;
   if ((it = json.find(">enabled")) != json.end()) {
     HALSIM_SetDriverStationEnabled(it.value());
@@ -139,6 +159,14 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(const wpi::json& json) {
     } else if (station == "blue3") {
       HALSIM_SetDriverStationAllianceStationId(HAL_AllianceStationID_kBlue3);
     }
+  }
+
+  if ((it = json.find(">match_time")) != json.end()) {
+    HALSIM_SetDriverStationMatchTime(it.value());
+  }
+  if ((it = json.find(">game_data")) != json.end()) {
+    HALSIM_SetGameSpecificMessage(
+        it.value().get_ref<const std::string&>().c_str());
   }
 
   // Only notify usercode if we get the new data message

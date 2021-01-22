@@ -1,30 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#include <WSProviderContainer.h>
-#include <WSProvider_Analog.h>
-#include <WSProvider_DIO.h>
-#include <WSProvider_DriverStation.h>
-#include <WSProvider_Encoder.h>
-#include <WSProvider_Joystick.h>
-#include <WSProvider_PWM.h>
-#include <WSProvider_Relay.h>
-#include <WSProvider_RoboRIO.h>
-#include <WSProvider_SimDevice.h>
-#include <WSProvider_dPWM.h>
-#include <hal/Main.h>
+#include <memory>
+
+#include <hal/Extensions.h>
 #include <wpi/raw_ostream.h>
 
 #include "HALSimWSClient.h"
 
 using namespace wpilibws;
 
-static ProviderContainer providers;
-static HALSimWSProviderSimDevices simDevices(providers);
+static std::unique_ptr<HALSimWSClient> gClient;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -34,31 +21,12 @@ __declspec(dllexport)
     int HALSIM_InitExtension(void) {
   wpi::outs() << "HALSim WS Client Extension Initializing\n";
 
-  auto hws = std::make_shared<HALSimWS>(providers, simDevices);
-  HALSimWS::SetInstance(hws);
+  HAL_OnShutdown(nullptr, [](void*) { gClient.reset(); });
 
-  if (!hws->Initialize()) {
+  gClient = std::make_unique<HALSimWSClient>();
+  if (!gClient->Initialize()) {
     return -1;
   }
-
-  WSRegisterFunc registerFunc = [&](auto key, auto provider) {
-    providers.Add(key, provider);
-  };
-
-  HALSimWSProviderAnalogIn::Initialize(registerFunc);
-  HALSimWSProviderAnalogOut::Initialize(registerFunc);
-  HALSimWSProviderDIO::Initialize(registerFunc);
-  HALSimWSProviderDigitalPWM::Initialize(registerFunc);
-  HALSimWSProviderDriverStation::Initialize(registerFunc);
-  HALSimWSProviderEncoder::Initialize(registerFunc);
-  HALSimWSProviderJoystick::Initialize(registerFunc);
-  HALSimWSProviderPWM::Initialize(registerFunc);
-  HALSimWSProviderRelay::Initialize(registerFunc);
-  HALSimWSProviderRoboRIO::Initialize(registerFunc);
-
-  simDevices.Initialize(hws->GetLoop());
-
-  HAL_SetMain(nullptr, HALSimWS::Main, HALSimWS::Exit);
 
   wpi::outs() << "HALSim WS Client Extension Initialized\n";
   return 0;

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WebServerClientTest.h"
 
@@ -19,8 +16,6 @@ static constexpr int kTcpConnectAttemptTimeout = 1000;
 namespace uv = wpi::uv;
 
 namespace wpilibws {
-
-std::shared_ptr<WebServerClientTest> WebServerClientTest::g_instance;
 
 // Create Web Socket and specify event callbacks
 void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
@@ -59,11 +54,6 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
     }
     // Save last message received
     m_json = j;
-
-    // If terminate flag set, end loop after message recieved
-    if (m_terminateFlag) {
-      m_loop->Stop();
-    }
   });
 
   m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
@@ -75,9 +65,8 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
 }
 
 // Create tcp client, specify callbacks, and create timers for loop
-bool WebServerClientTest::Initialize(std::shared_ptr<uv::Loop>& loop) {
-  m_loop = loop;
-  m_loop->error.connect(
+bool WebServerClientTest::Initialize() {
+  m_loop.error.connect(
       [](uv::Error err) { wpi::errs() << "uv Error: " << err.str() << "\n"; });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
@@ -92,7 +81,7 @@ bool WebServerClientTest::Initialize(std::shared_ptr<uv::Loop>& loop) {
         if (m_tcp_connected) {
           m_tcp_connected = false;
           m_connect_attempts = 0;
-          m_loop->Stop();
+          m_loop.Stop();
           return;
         }
 
@@ -124,22 +113,15 @@ void WebServerClientTest::AttemptConnect() {
 
   if (m_connect_attempts >= 5) {
     wpi::errs() << "Test Client Timeout. Unable to connect\n";
-    Exit();
+    m_loop.Stop();
     return;
   }
 
   struct sockaddr_in dest;
-  uv::NameToAddr("localhost", 8080, &dest);
+  uv::NameToAddr("localhost", 3300, &dest);
   m_tcp_client->Connect(dest, [this]() {
     m_tcp_connected = true;
-    InitializeWebSocket("localhost", 8080, "/wpilibws");
-  });
-}
-
-void WebServerClientTest::Exit() {
-  m_loop->Walk([](uv::Handle& h) {
-    h.SetLoopClosing(true);
-    h.Close();
+    InitializeWebSocket("localhost", 3300, "/wpilibws");
   });
 }
 
@@ -172,6 +154,8 @@ void WebServerClientTest::SendMessage(const wpi::json& msg) {
   });
 }
 
-const wpi::json& WebServerClientTest::GetLastMessage() { return m_json; }
+const wpi::json& WebServerClientTest::GetLastMessage() {
+  return m_json;
+}
 
 }  // namespace wpilibws

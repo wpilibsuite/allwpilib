@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -58,8 +55,8 @@ public class AddressableLED implements AutoCloseable {
   /**
    * Sets the led output data.
    *
-   * <p>If the output is enabled, this will start writing the next data cycle.
-   * It is safe to call, even while output is enabled.
+   * <p>If the output is enabled, this will start writing the next data cycle. It is safe to call,
+   * even while output is enabled.
    *
    * @param buffer the buffer to write
    */
@@ -77,10 +74,16 @@ public class AddressableLED implements AutoCloseable {
    * @param lowTime1NanoSeconds low time for 1 bit
    * @param highTime1NanoSeconds high time for 1 bit
    */
-  public void setBitTiming(int lowTime0NanoSeconds, int highTime0NanoSeconds,
-      int lowTime1NanoSeconds, int highTime1NanoSeconds) {
-    AddressableLEDJNI.setBitTiming(m_handle, lowTime0NanoSeconds,
-        highTime0NanoSeconds, lowTime1NanoSeconds,
+  public void setBitTiming(
+      int lowTime0NanoSeconds,
+      int highTime0NanoSeconds,
+      int lowTime1NanoSeconds,
+      int highTime1NanoSeconds) {
+    AddressableLEDJNI.setBitTiming(
+        m_handle,
+        lowTime0NanoSeconds,
+        highTime0NanoSeconds,
+        lowTime1NanoSeconds,
         highTime1NanoSeconds);
   }
 
@@ -98,15 +101,13 @@ public class AddressableLED implements AutoCloseable {
   /**
    * Starts the output.
    *
-   * <p>The output writes continously.
+   * <p>The output writes continuously.
    */
   public void start() {
     AddressableLEDJNI.start(m_handle);
   }
 
-  /**
-   * Stops the output.
-   */
+  /** Stops the output. */
   public void stop() {
     AddressableLEDJNI.stop(m_handle);
   }

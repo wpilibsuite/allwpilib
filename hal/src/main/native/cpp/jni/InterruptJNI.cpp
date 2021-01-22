@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -34,7 +31,7 @@ using namespace hal;
 // process, we will just ignore the redundant wakeup.
 class InterruptThreadJNI : public wpi::SafeThread {
  public:
-  void Main();
+  void Main() override;
 
   bool m_notify = false;
   uint32_t m_mask = 0;
@@ -49,7 +46,9 @@ class InterruptJNI : public wpi::SafeThreadOwner<InterruptThreadJNI> {
 
   void Notify(uint32_t mask) {
     auto thr = GetThread();
-    if (!thr) return;
+    if (!thr) {
+      return;
+    }
     thr->m_notify = true;
     thr->m_mask = mask;
     thr->m_cond.notify_one();
@@ -59,10 +58,16 @@ class InterruptJNI : public wpi::SafeThreadOwner<InterruptThreadJNI> {
 void InterruptJNI::SetFunc(JNIEnv* env, jobject func, jmethodID mid,
                            jobject param) {
   auto thr = GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
   // free global references
-  if (thr->m_func) env->DeleteGlobalRef(thr->m_func);
-  if (thr->m_param) env->DeleteGlobalRef(thr->m_param);
+  if (thr->m_func) {
+    env->DeleteGlobalRef(thr->m_func);
+  }
+  if (thr->m_param) {
+    env->DeleteGlobalRef(thr->m_param);
+  }
   // create global references
   thr->m_func = env->NewGlobalRef(func);
   thr->m_param = param ? env->NewGlobalRef(param) : nullptr;
@@ -77,14 +82,20 @@ void InterruptThreadJNI::Main() {
   args.group = nullptr;
   jint rs = GetJVM()->AttachCurrentThreadAsDaemon(
       reinterpret_cast<void**>(&env), &args);
-  if (rs != JNI_OK) return;
+  if (rs != JNI_OK) {
+    return;
+  }
 
   std::unique_lock lock(m_mutex);
   while (m_active) {
     m_cond.wait(lock, [&] { return !m_active || m_notify; });
-    if (!m_active) break;
+    if (!m_active) {
+      break;
+    }
     m_notify = false;
-    if (!m_func) continue;
+    if (!m_func) {
+      continue;
+    }
     jobject func = m_func;
     jmethodID mid = m_mid;
     uint32_t mask = m_mask;
@@ -99,8 +110,12 @@ void InterruptThreadJNI::Main() {
   }
 
   // free global references
-  if (m_func) env->DeleteGlobalRef(m_func);
-  if (m_param) env->DeleteGlobalRef(m_param);
+  if (m_func) {
+    env->DeleteGlobalRef(m_func);
+  }
+  if (m_param) {
+    env->DeleteGlobalRef(m_param);
+  }
 
   GetJVM()->DetachCurrentThread();
 }
@@ -256,12 +271,12 @@ Java_edu_wpi_first_hal_InterruptJNI_attachInterruptHandler
   (JNIEnv* env, jclass, jint interruptHandle, jobject handler, jobject param)
 {
   jclass cls = env->GetObjectClass(handler);
-  if (cls == 0) {
+  if (cls == nullptr) {
     assert(false);
     return;
   }
   jmethodID mid = env->GetMethodID(cls, "apply", "(ILjava/lang/Object;)V");
-  if (mid == 0) {
+  if (mid == nullptr) {
     assert(false);
     return;
   }

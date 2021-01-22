@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_DIO.h"
 
@@ -26,7 +23,9 @@ void HALSimWSProviderDIO::Initialize(WSRegisterFunc webRegisterFunc) {
                                        webRegisterFunc);
 }
 
-HALSimWSProviderDIO::~HALSimWSProviderDIO() { CancelCallbacks(); }
+HALSimWSProviderDIO::~HALSimWSProviderDIO() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderDIO::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
@@ -36,6 +35,10 @@ void HALSimWSProviderDIO::RegisterCallbacks() {
 }
 
 void HALSimWSProviderDIO::CancelCallbacks() {
+  DoCancelCallbacks();
+}
+
+void HALSimWSProviderDIO::DoCancelCallbacks() {
   HALSIM_CancelDIOInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelDIOValueCallback(m_channel, m_valueCbKey);
   HALSIM_CancelDIOPulseLengthCallback(m_channel, m_pulseLengthCbKey);

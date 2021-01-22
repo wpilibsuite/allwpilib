@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_UV_PROCESS_H_
 #define WPIUTIL_WPI_UV_PROCESS_H_
@@ -20,8 +17,7 @@
 #include "wpi/Twine.h"
 #include "wpi/uv/Handle.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 class Loop;
 class Pipe;
@@ -61,26 +57,25 @@ class Process final : public HandleImpl<Process, uv_process_t> {
 
     Option() : m_type(kNone) {}
 
-    /*implicit*/ Option(const char* arg) {  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(const char* arg) {  // NOLINT
       m_data.str = arg;
     }
 
-    /*implicit*/ Option(const std::string& arg) {  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(const std::string& arg) {  // NOLINT
       m_data.str = arg.data();
     }
 
-    /*implicit*/ Option(StringRef arg)  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(StringRef arg)  // NOLINT
         : m_strData(arg) {
       m_data.str = m_strData.c_str();
     }
 
-    /*implicit*/ Option(
-        const SmallVectorImpl<char>& arg)  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(const SmallVectorImpl<char>& arg)  // NOLINT
         : m_strData(arg.data(), arg.size()) {
       m_data.str = m_strData.c_str();
     }
 
-    /*implicit*/ Option(const Twine& arg)  // NOLINT(runtime/explicit)
+    /*implicit*/ Option(const Twine& arg)  // NOLINT
         : m_strData(arg.str()) {
       m_data.str = m_strData.c_str();
     }
@@ -314,7 +309,6 @@ class Process final : public HandleImpl<Process, uv_process_t> {
   sig::Signal<int64_t, int> exited;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_PROCESS_H_

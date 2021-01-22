@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "networktables/NetworkTableInstance.h"
 
@@ -15,7 +12,9 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
     const Twine& key) const {
   StringRef simple;
   bool isSimple = key.isSingleStringRef();
-  if (isSimple) simple = key.getSingleStringRef();
+  if (isSimple) {
+    simple = key.getSingleStringRef();
+  }
   if (isSimple && (simple.empty() || simple == "/")) {
     return std::make_shared<NetworkTable>(m_handle, "",
                                           NetworkTable::private_init{});
@@ -32,16 +31,18 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
 void NetworkTableInstance::StartClient(ArrayRef<StringRef> servers,
                                        unsigned int port) {
   wpi::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
-  for (const auto& server : servers)
+  for (const auto& server : servers) {
     server_ports.emplace_back(std::make_pair(server, port));
+  }
   StartClient(server_ports);
 }
 
 void NetworkTableInstance::SetServer(ArrayRef<StringRef> servers,
                                      unsigned int port) {
   wpi::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
-  for (const auto& server : servers)
+  for (const auto& server : servers) {
     server_ports.emplace_back(std::make_pair(server, port));
+  }
   SetServer(server_ports);
 }
 

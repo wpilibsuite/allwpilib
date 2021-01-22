@@ -4,7 +4,7 @@ include(CompileWarnings)
 
 file(GLOB halsim_ds_socket_src src/main/native/cpp/*.cpp)
 
-add_library(halsim_ds_socket MODULE ${halsim_ds_socket_src})
+add_library(halsim_ds_socket SHARED ${halsim_ds_socket_src})
 wpilib_target_warnings(halsim_ds_socket)
 set_target_properties(halsim_ds_socket PROPERTIES DEBUG_POSTFIX "d")
 target_link_libraries(halsim_ds_socket PUBLIC hal)

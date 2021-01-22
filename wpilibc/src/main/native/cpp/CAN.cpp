@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/CAN.h"
 
@@ -44,7 +41,9 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
 }
 
 CAN::~CAN() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal()) {
+    return;
+  }
   if (m_handle != HAL_kInvalidHandle) {
     HAL_CleanCAN(m_handle);
     m_handle = HAL_kInvalidHandle;
@@ -68,6 +67,25 @@ void CAN::WriteRTRFrame(int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
   wpi_setHALError(status);
+}
+
+int CAN::WritePacketNoError(const uint8_t* data, int length, int apiId) {
+  int32_t status = 0;
+  HAL_WriteCANPacket(m_handle, data, length, apiId, &status);
+  return status;
+}
+
+int CAN::WritePacketRepeatingNoError(const uint8_t* data, int length, int apiId,
+                                     int repeatMs) {
+  int32_t status = 0;
+  HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
+  return status;
+}
+
+int CAN::WriteRTRFrameNoError(int length, int apiId) {
+  int32_t status = 0;
+  HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
+  return status;
 }
 
 void CAN::StopPacketRepeating(int apiId) {

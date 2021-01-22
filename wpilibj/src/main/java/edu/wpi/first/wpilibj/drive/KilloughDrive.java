@@ -1,13 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.drive;
-
-import java.util.StringJoiner;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -17,6 +12,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
+import java.util.StringJoiner;
 
 /**
  * A class for driving Killough drive platforms.
@@ -24,6 +20,7 @@ import edu.wpi.first.wpiutil.math.MathUtil;
  * <p>Killough drives are triangular with one omni wheel on each corner.
  *
  * <p>Drive base diagram:
+ *
  * <pre>
  *  /_____\
  * / \   / \
@@ -67,13 +64,18 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    *
    * <p>If a motor needs to be inverted, do so before passing it in.
    *
-   * @param leftMotor  The motor on the left corner.
+   * @param leftMotor The motor on the left corner.
    * @param rightMotor The motor on the right corner.
-   * @param backMotor  The motor on the back corner.
+   * @param backMotor The motor on the back corner.
    */
-  public KilloughDrive(SpeedController leftMotor, SpeedController rightMotor,
-                       SpeedController backMotor) {
-    this(leftMotor, rightMotor, backMotor, kDefaultLeftMotorAngle, kDefaultRightMotorAngle,
+  public KilloughDrive(
+      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
+    this(
+        leftMotor,
+        rightMotor,
+        backMotor,
+        kDefaultLeftMotorAngle,
+        kDefaultRightMotorAngle,
         kDefaultBackMotorAngle);
   }
 
@@ -82,26 +84,36 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    *
    * <p>Angles are measured in degrees clockwise from the positive X axis.
    *
-   * @param leftMotor       The motor on the left corner.
-   * @param rightMotor      The motor on the right corner.
-   * @param backMotor       The motor on the back corner.
-   * @param leftMotorAngle  The angle of the left wheel's forward direction of travel.
+   * @param leftMotor The motor on the left corner.
+   * @param rightMotor The motor on the right corner.
+   * @param backMotor The motor on the back corner.
+   * @param leftMotorAngle The angle of the left wheel's forward direction of travel.
    * @param rightMotorAngle The angle of the right wheel's forward direction of travel.
-   * @param backMotorAngle  The angle of the back wheel's forward direction of travel.
+   * @param backMotorAngle The angle of the back wheel's forward direction of travel.
    */
-  public KilloughDrive(SpeedController leftMotor, SpeedController rightMotor,
-                       SpeedController backMotor, double leftMotorAngle, double rightMotorAngle,
-                       double backMotorAngle) {
+  public KilloughDrive(
+      SpeedController leftMotor,
+      SpeedController rightMotor,
+      SpeedController backMotor,
+      double leftMotorAngle,
+      double rightMotorAngle,
+      double backMotorAngle) {
     verify(leftMotor, rightMotor, backMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     m_backMotor = backMotor;
-    m_leftVec = new Vector2d(Math.cos(leftMotorAngle * (Math.PI / 180.0)),
-                             Math.sin(leftMotorAngle * (Math.PI / 180.0)));
-    m_rightVec = new Vector2d(Math.cos(rightMotorAngle * (Math.PI / 180.0)),
-                              Math.sin(rightMotorAngle * (Math.PI / 180.0)));
-    m_backVec = new Vector2d(Math.cos(backMotorAngle * (Math.PI / 180.0)),
-                             Math.sin(backMotorAngle * (Math.PI / 180.0)));
+    m_leftVec =
+        new Vector2d(
+            Math.cos(leftMotorAngle * (Math.PI / 180.0)),
+            Math.sin(leftMotorAngle * (Math.PI / 180.0)));
+    m_rightVec =
+        new Vector2d(
+            Math.cos(rightMotorAngle * (Math.PI / 180.0)),
+            Math.sin(rightMotorAngle * (Math.PI / 180.0)));
+    m_backVec =
+        new Vector2d(
+            Math.cos(backMotorAngle * (Math.PI / 180.0)),
+            Math.sin(backMotorAngle * (Math.PI / 180.0)));
     SendableRegistry.addChild(this, m_leftMotor);
     SendableRegistry.addChild(this, m_rightMotor);
     SendableRegistry.addChild(this, m_backMotor);
@@ -115,16 +127,16 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
   }
 
   /**
-   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are.
-   * The exception's error message will specify all null motors, e.g. {@code
-   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to
-   * the programmer.
+   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are. The
+   * exception's error message will specify all null motors, e.g. {@code
+   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to the
+   * programmer.
    *
    * @throws NullPointerException if any of the given motors are null
    */
   @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
-  private void verify(SpeedController leftMotor, SpeedController rightMotor,
-                      SpeedController backMotor) {
+  private void verify(
+      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
     if (leftMotor != null && rightMotor != null && backMotor != null) {
       return;
     }
@@ -147,10 +159,10 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
    * from its angle or rotation rate.
    *
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
-   *                  positive.
+   *     positive.
    */
   @SuppressWarnings("ParameterName")
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation) {
@@ -163,19 +175,18 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
    * from its angle or rotation rate.
    *
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
-   *                  positive.
-   * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use
-   *                  this to implement field-oriented controls.
+   *     positive.
+   * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
+   *     to implement field-oriented controls.
    */
   @SuppressWarnings("ParameterName")
-  public void driveCartesian(double ySpeed, double xSpeed, double zRotation,
-                             double gyroAngle) {
+  public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive,
-                 tInstances.kRobotDrive2_KilloughCartesian, 3);
+      HAL.report(
+          tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_KilloughCartesian, 3);
       m_reported = true;
     }
 
@@ -210,20 +221,22 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * drives (translation) is independent from its angle or rotation rate.
    *
    * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is positive.
-   * @param angle     The angle around the Z axis at which the robot drives in degrees [-180..180].
+   * @param angle The angle around the Z axis at which the robot drives in degrees [-180..180].
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
-   *                  positive.
+   *     positive.
    */
   @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
-      HAL.report(tResourceType.kResourceType_RobotDrive,
-                 tInstances.kRobotDrive2_KilloughPolar, 3);
+      HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_KilloughPolar, 3);
       m_reported = true;
     }
 
-    driveCartesian(magnitude * Math.sin(angle * (Math.PI / 180.0)),
-                   magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
+    driveCartesian(
+        magnitude * Math.sin(angle * (Math.PI / 180.0)),
+        magnitude * Math.cos(angle * (Math.PI / 180.0)),
+        zRotation,
+        0.0);
   }
 
   @Override

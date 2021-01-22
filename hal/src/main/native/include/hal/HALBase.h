@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -148,6 +145,26 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status);
  * @return        true if initialization was successful, otherwise false.
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
+
+/**
+ * Call this to shut down HAL.
+ *
+ * This must be called at termination of the robot program to avoid potential
+ * segmentation faults with simulation extensions at exit.
+ */
+void HAL_Shutdown(void);
+
+/**
+ * Calls registered SimPeriodic "before" callbacks (only in simulation mode).
+ * This should be called prior to user code periodic simulation functions.
+ */
+void HAL_SimPeriodicBefore(void);
+
+/**
+ * Calls registered SimPeriodic "after" callbacks (only in simulation mode).
+ * This should be called after user code periodic simulation functions.
+ */
+void HAL_SimPeriodicAfter(void);
 
 #ifdef __cplusplus
 }  // extern "C"

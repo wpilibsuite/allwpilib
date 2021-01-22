@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "RpcServer.h"
 
@@ -12,7 +9,9 @@ using namespace nt;
 RpcServer::RpcServer(int inst, wpi::Logger& logger)
     : m_inst(inst), m_logger(logger) {}
 
-void RpcServer::Start() { DoStart(m_inst, m_logger); }
+void RpcServer::Start() {
+  DoStart(m_inst, m_logger);
+}
 
 unsigned int RpcServer::Add(
     std::function<void(const RpcAnswer& answer)> callback) {
@@ -23,7 +22,9 @@ unsigned int RpcServer::AddPolled(unsigned int poller_uid) {
   return DoAdd(poller_uid);
 }
 
-void RpcServer::RemoveRpc(unsigned int rpc_uid) { Remove(rpc_uid); }
+void RpcServer::RemoveRpc(unsigned int rpc_uid) {
+  Remove(rpc_uid);
+}
 
 void RpcServer::ProcessRpc(unsigned int local_id, unsigned int call_uid,
                            StringRef name, StringRef params,

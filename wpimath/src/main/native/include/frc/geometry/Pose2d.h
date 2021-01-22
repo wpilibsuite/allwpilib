@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -151,8 +148,8 @@ class Pose2d {
   /**
    * Obtain a new Pose2d from a (constant curvature) velocity.
    *
-   * See <https://file.tavsys.net/control/state-space-guide.pdf> section on
-   * nonlinear pose estimation for derivation.
+   * See https://file.tavsys.net/control/controls-engineering-in-frc.pdf section
+   * 10.2 "Pose exponential" for a derivation.
    *
    * The twist is a change in pose in the robot's coordinate frame since the
    * previous pose update. When the user runs exp() on the previous known

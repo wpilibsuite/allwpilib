@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/uv/FsEvent.h"
 
@@ -12,8 +9,7 @@
 #include "wpi/SmallString.h"
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 std::shared_ptr<FsEvent> FsEvent::Create(Loop& loop) {
   auto h = std::make_shared<FsEvent>(private_init{});
@@ -32,10 +28,11 @@ void FsEvent::Start(const Twine& path, unsigned int flags) {
       &uv_fs_event_start, GetRaw(),
       [](uv_fs_event_t* handle, const char* filename, int events, int status) {
         FsEvent& h = *static_cast<FsEvent*>(handle->data);
-        if (status < 0)
+        if (status < 0) {
           h.ReportError(status);
-        else
+        } else {
           h.fsEvent(filename, events);
+        }
       },
       path.toNullTerminatedStringRef(pathBuf).data(), flags);
 }
@@ -63,5 +60,4 @@ std::string FsEvent::GetPath() {
   return std::string{};
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

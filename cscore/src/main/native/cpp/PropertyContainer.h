@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_PROPERTYCONTAINER_H_
 #define CSCORE_PROPERTYCONTAINER_H_
@@ -62,13 +59,17 @@ class PropertyContainer {
  protected:
   // Get a property; must be called with m_mutex held.
   PropertyImpl* GetProperty(int property) {
-    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
+    if (property <= 0 ||
+        static_cast<size_t>(property) > m_propertyData.size()) {
       return nullptr;
+    }
     return m_propertyData[property - 1].get();
   }
   const PropertyImpl* GetProperty(int property) const {
-    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
+    if (property <= 0 ||
+        static_cast<size_t>(property) > m_propertyData.size()) {
       return nullptr;
+    }
     return m_propertyData[property - 1].get();
   }
   // Create or update a property; must be called with m_mutex held.

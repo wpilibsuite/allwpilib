@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -29,9 +26,7 @@ public final class Resource {
   private final int m_size;
   private final Resource m_nextResource;
 
-  /**
-   * Clears all allocated resources.
-   */
+  /** Clears all allocated resources. */
   public static void restartProgram() {
     for (Resource r = Resource.resourceList; r != null; r = r.m_nextResource) {
       for (int i = 0; i < r.m_size; i++) {
@@ -42,8 +37,8 @@ public final class Resource {
 
   /**
    * Allocate storage for a new instance of Resource. Allocate a bool array of values that will get
-   * initialized to indicate that no resources have been allocated yet. The indices of the
-   * resources are 0..size-1.
+   * initialized to indicate that no resources have been allocated yet. The indices of the resources
+   * are 0..size-1.
    *
    * @param size The number of blocks to allocate
    */
@@ -106,5 +101,4 @@ public final class Resource {
     }
     m_numAllocated[index] = false;
   }
-
 }

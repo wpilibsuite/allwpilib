@@ -1,17 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.test;
-
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -27,6 +18,11 @@ import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This class provides access to all of the elements on the test bench, for use in fixtures. This
@@ -49,7 +45,6 @@ public final class TestBench {
   public static final int kTiltServoChannel = 9;
   public static final int kPanServoChannel = 8;
 
-
   /* PowerDistributionPanel channels */
   public static final int kJaguarPDPChannel = 6;
   public static final int kVictorPDPChannel = 8;
@@ -61,17 +56,14 @@ public final class TestBench {
   public static final int DIOCrossConnectA2 = 7;
   public static final int DIOCrossConnectA1 = 6;
 
-  /**
-   * The Singleton instance of the Test Bench.
-   */
+  /** The Singleton instance of the Test Bench. */
   private static TestBench instance = null;
 
   /**
    * The single constructor for the TestBench. This method is private in order to prevent multiple
    * TestBench objects from being allocated.
    */
-  protected TestBench() {
-  }
+  protected TestBench() {}
 
   /**
    * Constructs a new set of objects representing a connected set of Talon controlled Motors and an
@@ -201,27 +193,29 @@ public final class TestBench {
     return new DIOCrossConnectFixture(inputPort, outputPort);
   }
 
-  /**
-   * Gets two lists of possible DIO pairs for the two pairs.
-   */
+  /** Gets two lists of possible DIO pairs for the two pairs. */
   private List<List<Integer[]>> getDIOCrossConnect() {
     List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
     List<Integer[]> setA =
-        Arrays.asList(new Integer[][]{
-            {DIOCrossConnectA1, DIOCrossConnectA2},
-            {DIOCrossConnectA2, DIOCrossConnectA1}});
+        Arrays.asList(
+            new Integer[][] {
+              {DIOCrossConnectA1, DIOCrossConnectA2},
+              {DIOCrossConnectA2, DIOCrossConnectA1}
+            });
     pairs.add(setA);
 
     List<Integer[]> setB =
-        Arrays.asList(new Integer[][]{
-            {DIOCrossConnectB1, DIOCrossConnectB2},
-            {DIOCrossConnectB2, DIOCrossConnectB1}});
+        Arrays.asList(
+            new Integer[][] {
+              {DIOCrossConnectB1, DIOCrossConnectB2},
+              {DIOCrossConnectB2, DIOCrossConnectB1}
+            });
     pairs.add(setB);
     // NOTE: IF MORE DIOCROSSCONNECT PAIRS ARE ADDED ADD THEM HERE
     return pairs;
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static AnalogCrossConnectFixture getAnalogCrossConnectFixture() {
     return new AnalogCrossConnectFixture() {
       @Override
@@ -236,7 +230,7 @@ public final class TestBench {
     };
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
     return new RelayCrossConnectFixture() {
       @Override
@@ -276,8 +270,8 @@ public final class TestBench {
    * @param flip whether this encoder needs to be flipped
    * @return A list of different inputs to use for the tests
    */
-  private Collection<Integer[]> getPairArray(List<Integer[]> listA, List<Integer[]> listB,
-                                             boolean flip) {
+  private Collection<Integer[]> getPairArray(
+      List<Integer[]> listA, List<Integer[]> listB, boolean flip) {
     Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
     for (Integer[] portPairsA : listA) {
       Integer[] inputs = new Integer[5];
@@ -313,10 +307,10 @@ public final class TestBench {
   public Collection<Integer[]> getEncoderDIOCrossConnectCollection() {
     Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
     assert getDIOCrossConnect().size() == 2;
-    encoderPortPairs.addAll(getPairArray(getDIOCrossConnect().get(0), getDIOCrossConnect().get(1),
-        false));
-    encoderPortPairs.addAll(getPairArray(getDIOCrossConnect().get(1), getDIOCrossConnect().get(0),
-        false));
+    encoderPortPairs.addAll(
+        getPairArray(getDIOCrossConnect().get(0), getDIOCrossConnect().get(1), false));
+    encoderPortPairs.addAll(
+        getPairArray(getDIOCrossConnect().get(1), getDIOCrossConnect().get(0), false));
     assert encoderPortPairs.size() == 8;
     return encoderPortPairs;
   }

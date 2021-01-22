@@ -1,16 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <array>
 #include <cmath>
 
+#include <wpi/array.h>
+
 #include "Eigen/Core"
+#include "Eigen/src/Cholesky/LDLT.h"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
@@ -22,22 +21,20 @@ namespace frc {
 namespace detail {
 
 /**
- * Luenberger observers combine predictions from a model and measurements to
- * give an estimate of the true system state.
+ * A Kalman filter combines predictions from a model and measurements to give an
+ * estimate of the true system state. This is useful because many states cannot
+ * be measured directly as a result of sensor noise, or because the state is
+ * "hidden".
  *
- * Luenberger observers use an L gain matrix to determine whether to trust the
- * model or measurements more. Kalman filter theory uses statistics to compute
- * an optimal L gain (alternatively called the Kalman gain, K) which minimizes
- * the sum of squares error in the state estimate.
- *
- * Luenberger observers run the prediction and correction steps simultaneously
- * while Kalman filters run them sequentially. To implement a discrete-time
- * Kalman filter as a Luenberger observer, use the following mapping:
- * <pre>C = H, L = A * K</pre>
- * (H is the measurement matrix).
+ * Kalman filters use a K gain matrix to determine whether to trust the model or
+ * measurements more. Kalman filter theory uses statistics to compute an optimal
+ * K gain which minimizes the sum of squares error in the state estimate. This K
+ * gain is used to correct the state estimate by some amount of the difference
+ * between the actual measurements and the measurements predicted by the model.
  *
  * For more on the underlying math, read
- * https://file.tavsys.net/control/state-space-guide.pdf.
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
+ * "Stochastic control theory".
  */
 template <int States, int Inputs, int Outputs>
 class KalmanFilterImpl {
@@ -51,60 +48,70 @@ class KalmanFilterImpl {
    * @param dt                 Nominal discretization timestep.
    */
   KalmanFilterImpl(LinearSystem<States, Inputs, Outputs>& plant,
-                   const std::array<double, States>& stateStdDevs,
-                   const std::array<double, Outputs>& measurementStdDevs,
+                   const wpi::array<double, States>& stateStdDevs,
+                   const wpi::array<double, Outputs>& measurementStdDevs,
                    units::second_t dt) {
     m_plant = &plant;
 
-    m_contQ = MakeCovMatrix(stateStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
+    auto contQ = MakeCovMatrix(stateStdDevs);
+    auto contR = MakeCovMatrix(measurementStdDevs);
 
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(plant.A(), m_contQ, dt, &discA, &discQ);
+    DiscretizeAQTaylor<States>(plant.A(), contQ, dt, &discA, &discQ);
 
-    m_discR = DiscretizeR<Outputs>(m_contR, dt);
+    auto discR = DiscretizeR<Outputs>(contR, dt);
+
+    const auto& C = plant.C();
 
     // IsStabilizable(A^T, C^T) will tell us if the system is observable.
-    bool isObservable = IsStabilizable<States, Outputs>(discA.transpose(),
-                                                        plant.C().transpose());
-    if (isObservable) {
-      if (Outputs <= States) {
-        m_P = drake::math::DiscreteAlgebraicRiccatiEquation(
-            discA.transpose(), plant.C().transpose(), discQ, m_discR);
-      } else {
-        m_P.setZero();
-      }
-    } else {
+    bool isObservable =
+        IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
+    if (!isObservable) {
       wpi::math::MathSharedStore::ReportError(
-          "The system passed to the Kalman Filter is not observable!");
+          "The system passed to the Kalman filter is not observable!");
       throw std::invalid_argument(
-          "The system passed to the Kalman Filter is not observable!");
+          "The system passed to the Kalman filter is not observable!");
     }
+
+    Eigen::Matrix<double, States, States> P =
+        drake::math::DiscreteAlgebraicRiccatiEquation(
+            discA.transpose(), C.transpose(), discQ, discR);
+
+    Eigen::Matrix<double, Outputs, Outputs> S = C * P * C.transpose() + discR;
+
+    // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
+    // efficiently.
+    //
+    // K = PC^T S^-1
+    // KS = PC^T
+    // (KS)^T = (PC^T)^T
+    // S^T K^T = CP^T
+    //
+    // The solution of Ax = b can be found via x = A.solve(b).
+    //
+    // K^T = S^T.solve(CP^T)
+    // K = (S^T.solve(CP^T))^T
+    m_K = S.transpose().ldlt().solve(C * P.transpose()).transpose();
+
+    Reset();
   }
 
   KalmanFilterImpl(KalmanFilterImpl&&) = default;
   KalmanFilterImpl& operator=(KalmanFilterImpl&&) = default;
 
   /**
-   * Returns the error covariance matrix P.
+   * Returns the steady-state Kalman gain matrix K.
    */
-  const Eigen::Matrix<double, States, States>& P() const { return m_P; }
+  const Eigen::Matrix<double, States, Outputs>& K() const { return m_K; }
 
   /**
-   * Returns an element of the error covariance matrix P.
+   * Returns an element of the steady-state Kalman gain matrix K.
    *
-   * @param i Row of P.
-   * @param j Column of P.
+   * @param i Row of K.
+   * @param j Column of K.
    */
-  double P(int i, int j) const { return m_P(i, j); }
-
-  /**
-   * Set the current error covariance matrix P.
-   *
-   * @param P The error covariance matrix P.
-   */
-  void SetP(const Eigen::Matrix<double, States, States>& P) { m_P = P; }
+  double K(int i, int j) const { return m_K(i, j); }
 
   /**
    * Returns the state estimate x-hat.
@@ -146,13 +153,6 @@ class KalmanFilterImpl {
    */
   void Predict(const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
     m_xHat = m_plant->CalculateX(m_xHat, u, dt);
-
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(m_plant->A(), m_contQ, dt, &discA, &discQ);
-
-    m_P = discA * m_P * discA.transpose() + discQ;
-    m_discR = DiscretizeR<Outputs>(m_contR, dt);
   }
 
   /**
@@ -163,75 +163,19 @@ class KalmanFilterImpl {
    */
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
                const Eigen::Matrix<double, Outputs, 1>& y) {
-    Correct<Outputs>(u, y, m_plant->C(), m_plant->D(), m_discR);
-  }
-
-  /**
-   * Correct the state estimate x-hat using the measurements in y.
-   *
-   * This is useful for when the measurements available during a timestep's
-   * Correct() call vary. The C matrix passed to the constructor is used if one
-   * is not provided (the two-argument version of this function).
-   *
-   * @param u Same control input used in the predict step.
-   * @param y Measurement vector.
-   * @param C Output matrix.
-   * @param D Feedthrough matrix.
-   * @param R Measurement noise covariance matrix.
-   */
-  template <int Rows>
-  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
-               const Eigen::Matrix<double, Rows, 1>& y,
-               const Eigen::Matrix<double, Rows, States>& C,
-               const Eigen::Matrix<double, Rows, Inputs>& D,
-               const Eigen::Matrix<double, Rows, Rows>& R) {
-    const auto& x = m_xHat;
-    Eigen::Matrix<double, Rows, Rows> S = C * m_P * C.transpose() + R;
-
-    // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
-    // efficiently.
-    //
-    // K = PC^T S^-1
-    // KS = PC^T
-    // (KS)^T = (PC^T)^T
-    // S^T K^T = CP^T
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // K^T = S^T.solve(CP^T)
-    // K = (S^T.solve(CP^T))^T
-    Eigen::Matrix<double, States, Rows> K =
-        S.transpose().ldlt().solve(C * m_P.transpose()).transpose();
-
-    m_xHat = x + K * (y - (C * x + D * u));
-    m_P = (Eigen::Matrix<double, States, States>::Identity() - K * C) * m_P;
+    m_xHat += m_K * (y - (m_plant->C() * m_xHat + m_plant->D() * u));
   }
 
  private:
   LinearSystem<States, Inputs, Outputs>* m_plant;
 
   /**
-   * Error covariance matrix.
+   * The steady-state Kalman gain matrix.
    */
-  Eigen::Matrix<double, States, States> m_P;
+  Eigen::Matrix<double, States, Outputs> m_K;
 
   /**
-   * Continuous process noise covariance matrix.
-   */
-  Eigen::Matrix<double, States, States> m_contQ;
-
-  /**
-   * Continuous measurement noise covariance matrix.
-   */
-  Eigen::Matrix<double, Outputs, Outputs> m_contR;
-
-  /**
-   * Discrete measurement noise covariance matrix.
-   */
-  Eigen::Matrix<double, Outputs, Outputs> m_discR;
-
-  /**
-   * State estimate x-hat.
+   * The state estimate.
    */
   Eigen::Matrix<double, States, 1> m_xHat;
 };
@@ -250,8 +194,8 @@ class KalmanFilter : public detail::KalmanFilterImpl<States, Inputs, Outputs> {
    * @param dt                 Nominal discretization timestep.
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
-               const std::array<double, States>& stateStdDevs,
-               const std::array<double, Outputs>& measurementStdDevs,
+               const wpi::array<double, States>& stateStdDevs,
+               const wpi::array<double, Outputs>& measurementStdDevs,
                units::second_t dt)
       : detail::KalmanFilterImpl<States, Inputs, Outputs>{
             plant, stateStdDevs, measurementStdDevs, dt} {}
@@ -266,8 +210,8 @@ template <>
 class KalmanFilter<1, 1, 1> : public detail::KalmanFilterImpl<1, 1, 1> {
  public:
   KalmanFilter(LinearSystem<1, 1, 1>& plant,
-               const std::array<double, 1>& stateStdDevs,
-               const std::array<double, 1>& measurementStdDevs,
+               const wpi::array<double, 1>& stateStdDevs,
+               const wpi::array<double, 1>& measurementStdDevs,
                units::second_t dt);
 
   KalmanFilter(KalmanFilter&&) = default;
@@ -280,8 +224,8 @@ template <>
 class KalmanFilter<2, 1, 1> : public detail::KalmanFilterImpl<2, 1, 1> {
  public:
   KalmanFilter(LinearSystem<2, 1, 1>& plant,
-               const std::array<double, 2>& stateStdDevs,
-               const std::array<double, 1>& measurementStdDevs,
+               const wpi::array<double, 2>& stateStdDevs,
+               const wpi::array<double, 1>& measurementStdDevs,
                units::second_t dt);
 
   KalmanFilter(KalmanFilter&&) = default;

@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.util.logging.Logger;
+import static org.junit.Assert.assertTrue;
 
+import edu.wpi.first.wpilibj.fixtures.SampleFixture;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import edu.wpi.first.wpilibj.fixtures.SampleFixture;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Sample test for a sample PID controller. This demonstrates the general pattern of how to create a
@@ -62,5 +57,4 @@ public class SampleTest extends AbstractComsSetup {
     Timer.delay(0.5);
     assertTrue(true);
   }
-
 }

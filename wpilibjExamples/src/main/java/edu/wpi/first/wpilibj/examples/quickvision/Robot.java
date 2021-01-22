@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.quickvision;
 
@@ -11,10 +8,9 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
- * Uses the CameraServer class to automatically capture video from a USB webcam
- * and send it to the FRC dashboard without doing any vision processing. This
- * is the easiest way to get camera images to the dashboard. Just add this to
- * the robotInit() method in your program.
+ * Uses the CameraServer class to automatically capture video from a USB webcam and send it to the
+ * FRC dashboard without doing any vision processing. This is the easiest way to get camera images
+ * to the dashboard. Just add this to the robotInit() method in your program.
  */
 public class Robot extends TimedRobot {
   @Override

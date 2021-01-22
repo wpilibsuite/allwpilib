@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "Telemetry.h"
 
@@ -25,7 +22,7 @@ class Telemetry::Thread : public wpi::SafeThread {
  public:
   explicit Thread(Notifier& notifier) : m_notifier(notifier) {}
 
-  void Main();
+  void Main() override;
 
   Notifier& m_notifier;
   wpi::DenseMap<std::pair<CS_Handle, int>, int64_t> m_user;
@@ -46,24 +43,33 @@ int64_t Telemetry::Thread::GetValue(CS_Handle handle, CS_TelemetryKind kind,
   return it->getSecond();
 }
 
-Telemetry::~Telemetry() {}
+Telemetry::~Telemetry() = default;
 
-void Telemetry::Start() { m_owner.Start(m_notifier); }
+void Telemetry::Start() {
+  m_owner.Start(m_notifier);
+}
 
-void Telemetry::Stop() { m_owner.Stop(); }
+void Telemetry::Stop() {
+  m_owner.Stop();
+}
 
 void Telemetry::Thread::Main() {
   std::unique_lock lock(m_mutex);
   auto prevTime = std::chrono::steady_clock::now();
   while (m_active) {
     double period = m_period;
-    if (period == 0) period = 1000.0;
+    if (period == 0) {
+      period = 1000.0;
+    }
     auto timeoutTime = prevTime + std::chrono::duration<double>(period);
     while (m_active && !m_updated) {
-      if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout)
+      if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
         break;
+      }
     }
-    if (!m_active) break;
+    if (!m_active) {
+      break;
+    }
     if (m_updated) {
       m_updated = false;
       continue;
@@ -83,8 +89,12 @@ void Telemetry::Thread::Main() {
 
 void Telemetry::SetPeriod(double seconds) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
-  if (thr->m_period == seconds) return;  // no change
+  if (!thr) {
+    return;
+  }
+  if (thr->m_period == seconds) {
+    return;  // no change
+  }
   thr->m_period = seconds;
   thr->m_updated = true;
   thr->m_cond.notify_one();
@@ -92,7 +102,9 @@ void Telemetry::SetPeriod(double seconds) {
 
 double Telemetry::GetElapsedTime() {
   auto thr = m_owner.GetThread();
-  if (!thr) return 0;
+  if (!thr) {
+    return 0;
+  }
   return thr->m_elapsed;
 }
 
@@ -113,13 +125,17 @@ double Telemetry::GetAverageValue(CS_Handle handle, CS_TelemetryKind kind,
     *status = CS_TELEMETRY_NOT_ENABLED;
     return 0;
   }
-  if (thr->m_elapsed == 0) return 0.0;
+  if (thr->m_elapsed == 0) {
+    return 0.0;
+  }
   return thr->GetValue(handle, kind, status) / thr->m_elapsed;
 }
 
 void Telemetry::RecordSourceBytes(const SourceImpl& source, int quantity) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
   auto handleData = Instance::GetInstance().FindSource(source);
   thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
                                 static_cast<int>(CS_SOURCE_BYTES_RECEIVED))] +=
@@ -128,7 +144,9 @@ void Telemetry::RecordSourceBytes(const SourceImpl& source, int quantity) {
 
 void Telemetry::RecordSourceFrames(const SourceImpl& source, int quantity) {
   auto thr = m_owner.GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
   auto handleData = Instance::GetInstance().FindSource(source);
   thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
                                 static_cast<int>(CS_SOURCE_FRAMES_RECEIVED))] +=

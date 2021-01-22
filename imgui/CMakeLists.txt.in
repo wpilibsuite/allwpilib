@@ -5,7 +5,7 @@ project(imgui-download NONE)
 include(ExternalProject)
 ExternalProject_Add(glfw3
   GIT_REPOSITORY    https://github.com/glfw/glfw.git
-  GIT_TAG           63af05c41961c238c2f891e2c923e1b89c1271b6
+  GIT_TAG           2a5ac9a6d6cbe9f4113c0f17158cb13ab7f263bf
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/glfw-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/glfw-build"
   CONFIGURE_COMMAND ""
@@ -23,7 +23,7 @@ ExternalProject_Add(gl3w
 )
 ExternalProject_Add(imgui
   GIT_REPOSITORY    https://github.com/ocornut/imgui.git
-  GIT_TAG           v1.76
+  GIT_TAG           v1.79
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/imgui-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/imgui-build"
   CONFIGURE_COMMAND ""
@@ -33,7 +33,7 @@ ExternalProject_Add(imgui
 )
 ExternalProject_Add(implot
   GIT_REPOSITORY    https://github.com/epezent/implot.git
-  GIT_TAG           4d4cac629b0edcda6f8d99d5f34225a7d0878509
+  GIT_TAG           a6bab98517b1baa3116db52518dda1eb2d7eaab7
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/implot-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/implot-build"
   CONFIGURE_COMMAND ""

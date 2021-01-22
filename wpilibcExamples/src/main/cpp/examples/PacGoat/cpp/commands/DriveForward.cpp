@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "commands/DriveForward.h"
 
@@ -17,9 +14,13 @@ void DriveForward::init(double dist, double maxSpeed) {
   m_driveForwardSpeed = maxSpeed;
 }
 
-DriveForward::DriveForward() { init(10, 0.5); }
+DriveForward::DriveForward() {
+  init(10, 0.5);
+}
 
-DriveForward::DriveForward(double dist) { init(dist, 0.5); }
+DriveForward::DriveForward(double dist) {
+  init(dist, 0.5);
+}
 
 DriveForward::DriveForward(double dist, double maxSpeed) {
   init(dist, maxSpeed);
@@ -48,4 +49,6 @@ bool DriveForward::IsFinished() {
 }
 
 // Called once after isFinished returns true
-void DriveForward::End() { Robot::drivetrain.Stop(); }
+void DriveForward::End() {
+  Robot::drivetrain.Stop();
+}

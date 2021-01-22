@@ -1,0 +1,52 @@
+name: Lint and Format
+
+on: [pull_request]
+
+jobs:
+  wpiformat:
+    name: "wpiformat"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch all history and metadata
+        run: |
+          git fetch --prune --unshallow
+          git checkout -b pr
+          git branch -f master origin/master
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install clang-format
+        run: sudo apt-get update -q && sudo apt-get install -y clang-format-10
+      - name: Install wpiformat
+        run: pip3 install wpiformat
+      - name: Run
+        run: wpiformat -clang 10
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+  tidy:
+    name: "clang-tidy"
+    runs-on: ubuntu-latest
+    container: wpilib/roborio-cross-ubuntu:2020-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch all history and metadata
+        run: |
+          git fetch --prune --unshallow
+          git checkout -b pr
+          git branch -f master origin/master
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install clang-format and clang-tidy
+        run: sudo apt-get update -q && sudo apt-get install -y clang-format-10 clang-tidy-10
+      - name: Install wpiformat
+        run: pip3 install wpiformat
+      - name: Create compile_commands.json
+        run: mkdir build-cmake && cd build-cmake && cmake -DWITH_OLD_COMMANDS=ON -DWITH_EXAMPLES=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=YES ..
+      - name: List changed files
+        run: wpiformat -list-changed-files
+      - name: Run clang-tidy
+        run: wpiformat -clang 10 -no-format -tidy-changed -compile-commands=build-cmake

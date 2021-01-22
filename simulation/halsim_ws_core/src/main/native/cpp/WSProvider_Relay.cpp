@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_Relay.h"
 
@@ -25,7 +22,9 @@ void HALSimWSProviderRelay::Initialize(WSRegisterFunc webRegisterFunc) {
                                          webRegisterFunc);
 }
 
-HALSimWSProviderRelay::~HALSimWSProviderRelay() { CancelCallbacks(); }
+HALSimWSProviderRelay::~HALSimWSProviderRelay() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderRelay::RegisterCallbacks() {
   m_initFwdCbKey = REGISTER(InitializedForward, "<init_fwd", bool, boolean);
@@ -35,6 +34,10 @@ void HALSimWSProviderRelay::RegisterCallbacks() {
 }
 
 void HALSimWSProviderRelay::CancelCallbacks() {
+  DoCancelCallbacks();
+}
+
+void HALSimWSProviderRelay::DoCancelCallbacks() {
   HALSIM_CancelRelayInitializedForwardCallback(m_channel, m_initFwdCbKey);
   HALSIM_CancelRelayInitializedReverseCallback(m_channel, m_initRevCbKey);
   HALSIM_CancelRelayForwardCallback(m_channel, m_fwdCbKey);

@@ -222,3 +222,5 @@ compile_commands.json
 # clang configuration and clangd cache
 .clang
 .clangd/
+
+imgui.ini

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_NETWORKTABLES_RPCCALL_H_
 #define NTCORE_NETWORKTABLES_RPCCALL_H_
@@ -26,7 +23,7 @@ class RpcCall final {
   /**
    * Construct invalid instance.
    */
-  RpcCall() : m_entry(0), m_call(0) {}
+  RpcCall() = default;
 
   /**
    * Construct from native handles.
@@ -98,8 +95,8 @@ class RpcCall final {
   }
 
  private:
-  NT_Entry m_entry;
-  NT_RpcCall m_call;
+  NT_Entry m_entry{0};
+  NT_RpcCall m_call{0};
 };
 
 }  // namespace nt

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <ruleset name="WPILibRuleset"
-         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+  xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 
   <description>PMD Ruleset for WPILib</description>
 
@@ -28,7 +28,7 @@
   <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod">
     <properties>
       <property name="violationSuppressRegex"
-                value=".*'.*Arguments\(\)'.*" />
+        value=".*'.*Arguments\(\)'.*" />
     </properties>
   </rule>
 
@@ -39,6 +39,7 @@
     <exclude name="NcssConstructorCount" />
     <exclude name="NcssCount" />
     <exclude name="NcssMethodCount" />
+    <exclude name="TooManyMethods" />
   </rule>
 
   <rule ref="category/java/errorprone.xml">
@@ -66,19 +67,17 @@
     <exclude name="AvoidUsingShortType" />
   </rule>
 
-  <rule name="UnnecessaryCastRule"
-        language="java"
-        message="Avoid unnecessary casts"
-        class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
-        externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
+  <rule name="UnnecessaryCastRule" language="java"
+    message="Avoid unnecessary casts"
+    class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
+    externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
 
   <!-- Custom Rules -->
   <rule name="UseRequireNonNull"
-        message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
-        language="java"
-        class="net.sourceforge.pmd.lang.rule.XPathRule">
+    message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
+    language="java" class="net.sourceforge.pmd.lang.rule.XPathRule">
     <description>Use Objects.requireNonNull() instead of throwing a
-    NullPointerException yourself.</description>
+      NullPointerException yourself.</description>
     <properties>
       <property name="xpath">
         <value>

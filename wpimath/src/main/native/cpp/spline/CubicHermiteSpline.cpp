@@ -1,19 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/spline/CubicHermiteSpline.h"
 
 using namespace frc;
 
 CubicHermiteSpline::CubicHermiteSpline(
-    std::array<double, 2> xInitialControlVector,
-    std::array<double, 2> xFinalControlVector,
-    std::array<double, 2> yInitialControlVector,
-    std::array<double, 2> yFinalControlVector) {
+    wpi::array<double, 2> xInitialControlVector,
+    wpi::array<double, 2> xFinalControlVector,
+    wpi::array<double, 2> yInitialControlVector,
+    wpi::array<double, 2> yFinalControlVector) {
   const auto hermite = MakeHermiteBasis();
   const auto x =
       ControlVectorFromArrays(xInitialControlVector, xFinalControlVector);

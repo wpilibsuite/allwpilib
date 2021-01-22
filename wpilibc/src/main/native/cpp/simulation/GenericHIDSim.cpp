@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/GenericHIDSim.h"
 
@@ -18,7 +15,9 @@ GenericHIDSim::GenericHIDSim(const GenericHID& joystick)
 
 GenericHIDSim::GenericHIDSim(int port) : m_port{port} {}
 
-void GenericHIDSim::NotifyNewData() { DriverStationSim::NotifyNewData(); }
+void GenericHIDSim::NotifyNewData() {
+  DriverStationSim::NotifyNewData();
+}
 
 void GenericHIDSim::SetRawButton(int button, bool value) {
   DriverStationSim::SetJoystickButton(m_port, button, value);
@@ -32,7 +31,9 @@ void GenericHIDSim::SetPOV(int pov, int value) {
   DriverStationSim::SetJoystickPOV(m_port, pov, value);
 }
 
-void GenericHIDSim::SetPOV(int value) { SetPOV(0, value); }
+void GenericHIDSim::SetPOV(int value) {
+  SetPOV(0, value);
+}
 
 void GenericHIDSim::SetAxisCount(int count) {
   DriverStationSim::SetJoystickAxisCount(m_port, count);

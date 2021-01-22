@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Notifier.h"
 
@@ -21,8 +18,9 @@
 using namespace frc;
 
 Notifier::Notifier(std::function<void()> handler) {
-  if (handler == nullptr)
+  if (handler == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
+  }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
@@ -32,9 +30,13 @@ Notifier::Notifier(std::function<void()> handler) {
     for (;;) {
       int32_t status = 0;
       HAL_NotifierHandle notifier = m_notifier.load();
-      if (notifier == 0) break;
+      if (notifier == 0) {
+        break;
+      }
       uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
-      if (curTime == 0 || status != 0) break;
+      if (curTime == 0 || status != 0) {
+        break;
+      }
 
       std::function<void()> handler;
       {
@@ -50,14 +52,17 @@ Notifier::Notifier(std::function<void()> handler) {
       }
 
       // call callback
-      if (handler) handler();
+      if (handler) {
+        handler();
+      }
     }
   });
 }
 
 Notifier::Notifier(int priority, std::function<void()> handler) {
-  if (handler == nullptr)
+  if (handler == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
+  }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
@@ -68,9 +73,13 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
     HAL_SetCurrentThreadPriority(true, priority, &status);
     for (;;) {
       HAL_NotifierHandle notifier = m_notifier.load();
-      if (notifier == 0) break;
+      if (notifier == 0) {
+        break;
+      }
       uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
-      if (curTime == 0 || status != 0) break;
+      if (curTime == 0 || status != 0) {
+        break;
+      }
 
       std::function<void()> handler;
       {
@@ -86,7 +95,9 @@ Notifier::Notifier(int priority, std::function<void()> handler) {
       }
 
       // call callback
-      if (handler) handler();
+      if (handler) {
+        handler();
+      }
     }
   });
 }
@@ -99,7 +110,9 @@ Notifier::~Notifier() {
   wpi_setHALError(status);
 
   // Join the thread to ensure the handler has exited.
-  if (m_thread.joinable()) m_thread.join();
+  if (m_thread.joinable()) {
+    m_thread.join();
+  }
 
   HAL_CleanNotifier(handle, &status);
 }
@@ -177,7 +190,9 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   auto notifier = m_notifier.load();
-  if (notifier == 0) return;
+  if (notifier == 0) {
+    return;
+  }
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
   wpi_setHALError(status);
 }

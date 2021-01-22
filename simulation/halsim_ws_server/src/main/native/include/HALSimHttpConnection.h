@@ -1,43 +1,36 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <cinttypes>
 #include <memory>
-#include <string>
-#include <vector>
+#include <utility>
 
 #include <HALSimBaseWebSocketConnection.h>
 #include <wpi/HttpWebSocketServerConnection.h>
-#include <wpi/json.h>
 #include <wpi/mutex.h>
 #include <wpi/uv/AsyncFunction.h>
 #include <wpi/uv/Buffer.h>
 
-namespace wpilibws {
+#include "HALSimWeb.h"
 
-class HALSimWeb;
+namespace wpi {
+class json;
+}  // namespace wpi
+
+namespace wpilibws {
 
 class HALSimHttpConnection
     : public wpi::HttpWebSocketServerConnection<HALSimHttpConnection>,
       public HALSimBaseWebSocketConnection {
  public:
-  using BufferPool = wpi::uv::SimpleBufferPool<4>;
-
-  using LoopFunc = std::function<void(void)>;
-  using UvExecFunc = wpi::uv::AsyncFunction<void(LoopFunc)>;
-
-  explicit HALSimHttpConnection(std::shared_ptr<wpi::uv::Stream> stream,
-                                wpi::StringRef webroot_sys,
-                                wpi::StringRef webroot_user)
+  HALSimHttpConnection(std::shared_ptr<HALSimWeb> server,
+                       std::shared_ptr<wpi::uv::Stream> stream)
       : wpi::HttpWebSocketServerConnection<HALSimHttpConnection>(stream, {}),
-        m_webroot_sys(webroot_sys),
-        m_webroot_user(webroot_user) {}
+        m_server(std::move(server)),
+        m_buffers(128) {}
 
  public:
   // callable from any thread
@@ -56,18 +49,13 @@ class HALSimHttpConnection
   void Log(int code);
 
  private:
-  // Absolute paths of folders to retrieve data from
-  // -> /
-  std::string m_webroot_sys;
-  // -> /user
-  std::string m_webroot_user;
+  std::shared_ptr<HALSimWeb> m_server;
 
   // is the websocket connected?
   bool m_isWsConnected = false;
 
   // these are only valid if the websocket is connected
-  std::shared_ptr<UvExecFunc> m_exec;
-  std::unique_ptr<BufferPool> m_buffers;
+  wpi::uv::SimpleBufferPool<4> m_buffers;
   std::mutex m_buffers_mutex;
 };
 

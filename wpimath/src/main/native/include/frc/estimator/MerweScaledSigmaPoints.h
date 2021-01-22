@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <cmath>
 
-#include "Eigen/Cholesky"
 #include "Eigen/Core"
+#include "Eigen/src/Cholesky/LLT.h"
 
 namespace frc {
 
@@ -40,8 +37,8 @@ class MerweScaledSigmaPoints {
    *             For Gaussian distributions, beta = 2 is optimal.
    * @param kappa Secondary scaling parameter usually set to 0 or 3 - States.
    */
-  MerweScaledSigmaPoints(double alpha = 1e-3, double beta = 2,
-                         int kappa = 3 - States) {
+  explicit MerweScaledSigmaPoints(double alpha = 1e-3, double beta = 2,
+                                  int kappa = 3 - States) {
     m_alpha = alpha;
     m_kappa = kappa;
 

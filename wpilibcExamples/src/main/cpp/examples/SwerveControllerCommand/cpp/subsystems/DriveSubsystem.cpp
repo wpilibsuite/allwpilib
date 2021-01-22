@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/DriveSubsystem.h"
 
@@ -68,7 +65,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 }
 
 void DriveSubsystem::SetModuleStates(
-    std::array<frc::SwerveModuleState, 4> desiredStates) {
+    wpi::array<frc::SwerveModuleState, 4> desiredStates) {
   kDriveKinematics.NormalizeWheelSpeeds(&desiredStates,
                                         AutoConstants::kMaxSpeed);
   m_frontLeft.SetDesiredState(desiredStates[0]);
@@ -88,11 +85,17 @@ units::degree_t DriveSubsystem::GetHeading() const {
   return m_gyro.GetRotation2d().Degrees();
 }
 
-void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
+void DriveSubsystem::ZeroHeading() {
+  m_gyro.Reset();
+}
 
-double DriveSubsystem::GetTurnRate() { return -m_gyro.GetRate(); }
+double DriveSubsystem::GetTurnRate() {
+  return -m_gyro.GetRate();
+}
 
-frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+frc::Pose2d DriveSubsystem::GetPose() {
+  return m_odometry.GetPose();
+}
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(pose,
