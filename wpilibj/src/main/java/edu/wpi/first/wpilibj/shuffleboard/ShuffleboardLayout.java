@@ -19,14 +19,15 @@ import edu.wpi.first.wpilibj.Sendable;
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
- * A layout in a Shuffleboard tab. Layouts can contain widgets and other layouts.
+ * A layout in a Shuffleboard tab. Layouts can contain widgets and other
+ * layouts.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout>
-    implements ShuffleboardContainer {
+public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout> 
+  implements ShuffleboardContainer {
   private final ContainerHelper m_helper = new ContainerHelper(this);
 
-  public ShuffleboardLayout(ShuffleboardContainer parent, String title, String type) {
+  protected ShuffleboardLayout(ShuffleboardContainer parent, String title, String type) {
     super(parent, title, requireNonNullParam(type, "type", "ShuffleboardLayout"));
   }
 
@@ -61,50 +62,44 @@ public class ShuffleboardLayout extends ShuffleboardComponent<ShuffleboardLayout
   }
 
   @Override
-  public SuppliedValueWidget<String> addString(String title,
-                                               Supplier<String> valueSupplier)
+  public SuppliedValueWidget<String> addString(String title, Supplier<String> valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addString(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<Double> addNumber(String title,
-                                               DoubleSupplier valueSupplier)
+  public SuppliedValueWidget<Double> addNumber(String title, DoubleSupplier valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addNumber(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<Boolean> addBoolean(String title,
-                                                 BooleanSupplier valueSupplier)
+  public SuppliedValueWidget<Boolean> addBoolean(String title, BooleanSupplier valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addBoolean(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<String[]> addStringArray(String title,
-                                                      Supplier<String[]> valueSupplier)
+  public SuppliedValueWidget<String[]> addStringArray(String title, Supplier<String[]> valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addStringArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<double[]> addDoubleArray(String title,
-                                                      Supplier<double[]> valueSupplier)
+  public SuppliedValueWidget<double[]> addDoubleArray(String title, Supplier<double[]> valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addDoubleArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<boolean[]> addBooleanArray(String title,
-                                                        Supplier<boolean[]> valueSupplier)
+  public SuppliedValueWidget<boolean[]> addBooleanArray(String title, Supplier<boolean[]> valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addBooleanArray(title, valueSupplier);
   }
 
   @Override
-  public SuppliedValueWidget<byte[]> addRaw(String title,
-                                            Supplier<byte[]> valueSupplier)
+  public SuppliedValueWidget<byte[]> 
+  addRaw(String title, Supplier<byte[]> valueSupplier)
       throws IllegalArgumentException {
     return m_helper.addRaw(title, valueSupplier);
   }
