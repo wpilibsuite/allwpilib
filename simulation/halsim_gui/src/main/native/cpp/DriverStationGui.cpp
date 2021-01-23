@@ -1348,7 +1348,19 @@ static void DisplaySystemJoysticks() {
     DisplaySystemJoystick(*gGlfwJoysticks[i], i);
   }
   for (size_t i = 0; i < gKeyboardJoysticks.size(); ++i) {
-    DisplaySystemJoystick(*gKeyboardJoysticks[i], i + GLFW_JOYSTICK_LAST + 1);
+    auto joy = gKeyboardJoysticks[i].get();
+    DisplaySystemJoystick(*joy, i + GLFW_JOYSTICK_LAST + 1);
+    if (ImGui::BeginPopupContextItem()) {
+      char buf[64];
+      std::snprintf(buf, sizeof(buf), "%s Settings", joy->GetName());
+      if (ImGui::MenuItem(buf)) {
+        if (auto win = DriverStationGui::dsManager.GetWindow(buf)) {
+          win->SetVisible(true);
+        }
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
   }
 }
 
