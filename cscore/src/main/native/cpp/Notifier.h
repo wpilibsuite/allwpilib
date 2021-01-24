@@ -83,6 +83,7 @@ class Notifier : public wpi::CallbackManager<Notifier, impl::NotifierThread> {
                           const wpi::Twine& valueStr);
   void NotifyNetworkInterfacesChanged();
   void NotifyTelemetryUpdated();
+  void NotifyUsbCamerasChanged();
 };
 
 }  // namespace cs

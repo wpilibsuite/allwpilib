@@ -116,7 +116,8 @@ struct RawEvent {
     kTelemetryUpdated = CS_TELEMETRY_UPDATED,
     kSinkPropertyCreated = CS_SINK_PROPERTY_CREATED,
     kSinkPropertyValueUpdated = CS_SINK_PROPERTY_VALUE_UPDATED,
-    kSinkPropertyChoicesUpdated = CS_SINK_PROPERTY_CHOICES_UPDATED
+    kSinkPropertyChoicesUpdated = CS_SINK_PROPERTY_CHOICES_UPDATED,
+    kUsbCamerasChanged = CS_USB_CAMERAS_CHANGED
   };
 
   RawEvent() = default;
