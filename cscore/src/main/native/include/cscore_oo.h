@@ -1040,6 +1040,6 @@ class VideoListener {
 
 }  // namespace cs
 
-#include "cscore_oo.inl"
+#include "cscore_oo.inc"
 
 #endif  // CSCORE_CSCORE_OO_H_

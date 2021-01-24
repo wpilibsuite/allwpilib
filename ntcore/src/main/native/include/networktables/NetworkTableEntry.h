@@ -636,6 +636,6 @@ class NetworkTableEntry final {
 
 }  // namespace nt
 
-#include "networktables/NetworkTableEntry.inl"
+#include "networktables/NetworkTableEntry.inc"
 
 #endif  // NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_H_
