@@ -183,7 +183,8 @@ public class Rotation2d {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Rotation2d) {
-      return Math.abs(((Rotation2d) obj).m_value - m_value) < 1E-9;
+      var other = (Rotation2d) obj;
+      return Math.hypot(m_cos - other.m_cos, m_sin - other.m_sin) < 1E-9;
     }
     return false;
   }

@@ -15,22 +15,22 @@ class Rotation2dTest {
 
   @Test
   void testRadiansToDegrees() {
-    var one = new Rotation2d(Math.PI / 3);
-    var two = new Rotation2d(Math.PI / 4);
+    var rot1 = new Rotation2d(Math.PI / 3);
+    var rot2 = new Rotation2d(Math.PI / 4);
 
     assertAll(
-        () -> assertEquals(one.getDegrees(), 60.0, kEpsilon),
-        () -> assertEquals(two.getDegrees(), 45.0, kEpsilon));
+        () -> assertEquals(rot1.getDegrees(), 60.0, kEpsilon),
+        () -> assertEquals(rot2.getDegrees(), 45.0, kEpsilon));
   }
 
   @Test
   void testRadiansAndDegrees() {
-    var one = Rotation2d.fromDegrees(45.0);
-    var two = Rotation2d.fromDegrees(30.0);
+    var rot1 = Rotation2d.fromDegrees(45.0);
+    var rot2 = Rotation2d.fromDegrees(30.0);
 
     assertAll(
-        () -> assertEquals(one.getRadians(), Math.PI / 4, kEpsilon),
-        () -> assertEquals(two.getRadians(), Math.PI / 6, kEpsilon));
+        () -> assertEquals(rot1.getRadians(), Math.PI / 4, kEpsilon),
+        () -> assertEquals(rot2.getRadians(), Math.PI / 6, kEpsilon));
   }
 
   @Test
@@ -53,23 +53,27 @@ class Rotation2dTest {
 
   @Test
   void testMinus() {
-    var one = Rotation2d.fromDegrees(70.0);
-    var two = Rotation2d.fromDegrees(30.0);
+    var rot1 = Rotation2d.fromDegrees(70.0);
+    var rot2 = Rotation2d.fromDegrees(30.0);
 
-    assertEquals(one.minus(two).getDegrees(), 40.0, kEpsilon);
+    assertEquals(rot1.minus(rot2).getDegrees(), 40.0, kEpsilon);
   }
 
   @Test
   void testEquality() {
-    var one = Rotation2d.fromDegrees(43.0);
-    var two = Rotation2d.fromDegrees(43.0);
-    assertEquals(one, two);
+    var rot1 = Rotation2d.fromDegrees(43.0);
+    var rot2 = Rotation2d.fromDegrees(43.0);
+    assertEquals(rot1, rot2);
+
+    var rot3 = Rotation2d.fromDegrees(-180.0);
+    var rot4 = Rotation2d.fromDegrees(180.0);
+    assertEquals(rot3, rot4);
   }
 
   @Test
   void testInequality() {
-    var one = Rotation2d.fromDegrees(43.0);
-    var two = Rotation2d.fromDegrees(43.5);
-    assertNotEquals(one, two);
+    var rot1 = Rotation2d.fromDegrees(43.0);
+    var rot2 = Rotation2d.fromDegrees(43.5);
+    assertNotEquals(rot1, rot2);
   }
 }
