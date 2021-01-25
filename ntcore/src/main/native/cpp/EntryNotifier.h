@@ -9,7 +9,8 @@
 #include <memory>
 #include <string>
 
-#include "CallbackManager.h"
+#include <wpi/CallbackManager.h>
+
 #include "Handle.h"
 #include "IEntryNotifier.h"
 #include "ntcore_cpp.h"
@@ -23,22 +24,23 @@ namespace nt {
 namespace impl {
 
 struct EntryListenerData
-    : public ListenerData<std::function<void(const EntryNotification& event)>> {
+    : public wpi::CallbackListenerData<
+          std::function<void(const EntryNotification& event)>> {
   EntryListenerData() = default;
   EntryListenerData(
       std::function<void(const EntryNotification& event)> callback_,
       StringRef prefix_, unsigned int flags_)
-      : ListenerData(callback_), prefix(prefix_), flags(flags_) {}
+      : CallbackListenerData(callback_), prefix(prefix_), flags(flags_) {}
   EntryListenerData(
       std::function<void(const EntryNotification& event)> callback_,
       NT_Entry entry_, unsigned int flags_)
-      : ListenerData(callback_), entry(entry_), flags(flags_) {}
+      : CallbackListenerData(callback_), entry(entry_), flags(flags_) {}
   EntryListenerData(unsigned int poller_uid_, StringRef prefix_,
                     unsigned int flags_)
-      : ListenerData(poller_uid_), prefix(prefix_), flags(flags_) {}
+      : CallbackListenerData(poller_uid_), prefix(prefix_), flags(flags_) {}
   EntryListenerData(unsigned int poller_uid_, NT_Entry entry_,
                     unsigned int flags_)
-      : ListenerData(poller_uid_), entry(entry_), flags(flags_) {}
+      : CallbackListenerData(poller_uid_), entry(entry_), flags(flags_) {}
 
   std::string prefix;
   NT_Entry entry = 0;
@@ -46,8 +48,8 @@ struct EntryListenerData
 };
 
 class EntryNotifierThread
-    : public CallbackThread<EntryNotifierThread, EntryNotification,
-                            EntryListenerData> {
+    : public wpi::CallbackThread<EntryNotifierThread, EntryNotification,
+                                 EntryListenerData> {
  public:
   explicit EntryNotifierThread(int inst) : m_inst(inst) {}
 
@@ -71,9 +73,9 @@ class EntryNotifierThread
 
 class EntryNotifier
     : public IEntryNotifier,
-      public CallbackManager<EntryNotifier, impl::EntryNotifierThread> {
+      public wpi::CallbackManager<EntryNotifier, impl::EntryNotifierThread> {
   friend class EntryNotifierTest;
-  friend class CallbackManager<EntryNotifier, impl::EntryNotifierThread>;
+  friend class wpi::CallbackManager<EntryNotifier, impl::EntryNotifierThread>;
 
  public:
   explicit EntryNotifier(int inst, wpi::Logger& logger);
