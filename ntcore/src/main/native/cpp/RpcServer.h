@@ -7,10 +7,10 @@
 
 #include <utility>
 
+#include <wpi/CallbackManager.h>
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
 
-#include "CallbackManager.h"
 #include "Handle.h"
 #include "IRpcServer.h"
 #include "Log.h"
@@ -32,11 +32,11 @@ struct RpcNotifierData : public RpcAnswer {
 };
 
 using RpcListenerData =
-    ListenerData<std::function<void(const RpcAnswer& answer)>>;
+    wpi::CallbackListenerData<std::function<void(const RpcAnswer& answer)>>;
 
 class RpcServerThread
-    : public CallbackThread<RpcServerThread, RpcAnswer, RpcListenerData,
-                            RpcNotifierData> {
+    : public wpi::CallbackThread<RpcServerThread, RpcAnswer, RpcListenerData,
+                                 RpcNotifierData> {
  public:
   RpcServerThread(int inst, wpi::Logger& logger)
       : m_inst(inst), m_logger(logger) {}
@@ -78,10 +78,11 @@ class RpcServerThread
 
 }  // namespace impl
 
-class RpcServer : public IRpcServer,
-                  public CallbackManager<RpcServer, impl::RpcServerThread> {
+class RpcServer
+    : public IRpcServer,
+      public wpi::CallbackManager<RpcServer, impl::RpcServerThread> {
   friend class RpcServerTest;
-  friend class CallbackManager<RpcServer, impl::RpcServerThread>;
+  friend class wpi::CallbackManager<RpcServer, impl::RpcServerThread>;
 
  public:
   RpcServer(int inst, wpi::Logger& logger);

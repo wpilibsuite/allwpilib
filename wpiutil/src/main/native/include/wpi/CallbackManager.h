@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_CALLBACKMANAGER_H_
-#define NTCORE_CALLBACKMANAGER_H_
+#ifndef WPIUTIL_WPI_CALLBACKMANAGER_H_
+#define WPIUTIL_WPI_CALLBACKMANAGER_H_
 
 #include <atomic>
 #include <climits>
@@ -13,22 +13,21 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/SafeThread.h>
-#include <wpi/UidVector.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
+#include "wpi/SafeThread.h"
+#include "wpi/UidVector.h"
+#include "wpi/condition_variable.h"
+#include "wpi/mutex.h"
+#include "wpi/raw_ostream.h"
 
-namespace nt {
-
-namespace impl {
+namespace wpi {
 
 template <typename Callback>
-class ListenerData {
+class CallbackListenerData {
  public:
-  ListenerData() = default;
-  explicit ListenerData(Callback callback_) : callback(callback_) {}
-  explicit ListenerData(unsigned int poller_uid_) : poller_uid(poller_uid_) {}
+  CallbackListenerData() = default;
+  explicit CallbackListenerData(Callback callback_) : callback(callback_) {}
+  explicit CallbackListenerData(unsigned int poller_uid_)
+      : poller_uid(poller_uid_) {}
 
   explicit operator bool() const { return callback || poller_uid != UINT_MAX; }
 
@@ -46,7 +45,7 @@ class ListenerData {
 //   void DoCallback(Callback callback, const NotifierData& data);
 template <typename Derived, typename TUserInfo,
           typename TListenerData =
-              ListenerData<std::function<void(const TUserInfo& info)>>,
+              CallbackListenerData<std::function<void(const TUserInfo& info)>>,
           typename TNotifierData = TUserInfo>
 class CallbackThread : public wpi::SafeThread {
  public:
@@ -166,8 +165,6 @@ void CallbackThread<Derived, TUserInfo, TListenerData, TNotifierData>::Main() {
     m_queue_empty.notify_all();
   }
 }
-
-}  // namespace impl
 
 // CRTP callback manager
 // @tparam Derived  derived class
@@ -366,6 +363,6 @@ class CallbackManager {
   wpi::SafeThreadOwner<Thread> m_owner;
 };
 
-}  // namespace nt
+}  // namespace wpi
 
-#endif  // NTCORE_CALLBACKMANAGER_H_
+#endif  // WPIUTIL_WPI_CALLBACKMANAGER_H_
