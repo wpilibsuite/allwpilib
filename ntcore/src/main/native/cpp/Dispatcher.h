@@ -112,7 +112,7 @@ class DispatcherBase : public IDispatcher {
   // Condition variable for forced dispatch wakeup (flush)
   wpi::mutex m_flush_mutex;
   wpi::condition_variable m_flush_cv;
-  uint64_t m_last_flush;
+  uint64_t m_last_flush = 0;
   bool m_do_flush = false;
 
   // Condition variable for client reconnect (uses user mutex)
