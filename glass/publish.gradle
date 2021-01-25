@@ -4,9 +4,65 @@ def baseArtifactId = 'Glass'
 def artifactGroupId = 'edu.wpi.first.tools'
 def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_Glass_CLS'
 
+def libBaseArtifactId = 'libglass'
+def libArtifactGroupId = 'edu.wpi.first.glass'
+def libZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglass_CLS'
+
+def libntBaseArtifactId = 'libglassnt'
+def libntArtifactGroupId = 'edu.wpi.first.glass'
+def libntZipBaseName = '_GROUP_edu_wpi_first_glass_ID_libglassnt_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+task libCppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libZipBaseName
+    classifier = "sources"
+
+    from(licenseFile) { into '/' }
+    from('src/lib/native/cpp') { into '/' }
+}
+
+task libCppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libZipBaseName
+    classifier = "headers"
+
+    from(licenseFile) { into '/' }
+    from('src/lib/native/include') { into '/' }
+}
+
+task libntCppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libntZipBaseName
+    classifier = "sources"
+
+    from(licenseFile) { into '/' }
+    from('src/libnt/native/cpp') { into '/' }
+}
+
+task libntCppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = libntZipBaseName
+    classifier = "headers"
+
+    from(licenseFile) { into '/' }
+    from('src/libnt/native/include') { into '/' }
+}
+
+build.dependsOn libCppHeadersZip
+build.dependsOn libCppSourcesZip
+build.dependsOn libntCppHeadersZip
+build.dependsOn libntCppSourcesZip
+
+addTaskToCopyAllOutputs(libCppHeadersZip)
+addTaskToCopyAllOutputs(libCppSourcesZip)
+addTaskToCopyAllOutputs(libntCppHeadersZip)
+addTaskToCopyAllOutputs(libntCppSourcesZip)
+
 model {
     publishing {
-        def tasks = []
+        def glassAppTaskList = []
         $.components.each { component ->
             component.binaries.each { binary ->
                 if (binary in NativeExecutableBinarySpec && binary.component.name.contains("glassApp")) {
@@ -50,7 +106,6 @@ model {
                         }
 
                         // Create the ZIP.
-                        def outputsFolder = file("$project.buildDir/outputs")
                         def task = project.tasks.create("copyGlassExecutable", Zip) {
                             description("Copies the Glass executable to the outputs directory.")
                             destinationDirectory = outputsFolder
@@ -73,7 +128,7 @@ model {
                         }
 
                         task.dependsOn binary.tasks.link
-                        tasks.add(task)
+                        glassAppTaskList.add(task)
                         project.build.dependsOn task
                         project.artifacts { task }
                         addTaskToCopyAllOutputs(task)
@@ -82,11 +137,35 @@ model {
             }
         }
 
+        def libGlassTaskList = createComponentZipTasks($.components, ['glass'], libZipBaseName, Zip, project, includeStandardZipFormat)
+        def libGlassntTaskList = createComponentZipTasks($.components, ['glassnt'], libntZipBaseName, Zip, project, includeStandardZipFormat)
+
         publications {
-            cpp(MavenPublication) {
-                tasks.each { artifact it }
+            glassApp(MavenPublication) {
+                glassAppTaskList.each { artifact it }
+
                 artifactId = baseArtifactId
                 groupId = artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+            libglass(MavenPublication) {
+                libGlassTaskList.each { artifact it }
+
+                artifact libCppHeadersZip
+                artifact libCppSourcesZip
+
+                artifactId = libBaseArtifactId
+                groupId = libArtifactGroupId
+                version wpilibVersioning.version.get()
+            }
+            libglassnt(MavenPublication) {
+                libGlassntTaskList.each { artifact it }
+
+                artifact libntCppHeadersZip
+                artifact libntCppSourcesZip
+
+                artifactId = libntBaseArtifactId
+                groupId = libntArtifactGroupId
                 version wpilibVersioning.version.get()
             }
         }
