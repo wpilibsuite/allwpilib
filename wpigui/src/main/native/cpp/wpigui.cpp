@@ -394,12 +394,14 @@ void gui::ConfigurePlatformSaveFile(const std::string& name) {
   gContext->iniPath = name;
 #if defined(_MSC_VER)
   const char* env = std::getenv("APPDATA");
-  if (env)
+  if (env) {
     gContext->iniPath = env + std::string("/" + name);
+  }
 #elif defined(__APPLE__)
   const char* env = std::getenv("HOME");
-  if (env)
+  if (env) {
     gContext->iniPath = env + std::string("/Library/Preferences/" + name);
+  }
 #else
   const char* xdg = std::getenv("XDG_CONFIG_HOME");
   const char* env = std::getenv("HOME");
