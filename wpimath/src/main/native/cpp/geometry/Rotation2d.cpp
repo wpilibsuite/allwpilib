@@ -65,7 +65,7 @@ Rotation2d Rotation2d::operator*(double scalar) const {
 }
 
 bool Rotation2d::operator==(const Rotation2d& other) const {
-  return units::math::abs(m_value - other.m_value) < 1E-9_rad;
+  return std::hypot(m_cos - other.m_cos, m_sin - other.m_sin) < 1E-9;
 }
 
 bool Rotation2d::operator!=(const Rotation2d& other) const {
