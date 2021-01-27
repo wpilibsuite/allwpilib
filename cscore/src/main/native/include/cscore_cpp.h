@@ -163,6 +163,9 @@ struct RawEvent {
   CS_PropertyKind propertyKind;
   int value;
   std::string valueStr;
+
+  // Listener that was triggered
+  CS_Listener listener{0};
 };
 
 /**
@@ -378,6 +381,15 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
                         int eventMask, bool immediateNotify, CS_Status* status);
 
 void RemoveListener(CS_Listener handle, CS_Status* status);
+
+CS_ListenerPoller CreateListenerPoller();
+void DestroyListenerPoller(CS_ListenerPoller poller);
+CS_Listener AddPolledListener(CS_ListenerPoller poller, int eventMask,
+                              bool immediateNotify, CS_Status* status);
+std::vector<RawEvent> PollListener(CS_ListenerPoller poller);
+std::vector<RawEvent> PollListener(CS_ListenerPoller poller, double timeout,
+                                   bool* timedOut);
+void CancelPollListener(CS_ListenerPoller poller);
 /** @} */
 
 bool NotifierDestroyed();

@@ -31,6 +31,7 @@ static JClass videoModeCls;
 static JClass videoEventCls;
 static JClass rawFrameCls;
 static JException videoEx;
+static JException interruptedEx;
 static JException nullPointerEx;
 static JException unsupportedEx;
 static JException exceptionEx;
@@ -45,6 +46,7 @@ static const JClassInit classes[] = {
 
 static const JExceptionInit exceptions[] = {
     {"edu/wpi/cscore/VideoException", &videoEx},
+    {"java/lang/InterruptedException", &interruptedEx},
     {"java/lang/NullPointerException", &nullPointerEx},
     {"java/lang/UnsupportedOperationException", &unsupportedEx},
     {"java/lang/Exception", &exceptionEx}};
@@ -268,7 +270,7 @@ static jobject MakeJObject(JNIEnv* env, const cs::VideoMode& videoMode) {
 static jobject MakeJObject(JNIEnv* env, const cs::RawEvent& event) {
   static jmethodID constructor =
       env->GetMethodID(videoEventCls, "<init>",
-                       "(IIILjava/lang/String;IIIIIIILjava/lang/String;)V");
+                       "(IIILjava/lang/String;IIIIIIILjava/lang/String;I)V");
   JLocal<jstring> name(env, MakeJString(env, event.name));
   JLocal<jstring> valueStr(env, MakeJString(env, event.valueStr));
   // clang-format off
@@ -286,8 +288,21 @@ static jobject MakeJObject(JNIEnv* env, const cs::RawEvent& event) {
       static_cast<jint>(event.propertyHandle),
       static_cast<jint>(event.propertyKind),
       static_cast<jint>(event.value),
-      valueStr.obj());
+      valueStr.obj(),
+      static_cast<jint>(event.listener));
   // clang-format on
+}
+
+static jobjectArray MakeJObject(JNIEnv* env, wpi::ArrayRef<cs::RawEvent> arr) {
+  jobjectArray jarr = env->NewObjectArray(arr.size(), videoEventCls, nullptr);
+  if (!jarr) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < arr.size(); ++i) {
+    JLocal<jobject> elem{env, MakeJObject(env, arr[i])};
+    env->SetObjectArrayElement(jarr, i, elem.obj());
+  }
+  return jarr;
 }
 
 extern "C" {
@@ -1879,6 +1894,92 @@ Java_edu_wpi_cscore_CameraServerJNI_removeListener
   CS_Status status = 0;
   cs::RemoveListener(handle, &status);
   CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    createListenerPoller
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_createListenerPoller
+  (JNIEnv*, jclass)
+{
+  return cs::CreateListenerPoller();
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    destroyListenerPoller
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_destroyListenerPoller
+  (JNIEnv*, jclass, jint poller)
+{
+  cs::DestroyListenerPoller(poller);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    addPolledListener
+ * Signature: (IIZ)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_addPolledListener
+  (JNIEnv* env, jclass, jint poller, jint eventMask, jboolean immediateNotify)
+{
+  CS_Status status = 0;
+  auto rv = cs::AddPolledListener(poller, eventMask, immediateNotify, &status);
+  CheckStatus(env, status);
+  return rv;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    pollListener
+ * Signature: (I)[Ljava/lang/Object;
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_pollListener
+  (JNIEnv* env, jclass, jint poller)
+{
+  auto events = cs::PollListener(poller);
+  if (events.empty()) {
+    interruptedEx.Throw(env, "PollListener interrupted");
+    return nullptr;
+  }
+  return MakeJObject(env, events);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    pollListenerTimeout
+ * Signature: (ID)[Ljava/lang/Object;
+ */
+JNIEXPORT jobjectArray JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_pollListenerTimeout
+  (JNIEnv* env, jclass, jint poller, jdouble timeout)
+{
+  bool timed_out = false;
+  auto events = cs::PollListener(poller, timeout, &timed_out);
+  if (events.empty() && !timed_out) {
+    interruptedEx.Throw(env, "PollListener interrupted");
+    return nullptr;
+  }
+  return MakeJObject(env, events);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    cancelPollListener
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_cscore_CameraServerJNI_cancelPollListener
+  (JNIEnv*, jclass, jint poller)
+{
+  cs::CancelPollListener(poller);
 }
 
 /*

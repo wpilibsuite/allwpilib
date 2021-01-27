@@ -313,6 +313,19 @@ public class CameraServerJNI {
 
   public static native void removeListener(int handle);
 
+  public static native int createListenerPoller();
+
+  public static native void destroyListenerPoller(int poller);
+
+  public static native int addPolledListener(int poller, int eventMask, boolean immediateNotify);
+
+  public static native VideoEvent[] pollListener(int poller) throws InterruptedException;
+
+  public static native VideoEvent[] pollListenerTimeout(int poller, double timeout)
+      throws InterruptedException;
+
+  public static native void cancelPollListener(int poller);
+
   //
   // Telemetry Functions
   //

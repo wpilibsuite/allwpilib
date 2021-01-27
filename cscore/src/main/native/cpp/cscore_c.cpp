@@ -15,6 +15,39 @@
 #include "cscore_cpp.h"
 #include "cscore_raw.h"
 
+static CS_Event ConvertToC(const cs::RawEvent& rawEvent) {
+  CS_Event event;
+  event.kind = static_cast<CS_EventKind>(static_cast<int>(rawEvent.kind));
+  event.source = rawEvent.sourceHandle;
+  event.sink = rawEvent.sinkHandle;
+  event.name = rawEvent.name.c_str();
+  event.mode = rawEvent.mode;
+  event.property = rawEvent.propertyHandle;
+  event.propertyKind = rawEvent.propertyKind;
+  event.value = rawEvent.value;
+  event.valueStr = rawEvent.valueStr.c_str();
+  event.listener = rawEvent.listener;
+  return event;
+}
+
+template <typename O, typename I>
+static O* ConvertToC(std::vector<I>&& in, int* count) {
+  using T = std::vector<I>;
+  size_t size = in.size();
+  O* out = static_cast<O*>(wpi::safe_malloc(size * sizeof(O) + sizeof(T)));
+  *count = size;
+  for (size_t i = 0; i < size; ++i) {
+    out[i] = ConvertToC(in[i]);
+  }
+
+  // retain vector at end of returned array
+  alignas(T) unsigned char buf[sizeof(T)];
+  new (buf) T(std::move(in));
+  std::memcpy(out + size * sizeof(O), buf, sizeof(T));
+
+  return out;
+}
+
 extern "C" {
 
 CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
@@ -332,16 +365,7 @@ CS_Listener CS_AddListener(void* data,
                            CS_Status* status) {
   return cs::AddListener(
       [=](const cs::RawEvent& rawEvent) {
-        CS_Event event;
-        event.kind = static_cast<CS_EventKind>(static_cast<int>(rawEvent.kind));
-        event.source = rawEvent.sourceHandle;
-        event.sink = rawEvent.sinkHandle;
-        event.name = rawEvent.name.c_str();
-        event.mode = rawEvent.mode;
-        event.property = rawEvent.propertyHandle;
-        event.propertyKind = rawEvent.propertyKind;
-        event.value = rawEvent.value;
-        event.valueStr = rawEvent.valueStr.c_str();
+        CS_Event event = ConvertToC(rawEvent);
         callback(data, &event);
       },
       eventMask, immediateNotify, status);
@@ -349,6 +373,45 @@ CS_Listener CS_AddListener(void* data,
 
 void CS_RemoveListener(CS_Listener handle, CS_Status* status) {
   return cs::RemoveListener(handle, status);
+}
+
+CS_ListenerPoller CS_CreateListenerPoller(void) {
+  return cs::CreateListenerPoller();
+}
+
+void CS_DestroyListenerPoller(CS_ListenerPoller poller) {
+  cs::DestroyListenerPoller(poller);
+}
+
+CS_Listener CS_AddPolledListener(CS_ListenerPoller poller, int eventMask,
+                                 CS_Bool immediateNotify, CS_Status* status) {
+  return cs::AddPolledListener(poller, eventMask, immediateNotify, status);
+}
+
+struct CS_Event* CS_PollListener(CS_ListenerPoller poller, int* count) {
+  return ConvertToC<CS_Event>(cs::PollListener(poller), count);
+}
+
+struct CS_Event* CS_PollListenerTimeout(CS_ListenerPoller poller, int* count,
+                                        double timeout, CS_Bool* timedOut) {
+  bool cppTimedOut = false;
+  auto arrCpp = cs::PollListener(poller, timeout, &cppTimedOut);
+  *timedOut = cppTimedOut;
+  return ConvertToC<CS_Event>(std::move(arrCpp), count);
+}
+
+void CS_CancelPollListener(CS_ListenerPoller poller) {
+  cs::CancelPollListener(poller);
+}
+
+void CS_FreeEvents(CS_Event* arr, int count) {
+  // destroy vector saved at end of array
+  using T = std::vector<cs::RawEvent>;
+  alignas(T) unsigned char buf[sizeof(T)];
+  std::memcpy(buf, arr + count * sizeof(CS_Event), sizeof(T));
+  reinterpret_cast<T*>(buf)->~T();
+
+  std::free(arr);
 }
 
 int CS_NotifierDestroyed(void) {
