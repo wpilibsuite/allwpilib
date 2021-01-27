@@ -705,19 +705,12 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
 // Listener Functions
 //
 
-void SetListenerOnStart(std::function<void()> onStart) {
-  Instance::GetInstance().notifier.SetOnStart(onStart);
-}
+void SetListenerOnStart(std::function<void()> onStart) {}
 
-void SetListenerOnExit(std::function<void()> onExit) {
-  Instance::GetInstance().notifier.SetOnExit(onExit);
-}
+void SetListenerOnExit(std::function<void()> onExit) {}
 
-CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
-                        int eventMask, bool immediateNotify,
-                        CS_Status* status) {
+static void StartBackground(int eventMask, bool immediateNotify) {
   auto& inst = Instance::GetInstance();
-  int uid = inst.notifier.AddListener(callback, eventMask);
   if ((eventMask & CS_NETWORK_INTERFACES_CHANGED) != 0) {
     // start network interface event listener
     inst.networkListener.Start();
@@ -725,6 +718,14 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
       inst.notifier.NotifyNetworkInterfacesChanged();
     }
   }
+}
+
+CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
+                        int eventMask, bool immediateNotify,
+                        CS_Status* status) {
+  auto& inst = Instance::GetInstance();
+  int uid = inst.notifier.Add(callback, eventMask);
+  StartBackground(eventMask, immediateNotify);
   if (immediateNotify) {
     // TODO
   }
@@ -737,11 +738,67 @@ void RemoveListener(CS_Listener handle, CS_Status* status) {
     *status = CS_INVALID_HANDLE;
     return;
   }
-  Instance::GetInstance().notifier.RemoveListener(uid);
+  Instance::GetInstance().notifier.Remove(uid);
+}
+
+CS_ListenerPoller CreateListenerPoller() {
+  auto& inst = Instance::GetInstance();
+  return Handle(inst.notifier.CreatePoller(), Handle::kListenerPoller);
+}
+
+void DestroyListenerPoller(CS_ListenerPoller poller) {
+  int uid = Handle{poller}.GetTypedIndex(Handle::kListenerPoller);
+  if (uid < 0) {
+    return;
+  }
+  Instance::GetInstance().notifier.RemovePoller(uid);
+}
+
+CS_Listener AddPolledListener(CS_ListenerPoller poller, int eventMask,
+                              bool immediateNotify, CS_Status* status) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kListenerPoller);
+  if (id < 0) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+
+  auto& inst = Instance::GetInstance();
+  int uid = inst.notifier.AddPolled(id, eventMask);
+  StartBackground(eventMask, immediateNotify);
+  return Handle{uid, Handle::kListener};
+}
+
+std::vector<RawEvent> PollListener(CS_ListenerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kListenerPoller);
+  if (id < 0) {
+    return {};
+  }
+  return Instance::GetInstance().notifier.Poll(id);
+}
+
+std::vector<RawEvent> PollListener(CS_ListenerPoller poller, double timeout,
+                                   bool* timedOut) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kListenerPoller);
+  if (id < 0) {
+    return {};
+  }
+  return Instance::GetInstance().notifier.Poll(id, timeout, timedOut);
+}
+
+void CancelPollListener(CS_ListenerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kListenerPoller);
+  if (id < 0) {
+    return;
+  }
+  return Instance::GetInstance().notifier.CancelPoll(id);
 }
 
 bool NotifierDestroyed() {
-  return Notifier::destroyed();
+  return false;
 }
 
 //

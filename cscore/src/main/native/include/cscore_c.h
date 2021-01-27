@@ -46,6 +46,7 @@ typedef int CS_Status;
 typedef int CS_Handle;
 typedef CS_Handle CS_Property;
 typedef CS_Handle CS_Listener;
+typedef CS_Handle CS_ListenerPoller;
 typedef CS_Handle CS_Sink;
 typedef CS_Handle CS_Source;
 /** @} */
@@ -222,6 +223,9 @@ struct CS_Event {
   enum CS_PropertyKind propertyKind;
   int value;
   const char* valueStr;
+
+  // Listener that was triggered
+  CS_Listener listener;
 };
 
 /**
@@ -429,9 +433,19 @@ void CS_SetListenerOnStart(void (*onStart)(void* data), void* data);
 void CS_SetListenerOnExit(void (*onExit)(void* data), void* data);
 CS_Listener CS_AddListener(
     void* data, void (*callback)(void* data, const struct CS_Event* event),
-    int eventMask, int immediateNotify, CS_Status* status);
+    int eventMask, CS_Bool immediateNotify, CS_Status* status);
 
 void CS_RemoveListener(CS_Listener handle, CS_Status* status);
+
+CS_ListenerPoller CS_CreateListenerPoller(void);
+void CS_DestroyListenerPoller(CS_ListenerPoller poller);
+CS_Listener CS_AddPolledListener(CS_ListenerPoller poller, int eventMask,
+                                 CS_Bool immediateNotify, CS_Status* status);
+struct CS_Event* CS_PollListener(CS_ListenerPoller poller, int* count);
+struct CS_Event* CS_PollListenerTimeout(CS_ListenerPoller poller, int* count,
+                                        double timeout, CS_Bool* timedOut);
+void CS_FreeEvents(struct CS_Event* arr, int count);
+void CS_CancelPollListener(CS_ListenerPoller poller);
 /** @} */
 
 int CS_NotifierDestroyed(void);

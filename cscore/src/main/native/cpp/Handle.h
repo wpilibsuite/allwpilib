@@ -22,7 +22,8 @@ class Handle {
     kSource,
     kSink,
     kListener,
-    kSinkProperty
+    kSinkProperty,
+    kListenerPoller
   };
   enum { kIndexMax = 0xffff };
 
