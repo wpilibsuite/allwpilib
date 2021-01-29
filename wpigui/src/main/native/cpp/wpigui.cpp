@@ -193,9 +193,11 @@ bool gui::Initialize(const char* title, int width, int height) {
   }
 
   if (!gContext->loadedWidthHeight) {
+#ifndef __APPLE__
     if (windowScale == 1.0) {
       glfwGetWindowContentScale(gContext->window, &windowScale, nullptr);
     }
+#endif
     // force user scale if window scale is smaller
     if (windowScale <= 0.5) {
       gContext->userScale = 0;
@@ -284,7 +286,9 @@ void gui::CommonRenderFrame() {
 
   // Scale based on OS window content scaling
   float windowScale = 1.0;
+#ifndef __APPLE__
   glfwGetWindowContentScale(gContext->window, &windowScale, nullptr);
+#endif
   // map to closest font size: 0 = 0.5x, 1 = 0.75x, 2 = 1.0x, 3 = 1.25x,
   // 4 = 1.5x, 5 = 1.75x, 6 = 2x
   gContext->fontScale = std::clamp(
