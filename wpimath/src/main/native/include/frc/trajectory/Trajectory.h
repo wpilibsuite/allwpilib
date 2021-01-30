@@ -120,6 +120,16 @@ class Trajectory {
   Trajectory RelativeTo(const Pose2d& pose);
 
   /**
+   * Concatenates another trajectory to the current trajectory. The user is
+   * responsible for making sure that the end pose of this trajectory and the
+   * start pose of the other trajectory match (if that is the desired behavior).
+   *
+   * @param other The trajectory to concatenate.
+   * @return The concatenated trajectory.
+   */
+  Trajectory operator+(const Trajectory& other) const;
+
+  /**
    * Returns the initial pose of the trajectory.
    *
    * @return The initial pose of the trajectory.

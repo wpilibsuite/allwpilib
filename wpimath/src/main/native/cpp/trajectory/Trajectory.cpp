@@ -124,6 +124,16 @@ Trajectory Trajectory::RelativeTo(const Pose2d& pose) {
   return Trajectory(newStates);
 }
 
+Trajectory Trajectory::operator+(const Trajectory& other) const {
+  auto states = m_states;
+  auto otherStates = other.States();
+  std::for_each(otherStates.begin(), otherStates.end(),
+                [&](auto& s) { s.t += m_totalTime; });
+
+  states.insert(states.end(), otherStates.begin() + 1, otherStates.end());
+  return Trajectory(states);
+}
+
 void frc::to_json(wpi::json& json, const Trajectory::State& state) {
   json = wpi::json{{"time", state.t.to<double>()},
                    {"velocity", state.velocity.to<double>()},
