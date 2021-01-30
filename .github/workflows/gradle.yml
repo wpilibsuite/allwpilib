@@ -71,12 +71,12 @@ jobs:
           keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
       - name: Set Keychain Lock Timeout
         run: security set-keychain-settings -lut 3600
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
       - name: Set release environment variable
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         shell: bash
@@ -87,7 +87,7 @@ jobs:
         run: ./gradlew build -PbuildServer -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
           matrix.artifact-name == 'macOS' && (github.repository_owner == 'wpilibsuite' &&
-          (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')))
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
@@ -136,12 +136,12 @@ jobs:
       - name: Combine
         if: |
           !startsWith(github.ref, 'refs/tags/v') &&
-          github.ref != 'refs/heads/master'
+          github.ref != 'refs/heads/main'
         run: cd combiner && ./gradlew publish -Pallwpilib
       - name: Combine (Master)
         if: |
           github.repository_owner == 'wpilibsuite' &&
-          github.ref == 'refs/heads/master'
+          github.ref == 'refs/heads/main'
         run: cd combiner && ./gradlew publish -Pallwpilib
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"

@@ -12,7 +12,7 @@ jobs:
         run: |
           git fetch --prune --unshallow
           git checkout -b pr
-          git branch -f master origin/master
+          git branch -f main origin/main
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
@@ -35,7 +35,7 @@ jobs:
         run: |
           git fetch --prune --unshallow
           git checkout -b pr
-          git branch -f master origin/master
+          git branch -f main origin/main
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
