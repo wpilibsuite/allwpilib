@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   private Trajectory m_trajectory;
 
   // The Ramsete Controller to follow the trajectory.
-  private RamseteController m_ramseteController;
+  private final RamseteController m_ramseteController = new RamseteController();
 
   // The timer to use during the autonomous period.
   private Timer m_timer;
