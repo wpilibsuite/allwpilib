@@ -47,6 +47,78 @@ class ExtendedKalmanFilter {
       : m_f(f), m_h(h) {
     m_contQ = MakeCovMatrix(stateStdDevs);
     m_contR = MakeCovMatrix(measurementStdDevs);
+    m_residualFuncY = [](auto a, auto b) -> Eigen::Matrix<double, Outputs, 1> {
+      return a - b;
+    };
+    m_addFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
+      return a + b;
+    };
+    m_dt = dt;
+
+    Reset();
+
+    Eigen::Matrix<double, States, States> contA =
+        NumericalJacobianX<States, States, Inputs>(
+            m_f, m_xHat, Eigen::Matrix<double, Inputs, 1>::Zero());
+    Eigen::Matrix<double, Outputs, States> C =
+        NumericalJacobianX<Outputs, States, Inputs>(
+            m_h, m_xHat, Eigen::Matrix<double, Inputs, 1>::Zero());
+
+    Eigen::Matrix<double, States, States> discA;
+    Eigen::Matrix<double, States, States> discQ;
+    DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+
+    Eigen::Matrix<double, Outputs, Outputs> discR =
+        DiscretizeR<Outputs>(m_contR, dt);
+
+    // IsStabilizable(A^T, C^T) will tell us if the system is observable.
+    bool isObservable =
+        IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
+    if (isObservable && Outputs <= States) {
+      m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
+          discA.transpose(), C.transpose(), discQ, discR);
+    } else {
+      m_initP = Eigen::Matrix<double, States, States>::Zero();
+    }
+    m_P = m_initP;
+  }
+
+  /**
+   * Constructs an Extended Kalman filter.
+   *
+   * @param f                  A vector-valued function of x and u that returns
+   *                           the derivative of the state vector.
+   * @param h                  A vector-valued function of x and u that returns
+   *                           the measurement vector.
+   * @param stateStdDevs       Standard deviations of model states.
+   * @param measurementStdDevs Standard deviations of measurements.
+   * @param residualFuncY      A function that computes the residual of two
+   *                           measurement vectors (i.e. it subtracts them.)
+   * @param addFuncX           A function that adds two state vectors.
+   * @param dt                 Nominal discretization timestep.
+   */
+  ExtendedKalmanFilter(std::function<Eigen::Matrix<double, States, 1>(
+                           const Eigen::Matrix<double, States, 1>&,
+                           const Eigen::Matrix<double, Inputs, 1>&)>
+                           f,
+                       std::function<Eigen::Matrix<double, Outputs, 1>(
+                           const Eigen::Matrix<double, States, 1>&,
+                           const Eigen::Matrix<double, Inputs, 1>&)>
+                           h,
+                       const wpi::array<double, States>& stateStdDevs,
+                       const wpi::array<double, Outputs>& measurementStdDevs,
+                       std::function<Eigen::Matrix<double, Outputs, 1>(
+                           const Eigen::Matrix<double, Outputs, 1>&,
+                           const Eigen::Matrix<double, Outputs, 1>&)>
+                           residualFuncY,
+                       std::function<Eigen::Matrix<double, States, 1>(
+                           const Eigen::Matrix<double, States, 1>&,
+                           const Eigen::Matrix<double, States, 1>&)>
+                           addFuncX,
+                       units::second_t dt)
+      : m_f(f), m_h(h), m_residualFuncY(residualFuncY), m_addFuncX(addFuncX) {
+    m_contQ = MakeCovMatrix(stateStdDevs);
+    m_contR = MakeCovMatrix(measurementStdDevs);
     m_dt = dt;
 
     Reset();
@@ -162,7 +234,24 @@ class ExtendedKalmanFilter {
    */
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
                const Eigen::Matrix<double, Outputs, 1>& y) {
-    Correct<Outputs>(u, y, m_h, m_contR);
+    Correct<Outputs>(u, y, m_h, m_contR, m_residualFuncY, m_addFuncX);
+  }
+
+  template <int Rows>
+  void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
+               const Eigen::Matrix<double, Rows, 1>& y,
+               std::function<Eigen::Matrix<double, Rows, 1>(
+                   const Eigen::Matrix<double, States, 1>&,
+                   const Eigen::Matrix<double, Inputs, 1>&)>
+                   h,
+               const Eigen::Matrix<double, Rows, Rows>& R) {
+    auto residualFuncY = [](auto a, auto b) -> Eigen::Matrix<double, Rows, 1> {
+      return a - b;
+    };
+    auto addFuncX = [](auto a, auto b) -> Eigen::Matrix<double, States, 1> {
+      return a + b;
+    };
+    Correct<Rows>(u, y, h, R, residualFuncY, addFuncX);
   }
 
   /**
@@ -172,11 +261,14 @@ class ExtendedKalmanFilter {
    * Correct() call vary. The h(x, u) passed to the constructor is used if one
    * is not provided (the two-argument version of this function).
    *
-   * @param u Same control input used in the predict step.
-   * @param y Measurement vector.
-   * @param h A vector-valued function of x and u that returns
-   *          the measurement vector.
-   * @param R Discrete measurement noise covariance matrix.
+   * @param u             Same control input used in the predict step.
+   * @param y             Measurement vector.
+   * @param h             A vector-valued function of x and u that returns
+   *                      the measurement vector.
+   * @param R             Discrete measurement noise covariance matrix.
+   * @param residualFuncY A function that computes the residual of two
+   *                      measurement vectors (i.e. it subtracts them.)
+   * @param addFuncX      A function that adds two state vectors.
    */
   template <int Rows>
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
@@ -185,7 +277,15 @@ class ExtendedKalmanFilter {
                    const Eigen::Matrix<double, States, 1>&,
                    const Eigen::Matrix<double, Inputs, 1>&)>
                    h,
-               const Eigen::Matrix<double, Rows, Rows>& R) {
+               const Eigen::Matrix<double, Rows, Rows>& R,
+               std::function<Eigen::Matrix<double, Rows, 1>(
+                   const Eigen::Matrix<double, Rows, 1>&,
+                   const Eigen::Matrix<double, Rows, 1>&)>
+                   residualFuncY,
+               std::function<Eigen::Matrix<double, States, 1>(
+                   const Eigen::Matrix<double, States, 1>&,
+                   const Eigen::Matrix<double, States, 1>)>
+                   addFuncX) {
     const Eigen::Matrix<double, Rows, States> C =
         NumericalJacobianX<Rows, States, Inputs>(h, m_xHat, u);
     const Eigen::Matrix<double, Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
@@ -207,7 +307,7 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, States, Rows> K =
         S.transpose().ldlt().solve(C * m_P.transpose()).transpose();
 
-    m_xHat += K * (y - h(m_xHat, u));
+    m_xHat = addFuncX(m_xHat, K * residualFuncY(y, h(m_xHat, u)));
     m_P = (Eigen::Matrix<double, States, States>::Identity() - K * C) * m_P;
   }
 
@@ -220,6 +320,14 @@ class ExtendedKalmanFilter {
       const Eigen::Matrix<double, States, 1>&,
       const Eigen::Matrix<double, Inputs, 1>&)>
       m_h;
+  std::function<Eigen::Matrix<double, Outputs, 1>(
+      const Eigen::Matrix<double, Outputs, 1>&,
+      const Eigen::Matrix<double, Outputs, 1>)>
+      m_residualFuncY;
+  std::function<Eigen::Matrix<double, States, 1>(
+      const Eigen::Matrix<double, States, 1>&,
+      const Eigen::Matrix<double, States, 1>)>
+      m_addFuncX;
   Eigen::Matrix<double, States, 1> m_xHat;
   Eigen::Matrix<double, States, States> m_P;
   Eigen::Matrix<double, States, States> m_contQ;
