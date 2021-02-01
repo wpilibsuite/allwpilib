@@ -718,6 +718,13 @@ static void StartBackground(int eventMask, bool immediateNotify) {
       inst.notifier.NotifyNetworkInterfacesChanged();
     }
   }
+  if ((eventMask & CS_USB_CAMERAS_CHANGED) != 0) {
+    // start network interface event listener
+    inst.usbCameraListener.Start();
+    if (immediateNotify) {
+      inst.notifier.NotifyUsbCamerasChanged();
+    }
+  }
 }
 
 CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,

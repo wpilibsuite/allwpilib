@@ -18,6 +18,7 @@
 #include "SourceImpl.h"
 #include "Telemetry.h"
 #include "UnlimitedHandleResource.h"
+#include "UsbCameraListener.h"
 
 namespace cs {
 
@@ -54,6 +55,7 @@ class Instance {
   Notifier notifier;
   Telemetry telemetry;
   NetworkListener networkListener;
+  UsbCameraListener usbCameraListener;
 
  private:
   UnlimitedHandleResource<Handle, SourceData, Handle::kSource> m_sources;

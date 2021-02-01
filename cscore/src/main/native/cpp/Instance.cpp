@@ -36,7 +36,10 @@ static void def_log_func(unsigned int level, const char* file,
   wpi::errs() << oss.str();
 }
 
-Instance::Instance() : telemetry(notifier), networkListener(logger, notifier) {
+Instance::Instance()
+    : telemetry(notifier),
+      networkListener(logger, notifier),
+      usbCameraListener(logger, notifier) {
   SetDefaultLogger();
 }
 
@@ -52,6 +55,7 @@ void Instance::Shutdown() {
   m_sinks.FreeAll();
   m_sources.FreeAll();
   networkListener.Stop();
+  usbCameraListener.Stop();
   telemetry.Stop();
   notifier.Stop();
 }

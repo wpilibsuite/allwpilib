@@ -94,3 +94,7 @@ void Notifier::NotifyNetworkInterfacesChanged() {
 void Notifier::NotifyTelemetryUpdated() {
   Send(UINT_MAX, RawEvent::kTelemetryUpdated);
 }
+
+void Notifier::NotifyUsbCamerasChanged() {
+  Send(UINT_MAX, RawEvent::kUsbCamerasChanged);
+}

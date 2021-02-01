@@ -26,7 +26,8 @@ public class VideoEvent {
     kTelemetryUpdated(0x8000),
     kSinkPropertyCreated(0x10000),
     kSinkPropertyValueUpdated(0x20000),
-    kSinkPropertyChoicesUpdated(0x40000);
+    kSinkPropertyChoicesUpdated(0x40000),
+    kUsbCamerasChanged(0x80000);
 
     private final int value;
 
@@ -84,6 +85,8 @@ public class VideoEvent {
         return Kind.kSinkPropertyValueUpdated;
       case 0x40000:
         return Kind.kSinkPropertyChoicesUpdated;
+      case 0x80000:
+        return Kind.kUsbCamerasChanged;
       default:
         return Kind.kUnknown;
     }
