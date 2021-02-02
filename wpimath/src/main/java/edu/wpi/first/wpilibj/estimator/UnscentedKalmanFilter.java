@@ -363,9 +363,9 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param R Measurement noise covariance matrix.
    * @param meanFuncY A function that computes the mean of 2 * States + 1 measurement vectors using
    *     a given set of weights.
-   * @param residualFuncX A function that computes the residual of two state vectors (i.e. it
-   *     subtracts them.)
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it
+   *     subtracts them.)
+   * @param residualFuncX A function that computes the residual of two state vectors (i.e. it
    *     subtracts them.)
    * @param addFuncX A function that adds two state vectors.
    */
