@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.motorcontrolencoder;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_motor = new PWMVictorSPX(kMotorPort);
+    m_motor = new PWMSparkMax(kMotorPort);
     m_joystick = new Joystick(kJoystickPort);
     m_encoder = new Encoder(kEncoderPortA, kEncoderPortB);
     // Use SetDistancePerPulse to set the multiplier for GetDistance

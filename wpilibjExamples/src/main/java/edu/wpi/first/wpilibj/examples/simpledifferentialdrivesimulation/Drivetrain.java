@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.simpledifferentialdrivesimulation;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -37,10 +37,10 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508;
   private static final int kEncoderResolution = -4096;
 
-  private final PWMVictorSPX m_leftLeader = new PWMVictorSPX(1);
-  private final PWMVictorSPX m_leftFollower = new PWMVictorSPX(2);
-  private final PWMVictorSPX m_rightLeader = new PWMVictorSPX(3);
-  private final PWMVictorSPX m_rightFollower = new PWMVictorSPX(4);
+  private final PWMSparkMax m_leftLeader = new PWMSparkMax(1);
+  private final PWMSparkMax m_leftFollower = new PWMSparkMax(2);
+  private final PWMSparkMax m_rightLeader = new PWMSparkMax(3);
+  private final PWMSparkMax m_rightFollower = new PWMSparkMax(4);
 
   private final SpeedControllerGroup m_leftGroup =
       new SpeedControllerGroup(m_leftLeader, m_leftFollower);

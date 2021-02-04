@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc2/command/PIDSubsystem.h>
 #include <units/angle.h>
@@ -25,8 +25,8 @@ class ShooterSubsystem : public frc2::PIDSubsystem {
   void StopFeeder();
 
  private:
-  frc::PWMVictorSPX m_shooterMotor;
-  frc::PWMVictorSPX m_feederMotor;
+  frc::PWMSparkMax m_shooterMotor;
+  frc::PWMSparkMax m_feederMotor;
   frc::Encoder m_shooterEncoder;
   frc::SimpleMotorFeedforward<units::turns> m_shooterFeedforward;
 };

@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.armsimulation;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
   // Standard classes for controlling our elevator
   private final PIDController m_controller = new PIDController(kArmKp, 0, 0);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
-  private final PWMVictorSPX m_motor = new PWMVictorSPX(kMotorPort);
+  private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   // Simulation classes help us simulate what's going on, including gravity.

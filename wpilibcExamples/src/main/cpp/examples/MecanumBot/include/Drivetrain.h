@@ -6,7 +6,7 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/geometry/Translation2d.h>
@@ -35,10 +35,10 @@ class Drivetrain {
       wpi::math::pi};  // 1/2 rotation per second
 
  private:
-  frc::PWMVictorSPX m_frontLeftMotor{1};
-  frc::PWMVictorSPX m_frontRightMotor{2};
-  frc::PWMVictorSPX m_backLeftMotor{3};
-  frc::PWMVictorSPX m_backRightMotor{4};
+  frc::PWMSparkMax m_frontLeftMotor{1};
+  frc::PWMSparkMax m_frontRightMotor{2};
+  frc::PWMSparkMax m_backLeftMotor{3};
+  frc::PWMSparkMax m_backRightMotor{4};
 
   frc::Encoder m_frontLeftEncoder{0, 1};
   frc::Encoder m_frontRightEncoder{2, 3};

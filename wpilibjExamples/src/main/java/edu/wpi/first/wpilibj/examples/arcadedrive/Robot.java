@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.arcadedrive;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  * arcade steering.
  */
 public class Robot extends TimedRobot {
-  private final PWMVictorSPX m_leftMotor = new PWMVictorSPX(0);
-  private final PWMVictorSPX m_rightMotor = new PWMVictorSPX(1);
+  private final PWMSparkMax m_leftMotor = new PWMSparkMax(0);
+  private final PWMSparkMax m_rightMotor = new PWMSparkMax(1);
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
   private final Joystick m_stick = new Joystick(0);
 
