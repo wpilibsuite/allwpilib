@@ -31,7 +31,9 @@ task cppHeadersZip(type: Zip) {
         into '/'
     }
 
-    ext.includeDirs = [project.file('src/main/native/include')]
+    ext.includeDirs = [
+        project.file('src/main/native/include')
+    ]
 
     ext.includeDirs.each {
         from(it) {

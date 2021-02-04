@@ -81,7 +81,6 @@ doxygen {
     full_path_names true
     strip_from_inc_path cppIncludeRoots as String[]
     strip_from_path cppIncludeRoots as String[]
-
 }
 
 tasks.register("zipCppDocs", Zip) {
