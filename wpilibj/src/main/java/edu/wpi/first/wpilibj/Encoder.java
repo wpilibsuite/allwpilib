@@ -52,8 +52,9 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   private boolean m_allocatedB;
   private boolean m_allocatedI;
   private PIDSourceType m_pidSource;
+  private final EncodingType m_encodingType;
 
-  private int m_encoder; // the HAL encoder object
+  int m_encoder; // the HAL encoder object
 
   /**
    * Common initialization code for Encoders. This code allocates resources for Encoders and is
@@ -133,6 +134,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_allocatedI = false;
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
+    m_encodingType = encodingType;
     SendableRegistry.addChild(this, m_aSource);
     SendableRegistry.addChild(this, m_bSource);
     initEncoder(reverseDirection, encodingType);
@@ -232,6 +234,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_allocatedA = false;
     m_allocatedB = false;
     m_allocatedI = false;
+    m_encodingType = encodingType;
     m_aSource = sourceA;
     m_bSource = sourceB;
     initEncoder(reverseDirection, encodingType);
@@ -573,6 +576,23 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    */
   public void setSimDevice(SimDevice device) {
     EncoderJNI.setEncoderSimDevice(m_encoder, device.getNativeHandle());
+  }
+
+  /**
+   * Gets the decoding scale factor for scaling raw values to full counts.
+   * @return decoding scale factor
+   */
+  public double getDecodingScaleFactor() {
+    switch (m_encodingType) {
+      case k1X:
+        return 1.0;
+      case k2X:
+        return 0.5;
+      case k4X:
+        return 0.25;
+      default:
+        return 0.0;
+    }
   }
 
   @Override

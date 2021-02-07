@@ -75,6 +75,8 @@ jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
 
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
 
+jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index);
+
 JavaVM* GetJVM();
 
 }  // namespace hal
