@@ -61,6 +61,6 @@ class UnitsTest extends UtilityClassTest<Units> {
 
   @Test
   void secondsToMilliseconds() {
-    assertEquals(1500, Units.millisecondsToSeconds(1.5), 1e-2);
+    assertEquals(1500, Units.secondsToMilliseconds(1.5), 1e-2);
   }
 }

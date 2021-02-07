@@ -66,6 +66,13 @@ public class DMA implements AutoCloseable {
     DMAJNI.addAnalogAccumulator(m_dmaHandle, analogInput.m_port);
   }
 
+  /**
+   * Sets an external DMA trigger.
+   *
+   * @param source the source to trigger from.
+   * @param rising trigger on rising edge.
+   * @param falling trigger on falling edge.
+   */
   public void setExternalTrigger(DigitalSource source, boolean rising, boolean falling) {
     DMAJNI.setExternalTrigger(
         m_dmaHandle,
