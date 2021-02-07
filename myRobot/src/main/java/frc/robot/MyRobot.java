@@ -37,10 +37,8 @@ public class MyRobot extends TimedRobot {
     m_dmaSample = new DMASample();
     m_dma = new DMA();
 
-
-
     // Trigger on falling edge of dma trigger output
-    //m_dma.setExternalTrigger(m_dmaTrigger, false, true);
+    // m_dma.setExternalTrigger(m_dmaTrigger, false, true);
     m_dma.setTimedTrigger(0.005);
 
     // Add inputs we want to read via DMA
@@ -63,8 +61,7 @@ public class MyRobot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-
-    do  {
+    do {
 
       // Manually Trigger DMA read
       m_dmaTrigger.set(false);

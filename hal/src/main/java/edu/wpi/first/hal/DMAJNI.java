@@ -13,6 +13,7 @@ public class DMAJNI extends JNIWrapper {
   public static native void setPause(int handle, boolean pause);
 
   public static native void setTimedTrigger(int handle, double periodSeconds);
+
   public static native void setTimedTriggerCycles(int handle, int cycles);
 
   public static native void addEncoder(int handle, int encoderHandle);
@@ -37,6 +38,7 @@ public class DMAJNI extends JNIWrapper {
       int handle, int digitalSourceHandle, int analogTriggerType, boolean rising, boolean falling);
 
   public static native void clearSensors(int handle);
+
   public static native void clearExternalTriggers(int handle);
 
   public static native void startDMA(int handle, int queueDepth);
@@ -48,7 +50,8 @@ public class DMAJNI extends JNIWrapper {
   // 23: triggerChannels (bitflags)
   // 24: remaining
   // 25: read status
-  public static native long readDMA(int handle, double timeoutSeconds, int[] buffer, int[] sampleStore);
+  public static native long readDMA(
+      int handle, double timeoutSeconds, int[] buffer, int[] sampleStore);
 
   public static native DMAJNISample.BaseStore getSensorReadData(int handle);
 }
