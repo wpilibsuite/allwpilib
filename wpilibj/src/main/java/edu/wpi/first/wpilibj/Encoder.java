@@ -580,6 +580,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
 
   /**
    * Gets the decoding scale factor for scaling raw values to full counts.
+   *
    * @return decoding scale factor
    */
   public double getDecodingScaleFactor() {

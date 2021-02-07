@@ -255,6 +255,7 @@ Java_edu_wpi_first_hal_DMAJNI_readDMA
 {
   int32_t status = 0;
   HAL_DMASample dmaSample;
+  std::memset(&dmaSample, 0, sizeof(dmaSample));
   int32_t remaining = 0;
   HAL_DMAReadStatus readStatus =
       HAL_ReadDMA(handle, &dmaSample, timeoutMs, &remaining, &status);

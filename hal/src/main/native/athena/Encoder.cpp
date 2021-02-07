@@ -246,7 +246,7 @@ bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
                           HAL_FPGAEncoderHandle* fpgaHandle,
                           HAL_CounterHandle* counterHandle) {
   auto encoder = encoderHandles->Get(handle);
-  if (!handle) {
+  if (!encoder) {
     return false;
   }
 

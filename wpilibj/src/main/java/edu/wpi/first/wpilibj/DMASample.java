@@ -9,7 +9,9 @@ import edu.wpi.first.hal.DMAJNISample;
 
 public class DMASample {
   public enum DMAReadStatus {
-    Ok(1), Timeout(2), Error(3);
+    Ok(1),
+    Timeout(2),
+    Error(3);
 
     private final int value;
 
@@ -23,6 +25,7 @@ public class DMASample {
 
     /**
      * Constructs a DMAReadStatus from a raw value.
+     *
      * @param value raw value
      * @return enum value
      */
@@ -40,6 +43,14 @@ public class DMASample {
 
   public DMAReadStatus update(DMA dma, int timeoutMs) {
     return DMAReadStatus.getValue(m_dmaSample.update(dma.m_dmaHandle, timeoutMs));
+  }
+
+  public int getCaptureSize() {
+    return m_dmaSample.getCaptureSize();
+  }
+
+  public int getTriggerChannels() {
+    return m_dmaSample.getTriggerChannels();
   }
 
   public int getRemaining() {
@@ -60,6 +71,7 @@ public class DMASample {
 
   /**
    * Gets the scaled encoder distance for this sample.
+   *
    * @param encoder the encoder to use to read
    * @return the distance
    */
@@ -99,8 +111,8 @@ public class DMASample {
   }
 
   public double getAveragedAnalogInputVoltage(AnalogInput analogInput) {
-    return AnalogJNI.getAnalogValueToVolts(analogInput.m_port,
-      getAveragedAnalogInputRaw(analogInput));
+    return AnalogJNI.getAnalogValueToVolts(
+        analogInput.m_port, getAveragedAnalogInputRaw(analogInput));
   }
 
   public int getDutyCycleOutputRaw(DutyCycle dutyCycle) {
@@ -109,6 +121,6 @@ public class DMASample {
 
   public double getDutyCycleOutput(DutyCycle dutyCycle) {
     return m_dmaSample.getDutyCycleOutput(dutyCycle.m_handle)
-      / (double) dutyCycle.getOutputScaleFactor();
+        / (double) dutyCycle.getOutputScaleFactor();
   }
 }

@@ -56,6 +56,9 @@ class Robot : public frc::TimedRobot {
     HAL_DMAReadStatus readStatus =
         sample.Update(&m_dma, 1_ms, &remaining, &status);
 
+    // Unset trigger
+    m_dmaTrigger.Set(true);
+
     if (readStatus == HAL_DMA_OK) {
       // Status value in all these reads should be checked, a non 0 value means
       // value could not be read

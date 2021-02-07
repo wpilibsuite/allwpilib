@@ -63,8 +63,12 @@ public class DMA implements AutoCloseable {
   }
 
   public void setExternalTrigger(DigitalSource source, boolean rising, boolean falling) {
-    DMAJNI.setExternalTrigger(m_dmaHandle, source.getPortHandleForRouting(),
-      source.getAnalogTriggerTypeForRouting(), rising, falling);
+    DMAJNI.setExternalTrigger(
+        m_dmaHandle,
+        source.getPortHandleForRouting(),
+        source.getAnalogTriggerTypeForRouting(),
+        rising,
+        falling);
   }
 
   public void startDMA(int queueDepth) {

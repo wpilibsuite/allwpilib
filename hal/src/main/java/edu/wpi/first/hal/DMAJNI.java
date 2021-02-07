@@ -7,15 +7,19 @@ package edu.wpi.first.hal;
 @SuppressWarnings("AbbreviationAsWordInName")
 public class DMAJNI extends JNIWrapper {
   public static native int initialize();
+
   public static native void free(int handle);
 
   public static native void setPause(int handle, boolean pause);
+
   public static native void setRate(int handle, int cycles);
 
   public static native void addEncoder(int handle, int encoderHandle);
+
   public static native void addEncoderPeriod(int handle, int encoderHandle);
 
   public static native void addCounter(int handle, int counterHandle);
+
   public static native void addCounterPeriod(int handle, int counterHandle);
 
   public static native void addDigitalSource(int handle, int digitalSourceHandle);
@@ -23,13 +27,16 @@ public class DMAJNI extends JNIWrapper {
   public static native void addDutyCycle(int handle, int dutyCycleHandle);
 
   public static native void addAnalogInput(int handle, int analogInputHandle);
+
   public static native void addAveragedAnalogInput(int handle, int analogInputHandle);
+
   public static native void addAnalogAccumulator(int handle, int analogInputHandle);
 
-  public static native void setExternalTrigger(int handle, int digitalSourceHandle, int analogTriggerType,
-                          boolean rising, boolean falling);
+  public static native void setExternalTrigger(
+      int handle, int digitalSourceHandle, int analogTriggerType, boolean rising, boolean falling);
 
   public static native void startDMA(int handle, int queueDepth);
+
   public static native void stopDMA(int handle);
 
   // 0-21 channelOffsets

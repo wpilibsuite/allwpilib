@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * This is a sample program showing how to to use DMA to read a sensor.
- */
+/** This is a sample program showing how to to use DMA to read a sensor. */
 public class Robot extends TimedRobot {
   private DMA m_dma;
   private DMASample m_dmaSample;
@@ -64,6 +62,9 @@ public class Robot extends TimedRobot {
     // Wait 1ms if buffer is empty
     DMASample.DMAReadStatus readStatus = m_dmaSample.update(m_dma, 1);
 
+    // Unset trigger
+    m_dmaTrigger.set(true);
+
     if (readStatus == DMASample.DMAReadStatus.Ok) {
       // Status value in all these reads should be checked, a non 0 value means
       // value could not be read
@@ -72,12 +73,12 @@ public class Robot extends TimedRobot {
       double encoderDistance = m_dmaSample.getEncoderDistance(m_encoder);
       // Period is not scaled, and is a raw value
       int encoderPeriod = m_dmaSample.getEncoderPeriodRaw(m_encoder);
-      double analogVoltage =
-        m_dmaSample.getAnalogInputVoltage(m_analogInput);
+      double analogVoltage = m_dmaSample.getAnalogInputVoltage(m_analogInput);
 
       SmartDashboard.putNumber("Distance", encoderDistance);
       SmartDashboard.putNumber("Period", encoderPeriod);
       SmartDashboard.putNumber("Input", analogVoltage);
+      SmartDashboard.putNumber("Timestamp", m_dmaSample.getTimeStamp());
     }
   }
 }
