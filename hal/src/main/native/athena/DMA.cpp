@@ -105,10 +105,19 @@ HAL_DMAHandle HAL_InitializeDMA(int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
-  HAL_SetDMATimedTrigger(handle, 0.025, status);
-  if (*status != 0) {
-    dmaHandles->Free(handle);
-    return HAL_kInvalidHandle;
+  std::memset(&dma->captureStore, 0, sizeof(dma->captureStore));
+
+  tDMA::tConfig config;
+  std::memset(&config, 0, sizeof(config));
+  config.Pause = true;
+  dma->aDMA->writeConfig(config, status);
+
+  tDMA::tExternalTriggers newTrigger;
+  std::memset(&newTrigger, 0, sizeof(newTrigger));
+  for (unsigned char reg = 0; reg < tDMA::kNumExternalTriggersRegisters; reg++) {
+    for (unsigned char bit = 0; bit < tDMA::kNumExternalTriggersElements; bit++) {
+      dma->aDMA->writeExternalTriggers(reg, bit, newTrigger, status);
+    }
   }
 
   return handle;
@@ -134,6 +143,11 @@ void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status) {
     return;
   }
 
+  if (!dma->manager) {
+    *status = HAL_INVALID_DMA_STATE;
+    return;
+  }
+
   dma->aDMA->writeConfig_Pause(pause, status);
 }
 
@@ -147,6 +161,11 @@ void HAL_SetDMATimedTriggerCycles(HAL_DMAHandle handle, uint32_t cycles, int32_t
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (dma->manager) {
+    *status = HAL_INVALID_DMA_ADDITION;
     return;
   }
 
@@ -523,11 +542,6 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
     return;
   }
 
-  dma->aDMA->writeRate(1, status);
-  if (*status != 0) {
-    return;
-  }
-
   uint8_t pin = 0;
   uint8_t module = 0;
   bool analogTrigger = false;
@@ -550,6 +564,52 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
                                    newTrigger, status);
 }
 
+void HAL_ClearDMASensors(HAL_DMAHandle handle, int32_t* status) {
+  auto dma = dmaHandles->Get(handle);
+  if (!dma) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (dma->manager) {
+    *status = HAL_INVALID_DMA_STATE;
+    return;
+  }
+
+  bool existingExternal = dma->aDMA->readConfig_ExternalClock(status);
+  if (*status != 0) {
+    return;
+  }
+
+  tDMA::tConfig config;
+  std::memset(&config, 0, sizeof(config));
+  config.Pause = true;
+  config.ExternalClock = existingExternal;
+  dma->aDMA->writeConfig(config, status);
+}
+
+void HAL_ClearDMAExternalTriggers(HAL_DMAHandle handle, int32_t* status) {
+  auto dma = dmaHandles->Get(handle);
+  if (!dma) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  if (dma->manager) {
+    *status = HAL_INVALID_DMA_STATE;
+    return;
+  }
+
+  dma->captureStore.triggerChannels = 0;
+  tDMA::tExternalTriggers newTrigger;
+  std::memset(&newTrigger, 0, sizeof(newTrigger));
+  for (unsigned char reg = 0; reg < tDMA::kNumExternalTriggersRegisters; reg++) {
+    for (unsigned char bit = 0; bit < tDMA::kNumExternalTriggersElements; bit++) {
+      dma->aDMA->writeExternalTriggers(reg, bit, newTrigger, status);
+    }
+  }
+}
+
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
@@ -558,7 +618,7 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
   }
 
   if (dma->manager) {
-    *status = INCOMPATIBLE_STATE;
+    *status = HAL_INVALID_DMA_STATE;
     return;
   }
 
@@ -610,8 +670,6 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
     return;
   }
 
-  dma->aDMA->writeConfig_Pause(false, status);
-
   dma->manager->start(status);
   dma->manager->stop(status);
   dma->manager->start(status);
@@ -625,6 +683,8 @@ void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status) {
   }
 
   if (dma->manager) {
+    dma->aDMA->writeConfig_Pause(true, status);
+    *status = 0;
     dma->manager->stop(status);
     dma->manager = nullptr;
   }
@@ -645,7 +705,7 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
   size_t remainingBytes = 0;
 
   if (!dma->manager) {
-    *status = INCOMPATIBLE_STATE;
+    *status = HAL_INVALID_DMA_STATE;
     return HAL_DMA_ERROR;
   }
 

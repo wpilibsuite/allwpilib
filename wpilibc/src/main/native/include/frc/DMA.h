@@ -47,6 +47,9 @@ class DMA : public ErrorBase {
 
   void SetExternalTrigger(DigitalSource* source, bool rising, bool falling);
 
+  void ClearSensors();
+  void ClearExternalTriggers();
+
   void StartDMA(int queueDepth);
   void StopDMA();
 

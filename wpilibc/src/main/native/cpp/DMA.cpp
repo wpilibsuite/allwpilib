@@ -107,6 +107,18 @@ void DMA::SetExternalTrigger(DigitalSource* source, bool rising, bool falling) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
+void DMA::ClearSensors() {
+  int32_t status = 0;
+  HAL_ClearDMASensors(dmaHandle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void DMA::ClearExternalTriggers() {
+  int32_t status = 0;
+  HAL_ClearDMAExternalTriggers(dmaHandle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
 void DMA::StartDMA(int queueDepth) {
   int32_t status = 0;
   HAL_StartDMA(dmaHandle, queueDepth, &status);

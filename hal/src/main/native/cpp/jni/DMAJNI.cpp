@@ -231,6 +231,32 @@ Java_edu_wpi_first_hal_DMAJNI_setExternalTrigger
 
 /*
  * Class:     edu_wpi_first_hal_DMAJNI
+ * Method:    clearSensors
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_clearSensors
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_ClearDMASensors(handle, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DMAJNI
+ * Method:    clearExternalTriggers
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_clearExternalTriggers
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_ClearDMAExternalTriggers(handle, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DMAJNI
  * Method:    startDMA
  * Signature: (II)V
  */

@@ -75,6 +75,14 @@ public class DMA implements AutoCloseable {
         falling);
   }
 
+  public void clearSensors() {
+    DMAJNI.clearSensors(m_dmaHandle);
+  }
+
+  public void clearExternalTriggers() {
+    DMAJNI.clearExternalTriggers(m_dmaHandle);
+  }
+
   public void startDMA(int queueDepth) {
     DMAJNI.startDMA(m_dmaHandle, queueDepth);
   }

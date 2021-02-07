@@ -69,6 +69,9 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
                                HAL_Bool rising, HAL_Bool falling,
                                int32_t* status);
 
+void HAL_ClearDMASensors(HAL_DMAHandle handle, int32_t* status);
+void HAL_ClearDMAExternalTriggers(HAL_DMAHandle handle, int32_t* status);
+
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status);
 void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status);
 

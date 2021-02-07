@@ -99,6 +99,10 @@
 #define HAL_INVALID_DMA_ADDITION_MESSAGE \
   "HAL_AddDMA() only works before HAL_StartDMA()"
 
+#define HAL_INVALID_DMA_STATE -1103
+#define HAL_INVALID_DMA_STATE_MESSAGE \
+  "HAL_SetPause() only works before HAL_StartDMA()"
+
 #define HAL_SERIAL_PORT_NOT_FOUND -1123
 #define HAL_SERIAL_PORT_NOT_FOUND_MESSAGE \
   "HAL: The specified serial port device was not found"

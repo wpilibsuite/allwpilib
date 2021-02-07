@@ -36,6 +36,9 @@ public class DMAJNI extends JNIWrapper {
   public static native void setExternalTrigger(
       int handle, int digitalSourceHandle, int analogTriggerType, boolean rising, boolean falling);
 
+  public static native void clearSensors(int handle);
+  public static native void clearExternalTriggers(int handle);
+
   public static native void startDMA(int handle, int queueDepth);
 
   public static native void stopDMA(int handle);
