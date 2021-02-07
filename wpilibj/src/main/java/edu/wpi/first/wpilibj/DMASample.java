@@ -41,8 +41,8 @@ public class DMASample {
 
   private final DMAJNISample m_dmaSample = new DMAJNISample();
 
-  public DMAReadStatus update(DMA dma, int timeoutMs) {
-    return DMAReadStatus.getValue(m_dmaSample.update(dma.m_dmaHandle, timeoutMs));
+  public DMAReadStatus update(DMA dma, double timeoutSeconds) {
+    return DMAReadStatus.getValue(m_dmaSample.update(dma.m_dmaHandle, timeoutSeconds));
   }
 
   public int getCaptureSize() {

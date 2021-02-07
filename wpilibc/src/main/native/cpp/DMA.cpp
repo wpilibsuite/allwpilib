@@ -31,9 +31,15 @@ void DMA::SetPause(bool pause) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::SetRate(int cycles) {
+void DMA::setTimedTrigger(units::second_t seconds) {
   int32_t status = 0;
-  HAL_SetDMARate(dmaHandle, cycles, &status);
+  HAL_SetDMATimedTrigger(dmaHandle, seconds.to<double>(), &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+}
+
+void DMA::setTimedTriggerCycles(int cycles) {
+  int32_t status = 0;
+  HAL_SetDMATimedTriggerCycles(dmaHandle, cycles, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 

@@ -22,8 +22,12 @@ public class DMA implements AutoCloseable {
     DMAJNI.setPause(m_dmaHandle, pause);
   }
 
-  public void setRate(int cycles) {
-    DMAJNI.setRate(m_dmaHandle, cycles);
+  public void setTimedTrigger(double periodSeconds) {
+    DMAJNI.setTimedTrigger(m_dmaHandle, periodSeconds);
+  }
+
+  public void setTimedTriggerCycles(int cycles) {
+    DMAJNI.setTimedTriggerCycles(m_dmaHandle, cycles);
   }
 
   public void addEncoder(Encoder encoder) {

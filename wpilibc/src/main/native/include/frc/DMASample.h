@@ -21,9 +21,7 @@ class DMASample : public HAL_DMASample {
  public:
   HAL_DMAReadStatus Update(const DMA* dma, units::second_t timeout,
                            int32_t* remaining, int32_t* status) {
-    units::millisecond_t ms = timeout;
-    auto timeoutMs = ms.to<int32_t>();
-    return HAL_ReadDMA(dma->dmaHandle, this, timeoutMs, remaining, status);
+    return HAL_ReadDMA(dma->dmaHandle, this, timeout.to<double>(), remaining, status);
   }
 
   uint64_t GetTime() const { return timeStamp; }

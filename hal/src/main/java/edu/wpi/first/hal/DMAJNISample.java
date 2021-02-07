@@ -27,8 +27,8 @@ public class DMAJNISample {
   private long m_timeStamp;
   private Map<Integer, BaseStore> m_propertyMap = new HashMap<>();
 
-  public int update(int dmaHandle, int timeoutMs) {
-    m_timeStamp = DMAJNI.readDMA(dmaHandle, timeoutMs, m_dataBuffer, m_storage);
+  public int update(int dmaHandle, double timeoutSeconds) {
+    m_timeStamp = DMAJNI.readDMA(dmaHandle, timeoutSeconds, m_dataBuffer, m_storage);
     return m_storage[25];
   }
 

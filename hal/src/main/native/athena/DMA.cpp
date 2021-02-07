@@ -12,6 +12,7 @@
 
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"
+#include "ConstantsInternal.h"
 #include "EncoderInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
@@ -23,6 +24,8 @@
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 #include "hal/handles/UnlimitedHandleResource.h"
+
+#include <thread>
 
 using namespace hal;
 
@@ -102,19 +105,12 @@ HAL_DMAHandle HAL_InitializeDMA(int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
-  dma->aDMA->writeConfig_ExternalClock(false, status);
+  HAL_SetDMATimedTrigger(handle, 0.025, status);
   if (*status != 0) {
     dmaHandles->Free(handle);
     return HAL_kInvalidHandle;
   }
 
-  HAL_SetDMARate(handle, 1, status);
-  if (*status != 0) {
-    dmaHandles->Free(handle);
-    return HAL_kInvalidHandle;
-  }
-
-  HAL_SetDMAPause(handle, false, status);
   return handle;
 }
 
@@ -140,7 +136,14 @@ void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status) {
 
   dma->aDMA->writeConfig_Pause(pause, status);
 }
-void HAL_SetDMARate(HAL_DMAHandle handle, int32_t cycles, int32_t* status) {
+
+void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double seconds, int32_t* status) {
+  constexpr double baseMultipler = kSystemClockTicksPerMicrosecond * 1000000;
+  uint32_t cycles = static_cast<uint32_t>(baseMultipler * seconds);
+  HAL_SetDMATimedTriggerCycles(handle, cycles, status);
+}
+
+void HAL_SetDMATimedTriggerCycles(HAL_DMAHandle handle, uint32_t cycles, int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
@@ -151,7 +154,12 @@ void HAL_SetDMARate(HAL_DMAHandle handle, int32_t cycles, int32_t* status) {
     cycles = 1;
   }
 
-  dma->aDMA->writeRate(static_cast<uint32_t>(cycles), status);
+  dma->aDMA->writeConfig_ExternalClock(false, status);
+  if (*status != 0) {
+    return;
+  }
+
+  dma->aDMA->writeRate(cycles, status);
 }
 
 void HAL_AddDMAEncoder(HAL_DMAHandle handle, HAL_EncoderHandle encoderHandle,
@@ -510,13 +518,13 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 
   auto channelIndex = index;
 
-  auto isExternalClock = dma->aDMA->readConfig_ExternalClock(status);
-  if (*status == 0 && !isExternalClock) {
-    dma->aDMA->writeConfig_ExternalClock(true, status);
-    if (*status != 0) {
-      return;
-    }
-  } else if (*status != 0) {
+  dma->aDMA->writeConfig_ExternalClock(true, status);
+  if (*status != 0) {
+    return;
+  }
+
+  dma->aDMA->writeRate(1, status);
+  if (*status != 0) {
     return;
   }
 
@@ -594,11 +602,15 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
     dma->captureStore.captureSize = accum_size + 1;
   }
 
+  uint32_t byteDepth = queueDepth * dma->captureStore.captureSize;
+
   dma->manager = std::make_unique<tDMAManager>(
-      g_DMA_index, queueDepth * dma->captureStore.captureSize, status);
+      g_DMA_index, byteDepth, status);
   if (*status != 0) {
     return;
   }
+
+  dma->aDMA->writeConfig_Pause(false, status);
 
   dma->manager->start(status);
   dma->manager->stop(status);
@@ -625,7 +637,7 @@ void* HAL_GetDMADirectPointer(HAL_DMAHandle handle) {
 
 enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                                          HAL_DMASample* dmaSample,
-                                         int32_t timeoutMs,
+                                         double timeoutSeconds,
                                          int32_t* remainingOut,
                                          int32_t* status) {
   DMA* dma = static_cast<DMA*>(dmaPointer);
@@ -638,7 +650,7 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
   }
 
   dma->manager->read(dmaSample->readBuffer, dma->captureStore.captureSize,
-                     timeoutMs, &remainingBytes, status);
+                     static_cast<uint32_t>(timeoutSeconds * 1000), &remainingBytes, status);
 
   *remainingOut = remainingBytes / dma->captureStore.captureSize;
 
@@ -663,7 +675,7 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
 }
 
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASample* dmaSample, int32_t timeoutMs,
+                                   HAL_DMASample* dmaSample, double timeoutSeconds,
                                    int32_t* remainingOut, int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
@@ -671,7 +683,7 @@ enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
     return HAL_DMA_ERROR;
   }
 
-  return HAL_ReadDMADirect(dma.get(), dmaSample, timeoutMs, remainingOut,
+  return HAL_ReadDMADirect(dma.get(), dmaSample, timeoutSeconds, remainingOut,
                            status);
 }
 

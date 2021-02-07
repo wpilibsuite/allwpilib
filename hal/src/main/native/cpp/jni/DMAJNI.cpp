@@ -59,15 +59,29 @@ Java_edu_wpi_first_hal_DMAJNI_setPause
 
 /*
  * Class:     edu_wpi_first_hal_DMAJNI
- * Method:    setRate
+ * Method:    setTimedTrigger
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DMAJNI_setTimedTrigger
+  (JNIEnv* env, jclass, jint handle, jdouble seconds)
+{
+  int32_t status = 0;
+  HAL_SetDMATimedTrigger(handle, seconds, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_DMAJNI
+ * Method:    setTimedTriggerCycles
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_DMAJNI_setRate
-  (JNIEnv* env, jclass, jint handle, jint rate)
+Java_edu_wpi_first_hal_DMAJNI_setTimedTriggerCycles
+  (JNIEnv* env, jclass, jint handle, jint cycles)
 {
   int32_t status = 0;
-  HAL_SetDMARate(handle, rate, &status);
+  HAL_SetDMATimedTriggerCycles(handle, (uint32_t)cycles, &status);
   CheckStatus(env, status);
 }
 
@@ -246,11 +260,11 @@ Java_edu_wpi_first_hal_DMAJNI_stopDMA
 /*
  * Class:     edu_wpi_first_hal_DMAJNI
  * Method:    readDMA
- * Signature: (II[I[I)J
+ * Signature: (ID[I[I)J
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_hal_DMAJNI_readDMA
-  (JNIEnv* env, jclass, jint handle, jint timeoutMs, jintArray buf,
+  (JNIEnv* env, jclass, jint handle, jdouble timeoutSeconds, jintArray buf,
    jintArray store)
 {
   int32_t status = 0;
@@ -258,7 +272,7 @@ Java_edu_wpi_first_hal_DMAJNI_readDMA
   std::memset(&dmaSample, 0, sizeof(dmaSample));
   int32_t remaining = 0;
   HAL_DMAReadStatus readStatus =
-      HAL_ReadDMA(handle, &dmaSample, timeoutMs, &remaining, &status);
+      HAL_ReadDMA(handle, &dmaSample, timeoutSeconds, &remaining, &status);
   CheckStatus(env, status);
 
   static_assert(sizeof(uint32_t) == sizeof(jint), "Java ints must be 32 bits");

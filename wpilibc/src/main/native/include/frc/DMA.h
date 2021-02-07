@@ -5,6 +5,7 @@
 #pragma once
 
 #include <hal/Types.h>
+#include <units/time.h>
 
 #include "frc/ErrorBase.h"
 
@@ -27,7 +28,8 @@ class DMA : public ErrorBase {
   DMA(DMA&& other) = default;
 
   void SetPause(bool pause);
-  void SetRate(int cycles);
+  void setTimedTrigger(units::second_t seconds);
+  void setTimedTriggerCycles(int cycles);
 
   void AddEncoder(const Encoder* encoder);
   void AddEncoderPeriod(const Encoder* encoder);
