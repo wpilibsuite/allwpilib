@@ -81,7 +81,7 @@ Java_edu_wpi_first_hal_DMAJNI_setTimedTriggerCycles
   (JNIEnv* env, jclass, jint handle, jint cycles)
 {
   int32_t status = 0;
-  HAL_SetDMATimedTriggerCycles(handle, (uint32_t)cycles, &status);
+  HAL_SetDMATimedTriggerCycles(handle, static_cast<uint32_t>(cycles), &status);
   CheckStatus(env, status);
 }
 
@@ -234,7 +234,8 @@ Java_edu_wpi_first_hal_DMAJNI_setExternalTrigger
  * Method:    clearSensors
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_clearSensors
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DMAJNI_clearSensors
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -247,7 +248,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_clearSensors
  * Method:    clearExternalTriggers
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_DMAJNI_clearExternalTriggers
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_DMAJNI_clearExternalTriggers
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;

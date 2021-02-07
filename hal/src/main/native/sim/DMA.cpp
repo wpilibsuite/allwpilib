@@ -11,8 +11,10 @@ HAL_DMAHandle HAL_InitializeDMA(int32_t* status) {
 void HAL_FreeDMA(HAL_DMAHandle handle) {}
 
 void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status) {}
-void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double periodSeconds, int32_t* status) {}
-void HAL_SetDMATimedTriggerCycles(HAL_DMAHandle handle, uint32_t cycles, int32_t* status) {}
+void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double periodSeconds,
+                            int32_t* status) {}
+void HAL_SetDMATimedTriggerCycles(HAL_DMAHandle handle, uint32_t cycles,
+                                  int32_t* status) {}
 
 void HAL_AddDMAEncoder(HAL_DMAHandle handle, HAL_EncoderHandle encoderHandle,
                        int32_t* status) {}
@@ -66,8 +68,9 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
 }
 
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASample* dmaSample, double timeoutSeconds,
-                                   int32_t* remainingOut, int32_t* status) {
+                                   HAL_DMASample* dmaSample,
+                                   double timeoutSeconds, int32_t* remainingOut,
+                                   int32_t* status) {
   return HAL_DMA_ERROR;
 }
 

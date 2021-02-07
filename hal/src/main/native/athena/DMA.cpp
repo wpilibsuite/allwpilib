@@ -11,8 +11,8 @@
 #include <type_traits>
 
 #include "AnalogInternal.h"
-#include "DigitalInternal.h"
 #include "ConstantsInternal.h"
+#include "DigitalInternal.h"
 #include "EncoderInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
@@ -24,8 +24,6 @@
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 #include "hal/handles/UnlimitedHandleResource.h"
-
-#include <thread>
 
 using namespace hal;
 
@@ -114,8 +112,10 @@ HAL_DMAHandle HAL_InitializeDMA(int32_t* status) {
 
   tDMA::tExternalTriggers newTrigger;
   std::memset(&newTrigger, 0, sizeof(newTrigger));
-  for (unsigned char reg = 0; reg < tDMA::kNumExternalTriggersRegisters; reg++) {
-    for (unsigned char bit = 0; bit < tDMA::kNumExternalTriggersElements; bit++) {
+  for (unsigned char reg = 0; reg < tDMA::kNumExternalTriggersRegisters;
+       reg++) {
+    for (unsigned char bit = 0; bit < tDMA::kNumExternalTriggersElements;
+         bit++) {
       dma->aDMA->writeExternalTriggers(reg, bit, newTrigger, status);
     }
   }
@@ -151,13 +151,15 @@ void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status) {
   dma->aDMA->writeConfig_Pause(pause, status);
 }
 
-void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double seconds, int32_t* status) {
+void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double seconds,
+                            int32_t* status) {
   constexpr double baseMultipler = kSystemClockTicksPerMicrosecond * 1000000;
   uint32_t cycles = static_cast<uint32_t>(baseMultipler * seconds);
   HAL_SetDMATimedTriggerCycles(handle, cycles, status);
 }
 
-void HAL_SetDMATimedTriggerCycles(HAL_DMAHandle handle, uint32_t cycles, int32_t* status) {
+void HAL_SetDMATimedTriggerCycles(HAL_DMAHandle handle, uint32_t cycles,
+                                  int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
@@ -603,8 +605,10 @@ void HAL_ClearDMAExternalTriggers(HAL_DMAHandle handle, int32_t* status) {
   dma->captureStore.triggerChannels = 0;
   tDMA::tExternalTriggers newTrigger;
   std::memset(&newTrigger, 0, sizeof(newTrigger));
-  for (unsigned char reg = 0; reg < tDMA::kNumExternalTriggersRegisters; reg++) {
-    for (unsigned char bit = 0; bit < tDMA::kNumExternalTriggersElements; bit++) {
+  for (unsigned char reg = 0; reg < tDMA::kNumExternalTriggersRegisters;
+       reg++) {
+    for (unsigned char bit = 0; bit < tDMA::kNumExternalTriggersElements;
+         bit++) {
       dma->aDMA->writeExternalTriggers(reg, bit, newTrigger, status);
     }
   }
@@ -664,8 +668,7 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
 
   uint32_t byteDepth = queueDepth * dma->captureStore.captureSize;
 
-  dma->manager = std::make_unique<tDMAManager>(
-      g_DMA_index, byteDepth, status);
+  dma->manager = std::make_unique<tDMAManager>(g_DMA_index, byteDepth, status);
   if (*status != 0) {
     return;
   }
@@ -710,7 +713,8 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
   }
 
   dma->manager->read(dmaSample->readBuffer, dma->captureStore.captureSize,
-                     static_cast<uint32_t>(timeoutSeconds * 1000), &remainingBytes, status);
+                     static_cast<uint32_t>(timeoutSeconds * 1000),
+                     &remainingBytes, status);
 
   *remainingOut = remainingBytes / dma->captureStore.captureSize;
 
@@ -735,8 +739,9 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
 }
 
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
-                                   HAL_DMASample* dmaSample, double timeoutSeconds,
-                                   int32_t* remainingOut, int32_t* status) {
+                                   HAL_DMASample* dmaSample,
+                                   double timeoutSeconds, int32_t* remainingOut,
+                                   int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
