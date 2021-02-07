@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Units;
 
 /** This is a sample program showing how to to use DMA to read a sensor. */
 public class Robot extends TimedRobot {
@@ -63,7 +64,7 @@ public class Robot extends TimedRobot {
     // Update our sample. remaining is the number of samples remaining in the
     // buffer status is more specific error messages if readStatus is not OK.
     // Wait 1ms if buffer is empty
-    DMASample.DMAReadStatus readStatus = m_dmaSample.update(m_dma, 1);
+    DMASample.DMAReadStatus readStatus = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(1));
 
     // Unset trigger
     m_dmaTrigger.set(true);
