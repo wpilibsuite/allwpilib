@@ -31,7 +31,7 @@ class SimDeviceSim {
    * @param name name of the SimDevice
    * @param index device index number to append to name
    */
-  explicit SimDeviceSim(const char* name, int index);
+  SimDeviceSim(const char* name, int index);
 
   /**
    * Constructs a SimDeviceSim.
@@ -40,7 +40,7 @@ class SimDeviceSim {
    * @param index device index number to append to name
    * @param channel device channel number to append to name
    */
-  explicit SimDeviceSim(const char* name, int index, int channel);
+  SimDeviceSim(const char* name, int index, int channel);
 
   /**
    * Get the property object with the given name.

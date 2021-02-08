@@ -7,11 +7,10 @@
 #include <string>
 #include <vector>
 
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
-
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 using namespace frc;
 using namespace frc::sim;
