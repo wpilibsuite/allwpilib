@@ -16,6 +16,7 @@
 namespace frc {
 class AddressableLED;
 class SendableBuilder;
+class DMA;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -37,6 +38,7 @@ class SendableBuilder;
 class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
  public:
   friend class AddressableLED;
+  friend class DMA;
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */

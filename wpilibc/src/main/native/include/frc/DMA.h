@@ -16,6 +16,7 @@ class DigitalSource;
 class DutyCycle;
 class AnalogInput;
 class DMASample;
+class PWM;
 
 class DMA : public ErrorBase {
   friend class DMASample;
@@ -46,6 +47,7 @@ class DMA : public ErrorBase {
   void AddAnalogAccumulator(const AnalogInput* analogInput);
 
   int SetExternalTrigger(DigitalSource* source, bool rising, bool falling);
+  int SetPwmEdgeTrigger(PWM* pwm, bool rising, bool falling);
 
   void ClearSensors();
   void ClearExternalTriggers();

@@ -9,6 +9,7 @@
 #include <frc/DigitalSource.h>
 #include <frc/DutyCycle.h>
 #include <frc/Encoder.h>
+#include <frc/PWM.h>
 
 #include <hal/DMA.h>
 #include <hal/HALBase.h>
@@ -105,6 +106,15 @@ int DMA::SetExternalTrigger(DigitalSource* source, bool rising, bool falling) {
                                 static_cast<HAL_AnalogTriggerType>(
                                     source->GetAnalogTriggerTypeForRouting()),
                                 rising, falling, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return idx;
+}
+
+int DMA::SetPwmEdgeTrigger(PWM* source, bool rising, bool falling) {
+  int32_t status = 0;
+  int32_t idx = HAL_SetDMAExternalTrigger(
+      dmaHandle, source->m_handle, HAL_AnalogTriggerType::HAL_Trigger_kInWindow,
+      rising, falling, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return idx;
 }

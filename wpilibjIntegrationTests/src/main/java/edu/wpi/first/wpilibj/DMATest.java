@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -113,5 +114,17 @@ public class DMATest extends AbstractComsSetup {
       assertEquals(values.size() - i - 1, m_dmaSample.getRemaining());
       assertEquals(values.get(i), m_dmaSample.getAnalogInputVoltage(m_analogIO.getInput()), 0.01);
     }
+  }
+
+  @Test
+  public void testTimedTriggers() {
+    m_dma.setTimedTrigger(Units.millisecondsToSeconds(10));
+    m_dma.startDMA(1024);
+    Timer.delay(Units.millisecondsToSeconds(100));
+    m_dma.setPause(true);
+
+    var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(1));
+    assertEquals(DMASample.DMAReadStatus.Ok, timedOut);
+    assertTrue("Received more then 5 samples in 100 ms", m_dmaSample.getRemaining() > 5);
   }
 }
