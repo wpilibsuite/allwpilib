@@ -61,7 +61,7 @@ public class DMATest extends AbstractComsSetup {
   }
 
   @Test
-  public void testManaulTriggerOnlyWorksOnce() {
+  public void testManualTriggerOnlyWorksOnce() {
     m_dma.startDMA(1024);
     m_manualTrigger.set(false);
     var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(5));
