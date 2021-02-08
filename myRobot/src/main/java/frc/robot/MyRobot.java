@@ -38,10 +38,10 @@ public class MyRobot extends TimedRobot {
     m_dmaSample = new DMASample();
     m_dma = new DMA();
 
-    //m_dma.setTimedTriggerCycles(1);
+    // m_dma.setTimedTriggerCycles(1);
     // Trigger on falling edge of dma trigger output
     m_dma.setExternalTrigger(m_dmaTrigger, false, true);
-    //m_dma.setTimedTrigger(0.005);
+    // m_dma.setTimedTrigger(0.005);
 
     // Add inputs we want to read via DMA
     m_dma.addAnalogInput(m_analogInput);
@@ -49,7 +49,6 @@ public class MyRobot extends TimedRobot {
     m_dma.addEncoderPeriod(m_encoder);
 
     // Make sure trigger is set to off.
-
 
     // Start DMA. No triggers or inputs can be added after this call
     // unless DMA is stopped.
@@ -68,14 +67,10 @@ public class MyRobot extends TimedRobot {
 
     do {
 
-
-
       // Update our sample. remaining is the number of samples remaining in the
       // buffer status is more specific error messages if readStatus is not OK.
       // Wait 1ms if buffer is empty
       DMASample.DMAReadStatus readStatus = m_dmaSample.update(m_dma, 0.0001);
-
-
 
       SmartDashboard.putNumber("status", readStatus.getValue());
 
@@ -97,7 +92,6 @@ public class MyRobot extends TimedRobot {
 
         if (m_dmaSample.getRemaining() != 0) {
           SmartDashboard.putBoolean("HadData", true);
-
         }
 
         SmartDashboard.putNumber("CapSize", m_dmaSample.getCaptureSize());
