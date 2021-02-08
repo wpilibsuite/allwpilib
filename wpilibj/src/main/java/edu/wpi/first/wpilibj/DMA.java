@@ -83,6 +83,10 @@ public class DMA implements AutoCloseable {
         falling);
   }
 
+  public int setPwmEdgeTrigger(PWM pwm, boolean rising, boolean falling) {
+    return DMAJNI.setExternalTrigger(m_dmaHandle, pwm.m_handle, 0, rising, falling);
+  }
+
   public void clearSensors() {
     DMAJNI.clearSensors(m_dmaHandle);
   }

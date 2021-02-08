@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 @SuppressWarnings("all")
@@ -29,6 +30,8 @@ public class MyRobot extends TimedRobot {
   // Encoder to read with DMA
   private Encoder m_encoder;
 
+  private VictorSP m_vsp;
+
   @Override
   public void robotInit() {
     m_dmaTrigger = new DigitalOutput(2);
@@ -37,10 +40,16 @@ public class MyRobot extends TimedRobot {
     m_encoder = new Encoder(0, 1);
     m_dmaSample = new DMASample();
     m_dma = new DMA();
+    m_vsp = new VictorSP(11);
+
+    m_vsp.set(0);
+
+
 
     // m_dma.setTimedTriggerCycles(1);
     // Trigger on falling edge of dma trigger output
-    m_dma.setExternalTrigger(m_dmaTrigger, false, true);
+    m_dma.setPwmEdgeTrigger(m_vsp, false, true);
+    //m_dma.setExternalTrigger(m_dmaTrigger, false, true);
     // m_dma.setTimedTrigger(0.005);
 
     // Add inputs we want to read via DMA
