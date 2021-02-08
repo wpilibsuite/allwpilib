@@ -51,9 +51,6 @@ public class Robot extends TimedRobot {
     // Start DMA. No triggers or inputs can be added after this call
     // unless DMA is stopped.
     m_dma.startDMA(1024);
-
-    // DMA must be explicitly unpaused after calling startDMA
-    m_dma.setPause(false);
   }
 
   @Override

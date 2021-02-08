@@ -40,9 +40,6 @@ class Robot : public frc::TimedRobot {
     // Start DMA. No triggers or inputs can be added after this call
     // unless DMA is stopped.
     m_dma.StartDMA(1024);
-
-    // DMA must be explicitly unpaused after calling StartDMA
-    m_dma.SetPause(false);
   }
 
   void RobotPeriodic() override {

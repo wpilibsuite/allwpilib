@@ -32,14 +32,16 @@ public class MyRobot extends TimedRobot {
   @Override
   public void robotInit() {
     m_dmaTrigger = new DigitalOutput(2);
+    m_dmaTrigger.set(true);
     m_analogInput = new AnalogInput(0);
     m_encoder = new Encoder(0, 1);
     m_dmaSample = new DMASample();
     m_dma = new DMA();
 
+    //m_dma.setTimedTriggerCycles(1);
     // Trigger on falling edge of dma trigger output
-    // m_dma.setExternalTrigger(m_dmaTrigger, false, true);
-    m_dma.setTimedTrigger(0.005);
+    m_dma.setExternalTrigger(m_dmaTrigger, false, true);
+    //m_dma.setTimedTrigger(0.005);
 
     // Add inputs we want to read via DMA
     m_dma.addAnalogInput(m_analogInput);
@@ -47,7 +49,7 @@ public class MyRobot extends TimedRobot {
     m_dma.addEncoderPeriod(m_encoder);
 
     // Make sure trigger is set to off.
-    m_dmaTrigger.set(true);
+
 
     // Start DMA. No triggers or inputs can be added after this call
     // unless DMA is stopped.
@@ -56,23 +58,24 @@ public class MyRobot extends TimedRobot {
 
   int count = 0;
   int count2 = 0;
+  int count3 = 0;
   double existing = 0;
 
   @Override
   public void robotPeriodic() {
+    // Manually Trigger DMA read
+    m_dmaTrigger.set(false);
 
     do {
 
-      // Manually Trigger DMA read
-      m_dmaTrigger.set(false);
+
 
       // Update our sample. remaining is the number of samples remaining in the
       // buffer status is more specific error messages if readStatus is not OK.
       // Wait 1ms if buffer is empty
       DMASample.DMAReadStatus readStatus = m_dmaSample.update(m_dma, 0.0001);
 
-      // Unset trigger
-      m_dmaTrigger.set(true);
+
 
       SmartDashboard.putNumber("status", readStatus.getValue());
 
@@ -92,6 +95,14 @@ public class MyRobot extends TimedRobot {
         int encoderPeriod = m_dmaSample.getEncoderPeriodRaw(m_encoder);
         double analogVoltage = m_dmaSample.getAnalogInputVoltage(m_analogInput);
 
+        if (m_dmaSample.getRemaining() != 0) {
+          SmartDashboard.putBoolean("HadData", true);
+
+        }
+
+        SmartDashboard.putNumber("CapSize", m_dmaSample.getCaptureSize());
+        SmartDashboard.putNumber("Triggers", m_dmaSample.getTriggerChannels());
+
         SmartDashboard.putNumber("Distance", encoderDistance);
         SmartDashboard.putNumber("Period", encoderPeriod);
         SmartDashboard.putNumber("Input", analogVoltage);
@@ -101,7 +112,13 @@ public class MyRobot extends TimedRobot {
         existing = m_dmaSample.getTimeStamp();
         SmartDashboard.putNumber("Delta", delta);
         SmartDashboard.putNumber("Timestamp2", Timer.getFPGATimestamp());
+      } else {
+        count3++;
+        SmartDashboard.putNumber("Timeouts", count3);
       }
     } while (m_dmaSample.getRemaining() != 0);
+
+    // Unset trigger
+    m_dmaTrigger.set(true);
   }
 }

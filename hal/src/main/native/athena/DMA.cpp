@@ -110,6 +110,8 @@ HAL_DMAHandle HAL_InitializeDMA(int32_t* status) {
   config.Pause = true;
   dma->aDMA->writeConfig(config, status);
 
+  dma->aDMA->writeRate(1, status);
+
   tDMA::tExternalTriggers newTrigger;
   std::memset(&newTrigger, 0, sizeof(newTrigger));
   for (unsigned char reg = 0; reg < tDMA::kNumExternalTriggersRegisters;
@@ -544,6 +546,11 @@ int32_t HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
     return 0;
   }
 
+  dma->aDMA->writeRate(1, status);
+  if (*status != 0) {
+    return 0;
+  }
+
   uint8_t pin = 0;
   uint8_t module = 0;
   bool analogTrigger = false;
@@ -673,6 +680,8 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
   if (*status != 0) {
     return;
   }
+
+  dma->aDMA->writeConfig_Pause(false, status);
 
   dma->manager->start(status);
   dma->manager->stop(status);

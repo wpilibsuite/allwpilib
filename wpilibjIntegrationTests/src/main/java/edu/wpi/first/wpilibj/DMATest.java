@@ -50,8 +50,9 @@ public class DMATest extends AbstractComsSetup {
   }
 
   @Test
-  public void testStartsPaused() {
+  public void testPausingWorks() {
     m_dma.startDMA(1024);
+    m_dma.setPause(true);
     m_manualTrigger.set(false);
 
     var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(5));
@@ -62,7 +63,6 @@ public class DMATest extends AbstractComsSetup {
   @Test
   public void testManaulTriggerOnlyWorksOnce() {
     m_dma.startDMA(1024);
-    m_dma.setPause(false);
     m_manualTrigger.set(false);
     var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(5));
     m_manualTrigger.set(true);
@@ -76,7 +76,6 @@ public class DMATest extends AbstractComsSetup {
   @Test
   public void testAnalogIndividualTriggers() {
     m_dma.startDMA(1024);
-    m_dma.setPause(false);
     for (double i = 0; i < 5; i++) {
       m_analogIO.getOutput().setVoltage(i);
       // Need to sleep to ensure value sets
@@ -97,7 +96,6 @@ public class DMATest extends AbstractComsSetup {
   @Test
   public void testAnalogMultipleTriggers() {
     m_dma.startDMA(1024);
-    m_dma.setPause(false);
     List<Double> values = new ArrayList<>();
     for (double i = 0; i < 5; i++) {
       m_analogIO.getOutput().setVoltage(i);
