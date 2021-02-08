@@ -214,19 +214,20 @@ Java_edu_wpi_first_hal_DMAJNI_addAnalogAccumulator
 /*
  * Class:     edu_wpi_first_hal_DMAJNI
  * Method:    setExternalTrigger
- * Signature: (IIIZZ)V
+ * Signature: (IIIZZ)I
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_DMAJNI_setExternalTrigger
   (JNIEnv* env, jclass, jint handle, jint digitalSourceHandle,
    jint analogTriggerType, jboolean rising, jboolean falling)
 {
   int32_t status = 0;
-  HAL_SetDMAExternalTrigger(
+  int32_t idx = HAL_SetDMAExternalTrigger(
       handle, digitalSourceHandle,
       static_cast<HAL_AnalogTriggerType>(analogTriggerType), rising, falling,
       &status);
   CheckStatus(env, status);
+  return idx;
 }
 
 /*

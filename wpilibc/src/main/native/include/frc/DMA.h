@@ -45,7 +45,7 @@ class DMA : public ErrorBase {
   void AddAveragedAnalogInput(const AnalogInput* analogInput);
   void AddAnalogAccumulator(const AnalogInput* analogInput);
 
-  void SetExternalTrigger(DigitalSource* source, bool rising, bool falling);
+  int SetExternalTrigger(DigitalSource* source, bool rising, bool falling);
 
   void ClearSensors();
   void ClearExternalTriggers();

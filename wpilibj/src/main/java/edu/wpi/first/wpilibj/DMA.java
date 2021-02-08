@@ -72,9 +72,10 @@ public class DMA implements AutoCloseable {
    * @param source the source to trigger from.
    * @param rising trigger on rising edge.
    * @param falling trigger on falling edge.
+   * @return the index of the trigger
    */
-  public void setExternalTrigger(DigitalSource source, boolean rising, boolean falling) {
-    DMAJNI.setExternalTrigger(
+  public int setExternalTrigger(DigitalSource source, boolean rising, boolean falling) {
+    return DMAJNI.setExternalTrigger(
         m_dmaHandle,
         source.getPortHandleForRouting(),
         source.getAnalogTriggerTypeForRouting(),

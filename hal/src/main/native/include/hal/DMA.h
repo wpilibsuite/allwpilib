@@ -65,11 +65,11 @@ void HAL_AddDMAAnalogAccumulator(HAL_DMAHandle handle,
 void HAL_AddDMADutyCycle(HAL_DMAHandle handle,
                          HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);
 
-void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
-                               HAL_Handle digitalSourceHandle,
-                               HAL_AnalogTriggerType analogTriggerType,
-                               HAL_Bool rising, HAL_Bool falling,
-                               int32_t* status);
+int32_t HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
+                                  HAL_Handle digitalSourceHandle,
+                                  HAL_AnalogTriggerType analogTriggerType,
+                                  HAL_Bool rising, HAL_Bool falling,
+                                  int32_t* status);
 
 void HAL_ClearDMASensors(HAL_DMAHandle handle, int32_t* status);
 void HAL_ClearDMAExternalTriggers(HAL_DMAHandle handle, int32_t* status);

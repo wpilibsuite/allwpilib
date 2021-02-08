@@ -98,13 +98,15 @@ void DMA::AddAnalogAccumulator(const AnalogInput* analogInput) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::SetExternalTrigger(DigitalSource* source, bool rising, bool falling) {
+int DMA::SetExternalTrigger(DigitalSource* source, bool rising, bool falling) {
   int32_t status = 0;
-  HAL_SetDMAExternalTrigger(dmaHandle, source->GetPortHandleForRouting(),
-                            static_cast<HAL_AnalogTriggerType>(
-                                source->GetAnalogTriggerTypeForRouting()),
-                            rising, falling, &status);
+  int32_t idx =
+      HAL_SetDMAExternalTrigger(dmaHandle, source->GetPortHandleForRouting(),
+                                static_cast<HAL_AnalogTriggerType>(
+                                    source->GetAnalogTriggerTypeForRouting()),
+                                rising, falling, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return idx;
 }
 
 void DMA::ClearSensors() {

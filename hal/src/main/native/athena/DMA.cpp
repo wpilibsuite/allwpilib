@@ -505,20 +505,20 @@ void HAL_AddDMAAnalogAccumulator(HAL_DMAHandle handle,
   }
 }
 
-void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
-                               HAL_Handle digitalSourceHandle,
-                               HAL_AnalogTriggerType analogTriggerType,
-                               HAL_Bool rising, HAL_Bool falling,
-                               int32_t* status) {
+int32_t HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
+                                  HAL_Handle digitalSourceHandle,
+                                  HAL_AnalogTriggerType analogTriggerType,
+                                  HAL_Bool rising, HAL_Bool falling,
+                                  int32_t* status) {
   auto dma = dmaHandles->Get(handle);
   if (!dma) {
     *status = HAL_HANDLE_ERROR;
-    return;
+    return 0;
   }
 
   if (dma->manager) {
     *status = HAL_INVALID_DMA_ADDITION;
-    return;
+    return 0;
   }
 
   int index = 0;
@@ -532,7 +532,7 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 
   if (index == 8) {
     *status = NO_AVAILABLE_RESOURCES;
-    return;
+    return 0;
   }
 
   dma->captureStore.triggerChannels |= (1 << index);
@@ -541,7 +541,7 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 
   dma->aDMA->writeConfig_ExternalClock(true, status);
   if (*status != 0) {
-    return;
+    return 0;
   }
 
   uint8_t pin = 0;
@@ -552,7 +552,7 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 
   if (!success) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return;
+    return 0;
   }
 
   tDMA::tExternalTriggers newTrigger;
@@ -564,6 +564,7 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 
   dma->aDMA->writeExternalTriggers(channelIndex / 4, channelIndex % 4,
                                    newTrigger, status);
+  return index;
 }
 
 void HAL_ClearDMASensors(HAL_DMAHandle handle, int32_t* status) {

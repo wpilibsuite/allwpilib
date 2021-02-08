@@ -34,7 +34,7 @@ public class DMAJNI extends JNIWrapper {
 
   public static native void addAnalogAccumulator(int handle, int analogInputHandle);
 
-  public static native void setExternalTrigger(
+  public static native int setExternalTrigger(
       int handle, int digitalSourceHandle, int analogTriggerType, boolean rising, boolean falling);
 
   public static native void clearSensors(int handle);
