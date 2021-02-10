@@ -38,7 +38,7 @@ SynchronousInterrupt::SynchronousInterrupt(
 
 void SynchronousInterrupt::InitSynchronousInterrupt() {
   int32_t status = 0;
-  m_handle = HAL_InitializeInterrupts(true, &status);
+  m_handle = HAL_InitializeInterrupts(&status);
   wpi_setHALError(status);
   if (status != 0) {
     return;
@@ -56,8 +56,7 @@ void SynchronousInterrupt::InitSynchronousInterrupt() {
 }
 
 SynchronousInterrupt::~SynchronousInterrupt() {
-  int32_t status = 0;
-  HAL_CleanInterrupts(m_handle, &status);
+  HAL_CleanInterrupts(m_handle);
 }
 
 inline SynchronousInterrupt::WaitResult operator|(

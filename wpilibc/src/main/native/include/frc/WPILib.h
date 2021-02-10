@@ -43,7 +43,6 @@
 #include "frc/GearTooth.h"
 #include "frc/GenericHID.h"
 #include "frc/I2C.h"
-#include "frc/InterruptableSensorBase.h"
 #include "frc/IterativeRobot.h"
 #include "frc/Jaguar.h"
 #include "frc/Joystick.h"

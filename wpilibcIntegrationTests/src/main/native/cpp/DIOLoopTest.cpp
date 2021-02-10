@@ -8,7 +8,8 @@
 
 #include "TestBench.h"
 #include "frc/Counter.h"
-#include "frc/InterruptableSensorBase.h"
+#include "frc/AsynchronousInterrupt.h"
+#include "frc/SynchronousInterrupt.h"
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
@@ -77,10 +78,9 @@ TEST_F(DIOLoopTest, DIOPWM) {
   m_output->EnablePWM(0.0);
   Wait(0.5);
   m_output->UpdateDutyCycle(0.5);
-  m_input->RequestInterrupts();
-  m_input->SetUpSourceEdge(false, true);
-  InterruptableSensorBase::WaitResult result =
-      m_input->WaitForInterrupt(3.0, true);
+  frc::SynchronousInterrupt interrupt{m_output};
+  interrupt.SetInterruptEdges(false, true);
+  frc::SynchronousInterrupt::WaitResult result = interrupt.WaitForInterrupt(3_s, true);
 
   Wait(0.5);
   bool firstCycle = m_input->Get();
@@ -102,7 +102,7 @@ TEST_F(DIOLoopTest, DIOPWM) {
   Wait(0.5);
   bool secondAfterStop = m_input->Get();
 
-  EXPECT_EQ(InterruptableSensorBase::WaitResult::kFallingEdge, result)
+  EXPECT_EQ(frc::SynchronousInterrupt::WaitResult::kFallingEdge, result)
       << "WaitForInterrupt was not falling.";
 
   EXPECT_FALSE(firstCycle) << "Input not low after first delay";

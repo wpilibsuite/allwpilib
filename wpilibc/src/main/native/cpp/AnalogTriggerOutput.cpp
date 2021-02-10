@@ -4,9 +4,11 @@
 
 #include "frc/AnalogTriggerOutput.h"
 
+#include "hal/AnalogTrigger.h"
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/AnalogTrigger.h"
+#include "frc/AnalogTriggerType.h"
 #include "frc/WPIErrors.h"
 
 using namespace frc;

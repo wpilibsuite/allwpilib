@@ -23,9 +23,9 @@ import org.junit.Test;
  * use the InterruptableSensorBase.
  */
 public abstract class AbstractInterruptTest extends AbstractComsSetup {
-  private InterruptableSensorBase m_interruptable = null;
+  private DigitalSource m_interruptable = null;
 
-  private InterruptableSensorBase getInterruptable() {
+  private DigitalSource getInterruptable() {
     if (m_interruptable == null) {
       m_interruptable = giveInterruptableSensorBase();
     }
@@ -41,7 +41,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   }
 
   /** Give the interruptable sensor base that interrupts can be attached to. */
-  abstract InterruptableSensorBase giveInterruptableSensorBase();
+  abstract DigitalSource giveInterruptableSensorBase();
 
   /**
    * Cleans up the interruptable sensor base. This is only called if {@link
@@ -67,40 +67,40 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     }
   }
 
-  private class TestInterruptHandlerFunction extends InterruptHandlerFunction<InterruptCounter> {
-    protected final AtomicBoolean m_exceptionThrown = new AtomicBoolean(false);
-    /** Stores the time that the interrupt fires. */
-    final AtomicLong m_interruptFireTime = new AtomicLong();
-    /** Stores if the interrupt has completed at least once. */
-    final AtomicBoolean m_interruptComplete = new AtomicBoolean(false);
+  // private class TestInterruptHandlerFunction extends InterruptHandlerFunction<InterruptCounter> {
+  //   protected final AtomicBoolean m_exceptionThrown = new AtomicBoolean(false);
+  //   /** Stores the time that the interrupt fires. */
+  //   final AtomicLong m_interruptFireTime = new AtomicLong();
+  //   /** Stores if the interrupt has completed at least once. */
+  //   final AtomicBoolean m_interruptComplete = new AtomicBoolean(false);
 
-    protected Exception m_ex;
-    final InterruptCounter m_counter;
+  //   protected Exception m_ex;
+  //   final InterruptCounter m_counter;
 
-    TestInterruptHandlerFunction(InterruptCounter counter) {
-      m_counter = counter;
-    }
+  //   TestInterruptHandlerFunction(InterruptCounter counter) {
+  //     m_counter = counter;
+  //   }
 
-    @Override
-    public void interruptFired(int interruptAssertedMask, InterruptCounter param) {
-      m_interruptFireTime.set(RobotController.getFPGATime());
-      m_counter.increment();
-      try {
-        // This won't cause the test to fail
-        assertSame(m_counter, param);
-      } catch (Exception ex) {
-        // So we must throw the exception within the test
-        m_exceptionThrown.set(true);
-        m_ex = ex;
-      }
-      m_interruptComplete.set(true);
-    }
+  //   @Override
+  //   public void interruptFired(int interruptAssertedMask, InterruptCounter param) {
+  //     m_interruptFireTime.set(RobotController.getFPGATime());
+  //     m_counter.increment();
+  //     try {
+  //       // This won't cause the test to fail
+  //       assertSame(m_counter, param);
+  //     } catch (Exception ex) {
+  //       // So we must throw the exception within the test
+  //       m_exceptionThrown.set(true);
+  //       m_ex = ex;
+  //     }
+  //     m_interruptComplete.set(true);
+  //   }
 
-    @Override
-    public InterruptCounter overridableParameter() {
-      return m_counter;
-    }
-  }
+  //   @Override
+  //   public InterruptCounter overridableParameter() {
+  //     return m_counter;
+  //   }
+  // }
 
   @Test(timeout = 1000)
   public void testSingleInterruptsTriggering() throws Exception {

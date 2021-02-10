@@ -36,7 +36,7 @@ public class SynchronousInterrupt implements AutoCloseable {
     }
 
     /**
-     * Create a wait result
+     * Create a wait result.
      */
     public static WaitResult getValue(boolean rising, boolean falling) {
       if (rising && falling) {
@@ -60,7 +60,7 @@ public class SynchronousInterrupt implements AutoCloseable {
    */
   public SynchronousInterrupt(DigitalSource source) {
     m_source = requireNonNullParam(source, "source", "SynchronousInterrupt");
-    m_handle = InterruptJNI.initializeInterrupts(true);
+    m_handle = InterruptJNI.initializeInterrupts();
     InterruptJNI.requestInterrupts(
         m_handle, m_source.getPortHandleForRouting(), m_source.getAnalogTriggerTypeForRouting());
     InterruptJNI.setInterruptUpSourceEdge(m_handle, true, false);
@@ -72,7 +72,7 @@ public class SynchronousInterrupt implements AutoCloseable {
    * <p>This does not close the associated digital source.
    */
   @Override
-  public void close() throws Exception {
+  public void close() {
     InterruptJNI.cleanInterrupts(m_handle);
   }
 

@@ -50,7 +50,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
    * <p>This will disable the interrupt if it is enabled.
    */
   @Override
-  public void close() throws Exception {
+  public void close() {
     disable();
     m_interrupt.close();
   }
