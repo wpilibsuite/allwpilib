@@ -121,14 +121,14 @@ TEST_F(DMATest, AnalogMultipleTriggers) {
     m_manualTrigger->Set(true);
   }
 
-  for (int i = 0; i < values.size(); i++) {
+  for (size_t i = 0; i < values.size(); i++) {
     frc::DMASample sample;
     int32_t remaining = 0;
     int32_t status = 0;
     auto timedOut = sample.Update(m_dma, 1_ms, &remaining, &status);
     ASSERT_EQ(DMASample::DMAReadStatus::kOk, timedOut);
     ASSERT_EQ(0, status);
-    ASSERT_EQ(values.size() - i - 1, remaining);
+    ASSERT_EQ(values.size() - i - 1, (uint32_t)remaining);
     ASSERT_DOUBLE_EQ(values[i],
                      sample.GetAnalogInputVoltage(m_analogInput, &status));
   }
