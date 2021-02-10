@@ -29,6 +29,7 @@ class DMATest : public testing::Test {
     m_analogInput = new AnalogInput(TestBench::kFakeAnalogOutputChannel);
     m_manualTrigger = new DigitalOutput(TestBench::kLoop1InputChannel);
     m_pwm = new Jaguar(TestBench::kFakePwmOutput);
+    m_dma = new DMA();
 
     m_dma->AddAnalogInput(m_analogInput);
     m_dma->SetExternalTrigger(m_manualTrigger, false, true);
