@@ -99,9 +99,6 @@ class AsynchronousInterrupt {
 
   ~AsynchronousInterrupt();
 
-  AsynchronousInterrupt(AsynchronousInterrupt&&) = default;
-  AsynchronousInterrupt& operator=(AsynchronousInterrupt&&) = default;
-
   /**
    * Enables interrupt callbacks. Before this, callbacks will not occur. Does
    * nothing if already enabled.

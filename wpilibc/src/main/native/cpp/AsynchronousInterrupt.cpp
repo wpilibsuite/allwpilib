@@ -26,8 +26,9 @@ AsynchronousInterrupt::~AsynchronousInterrupt() {
 void AsynchronousInterrupt::ThreadMain() {
   while (m_keepRunning) {
     auto result = m_interrupt.WaitForInterrupt(10_s, false);
-    if (!m_keepRunning)
+    if (!m_keepRunning) {
       break;
+    }
     if (result == SynchronousInterrupt::WaitResult::kTimeout) {
       continue;
     }
@@ -37,8 +38,9 @@ void AsynchronousInterrupt::ThreadMain() {
 }
 
 void AsynchronousInterrupt::Enable() {
-  if (m_keepRunning)
+  if (m_keepRunning) {
     return;
+  }
 
   m_keepRunning = true;
   m_thread = std::thread([this] { this->ThreadMain(); });
@@ -47,8 +49,9 @@ void AsynchronousInterrupt::Enable() {
 void AsynchronousInterrupt::Disable() {
   m_keepRunning = false;
   m_interrupt.WakeupWaitingInterrupt();
-  if (m_thread.joinable())
+  if (m_thread.joinable()) {
     m_thread.join();
+  }
 }
 
 void AsynchronousInterrupt::SetInterruptEdges(bool risingEdge,
