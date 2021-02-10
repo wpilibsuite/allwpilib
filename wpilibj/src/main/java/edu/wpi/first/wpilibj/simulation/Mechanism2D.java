@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,8 @@ public class Mechanism2D {
     ligamentPath = ligamentPath + "/angle";
     if (m_device != null) {
       if (!m_createdItems.containsKey(ligamentPath)) {
-        m_createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, angle));
+        m_createdItems.put(
+            ligamentPath, m_device.createDouble(ligamentPath, Direction.kInput, angle));
       }
       m_createdItems.get(ligamentPath).set(angle);
     }
@@ -39,7 +41,8 @@ public class Mechanism2D {
     ligamentPath = ligamentPath + "/length";
     if (m_device != null) {
       if (!m_createdItems.containsKey(ligamentPath)) {
-        m_createdItems.put(ligamentPath, m_device.createDouble(ligamentPath, false, length));
+        m_createdItems.put(
+            ligamentPath, m_device.createDouble(ligamentPath, Direction.kInput, length));
       }
       m_createdItems.get(ligamentPath).set(length);
     }

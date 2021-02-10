@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 /** Class to control a simulated driver station. */
 @SuppressWarnings({"PMD.UseUtilityClass", "PMD.GodClass", "PMD.ExcessivePublicCount"})
 public class DriverStationSim {
+  private DriverStationSim() {
+    throw new UnsupportedOperationException("This is a utility class!");
+  }
+
   /**
    * Register a callback on whether the DS is enabled.
    *

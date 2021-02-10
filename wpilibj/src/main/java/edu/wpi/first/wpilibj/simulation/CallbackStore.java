@@ -82,7 +82,7 @@ public class CallbackStore implements AutoCloseable {
     m_cancelType = -1;
   }
 
-  @SuppressWarnings("NoFinalizer")
+  @SuppressWarnings({"NoFinalizer", "deprecation"})
   @Override
   protected void finalize() throws Throwable {
     try {

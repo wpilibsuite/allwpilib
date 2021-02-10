@@ -9,7 +9,6 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.AnalogGyroJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  *
  * <p>This class is for gyro sensors that connect to an analog input.
  */
-public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable, AutoCloseable {
+public class AnalogGyro extends GyroBase {
   private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
   protected AnalogInput m_analog;
   private boolean m_channelAllocated;

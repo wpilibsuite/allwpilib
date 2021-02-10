@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource implements Sendable, AutoCloseable {
+public class DigitalInput extends DigitalSource implements Sendable {
   private final int m_channel;
   private int m_handle;
 

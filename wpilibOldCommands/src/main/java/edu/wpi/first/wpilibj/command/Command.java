@@ -353,7 +353,7 @@ public abstract class Command implements Sendable, AutoCloseable {
    * @return the requirements (as an {@link Enumeration Enumeration} of {@link Subsystem
    *     Subsystems}) of this command
    */
-  synchronized Enumeration getRequirements() {
+  synchronized Enumeration<?> getRequirements() {
     return m_requirements.getElements();
   }
 

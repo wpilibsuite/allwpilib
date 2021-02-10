@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 public class ElevatorSimTest {
   @Test
-  @SuppressWarnings("LocalVariableName")
+  @SuppressWarnings({"LocalVariableName", "resource"})
   public void testStateSpaceSimWithElevator() {
 
     var controller = new PIDController(10, 0, 0);
