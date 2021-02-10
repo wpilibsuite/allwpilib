@@ -11,10 +11,10 @@ For Java dependencies, there is likely a file related to the specific dependency
 Note, changing artifact locations (This includes changing the artifact year currently, I have an issue open to change this) requires updating the `native-utils` plugin
 
 ## Publishing allwpilib
-allwpilib publishes to the development repo on every push to master. To publish a release build, upload a new tag, and a release will automatically be built and published.
+allwpilib publishes to the development repo on every push to main. To publish a release build, upload a new tag, and a release will automatically be built and published.
 
 ## Publishing desktop tools
-Desktop tools publish to the development repo on every push to master. To publish a release build, upload a new tag, and a release will automatically be built and published.
+Desktop tools publish to the development repo on every push to main. To publish a release build, upload a new tag, and a release will automatically be built and published.
 
 ## Publishing VS Code
 Before publishing, make sure to update the gradlerio version in `vscode-wpilib/resources/gradle/version.txt` Also make sure the gradle wrapper version matches the wrapper required by gradlerio.

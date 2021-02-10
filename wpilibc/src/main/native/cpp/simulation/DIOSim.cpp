@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/DIOSim.h"
 
@@ -50,9 +47,13 @@ std::unique_ptr<CallbackStore> DIOSim::RegisterValueCallback(
   return store;
 }
 
-bool DIOSim::GetValue() const { return HALSIM_GetDIOValue(m_index); }
+bool DIOSim::GetValue() const {
+  return HALSIM_GetDIOValue(m_index);
+}
 
-void DIOSim::SetValue(bool value) { HALSIM_SetDIOValue(m_index, value); }
+void DIOSim::SetValue(bool value) {
+  HALSIM_SetDIOValue(m_index, value);
+}
 
 std::unique_ptr<CallbackStore> DIOSim::RegisterPulseLengthCallback(
     NotifyCallback callback, bool initialNotify) {
@@ -80,7 +81,9 @@ std::unique_ptr<CallbackStore> DIOSim::RegisterIsInputCallback(
   return store;
 }
 
-bool DIOSim::GetIsInput() const { return HALSIM_GetDIOIsInput(m_index); }
+bool DIOSim::GetIsInput() const {
+  return HALSIM_GetDIOIsInput(m_index);
+}
 
 void DIOSim::SetIsInput(bool isInput) {
   HALSIM_SetDIOIsInput(m_index, isInput);
@@ -95,10 +98,14 @@ std::unique_ptr<CallbackStore> DIOSim::RegisterFilterIndexCallback(
   return store;
 }
 
-int DIOSim::GetFilterIndex() const { return HALSIM_GetDIOFilterIndex(m_index); }
+int DIOSim::GetFilterIndex() const {
+  return HALSIM_GetDIOFilterIndex(m_index);
+}
 
 void DIOSim::SetFilterIndex(int filterIndex) {
   HALSIM_SetDIOFilterIndex(m_index, filterIndex);
 }
 
-void DIOSim::ResetData() { HALSIM_ResetDIOData(m_index); }
+void DIOSim::ResetData() {
+  HALSIM_ResetDIOData(m_index);
+}

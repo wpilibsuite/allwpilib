@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpiutil.math;
 
@@ -16,8 +13,8 @@ public final class MathUtil {
    * Returns value clamped between low and high boundaries.
    *
    * @param value Value to clamp.
-   * @param low   The lower boundary to which to clamp value.
-   * @param high  The higher boundary to which to clamp value.
+   * @param low The lower boundary to which to clamp value.
+   * @param high The higher boundary to which to clamp value.
    */
   public static int clamp(int value, int low, int high) {
     return Math.max(low, Math.min(value, high));
@@ -27,30 +24,40 @@ public final class MathUtil {
    * Returns value clamped between low and high boundaries.
    *
    * @param value Value to clamp.
-   * @param low   The lower boundary to which to clamp value.
-   * @param high  The higher boundary to which to clamp value.
+   * @param low The lower boundary to which to clamp value.
+   * @param high The higher boundary to which to clamp value.
    */
   public static double clamp(double value, double low, double high) {
     return Math.max(low, Math.min(value, high));
   }
 
   /**
-   * Constrains theta to within the range (-pi, pi].
+   * Returns modulus of input.
    *
-   * @param theta The angle to normalize.
-   * @return The normalized angle.
+   * @param input Input value to wrap.
+   * @param minimumInput The minimum value expected from the input.
+   * @param maximumInput The maximum value expected from the input.
    */
-  @SuppressWarnings("LocalVariableName")
-  public static double normalizeAngle(double theta) {
-    // Constraint theta to within (-3pi, pi)
-    int nPiPos = (int) ((theta + Math.PI) / 2.0 / Math.PI);
-    theta -= nPiPos * 2.0 * Math.PI;
+  public static double inputModulus(double input, double minimumInput, double maximumInput) {
+    double modulus = maximumInput - minimumInput;
 
-    // Cut off the bottom half of the above range to constrain within
-    // (-pi, pi]
-    int nPiNeg = (int) ((theta - Math.PI) / 2.0 / Math.PI);
-    theta -= nPiNeg * 2.0 * Math.PI;
+    // Wrap input if it's above the maximum input
+    int numMax = (int) ((input - minimumInput) / modulus);
+    input -= numMax * modulus;
 
-    return theta;
+    // Wrap input if it's below the minimum input
+    int numMin = (int) ((input - maximumInput) / modulus);
+    input -= numMin * modulus;
+
+    return input;
+  }
+
+  /**
+   * Wraps an angle to the range -pi to pi radians.
+   *
+   * @param angleRadians Angle to wrap in radians.
+   */
+  public static double angleModulus(double angleRadians) {
+    return inputModulus(angleRadians, -Math.PI, Math.PI);
   }
 }

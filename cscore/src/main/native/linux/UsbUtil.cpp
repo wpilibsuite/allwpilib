@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "UsbUtil.h"
 
@@ -24,7 +21,9 @@ namespace cs {
 static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
                                          wpi::SmallVectorImpl<char>& buf) {
   int fd = open("/var/lib/usbutils/usb.ids", O_RDONLY);
-  if (fd < 0) return wpi::StringRef{};
+  if (fd < 0) {
+    return {};
+  }
 
   wpi::raw_svector_ostream os{buf};
   wpi::raw_fd_istream is{fd, true};
@@ -40,9 +39,13 @@ static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
   bool foundVendor = false;
   for (;;) {
     auto line = is.getline(lineBuf, 4096);
-    if (is.has_error()) break;
+    if (is.has_error()) {
+      break;
+    }
 
-    if (line.empty()) continue;
+    if (line.empty()) {
+      continue;
+    }
 
     // look for vendor at start of line
     if (line.startswith(vendorStr)) {
@@ -66,14 +69,16 @@ static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
     }
   }
 
-  return wpi::StringRef{};
+  return {};
 }
 
 wpi::StringRef GetUsbNameFromId(int vendor, int product,
                                 wpi::SmallVectorImpl<char>& buf) {
   // try reading usb.ids
   wpi::StringRef rv = GetUsbNameFromFile(vendor, product, buf);
-  if (!rv.empty()) return rv;
+  if (!rv.empty()) {
+    return rv;
+  }
 
   // Fall back to internal database
   wpi::raw_svector_ostream os{buf};

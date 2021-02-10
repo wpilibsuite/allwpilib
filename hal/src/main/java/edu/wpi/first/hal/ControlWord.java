@@ -1,15 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
-/**
- * A wrapper for the HALControlWord bitfield.
- */
+/** A wrapper for the HALControlWord bitfield. */
 public class ControlWord {
   private boolean m_enabled;
   private boolean m_autonomous;
@@ -18,8 +13,13 @@ public class ControlWord {
   private boolean m_fmsAttached;
   private boolean m_dsAttached;
 
-  void update(boolean enabled, boolean autonomous, boolean test, boolean emergencyStop,
-              boolean fmsAttached, boolean dsAttached) {
+  void update(
+      boolean enabled,
+      boolean autonomous,
+      boolean test,
+      boolean emergencyStop,
+      boolean fmsAttached,
+      boolean dsAttached) {
     m_enabled = enabled;
     m_autonomous = autonomous;
     m_test = test;

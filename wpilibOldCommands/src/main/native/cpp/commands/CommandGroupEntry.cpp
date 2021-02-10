@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/commands/CommandGroupEntry.h"
 
@@ -16,8 +13,12 @@ CommandGroupEntry::CommandGroupEntry(Command* command, Sequence state,
     : m_timeout(timeout), m_command(command), m_state(state) {}
 
 bool CommandGroupEntry::IsTimedOut() const {
-  if (m_timeout < 0.0) return false;
+  if (m_timeout < 0.0) {
+    return false;
+  }
   double time = m_command->TimeSinceInitialized();
-  if (time == 0.0) return false;
+  if (time == 0.0) {
+    return false;
+  }
   return time >= m_timeout;
 }

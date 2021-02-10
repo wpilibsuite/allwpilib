@@ -1,0 +1,91 @@
+import org.gradle.nativeplatform.toolchain.internal.msvcpp.VisualStudioLocator
+import org.gradle.internal.os.OperatingSystem
+import org.gradle.util.VersionNumber
+
+plugins {
+    id 'cpp'
+    id 'maven-publish'
+}
+
+if (OperatingSystem.current().isWindows()) {
+    def outputsFolder = file("$buildDir/outputs")
+
+    def baseArtifactId = 'runtime'
+    def artifactGroupId = "edu.wpi.first.msvc"
+    def zipBaseName = "_GROUP_edu_wpi_first_msvc_ID_runtime_CLS"
+
+    def vsLocator = gradle.services.get(VisualStudioLocator)
+
+    def vsLocation = vsLocator.locateAllComponents().first()
+
+    def visualCppVersion = vsLocation.visualCpp.version
+
+    def vsDirectory = vsLocation.visualStudioDir
+
+    def runtimeLocation = file("$vsDirectory\\VC\\Redist\\MSVC")
+
+    def runtimeVerNumber = null
+
+    runtimeLocation.eachFile {
+        def verNumber =  VersionNumber.parse(it.name)
+        if (verNumber.major == visualCppVersion.major && verNumber.minor == visualCppVersion.minor) {
+            runtimeVerNumber = verNumber
+        }
+    }
+
+    if (runtimeVerNumber != null) {
+        runtimeLocation = file("$runtimeLocation\\$runtimeVerNumber")
+
+        def x86Folder = null
+
+        file("$runtimeLocation\\x86").eachFile {
+            if (it.name.endsWith('.CRT')) {
+                x86Folder = it
+            }
+        }
+
+        def x64Folder = null
+
+        file("$runtimeLocation\\x64").eachFile {
+            if (it.name.endsWith('.CRT')) {
+                x64Folder = it
+            }
+        }
+
+        def x86ZipTask = tasks.create('x86RuntimeZip', Zip) {
+            destinationDirectory = outputsFolder
+            archiveBaseName = zipBaseName
+            classifier = 'x86'
+
+            from x86Folder
+        }
+
+        def x64ZipTask = tasks.create('x64RuntimeZip', Zip) {
+            destinationDirectory = outputsFolder
+            archiveBaseName = zipBaseName
+            classifier = 'x64'
+
+            from x64Folder
+        }
+
+        addTaskToCopyAllOutputs(x86ZipTask)
+        addTaskToCopyAllOutputs(x64ZipTask)
+
+        build.dependsOn x86ZipTask
+        build.dependsOn x64ZipTask
+
+        publishing {
+            publications {
+
+                runtime(MavenPublication) {
+                    artifact x86ZipTask
+                    artifact x64ZipTask
+
+                    artifactId = "${baseArtifactId}"
+                    groupId artifactGroupId
+                    version wpilibVersioning.version.get()
+                }
+            }
+        }
+    }
+}

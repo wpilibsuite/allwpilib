@@ -1,14 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/DriveTrain.h"
 
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <units/length.h>
+#include <wpi/math>
 
 DriveTrain::DriveTrain() {
 // Encoders may measure differently in the real world and in
@@ -20,11 +19,11 @@ DriveTrain::DriveTrain() {
   m_leftEncoder.SetDistancePerPulse(0.042);
   m_rightEncoder.SetDistancePerPulse(0.042);
 #else
-  // Circumference in ft = 4in/12(in/ft)*PI
-  m_leftEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
-                                    360.0);
-  m_rightEncoder.SetDistancePerPulse(static_cast<double>(4.0 / 12.0 * M_PI) /
-                                     360.0);
+  // Circumference = diameter * pi. 360 tick simulated encoders.
+  m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+                                    wpi::math::pi / 360.0);
+  m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+                                     wpi::math::pi / 360.0);
 #endif
   SetName("DriveTrain");
   // Let's show everything on the LiveWindow
@@ -51,7 +50,9 @@ void DriveTrain::Drive(double left, double right) {
   m_robotDrive.TankDrive(left, right);
 }
 
-double DriveTrain::GetHeading() { return m_gyro.GetAngle(); }
+double DriveTrain::GetHeading() {
+  return m_gyro.GetAngle();
+}
 
 void DriveTrain::Reset() {
   m_gyro.Reset();
@@ -68,4 +69,6 @@ double DriveTrain::GetDistanceToObstacle() {
   return m_rangefinder.GetAverageVoltage();
 }
 
-void DriveTrain::Periodic() { Log(); }
+void DriveTrain::Periodic() {
+  Log();
+}

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_WEBSOCKET_H_
 #define WPIUTIL_WPI_WEBSOCKET_H_
@@ -79,7 +76,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
     ClientOptions() : handshakeTimeout{(uv::Timer::Time::max)()} {}
 
     /** Timeout for the handshake request. */
-    uv::Timer::Time handshakeTimeout;
+    uv::Timer::Time handshakeTimeout;  // NOLINT
 
     /** Additional headers to include in handshake. */
     ArrayRef<std::pair<StringRef, StringRef>> extraHeaders;
@@ -249,7 +246,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendPing(std::function<void(uv::Error)> callback = nullptr) {
     SendPing(ArrayRef<uv::Buffer>{}, [callback](auto bufs, uv::Error err) {
-      if (callback) callback(err);
+      if (callback) {
+        callback(err);
+      }
     });
   }
 
@@ -272,7 +271,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendPong(std::function<void(uv::Error)> callback = nullptr) {
     SendPong(ArrayRef<uv::Buffer>{}, [callback](auto bufs, uv::Error err) {
-      if (callback) callback(err);
+      if (callback) {
+        callback(err);
+      }
     });
   }
 

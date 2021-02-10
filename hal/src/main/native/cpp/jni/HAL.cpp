@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/HAL.h"
 
@@ -82,6 +79,30 @@ Java_edu_wpi_first_hal_HAL_exitMain
   (JNIEnv*, jclass)
 {
   HAL_ExitMain();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    simPeriodicBeforeNative
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_simPeriodicBeforeNative
+  (JNIEnv*, jclass)
+{
+  HAL_SimPeriodicBefore();
+}
+
+/*
+ * Class:     edu_wpi_first_hal_HAL
+ * Method:    simPeriodicAfterNative
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_HAL_simPeriodicAfterNative
+  (JNIEnv*, jclass)
+{
+  HAL_SimPeriodicAfter();
 }
 
 /*
@@ -172,7 +193,6 @@ Java_edu_wpi_first_hal_HAL_nativeGetControlWord
   static_assert(sizeof(HAL_ControlWord) == sizeof(jint),
                 "Java int must match the size of control word");
   HAL_ControlWord controlWord;
-  std::memset(&controlWord, 0, sizeof(HAL_ControlWord));
   HAL_GetControlWord(&controlWord);
   jint retVal = 0;
   std::memcpy(&retVal, &controlWord, sizeof(HAL_ControlWord));

@@ -1,12 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <units/math.h>
 
+#include "frc/MathUtil.h"
 #include "frc/controller/RamseteController.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
@@ -39,7 +37,7 @@ TEST(RamseteControllerTest, ReachesReference) {
   auto& endPose = trajectory.States().back().pose;
   EXPECT_NEAR_UNITS(endPose.X(), robotPose.X(), kTolerance);
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
-  EXPECT_NEAR_UNITS(units::math::NormalizeAngle(endPose.Rotation().Radians() -
-                                                robotPose.Rotation().Radians()),
+  EXPECT_NEAR_UNITS(frc::AngleModulus(endPose.Rotation().Radians() -
+                                      robotPose.Rotation().Radians()),
                     0_rad, kAngularTolerance);
 }

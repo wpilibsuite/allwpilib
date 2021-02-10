@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Tracer.h"
 
@@ -15,9 +12,13 @@
 
 using namespace frc;
 
-Tracer::Tracer() { ResetTimer(); }
+Tracer::Tracer() {
+  ResetTimer();
+}
 
-void Tracer::ResetTimer() { m_startTime = hal::fpga_clock::now(); }
+void Tracer::ResetTimer() {
+  m_startTime = hal::fpga_clock::now();
+}
 
 void Tracer::ClearEpochs() {
   ResetTimer();
@@ -34,7 +35,9 @@ void Tracer::PrintEpochs() {
   wpi::SmallString<128> buf;
   wpi::raw_svector_ostream os(buf);
   PrintEpochs(os);
-  if (!buf.empty()) DriverStation::ReportWarning(buf);
+  if (!buf.empty()) {
+    DriverStation::ReportWarning(buf);
+  }
 }
 
 void Tracer::PrintEpochs(wpi::raw_ostream& os) {

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -45,12 +42,31 @@ class SendableChooser : public SendableChooserBase {
   static std::weak_ptr<U> _unwrap_smart_ptr(const std::shared_ptr<U>& value);
 
  public:
-  ~SendableChooser() override = default;
   SendableChooser() = default;
+  ~SendableChooser() override = default;
   SendableChooser(SendableChooser&& rhs) = default;
   SendableChooser& operator=(SendableChooser&& rhs) = default;
 
+  /**
+   * Adds the given object to the list of options.
+   *
+   * On the SmartDashboard on the desktop, the object will appear as the given
+   * name.
+   *
+   * @param name   the name of the option
+   * @param object the option
+   */
   void AddOption(wpi::StringRef name, T object);
+
+  /**
+   * Add the given object to the list of options and marks it as the default.
+   *
+   * Functionally, this is very close to AddOption() except that it will use
+   * this as the default option if none other is explicitly selected.
+   *
+   * @param name   the name of the option
+   * @param object the option
+   */
   void SetDefaultOption(wpi::StringRef name, T object);
 
   /**
@@ -83,6 +99,17 @@ class SendableChooser : public SendableChooserBase {
     SetDefaultOption(name, object);
   }
 
+  /**
+   * Returns a copy of the selected option (a raw pointer U* if T =
+   * std::unique_ptr<U> or a std::weak_ptr<U> if T = std::shared_ptr<U>).
+   *
+   * If there is none selected, it will return the default. If there is none
+   * selected and no default, then it will return a value-initialized instance.
+   * For integer types, this is 0. For container types like std::string, this is
+   * an empty string.
+   *
+   * @return The option selected
+   */
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 
   void InitSendable(SendableBuilder& builder) override;

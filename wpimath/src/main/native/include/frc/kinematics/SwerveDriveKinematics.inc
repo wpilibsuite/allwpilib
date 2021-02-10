@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <algorithm>
 
+#include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/math.h"
 
 namespace frc {
@@ -18,7 +16,7 @@ SwerveDriveKinematics(Translation2d, Wheels...)
     -> SwerveDriveKinematics<1 + sizeof...(Wheels)>;
 
 template <size_t NumModules>
-std::array<SwerveModuleState, NumModules>
+wpi::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     const ChassisSpeeds& chassisSpeeds,
     const Translation2d& centerOfRotation) const {
@@ -40,7 +38,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
 
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix =
       m_inverseKinematics * chassisSpeedsVector;
-  std::array<SwerveModuleState, NumModules> moduleStates;
+  wpi::array<SwerveModuleState, NumModules> moduleStates{wpi::empty_array};
 
   for (size_t i = 0; i < NumModules; i++) {
     units::meters_per_second_t x =
@@ -65,14 +63,14 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
                 "Number of modules is not consistent with number of wheel "
                 "locations provided in constructor.");
 
-  std::array<SwerveModuleState, NumModules> moduleStates{wheelStates...};
+  wpi::array<SwerveModuleState, NumModules> moduleStates{wheelStates...};
 
   return this->ToChassisSpeeds(moduleStates);
 }
 
 template <size_t NumModules>
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
-    std::array<SwerveModuleState, NumModules> moduleStates) const {
+    wpi::array<SwerveModuleState, NumModules> moduleStates) const {
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix;
 
   for (size_t i = 0; i < NumModules; i++) {
@@ -93,7 +91,7 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 
 template <size_t NumModules>
 void SwerveDriveKinematics<NumModules>::NormalizeWheelSpeeds(
-    std::array<SwerveModuleState, NumModules>* moduleStates,
+    wpi::array<SwerveModuleState, NumModules>* moduleStates,
     units::meters_per_second_t attainableMaxSpeed) {
   auto& states = *moduleStates;
   auto realMaxSpeed = std::max_element(states.begin(), states.end(),

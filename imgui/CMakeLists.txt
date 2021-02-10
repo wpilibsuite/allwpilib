@@ -40,6 +40,7 @@ file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/stb_image.cpp
 # Add imgui directly to our build.
 set(SAVE_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 set(BUILD_SHARED_LIBS OFF)
+set(GLFW_INSTALL OFF)
 add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/glfw-src
                  ${CMAKE_CURRENT_BINARY_DIR}/glfw-build
                  EXCLUDE_FROM_ALL)
@@ -50,12 +51,13 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/gl3w-src
                  EXCLUDE_FROM_ALL)
 
 set(imgui_srcdir ${CMAKE_CURRENT_BINARY_DIR}/imgui-src)
-file(GLOB imgui_sources ${imgui_srcdir}/*.cpp)
+file(GLOB imgui_sources ${imgui_srcdir}/*.cpp ${imgui_srcdir}/misc/cpp/*.cpp)
 set(implot_srcdir ${CMAKE_CURRENT_BINARY_DIR}/implot-src)
 file(GLOB implot_sources ${implot_srcdir}/*.cpp)
 add_library(imgui STATIC ${imgui_sources} ${implot_sources} ${imgui_srcdir}/examples/imgui_impl_glfw.cpp ${imgui_srcdir}/examples/imgui_impl_opengl3.cpp ${CMAKE_CURRENT_BINARY_DIR}/imgui_ProggyDotted.cpp ${CMAKE_CURRENT_BINARY_DIR}/stb_image.cpp)
+target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W)
 if (MSVC)
-    target_sources(imgui PRIVATE ${imgui_srcdir}/examples/imgui_impl_directx11.cpp)
+    target_sources(imgui PRIVATE ${imgui_srcdir}/examples/imgui_impl_dx11.cpp)
 else()
     if (APPLE)
         target_compile_options(imgui PRIVATE -fobjc-arc)
@@ -66,7 +68,7 @@ else()
     endif()
 endif()
 target_link_libraries(imgui PUBLIC gl3w glfw)
-target_include_directories(imgui PUBLIC "$<BUILD_INTERFACE:${imgui_srcdir}>" "$<BUILD_INTERFACE:${implot_srcdir}>" "$<BUILD_INTERFACE:${imgui_srcdir}/examples>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/stb-src>")
+target_include_directories(imgui PUBLIC "$<BUILD_INTERFACE:${imgui_srcdir}>" "$<BUILD_INTERFACE:${imgui_srcdir}/misc/cpp>" "$<BUILD_INTERFACE:${implot_srcdir}>" "$<BUILD_INTERFACE:${imgui_srcdir}/examples>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/stb-src>")
 
 set_property(TARGET imgui PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(imgui PUBLIC cxx_std_17)

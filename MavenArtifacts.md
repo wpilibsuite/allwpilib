@@ -9,7 +9,7 @@ We provide two repositories. These repositories are:
 * (Development) https://frcmaven.wpi.edu/artifactory/development/
 
 The release repository is where official WPILib releases are pushed.
-The development repository is where development releases of every commit to [master](https://github.com/wpilibsuite/allwpilib/tree/master) is pushed.
+The development repository is where development releases of every commit to [main](https://github.com/wpilibsuite/allwpilib/tree/main) is pushed.
 
 ## Artifact classifiers
 We provide two base types of artifacts.

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -16,11 +13,9 @@
 #include <hal/DriverStationTypes.h>
 #include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/RobotState.h"
 
 namespace frc {
 
@@ -182,6 +177,17 @@ class DriverStation : public ErrorBase {
    * @return What type of axis the axis is reporting to be
    */
   int GetJoystickAxisType(int stick, int axis) const;
+
+  /**
+   * Returns if a joystick is connected to the Driver Station.
+   *
+   * This makes a best effort guess by looking at the reported number of axis,
+   * buttons, and POVs attached.
+   *
+   * @param stick The joystick port number
+   * @return true if a joystick is connected
+   */
+  bool IsJoystickConnected(int stick) const;
 
   /**
    * Check if the DS has enabled the robot.
@@ -422,6 +428,23 @@ class DriverStation : public ErrorBase {
    */
   void WakeupWaitForData();
 
+  /**
+   * Allows the user to specify whether they want joystick connection warnings
+   * to be printed to the console. This setting is ignored when the FMS is
+   * connected -- warnings will always be on in that scenario.
+   *
+   * @param silence Whether warning messages should be silenced.
+   */
+  void SilenceJoystickConnectionWarning(bool silence);
+
+  /**
+   * Returns whether joystick connection warnings are silenced. This will
+   * always return false when connected to the FMS.
+   *
+   * @return Whether joystick connection warnings are silenced.
+   */
+  bool IsJoystickConnectionWarningSilenced() const;
+
  protected:
   /**
    * Copy data from the DS task for the user.
@@ -472,6 +495,8 @@ class DriverStation : public ErrorBase {
   mutable wpi::mutex m_waitForDataMutex;
   wpi::condition_variable m_waitForDataCond;
   int m_waitForDataCounter;
+
+  bool m_silenceJoystickWarning = false;
 
   // Robot state status variables
   bool m_userInDisabled = false;

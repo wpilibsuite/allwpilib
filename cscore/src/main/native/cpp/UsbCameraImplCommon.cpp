@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "cscore_c.h"  // NOLINT(build/include_order)
 
@@ -19,8 +16,9 @@ static void ConvertToC(CS_UsbCameraInfo* out, const UsbCameraInfo& in) {
   out->otherPaths = static_cast<char**>(
       wpi::safe_malloc(in.otherPaths.size() * sizeof(char*)));
   out->otherPathsCount = in.otherPaths.size();
-  for (size_t i = 0; i < in.otherPaths.size(); ++i)
+  for (size_t i = 0; i < in.otherPaths.size(); ++i) {
     out->otherPaths[i] = cs::ConvertToC(in.otherPaths[i]);
+  }
   out->vendorId = in.vendorId;
   out->productId = in.productId;
 }
@@ -28,8 +26,9 @@ static void ConvertToC(CS_UsbCameraInfo* out, const UsbCameraInfo& in) {
 static void FreeUsbCameraInfo(CS_UsbCameraInfo* info) {
   std::free(info->path);
   std::free(info->name);
-  for (int i = 0; i < info->otherPathsCount; ++i)
+  for (int i = 0; i < info->otherPathsCount; ++i) {
     std::free(info->otherPaths[i]);
+  }
   std::free(info->otherPaths);
 }
 
@@ -55,7 +54,9 @@ char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status) {
 
 CS_UsbCameraInfo* CS_GetUsbCameraInfo(CS_Source source, CS_Status* status) {
   auto info = cs::GetUsbCameraInfo(source, status);
-  if (*status != CS_OK) return nullptr;
+  if (*status != CS_OK) {
+    return nullptr;
+  }
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
       wpi::safe_malloc(sizeof(CS_UsbCameraInfo)));
   ConvertToC(out, info);
@@ -67,18 +68,26 @@ CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status) {
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
       wpi::safe_malloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
   *count = cameras.size();
-  for (size_t i = 0; i < cameras.size(); ++i) ConvertToC(&out[i], cameras[i]);
+  for (size_t i = 0; i < cameras.size(); ++i) {
+    ConvertToC(&out[i], cameras[i]);
+  }
   return out;
 }
 
 void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count) {
-  if (!cameras) return;
-  for (int i = 0; i < count; ++i) FreeUsbCameraInfo(&cameras[i]);
+  if (!cameras) {
+    return;
+  }
+  for (int i = 0; i < count; ++i) {
+    FreeUsbCameraInfo(&cameras[i]);
+  }
   std::free(cameras);
 }
 
 void CS_FreeUsbCameraInfo(CS_UsbCameraInfo* info) {
-  if (!info) return;
+  if (!info) {
+    return;
+  }
   FreeUsbCameraInfo(info);
   std::free(info);
 }

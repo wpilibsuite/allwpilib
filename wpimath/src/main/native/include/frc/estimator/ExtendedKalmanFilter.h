@@ -1,22 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <array>
 #include <functional>
+
+#include <wpi/array.h>
 
 #include "Eigen/Core"
 #include "Eigen/src/Cholesky/LDLT.h"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
-#include "frc/system/RungeKutta.h"
 #include "units/time.h"
 
 namespace frc {
@@ -25,7 +23,7 @@ template <int States, int Inputs, int Outputs>
 class ExtendedKalmanFilter {
  public:
   /**
-   * Constructs an extended Kalman filter.
+   * Constructs an Extended Kalman filter.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
@@ -43,12 +41,13 @@ class ExtendedKalmanFilter {
                            const Eigen::Matrix<double, States, 1>&,
                            const Eigen::Matrix<double, Inputs, 1>&)>
                            h,
-                       const std::array<double, States>& stateStdDevs,
-                       const std::array<double, Outputs>& measurementStdDevs,
+                       const wpi::array<double, States>& stateStdDevs,
+                       const wpi::array<double, Outputs>& measurementStdDevs,
                        units::second_t dt)
       : m_f(f), m_h(h) {
     m_contQ = MakeCovMatrix(stateStdDevs);
     m_contR = MakeCovMatrix(measurementStdDevs);
+    m_dt = dt;
 
     Reset();
 
@@ -63,14 +62,15 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, States, States> discQ;
     DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
 
-    m_discR = DiscretizeR<Outputs>(m_contR, dt);
+    Eigen::Matrix<double, Outputs, Outputs> discR =
+        DiscretizeR<Outputs>(m_contR, dt);
 
     // IsStabilizable(A^T, C^T) will tell us if the system is observable.
     bool isObservable =
         IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
     if (isObservable && Outputs <= States) {
       m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
-          discA.transpose(), C.transpose(), discQ, m_discR);
+          discA.transpose(), C.transpose(), discQ, discR);
     } else {
       m_initP = Eigen::Matrix<double, States, States>::Zero();
     }
@@ -139,6 +139,8 @@ class ExtendedKalmanFilter {
    * @param dt Timestep for prediction.
    */
   void Predict(const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
+    m_dt = dt;
+
     // Find continuous A
     Eigen::Matrix<double, States, States> contA =
         NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
@@ -148,9 +150,8 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, States, States> discQ;
     DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
 
-    m_xHat = RungeKutta(m_f, m_xHat, u, dt);
+    m_xHat = RK4(m_f, m_xHat, u, dt);
     m_P = discA * m_P * discA.transpose() + discQ;
-    m_discR = DiscretizeR<Outputs>(m_contR, dt);
   }
 
   /**
@@ -161,7 +162,7 @@ class ExtendedKalmanFilter {
    */
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
                const Eigen::Matrix<double, Outputs, 1>& y) {
-    Correct<Outputs>(u, y, m_h, m_discR);
+    Correct<Outputs>(u, y, m_h, m_contR);
   }
 
   /**
@@ -187,8 +188,9 @@ class ExtendedKalmanFilter {
                const Eigen::Matrix<double, Rows, Rows>& R) {
     const Eigen::Matrix<double, Rows, States> C =
         NumericalJacobianX<Rows, States, Inputs>(h, m_xHat, u);
+    const Eigen::Matrix<double, Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
 
-    Eigen::Matrix<double, Rows, Rows> S = C * m_P * C.transpose() + R;
+    Eigen::Matrix<double, Rows, Rows> S = C * m_P * C.transpose() + discR;
 
     // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
     // efficiently.
@@ -222,7 +224,7 @@ class ExtendedKalmanFilter {
   Eigen::Matrix<double, States, States> m_P;
   Eigen::Matrix<double, States, States> m_contQ;
   Eigen::Matrix<double, Outputs, Outputs> m_contR;
-  Eigen::Matrix<double, Outputs, Outputs> m_discR;
+  units::second_t m_dt;
 
   Eigen::Matrix<double, States, States> m_initP;
 };

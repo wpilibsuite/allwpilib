@@ -1,27 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PIDCommand;
-
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-/**
- * A command that will turn the robot to the specified angle.
- */
+/** A command that will turn the robot to the specified angle. */
 public class TurnToAngle extends PIDCommand {
   /**
    * Turns to robot to the specified angle.
    *
    * @param targetAngleDegrees The angle to turn to
-   * @param drive              The drive subsystem to use
+   * @param drive The drive subsystem to use
    */
   public TurnToAngle(double targetAngleDegrees, DriveSubsystem drive) {
     super(

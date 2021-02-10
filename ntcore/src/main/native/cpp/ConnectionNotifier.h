@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_CONNECTIONNOTIFIER_H_
 #define NTCORE_CONNECTIONNOTIFIER_H_
 
-#include "CallbackManager.h"
+#include <wpi/CallbackManager.h>
+
 #include "Handle.h"
 #include "IConnectionNotifier.h"
 #include "ntcore_cpp.h"
@@ -18,7 +16,8 @@ namespace nt {
 namespace impl {
 
 class ConnectionNotifierThread
-    : public CallbackThread<ConnectionNotifierThread, ConnectionNotification> {
+    : public wpi::CallbackThread<ConnectionNotifierThread,
+                                 ConnectionNotification> {
  public:
   explicit ConnectionNotifierThread(int inst) : m_inst(inst) {}
 
@@ -45,11 +44,11 @@ class ConnectionNotifierThread
 
 class ConnectionNotifier
     : public IConnectionNotifier,
-      public CallbackManager<ConnectionNotifier,
-                             impl::ConnectionNotifierThread> {
+      public wpi::CallbackManager<ConnectionNotifier,
+                                  impl::ConnectionNotifierThread> {
   friend class ConnectionNotifierTest;
-  friend class CallbackManager<ConnectionNotifier,
-                               impl::ConnectionNotifierThread>;
+  friend class wpi::CallbackManager<ConnectionNotifier,
+                                    impl::ConnectionNotifierThread>;
 
  public:
   explicit ConnectionNotifier(int inst);

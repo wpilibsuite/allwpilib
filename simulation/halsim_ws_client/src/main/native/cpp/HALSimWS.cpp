@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "HALSimWS.h"
 
@@ -42,14 +39,14 @@ bool HALSimWS::Initialize() {
   }
 
   const char* host = std::getenv("HALSIMWS_HOST");
-  if (host != NULL) {
+  if (host != nullptr) {
     m_host = host;
   } else {
     m_host = "localhost";
   }
 
   const char* port = std::getenv("HALSIMWS_PORT");
-  if (port != NULL) {
+  if (port != nullptr) {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
@@ -57,11 +54,11 @@ bool HALSimWS::Initialize() {
       return false;
     }
   } else {
-    m_port = 8080;
+    m_port = 3300;
   }
 
   const char* uri = std::getenv("HALSIMWS_URI");
-  if (uri != NULL) {
+  if (uri != nullptr) {
     m_uri = uri;
   } else {
     m_uri = "/wpilibws";

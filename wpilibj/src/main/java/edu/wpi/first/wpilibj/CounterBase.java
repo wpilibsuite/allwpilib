@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -16,24 +13,15 @@ package edu.wpi.first.wpilibj;
  * before use.
  */
 public interface CounterBase {
-  /**
-   * The number of edges for the counterbase to increment or decrement on.
-   */
+  /** The number of edges for the counterbase to increment or decrement on. */
   enum EncodingType {
-    /**
-     * Count only the rising edge.
-     */
+    /** Count only the rising edge. */
     k1X(0),
-    /**
-     * Count both the rising and falling edge.
-     */
+    /** Count both the rising and falling edge. */
     k2X(1),
-    /**
-     * Count rising and falling on both channels.
-     */
+    /** Count rising and falling on both channels. */
     k4X(2);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     EncodingType(int value) {
@@ -48,9 +36,7 @@ public interface CounterBase {
    */
   int get();
 
-  /**
-   * Reset the count to zero.
-   */
+  /** Reset the count to zero. */
   void reset();
 
   /**

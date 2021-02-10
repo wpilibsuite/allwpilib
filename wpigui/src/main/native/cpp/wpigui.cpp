@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpigui.h"
 
@@ -36,6 +33,7 @@ static void WindowSizeCallback(GLFWwindow* window, int width, int height) {
     gContext->width = width;
     gContext->height = height;
   }
+  PlatformRenderFrame();
 }
 
 static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -55,7 +53,9 @@ static void WindowPosCallback(GLFWwindow* window, int xpos, int ypos) {
 
 static void* IniReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                          const char* name) {
-  if (std::strcmp(name, "GLOBAL") != 0) return nullptr;
+  if (std::strcmp(name, "GLOBAL") != 0) {
+    return nullptr;
+  }
   return static_cast<SavedSettings*>(gContext);
 }
 
@@ -63,7 +63,9 @@ static void IniReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                         void* entry, const char* lineStr) {
   auto impl = static_cast<SavedSettings*>(entry);
   const char* value = std::strchr(lineStr, '=');
-  if (!value) return;
+  if (!value) {
+    return;
+  }
   ++value;
   int num = std::atoi(value);
   if (std::strncmp(lineStr, "width=", 6) == 0) {
@@ -87,7 +89,9 @@ static void IniReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
 
 static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                         ImGuiTextBuffer* out_buf) {
-  if (!gContext) return;
+  if (!gContext) {
+    return;
+  }
   out_buf->appendf(
       "[MainWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
       "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\n\n",
@@ -120,7 +124,9 @@ bool gui::Initialize(const char* title, int width, int height) {
   glfwSetErrorCallback(ErrorCallback);
   glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
   PlatformGlfwInitHints();
-  if (!glfwInit()) return false;
+  if (!glfwInit()) {
+    return false;
+  }
 
   PlatformGlfwWindowHints();
 
@@ -139,8 +145,12 @@ bool gui::Initialize(const char* title, int width, int height) {
   iniHandler.WriteAllFn = IniWriteAll;
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
+  io.IniFilename = gContext->iniPath.c_str();
+
   for (auto&& initialize : gContext->initializers) {
-    if (initialize) initialize();
+    if (initialize) {
+      initialize();
+    }
   }
 
   // Load INI file
@@ -170,25 +180,34 @@ bool gui::Initialize(const char* title, int width, int height) {
       }
     }
   }
-  if (gContext->xPos != -1 && gContext->yPos != -1)
+  if (gContext->xPos != -1 && gContext->yPos != -1) {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+  }
 
   // Create window with graphics context
   gContext->window =
       glfwCreateWindow(gContext->width, gContext->height,
                        gContext->title.c_str(), nullptr, nullptr);
-  if (!gContext->window) return false;
+  if (!gContext->window) {
+    return false;
+  }
 
   if (!gContext->loadedWidthHeight) {
-    if (windowScale == 1.0)
+#ifndef __APPLE__
+    if (windowScale == 1.0) {
       glfwGetWindowContentScale(gContext->window, &windowScale, nullptr);
+    }
+#endif
     // force user scale if window scale is smaller
-    if (windowScale <= 0.5)
+    if (windowScale <= 0.5) {
       gContext->userScale = 0;
-    else if (windowScale <= 0.75)
+    } else if (windowScale <= 0.75) {
       gContext->userScale = 1;
+    }
     if (windowScale != 1.0) {
-      for (auto&& func : gContext->windowScalers) func(windowScale);
+      for (auto&& func : gContext->windowScalers) {
+        func(windowScale);
+      }
     }
   }
 
@@ -204,6 +223,16 @@ bool gui::Initialize(const char* title, int width, int height) {
   glfwSetFramebufferSizeCallback(gContext->window, FramebufferSizeCallback);
   glfwSetWindowMaximizeCallback(gContext->window, WindowMaximizeCallback);
   glfwSetWindowPosCallback(gContext->window, WindowPosCallback);
+
+  // Set icons
+  if (!gContext->icons.empty()) {
+    glfwSetWindowIcon(gContext->window, gContext->icons.size(),
+                      gContext->icons.data());
+    for (auto&& icon : gContext->icons) {
+      stbi_image_free(icon.pixels);
+    }
+    gContext->icons.clear();
+  }
 
   // Setup Dear ImGui style
   SetStyle(static_cast<Style>(gContext->style));
@@ -224,7 +253,9 @@ bool gui::Initialize(const char* title, int width, int height) {
     }
   }
 
-  if (!PlatformInitRenderer()) return false;
+  if (!PlatformInitRenderer()) {
+    return false;
+  }
 
   return true;
 }
@@ -255,7 +286,9 @@ void gui::CommonRenderFrame() {
 
   // Scale based on OS window content scaling
   float windowScale = 1.0;
+#ifndef __APPLE__
   glfwGetWindowContentScale(gContext->window, &windowScale, nullptr);
+#endif
   // map to closest font size: 0 = 0.5x, 1 = 0.75x, 2 = 1.0x, 3 = 1.25x,
   // 4 = 1.5x, 5 = 1.75x, 6 = 2x
   gContext->fontScale = std::clamp(
@@ -265,12 +298,16 @@ void gui::CommonRenderFrame() {
 
   for (size_t i = 0; i < gContext->earlyExecutors.size(); ++i) {
     auto& execute = gContext->earlyExecutors[i];
-    if (execute) execute();
+    if (execute) {
+      execute();
+    }
   }
 
   for (size_t i = 0; i < gContext->lateExecutors.size(); ++i) {
     auto& execute = gContext->lateExecutors[i];
-    if (execute) execute();
+    if (execute) {
+      execute();
+    }
   }
 
   // Rendering
@@ -278,34 +315,59 @@ void gui::CommonRenderFrame() {
 }
 
 void gui::Exit() {
-  if (!gContext) return;
+  if (!gContext) {
+    return;
+  }
   gContext->exit = true;
 }
 
 void gui::AddInit(std::function<void()> initialize) {
-  if (initialize) gContext->initializers.emplace_back(std::move(initialize));
+  if (initialize) {
+    gContext->initializers.emplace_back(std::move(initialize));
+  }
 }
 
 void gui::AddWindowScaler(std::function<void(float scale)> windowScaler) {
-  if (windowScaler)
+  if (windowScaler) {
     gContext->windowScalers.emplace_back(std::move(windowScaler));
+  }
 }
 
 void gui::AddEarlyExecute(std::function<void()> execute) {
-  if (execute) gContext->earlyExecutors.emplace_back(std::move(execute));
+  if (execute) {
+    gContext->earlyExecutors.emplace_back(std::move(execute));
+  }
 }
 
 void gui::AddLateExecute(std::function<void()> execute) {
-  if (execute) gContext->lateExecutors.emplace_back(std::move(execute));
+  if (execute) {
+    gContext->lateExecutors.emplace_back(std::move(execute));
+  }
 }
 
-GLFWwindow* gui::GetSystemWindow() { return gContext->window; }
+GLFWwindow* gui::GetSystemWindow() {
+  return gContext->window;
+}
+
+bool gui::AddIcon(const unsigned char* data, int len) {
+  // Load from memory
+  GLFWimage image;
+  image.pixels =
+      stbi_load_from_memory(data, len, &image.width, &image.height, nullptr, 4);
+  if (!data) {
+    return false;
+  }
+  gContext->icons.emplace_back(std::move(image));
+  return true;
+}
 
 int gui::AddFont(
     const char* name,
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         makeFont) {
-  if (makeFont) gContext->makeFonts.emplace_back(name, std::move(makeFont));
+  if (makeFont) {
+    gContext->makeFonts.emplace_back(name, std::move(makeFont));
+  }
   return gContext->makeFonts.size() - 1;
 }
 
@@ -328,21 +390,49 @@ void gui::SetStyle(Style style) {
   }
 }
 
-void gui::SetClearColor(ImVec4 color) { gContext->clearColor = color; }
+void gui::SetClearColor(ImVec4 color) {
+  gContext->clearColor = color;
+}
+
+void gui::ConfigurePlatformSaveFile(const std::string& name) {
+  gContext->iniPath = name;
+#if defined(_MSC_VER)
+  const char* env = std::getenv("APPDATA");
+  if (env) {
+    gContext->iniPath = env + std::string("/" + name);
+  }
+#elif defined(__APPLE__)
+  const char* env = std::getenv("HOME");
+  if (env) {
+    gContext->iniPath = env + std::string("/Library/Preferences/" + name);
+  }
+#else
+  const char* xdg = std::getenv("XDG_CONFIG_HOME");
+  const char* env = std::getenv("HOME");
+  if (xdg) {
+    gContext->iniPath = xdg + std::string("/" + name);
+  } else if (env) {
+    gContext->iniPath = env + std::string("/.config/" + name);
+  }
+#endif
+}
 
 void gui::EmitViewMenu() {
   if (ImGui::BeginMenu("View")) {
     if (ImGui::BeginMenu("Style")) {
       bool selected;
       selected = gContext->style == kStyleClassic;
-      if (ImGui::MenuItem("Classic", nullptr, &selected, true))
+      if (ImGui::MenuItem("Classic", nullptr, &selected, true)) {
         SetStyle(kStyleClassic);
+      }
       selected = gContext->style == kStyleDark;
-      if (ImGui::MenuItem("Dark", nullptr, &selected, true))
+      if (ImGui::MenuItem("Dark", nullptr, &selected, true)) {
         SetStyle(kStyleDark);
+      }
       selected = gContext->style == kStyleLight;
-      if (ImGui::MenuItem("Light", nullptr, &selected, true))
+      if (ImGui::MenuItem("Light", nullptr, &selected, true)) {
         SetStyle(kStyleLight);
+      }
       ImGui::EndMenu();
     }
 
@@ -354,8 +444,9 @@ void gui::EmitViewMenu() {
         bool enabled = (gContext->fontScale - gContext->userScale + i) >= 0 &&
                        (gContext->fontScale - gContext->userScale + i) <
                            Font::kScaledLevels;
-        if (ImGui::MenuItem(label, nullptr, &selected, enabled))
+        if (ImGui::MenuItem(label, nullptr, &selected, enabled)) {
           gContext->userScale = i;
+        }
       }
       ImGui::EndMenu();
     }
@@ -370,12 +461,15 @@ bool gui::UpdateTextureFromImage(ImTextureID* texture, int width, int height,
   int height2 = 0;
   unsigned char* imgData =
       stbi_load_from_memory(data, len, &width2, &height2, nullptr, 4);
-  if (!data) return false;
+  if (!data) {
+    return false;
+  }
 
-  if (width2 == width && height2 == height)
+  if (width2 == width && height2 == height) {
     UpdateTexture(texture, kPixelRGBA, width2, height2, imgData);
-  else
+  } else {
     *texture = CreateTexture(kPixelRGBA, width2, height2, imgData);
+  }
 
   stbi_image_free(imgData);
 
@@ -388,11 +482,17 @@ bool gui::CreateTextureFromFile(const char* filename, ImTextureID* out_texture,
   int width = 0;
   int height = 0;
   unsigned char* data = stbi_load(filename, &width, &height, nullptr, 4);
-  if (!data) return false;
+  if (!data) {
+    return false;
+  }
 
   *out_texture = CreateTexture(kPixelRGBA, width, height, data);
-  if (out_width) *out_width = width;
-  if (out_height) *out_height = height;
+  if (out_width) {
+    *out_width = width;
+  }
+  if (out_height) {
+    *out_height = height;
+  }
 
   stbi_image_free(data);
 
@@ -407,11 +507,17 @@ bool gui::CreateTextureFromImage(const unsigned char* data, int len,
   int height = 0;
   unsigned char* imgData =
       stbi_load_from_memory(data, len, &width, &height, nullptr, 4);
-  if (!imgData) return false;
+  if (!imgData) {
+    return false;
+  }
 
   *out_texture = CreateTexture(kPixelRGBA, width, height, imgData);
-  if (out_width) *out_width = width;
-  if (out_height) *out_height = height;
+  if (out_width) {
+    *out_width = width;
+  }
+  if (out_height) {
+    *out_height = height;
+  }
 
   stbi_image_free(imgData);
 
@@ -421,7 +527,9 @@ bool gui::CreateTextureFromImage(const unsigned char* data, int len,
 void gui::MaxFit(ImVec2* min, ImVec2* max, float width, float height) {
   float destWidth = max->x - min->x;
   float destHeight = max->y - min->y;
-  if (width == 0 || height == 0) return;
+  if (width == 0 || height == 0) {
+    return;
+  }
   if (destWidth * height > destHeight * width) {
     float outputWidth = width * destHeight / height;
     min->x += (destWidth - outputWidth) / 2;

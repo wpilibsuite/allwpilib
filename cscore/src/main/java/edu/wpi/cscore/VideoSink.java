@@ -1,22 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.cscore;
 
 /**
- * A source for video that provides a sequence of frames.  Each frame may
- * consist of multiple images (e.g. from a stereo or depth camera); these
- * are called channels.
+ * A source for video that provides a sequence of frames. Each frame may consist of multiple images
+ * (e.g. from a stereo or depth camera); these are called channels.
  */
 public class VideoSink implements AutoCloseable {
   public enum Kind {
-    kUnknown(0), kMjpeg(2), kCv(4), kRaw(8);
+    kUnknown(0),
+    kMjpeg(2),
+    kCv(4),
+    kRaw(8);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     Kind(int value) {
@@ -36,9 +34,12 @@ public class VideoSink implements AutoCloseable {
    */
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
-      case 2: return Kind.kMjpeg;
-      case 4: return Kind.kCv;
-      default: return Kind.kUnknown;
+      case 2:
+        return Kind.kMjpeg;
+      case 4:
+        return Kind.kCv;
+      default:
+        return Kind.kUnknown;
     }
   }
 
@@ -82,24 +83,20 @@ public class VideoSink implements AutoCloseable {
     return m_handle;
   }
 
-  /**
-   * Get the kind of the sink.
-   */
+  /** Get the kind of the sink. */
   public Kind getKind() {
     return getKindFromInt(CameraServerJNI.getSinkKind(m_handle));
   }
 
   /**
-   * Get the name of the sink.  The name is an arbitrary identifier
-   * provided when the sink is created, and should be unique.
+   * Get the name of the sink. The name is an arbitrary identifier provided when the sink is
+   * created, and should be unique.
    */
   public String getName() {
     return CameraServerJNI.getSinkName(m_handle);
   }
 
-  /**
-   * Get the sink description.  This is sink-kind specific.
-   */
+  /** Get the sink description. This is sink-kind specific. */
   public String getDescription() {
     return CameraServerJNI.getSinkDescription(m_handle);
   }
@@ -108,16 +105,13 @@ public class VideoSink implements AutoCloseable {
    * Get a property of the sink.
    *
    * @param name Property name
-   * @return Property (kind Property::kNone if no property with
-   *         the given name exists)
+   * @return Property (kind Property::kNone if no property with the given name exists)
    */
   public VideoProperty getProperty(String name) {
     return new VideoProperty(CameraServerJNI.getSinkProperty(m_handle, name));
   }
 
-  /**
-   * Enumerate all properties of this sink.
-   */
+  /** Enumerate all properties of this sink. */
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public VideoProperty[] enumerateProperties() {
     int[] handles = CameraServerJNI.enumerateSinkProperties(m_handle);
@@ -161,9 +155,8 @@ public class VideoSink implements AutoCloseable {
   }
 
   /**
-   * Configure which source should provide frames to this sink.  Each sink
-   * can accept frames from only a single source, but a single source can
-   * provide frames to multiple clients.
+   * Configure which source should provide frames to this sink. Each sink can accept frames from
+   * only a single source, but a single source can provide frames to multiple clients.
    *
    * @param source Source
    */
@@ -190,12 +183,11 @@ public class VideoSink implements AutoCloseable {
    * Get a property of the associated source.
    *
    * @param name Property name
-   * @return Property (kind Property::kNone if no property with
-   *         the given name exists or no source connected)
+   * @return Property (kind Property::kNone if no property with the given name exists or no source
+   *     connected)
    */
   public VideoProperty getSourceProperty(String name) {
-    return new VideoProperty(
-        CameraServerJNI.getSinkSourceProperty(m_handle, name));
+    return new VideoProperty(CameraServerJNI.getSinkSourceProperty(m_handle, name));
   }
 
   /**

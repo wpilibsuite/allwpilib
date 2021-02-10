@@ -1,17 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/PIDSubsystem.h"
+
+#include <utility>
 
 using namespace frc2;
 
 PIDSubsystem::PIDSubsystem(PIDController controller, double initialPosition)
-    : m_controller{controller} {
+    : m_controller{std::move(controller)} {
   SetSetpoint(initialPosition);
+  AddChild("PID Controller", &m_controller);
 }
 
 void PIDSubsystem::Periodic() {
@@ -20,9 +20,13 @@ void PIDSubsystem::Periodic() {
   }
 }
 
-void PIDSubsystem::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
+void PIDSubsystem::SetSetpoint(double setpoint) {
+  m_setpoint = setpoint;
+}
 
-double PIDSubsystem::GetSetpoint() const { return m_setpoint; }
+double PIDSubsystem::GetSetpoint() const {
+  return m_setpoint;
+}
 
 void PIDSubsystem::Enable() {
   m_controller.Reset();
@@ -34,6 +38,10 @@ void PIDSubsystem::Disable() {
   m_enabled = false;
 }
 
-bool PIDSubsystem::IsEnabled() { return m_enabled; }
+bool PIDSubsystem::IsEnabled() {
+  return m_enabled;
+}
 
-PIDController& PIDSubsystem::GetController() { return m_controller; }
+PIDController& PIDSubsystem::GetController() {
+  return m_controller;
+}

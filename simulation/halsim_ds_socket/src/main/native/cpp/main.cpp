@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /*----------------------------------------------------------------------------
 **  This extension reimplements enough of the FRC_Network layer to enable the
@@ -60,7 +57,9 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
         size_t toCopy = (std::min)(2u - store.m_frame.size(), data.size());
         store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
         data = data.drop_front(toCopy);
-        if (store.m_frame.size() < 2u) return;  // need more data
+        if (store.m_frame.size() < 2u) {
+          return;  // need more data
+        }
       }
       store.m_frameSize = (static_cast<uint16_t>(store.m_frame[0]) << 8) |
                           static_cast<uint16_t>(store.m_frame[1]);

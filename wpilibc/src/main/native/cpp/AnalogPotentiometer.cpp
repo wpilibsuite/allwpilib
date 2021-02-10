@@ -1,12 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/AnalogPotentiometer.h"
 
+#include <utility>
+
+#include "frc/Base.h"
 #include "frc/RobotController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -28,7 +28,9 @@ AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
 
 AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
                                          double fullRange, double offset)
-    : m_analog_input(input), m_fullRange(fullRange), m_offset(offset) {
+    : m_analog_input(std::move(input)),
+      m_fullRange(fullRange),
+      m_offset(offset) {
   SendableRegistry::GetInstance().AddLW(this, "AnalogPotentiometer",
                                         m_analog_input->GetChannel());
 }
@@ -40,8 +42,12 @@ double AnalogPotentiometer::Get() const {
          m_offset;
 }
 
-double AnalogPotentiometer::PIDGet() { return Get(); }
+double AnalogPotentiometer::PIDGet() {
+  return Get();
+}
 
 void AnalogPotentiometer::InitSendable(SendableBuilder& builder) {
-  m_analog_input->InitSendable(builder);
+  builder.SetSmartDashboardType("Analog Input");
+  builder.AddDoubleProperty(
+      "Value", [=]() { return Get(); }, nullptr);
 }

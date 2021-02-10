@@ -1,0 +1,516 @@
+asyncapi: 2.0.0
+info:
+  title: WPILib WebSocket Remote Endpoint API
+  version: "1.0.0"
+  description: |
+    API to route WPILib HAL calls over WebSockets.
+  license:
+    name: WPILib BSD
+
+channels:
+  wpilibws:
+    description: General channel for WPILib WebSocket messages
+    publish:
+      operationId: wpilibwsPublish
+      message:
+        $ref: "#/components/messages/wpilibwsMsg"
+    subscribe:
+      operationId: wpilibwsSubscribe
+      message:
+        $ref: "#/components/messages/wpilibwsMsg"
+
+components:
+  messages:
+    wpilibwsMsg:
+      title: WPILib WebSocket Message
+      summary: Message envelope. Note that the "data" field contains a diff of the current state of a particular device. E.g. If only the "value" changes for a DIO device, then only the "<>value" field will be sent.
+      contentType: application/json
+      examples:
+      - payload:
+          type: PWM
+          device: "1"
+          data:
+            "<speed": 0.5
+      - payload:
+          type: DIO
+          device: "3"
+          data:
+            "<init": true
+      payload:
+        type: object
+        oneOf:
+            - $ref: "#/components/schemas/accelData"
+            - $ref: "#/components/schemas/aiData"
+            - $ref: "#/components/schemas/dioData"
+            - $ref: "#/components/schemas/dpwmData"
+            - $ref: "#/components/schemas/driverstationData"
+            - $ref: "#/components/schemas/dutycycleData"
+            - $ref: "#/components/schemas/encoderData"
+            - $ref: "#/components/schemas/gyroData"
+            - $ref: "#/components/schemas/joystickData"
+            - $ref: "#/components/schemas/pwmData"
+            - $ref: "#/components/schemas/relayData"
+            - $ref: "#/components/schemas/solenoidData"
+            - $ref: "#/components/schemas/roborioData"
+
+  schemas:
+    accelData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: Accel
+        device:
+          type: string
+          description: Arbitrary device name
+        data:
+          type: object
+          description: "Accelerometer Data (type: Accelerometer, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If accelerometer is initialized in the robot program"
+            <range:
+              type: number
+              description: "Desired range in G’s"
+            ">x":
+              type: number
+              description: "Acceleration in G’s "
+            ">y":
+              type: number
+              description: "Acceleration in G’s "
+            ">z":
+              type: number
+              description: "Acceleration in G’s "
+
+    aiData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: AI
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "Analog Input Data (type: AI, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If analog input is initialized in the robot program"
+            ">voltage":
+              type: number
+              description: "Input voltage, in volts"
+
+    dioData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: DIO
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "Digital Input/Output Data (type: DIO, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If DIO is initialized in the robot program"
+            <input:
+              type: boolean
+              description: "True if input, false if output"
+            <>value:
+              type: boolean
+              description: "Input or output state"
+
+    dpwmData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: dPWM
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "Duty Cycle Output Data (type: dPWM, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If output is initialized in the robot program"
+            <duty_cycle:
+              type: number
+              description: "Duty cycle %"
+              minimum: 0.0
+              maximum: 1.0
+            <dio_pin:
+              type: integer
+              description: "DIO pin number"
+
+    driverstationData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: DriverStation
+        device:
+          type: string
+          description: Should be left blank
+        data:
+          type: object
+          description: "Driver Station Data (type: DriverStation)"
+          properties:
+            ">new_data":
+              type: boolean
+              description: "One shot.  If set to true in a message, notifies the robot program that new DS and Joystick data is available."
+            ">enabled":
+              type: boolean
+              description: "True to enable the robot program"
+            ">autonomous":
+              type: boolean
+              description: "True for autonomous mode; false for teleoperated mode"
+            ">test":
+              type: boolean
+              description: "True for test mode; false for other modes"
+            ">estop":
+              type: boolean
+              description: "True to emergency stop (no motor outputs)"
+            ">fms":
+              type: boolean
+              description: "True if the DS is connected to a Field Management System (FMS)"
+            ">ds":
+              type: boolean
+              description: "True if a DS application is connected"
+            ">station":
+              type: string
+              description: "Station color and number; supported values are 'red1', 'red2', 'red3', 'blue1', 'blue2', 'blue3'."
+            ">match_time":
+              type: number
+              description: "Match time countdown, in seconds, for each match period (e.g. for 15 second period, starts at 15 and counts down to 0).  If not in a match, -1."
+            ">game_data":
+              type: string
+              description: "Game-specific data; arbitrary string contents"
+
+    dutycycleData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: DutyCycle
+        device:
+          type: string
+          description: Arbitrary device name
+        data:
+          type: object
+          description: "Duty Cycle Input Data (type: DutyCycle, device: channel number)"
+          properties:
+            ">connected":
+              type: boolean
+              description: "True if the encoder is connected"
+            ">position":
+              type: number
+              description: "The position in rotations"
+
+    encoderData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: Encoder
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "Quadrature Encoder Data (type: Encoder, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If encoder is initialized in the robot program"
+            <channel_a:
+              type: integer
+              description: "Digital channel number for 'A' phase"
+            <channel_b:
+              type: integer
+              description: "Digital channel number for 'B' phase"
+            <samples_to_avg:
+              type: integer
+              description: "Number of samples to average for period measurement"
+            ">count":
+              type: integer
+              description: "Accumulated count (pulses)"
+            ">period":
+              type: number
+              description: "Period between pulses in seconds"
+
+    gyroData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: Gyro
+        device:
+          type: string
+          description: Arbitrary device name
+        data:
+          type: object
+          description: "Gyro Data (type: Gyro, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If gyro is initialized in the robot program"
+            <range:
+              type: number
+              description: "Gyro range in degrees/second (optional)"
+            ">connected":
+              type: boolean
+              description: "True if the gyro is connected"
+            ">angle_x":
+              type: number
+              description: "The gyro angle in degrees"
+            ">angle_y":
+              type: number
+              description: "The gyro angle in degrees"
+            ">angle_z":
+              type: number
+              description: "The gyro angle in degrees"
+            ">rate_x":
+              type: number
+              description: "The current gyro angular rate of change in degrees/second"
+            ">rate_y":
+              type: number
+              description: "The current gyro angular rate of change in degrees/second"
+            ">rate_z":
+              type: number
+              description: "The current gyro angular rate of change in degrees/second"
+
+    joystickData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: Joystick
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "Joystick Data (type: Joystick, device: channel number)"
+          properties:
+            ">axes":
+              type: array
+              items:
+                type: number
+                description: "Value of an individual axis on this joystick"
+                minimum: -1.0
+                maximum: 1.0
+            ">povs":
+              type: array
+              description: "One array element per POV; value is a"
+              items:
+                type: integer
+                description: "State of all POV switches on this joystick; an angle in degrees of the POV (e.g. 0, 90, 315) if pressed, or -1 if the POV is not pressed"
+            ">buttons":
+              type: array
+              description: State of all buttons on this joystick
+              items:
+                type: boolean
+                description: Pressed state of an individual button
+            <rumble_left:
+              type: number
+              description: "Left rumble"
+              minimum: 0.0
+              maximum: 1.0
+            <rumble_right:
+              type: number
+              description: "Right rumble"
+              minimum: 0.0
+              maximum: 1.0
+
+    pwmData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: PWM
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "PWM Output Data (type: PWM, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If PWM is initialized in the robot program"
+            <speed:
+              type: number
+              description: "Speed"
+              minimum: -1.0
+              maximum: 1.0
+            <position:
+              type: number
+              description: "Servo position"
+              minimum: 0.0
+              maximum: 1.0
+
+    relayData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: Relay
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "Relay Output Data (type: Relay, device: channel number)"
+          properties:
+            <init_fwd:
+              type: boolean
+              description: "If relay forward direction is initialized in the robot program"
+            <init_rev:
+              type: boolean
+              description: "If relay reverse direction is initialized in the robot program"
+            <fwd:
+              type: boolean
+              description: "True if forward direction is enabled"
+            <rev:
+              type: boolean
+              description: "True if reverse direction is enabled"
+
+    solenoidData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: Solenoid
+        device:
+          type: string
+          description: Device Identifier (usually channel)
+        data:
+          type: object
+          description: "Solenoid Data (type: Solenoid, device: channel number)"
+          properties:
+            <init:
+              type: boolean
+              description: "If Solenoid is initialized in the robot program"
+            <output:
+              type: boolean
+              description: "The state of the solenoid"
+
+    roborioData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
+          const: RoboRIO
+        device:
+          type: string
+          description: Should be left blank
+        data:
+          type: object
+          description: "RoboRIO Data (type: RoboRIO)"
+          properties:
+            ">fpga_button":
+              type: boolean
+              description: "FPGA button state"
+            ">vin_voltage":
+              type: number
+              description: "Vin rail voltage"
+            ">vin_current":
+              type: number
+              description: "Vin rail current"
+            ">6v_voltage":
+              type: number
+              description: "6V rail voltage"
+            ">6v_current":
+              type: number
+              description: "6V rail current"
+            ">6v_active":
+              type: boolean
+              description: "True if 6V rail active, false if inactive"
+            ">6v_faults":
+              type: integer
+              description: "Number of faults on 6V rail"
+            ">5v_voltage":
+              type: number
+              description: "5V rail voltage"
+            ">5v_current":
+              type: number
+              description: "5V rail current"
+            ">5v_active":
+              type: boolean
+              description: "True if 5V rail active, false if inactive"
+            ">5v_faults":
+              type: integer
+              description: "Number of faults on 5V rail"
+            ">3v3_voltage":
+              type: number
+              description: "3.3V rail voltage"
+            ">3v3_current":
+              type: number
+              description: "3.3V rail current"
+            ">3v3_active":
+              type: boolean
+              description: "True if 3.3V rail active, false if inactive"
+            ">3v3_faults":
+              type: integer
+              description: "Number of faults on 3.3V rail"

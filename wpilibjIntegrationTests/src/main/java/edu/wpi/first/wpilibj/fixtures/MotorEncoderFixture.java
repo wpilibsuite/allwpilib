@@ -1,14 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.fixtures;
-
-import java.lang.reflect.ParameterizedType;
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -17,13 +11,16 @@ import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.test.TestBench;
+import java.lang.reflect.ParameterizedType;
+import java.util.logging.Logger;
 
 /**
  * Represents a physically connected Motor and Encoder to allow for unit tests on these different
- * pairs<br> Designed to allow the user to easily setup and tear down the fixture to allow for
- * reuse. This class should be explicitly instantiated in the TestBed class to allow any test to
- * access this fixture. This allows tests to be mailable so that you can easily reconfigure the
- * physical testbed without breaking the tests.
+ * pairs<br>
+ * Designed to allow the user to easily setup and tear down the fixture to allow for reuse. This
+ * class should be explicitly instantiated in the TestBed class to allow any test to access this
+ * fixture. This allows tests to be mailable so that you can easily reconfigure the physical testbed
+ * without breaking the tests.
  */
 public abstract class MotorEncoderFixture<T extends SpeedController> implements ITestFixture {
   private static final Logger logger = Logger.getLogger(MotorEncoderFixture.class.getName());
@@ -35,11 +32,8 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
   protected DigitalInput m_alphaSource; // Stored so it can be freed at tear down
   protected DigitalInput m_betaSource;
 
-  /**
-   * Default constructor for a MotorEncoderFixture.
-   */
-  public MotorEncoderFixture() {
-  }
+  /** Default constructor for a MotorEncoderFixture. */
+  public MotorEncoderFixture() {}
 
   public abstract int getPDPChannel();
 
@@ -77,7 +71,6 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
 
         m_alphaSource = giveDigitalInputA();
         m_betaSource = giveDigitalInputB();
-
 
         m_encoder = new Encoder(m_alphaSource, m_betaSource);
         m_counters[0] = new Counter(m_alphaSource);
@@ -133,7 +126,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    * Checks to see if the speed of the motor is within some range of a given value. This is used
    * instead of equals() because doubles can have inaccuracies.
    *
-   * @param value    The value to compare against
+   * @param value The value to compare against
    * @param accuracy The accuracy range to check against to see if the
    * @return true if the range of values between motors speed accuracy contains the 'value'.
    */
@@ -162,7 +155,6 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
 
     return wasReset;
   }
-
 
   /**
    * Safely tears down the MotorEncoder Fixture in a way that makes sure that even if an object
@@ -235,11 +227,10 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
     // Get the generic type as a class
     @SuppressWarnings("unchecked")
     Class<T> class1 =
-        (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
-            .getActualTypeArguments()[0];
+        (Class<T>)
+            ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     string.append(class1.getSimpleName());
     string.append(">");
     return string.toString();
   }
-
 }

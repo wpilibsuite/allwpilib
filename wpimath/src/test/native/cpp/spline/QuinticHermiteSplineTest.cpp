@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
 #include <iostream>
@@ -27,8 +24,7 @@ class QuinticHermiteSplineTest : public ::testing::Test {
     const auto start = std::chrono::high_resolution_clock::now();
 
     // Generate and parameterize the spline.
-    const auto spline = SplineHelper::QuinticSplinesFromControlVectors(
-        SplineHelper::QuinticControlVectorsFromWaypoints({a, b}))[0];
+    const auto spline = SplineHelper::QuinticSplinesFromWaypoints({a, b})[0];
     const auto poses = SplineParameterizer::Parameterize(spline);
 
     // End timer.

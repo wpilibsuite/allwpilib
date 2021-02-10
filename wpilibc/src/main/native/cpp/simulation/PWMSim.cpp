@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/simulation/PWMSim.h"
 
@@ -47,7 +44,9 @@ std::unique_ptr<CallbackStore> PWMSim::RegisterRawValueCallback(
   return store;
 }
 
-int PWMSim::GetRawValue() const { return HALSIM_GetPWMRawValue(m_index); }
+int PWMSim::GetRawValue() const {
+  return HALSIM_GetPWMRawValue(m_index);
+}
 
 void PWMSim::SetRawValue(int rawValue) {
   HALSIM_SetPWMRawValue(m_index, rawValue);
@@ -62,9 +61,13 @@ std::unique_ptr<CallbackStore> PWMSim::RegisterSpeedCallback(
   return store;
 }
 
-double PWMSim::GetSpeed() const { return HALSIM_GetPWMSpeed(m_index); }
+double PWMSim::GetSpeed() const {
+  return HALSIM_GetPWMSpeed(m_index);
+}
 
-void PWMSim::SetSpeed(double speed) { HALSIM_SetPWMSpeed(m_index, speed); }
+void PWMSim::SetSpeed(double speed) {
+  HALSIM_SetPWMSpeed(m_index, speed);
+}
 
 std::unique_ptr<CallbackStore> PWMSim::RegisterPositionCallback(
     NotifyCallback callback, bool initialNotify) {
@@ -75,7 +78,9 @@ std::unique_ptr<CallbackStore> PWMSim::RegisterPositionCallback(
   return store;
 }
 
-double PWMSim::GetPosition() const { return HALSIM_GetPWMPosition(m_index); }
+double PWMSim::GetPosition() const {
+  return HALSIM_GetPWMPosition(m_index);
+}
 
 void PWMSim::SetPosition(double position) {
   HALSIM_SetPWMPosition(m_index, position);
@@ -90,7 +95,9 @@ std::unique_ptr<CallbackStore> PWMSim::RegisterPeriodScaleCallback(
   return store;
 }
 
-int PWMSim::GetPeriodScale() const { return HALSIM_GetPWMPeriodScale(m_index); }
+int PWMSim::GetPeriodScale() const {
+  return HALSIM_GetPWMPeriodScale(m_index);
+}
 
 void PWMSim::SetPeriodScale(int periodScale) {
   HALSIM_SetPWMPeriodScale(m_index, periodScale);
@@ -105,10 +112,14 @@ std::unique_ptr<CallbackStore> PWMSim::RegisterZeroLatchCallback(
   return store;
 }
 
-bool PWMSim::GetZeroLatch() const { return HALSIM_GetPWMZeroLatch(m_index); }
+bool PWMSim::GetZeroLatch() const {
+  return HALSIM_GetPWMZeroLatch(m_index);
+}
 
 void PWMSim::SetZeroLatch(bool zeroLatch) {
   HALSIM_SetPWMZeroLatch(m_index, zeroLatch);
 }
 
-void PWMSim::ResetData() { HALSIM_ResetPWMData(m_index); }
+void PWMSim::ResetData() {
+  HALSIM_ResetPWMData(m_index);
+}

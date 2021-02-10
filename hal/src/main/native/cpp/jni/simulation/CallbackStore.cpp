@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "CallbackStore.h"
 
@@ -25,16 +22,14 @@ static hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
                                     hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 void InitializeStore() {
   static hal::UnlimitedHandleResource<SIM_JniHandle, CallbackStore,
                                       hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 void CallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);
@@ -60,8 +55,9 @@ void CallbackStore::performCallback(const char* name, const HAL_Value* value) {
   }
 
   env->CallVoidMethod(m_call, sim::GetNotifyCallback(), MakeJString(env, name),
-                      (jint)value->type, (jlong)value->data.v_long,
-                      (jdouble)value->data.v_double);
+                      static_cast<jint>(value->type),
+                      static_cast<jlong>(value->data.v_long),
+                      static_cast<jdouble>(value->data.v_double));
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();
@@ -72,7 +68,9 @@ void CallbackStore::performCallback(const char* name, const HAL_Value* value) {
   }
 }
 
-void CallbackStore::free(JNIEnv* env) { m_call.free(env); }
+void CallbackStore::free(JNIEnv* env) {
+  m_call.free(env);
+}
 
 SIM_JniHandle sim::AllocateCallback(JNIEnv* env, jint index, jobject callback,
                                     jboolean initialNotify,
@@ -95,7 +93,9 @@ SIM_JniHandle sim::AllocateCallback(JNIEnv* env, jint index, jobject callback,
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data) return;
+    if (!data) {
+      return;
+    }
 
     data->performCallback(name, value);
   };
@@ -135,7 +135,9 @@ SIM_JniHandle sim::AllocateChannelCallback(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data) return;
+    if (!data) {
+      return;
+    }
 
     data->performCallback(name, value);
   };
@@ -177,7 +179,9 @@ SIM_JniHandle sim::AllocateCallbackNoIndex(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data) return;
+    if (!data) {
+      return;
+    }
 
     data->performCallback(name, value);
   };

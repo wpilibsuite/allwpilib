@@ -1,16 +1,25 @@
 # WPILib Project
 
 ![CI](https://github.com/wpilibsuite/allwpilib/workflows/CI/badge.svg)
+[![C++ Documentation](https://img.shields.io/badge/documentation-c%2B%2B-blue)](https://first.wpi.edu/wpilib/allwpilib/docs/development/cpp/)
+[![Java Documentation](https://img.shields.io/badge/documentation-java-orange)](https://first.wpi.edu/wpilib/allwpilib/docs/development/java/)
 
 Welcome to the WPILib project. This repository contains the HAL, WPILibJ, and WPILibC projects. These are the core libraries for creating robot programs for the roboRIO.
 
-- [WPILib Mission](#wpilib-mission)
+- [WPILib Project](#wpilib-project)
+  - [WPILib Mission](#wpilib-mission)
 - [Building WPILib](#building-wpilib)
-    - [Requirements](#requirements)
-    - [Setup](#setup)
-    - [Building](#building)
-    - [Publishing](#publishing)
-    - [Structure and Organization](#structure-and-organization)
+  - [Requirements](#requirements)
+  - [Setup](#setup)
+  - [Building](#building)
+    - [Faster builds](#faster-builds)
+    - [Using Development Builds](#using-development-builds)
+    - [Custom toolchain location](#custom-toolchain-location)
+    - [Gazebo simulation](#gazebo-simulation)
+    - [Formatting/linting with wpiformat](#formattinglinting-with-wpiformat)
+    - [CMake](#cmake)
+  - [Publishing](#publishing)
+  - [Structure and Organization](#structure-and-organization)
 - [Contributing to WPILib](#contributing-to-wpilib)
 
 ## WPILib Mission
@@ -23,19 +32,26 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 ## Requirements
 
-- A C++ compiler
-    - On Linux, GCC works fine
-    - On Windows, you need Visual Studio 2019 (the free community edition works fine).
-      Make sure to select the C++ Programming Language for installation
-- [ARM Compiler Toolchain](https://github.com/wpilibsuite/roborio-toolchain/releases)
-  * Note that for 2020 and beyond, you should use version 7 or greater of GCC
-- Doxygen (Only required if you want to build the C++ documentation)
+- [JDK 11](https://adoptopenjdk.net/)
+    - Note that the JRE is insufficient; the full JDK is required
+    - On Ubuntu, run `sudo apt install openjdk-11-jdk`
+    - On Windows, install the JDK 11 .msi from the link above
+    - On macOS, install the JDK 11 .pkg from the link above
+- C++ compiler
+    - On Linux, install GCC 7 or greater
+    - On Windows, install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio 2019)
+    - On macOS, install the Xcode command-line build tools via `xcode-select --install`
+- ARM compiler toolchain
+    - Run `./gradlew installRoboRioToolchain` after cloning this repository
+    - If the WPILib installer was used, this toolchain is already installed
+- Raspberry Pi toolchain (optional)
+    - Run `./gradlew installRaspbianToolchain` after cloning this repository
 
 ## Setup
 
-Clone the WPILib repository. If the toolchains are not installed, install them, and make sure they are available on the system PATH.
+Clone the WPILib repository and follow the instructions above for installing any required tooling.
 
-See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/master/README.md) for wpiformat setup instructions.
+See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/main/README.md) for wpiformat setup instructions.
 
 ## Building
 
@@ -51,11 +67,33 @@ To build a specific subproject, such as WPILibC, you must access the subproject 
 ./gradlew :wpilibc:build
 ```
 
+The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change in the HAL and then run `./gradlew :wpilibc:build`, the HAL will be rebuilt, then WPILibC.
+
+There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
+
+### Faster builds
+
+`./gradlew build` builds _everything_, which includes debug and release builds for desktop and all installed cross compilers. Many developers don't need or want to build all of this. Therefore, common tasks have shortcuts to only build necessary components for common development and testing tasks.
+
+`./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibc` and `wpilibj` respectively. They will only build the minimum components required to run the tests.
+
+`testDesktopCpp` and `testDesktopJava` tasks also exist for the projects `wpiutil`, `ntcore`, `cscore`, `hal` `wpilibOldCommands`, `wpilibNewCommands` and `cameraserver`. These can be ran with `./gradlew :projectName:task`.
+
+`./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
+
+### Using Development Builds
+
+Please read the documentation available [here](OtherVersions.md)
+
+### Custom toolchain location
+
 If you have installed the FRC Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
 
 ```bash
 ./gradlew build -PtoolChainPath=some/path/to/frc/toolchain/bin
 ```
+
+### Gazebo simulation
 
 If you also want simulation to be built, add -PmakeSim. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
 
@@ -73,11 +111,18 @@ cmake ..
 make
 ```
 
-The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change in the HAL and then run `./gradlew :wpilibc:build`, the HAL will be rebuilt, then WPILibC.
 
-There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
+### Formatting/linting
+
+#### wpiformat
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
+
+#### Java Code Quality Tools
+
+The Java code quality tools (checkstyle, pmd, etc.) can be run with the `./gradlew javaFormat` task.
+
+### CMake
 
 CMake is also supported for building. See [README-CMAKE.md](README-CMAKE.md).
 

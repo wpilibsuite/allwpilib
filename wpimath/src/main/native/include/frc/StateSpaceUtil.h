@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -220,11 +217,35 @@ Eigen::Matrix<double, N, 1> MakeWhiteNoiseVector(
 
   Eigen::Matrix<double, N, 1> result;
   for (int i = 0; i < N; ++i) {
-    std::normal_distribution<> distr{0.0, stdDevs[i]};
-    result(i) = distr(gen);
+    // Passing a standard deviation of 0.0 to std::normal_distribution is
+    // undefined behavior
+    if (stdDevs[i] == 0.0) {
+      result(i) = 0.0;
+    } else {
+      std::normal_distribution distr{0.0, stdDevs[i]};
+      result(i) = distr(gen);
+    }
   }
   return result;
 }
+
+/**
+ * Converts a Pose2d into a vector of [x, y, theta].
+ *
+ * @param pose The pose that is being represented.
+ *
+ * @return The vector.
+ */
+Eigen::Matrix<double, 3, 1> PoseTo3dVector(const Pose2d& pose);
+
+/**
+ * Converts a Pose2d into a vector of [x, y, std::cos(theta), std::sin(theta)].
+ *
+ * @param pose The pose that is being represented.
+ *
+ * @return The vector.
+ */
+Eigen::Matrix<double, 4, 1> PoseTo4dVector(const Pose2d& pose);
 
 /**
  * Returns true if (A, B) is a stabilizable pair.

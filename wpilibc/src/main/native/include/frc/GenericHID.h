@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -47,7 +44,7 @@ class GenericHID : public ErrorBase {
   enum JoystickHand { kLeftHand = 0, kRightHand = 1 };
 
   explicit GenericHID(int port);
-  virtual ~GenericHID() = default;
+  ~GenericHID() override = default;
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;
@@ -135,6 +132,13 @@ class GenericHID : public ErrorBase {
    * @return the number of buttons on the current HID
    */
   int GetButtonCount() const;
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  bool IsConnected() const;
 
   /**
    * Get the type of the HID.

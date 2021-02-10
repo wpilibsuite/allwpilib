@@ -1,30 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
-/**
- * Structure for holding the values stored in an accumulator.
- */
+/** Structure for holding the values stored in an accumulator. */
 public class AccumulatorResult {
-  /**
-   * The total value accumulated.
-   */
+  /** The total value accumulated. */
   @SuppressWarnings("MemberName")
   public long value;
-  /**
-   * The number of sample value was accumulated over.
-   */
+  /** The number of sample value was accumulated over. */
   @SuppressWarnings("MemberName")
   public long count;
 
-  /**
-   * Set the value and count.
-   */
+  /** Set the value and count. */
   public void set(long value, long count) {
     this.value = value;
     this.count = count;

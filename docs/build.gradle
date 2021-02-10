@@ -39,7 +39,7 @@ cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 doxygen {
     executables {
         doxygen version : '1.8.18',
-            baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+        baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
     }
 }
 
@@ -130,7 +130,9 @@ task generateJavaDocs(type: Javadoc) {
     ext.entryPoint = "$destinationDir/index.html"
 
     if (JavaVersion.current().isJava11Compatible()) {
-        options.addBooleanOption('-no-module-directories', true)
+        if (!JavaVersion.current().isJava12Compatible()) {
+            options.addBooleanOption('-no-module-directories', true)
+        }
         doLast {
             // This is a work-around for https://bugs.openjdk.java.net/browse/JDK-8211194. Can be removed once that issue is fixed on JDK's side
             // Since JDK 11, package-list is missing from javadoc output files and superseded by element-list file, but a lot of external tools still need it
@@ -148,11 +150,10 @@ tasks.register("zipJavaDocs", Zip) {
     into '/'
 }
 
-addTaskToCopyAllOutputs(zipCppDocs)
-addTaskToCopyAllOutputs(zipJavaDocs)
-
-build.dependsOn zipCppDocs
-build.dependsOn zipJavaDocs
+tasks.register("zipDocs") {
+    dependsOn zipCppDocs
+    dependsOn zipJavaDocs
+}
 
 apply plugin: 'maven-publish'
 

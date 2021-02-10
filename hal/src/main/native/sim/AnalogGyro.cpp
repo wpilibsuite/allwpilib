@@ -1,19 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/AnalogGyro.h"
 
-#include <chrono>
-#include <thread>
-
-#include "AnalogInternal.h"
 #include "HALInitializer.h"
+#include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
-#include "hal/AnalogInput.h"
+#include "hal/Errors.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/AnalogGyroDataInternal.h"
 
@@ -29,16 +23,14 @@ using namespace hal;
 static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
                              HAL_HandleEnum::AnalogGyro>* analogGyroHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAnalogGyro() {
   static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
                                HAL_HandleEnum::AnalogGyro>
       agH;
   analogGyroHandles = &agH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
@@ -56,8 +48,9 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
 
   auto handle = analogGyroHandles->Allocate(channel, status);
 
-  if (*status != 0)
+  if (*status != 0) {
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
 
   // Initialize port structure
   auto gyro = analogGyroHandles->Get(handle);
@@ -81,7 +74,9 @@ void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
 void HAL_FreeAnalogGyro(HAL_GyroHandle handle) {
   auto gyro = analogGyroHandles->Get(handle);
   analogGyroHandles->Free(handle);
-  if (gyro == nullptr) return;
+  if (gyro == nullptr) {
+    return;
+  }
   SimAnalogGyroData[gyro->index].initialized = false;
 }
 

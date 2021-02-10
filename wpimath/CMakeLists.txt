@@ -7,15 +7,15 @@ include(AddTest)
 file(GLOB wpimath_jni_src src/main/native/cpp/jni/WPIMathJNI.cpp)
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
   find_package(Java REQUIRED)
   find_package(JNI REQUIRED)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.38.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.38.jar")
       set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
-      set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpimath/thirdparty/ejml")
+      set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml")
 
       message(STATUS "Downloading EJML jarfiles...")
 
@@ -37,15 +37,15 @@ if (NOT WITHOUT_JAVA)
       message(STATUS "All files downloaded.")
   endif()
 
-  file(GLOB EJML_JARS "${CMAKE_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
-  file(GLOB JACKSON_JARS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
+  file(GLOB EJML_JARS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/*.jar")
+  file(GLOB JACKSON_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar")
 
   set(CMAKE_JAVA_INCLUDE_PATH wpimath.jar ${EJML_JARS} ${JACKSON_JARS})
 
-  execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpimath/generate_numbers.py ${CMAKE_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
+  execute_process(COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
   if(NOT (generateResult EQUAL "0"))
     # Try python
-    execute_process(COMMAND python ${CMAKE_SOURCE_DIR}/wpimath/generate_numbers.py ${CMAKE_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
+    execute_process(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_numbers.py ${WPILIB_BINARY_DIR}/wpimath RESULT_VARIABLE generateResult)
     if(NOT (generateResult EQUAL "0"))
       message(FATAL_ERROR "python and python3 generate_numbers.py failed")
     endif()
@@ -53,7 +53,7 @@ if (NOT WITHOUT_JAVA)
 
   set(CMAKE_JNI_TARGET true)
 
-  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${CMAKE_BINARY_DIR}/wpimath/generated/*.java)
+  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${WPILIB_BINARY_DIR}/wpimath/generated/*.java)
 
   if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
     set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
@@ -106,7 +106,7 @@ target_link_libraries(wpimath wpiutil)
 
 if (NOT USE_VCPKG_EIGEN)
     install(DIRECTORY src/main/native/eigeninclude/ DESTINATION "${include_dest}/wpimath")
-    target_include_directories(wpimath PUBLIC
+    target_include_directories(wpimath SYSTEM PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigeninclude>
                             $<INSTALL_INTERFACE:${include_dest}/wpimath>)
 else()
@@ -121,18 +121,18 @@ target_include_directories(wpimath PUBLIC
 install(TARGETS wpimath EXPORT wpimath DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 
-if (NOT WITHOUT_JAVA AND MSVC)
+if (WITH_JAVA AND MSVC)
     install(TARGETS wpimath RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
 endif()
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (wpimath_config_dir ${wpilib_dest})
 else()
     set (wpimath_config_dir share/wpimath)
 endif()
 
-configure_file(wpimath-config.cmake.in ${CMAKE_BINARY_DIR}/wpimath-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/wpimath-config.cmake DESTINATION ${wpimath_config_dir})
+configure_file(wpimath-config.cmake.in ${WPILIB_BINARY_DIR}/wpimath-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION ${wpimath_config_dir})
 install(EXPORT wpimath DESTINATION ${wpimath_config_dir})
 
 if (WITH_TESTS)

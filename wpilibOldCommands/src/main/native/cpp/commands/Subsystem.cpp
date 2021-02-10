@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/commands/Subsystem.h"
 
@@ -58,7 +55,9 @@ void Subsystem::SetCurrentCommand(Command* command) {
   m_currentCommandChanged = true;
 }
 
-Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
+Command* Subsystem::GetCurrentCommand() const {
+  return m_currentCommand;
+}
 
 wpi::StringRef Subsystem::GetCurrentCommandName() const {
   Command* currentCommand = GetCurrentCommand();
@@ -103,9 +102,13 @@ void Subsystem::AddChild(const wpi::Twine& name, Sendable& child) {
   registry.AddLW(&child, registry.GetSubsystem(this), name);
 }
 
-void Subsystem::AddChild(std::shared_ptr<Sendable> child) { AddChild(*child); }
+void Subsystem::AddChild(std::shared_ptr<Sendable> child) {
+  AddChild(*child);
+}
 
-void Subsystem::AddChild(Sendable* child) { AddChild(*child); }
+void Subsystem::AddChild(Sendable* child) {
+  AddChild(*child);
+}
 
 void Subsystem::AddChild(Sendable& child) {
   auto& registry = SendableRegistry::GetInstance();
@@ -114,7 +117,9 @@ void Subsystem::AddChild(Sendable& child) {
 }
 
 void Subsystem::ConfirmCommand() {
-  if (m_currentCommandChanged) m_currentCommandChanged = false;
+  if (m_currentCommandChanged) {
+    m_currentCommandChanged = false;
+  }
 }
 
 void Subsystem::InitSendable(SendableBuilder& builder) {

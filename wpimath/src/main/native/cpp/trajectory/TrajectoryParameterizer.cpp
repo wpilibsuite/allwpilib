@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /*
  * MIT License
@@ -88,7 +85,9 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // Now enforce all acceleration limits.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.to<double>() < kEpsilon) break;
+      if (ds.to<double>() < kEpsilon) {
+        break;
+      }
 
       // If the actual acceleration for this state is higher than the max
       // acceleration that we applied, then we need to reduce the max
@@ -133,14 +132,18 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
                             successor.minAcceleration * ds * 2.0);
 
       // No more limits to impose! This state can be finalized.
-      if (newMaxVelocity >= constrainedState.maxVelocity) break;
+      if (newMaxVelocity >= constrainedState.maxVelocity) {
+        break;
+      }
 
       constrainedState.maxVelocity = newMaxVelocity;
 
       // Check all acceleration constraints with the new max velocity.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.to<double>() > -kEpsilon) break;
+      if (ds.to<double>() > -kEpsilon) {
+        break;
+      }
 
       // If the actual acceleration for this state is lower than the min
       // acceleration, then we need to lower the min acceleration of the

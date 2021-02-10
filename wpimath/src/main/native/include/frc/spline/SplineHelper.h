@@ -1,15 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <array>
 #include <utility>
 #include <vector>
+
+#include <wpi/array.h>
 
 #include "frc/spline/CubicHermiteSpline.h"
 #include "frc/spline/QuinticHermiteSpline.h"
@@ -30,19 +28,19 @@ class SplineHelper {
    * @param end               The ending pose.
    * @return 2 cubic control vectors.
    */
-  static std::array<Spline<3>::ControlVector, 2>
+  static wpi::array<Spline<3>::ControlVector, 2>
   CubicControlVectorsFromWaypoints(
       const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
       const Pose2d& end);
 
   /**
-   * Returns quintic control vectors from a set of waypoints.
+   * Returns quintic splines from a set of waypoints.
    *
    * @param waypoints The waypoints
-   * @return List of control vectors
+   * @return List of quintic splines.
    */
-  static std::vector<Spline<5>::ControlVector>
-  QuinticControlVectorsFromWaypoints(const std::vector<Pose2d>& waypoints);
+  static std::vector<QuinticHermiteSpline> QuinticSplinesFromWaypoints(
+      const std::vector<Pose2d>& waypoints);
 
   /**
    * Returns a set of cubic splines corresponding to the provided control

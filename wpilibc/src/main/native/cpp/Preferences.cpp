@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Preferences.h"
 
@@ -25,7 +22,9 @@ Preferences* Preferences::GetInstance() {
   return &instance;
 }
 
-std::vector<std::string> Preferences::GetKeys() { return m_table->GetKeys(); }
+std::vector<std::string> Preferences::GetKeys() {
+  return m_table->GetKeys();
+}
 
 std::string Preferences::GetString(wpi::StringRef key,
                                    wpi::StringRef defaultValue) {
@@ -122,7 +121,9 @@ bool Preferences::ContainsKey(wpi::StringRef key) {
   return m_table->ContainsKey(key);
 }
 
-void Preferences::Remove(wpi::StringRef key) { m_table->Delete(key); }
+void Preferences::Remove(wpi::StringRef key) {
+  m_table->Delete(key);
+}
 
 void Preferences::RemoveAll() {
   for (auto preference : GetKeys()) {

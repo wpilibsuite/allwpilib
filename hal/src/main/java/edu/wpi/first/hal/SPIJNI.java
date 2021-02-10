@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
@@ -13,11 +10,11 @@ import java.nio.ByteBuffer;
 public class SPIJNI extends JNIWrapper {
   public static native void spiInitialize(int port);
 
-  public static native int spiTransaction(int port, ByteBuffer dataToSend,
-                                          ByteBuffer dataReceived, byte size);
+  public static native int spiTransaction(
+      int port, ByteBuffer dataToSend, ByteBuffer dataReceived, byte size);
 
-  public static native int spiTransactionB(int port, byte[] dataToSend,
-                                           byte[] dataReceived, byte size);
+  public static native int spiTransactionB(
+      int port, byte[] dataToSend, byte[] dataReceived, byte size);
 
   public static native int spiWrite(int port, ByteBuffer dataToSend, byte sendSize);
 
@@ -31,8 +28,8 @@ public class SPIJNI extends JNIWrapper {
 
   public static native void spiSetSpeed(int port, int speed);
 
-  public static native void spiSetOpts(int port, int msbFirst, int sampleOnTrailing,
-                                       int clkIdleHigh);
+  public static native void spiSetOpts(
+      int port, int msbFirst, int sampleOnTrailing, int clkIdleHigh);
 
   public static native void spiSetChipSelectActiveHigh(int port);
 
@@ -44,9 +41,12 @@ public class SPIJNI extends JNIWrapper {
 
   public static native void spiStartAutoRate(int port, double period);
 
-  public static native void spiStartAutoTrigger(int port, int digitalSourceHandle,
-                                                int analogTriggerType, boolean triggerRising,
-                                                boolean triggerFalling);
+  public static native void spiStartAutoTrigger(
+      int port,
+      int digitalSourceHandle,
+      int analogTriggerType,
+      boolean triggerRising,
+      boolean triggerFalling);
 
   public static native void spiStopAuto(int port);
 
@@ -54,13 +54,14 @@ public class SPIJNI extends JNIWrapper {
 
   public static native void spiForceAutoRead(int port);
 
-  public static native int spiReadAutoReceivedData(int port, ByteBuffer buffer, int numToRead,
-                                                   double timeout);
+  public static native int spiReadAutoReceivedData(
+      int port, ByteBuffer buffer, int numToRead, double timeout);
 
-  public static native int spiReadAutoReceivedData(int port, int[] buffer, int numToRead,
-                                                   double timeout);
+  public static native int spiReadAutoReceivedData(
+      int port, int[] buffer, int numToRead, double timeout);
 
   public static native int spiGetAutoDroppedCount(int port);
 
-  public static native void spiConfigureAutoStall(int port, int csToSclkTicks, int stallTicks, int pow2BytesPerRead);
+  public static native void spiConfigureAutoStall(
+      int port, int csToSclkTicks, int stallTicks, int pow2BytesPerRead);
 }

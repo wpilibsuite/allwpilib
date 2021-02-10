@@ -53,5 +53,27 @@
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 1
+  },
+  {
+    "name": "Romi - Timed Robot",
+    "description": "Romi - Timed style",
+    "tags": [
+      "Timed", "Romi"
+    ],
+    "foldername": "romitimed",
+    "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Romi - Command Robot",
+    "description": "Romi - Command style",
+    "tags": [
+      "Command", "Romi"
+    ],
+    "foldername": "romicommandbased",
+    "gradlebase": "javaromi",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]

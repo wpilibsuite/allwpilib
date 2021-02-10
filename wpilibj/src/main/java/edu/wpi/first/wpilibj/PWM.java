@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -27,21 +24,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * width (currently .5ms) - 0 = disabled (i.e. PWM output is held low)
  */
 public class PWM extends MotorSafety implements Sendable, AutoCloseable {
-  /**
-   * Represents the amount to multiply the minimum servo-pulse pwm period by.
-   */
+  /** Represents the amount to multiply the minimum servo-pulse pwm period by. */
   public enum PeriodMultiplier {
-    /**
-     * Period Multiplier: don't skip pulses. PWM pulses occur every 5.005 ms
-     */
+    /** Period Multiplier: don't skip pulses. PWM pulses occur every 5.005 ms */
     k1X,
-    /**
-     * Period Multiplier: skip every other pulse. PWM pulses occur every 10.010 ms
-     */
+    /** Period Multiplier: skip every other pulse. PWM pulses occur every 10.010 ms */
     k2X,
-    /**
-     * Period Multiplier: skip three out of four pulses. PWM pulses occur every 20.020 ms
-     */
+    /** Period Multiplier: skip three out of four pulses. PWM pulses occur every 20.020 ms */
     k4X
   }
 
@@ -71,9 +60,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
     setSafetyEnabled(false);
   }
 
-  /**
-   * Free the resource associated with the PWM channel and set the value to 0.
-   */
+  /** Free the resource associated with the PWM channel and set the value to 0. */
   @Override
   public void close() {
     SendableRegistry.remove(this);
@@ -99,8 +86,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    * Optionally eliminate the deadband from a speed controller.
    *
    * @param eliminateDeadband If true, set the motor curve on the Jaguar to eliminate the deadband
-   *                          in the middle of the range. Otherwise, keep the full range without
-   *                          modifying any values.
+   *     in the middle of the range. Otherwise, keep the full range without modifying any values.
    */
   public void enableDeadbandElimination(boolean eliminateDeadband) {
     PWMJNI.setPWMEliminateDeadband(m_handle, eliminateDeadband);
@@ -111,21 +97,21 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
    * type of controller. The values determine the upper and lower speeds as well as the deadband
    * bracket.
    *
-   * @param max         The max PWM pulse width in ms
+   * @param max The max PWM pulse width in ms
    * @param deadbandMax The high end of the deadband range pulse width in ms
-   * @param center      The center (off) pulse width in ms
+   * @param center The center (off) pulse width in ms
    * @param deadbandMin The low end of the deadband pulse width in ms
-   * @param min         The minimum pulse width in ms
+   * @param min The minimum pulse width in ms
    */
-  public void setBounds(double max, double deadbandMax, double center, double deadbandMin,
-                           double min) {
+  public void setBounds(
+      double max, double deadbandMax, double center, double deadbandMin, double min) {
     PWMJNI.setPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min);
   }
 
   /**
    * Gets the bounds on the PWM pulse widths. This Gets the bounds on the PWM values for a
-   * particular type of controller. The values determine the upper and lower speeds as well
-   * as the deadband bracket.
+   * particular type of controller. The values determine the upper and lower speeds as well as the
+   * deadband bracket.
    */
   public PWMConfigDataResult getRawBounds() {
     return PWMJNI.getPWMConfigRaw(m_handle);
@@ -219,10 +205,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
     return PWMJNI.getPWMRaw(m_handle);
   }
 
-  /**
-   * Temporarily disables the PWM output. The next set call will reenable
-   * the output.
-   */
+  /** Temporarily disables the PWM output. The next set call will reenable the output. */
   public void setDisabled() {
     PWMJNI.setPWMDisabled(m_handle);
   }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.command;
 
@@ -12,8 +9,8 @@ package edu.wpi.first.wpilibj.command;
  * If it is not a part of a {@link CommandGroup}, then it will finish immediately. If it is itself
  * an active child, then the {@link CommandGroup} will never end.
  *
- * <p>This class is useful for the situation where you want to allow anything running in parallel
- * to finish, before continuing in the main {@link CommandGroup} sequence.
+ * <p>This class is useful for the situation where you want to allow anything running in parallel to
+ * finish, before continuing in the main {@link CommandGroup} sequence.
  */
 public class WaitForChildren extends Command {
   @Override

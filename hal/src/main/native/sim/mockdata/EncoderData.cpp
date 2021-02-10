@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "EncoderDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeEncoderData() {
   static EncoderData sed[kNumEncoders];
   ::hal::SimEncoderData = sed;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 EncoderData* hal::SimEncoderData;
 void EncoderData::ResetData() {
@@ -38,10 +33,13 @@ void EncoderData::ResetData() {
 extern "C" {
 int32_t HALSIM_FindEncoderForChannel(int32_t channel) {
   for (int i = 0; i < kNumEncoders; ++i) {
-    if (!SimEncoderData[i].initialized) continue;
+    if (!SimEncoderData[i].initialized) {
+      continue;
+    }
     if (SimEncoderData[i].digitalChannelA == channel ||
-        SimEncoderData[i].digitalChannelB == channel)
+        SimEncoderData[i].digitalChannelB == channel) {
       return i;
+    }
   }
   return -1;
 }

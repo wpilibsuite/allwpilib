@@ -1,17 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.geometry;
 
 import java.util.Objects;
 
-/**
- * Represents a transformation for a Pose2d.
- */
+/** Represents a transformation for a Pose2d. */
 public class Transform2d {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
@@ -20,13 +15,15 @@ public class Transform2d {
    * Constructs the transform that maps the initial pose to the final pose.
    *
    * @param initial The initial pose for the transformation.
-   * @param last    The final pose for the transformation.
+   * @param last The final pose for the transformation.
    */
   public Transform2d(Pose2d initial, Pose2d last) {
     // We are rotating the difference between the translations
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
-    m_translation = last.getTranslation().minus(initial.getTranslation())
+    m_translation =
+        last.getTranslation()
+            .minus(initial.getTranslation())
             .rotateBy(initial.getRotation().unaryMinus());
 
     m_rotation = last.getRotation().minus(initial.getRotation());
@@ -36,16 +33,14 @@ public class Transform2d {
    * Constructs a transform with the given translation and rotation components.
    *
    * @param translation Translational component of the transform.
-   * @param rotation    Rotational component of the transform.
+   * @param rotation Rotational component of the transform.
    */
   public Transform2d(Translation2d translation, Rotation2d rotation) {
     m_translation = translation;
     m_rotation = rotation;
   }
 
-  /**
-   * Constructs the identity transform -- maps an initial pose to itself.
-   */
+  /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform2d() {
     m_translation = new Translation2d();
     m_rotation = new Rotation2d();
@@ -106,7 +101,8 @@ public class Transform2d {
     // We are rotating the difference between the translations
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
-    return new Transform2d(getTranslation().unaryMinus().rotateBy(getRotation().unaryMinus()),
+    return new Transform2d(
+        getTranslation().unaryMinus().rotateBy(getRotation().unaryMinus()),
         getRotation().unaryMinus());
   }
 

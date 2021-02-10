@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/raw_socket_istream.h"
 
@@ -27,6 +24,10 @@ void raw_socket_istream::read_impl(void* data, size_t len) {
   set_read_count(pos);
 }
 
-void raw_socket_istream::close() { m_stream.close(); }
+void raw_socket_istream::close() {
+  m_stream.close();
+}
 
-size_t raw_socket_istream::in_avail() const { return 0; }
+size_t raw_socket_istream::in_avail() const {
+  return 0;
+}

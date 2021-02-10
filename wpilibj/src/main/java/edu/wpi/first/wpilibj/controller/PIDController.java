@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.controller;
 
@@ -14,24 +11,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
 
-/**
- * Implements a PID control loop.
- */
+/** Implements a PID control loop. */
 @SuppressWarnings("PMD.TooManyFields")
 public class PIDController implements Sendable, AutoCloseable {
   private static int instances;
 
   // Factor for "proportional" control
-  @SuppressWarnings("MemberName")
-  private double m_Kp;
+  private double m_kp;
 
   // Factor for "integral" control
-  @SuppressWarnings("MemberName")
-  private double m_Ki;
+  private double m_ki;
 
   // Factor for "derivative" control
-  @SuppressWarnings("MemberName")
-  private double m_Kd;
+  private double m_kd;
 
   // The period (in seconds) of the loop that calls the controller
   private final double m_period;
@@ -62,33 +54,32 @@ public class PIDController implements Sendable, AutoCloseable {
   private double m_velocityTolerance = Double.POSITIVE_INFINITY;
 
   private double m_setpoint;
+  private double m_measurement;
 
   /**
-   * Allocates a PIDController with the given constants for Kp, Ki, and Kd and a default period of
+   * Allocates a PIDController with the given constants for kp, ki, and kd and a default period of
    * 0.02 seconds.
    *
-   * @param Kp The proportional coefficient.
-   * @param Ki The integral coefficient.
-   * @param Kd The derivative coefficient.
+   * @param kp The proportional coefficient.
+   * @param ki The integral coefficient.
+   * @param kd The derivative coefficient.
    */
-  @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd) {
-    this(Kp, Ki, Kd, 0.02);
+  public PIDController(double kp, double ki, double kd) {
+    this(kp, ki, kd, 0.02);
   }
 
   /**
-   * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
+   * Allocates a PIDController with the given constants for kp, ki, and kd.
    *
-   * @param Kp     The proportional coefficient.
-   * @param Ki     The integral coefficient.
-   * @param Kd     The derivative coefficient.
+   * @param kp The proportional coefficient.
+   * @param ki The integral coefficient.
+   * @param kd The derivative coefficient.
    * @param period The period between controller updates in seconds.
    */
-  @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd, double period) {
-    m_Kp = Kp;
-    m_Ki = Ki;
-    m_Kd = Kd;
+  public PIDController(double kp, double ki, double kd, double period) {
+    m_kp = kp;
+    m_ki = ki;
+    m_kd = kd;
 
     m_period = period;
 
@@ -108,45 +99,41 @@ public class PIDController implements Sendable, AutoCloseable {
    *
    * <p>Set the proportional, integral, and differential coefficients.
    *
-   * @param Kp The proportional coefficient.
-   * @param Ki The integral coefficient.
-   * @param Kd The derivative coefficient.
+   * @param kp The proportional coefficient.
+   * @param ki The integral coefficient.
+   * @param kd The derivative coefficient.
    */
-  @SuppressWarnings("ParameterName")
-  public void setPID(double Kp, double Ki, double Kd) {
-    m_Kp = Kp;
-    m_Ki = Ki;
-    m_Kd = Kd;
+  public void setPID(double kp, double ki, double kd) {
+    m_kp = kp;
+    m_ki = ki;
+    m_kd = kd;
   }
 
   /**
    * Sets the Proportional coefficient of the PID controller gain.
    *
-   * @param Kp proportional coefficient
+   * @param kp proportional coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setP(double Kp) {
-    m_Kp = Kp;
+  public void setP(double kp) {
+    m_kp = kp;
   }
 
   /**
    * Sets the Integral coefficient of the PID controller gain.
    *
-   * @param Ki integral coefficient
+   * @param ki integral coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setI(double Ki) {
-    m_Ki = Ki;
+  public void setI(double ki) {
+    m_ki = ki;
   }
 
   /**
    * Sets the Differential coefficient of the PID controller gain.
    *
-   * @param Kd differential coefficient
+   * @param kd differential coefficient
    */
-  @SuppressWarnings("ParameterName")
-  public void setD(double Kd) {
-    m_Kd = Kd;
+  public void setD(double kd) {
+    m_kd = kd;
   }
 
   /**
@@ -155,7 +142,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return proportional coefficient
    */
   public double getP() {
-    return m_Kp;
+    return m_kp;
   }
 
   /**
@@ -164,7 +151,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return integral coefficient
    */
   public double getI() {
-    return m_Ki;
+    return m_ki;
   }
 
   /**
@@ -173,7 +160,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return differential coefficient
    */
   public double getD() {
-    return m_Kd;
+    return m_kd;
   }
 
   /**
@@ -211,16 +198,25 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    return Math.abs(m_positionError) < m_positionTolerance
-        && Math.abs(m_velocityError) < m_velocityTolerance;
+    double positionError;
+    if (m_continuous) {
+      positionError =
+          MathUtil.inputModulus(m_setpoint - m_measurement, m_minimumInput, m_maximumInput);
+    } else {
+      positionError = m_setpoint - m_measurement;
+    }
+
+    double velocityError = (positionError - m_prevError) / m_period;
+
+    return Math.abs(positionError) < m_positionTolerance
+        && Math.abs(velocityError) < m_velocityTolerance;
   }
 
   /**
    * Enables continuous input.
    *
-   * <p>Rather then using the max and min input range as constraints, it considers
-   * them to be the same point and automatically calculates the shortest route
-   * to the setpoint.
+   * <p>Rather then using the max and min input range as constraints, it considers them to be the
+   * same point and automatically calculates the shortest route to the setpoint.
    *
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
@@ -231,16 +227,12 @@ public class PIDController implements Sendable, AutoCloseable {
     m_maximumInput = maximumInput;
   }
 
-  /**
-   * Disables continuous input.
-   */
+  /** Disables continuous input. */
   public void disableContinuousInput() {
     m_continuous = false;
   }
 
-  /**
-   * Returns true if continuous input is enabled.
-   */
+  /** Returns true if continuous input is enabled. */
   public boolean isContinuousInputEnabled() {
     return m_continuous;
   }
@@ -248,8 +240,8 @@ public class PIDController implements Sendable, AutoCloseable {
   /**
    * Sets the minimum and maximum values for the integrator.
    *
-   * <p>When the cap is reached, the integrator value is added to the controller
-   * output rather than the integrator value times the integral gain.
+   * <p>When the cap is reached, the integrator value is added to the controller output rather than
+   * the integrator value times the integral gain.
    *
    * @param minimumIntegral The minimum value of the integrator.
    * @param maximumIntegral The maximum value of the integrator.
@@ -288,9 +280,7 @@ public class PIDController implements Sendable, AutoCloseable {
     return m_positionError;
   }
 
-  /**
-   * Returns the velocity error.
-   */
+  /** Returns the velocity error. */
   public double getVelocityError() {
     return m_velocityError;
   }
@@ -299,7 +289,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
-   * @param setpoint    The new setpoint of the controller.
+   * @param setpoint The new setpoint of the controller.
    */
   public double calculate(double measurement, double setpoint) {
     // Set setpoint to provided value
@@ -313,28 +303,30 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param measurement The current measurement of the process variable.
    */
   public double calculate(double measurement) {
+    m_measurement = measurement;
     m_prevError = m_positionError;
 
     if (m_continuous) {
-      m_positionError = ControllerUtil.getModulusError(m_setpoint, measurement, m_minimumInput,
-          m_maximumInput);
+      m_positionError =
+          MathUtil.inputModulus(m_setpoint - measurement, m_minimumInput, m_maximumInput);
     } else {
       m_positionError = m_setpoint - measurement;
     }
 
     m_velocityError = (m_positionError - m_prevError) / m_period;
 
-    if (m_Ki != 0) {
-      m_totalError = MathUtil.clamp(m_totalError + m_positionError * m_period,
-          m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
+    if (m_ki != 0) {
+      m_totalError =
+          MathUtil.clamp(
+              m_totalError + m_positionError * m_period,
+              m_minimumIntegral / m_ki,
+              m_maximumIntegral / m_ki);
     }
 
-    return m_Kp * m_positionError + m_Ki * m_totalError + m_Kd * m_velocityError;
+    return m_kp * m_positionError + m_ki * m_totalError + m_kd * m_velocityError;
   }
 
-  /**
-   * Resets the previous error and the integral term.
-   */
+  /** Resets the previous error and the integral term. */
   public void reset() {
     m_prevError = 0;
     m_totalError = 0;

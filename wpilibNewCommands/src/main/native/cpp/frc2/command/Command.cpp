@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/Command.h"
 
@@ -20,7 +17,9 @@
 
 using namespace frc2;
 
-Command::~Command() { CommandScheduler::GetInstance().Cancel(this); }
+Command::~Command() {
+  CommandScheduler::GetInstance().Cancel(this);
+}
 
 Command::Command(const Command& rhs) : ErrorBase(rhs) {}
 
@@ -86,13 +85,17 @@ PerpetualCommand Command::Perpetually() && {
   return PerpetualCommand(std::move(*this).TransferOwnership());
 }
 
-ProxyScheduleCommand Command::AsProxy() { return ProxyScheduleCommand(this); }
+ProxyScheduleCommand Command::AsProxy() {
+  return ProxyScheduleCommand(this);
+}
 
 void Command::Schedule(bool interruptible) {
   CommandScheduler::GetInstance().Schedule(interruptible, this);
 }
 
-void Command::Cancel() { CommandScheduler::GetInstance().Cancel(this); }
+void Command::Cancel() {
+  CommandScheduler::GetInstance().Cancel(this);
+}
 
 bool Command::IsScheduled() const {
   return CommandScheduler::GetInstance().IsScheduled(this);
@@ -106,11 +109,17 @@ bool Command::HasRequirement(Subsystem* requirement) const {
   return hasRequirement;
 }
 
-std::string Command::GetName() const { return GetTypeName(*this); }
+std::string Command::GetName() const {
+  return GetTypeName(*this);
+}
 
-bool Command::IsGrouped() const { return m_isGrouped; }
+bool Command::IsGrouped() const {
+  return m_isGrouped;
+}
 
-void Command::SetGrouped(bool grouped) { m_isGrouped = grouped; }
+void Command::SetGrouped(bool grouped) {
+  m_isGrouped = grouped;
+}
 
 namespace frc2 {
 bool RequirementsDisjoint(Command* first, Command* second) {

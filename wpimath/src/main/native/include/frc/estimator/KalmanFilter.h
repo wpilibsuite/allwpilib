@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <array>
 #include <cmath>
+
+#include <wpi/array.h>
 
 #include "Eigen/Core"
 #include "Eigen/src/Cholesky/LDLT.h"
@@ -50,8 +48,8 @@ class KalmanFilterImpl {
    * @param dt                 Nominal discretization timestep.
    */
   KalmanFilterImpl(LinearSystem<States, Inputs, Outputs>& plant,
-                   const std::array<double, States>& stateStdDevs,
-                   const std::array<double, Outputs>& measurementStdDevs,
+                   const wpi::array<double, States>& stateStdDevs,
+                   const wpi::array<double, Outputs>& measurementStdDevs,
                    units::second_t dt) {
     m_plant = &plant;
 
@@ -196,8 +194,8 @@ class KalmanFilter : public detail::KalmanFilterImpl<States, Inputs, Outputs> {
    * @param dt                 Nominal discretization timestep.
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
-               const std::array<double, States>& stateStdDevs,
-               const std::array<double, Outputs>& measurementStdDevs,
+               const wpi::array<double, States>& stateStdDevs,
+               const wpi::array<double, Outputs>& measurementStdDevs,
                units::second_t dt)
       : detail::KalmanFilterImpl<States, Inputs, Outputs>{
             plant, stateStdDevs, measurementStdDevs, dt} {}
@@ -212,8 +210,8 @@ template <>
 class KalmanFilter<1, 1, 1> : public detail::KalmanFilterImpl<1, 1, 1> {
  public:
   KalmanFilter(LinearSystem<1, 1, 1>& plant,
-               const std::array<double, 1>& stateStdDevs,
-               const std::array<double, 1>& measurementStdDevs,
+               const wpi::array<double, 1>& stateStdDevs,
+               const wpi::array<double, 1>& measurementStdDevs,
                units::second_t dt);
 
   KalmanFilter(KalmanFilter&&) = default;
@@ -226,8 +224,8 @@ template <>
 class KalmanFilter<2, 1, 1> : public detail::KalmanFilterImpl<2, 1, 1> {
  public:
   KalmanFilter(LinearSystem<2, 1, 1>& plant,
-               const std::array<double, 2>& stateStdDevs,
-               const std::array<double, 1>& measurementStdDevs,
+               const wpi::array<double, 2>& stateStdDevs,
+               const wpi::array<double, 1>& measurementStdDevs,
                units::second_t dt);
 
   KalmanFilter(KalmanFilter&&) = default;

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.statespaceelevator;
 
@@ -26,8 +23,8 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 
 /**
- * This is a sample program to demonstrate how to use a state-space controller
- * to control an elevator.
+ * This is a sample program to demonstrate how to use a state-space controller to control an
+ * elevator.
  */
 public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
@@ -46,53 +43,53 @@ public class Robot extends TimedRobot {
   // the motors, this number should be greater than one.
   private static final double kElevatorGearing = 6.0;
 
-  private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(
-        Units.feetToMeters(3.0), Units.feetToMeters(6.0)); // Max elevator speed and acceleration.
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(
+          Units.feetToMeters(3.0), Units.feetToMeters(6.0)); // Max elevator speed and acceleration.
   private TrapezoidProfile.State m_lastProfiledReference = new TrapezoidProfile.State();
 
-  // The plant holds a state-space model of our elevator. This system has the following properties:
-  //
-  // States: [position, velocity], in meters and meters per second.
-  // Inputs (what we can "put in"): [voltage], in volts.
-  // Outputs (what we can measure): [position], in meters.
-  private final LinearSystem<N2, N1, N1> m_elevatorPlant = LinearSystemId.createElevatorSystem(
-        DCMotor.getNEO(2),
-        kCarriageMass,
-        kDrumRadius,
-        kElevatorGearing
-  );
+  /* The plant holds a state-space model of our elevator. This system has the following properties:
+
+  States: [position, velocity], in meters and meters per second.
+  Inputs (what we can "put in"): [voltage], in volts.
+  Outputs (what we can measure): [position], in meters.
+
+  This elevator is driven by two NEO motors.
+   */
+  private final LinearSystem<N2, N1, N1> m_elevatorPlant =
+      LinearSystemId.createElevatorSystem(
+          DCMotor.getNEO(2), kCarriageMass, kDrumRadius, kElevatorGearing);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
-  private final KalmanFilter<N2, N1, N1> m_observer = new KalmanFilter<>(
-        Nat.N2(), Nat.N1(),
-        m_elevatorPlant,
-        VecBuilder.fill(Units.inchesToMeters(2), Units.inchesToMeters(40)), // How accurate we
-        // think our model is, in meters and meters/second.
-        VecBuilder.fill(0.001), // How accurate we think our encoder position
-        // data is. In this case we very highly trust our encoder position reading.
-        0.020);
+  private final KalmanFilter<N2, N1, N1> m_observer =
+      new KalmanFilter<>(
+          Nat.N2(),
+          Nat.N1(),
+          m_elevatorPlant,
+          VecBuilder.fill(Units.inchesToMeters(2), Units.inchesToMeters(40)), // How accurate we
+          // think our model is, in meters and meters/second.
+          VecBuilder.fill(0.001), // How accurate we think our encoder position
+          // data is. In this case we very highly trust our encoder position reading.
+          0.020);
 
   // A LQR uses feedback to create voltage commands.
-  private final LinearQuadraticRegulator<N2, N1, N1> m_controller
-        = new LinearQuadraticRegulator<>(m_elevatorPlant,
-        VecBuilder.fill(Units.inchesToMeters(1.0), Units.inchesToMeters(10.0)), // qelms. Position
-        // and velocity error tolerances, in meters and meters per second. Decrease this to more
-        // heavily penalize state excursion, or make the controller behave more aggressively. In
-        // this example we weight position much more highly than velocity, but this can be
-        // tuned to balance the two.
-        VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
-        // heavily penalize control effort, or make the controller less aggressive. 12 is a good
-        // starting point because that is the (approximate) maximum voltage of a battery.
-        0.020); // Nominal time between loops. 0.020 for TimedRobot, but can be
+  private final LinearQuadraticRegulator<N2, N1, N1> m_controller =
+      new LinearQuadraticRegulator<>(
+          m_elevatorPlant,
+          VecBuilder.fill(Units.inchesToMeters(1.0), Units.inchesToMeters(10.0)), // qelms. Position
+          // and velocity error tolerances, in meters and meters per second. Decrease this to more
+          // heavily penalize state excursion, or make the controller behave more aggressively. In
+          // this example we weight position much more highly than velocity, but this can be
+          // tuned to balance the two.
+          VecBuilder.fill(12.0), // relms. Control effort (voltage) tolerance. Decrease this to more
+          // heavily penalize control effort, or make the controller less aggressive. 12 is a good
+          // starting point because that is the (approximate) maximum voltage of a battery.
+          0.020); // Nominal time between loops. 0.020 for TimedRobot, but can be
   // lower if using notifiers.
 
   // The state-space loop combines a controller, observer, feedforward and plant for easy control.
-  private final LinearSystemLoop<N2, N1, N1> m_loop = new LinearSystemLoop<>(
-      m_elevatorPlant,
-        m_controller,
-        m_observer,
-        12.0,
-        0.020);
+  private final LinearSystemLoop<N2, N1, N1> m_loop =
+      new LinearSystemLoop<>(m_elevatorPlant, m_controller, m_observer, 12.0, 0.020);
 
   // An encoder set up to measure elevator height in meters.
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
@@ -114,8 +111,8 @@ public class Robot extends TimedRobot {
     m_loop.reset(VecBuilder.fill(m_encoder.getDistance(), m_encoder.getRate()));
 
     // Reset our last reference to the current state.
-    m_lastProfiledReference = new TrapezoidProfile.State(m_encoder.getDistance(),
-          m_encoder.getRate());
+    m_lastProfiledReference =
+        new TrapezoidProfile.State(m_encoder.getDistance(), m_encoder.getRate());
   }
 
   @Override
@@ -131,8 +128,8 @@ public class Robot extends TimedRobot {
       goal = new TrapezoidProfile.State(kLowGoalPosition, 0.0);
     }
     // Step our TrapezoidalProfile forward 20ms and set it as our next reference
-    m_lastProfiledReference = (new TrapezoidProfile(m_constraints, goal, m_lastProfiledReference))
-          .calculate(0.020);
+    m_lastProfiledReference =
+        (new TrapezoidProfile(m_constraints, goal, m_lastProfiledReference)).calculate(0.020);
     m_loop.setNextR(m_lastProfiledReference.position, m_lastProfiledReference.velocity);
 
     // Correct our Kalman filter's state vector estimate with encoder data.

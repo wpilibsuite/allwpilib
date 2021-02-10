@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DriverStation.h"
 
@@ -21,6 +18,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "HALInitializer.h"
+#include "hal/cpp/fpga_clock.h"
 #include "hal/simulation/MockHooks.h"
 #include "mockdata/DriverStationDataInternal.h"
 
@@ -33,14 +31,12 @@ static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDriverStation() {
   static wpi::condition_variable nddaC;
   newDSDataAvailableCond = &nddaC;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 using namespace hal;
 
@@ -58,29 +54,30 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
   auto errorHandler = sendErrorHandler.load();
-  if (errorHandler)
+  if (errorHandler) {
     return errorHandler(isError, errorCode, isLVCode, details, location,
                         callStack, printMsg);
+  }
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
   std::scoped_lock lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
-  static std::chrono::time_point<std::chrono::steady_clock>
-      prevMsgTime[KEEP_MSGS];
+  static fpga_clock::time_point prevMsgTime[KEEP_MSGS];
   static bool initialized = false;
   if (!initialized) {
     for (int i = 0; i < KEEP_MSGS; i++) {
-      prevMsgTime[i] =
-          std::chrono::steady_clock::now() - std::chrono::seconds(2);
+      prevMsgTime[i] = fpga_clock::now() - std::chrono::seconds(2);
     }
     initialized = true;
   }
 
-  auto curTime = std::chrono::steady_clock::now();
+  auto curTime = fpga_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
-    if (prevMsg[i] == details) break;
+    if (prevMsg[i] == details) {
+      break;
+    }
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
@@ -123,6 +120,7 @@ int32_t HAL_SendConsoleLine(const char* line) {
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
+  std::memset(controlWord, 0, sizeof(HAL_ControlWord));
   controlWord->enabled = SimDriverStationData->enabled;
   controlWord->autonomous = SimDriverStationData->autonomous;
   controlWord->test = SimDriverStationData->test;
@@ -180,9 +178,13 @@ char* HAL_GetJoystickName(int32_t joystickNum) {
   return name;
 }
 
-void HAL_FreeJoystickName(char* name) { std::free(name); }
+void HAL_FreeJoystickName(char* name) {
+  std::free(name);
+}
 
-int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) { return 0; }
+int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
+  return 0;
+}
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble) {
@@ -200,7 +202,9 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
   return 0;
 }
 
-void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
+void HAL_ObserveUserProgramStarting(void) {
+  HALSIM_SetProgramStarted();
+}
 
 void HAL_ObserveUserProgramDisabled(void) {
   // TODO
@@ -231,12 +235,16 @@ HAL_Bool HAL_IsNewControlData(void) {
   std::scoped_lock lock(newDSDataAvailableMutex);
   int& lastCount = GetThreadLocalLastCount();
   int currentCount = newDSDataAvailableCounter;
-  if (lastCount == currentCount) return false;
+  if (lastCount == currentCount) {
+    return false;
+  }
   lastCount = currentCount;
   return true;
 }
 
-void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
+void HAL_WaitForDSData(void) {
+  HAL_WaitForDSDataTimeout(0);
+}
 
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock lock(newDSDataAvailableMutex);
@@ -273,7 +281,9 @@ constexpr int32_t refNumber = 42;
 static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
-  if (refNum != refNumber) return 0;
+  if (refNum != refNumber) {
+    return 0;
+  }
   SimDriverStationData->CallNewDataCallbacks();
   std::scoped_lock lock(newDSDataAvailableMutex);
   // Nofify all threads
@@ -287,11 +297,15 @@ void HAL_InitializeDriverStation(void) {
   static std::atomic_bool initialized{false};
   static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (initialized) return;
+  if (initialized) {
+    return;
+  }
 
   std::scoped_lock lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (initialized) return;
+  if (initialized) {
+    return;
+  }
 
   SimDriverStationData->ResetData();
 
@@ -303,6 +317,8 @@ void HAL_InitializeDriverStation(void) {
   initialized = true;
 }
 
-void HAL_ReleaseDSMutex(void) { newDataOccur(refNumber); }
+void HAL_ReleaseDSMutex(void) {
+  newDataOccur(refNumber);
+}
 
 }  // extern "C"

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/SerialPort.h"
 
@@ -23,7 +20,9 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
       HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
   wpi_setHALError(status);
   // Don't continue if initialization failed
-  if (status < 0) return;
+  if (status < 0) {
+    return;
+  }
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
   wpi_setHALError(status);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
@@ -57,7 +56,9 @@ SerialPort::SerialPort(int baudRate, const wpi::Twine& portName, Port port,
       static_cast<HAL_SerialPort>(port), portNameC, &status);
   wpi_setHALError(status);
   // Don't continue if initialization failed
-  if (status < 0) return;
+  if (status < 0) {
+    return;
+  }
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
   wpi_setHALError(status);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);

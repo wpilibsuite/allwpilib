@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/I2C.h"
 
@@ -25,7 +22,9 @@ I2C::I2C(Port port, int deviceAddress)
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
 
-I2C::~I2C() { HAL_CloseI2C(m_port); }
+I2C::~I2C() {
+  HAL_CloseI2C(m_port);
+}
 
 bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
                       int receiveSize) {
@@ -36,7 +35,9 @@ bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
   return status < 0;
 }
 
-bool I2C::AddressOnly() { return Transaction(nullptr, 0, nullptr, 0); }
+bool I2C::AddressOnly() {
+  return Transaction(nullptr, 0, nullptr, 0);
+}
 
 bool I2C::Write(int registerAddress, uint8_t data) {
   uint8_t buffer[2];
@@ -86,10 +87,14 @@ bool I2C::VerifySensor(int registerAddress, int count,
        i += 4, curRegisterAddress += 4) {
     int toRead = count - i < 4 ? count - i : 4;
     // Read the chunk of data.  Return false if the sensor does not respond.
-    if (Read(curRegisterAddress, toRead, deviceData)) return false;
+    if (Read(curRegisterAddress, toRead, deviceData)) {
+      return false;
+    }
 
     for (int j = 0; j < toRead; j++) {
-      if (deviceData[j] != expected[i + j]) return false;
+      if (deviceData[j] != expected[i + j]) {
+        return false;
+      }
     }
   }
   return true;

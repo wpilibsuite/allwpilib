@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.command;
 
@@ -54,66 +51,47 @@ public class MockConditionalCommand extends ConditionalCommand {
     ++m_interruptedCount;
   }
 
-
-  /**
-   * How many times the initialize method has been called.
-   */
+  /** How many times the initialize method has been called. */
   public int getInitializeCount() {
     return m_initializeCount;
   }
 
-  /**
-   * If the initialize method has been called at least once.
-   */
+  /** If the initialize method has been called at least once. */
   public boolean hasInitialized() {
     return getInitializeCount() > 0;
   }
 
-  /**
-   * How many time the execute method has been called.
-   */
+  /** How many time the execute method has been called. */
   public int getExecuteCount() {
     return m_executeCount;
   }
 
-  /**
-   * How many times the isFinished method has been called.
-   */
+  /** How many times the isFinished method has been called. */
   public int getIsFinishedCount() {
     return m_isFinishedCount;
   }
 
-  /**
-   * How many times the end method has been called.
-   */
+  /** How many times the end method has been called. */
   public int getEndCount() {
     return m_endCount;
   }
 
-  /**
-   * If the end method has been called at least once.
-   */
+  /** If the end method has been called at least once. */
   public boolean hasEnd() {
     return getEndCount() > 0;
   }
 
-  /**
-   * How many times the interrupted method has been called.
-   */
+  /** How many times the interrupted method has been called. */
   public int getInterruptedCount() {
     return m_interruptedCount;
   }
 
-  /**
-   * If the interrupted method has been called at least once.
-   */
+  /** If the interrupted method has been called at least once. */
   public boolean hasInterrupted() {
     return getInterruptedCount() > 0;
   }
 
-  /**
-   * Reset internal counters.
-   */
+  /** Reset internal counters. */
   public void resetCounters() {
     m_condition = false;
     m_initializeCount = 0;

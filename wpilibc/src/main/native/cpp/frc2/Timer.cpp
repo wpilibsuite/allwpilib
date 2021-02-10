@@ -1,16 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/Timer.h"
 
 #include <chrono>
 #include <thread>
-
-#include <hal/FRCUsageReporting.h>
 
 #include "frc/DriverStation.h"
 #include "frc/RobotController.h"
@@ -36,7 +31,9 @@ units::second_t GetTime() {
 
 using namespace frc2;
 
-Timer::Timer() { Reset(); }
+Timer::Timer() {
+  Reset();
+}
 
 Timer::Timer(const Timer& rhs)
     : m_startTime(rhs.m_startTime),
@@ -106,7 +103,9 @@ void Timer::Stop() {
   }
 }
 
-bool Timer::HasElapsed(units::second_t period) const { return Get() > period; }
+bool Timer::HasElapsed(units::second_t period) const {
+  return Get() > period;
+}
 
 bool Timer::HasPeriodPassed(units::second_t period) {
   return AdvanceIfElapsed(period);

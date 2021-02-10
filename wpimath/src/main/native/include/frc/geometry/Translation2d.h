@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -39,6 +36,15 @@ class Translation2d {
    * @param y The y component of the translation.
    */
   Translation2d(units::meter_t x, units::meter_t y);
+
+  /**
+   * Constructs a Translation2d with the provided distance and angle. This is
+   * essentially converting from polar coordinates to Cartesian coordinates.
+   *
+   * @param distance The distance from the origin to the end of the translation.
+   * @param angle The angle between the x-axis and the translation vector.
+   */
+  Translation2d(units::meter_t distance, const Rotation2d& angle);
 
   /**
    * Calculates the distance between two translations in 2d space.

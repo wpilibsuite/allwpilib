@@ -1,13 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/PDP.h"
-
-#include <memory>
 
 #include <wpi/mutex.h>
 
@@ -15,8 +10,6 @@
 #include "PortsInternal.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
-#include "hal/Ports.h"
-#include "hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 
@@ -110,15 +103,13 @@ union PdpStatusEnergy {
 static wpi::mutex pdpHandleMutex;
 static HAL_PDPHandle pdpHandles[kNumPDPModules];
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePDP() {
   for (int i = 0; i < kNumPDPModules; i++) {
     pdpHandles[i] = HAL_kInvalidHandle;
   }
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
@@ -313,15 +304,21 @@ void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
   PdpStatus1 pdpStatus;
   HAL_ReadCANPacketTimeout(handle, Status1, pdpStatus.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   PdpStatus2 pdpStatus2;
   HAL_ReadCANPacketTimeout(handle, Status2, pdpStatus2.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
   PdpStatus3 pdpStatus3;
   HAL_ReadCANPacketTimeout(handle, Status3, pdpStatus3.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
 
   currents[0] = ((static_cast<uint32_t>(pdpStatus.bits.chan1_h8) << 2) |
                  pdpStatus.bits.chan1_l2) *

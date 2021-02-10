@@ -1,18 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
- * A Command that runs instantly; it will initialize, execute once, and end on the same
- * iteration of the scheduler.  Users can either pass in a Runnable and a set of requirements,
- * or else subclass this command if desired.
+ * A Command that runs instantly; it will initialize, execute once, and end on the same iteration of
+ * the scheduler. Users can either pass in a Runnable and a set of requirements, or else subclass
+ * this command if desired.
  */
 public class InstantCommand extends CommandBase {
   private final Runnable m_toRun;
@@ -20,7 +17,7 @@ public class InstantCommand extends CommandBase {
   /**
    * Creates a new InstantCommand that runs the given Runnable with the given requirements.
    *
-   * @param toRun        the Runnable to run
+   * @param toRun the Runnable to run
    * @param requirements the subsystems required by this command
    */
   public InstantCommand(Runnable toRun, Subsystem... requirements) {
@@ -30,12 +27,11 @@ public class InstantCommand extends CommandBase {
   }
 
   /**
-   * Creates a new InstantCommand with a Runnable that does nothing.  Useful only as a no-arg
+   * Creates a new InstantCommand with a Runnable that does nothing. Useful only as a no-arg
    * constructor to call implicitly from subclass constructors.
    */
   public InstantCommand() {
-    m_toRun = () -> {
-    };
+    m_toRun = () -> {};
   }
 
   @Override

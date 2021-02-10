@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "AnalogInternal.h"
 
@@ -43,9 +40,13 @@ void InitializeAnalogInternal() {
 
 void initializeAnalog(int32_t* status) {
   hal::init::CheckInit();
-  if (analogSystemInitialized) return;
+  if (analogSystemInitialized) {
+    return;
+  }
   std::scoped_lock lock(analogRegisterWindowMutex);
-  if (analogSystemInitialized) return;
+  if (analogSystemInitialized) {
+    return;
+  }
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));
   setAnalogNumChannelsToActivate(kNumAnalogInputs);
@@ -55,7 +56,9 @@ void initializeAnalog(int32_t* status) {
 
 int32_t getAnalogNumActiveChannels(int32_t* status) {
   int32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
-  if (scanSize == 0) return 8;
+  if (scanSize == 0) {
+    return 8;
+  }
   return scanSize;
 }
 
@@ -64,8 +67,9 @@ void setAnalogNumChannelsToActivate(int32_t channels) {
 }
 
 int32_t getAnalogNumChannelsToActivate(int32_t* status) {
-  if (analogNumChannelsToActivate == 0)
+  if (analogNumChannelsToActivate == 0) {
     return getAnalogNumActiveChannels(status);
+  }
   return analogNumChannelsToActivate;
 }
 
@@ -82,7 +86,9 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
       ticksPerSample / getAnalogNumChannelsToActivate(status);
   // ticksPerConversion must be at least 80
   if (ticksPerConversion < 80) {
-    if ((*status) >= 0) *status = SAMPLE_RATE_TOO_HIGH;
+    if ((*status) >= 0) {
+      *status = SAMPLE_RATE_TOO_HIGH;
+    }
     ticksPerConversion = 80;
   }
 

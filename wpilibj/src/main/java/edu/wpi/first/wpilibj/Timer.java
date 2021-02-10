@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -23,8 +20,8 @@ public class Timer {
    * Return the approximate match time. The FMS does not send an official match time to the robots,
    * but does send an approximate match time. The value will count down the time remaining in the
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
-   * dispute ref calls or guarantee that a function will trigger before the match ends) The
-   * Practice Match function of the DS approximates the behavior seen on the field.
+   * dispute ref calls or guarantee that a function will trigger before the match ends) The Practice
+   * Match function of the DS approximates the behavior seen on the field.
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
@@ -52,12 +49,10 @@ public class Timer {
   private double m_accumulatedTime;
   private boolean m_running;
 
-  /**
-   * Lock for synchronization.
-   */
+  /** Lock for synchronization. */
   private final Object m_lock = new Object();
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public Timer() {
     reset();
   }

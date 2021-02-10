@@ -1,18 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.filters;
-
-import java.util.Arrays;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpiutil.CircularBuffer;
+import java.util.Arrays;
 
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.
@@ -29,8 +25,8 @@ import edu.wpi.first.wpiutil.CircularBuffer;
  * <p>What can linear filters do? Basically, they can filter, or diminish, the effects of
  * undesirable input frequencies. High frequencies, or rapid changes, can be indicative of sensor
  * noise or be otherwise undesirable. A "low pass" filter smooths out the signal, reducing the
- * impact of these high frequency components.  Likewise, a "high pass" filter gets rid of
- * slow-moving signal components, letting you detect large changes more easily.
+ * impact of these high frequency components. Likewise, a "high pass" filter gets rid of slow-moving
+ * signal components, letting you detect large changes more easily.
  *
  * <p>Example FRC applications of filters: - Getting rid of noise from an analog sensor input (note:
  * the roboRIO's FPGA can do this faster in hardware) - Smoothing out joystick input to prevent the
@@ -65,12 +61,11 @@ public class LinearDigitalFilter extends Filter {
   /**
    * Create a linear FIR or IIR filter.
    *
-   * @param source  The PIDSource object that is used to get values
+   * @param source The PIDSource object that is used to get values
    * @param ffGains The "feed forward" or FIR gains
    * @param fbGains The "feed back" or IIR gains
    */
-  public LinearDigitalFilter(PIDSource source, double[] ffGains,
-                             double[] fbGains) {
+  public LinearDigitalFilter(PIDSource source, double[] ffGains, double[] fbGains) {
     super(source);
     m_inputs = new CircularBuffer(ffGains.length);
     m_outputs = new CircularBuffer(fbGains.length);
@@ -87,13 +82,12 @@ public class LinearDigitalFilter extends Filter {
    *
    * <p>This filter is stable for time constants greater than zero.
    *
-   * @param source       The PIDSource object that is used to get values
+   * @param source The PIDSource object that is used to get values
    * @param timeConstant The discrete-time time constant in seconds
-   * @param period       The period in seconds between samples taken by the user
+   * @param period The period in seconds between samples taken by the user
    */
-  public static LinearDigitalFilter singlePoleIIR(PIDSource source,
-                                                  double timeConstant,
-                                                  double period) {
+  public static LinearDigitalFilter singlePoleIIR(
+      PIDSource source, double timeConstant, double period) {
     double gain = Math.exp(-period / timeConstant);
     double[] ffGains = {1.0 - gain};
     double[] fbGains = {-gain};
@@ -107,13 +101,11 @@ public class LinearDigitalFilter extends Filter {
    *
    * <p>This filter is stable for time constants greater than zero.
    *
-   * @param source       The PIDSource object that is used to get values
+   * @param source The PIDSource object that is used to get values
    * @param timeConstant The discrete-time time constant in seconds
-   * @param period       The period in seconds between samples taken by the user
+   * @param period The period in seconds between samples taken by the user
    */
-  public static LinearDigitalFilter highPass(PIDSource source,
-                                             double timeConstant,
-                                             double period) {
+  public static LinearDigitalFilter highPass(PIDSource source, double timeConstant, double period) {
     double gain = Math.exp(-period / timeConstant);
     double[] ffGains = {gain, -gain};
     double[] fbGains = {-gain};
@@ -128,7 +120,7 @@ public class LinearDigitalFilter extends Filter {
    * <p>This filter is always stable.
    *
    * @param source The PIDSource object that is used to get values
-   * @param taps   The number of samples to average over. Higher = smoother but slower
+   * @param taps The number of samples to average over. Higher = smoother but slower
    * @throws IllegalArgumentException if number of taps is less than 1
    */
   public static LinearDigitalFilter movingAverage(PIDSource source, int taps) {

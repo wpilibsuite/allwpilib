@@ -1,35 +1,23 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.kinematics;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
-/**
- * Represents the state of one swerve module.
- */
+/** Represents the state of one swerve module. */
 @SuppressWarnings("MemberName")
 public class SwerveModuleState implements Comparable<SwerveModuleState> {
 
-  /**
-   * Speed of the wheel of the module.
-   */
+  /** Speed of the wheel of the module. */
   public double speedMetersPerSecond;
 
-  /**
-   * Angle of the module.
-   */
+  /** Angle of the module. */
   public Rotation2d angle = Rotation2d.fromDegrees(0);
 
-  /**
-   * Constructs a SwerveModuleState with zeros for speed and angle.
-   */
-  public SwerveModuleState() {
-  }
+  /** Constructs a SwerveModuleState with zeros for speed and angle. */
+  public SwerveModuleState() {}
 
   /**
    * Constructs a SwerveModuleState.
@@ -57,7 +45,27 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
 
   @Override
   public String toString() {
-    return String.format("SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speedMetersPerSecond,
-        angle);
+    return String.format(
+        "SwerveModuleState(Speed: %.2f m/s, Angle: %s)", speedMetersPerSecond, angle);
+  }
+
+  /**
+   * Minimize the change in heading the desired swerve module state would require by potentially
+   * reversing the direction the wheel spins. If this is used with the PIDController class's
+   * continuous input functionality, the furthest a wheel will ever rotate is 90 degrees.
+   *
+   * @param desiredState The desired state.
+   * @param currentAngle The current module angle.
+   */
+  public static SwerveModuleState optimize(
+      SwerveModuleState desiredState, Rotation2d currentAngle) {
+    var delta = desiredState.angle.minus(currentAngle);
+    if (Math.abs(delta.getDegrees()) > 90.0) {
+      return new SwerveModuleState(
+          -desiredState.speedMetersPerSecond,
+          desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+    } else {
+      return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+    }
   }
 }

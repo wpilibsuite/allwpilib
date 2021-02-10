@@ -2,7 +2,7 @@ import edu.wpi.first.toolchain.*
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.0.1'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.1.0'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'edu.wpi.first.NativeUtils' apply false
     id 'edu.wpi.first.GradleJni' version '0.10.1'
@@ -11,15 +11,11 @@ plugins {
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '1.1.1' apply false
     id 'com.github.johnrengelman.shadow' version '5.2.0' apply false
+    id 'com.diffplug.spotless' version '5.5.0'
 }
 
-if (project.hasProperty('buildServer')) {
-    wpilibVersioning.buildServerMode = true
-}
-
-if (project.hasProperty('releaseMode')) {
-    wpilibVersioning.releaseMode = true
-}
+wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
+wpilibVersioning.releaseMode = project.hasProperty('releaseMode')
 
 allprojects {
     repositories {
@@ -103,10 +99,77 @@ subprojects {
             }
         }
     }
+
+    // Sign outputs with Developer ID
+    if (project.hasProperty("developerID")) {
+        tasks.withType(AbstractLinkTask) { task ->
+            // Don't sign any executables because codesign complains
+            // about relative rpath.
+            if (!(task instanceof LinkExecutable)) {
+                doLast {
+                    // Get path to binary.
+                    String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
+                    exec {
+                        workingDir rootDir
+                        def args = [
+                            "sh",
+                            "-c",
+                            "codesign --force --strict --timestamp --options=runtime " +
+                            "--verbose -s ${project.findProperty("developerID")} ${path}"
+                        ]
+                        commandLine args
+                    }
+                }
+            }
+        }
+    }
 }
 
 ext.getCurrentArch = {
     return NativePlatforms.desktop
+}
+
+spotless {
+    java {
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        toggleOffOn()
+        googleJavaFormat()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    groovyGradle {
+        target fileTree('.') {
+            include '**/*.gradle'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        greclipse()
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format 'xml', {
+        target fileTree('.') {
+            include '**/*.xml'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        eclipseWtp('xml')
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+    format 'misc', {
+        target fileTree('.') {
+            include '**/*.md', '**/.gitignore'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
 }
 
 wrapper {

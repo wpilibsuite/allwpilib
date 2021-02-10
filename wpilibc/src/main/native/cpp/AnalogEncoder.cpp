@@ -1,13 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/AnalogEncoder.h"
 
 #include "frc/AnalogInput.h"
+#include "frc/Base.h"
 #include "frc/Counter.h"
 #include "frc/DriverStation.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -53,7 +51,9 @@ void AnalogEncoder::Init() {
 }
 
 units::turn_t AnalogEncoder::Get() const {
-  if (m_simPosition) return units::turn_t{m_simPosition.Get()};
+  if (m_simPosition) {
+    return units::turn_t{m_simPosition.Get()};
+  }
 
   // As the values are not atomic, keep trying until we get 2 reads of the same
   // value If we don't within 10 attempts, error
@@ -75,7 +75,9 @@ units::turn_t AnalogEncoder::Get() const {
   return m_lastPosition;
 }
 
-double AnalogEncoder::GetPositionOffset() const { return m_positionOffset; }
+double AnalogEncoder::GetPositionOffset() const {
+  return m_positionOffset;
+}
 
 void AnalogEncoder::SetDistancePerRotation(double distancePerRotation) {
   m_distancePerRotation = distancePerRotation;
@@ -94,7 +96,9 @@ void AnalogEncoder::Reset() {
   m_positionOffset = m_analogInput->GetVoltage();
 }
 
-int AnalogEncoder::GetChannel() const { return m_analogInput->GetChannel(); }
+int AnalogEncoder::GetChannel() const {
+  return m_analogInput->GetChannel();
+}
 
 void AnalogEncoder::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");

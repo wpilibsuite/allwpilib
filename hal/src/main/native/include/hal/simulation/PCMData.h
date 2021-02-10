@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -33,6 +30,14 @@ void HALSIM_CancelPCMSolenoidOutputCallback(int32_t index, int32_t channel,
 HAL_Bool HALSIM_GetPCMSolenoidOutput(int32_t index, int32_t channel);
 void HALSIM_SetPCMSolenoidOutput(int32_t index, int32_t channel,
                                  HAL_Bool solenoidOutput);
+
+int32_t HALSIM_RegisterPCMAnySolenoidInitializedCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify);
+void HALSIM_CancelPCMAnySolenoidInitializedCallback(int32_t index, int32_t uid);
+HAL_Bool HALSIM_GetPCMAnySolenoidInitialized(int32_t index);
+void HALSIM_SetPCMAnySolenoidInitialized(int32_t index,
+                                         HAL_Bool anySolenoidInitialized);
 
 int32_t HALSIM_RegisterPCMCompressorInitializedCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,

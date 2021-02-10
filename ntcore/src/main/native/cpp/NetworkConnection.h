@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_NETWORKCONNECTION_H_
 #define NTCORE_NETWORKCONNECTION_H_
@@ -42,18 +39,17 @@ class NetworkConnection : public INetworkConnection {
       std::function<std::shared_ptr<Message>()> get_msg,
       std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs)>
       HandshakeFunc;
-  typedef std::function<void(std::shared_ptr<Message> msg,
-                             NetworkConnection* conn)>
-      ProcessIncomingFunc;
-  typedef std::vector<std::shared_ptr<Message>> Outgoing;
-  typedef wpi::ConcurrentQueue<Outgoing> OutgoingQueue;
+  using ProcessIncomingFunc =
+      std::function<void(std::shared_ptr<Message>, NetworkConnection*)>;
+  using Outgoing = std::vector<std::shared_ptr<Message>>;
+  using OutgoingQueue = wpi::ConcurrentQueue<Outgoing>;
 
   NetworkConnection(unsigned int uid,
                     std::unique_ptr<wpi::NetworkStream> stream,
                     IConnectionNotifier& notifier, wpi::Logger& logger,
                     HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type);
-  ~NetworkConnection();
+  ~NetworkConnection() override;
 
   // Set the input processor function.  This must be called before Start().
   void set_process_incoming(ProcessIncomingFunc func) {
@@ -63,21 +59,21 @@ class NetworkConnection : public INetworkConnection {
   void Start();
   void Stop();
 
-  ConnectionInfo info() const override;
+  ConnectionInfo info() const final;
 
   bool active() const { return m_active; }
   wpi::NetworkStream& stream() { return *m_stream; }
 
-  void QueueOutgoing(std::shared_ptr<Message> msg) override;
+  void QueueOutgoing(std::shared_ptr<Message> msg) final;
   void PostOutgoing(bool keep_alive) override;
 
   unsigned int uid() const { return m_uid; }
 
-  unsigned int proto_rev() const override;
-  void set_proto_rev(unsigned int proto_rev) override;
+  unsigned int proto_rev() const final;
+  void set_proto_rev(unsigned int proto_rev) final;
 
-  State state() const override;
-  void set_state(State state) override;
+  State state() const final;
+  void set_state(State state) final;
 
   std::string remote_id() const;
   void set_remote_id(StringRef remote_id);

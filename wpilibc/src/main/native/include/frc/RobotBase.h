@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -77,15 +74,18 @@ int StartRobot() {
     HAL_RunMain();
 
     // signal loop to exit
-    if (robot) robot->EndCompetition();
+    if (robot) {
+      robot->EndCompetition();
+    }
 
     // prefer to join, but detach to exit if it doesn't exit in a timely manner
     using namespace std::chrono_literals;
     std::unique_lock lock{m};
-    if (cv.wait_for(lock, 1s, [] { return exited; }))
+    if (cv.wait_for(lock, 1s, [] { return exited; })) {
       thr.join();
-    else
+    } else {
       thr.detach();
+    }
   } else {
     impl::RunRobot<Robot>(m, &robot);
   }
@@ -185,6 +185,11 @@ class RobotBase {
 
   virtual void EndCompetition() = 0;
 
+  /**
+   * Get if the robot is real.
+   *
+   * @return If the robot is running in the real world.
+   */
   static constexpr bool IsReal() {
 #ifdef __FRC_ROBORIO__
     return true;
@@ -193,6 +198,11 @@ class RobotBase {
 #endif
   }
 
+  /**
+   * Get if the robot is a simulation.
+   *
+   * @return If the robot is running in simulation.
+   */
   static constexpr bool IsSimulation() { return !IsReal(); }
 
   /**

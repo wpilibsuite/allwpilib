@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/ParallelCommandGroup.h"
 
@@ -24,7 +21,9 @@ void ParallelCommandGroup::Initialize() {
 
 void ParallelCommandGroup::Execute() {
   for (auto& commandRunning : m_commands) {
-    if (!commandRunning.second) continue;
+    if (!commandRunning.second) {
+      continue;
+    }
     commandRunning.first->Execute();
     if (commandRunning.first->IsFinished()) {
       commandRunning.first->End(false);
@@ -46,7 +45,9 @@ void ParallelCommandGroup::End(bool interrupted) {
 
 bool ParallelCommandGroup::IsFinished() {
   for (auto& command : m_commands) {
-    if (command.second) return false;
+    if (command.second) {
+      return false;
+    }
   }
   return true;
 }
@@ -58,7 +59,9 @@ bool ParallelCommandGroup::RunsWhenDisabled() const {
 void ParallelCommandGroup::AddCommands(
     std::vector<std::unique_ptr<Command>>&& commands) {
   for (auto&& command : commands) {
-    if (!RequireUngrouped(*command)) return;
+    if (!RequireUngrouped(*command)) {
+      return;
+    }
   }
 
   if (isRunning) {

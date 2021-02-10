@@ -3,8 +3,6 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     description = "A plugin that creates a simulation gui"
 
     ext {
-        includeWpiutil = true
-        includeNtCore = true
         pluginName = 'halsim_gui'
     }
 
@@ -23,8 +21,12 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     model {
         binaries {
             all {
-                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':glass', library: 'glassnt', linkage: 'static'
+                lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'imgui_static')
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
                     it.buildable = false

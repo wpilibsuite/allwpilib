@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DMA.h"
 
@@ -73,15 +70,13 @@ enum DMAOffsetConstants {
 static hal::LimitedHandleResource<HAL_DMAHandle, DMA, 1, HAL_HandleEnum::DMA>*
     dmaHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDMA() {
   static hal::LimitedHandleResource<HAL_DMAHandle, DMA, 1, HAL_HandleEnum::DMA>
       dH;
   dmaHandles = &dH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
@@ -127,7 +122,8 @@ void HAL_FreeDMA(HAL_DMAHandle handle) {
   auto dma = dmaHandles->Get(handle);
   dmaHandles->Free(handle);
 
-  if (!dma) return;
+  if (!dma)
+    return;
 
   int32_t status = 0;
   if (dma->manager) {
@@ -517,7 +513,9 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
   auto isExternalClock = dma->aDMA->readConfig_ExternalClock(status);
   if (*status == 0 && !isExternalClock) {
     dma->aDMA->writeConfig_ExternalClock(true, status);
-    if (*status != 0) return;
+    if (*status != 0) {
+      return;
+    }
   } else if (*status != 0) {
     return;
   }
@@ -557,7 +555,9 @@ void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status) {
   }
 
   tDMA::tConfig config = dma->aDMA->readConfig(status);
-  if (*status != 0) return;
+  if (*status != 0) {
+    return;
+  }
 
   {
     size_t accum_size = 0;

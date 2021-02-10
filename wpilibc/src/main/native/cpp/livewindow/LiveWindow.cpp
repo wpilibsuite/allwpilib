@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2012-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/livewindow/LiveWindow.h"
 
@@ -85,7 +82,9 @@ void LiveWindow::DisableAllTelemetry() {
   std::scoped_lock lock(m_impl->mutex);
   m_impl->telemetryEnabled = false;
   m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-    if (!cbdata.data) cbdata.data = std::make_shared<Impl::Component>();
+    if (!cbdata.data) {
+      cbdata.data = std::make_shared<Impl::Component>();
+    }
     std::static_pointer_cast<Impl::Component>(cbdata.data)->telemetryEnabled =
         false;
   });
@@ -98,18 +97,24 @@ bool LiveWindow::IsEnabled() const {
 
 void LiveWindow::SetEnabled(bool enabled) {
   std::scoped_lock lock(m_impl->mutex);
-  if (m_impl->liveWindowEnabled == enabled) return;
+  if (m_impl->liveWindowEnabled == enabled) {
+    return;
+  }
   m_impl->startLiveWindow = enabled;
   m_impl->liveWindowEnabled = enabled;
   // Force table generation now to make sure everything is defined
   UpdateValuesUnsafe();
   if (enabled) {
-    if (this->enabled) this->enabled();
+    if (this->enabled) {
+      this->enabled();
+    }
   } else {
     m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
       cbdata.builder.StopLiveWindowMode();
     });
-    if (this->disabled) this->disabled();
+    if (this->disabled) {
+      this->disabled();
+    }
   }
   m_impl->enabledEntry.SetBoolean(enabled);
 }
@@ -121,30 +126,41 @@ void LiveWindow::UpdateValues() {
 
 void LiveWindow::UpdateValuesUnsafe() {
   // Only do this if either LiveWindow mode or telemetry is enabled.
-  if (!m_impl->liveWindowEnabled && !m_impl->telemetryEnabled) return;
+  if (!m_impl->liveWindowEnabled && !m_impl->telemetryEnabled) {
+    return;
+  }
 
   m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-    if (!cbdata.sendable || cbdata.parent) return;
+    if (!cbdata.sendable || cbdata.parent) {
+      return;
+    }
 
-    if (!cbdata.data) cbdata.data = std::make_shared<Impl::Component>();
+    if (!cbdata.data) {
+      cbdata.data = std::make_shared<Impl::Component>();
+    }
 
     auto& comp = *std::static_pointer_cast<Impl::Component>(cbdata.data);
 
-    if (!m_impl->liveWindowEnabled && !comp.telemetryEnabled) return;
+    if (!m_impl->liveWindowEnabled && !comp.telemetryEnabled) {
+      return;
+    }
 
     if (comp.firstTime) {
       // By holding off creating the NetworkTable entries, it allows the
       // components to be redefined. This allows default sensor and actuator
       // values to be created that are replaced with the custom names from
       // users calling setName.
-      if (cbdata.name.empty()) return;
+      if (cbdata.name.empty()) {
+        return;
+      }
       auto ssTable = m_impl->liveWindowTable->GetSubTable(cbdata.subsystem);
       std::shared_ptr<NetworkTable> table;
       // Treat name==subsystem as top level of subsystem
-      if (cbdata.name == cbdata.subsystem)
+      if (cbdata.name == cbdata.subsystem) {
         table = ssTable;
-      else
+      } else {
         table = ssTable->GetSubTable(cbdata.name);
+      }
       table->GetEntry(".name").SetString(cbdata.name);
       cbdata.builder.SetTable(table);
       cbdata.sendable->InitSendable(cbdata.builder);
@@ -153,7 +169,9 @@ void LiveWindow::UpdateValuesUnsafe() {
       comp.firstTime = false;
     }
 
-    if (m_impl->startLiveWindow) cbdata.builder.StartLiveWindowMode();
+    if (m_impl->startLiveWindow) {
+      cbdata.builder.StartLiveWindowMode();
+    }
     cbdata.builder.UpdateTable();
   });
 

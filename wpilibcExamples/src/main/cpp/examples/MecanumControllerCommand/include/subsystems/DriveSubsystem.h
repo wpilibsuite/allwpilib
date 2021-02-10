@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -42,7 +39,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to
    *                      the field.
    */
-  void Drive(double xSpeed, double ySpeed, double rot, bool feildRelative);
+  void Drive(double xSpeed, double ySpeed, double rot, bool fieldRelative);
 
   /**
    * Resets the drive encoders to currently read a position of 0.

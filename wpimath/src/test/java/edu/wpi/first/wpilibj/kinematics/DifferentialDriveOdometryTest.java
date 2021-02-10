@@ -1,24 +1,20 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.kinematics;
-
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import org.junit.jupiter.api.Test;
+
 class DifferentialDriveOdometryTest {
   private static final double kEpsilon = 1E-9;
-  private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(
-      new Rotation2d());
+  private final DifferentialDriveOdometry m_odometry =
+      new DifferentialDriveOdometry(new Rotation2d());
 
   @Test
   void testOdometryWithEncoderDistances() {
@@ -28,7 +24,6 @@ class DifferentialDriveOdometryTest {
     assertAll(
         () -> assertEquals(pose.getX(), 5.0, kEpsilon),
         () -> assertEquals(pose.getY(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getRotation().getDegrees(), 90.0, kEpsilon)
-    );
+        () -> assertEquals(pose.getRotation().getDegrees(), 90.0, kEpsilon));
   }
 }

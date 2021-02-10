@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WebServerClientTest.h"
 
@@ -121,10 +118,10 @@ void WebServerClientTest::AttemptConnect() {
   }
 
   struct sockaddr_in dest;
-  uv::NameToAddr("localhost", 8080, &dest);
+  uv::NameToAddr("localhost", 3300, &dest);
   m_tcp_client->Connect(dest, [this]() {
     m_tcp_connected = true;
-    InitializeWebSocket("localhost", 8080, "/wpilibws");
+    InitializeWebSocket("localhost", 3300, "/wpilibws");
   });
 }
 
@@ -157,6 +154,8 @@ void WebServerClientTest::SendMessage(const wpi::json& msg) {
   });
 }
 
-const wpi::json& WebServerClientTest::GetLastMessage() { return m_json; }
+const wpi::json& WebServerClientTest::GetLastMessage() {
+  return m_json;
+}
 
 }  // namespace wpilibws

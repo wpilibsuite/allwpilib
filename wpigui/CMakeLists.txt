@@ -1,6 +1,7 @@
 project(wpigui)
 
 include(CompileWarnings)
+include(LinkMacOSGUI)
 
 file(GLOB wpigui_src src/main/native/cpp/*.cpp)
 file(GLOB wpigui_windows_src src/main/native/directx11/*.cpp)
@@ -33,17 +34,18 @@ else()
 endif()
 
 add_executable(wpiguidev src/dev/native/cpp/main.cpp)
+wpilib_link_macos_gui(wpiguidev)
 target_link_libraries(wpiguidev wpigui)
 
 install(TARGETS wpigui EXPORT wpigui DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")
 
-#if (MSVC OR FLAT_INSTALL_WPILIB)
+#if (WITH_FLAT_INSTALL)
 #    set (wpigui_config_dir ${wpilib_dest})
 #else()
 #    set (wpigui_config_dir share/wpigui)
 #endif()
 
-#configure_file(wpigui-config.cmake.in ${CMAKE_BINARY_DIR}/wpigui-config.cmake )
-#install(FILES ${CMAKE_BINARY_DIR}/wpigui-config.cmake DESTINATION ${wpigui_config_dir})
+#configure_file(wpigui-config.cmake.in ${WPILIB_BINARY_DIR}/wpigui-config.cmake )
+#install(FILES ${WPILIB_BINARY_DIR}/wpigui-config.cmake DESTINATION ${wpigui_config_dir})
 #install(EXPORT wpigui DESTINATION ${wpigui_config_dir})

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.simulation;
 
@@ -12,81 +9,220 @@ import edu.wpi.first.hal.simulation.DriverStationDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DriverStation;
 
-/**
- * Class to control a simulated driver station.
- */
+/** Class to control a simulated driver station. */
 @SuppressWarnings({"PMD.UseUtilityClass", "PMD.GodClass", "PMD.ExcessivePublicCount"})
 public class DriverStationSim {
-  public static CallbackStore registerEnabledCallback(NotifyCallback callback, boolean initialNotify) {
+  /**
+   * Register a callback on whether the DS is enabled.
+   *
+   * @param callback the callback that will be called whenever the enabled state is changed
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerEnabledCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerEnabledCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelEnabledCallback);
   }
+
+  /**
+   * Check if the DS is enabled.
+   *
+   * @return true if enabled
+   */
   public static boolean getEnabled() {
     return DriverStationDataJNI.getEnabled();
   }
+
+  /**
+   * Change whether the DS is enabled.
+   *
+   * @param enabled the new value
+   */
   public static void setEnabled(boolean enabled) {
     DriverStationDataJNI.setEnabled(enabled);
   }
 
-  public static CallbackStore registerAutonomousCallback(NotifyCallback callback, boolean initialNotify) {
+  /**
+   * Register a callback on whether the DS is in autonomous mode.
+   *
+   * @param callback the callback that will be called on autonomous mode entrance/exit
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerAutonomousCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerAutonomousCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelAutonomousCallback);
   }
+
+  /**
+   * Check if the DS is in autonomous.
+   *
+   * @return true if autonomous
+   */
   public static boolean getAutonomous() {
     return DriverStationDataJNI.getAutonomous();
   }
+
+  /**
+   * Change whether the DS is in autonomous.
+   *
+   * @param autonomous the new value
+   */
   public static void setAutonomous(boolean autonomous) {
     DriverStationDataJNI.setAutonomous(autonomous);
   }
 
+  /**
+   * Register a callback on whether the DS is in test mode.
+   *
+   * @param callback the callback that will be called whenever the test mode is entered or left
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
   public static CallbackStore registerTestCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerTestCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelTestCallback);
   }
+
+  /**
+   * Check if the DS is in test.
+   *
+   * @return true if test
+   */
   public static boolean getTest() {
     return DriverStationDataJNI.getTest();
   }
+
+  /**
+   * Change whether the DS is in test.
+   *
+   * @param test the new value
+   */
   public static void setTest(boolean test) {
     DriverStationDataJNI.setTest(test);
   }
 
-  public static CallbackStore registerEStopCallback(NotifyCallback callback, boolean initialNotify) {
+  /**
+   * Register a callback on the eStop state.
+   *
+   * @param callback the callback that will be called whenever the eStop state changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerEStopCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerEStopCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelEStopCallback);
   }
+
+  /**
+   * Check if eStop has been activated.
+   *
+   * @return true if eStopped
+   */
   public static boolean getEStop() {
     return DriverStationDataJNI.getEStop();
   }
+
+  /**
+   * Set whether eStop is active.
+   *
+   * @param eStop true to activate
+   */
+  @SuppressWarnings("ParameterName")
   public static void setEStop(boolean eStop) {
     DriverStationDataJNI.setEStop(eStop);
   }
 
-  public static CallbackStore registerFmsAttachedCallback(NotifyCallback callback, boolean initialNotify) {
+  /**
+   * Register a callback on whether the FMS is connected.
+   *
+   * @param callback the callback that will be called whenever the FMS connection changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerFmsAttachedCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerFmsAttachedCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelFmsAttachedCallback);
   }
+
+  /**
+   * Check if the FMS is connected.
+   *
+   * @return true if FMS is connected
+   */
   public static boolean getFmsAttached() {
     return DriverStationDataJNI.getFmsAttached();
   }
+
+  /**
+   * Change whether the FMS is connected.
+   *
+   * @param fmsAttached the new value
+   */
   public static void setFmsAttached(boolean fmsAttached) {
     DriverStationDataJNI.setFmsAttached(fmsAttached);
   }
 
-  public static CallbackStore registerDsAttachedCallback(NotifyCallback callback, boolean initialNotify) {
+  /**
+   * Register a callback on whether the DS is connected.
+   *
+   * @param callback the callback that will be called whenever the DS connection changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerDsAttachedCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerDsAttachedCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelDsAttachedCallback);
   }
+
+  /**
+   * Check if the DS is attached.
+   *
+   * @return true if attached
+   */
   public static boolean getDsAttached() {
     return DriverStationDataJNI.getDsAttached();
   }
+
+  /**
+   * Change whether the DS is attached.
+   *
+   * @param dsAttached the new value
+   */
   public static void setDsAttached(boolean dsAttached) {
     DriverStationDataJNI.setDsAttached(dsAttached);
   }
 
-  public static CallbackStore registerAllianceStationIdCallback(NotifyCallback callback, boolean initialNotify) {
+  /**
+   * Register a callback on the alliance station ID.
+   *
+   * @param callback the callback that will be called whenever the alliance station changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerAllianceStationIdCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerAllianceStationIdCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelAllianceStationIdCallback);
   }
+
+  /**
+   * Get the alliance station ID (color + number).
+   *
+   * @return the alliance station color and number
+   */
   public static AllianceStationID getAllianceStationId() {
     switch (DriverStationDataJNI.getAllianceStationId()) {
       case 0:
@@ -105,6 +241,12 @@ public class DriverStationSim {
         return null;
     }
   }
+
+  /**
+   * Change the alliance station.
+   *
+   * @param allianceStationId the new alliance station
+   */
   public static void setAllianceStationId(AllianceStationID allianceStationId) {
     int allianceStation;
     switch (allianceStationId) {
@@ -132,21 +274,39 @@ public class DriverStationSim {
     DriverStationDataJNI.setAllianceStationId(allianceStation);
   }
 
-  public static CallbackStore registerMatchTimeCallback(NotifyCallback callback, boolean initialNotify) {
+  /**
+   * Register a callback on match time.
+   *
+   * @param callback the callback that will be called whenever match time changes
+   * @param initialNotify if true, the callback will be run on the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerMatchTimeCallback(
+      NotifyCallback callback, boolean initialNotify) {
     int uid = DriverStationDataJNI.registerMatchTimeCallback(callback, initialNotify);
     return new CallbackStore(uid, DriverStationDataJNI::cancelMatchTimeCallback);
   }
+
+  /**
+   * Get the current value of the match timer.
+   *
+   * @return the current match time
+   */
   public static double getMatchTime() {
     return DriverStationDataJNI.getMatchTime();
   }
+
+  /**
+   * Sets the match timer.
+   *
+   * @param matchTime the new match time
+   */
   public static void setMatchTime(double matchTime) {
     DriverStationDataJNI.setMatchTime(matchTime);
   }
 
-  /**
-   * Updates DriverStation data so that new values are visible to the user
-   * program.
-   */
+  /** Updates DriverStation data so that new values are visible to the user program. */
   public static void notifyNewData() {
     DriverStationDataJNI.notifyNewData();
     DriverStation.getInstance().waitForData();
@@ -194,7 +354,7 @@ public class DriverStationSim {
   /**
    * Sets the state of one joystick button. Button indexes begin at 1.
    *
-   * @param stick  The joystick number
+   * @param stick The joystick number
    * @param button The button index, beginning at 1
    * @param state The state of the joystick button
    */
@@ -206,7 +366,7 @@ public class DriverStationSim {
    * Gets the value of the axis on a joystick.
    *
    * @param stick The joystick number
-   * @param axis  The analog axis number
+   * @param axis The analog axis number
    * @param value The value of the axis on the joystick
    */
   public static void setJoystickAxis(int stick, int axis, double value) {
@@ -367,6 +527,7 @@ public class DriverStationSim {
     DriverStationDataJNI.setReplayNumber(replayNumber);
   }
 
+  /** Reset all simulation data for the Driver Station. */
   public static void resetData() {
     DriverStationDataJNI.resetData();
   }

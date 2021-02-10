@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "HttpCameraImpl.h"
 
@@ -33,26 +30,36 @@ HttpCameraImpl::~HttpCameraImpl() {
   m_monitorCond.notify_one();
 
   // join monitor thread
-  if (m_monitorThread.joinable()) m_monitorThread.join();
+  if (m_monitorThread.joinable()) {
+    m_monitorThread.join();
+  }
 
   // Close file if it's open
   {
     std::scoped_lock lock(m_mutex);
-    if (m_streamConn) m_streamConn->stream->close();
-    if (m_settingsConn) m_settingsConn->stream->close();
+    if (m_streamConn) {
+      m_streamConn->stream->close();
+    }
+    if (m_settingsConn) {
+      m_settingsConn->stream->close();
+    }
   }
 
   // force wakeup of camera thread in case it's waiting on cv
   m_sinkEnabledCond.notify_one();
 
   // join camera thread
-  if (m_streamThread.joinable()) m_streamThread.join();
+  if (m_streamThread.joinable()) {
+    m_streamThread.join();
+  }
 
   // force wakeup of settings thread
   m_settingsCond.notify_one();
 
   // join settings thread
-  if (m_settingsThread.joinable()) m_settingsThread.join();
+  if (m_settingsThread.joinable()) {
+    m_settingsThread.join();
+  }
 }
 
 void HttpCameraImpl::Start() {
@@ -69,7 +76,9 @@ void HttpCameraImpl::MonitorThreadMain() {
     m_monitorCond.wait_for(lock, std::chrono::seconds(1),
                            [=] { return !m_active; });
 
-    if (!m_active) break;
+    if (!m_active) {
+      break;
+    }
 
     // check to see if we got any frames, and close the stream if not
     // (this will result in an error at the read point, and ultimately
@@ -96,20 +105,28 @@ void HttpCameraImpl::StreamThreadMain() {
     // disconnect if not enabled
     if (!IsEnabled()) {
       std::unique_lock lock(m_mutex);
-      if (m_streamConn) m_streamConn->stream->close();
+      if (m_streamConn) {
+        m_streamConn->stream->close();
+      }
       // Wait for enable
       m_sinkEnabledCond.wait(lock, [=] { return !m_active || IsEnabled(); });
-      if (!m_active) return;
+      if (!m_active) {
+        return;
+      }
     }
 
     // connect
     wpi::SmallString<64> boundary;
     wpi::HttpConnection* conn = DeviceStreamConnect(boundary);
 
-    if (!m_active) break;
+    if (!m_active) {
+      break;
+    }
 
     // keep retrying
-    if (!conn) continue;
+    if (!conn) {
+      continue;
+    }
 
     // update connected since we're actually connected
     SetConnected(true);
@@ -137,7 +154,9 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
       std::this_thread::sleep_for(std::chrono::seconds(1));
       return nullptr;
     }
-    if (m_nextLocation >= m_locations.size()) m_nextLocation = 0;
+    if (m_nextLocation >= m_locations.size()) {
+      m_nextLocation = 0;
+    }
     req = wpi::HttpRequest{m_locations[m_nextLocation++], m_streamSettings};
     m_streamSettingsUpdated = false;
   }
@@ -146,7 +165,9 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   auto stream =
       wpi::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
 
-  if (!m_active || !stream) return nullptr;
+  if (!m_active || !stream) {
+    return nullptr;
+  }
 
   auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
@@ -218,24 +239,33 @@ void HttpCameraImpl::DeviceStream(wpi::raw_istream& is,
   // streaming loop
   while (m_active && !is.has_error() && IsEnabled() && numErrors < 3 &&
          !m_streamSettingsUpdated) {
-    if (!FindMultipartBoundary(is, boundary, nullptr)) break;
+    if (!FindMultipartBoundary(is, boundary, nullptr)) {
+      break;
+    }
 
     // Read the next two characters after the boundary (normally \r\n)
     // Handle just \n for LabVIEW however
     char eol[2];
     is.read(eol, 1);
-    if (!m_active || is.has_error()) break;
+    if (!m_active || is.has_error()) {
+      break;
+    }
     if (eol[0] != '\n') {
       is.read(eol + 1, 1);
-      if (!m_active || is.has_error()) break;
+      if (!m_active || is.has_error()) {
+        break;
+      }
       // End-of-stream is indicated with trailing --
-      if (eol[0] == '-' && eol[1] == '-') break;
+      if (eol[0] == '-' && eol[1] == '-') {
+        break;
+      }
     }
 
-    if (!DeviceStreamFrame(is, imageBuf))
+    if (!DeviceStreamFrame(is, imageBuf)) {
       ++numErrors;
-    else
+    } else {
       numErrors = 0;
+    }
   }
 }
 
@@ -280,7 +310,9 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   // the data directly into it.
   auto image = AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0, contentLength);
   is.read(image->data(), contentLength);
-  if (!m_active || is.has_error()) return false;
+  if (!m_active || is.has_error()) {
+    return false;
+  }
   int width, height;
   if (!GetJpegSize(image->str(), &width, &height)) {
     SWARNING("did not receive a JPEG image");
@@ -302,7 +334,9 @@ void HttpCameraImpl::SettingsThreadMain() {
       m_settingsCond.wait(lock, [=] {
         return !m_active || (m_prefLocation != -1 && !m_settings.empty());
       });
-      if (!m_active) break;
+      if (!m_active) {
+        break;
+      }
 
       // Build the request
       req = wpi::HttpRequest{m_locations[m_prefLocation], m_settings};
@@ -319,7 +353,9 @@ void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
   auto stream =
       wpi::TCPConnector::connect(req.host.c_str(), req.port, m_logger, 1);
 
-  if (!m_active || !stream) return;
+  if (!m_active || !stream) {
+    return;
+  }
 
   auto connPtr = std::make_unique<wpi::HttpConnection>(std::move(stream), 1);
   wpi::HttpConnection* conn = connPtr.get();
@@ -332,7 +368,9 @@ void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
 
   // Just need a handshake as settings are sent via GET parameters
   std::string warn;
-  if (!conn->Handshake(req, &warn)) SWARNING(GetName() << ": " << warn);
+  if (!conn->Handshake(req, &warn)) {
+    SWARNING(GetName() << ": " << warn);
+  }
 
   conn->stream->close();
 }
@@ -366,7 +404,9 @@ bool HttpCameraImpl::SetUrls(wpi::ArrayRef<std::string> urls,
 std::vector<std::string> HttpCameraImpl::GetUrls() const {
   std::scoped_lock lock(m_mutex);
   std::vector<std::string> urls;
-  for (const auto& loc : m_locations) urls.push_back(loc.url);
+  for (const auto& loc : m_locations) {
+    urls.push_back(loc.url);
+  }
   return urls;
 }
 
@@ -396,7 +436,9 @@ void HttpCameraImpl::CreateEnumProperty(
 
   auto& enumChoices = m_propertyData.back()->enumChoices;
   enumChoices.clear();
-  for (const auto& choice : choices) enumChoices.emplace_back(choice);
+  for (const auto& choice : choices) {
+    enumChoices.emplace_back(choice);
+  }
 
   m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name,
                                   m_propertyData.size() + 1, CS_PROP_ENUM,
@@ -471,7 +513,9 @@ void HttpCameraImpl::SetExposureManual(int value, CS_Status* status) {
 }
 
 bool HttpCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  if (mode.pixelFormat != VideoMode::kMJPEG) return false;
+  if (mode.pixelFormat != VideoMode::kMJPEG) {
+    return false;
+  }
   std::scoped_lock lock(m_mutex);
   m_mode = mode;
   m_streamSettingsUpdated = true;
@@ -530,7 +574,9 @@ CS_Source CreateHttpCamera(const wpi::Twine& name, const wpi::Twine& url,
                                                 inst.notifier, inst.telemetry);
       break;
   }
-  if (!source->SetUrls(url.str(), status)) return 0;
+  if (!source->SetUrls(url.str(), status)) {
+    return 0;
+  }
   return inst.CreateSource(CS_SOURCE_HTTP, source);
 }
 
@@ -544,7 +590,9 @@ CS_Source CreateHttpCamera(const wpi::Twine& name,
   }
   auto source = std::make_shared<HttpCameraImpl>(name, kind, inst.logger,
                                                  inst.notifier, inst.telemetry);
-  if (!source->SetUrls(urls, status)) return 0;
+  if (!source->SetUrls(urls, status)) {
+    return 0;
+  }
   return inst.CreateSource(CS_SOURCE_HTTP, source);
 }
 
@@ -595,7 +643,9 @@ CS_Source CS_CreateHttpCameraMulti(const char* name, const char** urls,
                                    CS_Status* status) {
   wpi::SmallVector<std::string, 4> vec;
   vec.reserve(count);
-  for (int i = 0; i < count; ++i) vec.push_back(urls[i]);
+  for (int i = 0; i < count; ++i) {
+    vec.push_back(urls[i]);
+  }
   return cs::CreateHttpCamera(name, vec, kind, status);
 }
 
@@ -607,7 +657,9 @@ void CS_SetHttpCameraUrls(CS_Source source, const char** urls, int count,
                           CS_Status* status) {
   wpi::SmallVector<std::string, 4> vec;
   vec.reserve(count);
-  for (int i = 0; i < count; ++i) vec.push_back(urls[i]);
+  for (int i = 0; i < count; ++i) {
+    vec.push_back(urls[i]);
+  }
   cs::SetHttpCameraUrls(source, vec, status);
 }
 
@@ -616,13 +668,19 @@ char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status) {
   char** out =
       static_cast<char**>(wpi::safe_malloc(urls.size() * sizeof(char*)));
   *count = urls.size();
-  for (size_t i = 0; i < urls.size(); ++i) out[i] = cs::ConvertToC(urls[i]);
+  for (size_t i = 0; i < urls.size(); ++i) {
+    out[i] = cs::ConvertToC(urls[i]);
+  }
   return out;
 }
 
 void CS_FreeHttpCameraUrls(char** urls, int count) {
-  if (!urls) return;
-  for (int i = 0; i < count; ++i) std::free(urls[i]);
+  if (!urls) {
+    return;
+  }
+  for (int i = 0; i < count; ++i) {
+    std::free(urls[i]);
+  }
   std::free(urls);
 }
 

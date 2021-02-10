@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "ConstBufferCallbackStore.h"
 
@@ -25,16 +22,14 @@ static hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
                                     hal::HAL_HandleEnum::SimulationJni>*
     callbackHandles;
 
-namespace hal {
-namespace sim {
+namespace hal::sim {
 void InitializeConstBufferStore() {
   static hal::UnlimitedHandleResource<SIM_JniHandle, ConstBufferCallbackStore,
                                       hal::HAL_HandleEnum::SimulationJni>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace sim
-}  // namespace hal
+}  // namespace hal::sim
 
 void ConstBufferCallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);
@@ -66,7 +61,8 @@ void ConstBufferCallbackStore::performCallback(const char* name,
                                          static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetConstBufferCallback(),
-                      MakeJString(env, name), toCallbackArr, (jint)length);
+                      MakeJString(env, name), toCallbackArr,
+                      static_cast<jint>(length));
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();
@@ -77,7 +73,9 @@ void ConstBufferCallbackStore::performCallback(const char* name,
   }
 }
 
-void ConstBufferCallbackStore::free(JNIEnv* env) { m_call.free(env); }
+void ConstBufferCallbackStore::free(JNIEnv* env) {
+  m_call.free(env);
+}
 
 SIM_JniHandle sim::AllocateConstBufferCallback(
     JNIEnv* env, jint index, jobject callback,
@@ -100,7 +98,9 @@ SIM_JniHandle sim::AllocateConstBufferCallback(
     uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
     SIM_JniHandle handle = static_cast<SIM_JniHandle>(handleTmp);
     auto data = callbackHandles->Get(handle);
-    if (!data) return;
+    if (!data) {
+      return;
+    }
 
     data->performCallback(name, buffer, length);
   };

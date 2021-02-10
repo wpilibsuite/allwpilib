@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_CSCORE_C_H_
 #define CSCORE_CSCORE_C_H_
@@ -49,6 +46,7 @@ typedef int CS_Status;
 typedef int CS_Handle;
 typedef CS_Handle CS_Property;
 typedef CS_Handle CS_Listener;
+typedef CS_Handle CS_ListenerPoller;
 typedef CS_Handle CS_Sink;
 typedef CS_Handle CS_Source;
 /** @} */
@@ -172,7 +170,8 @@ enum CS_EventKind {
   CS_TELEMETRY_UPDATED = 0x8000,
   CS_SINK_PROPERTY_CREATED = 0x10000,
   CS_SINK_PROPERTY_VALUE_UPDATED = 0x20000,
-  CS_SINK_PROPERTY_CHOICES_UPDATED = 0x40000
+  CS_SINK_PROPERTY_CHOICES_UPDATED = 0x40000,
+  CS_USB_CAMERAS_CHANGED = 0x80000
 };
 
 /**
@@ -225,6 +224,9 @@ struct CS_Event {
   enum CS_PropertyKind propertyKind;
   int value;
   const char* valueStr;
+
+  // Listener that was triggered
+  CS_Listener listener;
 };
 
 /**
@@ -432,9 +434,19 @@ void CS_SetListenerOnStart(void (*onStart)(void* data), void* data);
 void CS_SetListenerOnExit(void (*onExit)(void* data), void* data);
 CS_Listener CS_AddListener(
     void* data, void (*callback)(void* data, const struct CS_Event* event),
-    int eventMask, int immediateNotify, CS_Status* status);
+    int eventMask, CS_Bool immediateNotify, CS_Status* status);
 
 void CS_RemoveListener(CS_Listener handle, CS_Status* status);
+
+CS_ListenerPoller CS_CreateListenerPoller(void);
+void CS_DestroyListenerPoller(CS_ListenerPoller poller);
+CS_Listener CS_AddPolledListener(CS_ListenerPoller poller, int eventMask,
+                                 CS_Bool immediateNotify, CS_Status* status);
+struct CS_Event* CS_PollListener(CS_ListenerPoller poller, int* count);
+struct CS_Event* CS_PollListenerTimeout(CS_ListenerPoller poller, int* count,
+                                        double timeout, CS_Bool* timedOut);
+void CS_FreeEvents(struct CS_Event* arr, int count);
+void CS_CancelPollListener(CS_ListenerPoller poller);
 /** @} */
 
 int CS_NotifierDestroyed(void);

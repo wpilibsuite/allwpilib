@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "WSProvider_PWM.h"
 
@@ -25,7 +22,9 @@ void HALSimWSProviderPWM::Initialize(WSRegisterFunc webRegisterFunc) {
                                        webRegisterFunc);
 }
 
-HALSimWSProviderPWM::~HALSimWSProviderPWM() { DoCancelCallbacks(); }
+HALSimWSProviderPWM::~HALSimWSProviderPWM() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderPWM::RegisterCallbacks() {
   m_initCbKey = REGISTER(Initialized, "<init", bool, boolean);
@@ -36,7 +35,9 @@ void HALSimWSProviderPWM::RegisterCallbacks() {
   m_zeroLatchCbKey = REGISTER(ZeroLatch, "<zero_latch", bool, boolean);
 }
 
-void HALSimWSProviderPWM::CancelCallbacks() { DoCancelCallbacks(); }
+void HALSimWSProviderPWM::CancelCallbacks() {
+  DoCancelCallbacks();
+}
 
 void HALSimWSProviderPWM::DoCancelCallbacks() {
   HALSIM_CancelPWMInitializedCallback(m_channel, m_initCbKey);

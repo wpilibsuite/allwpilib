@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifdef __APPLE__
 #include <util.h>
@@ -81,11 +78,15 @@ static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out,
           uv::Buffer& buf, size_t len) {
         // build buffers
         wpi::SmallVector<uv::Buffer, 4> bufs;
-        if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) return;
+        if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) {
+          return;
+        }
 
         // send output
         outPtr->Send(addr, bufs, [](auto bufs2, uv::Error) {
-          for (auto buf : bufs2) buf.Deallocate();
+          for (auto buf : bufs2) {
+            buf.Deallocate();
+          }
         });
       },
       out);
@@ -101,12 +102,15 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
           uv::Buffer& buf, size_t len) {
         // build buffers
         wpi::SmallVector<uv::Buffer, 4> bufs;
-        if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++))
+        if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++)) {
           return;
+        }
 
         // send output
         outPtr->Write(bufs, [](auto bufs2, uv::Error) {
-          for (auto buf : bufs2) buf.Deallocate();
+          for (auto buf : bufs2) {
+            buf.Deallocate();
+          }
         });
       },
       out);
@@ -117,7 +121,9 @@ static void CopyStream(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
     uv::Buffer buf2 = buf.Dup();
     buf2.len = len;
     out->Write(buf2, [](auto bufs, uv::Error) {
-      for (auto buf : bufs) buf.Deallocate();
+      for (auto buf : bufs) {
+        buf.Deallocate();
+      }
     });
   });
 }
@@ -168,12 +174,20 @@ int main(int argc, char* argv[]) {
   auto stderrTty = uv::Tty::Create(loop, 2, false);
 
   // pass through our console to child's (bidirectional)
-  if (stdinTty) CopyStream(*stdinTty, stdinPipe);
-  if (stdoutTty) CopyStream(*stdoutPipe, stdoutTty);
-  if (stderrTty) CopyStream(*stderrPipe, stderrTty);
+  if (stdinTty) {
+    CopyStream(*stdinTty, stdinPipe);
+  }
+  if (stdoutTty) {
+    CopyStream(*stdoutPipe, stdoutTty);
+  }
+  if (stderrTty) {
+    CopyStream(*stderrPipe, stderrTty);
+  }
 
   // when our stdin closes, also close child stdin
-  if (stdinTty) stdinTty->end.connect([stdinPipe] { stdinPipe->Close(); });
+  if (stdinTty) {
+    stdinTty->end.connect([stdinPipe] { stdinPipe->Close(); });
+  }
 
   if (useUdp) {
     auto udp = uv::Udp::Create(loop);
@@ -189,7 +203,9 @@ int main(int argc, char* argv[]) {
     // when we get a connection, accept it
     tcp->connection.connect([srv = tcp.get(), stdoutPipe, stderrPipe] {
       auto tcp = srv->Accept();
-      if (!tcp) return;
+      if (!tcp) {
+        return;
+      }
 
       // close on error
       tcp->error.connect([s = tcp.get()](wpi::uv::Error err) { s->Close(); });
@@ -227,7 +243,9 @@ int main(int argc, char* argv[]) {
       uv::Process::StdioCreatePipe(2, *stderrPipe, UV_WRITABLE_PIPE));
 
   // pass our args as the child args (argv[1] becomes child argv[0], etc)
-  for (int i = programArgc; i < argc; ++i) options.emplace_back(argv[i]);
+  for (int i = programArgc; i < argc; ++i) {
+    options.emplace_back(argv[i]);
+  }
 
   auto proc = uv::Process::SpawnArray(loop, argv[programArgc], options);
   if (!proc) {
@@ -237,7 +255,9 @@ int main(int argc, char* argv[]) {
   proc->exited.connect([](int64_t status, int) { std::exit(status); });
 
   // start reading
-  if (stdinTty) stdinTty->StartRead();
+  if (stdinTty) {
+    stdinTty->StartRead();
+  }
   stdoutPipe->StartRead();
   stderrPipe->StartRead();
 

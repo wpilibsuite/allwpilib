@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
 
@@ -13,9 +10,10 @@
 #include "Eigen/Core"
 #include "Eigen/QR"
 #include "frc/StateSpaceUtil.h"
+#include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
+#include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
-#include "frc/system/RungeKutta.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "units/moment_of_inertia.h"
@@ -94,7 +92,9 @@ TEST(UnscentedKalmanFilterTest, Init) {
 
   auto globalY = GlobalMeasurementModel(observer.Xhat(), u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.01, 0.01);
-  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
+  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R,
+                      frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
+                      frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
 }
 
 TEST(UnscentedKalmanFilterTest, Convergence) {
@@ -154,7 +154,7 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
     observer.Predict(u, dt);
 
     r = nextR;
-    trueXhat = frc::RungeKutta(Dynamics, trueXhat, u, dt);
+    trueXhat = frc::RK4(Dynamics, trueXhat, u, dt);
   }
 
   auto localY = LocalMeasurementModel(trueXhat, u);
@@ -162,7 +162,11 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
 
   auto globalY = GlobalMeasurementModel(trueXhat, u);
   auto R = frc::MakeCovMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
-  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
+  observer.Correct<5>(u, globalY, GlobalMeasurementModel, R,
+                      frc::AngleMean<5, 5>(2), frc::AngleResidual<5>(2),
+                      frc::AngleResidual<5>(2), frc::AngleAdd<5>(2)
+
+  );
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
   ASSERT_NEAR(finalPosition.pose.Translation().X().template to<double>(),

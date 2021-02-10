@@ -1,22 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpiutil.CircularBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import edu.wpi.first.wpiutil.CircularBuffer;
-
 /**
- * A class that implements a moving-window median filter.  Useful for reducing measurement noise,
- * especially with processes that generate occasional, extreme outliers (such as values from
- * vision processing, LIDAR, or ultrasonic sensors).
+ * A class that implements a moving-window median filter. Useful for reducing measurement noise,
+ * especially with processes that generate occasional, extreme outliers (such as values from vision
+ * processing, LIDAR, or ultrasonic sensors).
  */
 public class MedianFilter {
   private final CircularBuffer m_valueBuffer;
@@ -76,9 +72,7 @@ public class MedianFilter {
     }
   }
 
-  /**
-   * Resets the filter, clearing the window of all elements.
-   */
+  /** Resets the filter, clearing the window of all elements. */
   public void reset() {
     m_orderedValues.clear();
     m_valueBuffer.clear();

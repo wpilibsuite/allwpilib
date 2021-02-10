@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_JNI_UTIL_H_
 #define WPIUTIL_WPI_JNI_UTIL_H_
@@ -26,11 +23,8 @@
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
 
-/** WPILib C++ utilities (wpiutil) namespace */
-namespace wpi {
-
 /** Java Native Interface (JNI) utility functions */
-namespace java {
+namespace wpi::java {
 
 // Gets a Java stack trace.  Also provides the last function
 // in the stack trace not starting with excludeFuncPrefix (useful for e.g.
@@ -47,13 +41,17 @@ class JClass {
 
   JClass(JNIEnv* env, const char* name) {
     jclass local = env->FindClass(name);
-    if (!local) return;
+    if (!local) {
+      return;
+    }
     m_cls = static_cast<jclass>(env->NewGlobalRef(local));
     env->DeleteLocalRef(local);
   }
 
   void free(JNIEnv* env) {
-    if (m_cls) env->DeleteGlobalRef(m_cls);
+    if (m_cls) {
+      env->DeleteGlobalRef(m_cls);
+    }
     m_cls = nullptr;
   }
 
@@ -80,13 +78,15 @@ class JGlobal {
   }
 
   void free(JNIEnv* env) {
-    if (m_cls) env->DeleteGlobalRef(m_cls);
+    if (m_cls) {
+      env->DeleteGlobalRef(m_cls);
+    }
     m_cls = nullptr;
   }
 
   explicit operator bool() const { return m_cls; }
 
-  operator T() const { return m_cls; }
+  operator T() const { return m_cls; }  // NOLINT
 
  protected:
   T m_cls = nullptr;
@@ -110,9 +110,11 @@ class JLocal {
     return *this;
   }
   ~JLocal() {
-    if (m_obj) m_env->DeleteLocalRef(m_obj);
+    if (m_obj) {
+      m_env->DeleteLocalRef(m_obj);
+    }
   }
-  operator T() { return m_obj; }
+  operator T() { return m_obj; }  // NOLINT
   T obj() { return m_obj; }
 
  private:
@@ -146,7 +148,7 @@ class JStringRef {
     m_str.pop_back();
   }
 
-  operator StringRef() const { return m_str; }
+  operator StringRef() const { return m_str; }  // NOLINT
   StringRef str() const { return m_str; }
   const char* c_str() const { return m_str.data(); }
   size_t size() const { return m_str.size(); }
@@ -169,7 +171,9 @@ class JArrayRefInner<C, jbyte> {
 
   StringRef str() const {
     auto arr = static_cast<const C*>(this)->array();
-    if (arr.empty()) return StringRef{};
+    if (arr.empty()) {
+      return {};
+    }
     return StringRef{reinterpret_cast<const char*>(arr.data()), arr.size()};
   }
 };
@@ -180,10 +184,12 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
  public:
   explicit operator bool() const { return this->m_elements != nullptr; }
 
-  operator ArrayRef<T>() const { return array(); }
+  operator ArrayRef<T>() const { return array(); }  // NOLINT
 
   ArrayRef<T> array() const {
-    if (!this->m_elements) return ArrayRef<T>{};
+    if (!this->m_elements) {
+      return {};
+    }
     return ArrayRef<T>{this->m_elements, this->m_size};
   }
 
@@ -245,30 +251,34 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
               env,                                                             \
               static_cast<T*>(bb ? env->GetDirectBufferAddress(bb) : nullptr), \
               len) {                                                           \
-      if (!bb)                                                                 \
+      if (!bb) {                                                               \
         errs() << "JArrayRef was passed a null pointer at \n"                  \
                << GetJavaStackTrace(env);                                      \
+      }                                                                        \
     }                                                                          \
     J##F##ArrayRef(JNIEnv* env, T##Array jarr, int len)                        \
         : detail::JArrayRefBase<T>(env, jarr, len) {                           \
-      if (jarr)                                                                \
+      if (jarr) {                                                              \
         m_elements = env->Get##F##ArrayElements(jarr, nullptr);                \
-      else                                                                     \
+      } else {                                                                 \
         errs() << "JArrayRef was passed a null pointer at \n"                  \
                << GetJavaStackTrace(env);                                      \
+      }                                                                        \
     }                                                                          \
     J##F##ArrayRef(JNIEnv* env, T##Array jarr)                                 \
         : detail::JArrayRefBase<T>(env, jarr) {                                \
-      if (jarr)                                                                \
+      if (jarr) {                                                              \
         m_elements = env->Get##F##ArrayElements(jarr, nullptr);                \
-      else                                                                     \
+      } else {                                                                 \
         errs() << "JArrayRef was passed a null pointer at \n"                  \
                << GetJavaStackTrace(env);                                      \
+      }                                                                        \
     }                                                                          \
     ~J##F##ArrayRef() {                                                        \
-      if (m_jarr && m_elements)                                                \
+      if (m_jarr && m_elements) {                                              \
         m_env->Release##F##ArrayElements(static_cast<T##Array>(m_jarr),        \
                                          m_elements, JNI_ABORT);               \
+      }                                                                        \
     }                                                                          \
   };                                                                           \
                                                                                \
@@ -276,25 +286,28 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
    public:                                                                     \
     CriticalJ##F##ArrayRef(JNIEnv* env, T##Array jarr, int len)                \
         : detail::JArrayRefBase<T>(env, jarr, len) {                           \
-      if (jarr)                                                                \
+      if (jarr) {                                                              \
         m_elements =                                                           \
             static_cast<T*>(env->GetPrimitiveArrayCritical(jarr, nullptr));    \
-      else                                                                     \
+      } else {                                                                 \
         errs() << "JArrayRef was passed a null pointer at \n"                  \
                << GetJavaStackTrace(env);                                      \
+      }                                                                        \
     }                                                                          \
     CriticalJ##F##ArrayRef(JNIEnv* env, T##Array jarr)                         \
         : detail::JArrayRefBase<T>(env, jarr) {                                \
-      if (jarr)                                                                \
+      if (jarr) {                                                              \
         m_elements =                                                           \
             static_cast<T*>(env->GetPrimitiveArrayCritical(jarr, nullptr));    \
-      else                                                                     \
+      } else {                                                                 \
         errs() << "JArrayRef was passed a null pointer at \n"                  \
                << GetJavaStackTrace(env);                                      \
+      }                                                                        \
     }                                                                          \
     ~CriticalJ##F##ArrayRef() {                                                \
-      if (m_jarr && m_elements)                                                \
+      if (m_jarr && m_elements) {                                              \
         m_env->ReleasePrimitiveArrayCritical(m_jarr, m_elements, JNI_ABORT);   \
+      }                                                                        \
     }                                                                          \
   };
 
@@ -330,12 +343,17 @@ template <typename T,
 struct ConvertIntArray {
   static jintArray ToJava(JNIEnv* env, ArrayRef<T> arr) {
     jintArray jarr = env->NewIntArray(arr.size());
-    if (!jarr) return nullptr;
+    if (!jarr) {
+      return nullptr;
+    }
     jint* elements =
         static_cast<jint*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-    if (!elements) return nullptr;
-    for (size_t i = 0; i < arr.size(); ++i)
+    if (!elements) {
+      return nullptr;
+    }
+    for (size_t i = 0; i < arr.size(); ++i) {
       elements[i] = static_cast<jint>(arr[i]);
+    }
     env->ReleasePrimitiveArrayCritical(jarr, elements, 0);
     return jarr;
   }
@@ -346,7 +364,9 @@ template <typename T>
 struct ConvertIntArray<T, true> {
   static jintArray ToJava(JNIEnv* env, ArrayRef<T> arr) {
     jintArray jarr = env->NewIntArray(arr.size());
-    if (!jarr) return nullptr;
+    if (!jarr) {
+      return nullptr;
+    }
     env->SetIntArrayRegion(jarr, 0, arr.size(),
                            reinterpret_cast<const jint*>(arr.data()));
     return jarr;
@@ -378,7 +398,9 @@ inline jintArray MakeJIntArray(JNIEnv* env, const std::vector<T>& arr) {
 // Convert a StringRef into a jbyteArray.
 inline jbyteArray MakeJByteArray(JNIEnv* env, StringRef str) {
   jbyteArray jarr = env->NewByteArray(str.size());
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   env->SetByteArrayRegion(jarr, 0, str.size(),
                           reinterpret_cast<const jbyte*>(str.data()));
   return jarr;
@@ -387,12 +409,17 @@ inline jbyteArray MakeJByteArray(JNIEnv* env, StringRef str) {
 // Convert an array of integers into a jbooleanArray.
 inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<int> arr) {
   jbooleanArray jarr = env->NewBooleanArray(arr.size());
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   jboolean* elements =
       static_cast<jboolean*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-  if (!elements) return nullptr;
-  for (size_t i = 0; i < arr.size(); ++i)
+  if (!elements) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < arr.size(); ++i) {
     elements[i] = arr[i] ? JNI_TRUE : JNI_FALSE;
+  }
   env->ReleasePrimitiveArrayCritical(jarr, elements, 0);
   return jarr;
 }
@@ -400,12 +427,17 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<int> arr) {
 // Convert an array of booleans into a jbooleanArray.
 inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
   jbooleanArray jarr = env->NewBooleanArray(arr.size());
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   jboolean* elements =
       static_cast<jboolean*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-  if (!elements) return nullptr;
-  for (size_t i = 0; i < arr.size(); ++i)
+  if (!elements) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < arr.size(); ++i) {
     elements[i] = arr[i] ? JNI_TRUE : JNI_FALSE;
+  }
   env->ReleasePrimitiveArrayCritical(jarr, elements, 0);
   return jarr;
 }
@@ -415,7 +447,9 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
 #define WPI_JNI_MAKEJARRAY(T, F)                                  \
   inline T##Array MakeJ##F##Array(JNIEnv* env, ArrayRef<T> arr) { \
     T##Array jarr = env->New##F##Array(arr.size());               \
-    if (!jarr) return nullptr;                                    \
+    if (!jarr) {                                                  \
+      return nullptr;                                             \
+    }                                                             \
     env->Set##F##ArrayRegion(jarr, 0, arr.size(), arr.data());    \
     return jarr;                                                  \
   }
@@ -432,9 +466,13 @@ WPI_JNI_MAKEJARRAY(jdouble, Double)
 // Convert an array of std::string into a jarray of jstring.
 inline jobjectArray MakeJStringArray(JNIEnv* env, ArrayRef<std::string> arr) {
   static JClass stringCls{env, "java/lang/String"};
-  if (!stringCls) return nullptr;
+  if (!stringCls) {
+    return nullptr;
+  }
   jobjectArray jarr = env->NewObjectArray(arr.size(), stringCls, nullptr);
-  if (!jarr) return nullptr;
+  if (!jarr) {
+    return nullptr;
+  }
   for (size_t i = 0; i < arr.size(); ++i) {
     JLocal<jstring> elem{env, MakeJString(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, elem.obj());
@@ -460,7 +498,7 @@ inline jobjectArray MakeJStringArray(JNIEnv* env, ArrayRef<std::string> arr) {
 template <typename T>
 class JCallbackThread : public SafeThread {
  public:
-  void Main();
+  void Main() override;
 
   std::queue<T> m_queue;
   jobject m_func = nullptr;
@@ -480,9 +518,13 @@ class JCallbackManager : public SafeThreadOwner<JCallbackThread<T>> {
 template <typename T>
 void JCallbackManager<T>::SetFunc(JNIEnv* env, jobject func, jmethodID mid) {
   auto thr = this->GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
   // free global reference
-  if (thr->m_func) env->DeleteGlobalRef(thr->m_func);
+  if (thr->m_func) {
+    env->DeleteGlobalRef(thr->m_func);
+  }
   // create global reference
   thr->m_func = env->NewGlobalRef(func);
   thr->m_mid = mid;
@@ -492,7 +534,9 @@ template <typename T>
 template <typename... Args>
 void JCallbackManager<T>::Send(Args&&... args) {
   auto thr = this->GetThread();
-  if (!thr) return;
+  if (!thr) {
+    return;
+  }
   thr->m_queue.emplace(std::forward<Args>(args)...);
   thr->m_cond.notify_one();
 }
@@ -506,14 +550,20 @@ void JCallbackThread<T>::Main() {
   args.group = nullptr;
   jint rs = T::GetJVM()->AttachCurrentThreadAsDaemon(
       reinterpret_cast<void**>(&env), &args);
-  if (rs != JNI_OK) return;
+  if (rs != JNI_OK) {
+    return;
+  }
 
   std::unique_lock lock(m_mutex);
   while (m_active) {
     m_cond.wait(lock, [&] { return !(m_active && m_queue.empty()); });
-    if (!m_active) break;
+    if (!m_active) {
+      break;
+    }
     while (!m_queue.empty()) {
-      if (!m_active) break;
+      if (!m_active) {
+        break;
+      }
       auto item = std::move(m_queue.front());
       m_queue.pop();
       auto func = m_func;
@@ -529,7 +579,9 @@ void JCallbackThread<T>::Main() {
   }
 
   JavaVM* jvm = T::GetJVM();
-  if (jvm) jvm->DetachCurrentThread();
+  if (jvm) {
+    jvm->DetachCurrentThread();
+  }
 }
 
 template <typename T>
@@ -545,37 +597,46 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
                                      StringRef excludeFuncPrefix) {
   // create a throwable
   static JClass throwableCls(env, "java/lang/Throwable");
-  if (!throwableCls) return "";
+  if (!throwableCls) {
+    return "";
+  }
   static jmethodID constructorId = nullptr;
-  if (!constructorId)
+  if (!constructorId) {
     constructorId = env->GetMethodID(throwableCls, "<init>", "()V");
+  }
   JLocal<jobject> throwable(env, env->NewObject(throwableCls, constructorId));
 
   // retrieve information from the exception.
   // get method id
   // getStackTrace returns an array of StackTraceElement
   static jmethodID getStackTraceId = nullptr;
-  if (!getStackTraceId)
+  if (!getStackTraceId) {
     getStackTraceId = env->GetMethodID(throwableCls, "getStackTrace",
                                        "()[Ljava/lang/StackTraceElement;");
+  }
 
   // call getStackTrace
   JLocal<jobjectArray> stackTrace(
       env, static_cast<jobjectArray>(
                env->CallObjectMethod(throwable, getStackTraceId)));
 
-  if (!stackTrace) return "";
+  if (!stackTrace) {
+    return "";
+  }
 
   // get length of the array
   jsize stackTraceLength = env->GetArrayLength(stackTrace);
 
   // get toString methodId of StackTraceElement class
   static JClass stackTraceElementCls(env, "java/lang/StackTraceElement");
-  if (!stackTraceElementCls) return "";
+  if (!stackTraceElementCls) {
+    return "";
+  }
   static jmethodID toStringId = nullptr;
-  if (!toStringId)
+  if (!toStringId) {
     toStringId = env->GetMethodID(stackTraceElementCls, "toString",
                                   "()Ljava/lang/String;");
+  }
 
   bool haveLoc = false;
   std::string buf;
@@ -590,7 +651,9 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
         env, static_cast<jstring>(
                  env->CallObjectMethod(curStackTraceElement, toStringId)));
 
-    if (!stackElementString) return "";
+    if (!stackElementString) {
+      return "";
+    }
 
     // add a line to res
     JStringRef elem(env, stackElementString);
@@ -620,9 +683,10 @@ class JException : public JClass {
  public:
   JException() = default;
   JException(JNIEnv* env, const char* name) : JClass(env, name) {
-    if (m_cls)
+    if (m_cls) {
       m_constructor =
           env->GetMethodID(m_cls, "<init>", "(Ljava/lang/String;)V");
+    }
   }
 
   void Throw(JNIEnv* env, jstring msg) {
@@ -643,7 +707,6 @@ struct JExceptionInit {
   JException* cls;
 };
 
-}  // namespace java
-}  // namespace wpi
+}  // namespace wpi::java
 
 #endif  // WPIUTIL_WPI_JNI_UTIL_H_

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -11,9 +8,7 @@
 
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
-#include <wpi/mutex.h>
 
-#include "frc/Base.h"
 #include "frc/Error.h"
 
 // Forward declared manually to avoid needing to pull in entire HAL header.

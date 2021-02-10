@@ -1,23 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.command;
 
 /**
  * This command will execute once, then finish immediately afterward.
  *
- * <p>Subclassing {@link InstantCommand} is shorthand for returning true from
- * {@link Command isFinished}.
+ * <p>Subclassing {@link InstantCommand} is shorthand for returning true from {@link Command
+ * isFinished}.
  */
 public class InstantCommand extends Command {
   private Runnable m_func;
 
-  public InstantCommand() {
-  }
+  public InstantCommand() {}
 
   /**
    * Creates a new {@link InstantCommand InstantCommand} with the given name.
@@ -40,7 +36,7 @@ public class InstantCommand extends Command {
   /**
    * Creates a new {@link InstantCommand InstantCommand} with the given name and requirement.
    *
-   * @param name      the name for this command
+   * @param name the name for this command
    * @param subsystem the subsystem this command requires
    */
   public InstantCommand(String name, Subsystem subsystem) {
@@ -71,7 +67,7 @@ public class InstantCommand extends Command {
    * Creates a new {@link InstantCommand InstantCommand}.
    *
    * @param requirement the subsystem this command requires
-   * @param func        the function to run when {@link Command#initialize() initialize()} is run
+   * @param func the function to run when {@link Command#initialize() initialize()} is run
    */
   public InstantCommand(Subsystem requirement, Runnable func) {
     super(requirement);
@@ -81,9 +77,9 @@ public class InstantCommand extends Command {
   /**
    * Creates a new {@link InstantCommand InstantCommand}.
    *
-   * @param name        the name for this command
+   * @param name the name for this command
    * @param requirement the subsystem this command requires
-   * @param func        the function to run when {@link Command#initialize() initialize()} is run
+   * @param func the function to run when {@link Command#initialize() initialize()} is run
    */
   public InstantCommand(String name, Subsystem requirement, Runnable func) {
     super(name, requirement);

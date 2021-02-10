@@ -1,30 +1,23 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
-
-import java.util.logging.Logger;
-
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
-import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
-import edu.wpi.first.wpilibj.test.TestBench;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Test that covers the {@link AnalogCrossConnectFixture}.
- */
+import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
+import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
+import edu.wpi.first.wpilibj.test.TestBench;
+import java.util.logging.Logger;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+/** Test that covers the {@link AnalogCrossConnectFixture}. */
 public class AnalogCrossConnectTest extends AbstractInterruptTest {
   private static final Logger logger = Logger.getLogger(AnalogCrossConnectTest.class.getName());
 
@@ -36,7 +29,6 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   protected Logger getClassLogger() {
     return logger;
   }
-
 
   @BeforeClass
   public static void setUpBeforeClass() {
@@ -53,7 +45,6 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   public void setUp() {
     analogIO.setup();
   }
-
 
   @Test
   public void testAnalogOuput() {
@@ -154,11 +145,10 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   InterruptableSensorBase giveInterruptableSensorBase() {
     m_interruptTrigger = new AnalogTrigger(analogIO.getInput());
     m_interruptTrigger.setLimitsVoltage(2.0, 3.0);
-    m_interruptTriggerOutput = new AnalogTriggerOutput(m_interruptTrigger,
-        AnalogTriggerType.kState);
+    m_interruptTriggerOutput =
+        new AnalogTriggerOutput(m_interruptTrigger, AnalogTriggerType.kState);
     return m_interruptTriggerOutput;
   }
-
 
   /*
    * (non-Javadoc)
@@ -174,7 +164,6 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     m_interruptTrigger.close();
     m_interruptTrigger = null;
   }
-
 
   /*
    * (non-Javadoc)

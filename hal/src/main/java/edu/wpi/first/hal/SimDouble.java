@@ -1,15 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
-/**
- * A wrapper around a simulator double value handle.
- */
+/** A wrapper around a simulator double value handle. */
 public class SimDouble extends SimValue {
   /**
    * Wraps a simulated value handle as returned by SimDeviceJNI.createSimValueDouble().
@@ -36,5 +31,14 @@ public class SimDouble extends SimValue {
    */
   public void set(double value) {
     SimDeviceJNI.setSimValueDouble(m_handle, value);
+  }
+
+  /**
+   * Resets the simulated value to 0. Use this instead of Set(0) for resetting incremental sensor
+   * values like encoder counts or gyro accumulated angle to ensure correct behavior in a
+   * distributed system (e.g. WebSockets).
+   */
+  public void reset() {
+    SimDeviceJNI.resetSimValue(m_handle);
   }
 }

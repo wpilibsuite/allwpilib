@@ -10,7 +10,7 @@
     ],
     "foldername": "MotorControl",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Motor Control With Encoder",
@@ -25,7 +25,7 @@
     ],
     "foldername": "MotorControlEncoder",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Relay",
@@ -37,7 +37,7 @@
     ],
     "foldername": "Relay",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "PDP CAN Monitoring",
@@ -49,7 +49,7 @@
     ],
     "foldername": "CANPDP",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Solenoids",
@@ -62,7 +62,7 @@
     ],
     "foldername": "Solenoid",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Encoder",
@@ -74,7 +74,7 @@
     ],
     "foldername": "Encoder",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Arcade Drive",
@@ -87,7 +87,7 @@
     ],
     "foldername": "ArcadeDrive",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Mecanum Drive",
@@ -100,7 +100,7 @@
     ],
     "foldername": "MecanumDrive",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Ultrasonic",
@@ -113,7 +113,7 @@
     ],
     "foldername": "Ultrasonic",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "UltrasonicPID",
@@ -126,7 +126,7 @@
     ],
     "foldername": "UltrasonicPID",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Gyro",
@@ -140,7 +140,7 @@
     ],
     "foldername": "Gyro",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Gyro Mecanum",
@@ -154,7 +154,7 @@
     ],
     "foldername": "GyroMecanum",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "HID Rumble",
@@ -164,7 +164,7 @@
     ],
     "foldername": "HidRumble",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "PotentiometerPID",
@@ -178,7 +178,7 @@
     ],
     "foldername": "PotentiometerPID",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Elevator with trapezoid profiled PID",
@@ -191,7 +191,7 @@
     ],
     "foldername": "ElevatorTrapezoidProfile",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Elevator with profiled PID controller",
@@ -204,7 +204,7 @@
     ],
     "foldername": "ElevatorProfiledPID",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Getting Started",
@@ -215,7 +215,7 @@
     ],
     "foldername": "GettingStarted",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Simple Vision",
@@ -226,7 +226,7 @@
     ],
     "foldername": "QuickVision",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Intermediate Vision",
@@ -237,7 +237,7 @@
     ],
     "foldername": "IntermediateVision",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Axis Camera Sample",
@@ -248,7 +248,7 @@
     ],
     "foldername": "AxisCameraSample",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "GearsBot",
@@ -280,7 +280,7 @@
     ],
     "foldername": "HAL",
     "gradlebase": "c",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "ShuffleBoard",
@@ -290,7 +290,7 @@
     ],
     "foldername": "ShuffleBoard",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "'Traditional' Hatchbot",
@@ -414,7 +414,7 @@
     ],
     "foldername": "ArcadeDriveXboxController",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Tank Drive Xbox Controller",
@@ -427,7 +427,7 @@
     ],
     "foldername": "TankDriveXboxController",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Duty Cycle Encoder",
@@ -544,8 +544,19 @@
     "commandversion": 2
   },
   {
+    "name": "RomiReference",
+    "description": "An example command-based robot program that can be used with the Romi reference robot design.",
+    "tags": [
+      "Drivetrain",
+      "Romi"
+    ],
+    "foldername": "RomiReference",
+    "gradlebase": "cppromi",
+    "commandversion": 2
+  },
+  {
     "name": "StateSpaceFlywheel",
-    "description": "An example command-based robot demonstrating the use of a SwerveControllerCommand to follow a pregenerated trajectory.",
+    "description": "An example state-space controller for a flywheel.",
     "tags": [
       "StateSpaceFlywheel",
       "Flywheel",
@@ -582,7 +593,7 @@
   },
   {
     "name": "StateSpaceElevator",
-    "description": "An example state-space controller demonstrating the use of FRC Characterization's System Identification for controlling a flywheel.",
+    "description": "An example state-space controller for controlling an elevator.",
     "tags": [
       "Elevator",
       "State Space",
@@ -598,7 +609,7 @@
   },
   {
     "name": "StateSpaceArm",
-    "description": "An example state-space controller demonstrating the use of FRC Characterization's System Identification for controlling a flywheel.",
+    "description": "An example state-space controller for controlling an arm.",
     "tags": [
       "Arm",
       "State space",
@@ -608,6 +619,123 @@
       "Joystick"
     ],
     "foldername": "StateSpaceArm",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorSimulation",
+    "description": "Demonstrates the use of physics simulation with a simple elevator.",
+    "tags": [
+      "Elevator",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Simulation",
+      "Physics"
+    ],
+    "foldername": "ElevatorSimulation",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "DifferentialDrivePoseEstimator",
+    "description": "Demonstrates the use of the DifferentialDrivePoseEstimator as a replacement for differential drive odometry.",
+    "tags": [
+      "Drivetrain",
+      "State space",
+      "Vision",
+      "Filter",
+      "Odometry",
+      "Pose"
+    ],
+    "foldername": "DifferentialDrivePoseEstimator",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumDrivePoseEstimator",
+    "description": "Demonstrates the use of the MecanumDrivePoseEstimator as a replacement for mecanum odometry.",
+    "tags": [
+      "Drivetrain",
+      "State space",
+      "Vision",
+      "Filter",
+      "Odometry",
+      "Pose"
+    ],
+    "foldername": "MecanumDrivePoseEstimator",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "ArmSimulation",
+    "description": "Demonstrates the use of physics simulation with a simple single-jointed arm.",
+    "tags": [
+      "Arm",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Simulation",
+      "Physics"
+    ],
+    "foldername": "ArmSimulation",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "SimpleDifferentialDriveSimulation",
+    "description": "An example of a minimal drivetrain simulation project without the command-based library.",
+    "tags": [
+      "Differential Drive",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Simulation",
+      "Physics",
+      "Drivetrain",
+      "Field2d"
+    ],
+    "foldername": "SimpleDifferentialDriveSimulation",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceDriveSimulation",
+    "description": "Demonstrates the use of physics simulation with a differential drivetrain and the Field2d class.",
+    "tags": [
+      "Differential Drive",
+      "State space",
+      "Digital",
+      "Sensors",
+      "Simulation",
+      "Physics",
+      "Drivetrain",
+      "Field2d"
+    ],
+    "foldername": "StateSpaceDifferentialDriveSimulation",
+    "gradlebase": "cpp",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveDrivePoseEstimator",
+    "description": "Demonstrates the use of the SwerveDrivePoseEstimator as a replacement for mecanum drive odometry.",
+    "tags": [
+      "Drivetrain",
+      "State space",
+      "Vision",
+      "Filter",
+      "Odometry",
+      "State",
+      "Swerve"
+    ],
+    "foldername": "SwerveDrivePoseEstimator",
     "gradlebase": "cpp",
     "mainclass": "Main",
     "commandversion": 2

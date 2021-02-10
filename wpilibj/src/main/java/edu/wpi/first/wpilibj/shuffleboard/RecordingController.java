@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
@@ -12,9 +9,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 
-/**
- * Controls Shuffleboard recordings via NetworkTables.
- */
+/** Controls Shuffleboard recordings via NetworkTables. */
 final class RecordingController {
   private static final String kRecordingTableName = "/Shuffleboard/.recording/";
   private static final String kRecordingControlKey = kRecordingTableName + "RecordData";
@@ -49,21 +44,20 @@ final class RecordingController {
 
   public void addEventMarker(String name, String description, EventImportance importance) {
     if (name == null || name.isEmpty()) {
-      DriverStation.reportError(
-          "Shuffleboard event name was not specified", true);
+      DriverStation.reportError("Shuffleboard event name was not specified", true);
       return;
     }
 
     if (importance == null) {
-      DriverStation.reportError(
-          "Shuffleboard event importance was null", true);
+      DriverStation.reportError("Shuffleboard event importance was null", true);
       return;
     }
 
     String eventDescription = description == null ? "" : description;
 
-    m_eventsTable.getSubTable(name)
+    m_eventsTable
+        .getSubTable(name)
         .getEntry("Info")
-        .setStringArray(new String[]{eventDescription, importance.getSimpleName()});
+        .setStringArray(new String[] {eventDescription, importance.getSimpleName()});
   }
 }

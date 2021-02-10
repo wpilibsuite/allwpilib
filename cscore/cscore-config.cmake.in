@@ -3,4 +3,5 @@ include(CMakeFindDependencyMacro)
 @WPIUTIL_DEP_REPLACE@
 find_dependency(OpenCV)
 
+@FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/cscore.cmake)

@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 /**
- * Classes in the {@code edu.wpi.first.vision} package are designed to
- * simplify using OpenCV vision processing code from a robot program.
+ * Classes in the {@code edu.wpi.first.vision} package are designed to simplify using OpenCV vision
+ * processing code from a robot program.
  *
- * <p>An example use case for grabbing a yellow tote from 2015 in autonomous:
- * <br>
+ * <p>An example use case for grabbing a yellow tote from 2015 in autonomous: <br>
+ *
  * <pre><code>
  * public class Robot extends IterativeRobot
  *     implements VisionRunner.Listener&lt;MyFindTotePipeline&gt; {

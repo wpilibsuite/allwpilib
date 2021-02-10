@@ -1,16 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.system;
-
-import java.util.function.Function;
-
-import org.ejml.MatrixDimensionException;
-import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.wpilibj.controller.LinearPlantInversionFeedforward;
 import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
@@ -19,26 +11,26 @@ import edu.wpi.first.wpilibj.math.StateSpaceUtil;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import java.util.function.Function;
+import org.ejml.MatrixDimensionException;
+import org.ejml.simple.SimpleMatrix;
 
 /**
- * Combines a plant, controller, and observer for controlling a mechanism with
- * full state feedback.
+ * Combines a controller, feedforward, and observer for controlling a mechanism with full state
+ * feedback.
  *
- * <p>For everything in this file, "inputs" and "outputs" are defined from the
- * perspective of the plant. This means U is an input and Y is an output
- * (because you give the plant U (powers) and it gives you back a Y (sensor
- * values). This is the opposite of what they mean from the perspective of the
- * controller (U is an output because that's what goes to the motors and Y is an
- * input because that's what comes back from the sensors).
+ * <p>For everything in this file, "inputs" and "outputs" are defined from the perspective of the
+ * plant. This means U is an input and Y is an output (because you give the plant U (powers) and it
+ * gives you back a Y (sensor values). This is the opposite of what they mean from the perspective
+ * of the controller (U is an output because that's what goes to the motors and Y is an input
+ * because that's what comes back from the sensors).
  *
  * <p>For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
 @SuppressWarnings("ClassTypeParameterName")
-public class LinearSystemLoop<States extends Num, Inputs extends Num,
-        Outputs extends Num> {
+public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
 
-  private final LinearSystem<States, Inputs, Outputs> m_plant;
   private final LinearQuadraticRegulator<States, Inputs, Outputs> m_controller;
   private final LinearPlantInversionFeedforward<States, Inputs, Outputs> m_feedforward;
   private final KalmanFilter<States, Inputs, Outputs> m_observer;
@@ -46,92 +38,97 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
   private Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> m_clampFunction;
 
   /**
-   * Constructs a state-space loop with the given plant, controller, and
-   * observer. By default, the initial reference is all zeros. Users should
-   * call reset with the initial system state before enabling the loop. This
-   * constructor assumes that the input(s) to this system are voltage.
+   * Constructs a state-space loop with the given plant, controller, and observer. By default, the
+   * initial reference is all zeros. Users should call reset with the initial system state before
+   * enabling the loop. This constructor assumes that the input(s) to this system are voltage.
    *
-   * @param plant      State-space plant.
+   * @param plant State-space plant.
    * @param controller State-space controller.
-   * @param observer   State-space observer.
+   * @param observer State-space observer.
    * @param maxVoltageVolts The maximum voltage that can be applied. Commonly 12.
    * @param dtSeconds The nominal timestep.
    */
-  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
-                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
-                          KalmanFilter<States, Inputs, Outputs> observer,
-                          double maxVoltageVolts,
-                          double dtSeconds) {
-    this(plant, controller,
-        new LinearPlantInversionFeedforward<>(plant, dtSeconds), observer,
+  public LinearSystemLoop(
+      LinearSystem<States, Inputs, Outputs> plant,
+      LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+      KalmanFilter<States, Inputs, Outputs> observer,
+      double maxVoltageVolts,
+      double dtSeconds) {
+    this(
+        controller,
+        new LinearPlantInversionFeedforward<>(plant, dtSeconds),
+        observer,
         u -> StateSpaceUtil.normalizeInputVector(u, maxVoltageVolts));
   }
 
   /**
-   * Constructs a state-space loop with the given plant, controller, and
-   * observer. By default, the initial reference is all zeros. Users should
-   * call reset with the initial system state before enabling the loop.
+   * Constructs a state-space loop with the given plant, controller, and observer. By default, the
+   * initial reference is all zeros. Users should call reset with the initial system state before
+   * enabling the loop.
    *
-   * @param plant      State-space plant.
+   * @param plant State-space plant.
    * @param controller State-space controller.
-   * @param observer   State-space observer.
+   * @param observer State-space observer.
    * @param clampFunction The function used to clamp the input U.
    * @param dtSeconds The nominal timestep.
    */
-  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
-                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
-                          KalmanFilter<States, Inputs, Outputs> observer,
-                          Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction,
-                          double dtSeconds) {
-    this(plant, controller, new LinearPlantInversionFeedforward<>(plant, dtSeconds),
-          observer, clampFunction);
+  public LinearSystemLoop(
+      LinearSystem<States, Inputs, Outputs> plant,
+      LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+      KalmanFilter<States, Inputs, Outputs> observer,
+      Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction,
+      double dtSeconds) {
+    this(
+        controller,
+        new LinearPlantInversionFeedforward<>(plant, dtSeconds),
+        observer,
+        clampFunction);
   }
 
   /**
-   * Constructs a state-space loop with the given plant, controller, and
-   * observer. By default, the initial reference is all zeros. Users should
-   * call reset with the initial system state before enabling the loop.
+   * Constructs a state-space loop with the given controller, feedforward and observer. By default,
+   * the initial reference is all zeros. Users should call reset with the initial system state
+   * before enabling the loop.
    *
-   * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param feedforward Plant inversion feedforward.
-   * @param observer   State-space observer.
-   * @param maxVoltageVolts The maximum voltage that can be applied. Assumes that the
-   *                        inputs are voltages.
+   * @param observer State-space observer.
+   * @param maxVoltageVolts The maximum voltage that can be applied. Assumes that the inputs are
+   *     voltages.
    */
-  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
-                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
-                          LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
-                          KalmanFilter<States, Inputs, Outputs> observer,
-                          double maxVoltageVolts
-  ) {
-    this(plant, controller, feedforward,
-          observer, u -> StateSpaceUtil.normalizeInputVector(u, maxVoltageVolts));
+  public LinearSystemLoop(
+      LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+      LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
+      KalmanFilter<States, Inputs, Outputs> observer,
+      double maxVoltageVolts) {
+    this(
+        controller,
+        feedforward,
+        observer,
+        u -> StateSpaceUtil.normalizeInputVector(u, maxVoltageVolts));
   }
 
   /**
-   * Constructs a state-space loop with the given plant, controller, and
-   * observer. By default, the initial reference is all zeros. Users should
-   * call reset with the initial system state before enabling the loop.
+   * Constructs a state-space loop with the given controller, feedforward, and observer. By default,
+   * the initial reference is all zeros. Users should call reset with the initial system state
+   * before enabling the loop.
    *
-   * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param feedforward Plant inversion feedforward.
-   * @param observer   State-space observer.
+   * @param observer State-space observer.
    * @param clampFunction The function used to clamp the input U.
    */
-  public LinearSystemLoop(LinearSystem<States, Inputs, Outputs> plant,
-                          LinearQuadraticRegulator<States, Inputs, Outputs> controller,
-                          LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
-                          KalmanFilter<States, Inputs, Outputs> observer,
-                          Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction) {
-    this.m_plant = plant;
+  public LinearSystemLoop(
+      LinearQuadraticRegulator<States, Inputs, Outputs> controller,
+      LinearPlantInversionFeedforward<States, Inputs, Outputs> feedforward,
+      KalmanFilter<States, Inputs, Outputs> observer,
+      Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction) {
     this.m_controller = controller;
     this.m_feedforward = feedforward;
     this.m_observer = observer;
     this.m_clampFunction = clampFunction;
 
-    m_nextR = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 0));
+    m_nextR = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 1));
     reset(m_nextR);
   }
 
@@ -166,7 +163,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
   /**
    * Set an element of the initial state estimate x-hat.
    *
-   * @param row   Row of x-hat.
+   * @param row Row of x-hat.
    * @param value Value for element of x-hat.
    */
   public void setXHat(int row, double value) {
@@ -208,10 +205,11 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
    */
   public void setNextR(double... nextR) {
     if (nextR.length != m_nextR.getNumRows()) {
-      throw new MatrixDimensionException(String.format("The next reference does not have the "
-                      + "correct number of entries! Expected %s, but got %s.",
-              m_nextR.getNumRows(),
-              nextR.length));
+      throw new MatrixDimensionException(
+          String.format(
+              "The next reference does not have the "
+                  + "correct number of entries! Expected %s, but got %s.",
+              m_nextR.getNumRows(), nextR.length));
     }
     m_nextR = new Matrix<>(new SimpleMatrix(m_nextR.getNumRows(), 1, true, nextR));
   }
@@ -233,15 +231,6 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
    */
   public double getU(int row) {
     return getU().get(row, 0);
-  }
-
-  /**
-   * Return the plant used internally.
-   *
-   * @return the plant used internally.
-   */
-  public LinearSystem<States, Inputs, Outputs> getPlant() {
-    return m_plant;
   }
 
   /**
@@ -272,29 +261,30 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
   }
 
   /**
-   * Zeroes reference r, controller output u and plant output y.
-   * The previous reference for PlantInversionFeedforward is set to the
-   * initial reference.
-   * @param initialReference The initial reference.
+   * Zeroes reference r and controller output u. The previous reference of the
+   * PlantInversionFeedforward and the initial state estimate of the KalmanFilter are set to the
+   * initial state provided.
+   *
+   * @param initialState The initial state.
    */
-  public void reset(Matrix<States, N1> initialReference) {
-    m_controller.reset();
-    m_feedforward.reset(initialReference);
-    m_observer.reset();
+  public void reset(Matrix<States, N1> initialState) {
     m_nextR.fill(0.0);
+    m_controller.reset();
+    m_feedforward.reset(initialState);
+    m_observer.setXhat(initialState);
   }
 
   /**
-   * Returns difference between reoid predict(double dtSference r and x-hat.
+   * Returns difference between reference r and current state x-hat.
    *
-   * @return the
+   * @return The state error matrix.
    */
   public Matrix<States, N1> getError() {
     return getController().getR().minus(m_observer.getXhat());
   }
 
   /**
-   * Returns difference between reference r and x-hat.
+   * Returns difference between reference r and current state x-hat.
    *
    * @param index The index of the error matrix to return.
    * @return The error at that index.
@@ -305,15 +295,14 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
   /**
    * Get the function used to clamp the input u.
+   *
    * @return The clamping function.
    */
   public Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> getClampFunction() {
     return m_clampFunction;
   }
 
-  /**
-   * Set the clamping function used to clamp inputs.
-   */
+  /** Set the clamping function used to clamp inputs. */
   public void setClampFunction(Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction) {
     this.m_clampFunction = clampFunction;
   }
@@ -329,18 +318,19 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
   }
 
   /**
-   * Sets new controller output, projects model forward, and runs observer
-   * prediction.
+   * Sets new controller output, projects model forward, and runs observer prediction.
    *
-   * <p>After calling this, the user should send the elements of u to the
-   * actuators.
+   * <p>After calling this, the user should send the elements of u to the actuators.
    *
    * @param dtSeconds Timestep for model update.
    */
   @SuppressWarnings("LocalVariableName")
   public void predict(double dtSeconds) {
-    var u = clampInput(m_controller.calculate(getObserver().getXhat(), m_nextR)
-          .plus(m_feedforward.calculate(m_nextR)));
+    var u =
+        clampInput(
+            m_controller
+                .calculate(getObserver().getXhat(), m_nextR)
+                .plus(m_feedforward.calculate(m_nextR)));
     getObserver().predict(u, dtSeconds);
   }
 
@@ -348,10 +338,9 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
    * Clamp the input u to the min and max.
    *
    * @param unclampedU The input to clamp.
-   * @return           The clamped input.
+   * @return The clamped input.
    */
   public Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> unclampedU) {
     return m_clampFunction.apply(unclampedU);
   }
-
 }

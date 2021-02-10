@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
@@ -21,8 +18,8 @@ public class SequentialCommandGroup extends CommandGroupBase {
   private boolean m_runWhenDisabled = true;
 
   /**
-   * Creates a new SequentialCommandGroup.  The given commands will be run sequentially, with
-   * the CommandGroup finishing when the last command finishes.
+   * Creates a new SequentialCommandGroup. The given commands will be run sequentially, with the
+   * CommandGroup finishing when the last command finishes.
    *
    * @param commands the commands to include in this group.
    */
@@ -77,9 +74,10 @@ public class SequentialCommandGroup extends CommandGroupBase {
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted && !m_commands.isEmpty() && m_currentCommandIndex > -1
-        && m_currentCommandIndex < m_commands.size()
-    ) {
+    if (interrupted
+        && !m_commands.isEmpty()
+        && m_currentCommandIndex > -1
+        && m_currentCommandIndex < m_commands.size()) {
       m_commands.get(m_currentCommandIndex).end(true);
     }
     m_currentCommandIndex = -1;

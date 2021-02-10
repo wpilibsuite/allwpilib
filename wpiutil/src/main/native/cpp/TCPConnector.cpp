@@ -108,7 +108,8 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
       WPI_ERROR(logger, "could not create socket");
       return nullptr;
     }
-    if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
+    if (::connect(sd, reinterpret_cast<struct sockaddr*>(&address),
+                  sizeof(address)) != 0) {
       WPI_ERROR(logger, "connect() to " << server << " port " << port
                                         << " failed: " << SocketStrerror());
 #ifdef _WIN32
@@ -144,15 +145,16 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
                 "could not set socket to non-blocking: " << SocketStrerror());
   } else {
     arg |= O_NONBLOCK;
-    if (fcntl(sd, F_SETFL, arg) < 0)
+    if (fcntl(sd, F_SETFL, arg) < 0) {
       WPI_WARNING(logger,
                   "could not set socket to non-blocking: " << SocketStrerror());
+    }
   }
 #endif
 
   // Connect with time limit
-  if ((result = ::connect(sd, (struct sockaddr*)&address, sizeof(address))) <
-      0) {
+  if ((result = ::connect(sd, reinterpret_cast<struct sockaddr*>(&address),
+                          sizeof(address))) < 0) {
     int my_errno = SocketErrno();
 #ifdef _WIN32
     if (my_errno == WSAEWOULDBLOCK || my_errno == WSAEINPROGRESS) {
@@ -171,10 +173,10 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
           WPI_ERROR(logger, "select() to " << server << " port " << port
                                            << " error " << valopt << " - "
                                            << SocketStrerror(valopt));
-        }
-        // connection established
-        else
+        } else {
+          // connection established
           result = 0;
+        }
       } else {
         WPI_INFO(logger,
                  "connect() to " << server << " port " << port << " timed out");
@@ -199,9 +201,10 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
                 "could not set socket to blocking: " << SocketStrerror());
   } else {
     arg &= (~O_NONBLOCK);
-    if (fcntl(sd, F_SETFL, arg) < 0)
+    if (fcntl(sd, F_SETFL, arg) < 0) {
       WPI_WARNING(logger,
                   "could not set socket to blocking: " << SocketStrerror());
+    }
   }
 #endif
 

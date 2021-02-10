@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/simulation/PDPData.h"
 
@@ -22,7 +19,9 @@ DEFINE_CAPI(double, Voltage, 0)
 HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(double, HALSIM, PDPCurrent, 0)
 
 void HALSIM_GetPDPAllCurrents(int32_t index, double* currents) {
-  for (int i = 0; i < hal::kNumPDPChannels; i++) currents[i] = 0;
+  for (int i = 0; i < hal::kNumPDPChannels; i++) {
+    currents[i] = 0;
+  }
 }
 
 void HALSIM_SetPDPAllCurrents(int32_t index, const double* currents) {}

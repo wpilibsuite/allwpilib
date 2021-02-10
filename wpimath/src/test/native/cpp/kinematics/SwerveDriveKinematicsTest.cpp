@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/math>
 
@@ -171,7 +168,7 @@ TEST_F(SwerveDriveKinematicsTest, NormalizeTest) {
   SwerveModuleState state3{4.0_mps, Rotation2d()};
   SwerveModuleState state4{7.0_mps, Rotation2d()};
 
-  std::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
+  wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
   SwerveDriveKinematics<4>::NormalizeWheelSpeeds(&arr, 5.5_mps);
 
   double kFactor = 5.5 / 7.0;

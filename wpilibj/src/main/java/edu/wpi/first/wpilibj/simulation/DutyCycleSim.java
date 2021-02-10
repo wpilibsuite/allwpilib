@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.simulation;
 
@@ -12,9 +9,7 @@ import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DutyCycle;
 import java.util.NoSuchElementException;
 
-/**
- * Class to control a simulated duty cycle digital input.
- */
+/** Class to control a simulated duty cycle digital input. */
 public class DutyCycleSim {
   private final int m_index;
 
@@ -47,8 +42,8 @@ public class DutyCycleSim {
   }
 
   /**
-   * Creates a DutyCycleSim for a simulated index.
-   * The index is incremented for each simulated DutyCycle.
+   * Creates a DutyCycleSim for a simulated index. The index is incremented for each simulated
+   * DutyCycle.
    *
    * @param index simulator index
    * @return Simulated object
@@ -57,36 +52,101 @@ public class DutyCycleSim {
     return new DutyCycleSim(index);
   }
 
+  /**
+   * Register a callback to be run when this duty cycle input is initialized.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to run the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DutyCycleDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DutyCycleDataJNI::cancelInitializedCallback);
   }
+
+  /**
+   * Check whether this duty cycle input has been initialized.
+   *
+   * @return true if initialized
+   */
   public boolean getInitialized() {
     return DutyCycleDataJNI.getInitialized(m_index);
   }
+
+  /**
+   * Define whether this duty cycle input has been initialized.
+   *
+   * @param initialized whether this object is initialized
+   */
   public void setInitialized(boolean initialized) {
     DutyCycleDataJNI.setInitialized(m_index, initialized);
   }
 
+  /**
+   * Register a callback to be run whenever the frequency changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
   public CallbackStore registerFrequencyCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DutyCycleDataJNI.registerFrequencyCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DutyCycleDataJNI::cancelFrequencyCallback);
   }
+
+  /**
+   * Measure the frequency.
+   *
+   * @return the duty cycle frequency
+   */
   public int getFrequency() {
     return DutyCycleDataJNI.getFrequency(m_index);
   }
+
+  /**
+   * Change the duty cycle frequency.
+   *
+   * @param frequency the new frequency
+   */
   public void setFrequency(int frequency) {
     DutyCycleDataJNI.setFrequency(m_index, frequency);
   }
 
+  /**
+   * Register a callback to be run whenever the output changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
   public CallbackStore registerOutputCallback(NotifyCallback callback, boolean initialNotify) {
     int uid = DutyCycleDataJNI.registerOutputCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, DutyCycleDataJNI::cancelOutputCallback);
   }
+
+  /**
+   * Measure the output from this duty cycle port.
+   *
+   * @return the output value
+   */
   public double getOutput() {
     return DutyCycleDataJNI.getOutput(m_index);
   }
+
+  /**
+   * Change the duty cycle output.
+   *
+   * @param output the new output value
+   */
   public void setOutput(double output) {
     DutyCycleDataJNI.setOutput(m_index, output);
+  }
+
+  /** Reset all simulation data for the duty cycle output. */
+  public void resetData() {
+    DutyCycleDataJNI.resetData(m_index);
   }
 }

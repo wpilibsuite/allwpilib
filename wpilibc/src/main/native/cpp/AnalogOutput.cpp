@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/AnalogOutput.h"
 
@@ -47,7 +44,9 @@ AnalogOutput::AnalogOutput(int channel) {
   SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
 }
 
-AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
+AnalogOutput::~AnalogOutput() {
+  HAL_FreeAnalogOutputPort(m_port);
+}
 
 void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
@@ -65,7 +64,9 @@ double AnalogOutput::GetVoltage() const {
   return voltage;
 }
 
-int AnalogOutput::GetChannel() const { return m_channel; }
+int AnalogOutput::GetChannel() const {
+  return m_channel;
+}
 
 void AnalogOutput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Output");

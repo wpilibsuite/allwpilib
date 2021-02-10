@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <array>
 #include <cstddef>
+
+#include <wpi/array.h>
 
 #include "Eigen/Core"
 #include "Eigen/QR"
@@ -76,6 +74,23 @@ class SwerveDriveKinematics {
         wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
   }
 
+  explicit SwerveDriveKinematics(
+      const wpi::array<Translation2d, NumModules>& wheels)
+      : m_modules{wheels} {
+    for (size_t i = 0; i < NumModules; i++) {
+      // clang-format off
+      m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
+        1, 0, (-m_modules[i].Y()).template to<double>(),
+        0, 1, (+m_modules[i].X()).template to<double>();
+      // clang-format on
+    }
+
+    m_forwardKinematics = m_inverseKinematics.householderQr();
+
+    wpi::math::MathSharedStore::ReportUsage(
+        wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
+  }
+
   SwerveDriveKinematics(const SwerveDriveKinematics&) = default;
 
   /**
@@ -105,7 +120,7 @@ class SwerveDriveKinematics {
    * auto [fl, fr, bl, br] = kinematics.ToSwerveModuleStates(chassisSpeeds);
    * @endcode
    */
-  std::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
+  wpi::array<SwerveModuleState, NumModules> ToSwerveModuleStates(
       const ChassisSpeeds& chassisSpeeds,
       const Translation2d& centerOfRotation = Translation2d()) const;
 
@@ -130,7 +145,7 @@ class SwerveDriveKinematics {
    * the robot's position on the field using data from the real-world speed and
    * angle of each module on the robot.
    *
-   * @param moduleStates The state of the modules as an std::array of type
+   * @param moduleStates The state of the modules as an wpi::array of type
    * SwerveModuleState, NumModules long as measured from respective encoders
    * and gyros. The order of the swerve module states should be same as passed
    * into the constructor of this class.
@@ -138,7 +153,7 @@ class SwerveDriveKinematics {
    * @return The resulting chassis speed.
    */
   ChassisSpeeds ToChassisSpeeds(
-      std::array<SwerveModuleState, NumModules> moduleStates) const;
+      wpi::array<SwerveModuleState, NumModules> moduleStates) const;
 
   /**
    * Normalizes the wheel speeds using some max attainable speed. Sometimes,
@@ -153,14 +168,14 @@ class SwerveDriveKinematics {
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
    */
   static void NormalizeWheelSpeeds(
-      std::array<SwerveModuleState, NumModules>* moduleStates,
+      wpi::array<SwerveModuleState, NumModules>* moduleStates,
       units::meters_per_second_t attainableMaxSpeed);
 
  private:
   mutable Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
   Eigen::HouseholderQR<Eigen::Matrix<double, NumModules * 2, 3>>
       m_forwardKinematics;
-  std::array<Translation2d, NumModules> m_modules;
+  wpi::array<Translation2d, NumModules> m_modules;
 
   mutable Translation2d m_previousCoR;
 };
