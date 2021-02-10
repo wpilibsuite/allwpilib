@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2020 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/SynchronousInterrupt.h"
 
@@ -72,7 +69,8 @@ inline SynchronousInterrupt::WaitResult operator|(
 
 SynchronousInterrupt::WaitResult SynchronousInterrupt::WaitForInterrupt(
     units::second_t timeout, bool ignorePrevious) {
-  if (StatusIsFatal()) return WaitResult::kTimeout;
+  if (StatusIsFatal())
+    return WaitResult::kTimeout;
   int32_t status = 0;
   auto result = HAL_WaitForInterrupt(m_handle, timeout.to<double>(),
                                      ignorePrevious, &status);
@@ -87,21 +85,24 @@ SynchronousInterrupt::WaitResult SynchronousInterrupt::WaitForInterrupt(
 
 void SynchronousInterrupt::SetInterruptEdges(bool risingEdge,
                                              bool fallingEdge) {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   int32_t status = 0;
   HAL_SetInterruptUpSourceEdge(m_handle, risingEdge, fallingEdge, &status);
   wpi_setHALError(status);
 }
 
 void SynchronousInterrupt::WakeupWaitingInterrupt() {
-  if (StatusIsFatal()) return;
+  if (StatusIsFatal())
+    return;
   int32_t status = 0;
   HAL_ReleaseWaitingInterrupt(m_handle, &status);
   wpi_setHALError(status);
 }
 
 units::second_t SynchronousInterrupt::GetRisingTimestamp() {
-  if (StatusIsFatal()) return 0_s;
+  if (StatusIsFatal())
+    return 0_s;
   int32_t status = 0;
   auto ts = HAL_ReadInterruptRisingTimestamp(m_handle, &status);
   wpi_setHALError(status);
@@ -110,7 +111,8 @@ units::second_t SynchronousInterrupt::GetRisingTimestamp() {
 }
 
 units::second_t SynchronousInterrupt::GetFallingTimestamp() {
-  if (StatusIsFatal()) return 0_s;
+  if (StatusIsFatal())
+    return 0_s;
   int32_t status = 0;
   auto ts = HAL_ReadInterruptFallingTimestamp(m_handle, &status);
   wpi_setHALError(status);
