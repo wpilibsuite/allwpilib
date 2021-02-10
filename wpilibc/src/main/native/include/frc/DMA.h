@@ -29,8 +29,8 @@ class DMA : public ErrorBase {
   DMA(DMA&& other) = default;
 
   void SetPause(bool pause);
-  void setTimedTrigger(units::second_t seconds);
-  void setTimedTriggerCycles(int cycles);
+  void SetTimedTrigger(units::second_t seconds);
+  void SetTimedTriggerCycles(int cycles);
 
   void AddEncoder(const Encoder* encoder);
   void AddEncoderPeriod(const Encoder* encoder);
@@ -52,8 +52,8 @@ class DMA : public ErrorBase {
   void ClearSensors();
   void ClearExternalTriggers();
 
-  void StartDMA(int queueDepth);
-  void StopDMA();
+  void Start(int queueDepth);
+  void Stop();
 
  private:
   hal::Handle<HAL_DMAHandle> dmaHandle;

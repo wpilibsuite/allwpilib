@@ -39,7 +39,7 @@ class Robot : public frc::TimedRobot {
 
     // Start DMA. No triggers or inputs can be added after this call
     // unless DMA is stopped.
-    m_dma.StartDMA(1024);
+    m_dma.Start(1024);
   }
 
   void RobotPeriodic() override {
@@ -53,13 +53,13 @@ class Robot : public frc::TimedRobot {
     // Update our sample. remaining is the number of samples remaining in the
     // buffer status is more specific error messages if readStatus is not OK.
     // Wait 1ms if buffer is empty
-    HAL_DMAReadStatus readStatus =
+    frc::DMASample::DMAReadStatus readStatus =
         sample.Update(&m_dma, 1_ms, &remaining, &status);
 
     // Unset trigger
     m_dmaTrigger.Set(true);
 
-    if (readStatus == HAL_DMA_OK) {
+    if (readStatus == frc::DMASample::DMAReadStatus::kOk) {
       // Status value in all these reads should be checked, a non 0 value means
       // value could not be read
 

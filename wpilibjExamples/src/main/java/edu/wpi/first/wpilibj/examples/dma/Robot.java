@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
 
     // Start DMA. No triggers or inputs can be added after this call
     // unless DMA is stopped.
-    m_dma.startDMA(1024);
+    m_dma.start(1024);
   }
 
   @Override
@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
     // Unset trigger
     m_dmaTrigger.set(true);
 
-    if (readStatus == DMASample.DMAReadStatus.Ok) {
+    if (readStatus == DMASample.DMAReadStatus.kOk) {
       // Status value in all these reads should be checked, a non 0 value means
       // value could not be read
 

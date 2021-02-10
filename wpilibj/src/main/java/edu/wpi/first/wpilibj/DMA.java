@@ -95,11 +95,11 @@ public class DMA implements AutoCloseable {
     DMAJNI.clearExternalTriggers(m_dmaHandle);
   }
 
-  public void startDMA(int queueDepth) {
+  public void start(int queueDepth) {
     DMAJNI.startDMA(m_dmaHandle, queueDepth);
   }
 
-  public void stopDMA() {
+  public void stop() {
     DMAJNI.stopDMA(m_dmaHandle);
   }
 }

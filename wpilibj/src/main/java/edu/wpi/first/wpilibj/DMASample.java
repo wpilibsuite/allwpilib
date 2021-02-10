@@ -9,9 +9,9 @@ import edu.wpi.first.hal.DMAJNISample;
 
 public class DMASample {
   public enum DMAReadStatus {
-    Ok(1),
-    Timeout(2),
-    Error(3);
+    kOk(1),
+    kTimeout(2),
+    kError(3);
 
     private final int value;
 
@@ -31,11 +31,11 @@ public class DMASample {
      */
     public static DMAReadStatus getValue(int value) {
       if (value == 1) {
-        return Ok;
+        return kOk;
       } else if (value == 2) {
-        return Timeout;
+        return kTimeout;
       }
-      return Error;
+      return kError;
     }
   }
 

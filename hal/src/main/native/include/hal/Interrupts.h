@@ -102,7 +102,7 @@ int64_t HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
  *
  * @param interruptHandle     the interrupt handle
  * @param digitalSourceHandle the digital source handle (either a
- * HAL_AnalogTriggerHandle of a HAL_DigitalHandle)
+ * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
  * @param analogTriggerType   the trigger type if the source is an AnalogTrigger
  */
 void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,

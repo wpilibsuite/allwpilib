@@ -41,6 +41,7 @@ class TestBench {
   static const uint32_t kFakeSolenoid2Channel = 13;
   static const uint32_t kFakeRelayForward = 18;
   static const uint32_t kFakeRelayReverse = 19;
+  static const uint32_t kFakePwmOutput = 14;
 
   /* Relay channels */
   static const uint32_t kRelayChannel = 0;

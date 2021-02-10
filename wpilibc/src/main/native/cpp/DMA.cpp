@@ -32,13 +32,13 @@ void DMA::SetPause(bool pause) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::setTimedTrigger(units::second_t seconds) {
+void DMA::SetTimedTrigger(units::second_t seconds) {
   int32_t status = 0;
   HAL_SetDMATimedTrigger(dmaHandle, seconds.to<double>(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::setTimedTriggerCycles(int cycles) {
+void DMA::SetTimedTriggerCycles(int cycles) {
   int32_t status = 0;
   HAL_SetDMATimedTriggerCycles(dmaHandle, cycles, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -131,13 +131,13 @@ void DMA::ClearExternalTriggers() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::StartDMA(int queueDepth) {
+void DMA::Start(int queueDepth) {
   int32_t status = 0;
   HAL_StartDMA(dmaHandle, queueDepth, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void DMA::StopDMA() {
+void DMA::Stop() {
   int32_t status = 0;
   HAL_StopDMA(dmaHandle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

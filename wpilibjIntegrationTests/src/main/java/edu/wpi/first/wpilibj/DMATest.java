@@ -28,13 +28,15 @@ public class DMATest extends AbstractComsSetup {
 
   private AnalogCrossConnectFixture m_analogIO;
   private DigitalOutput m_manualTrigger;
+  private PWMSpeedController m_pwm;
   private DMA m_dma;
   private DMASample m_dmaSample;
 
   @Before
   public void setUp() {
     m_analogIO = TestBench.getAnalogCrossConnectFixture();
-    m_manualTrigger = new DigitalOutput(13);
+    m_manualTrigger = new DigitalOutput(7);
+    m_pwm = new Jaguar(14);
     m_dma = new DMA();
     m_dmaSample = new DMASample();
 
@@ -48,36 +50,48 @@ public class DMATest extends AbstractComsSetup {
     m_dma.close();
     m_manualTrigger.close();
     m_analogIO.teardown();
+    m_pwm.close();
   }
 
   @Test
   public void testPausingWorks() {
-    m_dma.startDMA(1024);
+    m_dma.start(1024);
     m_dma.setPause(true);
     m_manualTrigger.set(false);
 
     var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(5));
 
-    assertEquals(DMASample.DMAReadStatus.Timeout, timedOut);
+    assertEquals(DMASample.DMAReadStatus.kTimeout, timedOut);
   }
 
   @Test
-  public void testManualTriggerOnlyWorksOnce() {
-    m_dma.startDMA(1024);
+  public void testRemovingTriggersWorks() {
+    m_dma.clearExternalTriggers();
+    m_dma.start(1024);
+    m_manualTrigger.set(false);
+
+    var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(5));
+
+    assertEquals(DMASample.DMAReadStatus.kTimeout, timedOut);
+  }
+
+  @Test
+  public void testManualTriggerOnlyHappensOnce() {
+    m_dma.start(1024);
     m_manualTrigger.set(false);
     var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(5));
     m_manualTrigger.set(true);
 
-    assertEquals(DMASample.DMAReadStatus.Ok, timedOut);
+    assertEquals(DMASample.DMAReadStatus.kOk, timedOut);
     assertEquals(0, m_dmaSample.getRemaining());
     timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(5));
-    assertEquals(DMASample.DMAReadStatus.Timeout, timedOut);
+    assertEquals(DMASample.DMAReadStatus.kTimeout, timedOut);
   }
 
   @Test
   public void testAnalogIndividualTriggers() {
-    m_dma.startDMA(1024);
-    for (double i = 0; i < 5; i++) {
+    m_dma.start(1024);
+    for (double i = 0; i < 5; i += 0.5) {
       m_analogIO.getOutput().setVoltage(i);
       // Need to sleep to ensure value sets
       Timer.delay(AnalogCrossConnectTest.kDelayTime);
@@ -85,7 +99,7 @@ public class DMATest extends AbstractComsSetup {
       var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(1));
       m_manualTrigger.set(true);
 
-      assertEquals(DMASample.DMAReadStatus.Ok, timedOut);
+      assertEquals(DMASample.DMAReadStatus.kOk, timedOut);
       assertEquals(0, m_dmaSample.getRemaining());
       assertEquals(
           m_analogIO.getInput().getVoltage(),
@@ -96,9 +110,9 @@ public class DMATest extends AbstractComsSetup {
 
   @Test
   public void testAnalogMultipleTriggers() {
-    m_dma.startDMA(1024);
+    m_dma.start(1024);
     List<Double> values = new ArrayList<>();
-    for (double i = 0; i < 5; i++) {
+    for (double i = 0; i < 5; i += 0.5) {
       m_analogIO.getOutput().setVoltage(i);
       values.add(i);
       // Need to sleep to ensure value sets
@@ -110,7 +124,7 @@ public class DMATest extends AbstractComsSetup {
 
     for (int i = 0; i < values.size(); i++) {
       var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(1));
-      assertEquals(DMASample.DMAReadStatus.Ok, timedOut);
+      assertEquals(DMASample.DMAReadStatus.kOk, timedOut);
       assertEquals(values.size() - i - 1, m_dmaSample.getRemaining());
       assertEquals(values.get(i), m_dmaSample.getAnalogInputVoltage(m_analogIO.getInput()), 0.01);
     }
@@ -119,12 +133,25 @@ public class DMATest extends AbstractComsSetup {
   @Test
   public void testTimedTriggers() {
     m_dma.setTimedTrigger(Units.millisecondsToSeconds(10));
-    m_dma.startDMA(1024);
+    m_dma.start(1024);
     Timer.delay(Units.millisecondsToSeconds(100));
     m_dma.setPause(true);
 
     var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(1));
-    assertEquals(DMASample.DMAReadStatus.Ok, timedOut);
+    assertEquals(DMASample.DMAReadStatus.kOk, timedOut);
+    assertTrue("Received more then 5 samples in 100 ms", m_dmaSample.getRemaining() > 5);
+  }
+
+  @Test
+  public void testPwmTimedTriggers() {
+    m_dma.clearExternalTriggers();
+    m_dma.setPwmEdgeTrigger(m_pwm, true, false);
+    m_dma.start(1024);
+    Timer.delay(Units.millisecondsToSeconds(100));
+    m_dma.setPause(true);
+
+    var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(1));
+    assertEquals(DMASample.DMAReadStatus.kOk, timedOut);
     assertTrue("Received more then 5 samples in 100 ms", m_dmaSample.getRemaining() > 5);
   }
 }
