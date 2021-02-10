@@ -14,7 +14,7 @@
 
 using namespace frc;
 
-static const double kDelayTime = 0.01;
+static const double kDelayTime = 0.1;
 
 class DMATest : public testing::Test {
  protected:
@@ -121,7 +121,7 @@ TEST_F(DMATest, AnalogMultipleTriggers) {
     m_manualTrigger->Set(true);
   }
 
-  for (double i = 0; i < 5; i += 0.5) {
+  for (int i = 0; i < values.size(); i++) {
     frc::DMASample sample;
     int32_t remaining = 0;
     int32_t status = 0;
@@ -129,7 +129,7 @@ TEST_F(DMATest, AnalogMultipleTriggers) {
     ASSERT_EQ(DMASample::DMAReadStatus::kOk, timedOut);
     ASSERT_EQ(0, status);
     ASSERT_EQ(values.size() - i - 1, remaining);
-    ASSERT_DOUBLE_EQ(m_analogInput->GetVoltage(),
+    ASSERT_DOUBLE_EQ(values[i],
                      sample.GetAnalogInputVoltage(m_analogInput, &status));
   }
 }
