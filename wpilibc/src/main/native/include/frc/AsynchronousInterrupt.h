@@ -24,6 +24,7 @@ namespace frc {
  * <p>Synchronous interrupts are handled by the SynchronousInterrupt class.
  */
 class AsynchronousInterrupt {
+ public:
   /**
    * Construct an Asynchronous Interrupt from a Digital Source.
    *

@@ -141,10 +141,10 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * (non-Javadoc)
    *
    * @see
-   * edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
+   * edu.wpi.first.wpilibj.AbstractInterruptTest#giveSource()
    */
   @Override
-  DigitalSource giveInterruptableSensorBase() {
+  DigitalSource giveSource() {
     return dio.getInput();
   }
 
@@ -152,10 +152,10 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * (non-Javadoc)
    *
    * @see
-   * edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
+   * edu.wpi.first.wpilibj.AbstractInterruptTest#freeSource()
    */
   @Override
-  void freeInterruptableSensorBase() {
+  void freeSource() {
     // Handled in the fixture
   }
 

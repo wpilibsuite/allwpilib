@@ -125,7 +125,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
   /**
    * Adds a command immediately to the {@link Scheduler}. This should only be called in the {@link
    * Scheduler#run()} loop. Any command with conflicting requirements will be removed, unless it is
-   * uninterruptable. Giving <code>null</code> does nothing.
+   * uninterruptible. Giving <code>null</code> does nothing.
    *
    * @param command the {@link Command} to add
    */

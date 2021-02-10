@@ -30,6 +30,5 @@ public abstract class DigitalSource implements AutoCloseable {
   public abstract int getPortHandleForRouting();
 
   @Override
-  public void close() {
-  }
+  public void close() {}
 }

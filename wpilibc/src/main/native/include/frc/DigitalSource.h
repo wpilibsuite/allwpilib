@@ -6,8 +6,8 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/AnalogTriggerType.h"
+#include "frc/ErrorBase.h"
 
 namespace frc {
 

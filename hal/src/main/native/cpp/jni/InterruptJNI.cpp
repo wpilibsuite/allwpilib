@@ -22,7 +22,7 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_hal_InterruptJNI
  * Method:    initializeInterrupts
- * Signature: (Z)I
+ * Signature: ()I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_InterruptJNI_initializeInterrupts

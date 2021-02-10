@@ -7,10 +7,11 @@
 #include "frc/DigitalOutput.h"  // NOLINT(build/include_order)
 
 #include "TestBench.h"
-#include "frc/Counter.h"
 #include "frc/AsynchronousInterrupt.h"
+#include "frc/Counter.h"
 #include "frc/SynchronousInterrupt.h"
 #include "frc/Timer.h"
+#include "frc2/Timer.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -19,8 +20,8 @@ static const double kCounterTime = 0.001;
 
 static const double kDelayTime = 0.1;
 
-static const double kSynchronousInterruptTime = 2.0;
-static const double kSynchronousInterruptTimeTolerance = 0.01;
+static const units::second_t kSynchronousInterruptTime = 2.0_s;
+static const units::second_t kSynchronousInterruptTimeTolerance = 0.01_s;
 
 /**
  * A fixture with a digital input and a digital output physically wired
@@ -80,7 +81,8 @@ TEST_F(DIOLoopTest, DIOPWM) {
   m_output->UpdateDutyCycle(0.5);
   frc::SynchronousInterrupt interrupt{m_output};
   interrupt.SetInterruptEdges(false, true);
-  frc::SynchronousInterrupt::WaitResult result = interrupt.WaitForInterrupt(3_s, true);
+  frc::SynchronousInterrupt::WaitResult result =
+      interrupt.WaitForInterrupt(3_s, true);
 
   Wait(0.5);
   bool firstCycle = m_input->Get();
@@ -145,41 +147,34 @@ static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
 TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
   int32_t param = 0;
 
-  // Given an interrupt handler that sets an int32_t to 12345
-  m_input->RequestInterrupts(InterruptHandler, &param);
-  m_input->EnableInterrupts();
+  frc::AsynchronousInterrupt interrupt(m_input,
+                                       [&](auto a, auto b) { param = 12345; });
 
+  interrupt.Enable();
   // If the voltage rises
   m_output->Set(false);
   m_output->Set(true);
-  m_input->CancelInterrupts();
+  interrupt.Disable();
 
   // Then the int32_t should be 12345
   Wait(kDelayTime);
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }
 
-static void* InterruptTriggerer(void* data) {
-  DigitalOutput* output = static_cast<DigitalOutput*>(data);
-  output->Set(false);
-  Wait(kSynchronousInterruptTime);
-  output->Set(true);
-  return nullptr;
-}
-
 TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
   // Given a synchronous interrupt
-  m_input->RequestInterrupts();
+  frc::SynchronousInterrupt interrupt(m_input);
 
-  // If we have another thread trigger the interrupt in a few seconds
-  pthread_t interruptTriggererLoop;
-  pthread_create(&interruptTriggererLoop, nullptr, InterruptTriggerer,
-                 m_output);
+  std::thread thr([this]() {
+    m_output->Set(false);
+    frc2::Wait(kSynchronousInterruptTime);
+    m_output->Set(true);
+  });
 
   // Then this thread should pause and resume after that number of seconds
-  Timer timer;
+  frc2::Timer timer;
   timer.Start();
-  m_input->WaitForInterrupt(kSynchronousInterruptTime + 1.0);
-  EXPECT_NEAR(kSynchronousInterruptTime, timer.Get(),
-              kSynchronousInterruptTimeTolerance);
+  interrupt.WaitForInterrupt(kSynchronousInterruptTime + 1.0_s);
+  EXPECT_NEAR(kSynchronousInterruptTime.to<double>(), timer.Get().to<double>(),
+              kSynchronousInterruptTimeTolerance.to<double>());
 }

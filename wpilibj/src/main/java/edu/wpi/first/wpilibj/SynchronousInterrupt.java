@@ -35,9 +35,7 @@ public class SynchronousInterrupt implements AutoCloseable {
       this.value = value;
     }
 
-    /**
-     * Create a wait result.
-     */
+    /** Create a wait result. */
     public static WaitResult getValue(boolean rising, boolean falling) {
       if (rising && falling) {
         return kBoth;
@@ -110,6 +108,16 @@ public class SynchronousInterrupt implements AutoCloseable {
     boolean rising = (result & 0xFF) != 0;
     boolean falling = (result & 0xFF00) != 0;
     return WaitResult.getValue(rising, falling);
+  }
+
+  /**
+   * Wait for an interrupt, ingoring any previously occuring interrupts.
+   *
+   * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
+   * @return Result of which edges were triggered, or if an timeout occured.
+   */
+  public WaitResult waitForInterrupt(double timeoutSeconds) {
+    return waitForInterrupt(timeoutSeconds, true);
   }
 
   /**

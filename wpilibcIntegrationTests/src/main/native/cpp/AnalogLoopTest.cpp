@@ -6,6 +6,7 @@
 #include "frc/AnalogInput.h"
 #include "frc/AnalogOutput.h"
 #include "frc/AnalogTrigger.h"
+#include "frc/AsynchronousInterrupt.h"
 #include "frc/Counter.h"
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
@@ -101,10 +102,6 @@ TEST_F(AnalogLoopTest, AnalogTriggerCounterWorks) {
       << "Analog trigger counter did not count 50 ticks";
 }
 
-static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
-  *reinterpret_cast<int32_t*>(param) = 12345;
-}
-
 TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
   int32_t param = 0;
   AnalogTrigger trigger(m_input);
@@ -113,14 +110,17 @@ TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
   // Given an interrupt handler that sets an int32_t to 12345
   std::shared_ptr<AnalogTriggerOutput> triggerOutput =
       trigger.CreateOutput(AnalogTriggerType::kState);
-  triggerOutput->RequestInterrupts(InterruptHandler, &param);
-  triggerOutput->EnableInterrupts();
+
+  frc::AsynchronousInterrupt interrupt{triggerOutput,
+                                       [&](auto a, auto b) { param = 12345; }};
+
+  interrupt.Enable();
 
   // If the analog output moves from below to above the window
   m_output->SetVoltage(0.0);
   Wait(kDelayTime);
   m_output->SetVoltage(5.0);
-  triggerOutput->CancelInterrupts();
+  interrupt.Disable();
 
   // Then the int32_t should be 12345
   Wait(kDelayTime);

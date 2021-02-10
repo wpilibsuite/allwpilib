@@ -4,7 +4,7 @@
 
 #include "frc/AnalogTriggerOutput.h"
 
-#include "hal/AnalogTrigger.h"
+#include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/AnalogTrigger.h"

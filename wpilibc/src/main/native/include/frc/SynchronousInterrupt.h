@@ -62,7 +62,7 @@ class SynchronousInterrupt : public ErrorBase {
    * @return The edge(s) that were triggered, or timeout.
    */
   WaitResult WaitForInterrupt(units::second_t timeout,
-                              bool ignorePrevious = false);
+                              bool ignorePrevious = true);
 
   /**
    * Set which edges cause an interrupt to occur.
