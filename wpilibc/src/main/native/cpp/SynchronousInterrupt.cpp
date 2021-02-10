@@ -8,6 +8,7 @@
 
 #include <hal/Interrupts.h>
 
+#include "frc/Base.h"
 #include "frc/DigitalSource.h"
 #include "frc/WPIErrors.h"
 

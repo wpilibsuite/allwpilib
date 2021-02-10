@@ -7,7 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <units/units.h>
+#include <units/time.h>
 
 #include "frc/ErrorBase.h"
 

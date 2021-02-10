@@ -4,25 +4,29 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.InterruptJNI;
-
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.hal.InterruptJNI;
 
 /**
  * Class for handling sychronous interrupts.
  *
- * <p> By default, interrupts will occur on rising edge.
+ * <p>By default, interrupts will occur on rising edge.
  *
  * <p>Asynchronous interrupts are handled by the AsynchronousInterrupt class.
  */
 public class SynchronousInterrupt implements AutoCloseable {
   @SuppressWarnings("PMD.SingularField")
   private final DigitalSource m_source;
+
   private final int m_handle;
 
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {
-    kTimeout(0x0), kRisingEdge(0x1), kFallingEdge(0x100), kBoth(0x101);
+    kTimeout(0x0),
+    kRisingEdge(0x1),
+    kFallingEdge(0x100),
+    kBoth(0x101);
 
     @SuppressWarnings("MemberName")
     public final int value;
@@ -31,6 +35,9 @@ public class SynchronousInterrupt implements AutoCloseable {
       this.value = value;
     }
 
+    /**
+     * Create a wait result
+     */
     public static WaitResult getValue(boolean rising, boolean falling) {
       if (rising && falling) {
         return kBoth;
@@ -54,8 +61,8 @@ public class SynchronousInterrupt implements AutoCloseable {
   public SynchronousInterrupt(DigitalSource source) {
     m_source = requireNonNullParam(source, "source", "SynchronousInterrupt");
     m_handle = InterruptJNI.initializeInterrupts(true);
-    InterruptJNI.requestInterrupts(m_handle, m_source.getPortHandleForRouting(),
-        m_source.getAnalogTriggerTypeForRouting());
+    InterruptJNI.requestInterrupts(
+        m_handle, m_source.getPortHandleForRouting(), m_source.getAnalogTriggerTypeForRouting());
     InterruptJNI.setInterruptUpSourceEdge(m_handle, true, false);
   }
 
@@ -75,9 +82,9 @@ public class SynchronousInterrupt implements AutoCloseable {
    * <p>Used by AsynchronousInterrupt. Users prefer to use waitForInterrupt.
    *
    * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
-   * @param ignorePrevious True to ignore if a previous interrupt has occured,
-   *     and only wait for a new trigger. False will consider if an interrupt has occured
-   *     since the last time the interrupt was read.
+   * @param ignorePrevious True to ignore if a previous interrupt has occured, and only wait for a
+   *     new trigger. False will consider if an interrupt has occured since the last time the
+   *     interrupt was read.
    * @return The raw hardware interrupt result
    */
   int waitForInterruptRaw(double timeoutSeconds, boolean ignorePrevious) {
@@ -88,9 +95,9 @@ public class SynchronousInterrupt implements AutoCloseable {
    * Wait for an interrupt.
    *
    * @param timeoutSeconds The timeout in seconds. 0 or less will return immediately.
-   * @param ignorePrevious True to ignore if a previous interrupt has occured,
-   *     and only wait for a new trigger. False will consider if an interrupt has occured
-   *     since the last time the interrupt was read.
+   * @param ignorePrevious True to ignore if a previous interrupt has occured, and only wait for a
+   *     new trigger. False will consider if an interrupt has occured since the last time the
+   *     interrupt was read.
    * @return Result of which edges were triggered, or if an timeout occured.
    */
   public WaitResult waitForInterrupt(double timeoutSeconds, boolean ignorePrevious) {
@@ -119,6 +126,7 @@ public class SynchronousInterrupt implements AutoCloseable {
    * Get the timestamp of the last rising edge.
    *
    * <p>This only works if rising edge was configured using setInterruptEdges.
+   *
    * @return the timestamp in seconds relative to getFPGATime
    */
   public double getRisingTimestamp() {
@@ -129,15 +137,14 @@ public class SynchronousInterrupt implements AutoCloseable {
    * Get the timestamp of the last falling edge.
    *
    * <p>This only works if falling edge was configured using setInterruptEdges.
+   *
    * @return the timestamp in seconds relative to getFPGATime
    */
   public double getFallingTimestamp() {
     return InterruptJNI.readInterruptFallingTimestamp(m_handle) * 1e-6;
   }
 
-  /**
-   * Force triggering of any waiting interrupt, which will be seen as a timeout.
-   */
+  /** Force triggering of any waiting interrupt, which will be seen as a timeout. */
   public void wakeupWaitingInterrupt() {
     InterruptJNI.releaseWaitingInterrupt(m_handle);
   }

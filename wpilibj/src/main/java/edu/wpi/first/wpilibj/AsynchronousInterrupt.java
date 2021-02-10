@@ -4,17 +4,19 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 /**
  * Class for handling asynchrounous interrupts.
  *
- * <p> By default, interrupts will occur on rising edge. Callbacks are disabled by default, and Enable() must be called before they will occur.
+ * <p>By default, interrupts will occur on rising edge. Callbacks are disabled by default, and
+ * Enable() must be called before they will occur.
  *
- * <p> Both rising and falling edge can be indiciated if both a rising and falling happen between callbacks.
+ * <p>Both rising and falling edge can be indiciated if both a rising and falling happen between
+ * callbacks.
  *
  * <p>Synchronous interrupts are handled by the SynchronousInterrupt class.
  */
@@ -54,7 +56,8 @@ public class AsynchronousInterrupt implements AutoCloseable {
   }
 
   /**
-   * Enables interrupt callbacks. Before this, callbacks will not occur. Does nothing if already enabled.
+   * Enables interrupt callbacks. Before this, callbacks will not occur. Does nothing if already
+   * enabled.
    */
   public void enable() {
     if (m_keepRunning.get()) {
@@ -65,9 +68,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
     m_thread = new Thread(this::threadMain);
   }
 
-  /**
-   * Disables interrupt callbacks. Does nothing if already disabled.
-   */
+  /** Disables interrupt callbacks. Does nothing if already disabled. */
   public void disable() {
     m_keepRunning.set(false);
     m_interrupt.wakeupWaitingInterrupt();
@@ -100,6 +101,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
    * <p>This function does not require the interrupt to be enabled to work.
    *
    * <p>This only works if rising edge was configured using setInterruptEdges.
+   *
    * @return the timestamp in seconds relative to getFPGATime
    */
   public double getRisingTimestamp() {
@@ -112,6 +114,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
    * <p>This function does not require the interrupt to be enabled to work.
    *
    * <p>This only works if falling edge was configured using setInterruptEdges.
+   *
    * @return the timestamp in seconds relative to getFPGATime
    */
   public double getFallingTimestamp() {
@@ -130,5 +133,4 @@ public class AsynchronousInterrupt implements AutoCloseable {
       m_callback.accept((result & 0x1) != 0, (result & 0x100) != 0);
     }
   }
-
 }
