@@ -127,8 +127,9 @@ Trajectory Trajectory::RelativeTo(const Pose2d& pose) {
 Trajectory Trajectory::operator+(const Trajectory& other) const {
   auto states = m_states;
   auto otherStates = other.States();
-  std::for_each(otherStates.begin(), otherStates.end(),
-                [&](auto& s) { s.t += m_totalTime; });
+  for (auto& otherState : otherStates) {
+    otherState.t += m_totalTime;
+  }
 
   states.insert(states.end(), otherStates.begin() + 1, otherStates.end());
   return Trajectory(states);
