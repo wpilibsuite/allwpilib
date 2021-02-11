@@ -229,6 +229,10 @@ public class Trajectory {
                         state.curvatureRadPerMeter))
             .collect(Collectors.toList());
 
+    // Here we omit the first state of the other trajectory because we don't want
+    // two time points with different states. Sample() will automatically
+    // interpolate between the end of this trajectory and the second state of the
+    // other trajectory.
     for (int i = 1; i < other.getStates().size(); ++i) {
       var s = other.getStates().get(i);
       states.add(

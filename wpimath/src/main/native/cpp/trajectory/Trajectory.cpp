@@ -131,6 +131,10 @@ Trajectory Trajectory::operator+(const Trajectory& other) const {
     otherState.t += m_totalTime;
   }
 
+  // Here we omit the first state of the other trajectory because we don't want
+  // two time points with different states. Sample() will automatically
+  // interpolate between the end of this trajectory and the second state of the
+  // other trajectory.
   states.insert(states.end(), otherStates.begin() + 1, otherStates.end());
   return Trajectory(states);
 }
