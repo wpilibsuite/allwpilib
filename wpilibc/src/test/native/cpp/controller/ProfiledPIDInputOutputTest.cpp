@@ -22,14 +22,6 @@ class ProfiledPIDInputOutputTest : public testing::Test {
   void TearDown() override { delete controller; }
 };
 
-TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest) {
-  controller->SetP(1);
-  controller->EnableContinuousInput(-180_deg, 180_deg);
-
-  controller->Reset(-179_deg);
-  EXPECT_LT(controller->Calculate(-179_deg, 179_deg), 0);
-}
-
 TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest1) {
   controller->SetP(1);
   controller->EnableContinuousInput(-180_deg, 180_deg);
@@ -71,6 +63,23 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest3) {
   static constexpr units::radian_t kSetpoint{-3.5176604690006377};
   static constexpr units::radian_t kMeasurement{3.1191729343822456};
   static constexpr units::radian_t kGoal{2.709680418117445};
+
+  controller->Reset(kSetpoint);
+  EXPECT_LT(controller->Calculate(kMeasurement, kGoal), 0.0);
+
+  // Error must be less than half the input range at all times
+  EXPECT_LT(units::math::abs(controller->GetSetpoint().position - kMeasurement),
+            units::radian_t{wpi::math::pi});
+}
+
+TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest4) {
+  controller->SetP(1);
+  controller->EnableContinuousInput(0_rad,
+                                    units::radian_t{2.0 * wpi::math::pi});
+
+  static constexpr units::radian_t kSetpoint{2.78};
+  static constexpr units::radian_t kMeasurement{3.12};
+  static constexpr units::radian_t kGoal{2.71};
 
   controller->Reset(kSetpoint);
   EXPECT_LT(controller->Calculate(kMeasurement, kGoal), 0.0);
