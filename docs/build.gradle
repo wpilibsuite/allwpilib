@@ -25,6 +25,7 @@ def zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
 def outputsFolder = file("$project.buildDir/outputs")
 
 def cppProjectZips = []
+def cppIncludeRoots = []
 
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
@@ -49,6 +50,9 @@ doxygen {
     cppProjectZips.each {
         dependsOn it
         source it.source
+        it.ext.includeDirs.each {
+            cppIncludeRoots.add(it.absolutePath)
+        }
     }
 
     exclude 'Eigen/**'
@@ -56,7 +60,6 @@ doxygen {
     exclude 'units/**'
     exclude 'uv.h'
     exclude 'uv/**'
-
 
     extension_mapping 'inc=C++'
     project_name 'WPILibC++'
@@ -75,6 +78,9 @@ doxygen {
     html_timestamp true
     generate_treeview true
     extract_static true
+    full_path_names true
+    strip_from_inc_path cppIncludeRoots as String[]
+    strip_from_path cppIncludeRoots as String[]
 }
 
 tasks.register("zipCppDocs", Zip) {
