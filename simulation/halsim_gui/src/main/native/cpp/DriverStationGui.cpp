@@ -779,6 +779,10 @@ void KeyboardJoystick::SettingsDisplay() {
   ImGui::PopItemWidth();
 }
 
+static inline bool IsKeyDown(ImGuiIO& io, int key) {
+  return key >= 0 && key < IM_ARRAYSIZE(ImGuiIO::KeysDown) && io.KeysDown[key];
+}
+
 void KeyboardJoystick::Update() {
   ImGuiIO& io = ImGui::GetIO();
 
@@ -792,7 +796,7 @@ void KeyboardJoystick::Update() {
     auto& config = m_axisConfig[i];
     float& axisValue = m_data.axes.axes[i];
     // increase/decrease while key held down (to saturation); decay back to 0
-    if (config.incKey >= 0 && io.KeysDown[config.incKey]) {
+    if (IsKeyDown(io, config.incKey)) {
       axisValue += config.keyRate;
       if (axisValue > config.maxAbsValue) {
         axisValue = config.maxAbsValue;
@@ -805,7 +809,7 @@ void KeyboardJoystick::Update() {
       }
     }
 
-    if (config.decKey >= 0 && io.KeysDown[config.decKey]) {
+    if (IsKeyDown(io, config.decKey)) {
       axisValue -= config.keyRate;
       if (axisValue < -config.maxAbsValue) {
         axisValue = -config.maxAbsValue;
@@ -823,7 +827,7 @@ void KeyboardJoystick::Update() {
   m_data.buttons.buttons = 0;
   m_anyButtonPressed = false;
   for (int i = 0; i < m_data.buttons.count; ++i) {
-    if (m_buttonKey[i] >= 0 && io.KeysDown[m_buttonKey[i]]) {
+    if (IsKeyDown(io, m_buttonKey[i])) {
       m_data.buttons.buttons |= 1u << i;
       m_anyButtonPressed = true;
     }
@@ -834,21 +838,21 @@ void KeyboardJoystick::Update() {
     auto& config = m_povConfig[i];
     auto& povValue = m_data.povs.povs[i];
     povValue = -1;
-    if (config.key0 >= 0 && io.KeysDown[config.key0]) {
+    if (IsKeyDown(io, config.key0)) {
       povValue = 0;
-    } else if (config.key45 >= 0 && io.KeysDown[config.key45]) {
+    } else if (IsKeyDown(io, config.key45)) {
       povValue = 45;
-    } else if (config.key90 >= 0 && io.KeysDown[config.key90]) {
+    } else if (IsKeyDown(io, config.key90)) {
       povValue = 90;
-    } else if (config.key135 >= 0 && io.KeysDown[config.key135]) {
+    } else if (IsKeyDown(io, config.key135)) {
       povValue = 135;
-    } else if (config.key180 >= 0 && io.KeysDown[config.key180]) {
+    } else if (IsKeyDown(io, config.key180)) {
       povValue = 180;
-    } else if (config.key225 >= 0 && io.KeysDown[config.key225]) {
+    } else if (IsKeyDown(io, config.key225)) {
       povValue = 225;
-    } else if (config.key270 >= 0 && io.KeysDown[config.key270]) {
+    } else if (IsKeyDown(io, config.key270)) {
       povValue = 270;
-    } else if (config.key315 >= 0 && io.KeysDown[config.key315]) {
+    } else if (IsKeyDown(io, config.key315)) {
       povValue = 315;
     }
   }
@@ -970,6 +974,9 @@ void KeyboardJoystick::ReadIni(wpi::StringRef name, wpi::StringRef value) {
     if (value.getAsInteger(10, v)) {
       return;
     }
+    if (v < 0 || v >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
+      return;
+    }
     m_buttonKey[index] = v;
   } else if (name.startswith("pov")) {
     name = name.drop_front(3);
@@ -991,6 +998,9 @@ void KeyboardJoystick::ReadIni(wpi::StringRef name, wpi::StringRef value) {
     }
     int v;
     if (value.getAsInteger(10, v)) {
+      return;
+    }
+    if (v < 0 || v >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
       return;
     }
     if (name == "key0") {
