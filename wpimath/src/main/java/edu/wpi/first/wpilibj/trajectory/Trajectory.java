@@ -216,6 +216,12 @@ public class Trajectory {
    */
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public Trajectory concatenate(Trajectory other) {
+    // If this is a default constructed trajectory with no states, then we can
+    // simply return the rhs trajectory.
+    if (m_states.isEmpty()) {
+      return other;
+    }
+
     // Deep copy the current states.
     List<State> states =
         m_states.stream()

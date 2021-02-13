@@ -125,6 +125,12 @@ Trajectory Trajectory::RelativeTo(const Pose2d& pose) {
 }
 
 Trajectory Trajectory::operator+(const Trajectory& other) const {
+  // If this is a default constructed trajectory with no states, then we can
+  // simply return the rhs trajectory.
+  if (m_states.empty()) {
+    return other;
+  }
+
   auto states = m_states;
   auto otherStates = other.States();
   for (auto& otherState : otherStates) {
