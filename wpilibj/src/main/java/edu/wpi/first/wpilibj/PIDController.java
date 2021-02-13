@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @deprecated Use {@link edu.wpi.first.wpilibj.controller.PIDController} instead.
  */
 @Deprecated(since = "2020", forRemoval = true)
-public class PIDController extends PIDBase implements Controller, AutoCloseable {
+public class PIDController extends PIDBase implements Controller {
   Notifier m_controlLoop = new Notifier(this::calculate);
 
   /**

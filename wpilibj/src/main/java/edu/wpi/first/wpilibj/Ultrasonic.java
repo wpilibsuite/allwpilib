@@ -10,6 +10,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -93,8 +94,8 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   private synchronized void initialize() {
     m_simDevice = SimDevice.create("Ultrasonic", m_echoChannel.getChannel());
     if (m_simDevice != null) {
-      m_simRangeValid = m_simDevice.createBoolean("Range Valid", false, true);
-      m_simRange = m_simDevice.createDouble("Range (in)", false, 0.0);
+      m_simRangeValid = m_simDevice.createBoolean("Range Valid", Direction.kInput, true);
+      m_simRange = m_simDevice.createDouble("Range (in)", Direction.kInput, 0.0);
       m_pingChannel.setSimDevice(m_simDevice);
       m_echoChannel.setSimDevice(m_simDevice);
     }
