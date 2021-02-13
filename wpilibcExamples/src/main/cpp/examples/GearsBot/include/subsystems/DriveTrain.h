@@ -7,7 +7,7 @@
 #include <frc/AnalogGyro.h>
 #include <frc/AnalogInput.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
@@ -64,12 +64,12 @@ class DriveTrain : public frc2::SubsystemBase {
   void Periodic() override;
 
  private:
-  frc::PWMVictorSPX m_frontLeft{1};
-  frc::PWMVictorSPX m_rearLeft{2};
+  frc::PWMSparkMax m_frontLeft{1};
+  frc::PWMSparkMax m_rearLeft{2};
   frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
 
-  frc::PWMVictorSPX m_frontRight{3};
-  frc::PWMVictorSPX m_rearRight{4};
+  frc::PWMSparkMax m_frontRight{3};
+  frc::PWMSparkMax m_rearRight{4};
   frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
 
   frc::DifferentialDrive m_robotDrive{m_left, m_right};

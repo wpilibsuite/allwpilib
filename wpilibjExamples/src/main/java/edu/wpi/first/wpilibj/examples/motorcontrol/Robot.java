@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.motorcontrol;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_motor = new PWMVictorSPX(kMotorPort);
+    m_motor = new PWMSparkMax(kMotorPort);
     m_joystick = new Joystick(kJoystickPort);
   }
 

@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.mecanumdrive;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
@@ -23,10 +23,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    PWMVictorSPX frontLeft = new PWMVictorSPX(kFrontLeftChannel);
-    PWMVictorSPX rearLeft = new PWMVictorSPX(kRearLeftChannel);
-    PWMVictorSPX frontRight = new PWMVictorSPX(kFrontRightChannel);
-    PWMVictorSPX rearRight = new PWMVictorSPX(kRearRightChannel);
+    PWMSparkMax frontLeft = new PWMSparkMax(kFrontLeftChannel);
+    PWMSparkMax rearLeft = new PWMSparkMax(kRearLeftChannel);
+    PWMSparkMax frontRight = new PWMSparkMax(kFrontRightChannel);
+    PWMSparkMax rearRight = new PWMSparkMax(kRearRightChannel);
 
     // Invert the left side motors.
     // You may need to change or remove this to match your robot.

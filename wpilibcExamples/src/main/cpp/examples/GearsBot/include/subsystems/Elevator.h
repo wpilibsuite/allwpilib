@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc2/command/PIDSubsystem.h>
 
 /**
@@ -43,7 +43,7 @@ class Elevator : public frc2::PIDSubsystem {
   void Periodic() override;
 
  private:
-  frc::PWMVictorSPX m_motor{5};
+  frc::PWMSparkMax m_motor{5};
   double m_setpoint = 0;
 
 // Conversion value of potentiometer varies between the real world and

@@ -6,7 +6,7 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -68,10 +68,10 @@ class Drivetrain {
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  frc::PWMVictorSPX m_leftLeader{1};
-  frc::PWMVictorSPX m_leftFollower{2};
-  frc::PWMVictorSPX m_rightLeader{3};
-  frc::PWMVictorSPX m_rightFollower{4};
+  frc::PWMSparkMax m_leftLeader{1};
+  frc::PWMSparkMax m_leftFollower{2};
+  frc::PWMSparkMax m_rightLeader{3};
+  frc::PWMSparkMax m_rightFollower{4};
 
   frc::SpeedControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
   frc::SpeedControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};

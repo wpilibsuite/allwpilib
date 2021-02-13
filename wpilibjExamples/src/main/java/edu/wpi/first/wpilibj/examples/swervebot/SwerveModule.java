@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.swervebot;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -49,8 +49,8 @@ public class SwerveModule {
    * @param turningMotorChannel ID for the turning motor.
    */
   public SwerveModule(int driveMotorChannel, int turningMotorChannel) {
-    m_driveMotor = new PWMVictorSPX(driveMotorChannel);
-    m_turningMotor = new PWMVictorSPX(turningMotorChannel);
+    m_driveMotor = new PWMSparkMax(driveMotorChannel);
+    m_turningMotor = new PWMSparkMax(turningMotorChannel);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder

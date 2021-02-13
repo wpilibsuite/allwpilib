@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.ultrasonic;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.MedianFilter;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
 
   private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
   private final DifferentialDrive m_robotDrive =
-      new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort), new PWMVictorSPX(kRightMotorPort));
+      new DifferentialDrive(new PWMSparkMax(kLeftMotorPort), new PWMSparkMax(kRightMotorPort));
 
   /**
    * Tells the robot to drive to a set distance (in inches) from an object using proportional

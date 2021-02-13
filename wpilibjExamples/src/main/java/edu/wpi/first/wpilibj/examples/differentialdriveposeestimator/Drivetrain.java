@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Timer;
@@ -30,10 +30,10 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final SpeedController m_leftLeader = new PWMVictorSPX(1);
-  private final SpeedController m_leftFollower = new PWMVictorSPX(2);
-  private final SpeedController m_rightLeader = new PWMVictorSPX(3);
-  private final SpeedController m_rightFollower = new PWMVictorSPX(4);
+  private final SpeedController m_leftLeader = new PWMSparkMax(1);
+  private final SpeedController m_leftFollower = new PWMSparkMax(2);
+  private final SpeedController m_rightLeader = new PWMSparkMax(3);
+  private final SpeedController m_rightFollower = new PWMSparkMax(4);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
