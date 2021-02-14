@@ -1,5 +1,3 @@
-#pragma once
-
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -8,9 +6,9 @@
 
 #include <memory>
 
+#include "frc/DoubleSolenoid.h"
 #include "frc/simulation/CallbackStore.h"
 #include "frc/simulation/PCMSim.h"
-#include "frc/DoubleSolenoid.h"
 
 namespace frc::sim {
 
@@ -48,9 +46,8 @@ class DoubleSolenoidSim {
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterFwdInitializedCallback(NotifyCallback callback,
-                                      bool initialNotify);
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterFwdInitializedCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if the forward solenoid has been initialized.
@@ -58,7 +55,7 @@ class DoubleSolenoidSim {
    * @return true if initialized
    */
   bool GetFwdInitialized() const;
-  
+
   /**
    * Define whether the forward solenoid has been initialized.
    *
@@ -73,9 +70,8 @@ class DoubleSolenoidSim {
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterRevInitializedCallback(NotifyCallback callback,
-                                      bool initialNotify);
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterRevInitializedCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Define whether the reverse solenoid has been initialized.
@@ -97,7 +93,7 @@ class DoubleSolenoidSim {
    * @param value The value to set (Off, Forward, Reverse)
    */
   void Set(DoubleSolenoid::Value value);
-  
+
   /**
    * Check the value of the double solenoid output.
    *

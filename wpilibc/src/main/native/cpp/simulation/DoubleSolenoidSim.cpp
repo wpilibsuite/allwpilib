@@ -4,43 +4,49 @@
 
 #include "frc/simulation/DoubleSolenoidSim.h"
 
-#include "frc/simulation/PCMSim.h"
 #include "frc/SensorUtil.h"
-
+#include "frc/simulation/PCMSim.h"
 
 using namespace frc;
 using namespace frc::sim;
 
-DoubleSolenoidSim::DoubleSolenoidSim(int fwd, int rev) : m_fwd{fwd}, m_rev{rev} {}
+DoubleSolenoidSim::DoubleSolenoidSim(int fwd, int rev)
+    : m_fwd{fwd}, m_rev{rev} {}
 
-DoubleSolenoidSim::DoubleSolenoidSim(int module, int fwd, int rev) : m_pcm{module}, m_fwd{fwd}, m_rev{rev} {}
+DoubleSolenoidSim::DoubleSolenoidSim(int module, int fwd, int rev)
+    : m_pcm{module}, m_fwd{fwd}, m_rev{rev} {}
 
-DoubleSolenoidSim::DoubleSolenoidSim(PCMSim& pcm, int fwd, int rev) : m_pcm{pcm}, m_fwd{fwd}, m_rev{rev} {}
+DoubleSolenoidSim::DoubleSolenoidSim(PCMSim& pcm, int fwd, int rev)
+    : m_pcm{pcm}, m_fwd{fwd}, m_rev{rev} {}
 
-std::unique_ptr<CallbackStore> DoubleSolenoidSim::RegisterFwdInitializedCallback(
-    NotifyCallback callback, bool initialNotify) {
-  return m_pcm.RegisterSolenoidInitializedCallback(m_fwd, callback, initialNotify);
+std::unique_ptr<CallbackStore>
+DoubleSolenoidSim::RegisterFwdInitializedCallback(NotifyCallback callback,
+                                                  bool initialNotify) {
+  return m_pcm.RegisterSolenoidInitializedCallback(m_fwd, callback,
+                                                   initialNotify);
 }
 
 bool DoubleSolenoidSim::GetFwdInitialized() const {
-    return m_pcm.GetSolenoidInitialized(m_fwd);
+  return m_pcm.GetSolenoidInitialized(m_fwd);
 }
 
 void DoubleSolenoidSim::SetFwdInitialized(bool initialized) {
-    m_pcm.SetSolenoidInitialized(m_fwd, initialized);
+  m_pcm.SetSolenoidInitialized(m_fwd, initialized);
 }
 
-std::unique_ptr<CallbackStore> DoubleSolenoidSim::RegisterRevInitializedCallback(
-    NotifyCallback callback, bool initialNotify) {
-  return m_pcm.RegisterSolenoidInitializedCallback(m_rev, callback, initialNotify);
+std::unique_ptr<CallbackStore>
+DoubleSolenoidSim::RegisterRevInitializedCallback(NotifyCallback callback,
+                                                  bool initialNotify) {
+  return m_pcm.RegisterSolenoidInitializedCallback(m_rev, callback,
+                                                   initialNotify);
 }
 
 bool DoubleSolenoidSim::GetRevInitialized() const {
-    return m_pcm.GetSolenoidInitialized(m_rev);
+  return m_pcm.GetSolenoidInitialized(m_rev);
 }
 
 void DoubleSolenoidSim::SetRevInitialized(bool initialized) {
-    m_pcm.SetSolenoidInitialized(m_rev, initialized);
+  m_pcm.SetSolenoidInitialized(m_rev, initialized);
 }
 
 void DoubleSolenoidSim::Set(DoubleSolenoid::Value value) {
