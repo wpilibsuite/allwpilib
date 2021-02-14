@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 /** Class to control a simulated {@link edu.wpi.first.wpilibj.DoubleSolenoid}. */
 public class DoubleSolenoidSim {
   private final PCMSim m_pcm;
-  private final int m_fwd
+  private final int m_fwd;
   private final int m_rev;
 
   /**

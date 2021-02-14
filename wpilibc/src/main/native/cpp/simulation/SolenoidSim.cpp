@@ -34,7 +34,8 @@ void SolenoidSim::SetInitialized(bool initialized) {
 
 std::unique_ptr<CallbackStore> SolenoidSim::RegisterOutputCallback(
     NotifyCallback callback, bool initialNotify) {
-  return m_pcm.RegisterSolenoidOutputCallback(m_channel, callback, initialNotify);
+  return m_pcm.RegisterSolenoidOutputCallback(m_channel, callback,
+                                              initialNotify);
 }
 
 bool SolenoidSim::GetOutput() const {
