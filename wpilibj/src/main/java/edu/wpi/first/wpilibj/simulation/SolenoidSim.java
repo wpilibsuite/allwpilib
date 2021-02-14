@@ -97,7 +97,7 @@ public class SolenoidSim {
    * @param output the new solenoid output
    */
   public void setOutput(boolean output) {
-    m_pcm.setSolenoidOutput(m_channel, solenoidOutput);
+    m_pcm.setSolenoidOutput(m_channel, output);
   }
 
   /**
