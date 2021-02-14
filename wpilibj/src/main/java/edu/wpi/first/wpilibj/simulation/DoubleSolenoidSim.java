@@ -3,9 +3,7 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-/**
- * Class to control a simulated {@link edu.wpi.first.wpilibj.DoubleSolenoid}.
- */
+/** Class to control a simulated {@link edu.wpi.first.wpilibj.DoubleSolenoid}. */
 public class DoubleSolenoidSim {
   private final PCMSim m_pcm;
   private final int m_fwd, m_rev;
@@ -50,13 +48,13 @@ public class DoubleSolenoidSim {
   /**
    * Register a callback to be run when the forward solenoid is initialized.
    *
-   * @param callback      the callback
+   * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   * this object so GC doesn't cancel the callback.
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerFwdInitializedCallback(
-          NotifyCallback callback, boolean initialNotify) {
+      NotifyCallback callback, boolean initialNotify) {
     return m_pcm.registerSolenoidInitializedCallback(m_fwd, callback, initialNotify);
   }
 
@@ -81,13 +79,13 @@ public class DoubleSolenoidSim {
   /**
    * Register a callback to be run when the reverse solenoid is initialized.
    *
-   * @param callback      the callback
+   * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   * this object so GC doesn't cancel the callback.
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerRevInitializedCallback(
-          NotifyCallback callback, boolean initialNotify) {
+      NotifyCallback callback, boolean initialNotify) {
     return m_pcm.registerSolenoidInitializedCallback(m_rev, callback, initialNotify);
   }
 
@@ -154,7 +152,8 @@ public class DoubleSolenoidSim {
     } else if (!fwdState && revState) {
       return DoubleSolenoid.Value.kReverse;
     } else {
-      throw new AssertionError("In a double solenoid, both fwd and rev can't be on at the same time.");
+      throw new AssertionError(
+          "In a double solenoid, both fwd and rev can't be on at the same time.");
     }
   }
 

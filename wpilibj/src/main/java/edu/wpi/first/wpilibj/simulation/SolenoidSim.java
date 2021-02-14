@@ -11,7 +11,6 @@ public class SolenoidSim {
    * Constructs for a solenoid on the default PCM.
    *
    * @param channel the solenoid channel.
-   *
    * @see PCMSim#PCMSim()
    */
   public SolenoidSim(int channel) {
@@ -24,7 +23,6 @@ public class SolenoidSim {
    *
    * @param module the CAN ID of the PCM the solenoid is connected to.
    * @param channel the solenoid channel.
-   *
    * @see PCMSim#PCMSim(int)
    */
   public SolenoidSim(int module, int channel) {
@@ -50,8 +48,7 @@ public class SolenoidSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  public CallbackStore registerInitializedCallback(
-          NotifyCallback callback, boolean initialNotify) {
+  public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
     return m_pcm.registerSolenoidInitializedCallback(m_channel, callback, initialNotify);
   }
 
@@ -81,8 +78,7 @@ public class SolenoidSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  public CallbackStore registerOutputCallback(
-          NotifyCallback callback, boolean initialNotify) {
+  public CallbackStore registerOutputCallback(NotifyCallback callback, boolean initialNotify) {
     return m_pcm.registerSolenoidOutputCallback(m_channel, callback, initialNotify);
   }
 
