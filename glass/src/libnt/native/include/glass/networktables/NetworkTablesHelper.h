@@ -28,7 +28,8 @@ class NetworkTablesHelper {
   }
 
   static constexpr int kDefaultListenerFlags =
-      NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE;
+      NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE | NT_NOTIFY_DELETE |
+      NT_NOTIFY_IMMEDIATE;
 
   NT_EntryListener AddListener(NT_Entry entry,
                                unsigned int flags = kDefaultListenerFlags) {
