@@ -56,8 +56,8 @@ void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
 void DifferentialDrivePoseEstimator::ResetPosition(
     const Pose2d& pose, const Rotation2d& gyroAngle) {
   m_previousAngle = pose.Rotation();
-  m_gyroOffset = GetEstimatedPosition().Rotation() - gyroAngle;
   m_observer.SetXhat(FillStateVector(pose, 0_m, 0_m));
+  m_gyroOffset = GetEstimatedPosition().Rotation() - gyroAngle;
 }
 
 Pose2d DifferentialDrivePoseEstimator::GetEstimatedPosition() const {
