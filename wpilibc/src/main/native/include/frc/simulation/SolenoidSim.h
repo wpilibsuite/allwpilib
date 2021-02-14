@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "frc/simulation/CallbackStore.h"
 #include "frc/simulation/PCMSim.h"
 
