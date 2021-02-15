@@ -19,6 +19,10 @@ DoubleSolenoidSim::DoubleSolenoidSim(int module, int fwd, int rev)
 DoubleSolenoidSim::DoubleSolenoidSim(PCMSim& pcm, int fwd, int rev)
     : m_pcm{pcm}, m_fwd{fwd}, m_rev{rev} {}
 
+DoubleSolenoidSim::DoubleSolenoidSim(DoubleSolenoid&solenoid)
+    : m_pcm{solenoid.GetModuleNumber()}, m_fwd{solenoid.GetFwdChannel()},
+      m_rev{solenoid.GetRevChannel()} {}
+
 std::unique_ptr<CallbackStore>
 DoubleSolenoidSim::RegisterFwdInitializedCallback(NotifyCallback callback,
                                                   bool initialNotify) {

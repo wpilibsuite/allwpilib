@@ -18,6 +18,9 @@ SolenoidSim::SolenoidSim(int module, int channel)
 SolenoidSim::SolenoidSim(PCMSim& pcm, int channel)
     : m_pcm{pcm}, m_channel{channel} {}
 
+SolenoidSim::SolenoidSim(Solenoid& solenoid)
+    : m_pcm{solenoid.GetModuleNumber()}, m_channel{solenoid.GetChannel()} {}
+
 std::unique_ptr<CallbackStore> SolenoidSim::RegisterInitializedCallback(
     NotifyCallback callback, bool initialNotify) {
   return m_pcm.RegisterSolenoidInitializedCallback(m_channel, callback,

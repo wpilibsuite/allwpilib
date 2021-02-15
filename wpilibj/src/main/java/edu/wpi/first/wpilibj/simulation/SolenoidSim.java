@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
+import edu.wpi.first.wpilibj.Solenoid;
 
 /** Class to control a simulated {@link edu.wpi.first.wpilibj.Solenoid}. */
 public class SolenoidSim {
@@ -42,6 +43,15 @@ public class SolenoidSim {
   public SolenoidSim(PCMSim pcm, int channel) {
     this.m_pcm = pcm;
     this.m_channel = channel;
+  }
+
+  /**
+   * Constructs for the given solenoid.
+   *
+   * @param solenoid the solenoid to simulate.
+   */
+  public SolenoidSim(Solenoid solenoid) {
+    this(solenoid.getModuleNumber(), solenoid.getChannel());
   }
 
   /**

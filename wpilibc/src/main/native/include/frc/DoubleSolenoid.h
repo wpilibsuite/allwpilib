@@ -75,6 +75,20 @@ class DoubleSolenoid : public SolenoidBase,
   void Toggle();
 
   /**
+   * Get the forward channel.
+   *
+   * @return the forward channel.
+   */
+  int GetFwdChannel() const;
+
+  /**
+   * Get the reverse channel.
+   *
+   * @return the reverse channel.
+   */
+  int GetRevChannel() const;
+
+  /**
    * Check if the forward solenoid is blacklisted.
    *
    * If a solenoid is shorted, it is added to the blacklist and disabled until

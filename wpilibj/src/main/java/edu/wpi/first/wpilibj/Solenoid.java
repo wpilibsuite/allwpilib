@@ -84,6 +84,10 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
     set(!get());
   }
 
+  /** Get the channel this solenoid is connected to. */
+  public int getChannel() {
+    return m_channel;
+  }
   /**
    * Check if solenoid is blacklisted. If a solenoid is shorted, it is added to the blacklist and
    * disabled until power cycle, or until faults are cleared.

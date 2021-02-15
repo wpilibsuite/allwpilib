@@ -58,3 +58,7 @@ void SolenoidBase::ClearAllPCMStickyFaults() {
 }
 
 SolenoidBase::SolenoidBase(int moduleNumber) : m_moduleNumber(moduleNumber) {}
+
+int SolenoidBase::GetModuleNumber() {
+  return m_moduleNumber;
+}

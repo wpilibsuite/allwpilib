@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include "frc/Solenoid.h"
 #include "frc/simulation/CallbackStore.h"
 #include "frc/simulation/PCMSim.h"
 
@@ -22,6 +23,13 @@ class SolenoidSim {
    * @param channel the solenoid channel.
    */
   explicit SolenoidSim(int channel);
+
+  /**
+   * Constructs for the given solenoid.
+   * 
+   * @param doubleSolenoid the solenoid to simulate.
+   */
+  explicit SolenoidSim(Solenoid& solenoid);
 
   /**
    * Constructs for a solenoid.

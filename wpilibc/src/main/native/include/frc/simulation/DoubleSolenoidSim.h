@@ -33,11 +33,18 @@ class DoubleSolenoidSim {
   DoubleSolenoidSim(int module, int fwd, int rev);
 
   /**
-   * Constructs from a Compressor object.
+   * Constructs from a PCMSim object.
    *
-   * @param compressor Compressor connected to PCM to simulate
+   * @param pcm the PCMSim object representing the PCM this solenoid is connected to.
    */
   DoubleSolenoidSim(PCMSim& pcm, int fwd, int rev);
+
+  /**
+   * Constructs for the given solenoid.
+   * 
+   * @param solenoid the solenoid to simulate.
+   */
+  explicit DoubleSolenoidSim(DoubleSolenoid& solenoid);
 
   /**
    * Register a callback to be run when the forward solenoid is initialized.

@@ -51,6 +51,15 @@ public class DoubleSolenoidSim {
   }
 
   /**
+   * Constructs for the given solenoid.
+   *
+   * @param solenoid the solenoid to simulate.
+   */
+  public DoubleSolenoidSim(DoubleSolenoid solenoid) {
+    this(solenoid.getModuleNumber(), solenoid.getFwdChannel(), solenoid.getRevChannel());
+  }
+
+  /**
    * Register a callback to be run when the forward solenoid is initialized.
    *
    * @param callback the callback

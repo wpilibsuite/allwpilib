@@ -67,6 +67,11 @@ class Solenoid : public SolenoidBase,
   void Toggle();
 
   /**
+   * Get the channel this solenoid is connected to.
+   */
+  int GetChannel() const;
+
+  /**
    * Check if solenoid is blacklisted.
    *
    * If a solenoid is shorted, it is added to the blacklist and

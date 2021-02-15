@@ -23,6 +23,15 @@ public class SolenoidBase {
   }
 
   /**
+   * Get the CAN ID of the module this solenoid is connected to.
+   *
+   * @return the module number.
+   */
+  public int getModuleNumber() {
+    return m_moduleNumber;
+  }
+
+  /**
    * Read all 8 solenoids from the specified module as a single byte.
    *
    * @param moduleNumber the module number to read
