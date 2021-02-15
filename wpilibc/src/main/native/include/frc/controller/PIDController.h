@@ -27,7 +27,7 @@ class PIDController : public frc::Sendable,
    * @param Ki     The integral coefficient.
    * @param Kd     The derivative coefficient.
    * @param period The period between controller updates in seconds. The
-   *               default is 20 milliseconds.
+   *               default is 20 milliseconds. Must be non-zero and positive.
    */
   PIDController(double Kp, double Ki, double Kd,
                 units::second_t period = 20_ms);
