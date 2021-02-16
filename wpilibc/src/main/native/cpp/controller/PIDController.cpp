@@ -23,8 +23,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
     frc::DriverStation::ReportError(
         "Controller period must be a non-zero positive number!");
     m_period = 20_ms;
-    frc::DriverStation::ReportWarning(
-        "Controller period defaulted to 20ms.");
+    frc::DriverStation::ReportWarning("Controller period defaulted to 20ms.");
   }
   static int instances = 0;
   instances++;
