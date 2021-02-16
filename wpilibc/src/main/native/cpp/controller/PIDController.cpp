@@ -19,9 +19,12 @@ using namespace frc2;
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
     : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
-  if (period == 0_s) {
+  if (period <= 0_s) {
     frc::DriverStation::ReportError(
         "Controller period must be a non-zero positive number!");
+    m_period = 20_ms;
+    frc::DriverStation::ReportWarning(
+         "Set controller period to default of 20ms.");
   }
   static int instances = 0;
   instances++;
