@@ -16,10 +16,10 @@ class SolenoidBase : public ErrorBase {
  public:
   /**
    * Get the CAN ID of the module this solenoid is connected to.
-   * 
+   *
    * @return the module number.
    */
-  int GetModuleNumber();
+  int GetModuleNumber() const;
 
   /**
    * Read all 8 solenoids as a single byte

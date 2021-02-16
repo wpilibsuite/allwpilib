@@ -26,7 +26,7 @@ class SolenoidSim {
 
   /**
    * Constructs for the given solenoid.
-   * 
+   *
    * @param doubleSolenoid the solenoid to simulate.
    */
   explicit SolenoidSim(Solenoid& solenoid);

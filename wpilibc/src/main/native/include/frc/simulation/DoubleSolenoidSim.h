@@ -35,13 +35,13 @@ class DoubleSolenoidSim {
   /**
    * Constructs from a PCMSim object.
    *
-   * @param pcm the PCMSim object representing the PCM this solenoid is connected to.
+   * @param pcm the PCM the solenoid is connected to.
    */
   DoubleSolenoidSim(PCMSim& pcm, int fwd, int rev);
 
   /**
    * Constructs for the given solenoid.
-   * 
+   *
    * @param solenoid the solenoid to simulate.
    */
   explicit DoubleSolenoidSim(DoubleSolenoid& solenoid);
