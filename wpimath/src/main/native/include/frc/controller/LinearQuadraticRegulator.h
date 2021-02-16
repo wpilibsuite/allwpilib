@@ -69,11 +69,11 @@ class LinearQuadraticRegulatorImpl {
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param A      Continuous system matrix of the plant being controlled.
-   * @param B      Continuous input matrix of the plant being controlled.
-   * @param Q      The state cost matrix.
-   * @param R      The input cost matrix.
-   * @param dt     Discretization timestep.
+   * @param A  Continuous system matrix of the plant being controlled.
+   * @param B  Continuous input matrix of the plant being controlled.
+   * @param Q  The state cost matrix.
+   * @param R  The input cost matrix.
+   * @param dt Discretization timestep.
    */
   LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
                                const Eigen::Matrix<double, States, Inputs>& B,
@@ -86,9 +86,38 @@ class LinearQuadraticRegulatorImpl {
 
     Eigen::Matrix<double, States, States> S =
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R);
-    Eigen::Matrix<double, Inputs, Inputs> tmp =
-        discB.transpose() * S * discB + R;
-    m_K = tmp.llt().solve(discB.transpose() * S * discA);
+    m_K = (discB.transpose() * S * discB + R)
+              .llt()
+              .solve(discB.transpose() * S * discA);
+
+    Reset();
+  }
+
+  /**
+   * Constructs a controller with the given coefficients and plant.
+   *
+   * @param A  Continuous system matrix of the plant being controlled.
+   * @param B  Continuous input matrix of the plant being controlled.
+   * @param Q  The state cost matrix.
+   * @param R  The input cost matrix.
+   * @param N  The state-input cross-term cost matrix.
+   * @param dt Discretization timestep.
+   */
+  LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
+                               const Eigen::Matrix<double, States, Inputs>& B,
+                               const Eigen::Matrix<double, States, States>& Q,
+                               const Eigen::Matrix<double, Inputs, Inputs>& R,
+                               const Eigen::Matrix<double, States, Inputs>& N,
+                               units::second_t dt) {
+    Eigen::Matrix<double, States, States> discA;
+    Eigen::Matrix<double, States, Inputs> discB;
+    DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
+
+    Eigen::Matrix<double, States, States> S =
+        drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
+    m_K = (B.transpose() * S * B + R)
+              .llt()
+              .solve(discB.transpose() * S * discA + N.transpose());
 
     Reset();
   }
@@ -251,11 +280,11 @@ class LinearQuadraticRegulator
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param A      Continuous system matrix of the plant being controlled.
-   * @param B      Continuous input matrix of the plant being controlled.
-   * @param Q      The state cost matrix.
-   * @param R      The input cost matrix.
-   * @param dt     Discretization timestep.
+   * @param A  Continuous system matrix of the plant being controlled.
+   * @param B  Continuous input matrix of the plant being controlled.
+   * @param Q  The state cost matrix.
+   * @param R  The input cost matrix.
+   * @param dt Discretization timestep.
    */
   LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
                            const Eigen::Matrix<double, States, Inputs>& B,
@@ -263,6 +292,25 @@ class LinearQuadraticRegulator
                            const Eigen::Matrix<double, Inputs, Inputs>& R,
                            units::second_t dt)
       : detail::LinearQuadraticRegulatorImpl<States, Inputs>{A, B, Q, R, dt} {}
+
+  /**
+   * Constructs a controller with the given coefficients and plant.
+   *
+   * @param A  Continuous system matrix of the plant being controlled.
+   * @param B  Continuous input matrix of the plant being controlled.
+   * @param Q  The state cost matrix.
+   * @param R  The input cost matrix.
+   * @param N  The state-input cross-term cost matrix.
+   * @param dt Discretization timestep.
+   */
+  LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
+                           const Eigen::Matrix<double, States, Inputs>& B,
+                           const Eigen::Matrix<double, States, States>& Q,
+                           const Eigen::Matrix<double, Inputs, Inputs>& R,
+                           const Eigen::Matrix<double, States, Inputs>& N,
+                           units::second_t dt)
+      : detail::LinearQuadraticRegulatorImpl<States, Inputs>{A, B, Q,
+                                                             R, N, dt} {}
 
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
   LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
@@ -293,6 +341,13 @@ class LinearQuadraticRegulator<1, 1>
                            const Eigen::Matrix<double, 1, 1>& R,
                            units::second_t dt);
 
+  LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
+                           const Eigen::Matrix<double, 1, 1>& B,
+                           const Eigen::Matrix<double, 1, 1>& Q,
+                           const Eigen::Matrix<double, 1, 1>& R,
+                           const Eigen::Matrix<double, 1, 1>& N,
+                           units::second_t dt);
+
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
   LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
 };
@@ -320,6 +375,13 @@ class LinearQuadraticRegulator<2, 1>
                            const Eigen::Matrix<double, 2, 1>& B,
                            const Eigen::Matrix<double, 2, 2>& Q,
                            const Eigen::Matrix<double, 1, 1>& R,
+                           units::second_t dt);
+
+  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
+                           const Eigen::Matrix<double, 2, 1>& B,
+                           const Eigen::Matrix<double, 2, 2>& Q,
+                           const Eigen::Matrix<double, 1, 1>& R,
+                           const Eigen::Matrix<double, 2, 1>& N,
                            units::second_t dt);
 
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
