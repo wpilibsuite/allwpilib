@@ -116,6 +116,40 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
   /**
    * Constructs a controller with the given coefficients and plant.
    *
+   * @param A Continuous system matrix of the plant being controlled.
+   * @param B Continuous input matrix of the plant being controlled.
+   * @param Q The state cost matrix.
+   * @param R The input cost matrix.
+   * @param N The state-input cross-term cost matrix.
+   * @param dtSeconds Discretization timestep.
+   */
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
+  public LinearQuadraticRegulator(
+      Matrix<States, States> A,
+      Matrix<States, Inputs> B,
+      Matrix<States, States> Q,
+      Matrix<Inputs, Inputs> R,
+      Matrix<States, Inputs> N,
+      double dtSeconds) {
+    var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
+    var discA = discABPair.getFirst();
+    var discB = discABPair.getSecond();
+
+    var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
+
+    var temp = discB.transpose().times(S).times(discB).plus(R);
+
+    m_K = temp.solve(discB.transpose().times(S).times(discA).plus(N.transpose()));
+
+    m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
+    m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
+
+    reset();
+  }
+
+  /**
+   * Constructs a controller with the given coefficients and plant.
+   *
    * @param states The number of states.
    * @param inputs The number of inputs.
    * @param k The gain matrix.
