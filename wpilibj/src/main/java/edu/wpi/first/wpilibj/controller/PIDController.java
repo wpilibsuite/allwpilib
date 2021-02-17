@@ -74,13 +74,16 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kp The proportional coefficient.
    * @param ki The integral coefficient.
    * @param kd The derivative coefficient.
-   * @param period The period between controller updates in seconds.
+   * @param period The period between controller updates in seconds. Must be non-zero and positive.
    */
   public PIDController(double kp, double ki, double kd, double period) {
     m_kp = kp;
     m_ki = ki;
     m_kd = kd;
 
+    if (period <= 0) {
+      throw new IllegalArgumentException("Controller period must be a non-zero positive number!");
+    }
     m_period = period;
 
     instances++;
