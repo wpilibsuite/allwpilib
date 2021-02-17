@@ -29,6 +29,8 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
   private byte m_reverseMask; // The mask for the reverse channel.
   private int m_forwardHandle;
   private int m_reverseHandle;
+  private final int m_forwardChannel;
+  private final int m_reverseChannel;
 
   /**
    * Constructor. Uses the default PCM ID (defaults to 0).
@@ -50,6 +52,9 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
   public DoubleSolenoid(
       final int moduleNumber, final int forwardChannel, final int reverseChannel) {
     super(moduleNumber);
+
+    m_forwardChannel = forwardChannel;
+    m_reverseChannel = reverseChannel;
 
     SensorUtil.checkSolenoidModule(m_moduleNumber);
     SensorUtil.checkSolenoidChannel(forwardChannel);
@@ -146,6 +151,24 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable, AutoClosea
     } else if (value == Value.kReverse) {
       set(Value.kForward);
     }
+  }
+
+  /**
+   * Get the forward channel.
+   *
+   * @return the forward channel.
+   */
+  public int getFwdChannel() {
+    return m_forwardChannel;
+  }
+
+  /**
+   * Get the reverse channel.
+   *
+   * @return the reverse channel.
+   */
+  public int getRevChannel() {
+    return m_reverseChannel;
   }
 
   /**

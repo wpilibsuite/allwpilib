@@ -148,6 +148,14 @@ void DoubleSolenoid::Toggle() {
   }
 }
 
+int DoubleSolenoid::GetFwdChannel() const {
+  return m_forwardChannel;
+}
+
+int DoubleSolenoid::GetRevChannel() const {
+  return m_reverseChannel;
+}
+
 bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
   int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
   return (blackList & m_forwardMask) != 0;
