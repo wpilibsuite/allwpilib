@@ -124,6 +124,27 @@ Trajectory Trajectory::RelativeTo(const Pose2d& pose) {
   return Trajectory(newStates);
 }
 
+Trajectory Trajectory::operator+(const Trajectory& other) const {
+  // If this is a default constructed trajectory with no states, then we can
+  // simply return the rhs trajectory.
+  if (m_states.empty()) {
+    return other;
+  }
+
+  auto states = m_states;
+  auto otherStates = other.States();
+  for (auto& otherState : otherStates) {
+    otherState.t += m_totalTime;
+  }
+
+  // Here we omit the first state of the other trajectory because we don't want
+  // two time points with different states. Sample() will automatically
+  // interpolate between the end of this trajectory and the second state of the
+  // other trajectory.
+  states.insert(states.end(), otherStates.begin() + 1, otherStates.end());
+  return Trajectory(states);
+}
+
 void frc::to_json(wpi::json& json, const Trajectory::State& state) {
   json = wpi::json{{"time", state.t.to<double>()},
                    {"velocity", state.velocity.to<double>()},

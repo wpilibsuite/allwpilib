@@ -207,6 +207,52 @@ public class Trajectory {
   }
 
   /**
+   * Concatenates another trajectory to the current trajectory. The user is responsible for making
+   * sure that the end pose of this trajectory and the start pose of the other trajectory match (if
+   * that is the desired behavior).
+   *
+   * @param other The trajectory to concatenate.
+   * @return The concatenated trajectory.
+   */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  public Trajectory concatenate(Trajectory other) {
+    // If this is a default constructed trajectory with no states, then we can
+    // simply return the rhs trajectory.
+    if (m_states.isEmpty()) {
+      return other;
+    }
+
+    // Deep copy the current states.
+    List<State> states =
+        m_states.stream()
+            .map(
+                state ->
+                    new State(
+                        state.timeSeconds,
+                        state.velocityMetersPerSecond,
+                        state.accelerationMetersPerSecondSq,
+                        state.poseMeters,
+                        state.curvatureRadPerMeter))
+            .collect(Collectors.toList());
+
+    // Here we omit the first state of the other trajectory because we don't want
+    // two time points with different states. Sample() will automatically
+    // interpolate between the end of this trajectory and the second state of the
+    // other trajectory.
+    for (int i = 1; i < other.getStates().size(); ++i) {
+      var s = other.getStates().get(i);
+      states.add(
+          new State(
+              s.timeSeconds + m_totalTimeSeconds,
+              s.velocityMetersPerSecond,
+              s.accelerationMetersPerSecondSq,
+              s.poseMeters,
+              s.curvatureRadPerMeter));
+    }
+    return new Trajectory(states);
+  }
+
+  /**
    * Represents a time-parameterized trajectory. The trajectory contains of various States that
    * represent the pose, curvature, time elapsed, velocity, and acceleration at that point.
    */
