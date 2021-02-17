@@ -217,8 +217,8 @@ public class DifferentialDrivePoseEstimator {
    */
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     m_previousAngle = poseMeters.getRotation();
-    m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
     m_observer.setXhat(fillStateVector(poseMeters, 0.0, 0.0));
+    m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
   }
 
   /**
