@@ -105,8 +105,7 @@ public final class WaypointUtil {
 
   private static Pose2d createPoseWaypoint(String input) {
     String[] arrOfStr = input.split(",", 0);
-    // 8.21m is the Height of the field PathWeaver and traj use different starting points
-    return new Pose2d(new Translation2d(Double.parseDouble(arrOfStr[0]), 8.21 + Double.parseDouble(arrOfStr[1])),
+    return new Pose2d(new Translation2d(Double.parseDouble(arrOfStr[0]), Double.parseDouble(arrOfStr[1])),
        new Rotation2d(Double.parseDouble(arrOfStr[2]), Double.parseDouble(arrOfStr[3])));
   }
 
