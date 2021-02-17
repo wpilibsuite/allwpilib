@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
@@ -22,18 +24,21 @@ public class Trajectory {
 
   /** Constructs an empty trajectory. */
   public Trajectory() {
-    m_states = new ArrayList<>();
-    m_totalTimeSeconds = 0.0;
+    this(new ArrayList<>());
   }
 
   /**
    * Constructs a trajectory from a vector of states.
    *
-   * @param states A vector of states.
+   * @param states A vector of states. Must be non-null.
    */
   public Trajectory(final List<State> states) {
-    m_states = states;
-    m_totalTimeSeconds = m_states.get(m_states.size() - 1).timeSeconds;
+    m_states = requireNonNullParam(states, "states", "Trajectory");
+    if (m_states.size() > 0) {
+      m_totalTimeSeconds = m_states.get(m_states.size() - 1).timeSeconds;
+    } else {
+      m_totalTimeSeconds = 0.0;
+    }
   }
 
   /**
