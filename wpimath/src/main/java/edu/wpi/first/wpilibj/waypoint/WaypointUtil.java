@@ -9,8 +9,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -22,8 +20,6 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator.ControlVectorList;
 
 public final class WaypointUtil {
-  private static final Logger LOGGER = Logger.getLogger(WaypointUtil.class.getName());
-
   private WaypointUtil() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
@@ -36,7 +32,7 @@ public final class WaypointUtil {
    *
    * @return Trajectory created from the waypoints in the file.
    */
-  public static Trajectory importPathToCubicTrajectory(String filepath, TrajectoryConfig config) {
+  public static Trajectory importPathToCubicTrajectory(String filepath, TrajectoryConfig config) throws IOException {
     try (FileReader fr = new FileReader(new File(filepath));
       BufferedReader reader = new BufferedReader(fr)) {
       
@@ -49,7 +45,7 @@ public final class WaypointUtil {
 
       while ((line = reader.readLine()) != null) {
         if (loop == 0) {
-          if (line != "X,Y,Tangent X,Tangent Y,Fixed Theta,Reversed,Name") {
+          if (!line.equals("X,Y,Tangent X,Tangent Y,Fixed Theta,Reversed,Name")) {
             throw new RuntimeException("this isn’t a PathWeaver csv file");
           }  
         }
@@ -57,7 +53,7 @@ public final class WaypointUtil {
           start = createPoseWaypoint(line);
         }
         else if (loop == 2) {
-          ; // skip the second line because we are logging last
+          ; // skip the second line because we are logging the lastline and at 2 lastline is start
         }
         else {
           interiorWaypoints.add(createTranslationWaypoint(lastline));
@@ -72,9 +68,6 @@ public final class WaypointUtil {
             interiorWaypoints,
             end,
             config);
-    } catch (IOException except) {
-      LOGGER.log(Level.WARNING, "Could not read Path file", except);
-      return null;
     }
   }
 
@@ -86,7 +79,7 @@ public final class WaypointUtil {
    *
    * @return Trajectory created from the waypoints in the file.
    */
-  public static Trajectory importPathToQuinticTrajectory(String filepath, TrajectoryConfig config) {
+  public static Trajectory importPathToQuinticTrajectory(String filepath, TrajectoryConfig config) throws IOException {
     try (FileReader fr = new FileReader(new File(filepath));
       BufferedReader reader = new BufferedReader(fr)) {
       
@@ -96,7 +89,7 @@ public final class WaypointUtil {
 
       while ((line = reader.readLine()) != null) {
          if (loop == 0) {
-            if (line != "X,Y,Tangent X,Tangent Y,Fixed Theta,Reversed,Name") {
+            if (!line.equals("X,Y,Tangent X,Tangent Y,Fixed Theta,Reversed,Name")) {
               throw new RuntimeException("this isn’t a PathWeaver csv file");
             }
          }
@@ -107,9 +100,6 @@ public final class WaypointUtil {
       }
       return TrajectoryGenerator.generateTrajectory(controlVectors,            
             config);
-    } catch (IOException except) {
-      LOGGER.log(Level.WARNING, "Could not read Path file", except);
-      return null;
     }
   }
 
