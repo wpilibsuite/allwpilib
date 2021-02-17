@@ -131,10 +131,11 @@ class Rotation2d {
   /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
+   * <pre>
    * [cos_new]   [other.cos, -other.sin][cos]
    * [sin_new] = [other.sin,  other.cos][sin]
-   *
-   * value_new = std::atan2(cos_new, sin_new)
+   * value_new = std::atan2(sin_new, cos_new)
+   * </pre>
    *
    * @param other The rotation to rotate by.
    *
