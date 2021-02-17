@@ -4,23 +4,22 @@
 
 package edu.wpi.first.wpilibj.waypoint;
 
-import edu.wpi.first.pathweaver.path.Path;
-import edu.wpi.first.pathweaver.path.wpilib.WpilibPath;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
-
-import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javafx.geometry.Point2D;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.spline.Spline.ControlVector;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator.ControlVectorList;
 
 public final class WaypointUtil {
   private static final Logger LOGGER = Logger.getLogger(WaypointUtil.class.getName());
@@ -30,106 +29,44 @@ public final class WaypointUtil {
   }
 
   /**
-   * Exports path object to csv file.
-   *
-   * @param fileLocation the directory and filename to write to
-   * @param path         Path object to save
-   *
-   * @return true if successful file write was preformed
-   */
-  public static boolean export(String fileLocation, Path path, Double yoffset) {
-    try (
-        BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileLocation + path.getPathName()));
-
-        CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
-            .withHeader("X", "Y", "Tangent X", "Tangent Y", "Fixed Theta", "Reversed", "Name"))
-    ) {
-      for (Waypoint wp : path.getWaypoints()) {
-        double xPos = wp.getX();
-        double yPos = wp.getY() + yoffset;
-        double tangentX = wp.getTangentX();
-        double tangentY = wp.getTangentY();
-        String name = wp.getName();
-        csvPrinter.printRecord(xPos, yPos, tangentX, tangentY, wp.isLockTangent(), wp.isReversed(), name);
-      }
-      csvPrinter.flush();
-    } catch (IOException except) {
-      LOGGER.log(Level.WARNING, "Could not save Path file", except);
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Imports Path object from disk.
-   *
-   * @param fileLocation Folder with path file
-   * @param fileName     Name of path file
-   *
-   * @return Path object saved in Path file
-   */
-  public static Path importPath(String fileLocation, String fileName) {
-    try(Reader reader = Files.newBufferedReader(java.nio.file.Path.of(fileLocation, fileName));
-        CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
-                .withFirstRecordAsHeader()
-                .withIgnoreHeaderCase()
-                .withTrim())) {
-      ArrayList<Waypoint> waypoints = new ArrayList<>();
-      for (CSVRecord csvRecord : csvParser) {
-        Point2D position = new Point2D(
-                Double.parseDouble(csvRecord.get("X")),
-                Double.parseDouble(csvRecord.get("Y"))
-        );
-        Point2D tangent = new Point2D(
-                Double.parseDouble(csvRecord.get("Tangent X")),
-                Double.parseDouble(csvRecord.get("Tangent Y"))
-        );
-        boolean locked = Boolean.parseBoolean(csvRecord.get("Fixed Theta"));
-        boolean reversed = Boolean.parseBoolean(csvRecord.get("Reversed"));
-        Waypoint point = new Waypoint(position, tangent, locked, reversed);
-        if (csvRecord.isMapped("Name")) {
-          String name = csvRecord.get("Name");
-          point.setName(name);
-        }
-        waypoints.add(point);
-      }
-      return new WpilibPath(waypoints, fileName);
-    } catch (IOException except) {
-      LOGGER.log(Level.WARNING, "Could not read Path file", except);
-      return null;
-    }
-  }
-
-  /**
    * Imports Path object and creates a trajectory with that info.
    *
-   * @param fileLocation Folder with path file
-   * @param fileName     Name of path file
+   * @param filepath Full path to the file
+   * @param config TrajectoryConfig that sets the contraints for the Trajectory to be generated
    *
    * @return Trajectory created from the waypoints in the file.
    */
-  public static Trajectory importPathToTrajectory(String fileLocation, String fileName, TrajectoryConfig config) {
-    try(Reader reader = Files.newBufferedReader(java.nio.file.Path.of(fileLocation, fileName));
-        CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
-                .withFirstRecordAsHeader()
-                .withIgnoreHeaderCase()
-                .withTrim())) {
-      int loop = 0;
+  public static Trajectory importPathToCubicTrajectory(String filepath, TrajectoryConfig config) {
+    try (FileReader fr = new FileReader(new File(filepath));
+      BufferedReader reader = new BufferedReader(fr)) {
+      
+      var interiorWaypoints = new ArrayList<Translation2d>();
       Pose2d start = new Pose2d();
       Pose2d end = new Pose2d();
-      var interiorWaypoints = new ArrayList<Translation2d>();
-      for (CSVRecord csvRecord : csvParser) {
+      int loop = 0;
+      String line;
+      String lastline = "";
+
+      while ((line = reader.readLine()) != null) {
         if (loop == 0) {
-          start = createPoseWaypoint(csvRecord);
+          if (line != "X,Y,Tangent X,Tangent Y,Fixed Theta,Reversed,Name") {
+            throw new RuntimeException("this isn’t a PathWeaver csv file");
+          }  
         }
-        else if (loop == csvParser.Length - 1) {
-          end = createPoseWaypoint(csvRecord);
+        else if (loop == 1) {
+          start = createPoseWaypoint(line);
+        }
+        else if (loop == 2) {
+          ; // skip the second line because we are logging last
         }
         else {
-          interiorWaypoints.add(createTranslationWaypoint(csvRecord));
+          interiorWaypoints.add(createTranslationWaypoint(lastline));
         }
-        config.setReversed(Boolean.parseBoolean(csvRecord.get("Reversed")));
+        lastline = line;
+        loop++;
       }
+      end = createPoseWaypoint(lastline);
+
       return TrajectoryGenerator.generateTrajectory(
             start,
             interiorWaypoints,
@@ -141,12 +78,57 @@ public final class WaypointUtil {
     }
   }
 
-  private static Pose2d createPoseWaypoint(CSVRecord csvRecord) {
-    return new Pose2d(new Translation2d(Double.parseDouble(csvRecord.get("X")), Double.parseDouble(csvRecord.get("Y"))),
-       new Rotation2d(Double.parseDouble(csvRecord.get("Tangent X")), Double.parseDouble(csvRecord.get("Tangent Y"))));
+  /**
+   * Imports Path object and creates a trajectory with that info.
+   *
+   * @param filepath Full path to the file
+   * @param config TrajectoryConfig that sets the contraints for the Trajectory to be generated
+   *
+   * @return Trajectory created from the waypoints in the file.
+   */
+  public static Trajectory importPathToQuinticTrajectory(String filepath, TrajectoryConfig config) {
+    try (FileReader fr = new FileReader(new File(filepath));
+      BufferedReader reader = new BufferedReader(fr)) {
+      
+      ControlVectorList controlVectors = new ControlVectorList();
+      int loop = 0;
+      String line;
+
+      while ((line = reader.readLine()) != null) {
+         if (loop == 0) {
+            if (line != "X,Y,Tangent X,Tangent Y,Fixed Theta,Reversed,Name") {
+              throw new RuntimeException("this isn’t a PathWeaver csv file");
+            }
+         }
+         else {
+            controlVectors.add(createControlVector(line));
+         }
+         loop++;
+      }
+      return TrajectoryGenerator.generateTrajectory(controlVectors,            
+            config);
+    } catch (IOException except) {
+      LOGGER.log(Level.WARNING, "Could not read Path file", except);
+      return null;
+    }
   }
 
-  private static Translation2d createTranslationWaypoint(CSVRecord csvRecord) {
-    return new Translation2d(Double.parseDouble(csvRecord.get("X")), Double.parseDouble(csvRecord.get("Y")));
+  private static Pose2d createPoseWaypoint(String input) {
+    String[] arrOfStr = input.split(",", 0);
+    // 8.21m is the Height of the field PathWeaver and traj use different starting points
+    return new Pose2d(new Translation2d(Double.parseDouble(arrOfStr[0]), 8.21 + Double.parseDouble(arrOfStr[1])),
+       new Rotation2d(Double.parseDouble(arrOfStr[2]), Double.parseDouble(arrOfStr[3])));
+  }
+
+  private static Translation2d createTranslationWaypoint(String input) {
+    String[] arrOfStr = input.split(",", 0);
+    return new Translation2d(Double.parseDouble(arrOfStr[0]), Double.parseDouble(arrOfStr[1]));
+  }
+
+  private static ControlVector createControlVector(String input) {
+    String[] arrOfStr = input.split(",", 0);
+    double[] x = new double[] {Double.parseDouble(arrOfStr[0]), Double.parseDouble(arrOfStr[2])};
+    double[] y = new double[] {Double.parseDouble(arrOfStr[1]), Double.parseDouble(arrOfStr[3])};
+    return new ControlVector(x, y);
   }
 }
