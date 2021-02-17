@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <units/voltage.h>
+
 namespace frc {
 
 struct CANStatus {
@@ -54,6 +56,13 @@ class RobotController {
    * @return True if the button is currently pressed down
    */
   static bool GetUserButton();
+
+  /**
+   * Read the battery voltage.
+   *
+   * @return The battery voltage in Volts.
+   */
+  static units::volt_t GetBatteryVoltage();
 
   /**
    * Check if the FPGA outputs are enabled.

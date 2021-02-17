@@ -42,6 +42,13 @@ bool RobotController::GetUserButton() {
   return value;
 }
 
+units::volt_t RobotController::GetBatteryVoltage() {
+  int32_t status = 0;
+  double retVal = HAL_GetVinVoltage(&status);
+  wpi_setGlobalHALError(status);
+  return units::volt_t{retVal};
+}
+
 bool RobotController::IsSysActive() {
   int32_t status = 0;
   bool retVal = HAL_GetSystemActive(&status);
