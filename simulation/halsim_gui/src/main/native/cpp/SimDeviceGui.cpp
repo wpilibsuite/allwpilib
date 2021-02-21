@@ -159,6 +159,7 @@ void SimDeviceGui::Initialize() {
       [](glass::Window* win, glass::Model* model) {
         win->SetDefaultPos(1025, 20);
         win->SetDefaultSize(250, 695);
+        win->DisableRenamePopup();
         return glass::MakeFunctionView([=] {
           if (ImGui::BeginPopupContextItem()) {
             ImGui::Checkbox("Show prefix", &gSimDevicesShowPrefix);
