@@ -897,9 +897,11 @@ void PlotView::Display() {
       ++numAuto;
     }
   }
-  availHeight /= numAuto;
-  for (size_t i = 0; i < m_plots.size(); ++i) {
-    m_plots[i]->SetAutoHeight(availHeight);
+  if (numAuto > 0) {
+    availHeight /= numAuto;
+    for (size_t i = 0; i < m_plots.size(); ++i) {
+      m_plots[i]->SetAutoHeight(availHeight);
+    }
   }
 
   double now = wpi::Now() * 1.0e-6;
