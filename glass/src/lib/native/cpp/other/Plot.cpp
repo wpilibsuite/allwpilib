@@ -113,6 +113,15 @@ class Plot {
 
   std::vector<std::unique_ptr<PlotSeries>> m_series;
 
+  // Returns base height; does not include actual plot height if auto-sized.
+  int GetAutoBaseHeight(bool* isAuto, size_t i);
+
+  void SetAutoHeight(int height) {
+    if (m_autoHeight) {
+      m_height = height;
+    }
+  }
+
  private:
   void EmitSettingsLimits(int axis);
 
@@ -123,6 +132,7 @@ class Plot {
   bool m_lockPrevX = false;
   bool m_paused = false;
   float m_viewTime = 10;
+  bool m_autoHeight = true;
   int m_height = 300;
   struct PlotRange {
     double min = 0;
@@ -527,6 +537,13 @@ bool Plot::ReadIni(wpi::StringRef name, wpi::StringRef value) {
     }
     m_viewTime = num / 1000.0;
     return true;
+  } else if (name == "autoHeight") {
+    int num;
+    if (value.getAsInteger(10, num)) {
+      return true;
+    }
+    m_autoHeight = num != 0;
+    return true;
   } else if (name == "height") {
     int num;
     if (value.getAsInteger(10, num)) {
@@ -582,12 +599,12 @@ bool Plot::ReadIni(wpi::StringRef name, wpi::StringRef value) {
 void Plot::WriteIni(ImGuiTextBuffer* out) {
   out->appendf(
       "name=%s\nvisible=%d\nshowPause=%d\nlockPrevX=%d\nlegend=%d\n"
-      "yaxis2=%d\nyaxis3=%d\nviewTime=%d\nheight=%d\n",
+      "yaxis2=%d\nyaxis3=%d\nviewTime=%d\nautoHeight=%d\nheight=%d\n",
       m_name.c_str(), m_visible ? 1 : 0, m_showPause ? 1 : 0,
       m_lockPrevX ? 1 : 0, (m_plotFlags & ImPlotFlags_NoLegend) ? 0 : 1,
       (m_plotFlags & ImPlotFlags_YAxis2) ? 1 : 0,
       (m_plotFlags & ImPlotFlags_YAxis3) ? 1 : 0,
-      static_cast<int>(m_viewTime * 1000), m_height);
+      static_cast<int>(m_viewTime * 1000), m_autoHeight ? 1 : 0, m_height);
   for (int i = 0; i < 3; ++i) {
     out->appendf(
         "y%d_min=%d\ny%d_max=%d\ny%d_lockMin=%d\ny%d_lockMax=%d\n"
@@ -761,12 +778,32 @@ void Plot::EmitSettings(size_t i) {
   }
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
   ImGui::InputFloat("View Time (s)", &m_viewTime, 0.1f, 1.0f, "%.1f");
-  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
-  if (ImGui::InputInt("Height", &m_height, 10)) {
-    if (m_height < 0) {
-      m_height = 0;
+  ImGui::Checkbox("Auto Height", &m_autoHeight);
+  if (!m_autoHeight) {
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+    if (ImGui::InputInt("Height", &m_height, 10)) {
+      if (m_height < 0) {
+        m_height = 0;
+      }
     }
   }
+}
+
+int Plot::GetAutoBaseHeight(bool* isAuto, size_t i) {
+  *isAuto = m_autoHeight;
+
+  if (!m_visible) {
+    return 0;
+  }
+
+  int height = m_autoHeight ? 0 : m_height;
+
+  // Pause button
+  if ((i == 0 || !m_lockPrevX) && m_showPause) {
+    height += ImGui::GetFrameHeightWithSpacing();
+  }
+
+  return height;
 }
 
 void PlotView::Display() {
@@ -844,6 +881,25 @@ void PlotView::Display() {
       auto ref = static_cast<const PlotSeriesRef*>(payload->Data);
       MovePlot(ref->view, ref->plotIndex, 0);
     }
+    return;
+  }
+
+  // Auto-size plots.  This requires two passes: the first pass to get the
+  // total height, the second to actually set the height after averaging it
+  // across all auto-sized heights.
+  int availHeight = ImGui::GetContentRegionAvail().y;
+  int numAuto = 0;
+  for (size_t i = 0; i < m_plots.size(); ++i) {
+    bool isAuto;
+    availHeight -= m_plots[i]->GetAutoBaseHeight(&isAuto, i);
+    availHeight -= ImGui::GetStyle().ItemSpacing.y;
+    if (isAuto) {
+      ++numAuto;
+    }
+  }
+  availHeight /= numAuto;
+  for (size_t i = 0; i < m_plots.size(); ++i) {
+    m_plots[i]->SetAutoHeight(availHeight);
   }
 
   double now = wpi::Now() * 1.0e-6;
