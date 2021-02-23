@@ -68,9 +68,9 @@ class ExampleSmartMotorController : public frc::SpeedController {
    */
   void ResetEncoder() {}
 
-  void Set(double speed) override {}
+  void Set(double speed) override { m_value = speed; }
 
-  double Get() const override { return 0; }
+  double Get() const override { return m_value; }
 
   void SetInverted(bool isInverted) override {}
 
@@ -81,4 +81,7 @@ class ExampleSmartMotorController : public frc::SpeedController {
   void StopMotor() override {}
 
   void PIDWrite(double output) override {}
+
+ private:
+  double m_value = 0.0;
 };
