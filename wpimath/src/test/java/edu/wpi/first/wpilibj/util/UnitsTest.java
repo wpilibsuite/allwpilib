@@ -53,4 +53,14 @@ class UnitsTest extends UtilityClassTest<Units> {
   void radiansPerSecondToRotationsPerMinute() {
     assertEquals(76.39, Units.radiansPerSecondToRotationsPerMinute(8), 1e-2);
   }
+
+  @Test
+  void kilogramsToLbsTest() {
+    assertEquals(2.20462, Units.kilogramsToLbs(1), 1e-2);
+  }
+
+  @Test
+  void lbsToKilogramsTest() {
+    assertEquals(0.453592, Units.lbsToKilograms(1), 1e-2);
+  }
 }
