@@ -9,6 +9,7 @@ public final class Units {
   private static final double kInchesPerFoot = 12.0;
   private static final double kMetersPerInch = 0.0254;
   private static final double kSecondsPerMinute = 60;
+  private static final double kKilogramsPerLb = 0.453592;
 
   /** Utility class, so constructor is private. */
   private Units() {
@@ -93,5 +94,25 @@ public final class Units {
    */
   public static double radiansPerSecondToRotationsPerMinute(double radiansPerSecond) {
     return radiansPerSecond * (kSecondsPerMinute / 2) / Math.PI;
+  }
+
+  /**
+   * Converts kilograms into lbs (pound-mass).
+   *
+   * @param kilograms The kilograms to convert to lbs (pound-mass).
+   * @return Lbs (pound-mass) converted from kilograms.
+   */
+  public static double kilogramsToLbs(double kilograms) {
+    return kilograms / kKilogramsPerLb;
+  }
+
+  /**
+   * Converts lbs (pound-mass) into kilograms.
+   *
+   * @param lbs The lbs (pound-mass) to convert to kilograms.
+   * @return Kilograms converted from lbs (pound-mass).
+   */
+  public static double lbsToKilograms(double lbs) {
+    return lbs * kKilogramsPerLb;
   }
 }
